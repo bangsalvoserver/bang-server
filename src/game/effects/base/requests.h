@@ -128,7 +128,7 @@ namespace banggame {
         request_death(card *origin_card, player *origin, player *target)
             : request_base(origin_card, origin, target) {}
 
-        std::vector<card *> draw_attempts;
+        bool unavoidable = false;
         
         void on_resolve() override;
         game_formatted_string status_text(player *owner) const override;

@@ -296,7 +296,11 @@ namespace banggame {
 
     game_formatted_string request_death::status_text(player *owner) const {
         if (target == owner) {
-            return "STATUS_DEATH";
+            if (unavoidable) {
+                return "STATUS_DEATH_UNAVOIDABLE";
+            } else {
+                return "STATUS_DEATH";
+            }
         } else {
             return {"STATUS_DEATH_OTHER", target};
         }

@@ -201,7 +201,7 @@ namespace banggame {
 
     bool effect_deathsave::can_respond(card *origin_card, player *origin) const {
         if (auto *req = origin->m_game->top_request_if<request_death>(origin)) {
-            return req->draw_attempts.empty();
+            return !req->unavoidable;
         }
         return false;
     }
