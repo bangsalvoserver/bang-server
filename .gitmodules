@@ -1,0 +1,3 @@
+[submodule "external/cpputils"]
+	path = external/cpputils
+	url = https://github.com/salvoilmiosi/cpputils
