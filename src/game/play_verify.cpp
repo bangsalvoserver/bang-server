@@ -78,8 +78,8 @@ namespace banggame {
 
     opt_error play_card_verify::verify_modifiers() const {
         for (card *mod_card : modifiers) {
-            if (origin->m_game->is_disabled(mod_card)) {
-                return game_error("ERROR_CARD_IS_DISABLED", mod_card);
+            if (card *disabler = origin->m_game->get_disabler(mod_card)) {
+                return game_error("ERROR_CARD_DISABLED_BY", mod_card, disabler);
             }
             if (mod_card->modifier == card_modifier_type::bangmod && !card_ptr->effects.last_is(effect_type::bangcard)) {
                 return game_error("ERROR_INVALID_ACTION");
@@ -104,8 +104,8 @@ namespace banggame {
     }
 
     opt_error play_card_verify::verify_equip_target() const {
-        if (origin->m_game->is_disabled(card_ptr)) {
-            return game_error("ERROR_CARD_IS_DISABLED", card_ptr);
+        if (card *disabler = origin->m_game->get_disabler(card_ptr)) {
+            return game_error("ERROR_CARD_DISABLED_BY", card_ptr, disabler);
         }
         if (origin->m_game->has_scenario(scenario_flags::judge)) {
             return game_error("ERROR_CANT_EQUIP_CARDS");
@@ -155,8 +155,8 @@ namespace banggame {
     opt_error play_card_verify::verify_card_targets() const {
         auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
 
-        if (origin->m_game->is_disabled(card_ptr)) {
-            return game_error("ERROR_CARD_IS_DISABLED", card_ptr);
+        if (card *disabler = origin->m_game->get_disabler(card_ptr)) {
+            return game_error("ERROR_CARD_DISABLED_BY", card_ptr, disabler);
         }
         if (card_ptr->inactive) {
             return game_error("ERROR_CARD_INACTIVE", card_ptr);

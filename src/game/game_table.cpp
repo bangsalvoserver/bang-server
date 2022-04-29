@@ -239,10 +239,15 @@ namespace banggame {
         m_disablers.erase(key);
     }
 
-    bool game_table::is_disabled(card *target_card) const {
-        for (const auto &fun : m_disablers | std::views::values) {
-            if (fun(target_card)) return true;
+    card *game_table::get_disabler(card *target_card) {
+        for (auto &[card_key, fun] : m_disablers) {
+            if (fun(target_card)) return card_key.target_card;
         }
-        return false;
+        return nullptr;
     }
+
+    bool game_table::is_disabled(card *target_card) {
+        return get_disabler(target_card) != nullptr;
+    }
+
 }

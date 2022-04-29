@@ -92,16 +92,22 @@ namespace banggame {
     using event_function = enums::enum_variant<event_type>;
 
     struct event_card_key {
-        int card_id;
+        card *target_card;
         int priority;
 
         event_card_key(card *target_card, int priority = 0)
-            : card_id(target_card->id), priority(priority) {}
+            : target_card(target_card), priority(priority) {}
 
-        auto operator <=> (const event_card_key &other) const = default;
+        bool operator == (const event_card_key &other) const = default;
+
+        auto operator <=> (const event_card_key &other) const {
+            return target_card == other.target_card ?
+                priority <=> other.priority :
+                target_card->id <=> other.target_card->id;
+        }
 
         auto operator <=> (card *other) const {
-            return card_id <=> other->id;
+            return target_card->id <=> other->id;
         }
     };
 

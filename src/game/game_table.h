@@ -85,7 +85,9 @@ namespace banggame {
 
         void add_disabler(event_card_key key, card_disabler_fun &&fun);
         void remove_disablers(event_card_key key);
-        bool is_disabled(card *target_card) const;
+
+        card *get_disabler(card *target_card);
+        bool is_disabled(card *target_card);
 
         bool has_expansion(card_expansion_type type) const {
             using namespace enums::flag_operators;
