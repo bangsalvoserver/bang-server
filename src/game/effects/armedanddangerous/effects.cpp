@@ -111,13 +111,13 @@ namespace banggame {
     }
 
     void effect_bigfifty::on_play(card *origin_card, player *p) {
-        p->m_game->add_disabler(origin_card, [=](card *c) {
-            return (c->pocket == pocket_type::player_table
-                || c->pocket == pocket_type::player_character)
-                && c->owner != p;
-        });
         p->m_game->add_event<event_type::apply_bang_modifier>(origin_card, [=](player *origin, request_bang *req) {
             if (origin == p) {
+                origin->m_game->add_disabler(origin_card, [=](card *c) {
+                    return (c->pocket == pocket_type::player_table
+                        || c->pocket == pocket_type::player_character)
+                        && c->owner == req->target;
+                });
                 req->on_cleanup([=]{
                     p->m_game->remove_disablers(origin_card);
                 });
