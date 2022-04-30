@@ -42,10 +42,12 @@ set(bangnet_srcs
     src/server/ansicvt.cpp
 )
 
+find_package(Threads REQUIRED)
+
 find_package(Boost REQUIRED COMPONENTS system)
 add_library(asio INTERFACE)
 target_include_directories(asio INTERFACE ${Boost_INCLUDE_DIRS})
-target_link_libraries(asio INTERFACE ${Boost_LIBRARIES})
+target_link_libraries(asio INTERFACE Threads::Threads ${Boost_LIBRARIES})
 if(MINGW)
     target_link_libraries(asio INTERFACE wsock32 ws2_32)
 endif()
@@ -77,3 +79,5 @@ option(DEBUG_PRINT_GAME_UPDATES "Debug Option: Print Game Updates" OFF)
 if (DEBUG_PRINT_GAME_UPDATES)
     target_compile_definitions(banggame PUBLIC DEBUG_PRINT_GAME_UPDATES)
 endif()
+
+install(TARGETS banggame bangnet bangserver)
