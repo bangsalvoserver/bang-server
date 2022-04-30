@@ -7,7 +7,7 @@
 int main(int argc, char **argv) {
     boost::asio::io_context ctx;
 
-    bang_server server(ctx, std::filesystem::path(argv[0]).parent_path());
+    bang_server server(ctx);
     
     server.set_message_callback([](const std::string &message) {
         std::cout << message << '\n';

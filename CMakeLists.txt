@@ -61,9 +61,10 @@ else()
 endif()
 
 add_subdirectory(external/cpputils)
+add_subdirectory(resources)
 
 add_library(banggame SHARED ${banggame_srcs})
-target_link_libraries(banggame cpputils PkgConfig::jsoncpp)
+target_link_libraries(banggame cpputils bang_cards_json PkgConfig::jsoncpp)
 target_include_directories(banggame PUBLIC src)
 
 add_library(bangnet SHARED ${bangnet_srcs})

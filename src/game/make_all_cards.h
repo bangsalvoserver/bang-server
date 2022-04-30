@@ -26,7 +26,7 @@ namespace banggame {
         std::vector<card_deck_info> fistfulofcards;
         std::vector<card_deck_info> wildwestshow;
 
-        all_cards_t(const std::filesystem::path &path);
+        all_cards_t();
     };
 }
 

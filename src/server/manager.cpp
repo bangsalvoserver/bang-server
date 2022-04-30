@@ -12,9 +12,6 @@ struct lobby_error : std::runtime_error {
     using std::runtime_error::runtime_error;
 };
 
-game_manager::game_manager(const std::filesystem::path &base_path)
-    : all_cards(base_path) {}
-
 void game_manager::handle_message(int client_id, const client_message &msg) {
     try {
         enums::visit_indexed([&](enums::enum_tag_for<client_message_type> auto tag, auto && ... args) {

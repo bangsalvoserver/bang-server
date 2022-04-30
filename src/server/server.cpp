@@ -6,11 +6,10 @@
 
 #include <fmt/core.h>
 
-bang_server::bang_server(boost::asio::io_context &ctx, const std::filesystem::path &base_path)
+bang_server::bang_server(boost::asio::io_context &ctx)
     : m_ctx(ctx)
     , m_acceptor(ctx)
-    , m_mgr(nullptr, [](game_manager *value) { delete value; })
-    , m_base_path(base_path) {}
+    , m_mgr(nullptr, [](game_manager *value) { delete value; }) {}
 
 void bang_server::start_accepting() {
     m_acceptor.async_accept(
@@ -66,7 +65,7 @@ bool bang_server::start(uint16_t port) {
     start_accepting();
 
     m_game_thread = std::jthread([this](std::stop_token token) {
-        m_mgr.reset(new game_manager(m_base_path));
+        m_mgr.reset(new game_manager());
 
         using frames = std::chrono::duration<int64_t, std::ratio<1, banggame::fps>>;
         auto next_frame = std::chrono::steady_clock::now() + frames{0};

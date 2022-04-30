@@ -50,8 +50,6 @@ server_message make_message(Ts && ... args) {
 
 class game_manager {
 public:
-    game_manager(const std::filesystem::path &base_path);
-
     struct invalid_message {};
     
     void handle_message(int client_id, const client_message &msg);

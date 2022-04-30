@@ -19,7 +19,7 @@ struct game_manager;
 
 class bang_server {
 public:
-    bang_server(boost::asio::io_context &ctx, const std::filesystem::path &base_path);
+    bang_server(boost::asio::io_context &ctx);
 
     void set_message_callback(message_callback_t &&fun) {
         m_message_callback = std::move(fun);
@@ -51,8 +51,6 @@ private:
     std::map<int, connection_type::pointer> m_clients;
 
     int m_client_id_counter = 0;
-
-    std::filesystem::path m_base_path;
 
     std::jthread m_game_thread;
 

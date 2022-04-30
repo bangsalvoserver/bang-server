@@ -11,6 +11,8 @@
 
 #include "holders.h"
 
+DECLARE_RESOURCE(bang_cards_json)
+
 namespace banggame {
 
     using namespace enums::flag_operators;
@@ -107,15 +109,14 @@ namespace banggame {
 #endif
     }
 
-    all_cards_t::all_cards_t(const std::filesystem::path &base_path) {
+    all_cards_t::all_cards_t() {
         using namespace enums::flag_operators;
 
         Json::Value json_cards;
         {
-            auto cards_pak_stream = ifstream_or_throw(base_path / "cards.pak");
-            unpacker cards_pak(cards_pak_stream);
-            cards_pak.seek("bang_cards");
-            cards_pak_stream >> json_cards;
+            auto bang_cards_resource = GET_RESOURCE(bang_cards_json);
+            std::stringstream ss(std::string(bang_cards_resource.data, bang_cards_resource.length));
+            ss >> json_cards;
         }
 
         const auto is_disabled = [](const Json::Value &value) {
