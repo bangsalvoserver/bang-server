@@ -2,13 +2,16 @@
 #define __MANAGER_H__
 
 #include <json/json.h>
+#include <thread>
 
-#include "utils/binary_serial.h"
+#include "utils/tsqueue.h"
 
 #include "net_options.h"
 #include "net_enums.h"
 
-#include "game/game.h"
+#include "game.h"
+
+namespace banggame {
 
 class game_manager;
 class game_user;
@@ -35,9 +38,9 @@ struct game_user {
     lobby_ptr in_lobby{};
 };
 
-struct server_message_pair {
+struct client_message_pair {
     int client_id;
-    server_message value;
+    client_message value;
 };
 
 template<server_message_type E, typename ... Ts>
@@ -45,34 +48,44 @@ server_message make_message(Ts && ... args) {
     return server_message{enums::enum_tag<E>, std::forward<Ts>(args) ...};
 }
 
-#define MESSAGE_TAG(name) enums::enum_tag_t<client_message_type::name>
-#define HANDLE_MESSAGE(name, ...) handle_message(MESSAGE_TAG(name) __VA_OPT__(,) __VA_ARGS__)\
+#define MESSAGE_TAG(name) enums::enum_tag_t<banggame::client_message_type::name>
+#define HANDLE_MESSAGE(name, ...) handle_message(MESSAGE_TAG(name) __VA_OPT__(,) __VA_ARGS__)
+
+using send_message_function = std::function<void(int, server_message)>;
 
 class game_manager {
 public:
-    struct invalid_message {};
+    void on_receive_message(int client_id, client_message &&msg) {
+        m_in_queue.emplace_back(client_id, std::move(msg));
+    }
     
     void handle_message(int client_id, const client_message &msg);
-    int pending_messages();
-    server_message_pair pop_message();
 
     void client_disconnected(int client_id);
     bool client_validated(int client_id) const;
 
     template<server_message_type E, typename ... Ts>
     void send_message(int client_id, Ts && ... args) {
-        m_out_queue.emplace_back(client_id, make_message<E>(std::forward<Ts>(args) ... ));
+        m_send_message(client_id, make_message<E>(std::forward<Ts>(args) ... ));
+    }
+
+    void set_send_message_function(send_message_function &&fun) {
+        m_send_message = std::move(fun);
     }
 
     template<server_message_type E, typename ... Ts>
     void broadcast_message(const lobby &lobby, Ts && ... args) {
         auto msg = make_message<E>(std::forward<Ts>(args) ... );
         for (user_ptr it : lobby.users) {
-            m_out_queue.emplace_back(it->first, msg);
+            m_send_message(it->first, msg);
         }
     }
 
-    void tick();
+    void start();
+
+    void stop() {
+        m_game_thread.request_stop();
+    }
 
 private:
     lobby_data make_lobby_data(lobby_ptr it);
@@ -89,14 +102,20 @@ private:
     void HANDLE_MESSAGE(game_start,     user_ptr user);
     void HANDLE_MESSAGE(game_action,    user_ptr user, const banggame::game_action &value);
 
+    std::jthread m_game_thread;
+
     std::map<int, game_user> users;
     lobby_map m_lobbies;
 
     int m_lobby_counter = 0;
 
-    std::deque<server_message_pair> m_out_queue;
+    util::tsqueue<client_message_pair> m_in_queue;
+    
+    send_message_function m_send_message;
 
     banggame::all_cards_t all_cards;
 };
+
+}
 
 #endif

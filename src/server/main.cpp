@@ -1,21 +1,26 @@
 #include <iostream>
 #include <charconv>
 
+#include "game/net_options.h"
+
 #include "server.h"
-#include "net_options.h"
+
+struct console_bang_server : banggame::bang_server<console_bang_server> {
+    using banggame::bang_server<console_bang_server>::bang_server;
+
+    void print_message(const std::string &message) {
+        std::cout << message << '\n';
+    }
+
+    void print_error(const std::string &message) {
+        std::cerr << message << '\n';
+    }
+};
 
 int main(int argc, char **argv) {
     boost::asio::io_context ctx;
 
-    bang_server server(ctx);
-    
-    server.set_message_callback([](const std::string &message) {
-        std::cout << message << '\n';
-    });
-    
-    server.set_error_callback([](const std::string &message) {
-        std::cerr << message << '\n';
-    });
+    console_bang_server server(ctx);
 
     uint16_t port = banggame::default_server_port;
     if (argc > 1) {
@@ -28,8 +33,6 @@ int main(int argc, char **argv) {
 
     if (server.start(port)) {
         std::thread ctx_thread([&]{ ctx.run(); });
-
-        server.join();
         ctx_thread.join();
     }
 

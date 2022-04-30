@@ -19,8 +19,6 @@ void game_manager::handle_message(int client_id, const client_message &msg) {
                 handle_message(tag, client_id, std::forward<decltype(args)>(args) ...);
             } else if (auto it = users.find(client_id); it != users.end()) {
                 handle_message(tag, it, std::forward<decltype(args)>(args) ...);
-            } else {
-                throw invalid_message{};
             }
         }, msg);
     } catch (const lobby_error &e) {
@@ -30,29 +28,37 @@ void game_manager::handle_message(int client_id, const client_message &msg) {
     }
 }
 
-void game_manager::tick() {
-    for (auto it = m_lobbies.begin(); it != m_lobbies.end(); ++it) {
-        auto &l = it->second;
-        if (l.state == lobby_state::playing) {
-            l.game.tick();
+void game_manager::start() {
+    m_game_thread = std::jthread([this](std::stop_token token) {
+        using frames = std::chrono::duration<int64_t, std::ratio<1, banggame::fps>>;
+        auto next_frame = std::chrono::steady_clock::now() + frames{0};
+
+        while (!token.stop_requested()) {
+            next_frame += frames{1};
+
+            while (auto msg = m_in_queue.pop_front()) {
+                try {
+                    handle_message(msg->client_id, msg->value);
+                } catch (const std::exception &error) {
+                    // print_error(fmt::format("Error: {}", error.what()));
+                }
+            }
+
+            for (auto it = m_lobbies.begin(); it != m_lobbies.end(); ++it) {
+                auto &l = it->second;
+                if (l.state == lobby_state::playing) {
+                    l.game.tick();
+                }
+                l.send_updates(*this);
+                if (l.state == lobby_state::finished) {
+                    send_lobby_update(it);
+                }
+            }
+
+            std::this_thread::sleep_until(next_frame);
         }
-        l.send_updates(*this);
-        if (l.state == lobby_state::finished) {
-            send_lobby_update(it);
-        }
-    }
+    });
 }
-
-int game_manager::pending_messages() {
-    return m_out_queue.size();
-}
-
-server_message_pair game_manager::pop_message() {
-    auto msg = std::move(m_out_queue.front());
-    m_out_queue.pop_front();
-    return msg;
-}
-
 
 void game_manager::HANDLE_MESSAGE(connect, int client_id, const connect_args &args) {
     if (users.try_emplace(client_id, args.user_name, args.profile_image).second) {
@@ -73,7 +79,7 @@ lobby_data game_manager::make_lobby_data(lobby_ptr it) {
 void game_manager::send_lobby_update(lobby_ptr it) {
     auto msg = make_message<server_message_type::lobby_update>(make_lobby_data(it));
     for (int client_id : users | std::views::keys) {
-        m_out_queue.emplace_back(client_id, msg);
+        m_send_message(client_id, msg);
     }
 }
 

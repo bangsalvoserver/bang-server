@@ -34,12 +34,7 @@ set(banggame_srcs
     src/game/player.cpp
     src/game/play_verify.cpp
     src/game/possible_to_play.cpp
-)
-
-set(bangnet_srcs
-    src/server/server.cpp
-    src/server/manager.cpp
-    src/server/ansicvt.cpp
+    src/game/manager.cpp
 )
 
 find_package(Threads REQUIRED)
@@ -66,18 +61,15 @@ add_subdirectory(external/cpputils)
 add_subdirectory(resources)
 
 add_library(banggame SHARED ${banggame_srcs})
-target_link_libraries(banggame cpputils bang_cards_json PkgConfig::jsoncpp)
+target_link_libraries(banggame PUBLIC cpputils bang_cards_json PkgConfig::jsoncpp)
 target_include_directories(banggame PUBLIC src)
 
-add_library(bangnet SHARED ${bangnet_srcs})
-target_link_libraries(bangnet asio banggame)
-
 add_executable(bangserver src/server/main.cpp)
-target_link_libraries(bangserver bangnet)
+target_link_libraries(bangserver asio banggame)
 
 option(DEBUG_PRINT_GAME_UPDATES "Debug Option: Print Game Updates" OFF)
 if (DEBUG_PRINT_GAME_UPDATES)
     target_compile_definitions(banggame PUBLIC DEBUG_PRINT_GAME_UPDATES)
 endif()
 
-install(TARGETS banggame bangnet bangserver)
+install(TARGETS banggame bangserver)
