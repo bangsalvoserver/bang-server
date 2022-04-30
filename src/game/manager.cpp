@@ -28,36 +28,34 @@ void game_manager::handle_message(int client_id, const client_message &msg) {
     }
 }
 
-void game_manager::start() {
-    m_game_thread = std::jthread([this](std::stop_token token) {
-        using frames = std::chrono::duration<int64_t, std::ratio<1, banggame::fps>>;
-        auto next_frame = std::chrono::steady_clock::now() + frames{0};
+void game_manager::start(std::stop_token token) {
+    using frames = std::chrono::duration<int64_t, std::ratio<1, banggame::fps>>;
+    auto next_frame = std::chrono::steady_clock::now() + frames{0};
 
-        while (!token.stop_requested()) {
-            next_frame += frames{1};
+    while (!token.stop_requested()) {
+        next_frame += frames{1};
 
-            while (auto msg = m_in_queue.pop_front()) {
-                try {
-                    handle_message(msg->client_id, msg->value);
-                } catch (const std::exception &error) {
-                    // print_error(fmt::format("Error: {}", error.what()));
-                }
+        while (auto msg = m_in_queue.pop_front()) {
+            try {
+                handle_message(msg->client_id, msg->value);
+            } catch (const std::exception &error) {
+                // print_error(fmt::format("Error: {}", error.what()));
             }
-
-            for (auto it = m_lobbies.begin(); it != m_lobbies.end(); ++it) {
-                auto &l = it->second;
-                if (l.state == lobby_state::playing) {
-                    l.game.tick();
-                }
-                l.send_updates(*this);
-                if (l.state == lobby_state::finished) {
-                    send_lobby_update(it);
-                }
-            }
-
-            std::this_thread::sleep_until(next_frame);
         }
-    });
+
+        for (auto it = m_lobbies.begin(); it != m_lobbies.end(); ++it) {
+            auto &l = it->second;
+            if (l.state == lobby_state::playing) {
+                l.game.tick();
+            }
+            l.send_updates(*this);
+            if (l.state == lobby_state::finished) {
+                send_lobby_update(it);
+            }
+        }
+
+        std::this_thread::sleep_until(next_frame);
+    }
 }
 
 void game_manager::HANDLE_MESSAGE(connect, int client_id, const connect_args &args) {

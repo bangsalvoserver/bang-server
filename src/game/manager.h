@@ -81,11 +81,7 @@ public:
         }
     }
 
-    void start();
-
-    void stop() {
-        m_game_thread.request_stop();
-    }
+    void start(std::stop_token token);
 
 private:
     lobby_data make_lobby_data(lobby_ptr it);
@@ -101,8 +97,6 @@ private:
     void HANDLE_MESSAGE(lobby_return,   user_ptr user);
     void HANDLE_MESSAGE(game_start,     user_ptr user);
     void HANDLE_MESSAGE(game_action,    user_ptr user, const banggame::game_action &value);
-
-    std::jthread m_game_thread;
 
     std::map<int, game_user> users;
     lobby_map m_lobbies;

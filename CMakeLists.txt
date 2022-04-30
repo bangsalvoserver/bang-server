@@ -37,15 +37,7 @@ set(banggame_srcs
     src/game/manager.cpp
 )
 
-find_package(Threads REQUIRED)
-
-find_package(Boost REQUIRED COMPONENTS system)
-add_library(asio INTERFACE)
-target_include_directories(asio INTERFACE ${Boost_INCLUDE_DIRS})
-target_link_libraries(asio INTERFACE Threads::Threads ${Boost_LIBRARIES})
-if(MINGW)
-    target_link_libraries(asio INTERFACE wsock32 ws2_32)
-endif()
+find_package(Boost REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(jsoncpp REQUIRED jsoncpp IMPORTED_TARGET)
@@ -64,12 +56,9 @@ add_library(banggame SHARED ${banggame_srcs})
 target_link_libraries(banggame PUBLIC cpputils bang_cards_json PkgConfig::jsoncpp)
 target_include_directories(banggame PUBLIC src)
 
-add_executable(bangserver src/server/main.cpp)
-target_link_libraries(bangserver asio banggame)
-
 option(DEBUG_PRINT_GAME_UPDATES "Debug Option: Print Game Updates" OFF)
 if (DEBUG_PRINT_GAME_UPDATES)
     target_compile_definitions(banggame PUBLIC DEBUG_PRINT_GAME_UPDATES)
 endif()
 
-install(TARGETS banggame bangserver)
+install(TARGETS banggame)
