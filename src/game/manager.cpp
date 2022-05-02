@@ -25,6 +25,8 @@ void game_manager::handle_message(client_handle client, const client_message &ms
         send_message<server_message_type::lobby_error>(client, e.what());
     } catch (const game_error &e) {
         send_message<server_message_type::game_update>(client, enums::enum_tag_t<game_update_type::game_error>(), e);
+    } catch (const std::exception &e) {
+        print_error(fmt::format("Error in game_manager: {}", e.what()));
     }
 }
 
@@ -36,11 +38,7 @@ void game_manager::start(std::stop_token token) {
         next_frame += frames{1};
 
         while (auto msg = m_in_queue.pop_front()) {
-            try {
-                handle_message(msg->first, msg->second);
-            } catch (const std::exception &error) {
-                // print_error(fmt::format("Error: {}", error.what()));
-            }
+            handle_message(msg->first, msg->second);
         }
 
         for (auto it = m_lobbies.begin(); it != m_lobbies.end(); ++it) {

@@ -49,25 +49,37 @@ server_message make_message(Ts && ... args) {
 #define HANDLE_MESSAGE(name, ...) handle_message(MESSAGE_TAG(name) __VA_OPT__(,) __VA_ARGS__)
 
 using send_message_function = std::function<void(client_handle, server_message)>;
+using print_error_function = std::function<void(const std::string &message)>;
 
 class game_manager {
 public:
+    void set_send_message_function(send_message_function &&fun) {
+        m_send_message = std::move(fun);
+    }
+
+    void set_print_error_function(print_error_function &&fun) {
+        m_print_error = std::move(fun);
+    }
+
     void on_receive_message(client_handle client, client_message &&msg) {
         m_in_queue.emplace_back(client, std::move(msg));
     }
-    
-    void handle_message(client_handle client, const client_message &msg);
 
     void client_disconnected(client_handle client);
+    
     bool client_validated(client_handle client) const;
+
+    void start(std::stop_token token);
+
+private:
+    lobby_data make_lobby_data(lobby_ptr it);
+    void send_lobby_update(lobby_ptr it);
+
+    void handle_message(client_handle client, const client_message &msg);
 
     template<server_message_type E, typename ... Ts>
     void send_message(client_handle client, Ts && ... args) {
         m_send_message(client, make_message<E>(std::forward<Ts>(args) ... ));
-    }
-
-    void set_send_message_function(send_message_function &&fun) {
-        m_send_message = std::move(fun);
     }
 
     template<server_message_type E, typename ... Ts>
@@ -78,11 +90,11 @@ public:
         }
     }
 
-    void start(std::stop_token token);
-
-private:
-    lobby_data make_lobby_data(lobby_ptr it);
-    void send_lobby_update(lobby_ptr it);
+    void print_error(const std::string &message) {
+        if (m_print_error) {
+            m_print_error(message);
+        }
+    }
 
     void HANDLE_MESSAGE(connect,        client_handle client, const connect_args &value);
     void HANDLE_MESSAGE(lobby_list,     user_ptr user);
@@ -95,6 +107,7 @@ private:
     void HANDLE_MESSAGE(game_start,     user_ptr user);
     void HANDLE_MESSAGE(game_action,    user_ptr user, const banggame::game_action &value);
 
+private:
     user_map users;
     lobby_map m_lobbies;
 
@@ -104,8 +117,11 @@ private:
     util::tsqueue<std::pair<client_handle, client_message>> m_in_queue;
     
     send_message_function m_send_message;
+    print_error_function m_print_error;
 
     banggame::all_cards_t all_cards;
+
+    friend class lobby;
 };
 
 }
