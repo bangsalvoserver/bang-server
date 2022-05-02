@@ -16,7 +16,8 @@ namespace banggame {
 class game_manager;
 class game_user;
 
-using user_map = std::map<int, game_user>;
+using client_handle = std::weak_ptr<void>;
+using user_map = std::map<client_handle, game_user, std::owner_less<client_handle>>;
 using user_ptr = user_map::iterator;
 
 struct lobby : lobby_info {
@@ -33,13 +34,16 @@ using lobby_map = std::map<int, lobby>;
 using lobby_ptr = lobby_map::iterator;
 
 struct game_user {
+    static inline int user_id_counter = 0;
+
+    int user_id;
     std::string name;
     std::vector<std::byte> profile_image;
     lobby_ptr in_lobby{};
 };
 
 struct client_message_pair {
-    int client_id;
+    client_handle client;
     client_message value;
 };
 
@@ -51,22 +55,22 @@ server_message make_message(Ts && ... args) {
 #define MESSAGE_TAG(name) enums::enum_tag_t<banggame::client_message_type::name>
 #define HANDLE_MESSAGE(name, ...) handle_message(MESSAGE_TAG(name) __VA_OPT__(,) __VA_ARGS__)
 
-using send_message_function = std::function<void(int, server_message)>;
+using send_message_function = std::function<void(client_handle, server_message)>;
 
 class game_manager {
 public:
-    void on_receive_message(int client_id, client_message &&msg) {
-        m_in_queue.emplace_back(client_id, std::move(msg));
+    void on_receive_message(client_handle client, client_message &&msg) {
+        m_in_queue.emplace_back(client, std::move(msg));
     }
     
-    void handle_message(int client_id, const client_message &msg);
+    void handle_message(client_handle client, const client_message &msg);
 
-    void client_disconnected(int client_id);
-    bool client_validated(int client_id) const;
+    void client_disconnected(client_handle client);
+    bool client_validated(client_handle client) const;
 
     template<server_message_type E, typename ... Ts>
-    void send_message(int client_id, Ts && ... args) {
-        m_send_message(client_id, make_message<E>(std::forward<Ts>(args) ... ));
+    void send_message(client_handle client, Ts && ... args) {
+        m_send_message(client, make_message<E>(std::forward<Ts>(args) ... ));
     }
 
     void set_send_message_function(send_message_function &&fun) {
@@ -87,7 +91,7 @@ private:
     lobby_data make_lobby_data(lobby_ptr it);
     void send_lobby_update(lobby_ptr it);
 
-    void HANDLE_MESSAGE(connect,        int client_id, const connect_args &value);
+    void HANDLE_MESSAGE(connect,        client_handle client, const connect_args &value);
     void HANDLE_MESSAGE(lobby_list,     user_ptr user);
     void HANDLE_MESSAGE(lobby_make,     user_ptr user, const lobby_info &value);
     void HANDLE_MESSAGE(lobby_edit,     user_ptr user, const lobby_info &args);
@@ -98,7 +102,7 @@ private:
     void HANDLE_MESSAGE(game_start,     user_ptr user);
     void HANDLE_MESSAGE(game_action,    user_ptr user, const banggame::game_action &value);
 
-    std::map<int, game_user> users;
+    user_map users;
     lobby_map m_lobbies;
 
     int m_lobby_counter = 0;

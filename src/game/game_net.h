@@ -37,8 +37,8 @@ namespace banggame {
             m_targets.push_back(target);
         }
 
-        bool matches(int client_id) const {
-            return (std::ranges::find(m_targets, client_id, &player::client_id) != m_targets.end()) == m_inclusive;
+        bool matches(int user_id) const {
+            return (std::ranges::find(m_targets, user_id, &player::user_id) != m_targets.end()) == m_inclusive;
         }
     };
 

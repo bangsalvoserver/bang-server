@@ -13,7 +13,7 @@ namespace banggame {
     using namespace enums::flag_operators;
 
     player *game::find_disconnected_player() {
-        auto dc_view = std::ranges::filter_view(m_players, [](const player &p) { return p.client_id == 0; });
+        auto dc_view = std::ranges::filter_view(m_players, [](const player &p) { return p.user_id == 0; });
         if (dc_view.empty()) return nullptr;
 
         auto first_alive = std::ranges::find_if(dc_view, &player::alive);
@@ -101,7 +101,7 @@ namespace banggame {
             ADD_TO_RET(force_play_card, owner->m_forced_card->id);
         }
         for (const auto &[target, str] : m_saved_log) {
-            if (target.matches(owner ? owner->client_id : 0)) {
+            if (target.matches(owner ? owner->user_id : 0)) {
                 ADD_TO_RET(game_log, str);
             }
         }
