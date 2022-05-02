@@ -37,7 +37,7 @@ void game_manager::start(std::stop_token token) {
 
         while (auto msg = m_in_queue.pop_front()) {
             try {
-                handle_message(msg->client, msg->value);
+                handle_message(msg->first, msg->second);
             } catch (const std::exception &error) {
                 // print_error(fmt::format("Error: {}", error.what()));
             }
@@ -59,7 +59,7 @@ void game_manager::start(std::stop_token token) {
 }
 
 void game_manager::HANDLE_MESSAGE(connect, client_handle client, const connect_args &args) {
-    if (auto [it, inserted] = users.try_emplace(client, ++game_user::user_id_counter, args.user_name, args.profile_image); inserted) {
+    if (auto [it, inserted] = users.try_emplace(client, ++m_user_counter, args.user_name, args.profile_image); inserted) {
         send_message<server_message_type::client_accepted>(client, it->second.user_id);
     }
 }

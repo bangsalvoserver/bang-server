@@ -34,17 +34,10 @@ using lobby_map = std::map<int, lobby>;
 using lobby_ptr = lobby_map::iterator;
 
 struct game_user {
-    static inline int user_id_counter = 0;
-
     int user_id;
     std::string name;
     std::vector<std::byte> profile_image;
     lobby_ptr in_lobby{};
-};
-
-struct client_message_pair {
-    client_handle client;
-    client_message value;
 };
 
 template<server_message_type E, typename ... Ts>
@@ -106,8 +99,9 @@ private:
     lobby_map m_lobbies;
 
     int m_lobby_counter = 0;
+    int m_user_counter = 0;
 
-    util::tsqueue<client_message_pair> m_in_queue;
+    util::tsqueue<std::pair<client_handle, client_message>> m_in_queue;
     
     send_message_function m_send_message;
 
