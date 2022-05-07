@@ -7,7 +7,7 @@
 #include "utils/tsqueue.h"
 
 #include "net_options.h"
-#include "net_enums.h"
+#include "messages.h"
 
 #include "game.h"
 

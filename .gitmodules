@@ -1,3 +1,6 @@
 [submodule "external/cpputils"]
 	path = external/cpputils
 	url = https://github.com/salvoilmiosi/cpputils
+[submodule "external/websocketpp"]
+	path = external/websocketpp
+	url = http://github.com/zaphoyd/websocketpp

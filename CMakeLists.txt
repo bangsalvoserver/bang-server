@@ -37,7 +37,8 @@ set(banggame_srcs
     src/game/manager.cpp
 )
 
-find_package(Boost REQUIRED)
+find_package(Threads REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(jsoncpp REQUIRED jsoncpp IMPORTED_TARGET)
@@ -50,7 +51,16 @@ else()
 endif()
 
 add_subdirectory(external/cpputils)
+add_subdirectory(external/websocketpp)
 add_subdirectory(resources)
+
+add_library(asio INTERFACE)
+target_include_directories(asio INTERFACE ${Boost_INCLUDE_DIRS})
+target_include_directories(asio INTERFACE external/websocketpp)
+target_link_libraries(asio INTERFACE Threads::Threads ${Boost_LIBRARIES})
+if(MINGW)
+    target_link_libraries(asio INTERFACE wsock32 ws2_32)
+endif()
 
 add_library(banggame SHARED ${banggame_srcs})
 target_link_libraries(banggame PUBLIC cpputils bang_cards_json PkgConfig::jsoncpp)
@@ -61,4 +71,7 @@ if (DEBUG_PRINT_GAME_UPDATES)
     target_compile_definitions(banggame PUBLIC DEBUG_PRINT_GAME_UPDATES)
 endif()
 
-install(TARGETS banggame)
+add_executable(bangserver src/net/main.cpp)
+target_link_libraries(bangserver asio banggame)
+
+install(TARGETS banggame bangserver)

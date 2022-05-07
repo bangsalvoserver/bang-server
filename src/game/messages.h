@@ -1,5 +1,5 @@
-#ifndef __NET_ENUMS_H__
-#define __NET_ENUMS_H__
+#ifndef __MESSAGES_H__
+#define __MESSAGES_H__
 
 #include "game/game_update.h"
 
