@@ -85,13 +85,11 @@ public:
     }
 
     void push_message(client_handle con, const OutputMessage &msg) {
-        try {
-            std::stringstream ss;
-            ss << json::serialize(msg);
-            m_server.send(con, ss.str(), websocketpp::frame::opcode::text);
-        } catch (const std::exception &e) {
-            // ignore
-        }
+        Json::StreamWriterBuilder builder;
+        builder["indentation"] = "";
+        std::error_code ec;
+        m_server.send(con, Json::writeString(builder, json::serialize(msg)),
+            websocketpp::frame::opcode::text, ec);
     }
 
 };
