@@ -63,6 +63,10 @@ namespace banggame {
         move_cards(m_shop_selection, show_always);
         move_cards(m_hidden_deck, show_always);
 
+        if (!m_scenario_deck.empty()) {
+            ADD_TO_RET(move_scenario_deck, m_first_player->id);
+        }
+
         move_cards(m_scenario_deck, [&](const card &c) { return &c == m_scenario_deck.back(); });
         move_cards(m_scenario_cards, [&](const card &c) { return &c == m_scenario_cards.back(); });
         
