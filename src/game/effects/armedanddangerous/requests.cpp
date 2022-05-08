@@ -11,7 +11,7 @@ namespace banggame {
         } else if (pocket != pocket_type::player_table || target_card->color != card_color_type::orange) {
             return false;
         }
-        return target_player == target && target_card->cubes.size() < 4;
+        return target_player == target && target_card->num_cubes < max_cubes;
     }
 
     void request_add_cube::on_pick(pocket_type pocket, player *target_player, card *target_card) {
@@ -64,9 +64,9 @@ namespace banggame {
         if (target_player == target) {
             switch (pocket) {
             case pocket_type::player_character:
-                return !target_player->m_characters.front()->cubes.empty();
+                return target_player->m_characters.front()->num_cubes != 0;
             case pocket_type::player_table:
-                return !target_card->cubes.empty();
+                return target_card->num_cubes != 0;
             }
         }
         return false;

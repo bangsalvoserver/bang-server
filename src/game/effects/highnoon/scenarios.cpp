@@ -225,7 +225,7 @@ namespace banggame {
             target->m_game->move_card(target_card, pocket_type::player_character, target, show_card_flags::shown);
 
             target->enable_equip(target_card);
-            target->move_cubes(old_character, target_card, old_character->cubes.size());
+            target->move_cubes(old_character, target_card, old_character->num_cubes);
             target_card->on_equip(target);
             
             target->m_hp = 2;

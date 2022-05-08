@@ -152,17 +152,18 @@ namespace banggame {
     }
 
     void player::queue_request_add_cube(card *origin_card, int ncubes) {
-        int nslots = 4 - m_characters.front()->cubes.size();
+        int nslots = max_cubes - m_characters.front()->num_cubes;
         int ncards = nslots > 0;
         for (card *c : m_table) {
             if (c->color == card_color_type::orange) {
-                ncards += c->cubes.size() < 4;
-                nslots += 4 - c->cubes.size();
+                ncards += c->num_cubes < max_cubes;
+                nslots += max_cubes - c->num_cubes;
             }
         }
+        ncubes = std::min<int>(ncubes, m_game->num_cubes);
         if (nslots <= ncubes || ncards <= 1) {
             auto do_add_cubes = [&](card *c) {
-                int cubes_to_add = std::min<int>(ncubes, 4 - c->cubes.size());
+                int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes);
                 ncubes -= cubes_to_add;
                 add_cubes(c, cubes_to_add);
             };
@@ -187,12 +188,11 @@ namespace banggame {
     }
     
     void player::add_cubes(card *target, int ncubes) {
-        for (;ncubes!=0 && !m_game->m_cubes.empty() && target->cubes.size() < 4; --ncubes) {
-            int cube = m_game->m_cubes.back();
-            m_game->m_cubes.pop_back();
-
-            target->cubes.push_back(cube);
-            m_game->add_update<game_update_type::move_cube>(cube, target->id);
+        ncubes = std::min<int>({ncubes, m_game->num_cubes, max_cubes - target->num_cubes});
+        if (ncubes > 0) {
+            m_game->num_cubes -= ncubes;
+            target->num_cubes += ncubes;
+            m_game->add_update<game_update_type::move_cubes>(ncubes, 0, target->id);
         }
     }
 
@@ -201,19 +201,20 @@ namespace banggame {
     }
 
     void player::move_cubes(card *origin, card *target, int ncubes) {
-        for(;ncubes!=0 && !origin->cubes.empty(); --ncubes) {
-            int cube = origin->cubes.back();
-            origin->cubes.pop_back();
-            
-            if (target && target->cubes.size() < 4) {
-                target->cubes.push_back(cube);
-                m_game->add_update<game_update_type::move_cube>(cube, target->id);
-            } else {
-                m_game->m_cubes.push_back(cube);
-                m_game->add_update<game_update_type::move_cube>(cube, 0);
-            }
+        ncubes = std::min<int>(ncubes, origin->num_cubes);
+        if (target && ncubes > 0) {
+            int added_cubes = std::min<int>(ncubes, max_cubes - target->num_cubes);
+            target->num_cubes += added_cubes;
+            origin->num_cubes -= added_cubes;
+            ncubes -= added_cubes;
+            m_game->add_update<game_update_type::move_cubes>(added_cubes, origin->id, target->id);
         }
-        if (origin->sign && origin->cubes.empty()) {
+        if (ncubes > 0) {
+            origin->num_cubes -= ncubes;
+            m_game->num_cubes += ncubes;
+            m_game->add_update<game_update_type::move_cubes>(ncubes, origin->id, 0);
+        }
+        if (origin->sign && origin->num_cubes == 0) {
             m_game->add_log("LOG_DISCARDED_ORANGE_CARD", this, origin);
             disable_equip(origin);
             m_game->move_card(origin, pocket_type::discard_pile);
@@ -223,11 +224,11 @@ namespace banggame {
     }
 
     void player::drop_all_cubes(card *target) {
-        for (int id : target->cubes) {
-            m_game->m_cubes.push_back(id);
-            m_game->add_update<game_update_type::move_cube>(id, 0);
+        if (target->num_cubes > 0) {
+            m_game->num_cubes += target->num_cubes;
+            m_game->add_update<game_update_type::move_cubes>(target->num_cubes, target->id, 0);
+            target->num_cubes = 0;
         }
-        target->cubes.clear();
     }
 
     void player::add_to_hand(card *target) {
@@ -647,7 +648,11 @@ namespace banggame {
     }
 
     int player::count_cubes() const {
-        return m_characters.front()->cubes.size() + std::transform_reduce(m_table.begin(), m_table.end(), 0,
-            std::plus(), [](const card *c) { return c->cubes.size(); });
+        return m_characters.front()->num_cubes
+            + std::transform_reduce(
+                m_table.begin(),
+                m_table.end(),
+                0, std::plus(),
+                std::mem_fn(&card::num_cubes));
     }
 }

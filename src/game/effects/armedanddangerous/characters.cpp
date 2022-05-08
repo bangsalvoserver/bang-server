@@ -48,8 +48,11 @@ namespace banggame {
         if (target_card == origin->m_characters.front()) {
             return game_error("ERROR_INVALID_ACTION");
         }
-        if (target_card->cubes.empty()) {
+        if (target_card->num_cubes == 0) {
             return game_error("ERROR_NOT_ENOUGH_CUBES_ON", target_card);
+        }
+        if (origin->m_characters.front()->num_cubes >= max_cubes) {
+            return game_error("ERROR_CARD_HAS_FULL_CUBES", origin_card);
         }
         return std::nullopt;
     }
@@ -68,14 +71,14 @@ namespace banggame {
     }
 
     void effect_red_ringo::on_equip(card *target_card, player *target) {
-        target->add_cubes(target->m_characters.front(), 4);
+        target->add_cubes(target->m_characters.front(), max_cubes);
     }
 
     opt_error effect_red_ringo::verify(card *origin_card, player *origin, card *target_card) const {
-        if (origin->m_characters.front()->cubes.size() == 0) {
+        if (origin->m_characters.front()->num_cubes == 0) {
             return game_error("ERROR_NOT_ENOUGH_CUBES_ON", origin->m_characters.front());
         }
-        if (target_card->cubes.size() >= 4) {
+        if (target_card->num_cubes >= max_cubes) {
             return game_error("ERROR_CARD_HAS_FULL_CUBES", target_card);
         }
         return std::nullopt;

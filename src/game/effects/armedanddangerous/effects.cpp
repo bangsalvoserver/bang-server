@@ -23,7 +23,7 @@ namespace banggame {
     }
 
     opt_error effect_select_cube::verify(card *origin_card, player *origin, card *target) const {
-        if (target->cubes.size() < 1) {
+        if (target->num_cubes == 0) {
             return game_error("ERROR_NOT_ENOUGH_CUBES_ON", target);
         }
         return std::nullopt;
@@ -34,11 +34,11 @@ namespace banggame {
     }
 
     bool effect_pay_cube::can_respond(card *origin_card, player *origin) const {
-        return origin_card->cubes.size() >= ncubes;
+        return origin_card->num_cubes >= ncubes;
     }
 
     opt_error effect_pay_cube::verify(card *origin_card, player *origin) const {
-        if (origin_card->cubes.size() < ncubes) {
+        if (origin_card->num_cubes < ncubes) {
             return game_error("ERROR_NOT_ENOUGH_CUBES_ON", origin_card);
         }
         return std::nullopt;

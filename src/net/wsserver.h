@@ -40,6 +40,10 @@ public:
             websocketpp::log::alevel::frame_header);
     }
 
+    ~wsserver() {
+        m_server.stop_listening();
+    }
+
     bool start(uint16_t port) {
         m_server.set_open_handler([this](client_handle con) {
             std::scoped_lock lock(m_con_mutex);

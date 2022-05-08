@@ -41,7 +41,7 @@ namespace banggame {
         std::vector<card *> m_scenario_deck;
         std::vector<card *> m_scenario_cards;
         
-        std::vector<int> m_cubes;
+        int8_t num_cubes = 0;
 
         scenario_flags m_scenario_flags{};
         game_options m_options;

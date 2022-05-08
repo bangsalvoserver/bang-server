@@ -13,11 +13,13 @@ namespace banggame {
 
     struct game;
     struct player;
+
+    constexpr int max_cubes = 4;
     
     struct card : card_data {
         int8_t usages = 0;
         bool inactive = false;
-        std::vector<int> cubes;
+        int8_t num_cubes = 0;
 
         pocket_type pocket = pocket_type::none;
         player *owner = nullptr;

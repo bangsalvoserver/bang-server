@@ -42,9 +42,8 @@ namespace banggame {
 
                 if (do_show_card(*c)) {
                     ADD_TO_RET(show_card, *c, show_card_flags::instant);
-
-                    for (int id : c->cubes) {
-                        ADD_TO_RET(move_cube, id, c->id);
+                    if (c->num_cubes > 0) {
+                        ADD_TO_RET(add_cubes, c->num_cubes, c->id);
                     }
 
                     if (c->inactive) {
@@ -67,8 +66,8 @@ namespace banggame {
         move_cards(m_scenario_deck, [&](const card &c) { return &c == m_scenario_deck.back(); });
         move_cards(m_scenario_cards, [&](const card &c) { return &c == m_scenario_cards.back(); });
         
-        if (!m_cubes.empty()) {
-            ADD_TO_RET(add_cubes, m_cubes);
+        if (num_cubes > 0) {
+            ADD_TO_RET(add_cubes, num_cubes, 0);
         }
 
         for (auto &p : m_players) {
@@ -173,9 +172,8 @@ namespace banggame {
         }
 
         if (has_expansion(card_expansion_type::armedanddangerous)) {
-            auto cube_ids = std::views::iota(1, 32);
-            m_cubes.assign(cube_ids.begin(), cube_ids.end());
-            add_update<game_update_type::add_cubes>(m_cubes);
+            num_cubes = 32;
+            add_update<game_update_type::add_cubes>(num_cubes, 0);
         }
 
         std::vector<card *> last_scenario_cards;

@@ -40,12 +40,14 @@ namespace banggame {
     )};
 
     struct add_cubes_update {REFLECTABLE(
-        (std::vector<int>) cubes
+        (int) num_cubes,
+        (int) target_card_id
     )};
 
-    struct move_cube_update {REFLECTABLE(
-        (int) cube_id,
-        (int) card_id
+    struct move_cubes_update {REFLECTABLE(
+        (int) num_cubes,
+        (int) origin_card_id,
+        (int) target_card_id
     )};
 
     struct move_scenario_deck_args {REFLECTABLE(
@@ -144,7 +146,7 @@ namespace banggame {
         (remove_cards, remove_cards_update)
         (move_card, move_card_update)
         (add_cubes, add_cubes_update)
-        (move_cube, move_cube_update)
+        (move_cubes, move_cubes_update)
         (move_scenario_deck, move_scenario_deck_args)
         (deck_shuffled, pocket_type)
         (show_card, show_card_update)

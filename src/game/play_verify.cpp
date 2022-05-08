@@ -123,7 +123,7 @@ namespace banggame {
         if (auto *card = target->find_equipped_card(card_ptr)) {
             return game_error("ERROR_DUPLICATED_CARD", card);
         }
-        if (card_ptr->color == card_color_type::orange && origin->m_game->m_cubes.size() < 3) {
+        if (card_ptr->color == card_color_type::orange && origin->m_game->num_cubes < 3) {
             return game_error("ERROR_NOT_ENOUGH_CUBES");
         }
         return std::nullopt;
