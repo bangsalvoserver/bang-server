@@ -81,8 +81,37 @@ namespace banggame {
             if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return game_error("ERROR_CARD_DISABLED_BY", mod_card, disabler);
             }
-            if (mod_card->modifier == card_modifier_type::bangmod
-                && !card_ptr->has_tag(tag_type::bangcard) && !card_ptr->has_tag(tag_type::bangproxy)) {
+            switch(mod_card->modifier) {
+            case card_modifier_type::bangmod:
+            case card_modifier_type::bandolier:
+                if (!origin->is_bangcard(card_ptr) && !card_ptr->has_tag(tag_type::bangproxy))
+                    return game_error("ERROR_INVALID_ACTION");
+                break;
+            case card_modifier_type::leevankliff:
+                if (card_ptr != origin->m_last_played_card)
+                    return game_error("ERROR_INVALID_ACTION");
+                break;
+            case card_modifier_type::shopchoice:
+            case card_modifier_type::discount:
+                if (card_ptr->expansion != card_expansion_type::goldrush)
+                    return game_error("ERROR_INVALID_ACTION");
+                break;
+            case card_modifier_type::belltower:
+                switch (card_ptr->pocket) {
+                case pocket_type::player_hand:
+                    if (card_ptr->color != card_color_type::brown)
+                        return game_error("ERROR_INVALID_ACTION");
+                    break;
+                case pocket_type::player_table:
+                    if (card_ptr->effects.empty())
+                        return game_error("ERROR_INVALID_ACTION");
+                    break;
+                default:
+                    if (card_ptr->color == card_color_type::black)
+                        return game_error("ERROR_INVALID_ACTION");
+                }
+                break;
+            default:
                 return game_error("ERROR_INVALID_ACTION");
             }
             for (const auto &effect : mod_card->effects) {
@@ -456,6 +485,9 @@ namespace banggame {
         case pocket_type::player_hand:
             if (!modifiers.empty() && modifiers.front()->modifier == card_modifier_type::leevankliff) {
                 card *bang_card = std::exchange(card_ptr, origin->m_last_played_card);
+                if (!origin->is_bangcard(bang_card)) {
+                    return game_error("ERROR_INVALID_ACTION");
+                }
                 if (auto error = verify_modifiers()) {
                     return error;
                 } else if (auto error = verify_card_targets()) {
