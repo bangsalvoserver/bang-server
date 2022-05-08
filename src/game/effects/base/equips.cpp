@@ -12,12 +12,6 @@ namespace banggame {
         target->remove_predraw_check(target_card);
     }
 
-    void effect_max_hp::on_enable(card *target_card, player *target) {
-        if (target_card == target->m_characters.front()) {
-            target->m_max_hp = value + (target->m_role == player_role::sheriff);
-        }
-    }
-
     void effect_mustang::on_enable(card *target_card, player *target) {
         ++target->m_distance_mod;
         target->send_player_status();
@@ -85,7 +79,7 @@ namespace banggame {
     }
 
     static bool is_horse(const card *c) {
-        return c->equips.first_is(equip_type::horse);
+        return c->has_tag(tag_type::horse);
     }
 
     opt_fmt_str effect_horse::on_prompt(card *target_card, player *target) const {
@@ -101,10 +95,14 @@ namespace banggame {
             target->discard_card(*it);
         }
     }
+    
+    static bool is_weapon(card *c) {
+        return c->has_tag(tag_type::weapon);
+    }
 
     opt_fmt_str effect_weapon::on_prompt(card *target_card, player *target) const {
         if (target == target_card->owner) {
-            if (auto it = std::ranges::find_if(target->m_table, &card::is_weapon); it != target->m_table.end()) {
+            if (auto it = std::ranges::find_if(target->m_table, is_weapon); it != target->m_table.end()) {
                 return game_formatted_string{"PROMPT_REPLACE", target_card, *it};
             }
         }
@@ -112,7 +110,7 @@ namespace banggame {
     }
 
     void effect_weapon::on_equip(card *target_card, player *target) {
-        if (auto it = std::ranges::find_if(target->m_table, &card::is_weapon); it != target->m_table.end()) {
+        if (auto it = std::ranges::find_if(target->m_table, is_weapon); it != target->m_table.end()) {
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, *it);
             target->discard_card(*it);
         }

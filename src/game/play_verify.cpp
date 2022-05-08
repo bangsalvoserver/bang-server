@@ -57,16 +57,16 @@ namespace banggame {
         if (bool(filter & target_card_filter::clubs) && origin->get_card_sign(target).suit != card_suit::clubs)
             return game_error("ERROR_TARGET_NOT_CLUBS");
 
-        if (bool(filter & target_card_filter::bang) && !(target->equips.empty() && origin->is_bangcard(target)))
+        if (bool(filter & target_card_filter::bang) && !origin->is_bangcard(target))
             return game_error("ERROR_TARGET_NOT_BANG");
 
-        if (bool(filter & target_card_filter::missed) && !target->responses.last_is(effect_type::missedcard))
+        if (bool(filter & target_card_filter::missed) && !target->has_tag(tag_type::missedcard))
             return game_error("ERROR_TARGET_NOT_MISSED");
 
-        if (bool(filter & target_card_filter::beer) && !target->effects.first_is(effect_type::beer))
+        if (bool(filter & target_card_filter::beer) && !target->has_tag(tag_type::beer))
             return game_error("ERROR_TARGET_NOT_BEER");
 
-        if (bool(filter & target_card_filter::bronco) && !target->equips.last_is(equip_type::bronco))
+        if (bool(filter & target_card_filter::bronco) && !target->has_tag(tag_type::bronco))
             return game_error("ERROR_TARGET_NOT_BRONCO");
 
         if (bool(filter & (target_card_filter::cube_slot | target_card_filter::cube_slot_card))
@@ -81,7 +81,8 @@ namespace banggame {
             if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return game_error("ERROR_CARD_DISABLED_BY", mod_card, disabler);
             }
-            if (mod_card->modifier == card_modifier_type::bangmod && !card_ptr->effects.last_is(effect_type::bangcard)) {
+            if (mod_card->modifier == card_modifier_type::bangmod
+                && !card_ptr->has_tag(tag_type::bangcard) && !card_ptr->has_tag(tag_type::bangproxy)) {
                 return game_error("ERROR_INVALID_ACTION");
             }
             for (const auto &effect : mod_card->effects) {
@@ -188,10 +189,9 @@ namespace banggame {
         }
 
         int diff = targets.size() - effects.size();
-        if (card_ptr->optionals.last_is(effect_type::repeatable)) {
+        if (auto repeatable = card_ptr->get_tag_value(tag_type::repeatable)) {
             if (diff < 0 || diff % card_ptr->optionals.size() != 0
-                || (card_ptr->optionals.back().effect_value > 0
-                    && diff > (card_ptr->optionals.size() * card_ptr->optionals.back().effect_value)))
+                || (*repeatable > 0 && diff > (card_ptr->optionals.size() * *repeatable)))
             {
                 return game_error("ERROR_INVALID_TARGETS");
             }
@@ -546,7 +546,7 @@ namespace banggame {
                     --cost;
                     break;
                 case card_modifier_type::shopchoice:
-                    if (!c->effects.first_is(card_ptr->effects.front().type)) {
+                    if (c->get_tag_value(tag_type::shopchoice) != card_ptr->get_tag_value(tag_type::shopchoice)) {
                         return game_error("ERROR_INVALID_ACTION");
                     }
                     cost += c->buy_cost();

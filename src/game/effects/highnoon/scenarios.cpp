@@ -104,7 +104,7 @@ namespace banggame {
     void effect_reverend::on_enable(card *target_card, player *target) {
         target->m_game->add_disabler(target_card, [](card *c) {
             return c->pocket == pocket_type::player_hand
-                && c->effects.first_is(effect_type::beer);
+                && c->has_tag(tag_type::beer);
         });
     }
 
@@ -126,7 +126,7 @@ namespace banggame {
     void effect_sermon::on_enable(card *target_card, player *target) {
         target->m_game->add_event<event_type::pre_turn_start>(target_card, [=](player *p) {
             target->m_game->add_disabler(target_card, [=](card *c) {
-                return c->owner == p && c->effects.last_is(effect_type::bangcard);
+                return c->owner == p && c->has_tag(tag_type::bangcard);
             });
         });
         target->m_game->add_event<event_type::on_turn_end>(target_card, [=](player *p) {
@@ -147,7 +147,7 @@ namespace banggame {
         target->m_game->add_event<event_type::post_draw_cards>(target_card, [=](player *origin) {
             std::vector<card *> target_cards;
             for (card *c : origin->m_game->m_hidden_deck) {
-                if (c->responses.first_is(effect_type::handcuffschoice)) {
+                if (c->has_tag(tag_type::handcuffs)) {
                     target_cards.push_back(c);
                 }
             }
@@ -162,7 +162,7 @@ namespace banggame {
     }
 
     void request_handcuffs::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        auto declared_suit = static_cast<card_suit>(target_card->responses.front().effect_value);
+        auto declared_suit = static_cast<card_suit>(*target_card->get_tag_value(tag_type::handcuffs));
         switch (declared_suit) {
         case card_suit::clubs:
             target->m_game->add_log("LOG_DECLARED_CLUBS", target, origin_card);
@@ -224,6 +224,7 @@ namespace banggame {
             target->m_game->move_card(old_character, pocket_type::player_backup, target, show_card_flags::hidden);
             target->m_game->move_card(target_card, pocket_type::player_character, target, show_card_flags::shown);
 
+            target->reset_max_hp();
             target->enable_equip(target_card);
             target->move_cubes(old_character, target_card, old_character->num_cubes);
             target_card->on_equip(target);

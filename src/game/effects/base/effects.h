@@ -145,7 +145,7 @@ namespace banggame {
         bool can_respond(card *origin_card, player *origin) const;
     };
 
-    struct effect_drawing : effect_while_drawing {
+    struct effect_end_drawing : effect_while_drawing {
         void on_play(card *origin_card, player *origin);
     };
 

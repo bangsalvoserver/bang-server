@@ -153,6 +153,7 @@ namespace banggame {
         void next_predraw_check(card *target_card);
 
         void set_role(player_role role);
+        void reset_max_hp();
 
         void set_last_played_card(card *c);
 

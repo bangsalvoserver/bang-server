@@ -5,13 +5,6 @@
 
 namespace banggame {
 
-    struct effect_max_hp {
-        int value;
-        effect_max_hp(int value) : value(value) {}
-
-        void on_enable(card *target_card, player *target);
-    };
-
     struct effect_mustang {
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);

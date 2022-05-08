@@ -16,7 +16,7 @@ namespace banggame {
 
     void effect_indianguide::on_enable(card *target_card, player *p) {
         p->m_game->add_event<event_type::apply_immunity_modifier>(target_card, [p](card *origin_card, player *origin, bool &value) {
-            value = value || (origin == p && origin_card->effects.first_is(effect_type::indians));
+            value = value || (origin == p && origin_card->has_tag(tag_type::indians));
         });
     }
 
@@ -63,8 +63,7 @@ namespace banggame {
     }
 
     static bool is_discard_bronco(card *c) {
-        return c->effects.last_is(effect_type::destroy)
-            && bool(c->effects.back().card_filter & target_card_filter::bronco);
+        return c->has_tag(tag_type::bronco);
     }
 
     void effect_bronco::on_equip(card *origin_card, player *target) {

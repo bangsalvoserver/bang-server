@@ -59,7 +59,7 @@ namespace banggame {
         target->m_game->add_event<event_type::on_request_draw>(target_card, [=](player *p) {
             std::vector<card *> target_cards;
             for (card *c : p->m_game->m_hidden_deck) {
-                if (c->responses.first_is(effect_type::peyotechoice)) {
+                if (c->has_tag(tag_type::peyote)) {
                     target_cards.push_back(c);
                 }
             }
@@ -75,13 +75,15 @@ namespace banggame {
         auto *drawn_card = target->m_game->m_deck.back();
         target->m_game->send_card_update(drawn_card, nullptr, show_card_flags::short_pause);
 
-        if (target_card->responses.front().effect_value == 1) {
+        short choice = *target_card->get_tag_value(tag_type::peyote);
+
+        if (choice == 1) {
             target->m_game->add_log("LOG_DECLARED_RED", target, origin_card);
         } else {
             target->m_game->add_log("LOG_DECLARED_BLACK", target, origin_card);
         }
 
-        if ((target_card->responses.front().effect_value == 1)
+        if (choice == 1
             ? (drawn_card->sign.suit == card_suit::hearts || drawn_card->sign.suit == card_suit::diamonds)
             : (drawn_card->sign.suit == card_suit::clubs || drawn_card->sign.suit == card_suit::spades))
         {

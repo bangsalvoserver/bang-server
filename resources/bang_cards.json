@@ -55,6 +55,11 @@
                 {
                     "class": "mustang"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "horse"
+                }
             ]
         },
         {
@@ -86,6 +91,11 @@
                     "class": "weapon",
                     "value": 3
                 }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
+                }
             ]
         },
         {
@@ -99,6 +109,11 @@
                 {
                     "class": "weapon",
                     "value": 4
+                }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
                 }
             ]
         },
@@ -115,6 +130,11 @@
                 {
                     "class": "weapon",
                     "value": 2
+                }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
                 }
             ]
         },
@@ -134,6 +154,11 @@
                 {
                     "class": "volcanic"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
+                }
             ]
         },
         {
@@ -147,6 +172,11 @@
                 {
                     "class": "weapon",
                     "value": 5
+                }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
                 }
             ]
         },
@@ -195,6 +225,11 @@
                 {
                     "class": "bangresponse"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "bangcard"
+                }
             ]
         },
         {
@@ -220,6 +255,11 @@
                 },
                 {
                     "class": "deathsave"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "beer"
                 }
             ]
         },
@@ -313,6 +353,11 @@
                     "target": "other_players",
                     "class": "indians"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "indians"
+                }
             ]
         },
         {
@@ -334,6 +379,11 @@
             "image": "01_mancato",
             "color": "brown",
             "responses": [
+                {
+                    "class": "missed"
+                }
+            ],
+            "tags": [
                 {
                     "class": "missedcard"
                 }
@@ -441,6 +491,11 @@
                 {
                     "class": "mustang"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "horse"
+                }
             ]
         },
         {
@@ -456,6 +511,11 @@
                     "class": "weapon",
                     "value": 3
                 }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
+                }
             ]
         },
         {
@@ -470,6 +530,11 @@
                 {
                     "class": "weapon",
                     "value": 4
+                }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
                 }
             ]
         },
@@ -512,6 +577,11 @@
                 {
                     "class": "bangresponse"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "bangcard"
+                }
             ]
         },
         {
@@ -534,6 +604,11 @@
                 },
                 {
                     "class": "deathsave"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "beer"
                 }
             ]
         },
@@ -579,6 +654,11 @@
                     "target": "other_players",
                     "class": "indians"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "indians"
+                }
             ]
         },
         {
@@ -590,6 +670,11 @@
             "expansion": "dodgecity",
             "color": "brown",
             "responses": [
+                {
+                    "class": "missed"
+                }
+            ],
+            "tags": [
                 {
                     "class": "missedcard"
                 }
@@ -1014,6 +1099,14 @@
                     "player_filter": "reachable notself",
                     "class": "bangcard"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
+                },
+                {
+                    "class": "bangproxy"
+                }
             ]
         },
         {
@@ -1046,6 +1139,11 @@
                 },
                 {
                     "class": "shotgun"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
                 }
             ]
         },
@@ -1139,6 +1237,11 @@
                 {
                     "class": "backfire"
                 },
+                {
+                    "class": "missed"
+                }
+            ],
+            "tags": [
                 {
                     "class": "missedcard"
                 }
@@ -1259,6 +1362,11 @@
                 {
                     "class": "bangresponse"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "bangcard"
+                }
             ]
         },
         {
@@ -1292,7 +1400,9 @@
                 },
                 {
                     "class": "mth_add"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "repeatable"
                 }
@@ -1348,7 +1458,9 @@
                 },
                 {
                     "class": "mth_add"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "repeatable"
                 }
@@ -1381,7 +1493,9 @@
                     "target": "player",
                     "player_filter": "reachable notself",
                     "class": "bang"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "repeatable"
                 }
@@ -1446,9 +1560,14 @@
                     "target": "player",
                     "player_filter": "notself",
                     "class": "indians"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "repeatable"
+                },
+                {
+                    "class": "indians"
                 }
             ]
         },
@@ -1492,6 +1611,11 @@
             "expansion": "armedanddangerous",
             "color": "brown",
             "responses": [
+                {
+                    "class": "missed"
+                }
+            ],
+            "tags": [
                 {
                     "class": "missedcard"
                 }
@@ -1619,6 +1743,11 @@
                 {
                     "class": "bigfifty"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
+                }
             ]
         },
         {
@@ -1667,6 +1796,11 @@
                 },
                 {
                     "class": "buntlinespecial"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
                 }
             ]
         },
@@ -1746,6 +1880,11 @@
                 },
                 {
                     "class": "doublebarrel"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
                 }
             ]
         },
@@ -1829,6 +1968,11 @@
                 },
                 {
                     "class": "thunderer"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
                 }
             ]
         },
@@ -1938,6 +2082,11 @@
                     "class": "disarm"
                 },
                 {
+                    "class": "missed"
+                }
+            ],
+            "tags": [
+                {
                     "class": "missedcard"
                 }
             ]
@@ -1969,6 +2118,11 @@
             "color": "brown",
             "responses": [
                 {
+                    "class": "missed"
+                }
+            ],
+            "tags": [
+                {
                     "class": "missedcard"
                 }
             ]
@@ -1997,6 +2151,11 @@
             "responses": [
                 {
                     "class": "bangresponse"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "bangcard"
                 }
             ]
         },
@@ -2035,6 +2194,11 @@
                 },
                 {
                     "class": "deathsave"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "beer"
                 }
             ]
         },
@@ -2088,6 +2252,11 @@
                     "target": "other_players",
                     "class": "bang"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
+                }
             ]
         },
         {
@@ -2129,7 +2298,9 @@
                     "target": "card",
                     "player_filter": "self",
                     "class": "mth_add"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "repeatable",
                     "value": 2
@@ -2163,6 +2334,11 @@
                 {
                     "class": "weapon",
                     "value": 3
+                }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
                 }
             ]
         },
@@ -2214,6 +2390,14 @@
                 {
                     "class": "bronco"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "horse"
+                },
+                {
+                    "class": "bronco"
+                }
             ]
         },
         {
@@ -2231,6 +2415,11 @@
                 {
                     "class": "packmule"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "horse"
+                }
             ]
         },
         {
@@ -2244,6 +2433,11 @@
             "effects": [
                 {
                     "target": "other_players",
+                    "class": "indians"
+                }
+            ],
+            "tags": [
+                {
                     "class": "indians"
                 }
             ]
@@ -2273,7 +2467,7 @@
             "color": "brown",
             "responses": [
                 {
-                    "class": "missedcard"
+                    "class": "missed"
                 }
             ],
             "optional": [
@@ -2281,6 +2475,11 @@
                     "target": "player",
                     "player_filter": "notself range_1",
                     "class": "bang"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "missedcard"
                 }
             ]
         },
@@ -2319,6 +2518,11 @@
                 },
                 {
                     "class": "prompt_on_self_equip"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "weapon"
                 }
             ]
         },
@@ -2382,10 +2586,6 @@
             "image": "01_bartcassidy",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "boots"
                 }
             ]
@@ -2395,10 +2595,6 @@
             "image": "01_blackjack",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "black_jack"
                 }
             ]
@@ -2407,10 +2603,6 @@
             "name": "CALAMITY_JANET",
             "image": "01_calamityjanet",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "calamity_janet"
                 }
@@ -2430,6 +2622,11 @@
                     "player_filter": "reachable notself",
                     "class": "bangcard"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "bangproxy"
+                }
             ]
         },
         {
@@ -2437,26 +2634,22 @@
             "image": "01_elgringo",
             "equip": [
                 {
+                    "class": "el_gringo"
+                }
+            ],
+            "tags": [
+                {
                     "class": "max_hp",
                     "value": 3
-                },
-                {
-                    "class": "el_gringo"
                 }
             ]
         },
         {
             "name": "JESSE_JONES",
             "image": "01_jessejones",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "responses": [
                 {
-                    "class": "drawing"
+                    "class": "end_drawing"
                 },
                 {
                     "target": "card",
@@ -2467,17 +2660,16 @@
                 {
                     "class": "draw_one_less"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "drawing"
+                }
             ]
         },
         {
             "name": "JOURDONNAINS",
             "image": "01_jourdonnais",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "responses": [
                 {
                     "class": "barrel"
@@ -2489,10 +2681,6 @@
             "image": "01_kitcarlson",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "kit_carlson"
                 }
             ]
@@ -2501,10 +2689,6 @@
             "name": "LUCKY_DUKE",
             "image": "01_luckyduke",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "horsecharm"
                 }
@@ -2515,26 +2699,22 @@
             "image": "01_paulregret",
             "equip": [
                 {
+                    "class": "mustang"
+                }
+            ],
+            "tags": [
+                {
                     "class": "max_hp",
                     "value": 3
-                },
-                {
-                    "class": "mustang"
                 }
             ]
         },
         {
             "name": "PEDRO_RAMIREZ",
             "image": "01_pedroramirez",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "responses": [
                 {
-                    "class": "drawing"
+                    "class": "end_drawing"
                 },
                 {
                     "target": "player",
@@ -2544,16 +2724,17 @@
                 {
                     "class": "draw_one_less"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "drawing"
+                }
             ]
         },
         {
             "name": "ROSE_DOOLAN",
             "image": "01_rosedoolan",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "scope"
                 }
@@ -2562,12 +2743,6 @@
         {
             "name": "SID_KETCHUM",
             "image": "01_sidketchum",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "target": "card",
@@ -2611,10 +2786,6 @@
             "image": "01_slab",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "slab_the_killer"
                 }
             ]
@@ -2623,10 +2794,6 @@
             "name": "SUZY_LAFAYETTE",
             "image": "01_suzylafayette",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "suzy_lafayette"
                 }
@@ -2638,9 +2805,10 @@
             "image": "01_vulturesam",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
+                    "class": "vulture_sam"
+                }
+            ],
+            "tags": [
                 {
                     "class": "vulture_sam"
                 }
@@ -2650,10 +2818,6 @@
             "name": "WILLY_THE_KID",
             "image": "01_willythekid",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "volcanic"
                 }
@@ -2665,11 +2829,13 @@
             "expansion": "thebullet",
             "equip": [
                 {
+                    "class": "claus_the_saint"
+                }
+            ],
+            "tags": [
+                {
                     "class": "max_hp",
                     "value": 3
-                },
-                {
-                    "class": "claus_the_saint"
                 }
             ]
         },
@@ -2679,10 +2845,6 @@
             "expansion": "thebullet",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "johnny_kisch"
                 }
             ]
@@ -2691,12 +2853,6 @@
             "name": "UNCLE_WILL",
             "image": "02_unclewill",
             "expansion": "thebullet",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -2719,11 +2875,13 @@
             "expansion": "dodgecity",
             "equip": [
                 {
+                    "class": "calumet"
+                }
+            ],
+            "tags": [
+                {
                     "class": "max_hp",
                     "value": 3
-                },
-                {
-                    "class": "calumet"
                 }
             ]
         },
@@ -2732,10 +2890,6 @@
             "image": "03_belle_star",
             "expansion": "dodgecity",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "bellestar"
                 }
@@ -2747,10 +2901,6 @@
             "expansion": "dodgecity",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "bill_noface"
                 }
             ]
@@ -2759,12 +2909,6 @@
             "name": "CHUCK_WENGAM",
             "image": "03_chuck_wengam",
             "expansion": "dodgecity",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "target": "player",
@@ -2781,12 +2925,6 @@
             "name": "DOC_HOLYDAY",
             "image": "03_doc_holyday",
             "expansion": "dodgecity",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -2816,12 +2954,6 @@
             "name": "ELENA_FUENTE",
             "image": "03_elena_fuente",
             "expansion": "dodgecity",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 3
-                }
-            ],
             "responses": [
                 {
                     "target": "card",
@@ -2832,6 +2964,12 @@
                 {
                     "class": "missed"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "max_hp",
+                    "value": 3
+                }
             ]
         },
         {
@@ -2840,10 +2978,6 @@
             "image": "03_greg_digger",
             "expansion": "dodgecity",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "greg_digger"
                 }
@@ -2856,10 +2990,6 @@
             "expansion": "dodgecity",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "herb_hunter"
                 }
             ]
@@ -2868,12 +2998,6 @@
             "name": "JOSE_DELGADO",
             "image": "03_jose_delgado",
             "expansion": "dodgecity",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -2897,10 +3021,6 @@
             "expansion": "dodgecity",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "molly_stark"
                 }
             ]
@@ -2909,20 +3029,19 @@
             "name": "PAT_BRENNAN",
             "image": "03_pat_brennan",
             "expansion": "dodgecity",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "responses": [
                 {
-                    "class": "drawing"
+                    "class": "end_drawing"
                 },
                 {
                     "target": "card",
                     "card_filter": "table",
                     "class": "steal"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "drawing"
                 }
             ]
         },
@@ -2932,11 +3051,13 @@
             "expansion": "dodgecity",
             "equip": [
                 {
+                    "class": "pickaxe"
+                }
+            ],
+            "tags": [
+                {
                     "class": "max_hp",
                     "value": 3
-                },
-                {
-                    "class": "pickaxe"
                 }
             ]
         },
@@ -2946,12 +3067,14 @@
             "expansion": "dodgecity",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 3
-                },
-                {
                     "class": "gunbelt",
                     "value": 10
+                }
+            ],
+            "tags": [
+                {
+                    "class": "max_hp",
+                    "value": 3
                 }
             ]
         },
@@ -2960,10 +3083,6 @@
             "image": "03_tequila_joe",
             "expansion": "dodgecity",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "tequila_joe"
                 }
@@ -2975,11 +3094,13 @@
             "expansion": "dodgecity",
             "equip": [
                 {
+                    "class": "vera_custer"
+                }
+            ],
+            "tags": [
+                {
                     "class": "max_hp",
                     "value": 3
-                },
-                {
-                    "class": "vera_custer"
                 }
             ]
         },
@@ -2987,12 +3108,6 @@
             "name": "BLACK_FLOWER",
             "image": "07_blackflower",
             "expansion": "valleyofshadows",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -3017,10 +3132,6 @@
             "expansion": "valleyofshadows",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "colorado_bill"
                 }
             ]
@@ -3029,12 +3140,6 @@
             "name": "DER_SPOT_BURST_RINGER",
             "image": "07_derspot",
             "expansion": "valleyofshadows",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -3058,10 +3163,6 @@
             "expansion": "valleyofshadows",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "evelyn_shebang"
                 }
             ],
@@ -3082,10 +3183,6 @@
             "expansion": "valleyofshadows",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "henry_block"
                 }
             ]
@@ -3095,10 +3192,6 @@
             "image": "07_lemonadejim",
             "expansion": "valleyofshadows",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "lemonade_jim"
                 }
@@ -3122,12 +3215,6 @@
             "name": "MICK_DEFENDER",
             "image": "07_mickdefender",
             "expansion": "valleyofshadows",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "responses": [
                 {
                     "target": "card",
@@ -3146,11 +3233,13 @@
             "expansion": "valleyofshadows",
             "equip": [
                 {
+                    "class": "tuco_franziskaner"
+                }
+            ],
+            "tags": [
+                {
                     "class": "max_hp",
                     "value": 5
-                },
-                {
-                    "class": "tuco_franziskaner"
                 }
             ]
         },
@@ -3160,11 +3249,13 @@
             "expansion": "wildwestshow",
             "equip": [
                 {
+                    "class": "big_spencer"
+                }
+            ],
+            "tags": [
+                {
                     "class": "max_hp",
                     "value": 9
-                },
-                {
-                    "class": "big_spencer"
                 }
             ]
         },
@@ -3172,12 +3263,6 @@
             "name": "FLINT_WESTWOOD",
             "image": "06_flintwestwood",
             "expansion": "wildwestshow",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -3203,6 +3288,11 @@
             "image": "06_garylooter",
             "expansion": "wildwestshow",
             "equip": [
+                {
+                    "class": "gary_looter"
+                }
+            ],
+            "tags": [
                 {
                     "class": "max_hp",
                     "value": 5
@@ -3230,10 +3320,6 @@
             ],
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "greygory_deck"
                 }
             ]
@@ -3244,9 +3330,10 @@
             "expansion": "wildwestshow",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
+                    "class": "john_pain"
+                }
+            ],
+            "tags": [
                 {
                     "class": "john_pain"
                 }
@@ -3256,27 +3343,21 @@
             "name": "LEE_VAN_KLIFF",
             "image": "06_leevankliff",
             "expansion": "wildwestshow",
-            "modifier": "leevankliff",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ]
+            "modifier": "leevankliff"
         },
         {
             "name": "TEREN_KILL",
             "image": "06_terenkill",
             "expansion": "wildwestshow",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 3
-                }
-            ],
             "responses": [
                 {
                     "class": "teren_kill"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "max_hp",
+                    "value": 3
                 }
             ]
         },
@@ -3285,10 +3366,6 @@
             "image": "06_youlgrinner",
             "expansion": "wildwestshow",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "youl_grinner"
                 }
@@ -3299,10 +3376,6 @@
             "image": "17_alpreacher",
             "expansion": "armedanddangerous",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "al_preacher"
                 }
@@ -3332,12 +3405,6 @@
             "name": "BASS_GREEVES",
             "image": "17_bassgreeves",
             "expansion": "armedanddangerous",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -3364,10 +3431,6 @@
             "expansion": "armedanddangerous",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "bloody_mary"
                 }
             ]
@@ -3376,12 +3439,6 @@
             "name": "FRANKIE_CANTON",
             "image": "17_frankiecanton",
             "expansion": "armedanddangerous",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -3400,10 +3457,6 @@
             "expansion": "armedanddangerous",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "julie_cutter"
                 }
             ]
@@ -3412,12 +3465,6 @@
             "name": "MEXICALI_KID",
             "image": "17_mexicalikid",
             "expansion": "armedanddangerous",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -3448,10 +3495,6 @@
             "expansion": "armedanddangerous",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "ms_abigail"
                 }
             ],
@@ -3466,10 +3509,6 @@
             "image": "17_redringo",
             "expansion": "armedanddangerous",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 5
-                },
                 {
                     "class": "red_ringo"
                 }
@@ -3493,6 +3532,12 @@
                     "card_filter": "cube_slot_card table can_repeat",
                     "class": "red_ringo"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "max_hp",
+                    "value": 5
+                }
             ]
         },
         {
@@ -3500,10 +3545,6 @@
             "image": "04_don_bell",
             "expansion": "goldrush",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "don_bell"
                 }
@@ -3515,10 +3556,6 @@
             "expansion": "goldrush",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "dutch_will"
                 }
             ]
@@ -3527,12 +3564,6 @@
             "name": "JACKY_MURIETA",
             "image": "04_jacky_murieta",
             "expansion": "goldrush",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -3553,12 +3584,6 @@
             "name": "JOSH_MCCLOUD",
             "image": "04_josh_mccloud",
             "expansion": "goldrush",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "pay_gold",
@@ -3575,10 +3600,6 @@
             "expansion": "goldrush",
             "equip": [
                 {
-                    "class": "max_hp",
-                    "value": 4
-                },
-                {
                     "class": "madam_yto"
                 }
             ]
@@ -3588,12 +3609,6 @@
             "image": "04_pretty_luzena",
             "expansion": "goldrush",
             "modifier": "discount",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -3605,12 +3620,6 @@
             "name": "RADDIE_SNAKE",
             "image": "04_raddie_snake",
             "expansion": "goldrush",
-            "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                }
-            ],
             "effects": [
                 {
                     "class": "max_usages",
@@ -3630,10 +3639,6 @@
             "image": "04_simeon_picos",
             "expansion": "goldrush",
             "equip": [
-                {
-                    "class": "max_hp",
-                    "value": 4
-                },
                 {
                     "class": "luckycharm"
                 }
@@ -3767,9 +3772,9 @@
             "expansion": "thebullet",
             "name": "HANDCUFFS_HEARTS",
             "image": "05_manette_hearts",
-            "responses": [
+            "tags": [
                 {
-                    "class": "handcuffschoice",
+                    "class": "handcuffs",
                     "value": 1
                 }
             ]
@@ -3779,9 +3784,9 @@
             "expansion": "thebullet",
             "name": "HANDCUFFS_DIAMONDS",
             "image": "05_manette_diamonds",
-            "responses": [
+            "tags": [
                 {
-                    "class": "handcuffschoice",
+                    "class": "handcuffs",
                     "value": 2
                 }
             ]
@@ -3791,9 +3796,9 @@
             "expansion": "thebullet",
             "name": "HANDCUFFS_CLUBS",
             "image": "05_manette_clubs",
-            "responses": [
+            "tags": [
                 {
-                    "class": "handcuffschoice",
+                    "class": "handcuffs",
                     "value": 3
                 }
             ]
@@ -3803,9 +3808,9 @@
             "expansion": "thebullet",
             "name": "HANDCUFFS_SPADES",
             "image": "05_manette_spades",
-            "responses": [
+            "tags": [
                 {
-                    "class": "handcuffschoice",
+                    "class": "handcuffs",
                     "value": 4
                 }
             ]
@@ -3929,7 +3934,7 @@
             "image": "05_liquoreforte",
             "responses": [
                 {
-                    "class": "drawing"
+                    "class": "end_drawing"
                 },
                 {
                     "class": "heal"
@@ -3958,9 +3963,9 @@
             "hidden": true,
             "name": "PEYOTE_RED",
             "image": "05_peyote_rosso",
-            "responses": [
+            "tags": [
                 {
-                    "class": "peyotechoice",
+                    "class": "peyote",
                     "value": 1
                 }
             ]
@@ -3969,9 +3974,9 @@
             "hidden": true,
             "name": "PEYOTE_BLACK",
             "image": "05_peyote_nero",
-            "responses": [
+            "tags": [
                 {
-                    "class": "peyotechoice",
+                    "class": "peyote",
                     "value": 2
                 }
             ]
@@ -4002,7 +4007,9 @@
                 },
                 {
                     "class": "mth_add"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "repeatable"
                 }
@@ -4109,7 +4116,7 @@
                     "class": "heal"
                 }
             ],
-            "equip": [
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 1
@@ -4122,12 +4129,11 @@
             "image": "04_bottiglia",
             "color": "brown",
             "modifier": "shopchoice",
-            "effects": [
+            "tags": [
                 {
-                    "class": "bottle"
-                }
-            ],
-            "equip": [
+                    "class": "shopchoice",
+                    "value": 1
+                },
                 {
                     "class": "buy_cost",
                     "value": 2
@@ -4141,12 +4147,15 @@
             "color": "brown",
             "effects": [
                 {
-                    "class": "bottle"
-                },
-                {
                     "target": "card",
                     "player_filter": "range_1",
                     "class": "steal"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "shopchoice",
+                    "value": 1
                 }
             ]
         },
@@ -4157,10 +4166,13 @@
             "color": "brown",
             "effects": [
                 {
-                    "class": "bottle"
-                },
-                {
                     "class": "heal"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "shopchoice",
+                    "value": 1
                 }
             ]
         },
@@ -4171,12 +4183,15 @@
             "color": "brown",
             "effects": [
                 {
-                    "class": "bottle"
-                },
-                {
                     "target": "player",
                     "player_filter": "reachable notself",
                     "class": "bang"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "shopchoice",
+                    "value": 1
                 }
             ]
         },
@@ -4187,7 +4202,9 @@
             "equip": [
                 {
                     "class": "calumet"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 3
@@ -4202,7 +4219,9 @@
                 {
                     "class": "gunbelt",
                     "value": 8
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 2
@@ -4215,12 +4234,11 @@
             "image": "04_complice",
             "color": "brown",
             "modifier": "shopchoice",
-            "effects": [
+            "tags": [
                 {
-                    "class": "pardner"
-                }
-            ],
-            "equip": [
+                    "class": "shopchoice",
+                    "value": 2
+                },
                 {
                     "class": "buy_cost",
                     "value": 2
@@ -4234,10 +4252,13 @@
             "color": "brown",
             "effects": [
                 {
-                    "class": "pardner"
-                },
-                {
                     "class": "generalstore"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "shopchoice",
+                    "value": 2
                 }
             ]
         },
@@ -4248,12 +4269,15 @@
             "color": "brown",
             "effects": [
                 {
-                    "class": "pardner"
-                },
-                {
                     "target": "player",
                     "player_filter": "notself",
                     "class": "duel"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "shopchoice",
+                    "value": 2
                 }
             ]
         },
@@ -4264,11 +4288,14 @@
             "color": "brown",
             "effects": [
                 {
-                    "class": "pardner"
-                },
-                {
                     "target": "card",
                     "class": "destroy"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "shopchoice",
+                    "value": 2
                 }
             ]
         },
@@ -4284,7 +4311,7 @@
                     "class": "pass_turn"
                 }
             ],
-            "equip": [
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 5
@@ -4298,7 +4325,9 @@
             "equip": [
                 {
                     "class": "horsecharm"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 2
@@ -4312,7 +4341,9 @@
             "equip": [
                 {
                     "class": "pickaxe"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 4
@@ -4329,7 +4360,9 @@
                 {
                     "target": "player",
                     "class": "wanted"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 2
@@ -4346,7 +4379,7 @@
                     "class": "rum"
                 }
             ],
-            "equip": [
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 3
@@ -4370,7 +4403,7 @@
                     "class": "draw"
                 }
             ],
-            "equip": [
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 3
@@ -4384,7 +4417,9 @@
             "equip": [
                 {
                     "class": "boots"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 3
@@ -4398,7 +4433,9 @@
             "equip": [
                 {
                     "class": "luckycharm"
-                },
+                }
+            ],
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 3
@@ -4415,7 +4452,7 @@
                     "value": 4
                 }
             ],
-            "equip": [
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 4
@@ -4447,7 +4484,7 @@
                     "class": "deathsave"
                 }
             ],
-            "equip": [
+            "tags": [
                 {
                     "class": "buy_cost",
                     "value": 3
@@ -4518,6 +4555,11 @@
                     "player_filter": "notself",
                     "card_filter": "table bronco",
                     "class": "destroy"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "bronco"
                 }
             ]
         }

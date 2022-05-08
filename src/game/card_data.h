@@ -9,21 +9,9 @@
 
 namespace banggame {
 
-    template<typename Holder>
-    struct effect_list_base : std::vector<Holder> {
-        using enum_type = typename Holder::enum_type;
-
-        bool first_is(enum_type type) const {
-            return !this->empty() && this->front().is(type);
-        }
-
-        bool last_is(enum_type type) const {
-            return !this->empty() && this->back().is(type);
-        }
-    };
-
-    using effect_list = effect_list_base<effect_holder>;
-    using equip_list = effect_list_base<equip_holder>;
+    using effect_list = std::vector<effect_holder>;
+    using equip_list = std::vector<equip_holder>;
+    using tag_list = std::vector<tag_holder>;
 
     struct card_data {REFLECTABLE(
         (int) id,
@@ -35,6 +23,7 @@ namespace banggame {
         (effect_list) responses,
         (effect_list) optionals,
         (equip_list) equips,
+        (tag_list) tags,
 
         (card_expansion_type) expansion,
         (card_deck_type) deck,
@@ -46,8 +35,16 @@ namespace banggame {
         (card_color_type) color
     )
 
-        bool is_weapon() const {
-            return equips.first_is(equip_type::weapon);
+        bool has_tag(tag_type tag) const {
+            return std::ranges::find(tags, tag, &tag_holder::type) != tags.end();
+        }
+
+        std::optional<short> get_tag_value(tag_type tag) const {
+            if (auto it = std::ranges::find(tags, tag, &tag_holder::type); it != tags.end()) {
+                return it->tag_value;
+            } else {
+                return std::nullopt;
+            }
         }
 
         bool self_equippable() const {
@@ -55,7 +52,7 @@ namespace banggame {
         }
     
         short buy_cost() const {
-            return equips.last_is(equip_type::buy_cost) ? equips.back().effect_value : 0;
+            return get_tag_value(tag_type::buy_cost).value_or(0);
         }
     };
 

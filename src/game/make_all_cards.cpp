@@ -37,10 +37,10 @@ namespace banggame {
     }
 
     template<typename Holder>
-    static effect_list_base<Holder> make_effects_from_json(const Json::Value &json_effects) {
+    static std::vector<Holder> make_effects_from_json(const Json::Value &json_effects) {
         using enum_type = typename Holder::enum_type;
 
-        effect_list_base<Holder> ret;
+        std::vector<Holder> ret;
         for (const auto &json_effect : json_effects) {
             Holder effect;
             effect.type = string_to_enum_or_throw<enum_type>(json_effect["class"].asString());
@@ -70,6 +70,20 @@ namespace banggame {
 
         return ret;
     }
+
+    std::vector<tag_holder> make_tags_from_json(const Json::Value &json_tags) {
+        std::vector<tag_holder> ret;
+        for (const auto &json_tag : json_tags) {
+            tag_holder holder;
+            holder.type = string_to_enum_or_throw<tag_type>(json_tag["class"].asString());
+            
+            if (json_tag.isMember("value")) {
+                holder.tag_value = json_tag["value"].asInt();
+            }
+            ret.push_back(holder);
+        }
+        return ret;
+    }
     
     static void make_all_effects(card_deck_info &out, const Json::Value &json_card) {
         out.name = json_card["name"].asString();
@@ -92,6 +106,9 @@ namespace banggame {
             }
             if (json_card.isMember("multitarget")) {
                 out.multi_target_handler.type = string_to_enum_or_throw<mth_type>(json_card["multitarget"].asString());
+            }
+            if (json_card.isMember("tags")) {
+                out.tags = make_tags_from_json(json_card["tags"]);
             }
         } catch (const invalid_effect &e) {
             throw std::runtime_error(fmt::format("{}: {}", out.name, e.what()));

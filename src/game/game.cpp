@@ -327,6 +327,7 @@ namespace banggame {
             for (auto &p : m_players) {
                 add_log("LOG_CHARACTER_CHOICE", &p, p.m_characters.front());
                 send_card_update(p.m_characters.front(), &p, show_card_flags::instant | show_card_flags::shown);
+                p.reset_max_hp();
                 p.m_characters.front()->on_enable(&p);
                 p.m_hp = p.m_max_hp;
                 add_update<game_update_type::player_hp>(p.id, p.m_hp, false, true);

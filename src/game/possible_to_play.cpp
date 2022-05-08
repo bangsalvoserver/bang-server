@@ -64,7 +64,7 @@ namespace banggame {
                 holder.target = play_card_target_type::player;
                 holder.player_filter = target_player_filter::reachable | target_player_filter::notself;
                 return std::ranges::any_of(m_hand, [](card *c) {
-                    return c->equips.empty() && c->owner->is_bangcard(c);
+                    return c->owner->is_bangcard(c);
                 }) && !make_card_target_set(this, target_card, holder).empty();
             }
             default: return true;

@@ -277,8 +277,8 @@ namespace banggame {
 
     bool player::is_bangcard(card *card_ptr) {
         return (check_player_flags(player_flags::treat_missed_as_bang)
-                && card_ptr->responses.last_is(effect_type::missedcard))
-            || card_ptr->effects.last_is(effect_type::bangcard);
+                && card_ptr->has_tag(tag_type::missedcard))
+            || card_ptr->has_tag(tag_type::bangcard);
     };
 
     struct confirmer {
@@ -347,7 +347,7 @@ namespace banggame {
             break;
         case pocket_type::player_character:
             m_game->add_log(is_response ?
-                card_ptr->responses.first_is(effect_type::drawing)
+                card_ptr->has_tag(tag_type::drawing)
                     ? "LOG_DRAWN_WITH_CHARACTER"
                     : "LOG_RESPONDED_WITH_CHARACTER"
                 : "LOG_PLAYED_CHARACTER", card_ptr, this);
@@ -623,6 +623,10 @@ namespace banggame {
         } else {
             m_game->add_update<game_update_type::player_show_role>(update_target::includes(this), id, m_role, true);
         }
+    }
+
+    void player::reset_max_hp() {
+        m_max_hp = m_characters.front()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
     }
 
     void player::send_player_status() {

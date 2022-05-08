@@ -291,7 +291,7 @@ namespace banggame {
         return origin->m_game->top_request_is<request_draw>(origin);
     }
 
-    void effect_drawing::on_play(card *origin_card, player *origin) {
+    void effect_end_drawing::on_play(card *origin_card, player *origin) {
         if (origin->m_game->pop_request<request_draw>()) {
             origin->m_game->add_event<event_type::on_effect_end>(origin_card, [=](player *p, card *c) {
                 if (p == origin && c == origin_card) {

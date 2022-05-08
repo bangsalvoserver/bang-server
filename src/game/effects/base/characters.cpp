@@ -120,7 +120,7 @@ namespace banggame {
                     while (true) {
                         p = p->m_game->get_next_player(p);
                         if (p != target && std::ranges::any_of(p->m_characters, [](card *c) {
-                            return c->equips.last_is(equip_type::vulture_sam);
+                            return c->has_tag(tag_type::vulture_sam);
                         })) return p;
                     }
                 };

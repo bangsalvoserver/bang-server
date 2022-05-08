@@ -14,6 +14,7 @@ namespace banggame {
     void request_characterchoice::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
         target->m_game->move_card(target_card, pocket_type::player_character, target, show_card_flags::shown);
+        target->reset_max_hp();
         target_card->on_enable(target);
 
         target->m_hp = target->m_max_hp;
@@ -196,7 +197,7 @@ namespace banggame {
     }
 
     bool request_indians::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return pocket == pocket_type::player_hand && target_player == target && target_card->equips.empty() && target->is_bangcard(target_card);
+        return pocket == pocket_type::player_hand && target_player == target && target->is_bangcard(target_card);
     }
 
     void request_indians::on_pick(pocket_type pocket, player *target_player, card *target_card) {
@@ -221,7 +222,7 @@ namespace banggame {
     }
 
     bool request_duel::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return pocket == pocket_type::player_hand && target_player == target && target_card->equips.empty() && target->is_bangcard(target_card);
+        return pocket == pocket_type::player_hand && target_player == target && target->is_bangcard(target_card);
     }
 
     void request_duel::on_pick(pocket_type pocket, player *target_player, card *target_card) {

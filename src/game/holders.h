@@ -57,6 +57,11 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, const target_list &targets);
     };
 
+    struct tag_holder {REFLECTABLE(
+        (tag_type) type,
+        (short) tag_value
+    )};
+
     class request_holder {
     public:
         request_holder(std::shared_ptr<request_base> &&value)
