@@ -51,9 +51,6 @@ namespace banggame {
         if (target_card->num_cubes == 0) {
             return game_error("ERROR_NOT_ENOUGH_CUBES_ON", target_card);
         }
-        if (origin->m_characters.front()->num_cubes >= max_cubes) {
-            return game_error("ERROR_CARD_HAS_FULL_CUBES", origin_card);
-        }
         return std::nullopt;
     }
 
