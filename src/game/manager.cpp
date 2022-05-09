@@ -190,6 +190,7 @@ void game_manager::HANDLE_MESSAGE(lobby_leave, user_ptr user) {
 
     if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
         it->user_id = 0;
+        broadcast_message<server_message_type::game_update>(lobby, enums::enum_tag<game_update_type::player_add>, it->id, 0);
     }
     
     broadcast_message<server_message_type::lobby_remove_user>(lobby, user->second.user_id);

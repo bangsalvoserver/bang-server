@@ -41,7 +41,9 @@ public:
     }
 
     ~wsserver() {
-        m_server.stop_listening();
+        if (m_server.is_listening()) {
+            m_server.stop_listening();
+        }
     }
 
     bool start(uint16_t port) {

@@ -104,7 +104,7 @@ namespace banggame {
             ADD_TO_RET(force_play_card, owner->m_forced_card->id);
         }
         for (const auto &[target, str] : m_saved_log) {
-            if (target.matches(owner ? owner->user_id : 0)) {
+            if (target.matches(owner ? owner->user_id : -1)) {
                 ADD_TO_RET(game_log, str);
             }
         }
