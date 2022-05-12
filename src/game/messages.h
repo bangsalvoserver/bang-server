@@ -3,11 +3,27 @@
 
 #include "game/game_update.h"
 
+namespace sdl {
+    struct surface;
+
+    struct image_pixels {
+        REFLECTABLE(
+            (int) width,
+            (int) height,
+            (std::vector<std::byte>) pixels
+        )
+
+        image_pixels() = default;
+        image_pixels(const surface &);
+        operator surface() const;
+    };
+}
+
 namespace banggame {
 
     struct connect_args {REFLECTABLE(
         (std::string) user_name,
-        (std::vector<std::byte>) profile_image
+        (sdl::image_pixels) profile_image
     )};
 
     struct lobby_info {REFLECTABLE(
@@ -58,7 +74,7 @@ namespace banggame {
     struct lobby_add_user_args {REFLECTABLE(
         (int) user_id,
         (std::string) name,
-        (std::vector<std::byte>) profile_image
+        (sdl::image_pixels) profile_image
     )};
 
     struct lobby_entered_args {REFLECTABLE(

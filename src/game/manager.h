@@ -36,7 +36,7 @@ using lobby_ptr = lobby_map::iterator;
 struct game_user {
     int user_id;
     std::string name;
-    std::vector<std::byte> profile_image;
+    sdl::image_pixels profile_image;
     lobby_ptr in_lobby{};
 };
 
