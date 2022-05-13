@@ -4,7 +4,7 @@
 #include "wsbang.h"
 
 int main(int argc, char **argv) {
-    boost::asio::io_context ctx;
+    asio::io_context ctx;
 
     banggame::bang_server server(ctx);
 

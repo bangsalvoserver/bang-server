@@ -1,8 +1,7 @@
 #ifndef __WSCONNECTION_H__
 #define __WSCONNECTION_H__
 
-#include <boost/asio.hpp>
-
+#include <asio.hpp>
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 
@@ -23,7 +22,7 @@ namespace net {
         std::string m_address;
 
     public:
-        wsconnection(boost::asio::io_context &ctx) {
+        wsconnection(asio::io_context &ctx) {
             m_client.init_asio(&ctx);
             m_client.set_access_channels(websocketpp::log::alevel::none);
             m_client.set_error_channels(websocketpp::log::alevel::none);

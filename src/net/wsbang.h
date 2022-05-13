@@ -16,7 +16,7 @@ namespace banggame {
         game_manager m_mgr;
         std::jthread m_game_thread;
 
-        bang_server(boost::asio::io_context &ctx) : base(ctx) {
+        bang_server(asio::io_context &ctx) : base(ctx) {
             m_mgr.set_send_message_function([&](client_handle con, banggame::server_message msg) {
                 this->push_message(con, std::move(msg));
             });

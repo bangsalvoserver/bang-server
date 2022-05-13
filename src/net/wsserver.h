@@ -1,10 +1,10 @@
 #ifndef __WSSERVER_H__
 #define __WSSERVER_H__
 
-#include <boost/asio.hpp>
 #include <sstream>
 #include <set>
 
+#include <asio.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
@@ -31,7 +31,7 @@ private:
     }
 
 public:
-    wsserver(boost::asio::io_context &ctx) {
+    wsserver(asio::io_context &ctx) {
         m_server.init_asio(&ctx);
 
         m_server.set_access_channels(websocketpp::log::alevel::all);

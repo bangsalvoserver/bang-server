@@ -37,29 +37,17 @@ set(banggame_srcs
     src/game/manager.cpp
 )
 
-find_package(Threads REQUIRED)
-find_package(Boost REQUIRED COMPONENTS system)
-
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(jsoncpp REQUIRED jsoncpp IMPORTED_TARGET)
 
-find_package(fmt REQUIRED)
-if (TARGET fmt::fmt-header-only)
-    link_libraries(fmt::fmt-header-only)
-else()
-    link_libraries(fmt::fmt)
-endif()
-
 add_subdirectory(external/cpputils)
-add_subdirectory(external/websocketpp)
 add_subdirectory(resources)
 
-add_library(asio INTERFACE)
-target_include_directories(asio INTERFACE ${Boost_INCLUDE_DIRS})
-target_include_directories(asio INTERFACE external/websocketpp)
-target_link_libraries(asio INTERFACE Threads::Threads ${Boost_LIBRARIES})
+add_library(networking INTERFACE)
+target_include_directories(networking INTERFACE external/websocketpp)
+target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
 if(MINGW)
-    target_link_libraries(asio INTERFACE wsock32 ws2_32)
+    target_link_libraries(networking INTERFACE wsock32 ws2_32)
 endif()
 
 add_library(banggame SHARED ${banggame_srcs})
@@ -72,6 +60,6 @@ if (DEBUG_PRINT_GAME_UPDATES)
 endif()
 
 add_executable(bangserver src/net/main.cpp)
-target_link_libraries(bangserver asio banggame)
+target_link_libraries(bangserver networking banggame)
 
 install(TARGETS banggame bangserver)
