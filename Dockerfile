@@ -1,15 +1,18 @@
-FROM ubuntu
+FROM alpine:latest
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    g++ cmake ninja-build pkgconf libfmt-dev libjsoncpp-dev \
-    libboost-dev libboost-system-dev libasio-dev
+RUN apk update && apk add jsoncpp
+RUN apk add --no-cache --virtual .build_deps \
+    g++ cmake ninja pkgconf \
+    fmt-dev jsoncpp-dev boost-dev asio-dev
 
-COPY . /home/src
+COPY . /usr/src/bang
+WORKDIR /usr/src/bang/build
 
-RUN mkdir -p /home/src/build && cd /home/src/build && \
-    cmake -G Ninja .. && cmake --build . -j6 && cmake --install . && ldconfig
+RUN cmake -G Ninja -DCMAKE_BUILD_TYPE=Release .. && cmake --build .
+RUN cmake --install . && ldconfig /usr/local/lib
 
-RUN rm -rf /home/src
+WORKDIR /
+RUN rm -rf /usr/src/bang && apk del .build_deps
 
 EXPOSE 47654
 
