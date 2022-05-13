@@ -2,7 +2,7 @@ FROM alpine:latest
 
 RUN apk update && apk add jsoncpp
 RUN apk add --no-cache --virtual .build_deps \
-    g++ cmake ninja pkgconf fmt-dev jsoncpp-dev
+    g++ cmake ninja pkgconf linux-headers fmt-dev jsoncpp-dev
 
 COPY . /usr/src/bang
 WORKDIR /usr/src/bang/build
