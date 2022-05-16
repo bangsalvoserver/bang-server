@@ -1,5 +1,6 @@
 #include "make_all_cards.h"
 
+#include <cassert>
 #include <stdexcept>
 #include <iostream>
 
@@ -140,7 +141,7 @@ namespace banggame {
             return value.isMember("disabled") && value["disabled"].asBool();
         };
 
-        for (const auto &json_card : json_cards["cards"]) {
+        for (const auto &json_card : json_cards["main_deck"]) {
             if (is_disabled(json_card)) continue;
             card_deck_info c;
             c.deck = card_deck_type::main_deck;
@@ -150,8 +151,8 @@ namespace banggame {
             for (const auto &json_sign : json_card["signs"]) {
                 std::string str = json_sign.asString();
 
-                // assume no error
                 auto space = str.find(' ');
+                assert(space != std::string::npos);
                 c.sign.suit = *enums::from_string<card_suit>(str.substr(space + 1));
 
                 const auto &rank_letters = enums::enum_data_array_v<card_rank>;
@@ -161,7 +162,7 @@ namespace banggame {
             }
         }
 
-        for (const auto &json_character : json_cards["characters"]) {
+        for (const auto &json_character : json_cards["character"]) {
             if (is_disabled(json_character)) continue;
             card_deck_info c;
             c.deck = card_deck_type::character;
@@ -220,15 +221,6 @@ namespace banggame {
             c.expansion = card_expansion_type::wildwestshow | get_expansion(json_card);
             make_all_effects(c, json_card);
             wildwestshow.push_back(c);
-        }
-
-        for (const auto &json_card : json_cards["hidden"]) {
-            if (is_disabled(json_card)) continue;
-            card_deck_info c;
-            c.expansion = get_expansion(json_card);
-            if (json_card.isMember("color")) c.color = string_to_enum_or_throw<card_color_type>(json_card["color"].asString());
-            make_all_effects(c, json_card);
-            hidden.push_back(c);
         }
 
         for (const auto &json_card : json_cards["specials"]) {

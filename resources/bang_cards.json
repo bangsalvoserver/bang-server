@@ -1,5 +1,5 @@
 {
-    "cards": [
+    "main_deck": [
         {
             "name": "BARREL",
             "signs": [
@@ -2580,7 +2580,7 @@
             ]
         }
     ],
-    "characters": [
+    "character": [
         {
             "name": "BART_CASSIDY",
             "image": "01_bartcassidy",
@@ -4564,20 +4564,24 @@
             ]
         }
     ],
+    "backface": [
+        { "image": "character" },
+        { "image": "goldrush" },
+        { "image": "main_deck" },
+        { "image": "role" }
+    ],
+    "role": [
+        { "image": "deputy" },
+        { "image": "outlaw" },
+        { "image": "renegade" },
+        { "image": "sheriff" },
+        { "image": "deputy_3p" },
+        { "image": "outlaw_3p" },
+        { "image": "renegade_3p" }
+    ],
     "misc": [
-        { "image": "back_character" },
-        { "image": "back_goldrush" },
-        { "image": "back_maindeck" },
-        { "image": "back_role" },
         { "image": "card_border" },
         { "image": "card_mask" },
-        { "image": "role_deputy" },
-        { "image": "role_outlaw" },
-        { "image": "role_renegade" },
-        { "image": "role_sheriff" },
-        { "image": "role_deputy_3p" },
-        { "image": "role_outlaw_3p" },
-        { "image": "role_renegade_3p" },
         { "image": "suit_clubs" },
         { "image": "suit_diamonds" },
         { "image": "suit_hearts" },
