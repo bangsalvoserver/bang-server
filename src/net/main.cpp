@@ -19,7 +19,19 @@ int main(int argc, char **argv) {
 
     if (server.start(port)) {
         std::cout << "Server listening on port " << port << '\n';
-        ctx.run();
+
+        using frames = std::chrono::duration<int64_t, std::ratio<1, banggame::fps>>;
+        auto next_frame = std::chrono::steady_clock::now() + frames{0};
+
+        while (true) {
+            next_frame += frames{1};
+
+            ctx.poll();
+            server.tick();
+
+            std::this_thread::sleep_until(next_frame);
+        }
+
         return 0;
     } else {
         std::cerr << "Could not start server\n";

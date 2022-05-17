@@ -2,9 +2,6 @@
 #define __MANAGER_H__
 
 #include <json/json.h>
-#include <thread>
-
-#include "utils/tsqueue.h"
 
 #include "net_options.h"
 #include "messages.h"
@@ -61,21 +58,17 @@ public:
         m_print_error = std::move(fun);
     }
 
-    void on_receive_message(client_handle client, client_message &&msg) {
-        m_in_queue.emplace_back(client, std::move(msg));
-    }
+    void on_receive_message(client_handle client, const client_message &msg);
 
     void client_disconnected(client_handle client);
     
     bool client_validated(client_handle client) const;
 
-    void start(std::stop_token token);
+    void tick();
 
 private:
     lobby_data make_lobby_data(lobby_ptr it);
     void send_lobby_update(lobby_ptr it);
-
-    void handle_message(client_handle client, const client_message &msg);
 
     template<server_message_type E, typename ... Ts>
     void send_message(client_handle client, Ts && ... args) {
@@ -113,8 +106,6 @@ private:
 
     int m_lobby_counter = 0;
     int m_user_counter = 0;
-
-    util::tsqueue<std::pair<client_handle, client_message>> m_in_queue;
     
     send_message_function m_send_message;
     print_error_function m_print_error;

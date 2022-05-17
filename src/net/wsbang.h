@@ -22,18 +22,16 @@ namespace banggame {
             });
         }
 
-        bool start(uint16_t port = default_server_port) {
-            if (!base::start(port)) return false;
-            m_game_thread = std::jthread(std::bind_front(&game_manager::start, &m_mgr));
-            return true;
+        void tick() {
+            m_mgr.tick();
         }
 
         void on_disconnect(client_handle con) {
             m_mgr.client_disconnected(con);
         }
 
-        void on_message(client_handle con, client_message msg) {
-            m_mgr.on_receive_message(con, std::move(msg));
+        void on_message(client_handle con, const client_message &msg) {
+            m_mgr.on_receive_message(con, msg);
         }
     };
 

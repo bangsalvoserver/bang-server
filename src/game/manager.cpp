@@ -12,7 +12,7 @@ struct lobby_error : std::runtime_error {
     using std::runtime_error::runtime_error;
 };
 
-void game_manager::handle_message(client_handle client, const client_message &msg) {
+void game_manager::on_receive_message(client_handle client, const client_message &msg) {
     try {
         enums::visit_indexed([&](enums::enum_tag_for<client_message_type> auto tag, auto && ... args) {
             if constexpr (requires { handle_message(tag, client, std::forward<decltype(args)>(args) ...); }) {
@@ -30,29 +30,16 @@ void game_manager::handle_message(client_handle client, const client_message &ms
     }
 }
 
-void game_manager::start(std::stop_token token) {
-    using frames = std::chrono::duration<int64_t, std::ratio<1, banggame::fps>>;
-    auto next_frame = std::chrono::steady_clock::now() + frames{0};
-
-    while (!token.stop_requested()) {
-        next_frame += frames{1};
-
-        while (auto msg = m_in_queue.pop_front()) {
-            handle_message(msg->first, msg->second);
+void game_manager::tick() {
+    for (auto it = m_lobbies.begin(); it != m_lobbies.end(); ++it) {
+        auto &l = it->second;
+        if (l.state == lobby_state::playing) {
+            l.game.tick();
         }
-
-        for (auto it = m_lobbies.begin(); it != m_lobbies.end(); ++it) {
-            auto &l = it->second;
-            if (l.state == lobby_state::playing) {
-                l.game.tick();
-            }
-            l.send_updates(*this);
-            if (l.state == lobby_state::finished) {
-                send_lobby_update(it);
-            }
+        l.send_updates(*this);
+        if (l.state == lobby_state::finished) {
+            send_lobby_update(it);
         }
-
-        std::this_thread::sleep_until(next_frame);
     }
 }
 
