@@ -100,13 +100,16 @@ namespace banggame {
         if (!m_requests.empty()) {
             ADD_TO_RET(request_status, make_request_update(owner));
         }
-        if (owner && owner->m_forced_card) {
-            ADD_TO_RET(force_play_card, owner->m_forced_card->id);
-        }
         for (const auto &[target, str] : m_saved_log) {
             if (target.matches(owner ? owner->user_id : -1)) {
                 ADD_TO_RET(game_log, str);
             }
+        }
+        if (owner && owner->m_forced_card) {
+            ADD_TO_RET(force_play_card, owner->m_forced_card->id);
+        }
+        if (owner && owner->m_prompt) {
+            ADD_TO_RET(game_prompt, owner->m_prompt->second);
         }
 
 #undef ADD_TO_RET

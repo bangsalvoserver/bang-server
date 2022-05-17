@@ -283,7 +283,7 @@ namespace banggame {
 
     void player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, const pick_card_args &args) {
         if (m_prompt) {
-            throw game_error("ERROR_MUST_ANSWER_PROMPT");
+            throw game_error("ERROR_INVALID_ACTION");
         }
         
         if (m_game->m_requests.empty()) {
@@ -430,8 +430,8 @@ namespace banggame {
 
     void player::prompt_then(opt_fmt_str &&message, std::function<void()> &&fun) {
         if (message) {
+            m_prompt.emplace(std::move(fun), *message);
             m_game->add_update<game_update_type::game_prompt>(update_target::includes(this), std::move(*message));
-            m_prompt = std::move(fun);
         } else {
             m_game->add_update<game_update_type::confirm_play>(update_target::includes(this));
             std::invoke(fun);
@@ -445,9 +445,9 @@ namespace banggame {
 
         m_game->add_update<game_update_type::confirm_play>(update_target::includes(this));
         if (response) {
-            std::invoke(m_prompt);
+            std::invoke(m_prompt->first);
         }
-        m_prompt = nullptr;
+        m_prompt.reset();
     }
 
     void player::draw_from_deck() {
