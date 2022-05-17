@@ -77,6 +77,7 @@ namespace banggame {
     )
 
     DEFINE_ENUM_FLAGS(target_player_filter,
+        (any)
         (dead)
         (self)
         (notself)

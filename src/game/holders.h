@@ -10,22 +10,15 @@
 
 namespace banggame {
 
-    template<enums::reflected_enum E>
-    struct effect_base {
-        using enum_type = E;
-
+    struct effect_holder {
         REFLECTABLE(
             (play_card_target_type) target,
             (target_player_filter) player_filter,
             (target_card_filter) card_filter,
             (short) effect_value,
-            (enum_type) type
+            (effect_type) type
         )
 
-        bool is(enum_type value) const { return type == value; }
-    };
-
-    struct effect_holder : effect_base<effect_type> {
         bool can_respond(card *origin_card, player *target) const;
 
         opt_error verify(card *origin_card, player *origin) const;
@@ -41,7 +34,12 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags);
     };
     
-    struct equip_holder : effect_base<equip_type> {
+    struct equip_holder {
+        REFLECTABLE(
+            (short) effect_value,
+            (equip_type) type
+        )
+
         opt_fmt_str on_prompt(card *target_card, player *target) const;
         void on_equip(card *target_card, player *target);
         void on_enable(card *target_card, player *target);

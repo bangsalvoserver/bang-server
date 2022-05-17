@@ -37,14 +37,11 @@ namespace banggame {
         return {};
     }
 
-    template<typename Holder>
-    static std::vector<Holder> make_effects_from_json(const Json::Value &json_effects) {
-        using enum_type = typename Holder::enum_type;
-
-        std::vector<Holder> ret;
+    static effect_list make_effects_from_json(const Json::Value &json_effects) {
+        effect_list ret;
         for (const auto &json_effect : json_effects) {
-            Holder effect;
-            effect.type = string_to_enum_or_throw<enum_type>(json_effect["class"].asString());
+            effect_holder effect;
+            effect.type = string_to_enum_or_throw<effect_type>(json_effect["class"].asString());
 
             if (json_effect.isMember("value")) {
                 effect.effect_value = json_effect["value"].asInt();
@@ -72,6 +69,20 @@ namespace banggame {
         return ret;
     }
 
+    static equip_list make_equips_from_json(const Json::Value &json_equips) {
+        equip_list ret;
+        for (const auto &json_equip : json_equips) {
+            equip_holder equip;
+            equip.type = string_to_enum_or_throw<equip_type>(json_equip["class"].asString());
+
+            if (json_equip.isMember("value")) {
+                equip.effect_value = json_equip["value"].asInt();
+            }
+            ret.push_back(equip);
+        }
+        return ret;
+    }
+
     std::vector<tag_holder> make_tags_from_json(const Json::Value &json_tags) {
         std::vector<tag_holder> ret;
         for (const auto &json_tag : json_tags) {
@@ -91,16 +102,19 @@ namespace banggame {
         out.image = json_card["image"].asString();
         try {
             if (json_card.isMember("effects")) {
-                out.effects = make_effects_from_json<effect_holder>(json_card["effects"]);
+                out.effects = make_effects_from_json(json_card["effects"]);
             }
             if (json_card.isMember("responses")) {
-                out.responses = make_effects_from_json<effect_holder>(json_card["responses"]);
+                out.responses = make_effects_from_json(json_card["responses"]);
             }
             if (json_card.isMember("optional")) {
-                out.optionals = make_effects_from_json<effect_holder>(json_card["optional"]);
+                out.optionals = make_effects_from_json(json_card["optional"]);
+            }
+            if (json_card.isMember("equip_target")) {
+                out.equip_target = string_to_enum_or_throw<target_player_filter>(json_card["equip_target"].asString());
             }
             if (json_card.isMember("equip")) {
-                out.equips = make_effects_from_json<equip_holder>(json_card["equip"]);
+                out.equips = make_equips_from_json(json_card["equip"]);
             }
             if (json_card.isMember("modifier")) {
                 out.modifier = string_to_enum_or_throw<card_modifier_type>(json_card["modifier"].asString());

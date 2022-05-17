@@ -30,6 +30,7 @@ namespace banggame {
 
         (card_modifier_type) modifier,
         (mth_holder) multi_target_handler,
+        (target_player_filter) equip_target,
         
         (card_sign) sign,
         (card_color_type) color
@@ -48,7 +49,7 @@ namespace banggame {
         }
 
         bool self_equippable() const {
-            return equips.empty() || equips.front().target == play_card_target_type::none;
+            return equip_target == target_player_filter{};
         }
     
         short buy_cost() const {

@@ -15,7 +15,7 @@ namespace banggame {
 
     template<typename Holder, typename Function>
     static auto visit_effect(Function &&fun, Holder &holder) {
-        return enums::visit_enum([&]<typename Holder::enum_type E>(enums::enum_tag_t<E>) {
+        return enums::visit_enum([&]<decltype(Holder::type) E>(enums::enum_tag_t<E>) {
             if constexpr (enums::value_with_type<E>) {
                 using type = enums::enum_type_t<E>;
                 if constexpr (requires { type{holder.effect_value}; }) {

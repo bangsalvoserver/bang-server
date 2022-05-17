@@ -146,7 +146,7 @@ namespace banggame {
                 return game_error("ERROR_INVALID_ACTION");
             }
             target = std::get<target_player_t>(targets.front()).target;
-            if (auto error = check_player_filter(origin, card_ptr->equips.front().player_filter, target)) {
+            if (auto error = check_player_filter(origin, card_ptr->equip_target, target)) {
                 return error;
             }
         }
@@ -239,7 +239,7 @@ namespace banggame {
                 effect_end = card_ptr->optionals.end();
             }
 
-            if (e.is(effect_type::mth_add)) {
+            if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
             }
 
@@ -325,7 +325,7 @@ namespace banggame {
                 effect_end = card_ptr->optionals.end();
             }
 
-            if (e.is(effect_type::mth_add)) {
+            if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
             }
 
@@ -399,7 +399,7 @@ namespace banggame {
                 effect_end = card_ptr->optionals.end();
             }
 
-            if (e.is(effect_type::mth_add)) {
+            if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
             }
 
@@ -409,13 +409,13 @@ namespace banggame {
                 },
                 [this, &e](target_player_t args) {
                     if (args.target != origin && args.target->immune_to(origin->chosen_card_or(card_ptr))) {
-                        if (e.is(effect_type::bangcard)) {
+                        if (e.type == effect_type::bangcard) {
                             request_bang req{card_ptr, origin, args.target};
                             origin->m_game->call_event<event_type::apply_bang_modifier>(origin, &req);
                         }
                     } else {
                         auto flags = effect_flags::single_target;
-                        if (card_ptr->sign && card_ptr->color == card_color_type::brown && !e.is(effect_type::bangcard)) {
+                        if (card_ptr->sign && card_ptr->color == card_color_type::brown && e.type != effect_type::bangcard) {
                             flags |= effect_flags::escapable;
                         }
                         e.on_play(card_ptr, origin, args.target, flags);

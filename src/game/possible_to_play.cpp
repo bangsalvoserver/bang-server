@@ -7,10 +7,10 @@
 namespace banggame {
     using namespace enums::flag_operators;
 
-    static std::vector<player *> make_equip_set(player *origin, card *card, target_player_filter filter) {
+    static std::vector<player *> make_equip_set(player *origin, card *card) {
         std::vector<player *> ret;
         for (player &p : origin->m_game->m_players) {
-            if (!check_player_filter(origin, filter, &p) && !p.find_equipped_card(card)) {
+            if (!check_player_filter(origin, card->equip_target, &p) && !p.find_equipped_card(card)) {
                 ret.push_back(&p);
             }
         }
@@ -72,7 +72,7 @@ namespace banggame {
         } else {
             if (m_game->has_scenario(scenario_flags::judge)) return false;
             if (!target_card->self_equippable()) {
-                return !make_equip_set(this, target_card, target_card->equips.front().player_filter).empty();
+                return !make_equip_set(this, target_card).empty();
             }
             return true;
         }

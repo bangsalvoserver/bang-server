@@ -71,11 +71,13 @@
             ],
             "image": "01_prigione",
             "color": "blue",
+            "equip_target": "notsheriff",
             "equip": [
                 {
-                    "target": "player",
-                    "player_filter": "notsheriff",
                     "class": "jail"
+                },
+                {
+                    "class": "prompt_on_self_equip"
                 }
             ]
         },
@@ -1062,10 +1064,9 @@
             "image": "07_fantasma",
             "expansion": "valleyofshadows ghostcards",
             "color": "blue",
+            "equip_target": "dead",
             "equip": [
                 {
-                    "target": "player",
-                    "player_filter": "dead",
                     "class": "ghost"
                 }
             ]
@@ -1117,10 +1118,13 @@
             "image": "07_serpenteasonagli",
             "expansion": "valleyofshadows",
             "color": "blue",
+            "equip_target": "any",
             "equip": [
                 {
-                    "target": "player",
                     "class": "snake"
+                },
+                {
+                    "class": "prompt_on_self_equip"
                 }
             ]
         },
@@ -1155,10 +1159,13 @@
             "image": "07_taglia",
             "expansion": "valleyofshadows",
             "color": "blue",
+            "equip_target": "any",
             "equip": [
                 {
-                    "target": "player",
                     "class": "bounty"
+                },
+                {
+                    "class": "prompt_on_self_equip"
                 }
             ]
         },
@@ -1760,10 +1767,13 @@
             "image": "17_bomba",
             "expansion": "armedanddangerous",
             "color": "orange",
+            "equip_target": "any",
             "equip": [
                 {
-                    "target": "player",
                     "class": "bomb"
+                },
+                {
+                    "class": "prompt_on_self_equip"
                 }
             ],
             "responses": [
@@ -2270,12 +2280,7 @@
             "image": "20_ultimevolonta",
             "expansion": "canyondiablo",
             "color": "blue",
-            "equip": [
-                {
-                    "target": "player",
-                    "class": "none"
-                }
-            ],
+            "equip_target": "any",
             "responses": [
                 {
                     "class": "max_usages",
@@ -2352,10 +2357,13 @@
             "image": "20_esattore",
             "expansion": "canyondiablo",
             "color": "blue",
+            "equip_target": "any",
             "equip": [
                 {
-                    "target": "player",
                     "class": "taxman"
+                },
+                {
+                    "class": "prompt_on_self_equip"
                 }
             ]
         },
@@ -2367,10 +2375,13 @@
             "image": "20_bordello",
             "expansion": "canyondiablo",
             "color": "blue",
+            "equip_target": "any",
             "equip": [
                 {
-                    "target": "player",
                     "class": "brothel"
+                },
+                {
+                    "class": "prompt_on_self_equip"
                 }
             ]
         },
@@ -2512,9 +2523,9 @@
             "image": "20_chitarra",
             "expansion": "canyondiablo",
             "color": "blue",
+            "equip_target": "any",
             "equip": [
                 {
-                    "target": "player",
                     "class": "weapon",
                     "value": 0
                 },
@@ -2826,7 +2837,7 @@
             ]
         },
         {
-            "name": "Claus \"The Saint\"",
+            "name": "CLAUS_THE_SAINT",
             "image": "02_clausthesaint",
             "expansion": "thebullet",
             "equip": [
@@ -4358,9 +4369,9 @@
             "name": "WANTED",
             "image": "04_ricercato",
             "color": "black",
+            "equip_target": "any",
             "equip": [
                 {
-                    "target": "player",
                     "class": "wanted"
                 }
             ],
