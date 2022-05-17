@@ -83,7 +83,7 @@ namespace banggame {
         });
     }
 
-    bool effect_missed::can_respond(card *origin_card, player *origin) const {
+    bool effect_missedlike::can_respond(card *origin_card, player *origin) const {
         if (auto *req = origin->m_game->top_request_if<missable_request>(origin)) {
             return req->can_respond(origin_card);
         }

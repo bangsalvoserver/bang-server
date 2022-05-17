@@ -126,16 +126,22 @@ namespace banggame {
         });
     }
 
-    void effect_flintlock::on_play(card *origin_card, player *p) {
-        p->m_game->add_event<event_type::on_missed>(origin_card, [=](card *origin_card, player *origin, player *target, bool is_bang) {
-            if (origin == p) {
-                origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
-                origin->add_to_hand(origin_card);
-            }
-        });
-        p->m_game->top_request().get<request_bang>().on_cleanup([=]{
-            p->m_game->remove_events(origin_card);
-        });
+    void handler_flintlock::on_play(card *origin_card, player *origin, const target_list &targets) {
+        player *target = std::get<target_player_t>(targets[0]).target;
+        origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
+        auto req = std::make_shared<request_bang>(origin_card, origin, target, effect_flags::escapable | effect_flags::single_target);
+        if (targets.size() > 1) {
+            origin->m_game->add_event<event_type::on_missed>(origin_card, [=](card *origin_card, player *p, player *target, bool is_bang) {
+                if (origin == p) {
+                    origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
+                    origin->add_to_hand(origin_card);
+                }
+            });
+            req->on_cleanup([=]{
+                origin->m_game->remove_events(origin_card);
+            });
+        }
+        origin->m_game->queue_request(std::move(req));
     }
 
     opt_error effect_bandolier::verify(card *origin_card, player *origin) const {
@@ -145,10 +151,12 @@ namespace banggame {
         return std::nullopt;
     }
 
-    void effect_duck::on_play(card *origin_card, player *origin) {
-        origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
-        origin->add_to_hand(origin_card);
-        origin->m_game->update_request();
+    void handler_duck::on_play(card *origin_card, player *origin, const target_list &targets) {
+        if (!targets.empty()) {
+            origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
+            origin->add_to_hand(origin_card);
+        }
+        effect_missed().on_play(origin_card, origin);
     }
 
     opt_error handler_squaw::verify(card *origin_card, player *origin, const target_list &targets) const {

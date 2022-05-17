@@ -60,16 +60,16 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
-    struct effect_flintlock {
-        void on_play(card *origin_card, player *origin);
+    struct handler_flintlock {
+        void on_play(card *origin_card, player *origin, const target_list &targets);
     };
 
     struct effect_bandolier : effect_empty {
         opt_error verify(card *origin_card, player *origin) const;
     };
 
-    struct effect_duck {
-        void on_play(card *origin_card, player *origin);
+    struct handler_duck {
+        void on_play(card *origin_card, player *origin, const target_list &targets);
     };
 
     struct handler_squaw {

@@ -48,9 +48,13 @@ namespace banggame {
     struct effect_duel {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
-    
-    struct effect_missed {
+
+    struct effect_missedlike {
         bool can_respond(card *origin_card, player *origin) const;
+        void on_play(card *origin_card, player *origin) {}
+    };
+    
+    struct effect_missed : effect_missedlike {
         void on_play(card *origin_card, player *origin);
     };
 

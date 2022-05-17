@@ -1513,7 +1513,7 @@
                 {
                     "target": "player",
                     "player_filter": "reachable notself",
-                    "class": "bang"
+                    "class": "mth_add"
                 }
             ],
             "optional": [
@@ -1530,9 +1530,10 @@
                     "class": "select_cube"
                 },
                 {
-                    "class": "flintlock"
+                    "class": "mth_add"
                 }
-            ]
+            ],
+            "multitarget": "flintlock"
         },
         {
             "name": "ARROW",
@@ -1581,7 +1582,7 @@
             "color": "brown",
             "responses": [
                 {
-                    "class": "missed"
+                    "class": "missedlike"
                 }
             ],
             "optional": [
@@ -1598,9 +1599,10 @@
                     "class": "select_cube"
                 },
                 {
-                    "class": "duck"
+                    "class": "mth_add"
                 }
-            ]
+            ],
+            "multitarget": "duck"
         },
         {
             "name": "MISSED",
