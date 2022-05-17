@@ -281,22 +281,10 @@ namespace banggame {
             || card_ptr->has_tag(tag_type::bangcard);
     };
 
-    struct confirmer {
-        player *p = nullptr;
-
-        ~confirmer() {
-            if (std::uncaught_exceptions()) {
-                p->m_game->add_update<game_update_type::confirm_play>(update_target::includes(p));
-                if (p->m_forced_card) {
-                    p->m_game->add_update<game_update_type::force_play_card>(update_target::includes(p), p->m_forced_card->id);
-                }
-            }
-        }
-    };
-
     void player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, const pick_card_args &args) {
-        [[maybe_unused]] confirmer _confirm{this};
-        m_prompt.reset();
+        if (m_prompt) {
+            throw game_error("ERROR_MUST_ANSWER_PROMPT");
+        }
         
         if (m_game->m_requests.empty()) {
             throw game_error("ERROR_INVALID_ACTION");
@@ -391,8 +379,9 @@ namespace banggame {
     }
 
     void player::handle_action(enums::enum_tag_t<game_action_type::play_card>, const play_card_args &args) {
-        [[maybe_unused]] confirmer _confirm{this};
-        m_prompt.reset();
+        if (m_prompt) {
+            throw game_error("ERROR_INVALID_ACTION");
+        }
 
         if (!m_game->m_requests.empty() || m_game->m_playing != this) {
             throw game_error("ERROR_INVALID_ACTION");
@@ -410,8 +399,9 @@ namespace banggame {
     }
     
     void player::handle_action(enums::enum_tag_t<game_action_type::respond_card>, const play_card_args &args) {
-        [[maybe_unused]] confirmer _confirm{this};
-        m_prompt.reset();
+        if (m_prompt) {
+            throw game_error("ERROR_INVALID_ACTION");
+        }
         
         play_card_verify verifier{
             this,
@@ -455,9 +445,9 @@ namespace banggame {
 
         m_game->add_update<game_update_type::confirm_play>(update_target::includes(this));
         if (response) {
-            std::invoke(*m_prompt);
+            std::invoke(m_prompt);
         }
-        m_prompt.reset();
+        m_prompt = nullptr;
     }
 
     void player::draw_from_deck() {

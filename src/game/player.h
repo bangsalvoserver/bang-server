@@ -71,7 +71,7 @@ namespace banggame {
 
         std::map<card *, predraw_check> m_predraw_checks;
 
-        std::optional<std::function<void()>> m_prompt;
+        std::function<void()> m_prompt;
 
         int8_t m_range_mod = 0;
         int8_t m_weapon_range = 1;
