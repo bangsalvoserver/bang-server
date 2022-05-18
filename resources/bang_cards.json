@@ -4373,6 +4373,9 @@
             "equip": [
                 {
                     "class": "wanted"
+                },
+                {
+                    "class": "prompt_on_self_equip"
                 }
             ],
             "tags": [
