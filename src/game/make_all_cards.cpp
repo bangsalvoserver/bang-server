@@ -1,8 +1,7 @@
 #include "make_all_cards.h"
 
-#include <cassert>
 #include <stdexcept>
-#include <iostream>
+#include <regex>
 
 #include <json/json.h>
 #include <fmt/core.h>
@@ -23,11 +22,17 @@ namespace banggame {
     };
 
     template<enums::reflected_enum E> E string_to_enum_or_throw(std::string_view str) {
-        if (auto value = enums::from_string<E>(str)) {
+        if (str.empty()) {
+            return E{};
+        } else if (auto value = enums::from_string<E>(str)) {
             return *value;
         } else {
             throw invalid_effect(fmt::format("Invalid {}: {}", enums::enum_name_v<E>, str));
         }
+    }
+
+    static short string_to_int_or_zero(const std::string &str) {
+        return str.empty() ? 0 : std::stoi(str);
     }
 
     static card_expansion_type get_expansion(const Json::Value &value) {
@@ -38,65 +43,89 @@ namespace banggame {
     }
 
     static effect_list make_effects_from_json(const Json::Value &json_effects) {
+        static const std::regex effect_string_regex(
+            "^\\s*(\\w+)" // type
+            "(?:\\s*\\((\\d+)\\))?" // effect_value
+            "(?:\\s*(\\w+)\\s*)?" // target
+            "([\\w\\s]*?)" // player_filter
+            "(?:\\s*\\|\\s*([\\w\\s]+))?\\s*$" // card_filter
+        );
         effect_list ret;
         for (const auto &json_effect : json_effects) {
-            effect_holder effect;
-            effect.type = string_to_enum_or_throw<effect_type>(json_effect["class"].asString());
+            std::string str = json_effect.asString();
+            std::smatch match;
+            if (std::regex_match(str, match, effect_string_regex)) {
+                effect_holder effect;
+                effect.type = string_to_enum_or_throw<effect_type>(match.str(1));
+                effect.effect_value = string_to_int_or_zero(match.str(2));
+                effect.target = string_to_enum_or_throw<play_card_target_type>(match.str(3));
+                effect.player_filter = string_to_enum_or_throw<target_player_filter>(match.str(4));
+                effect.card_filter = string_to_enum_or_throw<target_card_filter>(match.str(5));
 
-            if (json_effect.isMember("value")) {
-                effect.effect_value = json_effect["value"].asInt();
-            }
-            if (json_effect.isMember("target")) {
-                effect.target = string_to_enum_or_throw<play_card_target_type>(json_effect["target"].asString());
-            }
-            if (json_effect.isMember("player_filter")) {
-                switch (effect.target) {
-                case play_card_target_type::player:
-                case play_card_target_type::conditional_player:
-                case play_card_target_type::card:
-                    effect.player_filter = string_to_enum_or_throw<target_player_filter>(json_effect["player_filter"].asString());
-                    break;
-                default:
-                    throw invalid_effect(fmt::format("Target type {} cannot have a player filter", enums::to_string(effect.target)));
+                if (bool(effect.player_filter)) {
+                    switch (effect.target) {
+                    case play_card_target_type::player:
+                    case play_card_target_type::conditional_player:
+                    case play_card_target_type::card:
+                        break;
+                    default:
+                        throw invalid_effect(fmt::format("Target type {} cannot have a player filter", enums::to_string(effect.target)));
+                    }
                 }
-            }
-            if (json_effect.isMember("card_filter")) {
-                if (effect.target == play_card_target_type::card) {
-                    effect.card_filter = string_to_enum_or_throw<target_card_filter>(json_effect["card_filter"].asString());
-                } else {
+
+                if (bool(effect.card_filter) && effect.target != play_card_target_type::card) {
                     throw invalid_effect(fmt::format("Target type {} cannot have a card filter", enums::to_string(effect.target)));
                 }
+
+                ret.push_back(effect);
+            } else {
+                throw invalid_effect(fmt::format("Invalid effect string: {}", str));
             }
-            ret.push_back(effect);
         }
 
         return ret;
     }
 
     static equip_list make_equips_from_json(const Json::Value &json_equips) {
+        static const std::regex equip_string_regex(
+            "^\\s*(\\w+)" // type
+            "(?:\\s*\\((\\d+)\\))?\\s*$" // effect_value
+        );
         equip_list ret;
         for (const auto &json_equip : json_equips) {
-            equip_holder equip;
-            equip.type = string_to_enum_or_throw<equip_type>(json_equip["class"].asString());
+            std::string str = json_equip.asString();
+            std::smatch match;
+            if (std::regex_match(str, match, equip_string_regex)) {
+                equip_holder equip;
+                equip.type = string_to_enum_or_throw<equip_type>(match.str(1));
+                equip.effect_value = string_to_int_or_zero(match.str(2));
 
-            if (json_equip.isMember("value")) {
-                equip.effect_value = json_equip["value"].asInt();
+                ret.push_back(equip);
+            } else {
+                throw invalid_effect(fmt::format("Invalid equip string: {}", str));
             }
-            ret.push_back(equip);
         }
         return ret;
     }
 
-    std::vector<tag_holder> make_tags_from_json(const Json::Value &json_tags) {
-        std::vector<tag_holder> ret;
+    tag_list make_tags_from_json(const Json::Value &json_tags) {
+        static const std::regex tag_string_regex(
+            "^\\s*(\\w+)" // type
+            "(?:\\s*\\((\\d+)\\))?\\s*$" // tag_value
+        );
+        tag_list ret;
         for (const auto &json_tag : json_tags) {
-            tag_holder holder;
-            holder.type = string_to_enum_or_throw<tag_type>(json_tag["class"].asString());
-            
-            if (json_tag.isMember("value")) {
-                holder.tag_value = json_tag["value"].asInt();
+            std::string str = json_tag.asString();
+            std::smatch match;
+            if (std::regex_match(str, match, tag_string_regex)) {
+                tag_holder tag;
+                tag.type = string_to_enum_or_throw<tag_type>(match.str(1));
+                tag.tag_value = string_to_int_or_zero(match.str(2));
+
+                ret.push_back(tag);
+            } else {
+                throw invalid_effect(fmt::format("Invalid tag string: {}", str));
             }
-            ret.push_back(holder);
         }
         return ret;
     }
@@ -156,16 +185,23 @@ namespace banggame {
             make_all_effects(c, json_card);
             c.color = string_to_enum_or_throw<card_color_type>(json_card["color"].asString());
             for (const auto &json_sign : json_card["signs"]) {
+                static const std::regex sign_regex("^\\s*([\\w\\d]+)\\s+(\\w+)\\s*$");
+
                 std::string str = json_sign.asString();
-
-                auto space = str.find(' ');
-                assert(space != std::string::npos);
-                c.sign.suit = *enums::from_string<card_suit>(str.substr(space + 1));
-
-                const auto &rank_letters = enums::enum_data_array_v<card_rank>;
-                c.sign.rank = enums::index_to<card_rank>(std::ranges::find(rank_letters, str.substr(0, space)) - rank_letters.begin());
-                
-                deck.push_back(c);
+                std::smatch match;
+                if (std::regex_match(str, match, sign_regex)) {
+                    const auto &rank_letters = enums::enum_data_array_v<card_rank>;
+                    if (auto it = std::ranges::find(rank_letters, match.str(1)); it != rank_letters.end()) {
+                        c.sign.rank = enums::index_to<card_rank>(it - rank_letters.begin());
+                    } else {
+                        throw invalid_effect(fmt::format("Invalid card_rank: {}", match.str(1)));
+                    }
+                    c.sign.suit = string_to_enum_or_throw<card_suit>(match.str(2));
+                    
+                    deck.push_back(c);
+                } else {
+                    throw invalid_effect(fmt::format("Invalid sign string: {}", str));
+                }
             }
         }
 

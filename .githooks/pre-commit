@@ -9,6 +9,6 @@ if __name__ == '__main__':
         bang_cards_json = json.load(file)
 
     for card in itertools.chain.from_iterable(bang_cards_json.values()):
-        if 'tags' in card and 'testing' in (tag['class'] for tag in card['tags']):
+        if 'tags' in card and 'testing' in card['tags']:
             print("Error: found 'testing' tag in ", card['name'] if 'name' in card else '(unnamed card)')
             exit(1)
