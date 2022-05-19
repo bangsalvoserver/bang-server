@@ -367,6 +367,9 @@ namespace banggame {
                 [game](enums::enum_tag_t<play_card_target_type::player>, int player_id) {
                     return target_player_t{game->find_player(player_id)};
                 },
+                [game](enums::enum_tag_t<play_card_target_type::conditional_player>, int player_id) {
+                    return target_conditional_player_t{player_id ? game->find_player(player_id) : nullptr};
+                },
                 [game](enums::enum_tag_t<play_card_target_type::card>, int card_id) {
                     return target_card_t{game->find_card(card_id)};
                 },

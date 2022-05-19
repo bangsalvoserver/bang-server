@@ -105,6 +105,7 @@ namespace banggame {
     DEFINE_ENUM_TYPES(play_card_target_type,
         (none)
         (player, int)
+        (conditional_player, int)
         (card, int)
         (other_players)
         (cards_other_players, std::vector<int>)
@@ -350,6 +351,7 @@ namespace banggame {
         (weapon)
         (horse)
         (repeatable)
+        (auto_confirm)
         (shopchoice)
         (peyote)
         (handcuffs)

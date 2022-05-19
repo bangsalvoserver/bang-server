@@ -50,9 +50,13 @@ namespace banggame {
                 effect.target = string_to_enum_or_throw<play_card_target_type>(json_effect["target"].asString());
             }
             if (json_effect.isMember("player_filter")) {
-                if (effect.target == play_card_target_type::player || effect.target == play_card_target_type::card) {
+                switch (effect.target) {
+                case play_card_target_type::player:
+                case play_card_target_type::conditional_player:
+                case play_card_target_type::card:
                     effect.player_filter = string_to_enum_or_throw<target_player_filter>(json_effect["player_filter"].asString());
-                } else {
+                    break;
+                default:
                     throw invalid_effect(fmt::format("Target type {} cannot have a player filter", enums::to_string(effect.target)));
                 }
             }

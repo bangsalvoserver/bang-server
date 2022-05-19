@@ -1505,7 +1505,7 @@
                     "class": "select_cube"
                 },
                 {
-                    "target": "player",
+                    "target": "conditional_player",
                     "player_filter": "reachable notself",
                     "class": "bang"
                 }
@@ -1513,6 +1513,9 @@
             "tags": [
                 {
                     "class": "repeatable"
+                },
+                {
+                    "class": "auto_confirm"
                 }
             ]
         },
@@ -1573,7 +1576,7 @@
                     "class": "select_cube"
                 },
                 {
-                    "target": "player",
+                    "target": "conditional_player",
                     "player_filter": "notself",
                     "class": "indians"
                 }
@@ -1581,6 +1584,9 @@
             "tags": [
                 {
                     "class": "repeatable"
+                },
+                {
+                    "class": "auto_confirm"
                 },
                 {
                     "class": "indians"
@@ -2491,11 +2497,9 @@
             "responses": [
                 {
                     "class": "missed"
-                }
-            ],
-            "optional": [
+                },
                 {
-                    "target": "player",
+                    "target": "conditional_player",
                     "player_filter": "notself range_1",
                     "class": "bang"
                 }

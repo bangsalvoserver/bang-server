@@ -260,6 +260,20 @@ namespace banggame {
                         return e.verify(card_ptr, origin, args.target);
                     }
                 },
+                [this, &e](target_conditional_player_t args) -> opt_error {
+                    if (e.target != play_card_target_type::conditional_player) {
+                        return game_error("ERROR_INVALID_ACTION");
+                    } else if (args.target) {
+                        if (auto error = check_player_filter(origin, e.player_filter, args.target)) {
+                            return error;
+                        } else {
+                            return e.verify(card_ptr, origin, args.target);
+                        }
+                    } else {
+                        // TODO check set target validi
+                        return std::nullopt;
+                    }
+                },
                 [this, &e](target_card_t args) -> opt_error {
                     if (e.target != play_card_target_type::card) {
                         return game_error("ERROR_INVALID_ACTION");
@@ -336,6 +350,13 @@ namespace banggame {
                 [this, &e](target_player_t args) -> opt_fmt_str {
                     return e.on_prompt(card_ptr, origin, args.target);
                 },
+                [this, &e](target_conditional_player_t args) -> opt_fmt_str {
+                    if (args.target) {
+                        return e.on_prompt(card_ptr, origin, args.target);
+                    } else {
+                        return std::nullopt;
+                    }
+                },
                 [this, &e](target_other_players_t args) -> opt_fmt_str {
                     opt_fmt_str msg = std::nullopt;
                     for (auto *p = origin;;) {
@@ -408,6 +429,21 @@ namespace banggame {
                     e.on_play(card_ptr, origin, effect_flags{});
                 },
                 [this, &e](target_player_t args) {
+                    if (args.target != origin && args.target->immune_to(origin->chosen_card_or(card_ptr))) {
+                        if (e.type == effect_type::bangcard) {
+                            request_bang req{card_ptr, origin, args.target};
+                            origin->m_game->call_event<event_type::apply_bang_modifier>(origin, &req);
+                        }
+                    } else {
+                        auto flags = effect_flags::single_target;
+                        if (card_ptr->sign && card_ptr->color == card_color_type::brown && e.type != effect_type::bangcard) {
+                            flags |= effect_flags::escapable;
+                        }
+                        e.on_play(card_ptr, origin, args.target, flags);
+                    }
+                },
+                [this, &e](target_conditional_player_t args) {
+                    if (!args.target) return;
                     if (args.target != origin && args.target->immune_to(origin->chosen_card_or(card_ptr))) {
                         if (e.type == effect_type::bangcard) {
                             request_bang req{card_ptr, origin, args.target};

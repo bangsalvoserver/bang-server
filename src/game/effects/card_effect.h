@@ -22,13 +22,17 @@ namespace banggame {
     struct target_cards_other_players_t {
         std::vector<card *> target_cards;
     };
+    struct target_conditional_player_t {
+        player *target;
+    };
 
     using play_card_target = std::variant<
         target_none_t,
         target_player_t,
         target_card_t,
         target_other_players_t,
-        target_cards_other_players_t
+        target_cards_other_players_t,
+        target_conditional_player_t
     >;
 
     using target_list = std::vector<play_card_target>;
