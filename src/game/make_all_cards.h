@@ -7,24 +7,15 @@
 
 namespace banggame {
 
-    struct card_deck_info : card_data {
-        bool discard_if_two_players = false;
-        bool hidden = false;
-
-#ifdef TESTING_CARDS
-        bool testing = false;
-#endif
-    };
-
     struct all_cards_t {
-        std::vector<card_deck_info> deck;
-        std::vector<card_deck_info> characters;
-        std::vector<card_deck_info> goldrush;
-        std::vector<card_deck_info> hidden;
-        std::vector<card_deck_info> specials;
-        std::vector<card_deck_info> highnoon;
-        std::vector<card_deck_info> fistfulofcards;
-        std::vector<card_deck_info> wildwestshow;
+        std::vector<card_data> deck;
+        std::vector<card_data> characters;
+        std::vector<card_data> goldrush;
+        std::vector<card_data> hidden;
+        std::vector<card_data> specials;
+        std::vector<card_data> highnoon;
+        std::vector<card_data> fistfulofcards;
+        std::vector<card_data> wildwestshow;
 
         all_cards_t();
     };

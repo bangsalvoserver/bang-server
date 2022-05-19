@@ -1055,7 +1055,6 @@
             ]
         },
         {
-            "discard_if_two_players": true,
             "name": "GHOST",
             "signs": [
                 "9 spades",
@@ -1068,6 +1067,11 @@
             "equip": [
                 {
                     "class": "ghost"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "discard_if_two_players"
                 }
             ]
         },
@@ -1269,7 +1273,6 @@
             ]
         },
         {
-            "discard_if_two_players": true,
             "name": "FANNING",
             "signs": [
                 "2 spades"
@@ -1292,7 +1295,12 @@
                     "class": "banglimit"
                 }
             ],
-            "multitarget": "fanning"
+            "multitarget": "fanning",
+            "tags": [
+                {
+                    "class": "discard_if_two_players"
+                }
+            ]
         },
         {
             "name": "TOMAHAWK",
@@ -2272,7 +2280,6 @@
             ]
         },
         {
-            "discard_if_two_players": true,
             "name": "LAST_WILL",
             "signs": [
                 "A spades"
@@ -2311,6 +2318,9 @@
                 {
                     "class": "repeatable",
                     "value": 2
+                },
+                {
+                    "class": "discard_if_two_players"
                 }
             ],
             "multitarget": "lastwill"
@@ -2813,7 +2823,6 @@
             ]
         },
         {
-            "discard_if_two_players": true,
             "name": "VULTURE_SAM",
             "image": "01_vulturesam",
             "equip": [
@@ -2824,6 +2833,9 @@
             "tags": [
                 {
                     "class": "vulture_sam"
+                },
+                {
+                    "class": "discard_if_two_players"
                 }
             ]
         },
@@ -2986,7 +2998,6 @@
             ]
         },
         {
-            "discard_if_two_players": true,
             "name": "GREG_DIGGER",
             "image": "03_greg_digger",
             "expansion": "dodgecity",
@@ -2994,16 +3005,25 @@
                 {
                     "class": "greg_digger"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "discard_if_two_players"
+                }
             ]
         },
         {
-            "discard_if_two_players": true,
             "name": "HERB_HUNTER",
             "image": "03_herb_hunter",
             "expansion": "dodgecity",
             "equip": [
                 {
                     "class": "herb_hunter"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "discard_if_two_players"
                 }
             ]
         },
@@ -3669,7 +3689,6 @@
             ]
         },
         {
-            "discard_if_two_players": true,
             "name": "GHOST_TOWN",
             "image": "05_cittafantasma",
             "expansion": "ghostcards",
@@ -3677,15 +3696,24 @@
                 {
                     "class": "ghosttown"
                 }
+            ],
+            "tags": [
+                {
+                    "class": "discard_if_two_players"
+                }
             ]
         },
         {
-            "discard_if_two_players": true,
             "name": "INVERT_ROTATION",
             "image": "05_corsaalloro",
             "equip": [
                 {
                     "class": "invert_rotation"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "discard_if_two_players"
                 }
             ]
         },
@@ -3781,7 +3809,6 @@
             ]
         },
         {
-            "hidden": true,
             "expansion": "thebullet",
             "name": "HANDCUFFS_HEARTS",
             "image": "05_manette_hearts",
@@ -3789,11 +3816,13 @@
                 {
                     "class": "handcuffs",
                     "value": 1
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
         {
-            "hidden": true,
             "expansion": "thebullet",
             "name": "HANDCUFFS_DIAMONDS",
             "image": "05_manette_diamonds",
@@ -3801,11 +3830,13 @@
                 {
                     "class": "handcuffs",
                     "value": 2
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
         {
-            "hidden": true,
             "expansion": "thebullet",
             "name": "HANDCUFFS_CLUBS",
             "image": "05_manette_clubs",
@@ -3813,11 +3844,13 @@
                 {
                     "class": "handcuffs",
                     "value": 3
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
         {
-            "hidden": true,
             "expansion": "thebullet",
             "name": "HANDCUFFS_SPADES",
             "image": "05_manette_spades",
@@ -3825,6 +3858,9 @@
                 {
                     "class": "handcuffs",
                     "value": 4
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
@@ -3850,12 +3886,16 @@
     ],
     "fistfulofcards": [
         {
-            "discard_if_two_players": true,
             "name": "AMBUSH",
             "image": "05_agguato",
             "equip": [
                 {
                     "class": "ambush"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "discard_if_two_players"
                 }
             ]
         },
@@ -3883,13 +3923,17 @@
             ]
         },
         {
-            "discard_if_two_players": true,
             "name": "DEAD_MAN",
             "image": "05_deadman",
             "expansion": "ghostcards",
             "equip": [
                 {
                     "class": "deadman"
+                }
+            ],
+            "tags": [
+                {
+                    "class": "discard_if_two_players"
                 }
             ]
         },
@@ -3973,24 +4017,28 @@
             ]
         },
         {
-            "hidden": true,
             "name": "PEYOTE_RED",
             "image": "05_peyote_rosso",
             "tags": [
                 {
                     "class": "peyote",
                     "value": 1
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
         {
-            "hidden": true,
             "name": "PEYOTE_BLACK",
             "image": "05_peyote_nero",
             "tags": [
                 {
                     "class": "peyote",
                     "value": 2
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
@@ -4154,7 +4202,6 @@
             ]
         },
         {
-            "hidden": true,
             "name": "BOTTLE_PANIC",
             "image": "04_bottiglia_panico",
             "color": "brown",
@@ -4169,11 +4216,13 @@
                 {
                     "class": "shopchoice",
                     "value": 1
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
         {
-            "hidden": true,
             "name": "BOTTLE_BEER",
             "image": "04_bottiglia_birra",
             "color": "brown",
@@ -4186,11 +4235,13 @@
                 {
                     "class": "shopchoice",
                     "value": 1
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
         {
-            "hidden": true,
             "name": "BOTTLE_BANG",
             "image": "04_bottiglia_bang",
             "color": "brown",
@@ -4205,6 +4256,9 @@
                 {
                     "class": "shopchoice",
                     "value": 1
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
@@ -4259,7 +4313,6 @@
             ]
         },
         {
-            "hidden": true,
             "name": "PARDNER_GENERAL_STORE",
             "image": "04_complice_emporio",
             "color": "brown",
@@ -4272,11 +4325,13 @@
                 {
                     "class": "shopchoice",
                     "value": 2
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
         {
-            "hidden": true,
             "name": "PARDNER_DUEL",
             "image": "04_complice_duello",
             "color": "brown",
@@ -4291,11 +4346,13 @@
                 {
                     "class": "shopchoice",
                     "value": 2
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
         {
-            "hidden": true,
             "name": "PARDNER_CAT_BALOU",
             "image": "04_complice_catbalou",
             "color": "brown",
@@ -4309,6 +4366,9 @@
                 {
                     "class": "shopchoice",
                     "value": 2
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         },
@@ -4364,7 +4424,6 @@
             ]
         },
         {
-            "discard_if_two_players": true,
             "count": 3,
             "name": "WANTED",
             "image": "04_ricercato",
@@ -4382,6 +4441,9 @@
                 {
                     "class": "buy_cost",
                     "value": 2
+                },
+                {
+                    "class": "discard_if_two_players"
                 }
             ]
         },
@@ -4550,7 +4612,6 @@
             ]
         },
         {
-            "hidden": true,
             "name": "GAME_DISCARD_BRONCO",
             "expansion": "canyondiablo",
             "effects": [
@@ -4576,6 +4637,9 @@
             "tags": [
                 {
                     "class": "bronco"
+                },
+                {
+                    "class": "hidden"
                 }
             ]
         }

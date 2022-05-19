@@ -97,7 +97,7 @@ namespace banggame {
         return ret;
     }
     
-    static void make_all_effects(card_deck_info &out, const Json::Value &json_card) {
+    static void make_all_effects(card_data &out, const Json::Value &json_card) {
         out.name = json_card["name"].asString();
         out.image = json_card["image"].asString();
         try {
@@ -128,17 +128,6 @@ namespace banggame {
         } catch (const invalid_effect &e) {
             throw std::runtime_error(fmt::format("{}: {}", out.name, e.what()));
         }
-        if (json_card.isMember("discard_if_two_players")) {
-            out.discard_if_two_players = json_card["discard_if_two_players"].asBool();
-        }
-        if (json_card.isMember("hidden")) {
-            out.hidden = json_card["hidden"].asBool();
-        }
-#ifdef TESTING_CARDS
-        if (json_card.isMember("testing")) {
-            out.testing = json_card["testing"].asBool();
-        }
-#endif
     }
 
     all_cards_t::all_cards_t() {
@@ -157,7 +146,7 @@ namespace banggame {
 
         for (const auto &json_card : json_cards["main_deck"]) {
             if (is_disabled(json_card)) continue;
-            card_deck_info c;
+            card_data c;
             c.deck = card_deck_type::main_deck;
             c.expansion = get_expansion(json_card);
             make_all_effects(c, json_card);
@@ -178,7 +167,7 @@ namespace banggame {
 
         for (const auto &json_character : json_cards["character"]) {
             if (is_disabled(json_character)) continue;
-            card_deck_info c;
+            card_data c;
             c.deck = card_deck_type::character;
             c.expansion = get_expansion(json_character);
             make_all_effects(c, json_character);
@@ -187,12 +176,12 @@ namespace banggame {
 
         for (const auto &json_card : json_cards["goldrush"]) {
             if (is_disabled(json_card)) continue;
-            card_deck_info c;
+            card_data c;
             c.deck = card_deck_type::goldrush;
             c.expansion = card_expansion_type::goldrush;
             make_all_effects(c, json_card);
             c.color = string_to_enum_or_throw<card_color_type>(json_card["color"].asString());
-            if (c.hidden) {
+            if (c.has_tag(tag_type::hidden)) {
                 hidden.push_back(c);
             } else {
                 int count = json_card.isMember("count") ? json_card["count"].asInt() : 1;
@@ -204,11 +193,11 @@ namespace banggame {
 
         for (const auto &json_card : json_cards["highnoon"]) {
             if (is_disabled(json_card)) continue;
-            card_deck_info c;
+            card_data c;
             c.deck = card_deck_type::highnoon;
             c.expansion = card_expansion_type::highnoon | get_expansion(json_card);
             make_all_effects(c, json_card);
-            if (c.hidden) {
+            if (c.has_tag(tag_type::hidden)) {
                 hidden.push_back(c);
             } else {
                 highnoon.push_back(c);
@@ -217,11 +206,11 @@ namespace banggame {
 
         for (const auto &json_card : json_cards["fistfulofcards"]) {
             if (is_disabled(json_card)) continue;
-            card_deck_info c;
+            card_data c;
             c.deck = card_deck_type::fistfulofcards;
             c.expansion = card_expansion_type::fistfulofcards;
             make_all_effects(c, json_card);
-            if (c.hidden) {
+            if (c.has_tag(tag_type::hidden)) {
                 hidden.push_back(c);
             } else {
                 fistfulofcards.push_back(c);
@@ -230,7 +219,7 @@ namespace banggame {
 
         for (const auto &json_card : json_cards["wildwestshow"]) {
             if (is_disabled(json_card)) continue;
-            card_deck_info c;
+            card_data c;
             c.deck = card_deck_type::wildwestshow;
             c.expansion = card_expansion_type::wildwestshow | get_expansion(json_card);
             make_all_effects(c, json_card);
@@ -239,10 +228,10 @@ namespace banggame {
 
         for (const auto &json_card : json_cards["specials"]) {
             if (is_disabled(json_card)) continue;
-            card_deck_info c;
+            card_data c;
             c.expansion = get_expansion(json_card);
             make_all_effects(c, json_card);
-            if (c.hidden) {
+            if (c.has_tag(tag_type::hidden)) {
                 hidden.push_back(c);
             } else {
                 specials.push_back(c);

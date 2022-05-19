@@ -338,6 +338,9 @@ namespace banggame {
 
     DEFINE_ENUM(tag_type,
         (none)
+        (testing)
+        (hidden)
+        (discard_if_two_players)
         (bangcard)
         (missedcard)
         (bangproxy)
