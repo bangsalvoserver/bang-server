@@ -160,10 +160,9 @@ namespace banggame {
     }
 
     opt_error handler_squaw::verify(card *origin_card, player *origin, const target_list &targets) const {
-        if (targets.size() == 3) {
+        if (targets.size() == 2) {
             auto discarded_card = std::get<target_card_t>(targets[0]).target;
-            for (auto target : targets | std::views::drop(1)) {
-                card *target_card = std::get<target_card_t>(target).target;
+            for (auto target_card : std::get<target_cubes_t>(targets[1]).target_cards) {
                 if (target_card == discarded_card) {
                     return game_error("ERROR_INVALID_ACTION");
                 }
@@ -179,9 +178,10 @@ namespace banggame {
         card *target_card = std::get<target_card_t>(targets[0]).target;
 
         bool immune = target_card->owner->immune_to(origin_card);
-        if (targets.size() == 3) {
-            effect_select_cube().on_play(origin_card, origin, std::get<target_card_t>(targets[1]).target);
-            effect_select_cube().on_play(origin_card, origin, std::get<target_card_t>(targets[2]).target);
+        if (targets.size() == 2) {
+            for (auto target_card : std::get<target_cubes_t>(targets[1]).target_cards) {
+                effect_select_cube().on_play(origin_card, origin, target_card);
+            }
 
             if (!immune) {
                 effect_steal{}.on_play(origin_card, origin, target_card, effect_flags::escapable | effect_flags::single_target);

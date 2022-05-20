@@ -18,6 +18,9 @@ namespace banggame {
     struct target_card_t {
         card *target;
     };
+    struct target_cubes_t {
+        std::vector<card *> target_cards;
+    };
     struct target_other_players_t {};
     struct target_cards_other_players_t {
         std::vector<card *> target_cards;
@@ -30,6 +33,7 @@ namespace banggame {
         target_none_t,
         target_player_t,
         target_card_t,
+        target_cubes_t,
         target_other_players_t,
         target_cards_other_players_t,
         target_conditional_player_t

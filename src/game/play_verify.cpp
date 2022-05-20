@@ -69,7 +69,7 @@ namespace banggame {
         if (bool(filter & target_card_filter::bronco) && !target->has_tag(tag_type::bronco))
             return game_error("ERROR_TARGET_NOT_BRONCO");
 
-        if (bool(filter & (target_card_filter::cube_slot | target_card_filter::cube_slot_card))
+        if (bool(filter & target_card_filter::cube_slot)
             && (target != target->owner->m_characters.front() && target->color != card_color_type::orange))
             return game_error("ERROR_TARGET_NOT_CUBE_SLOT");
         
@@ -274,6 +274,21 @@ namespace banggame {
                         return std::nullopt;
                     }
                 },
+                [this, &e](target_cubes_t args) -> opt_error {
+                    if (e.target != play_card_target_type::cube) {
+                        return game_error("ERROR_INVALID_ACTION");
+                    } else {
+                        for (card *c : args.target_cards) {
+                            if (!c || c->owner != origin) {
+                                return game_error("ERROR_INVALID_ACTION");
+                            }
+                            if (auto error = e.verify(card_ptr, origin, c)) {
+                                return error;
+                            }
+                        }
+                        return std::nullopt;
+                    }
+                },
                 [this, &e](target_card_t args) -> opt_error {
                     if (e.target != play_card_target_type::card) {
                         return game_error("ERROR_INVALID_ACTION");
@@ -371,6 +386,15 @@ namespace banggame {
                     return e.on_prompt(card_ptr, origin, args.target);
                 },
                 [this, &e](target_cards_other_players_t const& args) -> opt_fmt_str {
+                    opt_fmt_str msg = std::nullopt;
+                    for (card *target_card : args.target_cards) {
+                        if (!(msg = e.on_prompt(card_ptr, origin, target_card))) {
+                            break;
+                        }
+                    }
+                    return msg;
+                },
+                [this, &e](target_cubes_t const& args) -> opt_fmt_str {
                     opt_fmt_str msg = std::nullopt;
                     for (card *target_card : args.target_cards) {
                         if (!(msg = e.on_prompt(card_ptr, origin, target_card))) {
@@ -507,6 +531,11 @@ namespace banggame {
                         } else {
                             e.on_play(card_ptr, origin, target_card, flags);
                         }
+                    }
+                },
+                [this, &e](target_cubes_t const& args) {
+                    for (card *target_card : args.target_cards) {
+                        e.on_play(card_ptr, origin, target_card, effect_flags{});
                     }
                 }
             }, t);

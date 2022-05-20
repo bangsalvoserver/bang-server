@@ -375,6 +375,9 @@ namespace banggame {
                 },
                 [game](enums::enum_tag_t<play_card_target_type::cards_other_players>, const std::vector<int> &args) {
                     return target_cards_other_players_t{find_cards(game, args)};
+                },
+                [game](enums::enum_tag_t<play_card_target_type::cube>, const std::vector<int> &args) {
+                    return target_cubes_t{find_cards(game, args)};
                 }
             }, t));
         }

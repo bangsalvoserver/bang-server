@@ -98,7 +98,6 @@ namespace banggame {
         (beer)
         (bronco)
         (cube_slot)
-        (cube_slot_card)
         (can_repeat)
     )
 
@@ -109,6 +108,7 @@ namespace banggame {
         (card, int)
         (other_players)
         (cards_other_players, std::vector<int>)
+        (cube, std::vector<int>)
     )
 
     using play_card_target_ids = enums::enum_variant<play_card_target_type>;

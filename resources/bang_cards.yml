@@ -733,8 +733,7 @@ main_deck:
       - mth_add
       - mth_add
     optional:
-      - select_cube card self | cube_slot
-      - select_cube card self | cube_slot
+      - select_cube(2) cube
       - mth_add
     tags:
       - repeatable
@@ -756,9 +755,7 @@ main_deck:
     effects:
       - mth_add
     optional:
-      - select_cube card self | cube_slot
-      - select_cube card self | cube_slot
-      - select_cube card self | cube_slot
+      - select_cube(3) cube
       - mth_add
     tags:
       - repeatable
@@ -772,7 +769,7 @@ main_deck:
     effects:
       - bang player reachable notself
     optional:
-      - select_cube card self | cube_slot
+      - select_cube cube
       - bang conditional_player reachable notself
     tags:
       - repeatable
@@ -786,8 +783,7 @@ main_deck:
     effects:
       - mth_add player reachable notself
     optional:
-      - select_cube card self | cube_slot
-      - select_cube card self | cube_slot
+      - select_cube(2) cube
       - mth_add
     multitarget: flintlock
   - name: ARROW
@@ -799,7 +795,7 @@ main_deck:
     effects:
       - indians player notself
     optional:
-      - select_cube card self | cube_slot
+      - select_cube cube
       - indians conditional_player notself
     tags:
       - repeatable
@@ -814,8 +810,7 @@ main_deck:
     responses:
       - missedlike
     optional:
-      - select_cube card self | cube_slot
-      - select_cube card self | cube_slot
+      - select_cube(2) cube
       - mth_add
     multitarget: duck
   - name: MISSED
@@ -853,8 +848,7 @@ main_deck:
     effects:
       - mth_add card | table
     optional:
-      - mth_add card self | cube_slot
-      - mth_add card self | cube_slot
+      - mth_add(2) cube
     multitarget: squaw
   - name: ACE_UP_THE_SLEEVE
     signs:
@@ -1624,8 +1618,7 @@ character:
       - al_preacher
     responses:
       - al_preacher
-      - select_cube card self | cube_slot
-      - select_cube card self | cube_slot
+      - select_cube(2) cube
       - draw
   - name: BASS_GREEVES
     image: 17_bassgreeves
@@ -1633,7 +1626,7 @@ character:
     effects:
       - max_usages(1)
       - destroy card self | hand
-      - add_cube(2) card self | cube_slot_card
+      - add_cube(2) card self | cube_slot
   - name: BLOODY_MARY
     image: 17_bloodymary
     expansion: armedanddangerous
@@ -1644,7 +1637,7 @@ character:
     expansion: armedanddangerous
     effects:
       - max_usages(1)
-      - frankie_canton card | cube_slot_card
+      - frankie_canton card | cube_slot
   - name: JULIE_CUTTER
     image: 17_juliecutter
     expansion: armedanddangerous
@@ -1655,8 +1648,7 @@ character:
     expansion: armedanddangerous
     effects:
       - max_usages(1)
-      - select_cube card self | cube_slot
-      - select_cube card self | cube_slot
+      - select_cube(2) cube
       - bang player reachable notself
   - name: MS_ABIGAIL
     image: 17_msabigail
@@ -1672,9 +1664,9 @@ character:
       - red_ringo
     effects:
       - max_usages(1)
-      - red_ringo card self | cube_slot_card table
+      - red_ringo card self | cube_slot table
     optional:
-      - red_ringo card self | cube_slot_card table can_repeat
+      - red_ringo card self | cube_slot table can_repeat
     tags:
       - max_hp(5)
   - name: DON_BELL
