@@ -202,7 +202,7 @@ namespace banggame {
 
     void player::move_cubes(card *origin, card *target, int ncubes) {
         ncubes = std::min<int>(ncubes, origin->num_cubes);
-        if (target && ncubes > 0) {
+        if (target && ncubes > 0 && target->num_cubes < max_cubes) {
             int added_cubes = std::min<int>(ncubes, max_cubes - target->num_cubes);
             target->num_cubes += added_cubes;
             origin->num_cubes -= added_cubes;
