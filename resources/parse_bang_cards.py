@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-from multiprocessing.sharedctypes import Value
-from pathlib import Path
-import yaml
 import sys
+import yaml
 import re
 
 def parse_sign(sign):

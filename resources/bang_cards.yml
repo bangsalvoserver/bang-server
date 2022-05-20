@@ -1092,7 +1092,7 @@ main_deck:
   - name: PANIC
     signs:
       - 9 hearts
-    image: 01_panico
+    image: 20_panico
     expansion: canyondiablo
     color: brown
     effects:
@@ -1100,7 +1100,7 @@ main_deck:
   - name: BEER
     signs:
       - Q hearts
-    image: 01_birra
+    image: 20_birra
     expansion: canyondiablo
     color: brown
     effects:
@@ -1113,7 +1113,7 @@ main_deck:
   - name: CAT_BALOU
     signs:
       - J clubs
-    image: 01_catbalou
+    image: 20_catbalou
     expansion: canyondiablo
     color: brown
     effects:

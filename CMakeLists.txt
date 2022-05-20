@@ -51,7 +51,7 @@ endif()
 set(bang_cards_cpp "${CMAKE_CURRENT_BINARY_DIR}/bang_cards.cpp")
 add_custom_command(
     OUTPUT "${bang_cards_cpp}"
-    COMMAND python
+    COMMAND python3
         resources/parse_bang_cards.py
         resources/bang_cards.yml >
         "${bang_cards_cpp}"
