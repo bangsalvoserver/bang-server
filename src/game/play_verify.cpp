@@ -456,29 +456,20 @@ namespace banggame {
                     e.on_play(card_ptr, origin, effect_flags{});
                 },
                 [this, &e](target_player_t args) {
-                    if (args.target != origin && args.target->immune_to(origin->chosen_card_or(card_ptr))) {
-                        if (e.type == effect_type::bangcard) {
-                            request_bang req{card_ptr, origin, args.target};
-                            origin->m_game->call_event<event_type::apply_bang_modifier>(origin, &req);
-                        }
-                    } else {
+                    if (args.target == origin || args.target->immune_to(origin->chosen_card_or(card_ptr))) {
                         auto flags = effect_flags::single_target;
-                        if (card_ptr->sign && card_ptr->color == card_color_type::brown && e.type != effect_type::bangcard) {
+                        if (card_ptr->sign && card_ptr->color == card_color_type::brown
+                            && !origin->is_bangcard(card_ptr) && !card_ptr->has_tag(tag_type::bangproxy)) {
                             flags |= effect_flags::escapable;
                         }
                         e.on_play(card_ptr, origin, args.target, flags);
                     }
                 },
                 [this, &e](target_conditional_player_t args) {
-                    if (!args.target) return;
-                    if (args.target != origin && args.target->immune_to(origin->chosen_card_or(card_ptr))) {
-                        if (e.type == effect_type::bangcard) {
-                            request_bang req{card_ptr, origin, args.target};
-                            origin->m_game->call_event<event_type::apply_bang_modifier>(origin, &req);
-                        }
-                    } else {
+                    if (args.target && (args.target == origin || !args.target->immune_to(origin->chosen_card_or(card_ptr)))) {
                         auto flags = effect_flags::single_target;
-                        if (card_ptr->sign && card_ptr->color == card_color_type::brown && e.type != effect_type::bangcard) {
+                        if (card_ptr->sign && card_ptr->color == card_color_type::brown
+                            && !origin->is_bangcard(card_ptr) && !card_ptr->has_tag(tag_type::bangproxy)) {
                             flags |= effect_flags::escapable;
                         }
                         e.on_play(card_ptr, origin, args.target, flags);

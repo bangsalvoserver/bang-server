@@ -32,8 +32,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
 
-    struct effect_bangcard {
-        void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
+    struct handler_bangcard {
+        void on_play(card *origin_card, player *origin, const target_list &targets) const;
     };
 
     struct effect_banglimit {

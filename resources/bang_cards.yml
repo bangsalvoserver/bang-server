@@ -126,9 +126,10 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - bangcard player reachable notself
+      - mth_add player reachable notself
     responses:
       - bangresponse
+    multitarget: bangcard
     tags:
       - bangcard
   - name: BEER
@@ -319,9 +320,10 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - bangcard player reachable notself
+      - mth_add player reachable notself
     responses:
       - bangresponse
+    multitarget: bangcard
     tags:
       - bangcard
   - name: BEER
@@ -580,7 +582,8 @@ main_deck:
     effects:
       - banglimit
       - choose_card card self | hand
-      - bangcard player reachable notself
+      - mth_add player reachable notself
+    multitarget: bangcard
     tags:
       - weapon
       - bangproxy
@@ -718,9 +721,10 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - bangcard player reachable notself
+      - mth_add player reachable notself
     responses:
       - bangresponse
+    multitarget: bangcard
     tags:
       - bangcard
   - name: CARAVAN
@@ -1083,9 +1087,10 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - bangcard player reachable notself
+      - mth_add player reachable notself
     responses:
       - bangresponse
+    multitarget: bangcard
     tags:
       - bangcard
   - name: PANIC
@@ -1306,7 +1311,8 @@ character:
     effects:
       - banglimit
       - choose_card card self | hand bang
-      - bangcard player reachable notself
+      - mth_add player reachable notself
+    multitarget: bangcard
     tags:
       - bangproxy
   - name: EL_GRINGO

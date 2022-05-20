@@ -165,7 +165,6 @@ namespace banggame {
         (resolve,               effect_resolve)
         (mth_add,               effect_empty)
         (bang,                  effect_bang)
-        (bangcard,              effect_bangcard)
         (banglimit,             effect_banglimit)
         (missedlike,            effect_missedlike)
         (missed,                effect_missed)
@@ -325,6 +324,7 @@ namespace banggame {
 
     DEFINE_ENUM_FWD_TYPES(mth_type,
         (none)
+        (bangcard,              handler_bangcard)
         (doc_holyday,           handler_doc_holyday)
         (flint_westwood,        handler_flint_westwood)
         (draw_atend,            handler_draw_atend)

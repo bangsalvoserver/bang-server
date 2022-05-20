@@ -73,13 +73,18 @@ namespace banggame {
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
-    void effect_bangcard::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
-        target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
-        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags);
+    void handler_bangcard::on_play(card *origin_card, player *origin, const target_list &targets) const {
+        if (targets.empty()) return;
+
+        player *target = std::get<target_player_t>(targets[0]).target;
+        origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
+        auto req = std::make_shared<request_bang>(origin_card, origin, target, effect_flags::single_target);
         req->is_bang_card = true;
         origin->m_game->call_event<event_type::apply_bang_modifier>(origin, req.get());
-        target->m_game->queue_action([origin, req = std::move(req)]() mutable {
-            origin->m_game->queue_request(std::move(req));
+        origin->m_game->queue_action([req = std::move(req)]() mutable {
+            if (!req->target->immune_to(req->origin->chosen_card_or(req->origin_card))) {
+                req->origin->m_game->queue_request(std::move(req));
+            }
         });
     }
 
