@@ -89,7 +89,7 @@ def parse_tags(tags_data):
             print('        },')
     print('      }', end='')
 
-def parse_all_effects(card, deck=None):
+def parse_all_effects(card):
     print('    {')
     print(f'      .name = "{card["name"]}"', end='')
     try:
@@ -107,8 +107,8 @@ def parse_all_effects(card, deck=None):
             parse_tags(card['tags'])
         if 'expansion' in card:
             print(f',\n      .expansion = {enum_flags(card["expansion"], "card_expansion_type")}', end='')
-        if (deck):
-            print(f',\n      .deck = card_deck_type::{deck}', end='')
+        if 'deck' in card:
+            print(f',\n      .deck = card_deck_type::{card["deck"]}', end='')
         if 'modifier' in card:
             print(f',\n      .modifier = card_modifier_type::{card["modifier"]}', end='')
         if 'multitarget' in card:
@@ -117,6 +117,8 @@ def parse_all_effects(card, deck=None):
             print('      }', end='')
         if 'equip_target' in card:
             print(f',\n      .equip_target = target_player_filter::{card["equip_target"]}', end='')
+        if 'color' in card:
+            print(f',\n      .color = card_color_type::{card["color"]}', end='')
     except ValueError as error:
         print(f'Error in card {card["name"]}:\n{error}', file=sys.stderr)
         exit(1)
@@ -132,10 +134,10 @@ def parse_file(data):
     for card in data['main_deck']:
         if 'disabled' in card and card['disabled']:
             continue
+        card['deck'] = 'main_deck'
         for sign in card['signs']:
-            parse_all_effects(card, 'main_deck')
-            print(f',\n      .sign = {parse_sign(sign)},')
-            print(f'      .color = card_color_type::{card["color"]}')
+            parse_all_effects(card)
+            print(f',\n      .sign = {parse_sign(sign)}')
             print('    },')
     print('  },')
 
@@ -143,7 +145,8 @@ def parse_file(data):
     for card in data['character']:
         if 'disabled' in card and card['disabled']:
             continue
-        parse_all_effects(card, 'character')
+        card['deck'] = 'character'
+        parse_all_effects(card)
         print('\n    },')
     print('  },')
 
@@ -151,11 +154,13 @@ def parse_file(data):
     for card in data['goldrush']:
         if 'disabled' in card and card['disabled']:
             continue
+        card['expansion'] = 'goldrush'
+        card['deck'] = 'goldrush'
         for _ in range(card['count'] if 'count' in card else 1):
             if 'tags' in card and 'hidden' in card['tags']:
                 hidden_cards.append(card)
             else:
-                parse_all_effects(card, 'goldrush')
+                parse_all_effects(card)
                 print('\n    },')
     print('  },')
 
@@ -164,10 +169,11 @@ def parse_file(data):
         if 'disabled' in card and card['disabled']:
             continue
         card['expansion'] = f'highnoon {card["expansion"]}' if 'expansion' in card else 'highnoon'
+        card['deck'] = 'highnoon'
         if 'tags' in card and 'hidden' in card['tags']:
             hidden_cards.append(card)
         else:
-            parse_all_effects(card, 'highnoon')
+            parse_all_effects(card)
             print('\n    },')
     print('  },')
 
@@ -176,10 +182,11 @@ def parse_file(data):
         if 'disabled' in card and card['disabled']:
             continue
         card['expansion'] = f'fistfulofcards {card["expansion"]}' if 'expansion' in card else 'fistfulofcards'
+        card['deck'] = 'fistfulofcards'
         if 'tags' in card and 'hidden' in card['tags']:
             hidden_cards.append(card)
         else:
-            parse_all_effects(card, 'fistfulofcards')
+            parse_all_effects(card)
             print('\n    },')
     print('  },')
 
@@ -188,7 +195,8 @@ def parse_file(data):
         if 'disabled' in card and card['disabled']:
             continue
         card['expansion'] = 'wildwestshow'
-        parse_all_effects(card, 'wildwestshow')
+        card['deck'] = 'wildwestshow'
+        parse_all_effects(card)
         print('\n    },')
     print('  },')
 

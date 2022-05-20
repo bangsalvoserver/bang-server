@@ -32,8 +32,8 @@ namespace banggame {
         (mth_holder) multi_target_handler,
         (target_player_filter) equip_target,
         
-        (card_sign) sign,
-        (card_color_type) color
+        (card_color_type) color,
+        (card_sign) sign
     )
 
         bool has_tag(tag_type tag) const {
