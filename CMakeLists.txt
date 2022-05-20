@@ -62,6 +62,7 @@ add_custom_command(
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 add_library(bang_cards_obj OBJECT "${bang_cards_cpp}")
+set_property(TARGET bang_cards_obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories(bang_cards_obj PRIVATE src)
 target_include_directories(bang_cards_obj PRIVATE $<TARGET_PROPERTY:cpputils,INCLUDE_DIRECTORIES>)
 
