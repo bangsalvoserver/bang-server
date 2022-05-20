@@ -116,7 +116,7 @@ namespace banggame {
         return ret;
     }
 
-    void game::start_game(const game_options &options, const all_cards_t &all_cards) {
+    void game::start_game(const game_options &options) {
         m_options = options;
         
         auto add_card = [&](pocket_type pocket, const card_data &c) {

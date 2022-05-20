@@ -56,8 +56,8 @@ namespace banggame {
     };
 
     struct tag_holder {REFLECTABLE(
-        (tag_type) type,
-        (short) tag_value
+        (short) tag_value,
+        (tag_type) type
     )};
 
     class request_holder {

@@ -57,6 +57,19 @@ namespace banggame {
         }
     };
 
+    struct all_cards_t {
+        std::vector<card_data> deck;
+        std::vector<card_data> characters;
+        std::vector<card_data> goldrush;
+        std::vector<card_data> highnoon;
+        std::vector<card_data> fistfulofcards;
+        std::vector<card_data> wildwestshow;
+        std::vector<card_data> specials;
+        std::vector<card_data> hidden;
+    };
+
+    extern const all_cards_t all_cards;
+
 }
 
 #endif

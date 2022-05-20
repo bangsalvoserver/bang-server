@@ -29,7 +29,6 @@ set(banggame_srcs
     src/game/holders.cpp
     src/game/game.cpp
     src/game/game_table.cpp
-    src/game/make_all_cards.cpp
     src/game/draw_check_handler.cpp
     src/game/player.cpp
     src/game/play_verify.cpp
@@ -41,7 +40,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(jsoncpp REQUIRED jsoncpp IMPORTED_TARGET)
 
 add_subdirectory(external/cpputils)
-add_subdirectory(resources)
 
 add_library(networking INTERFACE)
 target_include_directories(networking INTERFACE external/websocketpp)
@@ -50,8 +48,25 @@ if(MINGW)
     target_link_libraries(networking INTERFACE wsock32 ws2_32)
 endif()
 
+set(bang_cards_cpp "${CMAKE_CURRENT_BINARY_DIR}/bang_cards.cpp")
+add_custom_command(
+    OUTPUT "${bang_cards_cpp}"
+    COMMAND python
+        resources/parse_bang_cards.py
+        resources/bang_cards.yml >
+        "${bang_cards_cpp}"
+    VERBATIM
+    DEPENDS
+        resources/parse_bang_cards.py
+        resources/bang_cards.yml
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+add_library(bang_cards_obj OBJECT "${bang_cards_cpp}")
+target_include_directories(bang_cards_obj PRIVATE src)
+target_include_directories(bang_cards_obj PRIVATE $<TARGET_PROPERTY:cpputils,INCLUDE_DIRECTORIES>)
+
 add_library(banggame SHARED ${banggame_srcs})
-target_link_libraries(banggame PUBLIC cpputils bang_cards_json PkgConfig::jsoncpp)
+target_link_libraries(banggame PUBLIC cpputils bang_cards_obj PkgConfig::jsoncpp)
 target_include_directories(banggame PUBLIC src)
 
 option(DEBUG_PRINT_GAME_UPDATES "Debug Option: Print Game Updates" OFF)

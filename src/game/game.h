@@ -5,7 +5,6 @@
 #include "game_table.h"
 #include "request_queue.h"
 #include "draw_check_handler.h"
-#include "make_all_cards.h"
 
 namespace banggame {
 
@@ -20,7 +19,7 @@ namespace banggame {
 
         std::vector<game_update> get_game_state_updates(player *owner);
 
-        void start_game(const game_options &options, const all_cards_t &all_cards);
+        void start_game(const game_options &options);
 
         request_status_args make_request_update(player *p);
         void send_request_update();

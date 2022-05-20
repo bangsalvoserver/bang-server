@@ -23,7 +23,7 @@ struct lobby : lobby_info {
     lobby_state state;
 
     banggame::game game;
-    void start_game(game_manager &mgr, const banggame::all_cards_t &all_cards);
+    void start_game(game_manager &mgr);
     void send_updates(game_manager &mgr);
 };
 
@@ -109,8 +109,6 @@ private:
     
     send_message_function m_send_message;
     print_error_function m_print_error;
-
-    banggame::all_cards_t all_cards;
 
     friend class lobby;
 };

@@ -252,7 +252,7 @@ void game_manager::HANDLE_MESSAGE(game_start, user_ptr user) {
     lobby.state = lobby_state::playing;
     send_lobby_update(user->second.in_lobby);
 
-    lobby.start_game(*this, all_cards);
+    lobby.start_game(*this);
 }
 
 void game_manager::HANDLE_MESSAGE(game_action, user_ptr user, const game_action &value) {
@@ -292,7 +292,7 @@ void lobby::send_updates(game_manager &mgr) {
     }
 }
 
-void lobby::start_game(game_manager &mgr, const banggame::all_cards_t &all_cards) {
+void lobby::start_game(game_manager &mgr) {
     game_options opts;
     opts.expansions = expansions;
     opts.keep_last_card_shuffling = false;
@@ -314,5 +314,5 @@ void lobby::start_game(game_manager &mgr, const banggame::all_cards_t &all_cards
         ++it;
     }
 
-    game.start_game(opts, all_cards);
+    game.start_game(opts);
 }

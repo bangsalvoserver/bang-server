@@ -1,0 +1,2116 @@
+---
+main_deck:
+  - name: BARREL
+    signs:
+      - Q spades
+      - K spades
+    image: 01_barile
+    color: blue
+    responses:
+      - barrel
+  - name: DYNAMITE
+    signs:
+      - 2 hearts
+    image: 01_dinamite
+    color: blue
+    equip:
+      - dynamite
+  - name: SCOPE
+    signs:
+      - A spades
+    image: 01_mirino
+    color: blue
+    equip:
+      - scope
+  - name: MUSTANG
+    signs:
+      - 8 hearts
+      - 9 hearts
+    image: 01_mustang
+    color: blue
+    equip:
+      - horse
+      - mustang
+    tags:
+      - horse
+  - name: JAIL
+    signs:
+      - J spades
+      - 4 hearts
+      - 10 spades
+    image: 01_prigione
+    color: blue
+    equip_target: notsheriff
+    equip:
+      - jail
+      - prompt_on_self_equip
+  - name: REMINGTON
+    signs:
+      - K clubs
+    image: 01_remington
+    color: blue
+    equip:
+      - weapon(3)
+    tags:
+      - weapon
+  - name: REV_CARABINE
+    signs:
+      - A clubs
+    image: 01_carabine
+    color: blue
+    equip:
+      - weapon(4)
+    tags:
+      - weapon
+  - name: SCHOFIELD
+    signs:
+      - J clubs
+      - Q clubs
+      - K spades
+    image: 01_schofield
+    color: blue
+    equip:
+      - weapon(2)
+    tags:
+      - weapon
+  - name: VOLCANIC
+    signs:
+      - 10 spades
+      - 10 clubs
+    image: 01_volcanic
+    color: blue
+    equip:
+      - weapon(1)
+      - volcanic
+    tags:
+      - weapon
+  - name: WINCHESTER
+    signs:
+      - 8 spades
+    image: 01_winchester
+    color: blue
+    equip:
+      - weapon(5)
+    tags:
+      - weapon
+  - name: BANG
+    signs:
+      - 2 clubs
+      - 3 clubs
+      - 4 clubs
+      - 5 clubs
+      - 6 clubs
+      - 7 clubs
+      - 8 clubs
+      - 9 clubs
+      - A diamonds
+      - 2 diamonds
+      - 3 diamonds
+      - 4 diamonds
+      - 5 diamonds
+      - 6 diamonds
+      - 7 diamonds
+      - 8 diamonds
+      - 9 diamonds
+      - 10 diamonds
+      - J diamonds
+      - Q diamonds
+      - K diamonds
+      - A hearts
+      - Q hearts
+      - K hearts
+      - A spades
+    image: 01_bang
+    color: brown
+    effects:
+      - banglimit
+      - bangcard player reachable notself
+    responses:
+      - bangresponse
+    tags:
+      - bangcard
+  - name: BEER
+    signs:
+      - 6 hearts
+      - 7 hearts
+      - 8 hearts
+      - 9 hearts
+      - 10 hearts
+      - J hearts
+    image: 01_birra
+    color: brown
+    effects:
+      - beer
+    responses:
+      - beer
+      - deathsave
+    tags:
+      - beer
+  - name: CAT_BALOU
+    signs:
+      - K hearts
+      - 9 diamonds
+      - 10 diamonds
+      - J diamonds
+    image: 01_catbalou
+    color: brown
+    effects:
+      - destroy card
+  - name: STAGECOACH
+    signs:
+      - 9 spades
+      - 9 spades
+    image: 01_diligenza
+    color: brown
+    effects:
+      - draw(2)
+  - name: DUEL
+    signs:
+      - Q diamonds
+      - J spades
+      - 8 clubs
+    image: 01_duello
+    color: brown
+    effects:
+      - duel player notself
+  - name: GENERAL_STORE
+    signs:
+      - 9 clubs
+      - Q spades
+    image: 01_emporio
+    color: brown
+    effects:
+      - generalstore
+  - name: GATLING
+    signs:
+      - 10 hearts
+    image: 01_gatling
+    color: brown
+    effects:
+      - bang other_players
+  - name: INDIANS
+    signs:
+      - K diamonds
+      - A diamonds
+    image: 01_indiani
+    color: brown
+    effects:
+      - indians other_players
+    tags:
+      - indians
+  - name: MISSED
+    signs:
+      - 2 spades
+      - 3 spades
+      - 4 spades
+      - 5 spades
+      - 6 spades
+      - 7 spades
+      - 8 spades
+      - A clubs
+      - 10 clubs
+      - J clubs
+      - Q clubs
+      - K clubs
+    image: 01_mancato
+    color: brown
+    responses:
+      - missed
+    tags:
+      - missedcard
+  - name: PANIC
+    signs:
+      - J hearts
+      - Q hearts
+      - A hearts
+      - 8 diamonds
+    image: 01_panico
+    color: brown
+    effects:
+      - steal card range_1
+  - name: SALOON
+    signs:
+      - 5 hearts
+    image: 01_saloon
+    color: brown
+    effects:
+      - saloon
+  - name: WELLS_FARGO
+    signs:
+      - 3 hearts
+    image: 01_wellsfargo
+    color: brown
+    effects:
+      - draw(3)
+  - name: BARREL
+    signs:
+      - A clubs
+    image: 03_barile
+    expansion: dodgecity
+    color: blue
+    responses:
+      - barrel
+  - name: BINOCULAR
+    signs:
+      - 10 diamonds
+    image: 03_binocolo
+    expansion: dodgecity
+    color: blue
+    equip:
+      - scope
+  - name: DYNAMITE
+    signs:
+      - 10 clubs
+    image: 03_dinamite
+    expansion: dodgecity
+    color: blue
+    equip:
+      - dynamite
+  - name: MUSTANG
+    signs:
+      - 5 hearts
+    image: 03_mustang
+    expansion: dodgecity
+    color: blue
+    equip:
+      - horse
+      - mustang
+    tags:
+      - horse
+  - name: REMINGTON
+    signs:
+      - 6 diamonds
+    image: 03_remington
+    expansion: dodgecity
+    color: blue
+    equip:
+      - weapon(3)
+    tags:
+      - weapon
+  - name: REV_CARABINE
+    signs:
+      - 5 spades
+    image: 03_rev_carabine
+    expansion: dodgecity
+    color: blue
+    equip:
+      - weapon(4)
+    tags:
+      - weapon
+  - name: HIDEOUT
+    signs:
+      - K diamonds
+    image: 03_riparo
+    expansion: dodgecity
+    color: blue
+    equip:
+      - mustang
+  - name: BANG
+    signs:
+      - 8 spades
+      - 5 clubs
+      - 6 clubs
+      - K clubs
+    image: 03_bang
+    expansion: dodgecity
+    color: brown
+    effects:
+      - banglimit
+      - bangcard player reachable notself
+    responses:
+      - bangresponse
+    tags:
+      - bangcard
+  - name: BEER
+    signs:
+      - 6 hearts
+      - 6 spades
+    image: 03_birra
+    expansion: dodgecity
+    color: brown
+    effects:
+      - beer
+    responses:
+      - beer
+      - deathsave
+    tags:
+      - beer
+  - name: CAT_BALOU
+    signs:
+      - 8 clubs
+    image: 03_cat_balou
+    expansion: dodgecity
+    color: brown
+    effects:
+      - destroy card
+  - name: GENERAL_STORE
+    signs:
+      - A spades
+    image: 03_emporio
+    expansion: dodgecity
+    color: brown
+    effects:
+      - generalstore
+  - name: INDIANS
+    signs:
+      - 5 diamonds
+    image: 03_indiani
+    expansion: dodgecity
+    color: brown
+    effects:
+      - indians other_players
+    tags:
+      - indians
+  - name: MISSED
+    signs:
+      - 8 diamonds
+    image: 03_mancato
+    expansion: dodgecity
+    color: brown
+    responses:
+      - missed
+    tags:
+      - missedcard
+  - name: PANIC
+    signs:
+      - J hearts
+    image: 03_panico
+    expansion: dodgecity
+    color: brown
+    effects:
+      - steal card range_1
+  - name: PUNCH
+    signs:
+      - 10 spades
+    image: 03_pugno
+    expansion: dodgecity
+    color: brown
+    effects:
+      - bang player notself range_1
+  - name: RAG_TIME
+    signs:
+      - 9 hearts
+    image: 03_rag_time
+    expansion: dodgecity
+    color: brown
+    effects:
+      - destroy card self | hand
+      - play_card_action
+      - steal card
+  - name: BRAWL
+    signs:
+      - J spades
+    image: 03_rissa
+    expansion: dodgecity
+    color: brown
+    effects:
+      - destroy card self | hand
+      - play_card_action
+      - destroy cards_other_players
+  - name: DODGE
+    signs:
+      - 7 diamonds
+      - K hearts
+    image: 03_schivata
+    expansion: dodgecity
+    color: brown
+    responses:
+      - draw
+      - missed
+  - name: SPRINGFIELD
+    signs:
+      - K spades
+    image: 03_springfield
+    expansion: dodgecity
+    color: brown
+    effects:
+      - destroy card self | hand
+      - play_card_action
+      - bang player notself
+  - name: TEQUILA
+    signs:
+      - 9 clubs
+    image: 03_tequila
+    expansion: dodgecity
+    color: brown
+    effects:
+      - destroy card self | hand
+      - play_card_action
+      - heal player
+  - name: WHISKY
+    signs:
+      - Q hearts
+    image: 03_whisky
+    expansion: dodgecity
+    color: brown
+    effects:
+      - destroy card self | hand
+      - play_card_action
+      - heal(2)
+  - name: BIBLE
+    signs:
+      - 10 hearts
+    image: 03_bibbia
+    expansion: dodgecity
+    color: green
+    responses:
+      - draw
+      - missed
+  - name: CANTEEN
+    signs:
+      - 7 hearts
+    image: 03_borraccia
+    expansion: dodgecity
+    color: green
+    effects:
+      - heal
+  - name: CAN_CAN
+    signs:
+      - J clubs
+    image: 03_can_can
+    expansion: dodgecity
+    color: green
+    effects:
+      - destroy card
+  - name: TEN_GALLON_HAT
+    signs:
+      - J diamonds
+    image: 03_cappello
+    expansion: dodgecity
+    color: green
+    responses:
+      - missed
+  - name: CONESTOGA
+    signs:
+      - 9 diamonds
+    image: 03_conestoga
+    expansion: dodgecity
+    color: green
+    effects:
+      - steal card
+  - name: DERRINGER
+    signs:
+      - 7 spades
+    image: 03_derringer
+    expansion: dodgecity
+    color: green
+    effects:
+      - bang player notself range_1
+      - draw
+  - name: BUFFALO_RIFLE
+    signs:
+      - 9 clubs
+    image: 03_fucile_da_caccia
+    expansion: dodgecity
+    color: green
+    effects:
+      - bang player notself
+  - name: HOWITZER
+    signs:
+      - 9 spades
+    image: 03_howitzer
+    expansion: dodgecity
+    color: green
+    effects:
+      - bang other_players
+  - name: PEPPERBOX
+    signs:
+      - A hearts
+    image: 03_pepperbox
+    expansion: dodgecity
+    color: green
+    effects:
+      - bang player reachable notself
+  - name: IRON_PLATE
+    signs:
+      - A diamonds
+      - Q spades
+    image: 03_placca_di_ferro
+    expansion: dodgecity
+    color: green
+    responses:
+      - missed
+  - name: PONY_EXPRESS
+    signs:
+      - Q diamonds
+    image: 03_pony_express
+    expansion: dodgecity
+    color: green
+    effects:
+      - draw(3)
+  - name: KNIFE
+    signs:
+      - 8 hearts
+    image: 03_pugnale
+    expansion: dodgecity
+    color: green
+    effects:
+      - bang player notself range_1
+  - name: SOMBRERO
+    signs:
+      - 7 clubs
+    image: 03_sombrero
+    expansion: dodgecity
+    color: green
+    responses:
+      - missed
+  - name: GHOST
+    signs:
+      - 9 spades
+      - 10 spades
+    image: 07_fantasma
+    expansion: valleyofshadows ghostcards
+    color: blue
+    equip_target: dead
+    equip:
+      - ghost
+    tags:
+      - discard_if_two_players
+  - name: LEMAT
+    signs:
+      - 4 diamonds
+    image: 07_lemat
+    expansion: valleyofshadows
+    color: blue
+    equip:
+      - weapon(1)
+    effects:
+      - banglimit
+      - choose_card card self | hand
+      - bangcard player reachable notself
+    tags:
+      - weapon
+      - bangproxy
+  - name: RATTLESNAKE
+    signs:
+      - 7 hearts
+    image: 07_serpenteasonagli
+    expansion: valleyofshadows
+    color: blue
+    equip_target: any
+    equip:
+      - snake
+      - prompt_on_self_equip
+  - name: SHOTGUN
+    signs:
+      - K spades
+    image: 07_shotgun
+    expansion: valleyofshadows
+    color: blue
+    equip:
+      - weapon(1)
+      - shotgun
+    tags:
+      - weapon
+  - name: BOUNTY
+    signs:
+      - 9 clubs
+    image: 07_taglia
+    expansion: valleyofshadows
+    color: blue
+    equip_target: any
+    equip:
+      - bounty
+      - prompt_on_self_equip
+  - name: BANDIDOS
+    signs:
+      - Q diamonds
+    image: 07_bandidos
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - bandidos player self
+      - bandidos other_players
+  - name: ESCAPE
+    signs:
+      - 3 hearts
+    image: 07_fuga
+    expansion: valleyofshadows
+    color: brown
+    responses:
+      - escape
+  - name: AIM
+    signs:
+      - 6 clubs
+    image: 07_mira
+    expansion: valleyofshadows
+    color: brown
+    modifier: bangmod
+    effects:
+      - aim
+  - name: POKER
+    signs:
+      - J hearts
+    image: 07_poker
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - poker
+  - name: BACKFIRE
+    signs:
+      - Q clubs
+    image: 07_ritornodifiamma
+    expansion: valleyofshadows
+    color: brown
+    responses:
+      - backfire
+      - missed
+    tags:
+      - missedcard
+  - name: SAVED
+    signs:
+      - 5 hearts
+    image: 07_salvo
+    expansion: valleyofshadows
+    color: brown
+    responses:
+      - saved
+  - name: FANNING
+    signs:
+      - 2 spades
+    image: 07_sventagliata
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - mth_add player reachable notself
+      - mth_add player notself
+      - banglimit
+    multitarget: fanning
+    tags:
+      - discard_if_two_players
+  - name: TOMAHAWK
+    signs:
+      - A diamonds
+    image: 07_tomahawk
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - bang player notself range_2
+  - name: TORNADO
+    signs:
+      - A clubs
+    image: 07_tornado
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - tornado player self
+      - tornado other_players
+  - name: LAST_CALL
+    signs:
+      - 8 diamonds
+    image: 07_ultimogiro
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - heal
+  - name: BANG
+    signs:
+      - 6 hearts
+      - 2 clubs
+      - 2 diamonds
+      - 3 diamonds
+    image: 17_bang
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - banglimit
+      - bangcard player reachable notself
+    responses:
+      - bangresponse
+    tags:
+      - bangcard
+  - name: CARAVAN
+    signs:
+      - 2 spades
+    image: 17_carovana
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - mth_add
+      - mth_add
+    optional:
+      - select_cube card self | cube_slot
+      - select_cube card self | cube_slot
+      - mth_add
+    tags:
+      - repeatable
+    multitarget: draw_atend
+  - name: CAT_BALOU
+    signs:
+      - 3 hearts
+    image: 17_catbalou
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - destroy card
+  - name: A_LITTLE_NIP
+    signs:
+      - 5 hearts
+    image: 17_cicchetto
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - mth_add
+    optional:
+      - select_cube card self | cube_slot
+      - select_cube card self | cube_slot
+      - select_cube card self | cube_slot
+      - mth_add
+    tags:
+      - repeatable
+    multitarget: heal_multi
+  - name: QUICK_SHOT
+    signs:
+      - 3 spades
+    image: 17_colporapido
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - bang player reachable notself
+    optional:
+      - select_cube card self | cube_slot
+      - bang conditional_player reachable notself
+    tags:
+      - repeatable
+      - auto_confirm
+  - name: FLINTLOCK
+    signs:
+      - A spades
+    image: 17_flintlock
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - mth_add player reachable notself
+    optional:
+      - select_cube card self | cube_slot
+      - select_cube card self | cube_slot
+      - mth_add
+    multitarget: flintlock
+  - name: ARROW
+    signs:
+      - 5 diamonds
+    image: 17_freccia
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - indians player notself
+    optional:
+      - select_cube card self | cube_slot
+      - indians conditional_player notself
+    tags:
+      - repeatable
+      - auto_confirm
+      - indians
+  - name: DUCK
+    signs:
+      - 3 diamonds
+    image: 17_giulatesta
+    expansion: armedanddangerous
+    color: brown
+    responses:
+      - missedlike
+    optional:
+      - select_cube card self | cube_slot
+      - select_cube card self | cube_slot
+      - mth_add
+    multitarget: duck
+  - name: MISSED
+    signs:
+      - K spades
+    image: 17_mancato
+    expansion: armedanddangerous
+    color: brown
+    responses:
+      - missed
+    tags:
+      - missedcard
+  - name: RELOAD
+    signs:
+      - 4 diamonds
+    image: 17_ricarica
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - reload
+  - name: RUST
+    signs:
+      - 9 spades
+    image: 17_ruggine
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - rust other_players
+  - name: SQUAW
+    signs:
+      - 3 diamonds
+    image: 17_squaw
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - mth_add card | table
+    optional:
+      - mth_add card self | cube_slot
+      - mth_add card self | cube_slot
+    multitarget: squaw
+  - name: ACE_UP_THE_SLEEVE
+    signs:
+      - A hearts
+    image: 17_assonellamanica
+    expansion: armedanddangerous
+    color: orange
+    effects:
+      - pay_cube(2)
+      - draw
+  - name: BANDOLIER
+    signs:
+      - 2 hearts
+    image: 17_bandoliera
+    expansion: armedanddangerous
+    color: orange
+    modifier: bandolier
+    effects:
+      - max_usages(1)
+      - pay_cube
+      - bandolier
+  - name: BIG_FIFTY
+    signs:
+      - Q spades
+    image: 17_bigfifty
+    expansion: armedanddangerous
+    color: orange
+    modifier: bangmod
+    equip:
+      - weapon(6)
+    effects:
+      - pay_cube
+      - bigfifty
+    tags:
+      - weapon
+  - name: BOMB
+    signs:
+      - 7 diamonds
+    image: 17_bomba
+    expansion: armedanddangerous
+    color: orange
+    equip_target: any
+    equip:
+      - bomb
+      - prompt_on_self_equip
+    responses:
+      - move_bomb
+      - mth_add player
+    multitarget: move_bomb
+  - name: BUNTLINE_SPECIAL
+    signs:
+      - J spades
+    image: 17_buntlinespecial
+    expansion: armedanddangerous
+    color: orange
+    modifier: bangmod
+    equip:
+      - weapon(2)
+    effects:
+      - pay_cube
+      - buntlinespecial
+    tags:
+      - weapon
+  - name: BELL_TOWER
+    signs:
+      - 7 clubs
+    image: 17_campanile
+    expansion: armedanddangerous
+    color: orange
+    modifier: belltower
+    effects:
+      - pay_cube
+  - name: CRATE
+    signs:
+      - 3 hearts
+    image: 17_cassa
+    expansion: armedanddangerous
+    color: orange
+    responses:
+      - pay_cube(2)
+      - missed
+  - name: TUMBLEWEED
+    signs:
+      - 4 clubs
+    image: 17_cespuglio
+    expansion: armedanddangerous
+    color: orange
+    equip:
+      - tumbleweed
+    responses:
+      - pay_cube
+      - tumbleweed
+  - name: DOUBLE_BARREL
+    signs:
+      - 6 clubs
+    image: 17_doppiacanna
+    expansion: armedanddangerous
+    color: orange
+    modifier: bangmod
+    equip:
+      - weapon(1)
+    effects:
+      - pay_cube
+      - doublebarrel
+    tags:
+      - weapon
+  - name: WHIP
+    signs:
+      - 5 clubs
+    image: 17_frusta
+    expansion: armedanddangerous
+    color: orange
+    effects:
+      - pay_cube(3)
+      - destroy card | table
+  - name: BEER_KEG
+    signs:
+      - 4 hearts
+    image: 17_fustodibirra
+    expansion: armedanddangerous
+    color: orange
+    effects:
+      - pay_cube(3)
+      - heal
+  - name: LOCKPICK
+    signs:
+      - 2 clubs
+    image: 17_grimaldello
+    expansion: armedanddangerous
+    color: orange
+    effects:
+      - pay_cube(3)
+      - steal card notself | hand
+  - name: THUNDERER
+    signs:
+      - 3 clubs
+    image: 17_thunderer
+    expansion: armedanddangerous
+    color: orange
+    modifier: bangmod
+    equip:
+      - weapon(3)
+    effects:
+      - pay_cube
+      - thunderer
+    tags:
+      - weapon
+  - name: GRAVE_ROBBER
+    signs:
+      - 8 spades
+    image: 20_tombarolo
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - graverobber
+      - play_card_action
+  - name: CARD_SHARPER
+    signs:
+      - 10 clubs
+    image: 20_baro
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - mth_add card self | table blue
+      - mth_add card notself | table blue
+    multitarget: card_sharper
+  - name: MIRAGE
+    signs:
+      - 8 hearts
+    image: 20_miraggio
+    expansion: canyondiablo
+    color: brown
+    responses:
+      - mirage
+      - missed
+  - name: BLOOD_PACT
+    signs:
+      - J hearts
+    image: 20_pattodisangue
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - damage player self
+      - heal_notfull player notself
+  - name: SACRIFICE
+    signs:
+      - 10 hearts
+    image: 20_sacrificio
+    expansion: canyondiablo
+    color: brown
+    responses:
+      - sacrifice
+  - name: DISARM
+    signs:
+      - 7 hearts
+    image: 20_disarmare
+    expansion: canyondiablo
+    color: brown
+    responses:
+      - disarm
+      - missed
+    tags:
+      - missedcard
+  - name: MOLOTOV
+    signs:
+      - A hearts
+    image: 20_molotov
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - bang player reachable notself
+  - name: MISSED
+    signs:
+      - J spades
+      - 6 clubs
+    image: 20_mancato
+    expansion: canyondiablo
+    color: brown
+    responses:
+      - missed
+    tags:
+      - missedcard
+  - name: BANG
+    signs:
+      - 10 spades
+      - Q clubs
+      - 8 diamonds
+      - 6 diamonds
+    image: 20_bang
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - banglimit
+      - bangcard player reachable notself
+    responses:
+      - bangresponse
+    tags:
+      - bangcard
+  - name: PANIC
+    signs:
+      - 9 hearts
+    image: 01_panico
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - steal card range_1
+  - name: BEER
+    signs:
+      - Q hearts
+    image: 01_birra
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - beer
+    responses:
+      - beer
+      - deathsave
+    tags:
+      - beer
+  - name: CAT_BALOU
+    signs:
+      - J clubs
+    image: 01_catbalou
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - destroy card
+  - name: BULLDOG
+    signs:
+      - 7 diamonds
+    image: 20_bulldog
+    expansion: canyondiablo
+    color: blue
+    equip:
+      - weapon(2)
+    effects:
+      - max_usages(1)
+      - choose_card card self | hand bang
+      - destroy card self | hand
+      - bang other_players
+    tags:
+      - weapon
+  - name: LAST_WILL
+    signs:
+      - A spades
+    image: 20_ultimevolonta
+    expansion: canyondiablo
+    color: blue
+    equip_target: any
+    responses:
+      - max_usages(1)
+      - lastwill
+      - mth_add player notself
+      - mth_add card self
+    optional:
+      - mth_add card self
+    tags:
+      - repeatable(2)
+      - discard_if_two_players
+    multitarget: lastwill
+  - name: INDIAN_GUIDE
+    signs:
+      - 8 clubs
+    image: 20_guidaindiana
+    expansion: canyondiablo
+    color: blue
+    equip:
+      - indianguide
+  - name: REMINGTON
+    signs:
+      - K spades
+    image: 20_remington
+    expansion: canyondiablo
+    color: blue
+    equip:
+      - weapon(3)
+    tags:
+      - weapon
+  - name: TAXMAN
+    signs:
+      - K clubs
+    image: 20_esattore
+    expansion: canyondiablo
+    color: blue
+    equip_target: any
+    equip:
+      - taxman
+      - prompt_on_self_equip
+  - name: BROTHEL
+    signs:
+      - 7 clubs
+    image: 20_bordello
+    expansion: canyondiablo
+    color: blue
+    equip_target: any
+    equip:
+      - brothel
+      - prompt_on_self_equip
+  - name: BRONCO
+    signs:
+      - Q diamonds
+    image: 20_bronco
+    expansion: canyondiablo
+    color: blue
+    equip:
+      - horse
+      - mustang
+      - bronco
+    tags:
+      - horse
+      - bronco
+  - name: PACK_MULE
+    signs:
+      - Q spades
+    image: 20_mulo
+    expansion: canyondiablo
+    color: blue
+    equip:
+      - horse
+      - packmule
+    tags:
+      - horse
+  - name: WAR_PATH
+    signs:
+      - K diamonds
+    image: 20_sentierodiguerra
+    expansion: canyondiablo
+    color: green
+    effects:
+      - indians other_players
+    tags:
+      - indians
+  - name: ARSON
+    signs:
+      - J diamonds
+    image: 20_incendio
+    expansion: canyondiablo
+    color: green
+    effects:
+      - destroy cards_other_players
+  - name: FLYING_BULLET
+    signs:
+      - 10 diamonds
+    image: 20_proiettilevagante
+    expansion: canyondiablo
+    color: brown
+    responses:
+      - missed
+      - bang conditional_player notself range_1
+    tags:
+      - missedcard
+  - name: ON_THE_HOUSE
+    signs:
+      - K hearts
+    image: 20_offrelacasa
+    expansion: canyondiablo
+    color: green
+    effects:
+      - heal_notfull player self
+      - draw
+  - name: GUITAR
+    signs:
+      - 9 clubs
+    image: 20_chitarra
+    expansion: canyondiablo
+    color: blue
+    equip_target: any
+    equip:
+      - weapon(0)
+      - prompt_on_self_equip
+    tags:
+      - weapon
+  - name: SCRAPPER
+    signs:
+      - 9 spades
+    image: 20_attaccabrighe
+    expansion: canyondiablo
+    color: green
+    effects:
+      - steal card range_1
+  - name: SHYLOCK
+    signs:
+      - 9 diamonds
+    image: 20_strozzino
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - draw(2)
+      - damage player self
+  - name: DODGE
+    signs:
+      - 7 spades
+    image: 20_schivata
+    expansion: canyondiablo
+    color: brown
+    responses:
+      - draw
+      - missed
+character:
+  - name: BART_CASSIDY
+    image: 01_bartcassidy
+    equip:
+      - boots
+  - name: BLACK_JACK
+    image: 01_blackjack
+    equip:
+      - black_jack
+  - name: CALAMITY_JANET
+    image: 01_calamityjanet
+    equip:
+      - calamity_janet
+    effects:
+      - banglimit
+      - choose_card card self | hand bang
+      - bangcard player reachable notself
+    tags:
+      - bangproxy
+  - name: EL_GRINGO
+    image: 01_elgringo
+    equip:
+      - el_gringo
+    tags:
+      - max_hp(3)
+  - name: JESSE_JONES
+    image: 01_jessejones
+    responses:
+      - end_drawing
+      - steal card notself | hand
+      - draw_one_less
+    tags:
+      - drawing
+  - name: JOURDONNAINS
+    image: 01_jourdonnais
+    responses:
+      - barrel
+  - name: KIT_CARLSON
+    image: 01_kitcarlson
+    equip:
+      - kit_carlson
+  - name: LUCKY_DUKE
+    image: 01_luckyduke
+    equip:
+      - horsecharm
+  - name: PAUL_REGRET
+    image: 01_paulregret
+    equip:
+      - mustang
+    tags:
+      - max_hp(3)
+  - name: PEDRO_RAMIREZ
+    image: 01_pedroramirez
+    responses:
+      - end_drawing
+      - draw_discard player self
+      - draw_one_less
+    tags:
+      - drawing
+  - name: ROSE_DOOLAN
+    image: 01_rosedoolan
+    equip:
+      - scope
+  - name: SID_KETCHUM
+    image: 01_sidketchum
+    effects:
+      - destroy card self | hand
+      - destroy card self | hand
+      - heal
+    responses:
+      - destroy card self | hand
+      - destroy card self | hand
+      - heal
+      - deathsave
+  - name: SLAB_THE_KILLER
+    image: 01_slab
+    equip:
+      - slab_the_killer
+  - name: SUZY_LAFAYETTE
+    image: 01_suzylafayette
+    equip:
+      - suzy_lafayette
+  - name: VULTURE_SAM
+    image: 01_vulturesam
+    equip:
+      - vulture_sam
+    tags:
+      - vulture_sam
+      - discard_if_two_players
+  - name: WILLY_THE_KID
+    image: 01_willythekid
+    equip:
+      - volcanic
+  - name: CLAUS_THE_SAINT
+    image: 02_clausthesaint
+    expansion: thebullet
+    equip:
+      - claus_the_saint
+    tags:
+      - max_hp(3)
+  - name: JOHNNY_KISCH
+    image: 02_johnnykisch
+    expansion: thebullet
+    equip:
+      - johnny_kisch
+  - name: UNCLE_WILL
+    image: 02_unclewill
+    expansion: thebullet
+    effects:
+      - max_usages(1)
+      - destroy card self | hand
+      - generalstore
+  - name: APACHE_KID
+    image: 03_apache_kid
+    expansion: dodgecity
+    equip:
+      - calumet
+    tags:
+      - max_hp(3)
+  - name: BELLE_STAR
+    image: 03_belle_star
+    expansion: dodgecity
+    equip:
+      - bellestar
+  - name: BILL_NOFACE
+    image: 03_bill_noface
+    expansion: dodgecity
+    equip:
+      - bill_noface
+  - name: CHUCK_WENGAM
+    image: 03_chuck_wengam
+    expansion: dodgecity
+    effects:
+      - damage player self
+      - draw(2)
+  - name: DOC_HOLYDAY
+    image: 03_doc_holyday
+    expansion: dodgecity
+    effects:
+      - max_usages(1)
+      - mth_add card self | hand
+      - mth_add card self | hand
+      - mth_add player reachable notself
+    multitarget: doc_holyday
+  - name: ELENA_FUENTE
+    image: 03_elena_fuente
+    expansion: dodgecity
+    responses:
+      - destroy card self | hand
+      - missed
+    tags:
+      - max_hp(3)
+  - name: GREG_DIGGER
+    image: 03_greg_digger
+    expansion: dodgecity
+    equip:
+      - greg_digger
+    tags:
+      - discard_if_two_players
+  - name: HERB_HUNTER
+    image: 03_herb_hunter
+    expansion: dodgecity
+    equip:
+      - herb_hunter
+    tags:
+      - discard_if_two_players
+  - name: JOSE_DELGADO
+    image: 03_jose_delgado
+    expansion: dodgecity
+    effects:
+      - max_usages(2)
+      - destroy card self | hand blue
+      - draw(2)
+  - name: MOLLY_STARK
+    image: 03_molly_stark
+    expansion: dodgecity
+    equip:
+      - molly_stark
+  - name: PAT_BRENNAN
+    image: 03_pat_brennan
+    expansion: dodgecity
+    responses:
+      - end_drawing
+      - steal card | table
+    tags:
+      - drawing
+  - name: PIXIE_PETE
+    image: 03_pixie_pete
+    expansion: dodgecity
+    equip:
+      - pickaxe
+    tags:
+      - max_hp(3)
+  - name: SEAN_MALLORY
+    image: 03_sean_mallory
+    expansion: dodgecity
+    equip:
+      - gunbelt(10)
+    tags:
+      - max_hp(3)
+  - name: TEQUILA_JOE
+    image: 03_tequila_joe
+    expansion: dodgecity
+    equip:
+      - tequila_joe
+  - name: VERA_CUSTER
+    image: 03_vera_custer
+    expansion: dodgecity
+    equip:
+      - vera_custer
+    tags:
+      - max_hp(3)
+  - name: BLACK_FLOWER
+    image: 07_blackflower
+    expansion: valleyofshadows
+    effects:
+      - max_usages(1)
+      - destroy card self | hand clubs
+      - bang player reachable notself
+  - name: COLORADO_BILL
+    image: 07_coloradobill
+    expansion: valleyofshadows
+    equip:
+      - colorado_bill
+  - name: DER_SPOT_BURST_RINGER
+    image: 07_derspot
+    expansion: valleyofshadows
+    effects:
+      - max_usages(1)
+      - choose_card card self | hand bang
+      - bang other_players
+  - name: EVELYN_SHEBANG
+    image: 07_evelynshebang
+    expansion: valleyofshadows
+    equip:
+      - evelyn_shebang
+    responses:
+      - while_drawing
+      - evelyn_shebang player notself reachable
+  - name: HENRY_BLOCK
+    image: 07_henryblock
+    expansion: valleyofshadows
+    equip:
+      - henry_block
+  - name: LEMONADE_JIM
+    image: 07_lemonadejim
+    expansion: valleyofshadows
+    equip:
+      - lemonade_jim
+    responses:
+      - lemonade_jim
+      - destroy card self | hand
+      - heal
+  - name: MICK_DEFENDER
+    image: 07_mickdefender
+    expansion: valleyofshadows
+    responses:
+      - destroy card self | hand missed
+      - escape
+  - name: TUCO_FRANZISKANER
+    image: 07_tucofranziskaner
+    expansion: valleyofshadows
+    equip:
+      - tuco_franziskaner
+    tags:
+      - max_hp(5)
+  - name: BIG_SPENCER
+    image: 06_bigspencer
+    expansion: wildwestshow
+    equip:
+      - big_spencer
+    tags:
+      - max_hp(9)
+  - name: FLINT_WESTWOOD
+    image: 06_flintwestwood
+    expansion: wildwestshow
+    effects:
+      - max_usages(1)
+      - mth_add card self | hand
+      - mth_add card notself | hand
+    multitarget: flint_westwood
+  - name: GARY_LOOTER
+    image: 06_garylooter
+    expansion: wildwestshow
+    equip:
+      - gary_looter
+    tags:
+      - max_hp(5)
+      - gary_looter
+  - name: GREYGORY_DECK
+    image: 06_greygorydeck
+    expansion: wildwestshow
+    responses:
+      - max_usages(1)
+      - while_drawing
+      - greygory_deck
+    equip:
+      - greygory_deck
+  - name: JOHN_PAIN
+    image: 06_johnpain
+    expansion: wildwestshow
+    equip:
+      - john_pain
+    tags:
+      - john_pain
+  - name: LEE_VAN_KLIFF
+    image: 06_leevankliff
+    expansion: wildwestshow
+    modifier: leevankliff
+  - name: TEREN_KILL
+    image: 06_terenkill
+    expansion: wildwestshow
+    responses:
+      - teren_kill
+    tags:
+      - max_hp(3)
+  - name: YOUL_GRINNER
+    image: 06_youlgrinner
+    expansion: wildwestshow
+    equip:
+      - youl_grinner
+  - name: AL_PREACHER
+    image: 17_alpreacher
+    expansion: armedanddangerous
+    equip:
+      - al_preacher
+    responses:
+      - al_preacher
+      - select_cube card self | cube_slot
+      - select_cube card self | cube_slot
+      - draw
+  - name: BASS_GREEVES
+    image: 17_bassgreeves
+    expansion: armedanddangerous
+    effects:
+      - max_usages(1)
+      - destroy card self | hand
+      - add_cube(2) card self | cube_slot_card
+  - name: BLOODY_MARY
+    image: 17_bloodymary
+    expansion: armedanddangerous
+    equip:
+      - bloody_mary
+  - name: FRANKIE_CANTON
+    image: 17_frankiecanton
+    expansion: armedanddangerous
+    effects:
+      - max_usages(1)
+      - frankie_canton card | cube_slot_card
+  - name: JULIE_CUTTER
+    image: 17_juliecutter
+    expansion: armedanddangerous
+    equip:
+      - julie_cutter
+  - name: MEXICALI_KID
+    image: 17_mexicalikid
+    expansion: armedanddangerous
+    effects:
+      - max_usages(1)
+      - select_cube card self | cube_slot
+      - select_cube card self | cube_slot
+      - bang player reachable notself
+  - name: MS_ABIGAIL
+    image: 17_msabigail
+    expansion: armedanddangerous
+    equip:
+      - ms_abigail
+    responses:
+      - ms_abigail
+  - name: RED_RINGO
+    image: 17_redringo
+    expansion: armedanddangerous
+    equip:
+      - red_ringo
+    effects:
+      - max_usages(1)
+      - red_ringo card self | cube_slot_card table
+    optional:
+      - red_ringo card self | cube_slot_card table can_repeat
+    tags:
+      - max_hp(5)
+  - name: DON_BELL
+    image: 04_don_bell
+    expansion: goldrush
+    equip:
+      - don_bell
+  - name: DUTCH_WILL
+    image: 04_dutch_will
+    expansion: goldrush
+    equip:
+      - dutch_will
+  - name: JACKY_MURIETA
+    image: 04_jacky_murieta
+    expansion: goldrush
+    effects:
+      - max_usages(1)
+      - pay_gold(2)
+      - bang player reachable notself
+  - name: JOSH_MCCLOUD
+    image: 04_josh_mccloud
+    expansion: goldrush
+    effects:
+      - pay_gold(2)
+      - josh_mccloud
+  - name: MADAME_YTO
+    image: 04_madame_yto
+    expansion: goldrush
+    equip:
+      - madam_yto
+  - name: PRETTY_LUZENA
+    image: 04_pretty_luzena
+    expansion: goldrush
+    modifier: discount
+    effects:
+      - max_usages(1)
+  - name: RADDIE_SNAKE
+    image: 04_raddie_snake
+    expansion: goldrush
+    effects:
+      - max_usages(2)
+      - pay_gold(1)
+      - draw
+  - name: SIMEON_PICOS
+    image: 04_simeon_picos
+    expansion: goldrush
+    equip:
+      - luckycharm
+highnoon:
+  - name: BLESSING
+    image: 05_benedizione
+    equip:
+      - blessing
+  - name: GHOST_TOWN
+    image: 05_cittafantasma
+    expansion: ghostcards
+    equip:
+      - ghosttown
+    tags:
+      - discard_if_two_players
+  - name: INVERT_ROTATION
+    image: 05_corsaalloro
+    equip:
+      - invert_rotation
+    tags:
+      - discard_if_two_players
+  - name: THE_DALTONS
+    image: 05_idalton
+    equip:
+      - thedaltons
+  - name: THE_DOCTOR
+    image: 05_ildottore
+    equip:
+      - thedoctor
+  - name: THE_REVEREND
+    image: 05_ilreverendo
+    equip:
+      - reverend
+  - name: TRAIN_ARRIVAL
+    image: 05_iltreno
+    equip:
+      - trainarrival
+  - name: CURSE
+    image: 05_maledizione
+    equip:
+      - curse
+  - name: HANGOVER
+    image: 05_sbornia
+    equip:
+      - hangover
+  - name: SERMON
+    image: 05_sermone
+    equip:
+      - sermon
+  - name: THIRST
+    image: 05_sete
+    equip:
+      - thirst
+  - name: SHOOTOUT
+    image: 05_sparatoria
+    equip:
+      - shootout
+  - name: HANDCUFFS
+    image: 05_manette
+    expansion: thebullet
+    equip:
+      - handcuffs
+  - expansion: thebullet
+    name: HANDCUFFS_HEARTS
+    image: 05_manette_hearts
+    tags:
+      - handcuffs(1)
+      - hidden
+  - expansion: thebullet
+    name: HANDCUFFS_DIAMONDS
+    image: 05_manette_diamonds
+    tags:
+      - handcuffs(2)
+      - hidden
+  - expansion: thebullet
+    name: HANDCUFFS_CLUBS
+    image: 05_manette_clubs
+    tags:
+      - handcuffs(3)
+      - hidden
+  - expansion: thebullet
+    name: HANDCUFFS_SPADES
+    image: 05_manette_spades
+    tags:
+      - handcuffs(4)
+      - hidden
+  - name: NEW_IDENTITY
+    image: 05_nuovaidentita
+    expansion: thebullet
+    equip:
+      - newidentity
+  - name: HIGH_NOON
+    image: 05_mezzogiornodifuoco
+    equip:
+      - highnoon
+fistfulofcards:
+  - name: AMBUSH
+    image: 05_agguato
+    equip:
+      - ambush
+    tags:
+      - discard_if_two_players
+  - name: SNIPER
+    image: 05_cecchino
+    effects:
+      - destroy card self | hand bang
+      - destroy card self | hand bang
+      - sniper player reachable notself
+  - name: DEAD_MAN
+    image: 05_deadman
+    expansion: ghostcards
+    equip:
+      - deadman
+    tags:
+      - discard_if_two_players
+  - name: BLOOD_BROTHERS
+    image: 05_fratellidisangue
+    responses:
+      - while_drawing
+      - startofturn
+      - damage player self
+      - heal_notfull player notself
+  - name: THE_JUDGE
+    image: 05_ilgiudice
+    equip:
+      - judge
+  - name: LASSO
+    image: 05_lazo
+    equip:
+      - lasso
+  - name: LAW_OF_THE_WEST
+    image: 05_leggedelwest
+    equip:
+      - lawofthewest
+  - name: HARD_LIQUOR
+    image: 05_liquoreforte
+    responses:
+      - end_drawing
+      - heal
+  - name: ABANDONED_MINE
+    image: 05_minieraabbandonata
+    equip:
+      - abandonedmine
+  - name: PEYOTE
+    image: 05_peyote
+    equip:
+      - peyote
+  - name: PEYOTE_RED
+    image: 05_peyote_rosso
+    tags:
+      - peyote(1)
+      - hidden
+  - name: PEYOTE_BLACK
+    image: 05_peyote_nero
+    tags:
+      - peyote(2)
+      - hidden
+  - name: RANCH
+    image: 05_ranch
+    effects:
+      - startofturn
+      - destroy card self | hand
+      - mth_add
+    optional:
+      - destroy card self | hand
+      - mth_add
+    tags:
+      - repeatable
+    multitarget: draw_atend
+  - name: RICOCHET
+    image: 05_rimbalzo
+    effects:
+      - destroy card self | hand bang
+      - ricochet card notself | table
+  - name: RUSSIAN_ROULETTE
+    image: 05_rouletterussa
+    equip:
+      - russianroulette
+  - name: VENDETTA
+    image: 05_vendetta
+    equip:
+      - vendetta
+  - name: A_FISTFUL_OF_CARDS
+    image: 05_perunpugnodicarte
+    equip:
+      - fistfulofcards
+wildwestshow:
+  - name: GAG
+    image: 06_bavaglio
+  - name: BONE_ORCHARD
+    image: 06_camposanto
+  - name: DARLING_VALENTINE
+    image: 06_darlingvalentine
+  - name: DOROTHY_RAGE
+    image: 06_dorothyrage
+  - name: HELENA_ZONTERO
+    image: 06_helenazontero
+  - name: LADY_ROSA_OF_TEXAS
+    image: 06_ladyrosadeltexas
+  - name: MISS_SUSANNA
+    image: 06_misssusanna
+  - name: SHOWDOWN
+    image: 06_regolamentodiconti
+  - name: SACAGAWAY
+    image: 06_sacagaway
+  - name: WILD_WEST_SHOW
+    image: 06_wildwestshow
+goldrush:
+  - count: 3
+    name: SHOT
+    image: 04_bicchierino
+    color: brown
+    effects:
+      - heal player
+    tags:
+      - buy_cost(1)
+  - count: 3
+    name: BOTTLE
+    image: 04_bottiglia
+    color: brown
+    modifier: shopchoice
+    tags:
+      - shopchoice(1)
+      - buy_cost(2)
+  - name: BOTTLE_PANIC
+    image: 04_bottiglia_panico
+    color: brown
+    effects:
+      - steal card range_1
+    tags:
+      - shopchoice(1)
+      - hidden
+  - name: BOTTLE_BEER
+    image: 04_bottiglia_birra
+    color: brown
+    effects:
+      - heal
+    tags:
+      - shopchoice(1)
+      - hidden
+  - name: BOTTLE_BANG
+    image: 04_bottiglia_bang
+    color: brown
+    effects:
+      - bang player reachable notself
+    tags:
+      - shopchoice(1)
+      - hidden
+  - name: CALUMET
+    image: 04_calumet
+    color: black
+    equip:
+      - calumet
+    tags:
+      - buy_cost(3)
+  - name: GUN_BELT
+    image: 04_cinturone
+    color: black
+    equip:
+      - gunbelt(8)
+    tags:
+      - buy_cost(2)
+  - count: 3
+    name: PARDNER
+    image: 04_complice
+    color: brown
+    modifier: shopchoice
+    tags:
+      - shopchoice(2)
+      - buy_cost(2)
+  - name: PARDNER_GENERAL_STORE
+    image: 04_complice_emporio
+    color: brown
+    effects:
+      - generalstore
+    tags:
+      - shopchoice(2)
+      - hidden
+  - name: PARDNER_DUEL
+    image: 04_complice_duello
+    color: brown
+    effects:
+      - duel player notself
+    tags:
+      - shopchoice(2)
+      - hidden
+  - name: PARDNER_CAT_BALOU
+    image: 04_complice_catbalou
+    color: brown
+    effects:
+      - destroy card
+    tags:
+      - shopchoice(2)
+      - hidden
+  - name: GOLD_RUSH
+    image: 04_corsa_all_oro
+    color: brown
+    effects:
+      - goldrush
+      - pass_turn
+    tags:
+      - buy_cost(5)
+  - name: HORSESHOE
+    image: 04_ferro_di_cavallo
+    color: black
+    equip:
+      - horsecharm
+    tags:
+      - buy_cost(2)
+  - name: PICKAXE
+    image: 04_piccone
+    color: black
+    equip:
+      - pickaxe
+    tags:
+      - buy_cost(4)
+  - count: 3
+    name: WANTED
+    image: 04_ricercato
+    color: black
+    equip_target: any
+    equip:
+      - wanted
+      - prompt_on_self_equip
+    tags:
+      - buy_cost(2)
+      - discard_if_two_players
+  - count: 2
+    name: RHUM
+    image: 04_rum
+    color: brown
+    effects:
+      - rum
+    tags:
+      - buy_cost(3)
+  - name: GOLD_PAN
+    image: 04_setaccio
+    color: black
+    effects:
+      - max_usages(2)
+      - pay_gold(1)
+      - draw
+    tags:
+      - buy_cost(3)
+  - name: BOOTS
+    image: 04_stivali
+    color: black
+    equip:
+      - boots
+    tags:
+      - buy_cost(3)
+  - name: LUCKY_CHARM
+    image: 04_talismano
+    color: black
+    equip:
+      - luckycharm
+    tags:
+      - buy_cost(3)
+  - name: UNION_PACIFIC
+    image: 04_union_pacific
+    color: brown
+    effects:
+      - draw(4)
+    tags:
+      - buy_cost(4)
+  - name: RUCKSACK
+    image: 04_zaino
+    color: black
+    effects:
+      - pay_gold(2)
+      - heal
+    responses:
+      - pay_gold(2)
+      - heal
+      - deathsave
+    tags:
+      - buy_cost(3)
+specials:
+  - name: GAME_PASS
+    effects:
+      - pass_turn
+  - name: GAME_RESOLVE
+    responses:
+      - resolve
+  - name: GAME_SELL_BEER
+    expansion: goldrush
+    effects:
+      - sell_beer card self | hand beer
+  - name: GAME_DISCARD_BLACK
+    expansion: goldrush
+    effects:
+      - discard_black card notself | table black
+  - name: GAME_DISCARD_BRONCO
+    expansion: canyondiablo
+    effects:
+      - destroy card self | hand
+      - destroy card self | hand
+      - destroy card notself | table bronco
+    tags:
+      - bronco
+      - hidden
