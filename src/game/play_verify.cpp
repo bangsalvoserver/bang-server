@@ -72,6 +72,9 @@ namespace banggame {
         if (bool(filter & target_card_filter::cube_slot)
             && (target != target->owner->m_characters.front() && target->color != card_color_type::orange))
             return game_error("ERROR_TARGET_NOT_CUBE_SLOT");
+
+        if (!bool(filter & target_card_filter::cube_slot) && target->deck != card_deck_type::main_deck)
+            return game_error("ERROR_TARGET_NOT_CARD");
         
         return std::nullopt;
     }
