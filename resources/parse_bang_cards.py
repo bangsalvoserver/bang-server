@@ -19,7 +19,7 @@ def parse_effects(effects_data, vec_name):
     for i, effect in enumerate(effects_data):
         match = re.match(
             r"\s*(\w+)" # type
-            r"(?:\s*\((\d+)\))?" # effect_value
+            r"(?:\s*\((-?\d+)\))?" # effect_value
             r"(?:\s*(\w+)\s*)?" # target
             r"([\w\s]*?)" # player_filter
             r"(?:\s*\|\s*([\w\s]+))?\s*$", #card_filter
@@ -53,7 +53,7 @@ def parse_equips(equips_data):
     for i, equip in enumerate(equips_data):
         match = re.match(
             r"^\s*(\w+)"
-            r"(?:\s*\((\d+)\))?\s*$",
+            r"(?:\s*\((-?\d+)\))?\s*$",
             equip
         )
         if not match:
@@ -74,7 +74,7 @@ def parse_tags(tags_data):
     for i, tag in enumerate(tags_data):
         match = re.match(
             r"^\s*(\w+)"
-            r"(?:\s*\((\d+)\))?\s*$",
+            r"(?:\s*\((-?\d+)\))?\s*$",
             tag
         )
         if not match:

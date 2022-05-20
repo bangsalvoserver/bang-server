@@ -47,10 +47,6 @@ namespace banggame {
         void on_disable(card *target_card, player *target);
     };
 
-    struct predraw_check_effect {
-        void on_disable(card *target_card, player *target);
-    };
-
     struct effect_prompt_on_self_equip {
         opt_fmt_str on_prompt(card *target_card, player *target) const;
     };

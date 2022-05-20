@@ -13,11 +13,11 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
-    struct effect_taxman : predraw_check_effect, effect_prompt_on_self_equip {
+    struct effect_taxman : event_based_effect {
         void on_enable(card *target_card, player *target);
     };
 
-    struct effect_brothel : predraw_check_effect, effect_prompt_on_self_equip {
+    struct effect_brothel : event_based_effect {
         static inline uint8_t effect_holder_counter = 0;
 
         void on_enable(card *target_card, player *target);

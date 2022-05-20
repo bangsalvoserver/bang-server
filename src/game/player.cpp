@@ -535,7 +535,23 @@ namespace banggame {
                 if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
                     request_drawing();
                 } else {
-                    m_game->queue_request<request_predraw>(this);
+                    using predraw_check_pair = decltype(player::m_predraw_checks)::value_type;
+                    auto unresolved = m_predraw_checks
+                        | std::views::filter([](const predraw_check_pair &pair) {
+                            return !pair.second.resolved;
+                        });
+                    auto top_priority = unresolved
+                        | std::views::filter([value = std::ranges::max(unresolved
+                            | std::views::values
+                            | std::views::transform(&player::predraw_check::priority))]
+                        (const predraw_check_pair &pair) {
+                            return pair.second.priority == value;
+                        });
+                    if (std::ranges::distance(top_priority) == 1) {
+                        m_game->call_event<event_type::on_predraw_check>(this, top_priority.begin()->first);
+                    } else {
+                        m_game->queue_request<request_predraw>(this);
+                    }
                 }
             }
         });

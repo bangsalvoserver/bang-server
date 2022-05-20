@@ -21,44 +21,56 @@ namespace banggame {
     }
 
     void effect_taxman::on_enable(card *target_card, player *target) {
-        target->add_predraw_check(target_card, -1, [=](card *drawn_card) {
-            auto suit = target->get_card_sign(drawn_card).suit;
-            if (suit == card_suit::clubs || suit == card_suit::spades) {
-                target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
-                --target->m_num_cards_to_draw;
-                target->m_game->add_event<event_type::post_draw_cards>(target_card, [=](player *origin) {
-                    if (origin == target) {
-                        ++target->m_num_cards_to_draw;
-                        origin->m_game->remove_events(target_card);
-                    }
-                });
+        target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *p, card *drawn_card) {
+            if (p == target) {
+                if (target->m_game->m_scenario_cards.empty() || !target->m_game->m_scenario_deck.back()->has_tag(tag_type::peyote)) {
+                    target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
+                        auto suit = target->get_card_sign(drawn_card).suit;
+                        if (suit == card_suit::clubs || suit == card_suit::spades) {
+                            target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
+                            --target->m_num_cards_to_draw;
+                            target->m_game->add_event<event_type::post_draw_cards>(target_card, [=](player *origin) {
+                                if (origin == target) {
+                                    ++target->m_num_cards_to_draw;
+                                    origin->m_game->remove_events(target_card);
+                                }
+                            });
+                        }
+                        target->next_predraw_check(target_card);
+                    });
+                } else {
+                    target->next_predraw_check(target_card);
+                }
             }
-            target->next_predraw_check(target_card);
         });
     }
 
     void effect_brothel::on_enable(card *target_card, player *target) {
-        target->add_predraw_check(target_card, -2, [=](card *drawn_card) {
-            target->discard_card(target_card);
-            auto suit = target->get_card_sign(drawn_card).suit;
-            if (suit == card_suit::clubs || suit == card_suit::spades) {
-                target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
-                event_card_key event_key{target_card, 1 + effect_holder_counter++ % 20};
-                target->m_game->add_disabler(event_key, [=](card *c) {
-                    return c->pocket == pocket_type::player_character && c->owner == target;
-                });
-                auto clear_events = [target, event_key](player *p) {
-                    if (p == target) {
-                        target->m_game->remove_disablers(event_key);
-                        target->m_game->remove_events(event_key);
+        target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
+            if (p == target && e_card == target_card) {
+                target->m_game->draw_check_then(target, target_card, [=](card *drawn_card){
+                    target->discard_card(target_card);
+                    auto suit = target->get_card_sign(drawn_card).suit;
+                    if (suit == card_suit::clubs || suit == card_suit::spades) {
+                        target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
+                        event_card_key event_key{target_card, 1 + effect_holder_counter++ % 20};
+                        target->m_game->add_disabler(event_key, [=](card *c) {
+                            return c->pocket == pocket_type::player_character && c->owner == target;
+                        });
+                        auto clear_events = [target, event_key](player *p) {
+                            if (p == target) {
+                                target->m_game->remove_disablers(event_key);
+                                target->m_game->remove_events(event_key);
+                            }
+                        };
+                        target->m_game->add_event<event_type::pre_turn_start>(event_key, clear_events);
+                        target->m_game->add_event<event_type::on_player_death>(event_key, [=](player *killer, player *p) {
+                            clear_events(p);
+                        });
                     }
-                };
-                target->m_game->add_event<event_type::pre_turn_start>(event_key, clear_events);
-                target->m_game->add_event<event_type::on_player_death>(event_key, [=](player *killer, player *p) {
-                    clear_events(p);
+                    target->next_predraw_check(target_card);
                 });
             }
-            target->next_predraw_check(target_card);
         });
     }
 

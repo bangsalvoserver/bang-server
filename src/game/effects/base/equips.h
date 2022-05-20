@@ -15,11 +15,19 @@ namespace banggame {
         void on_disable(card *target_card, player *target);
     };
 
-    struct effect_jail : predraw_check_effect, effect_prompt_on_self_equip {
+    struct effect_predraw_check {
+        int priority;
+        effect_predraw_check(int priority) : priority(priority) {}
+
+        void on_enable(card *target_card, player *target);
+        void on_disable(card *target_card, player *target);
+    };
+
+    struct effect_jail : event_based_effect {
         void on_enable(card *target_card, player *target);
     };
 
-    struct effect_dynamite : predraw_check_effect {
+    struct effect_dynamite : event_based_effect {
         void on_enable(card *target_card, player *target);
     };
 

@@ -237,6 +237,7 @@ namespace banggame {
         (none)
         (mustang,               effect_mustang)
         (scope,                 effect_scope)
+        (predraw_check,         effect_predraw_check)
         (jail,                  effect_jail)
         (dynamite,              effect_dynamite)
         (horse,                 effect_horse)

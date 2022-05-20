@@ -68,29 +68,11 @@ namespace banggame {
     
     void request_predraw::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->m_game->pop_request<request_predraw>();
-        target->m_game->draw_check_then(target, target_card, target->m_predraw_checks.find(target_card)->second.check_fun);
+        target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
     }
 
     game_formatted_string request_predraw::status_text(player *owner) const {
-        using predraw_check_pair = decltype(player::m_predraw_checks)::value_type;
-        auto unresolved = target->m_predraw_checks
-            | std::views::filter([](const predraw_check_pair &pair) {
-                return !pair.second.resolved;
-            });
-        auto top_priority = unresolved
-            | std::views::filter([value = std::ranges::max(unresolved
-                | std::views::values
-                | std::views::transform(&player::predraw_check::priority))]
-            (const predraw_check_pair &pair) {
-                return pair.second.priority == value;
-            });
-        if (std::ranges::distance(top_priority) == 1) {
-            if (owner == target) {
-                return {"STATUS_PREDRAW_FOR", top_priority.begin()->first};
-            } else {
-                return {"STATUS_PREDRAW_FOR_OTHER", target, top_priority.begin()->first};
-            }
-        } else if (owner == target) {
+        if (owner == target) {
             return "STATUS_PREDRAW";
         } else {
             return {"STATUS_PREDRAW_OTHER", target};

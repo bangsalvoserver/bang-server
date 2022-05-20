@@ -5,6 +5,8 @@
 
 namespace banggame {
 
+    using draw_check_function = std::function<void(card *drawn_card)>;
+
     class draw_check_handler {
     private:
         player *m_origin = nullptr;

@@ -49,8 +49,6 @@ namespace banggame {
         }
     };
 
-    using draw_check_function = std::function<void(card *drawn_card)>;
-
     struct player {
         game *m_game;
         int id;
@@ -66,7 +64,6 @@ namespace banggame {
         struct predraw_check {
             int priority;
             bool resolved;
-            draw_check_function check_fun;
         };
 
         std::map<card *, predraw_check> m_predraw_checks;
@@ -141,14 +138,6 @@ namespace banggame {
         bool can_respond_with(card *c);
         
         void discard_all();
-
-        void add_predraw_check(card *target_card, int priority, draw_check_function &&fun) {
-            m_predraw_checks.try_emplace(target_card, priority, false, std::move(fun));
-        }
-
-        void remove_predraw_check(card *target_card) {
-            m_predraw_checks.erase(target_card);
-        }
 
         void next_predraw_check(card *target_card);
 

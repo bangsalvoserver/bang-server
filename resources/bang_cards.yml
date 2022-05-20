@@ -14,6 +14,7 @@ main_deck:
     image: 01_dinamite
     color: blue
     equip:
+      - predraw_check(2)
       - dynamite
   - name: SCOPE
     signs:
@@ -42,6 +43,7 @@ main_deck:
     color: blue
     equip_target: notsheriff
     equip:
+      - predraw_check(1)
       - jail
       - prompt_on_self_equip
   - name: REMINGTON
@@ -265,6 +267,7 @@ main_deck:
     expansion: dodgecity
     color: blue
     equip:
+      - predraw_check(2)
       - dynamite
   - name: MUSTANG
     signs:
@@ -589,6 +592,7 @@ main_deck:
     color: blue
     equip_target: any
     equip:
+      - predraw_check(0)
       - snake
       - prompt_on_self_equip
   - name: SHOTGUN
@@ -894,6 +898,7 @@ main_deck:
     color: orange
     equip_target: any
     equip:
+      - predraw_check(0)
       - bomb
       - prompt_on_self_equip
     responses:
@@ -1177,6 +1182,7 @@ main_deck:
     color: blue
     equip_target: any
     equip:
+      - predraw_check(-1)
       - taxman
       - prompt_on_self_equip
   - name: BROTHEL
@@ -1187,6 +1193,7 @@ main_deck:
     color: blue
     equip_target: any
     equip:
+      - predraw_check(-2)
       - brothel
       - prompt_on_self_equip
   - name: BRONCO

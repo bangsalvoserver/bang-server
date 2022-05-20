@@ -31,6 +31,9 @@ namespace banggame {
         // viene chiamato quando scarti una carta a fine turno
         EVENT(on_discard_pass, player *origin, card *target_card)
 
+        // viene chiamata quando un giocatore deve estrarre prima di pescare
+        EVENT(on_predraw_check, player *origin, card *target_card)
+
         // viene chiamata quando estrai una carta nel momento che viene pescata
         EVENT(on_draw_check, player *origin, card *target_card)
 

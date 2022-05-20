@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct effect_bomb : effect_prompt_on_self_equip, predraw_check_effect {
+    struct effect_bomb : event_based_effect {
         void on_equip(card *target_card, player *target);
         void on_enable(card *target_card, player *target);
         void on_unequip(card *target_card, player *target);
