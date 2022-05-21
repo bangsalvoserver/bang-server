@@ -1029,6 +1029,8 @@ main_deck:
     responses:
       - mirage
       - missed
+    tags:
+      - missedcard
   - name: BLOOD_PACT
     signs:
       - J hearts
