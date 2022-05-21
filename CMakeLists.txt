@@ -52,6 +52,13 @@ endif()
 add_executable(parse_bang_cards src/cards/parse_bang_cards.cpp)
 target_link_libraries(parse_bang_cards PRIVATE PkgConfig::yaml-cpp)
 
+find_package(fmt REQUIRED)
+if (TARGET fmt::fmt-header-only)
+    target_link_libraries(parse_bang_cards PRIVATE fmt::fmt-header-only)
+else()
+    target_link_libraries(parse_bang_cards PRIVATE fmt::fmt)
+endif()
+
 set(bang_cards_cpp "${CMAKE_CURRENT_BINARY_DIR}/bang_cards.cpp")
 add_custom_command(
     OUTPUT "${bang_cards_cpp}"
