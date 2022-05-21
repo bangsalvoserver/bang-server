@@ -9,8 +9,8 @@
 
 namespace banggame {
 
-    opt_error check_player_filter(player *origin, target_player_filter filter, player *target);
-    opt_error check_card_filter(player *origin, target_card_filter filter, card *target);
+    opt_error check_player_filter(card *origin_card, player *origin, target_player_filter filter, player *target);
+    opt_error check_card_filter(card *origin_card, player *origin, target_card_filter filter, card *target);
 
     struct play_card_verify {
         player *origin;

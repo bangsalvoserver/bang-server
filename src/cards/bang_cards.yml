@@ -1679,7 +1679,7 @@ character:
       - red_ringo card self | cube_slot table
     tags:
       - max_hp(5)
-      - not_unique
+      - can_repeat
   - name: DON_BELL
     image: 04_don_bell
     expansion: goldrush

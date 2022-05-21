@@ -353,7 +353,7 @@ namespace banggame {
         (horse)
         (repeatable)
         (auto_confirm)
-        (not_unique)
+        (can_repeat)
         (can_target_self)
         (shopchoice)
         (peyote)

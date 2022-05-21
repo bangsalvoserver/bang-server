@@ -11,7 +11,7 @@ template<typename ... Ts> overloaded(Ts ...) -> overloaded<Ts ...>;
 namespace banggame {
     using namespace enums::flag_operators;
 
-    opt_error check_player_filter(player *origin, target_player_filter filter, player *target) {
+    opt_error check_player_filter(card *origin_card, player *origin, target_player_filter filter, player *target) {
         if (bool(filter & target_player_filter::dead) == target->alive())
             return game_error("ERROR_TARGET_DEAD");
 
@@ -41,7 +41,35 @@ namespace banggame {
         return std::nullopt;
     }
 
-    opt_error check_card_filter(player *origin, target_card_filter filter, card *target) {
+    opt_error check_card_filter(card *origin_card, player *origin, target_card_filter filter, card *target) {
+        if (!origin_card->has_tag(tag_type::can_target_self) && target == origin_card)
+            return game_error("ERROR_TARGET_PLAYING_CARD");
+        
+        if (bool(filter & target_card_filter::cube_slot)) {
+            if (target != target->owner->m_characters.front() && target->color != card_color_type::orange)
+                return game_error("ERROR_TARGET_NOT_CUBE_SLOT");
+        } else if (target->deck == card_deck_type::character) {
+            return game_error("ERROR_TARGET_NOT_CARD");
+        }
+
+        if (bool(filter & target_card_filter::beer) && !target->has_tag(tag_type::beer))
+            return game_error("ERROR_TARGET_NOT_BEER");
+
+        if (bool(filter & target_card_filter::bang) && !origin->is_bangcard(target))
+            return game_error("ERROR_TARGET_NOT_BANG");
+
+        if (bool(filter & target_card_filter::missed) && !target->has_tag(tag_type::missedcard))
+            return game_error("ERROR_TARGET_NOT_MISSED");
+
+        if (bool(filter & target_card_filter::bronco) && !target->has_tag(tag_type::bronco))
+            return game_error("ERROR_TARGET_NOT_BRONCO");
+
+        if (bool(filter & target_card_filter::blue) && target->color != card_color_type::blue)
+            return game_error("ERROR_TARGET_NOT_BLUE_CARD");
+
+        if (bool(filter & target_card_filter::clubs) && origin->get_card_sign(target).suit != card_suit::clubs)
+            return game_error("ERROR_TARGET_NOT_CLUBS");
+
         if (bool(filter & target_card_filter::black) != (target->color == card_color_type::black))
             return game_error("ERROR_TARGET_BLACK_CARD");
 
@@ -51,31 +79,6 @@ namespace banggame {
         if (bool(filter & target_card_filter::hand) && target->pocket != pocket_type::player_hand)
             return game_error("ERROR_TARGET_NOT_HAND_CARD");
 
-        if (bool(filter & target_card_filter::blue) && target->color != card_color_type::blue)
-            return game_error("ERROR_TARGET_NOT_BLUE_CARD");
-
-        if (bool(filter & target_card_filter::clubs) && origin->get_card_sign(target).suit != card_suit::clubs)
-            return game_error("ERROR_TARGET_NOT_CLUBS");
-
-        if (bool(filter & target_card_filter::bang) && !origin->is_bangcard(target))
-            return game_error("ERROR_TARGET_NOT_BANG");
-
-        if (bool(filter & target_card_filter::missed) && !target->has_tag(tag_type::missedcard))
-            return game_error("ERROR_TARGET_NOT_MISSED");
-
-        if (bool(filter & target_card_filter::beer) && !target->has_tag(tag_type::beer))
-            return game_error("ERROR_TARGET_NOT_BEER");
-
-        if (bool(filter & target_card_filter::bronco) && !target->has_tag(tag_type::bronco))
-            return game_error("ERROR_TARGET_NOT_BRONCO");
-
-        if (bool(filter & target_card_filter::cube_slot)
-            && (target != target->owner->m_characters.front() && target->color != card_color_type::orange))
-            return game_error("ERROR_TARGET_NOT_CUBE_SLOT");
-
-        if (!bool(filter & target_card_filter::cube_slot) && target->deck != card_deck_type::main_deck)
-            return game_error("ERROR_TARGET_NOT_CARD");
-        
         return std::nullopt;
     }
 
@@ -149,7 +152,7 @@ namespace banggame {
                 return game_error("ERROR_INVALID_ACTION");
             }
             target = std::get<target_player_t>(targets.front()).target;
-            if (auto error = check_player_filter(origin, card_ptr->equip_target, target)) {
+            if (auto error = check_player_filter(card_ptr, origin, card_ptr->equip_target, target)) {
                 return error;
             }
         }
@@ -257,7 +260,7 @@ namespace banggame {
                 [this, &e](target_player_t args) -> opt_error {
                     if (!args.target || (e.target != play_card_target_type::player && e.target != play_card_target_type::conditional_player)) {
                         return game_error("ERROR_INVALID_ACTION");
-                    } else if (auto error = check_player_filter(origin, e.player_filter, args.target)) {
+                    } else if (auto error = check_player_filter(card_ptr, origin, e.player_filter, args.target)) {
                         return error;
                     } else {
                         return e.verify(card_ptr, origin, args.target);
@@ -291,9 +294,9 @@ namespace banggame {
                         return game_error("ERROR_INVALID_ACTION");
                     } else if (!args.target->owner) {
                         return game_error("ERROR_INVALID_ACTION");
-                    } else if (auto error = check_player_filter(origin, e.player_filter, args.target->owner)) {
+                    } else if (auto error = check_player_filter(card_ptr, origin, e.player_filter, args.target->owner)) {
                         return error;
-                    } else if (auto error = check_card_filter(origin, e.card_filter, args.target)) {
+                    } else if (auto error = check_card_filter(card_ptr, origin, e.card_filter, args.target)) {
                         return error;
                     } else {
                         return e.verify(card_ptr, origin, args.target);

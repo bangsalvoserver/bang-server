@@ -10,7 +10,7 @@ namespace banggame {
     static std::vector<player *> make_equip_set(player *origin, card *card) {
         std::vector<player *> ret;
         for (player &p : origin->m_game->m_players) {
-            if (!check_player_filter(origin, card->equip_target, &p) && !p.find_equipped_card(card)) {
+            if (!check_player_filter(card, origin, card->equip_target, &p) && !p.find_equipped_card(card)) {
                 ret.push_back(&p);
             }
         }
@@ -21,7 +21,7 @@ namespace banggame {
         target_list ret;
 
         for (player &target : origin->m_game->m_players) {
-            if (!check_player_filter(origin, holder.player_filter, &target)) {
+            if (!check_player_filter(origin_card, origin, holder.player_filter, &target)) {
                 if (holder.target == play_card_target_type::player) {
                     ret.emplace_back(target_player_t{&target});
                 }
