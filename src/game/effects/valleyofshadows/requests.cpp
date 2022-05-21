@@ -71,6 +71,14 @@ namespace banggame {
         }
     }
 
+    game_formatted_string request_card_as_gatling::status_text(player *owner) const {
+        if (target == owner) {
+            return {"STATUS_CARD_AS_GATLING", origin_card};
+        } else {
+            return {"STATUS_CARD_AS_GATLING_OTHER", target, origin_card};
+        }
+    }
+
     bool request_bandidos::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
         return pocket == pocket_type::player_hand && target_player == target;
     }

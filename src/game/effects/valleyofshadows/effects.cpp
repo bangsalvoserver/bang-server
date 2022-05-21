@@ -1,7 +1,6 @@
 #include "effects.h"
 #include "requests.h"
 
-#include "../base/requests.h"
 #include "../base/effects.h"
 
 #include "../../game.h"
@@ -132,6 +131,27 @@ namespace banggame {
     void handler_fanning::on_play(card *origin_card, player *origin, const target_list &targets) {
         for (auto target : targets) {
             effect_bang{}.on_play(origin_card, origin, std::get<target_player_t>(target).target, effect_flags::escapable);
+        }
+    }
+
+    void handler_play_as_gatling::on_play(card *origin_card, player *origin, const target_list &ts) const {
+        card *chosen_card = std::get<target_card_t>(ts[0]).target;
+
+        origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
+        origin->discard_card(chosen_card);
+
+        std::vector<player *> targets;
+        for (auto *p = origin;;) {
+            p = origin->m_game->get_next_player(p);
+            if (p == origin) break;
+            targets.push_back(p);
+        }
+        
+        auto flags = targets.size() == 1 ? effect_flags::single_target : effect_flags{};
+        for (auto *p : targets) {
+            if (!p->immune_to(chosen_card)) {
+                origin->m_game->queue_request<request_card_as_gatling>(chosen_card, origin, p, flags);
+            }
         }
     }
 

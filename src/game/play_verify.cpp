@@ -450,7 +450,7 @@ namespace banggame {
                     e.on_play(card_ptr, origin, effect_flags{});
                 },
                 [this, &e](target_player_t args) {
-                    if (args.target == origin || !args.target->immune_to(origin->chosen_card_or(card_ptr))) {
+                    if (args.target == origin || !args.target->immune_to(card_ptr)) {
                         auto flags = effect_flags::single_target;
                         if (card_ptr->sign && card_ptr->color == card_color_type::brown
                             && !origin->is_bangcard(card_ptr) && !card_ptr->has_tag(tag_type::bangproxy)) {
@@ -476,7 +476,7 @@ namespace banggame {
                         flags |= effect_flags::single_target;
                     }
                     for (auto *p : targets) {
-                        if (!p->immune_to(origin->chosen_card_or(card_ptr))) {
+                        if (!p->immune_to(card_ptr)) {
                             e.on_play(card_ptr, origin, p, flags);
                         }
                     }
@@ -488,7 +488,7 @@ namespace banggame {
                     }
                     if (args.target->owner == origin) {
                         e.on_play(card_ptr, origin, args.target, flags);
-                    } else if (!args.target->owner->immune_to(origin->chosen_card_or(card_ptr))) {
+                    } else if (!args.target->owner->immune_to(card_ptr)) {
                         if (args.target->pocket == pocket_type::player_hand) {
                             e.on_play(card_ptr, origin, args.target->owner->random_hand_card(), flags);
                         } else {

@@ -124,6 +124,11 @@ namespace banggame {
         game_formatted_string status_text(player *owner) const override;
     };
 
+    struct request_card_as_bang : request_bang {
+        using request_bang::request_bang;
+        game_formatted_string status_text(player *owner) const override;
+    };
+
     struct request_death : request_base, resolvable_request {
         request_death(card *origin_card, player *origin, player *target)
             : request_base(origin_card, origin, target) {}

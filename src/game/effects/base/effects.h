@@ -36,6 +36,10 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, const target_list &targets) const;
     };
 
+    struct handler_play_as_bang {
+        void on_play(card *origin_card, player *origin, const target_list &targets) const;
+    };
+
     struct effect_banglimit {
         opt_error verify(card *origin_card, player *origin) const;
         void on_play(card *origin_card, player *origin);

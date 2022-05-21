@@ -581,9 +581,9 @@ main_deck:
       - weapon(1)
     effects:
       - banglimit
-      - choose_card card self | hand
+      - mth_add card self | hand
       - mth_add player reachable notself
-    multitarget: bangcard
+    multitarget: play_as_bang
     tags:
       - weapon
       - bangproxy
@@ -1134,9 +1134,9 @@ main_deck:
       - weapon(2)
     effects:
       - max_usages(1)
-      - choose_card card self | hand bang
+      - mth_add card self | hand bang
       - destroy card self | hand
-      - bang other_players
+    multitarget: play_as_gatling
     tags:
       - weapon
   - name: LAST_WILL
@@ -1312,9 +1312,9 @@ character:
       - calamity_janet
     effects:
       - banglimit
-      - choose_card card self | hand bang
+      - mth_add card self | hand missed
       - mth_add player reachable notself
-    multitarget: bangcard
+    multitarget: play_as_bang
     tags:
       - bangproxy
   - name: EL_GRINGO
@@ -1527,8 +1527,8 @@ character:
     expansion: valleyofshadows
     effects:
       - max_usages(1)
-      - choose_card card self | hand bang
-      - bang other_players
+      - mth_add card self | hand bang
+    multitarget: play_as_gatling
   - name: EVELYN_SHEBANG
     image: 07_evelynshebang
     expansion: valleyofshadows

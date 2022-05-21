@@ -66,11 +66,6 @@ namespace banggame {
         return m_hand[std::uniform_int_distribution<int>(0, m_hand.size() - 1)(m_game->rng)];
     }
 
-    card *player::chosen_card_or(card *c) {
-        m_game->call_event<event_type::apply_chosen_card_modifier>(this, c);
-        return c;
-    }
-
     static void move_owned_card(player *owner, card *target_card, pocket_type pocket, player *target = nullptr, show_card_flags flags = {}) {
         if (target_card->owner == owner) {
             if (target_card->pocket == pocket_type::player_table) {

@@ -272,6 +272,18 @@ namespace banggame {
         }
     }
 
+    game_formatted_string request_card_as_bang::status_text(player *owner) const {
+        if (target != owner) {
+            return {"STATUS_CARD_AS_BANG_OTHER", target, origin_card};
+        } else if (unavoidable) {
+            return {"STATUS_CARD_AS_BANG_UNAVOIDABLE", origin_card};
+        } else if (bang_strength > 1) {
+            return {"STATUS_CARD_AS_BANG_MULTIPLE_MISSED", origin_card, bang_strength};
+        } else {
+            return {"STATUS_CARD_AS_BANG", origin_card};
+        }
+    }
+
     void request_death::on_resolve() {
         target->m_game->player_death(origin, target);
         target->m_game->pop_request_noupdate<request_death>();

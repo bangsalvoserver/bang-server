@@ -23,7 +23,6 @@ namespace banggame {
         EVENT(apply_immunity_modifier,          card *origin_card, player *target, bool &value)
         EVENT(apply_escapable_modifier,         card *origin_card, player *origin, const player *target, effect_flags flags, bool &value)
         EVENT(apply_initial_cards_modifier,     player *origin, int &value)
-        EVENT(apply_chosen_card_modifier,       player *origin, card* &target_card)
         EVENT(apply_bang_modifier,              player *origin, request_bang *req)
 
         EVENT(verify_target_unique,             card *origin_card, player *origin, player *target, bool &value)

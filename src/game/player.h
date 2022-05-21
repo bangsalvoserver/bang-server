@@ -105,8 +105,6 @@ namespace banggame {
 
         card *random_hand_card();
 
-        card *chosen_card_or(card *c);
-
         void add_cubes(card *target, int ncubes);
         void pay_cubes(card *target, int ncubes);
         void move_cubes(card *origin, card *target, int ncubes);

@@ -3,6 +3,8 @@
 
 #include "../card_effect.h"
 
+#include "../base/requests.h"
+
 namespace banggame {
 
     struct request_targeting : request_base {
@@ -31,6 +33,11 @@ namespace banggame {
         using request_targeting::request_targeting;
 
         void on_resolve() override;
+        game_formatted_string status_text(player *owner) const override;
+    };
+    
+    struct request_card_as_gatling : request_bang {
+        using request_bang::request_bang;
         game_formatted_string status_text(player *owner) const override;
     };
 

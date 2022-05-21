@@ -158,11 +158,11 @@ namespace banggame {
     
     DEFINE_ENUM_FWD_TYPES(effect_type,
         (none)
+        (mth_add,               effect_empty)
         (play_card_action,      effect_play_card_action)
         (max_usages,            effect_max_usages)
         (pass_turn,             effect_pass_turn)
         (resolve,               effect_resolve)
-        (mth_add,               effect_empty)
         (bang,                  effect_bang)
         (banglimit,             effect_banglimit)
         (missedlike,            effect_missedlike)
@@ -170,7 +170,6 @@ namespace banggame {
         (bangresponse,          effect_bangresponse)
         (barrel,                effect_barrel)
         (destroy,               effect_destroy)
-        (choose_card,           effect_choose_card)
         (startofturn,           effect_startofturn)
         (while_drawing,         effect_while_drawing)
         (end_drawing,           effect_end_drawing)
@@ -324,6 +323,8 @@ namespace banggame {
     DEFINE_ENUM_FWD_TYPES(mth_type,
         (none)
         (bangcard,              handler_bangcard)
+        (play_as_bang,          handler_play_as_bang)
+        (play_as_gatling,       handler_play_as_gatling)
         (doc_holyday,           handler_doc_holyday)
         (flint_westwood,        handler_flint_westwood)
         (draw_atend,            handler_draw_atend)
