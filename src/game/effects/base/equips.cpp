@@ -51,7 +51,6 @@ namespace banggame {
                     target->discard_card(target_card);
                     if (target->get_card_sign(drawn_card).suit == card_suit::hearts) {
                         target->m_game->add_log("LOG_JAIL_BREAK", target);
-                        target->next_predraw_check(target_card);
                     } else {
                         target->m_game->add_log("LOG_SKIP_TURN", target);
                         target->skip_turn();
@@ -84,7 +83,6 @@ namespace banggame {
                             p->equip_card(target_card);
                         }
                     }
-                    target->next_predraw_check(target_card);
                 });
             }
         });
@@ -156,11 +154,11 @@ namespace banggame {
         });
     }
 
-    void effect_horsecharm::on_enable(card *target_card, player *target) {
+    void effect_horseshoe::on_enable(card *target_card, player *target) {
         ++target->m_num_checks;
     }
 
-    void effect_horsecharm::on_disable(card *target_card, player *target) {
+    void effect_horseshoe::on_disable(card *target_card, player *target) {
         --target->m_num_checks;
     }
 }

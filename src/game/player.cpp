@@ -367,8 +367,8 @@ namespace banggame {
                 [game](enums::enum_tag_t<play_card_target_type::player>, int player_id) {
                     return target_player_t{game->find_player(player_id)};
                 },
-                [game](enums::enum_tag_t<play_card_target_type::conditional_player>, int player_id) {
-                    return target_conditional_player_t{player_id ? game->find_player(player_id) : nullptr};
+                [game](enums::enum_tag_t<play_card_target_type::conditional_player>) {
+                    return target_no_player_t{};
                 },
                 [game](enums::enum_tag_t<play_card_target_type::card>, int card_id) {
                     return target_card_t{game->find_card(card_id)};
@@ -526,38 +526,43 @@ namespace banggame {
         m_game->add_update<game_update_type::switch_turn>(id);
         m_game->add_log("LOG_TURN_START", this);
         m_game->call_event<event_type::pre_turn_start>(this);
-        next_predraw_check(nullptr);
+
+        m_game->queue_action([this]{
+            next_predraw_check(nullptr);
+        });
     }
 
     void player::next_predraw_check(card *target_card) {
         if (auto it = m_predraw_checks.find(target_card); it != m_predraw_checks.end()) {
             it->second.resolved = true;
         }
-        m_game->queue_action([this]{
-            if (alive() && m_game->m_playing == this && !m_game->m_game_over) {
-                if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
-                    request_drawing();
+        if (alive() && m_game->m_playing == this && !m_game->m_game_over) {
+            if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
+                request_drawing();
+            } else {
+                using predraw_check_pair = decltype(player::m_predraw_checks)::value_type;
+                auto unresolved = m_predraw_checks
+                    | std::views::filter([](const predraw_check_pair &pair) {
+                        return !pair.second.resolved;
+                    });
+                auto top_priority = unresolved
+                    | std::views::filter([value = std::ranges::max(unresolved
+                        | std::views::values
+                        | std::views::transform(&player::predraw_check::priority))]
+                    (const predraw_check_pair &pair) {
+                        return pair.second.priority == value;
+                    });
+                if (std::ranges::distance(top_priority) == 1) {
+                    card *predraw_card = top_priority.begin()->first;
+                    m_game->call_event<event_type::on_predraw_check>(this, predraw_card);
+                    m_game->queue_action([this, predraw_card]{
+                        next_predraw_check(predraw_card);
+                    });
                 } else {
-                    using predraw_check_pair = decltype(player::m_predraw_checks)::value_type;
-                    auto unresolved = m_predraw_checks
-                        | std::views::filter([](const predraw_check_pair &pair) {
-                            return !pair.second.resolved;
-                        });
-                    auto top_priority = unresolved
-                        | std::views::filter([value = std::ranges::max(unresolved
-                            | std::views::values
-                            | std::views::transform(&player::predraw_check::priority))]
-                        (const predraw_check_pair &pair) {
-                            return pair.second.priority == value;
-                        });
-                    if (std::ranges::distance(top_priority) == 1) {
-                        m_game->call_event<event_type::on_predraw_check>(this, top_priority.begin()->first);
-                    } else {
-                        m_game->queue_request<request_predraw>(this);
-                    }
+                    m_game->queue_request<request_predraw>(this);
                 }
             }
-        });
+        }
     }
 
     void player::request_drawing() {

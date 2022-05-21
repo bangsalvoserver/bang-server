@@ -67,8 +67,12 @@ namespace banggame {
     }
     
     void request_predraw::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request<request_predraw>();
+        target->m_game->pop_request_noupdate<request_predraw>();
         target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
+        target->m_game->queue_action([target = target, target_card]{
+            target->next_predraw_check(target_card);
+        });
+        target->m_game->update_request();
     }
 
     game_formatted_string request_predraw::status_text(player *owner) const {

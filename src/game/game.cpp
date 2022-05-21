@@ -278,13 +278,13 @@ namespace banggame {
 #ifdef TESTING_CARDS
         for (auto &p : m_players) {
             add_character_to(*character_it++, p);
+        }
+        for (auto &p : m_players) {
             add_character_to(*character_it++, p);
         }
 #else
         for (auto &p : m_players) {
             add_character_to(*character_it++, p);
-        }
-        for (auto &p : m_players) {
             add_character_to(*character_it++, p);
         }
 #endif

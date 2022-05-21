@@ -24,7 +24,6 @@ namespace banggame {
                         target->m_game->queue_request_front<request_move_bomb>(target_card, target);
                         target->set_forced_card(target_card);
                     }
-                    target->next_predraw_check(target_card);
                 });
             }
         });

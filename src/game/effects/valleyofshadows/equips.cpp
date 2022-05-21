@@ -15,7 +15,6 @@ namespace banggame {
                         target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
                         target->damage(target_card, nullptr, 1);
                     }
-                    target->next_predraw_check(target_card);
                 });
             }
         });

@@ -54,7 +54,7 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
-    struct effect_horsecharm {
+    struct effect_horseshoe {
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);
     };

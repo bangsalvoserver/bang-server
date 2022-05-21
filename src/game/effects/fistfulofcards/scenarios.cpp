@@ -69,6 +69,8 @@ namespace banggame {
             
             p->m_game->queue_request<request_peyote>(target_card, p);
         });
+
+        target->m_game->m_scenario_flags |= scenario_flags::peyote;
     }
 
     void request_peyote::on_pick(pocket_type pocket, player *target_player, card *target_card) {

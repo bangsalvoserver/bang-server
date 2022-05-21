@@ -22,25 +22,21 @@ namespace banggame {
 
     void effect_taxman::on_enable(card *target_card, player *target) {
         target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *p, card *drawn_card) {
-            if (p == target) {
-                if (target->m_game->m_scenario_cards.empty() || !target->m_game->m_scenario_deck.back()->has_tag(tag_type::peyote)) {
-                    target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
-                        auto suit = target->get_card_sign(drawn_card).suit;
-                        if (suit == card_suit::clubs || suit == card_suit::spades) {
-                            target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
-                            --target->m_num_cards_to_draw;
-                            target->m_game->add_event<event_type::post_draw_cards>(target_card, [=](player *origin) {
-                                if (origin == target) {
-                                    ++target->m_num_cards_to_draw;
-                                    origin->m_game->remove_events(target_card);
-                                }
-                            });
-                        }
-                        target->next_predraw_check(target_card);
-                    });
-                } else {
-                    target->next_predraw_check(target_card);
-                }
+            if (p == target && !target->m_game->has_scenario(scenario_flags::peyote)) {
+                target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
+                    auto suit = target->get_card_sign(drawn_card).suit;
+                    if (suit == card_suit::clubs || suit == card_suit::spades) {
+                        target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
+                        --target->m_num_cards_to_draw;
+                        event_card_key key{target_card, 1};
+                        target->m_game->add_event<event_type::post_draw_cards>(key, [=](player *origin) {
+                            if (origin == target) {
+                                ++target->m_num_cards_to_draw;
+                                origin->m_game->remove_events(key);
+                            }
+                        });
+                    }
+                });
             }
         });
     }
@@ -68,7 +64,6 @@ namespace banggame {
                             clear_events(p);
                         });
                     }
-                    target->next_predraw_check(target_card);
                 });
             }
         });

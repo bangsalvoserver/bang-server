@@ -774,7 +774,7 @@ main_deck:
       - bang player reachable notself
     optional:
       - select_cube cube
-      - bang conditional_player reachable notself
+      - bang player reachable notself
     tags:
       - repeatable
       - auto_confirm
@@ -800,7 +800,7 @@ main_deck:
       - indians player notself
     optional:
       - select_cube cube
-      - indians conditional_player notself
+      - indians player notself
     tags:
       - repeatable
       - auto_confirm
@@ -1340,7 +1340,7 @@ character:
   - name: LUCKY_DUKE
     image: 01_luckyduke
     equip:
-      - horsecharm
+      - horseshoe
   - name: PAUL_REGRET
     image: 01_paulregret
     equip:
@@ -1633,6 +1633,8 @@ character:
       - max_usages(1)
       - destroy card self | hand
       - add_cube(2) card self | cube_slot
+    tags:
+      - can_target_self
   - name: BLOODY_MARY
     image: 17_bloodymary
     expansion: armedanddangerous
@@ -1672,9 +1674,10 @@ character:
       - max_usages(1)
       - red_ringo card self | cube_slot table
     optional:
-      - red_ringo card self | cube_slot table can_repeat
+      - red_ringo card self | cube_slot table
     tags:
       - max_hp(5)
+      - not_unique
   - name: DON_BELL
     image: 04_don_bell
     expansion: goldrush
@@ -2024,7 +2027,7 @@ goldrush:
     image: 04_ferro_di_cavallo
     color: black
     equip:
-      - horsecharm
+      - horseshoe
     tags:
       - buy_cost(2)
   - name: PICKAXE
