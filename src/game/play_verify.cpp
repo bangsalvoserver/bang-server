@@ -353,9 +353,7 @@ namespace banggame {
 
             if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
-            }
-
-            if (auto prompt_message = std::visit(overloaded{
+            } else if (auto prompt_message = std::visit(overloaded{
                 [this, &e](target_none_t args) -> opt_fmt_str {
                     return e.on_prompt(card_ptr, origin);
                 },
@@ -443,17 +441,14 @@ namespace banggame {
 
             if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
-            }
-
-            std::visit(overloaded{
+            } else std::visit(overloaded{
                 [this, &e](target_none_t args) {
                     e.on_play(card_ptr, origin, effect_flags{});
                 },
                 [this, &e](target_player_t args) {
                     if (args.target == origin || !args.target->immune_to(card_ptr)) {
                         auto flags = effect_flags::single_target;
-                        if (card_ptr->sign && card_ptr->color == card_color_type::brown
-                            && !origin->is_bangcard(card_ptr) && !card_ptr->has_tag(tag_type::bangproxy)) {
+                        if (card_ptr->sign && card_ptr->color == card_color_type::brown) {
                             flags |= effect_flags::escapable;
                         }
                         e.on_play(card_ptr, origin, args.target, flags);

@@ -38,6 +38,7 @@ set(banggame_srcs
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(jsoncpp REQUIRED jsoncpp IMPORTED_TARGET)
+pkg_check_modules(yaml-cpp REQUIRED yaml-cpp IMPORTED_TARGET)
 
 add_subdirectory(external/cpputils)
 
@@ -48,17 +49,19 @@ if(MINGW)
     target_link_libraries(networking INTERFACE wsock32 ws2_32)
 endif()
 
+add_executable(parse_bang_cards src/cards/parse_bang_cards.cpp)
+target_link_libraries(parse_bang_cards PRIVATE PkgConfig::yaml-cpp)
+
 set(bang_cards_cpp "${CMAKE_CURRENT_BINARY_DIR}/bang_cards.cpp")
 add_custom_command(
     OUTPUT "${bang_cards_cpp}"
-    COMMAND python3
-        resources/parse_bang_cards.py
-        resources/bang_cards.yml >
+    COMMAND parse_bang_cards
+        src/cards/bang_cards.yml
         "${bang_cards_cpp}"
     VERBATIM
     DEPENDS
-        resources/parse_bang_cards.py
-        resources/bang_cards.yml
+        src/cards/bang_cards.yml
+        parse_bang_cards
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 add_library(bang_cards_obj OBJECT "${bang_cards_cpp}")

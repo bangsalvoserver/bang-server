@@ -5,7 +5,7 @@ import yaml
 from pathlib import Path
 
 if __name__ == '__main__':
-    with open(Path(__file__).parent / '../resources/bang_cards.yml', 'r') as file:
+    with open(Path(__file__).parent / '../src/cards/bang_cards.yml', 'r') as file:
         bang_cards_data = yaml.safe_load(file)
 
     for card in itertools.chain.from_iterable(bang_cards_data.values()):
