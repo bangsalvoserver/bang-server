@@ -125,11 +125,10 @@ namespace banggame {
         });
     }
 
-    void handler_flintlock::on_play(card *origin_card, player *origin, const target_list &targets) {
-        player *target = std::get<target_player_t>(targets[0]).target;
+    void handler_flintlock::on_play(card *origin_card, player *origin, player *target, std::optional<target_none_t> paid_cubes) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         auto req = std::make_shared<request_bang>(origin_card, origin, target, effect_flags::escapable | effect_flags::single_target);
-        if (targets.size() > 1) {
+        if (paid_cubes) {
             origin->m_game->add_event<event_type::on_missed>(origin_card, [=](card *origin_card, player *p, player *target, bool is_bang) {
                 if (origin == p) {
                     origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
@@ -150,18 +149,17 @@ namespace banggame {
         return std::nullopt;
     }
 
-    void handler_duck::on_play(card *origin_card, player *origin, const target_list &targets) {
-        if (!targets.empty()) {
+    void handler_duck::on_play(card *origin_card, player *origin, std::optional<target_none_t> paid_cubes) {
+        if (paid_cubes) {
             origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
             origin->add_to_hand(origin_card);
         }
         effect_missed().on_play(origin_card, origin);
     }
 
-    opt_error handler_squaw::verify(card *origin_card, player *origin, const target_list &targets) const {
-        if (targets.size() == 2) {
-            auto discarded_card = std::get<target_card_t>(targets[0]).target;
-            for (auto target_card : std::get<target_cubes_t>(targets[1]).target_cards) {
+    opt_error handler_squaw::verify(card *origin_card, player *origin, card *discarded_card, std::optional<target_cubes_t> paid_cubes) const {
+        if (paid_cubes) {
+            for (auto target_card : paid_cubes->target_cards) {
                 if (target_card == discarded_card) {
                     return game_error("ERROR_INVALID_ACTION");
                 }
@@ -173,12 +171,10 @@ namespace banggame {
         return std::nullopt;
     }
 
-    void handler_squaw::on_play(card *origin_card, player *origin, const target_list &targets) {
-        card *target_card = std::get<target_card_t>(targets[0]).target;
-
+    void handler_squaw::on_play(card *origin_card, player *origin, card *target_card, std::optional<target_cubes_t> paid_cubes) {
         bool immune = target_card->owner->immune_to(origin_card);
-        if (targets.size() == 2) {
-            for (auto target_card : std::get<target_cubes_t>(targets[1]).target_cards) {
+        if (paid_cubes) {
+            for (auto target_card : paid_cubes->target_cards) {
                 effect_select_cube().on_play(origin_card, origin, target_card);
             }
 
@@ -216,8 +212,7 @@ namespace banggame {
         return origin->m_game->top_request_is<request_move_bomb>(origin);
     }
 
-    opt_fmt_str handler_move_bomb::on_prompt(card *origin_card, player *origin, const target_list &targets) const {
-        auto target = std::get<target_player_t>(targets[0]).target;
+    opt_fmt_str handler_move_bomb::on_prompt(card *origin_card, player *origin, player *target) const {
         if (origin == target) {
             return game_formatted_string{"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
         } else {
@@ -225,8 +220,7 @@ namespace banggame {
         }
     }
 
-    opt_error handler_move_bomb::verify(card *origin_card, player *origin, const target_list &targets) const {
-        auto target = std::get<target_player_t>(targets[0]).target;
+    opt_error handler_move_bomb::verify(card *origin_card, player *origin, player *target) const {
         if (target != origin) {
             if (auto c = target->find_equipped_card(origin_card)) {
                 return game_error("ERROR_DUPLICATED_CARD", c);
@@ -235,8 +229,7 @@ namespace banggame {
         return std::nullopt;
     }
 
-    void handler_move_bomb::on_play(card *origin_card, player *origin, const target_list &targets) {
-        player *target = std::get<target_player_t>(targets[0]).target;
+    void handler_move_bomb::on_play(card *origin_card, player *origin, player *target) {
         if (target != origin) {
             origin->m_game->add_log("LOG_MOVE_BOMB_ON", origin_card, origin, target);
             origin_card->on_disable(origin);

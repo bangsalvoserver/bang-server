@@ -115,28 +115,19 @@ namespace banggame {
         origin->m_game->pop_request();
     }
 
-    opt_error handler_fanning::verify(card *origin_card, player *origin, const target_list &targets) const {
-        player *target_players[] = {
-            std::get<target_player_t>(targets[0]).target,
-            std::get<target_player_t>(targets[1]).target
-        };
-        if (origin->m_game->calc_distance(target_players[0], target_players[1]) > 1
-            && target_players[0] != target_players[1])
-        {
+    opt_error handler_fanning::verify(card *origin_card, player *origin, player *player1, player *player2) const {
+        if (origin->m_game->calc_distance(player1, player2) > 1 && player1 != player2) {
             return game_error("ERROR_TARGET_NOT_IN_RANGE");
         }
         return std::nullopt;
     }
 
-    void handler_fanning::on_play(card *origin_card, player *origin, const target_list &targets) {
-        for (auto target : targets) {
-            effect_bang{}.on_play(origin_card, origin, std::get<target_player_t>(target).target, effect_flags::escapable);
-        }
+    void handler_fanning::on_play(card *origin_card, player *origin, player *player1, player *player2) {
+        effect_bang{}.on_play(origin_card, origin, player1, effect_flags::escapable);
+        effect_bang{}.on_play(origin_card, origin, player2, effect_flags::escapable);
     }
 
-    void handler_play_as_gatling::on_play(card *origin_card, player *origin, const target_list &ts) const {
-        card *chosen_card = std::get<target_card_t>(ts[0]).target;
-
+    void handler_play_as_gatling::on_play(card *origin_card, player *origin, card *chosen_card) const {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
         origin->discard_card(chosen_card);
 

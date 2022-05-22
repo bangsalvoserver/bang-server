@@ -10,6 +10,7 @@
 #include "effects/scenarios.h"
 
 #include "game.h"
+#include "mth_unwrapper.h"
 
 namespace banggame {
 
@@ -176,8 +177,8 @@ namespace banggame {
         return enums::visit_enum([&](enums::enum_tag_for<mth_type> auto tag) -> opt_error {
             if constexpr (enums::value_with_type<tag.value>) {
                 using handler_type = enums::enum_type_t<tag.value>;
-                if constexpr (requires (handler_type handler) { handler.verify(origin_card, origin, targets); }) {
-                    return handler_type{}.verify(origin_card, origin, targets);
+                if constexpr (requires { handler_type::verify; }) {
+                    return mth_unwrapper{&handler_type::verify}(origin_card, origin, targets);
                 }
             }
             return std::nullopt;
@@ -188,8 +189,8 @@ namespace banggame {
         return enums::visit_enum([&](enums::enum_tag_for<mth_type> auto tag) -> opt_fmt_str {
             if constexpr (enums::value_with_type<tag.value>) {
                 using handler_type = enums::enum_type_t<tag.value>;
-                if constexpr (requires (handler_type handler) { handler.on_prompt(origin_card, origin, targets); }) {
-                    return handler_type{}.on_prompt(origin_card, origin, targets);
+                if constexpr (requires { handler_type::on_prompt; }) {
+                    return mth_unwrapper{&handler_type::on_prompt}(origin_card, origin, targets);
                 }
             }
             return std::nullopt;
@@ -200,7 +201,7 @@ namespace banggame {
         enums::visit_enum([&](enums::enum_tag_for<mth_type> auto tag) {
             if constexpr (enums::value_with_type<tag.value>) {
                 using handler_type = enums::enum_type_t<tag.value>;
-                handler_type{}.on_play(origin_card, origin, targets);
+                return mth_unwrapper{&handler_type::on_play}(origin_card, origin, targets);
             }
         }, type);
     }

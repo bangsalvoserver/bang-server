@@ -37,7 +37,7 @@ namespace banggame {
     };
 
     struct handler_flint_westwood {
-        void on_play(card *origin_card, player *origin, const target_list &targets);
+        void on_play(card *origin_card, player *origin, card *chosen_card, card *target_card);
     };
 
     struct effect_greygory_deck : event_based_effect {

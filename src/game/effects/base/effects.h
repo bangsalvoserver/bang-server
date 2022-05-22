@@ -33,11 +33,11 @@ namespace banggame {
     };
 
     struct handler_bangcard {
-        void on_play(card *origin_card, player *origin, const target_list &targets) const;
+        void on_play(card *origin_card, player *origin, std::optional<player *> target);
     };
 
     struct handler_play_as_bang {
-        void on_play(card *origin_card, player *origin, const target_list &targets) const;
+        void on_play(card *origin_card, player *origin, card *chosen_card, player *target);
     };
 
     struct effect_banglimit {

@@ -48,10 +48,7 @@ namespace banggame {
         }
     }
 
-    opt_error handler_card_sharper::verify(card *origin_card, player *origin, const target_list &targets) const {
-        auto chosen_card = std::get<target_card_t>(targets[0]).target;
-        auto target_card = std::get<target_card_t>(targets[1]).target;
-
+    opt_error handler_card_sharper::verify(card *origin_card, player *origin, card *chosen_card, card *target_card) const {
         if (auto *c = origin->find_equipped_card(target_card)) {
             return game_error("ERROR_DUPLICATED_CARD", c);
         }
@@ -82,10 +79,7 @@ namespace banggame {
         }
     };
 
-    void handler_card_sharper::on_play(card *origin_card, player *origin, const target_list &targets) {
-        auto chosen_card = std::get<target_card_t>(targets[0]).target;
-        auto target_card = std::get<target_card_t>(targets[1]).target;
-
+    void handler_card_sharper::on_play(card *origin_card, player *origin, card *chosen_card, card *target_card) {
         if (target_card->owner->can_escape(origin, origin_card, effect_flags::escapable)) {
             origin->m_game->queue_request<request_card_sharper>(origin_card, origin, target_card->owner, chosen_card, target_card);
         } else {

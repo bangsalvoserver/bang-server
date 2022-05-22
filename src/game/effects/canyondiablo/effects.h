@@ -20,8 +20,8 @@ namespace banggame {
     };
 
     struct handler_card_sharper {
-        opt_error verify(card *origin_card, player *origin, const target_list &targets) const;
-        void on_play(card *origin_card, player *origin, const target_list &targets);
+        opt_error verify(card *origin_card, player *origin, card *chosen_card, card *target_card) const;
+        void on_play(card *origin_card, player *origin, card *chosen_card, card *target_card);
         void on_resolve(card *origin_card, player *origin, card *chosen_card, card *target_card);
     };
 

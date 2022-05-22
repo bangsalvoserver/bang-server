@@ -37,12 +37,12 @@ namespace banggame {
     };
 
     struct handler_fanning {
-        opt_error verify(card *origin_card, player *origin, const target_list &targets) const;
-        void on_play(card *origin_card, player *origin, const target_list &targets);
+        opt_error verify(card *origin_card, player *origin, player *player1, player *player2) const;
+        void on_play(card *origin_card, player *origin, player *player1, player *player2);
     };
 
     struct handler_play_as_gatling {
-        void on_play(card *origin_card, player *origin, const target_list &targets) const;
+        void on_play(card *origin_card, player *origin, card *chosen_card) const;
     };
 }
 
