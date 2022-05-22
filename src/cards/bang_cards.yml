@@ -2112,7 +2112,7 @@ specials:
     effects:
       - destroy card self | hand
       - destroy card self | hand
-      - destroy card notself | table bronco
+      - destroy card | table bronco
     tags:
       - bronco
       - hidden

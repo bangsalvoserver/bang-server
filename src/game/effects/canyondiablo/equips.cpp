@@ -21,8 +21,8 @@ namespace banggame {
     }
 
     void effect_taxman::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *p, card *drawn_card) {
-            if (p == target && !target->m_game->has_scenario(scenario_flags::peyote)) {
+        target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
+            if (p == target && e_card == target_card && !target->m_game->has_scenario(scenario_flags::peyote)) {
                 target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
                     auto suit = target->get_card_sign(drawn_card).suit;
                     if (suit == card_suit::clubs || suit == card_suit::spades) {
