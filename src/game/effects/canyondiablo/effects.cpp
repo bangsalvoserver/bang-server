@@ -19,7 +19,7 @@ namespace banggame {
         origin->m_game->queue_request<request_generalstore>(origin_card, origin, origin);
     }
 
-    opt_error effect_mirage::verify(card *origin_card, player *origin) const {
+    opt_error effect_mirage::verify(card *origin_card, player *origin) {
         if (origin->m_game->m_requests.empty()
             || origin->m_game->top_request().origin() != origin->m_game->m_playing) {
             return game_error("ERROR_CANT_PLAY_CARD", origin_card);
@@ -32,7 +32,7 @@ namespace banggame {
         origin->m_game->m_playing->skip_turn();
     }
 
-    opt_error effect_disarm::verify(card *origin_card, player *origin) const {
+    opt_error effect_disarm::verify(card *origin_card, player *origin) {
         if (origin->m_game->m_requests.empty() || !origin->m_game->top_request().origin()) {
             return game_error("ERROR_CANT_PLAY_CARD", origin_card);
         }
@@ -48,7 +48,7 @@ namespace banggame {
         }
     }
 
-    opt_error handler_card_sharper::verify(card *origin_card, player *origin, card *chosen_card, card *target_card) const {
+    opt_error handler_card_sharper::verify(card *origin_card, player *origin, card *chosen_card, card *target_card) {
         if (auto *c = origin->find_equipped_card(target_card)) {
             return game_error("ERROR_DUPLICATED_CARD", c);
         }
@@ -101,7 +101,7 @@ namespace banggame {
         target->equip_card(chosen_card);
     }
 
-    bool effect_sacrifice::can_respond(card *origin_card, player *origin) const {
+    bool effect_sacrifice::can_respond(card *origin_card, player *origin) {
         if (auto *req = origin->m_game->top_request_if<timer_damaging>()) {
             return req->target != origin;
         }
@@ -123,7 +123,7 @@ namespace banggame {
         });
     }
 
-    bool effect_lastwill::can_respond(card *origin_card, player *origin) const {
+    bool effect_lastwill::can_respond(card *origin_card, player *origin) {
         return origin->m_game->top_request_is<request_death>(origin);
     }
 

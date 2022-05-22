@@ -57,7 +57,7 @@ namespace banggame {
         });
     }
 
-    bool effect_teren_kill::can_respond(card *origin_card, player *origin) const {
+    bool effect_teren_kill::can_respond(card *origin_card, player *origin) {
         if (auto *req = origin->m_game->top_request_if<request_death>(origin)) {
             return !req->unavoidable;
         }

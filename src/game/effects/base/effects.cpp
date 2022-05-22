@@ -12,14 +12,14 @@ namespace banggame {
         origin->play_card_action(origin_card);
     }
 
-    opt_error effect_max_usages::verify(card *origin_card, player *origin) const {
+    opt_error effect_max_usages::verify(card *origin_card, player *origin) {
         if (origin_card->usages >= max_usages) {
             return game_error("ERROR_MAX_USAGES", origin_card, max_usages);
         }
         return std::nullopt;
     }
 
-    bool effect_max_usages::can_respond(card *origin_card, player *origin) const {
+    bool effect_max_usages::can_respond(card *origin_card, player *origin) {
         return origin_card->usages < max_usages;
     }
 
@@ -27,14 +27,14 @@ namespace banggame {
         ++origin_card->usages;
     }
 
-    opt_error effect_pass_turn::verify(card *origin_card, player *origin) const {
+    opt_error effect_pass_turn::verify(card *origin_card, player *origin) {
         if (origin->m_mandatory_card && origin->m_mandatory_card->owner == origin && origin->is_possible_to_play(origin->m_mandatory_card)) {
             return game_error("ERROR_MANDATORY_CARD", origin->m_mandatory_card);
         }
         return std::nullopt;
     }
 
-    opt_fmt_str effect_pass_turn::on_prompt(card *origin_card, player *origin) const {
+    opt_fmt_str effect_pass_turn::on_prompt(card *origin_card, player *origin) {
         int diff = origin->m_hand.size() - origin->max_cards_end_of_turn();
         if (diff == 1) {
             return game_formatted_string{"PROMPT_PASS_DISCARD"};
@@ -48,7 +48,7 @@ namespace banggame {
         origin->pass_turn();
     }
 
-    bool effect_resolve::can_respond(card *origin_card, player *origin) const {
+    bool effect_resolve::can_respond(card *origin_card, player *origin) {
         return origin->m_game->top_request_is<resolvable_request>(origin);
     }
     
@@ -57,7 +57,7 @@ namespace banggame {
         copy.get<resolvable_request>().on_resolve();
     }
 
-    opt_error effect_damage::verify(card *origin_card, player *origin, player *target) const {
+    opt_error effect_damage::verify(card *origin_card, player *origin, player *target) {
         if (target->m_hp <= 1) {
             return game_error("ERROR_CANT_SELF_DAMAGE");
         }
@@ -98,7 +98,7 @@ namespace banggame {
         });
     }
 
-    bool effect_missedlike::can_respond(card *origin_card, player *origin) const {
+    bool effect_missedlike::can_respond(card *origin_card, player *origin) {
         if (auto *req = origin->m_game->top_request_if<missable_request>(origin)) {
             return req->can_respond(origin_card);
         }
@@ -120,7 +120,7 @@ namespace banggame {
         });
     }
 
-    opt_error effect_banglimit::verify(card *origin_card, player *origin) const {
+    opt_error effect_banglimit::verify(card *origin_card, player *origin) {
         bool value = origin->m_bangs_played < origin->m_bangs_per_turn;
         origin->m_game->call_event<event_type::apply_volcanic_modifier>(origin, value);
         if (!value) {
@@ -150,7 +150,7 @@ namespace banggame {
         origin->m_game->queue_request<request_generalstore>(origin_card, origin, origin);
     }
 
-    opt_fmt_str effect_heal::on_prompt(card *origin_card, player *origin, player *target) const {
+    opt_fmt_str effect_heal::on_prompt(card *origin_card, player *origin, player *target) {
         if (target->m_hp == target->m_max_hp) {
             return game_formatted_string{"PROMPT_CARD_NO_EFFECT", origin_card};
         }
@@ -161,14 +161,14 @@ namespace banggame {
         target->heal(amount);
     }
 
-    opt_error effect_heal_notfull::verify(card *origin_card, player *origin, player *target) const {
+    opt_error effect_heal_notfull::verify(card *origin_card, player *origin, player *target) {
         if (target->m_hp == target->m_max_hp) {
             return game_error("ERROR_CANT_HEAL_PAST_FULL_HP");
         }
         return std::nullopt;
     }
 
-    opt_fmt_str effect_saloon::on_prompt(card *origin_card, player *origin) const {
+    opt_fmt_str effect_saloon::on_prompt(card *origin_card, player *origin) {
         if (std::ranges::all_of(origin->m_game->m_players | std::views::filter([](const player &p) {
             return p.alive() && p.m_hp != 0;
         }), [](const player &p) {
@@ -188,7 +188,7 @@ namespace banggame {
         }
     }
 
-    opt_fmt_str effect_beer::on_prompt(card *origin_card, player *origin, player *target) const {
+    opt_fmt_str effect_beer::on_prompt(card *origin_card, player *origin, player *target) {
         if ((target->m_game->m_players.size() > 2 && target->m_game->num_alive() == 2)
             || (target->m_hp == target->m_max_hp)) {
             return game_formatted_string{"PROMPT_CARD_NO_EFFECT", origin_card};
@@ -205,7 +205,7 @@ namespace banggame {
         }
     }
 
-    bool effect_deathsave::can_respond(card *origin_card, player *origin) const {
+    bool effect_deathsave::can_respond(card *origin_card, player *origin) {
         if (auto *req = origin->m_game->top_request_if<request_death>(origin)) {
             return !req->unavoidable;
         }
@@ -218,7 +218,7 @@ namespace banggame {
         }
     }
 
-    opt_fmt_str effect_steal::on_prompt(card *origin_card, player *origin, card *target_card) const {
+    opt_fmt_str effect_steal::on_prompt(card *origin_card, player *origin, card *target_card) {
         if (origin == target_card->owner && target_card->pocket == pocket_type::player_hand) {
             return game_formatted_string{"PROMPT_STEAL_OWN_HAND", origin_card};
         }
@@ -293,7 +293,7 @@ namespace banggame {
         }
     }
 
-    bool effect_while_drawing::can_respond(card *origin_card, player *origin) const {
+    bool effect_while_drawing::can_respond(card *origin_card, player *origin) {
         return origin->m_game->top_request_is<request_draw>(origin);
     }
 
@@ -314,7 +314,7 @@ namespace banggame {
         target->draw_card(ncards, origin_card);
     }
 
-    opt_error effect_draw_discard::verify(card *origin_card, player *origin, player *target) const {
+    opt_error effect_draw_discard::verify(card *origin_card, player *origin, player *target) {
         if (target->m_game->m_discards.empty()) {
             return game_error("ERROR_DISCARD_PILE_EMPTY");
         }

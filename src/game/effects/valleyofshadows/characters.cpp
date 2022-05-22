@@ -49,7 +49,7 @@ namespace banggame {
         });
     }
 
-    bool effect_lemonade_jim::can_respond(card *origin_card, player *origin) const {
+    bool effect_lemonade_jim::can_respond(card *origin_card, player *origin) {
         return origin->m_game->top_request_is<timer_lemonade_jim>(origin);
     }
 
@@ -57,7 +57,7 @@ namespace banggame {
         origin->m_game->pop_request<timer_lemonade_jim>();
     }
 
-    opt_error effect_evelyn_shebang::verify(card *origin_card, player *origin, player *target) const {
+    opt_error effect_evelyn_shebang::verify(card *origin_card, player *origin, player *target) {
         bool valid = true;
         origin->m_game->call_event<event_type::verify_target_unique>(origin_card, origin, target, valid);
         if (!valid) {

@@ -23,15 +23,15 @@ namespace banggame {
 
         opt_error verify(card *origin_card, player *origin) const;
         opt_fmt_str on_prompt(card *origin_card, player *origin) const;
-        void on_play(card *origin_card, player *origin, effect_flags flags);
+        void on_play(card *origin_card, player *origin, effect_flags flags) const;
         
         opt_error verify(card *origin_card, player *origin, player *target) const;
         opt_fmt_str on_prompt(card *origin_card, player *origin, player *target) const;
-        void on_play(card *origin_card, player *origin, player *target, effect_flags flags);
+        void on_play(card *origin_card, player *origin, player *target, effect_flags flags) const;
         
         opt_error verify(card *origin_card, player *origin, card *target) const;
         opt_fmt_str on_prompt(card *origin_card, player *origin, card *target) const;
-        void on_play(card *origin_card, player *origin, card *target, effect_flags flags);
+        void on_play(card *origin_card, player *origin, card *target, effect_flags flags) const;
     };
     
     struct equip_holder {
@@ -41,10 +41,10 @@ namespace banggame {
         )
 
         opt_fmt_str on_prompt(card *target_card, player *target) const;
-        void on_equip(card *target_card, player *target);
-        void on_enable(card *target_card, player *target);
-        void on_disable(card *target_card, player *target);
-        void on_unequip(card *target_card, player *target);
+        void on_equip(card *target_card, player *target) const;
+        void on_enable(card *target_card, player *target) const;
+        void on_disable(card *target_card, player *target) const;
+        void on_unequip(card *target_card, player *target) const;
     };
 
     struct mth_holder {
@@ -52,7 +52,7 @@ namespace banggame {
         
         opt_error verify(card *origin_card, player *origin, const target_list &targets) const;
         opt_fmt_str on_prompt(card *origin_card, player *origin, const target_list &targets) const;
-        void on_play(card *origin_card, player *origin, const target_list &targets);
+        void on_play(card *origin_card, player *origin, const target_list &targets) const;
     };
 
     struct tag_holder {REFLECTABLE(

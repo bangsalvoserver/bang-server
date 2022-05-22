@@ -31,7 +31,7 @@ namespace banggame {
     }
 
     opt_error effect_holder::verify(card *origin_card, player *origin) const {
-        return visit_effect([=](const auto &value) -> opt_error {
+        return visit_effect([=](auto &&value) -> opt_error {
             if constexpr (requires { value.verify(origin_card, origin); }) {
                 return value.verify(origin_card, origin);
             }
@@ -40,7 +40,7 @@ namespace banggame {
     }
 
     opt_error effect_holder::verify(card *origin_card, player *origin, player *target) const {
-        return visit_effect([=](const auto &value) -> opt_error {
+        return visit_effect([=](auto &&value) -> opt_error {
             if constexpr (requires { value.verify(origin_card, origin, target); }) {
                 return value.verify(origin_card, origin, target);
             }
@@ -49,7 +49,7 @@ namespace banggame {
     }
 
     opt_error effect_holder::verify(card *origin_card, player *origin, card *target) const {
-        return visit_effect([=](const auto &value) -> opt_error {
+        return visit_effect([=](auto &&value) -> opt_error {
             if constexpr (requires { value.verify(origin_card, origin, target); }) {
                 return value.verify(origin_card, origin, target);
             }
@@ -58,7 +58,7 @@ namespace banggame {
     }
 
     opt_fmt_str effect_holder::on_prompt(card *origin_card, player *origin) const {
-        return visit_effect([=](const auto &value) -> opt_fmt_str {
+        return visit_effect([=](auto &&value) -> opt_fmt_str {
             if constexpr (requires { value.on_prompt(origin_card, origin); }) {
                 return value.on_prompt(origin_card, origin);
             } else {
@@ -68,7 +68,7 @@ namespace banggame {
     }
 
     opt_fmt_str effect_holder::on_prompt(card *origin_card, player *origin, player *target) const {
-        return visit_effect([=](const auto &value) -> opt_fmt_str {
+        return visit_effect([=](auto &&value) -> opt_fmt_str {
             if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                 return value.on_prompt(origin_card, origin, target);
             } else {
@@ -78,7 +78,7 @@ namespace banggame {
     }
 
     opt_fmt_str effect_holder::on_prompt(card *origin_card, player *origin, card *target) const {
-        return visit_effect([=](const auto &value) -> opt_fmt_str {
+        return visit_effect([=](auto &&value) -> opt_fmt_str {
             if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                 return value.on_prompt(origin_card, origin, target);
             } else {
@@ -88,7 +88,7 @@ namespace banggame {
     }
 
     bool effect_holder::can_respond(card *origin_card, player *target) const {
-        return visit_effect([=](const auto &value) {
+        return visit_effect([=](auto &&value) {
             if constexpr (requires { value.can_respond(origin_card, target); }) {
                 return value.can_respond(origin_card, target);
             }
@@ -96,7 +96,7 @@ namespace banggame {
         }, *this);
     }
 
-    void effect_holder::on_play(card *origin_card, player *origin, effect_flags flags) {
+    void effect_holder::on_play(card *origin_card, player *origin, effect_flags flags) const {
         visit_effect([=](auto &&value) {
             if constexpr (requires { value.on_play(origin_card, origin, flags); }) {
                 value.on_play(origin_card, origin, flags);
@@ -108,7 +108,7 @@ namespace banggame {
         }, *this);
     }
 
-    void effect_holder::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
+    void effect_holder::on_play(card *origin_card, player *origin, player *target, effect_flags flags) const {
         visit_effect([=](auto &&value) {
             if constexpr (requires { value.on_play(origin_card, origin, target, flags); }) {
                 value.on_play(origin_card, origin, target, flags);
@@ -120,7 +120,7 @@ namespace banggame {
         }, *this);
     }
 
-    void effect_holder::on_play(card *origin_card, player *origin, card *target, effect_flags flags) {
+    void effect_holder::on_play(card *origin_card, player *origin, card *target, effect_flags flags) const {
         visit_effect([=](auto &&value) {
             if constexpr (requires { value.on_play(origin_card, origin, target, flags); }) {
                 value.on_play(origin_card, origin, target, flags);
@@ -141,7 +141,7 @@ namespace banggame {
         }, *this);
     }
 
-    void equip_holder::on_equip(card *target_card, player *target) {
+    void equip_holder::on_equip(card *target_card, player *target) const {
         visit_effect([=](auto &&value) {
             if constexpr (requires { value.on_equip(target_card, target); }) {
                 value.on_equip(target_card, target);
@@ -149,7 +149,7 @@ namespace banggame {
         }, *this);
     }
 
-    void equip_holder::on_enable(card *target_card, player *target) {
+    void equip_holder::on_enable(card *target_card, player *target) const {
         visit_effect([=](auto &&value) {
             if constexpr (requires { value.on_enable(target_card, target); }) {
                 value.on_enable(target_card, target);
@@ -157,7 +157,7 @@ namespace banggame {
         }, *this);
     }
 
-    void equip_holder::on_disable(card *target_card, player *target) {
+    void equip_holder::on_disable(card *target_card, player *target) const {
         visit_effect([=](auto &&value) {
             if constexpr (requires { value.on_disable(target_card, target); }) {
                 value.on_disable(target_card, target);
@@ -165,7 +165,7 @@ namespace banggame {
         }, *this);
     }
 
-    void equip_holder::on_unequip(card *target_card, player *target) {
+    void equip_holder::on_unequip(card *target_card, player *target) const {
         visit_effect([=](auto &&value) {
             if constexpr (requires { value.on_unequip(target_card, target); }) {
                 value.on_unequip(target_card, target);
@@ -197,7 +197,7 @@ namespace banggame {
         }, type);
     }
     
-    void mth_holder::on_play(card *origin_card, player *origin, const target_list &targets) {
+    void mth_holder::on_play(card *origin_card, player *origin, const target_list &targets) const {
         enums::visit_enum([&](enums::enum_tag_for<mth_type> auto tag) {
             if constexpr (enums::value_with_type<tag.value>) {
                 using handler_type = enums::enum_type_t<tag.value>;

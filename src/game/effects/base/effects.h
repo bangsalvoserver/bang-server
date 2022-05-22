@@ -12,19 +12,19 @@ namespace banggame {
     struct effect_max_usages {
         int max_usages;
         
-        opt_error verify(card *origin_card, player *origin) const;
-        bool can_respond(card *origin_card, player *origin) const;
+        opt_error verify(card *origin_card, player *origin);
+        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct effect_pass_turn {
-        opt_error verify(card *origin_card, player *origin) const;
-        opt_fmt_str on_prompt(card *origin_card, player *origin) const;
+        opt_error verify(card *origin_card, player *origin);
+        opt_fmt_str on_prompt(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct effect_resolve {
-        bool can_respond(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
     
@@ -41,7 +41,7 @@ namespace banggame {
     };
 
     struct effect_banglimit {
-        opt_error verify(card *origin_card, player *origin) const;
+        opt_error verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
@@ -54,7 +54,7 @@ namespace banggame {
     };
 
     struct effect_missedlike {
-        bool can_respond(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin) {}
     };
     
@@ -67,10 +67,10 @@ namespace banggame {
     };
 
     struct effect_beer {
-        opt_fmt_str on_prompt(card *origin_card, player *origin) const {
+        opt_fmt_str on_prompt(card *origin_card, player *origin) {
             return on_prompt(origin_card, origin, origin);
         }
-        opt_fmt_str on_prompt(card *origin_card, player *origin, player *target) const;
+        opt_fmt_str on_prompt(card *origin_card, player *origin, player *target);
         
         void on_play(card *origin_card, player *origin) {
             on_play(origin_card, origin, origin);
@@ -82,10 +82,10 @@ namespace banggame {
         int amount;
         effect_heal(int value) : amount(std::max(1, value)) {}
 
-        opt_fmt_str on_prompt(card *origin_card, player *origin) const {
+        opt_fmt_str on_prompt(card *origin_card, player *origin) {
             return on_prompt(origin_card, origin, origin);
         }
-        opt_fmt_str on_prompt(card *origin_card, player *origin, player *target) const;
+        opt_fmt_str on_prompt(card *origin_card, player *origin, player *target);
 
         void on_play(card *origin_card, player *origin) {
             on_play(origin_card, origin, origin);
@@ -94,21 +94,21 @@ namespace banggame {
     };
 
     struct effect_heal_notfull : effect_heal {
-        opt_error verify(card *origin_card, player *origin, player *target) const;
+        opt_error verify(card *origin_card, player *origin, player *target);
     };
 
     struct effect_saloon {
-        opt_fmt_str on_prompt(card *origin_card, player *origin) const;
+        opt_fmt_str on_prompt(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct effect_deathsave {
-        bool can_respond(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct effect_steal {
-        opt_fmt_str on_prompt(card *origin_card, player *origin, card *target) const;
+        opt_fmt_str on_prompt(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };
@@ -133,7 +133,7 @@ namespace banggame {
     };
 
     struct effect_draw_discard {
-        opt_error verify(card *origin_card, player *origin, player *target) const;
+        opt_error verify(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };
 
@@ -145,7 +145,7 @@ namespace banggame {
     };
 
     struct effect_while_drawing : effect_empty {
-        bool can_respond(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
     };
 
     struct effect_end_drawing : effect_while_drawing {
@@ -161,7 +161,7 @@ namespace banggame {
     };
 
     struct effect_damage {
-        opt_error verify(card *origin_card, player *origin, player *target) const;
+        opt_error verify(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };
 

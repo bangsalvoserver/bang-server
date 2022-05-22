@@ -28,7 +28,7 @@ namespace banggame {
         target->send_player_status();
     }
 
-    opt_fmt_str effect_prompt_on_self_equip::on_prompt(card *target_card, player *target) const {
+    opt_fmt_str effect_prompt_on_self_equip::on_prompt(card *target_card, player *target) {
         if (target == target_card->owner) {
             return game_formatted_string{"PROMPT_EQUIP_ON_SELF", target_card};
         } else {
@@ -92,7 +92,7 @@ namespace banggame {
         return c->has_tag(tag_type::horse);
     }
 
-    opt_fmt_str effect_horse::on_prompt(card *target_card, player *target) const {
+    opt_fmt_str effect_horse::on_prompt(card *target_card, player *target) {
         if (auto it = std::ranges::find_if(target->m_table, is_horse); it != target->m_table.end()) {
             return game_formatted_string{"PROMPT_REPLACE", target_card, *it};
         } else {
@@ -110,7 +110,7 @@ namespace banggame {
         return c->has_tag(tag_type::weapon);
     }
 
-    opt_fmt_str effect_weapon::on_prompt(card *target_card, player *target) const {
+    opt_fmt_str effect_weapon::on_prompt(card *target_card, player *target) {
         if (target == target_card->owner) {
             if (auto it = std::ranges::find_if(target->m_table, is_weapon); it != target->m_table.end()) {
                 return game_formatted_string{"PROMPT_REPLACE", target_card, *it};
@@ -143,7 +143,7 @@ namespace banggame {
     }
 
     void effect_boots::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_hit>({target_card, 1}, [p, target_card](card *origin_card, player *origin, player *target, int damage, bool is_bang){
+        p->m_game->add_event<event_type::on_hit>({target_card, 1}, [p, target_card](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
             if (p == target) {
                 target->m_game->queue_action([=]{
                     if (target->alive()) {

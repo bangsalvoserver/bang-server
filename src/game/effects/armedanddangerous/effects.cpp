@@ -10,19 +10,19 @@
 namespace banggame {
     using namespace enums::flag_operators;
 
-    void handler_draw_atend::on_play(card *origin_card, player *origin, const target_list &targets) {
-        effect_draw(targets.size()).on_play(origin_card, origin);
+    void handler_draw_atend::on_play(card *origin_card, player *origin, size_t amount) {
+        effect_draw(amount).on_play(origin_card, origin);
     }
 
-    opt_fmt_str handler_heal_multi::on_prompt(card *origin_card, player *origin, const target_list &targets) const {
-        return effect_heal(targets.size()).on_prompt(origin_card, origin);
+    opt_fmt_str handler_heal_multi::on_prompt(card *origin_card, player *origin, size_t amount) {
+        return effect_heal(amount).on_prompt(origin_card, origin);
     }
 
-    void handler_heal_multi::on_play(card *origin_card, player *origin, const target_list &targets) {
-        effect_heal(targets.size()).on_play(origin_card, origin);
+    void handler_heal_multi::on_play(card *origin_card, player *origin, size_t amount) {
+        effect_heal(amount).on_play(origin_card, origin);
     }
 
-    opt_error effect_select_cube::verify(card *origin_card, player *origin, card *target) const {
+    opt_error effect_select_cube::verify(card *origin_card, player *origin, card *target) {
         if (target->num_cubes == 0) {
             return game_error("ERROR_NOT_ENOUGH_CUBES_ON", target);
         }
@@ -33,11 +33,11 @@ namespace banggame {
         target->owner->pay_cubes(target, 1);
     }
 
-    bool effect_pay_cube::can_respond(card *origin_card, player *origin) const {
+    bool effect_pay_cube::can_respond(card *origin_card, player *origin) {
         return origin_card->num_cubes >= ncubes;
     }
 
-    opt_error effect_pay_cube::verify(card *origin_card, player *origin) const {
+    opt_error effect_pay_cube::verify(card *origin_card, player *origin) {
         if (origin_card->num_cubes < ncubes) {
             return game_error("ERROR_NOT_ENOUGH_CUBES_ON", origin_card);
         }
@@ -142,7 +142,7 @@ namespace banggame {
         origin->m_game->queue_request(std::move(req));
     }
 
-    opt_error effect_bandolier::verify(card *origin_card, player *origin) const {
+    opt_error effect_bandolier::verify(card *origin_card, player *origin) {
         if (origin->m_bangs_played == 0) {
             return game_error("ERROR_CANT_PLAY_CARD", origin_card);
         }
@@ -157,7 +157,7 @@ namespace banggame {
         effect_missed().on_play(origin_card, origin);
     }
 
-    opt_error handler_squaw::verify(card *origin_card, player *origin, card *discarded_card, std::optional<target_cubes_t> paid_cubes) const {
+    opt_error handler_squaw::verify(card *origin_card, player *origin, card *discarded_card, std::optional<target_cubes_t> paid_cubes) {
         if (paid_cubes) {
             for (auto target_card : paid_cubes->target_cards) {
                 if (target_card == discarded_card) {
@@ -192,7 +192,7 @@ namespace banggame {
         });
     }
 
-    bool effect_tumbleweed::can_respond(card *origin_card, player *origin) const {
+    bool effect_tumbleweed::can_respond(card *origin_card, player *origin) {
         return origin->m_game->top_request_is<timer_tumbleweed>(origin);
     }
 
@@ -208,11 +208,11 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    bool effect_move_bomb::can_respond(card *origin_card, player *origin) const {
+    bool effect_move_bomb::can_respond(card *origin_card, player *origin) {
         return origin->m_game->top_request_is<request_move_bomb>(origin);
     }
 
-    opt_fmt_str handler_move_bomb::on_prompt(card *origin_card, player *origin, player *target) const {
+    opt_fmt_str handler_move_bomb::on_prompt(card *origin_card, player *origin, player *target) {
         if (origin == target) {
             return game_formatted_string{"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
         } else {
@@ -220,7 +220,7 @@ namespace banggame {
         }
     }
 
-    opt_error handler_move_bomb::verify(card *origin_card, player *origin, player *target) const {
+    opt_error handler_move_bomb::verify(card *origin_card, player *origin, player *target) {
         if (target != origin) {
             if (auto c = target->find_equipped_card(origin_card)) {
                 return game_error("ERROR_DUPLICATED_CARD", c);

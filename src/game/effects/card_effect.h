@@ -50,7 +50,7 @@ namespace banggame {
     };
 
     struct effect_prompt_on_self_equip {
-        opt_fmt_str on_prompt(card *target_card, player *target) const;
+        opt_fmt_str on_prompt(card *target_card, player *target);
     };
 
     struct request_base {

@@ -6,16 +6,16 @@
 namespace banggame {
 
     struct handler_draw_atend {
-        void on_play(card *origin_card, player *origin, const target_list &targets);
+        void on_play(card *origin_card, player *origin, size_t amount);
     };
 
     struct handler_heal_multi {
-        opt_fmt_str on_prompt(card *origin_card, player *origin, const target_list &targets) const;
-        void on_play(card *origin_card, player *origin, const target_list &targets);
+        opt_fmt_str on_prompt(card *origin_card, player *origin, size_t amount);
+        void on_play(card *origin_card, player *origin, size_t amount);
     };
 
     struct effect_select_cube {
-        opt_error verify(card *origin_card, player *origin, card *target) const;
+        opt_error verify(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target);
     };
 
@@ -23,8 +23,8 @@ namespace banggame {
         int ncubes;
         effect_pay_cube(int value) : ncubes(std::max(1, value)) {}
         
-        bool can_respond(card *origin_card, player *origin) const;
-        opt_error verify(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
+        opt_error verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
@@ -65,7 +65,7 @@ namespace banggame {
     };
 
     struct effect_bandolier : effect_empty {
-        opt_error verify(card *origin_card, player *origin) const;
+        opt_error verify(card *origin_card, player *origin);
     };
 
     struct handler_duck {
@@ -73,17 +73,17 @@ namespace banggame {
     };
 
     struct handler_squaw {
-        opt_error verify(card *origin_card, player *origin, card *discarded_card, std::optional<target_cubes_t> paid_cubes) const;
+        opt_error verify(card *origin_card, player *origin, card *discarded_card, std::optional<target_cubes_t> paid_cubes);
         void on_play(card *origin_card, player *origin, card *discarded_card, std::optional<target_cubes_t> paid_cubes);
     };
 
     struct effect_move_bomb : effect_empty {
-        bool can_respond(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
     };
 
     struct handler_move_bomb {
-        opt_fmt_str on_prompt(card *origin_card, player *origin, player *target) const;
-        opt_error verify(card *origin_card, player *origin, player *target) const;
+        opt_fmt_str on_prompt(card *origin_card, player *origin, player *target);
+        opt_error verify(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };
 }

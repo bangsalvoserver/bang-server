@@ -10,7 +10,7 @@ namespace banggame {
     };
 
     struct effect_discard_black {
-        opt_error verify(card *origin_card, player *origin, card *target) const;
+        opt_error verify(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target);
     };
 
@@ -25,8 +25,8 @@ namespace banggame {
         int amount;
         effect_pay_gold(int value) : amount(value) {}
 
-        opt_error verify(card *origin_card, player *origin) const;
-        bool can_respond(card *origin_card, player *origin) const;
+        opt_error verify(card *origin_card, player *origin);
+        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 

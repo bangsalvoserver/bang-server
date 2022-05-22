@@ -19,7 +19,7 @@ namespace banggame {
     };
 
     struct effect_teren_kill {
-        bool can_respond(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 

@@ -10,7 +10,7 @@ namespace banggame {
     };
     
     struct effect_backfire {
-        opt_error verify(card *origin_card, player *origin) const;
+        opt_error verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
@@ -27,22 +27,22 @@ namespace banggame {
     };
 
     struct effect_saved {
-        bool can_respond(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct effect_escape {
-        bool can_respond(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct handler_fanning {
-        opt_error verify(card *origin_card, player *origin, player *player1, player *player2) const;
+        opt_error verify(card *origin_card, player *origin, player *player1, player *player2);
         void on_play(card *origin_card, player *origin, player *player1, player *player2);
     };
 
     struct handler_play_as_gatling {
-        void on_play(card *origin_card, player *origin, card *chosen_card) const;
+        void on_play(card *origin_card, player *origin, card *chosen_card);
     };
 }
 

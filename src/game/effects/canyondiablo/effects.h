@@ -10,28 +10,28 @@ namespace banggame {
     };
 
     struct effect_mirage {
-        opt_error verify(card *origin_card, player *origin) const;
+        opt_error verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct effect_disarm {
-        opt_error verify(card *origin_card, player *origin) const;
+        opt_error verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct handler_card_sharper {
-        opt_error verify(card *origin_card, player *origin, card *chosen_card, card *target_card) const;
+        opt_error verify(card *origin_card, player *origin, card *chosen_card, card *target_card);
         void on_play(card *origin_card, player *origin, card *chosen_card, card *target_card);
         void on_resolve(card *origin_card, player *origin, card *chosen_card, card *target_card);
     };
 
     struct effect_sacrifice {
-        bool can_respond(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct effect_lastwill {
-        bool can_respond(card *origin_card, player *origin) const;
+        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
