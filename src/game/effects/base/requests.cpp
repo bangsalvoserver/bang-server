@@ -240,7 +240,8 @@ namespace banggame {
     bool missable_request::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
         return pocket == pocket_type::player_hand && target_player == target
             && target->check_player_flags(player_flags::treat_missed_as_bang)
-            && target_card->has_tag(tag_type::bangcard);
+            && target_card->has_tag(tag_type::bangcard)
+            && can_respond(target_card);
     }
 
     void missable_request::on_pick(pocket_type pocket, player *target_player, card *target_card) {
