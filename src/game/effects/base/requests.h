@@ -123,9 +123,9 @@ namespace banggame {
         bool unavoidable = false;
         bool is_bang_card = false;
 
-        bool can_respond(card *c) const override;
         void on_miss() override;
         void on_resolve() override;
+        void resolve_unavoidable();
         game_formatted_string status_text(player *owner) const override;
     };
 
@@ -137,8 +137,6 @@ namespace banggame {
     struct request_death : request_base, resolvable_request {
         request_death(card *origin_card, player *origin, player *target)
             : request_base(origin_card, origin, target) {}
-
-        bool unavoidable = false;
         
         void on_resolve() override;
         game_formatted_string status_text(player *owner) const override;

@@ -80,7 +80,11 @@ namespace banggame {
         origin->m_game->call_event<event_type::apply_bang_modifier>(origin, req.get());
         origin->m_game->queue_action([req = std::move(req)]() mutable {
             if (!req->target->immune_to(req->origin_card)) {
-                req->origin->m_game->queue_request(std::move(req));
+                if (req->unavoidable) {
+                    req->resolve_unavoidable();
+                } else {
+                    req->origin->m_game->queue_request(std::move(req));
+                }
             }
         });
     }
@@ -93,7 +97,11 @@ namespace banggame {
         origin->m_game->call_event<event_type::apply_bang_modifier>(origin, req.get());
         origin->m_game->queue_action([req = std::move(req)]() mutable {
             if (!req->target->immune_to(req->origin_card)) {
-                req->origin->m_game->queue_request(std::move(req));
+                if (req->unavoidable) {
+                    req->resolve_unavoidable();
+                } else {
+                    req->origin->m_game->queue_request(std::move(req));
+                }
             }
         });
     }
@@ -206,10 +214,7 @@ namespace banggame {
     }
 
     bool effect_deathsave::can_respond(card *origin_card, player *origin) {
-        if (auto *req = origin->m_game->top_request_if<request_death>(origin)) {
-            return !req->unavoidable;
-        }
-        return false;
+        return origin->m_game->top_request_if<request_death>(origin);
     }
 
     void effect_deathsave::on_play(card *origin_card, player *origin) {

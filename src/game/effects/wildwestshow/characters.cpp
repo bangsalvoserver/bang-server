@@ -58,10 +58,7 @@ namespace banggame {
     }
 
     bool effect_teren_kill::can_respond(card *origin_card, player *origin) {
-        if (auto *req = origin->m_game->top_request_if<request_death>(origin)) {
-            return !req->unavoidable;
-        }
-        return false;
+        return origin->m_game->top_request_if<request_death>(origin);
     }
 
     void effect_teren_kill::on_play(card *origin_card, player *origin) {
@@ -72,8 +69,7 @@ namespace banggame {
                 origin->m_game->add_update<game_update_type::player_hp>(origin->id, 1);
                 origin->draw_card(1, origin_card);
             } else {
-                origin->m_game->top_request().get<request_death>().unavoidable = true;
-                origin->m_game->update_request();
+                origin->m_game->top_request().get<request_death>().on_resolve();
             }
         });
     }
