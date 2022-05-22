@@ -293,11 +293,7 @@ void lobby::send_updates(game_manager &mgr) {
 }
 
 void lobby::start_game(game_manager &mgr) {
-    game_options opts;
-    opts.expansions = expansions;
-    opts.keep_last_card_shuffling = false;
-
-    mgr.broadcast_message<server_message_type::game_started>(*this, opts);
+    mgr.broadcast_message<server_message_type::game_started>(*this, options);
 
     game = {};
     
@@ -314,5 +310,5 @@ void lobby::start_game(game_manager &mgr) {
         ++it;
     }
 
-    game.start_game(opts);
+    game.start_game(options);
 }

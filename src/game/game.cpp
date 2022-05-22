@@ -198,13 +198,14 @@ namespace banggame {
         }
 
         if (!m_scenario_deck.empty()) {
-            shuffle_cards_and_ids(m_scenario_deck);
-            move_testing_cards_back(m_scenario_deck);
-            if (m_scenario_deck.size() > 12) {
-                m_scenario_deck.resize(12);
-            }
             m_scenario_deck.push_back(last_scenario_cards[std::uniform_int_distribution<>(0, last_scenario_cards.size() - 1)(rng)]);
             std::swap(m_scenario_deck.back(), m_scenario_deck.front());
+
+            shuffle_cards_and_ids(std::span(m_scenario_deck).subspan(1));
+            move_testing_cards_back(m_scenario_deck);
+            if (m_scenario_deck.size() > m_options.scenario_deck_size) {
+                m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
+            }
 
             add_update<game_update_type::add_cards>(make_id_vector(m_scenario_deck), pocket_type::scenario_deck);
         }

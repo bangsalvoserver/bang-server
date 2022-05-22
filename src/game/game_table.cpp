@@ -81,7 +81,7 @@ namespace banggame {
         return bool(m_scenario_flags & type);
     }
 
-    void game_table::shuffle_cards_and_ids(std::vector<card *> &vec) {
+    void game_table::shuffle_cards_and_ids(std::span<card *> vec) {
         for (size_t i = vec.size() - 1; i > 0; --i) {
             size_t i2 = std::uniform_int_distribution<size_t>{0, i}(rng);
             if (i == i2) continue;

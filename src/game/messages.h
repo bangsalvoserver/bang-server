@@ -28,7 +28,7 @@ namespace banggame {
 
     struct lobby_info {REFLECTABLE(
         (std::string) name,
-        (banggame::card_expansion_type) expansions
+        (game_options) options
     )};
 
     struct lobby_join_args {REFLECTABLE(
@@ -49,7 +49,7 @@ namespace banggame {
         (lobby_chat, lobby_chat_client_args)
         (lobby_return)
         (game_start)
-        (game_action, banggame::game_action)
+        (game_action, game_action)
     )
 
     using client_message = enums::enum_variant<client_message_type>;
@@ -100,8 +100,8 @@ namespace banggame {
         (lobby_add_user, lobby_add_user_args)
         (lobby_remove_user, lobby_remove_user_args)
         (lobby_chat, lobby_chat_args)
-        (game_started, banggame::game_options)
-        (game_update, banggame::game_update)
+        (game_started, game_options)
+        (game_update, game_update)
     )
 
     using server_message = enums::enum_variant<server_message_type>;

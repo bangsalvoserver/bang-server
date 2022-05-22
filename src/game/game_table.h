@@ -71,7 +71,7 @@ namespace banggame {
 
         bool has_scenario(scenario_flags type) const;
 
-        void shuffle_cards_and_ids(std::vector<card *> &vec);
+        void shuffle_cards_and_ids(std::span<card *> vec);
 
         void send_card_update(card *c, player *owner = nullptr, show_card_flags flags = {});
 

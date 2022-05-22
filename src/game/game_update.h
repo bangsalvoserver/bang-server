@@ -170,8 +170,11 @@ namespace banggame {
 
     struct game_options {REFLECTABLE(
         (card_expansion_type) expansions,
-        (bool) keep_last_card_shuffling
-    )};
+        (bool) keep_last_card_shuffling,
+        (int) scenario_deck_size
+    )
+        game_options() : scenario_deck_size(12) {}
+    };
 }
 
 #endif
