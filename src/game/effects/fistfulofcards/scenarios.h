@@ -3,8 +3,6 @@
 
 #include "../card_effect.h"
 
-#include "../valleyofshadows/requests.h"
-
 #include "../base/requests.h"
 
 namespace banggame {
@@ -55,8 +53,15 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, card *target);
     };
     
-    struct request_ricochet : request_destroy, missable_request {
-        using request_destroy::request_destroy;
+    struct request_ricochet : missable_request {
+        request_ricochet(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
+            : missable_request(origin_card, origin, target, flags)
+            , target_card(target_card) {}
+        
+        card *target_card;
+        
+        bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override;
+        void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
 
         game_formatted_string status_text(player *owner) const override;
     };

@@ -1,6 +1,7 @@
 #include "scenarios.h"
 
 #include "../base/requests.h"
+#include "../base/effects.h"
 
 #include "../../game.h"
 
@@ -112,6 +113,20 @@ namespace banggame {
 
     void effect_ricochet::on_play(card *origin_card, player *origin, card *target_card) {
         origin->m_game->queue_request<request_ricochet>(origin_card, origin, target_card->owner, target_card);
+    }
+        
+    bool request_ricochet::can_pick(pocket_type pocket, player *target_player, card *selected_card) const {
+        return missable_request::can_pick(pocket, target_player, selected_card)
+            || (target_player == target && selected_card == target_card);
+    }
+
+    void request_ricochet::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+        if (missable_request::can_pick(pocket, target_player, target_card)) {
+            missable_request::on_pick(pocket, target_player, target_card);
+        } else {
+            effect_destroy{}.on_resolve(origin_card, origin, target_card);
+            origin->m_game->pop_request<request_ricochet>();
+        }
     }
 
     game_formatted_string request_ricochet::status_text(player *owner) const {

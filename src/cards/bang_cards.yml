@@ -127,8 +127,6 @@ main_deck:
     effects:
       - banglimit
       - mth_add player reachable notself
-    responses:
-      - bangresponse
     multitarget: bangcard
     tags:
       - bangcard
@@ -321,8 +319,6 @@ main_deck:
     effects:
       - banglimit
       - mth_add player reachable notself
-    responses:
-      - bangresponse
     multitarget: bangcard
     tags:
       - bangcard
@@ -722,8 +718,6 @@ main_deck:
     effects:
       - banglimit
       - mth_add player reachable notself
-    responses:
-      - bangresponse
     multitarget: bangcard
     tags:
       - bangcard
@@ -1090,8 +1084,6 @@ main_deck:
     effects:
       - banglimit
       - mth_add player reachable notself
-    responses:
-      - bangresponse
     multitarget: bangcard
     tags:
       - bangcard

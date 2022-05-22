@@ -33,7 +33,7 @@ namespace banggame {
     };
 
     struct handler_bangcard {
-        void on_play(card *origin_card, player *origin, std::optional<player *> target);
+        void on_play(card *origin_card, player *origin, player *target);
     };
 
     struct handler_play_as_bang {
@@ -59,11 +59,6 @@ namespace banggame {
     };
     
     struct effect_missed : effect_missedlike {
-        void on_play(card *origin_card, player *origin);
-    };
-
-    struct effect_bangresponse {
-        bool can_respond(card *origin_card, player *origin) const;
         void on_play(card *origin_card, player *origin);
     };
     

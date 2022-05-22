@@ -167,7 +167,6 @@ namespace banggame {
         (banglimit,             effect_banglimit)
         (missedlike,            effect_missedlike)
         (missed,                effect_missed)
-        (bangresponse,          effect_bangresponse)
         (barrel,                effect_barrel)
         (destroy,               effect_destroy)
         (startofturn,           effect_startofturn)

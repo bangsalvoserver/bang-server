@@ -73,11 +73,9 @@ namespace banggame {
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
-    void handler_bangcard::on_play(card *origin_card, player *origin, std::optional<player *> target) {
-        if (!target) return;
-
-        origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, *target);
-        auto req = std::make_shared<request_bang>(origin_card, origin, *target, effect_flags::single_target);
+    void handler_bangcard::on_play(card *origin_card, player *origin, player *target) {
+        origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
+        auto req = std::make_shared<request_bang>(origin_card, origin, target, effect_flags::single_target);
         req->is_bang_card = true;
         origin->m_game->call_event<event_type::apply_bang_modifier>(origin, req.get());
         origin->m_game->queue_action([req = std::move(req)]() mutable {
@@ -108,16 +106,7 @@ namespace banggame {
     }
 
     void effect_missed::on_play(card *origin_card, player *origin) {
-        origin->m_game->top_request().get<missable_request>().on_miss(origin);
-    }
-
-    bool effect_bangresponse::can_respond(card *origin_card, player *origin) const {
-        return origin->check_player_flags(player_flags::treat_missed_as_bang)
-            && effect_missed().can_respond(origin_card, origin);
-    }
-
-    void effect_bangresponse::on_play(card *origin_card, player *target) {
-        effect_missed().on_play(origin_card, target);
+        origin->m_game->top_request().get<missable_request>().on_miss();
     }
 
     void effect_barrel::on_play(card *origin_card, player *target) {
