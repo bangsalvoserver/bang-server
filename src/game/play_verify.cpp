@@ -306,13 +306,12 @@ namespace banggame {
                     if (e.target != play_card_target_type::other_players) {
                         return game_error("ERROR_INVALID_ACTION");
                     } else {
-                        for (auto *p = origin;;) {
-                            p = origin->m_game->get_next_player(p);
-                            if (p == origin) return std::nullopt;
-                            if (auto error = e.verify(card_ptr, origin, p)) {
+                        for (player &p : range_other_players(origin)) {
+                            if (auto error = e.verify(card_ptr, origin, &p)) {
                                 return error;
                             }
                         }
+                        return std::nullopt;
                     }
                 },
                 [this, &e](target_cards_other_players_t const& args) -> opt_error {
@@ -372,9 +371,8 @@ namespace banggame {
                 },
                 [this, &e](target_other_players_t args) -> opt_fmt_str {
                     opt_fmt_str msg = std::nullopt;
-                    for (auto *p = origin;;) {
-                        p = origin->m_game->get_next_player(p);
-                        if (p == origin || !(msg = e.on_prompt(card_ptr, origin, p))) {
+                    for (player &p : range_other_players(origin)) {
+                        if (!(msg = e.on_prompt(card_ptr, origin, &p))) {
                             break;
                         }
                     }
@@ -459,23 +457,18 @@ namespace banggame {
                 },
                 [this, &e](target_no_player_t args) {},
                 [this, &e](target_other_players_t args) {
-                    std::vector<player *> targets;
-                    for (auto *p = origin;;) {
-                        p = origin->m_game->get_next_player(p);
-                        if (p == origin) break;
-                        targets.push_back(p);
-                    }
+                    auto targets = range_other_players(origin);
                     
                     effect_flags flags{};
                     if (card_ptr->sign && card_ptr->color == card_color_type::brown) {
                         flags |= effect_flags::escapable;
                     }
-                    if (targets.size() == 1) {
+                    if (std::ranges::distance(targets) == 1) {
                         flags |= effect_flags::single_target;
                     }
-                    for (auto *p : targets) {
-                        if (!p->immune_to(card_ptr)) {
-                            e.on_play(card_ptr, origin, p, flags);
+                    for (player &p : targets) {
+                        if (!p.immune_to(card_ptr)) {
+                            e.on_play(card_ptr, origin, &p, flags);
                         }
                     }
                 },

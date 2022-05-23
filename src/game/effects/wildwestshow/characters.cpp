@@ -26,31 +26,23 @@ namespace banggame {
     }
 
     void effect_gary_looter::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_discard_pass>(target_card, [p](player *origin, card *discarded_card) {
-            if (p != origin) {
-                for (;origin != p; origin = origin->m_game->get_next_player(origin)) {
-                    if (std::ranges::any_of(origin->m_characters, [](const card *c) {
-                        return c->has_tag(tag_type::gary_looter);
-                    })) {
-                        return;
-                    }
-                }
-                p->m_game->add_log("LOG_DRAWN_CARD", p, discarded_card);
-                p->m_game->move_card(discarded_card, pocket_type::player_hand, p, show_card_flags::short_pause);
+        p->m_game->add_event<event_type::on_discard_pass>(target_card, [player_end = p](player *player_begin, card *discarded_card) {
+            const auto is_valid_target = [](const player &target) {
+                return target.has_character_tag(tag_type::gary_looter);
+            };
+            if (player_begin != player_end && !std::any_of(player_iterator(player_begin), player_iterator(player_end), is_valid_target)) {
+                player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, discarded_card);
+                player_end->m_game->move_card(discarded_card, pocket_type::player_hand, player_end, show_card_flags::short_pause);
             }
         });
     }
 
     void effect_john_pain::on_enable(card *target_card, player *p) {
         p->m_game->add_event<event_type::on_draw_check>(target_card, [player_end = p](player *player_begin, card *drawn_card) {
-            if (player_end->alive() && player_end->m_hand.size() < 6) {
-                for (player *it = player_begin; it != player_end; it = it->m_game->get_next_player(it)) {
-                    if (std::ranges::any_of(it->m_characters, [](const card *c) {
-                        return c->has_tag(tag_type::john_pain);
-                    })) {
-                        return;
-                    }
-                }
+            const auto is_valid_target = [](const player &target) {
+                return target.alive() && target.m_hand.size() && target.has_character_tag(tag_type::john_pain);
+            };
+            if (!std::any_of(player_iterator(player_begin), player_iterator(player_end), is_valid_target) && is_valid_target(*player_end)) {
                 player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, drawn_card);
                 player_end->m_game->move_card(drawn_card, pocket_type::player_hand, player_end, show_card_flags::short_pause);
             }

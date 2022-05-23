@@ -103,7 +103,7 @@ namespace banggame {
                     m_game->queue_request_front<request_death>(origin_card, origin, this);
                 }
                 if (m_game->has_expansion(card_expansion_type::goldrush)) {
-                    if (origin && origin->m_game->m_playing == origin && origin != this) {
+                    if (origin && origin->m_game->m_playing == origin && origin != this && origin->alive()) {
                         origin->add_gold(value);
                     }
                 }
@@ -461,7 +461,7 @@ namespace banggame {
                 card *drawn_card = m_game->phase_one_drawn_card();
                 m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);
                 m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);
-                m_game->draw_phase_one_card_to(pocket_type::player_hand, this);
+                m_game->move_card(drawn_card, pocket_type::player_hand, this);
                 m_game->call_event<event_type::on_card_drawn>(this, drawn_card);
             }
         }
@@ -663,6 +663,12 @@ namespace banggame {
         return (m_player_flags & flags) == flags;
     }
 
+    bool player::has_character_tag(tag_type tag) const {
+        return std::ranges::any_of(m_characters, [=](const card *c) {
+            return c->has_tag(tag);
+        });
+    }
+
     int player::count_cubes() const {
         return m_characters.front()->num_cubes
             + std::transform_reduce(
@@ -670,5 +676,11 @@ namespace banggame {
                 m_table.end(),
                 0, std::plus(),
                 std::mem_fn(&card::num_cubes));
+    }
+    
+    player_iterator &player_iterator::operator++() {
+        m_begin_flag = false;
+        m_ptr = m_ptr->m_game->get_next_player(m_ptr);
+        return *this;
     }
 }

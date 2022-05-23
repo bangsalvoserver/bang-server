@@ -35,7 +35,7 @@ namespace banggame {
                         card *drawn_card = origin->m_game->phase_one_drawn_card();
                         target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_A_CARD", target);
                         target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, drawn_card);
-                        origin->m_game->draw_phase_one_card_to(pocket_type::player_hand, origin);
+                        origin->m_game->move_card(drawn_card, pocket_type::player_hand, origin);
                         origin->m_game->call_event<event_type::on_card_drawn>(target, drawn_card);
                     });
                 }
@@ -119,9 +119,9 @@ namespace banggame {
                 auto next_vulture_sam = [p = target, target]() mutable {
                     while (true) {
                         p = p->m_game->get_next_player(p);
-                        if (p != target && std::ranges::any_of(p->m_characters, [](card *c) {
-                            return c->has_tag(tag_type::vulture_sam);
-                        })) return p;
+                        if (p != target && p->has_character_tag(tag_type::vulture_sam)) {
+                            return p;
+                        }
                     }
                 };
 

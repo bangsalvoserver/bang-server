@@ -1,6 +1,7 @@
 #ifndef __GAME_TABLE_H__
 #define __GAME_TABLE_H__
 
+#include <span>
 #include <random>
 
 #include "player.h"

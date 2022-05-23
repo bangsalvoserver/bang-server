@@ -72,15 +72,13 @@ namespace banggame {
                         target->discard_card(target_card);
                         target->damage(target_card, nullptr, 3);
                     } else {
-                        player *p = target;
-                        do {
-                            p = p->m_game->get_next_player(p);
-                        } while (p->find_equipped_card(target_card) && p != target);
-
-                        if (p != target) {
+                        auto targets = range_other_players(target);
+                        if (auto it = std::ranges::find_if(targets, [target_card](player &p) {
+                            return p.find_equipped_card(target_card) == nullptr;
+                        }); it != targets.end()) {
                             target_card->on_disable(target);
-                            target_card->on_equip(p);
-                            p->equip_card(target_card);
+                            target_card->on_equip(&*it);
+                            it->equip_card(target_card);
                         }
                     }
                 });

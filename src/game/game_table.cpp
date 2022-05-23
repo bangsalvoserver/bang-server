@@ -66,10 +66,9 @@ namespace banggame {
     int game_table::calc_distance(player *from, player *to) {
         if (from == to) return 0;
         if (from->check_player_flags(player_flags::disable_player_distances)) return to->m_distance_mod;
-        int d1=0, d2=0;
-        for (player *counter = from; counter != to; counter = get_next_player(counter), ++d1);
-        for (player *counter = to; counter != from; counter = get_next_player(counter), ++d2);
-        return std::min(d1, d2) + to->m_distance_mod;
+        return std::min(
+            std::distance(player_iterator(from), player_iterator(to)),
+            std::distance(player_iterator(to), player_iterator(from))) + to->m_distance_mod;
     }
 
     int game_table::num_alive() const {
@@ -107,6 +106,7 @@ namespace banggame {
     }
 
     void game_table::move_card(card *c, pocket_type pocket, player *owner, show_card_flags flags) {
+        pocket_type prev_pocket = c->pocket;
         if (c->pocket != pocket || c->owner != owner) {
             send_card_update(c, owner, flags);
 
@@ -120,12 +120,7 @@ namespace banggame {
             
             add_update<game_update_type::move_card>(c->id, owner ? owner->id : 0, pocket, flags);
         }
-    }
-
-    card *game_table::draw_card_to(pocket_type pocket, player *owner, show_card_flags flags) {
-        card *drawn_card = m_deck.back();
-        move_card(drawn_card, pocket, owner, flags);
-        if (m_deck.empty()) {
+        if (prev_pocket == pocket_type::main_deck && m_deck.empty()) {
             card *top_discards = m_discards.back();
             if (m_options.keep_last_card_shuffling) {
                 m_discards.pop_back();
@@ -143,17 +138,12 @@ namespace banggame {
             add_log("LOG_DECK_RESHUFFLED");
             add_update<game_update_type::deck_shuffled>(pocket_type::main_deck);
         }
-        return drawn_card;
     }
 
-    card *game_table::draw_phase_one_card_to(pocket_type pocket, player *owner, show_card_flags flags) {
-        if (!has_scenario(scenario_flags::abandonedmine) || m_discards.empty()) {
-            return draw_card_to(pocket, owner, flags);
-        } else {
-            card *drawn_card = m_discards.back();
-            move_card(drawn_card, pocket, owner, flags);
-            return drawn_card;
-        }
+    card *game_table::draw_card_to(pocket_type pocket, player *owner, show_card_flags flags) {
+        card *drawn_card = m_deck.back();
+        move_card(drawn_card, pocket, owner, flags);
+        return drawn_card;
     }
 
     card *game_table::phase_one_drawn_card() {
@@ -162,6 +152,12 @@ namespace banggame {
         } else {
             return m_discards.back();
         }
+    }
+
+    card *game_table::draw_phase_one_card_to(pocket_type pocket, player *owner, show_card_flags flags) {
+        card *drawn_card = phase_one_drawn_card();
+        move_card(drawn_card, pocket, owner, flags);
+        return drawn_card;
     }
 
     card *game_table::draw_shop_card() {

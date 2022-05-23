@@ -38,12 +38,8 @@ namespace banggame {
     }
 
     player *request_claus_the_saint::get_next_target() const {
-        int index = target->m_game->num_alive() - target->m_game->m_selection.size();
-        auto p = target;
-        for (int i=0; i<index; ++i) {
-            p = target->m_game->get_next_player(p);
-        }
-        return p;
+        return &*std::next(player_iterator(target),
+            target->m_game->num_alive() - target->m_game->m_selection.size());
     }
 
     void request_claus_the_saint::on_pick(pocket_type pocket, player *target_player, card *target_card) {

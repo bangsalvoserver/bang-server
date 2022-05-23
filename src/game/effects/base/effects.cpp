@@ -189,10 +189,8 @@ namespace banggame {
     }
 
     void effect_saloon::on_play(card *origin_card, player *origin) {
-        for (auto *p = origin;;) {
-            p->heal(1);
-            p = p->m_game->get_next_player(p);
-            if (p == origin) break;
+        for (player &p : range_all_players(origin)) {
+            p.heal(1);
         }
     }
 
@@ -345,7 +343,7 @@ namespace banggame {
                 card *drawn_card = target->m_game->phase_one_drawn_card();
                 target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_A_CARD", target);
                 target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, drawn_card);
-                target->m_game->draw_phase_one_card_to(pocket_type::player_hand, target);
+                target->m_game->move_card(drawn_card, pocket_type::player_hand, target);
                 target->m_game->call_event<event_type::on_card_drawn>(target, drawn_card);
             }
         });

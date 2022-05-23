@@ -44,20 +44,18 @@ namespace banggame {
     }
 
     void effect_poker::on_play(card *origin_card, player *origin) {
-        auto target = origin;
+        auto targets = range_other_players(origin) | std::views::filter([](const player &p) {
+            return !p.m_hand.empty();
+        });
+
         effect_flags flags = effect_flags::escapable;
-        if (std::ranges::count_if(origin->m_game->m_players, [&](const player &p) {
-            return &p != origin && p.alive() && !p.m_hand.empty();
-        }) == 1) {
-            flags |= effect_flags::single_target;
-        }
-        while(true) {
-            target = origin->m_game->get_next_player(target);
-            if (target == origin) break;
-            if (!target->m_hand.empty()) {
-                origin->m_game->queue_request<request_poker>(origin_card, origin, target, flags);
+        if (std::ranges::distance(targets) == 1) flags |= effect_flags::single_target;
+        
+        for (player &p : targets) {
+            if (!p.m_hand.empty()) {
+                origin->m_game->queue_request<request_poker>(origin_card, origin, &p, flags);
             }
-        };
+        }
         origin->m_game->queue_action([=]{
             for (auto it = origin->m_game->m_selection.begin(); it != origin->m_game->m_selection.end(); ++it) {
                 origin->m_game->add_log("LOG_POKER_REVEAL", origin_card, *it);
@@ -71,8 +69,8 @@ namespace banggame {
                 return origin->get_card_sign(card_ptr).rank == card_rank::rank_A;
             })) {
                 origin->m_game->add_log("LOG_POKER_ACE");
-                while (!target->m_game->m_selection.empty()) {
-                    origin->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+                while (!origin->m_game->m_selection.empty()) {
+                    origin->m_game->move_card(origin->m_game->m_selection.front(), pocket_type::discard_pile);
                 }
             } else if (origin->m_game->m_selection.size() <= 2) {
                 while (!origin->m_game->m_selection.empty()) {
@@ -131,17 +129,11 @@ namespace banggame {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
         origin->discard_card(chosen_card);
 
-        std::vector<player *> targets;
-        for (auto *p = origin;;) {
-            p = origin->m_game->get_next_player(p);
-            if (p == origin) break;
-            targets.push_back(p);
-        }
-        
-        auto flags = targets.size() == 1 ? effect_flags::single_target : effect_flags{};
-        for (auto *p : targets) {
-            if (!p->immune_to(chosen_card)) {
-                origin->m_game->queue_request<request_card_as_gatling>(chosen_card, origin, p, flags);
+        auto targets = range_other_players(origin);
+        auto flags = std::ranges::distance(targets) == 1 ? effect_flags::single_target : effect_flags{};
+        for (player &p : targets) {
+            if (!p.immune_to(chosen_card)) {
+                origin->m_game->queue_request<request_card_as_gatling>(chosen_card, origin, &p, flags);
             }
         }
     }

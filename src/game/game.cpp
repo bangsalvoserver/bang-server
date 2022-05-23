@@ -296,12 +296,8 @@ namespace banggame {
                     move_card(p.m_characters.front(), pocket_type::player_hand, &p, show_card_flags::instant | show_card_flags::shown);
                 }
             }
-            auto *p = m_first_player;
-            while (true) {
-                queue_request<request_characterchoice>(p);
-
-                p = get_next_player(p);
-                if (p == m_first_player) break;
+            for (player &p : range_all_players(m_first_player)) {
+                queue_request<request_characterchoice>(&p);
             }
         } else {
             for (auto &p : m_players) {
@@ -323,13 +319,11 @@ namespace banggame {
 
             int max_initial_cards = std::ranges::max(m_players | std::views::transform(&player::get_initial_cards));
             for (int i=0; i<max_initial_cards; ++i) {
-                player *p = m_first_player;
-                do {
-                    if (p->m_hand.size() < p->get_initial_cards()) {
-                        p->draw_card();
+                for (player &p : range_all_players(m_first_player)) {
+                    if (p.m_hand.size() < p.get_initial_cards()) {
+                        p.draw_card();
                     }
-                    p = get_next_player(p);
-                } while (p != m_first_player);
+                }
             }
 
             if (!m_shop_deck.empty()) {
