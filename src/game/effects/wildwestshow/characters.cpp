@@ -69,8 +69,8 @@ namespace banggame {
     void effect_youl_grinner::on_enable(card *target_card, player *target) {
         target->m_game->add_event<event_type::on_turn_start>(target_card, [=](player *origin) {
             if (target == origin) {
-                for (auto &p : target->m_game->m_players) {
-                    if (p.alive() && p.id != target->id && p.m_hand.size() > target->m_hand.size()) {
+                for (player &p : range_other_players(target)) {
+                    if (p.m_hand.size() > target->m_hand.size()) {
                         target->m_game->queue_request<request_youl_grinner>(target_card, target, &p);
                     }
                 }

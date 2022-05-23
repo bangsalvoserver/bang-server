@@ -50,7 +50,7 @@ namespace banggame {
             | std::views::filter(&player::alive)
             | std::views::transform(&player::m_hp));
         
-        for (auto &p : target->m_game->m_players) {
+        for (player &p : range_all_players(target)) {
             if (p.m_hp == min_hp) {
                 p.heal(1);
             }
