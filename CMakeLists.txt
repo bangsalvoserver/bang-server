@@ -38,10 +38,6 @@ set(bangserver_srcs
     src/net/main.cpp
 )
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(jsoncpp REQUIRED jsoncpp IMPORTED_TARGET)
-pkg_check_modules(yaml-cpp REQUIRED yaml-cpp IMPORTED_TARGET)
-
 add_subdirectory(external/cpputils)
 
 add_library(networking INTERFACE)
@@ -49,8 +45,9 @@ target_link_libraries(networking INTERFACE asio)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
 target_include_directories(networking INTERFACE external/websocketpp)
 
+find_package(yaml-cpp REQUIRED)
 add_executable(parse_bang_cards src/cards/parse_bang_cards.cpp)
-target_link_libraries(parse_bang_cards PRIVATE cpputils PkgConfig::yaml-cpp)
+target_link_libraries(parse_bang_cards PRIVATE cpputils yaml-cpp)
 
 set(bang_cards_cpp "${CMAKE_CURRENT_BINARY_DIR}/bang_cards.cpp")
 add_custom_command(
@@ -70,7 +67,18 @@ target_link_libraries(bang_cards_obj PRIVATE cpputils)
 
 add_library(bangcommon INTERFACE)
 target_include_directories(bangcommon INTERFACE src)
-target_link_libraries(bangcommon INTERFACE cpputils networking PkgConfig::jsoncpp)
+target_link_libraries(bangcommon INTERFACE cpputils networking)
+
+find_package(jsoncpp)
+if(TARGET jsoncpp_static)
+    target_link_libraries(bangcommon INTERFACE jsoncpp_static)
+elseif(TARGET jsoncpp_lib)
+    target_link_libraries(bangcommon INTERFACE jsoncpp_lib)
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(jsoncpp REQUIRED jsoncpp IMPORTED_TARGET)
+    target_link_libraries(bangcommon INTERFACE PkgConfig::jsoncpp)
+endif()
 
 add_executable(bangserver ${bangserver_srcs})
 target_link_libraries(bangserver PUBLIC bang_cards_obj bangcommon)
