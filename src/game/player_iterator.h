@@ -64,8 +64,8 @@ private:
     int m_cycle = 0;
 };
 
-inline auto range_all_players(player *begin) {
-    return std::ranges::subrange(cycle_player_iterator(begin), cycle_player_iterator(begin, 1));
+inline auto range_all_players(player *begin, int cycles = 1) {
+    return std::ranges::subrange(cycle_player_iterator(begin), cycle_player_iterator(begin, cycles));
 }
 
 inline auto range_other_players(player *begin) {

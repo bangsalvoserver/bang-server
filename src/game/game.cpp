@@ -317,12 +317,11 @@ namespace banggame {
                 p.m_characters.front()->on_equip(&p);
             }
 
-            int max_initial_cards = std::ranges::max(m_players | std::views::transform(&player::get_initial_cards));
-            for (int i=0; i<max_initial_cards; ++i) {
-                for (player &p : range_all_players(m_first_player)) {
-                    if (p.m_hand.size() < p.get_initial_cards()) {
-                        p.draw_card();
-                    }
+            for (player &p : range_all_players(m_first_player,
+                std::ranges::max(m_players | std::views::transform(&player::get_initial_cards))))
+            {
+                if (p.m_hand.size() < p.get_initial_cards()) {
+                    p.draw_card();
                 }
             }
 
