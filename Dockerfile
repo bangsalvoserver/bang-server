@@ -7,8 +7,7 @@ RUN apk add --no-cache --virtual .build_deps \
 COPY . /usr/src/bang
 WORKDIR /usr/src/bang/build
 
-RUN cmake -G Ninja -DCMAKE_BUILD_TYPE=Release .. && cmake --build .
-RUN cmake --install . && ldconfig /usr/local/lib
+RUN cmake -G Ninja -DCMAKE_BUILD_TYPE=Release .. && cmake --build . && cmake --install .
 
 WORKDIR /
 RUN rm -rf /usr/src/bang && apk del .build_deps

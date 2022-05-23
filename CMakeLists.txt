@@ -4,7 +4,7 @@ project(bangcardgame VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(banggame_srcs
+set(bangserver_srcs
     src/game/effects/base/effects.cpp
     src/game/effects/base/equips.cpp
     src/game/effects/base/characters.cpp
@@ -34,6 +34,7 @@ set(banggame_srcs
     src/game/play_verify.cpp
     src/game/possible_to_play.cpp
     src/game/manager.cpp
+    src/net/main.cpp
 )
 
 find_package(PkgConfig REQUIRED)
@@ -43,21 +44,12 @@ pkg_check_modules(yaml-cpp REQUIRED yaml-cpp IMPORTED_TARGET)
 add_subdirectory(external/cpputils)
 
 add_library(networking INTERFACE)
-target_include_directories(networking INTERFACE external/websocketpp)
+target_link_libraries(networking INTERFACE asio)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
-if(MINGW)
-    target_link_libraries(networking INTERFACE wsock32 ws2_32)
-endif()
+target_include_directories(networking INTERFACE external/websocketpp)
 
 add_executable(parse_bang_cards src/cards/parse_bang_cards.cpp)
-target_link_libraries(parse_bang_cards PRIVATE PkgConfig::yaml-cpp)
-
-find_package(fmt REQUIRED)
-if (TARGET fmt::fmt-header-only)
-    target_link_libraries(parse_bang_cards PRIVATE fmt::fmt-header-only)
-else()
-    target_link_libraries(parse_bang_cards PRIVATE fmt::fmt)
-endif()
+target_link_libraries(parse_bang_cards PRIVATE cpputils PkgConfig::yaml-cpp)
 
 set(bang_cards_cpp "${CMAKE_CURRENT_BINARY_DIR}/bang_cards.cpp")
 add_custom_command(
@@ -72,25 +64,24 @@ add_custom_command(
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 add_library(bang_cards_obj OBJECT "${bang_cards_cpp}")
-set_property(TARGET bang_cards_obj PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories(bang_cards_obj PRIVATE src)
-target_include_directories(bang_cards_obj PRIVATE $<TARGET_PROPERTY:cpputils,INCLUDE_DIRECTORIES>)
+target_link_libraries(bang_cards_obj PRIVATE cpputils)
 
-add_library(banggame SHARED ${banggame_srcs})
-target_link_libraries(banggame PUBLIC cpputils bang_cards_obj PkgConfig::jsoncpp)
-target_include_directories(banggame PUBLIC src)
+add_library(bangcommon INTERFACE)
+target_include_directories(bangcommon INTERFACE src)
+target_link_libraries(bangcommon INTERFACE cpputils networking PkgConfig::jsoncpp)
+
+add_executable(bangserver ${bangserver_srcs})
+target_link_libraries(bangserver PUBLIC bang_cards_obj bangcommon)
 
 option(DEBUG_PRINT_GAME_UPDATES "Debug Option: Print Game Updates" OFF)
 if (DEBUG_PRINT_GAME_UPDATES)
-    target_compile_definitions(banggame PUBLIC DEBUG_PRINT_GAME_UPDATES)
+    target_compile_definitions(bangserver PUBLIC DEBUG_PRINT_GAME_UPDATES)
 endif()
 
 option(TESTING_CARDS "Debug Option: Enable Testing Cards" OFF)
 if (TESTING_CARDS)
-    target_compile_definitions(banggame PUBLIC TESTING_CARDS)
+    target_compile_definitions(bangserver PUBLIC TESTING_CARDS)
 endif()
 
-add_executable(bangserver src/net/main.cpp)
-target_link_libraries(bangserver networking banggame)
-
-install(TARGETS banggame bangserver)
+install(TARGETS bangserver)
