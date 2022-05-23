@@ -372,9 +372,8 @@ namespace banggame {
                 [this, &e](target_other_players_t args) -> opt_fmt_str {
                     opt_fmt_str msg = std::nullopt;
                     for (player &p : range_other_players(origin)) {
-                        if (!(msg = e.on_prompt(card_ptr, origin, &p))) {
-                            break;
-                        }
+                        msg = e.on_prompt(card_ptr, origin, &p);
+                        if (!msg) break;
                     }
                     return msg;
                 },
@@ -384,18 +383,16 @@ namespace banggame {
                 [this, &e](target_cards_other_players_t const& args) -> opt_fmt_str {
                     opt_fmt_str msg = std::nullopt;
                     for (card *target_card : args.target_cards) {
-                        if (!(msg = e.on_prompt(card_ptr, origin, target_card))) {
-                            break;
-                        }
+                        msg = e.on_prompt(card_ptr, origin, target_card);
+                        if (!msg) break;
                     }
                     return msg;
                 },
                 [this, &e](target_cubes_t const& args) -> opt_fmt_str {
                     opt_fmt_str msg = std::nullopt;
                     for (card *target_card : args.target_cards) {
-                        if (!(msg = e.on_prompt(card_ptr, origin, target_card))) {
-                            break;
-                        }
+                        msg = e.on_prompt(card_ptr, origin, target_card);
+                        if (!msg) break;
                     }
                     return msg;
                 }

@@ -117,12 +117,10 @@ namespace banggame {
                 }
 
                 auto next_vulture_sam = [p = player_iterator(target), target]() mutable -> player * {
-                    while (true) {
+                    do {
                         ++p;
-                        if (p != target && p->has_character_tag(tag_type::vulture_sam)) {
-                            return p;
-                        }
-                    }
+                    } while (p == target || !p->has_character_tag(tag_type::vulture_sam));
+                    return p;
                 };
 
                 for (card *c : target_cards) {

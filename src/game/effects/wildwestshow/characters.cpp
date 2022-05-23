@@ -30,7 +30,7 @@ namespace banggame {
             const auto is_valid_target = [](const player &target) {
                 return target.has_character_tag(tag_type::gary_looter);
             };
-            if (player_begin != player_end && !std::any_of(player_iterator(player_begin), player_iterator(player_end), is_valid_target)) {
+            if (player_begin != player_end && std::none_of(player_iterator(player_begin), player_iterator(player_end), is_valid_target)) {
                 player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, discarded_card);
                 player_end->m_game->move_card(discarded_card, pocket_type::player_hand, player_end, show_card_flags::short_pause);
             }
@@ -40,9 +40,12 @@ namespace banggame {
     void effect_john_pain::on_enable(card *target_card, player *p) {
         p->m_game->add_event<event_type::on_draw_check>(target_card, [player_end = p](player *player_begin, card *drawn_card) {
             const auto is_valid_target = [](const player &target) {
-                return target.alive() && target.m_hand.size() && target.has_character_tag(tag_type::john_pain);
+                return target.alive() && target.has_character_tag(tag_type::john_pain) && target.m_hand.size() < 6;
             };
-            if (!std::any_of(player_iterator(player_begin), player_iterator(player_end), is_valid_target) && is_valid_target(*player_end)) {
+            if (drawn_card->pocket != pocket_type::player_hand
+                && std::none_of(player_iterator(player_begin), player_iterator(player_end), is_valid_target)
+                && is_valid_target(*player_end))
+            {
                 player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, drawn_card);
                 player_end->m_game->move_card(drawn_card, pocket_type::player_hand, player_end, show_card_flags::short_pause);
             }
