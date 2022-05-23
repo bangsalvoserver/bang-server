@@ -98,7 +98,7 @@ namespace banggame {
     }
 
     void request_generalstore::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        auto next = target->m_game->get_next_player(target);
+        player *next = std::next(player_iterator(target));
         if (target->m_game->m_selection.size() == 2) {
             target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
             target->add_to_hand(target_card);

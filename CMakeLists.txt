@@ -31,6 +31,7 @@ set(bangserver_srcs
     src/game/game_table.cpp
     src/game/draw_check_handler.cpp
     src/game/player.cpp
+    src/game/player_iterator.cpp
     src/game/play_verify.cpp
     src/game/possible_to_play.cpp
     src/game/manager.cpp

@@ -406,6 +406,21 @@ namespace banggame {
         m_current_check.start();
     }
 
+    void game::start_next_turn() {
+        auto it = m_players.find(m_playing->id);
+        do {
+            if (has_scenario(scenario_flags::invert_rotation)) {
+                if (it == m_players.begin()) it = m_players.end();
+                --it;
+            } else {
+                ++it;
+                if (it == m_players.end()) it = m_players.begin();
+            }
+        } while(!it->alive() && !has_scenario(scenario_flags::ghosttown)
+            && !(has_scenario(scenario_flags::deadman) && &*it == m_first_dead));
+        it->start_of_turn();
+    }
+
     void game::check_game_over(player *killer, player *target) {
         if (m_game_over) return;
         if (killer != m_playing) killer = nullptr;
@@ -445,7 +460,7 @@ namespace banggame {
             add_update<game_update_type::game_over>(winner_role);
             m_game_over = true;
         } else if (m_playing == target) {
-            get_next_in_turn(target)->start_of_turn();
+            start_next_turn();
         } else if (killer) {
             if (m_players.size() > 3) {
                 switch (target->m_role) {
@@ -467,7 +482,7 @@ namespace banggame {
         }
         
         if (target == m_first_player) {
-            m_first_player = get_next_player(m_first_player);
+            m_first_player = std::next(player_iterator(m_first_player));
             add_update<game_update_type::move_scenario_deck>(m_first_player->id);
         }
 

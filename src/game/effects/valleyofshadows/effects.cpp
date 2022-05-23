@@ -52,9 +52,7 @@ namespace banggame {
         if (std::ranges::distance(targets) == 1) flags |= effect_flags::single_target;
         
         for (player &p : targets) {
-            if (!p.m_hand.empty()) {
-                origin->m_game->queue_request<request_poker>(origin_card, origin, &p, flags);
-            }
+            origin->m_game->queue_request<request_poker>(origin_card, origin, &p, flags);
         }
         origin->m_game->queue_action([=]{
             for (auto it = origin->m_game->m_selection.begin(); it != origin->m_game->m_selection.end(); ++it) {

@@ -588,7 +588,7 @@ namespace banggame {
                         m_game->player_death(nullptr, this);
                     }
                     remove_player_flags(player_flags::extra_turn);
-                    m_game->get_next_in_turn(this)->start_of_turn();
+                    m_game->start_next_turn();
                 } else {
                     --m_extra_turns;
                     add_player_flags(player_flags::extra_turn);
@@ -602,7 +602,7 @@ namespace banggame {
         untap_inactive_cards();
         remove_player_flags(player_flags::extra_turn);
         m_game->call_event<event_type::on_turn_end>(this);
-        m_game->get_next_in_turn(this)->start_of_turn();
+        m_game->start_next_turn();
     }
 
     void player::untap_inactive_cards() {
@@ -676,11 +676,5 @@ namespace banggame {
                 m_table.end(),
                 0, std::plus(),
                 std::mem_fn(&card::num_cubes));
-    }
-    
-    player_iterator &player_iterator::operator++() {
-        m_begin_flag = false;
-        m_ptr = m_ptr->m_game->get_next_player(m_ptr);
-        return *this;
     }
 }

@@ -116,9 +116,9 @@ namespace banggame {
                     target_cards.push_back(c);
                 }
 
-                auto next_vulture_sam = [p = target, target]() mutable {
+                auto next_vulture_sam = [p = player_iterator(target), target]() mutable -> player * {
                     while (true) {
-                        p = p->m_game->get_next_player(p);
+                        ++p;
                         if (p != target && p->has_character_tag(tag_type::vulture_sam)) {
                             return p;
                         }

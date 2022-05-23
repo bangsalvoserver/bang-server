@@ -38,7 +38,7 @@ namespace banggame {
     }
 
     player *request_claus_the_saint::get_next_target() const {
-        return &*std::next(player_iterator(target),
+        return std::next(player_iterator(target),
             target->m_game->num_alive() - target->m_game->m_selection.size());
     }
 
@@ -180,7 +180,7 @@ namespace banggame {
             if (origin == target) {
                 ++usages;
                 if (origin->m_game->num_alive() == 2) {
-                    copy_characters(origin, origin->m_game->get_next_player(origin));
+                    copy_characters(origin, std::next(player_iterator(origin)));
                 } else {
                     origin->m_game->queue_request<request_vera_custer>(origin_card, target);
                 }

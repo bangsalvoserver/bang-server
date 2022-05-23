@@ -77,7 +77,7 @@ namespace banggame {
                             return p.find_equipped_card(target_card) == nullptr;
                         }); it != targets.end()) {
                             target_card->on_disable(target);
-                            target_card->on_equip(&*it);
+                            target_card->on_equip(it);
                             it->equip_card(target_card);
                         }
                     }

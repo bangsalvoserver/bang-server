@@ -5,6 +5,7 @@
 #include "game_table.h"
 #include "request_queue.h"
 #include "draw_check_handler.h"
+#include "player_iterator.h"
 
 namespace banggame {
 
@@ -23,6 +24,8 @@ namespace banggame {
 
         request_status_args make_request_update(player *p);
         void send_request_update();
+
+        void start_next_turn();
 
         void draw_check_then(player *origin, card *origin_card, draw_check_function fun);
 

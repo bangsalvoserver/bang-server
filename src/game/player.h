@@ -180,45 +180,6 @@ namespace banggame {
         void handle_action(enums::enum_tag_t<game_action_type::respond_card>, const play_card_args &args);
         void handle_action(enums::enum_tag_t<game_action_type::prompt_respond>, bool response);
     };
-    
-    class player_iterator {
-    public:
-        using iterator_category = std::forward_iterator_tag;
-        using difference_type = int;
-        using value_type = player;
-        using pointer = player *;
-        using reference = player &;
-
-        player_iterator() = default;
-
-        player_iterator(player *p, bool begin_flag = false)
-            : m_ptr(p), m_begin_flag(begin_flag) {}
-
-        reference operator *() const { return *m_ptr; }
-        pointer operator ->() { return m_ptr; }
-
-        player_iterator &operator++();
-
-        player_iterator operator++(int) {
-            auto copy = *this;
-            ++*this;
-            return copy;
-        }
-
-        bool operator == (const player_iterator &other) const = default;
-
-    private:
-        pointer m_ptr = nullptr;
-        bool m_begin_flag = false;
-    };
-
-    inline auto range_all_players(player *begin) {
-        return std::ranges::subrange(player_iterator(begin, true), player_iterator(begin));
-    }
-    
-    inline auto range_other_players(player *begin) {
-        return std::ranges::subrange(std::next(player_iterator(begin)), begin);
-    }
 
 }
 

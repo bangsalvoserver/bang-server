@@ -2,6 +2,8 @@
 
 #include "formatter.h"
 
+#include "player_iterator.h"
+
 namespace banggame {
 
     using namespace enums::flag_operators;
@@ -38,29 +40,6 @@ namespace banggame {
         case pocket_type::specials:          return m_specials;
         default: throw std::runtime_error("Invalid pocket");
         }
-    }
-
-    player *game_table::get_next_player(player *p) {
-        auto it = m_players.find(p->id);
-        do {
-            if (++it == m_players.end()) it = m_players.begin();
-        } while(!it->alive());
-        return &*it;
-    }
-
-    player *game_table::get_next_in_turn(player *p) {
-        auto it = m_players.find(p->id);
-        do {
-            if (has_scenario(scenario_flags::invert_rotation)) {
-                if (it == m_players.begin()) it = m_players.end();
-                --it;
-            } else {
-                ++it;
-                if (it == m_players.end()) it = m_players.begin();
-            }
-        } while(!it->alive() && !has_scenario(scenario_flags::ghosttown)
-            && !(has_scenario(scenario_flags::deadman) && &*it == m_first_dead));
-        return &*it;
     }
 
     int game_table::calc_distance(player *from, player *to) {

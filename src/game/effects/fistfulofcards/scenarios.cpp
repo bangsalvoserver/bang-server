@@ -146,7 +146,7 @@ namespace banggame {
         queue_russianroulette_request(target);
         target->m_game->add_event<event_type::on_missed>(target_card, [=](card *origin_card, player *origin, player *target, bool is_bang) {
             if (target_card == origin_card) {
-                queue_russianroulette_request(target->m_game->get_next_player(target));
+                queue_russianroulette_request(std::next(player_iterator(target)));
             }
         });
         target->m_game->add_event<event_type::on_hit>(target_card, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
