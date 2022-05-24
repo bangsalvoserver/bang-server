@@ -344,7 +344,7 @@ namespace banggame {
         (discard_if_two_players)
         (bangcard)
         (missedcard)
-        (bangproxy)
+        (play_as_bang)
         (beer)
         (indians)
         (drawing)

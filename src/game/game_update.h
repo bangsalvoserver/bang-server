@@ -86,7 +86,6 @@ namespace banggame {
     struct player_hp_update {REFLECTABLE(
         (int) player_id,
         (int) hp,
-        (bool) dead,
         (bool) instant
     )};
 
@@ -104,6 +103,8 @@ namespace banggame {
     DEFINE_ENUM_FLAGS(player_flags,
         (dead)
         (ghost)
+        (temp_ghost)
+        (targetable)
         (start_of_turn)
         (extra_turn)
         (disable_player_distances)

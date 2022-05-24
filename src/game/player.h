@@ -124,11 +124,19 @@ namespace banggame {
 
         int max_cards_end_of_turn();
 
-        bool alive() const;
+        bool is_ghost() const {
+            return check_player_flags(player_flags::ghost)
+                || check_player_flags(player_flags::temp_ghost);
+        }
+
+        bool alive() const {
+            return !check_player_flags(player_flags::dead) || is_ghost();
+        }
 
         void damage(card *origin_card, player *source, int value, bool is_bang = false, bool instant = false);
 
         void heal(int value);
+        void set_hp(int value, bool instant = false);
 
         void add_gold(int amount);
 
@@ -161,8 +169,8 @@ namespace banggame {
         card_sign get_card_sign(card *target_card);
 
         void send_player_status();
-        void add_player_flags(player_flags flags);
-        void remove_player_flags(player_flags flags);
+        bool add_player_flags(player_flags flags);
+        bool remove_player_flags(player_flags flags);
         bool check_player_flags(player_flags flags) const;
         bool has_character_tag(tag_type tag) const;
 

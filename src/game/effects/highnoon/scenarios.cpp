@@ -122,7 +122,7 @@ namespace banggame {
     void effect_sermon::on_enable(card *target_card, player *target) {
         target->m_game->add_event<event_type::pre_turn_start>(target_card, [=](player *p) {
             target->m_game->add_disabler(target_card, [=](card *c) {
-                return c->owner == p && c->has_tag(tag_type::bangcard);
+                return c->owner == p && (c->has_tag(tag_type::bangcard) || c->has_tag(tag_type::play_as_bang));
             });
         });
         target->m_game->add_event<event_type::on_turn_end>(target_card, [=](player *p) {
@@ -225,8 +225,7 @@ namespace banggame {
             target->move_cubes(old_character, target_card, old_character->num_cubes);
             target_card->on_equip(target);
             
-            target->m_hp = 2;
-            target->m_game->add_update<game_update_type::player_hp>(target->id, target->m_hp, false, false);
+            target->set_hp(2);
         } else {
             target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::player_backup, target, show_card_flags::hidden);
         }

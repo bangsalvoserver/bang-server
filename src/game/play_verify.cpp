@@ -12,8 +12,11 @@ namespace banggame {
     using namespace enums::flag_operators;
 
     opt_error check_player_filter(card *origin_card, player *origin, target_player_filter filter, player *target) {
-        if (bool(filter & target_player_filter::dead) == target->alive())
+        if (bool(filter & target_player_filter::dead)) {
+            if (target->m_hp > 0) return game_error("ERROR_TARGET_NOT_DEAD");
+        } else if (!target->check_player_flags(player_flags::targetable) && !target->alive()) {
             return game_error("ERROR_TARGET_DEAD");
+        }
 
         if (bool(filter & target_player_filter::self) && target != origin)
             return game_error("ERROR_TARGET_NOT_SELF");
@@ -90,7 +93,7 @@ namespace banggame {
             switch(mod_card->modifier) {
             case card_modifier_type::bangmod:
             case card_modifier_type::bandolier:
-                if (!origin->is_bangcard(card_ptr) && !card_ptr->has_tag(tag_type::bangproxy))
+                if (!origin->is_bangcard(card_ptr) && !card_ptr->has_tag(tag_type::play_as_bang))
                     return game_error("ERROR_INVALID_ACTION");
                 break;
             case card_modifier_type::leevankliff:

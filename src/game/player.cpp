@@ -48,11 +48,6 @@ namespace banggame {
         return n;
     }
 
-    bool player::alive() const {
-        return !check_player_flags(player_flags::dead) || check_player_flags(player_flags::ghost)
-            || (m_game->m_playing == this && m_game->has_scenario(scenario_flags::ghosttown));
-    }
-
     card *player::find_equipped_card(card *card) {
         auto it = std::ranges::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {
@@ -94,36 +89,39 @@ namespace banggame {
     }
 
     void player::damage(card *origin_card, player *origin, int value, bool is_bang, bool instant) {
-        if (!check_player_flags(player_flags::ghost) && !(m_hp == 0 && m_game->has_scenario(scenario_flags::ghosttown))) {
-            if (instant || !m_game->has_expansion(card_expansion_type::valleyofshadows | card_expansion_type::canyondiablo)) {
-                m_game->add_log(value == 1 ? "LOG_TAKEN_DAMAGE" : "LOG_TAKEN_DAMAGE_PLURAL", origin_card, this, value);
-                m_hp -= value;
-                m_game->add_update<game_update_type::player_hp>(id, m_hp);
-                if (m_hp <= 0) {
-                    m_game->queue_request_front<request_death>(origin_card, origin, this);
-                }
-                if (m_game->has_expansion(card_expansion_type::goldrush)) {
-                    if (origin && origin->m_game->m_playing == origin && origin != this && origin->alive()) {
-                        origin->add_gold(value);
-                    }
-                }
-                m_game->call_event<event_type::on_hit>(origin_card, origin, this, value, is_bang);
-            } else {
-                m_game->queue_request_front<timer_damaging>(origin_card, origin, this, value, is_bang);
+        if (is_ghost()) return;
+        
+        if (instant || !m_game->has_expansion(card_expansion_type::valleyofshadows | card_expansion_type::canyondiablo)) {
+            m_game->add_log(value == 1 ? "LOG_TAKEN_DAMAGE" : "LOG_TAKEN_DAMAGE_PLURAL", origin_card, this, value);
+            set_hp(m_hp - value);
+            if (m_hp <= 0) {
+                m_game->queue_request_front<request_death>(origin_card, origin, this);
             }
+            if (m_game->has_expansion(card_expansion_type::goldrush)) {
+                if (origin && origin->m_game->m_playing == origin && origin != this && origin->alive()) {
+                    origin->add_gold(value);
+                }
+            }
+            m_game->call_event<event_type::on_hit>(origin_card, origin, this, value, is_bang);
+        } else {
+            m_game->queue_request_front<timer_damaging>(origin_card, origin, this, value, is_bang);
         }
     }
 
     void player::heal(int value) {
-        if (!check_player_flags(player_flags::ghost) && !(m_hp == 0 && m_game->has_scenario(scenario_flags::ghosttown)) && m_hp != m_max_hp) {
-            if (value == 1) {
-                m_game->add_log("LOG_HEALED", this);
-            } else {
-                m_game->add_log("LOG_HEALED_PLURAL", this, value);
-            }
-            m_hp = std::min<int8_t>(m_hp + value, m_max_hp);
-            m_game->add_update<game_update_type::player_hp>(id, m_hp);
+        if (is_ghost() || m_hp == m_max_hp) return;
+        
+        if (value == 1) {
+            m_game->add_log("LOG_HEALED", this);
+        } else {
+            m_game->add_log("LOG_HEALED_PLURAL", this, value);
         }
+        set_hp(std::min<int>(m_hp + value, m_max_hp));
+    }
+
+    void player::set_hp(int value, bool instant) {
+        m_hp = value;
+        m_game->add_update<game_update_type::player_hp>(id, value, instant);
     }
 
     void player::add_gold(int amount) {
@@ -489,24 +487,6 @@ namespace banggame {
         m_bangs_per_turn = 1;
         m_num_drawn_cards = 0;
         add_player_flags(player_flags::start_of_turn);
-
-        if (!check_player_flags(player_flags::ghost) && m_hp == 0) {
-            if (m_game->has_scenario(scenario_flags::ghosttown)) {
-                m_game->add_log("LOG_REVIVE", this, m_game->m_scenario_cards.back());
-                ++m_num_cards_to_draw;
-                for (auto *c : m_characters) {
-                    enable_equip(c);
-                }
-            } else if (m_game->has_scenario(scenario_flags::deadman) && this == m_game->m_first_dead) {
-                remove_player_flags(player_flags::dead);
-                m_game->add_log("LOG_REVIVE", this, m_game->m_scenario_cards.back());
-                m_game->add_update<game_update_type::player_hp>(id, m_hp = 2);
-                draw_card(2);
-                for (auto *c : m_characters) {
-                    enable_equip(c);
-                }
-            }
-        }
         
         for (card *c : m_characters) {
             c->usages = 0;
@@ -583,11 +563,13 @@ namespace banggame {
             }
             m_game->queue_action([&]{
                 if (m_extra_turns == 0) {
-                    if (!check_player_flags(player_flags::ghost) && m_hp == 0 && m_game->has_scenario(scenario_flags::ghosttown)) {
-                        --m_num_cards_to_draw;
-                        m_game->player_death(nullptr, this);
-                    }
                     remove_player_flags(player_flags::extra_turn);
+                    if (remove_player_flags(player_flags::temp_ghost)) {
+                        --m_num_cards_to_draw;
+                        if (!check_player_flags(player_flags::ghost)) {
+                            m_game->player_death(nullptr, this);
+                        }
+                    }
                     m_game->start_next_turn();
                 } else {
                     --m_extra_turns;
@@ -645,18 +627,22 @@ namespace banggame {
         m_game->add_update<game_update_type::player_status>(id, m_player_flags, m_range_mod, m_weapon_range, m_distance_mod);
     }
 
-    void player::add_player_flags(player_flags flags) {
+    bool player::add_player_flags(player_flags flags) {
         if (!check_player_flags(flags)) {
             m_player_flags |= flags;
             send_player_status();
+            return true;
         }
+        return false;
     }
 
-    void player::remove_player_flags(player_flags flags) {
+    bool player::remove_player_flags(player_flags flags) {
         if (check_player_flags(flags)) {
             m_player_flags &= ~flags;
             send_player_status();
+            return true;
         }
+        return false;
     }
 
     bool player::check_player_flags(player_flags flags) const {

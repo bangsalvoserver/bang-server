@@ -21,24 +21,23 @@ namespace banggame {
     }
 
     void effect_ghost::on_equip(card *target_card, player *target) {
+        target->add_player_flags(player_flags::targetable);
         for (card *c : target->m_characters) {
             target->enable_equip(c);
         }
     }
 
     void effect_ghost::on_enable(card *target_card, player *target) {
-        target->m_game->add_update<game_update_type::player_hp>(target->id, 0, false);
         target->add_player_flags(player_flags::ghost);
     }
 
     void effect_ghost::on_disable(card *target_card, player *target) {
-        target->m_game->add_update<game_update_type::player_hp>(target->id, 0, true);
         target->remove_player_flags(player_flags::ghost);
     }
     
     void effect_ghost::on_unequip(card *target_card, player *target) {
+        target->remove_player_flags(player_flags::targetable);
         target->m_game->queue_action_front([=]{
-            target->remove_player_flags(player_flags::ghost);
             target->m_game->player_death(nullptr, target);
             target->m_game->check_game_over(nullptr, target);
         });

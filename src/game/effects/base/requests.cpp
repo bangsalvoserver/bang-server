@@ -15,10 +15,8 @@ namespace banggame {
         target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
         target->m_game->move_card(target_card, pocket_type::player_character, target, show_card_flags::shown);
         target->reset_max_hp();
+        target->set_hp(target->m_max_hp, true);
         target_card->on_enable(target);
-
-        target->m_hp = target->m_max_hp;
-        target->m_game->add_update<game_update_type::player_hp>(target->id, target->m_hp, false, true);
 
         target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, show_card_flags::hidden);
         target->m_game->pop_request<request_characterchoice>();

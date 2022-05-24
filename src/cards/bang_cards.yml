@@ -582,7 +582,7 @@ main_deck:
     multitarget: play_as_bang
     tags:
       - weapon
-      - bangproxy
+      - play_as_bang
   - name: RATTLESNAKE
     signs:
       - 7 hearts
@@ -1308,7 +1308,7 @@ character:
       - mth_add player reachable notself
     multitarget: play_as_bang
     tags:
-      - bangproxy
+      - play_as_bang
   - name: EL_GRINGO
     image: 01_elgringo
     equip:
@@ -1411,7 +1411,7 @@ character:
       - mth_add player reachable notself
     multitarget: play_as_bang
     tags:
-      - bangproxy
+      - play_as_bang
   - name: APACHE_KID
     image: 03_apache_kid
     expansion: dodgecity

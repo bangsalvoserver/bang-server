@@ -86,7 +86,8 @@ namespace banggame {
                 move_cards(p.m_table, show_always);
                 move_cards(p.m_hand, [&](const card &c){ return c.owner == owner || c.deck == card_deck_type::character; });
 
-                ADD_TO_RET(player_hp, p.id, p.m_hp, !p.alive(), true);
+                ADD_TO_RET(player_hp, p.id, p.m_hp, true);
+                ADD_TO_RET(player_status, p.id, p.m_player_flags, p.m_range_mod, p.m_weapon_range, p.m_distance_mod);
                 
                 if (p.m_gold != 0) {
                     ADD_TO_RET(player_gold, p.id, p.m_gold);
@@ -304,9 +305,8 @@ namespace banggame {
                 add_log("LOG_CHARACTER_CHOICE", &p, p.m_characters.front());
                 send_card_update(p.m_characters.front(), &p, show_card_flags::instant | show_card_flags::shown);
                 p.reset_max_hp();
+                p.set_hp(p.m_max_hp, true);
                 p.m_characters.front()->on_enable(&p);
-                p.m_hp = p.m_max_hp;
-                add_update<game_update_type::player_hp>(p.id, p.m_hp, false, true);
 
                 move_card(p.m_characters.back(), pocket_type::player_backup, &p, show_card_flags::instant | show_card_flags::hidden);
             }
@@ -415,8 +415,29 @@ namespace banggame {
                 ++it;
                 if (it == m_players.end()) it = m_players.begin();
             }
-        } while(!it->alive() && !has_scenario(scenario_flags::ghosttown)
+        } while(!it->alive()
+            && !has_scenario(scenario_flags::ghosttown)
             && !(has_scenario(scenario_flags::deadman) && &*it == m_first_dead));
+
+        if (!it->is_ghost() && it->m_hp == 0) {
+            add_log("LOG_REVIVE", &*it, m_scenario_cards.back());
+
+            if (has_scenario(scenario_flags::ghosttown)) {
+                it->add_player_flags(player_flags::temp_ghost);
+                ++it->m_num_cards_to_draw;
+            } else if (has_scenario(scenario_flags::deadman) && &*it == m_first_dead) {
+                it->remove_player_flags(player_flags::dead);
+                it->set_hp(2);
+                it->draw_card(2);
+            } else {
+                assert("giocatore invalido ritorna in gioco" == nullptr);
+            }
+
+            for (auto *c : it->m_characters) {
+                c->on_enable(&*it);
+            }
+        }
+
         it->start_of_turn();
     }
 
@@ -503,7 +524,7 @@ namespace banggame {
         }
 
         target->add_player_flags(player_flags::dead);
-        target->m_hp = 0;
+        target->set_hp(0, true);
 
         if (!m_first_dead) m_first_dead = target;
 
@@ -518,7 +539,6 @@ namespace banggame {
         target->discard_all();
         target->add_gold(-target->m_gold);
 
-        add_update<game_update_type::player_hp>(target->id, 0, true);
         add_update<game_update_type::player_show_role>(target->id, target->m_role);
         target->add_player_flags(player_flags::role_revealed);
     }
