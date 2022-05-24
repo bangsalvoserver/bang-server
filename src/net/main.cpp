@@ -15,13 +15,13 @@ int main(int argc, char **argv) {
     if (argc > 1) {
         auto [ptr, ec] = std::from_chars(argv[1], argv[1] + strlen(argv[1]), port);
         if (ec != std::errc{}) {
-            std::cerr << "Port must be a number\n";
+            std::cerr << "Port must be a number" << std::endl;
             return 1;
         }
     }
 
     if (server.start(port)) {
-        std::cout << "Server listening on port " << port << '\n';
+        std::cout << "Server listening on port " << port << std::endl;
 
         ::signal(SIGTERM, [](int) {
             g_stop = true;
@@ -39,11 +39,11 @@ int main(int argc, char **argv) {
             std::this_thread::sleep_until(next_frame);
         }
 
-        std::cout << "Server stopped\n";
+        std::cout << "Server stopped" << std::endl;
 
         return 0;
     } else {
-        std::cerr << "Could not start server\n";
+        std::cerr << "Could not start server" << std::endl;
         return 1;
     }
 }
