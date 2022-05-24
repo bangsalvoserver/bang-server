@@ -1402,6 +1402,16 @@ character:
       - max_usages(1)
       - destroy card self | hand
       - generalstore
+  - name: ANNIE_VERSARY
+    image: 02_annieversary
+    expansion: thebullet
+    effects:
+      - banglimit
+      - mth_add card self | hand
+      - mth_add player reachable notself
+    multitarget: play_as_bang
+    tags:
+      - bangproxy
   - name: APACHE_KID
     image: 03_apache_kid
     expansion: dodgecity
