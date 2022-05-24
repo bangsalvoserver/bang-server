@@ -65,13 +65,17 @@ namespace net {
         }
         
         void disconnect() {
-            std::error_code ec;
-            if (!m_con.expired()) {
-                m_client.close(m_con, 0, "", ec);
-            }
-            if constexpr (requires (Derived obj) { obj.on_close(); }) {
-                if (ec) {
-                    static_cast<Derived &>(*this).on_close();
+            if (auto con = m_con.lock()) {
+                switch (con->get_state()) {
+                case websocketpp::session::state::connecting:
+                    con->terminate(make_error_code(websocketpp::error::http_connection_ended));
+                    if constexpr (requires (Derived obj) { obj.on_close(); }) {
+                        static_cast<Derived &>(*this).on_close();
+                    }
+                    break;
+                case websocketpp::session::state::open:
+                    con->close(0, "");
+                    break;
                 }
             }
         }
