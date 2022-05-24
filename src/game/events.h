@@ -3,6 +3,8 @@
 
 #include <map>
 #include <functional>
+#include <cassert>
+#include <span>
 
 #include "utils/enum_variant.h"
 
@@ -154,16 +156,20 @@ namespace banggame {
 
         template<event_type E, typename ... Ts>
         void call_event(Ts && ... args) {
-            using vector_pair = std::pair<int, enums::enum_type_t<E> *>;
-            std::vector<vector_pair> handlers;
+            using priority_handler_pair = std::pair<int, enums::enum_type_t<E> *>;
+
+            std::array<priority_handler_pair, 16> buffer;
+            auto next = buffer.begin();
 
             for (auto &[key, handler] : m_event_handlers) {
                 if (auto *fun = std::get_if<enums::indexof(E)>(&handler)) {
-                    handlers.emplace_back(key.priority, fun);
+                    assert(next - buffer.begin() < buffer.size());
+                    *next++ = std::make_pair(key.priority, fun);
                 }
             }
 
-            std::ranges::sort(handlers, std::greater(), &vector_pair::first);
+            std::span handlers{buffer.begin(), next};
+            std::ranges::sort(handlers, std::greater(), &priority_handler_pair::first);
 
             for (auto &[key, fun] : handlers) {
                 std::invoke(*fun, args ...);
