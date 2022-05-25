@@ -22,6 +22,10 @@ namespace banggame {
         using type = int;
     };
 
+    template<> struct id_target_transform<target_type::conditional_player> {
+        using type = int;
+    };
+
     template<> struct id_target_transform<target_type::card> {
         using type = int;
     };

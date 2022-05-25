@@ -19,7 +19,7 @@ namespace banggame {
 
     DECLARE_VISITOR(none)
     DECLARE_VISITOR(player, player *target)
-    DECLARE_VISITOR(conditional_player)
+    DECLARE_VISITOR(conditional_player, nullable<player> target)
     DECLARE_VISITOR(card, card *target)
     DECLARE_VISITOR(all_players)
     DECLARE_VISITOR(other_players)

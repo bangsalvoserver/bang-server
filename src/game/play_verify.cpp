@@ -244,11 +244,11 @@ namespace banggame {
                 effect_end = card_ptr->optionals.end();
             }
 
-            if (e.type == effect_type::mth_add) {
+            if (!t.is(e.target)) {
+                return game_error("ERROR_INVALID_ACTION");
+            } else if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
-            }
-
-            if (auto error = enums::visit_indexed(
+            } else if (auto error = enums::visit_indexed(
                 [this, &e](enums::enum_tag_for<target_type> auto tag, auto && ... args) {
                     return play_visitor<tag.value>{}.verify(this, e, std::forward<decltype(args)>(args) ... );
                 }, t))

@@ -13,8 +13,9 @@ template<typename T> struct target_getter {
 
 template<target_type E> struct target_getter<tagged_value<E>> {
     tagged_value<E> operator()(const target_list &targets, size_t index) {
-        // check
-        targets.at(index).get<E>();
+        if (index >= targets.size() || !targets[index].is(E)) {
+            throw std::bad_variant_access();
+        }
         return {};
     }
 };

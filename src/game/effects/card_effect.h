@@ -4,6 +4,8 @@
 #include "../card_enums.h"
 #include "../format_str.h"
 
+#include "utils/nullable.h"
+
 #include <memory>
 
 namespace banggame {
@@ -16,6 +18,9 @@ namespace banggame {
     };
     template<> struct game_target_transform<target_type::player> {
         using type = player*;
+    };
+    template<> struct game_target_transform<target_type::conditional_player> {
+        using type = nullable<player>;
     };
     template<> struct game_target_transform<target_type::card> {
         using type = card*;

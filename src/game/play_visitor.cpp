@@ -5,11 +5,7 @@ namespace banggame {
     using namespace enums::flag_operators;
 
     opt_error play_visitor<target_type::none>::verify(const play_card_verify *verifier, const effect_holder &effect) {
-        if (effect.target != target_type::none) {
-            return game_error("ERROR_INVALID_ACTION");
-        } else {
-            return effect.verify(verifier->card_ptr, verifier->origin);
-        }
+        return effect.verify(verifier->card_ptr, verifier->origin);
     }
 
     opt_fmt_str play_visitor<target_type::none>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
@@ -21,9 +17,7 @@ namespace banggame {
     }
 
     opt_error play_visitor<target_type::player>::verify(const play_card_verify *verifier, const effect_holder &effect, player *target) {
-        if (!target || (effect.target != target_type::player && effect.target != target_type::conditional_player)) {
-            return game_error("ERROR_INVALID_ACTION");
-        } else if (auto error = check_player_filter(verifier->card_ptr, verifier->origin, effect.player_filter, target)) {
+        if (auto error = check_player_filter(verifier->card_ptr, verifier->origin, effect.player_filter, target)) {
             return error;
         } else {
             return effect.verify(verifier->card_ptr, verifier->origin, target);
@@ -31,11 +25,7 @@ namespace banggame {
     }
 
     opt_fmt_str play_visitor<target_type::player>::prompt(const play_card_verify *verifier, const effect_holder &effect, player *target) {
-        if (target) {
-            return effect.on_prompt(verifier->card_ptr, verifier->origin, target);
-        } else {
-            return std::nullopt;
-        }
+        return effect.on_prompt(verifier->card_ptr, verifier->origin, target);
     }
 
     void play_visitor<target_type::player>::play(const play_card_verify *verifier, const effect_holder &effect, player *target) {
@@ -48,34 +38,36 @@ namespace banggame {
         }
     }
 
-    opt_error play_visitor<target_type::conditional_player>::verify(const play_card_verify *verifier, const effect_holder &effect) {
-        if (effect.target != target_type::conditional_player) {
-            return game_error("ERROR_INVALID_ACTION");
+    opt_error play_visitor<target_type::conditional_player>::verify(const play_card_verify *verifier, const effect_holder &effect, nullable<player> target) {
+        if (target) {
+            return play_visitor<target_type::player>{}.verify(verifier, effect, target);
         } else {
             // TODO check set target validi
             return std::nullopt;
         }
     }
 
-    opt_fmt_str play_visitor<target_type::conditional_player>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
-        return std::nullopt;
+    opt_fmt_str play_visitor<target_type::conditional_player>::prompt(const play_card_verify *verifier, const effect_holder &effect, nullable<player> target) {
+        if (target) {
+            return play_visitor<target_type::player>{}.prompt(verifier, effect, target);
+        } else {
+            return std::nullopt;
+        }
     }
 
-    void play_visitor<target_type::conditional_player>::play(const play_card_verify *verifier, const effect_holder &effect) {
-        // do nothing
+    void play_visitor<target_type::conditional_player>::play(const play_card_verify *verifier, const effect_holder &effect, nullable<player> target) {
+        if (target) {
+            play_visitor<target_type::player>{}.play(verifier, effect, target);
+        }
     }
 
     opt_error play_visitor<target_type::other_players>::verify(const play_card_verify *verifier, const effect_holder &effect) {
-        if (effect.target != target_type::other_players) {
-            return game_error("ERROR_INVALID_ACTION");
-        } else {
-            for (player &p : range_other_players(verifier->origin)) {
-                if (auto error = effect.verify(verifier->card_ptr, verifier->origin, &p)) {
-                    return error;
-                }
+        for (player &p : range_other_players(verifier->origin)) {
+            if (auto error = effect.verify(verifier->card_ptr, verifier->origin, &p)) {
+                return error;
             }
-            return std::nullopt;
         }
+        return std::nullopt;
     }
 
     opt_fmt_str play_visitor<target_type::other_players>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
@@ -105,16 +97,12 @@ namespace banggame {
     }
 
     opt_error play_visitor<target_type::all_players>::verify(const play_card_verify *verifier, const effect_holder &effect) {
-        if (effect.target != target_type::all_players) {
-            return game_error("ERROR_INVALID_ACTION");
-        } else {
-            for (player &p : range_all_players(verifier->origin)) {
-                if (auto error = effect.verify(verifier->card_ptr, verifier->origin, &p)) {
-                    return error;
-                }
+        for (player &p : range_all_players(verifier->origin)) {
+            if (auto error = effect.verify(verifier->card_ptr, verifier->origin, &p)) {
+                return error;
             }
-            return std::nullopt;
         }
+        return std::nullopt;
     }
 
     opt_fmt_str play_visitor<target_type::all_players>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
@@ -139,9 +127,7 @@ namespace banggame {
     }
 
     opt_error play_visitor<target_type::card>::verify(const play_card_verify *verifier, const effect_holder &effect, card *target) {
-        if (effect.target != target_type::card) {
-            return game_error("ERROR_INVALID_ACTION");
-        } else if (!target->owner) {
+        if (!target->owner) {
             return game_error("ERROR_INVALID_ACTION");
         } else if (auto error = check_player_filter(verifier->card_ptr, verifier->origin, effect.player_filter, target->owner)) {
             return error;
@@ -173,9 +159,7 @@ namespace banggame {
     }
 
     opt_error play_visitor<target_type::cards_other_players>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
-        if (effect.target != target_type::cards_other_players) {
-            return game_error("ERROR_INVALID_ACTION");
-        } else if (!std::ranges::all_of(verifier->origin->m_game->m_players | std::views::filter(&player::alive), [&](const player &p) {
+        if (!std::ranges::all_of(verifier->origin->m_game->m_players | std::views::filter(&player::alive), [&](const player &p) {
             int found = std::ranges::count(target_cards, &p, &card::owner);
             if (p.m_hand.empty() && p.m_table.empty()) return found == 0;
             if (&p == verifier->origin) return found == 0;
@@ -219,19 +203,15 @@ namespace banggame {
     }
 
     opt_error play_visitor<target_type::cube>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
-        if (effect.target != target_type::cube) {
-            return game_error("ERROR_INVALID_ACTION");
-        } else {
-            for (card *c : target_cards) {
-                if (!c || c->owner != verifier->origin) {
-                    return game_error("ERROR_INVALID_ACTION");
-                }
-                if (auto error = effect.verify(verifier->card_ptr, verifier->origin, c)) {
-                    return error;
-                }
+        for (card *c : target_cards) {
+            if (!c || c->owner != verifier->origin) {
+                return game_error("ERROR_INVALID_ACTION");
             }
-            return std::nullopt;
+            if (auto error = effect.verify(verifier->card_ptr, verifier->origin, c)) {
+                return error;
+            }
         }
+        return std::nullopt;
     }
 
     opt_fmt_str play_visitor<target_type::cube>::prompt(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
