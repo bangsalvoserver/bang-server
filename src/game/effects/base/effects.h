@@ -97,11 +97,6 @@ namespace banggame {
         opt_error verify(card *origin_card, player *origin, player *target);
     };
 
-    struct effect_saloon {
-        opt_fmt_str on_prompt(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
-    };
-
     struct effect_deathsave {
         bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);

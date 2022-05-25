@@ -317,6 +317,18 @@ namespace banggame {
                         return std::nullopt;
                     }
                 },
+                [this, &e](enums::enum_tag_t<target_type::all_players>) -> opt_error {
+                    if (e.target != target_type::all_players) {
+                        return game_error("ERROR_INVALID_ACTION");
+                    } else {
+                        for (player &p : range_all_players(origin)) {
+                            if (auto error = e.verify(card_ptr, origin, &p)) {
+                                return error;
+                            }
+                        }
+                        return std::nullopt;
+                    }
+                },
                 [this, &e](enums::enum_tag_t<target_type::cards_other_players>, const std::vector<card *> target_cards) -> opt_error {
                     if (e.target != target_type::cards_other_players) {
                         return game_error("ERROR_INVALID_ACTION");
@@ -375,6 +387,14 @@ namespace banggame {
                 [this, &e](enums::enum_tag_t<target_type::other_players>) -> opt_fmt_str {
                     opt_fmt_str msg = std::nullopt;
                     for (player &p : range_other_players(origin)) {
+                        msg = e.on_prompt(card_ptr, origin, &p);
+                        if (!msg) break;
+                    }
+                    return msg;
+                },
+                [this, &e](enums::enum_tag_t<target_type::all_players>) -> opt_fmt_str {
+                    opt_fmt_str msg = std::nullopt;
+                    for (player &p : range_all_players(origin)) {
                         msg = e.on_prompt(card_ptr, origin, &p);
                         if (!msg) break;
                     }
@@ -467,6 +487,17 @@ namespace banggame {
                         flags |= effect_flags::single_target;
                     }
                     for (player &p : targets) {
+                        if (!p.immune_to(card_ptr)) {
+                            e.on_play(card_ptr, origin, &p, flags);
+                        }
+                    }
+                },
+                [this, &e](enums::enum_tag_t<target_type::all_players>) {
+                    effect_flags flags{};
+                    if (card_ptr->sign && card_ptr->color == card_color_type::brown) {
+                        flags |= effect_flags::escapable;
+                    }
+                    for (player &p : range_all_players(origin)) {
                         if (!p.immune_to(card_ptr)) {
                             e.on_play(card_ptr, origin, &p, flags);
                         }

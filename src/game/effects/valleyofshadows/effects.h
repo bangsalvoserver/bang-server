@@ -15,11 +15,11 @@ namespace banggame {
     };
 
     struct effect_bandidos {
-        void on_play(card *origin_card, player *origin, player *target);
+        void on_play(card *origin_card, player *origin, player *target, effect_flags flags);
     };
 
     struct effect_tornado {
-        void on_play(card *origin_card, player *origin, player *target);
+        void on_play(card *origin_card, player *origin, player *target, effect_flags flags);
     };
 
     struct effect_poker {

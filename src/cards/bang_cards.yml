@@ -235,7 +235,7 @@ main_deck:
     image: 01_saloon
     color: brown
     effects:
-      - saloon
+      - heal all_players
   - name: WELLS_FARGO
     signs:
       - 3 hearts
@@ -622,8 +622,7 @@ main_deck:
     expansion: valleyofshadows
     color: brown
     effects:
-      - bandidos player self
-      - bandidos other_players
+      - bandidos all_players
   - name: ESCAPE
     signs:
       - 3 hearts
@@ -696,8 +695,7 @@ main_deck:
     expansion: valleyofshadows
     color: brown
     effects:
-      - tornado player self
-      - tornado other_players
+      - tornado all_players
   - name: LAST_CALL
     signs:
       - 8 diamonds

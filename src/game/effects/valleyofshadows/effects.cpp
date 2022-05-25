@@ -29,16 +29,17 @@ namespace banggame {
             effect_flags::escapable | effect_flags::single_target);
     }
 
-    void effect_bandidos::on_play(card *origin_card, player *origin, player *target) {
-        target->m_game->queue_request<request_bandidos>(origin_card, origin, target, effect_flags::escapable);
+    void effect_bandidos::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
+        target->m_game->queue_request<request_bandidos>(origin_card, origin, target, flags);
     }
 
-    void effect_tornado::on_play(card *origin_card, player *origin, player *target) {
+    void effect_tornado::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
         if (target->m_hand.empty()) {
             target->m_game->queue_action([=]{
                 target->draw_card(2, origin_card);
             });
         } else {
+            // ignore flags ... why would you ever play escape vs tornado?
             target->m_game->queue_request<request_tornado>(origin_card, origin, target);
         }
     }
