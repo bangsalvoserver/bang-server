@@ -13,30 +13,14 @@ namespace banggame {
         (int) card_id
     )};
 
-    template<target_type E>
-    struct id_target_transform {
-        using type = void;
-    };
+    auto id_target_type(enums::enum_tag_for<target_type> auto) -> void;
+    auto id_target_type(enums::enum_tag_t<target_type::player>) ->              int;
+    auto id_target_type(enums::enum_tag_t<target_type::conditional_player>) ->  int;
+    auto id_target_type(enums::enum_tag_t<target_type::card>) ->                int;
+    auto id_target_type(enums::enum_tag_t<target_type::cards_other_players>) -> std::vector<int>;
+    auto id_target_type(enums::enum_tag_t<target_type::cube>) ->                std::vector<int>;
 
-    template<> struct id_target_transform<target_type::player> {
-        using type = int;
-    };
-
-    template<> struct id_target_transform<target_type::conditional_player> {
-        using type = int;
-    };
-
-    template<> struct id_target_transform<target_type::card> {
-        using type = int;
-    };
-
-    template<> struct id_target_transform<target_type::cards_other_players> {
-        using type = std::vector<int>;
-    };
-
-    template<> struct id_target_transform<target_type::cube> {
-        using type = std::vector<int>;
-    };
+    template<target_type E> struct id_target_transform { using type = decltype(id_target_type(enums::enum_tag<E>)); };
 
     using play_card_target_ids = enums::enum_variant<target_type, id_target_transform>;
 

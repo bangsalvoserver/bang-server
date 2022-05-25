@@ -13,24 +13,14 @@ namespace banggame {
     struct player;
     struct card;
 
-    template<target_type E> struct game_target_transform {
-        using type = void;
-    };
-    template<> struct game_target_transform<target_type::player> {
-        using type = player*;
-    };
-    template<> struct game_target_transform<target_type::conditional_player> {
-        using type = nullable<player>;
-    };
-    template<> struct game_target_transform<target_type::card> {
-        using type = card*;
-    };
-    template<> struct game_target_transform<target_type::cards_other_players> {
-        using type = std::vector<card*>;
-    };
-    template<> struct game_target_transform<target_type::cube> {
-        using type = std::vector<card*>;
-    };
+    auto game_target_type(enums::enum_tag_for<target_type> auto) -> void;
+    auto game_target_type(enums::enum_tag_t<target_type::player>) ->                player *;
+    auto game_target_type(enums::enum_tag_t<target_type::conditional_player>) ->    nullable<player>;
+    auto game_target_type(enums::enum_tag_t<target_type::card>) ->                  card *;
+    auto game_target_type(enums::enum_tag_t<target_type::cards_other_players>) ->   std::vector<card *>;
+    auto game_target_type(enums::enum_tag_t<target_type::cube>) ->                  std::vector<card *>;
+
+    template<target_type E> struct game_target_transform { using type = decltype(game_target_type(enums::enum_tag<E>)); };
 
     using play_card_target = enums::enum_variant<target_type, game_target_transform>;
 
