@@ -189,7 +189,7 @@ namespace banggame {
         (aim,                   effect_aim)
         (poker,                 effect_poker)
         (tornado,               effect_tornado)
-        (damage,                effect_damage)
+        (self_damage,           effect_self_damage)
         (saved,                 effect_saved)
         (escape,                effect_escape)
         (sell_beer,             effect_sell_beer)

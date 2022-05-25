@@ -57,15 +57,15 @@ namespace banggame {
         copy.get<resolvable_request>().on_resolve();
     }
 
-    opt_error effect_damage::verify(card *origin_card, player *origin, player *target) {
-        if (target->m_hp <= 1) {
+    opt_error effect_self_damage::verify(card *origin_card, player *origin) {
+        if (origin->m_hp <= 1) {
             return game_error("ERROR_CANT_SELF_DAMAGE");
         }
         return std::nullopt;
     }
 
-    void effect_damage::on_play(card *origin_card, player *origin, player *target) {
-        target->damage(origin_card, origin, 1);
+    void effect_self_damage::on_play(card *origin_card, player *origin) {
+        origin->damage(origin_card, origin, 1);
     }
 
     void effect_bang::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {

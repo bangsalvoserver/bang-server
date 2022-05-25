@@ -146,7 +146,7 @@ namespace banggame {
             return game_error("ERROR_CANT_EQUIP_CARDS");
         }
         player *target = origin;
-        if (!card_ptr->equips.empty()) {
+        if (!card_ptr->self_equippable()) {
             if (targets.size() != 1 || !targets.front().is(target_type::player)) {
                 return game_error("ERROR_INVALID_ACTION");
             }

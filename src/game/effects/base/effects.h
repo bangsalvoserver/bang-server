@@ -94,6 +94,9 @@ namespace banggame {
     };
 
     struct effect_heal_notfull : effect_heal {
+        opt_error verify(card *origin_card, player *origin) {
+            return verify(origin_card, origin, origin);
+        }
         opt_error verify(card *origin_card, player *origin, player *target);
     };
 
@@ -128,7 +131,14 @@ namespace banggame {
     };
 
     struct effect_draw_discard {
+        opt_error verify(card *origin_card, player *origin) {
+            return verify(origin_card, origin, origin);
+        }
         opt_error verify(card *origin_card, player *origin, player *target);
+
+        void on_play(card *origin_card, player *origin) {
+            return on_play(origin_card, origin, origin);
+        }
         void on_play(card *origin_card, player *origin, player *target);
     };
 
@@ -155,9 +165,9 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
-    struct effect_damage {
-        opt_error verify(card *origin_card, player *origin, player *target);
-        void on_play(card *origin_card, player *origin, player *target);
+    struct effect_self_damage {
+        opt_error verify(card *origin_card, player *origin);
+        void on_play(card *origin_card, player *origin);
     };
 
 }

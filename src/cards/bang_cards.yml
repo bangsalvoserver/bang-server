@@ -1030,7 +1030,7 @@ main_deck:
     expansion: canyondiablo
     color: brown
     effects:
-      - damage player self
+      - self_damage
       - heal_notfull player notself
   - name: SACRIFICE
     signs:
@@ -1247,7 +1247,7 @@ main_deck:
     expansion: canyondiablo
     color: green
     effects:
-      - heal_notfull player self
+      - heal_notfull
       - draw
   - name: GUITAR
     signs:
@@ -1277,7 +1277,7 @@ main_deck:
     color: brown
     effects:
       - draw(2)
-      - damage player self
+      - self_damage
   - name: DODGE
     signs:
       - 7 spades
@@ -1343,7 +1343,7 @@ character:
     image: 01_pedroramirez
     responses:
       - end_drawing
-      - draw_discard player self
+      - draw_discard
       - draw_one_less
     tags:
       - drawing
@@ -1431,7 +1431,7 @@ character:
     image: 03_chuck_wengam
     expansion: dodgecity
     effects:
-      - damage player self
+      - self_damage
       - draw(2)
   - name: DOC_HOLYDAY
     image: 03_doc_holyday
@@ -1843,7 +1843,7 @@ fistfulofcards:
     responses:
       - while_drawing
       - startofturn
-      - damage player self
+      - self_damage
       - heal_notfull player notself
   - name: THE_JUDGE
     image: 05_ilgiudice
