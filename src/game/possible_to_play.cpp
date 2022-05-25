@@ -7,23 +7,25 @@
 namespace banggame {
     using namespace enums::flag_operators;
 
-    static std::vector<player *> make_equip_set(player *origin, card *card) {
+    std::vector<player *> player::make_equip_set(card *card) {
         std::vector<player *> ret;
-        for (player &p : origin->m_game->m_players) {
-            if (!check_player_filter(card, origin, card->equip_target, &p) && !p.find_equipped_card(card)) {
+        for (player &p : m_game->m_players) {
+            if (!check_player_filter(card, this, card->equip_target, &p) && !p.find_equipped_card(card)) {
                 ret.push_back(&p);
             }
         }
         return ret;
     }
 
-    static target_list make_card_target_set(player *origin, card *origin_card, const effect_holder &holder) {
+    target_list player::make_card_target_set(card *origin_card, const effect_holder &holder) {
         target_list ret;
 
-        for (player &target : origin->m_game->m_players) {
-            if (!check_player_filter(origin_card, origin, holder.player_filter, &target)) {
+        for (player &target : m_game->m_players) {
+            if (!check_player_filter(origin_card, this, holder.player_filter, &target)) {
                 if (holder.target == target_type::player) {
                     ret.emplace_back(enums::enum_tag<target_type::player>, &target);
+                } else if (holder.target == target_type::conditional_player) {
+                    ret.emplace_back(enums::enum_tag<target_type::conditional_player>, &target);
                 }
             } else {
                 continue;
@@ -57,7 +59,7 @@ namespace banggame {
                 if (target_card->effects.empty()) return false;
                 return std::ranges::all_of(target_card->effects, [&](const effect_holder &holder) {
                     return holder.target == target_type::none
-                        || !make_card_target_set(this, target_card, holder).empty();
+                        || !make_card_target_set(target_card, holder).empty();
                 });
             case card_modifier_type::bangmod: {
                 effect_holder holder;
@@ -65,14 +67,14 @@ namespace banggame {
                 holder.player_filter = target_player_filter::reachable | target_player_filter::notself;
                 return std::ranges::any_of(m_hand, [](card *c) {
                     return c->owner->is_bangcard(c);
-                }) && !make_card_target_set(this, target_card, holder).empty();
+                }) && !make_card_target_set(target_card, holder).empty();
             }
             default: return true;
             }
         } else {
             if (m_game->has_scenario(scenario_flags::judge)) return false;
             if (!target_card->self_equippable()) {
-                return !make_equip_set(this, target_card).empty();
+                return !make_equip_set(target_card).empty();
             }
             return true;
         }
