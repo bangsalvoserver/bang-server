@@ -105,6 +105,7 @@ namespace banggame {
         (player)
         (conditional_player)
         (card)
+        (extra_card)
         (all_players)
         (other_players)
         (cards_other_players)

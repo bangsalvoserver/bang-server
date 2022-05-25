@@ -21,6 +21,7 @@ namespace banggame {
     DECLARE_VISITOR(player, player *target)
     DECLARE_VISITOR(conditional_player, nullable<player> target)
     DECLARE_VISITOR(card, card *target)
+    DECLARE_VISITOR(extra_card, nullable<card>)
     DECLARE_VISITOR(all_players)
     DECLARE_VISITOR(other_players)
     DECLARE_VISITOR(cards_other_players, const std::vector<card *> &target_cards)

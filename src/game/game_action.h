@@ -17,6 +17,7 @@ namespace banggame {
     auto id_target_type(enums::enum_tag_t<target_type::player>) ->              int;
     auto id_target_type(enums::enum_tag_t<target_type::conditional_player>) ->  int;
     auto id_target_type(enums::enum_tag_t<target_type::card>) ->                int;
+    auto id_target_type(enums::enum_tag_t<target_type::extra_card>) ->          int;
     auto id_target_type(enums::enum_tag_t<target_type::cards_other_players>) -> std::vector<int>;
     auto id_target_type(enums::enum_tag_t<target_type::cube>) ->                std::vector<int>;
 

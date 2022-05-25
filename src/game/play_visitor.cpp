@@ -159,6 +159,34 @@ namespace banggame {
         }
     }
 
+    opt_error play_visitor<target_type::extra_card>::verify(const play_card_verify *verifier, const effect_holder &effect, nullable<card> target) {
+        if (!target) {
+            if (verifier->card_ptr != verifier->origin->m_last_played_card) {
+                return game_error("ERROR_INVALID_ACTION");
+            } else {
+                return std::nullopt;
+            }
+        } else if (target->owner != verifier->origin || target->pocket != pocket_type::player_hand || target == verifier->card_ptr) {
+            throw game_error("ERROR_INVALID_ACTION");
+        } else {
+            return effect.verify(verifier->card_ptr, verifier->origin, target);
+        }
+    }
+
+    opt_fmt_str play_visitor<target_type::extra_card>::prompt(const play_card_verify *verifier, const effect_holder &effect, nullable<card> target) {
+        if (target) {
+            return effect.on_prompt(verifier->card_ptr, verifier->origin, target);
+        } else {
+            return std::nullopt;
+        }
+    }
+
+    void play_visitor<target_type::extra_card>::play(const play_card_verify *verifier, const effect_holder &effect, nullable<card> target) {
+        if (target) {
+            effect.on_play(verifier->card_ptr, verifier->origin, target, effect_flags{});
+        }
+    }
+
     opt_error play_visitor<target_type::cards_other_players>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
         if (!std::ranges::all_of(verifier->origin->m_game->m_players | std::views::filter(&player::alive), [&](const player &p) {
             int found = std::ranges::count(target_cards, &p, &card::owner);
