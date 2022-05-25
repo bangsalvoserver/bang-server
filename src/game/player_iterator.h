@@ -9,7 +9,7 @@ namespace banggame {
 
 class player_iterator_base {
 public:
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
     using difference_type = int;
     using value_type = player;
     using pointer = player *;
@@ -40,6 +40,14 @@ struct player_iterator : player_iterator_base {
         return copy;
     }
 
+    player_iterator &operator--();
+
+    player_iterator operator--(int) {
+        auto copy = *this;
+        --*this;
+        return copy;
+    }
+
     bool operator == (const player_iterator &other) const = default;
 };
 
@@ -55,6 +63,14 @@ public:
     cycle_player_iterator operator++(int) {
         auto copy = *this;
         ++*this;
+        return copy;
+    }
+
+    cycle_player_iterator &operator--();
+
+    cycle_player_iterator operator--(int) {
+        auto copy = *this;
+        --*this;
         return copy;
     }
 

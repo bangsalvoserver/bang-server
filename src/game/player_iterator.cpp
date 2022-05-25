@@ -18,6 +18,17 @@ namespace banggame {
         return *this;
     }
 
+    player_iterator &player_iterator::operator--() {
+        auto &list = m_it->m_game->m_players;
+        do {
+            if (m_it == list.begin()) {
+                m_it = list.end();
+            }
+            --m_it;
+        } while(!m_it->alive());
+        return *this;
+    }
+
     cycle_player_iterator &cycle_player_iterator::operator++() {
         auto &list = m_it->m_game->m_players;
         do {
@@ -26,6 +37,18 @@ namespace banggame {
                 m_it = list.begin();
                 ++m_cycle;
             }
+        } while(!m_it->alive());
+        return *this;
+    }
+
+    cycle_player_iterator &cycle_player_iterator::operator--() {
+        auto &list = m_it->m_game->m_players;
+        do {
+            if (m_it == list.begin()) {
+                m_it = list.end();
+                --m_cycle;
+            }
+            --m_it;
         } while(!m_it->alive());
         return *this;
     }
