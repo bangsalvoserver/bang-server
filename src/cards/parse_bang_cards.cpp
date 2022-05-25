@@ -78,7 +78,7 @@ void parse_effects(std::ostream &out, const YAML::Node &list, const std::string 
         out << "        {\n";
 
         if (!target.empty()) {
-            out << fmt::format("          .target {{play_card_target_type::{}}},\n", target);
+            out << fmt::format("          .target {{target_type::{}}},\n", target);
         }
         if (!player_filter.empty()) {
             if (target != "player" && target != "conditional_player" && target != "card") {

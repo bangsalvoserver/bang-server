@@ -125,7 +125,7 @@ namespace banggame {
         });
     }
 
-    void handler_flintlock::on_play(card *origin_card, player *origin, player *target, std::optional<target_none_t> paid_cubes) {
+    void handler_flintlock::on_play(card *origin_card, player *origin, player *target, opt_tagged_value<target_type::none> paid_cubes) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         auto req = std::make_shared<request_bang>(origin_card, origin, target, effect_flags::escapable | effect_flags::single_target);
         if (paid_cubes) {
@@ -149,7 +149,7 @@ namespace banggame {
         return std::nullopt;
     }
 
-    void handler_duck::on_play(card *origin_card, player *origin, std::optional<target_none_t> paid_cubes) {
+    void handler_duck::on_play(card *origin_card, player *origin, opt_tagged_value<target_type::none> paid_cubes) {
         if (paid_cubes) {
             origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
             origin->add_to_hand(origin_card);
@@ -157,9 +157,9 @@ namespace banggame {
         effect_missed().on_play(origin_card, origin);
     }
 
-    opt_error handler_squaw::verify(card *origin_card, player *origin, card *discarded_card, std::optional<target_cubes_t> paid_cubes) {
+    opt_error handler_squaw::verify(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::cube> paid_cubes) {
         if (paid_cubes) {
-            for (auto target_card : paid_cubes->target_cards) {
+            for (auto target_card : paid_cubes->value) {
                 if (target_card == discarded_card) {
                     return game_error("ERROR_INVALID_ACTION");
                 }
@@ -171,10 +171,10 @@ namespace banggame {
         return std::nullopt;
     }
 
-    void handler_squaw::on_play(card *origin_card, player *origin, card *target_card, std::optional<target_cubes_t> paid_cubes) {
+    void handler_squaw::on_play(card *origin_card, player *origin, card *target_card, opt_tagged_value<target_type::cube> paid_cubes) {
         bool immune = target_card->owner->immune_to(origin_card);
         if (paid_cubes) {
-            for (auto target_card : paid_cubes->target_cards) {
+            for (auto target_card : paid_cubes->value) {
                 effect_select_cube().on_play(origin_card, origin, target_card);
             }
 

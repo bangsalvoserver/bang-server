@@ -12,7 +12,7 @@ namespace banggame {
 
     struct effect_holder {
         REFLECTABLE(
-            (play_card_target_type) target,
+            (target_type) target,
             (target_player_filter) player_filter,
             (target_card_filter) card_filter,
             (short) effect_value,

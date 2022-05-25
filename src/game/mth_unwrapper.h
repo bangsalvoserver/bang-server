@@ -5,26 +5,32 @@
 
 namespace banggame {
 
-template<typename T> T get_target(const play_card_target &target) {
-    return std::get<T>(target);
-}
-template<> player *get_target(const play_card_target &target) {
-    return std::get<target_player_t>(target).target;
-}
-template<> card *get_target(const play_card_target &target) {
-    return std::get<target_card_t>(target).target;
-}
-
 template<typename T> struct target_getter {
     T operator()(const target_list &targets, size_t index) {
-        return get_target<T>(targets.at(index));
+        return std::get<T>(targets.at(index));
+    }
+};
+
+template<target_type E> struct target_getter<tagged_value<E>> {
+    tagged_value<E> operator()(const target_list &targets, size_t index) {
+        // check
+        targets.at(index).get<E>();
+        return {};
+    }
+};
+
+template<target_type E>
+requires (!std::is_void_v<typename play_card_target::value_type<E>>)
+struct target_getter<tagged_value<E>> {
+    tagged_value<E> operator()(const target_list &targets, size_t index) {
+        return {targets.at(index).get<E>()};
     }
 };
 
 template<typename T> struct target_getter<std::optional<T>> {
     std::optional<T> operator()(const target_list &targets, size_t index) {
         if (index < targets.size()) {
-            return get_target<T>(targets[index]);
+            return target_getter<T>{}(targets, index);
         } else {
             return std::nullopt;
         }

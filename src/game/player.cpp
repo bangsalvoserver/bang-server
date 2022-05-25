@@ -350,27 +350,21 @@ namespace banggame {
     static target_list parse_target_id_vector(game *game, const std::vector<play_card_target_ids> &args) {
         target_list ret;
         for (const auto &t : args) {
-            ret.push_back(enums::visit_indexed<play_card_target>(overloaded{
-                [](enums::enum_tag_t<play_card_target_type::none>) {
-                    return target_none_t{};
+            ret.push_back(enums::visit_indexed(overloaded{
+                [](enums::enum_tag_for<target_type> auto tag) {
+                    return play_card_target(tag);
                 },
-                [](enums::enum_tag_t<play_card_target_type::other_players>) {
-                    return target_other_players_t{};
+                [game](enums::enum_tag_t<target_type::player> tag, int player_id) {
+                    return play_card_target(tag, game->find_player(player_id));
                 },
-                [game](enums::enum_tag_t<play_card_target_type::player>, int player_id) {
-                    return target_player_t{game->find_player(player_id)};
+                [game](enums::enum_tag_t<target_type::card> tag, int card_id) {
+                    return play_card_target(tag, game->find_card(card_id));
                 },
-                [game](enums::enum_tag_t<play_card_target_type::conditional_player>) {
-                    return target_no_player_t{};
+                [game](enums::enum_tag_t<target_type::cards_other_players> tag, const std::vector<int> &card_ids) {
+                    return play_card_target(tag, find_cards(game, card_ids));
                 },
-                [game](enums::enum_tag_t<play_card_target_type::card>, int card_id) {
-                    return target_card_t{game->find_card(card_id)};
-                },
-                [game](enums::enum_tag_t<play_card_target_type::cards_other_players>, const std::vector<int> &args) {
-                    return target_cards_other_players_t{find_cards(game, args)};
-                },
-                [game](enums::enum_tag_t<play_card_target_type::cube>, const std::vector<int> &args) {
-                    return target_cubes_t{find_cards(game, args)};
+                [game](enums::enum_tag_t<target_type::cube> tag, const std::vector<int> &card_ids) {
+                    return play_card_target(tag, find_cards(game, card_ids));
                 }
             }, t));
         }

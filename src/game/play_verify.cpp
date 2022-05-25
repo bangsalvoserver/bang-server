@@ -151,10 +151,10 @@ namespace banggame {
         }
         player *target = origin;
         if (!card_ptr->equips.empty()) {
-            if (targets.size() != 1 || !std::holds_alternative<target_player_t>(targets.front())) {
+            if (targets.size() != 1 || !targets.front().is(target_type::player)) {
                 return game_error("ERROR_INVALID_ACTION");
             }
-            target = std::get<target_player_t>(targets.front()).target;
+            target = targets.front().get<target_type::player>();
             if (auto error = check_player_filter(card_ptr, origin, card_ptr->equip_target, target)) {
                 return error;
             }
@@ -172,7 +172,7 @@ namespace banggame {
         if (card_ptr->self_equippable()) {
             return origin;
         } else {
-            return std::get<target_player_t>(targets.front()).target;
+            return targets.front().get<target_type::player>();
         }
     }
 
@@ -252,36 +252,36 @@ namespace banggame {
                 mth_targets.push_back(t);
             }
 
-            if (auto error = std::visit(overloaded{
-                [this, &e](target_none_t args) -> opt_error {
-                    if (e.target != play_card_target_type::none) {
+            if (auto error = enums::visit_indexed(overloaded{
+                [this, &e](enums::enum_tag_t<target_type::none>) -> opt_error {
+                    if (e.target != target_type::none) {
                         return game_error("ERROR_INVALID_ACTION");
                     } else {
                         return e.verify(card_ptr, origin);
                     }
                 },
-                [this, &e](target_player_t args) -> opt_error {
-                    if (!args.target || (e.target != play_card_target_type::player && e.target != play_card_target_type::conditional_player)) {
+                [this, &e](enums::enum_tag_t<target_type::player>, player *target) -> opt_error {
+                    if (!target || (e.target != target_type::player && e.target != target_type::conditional_player)) {
                         return game_error("ERROR_INVALID_ACTION");
-                    } else if (auto error = check_player_filter(card_ptr, origin, e.player_filter, args.target)) {
+                    } else if (auto error = check_player_filter(card_ptr, origin, e.player_filter, target)) {
                         return error;
                     } else {
-                        return e.verify(card_ptr, origin, args.target);
+                        return e.verify(card_ptr, origin, target);
                     }
                 },
-                [this, &e](target_no_player_t) -> opt_error {
-                    if (e.target != play_card_target_type::conditional_player) {
+                [this, &e](enums::enum_tag_t<target_type::conditional_player>) -> opt_error {
+                    if (e.target != target_type::conditional_player) {
                         return game_error("ERROR_INVALID_ACTION");
                     } else {
                         // TODO check set target validi
                         return std::nullopt;
                     }
                 },
-                [this, &e](target_cubes_t args) -> opt_error {
-                    if (e.target != play_card_target_type::cube) {
+                [this, &e](enums::enum_tag_t<target_type::cube>, const std::vector<card *> target_cards) -> opt_error {
+                    if (e.target != target_type::cube) {
                         return game_error("ERROR_INVALID_ACTION");
                     } else {
-                        for (card *c : args.target_cards) {
+                        for (card *c : target_cards) {
                             if (!c || c->owner != origin) {
                                 return game_error("ERROR_INVALID_ACTION");
                             }
@@ -292,21 +292,21 @@ namespace banggame {
                         return std::nullopt;
                     }
                 },
-                [this, &e](target_card_t args) -> opt_error {
-                    if (e.target != play_card_target_type::card) {
+                [this, &e](enums::enum_tag_t<target_type::card>, card *target) -> opt_error {
+                    if (e.target != target_type::card) {
                         return game_error("ERROR_INVALID_ACTION");
-                    } else if (!args.target->owner) {
+                    } else if (!target->owner) {
                         return game_error("ERROR_INVALID_ACTION");
-                    } else if (auto error = check_player_filter(card_ptr, origin, e.player_filter, args.target->owner)) {
+                    } else if (auto error = check_player_filter(card_ptr, origin, e.player_filter, target->owner)) {
                         return error;
-                    } else if (auto error = check_card_filter(card_ptr, origin, e.card_filter, args.target)) {
+                    } else if (auto error = check_card_filter(card_ptr, origin, e.card_filter, target)) {
                         return error;
                     } else {
-                        return e.verify(card_ptr, origin, args.target);
+                        return e.verify(card_ptr, origin, target);
                     }
                 },
-                [this, &e](target_other_players_t args) -> opt_error {
-                    if (e.target != play_card_target_type::other_players) {
+                [this, &e](enums::enum_tag_t<target_type::other_players>) -> opt_error {
+                    if (e.target != target_type::other_players) {
                         return game_error("ERROR_INVALID_ACTION");
                     } else {
                         for (player &p : range_other_players(origin)) {
@@ -317,18 +317,18 @@ namespace banggame {
                         return std::nullopt;
                     }
                 },
-                [this, &e](target_cards_other_players_t const& args) -> opt_error {
-                    if (e.target != play_card_target_type::cards_other_players) {
+                [this, &e](enums::enum_tag_t<target_type::cards_other_players>, const std::vector<card *> target_cards) -> opt_error {
+                    if (e.target != target_type::cards_other_players) {
                         return game_error("ERROR_INVALID_ACTION");
                     } else if (!std::ranges::all_of(origin->m_game->m_players | std::views::filter(&player::alive), [&](const player &p) {
-                        int found = std::ranges::count(args.target_cards, &p, &card::owner);
+                        int found = std::ranges::count(target_cards, &p, &card::owner);
                         if (p.m_hand.empty() && p.m_table.empty()) return found == 0;
                         if (&p == origin) return found == 0;
                         else return found == 1;
                     })) {
                         return game_error("ERROR_INVALID_TARGETS");
                     } else {
-                        for (card *c : args.target_cards) {
+                        for (card *c : target_cards) {
                             if (auto error = e.verify(card_ptr, origin, c)) {
                                 return error;
                             }
@@ -358,21 +358,21 @@ namespace banggame {
 
             if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
-            } else if (auto prompt_message = std::visit(overloaded{
-                [this, &e](target_none_t args) -> opt_fmt_str {
+            } else if (auto prompt_message = enums::visit_indexed(overloaded{
+                [this, &e](enums::enum_tag_t<target_type::none>) -> opt_fmt_str {
                     return e.on_prompt(card_ptr, origin);
                 },
-                [this, &e](target_player_t args) -> opt_fmt_str {
-                    if (args.target) {
-                        return e.on_prompt(card_ptr, origin, args.target);
+                [this, &e](enums::enum_tag_t<target_type::player>, player *target) -> opt_fmt_str {
+                    if (target) {
+                        return e.on_prompt(card_ptr, origin, target);
                     } else {
                         return std::nullopt;
                     }
                 },
-                [this, &e](target_no_player_t args) -> opt_fmt_str {
+                [this, &e](enums::enum_tag_t<target_type::conditional_player>) -> opt_fmt_str {
                     return std::nullopt;
                 },
-                [this, &e](target_other_players_t args) -> opt_fmt_str {
+                [this, &e](enums::enum_tag_t<target_type::other_players>) -> opt_fmt_str {
                     opt_fmt_str msg = std::nullopt;
                     for (player &p : range_other_players(origin)) {
                         msg = e.on_prompt(card_ptr, origin, &p);
@@ -380,20 +380,20 @@ namespace banggame {
                     }
                     return msg;
                 },
-                [this, &e](target_card_t args) -> opt_fmt_str {
-                    return e.on_prompt(card_ptr, origin, args.target);
+                [this, &e](enums::enum_tag_t<target_type::card>, card *target) -> opt_fmt_str {
+                    return e.on_prompt(card_ptr, origin, target);
                 },
-                [this, &e](target_cards_other_players_t const& args) -> opt_fmt_str {
+                [this, &e](enums::enum_tag_t<target_type::cards_other_players>, const std::vector<card *> &target_cards) -> opt_fmt_str {
                     opt_fmt_str msg = std::nullopt;
-                    for (card *target_card : args.target_cards) {
+                    for (card *target_card : target_cards) {
                         msg = e.on_prompt(card_ptr, origin, target_card);
                         if (!msg) break;
                     }
                     return msg;
                 },
-                [this, &e](target_cubes_t const& args) -> opt_fmt_str {
+                [this, &e](enums::enum_tag_t<target_type::cube>, const std::vector<card *> &target_cards) -> opt_fmt_str {
                     opt_fmt_str msg = std::nullopt;
-                    for (card *target_card : args.target_cards) {
+                    for (card *target_card : target_cards) {
                         msg = e.on_prompt(card_ptr, origin, target_card);
                         if (!msg) break;
                     }
@@ -442,21 +442,21 @@ namespace banggame {
 
             if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
-            } else std::visit(overloaded{
-                [this, &e](target_none_t args) {
+            } else enums::visit_indexed(overloaded{
+                [this, &e](enums::enum_tag_t<target_type::none>) {
                     e.on_play(card_ptr, origin, effect_flags{});
                 },
-                [this, &e](target_player_t args) {
-                    if (args.target == origin || !args.target->immune_to(card_ptr)) {
+                [this, &e](enums::enum_tag_t<target_type::player>, player *target) {
+                    if (target == origin || !target->immune_to(card_ptr)) {
                         auto flags = effect_flags::single_target;
                         if (card_ptr->sign && card_ptr->color == card_color_type::brown) {
                             flags |= effect_flags::escapable;
                         }
-                        e.on_play(card_ptr, origin, args.target, flags);
+                        e.on_play(card_ptr, origin, target, flags);
                     }
                 },
-                [this, &e](target_no_player_t args) {},
-                [this, &e](target_other_players_t args) {
+                [this, &e](enums::enum_tag_t<target_type::conditional_player>) {},
+                [this, &e](enums::enum_tag_t<target_type::other_players>) {
                     auto targets = range_other_players(origin);
                     
                     effect_flags flags{};
@@ -472,30 +472,30 @@ namespace banggame {
                         }
                     }
                 },
-                [this, &e](target_card_t args) {
+                [this, &e](enums::enum_tag_t<target_type::card>, card *target) {
                     auto flags = effect_flags::single_target;
                     if (card_ptr->sign && card_ptr->color == card_color_type::brown) {
                         flags |= effect_flags::escapable;
                     }
-                    if (args.target->owner == origin) {
-                        e.on_play(card_ptr, origin, args.target, flags);
-                    } else if (!args.target->owner->immune_to(card_ptr)) {
-                        if (args.target->pocket == pocket_type::player_hand) {
-                            e.on_play(card_ptr, origin, args.target->owner->random_hand_card(), flags);
+                    if (target->owner == origin) {
+                        e.on_play(card_ptr, origin, target, flags);
+                    } else if (!target->owner->immune_to(card_ptr)) {
+                        if (target->pocket == pocket_type::player_hand) {
+                            e.on_play(card_ptr, origin, target->owner->random_hand_card(), flags);
                         } else {
-                            e.on_play(card_ptr, origin, args.target, flags);
+                            e.on_play(card_ptr, origin, target, flags);
                         }
                     }
                 },
-                [this, &e](target_cards_other_players_t const& args) {
+                [this, &e](enums::enum_tag_t<target_type::cards_other_players>, const std::vector<card *> &target_cards) {
                     effect_flags flags{};
                     if (card_ptr->sign && card_ptr->color == card_color_type::brown) {
                         flags |= effect_flags::escapable;
                     }
-                    if (args.target_cards.size() == 1) {
+                    if (target_cards.size() == 1) {
                         flags |= effect_flags::single_target;
                     }
-                    for (card *target_card : args.target_cards) {
+                    for (card *target_card : target_cards) {
                         if (target_card->pocket == pocket_type::player_hand) {
                             e.on_play(card_ptr, origin, target_card->owner->random_hand_card(), flags);
                         } else {
@@ -503,8 +503,8 @@ namespace banggame {
                         }
                     }
                 },
-                [this, &e](target_cubes_t const& args) {
-                    for (card *target_card : args.target_cards) {
+                [this, &e](enums::enum_tag_t<target_type::cube>, const std::vector<card *> &target_cards) {
+                    for (card *target_card : target_cards) {
                         e.on_play(card_ptr, origin, target_card, effect_flags{});
                     }
                 }

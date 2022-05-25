@@ -132,10 +132,10 @@ namespace banggame {
     }
 
     void handler_lastwill::on_play(card *origin_card, player *origin, const target_list &targets) {
-        player *target = std::get<target_player_t>(targets[0]).target;
+        player *target = targets[0].get<target_type::player>();
 
         for (auto c : targets | std::views::drop(1)) {
-            card *chosen_card = std::get<target_card_t>(c).target;
+            card *chosen_card = c.get<target_type::card>();
             if (chosen_card->pocket == pocket_type::player_hand) {
                 origin->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, chosen_card);
                 origin->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", origin, target);

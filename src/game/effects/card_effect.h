@@ -11,31 +11,34 @@ namespace banggame {
     struct player;
     struct card;
 
-    struct target_none_t {};
-    struct target_player_t {
-        player *target;
+    template<target_type E> struct game_target_transform {
+        using type = void;
     };
-    struct target_card_t {
-        card *target;
+    template<> struct game_target_transform<target_type::player> {
+        using type = player*;
     };
-    struct target_cubes_t {
-        std::vector<card *> target_cards;
+    template<> struct game_target_transform<target_type::card> {
+        using type = card*;
     };
-    struct target_other_players_t {};
-    struct target_cards_other_players_t {
-        std::vector<card *> target_cards;
+    template<> struct game_target_transform<target_type::cards_other_players> {
+        using type = std::vector<card*>;
     };
-    struct target_no_player_t {};
+    template<> struct game_target_transform<target_type::cube> {
+        using type = std::vector<card*>;
+    };
 
-    using play_card_target = std::variant<
-        target_none_t,
-        target_player_t,
-        target_card_t,
-        target_cubes_t,
-        target_other_players_t,
-        target_cards_other_players_t,
-        target_no_player_t
-    >;
+    using play_card_target = enums::enum_variant<target_type, game_target_transform>;
+
+    template<target_type E> struct tagged_value {};
+
+    template<target_type E>
+    requires (!std::is_void_v<typename play_card_target::value_type<E>>)
+    struct tagged_value<E> {
+        typename play_card_target::value_type<E> value;
+    };
+
+    template<target_type E>
+    using opt_tagged_value = std::optional<tagged_value<E>>;
 
     using target_list = std::vector<play_card_target>;
 

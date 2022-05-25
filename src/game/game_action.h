@@ -13,6 +13,29 @@ namespace banggame {
         (int) card_id
     )};
 
+    template<target_type E>
+    struct id_target_transform {
+        using type = void;
+    };
+
+    template<> struct id_target_transform<target_type::player> {
+        using type = int;
+    };
+
+    template<> struct id_target_transform<target_type::card> {
+        using type = int;
+    };
+
+    template<> struct id_target_transform<target_type::cards_other_players> {
+        using type = std::vector<int>;
+    };
+
+    template<> struct id_target_transform<target_type::cube> {
+        using type = std::vector<int>;
+    };
+
+    using play_card_target_ids = enums::enum_variant<target_type, id_target_transform>;
+
     struct play_card_args {REFLECTABLE(
         (int) card_id,
         (std::vector<int>) modifier_ids,

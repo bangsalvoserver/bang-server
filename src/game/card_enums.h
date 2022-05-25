@@ -100,17 +100,15 @@ namespace banggame {
         (cube_slot)
     )
 
-    DEFINE_ENUM_TYPES(play_card_target_type,
+    DEFINE_ENUM(target_type,
         (none)
-        (player, int)
+        (player)
         (conditional_player)
-        (card, int)
+        (card)
         (other_players)
-        (cards_other_players, std::vector<int>)
-        (cube, std::vector<int>)
+        (cards_other_players)
+        (cube)
     )
-
-    using play_card_target_ids = enums::enum_variant<play_card_target_type>;
 
     DEFINE_ENUM(card_deck_type,
         (none)

@@ -61,7 +61,7 @@ namespace banggame {
     };
 
     struct handler_flintlock {
-        void on_play(card *origin_card, player *origin, player *target, std::optional<target_none_t> paid_cubes);
+        void on_play(card *origin_card, player *origin, player *target, opt_tagged_value<target_type::none> paid_cubes);
     };
 
     struct effect_bandolier : effect_empty {
@@ -69,12 +69,12 @@ namespace banggame {
     };
 
     struct handler_duck {
-        void on_play(card *origin_card, player *origin, std::optional<target_none_t> paid_cubes);
+        void on_play(card *origin_card, player *origin, opt_tagged_value<target_type::none> paid_cubes);
     };
 
     struct handler_squaw {
-        opt_error verify(card *origin_card, player *origin, card *discarded_card, std::optional<target_cubes_t> paid_cubes);
-        void on_play(card *origin_card, player *origin, card *discarded_card, std::optional<target_cubes_t> paid_cubes);
+        opt_error verify(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::cube> paid_cubes);
+        void on_play(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::cube> paid_cubes);
     };
 
     struct effect_move_bomb : effect_empty {
