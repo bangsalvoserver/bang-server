@@ -7,6 +7,8 @@
 #include "game/manager.h"
 #include "game/net_options.h"
 
+#include <iostream>
+
 namespace banggame {
 
     struct bang_server : net::wsserver<bang_server, client_message, server_message> {
@@ -19,6 +21,10 @@ namespace banggame {
         bang_server(asio::io_context &ctx) : base(ctx) {
             m_mgr.set_send_message_function([&](client_handle con, banggame::server_message msg) {
                 this->push_message(con, std::move(msg));
+            });
+
+            m_mgr.set_print_error_function([&](const std::string &msg) {
+                std::cerr << msg << '\n';
             });
         }
 
