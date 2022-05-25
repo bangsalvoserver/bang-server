@@ -33,6 +33,7 @@ set(bangserver_srcs
     src/game/player.cpp
     src/game/player_iterator.cpp
     src/game/play_verify.cpp
+    src/game/play_visitor.cpp
     src/game/possible_to_play.cpp
     src/game/manager.cpp
     src/net/main.cpp
