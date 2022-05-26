@@ -41,14 +41,16 @@ namespace banggame {
     };
 
     struct target_id_visitor {
-        game *game;
+        game *m_game;
 
-        play_card_target operator()(enums::enum_tag_for<target_type> auto tag) {
+        template<target_type E>
+        play_card_target operator()(enums::enum_tag_t<E> tag) {
             return play_card_target(tag);
         }
 
-        play_card_target operator()(enums::enum_tag_for<target_type> auto tag, const auto &args) {
-            return play_card_target(tag, target_converter<play_card_target::value_type<tag.value>>{}(game, args));
+        template<target_type E>
+        play_card_target operator()(enums::enum_tag_t<E> tag, const auto &args) {
+            return play_card_target(tag, target_converter<play_card_target::value_type<E>>{}(m_game, args));
         }
     };
 

@@ -249,8 +249,8 @@ namespace banggame {
             } else if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
             } else if (auto error = enums::visit_indexed(
-                [this, &e](enums::enum_tag_for<target_type> auto tag, auto && ... args) {
-                    return play_visitor<tag.value>{}.verify(this, e, std::forward<decltype(args)>(args) ... );
+                [this, &e]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                    return play_visitor<E>{}.verify(this, e, std::forward<decltype(args)>(args) ... );
                 }, t))
             {
                 return error;
@@ -277,8 +277,8 @@ namespace banggame {
             if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
             } else if (auto prompt_message = enums::visit_indexed(
-                [this, &e](enums::enum_tag_for<target_type> auto tag, auto && ... args) {
-                    return play_visitor<tag.value>{}.prompt(this, e, std::forward<decltype(args)>(args) ... );
+                [this, &e]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                    return play_visitor<E>{}.prompt(this, e, std::forward<decltype(args)>(args) ... );
                 }, t))
             {
                 return prompt_message;
@@ -324,8 +324,8 @@ namespace banggame {
             if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
             } else {
-                enums::visit_indexed([this, &e](enums::enum_tag_for<target_type> auto tag, auto && ... args) {
-                    play_visitor<tag.value>{}.play(this, e, std::forward<decltype(args)>(args) ... );
+                enums::visit_indexed([this, &e]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                    play_visitor<E>{}.play(this, e, std::forward<decltype(args)>(args) ... );
                 }, t);
             }
         }

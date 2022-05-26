@@ -174,9 +174,9 @@ namespace banggame {
     }
 
     opt_error mth_holder::verify(card *origin_card, player *origin, const target_list &targets) const {
-        return enums::visit_enum([&](enums::enum_tag_for<mth_type> auto tag) -> opt_error {
-            if constexpr (enums::value_with_type<tag.value>) {
-                using handler_type = enums::enum_type_t<tag.value>;
+        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> opt_error {
+            if constexpr (enums::value_with_type<E>) {
+                using handler_type = enums::enum_type_t<E>;
                 if constexpr (requires { handler_type::verify; }) {
                     return mth_unwrapper{&handler_type::verify}(origin_card, origin, targets);
                 }
@@ -186,9 +186,9 @@ namespace banggame {
     }
 
     opt_fmt_str mth_holder::on_prompt(card *origin_card, player *origin, const target_list &targets) const {
-        return enums::visit_enum([&](enums::enum_tag_for<mth_type> auto tag) -> opt_fmt_str {
-            if constexpr (enums::value_with_type<tag.value>) {
-                using handler_type = enums::enum_type_t<tag.value>;
+        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> opt_fmt_str {
+            if constexpr (enums::value_with_type<E>) {
+                using handler_type = enums::enum_type_t<E>;
                 if constexpr (requires { handler_type::on_prompt; }) {
                     return mth_unwrapper{&handler_type::on_prompt}(origin_card, origin, targets);
                 }
@@ -198,9 +198,9 @@ namespace banggame {
     }
     
     void mth_holder::on_play(card *origin_card, player *origin, const target_list &targets) const {
-        enums::visit_enum([&](enums::enum_tag_for<mth_type> auto tag) {
-            if constexpr (enums::value_with_type<tag.value>) {
-                using handler_type = enums::enum_type_t<tag.value>;
+        enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) {
+            if constexpr (enums::value_with_type<E>) {
+                using handler_type = enums::enum_type_t<E>;
                 return mth_unwrapper{&handler_type::on_play}(origin_card, origin, targets);
             }
         }, type);
