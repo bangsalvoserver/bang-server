@@ -13,22 +13,19 @@ namespace banggame {
         (int) card_id
     )};
 
-    auto id_target_type(enums::enum_tag_for<target_type> auto) -> void;
-    auto id_target_type(enums::enum_tag_t<target_type::player>) ->              int;
-    auto id_target_type(enums::enum_tag_t<target_type::conditional_player>) ->  int;
-    auto id_target_type(enums::enum_tag_t<target_type::card>) ->                int;
-    auto id_target_type(enums::enum_tag_t<target_type::extra_card>) ->          int;
-    auto id_target_type(enums::enum_tag_t<target_type::cards_other_players>) -> std::vector<int>;
-    auto id_target_type(enums::enum_tag_t<target_type::cube>) ->                std::vector<int>;
-
-    template<target_type E> struct id_target_transform { using type = decltype(id_target_type(enums::enum_tag<E>)); };
-
-    using play_card_target_ids = enums::enum_variant<target_type, id_target_transform>;
+    DEFINE_ENUM_VARIANT(play_card_target_id, target_type,
+        (player,                int)
+        (conditional_player,    int)
+        (card,                  int)
+        (extra_card,            int)
+        (cards_other_players,   std::vector<int>)
+        (cube,                  std::vector<int>)
+    )
 
     struct play_card_args {REFLECTABLE(
         (int) card_id,
         (std::vector<int>) modifier_ids,
-        (std::vector<play_card_target_ids>) targets
+        (std::vector<play_card_target_id>) targets
     )};
 
     DEFINE_ENUM_TYPES(game_action_type,

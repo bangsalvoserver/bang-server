@@ -13,22 +13,19 @@ namespace banggame {
     struct player;
     struct card;
 
-    auto game_target_type(enums::enum_tag_for<target_type> auto) -> void;
-    auto game_target_type(enums::enum_tag_t<target_type::player>) ->                player *;
-    auto game_target_type(enums::enum_tag_t<target_type::conditional_player>) ->    nullable<player>;
-    auto game_target_type(enums::enum_tag_t<target_type::card>) ->                  card *;
-    auto game_target_type(enums::enum_tag_t<target_type::extra_card>) ->            nullable<card>;
-    auto game_target_type(enums::enum_tag_t<target_type::cards_other_players>) ->   std::vector<card *>;
-    auto game_target_type(enums::enum_tag_t<target_type::cube>) ->                  std::vector<card *>;
-
-    template<target_type E> struct game_target_transform { using type = decltype(game_target_type(enums::enum_tag<E>)); };
-
-    using play_card_target = enums::enum_variant<target_type, game_target_transform>;
+    DEFINE_ENUM_VARIANT(play_card_target, target_type,
+        (player,                player *)
+        (conditional_player,    nullable<player>)
+        (card,                  card *)
+        (extra_card,            nullable<card>)
+        (cards_other_players,   std::vector<card *>)
+        (cube,                  std::vector<card *>)
+    )
 
     template<target_type E> struct tagged_value {};
 
     template<target_type E>
-    requires (!std::is_void_v<typename play_card_target::value_type<E>>)
+    requires (play_card_target::has_type<E>)
     struct tagged_value<E> {
         typename play_card_target::value_type<E> value;
     };

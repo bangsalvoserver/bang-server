@@ -21,7 +21,7 @@ template<target_type E> struct target_getter<tagged_value<E>> {
 };
 
 template<target_type E>
-requires (!std::is_void_v<typename play_card_target::value_type<E>>)
+requires (play_card_target::has_type<E>)
 struct target_getter<tagged_value<E>> {
     tagged_value<E> operator()(const target_list &targets, size_t index) {
         return {targets.at(index).get<E>()};
