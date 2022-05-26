@@ -5,15 +5,13 @@
 #include "holders.h"
 #include "play_verify.h"
 #include "game_update.h"
+#include "target_converter.h"
 
 #include "effects/base/requests.h"
 #include "effects/armedanddangerous/requests.h"
 #include "effects/valleyofshadows/requests.h"
 
 #include <cassert>
-
-template<typename ... Ts> struct overloaded : Ts ... { using Ts::operator() ...; };
-template<typename ... Ts> overloaded(Ts ...) -> overloaded<Ts ...>;
 
 namespace banggame {
     using namespace enums::flag_operators;
@@ -339,52 +337,6 @@ namespace banggame {
         }
     }
 
-    static std::vector<card *> find_cards(game *game, const std::vector<int> &args) {
-        std::vector<card *> ret;
-        for (int id : args) {
-            ret.push_back(game->find_card(id));
-        }
-        return ret;
-    }
-
-    static target_list parse_target_id_vector(game *game, const std::vector<play_card_target_ids> &args) {
-        target_list ret;
-        for (const auto &t : args) {
-            ret.push_back(enums::visit_indexed(overloaded{
-                [](enums::enum_tag_for<target_type> auto tag) {
-                    return play_card_target(tag);
-                },
-                [game](enums::enum_tag_t<target_type::player> tag, int player_id) {
-                    return play_card_target(tag, game->find_player(player_id));
-                },
-                [game](enums::enum_tag_t<target_type::conditional_player> tag, int player_id) {
-                    if (player_id) {
-                        return play_card_target(tag, game->find_player(player_id));
-                    } else {
-                        return play_card_target(tag);
-                    }
-                },
-                [game](enums::enum_tag_t<target_type::card> tag, int card_id) {
-                    return play_card_target(tag, game->find_card(card_id));
-                },
-                [game](enums::enum_tag_t<target_type::extra_card> tag, int card_id) {
-                    if (card_id) {
-                        return play_card_target(tag, game->find_card(card_id));
-                    } else {
-                        return play_card_target(tag);
-                    }
-                },
-                [game](enums::enum_tag_t<target_type::cards_other_players> tag, const std::vector<int> &card_ids) {
-                    return play_card_target(tag, find_cards(game, card_ids));
-                },
-                [game](enums::enum_tag_t<target_type::cube> tag, const std::vector<int> &card_ids) {
-                    return play_card_target(tag, find_cards(game, card_ids));
-                }
-            }, t));
-        }
-        return ret;
-    }
-
     void player::handle_action(enums::enum_tag_t<game_action_type::play_card>, const play_card_args &args) {
         if (m_prompt) {
             throw game_error("ERROR_INVALID_ACTION");
@@ -398,8 +350,8 @@ namespace banggame {
             this,
             m_game->find_card(args.card_id),
             false,
-            parse_target_id_vector(m_game, args.targets),
-            find_cards(m_game, args.modifier_ids)
+            target_converter<std::vector<play_card_target>>{}(m_game, args.targets),
+            target_converter<std::vector<card *>>{}(m_game, args.modifier_ids)
         }.verify_and_play()) {
             throw std::move(*error);
         }
@@ -414,8 +366,8 @@ namespace banggame {
             this,
             m_game->find_card(args.card_id),
             true,
-            parse_target_id_vector(m_game, args.targets),
-            find_cards(m_game, args.modifier_ids)
+            target_converter<std::vector<play_card_target>>{}(m_game, args.targets),
+            target_converter<std::vector<card *>>{}(m_game, args.modifier_ids)
         };
 
         if (!can_respond_with(verifier.card_ptr)
