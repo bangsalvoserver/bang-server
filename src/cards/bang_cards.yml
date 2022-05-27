@@ -1125,7 +1125,7 @@ main_deck:
     effects:
       - max_usages(1)
       - mth_add card self | hand bang
-      - destroy card self | hand
+      - discard card self | hand
     multitarget: play_as_gatling
     tags:
       - weapon
@@ -1354,12 +1354,12 @@ character:
   - name: SID_KETCHUM
     image: 01_sidketchum
     effects:
-      - destroy card self | hand
-      - destroy card self | hand
+      - discard card self | hand
+      - discard card self | hand
       - heal
     responses:
-      - destroy card self | hand
-      - destroy card self | hand
+      - discard card self | hand
+      - discard card self | hand
       - heal
       - deathsave
   - name: SLAB_THE_KILLER
@@ -1398,7 +1398,7 @@ character:
     expansion: thebullet
     effects:
       - max_usages(1)
-      - destroy card self | hand
+      - discard card self | hand
       - generalstore
   - name: ANNIE_VERSARY
     image: 02_annieversary
@@ -1446,7 +1446,7 @@ character:
     image: 03_elena_fuente
     expansion: dodgecity
     responses:
-      - destroy card self | hand
+      - discard card self | hand
       - missed
     tags:
       - max_hp(3)
@@ -1469,7 +1469,7 @@ character:
     expansion: dodgecity
     effects:
       - max_usages(2)
-      - destroy card self | hand blue
+      - discard card self | hand blue
       - draw(2)
   - name: MOLLY_STARK
     image: 03_molly_stark
@@ -1515,7 +1515,7 @@ character:
     expansion: valleyofshadows
     effects:
       - max_usages(1)
-      - destroy card self | hand clubs
+      - discard card self | hand clubs
       - bang player reachable notself
   - name: COLORADO_BILL
     image: 07_coloradobill
@@ -1549,13 +1549,13 @@ character:
       - lemonade_jim
     responses:
       - lemonade_jim
-      - destroy card self | hand
+      - discard card self | hand
       - heal
   - name: MICK_DEFENDER
     image: 07_mickdefender
     expansion: valleyofshadows
     responses:
-      - destroy card self | hand missed
+      - discard card self | hand missed
       - escape
   - name: TUCO_FRANZISKANER
     image: 07_tucofranziskaner
@@ -1633,7 +1633,7 @@ character:
     expansion: armedanddangerous
     effects:
       - max_usages(1)
-      - destroy card self | hand
+      - discard card self | hand
       - add_cube(2) card self | cube_slot
     tags:
       - can_target_self
@@ -1828,8 +1828,8 @@ fistfulofcards:
   - name: SNIPER
     image: 05_cecchino
     effects:
-      - destroy card self | hand bang
-      - destroy card self | hand bang
+      - discard card self | hand bang
+      - discard card self | hand bang
       - sniper player reachable notself
   - name: DEAD_MAN
     image: 05_deadman
@@ -1884,10 +1884,10 @@ fistfulofcards:
     image: 05_ranch
     effects:
       - startofturn
-      - destroy card self | hand
+      - discard card self | hand
       - mth_add
     optional:
-      - destroy card self | hand
+      - discard card self | hand
       - mth_add
     tags:
       - repeatable
@@ -1895,7 +1895,7 @@ fistfulofcards:
   - name: RICOCHET
     image: 05_rimbalzo
     effects:
-      - destroy card self | hand bang
+      - discard card self | hand bang
       - ricochet card notself | table
   - name: RUSSIAN_ROULETTE
     image: 05_rouletterussa
@@ -2118,8 +2118,8 @@ specials:
   - name: GAME_DISCARD_BRONCO
     expansion: canyondiablo
     effects:
-      - destroy card self | hand
-      - destroy card self | hand
+      - discard card self | hand
+      - discard card self | hand
       - destroy card | table bronco
     tags:
       - bronco
