@@ -13,13 +13,6 @@
 
 namespace banggame {
 
-    DEFINE_ENUM_FLAGS(scenario_flags,
-        (invert_rotation) // inverti giro
-        (judge) // non si puo' equipaggiare
-        (abandonedmine) // fase 1 : pesca dagli scarti, fase 3 : scarta coperto nel mazzo
-        (peyote) // cambia la fase 1
-    )
-
     using card_disabler_fun = std::function<bool(card *)>;
 
     struct game_table : game_net_manager {
@@ -43,7 +36,7 @@ namespace banggame {
         
         int8_t num_cubes = 0;
 
-        scenario_flags m_scenario_flags{};
+        game_flags m_game_flags{};
         game_options m_options;
 
         player *m_first_player = nullptr;
@@ -65,8 +58,6 @@ namespace banggame {
 
         int num_alive() const;
 
-        bool has_scenario(scenario_flags type) const;
-
         void shuffle_cards_and_ids(std::span<card *> vec);
 
         void send_card_update(card *c, player *owner = nullptr, show_card_flags flags = {});
@@ -85,6 +76,13 @@ namespace banggame {
 
         card *get_disabler(card *target_card);
         bool is_disabled(card *target_card);
+
+        void set_game_flags(game_flags flags);
+    
+        bool check_flags(game_flags type) const {
+            using namespace enums::flag_operators;
+            return bool(m_game_flags & type);
+        }
 
         bool has_expansion(card_expansion_type type) const {
             using namespace enums::flag_operators;

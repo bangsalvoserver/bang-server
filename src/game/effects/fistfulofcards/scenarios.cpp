@@ -9,15 +9,7 @@ namespace banggame {
     using namespace enums::flag_operators;
 
     void effect_ambush::on_enable(card *target_card, player *target) {
-        for (auto &p : target->m_game->m_players) {
-            p.add_player_flags(player_flags::disable_player_distances);
-        }
-    }
-
-    void effect_ambush::on_disable(card *target_card, player *target) {
-        for (auto &p : target->m_game->m_players) {
-            p.remove_player_flags(player_flags::disable_player_distances);
-        }
+        target->m_game->set_game_flags(game_flags::disable_player_distances);
     }
 
     void effect_sniper::on_play(card *origin_card, player *origin, player *target) {
@@ -51,7 +43,7 @@ namespace banggame {
     }
 
     void effect_judge::on_enable(card *target_card, player *target) {
-        target->m_game->m_scenario_flags |= scenario_flags::judge;
+        target->m_game->set_game_flags(game_flags::disable_equipping);
     }
 
     void effect_lasso::on_enable(card *target_card, player *target) {
@@ -65,7 +57,7 @@ namespace banggame {
     }
 
     void effect_abandonedmine::on_enable(card *target_card, player *target) {
-        target->m_game->m_scenario_flags |= scenario_flags::abandonedmine;
+        target->m_game->set_game_flags(game_flags::phase_one_draw_discard);
     }
 
     void effect_peyote::on_enable(card *target_card, player *target) {
@@ -83,7 +75,7 @@ namespace banggame {
             p->m_game->queue_request<request_peyote>(target_card, p);
         });
 
-        target->m_game->m_scenario_flags |= scenario_flags::peyote;
+        target->m_game->set_game_flags(game_flags::phase_one_override);
     }
 
     void request_peyote::on_pick(pocket_type pocket, player *target_player, card *target_card) {

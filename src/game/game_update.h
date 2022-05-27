@@ -100,6 +100,15 @@ namespace banggame {
         (bool) instant
     )};
 
+    DEFINE_ENUM_FLAGS(game_flags,
+        (game_over)
+        (invert_rotation)
+        (disable_equipping)
+        (phase_one_draw_discard)
+        (phase_one_override)
+        (disable_player_distances)
+    )
+
     DEFINE_ENUM_FLAGS(player_flags,
         (dead)
         (ghost)
@@ -107,7 +116,6 @@ namespace banggame {
         (targetable)
         (start_of_turn)
         (extra_turn)
-        (disable_player_distances)
         (treat_missed_as_bang)
         (role_revealed)
     )
@@ -163,6 +171,7 @@ namespace banggame {
         (player_status, player_status_update)
         (switch_turn, switch_turn_update)
         (request_status, request_status_args)
+        (game_flags, game_flags)
         (status_clear)
         (confirm_play)
     )

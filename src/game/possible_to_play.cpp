@@ -72,7 +72,7 @@ namespace banggame {
             default: return true;
             }
         } else {
-            if (m_game->has_scenario(scenario_flags::judge)) return false;
+            if (m_game->check_flags(game_flags::disable_equipping)) return false;
             if (!target_card->self_equippable()) {
                 return !make_equip_set(target_card).empty();
             }

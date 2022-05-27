@@ -44,7 +44,7 @@ namespace banggame {
 
     int game_table::calc_distance(player *from, player *to) {
         if (from == to) return 0;
-        if (from->check_player_flags(player_flags::disable_player_distances)) return to->m_distance_mod;
+        if (check_flags(game_flags::disable_player_distances)) return to->m_distance_mod;
         if (to->alive()) {
             return std::min(
                 std::distance(player_iterator(from), player_iterator(to)),
@@ -58,11 +58,6 @@ namespace banggame {
 
     int game_table::num_alive() const {
         return std::ranges::count_if(m_players, &player::alive);
-    }
-    
-    bool game_table::has_scenario(scenario_flags type) const {
-        using namespace enums::flag_operators;
-        return bool(m_scenario_flags & type);
     }
 
     void game_table::shuffle_cards_and_ids(std::span<card *> vec) {
@@ -132,7 +127,7 @@ namespace banggame {
     }
 
     card *game_table::phase_one_drawn_card() {
-        if (!has_scenario(scenario_flags::abandonedmine) || m_discards.empty()) {
+        if (!check_flags(game_flags::phase_one_draw_discard) || m_discards.empty()) {
             return m_deck.back();
         } else {
             return m_discards.back();
@@ -177,7 +172,7 @@ namespace banggame {
         }
         if (!m_scenario_cards.empty()) {
             m_scenario_cards.back()->on_disable(m_first_player);
-            m_scenario_flags = {};
+            set_game_flags({});
         }
         add_log("LOG_DRAWN_SCENARIO_CARD", m_scenario_deck.back());
         move_card(m_scenario_deck.back(), pocket_type::scenario_card);
@@ -229,6 +224,11 @@ namespace banggame {
 
     bool game_table::is_disabled(card *target_card) {
         return get_disabler(target_card) != nullptr;
+    }
+
+    void game_table::set_game_flags(game_flags type) {
+        m_game_flags = type;
+        add_update<game_update_type::game_flags>(type);
     }
 
 }

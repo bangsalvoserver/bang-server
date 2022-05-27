@@ -9,7 +9,6 @@ namespace banggame {
 
     struct effect_ambush {
         void on_enable(card *target_card, player *target);
-        void on_disable(card *target_card, player *target);
     };
 
     struct effect_sniper {

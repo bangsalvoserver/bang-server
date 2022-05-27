@@ -10,8 +10,6 @@
 namespace banggame {
 
     struct game : game_table, event_handler_map, request_queue<game> {
-        bool m_game_over = false;
-
         draw_check_handler m_current_check;
 
         player *m_playing = nullptr;

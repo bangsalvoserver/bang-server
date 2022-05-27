@@ -94,7 +94,7 @@ namespace banggame {
     }
 
     void effect_invert_rotation::on_enable(card *target_card, player *target) {
-        target->m_game->m_scenario_flags |= scenario_flags::invert_rotation;
+        target->m_game->set_game_flags(game_flags::invert_rotation);
     }
 
     void effect_reverend::on_enable(card *target_card, player *target) {

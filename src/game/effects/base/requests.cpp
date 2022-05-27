@@ -31,9 +31,7 @@ namespace banggame {
     }
 
     bool request_draw::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return target->m_game->has_scenario(scenario_flags::abandonedmine) && !target->m_game->m_discards.empty()
-            ? pocket == pocket_type::discard_pile
-            : pocket == pocket_type::main_deck;
+        return pocket == target->m_game->phase_one_drawn_card()->pocket;
     }
 
     void request_draw::on_pick(pocket_type pocket, player *target_player, card *target_card) {
@@ -147,7 +145,7 @@ namespace banggame {
 
     void request_discard_pass::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
-        if (target->m_game->has_scenario(scenario_flags::abandonedmine)) {
+        if (target->m_game->check_flags(game_flags::phase_one_draw_discard)) {
             target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, show_card_flags::hidden);
         } else {
             target->discard_card(target_card);

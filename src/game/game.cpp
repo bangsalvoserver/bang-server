@@ -408,7 +408,7 @@ namespace banggame {
     void game::start_next_turn() {
         auto it = m_players.find(m_playing->id);
         do {
-            if (has_scenario(scenario_flags::invert_rotation)) {
+            if (check_flags(game_flags::invert_rotation)) {
                 if (it == m_players.begin()) it = m_players.end();
                 --it;
             } else {
@@ -428,7 +428,7 @@ namespace banggame {
     }
 
     void game::check_game_over(player *killer, player *target) {
-        if (m_game_over) return;
+        if (check_flags(game_flags::game_over)) return;
         if (killer != m_playing) killer = nullptr;
         
         player_role winner_role = player_role::unknown;
@@ -463,8 +463,8 @@ namespace banggame {
                 }
             }
             add_log("LOG_GAME_OVER");
+            set_game_flags(game_flags::game_over);
             add_update<game_update_type::game_over>(winner_role);
-            m_game_over = true;
         } else if (m_playing == target) {
             start_next_turn();
         } else if (killer) {

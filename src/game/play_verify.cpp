@@ -142,7 +142,7 @@ namespace banggame {
         if (card *disabler = origin->m_game->get_disabler(card_ptr)) {
             return game_error("ERROR_CARD_DISABLED_BY", card_ptr, disabler);
         }
-        if (origin->m_game->has_scenario(scenario_flags::judge)) {
+        if (origin->m_game->check_flags(game_flags::disable_equipping)) {
             return game_error("ERROR_CANT_EQUIP_CARDS");
         }
         player *target = origin;
