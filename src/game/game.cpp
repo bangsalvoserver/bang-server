@@ -422,8 +422,8 @@ namespace banggame {
             draw_scenario_card();
         }
 
-        queue_action([&p = *it]{
-            p.start_of_turn();
+        queue_action_front([it = &*it]{
+            it->start_of_turn();
         });
     }
 

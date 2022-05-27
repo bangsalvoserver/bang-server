@@ -353,7 +353,7 @@ namespace banggame {
             target_converter<std::vector<play_card_target>>{}(m_game, args.targets),
             target_converter<std::vector<card *>>{}(m_game, args.modifier_ids)
         }.verify_and_play()) {
-            throw std::move(*error);
+            throw *error;
         }
     }
     
@@ -379,7 +379,7 @@ namespace banggame {
         }
         
         if (auto error = verifier.verify_card_targets()) {
-            throw std::move(*error);
+            throw *error;
         }
         prompt_then(verifier.check_prompt(), [=, this]{
             verifier.do_play_card();
