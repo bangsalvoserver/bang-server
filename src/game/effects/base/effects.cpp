@@ -203,9 +203,9 @@ namespace banggame {
         }
     }
 
-    opt_fmt_str effect_steal::on_prompt(card *origin_card, player *origin, card *target_card) {
+    opt_fmt_str prompt_target_self_hand::on_prompt(card *origin_card, player *origin, card *target_card) {
         if (origin == target_card->owner && target_card->pocket == pocket_type::player_hand) {
-            return game_formatted_string{"PROMPT_STEAL_OWN_HAND", origin_card};
+            return game_formatted_string{"PROMPT_TARGET_OWN_HAND", origin_card};
         }
         return std::nullopt;
     }
@@ -250,7 +250,7 @@ namespace banggame {
         }
     }
 
-    void effect_destroy::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
+    void effect_discard::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
         if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
             origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
         } else {
@@ -258,7 +258,7 @@ namespace banggame {
         }
     }
 
-    void effect_destroy::on_resolve(card *origin_card, player *origin, card *target_card) {
+    void effect_discard::on_resolve(card *origin_card, player *origin, card *target_card) {
         auto fun = [=]{
             if (origin->alive()) {
                 if (origin != target_card->owner) {

@@ -395,7 +395,7 @@ main_deck:
     expansion: dodgecity
     color: brown
     effects:
-      - destroy extra_card
+      - discard extra_card
       - play_card_action
       - steal card
   - name: BRAWL
@@ -405,7 +405,7 @@ main_deck:
     expansion: dodgecity
     color: brown
     effects:
-      - destroy extra_card
+      - discard extra_card
       - play_card_action
       - destroy cards_other_players
   - name: DODGE
@@ -425,7 +425,7 @@ main_deck:
     expansion: dodgecity
     color: brown
     effects:
-      - destroy extra_card
+      - discard extra_card
       - play_card_action
       - bang player notself
   - name: TEQUILA
@@ -435,7 +435,7 @@ main_deck:
     expansion: dodgecity
     color: brown
     effects:
-      - destroy extra_card
+      - discard extra_card
       - play_card_action
       - heal player
   - name: WHISKY
@@ -445,7 +445,7 @@ main_deck:
     expansion: dodgecity
     color: brown
     effects:
-      - destroy extra_card
+      - discard extra_card
       - play_card_action
       - heal(2)
   - name: BIBLE

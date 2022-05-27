@@ -168,6 +168,7 @@ namespace banggame {
         (missedlike,            effect_missedlike)
         (missed,                effect_missed)
         (barrel,                effect_barrel)
+        (discard,               effect_discard)
         (destroy,               effect_destroy)
         (startofturn,           effect_startofturn)
         (while_drawing,         effect_while_drawing)

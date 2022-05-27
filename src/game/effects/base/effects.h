@@ -105,16 +105,21 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
-    struct effect_steal {
+    struct prompt_target_self_hand {
         opt_fmt_str on_prompt(card *origin_card, player *origin, card *target);
+    };
+
+    struct effect_steal : prompt_target_self_hand {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };
 
-    struct effect_destroy {
+    struct effect_discard {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };
+
+    struct effect_destroy : effect_discard, prompt_target_self_hand {};
 
     struct effect_choose_card {
         void on_play(card *origin_card, player *origin, card *target);
