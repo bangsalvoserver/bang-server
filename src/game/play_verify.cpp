@@ -4,6 +4,8 @@
 
 #include "effects/base/requests.h"
 
+#include "utils/raii_editor.h"
+
 namespace banggame {
     using namespace enums::flag_operators;
 
@@ -172,21 +174,6 @@ namespace banggame {
         }
     }
 
-    template<typename T, T Diff = 1>
-    struct raii_modifier {
-        T *ptr = nullptr;
-
-        void set(T &value) {
-            ptr = &value;
-            *ptr += Diff;
-        }
-        ~raii_modifier() {
-            if (ptr) {
-                *ptr -= Diff;
-            }
-        }
-    };
-
     opt_error play_card_verify::verify_card_targets() const {
         auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
 
@@ -210,15 +197,18 @@ namespace banggame {
             return game_error("ERROR_INVALID_ACTION");
         }
 
-        raii_modifier<decltype(player::m_range_mod), 50> _belltower_mod;
-        raii_modifier<decltype(player::m_bangs_per_turn)> _bandolier_mod;
-        raii_modifier<decltype(player::m_bangs_per_turn), 10> _leevankliff_mod;
+        struct {
+            raii_editor_stack<int8_t> data;
+            void add(int8_t &value, int8_t diff) {
+                data.add(value, value + diff);
+            }
+        } editors;
 
         for (card *c : modifiers) {
             switch (c->modifier) {
-            case card_modifier_type::belltower: _belltower_mod.set(origin->m_range_mod); break;
-            case card_modifier_type::bandolier: _bandolier_mod.set(origin->m_bangs_per_turn); break;
-            case card_modifier_type::leevankliff: _leevankliff_mod.set(origin->m_bangs_per_turn); break;
+            case card_modifier_type::belltower: editors.add(origin->m_range_mod, 50); break;
+            case card_modifier_type::bandolier: editors.add(origin->m_bangs_per_turn, 1); break;
+            case card_modifier_type::leevankliff: editors.add(origin->m_bangs_per_turn, 10); break;
             }
         }
 

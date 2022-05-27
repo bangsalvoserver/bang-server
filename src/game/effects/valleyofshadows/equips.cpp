@@ -41,7 +41,6 @@ namespace banggame {
             target->m_game->player_death(nullptr, target);
             target->m_game->check_game_over(nullptr, target);
         });
-        target->m_game->remove_events(target_card);
     }
 
     void effect_shotgun::on_enable(card *target_card, player *p) {

@@ -309,6 +309,7 @@ namespace banggame {
         (abandonedmine,         effect_abandonedmine)
         (deadman,               effect_deadman)
         (fistfulofcards,        effect_fistfulofcards)
+        (guitar,                effect_guitar)
         (packmule,              effect_packmule)
         (indianguide,           effect_indianguide)
         (taxman,                effect_taxman)

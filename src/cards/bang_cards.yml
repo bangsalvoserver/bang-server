@@ -1257,7 +1257,7 @@ main_deck:
     color: blue
     equip_target: any
     equip:
-      - weapon(0)
+      - guitar
       - prompt_on_self_equip
     tags:
       - weapon

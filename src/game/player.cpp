@@ -405,6 +405,8 @@ namespace banggame {
         m_game->add_update<game_update_type::confirm_play>(update_target::includes(this));
         if (response) {
             std::invoke(m_prompt->first);
+        } else if (m_forced_card) {
+            set_forced_card(m_forced_card);
         }
         m_prompt.reset();
     }
