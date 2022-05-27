@@ -34,8 +34,20 @@ namespace banggame {
         return std::nullopt;
     }
 
-    void effect_deadman::on_enable(card *target_card, player *target) {
-        target->m_game->m_scenario_flags |= scenario_flags::deadman;
+    void effect_deadman::on_enable(card *target_card, player *origin) {
+        origin->m_game->add_event<event_type::verify_revivers>(target_card, [=](player *target) {
+            if (!target->alive() && target == origin->m_game->m_first_dead) {
+                origin->m_game->add_log("LOG_REVIVE", target, target_card);
+
+                target->remove_player_flags(player_flags::dead);
+                target->set_hp(2);
+                target->draw_card(2);
+
+                for (auto *c : target->m_characters) {
+                    c->on_enable(target);
+                }
+            }
+        });
     }
 
     void effect_judge::on_enable(card *target_card, player *target) {

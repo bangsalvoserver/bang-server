@@ -436,10 +436,6 @@ namespace banggame {
     }
 
     void player::start_of_turn() {
-        if (this != m_game->m_playing && this == m_game->m_first_player) {
-            m_game->draw_scenario_card();
-        }
-        
         m_game->m_playing = this;
 
         m_mandatory_card = nullptr;
@@ -524,12 +520,6 @@ namespace banggame {
             m_game->queue_action([&]{
                 if (m_extra_turns == 0) {
                     remove_player_flags(player_flags::extra_turn);
-                    if (remove_player_flags(player_flags::temp_ghost)) {
-                        --m_num_cards_to_draw;
-                        if (!check_player_flags(player_flags::ghost)) {
-                            m_game->player_death(nullptr, this);
-                        }
-                    }
                     m_game->start_next_turn();
                 } else {
                     --m_extra_turns;

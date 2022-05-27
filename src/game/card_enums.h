@@ -158,7 +158,7 @@ namespace banggame {
     
     DEFINE_ENUM_FWD_TYPES(effect_type,
         (none)
-        (mth_add,               effect_empty)
+        (mth_add)
         (play_card_action,      effect_play_card_action)
         (max_usages,            effect_max_usages)
         (pass_turn,             effect_pass_turn)

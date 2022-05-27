@@ -135,8 +135,30 @@ namespace banggame {
         target->m_game->remove_events(target_card);
     }
 
-    void effect_ghosttown::on_enable(card *target_card, player *target) {
-        target->m_game->m_scenario_flags |= scenario_flags::ghosttown;
+    void effect_ghosttown::on_enable(card *target_card, player *origin) {
+        origin->m_game->add_event<event_type::verify_revivers>(target_card,
+            [=, last_revived = static_cast<player*>(nullptr)](player *target) mutable {
+                if (last_revived) {
+                    last_revived->remove_player_flags(player_flags::temp_ghost);
+                    --last_revived->m_num_cards_to_draw;
+                    if (!last_revived->alive()) {
+                        origin->m_game->player_death(nullptr, last_revived);
+                    }
+                    last_revived = nullptr;
+                }
+                if (!target->alive()) {
+                    origin->m_game->add_log("LOG_REVIVE", target, target_card);
+
+                    target->add_player_flags(player_flags::temp_ghost);
+                    ++target->m_num_cards_to_draw;
+                    
+                    for (auto *c : target->m_characters) {
+                        c->on_enable(target);
+                    }
+                    
+                    last_revived = target;
+                }
+            });
     }
 
     void effect_handcuffs::on_enable(card *target_card, player *target) {

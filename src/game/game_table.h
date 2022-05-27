@@ -15,10 +15,8 @@ namespace banggame {
 
     DEFINE_ENUM_FLAGS(scenario_flags,
         (invert_rotation) // inverti giro
-        (ghosttown) // citta' fantasma
         (judge) // non si puo' equipaggiare
         (abandonedmine) // fase 1 : pesca dagli scarti, fase 3 : scarta coperto nel mazzo
-        (deadman) // il primo morto ritorna in vita con 2 carte e 2 hp nel suo turno
         (peyote) // cambia la fase 1
     )
 

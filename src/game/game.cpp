@@ -415,30 +415,16 @@ namespace banggame {
                 ++it;
                 if (it == m_players.end()) it = m_players.begin();
             }
-        } while(!it->alive()
-            && !has_scenario(scenario_flags::ghosttown)
-            && !(has_scenario(scenario_flags::deadman) && &*it == m_first_dead));
-
-        if (!it->is_ghost() && it->m_hp == 0) {
-            add_log("LOG_REVIVE", &*it, m_scenario_cards.back());
-
-            if (has_scenario(scenario_flags::ghosttown)) {
-                it->add_player_flags(player_flags::temp_ghost);
-                ++it->m_num_cards_to_draw;
-            } else if (has_scenario(scenario_flags::deadman) && &*it == m_first_dead) {
-                it->remove_player_flags(player_flags::dead);
-                it->set_hp(2);
-                it->draw_card(2);
-            } else {
-                assert("giocatore invalido ritorna in gioco" == nullptr);
-            }
-
-            for (auto *c : it->m_characters) {
-                c->on_enable(&*it);
-            }
+            call_event<event_type::verify_revivers>(&*it);
+        } while (!it->alive());
+        
+        if (&*it == m_first_player) {
+            draw_scenario_card();
         }
 
-        it->start_of_turn();
+        queue_action([&p = *it]{
+            p.start_of_turn();
+        });
     }
 
     void game::check_game_over(player *killer, player *target) {

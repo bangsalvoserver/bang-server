@@ -28,6 +28,8 @@ namespace banggame {
         EVENT(apply_bang_modifier,              player *origin, request_bang *req)
 
         EVENT(verify_target_unique,             card *origin_card, player *origin, player *target, bool &value)
+
+        EVENT(verify_revivers,                  player *origin)
         
         // viene chiamato quando scarti una carta a fine turno
         EVENT(on_discard_pass, player *origin, card *target_card)
