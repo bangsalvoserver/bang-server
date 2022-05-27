@@ -248,7 +248,9 @@ namespace banggame {
                 return game_error("ERROR_INVALID_ACTION");
             } else if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
-            } else if (auto error = enums::visit_indexed(
+            }
+            
+            if (auto error = enums::visit_indexed(
                 [this, &e]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
                     return play_visitor<E>{}.verify(this, e, std::forward<decltype(args)>(args) ... );
                 }, t))
