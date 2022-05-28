@@ -7,18 +7,6 @@
 
 namespace banggame {
 
-    bool request_targeting::can_pick(pocket_type pocket, player *target_player, card *c) const {
-        if (target_player == target) {
-            switch (pocket) {
-            case pocket_type::player_hand:
-                return target_card->pocket == pocket_type::player_hand;
-            case pocket_type::player_table:
-                return target_card == c;
-            }
-        }
-        return false;
-    }
-    
     void timer_damaging::on_finished() {
         target->m_game->pop_request_noupdate<timer_damaging>();
         target->damage(origin_card, origin, damage, is_bang, true);
@@ -29,7 +17,7 @@ namespace banggame {
         return {damage > 1 ? "STATUS_DAMAGING_PLURAL" : "STATUS_DAMAGING", target, origin_card, damage};
     }
 
-    void request_destroy::on_resolve() {
+    void request_destroy::on_finished() {
         effect_destroy{}.on_resolve(origin_card, origin, target_card);
         target->m_game->pop_request<request_destroy>();
     }
@@ -50,7 +38,7 @@ namespace banggame {
         }
     }
 
-    void request_steal::on_resolve() {
+    void request_steal::on_finished() {
         effect_steal{}.on_resolve(origin_card, origin, target_card);
         target->m_game->pop_request<request_steal>();
     }

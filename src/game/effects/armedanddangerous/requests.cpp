@@ -60,21 +60,10 @@ namespace banggame {
         }
     }
 
-    bool request_rust::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        if (target_player == target) {
-            switch (pocket) {
-            case pocket_type::player_character:
-                return target_player->m_characters.front()->num_cubes != 0;
-            case pocket_type::player_table:
-                return target_card->num_cubes != 0;
-            }
-        }
-        return false;
-    }
-
-    void request_rust::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request<request_rust>();
+    void request_rust::on_finished() {
+        target->m_game->pop_request_noupdate<request_rust>();
         effect_rust{}.on_resolve(origin_card, origin, target);
+        target->m_game->update_request();
     }
 
     game_formatted_string request_rust::status_text(player *owner) const {

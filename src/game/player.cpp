@@ -93,7 +93,7 @@ namespace banggame {
             m_game->add_log(value == 1 ? "LOG_TAKEN_DAMAGE" : "LOG_TAKEN_DAMAGE_PLURAL", origin_card, this, value);
             set_hp(m_hp - value);
             if (m_hp <= 0) {
-                m_game->queue_request_front<request_death>(origin_card, origin, this);
+                m_game->queue_request<request_death>(origin_card, origin, this);
             }
             if (m_game->has_expansion(card_expansion_type::goldrush)) {
                 if (origin && origin->m_game->m_playing == origin && origin != this && origin->alive()) {

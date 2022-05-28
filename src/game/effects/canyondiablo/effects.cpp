@@ -65,7 +65,7 @@ namespace banggame {
 
         card *chosen_card;
 
-        void on_resolve() override {
+        void on_finished() override {
             target->m_game->pop_request<request_card_sharper>();
             handler_card_sharper{}.on_resolve(origin_card, origin, chosen_card, target_card);
         }

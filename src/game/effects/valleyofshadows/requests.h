@@ -7,32 +7,25 @@
 
 namespace banggame {
 
-    struct request_targeting : request_base {
+    struct request_targeting : timer_request {
         request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags)
+            : timer_request(origin_card, origin, target, flags)
             , target_card(target_card) {}
 
         card *target_card;
-        
-        bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
-        void on_pick(pocket_type pocket, player *target, card *target_card) override {
-            on_resolve();
-        }
-
-        virtual void on_resolve() = 0;
     };
 
     struct request_destroy : request_targeting {
         using request_targeting::request_targeting;
-
-        void on_resolve() override;
+        
+        void on_finished() override;
         game_formatted_string status_text(player *owner) const override;
     };
 
     struct request_steal : request_targeting {
         using request_targeting::request_targeting;
 
-        void on_resolve() override;
+        void on_finished() override;
         game_formatted_string status_text(player *owner) const override;
     };
     

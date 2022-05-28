@@ -49,7 +49,11 @@ namespace banggame {
         opt_fmt_str on_prompt(card *target_card, player *target);
     };
 
-    struct request_base {
+    struct tick_interface {
+        virtual void tick() {}
+    };
+
+    struct request_base : virtual tick_interface {
         request_base(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : origin_card(origin_card), origin(origin), target(target), flags(flags) {}
         
@@ -67,12 +71,26 @@ namespace banggame {
         }
 
         virtual void on_pick(pocket_type pocket, player *target, card *target_card);
-
-        virtual void tick() {}
     };
 
-    struct resolvable_request {
-        virtual void on_resolve() = 0;
+    struct timer_base : virtual tick_interface, std::enable_shared_from_this<timer_base> {
+        static constexpr int default_duration = 200;
+
+        timer_base(int duration = default_duration) : duration(duration) {}
+
+        int duration = default_duration;
+
+        void tick() override final;
+        virtual void on_finished() {}
+    };
+
+    struct timer_request : request_base, timer_base {
+        timer_request(card *origin_card, player *origin, player *target, effect_flags flags = {}
+            , int duration = timer_base::default_duration)
+            : request_base(origin_card, origin, target, flags)
+            , timer_base(duration) {}
+
+        virtual void on_finished() override;
     };
 
     class cleanup_request {
@@ -107,23 +125,16 @@ namespace banggame {
         std::function<void()> m_fun;
     };
 
-    struct timer_request : request_base, std::enable_shared_from_this<timer_request> {
-        timer_request(card *origin_card, player *origin, player *target, effect_flags flags = {}, int duration = 200)
-            : request_base(origin_card, origin, target, flags)
-            , duration(duration) {}
-
-        int duration;
-
-        void tick() override final;
-        virtual void on_finished();
-    };
-
     struct selection_picker : request_base {
         using request_base::request_base;
 
         bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override {
             return pocket == pocket_type::selection;
         }
+    };
+
+    struct resolvable_request {
+        virtual void on_resolve() = 0;
     };
 
 }
