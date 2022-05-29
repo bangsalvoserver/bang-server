@@ -121,7 +121,7 @@ namespace banggame {
             flags |= effect_flags::escapable;
         }
         for (player &p : range_all_players(verifier->origin)) {
-            if (!p.immune_to(verifier->card_ptr)) {
+            if (&p == verifier->origin || !p.immune_to(verifier->card_ptr)) {
                 effect.on_play(verifier->card_ptr, verifier->origin, &p, flags);
             }
         }
