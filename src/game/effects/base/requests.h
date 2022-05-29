@@ -137,6 +137,8 @@ namespace banggame {
     struct request_death : request_base, resolvable_request {
         request_death(card *origin_card, player *origin, player *target)
             : request_base(origin_card, origin, target) {}
+
+        bool tried_save = false;
         
         void on_resolve() override;
         game_formatted_string status_text(player *owner) const override;

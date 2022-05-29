@@ -291,10 +291,15 @@ namespace banggame {
     }
 
     void request_death::on_resolve() {
-        target->m_game->player_death(origin, target);
         target->m_game->pop_request_noupdate<request_death>();
+        if (!tried_save) {
+            target->m_game->call_event<event_type::on_player_death_resolve>(target);
+        }
         target->m_game->queue_action_front([origin=origin, target=target]{
-            target->m_game->check_game_over(origin, target);
+            if (target->m_hp <= 0) {
+                target->m_game->player_death(origin, target);
+                target->m_game->check_game_over(origin, target);
+            }
         });
         target->m_game->update_request();
     }

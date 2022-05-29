@@ -18,9 +18,8 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
-    struct effect_teren_kill {
-        bool can_respond(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+    struct effect_teren_kill : event_based_effect {
+        void on_enable(card *origin_card, player *origin);
     };
 
     struct effect_youl_grinner : event_based_effect {

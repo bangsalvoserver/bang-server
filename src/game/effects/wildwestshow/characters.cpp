@@ -52,18 +52,15 @@ namespace banggame {
         });
     }
 
-    bool effect_teren_kill::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_if<request_death>(origin);
-    }
-
-    void effect_teren_kill::on_play(card *origin_card, player *origin) {
-        origin->m_game->draw_check_then(origin, origin_card, [origin, origin_card](card *drawn_card) {
-            if (origin->get_card_sign(drawn_card).suit != card_suit::spades) {
-                origin->m_game->pop_request<request_death>();
-                origin->set_hp(1);
-                origin->draw_card(1, origin_card);
-            } else {
-                origin->m_game->top_request().get<request_death>().on_resolve();
+    void effect_teren_kill::on_enable(card *origin_card, player *origin) {
+        origin->m_game->add_event<event_type::on_player_death_resolve>(origin_card, [=](player *target) {
+            if (origin == target) {
+                origin->m_game->draw_check_then(origin, origin_card, [=](card *drawn_card) {
+                    if (origin->get_card_sign(drawn_card).suit != card_suit::spades) {
+                        origin->set_hp(1);
+                        origin->draw_card(1, origin_card);
+                    }
+                });
             }
         });
     }

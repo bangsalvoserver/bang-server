@@ -55,6 +55,9 @@ namespace banggame {
         // viene chiamato quando un giocatore gioca mancato
         EVENT(on_missed, card *origin_card, player *origin, player *target, bool is_bang)
 
+        // viene chiamato quando un giocatore clicca su prendi danno quando muore
+        EVENT(on_player_death_resolve, player *target)
+
         // viene chiamato quando un giocatore muore
         EVENT(on_player_death, player *origin, player *target)
 
