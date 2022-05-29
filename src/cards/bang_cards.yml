@@ -1136,8 +1136,9 @@ main_deck:
     expansion: canyondiablo
     color: blue
     equip_target: any
+    equip:
+      - lastwill
     responses:
-      - max_usages(1)
       - lastwill
       - mth_add player notself
       - mth_add card self

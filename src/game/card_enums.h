@@ -315,6 +315,7 @@ namespace banggame {
         (taxman,                effect_taxman)
         (prompt_on_self_equip,  effect_prompt_on_self_equip)
         (brothel,               effect_brothel)
+        (lastwill,              effect_lastwill)
         (newidentity,           effect_newidentity)
         (lawofthewest,          effect_lawofthewest)
         (vendetta,              effect_vendetta)

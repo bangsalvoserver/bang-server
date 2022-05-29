@@ -30,9 +30,11 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
-    struct effect_lastwill {
+    struct effect_lastwill : event_based_effect {
+        void on_enable(card *origin_card, player *origin);
+        
         bool can_respond(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+        void on_play(card *origin_card, player *origin) {}
     };
 
     struct handler_lastwill {
