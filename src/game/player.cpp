@@ -253,13 +253,13 @@ namespace banggame {
 
     void player::set_last_played_card(card *c) {
         m_last_played_card = c;
-        m_game->add_update<game_update_type::last_played_card>(update_target::includes(this), c ? c->id : 0);
+        m_game->add_update<game_update_type::last_played_card>(update_target::includes_private(this), c ? c->id : 0);
         remove_player_flags(player_flags::start_of_turn);
     }
 
     void player::set_forced_card(card *c) {
         m_forced_card = c;
-        m_game->add_update<game_update_type::force_play_card>(update_target::includes(this), c ? c->id : 0);
+        m_game->add_update<game_update_type::force_play_card>(update_target::includes_private(this), c ? c->id : 0);
     }
 
     void player::set_mandatory_card(card *c) {
@@ -286,7 +286,7 @@ namespace banggame {
             throw game_error("ERROR_INVALID_ACTION");
         }
 
-        m_game->add_update<game_update_type::confirm_play>(update_target::includes(this));
+        m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
         player *target_player = args.player_id ? m_game->find_player(args.player_id) : nullptr;
         card *target_card = args.card_id ? m_game->find_card(args.card_id) : nullptr;
         if (req.can_pick(args.pocket, target_player, target_card)) {
@@ -390,9 +390,9 @@ namespace banggame {
     void player::prompt_then(opt_fmt_str &&message, std::function<void()> &&fun) {
         if (message) {
             m_prompt.emplace(std::move(fun), *message);
-            m_game->add_update<game_update_type::game_prompt>(update_target::includes(this), std::move(*message));
+            m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(*message));
         } else {
-            m_game->add_update<game_update_type::confirm_play>(update_target::includes(this));
+            m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
             std::invoke(fun);
         }
     }
@@ -402,7 +402,7 @@ namespace banggame {
             throw game_error("ERROR_INVALID_ACTION");
         }
 
-        m_game->add_update<game_update_type::confirm_play>(update_target::includes(this));
+        m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
         if (response) {
             std::invoke(m_prompt->first);
         } else if (m_forced_card) {

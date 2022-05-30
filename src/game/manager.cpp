@@ -3,6 +3,10 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <fstream>
+#include <iomanip>
+#include <ctime>
+
 #include "utils/json_serial.h"
 
 using namespace banggame;
@@ -220,6 +224,21 @@ void game_manager::HANDLE_MESSAGE(lobby_return, user_ptr user) {
     if (lobby.state != lobby_state::finished) {
         throw lobby_error("ERROR_LOBBY_NOT_FINISHED");
     }
+
+#ifndef NO_PRINT_PUBLIC_LOGS
+    if (!lobby.game.m_public_updates.empty()) {
+        std::stringstream filename;
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        filename << "game_log_" << std::put_time(&tm, "%Y%m%d%H%M%S") << ".json";
+        std::ofstream ofs(filename.str());
+        Json::Value val = Json::arrayValue;
+        for (const auto &obj : lobby.game.m_public_updates) {
+            val.append(json::serialize(obj));
+        }
+        ofs << val;
+    }
+#endif
 
     lobby.state = lobby_state::waiting;
     send_lobby_update(user->second.in_lobby);
