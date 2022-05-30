@@ -139,7 +139,7 @@ void game_manager::HANDLE_MESSAGE(lobby_join, user_ptr user, const lobby_join_ar
             send_message<server_message_type::lobby_add_user>(user->first, p->second.user_id, p->second.name, p->second.profile_image);
         }
         if (lobby.state != lobby_state::waiting) {
-            send_message<server_message_type::game_started>(user->first, lobby.game.m_options);
+            send_message<server_message_type::game_started>(user->first);
 
             player *controlling = lobby.game.find_disconnected_player();
             if (controlling) {
@@ -312,7 +312,7 @@ void lobby::send_updates(game_manager &mgr) {
 }
 
 void lobby::start_game(game_manager &mgr) {
-    mgr.broadcast_message<server_message_type::game_started>(*this, options);
+    mgr.broadcast_message<server_message_type::game_started>(*this);
 
     game = {};
     

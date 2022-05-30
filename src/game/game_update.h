@@ -146,6 +146,14 @@ namespace banggame {
         (std::vector<picking_args>) pick_ids
     )};
 
+    struct game_options {REFLECTABLE(
+        (card_expansion_type) expansions,
+        (bool) keep_last_card_shuffling,
+        (int) scenario_deck_size
+    )
+        game_options() : scenario_deck_size(12) {}
+    };
+
     DEFINE_ENUM_TYPES(game_update_type,
         (game_over, game_over_update)
         (game_error, game_formatted_string)
@@ -172,19 +180,12 @@ namespace banggame {
         (switch_turn, switch_turn_update)
         (request_status, request_status_args)
         (game_flags, game_flags)
+        (game_options, game_options)
         (status_clear)
         (confirm_play)
     )
 
     using game_update = enums::enum_variant<game_update_type>;
-
-    struct game_options {REFLECTABLE(
-        (card_expansion_type) expansions,
-        (bool) keep_last_card_shuffling,
-        (int) scenario_deck_size
-    )
-        game_options() : scenario_deck_size(12) {}
-    };
 }
 
 #endif

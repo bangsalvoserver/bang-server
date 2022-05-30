@@ -100,8 +100,8 @@ namespace banggame {
         (lobby_add_user, lobby_add_user_args)
         (lobby_remove_user, lobby_remove_user_args)
         (lobby_chat, lobby_chat_args)
-        (game_started, game_options)
         (game_update, game_update)
+        (game_started)
     )
 
     using server_message = enums::enum_variant<server_message_type>;

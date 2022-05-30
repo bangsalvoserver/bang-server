@@ -53,6 +53,8 @@ namespace banggame {
             }
         };
 
+        ADD_TO_RET(game_options, m_options);
+
         move_cards(m_specials, show_always);
         move_cards(m_deck, show_never);
         move_cards(m_shop_deck, show_never);
@@ -119,6 +121,8 @@ namespace banggame {
 
     void game::start_game(const game_options &options) {
         m_options = options;
+    
+        add_update<game_update_type::game_options>(options);
         
         auto add_card = [&](pocket_type pocket, const card_data &c) {
             card copy(c);
