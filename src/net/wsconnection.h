@@ -84,11 +84,11 @@ namespace net {
             return m_address;
         }
 
-        template<typename ... Ts> void push_message(Ts && ... args) {
+        void push_message(auto && ... args) {
             Json::StreamWriterBuilder builder;
             builder["indentation"] = "";
             std::error_code ec;
-            m_client.send(m_con, Json::writeString(builder, json::serialize(OutputMessage{std::forward<Ts>(args) ... })),
+            m_client.send(m_con, Json::writeString(builder, json::serialize(OutputMessage{FWD(args) ... })),
                 websocketpp::frame::opcode::text, ec);
         }
     };

@@ -242,7 +242,7 @@ namespace banggame {
             
             if (auto error = enums::visit_indexed(
                 [this, &e]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return play_visitor<E>{}.verify(this, e, std::forward<decltype(args)>(args) ... );
+                    return play_visitor<E>{}.verify(this, e, FWD(args) ... );
                 }, t))
             {
                 return error;
@@ -270,7 +270,7 @@ namespace banggame {
                 mth_targets.push_back(t);
             } else if (auto prompt_message = enums::visit_indexed(
                 [this, &e]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return play_visitor<E>{}.prompt(this, e, std::forward<decltype(args)>(args) ... );
+                    return play_visitor<E>{}.prompt(this, e, FWD(args) ... );
                 }, t))
             {
                 return prompt_message;
@@ -317,7 +317,7 @@ namespace banggame {
                 mth_targets.push_back(t);
             } else {
                 enums::visit_indexed([this, &e]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    play_visitor<E>{}.play(this, e, std::forward<decltype(args)>(args) ... );
+                    play_visitor<E>{}.play(this, e, FWD(args) ... );
                 }, t);
             }
         }

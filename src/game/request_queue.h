@@ -50,14 +50,14 @@ namespace banggame {
             }
         }
 
-        template<std::derived_from<request_base> T, typename ... Ts>
-        void queue_request_front(Ts && ... args) {
-            queue_request_front(std::make_shared<T>(std::forward<Ts>(args) ... ));
+        template<std::derived_from<request_base> T>
+        void queue_request_front(auto && ... args) {
+            queue_request_front(std::make_shared<T>(FWD(args) ... ));
         }
         
-        template<std::derived_from<request_base> T, typename ... Ts>
-        void queue_request(Ts && ... args) {
-            queue_request(std::make_shared<T>(std::forward<Ts>(args) ... ));
+        template<std::derived_from<request_base> T>
+        void queue_request(auto && ... args) {
+            queue_request(std::make_shared<T>(FWD(args) ... ));
         }
 
         template<typename T = request_base>

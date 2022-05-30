@@ -124,9 +124,8 @@ namespace banggame {
     struct card_multimap : std::multimap<event_card_key, T, std::less<>> {
         using base = std::multimap<event_card_key, T, std::less<>>;
 
-        template<typename ... Ts>
-        void add(event_card_key key, Ts && ... args) {
-            base::emplace(std::piecewise_construct, std::make_tuple(key), std::make_tuple(std::forward<Ts>(args) ... ));
+        void add(event_card_key key, auto && ... args) {
+            base::emplace(std::piecewise_construct, std::make_tuple(key), std::make_tuple(FWD(args) ... ));
         }
 
         void erase(card *target_card) {

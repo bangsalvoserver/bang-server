@@ -15,10 +15,10 @@ struct lobby_error : std::runtime_error {
 void game_manager::on_receive_message(client_handle client, const client_message &msg) {
     try {
         enums::visit_indexed([&]<client_message_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
-            if constexpr (requires { handle_message(tag, client, std::forward<decltype(args)>(args) ...); }) {
-                handle_message(tag, client, std::forward<decltype(args)>(args) ...);
+            if constexpr (requires { handle_message(tag, client, FWD(args) ...); }) {
+                handle_message(tag, client, FWD(args) ...);
             } else if (auto it = users.find(client); it != users.end()) {
-                handle_message(tag, it, std::forward<decltype(args)>(args) ...);
+                handle_message(tag, it, FWD(args) ...);
             }
         }, msg);
     } catch (const lobby_error &e) {
@@ -270,7 +270,7 @@ void game_manager::HANDLE_MESSAGE(game_action, user_ptr user, const game_action 
 
     if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
         enums::visit_indexed([&]<game_action_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
-            it->handle_action(tag, std::forward<decltype(args)>(args) ...);
+            it->handle_action(tag, FWD(args) ...);
         }, value);
     } else {
         throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");

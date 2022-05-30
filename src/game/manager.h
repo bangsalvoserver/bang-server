@@ -37,9 +37,9 @@ struct game_user {
     lobby_ptr in_lobby{};
 };
 
-template<server_message_type E, typename ... Ts>
-server_message make_message(Ts && ... args) {
-    return server_message{enums::enum_tag<E>, std::forward<Ts>(args) ...};
+template<server_message_type E>
+server_message make_message(auto && ... args) {
+    return server_message{enums::enum_tag<E>, FWD(args) ...};
 }
 
 #define MESSAGE_TAG(name) enums::enum_tag_t<banggame::client_message_type::name>
@@ -70,14 +70,14 @@ private:
     lobby_data make_lobby_data(lobby_ptr it);
     void send_lobby_update(lobby_ptr it);
 
-    template<server_message_type E, typename ... Ts>
-    void send_message(client_handle client, Ts && ... args) {
-        m_send_message(client, make_message<E>(std::forward<Ts>(args) ... ));
+    template<server_message_type E>
+    void send_message(client_handle client, auto && ... args) {
+        m_send_message(client, make_message<E>(FWD(args) ... ));
     }
 
-    template<server_message_type E, typename ... Ts>
-    void broadcast_message(const lobby &lobby, Ts && ... args) {
-        auto msg = make_message<E>(std::forward<Ts>(args) ... );
+    template<server_message_type E>
+    void broadcast_message(const lobby &lobby, auto && ... args) {
+        auto msg = make_message<E>(FWD(args) ... );
         for (user_ptr it : lobby.users) {
             m_send_message(it->first, msg);
         }

@@ -23,10 +23,11 @@ namespace banggame{
         }
     };
 
-    template<std::convertible_to<std::string> T, typename ... Ts>
-    game_formatted_string::game_formatted_string(T &&message, Ts && ... args)
-        : format_str(std::forward<T>(message))
-        , format_args{game_format_arg_visitor{}(std::forward<Ts>(args)) ...} {}
+    game_formatted_string::game_formatted_string(
+            std::convertible_to<std::string> auto &&message,
+            auto && ... args)
+        : format_str(FWD(message))
+        , format_args{game_format_arg_visitor{}(FWD(args)) ...} {}
 
 }
 
