@@ -225,7 +225,7 @@ void game_manager::HANDLE_MESSAGE(lobby_return, user_ptr user) {
         throw lobby_error("ERROR_LOBBY_NOT_FINISHED");
     }
 
-#ifndef NO_PRINT_PUBLIC_LOGS
+#ifdef DEBUG_PRINT_PUBLIC_LOGS
     if (!lobby.game.m_public_updates.empty()) {
         std::stringstream filename;
         auto t = std::time(nullptr);
