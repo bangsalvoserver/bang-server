@@ -29,10 +29,6 @@ namespace banggame {
         target->add_gold(amount);
     }
 
-    bool effect_pay_gold::can_respond(card *origin_card, player *origin) {
-        return origin->m_gold >= amount;
-    }
-
     opt_error effect_pay_gold::verify(card *origin_card, player *origin) {
         if (origin->m_gold < amount) {
             return game_error("ERROR_NOT_ENOUGH_GOLD");

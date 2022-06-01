@@ -26,7 +26,6 @@ namespace banggame {
         effect_pay_gold(int value) : amount(value) {}
 
         opt_error verify(card *origin_card, player *origin);
-        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 

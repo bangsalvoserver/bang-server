@@ -33,10 +33,6 @@ namespace banggame {
         target->owner->pay_cubes(target, 1);
     }
 
-    bool effect_pay_cube::can_respond(card *origin_card, player *origin) {
-        return origin_card->num_cubes >= ncubes;
-    }
-
     opt_error effect_pay_cube::verify(card *origin_card, player *origin) {
         if (origin_card->num_cubes < ncubes) {
             return game_error("ERROR_NOT_ENOUGH_CUBES_ON", origin_card);

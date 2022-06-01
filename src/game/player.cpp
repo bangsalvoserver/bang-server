@@ -138,7 +138,7 @@ namespace banggame {
     bool player::can_respond_with(card *c) {
         return !m_game->is_disabled(c) && !c->responses.empty()
             && std::ranges::all_of(c->responses, [&](const effect_holder &e) {
-                return e.can_respond(c, this);
+                return !e.verify(c, this);
             });
     }
 

@@ -19,8 +19,6 @@ namespace banggame {
             (effect_type) type
         )
 
-        bool can_respond(card *origin_card, player *target) const;
-
         opt_error verify(card *origin_card, player *origin) const;
         opt_fmt_str on_prompt(card *origin_card, player *origin) const;
         void on_play(card *origin_card, player *origin, effect_flags flags) const;

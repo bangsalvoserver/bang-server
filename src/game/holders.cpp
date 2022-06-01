@@ -34,6 +34,10 @@ namespace banggame {
         return visit_effect([=](auto &&value) -> opt_error {
             if constexpr (requires { value.verify(origin_card, origin); }) {
                 return value.verify(origin_card, origin);
+            } else if constexpr (requires { value.can_respond(origin_card, origin); }) {
+                if (!value.can_respond(origin_card, origin)) {
+                    return game_error("ERROR_INVALID_RESPONSE");
+                }
             }
             return std::nullopt;
         }, *this);
@@ -84,15 +88,6 @@ namespace banggame {
             } else {
                 return std::nullopt;
             }
-        }, *this);
-    }
-
-    bool effect_holder::can_respond(card *origin_card, player *target) const {
-        return visit_effect([=](auto &&value) {
-            if constexpr (requires { value.can_respond(origin_card, target); }) {
-                return value.can_respond(origin_card, target);
-            }
-            return true;
         }, *this);
     }
 

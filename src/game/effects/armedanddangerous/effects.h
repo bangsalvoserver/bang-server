@@ -23,7 +23,6 @@ namespace banggame {
         int ncubes;
         effect_pay_cube(int value) : ncubes(std::max(1, value)) {}
         
-        bool can_respond(card *origin_card, player *origin);
         opt_error verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };

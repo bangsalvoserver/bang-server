@@ -18,11 +18,6 @@ namespace banggame {
         }
         return std::nullopt;
     }
-
-    bool effect_max_usages::can_respond(card *origin_card, player *origin) {
-        return origin_card->usages < max_usages;
-    }
-
     void effect_max_usages::on_play(card *origin_card, player *origin) {
         ++origin_card->usages;
     }

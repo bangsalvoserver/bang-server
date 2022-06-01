@@ -13,7 +13,6 @@ namespace banggame {
         int max_usages;
         
         opt_error verify(card *origin_card, player *origin);
-        bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
