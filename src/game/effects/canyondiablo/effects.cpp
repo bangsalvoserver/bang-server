@@ -20,7 +20,7 @@ namespace banggame {
     }
 
     opt_error effect_mirage::verify(card *origin_card, player *origin) {
-        if (origin->m_game->m_requests.empty()
+        if (!origin->m_game->pending_requests()
             || origin->m_game->top_request().origin() != origin->m_game->m_playing) {
             return game_error("ERROR_CANT_PLAY_CARD", origin_card);
         }
@@ -33,7 +33,7 @@ namespace banggame {
     }
 
     opt_error effect_disarm::verify(card *origin_card, player *origin) {
-        if (origin->m_game->m_requests.empty() || !origin->m_game->top_request().origin()) {
+        if (!origin->m_game->pending_requests() || !origin->m_game->top_request().origin()) {
             return game_error("ERROR_CANT_PLAY_CARD", origin_card);
         }
         return std::nullopt;
@@ -66,7 +66,7 @@ namespace banggame {
         card *chosen_card;
 
         void on_finished() override {
-            target->m_game->pop_request<request_card_sharper>();
+            target->m_game->pop_request_update();
             handler_card_sharper{}.on_resolve(origin_card, origin, chosen_card, target_card);
         }
 
@@ -113,7 +113,7 @@ namespace banggame {
         player *saved = req.target;
         bool fatal = saved->m_hp <= req.damage;
         if (0 == --req.damage) {
-            origin->m_game->pop_request_noupdate<timer_damaging>();
+            origin->m_game->pop_request();
         }
         origin->damage(origin_card, origin, 1);
         origin->m_game->queue_action_front([=]{
@@ -128,7 +128,7 @@ namespace banggame {
             : request_base(origin_card, nullptr, target) {}
 
         void on_resolve() override {
-            target->m_game->pop_request<request_lastwill>();
+            target->m_game->pop_request_update();
         }
         
         game_formatted_string status_text(player *owner) const override {
@@ -166,6 +166,6 @@ namespace banggame {
             target->add_to_hand(chosen_card);
         }
 
-        origin->m_game->pop_request<request_lastwill>();
+        origin->m_game->pop_request_update();
     }
 }

@@ -20,7 +20,7 @@ namespace banggame {
         }
         target->add_cubes(target_card, 1);
         if (--ncubes == 0) {
-            target->m_game->pop_request<request_add_cube>();
+            target->m_game->pop_request_update();
         } else {
             target->m_game->update_request();
         }
@@ -61,7 +61,7 @@ namespace banggame {
     }
 
     void request_rust::on_finished() {
-        target->m_game->pop_request_noupdate<request_rust>();
+        target->m_game->pop_request();
         effect_rust{}.on_resolve(origin_card, origin, target);
         target->m_game->update_request();
     }

@@ -23,7 +23,7 @@ namespace banggame {
     }
 
     void effect_al_preacher::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request<timer_al_preacher>();
+        origin->m_game->pop_request_update();
     }
 
     void effect_julie_cutter::on_enable(card *target_card, player *p) {
@@ -101,7 +101,7 @@ namespace banggame {
     }
 
     bool effect_ms_abigail::can_respond(card *origin_card, player *origin) {
-        if (!origin->m_game->m_requests.empty()) {
+        if (origin->m_game->pending_requests()) {
             auto &req = origin->m_game->top_request();
             return req.target() == origin && can_escape(req.origin(), req.origin_card(), req.flags());
         }
@@ -109,7 +109,7 @@ namespace banggame {
     }
 
     void effect_ms_abigail::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request();
+        origin->m_game->pop_request_update();
     }
 
     void effect_ms_abigail::on_enable(card *origin_card, player *origin) {

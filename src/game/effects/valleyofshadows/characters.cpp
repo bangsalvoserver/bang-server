@@ -54,7 +54,7 @@ namespace banggame {
     }
 
     void effect_lemonade_jim::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request<timer_lemonade_jim>();
+        origin->m_game->pop_request_update();
     }
 
     struct verify_target_unique {
@@ -86,7 +86,7 @@ namespace banggame {
             }
         });
 
-        origin->m_game->pop_request_noupdate<request_draw>();
+        origin->m_game->pop_request();
         ++origin->m_num_drawn_cards;
 
         effect_bang().on_play(origin_card, origin, target);

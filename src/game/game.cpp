@@ -100,7 +100,7 @@ namespace banggame {
         if (m_playing) {
             ADD_TO_RET(switch_turn, m_playing->id);
         }
-        if (!m_requests.empty()) {
+        if (pending_requests()) {
             ADD_TO_RET(request_status, make_request_update(owner));
         }
         for (const auto &[target, str] : m_saved_log) {
@@ -392,7 +392,7 @@ namespace banggame {
     }
 
     void game::send_request_update() {
-        if (m_requests.empty()) {
+        if (!pending_requests()) {
             add_update<game_update_type::status_clear>();
         } else {
             auto spectator_target = update_target::excludes_public();

@@ -32,7 +32,7 @@ namespace banggame {
         target->m_game->add_event<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (origin == target) {
                 if (target->m_num_cards_to_draw > 1) {
-                    target->m_game->pop_request_noupdate<request_draw>();
+                    target->m_game->pop_request();
                     for (int i=0; i<target->m_num_cards_to_draw; ++i) {
                         target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
                     }
@@ -49,7 +49,7 @@ namespace banggame {
         target->add_to_hand(target_card);
         target->m_game->call_event<event_type::on_card_drawn>(target, target_card);
         if (target->m_game->m_selection.size() == 1) {
-            target->m_game->pop_request<request_dutch_will>();
+            target->m_game->pop_request_update();
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_game->m_selection.front());
             target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
             target->add_gold(1);

@@ -19,7 +19,7 @@ namespace banggame {
         target_card->on_enable(target);
 
         target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, show_card_flags::hidden);
-        target->m_game->pop_request<request_characterchoice>();
+        target->m_game->pop_request_update();
     }
 
     game_formatted_string request_characterchoice::status_text(player *owner) const {
@@ -63,7 +63,7 @@ namespace banggame {
     }
     
     void request_predraw::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request_noupdate<request_predraw>();
+        target->m_game->pop_request();
         target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
         target->m_game->queue_action([target = target, target_card]{
             target->next_predraw_check(target_card);
@@ -80,7 +80,7 @@ namespace banggame {
     }
 
     void request_check::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request_noupdate<request_check>();
+        target->m_game->pop_request();
         target->m_game->m_current_check.select(target_card);
         target->m_game->update_request();
     }
@@ -100,9 +100,9 @@ namespace banggame {
             target->add_to_hand(target_card);
             target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", next, target->m_game->m_selection.front(), origin_card);
             next->add_to_hand(target->m_game->m_selection.front());
-            target->m_game->pop_request<request_generalstore>();
+            target->m_game->pop_request_update();
         } else {
-            target->m_game->pop_request_noupdate<request_generalstore>();
+            target->m_game->pop_request();
             target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
             target->add_to_hand(target_card);
             target->m_game->queue_request<request_generalstore>(origin_card, origin, next);
@@ -127,7 +127,7 @@ namespace banggame {
         target->m_game->call_event<event_type::on_effect_end>(target, origin_card);
         
         if (--ncards == 0) {
-            target->m_game->pop_request<request_discard>();
+            target->m_game->pop_request_update();
         }
     }
 
@@ -156,7 +156,7 @@ namespace banggame {
             if (target->m_game->has_expansion(card_expansion_type::armedanddangerous)) {
                 target->queue_request_add_cube(nullptr, ndiscarded);
             }
-            target->m_game->pop_request<request_discard_pass>();
+            target->m_game->pop_request_update();
             target->m_game->queue_action([target = target]{ target->pass_turn(); });
         } else {
             target->m_game->update_request();
@@ -186,11 +186,11 @@ namespace banggame {
         target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
         target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
         target->discard_card(target_card);
-        target->m_game->pop_request<request_indians>();
+        target->m_game->pop_request_update();
     }
 
     void request_indians::on_resolve() {
-        target->m_game->pop_request_noupdate<request_indians>();
+        target->m_game->pop_request();
         target->damage(origin_card, origin, 1);
         target->m_game->update_request();
     }
@@ -211,12 +211,12 @@ namespace banggame {
         target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
         target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
         target->discard_card(target_card);
-        target->m_game->pop_request_noupdate<request_duel>();
+        target->m_game->pop_request();
         target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target);
     }
 
     void request_duel::on_resolve() {
-        target->m_game->pop_request_noupdate<request_duel>();
+        target->m_game->pop_request();
         target->damage(origin_card, origin, 1);
         target->m_game->update_request();
     }
@@ -230,7 +230,7 @@ namespace banggame {
     }
 
     void missable_request::on_miss() {
-        target->m_game->pop_request<missable_request>();
+        target->m_game->pop_request_update();
     }
         
     bool missable_request::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
@@ -250,14 +250,14 @@ namespace banggame {
     void request_bang::on_miss() {
         if (--bang_strength == 0) {
             target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, is_bang_card);
-            target->m_game->pop_request<request_bang>();
+            target->m_game->pop_request_update();
         } else {
             target->m_game->update_request();
         }
     }
 
     void request_bang::on_resolve() {
-        target->m_game->pop_request_noupdate<request_bang>();
+        target->m_game->pop_request();
         resolve_unavoidable();
     }
      
@@ -291,7 +291,7 @@ namespace banggame {
     }
 
     void request_death::on_resolve() {
-        target->m_game->pop_request_noupdate<request_death>();
+        target->m_game->pop_request();
         target->m_game->call_event<event_type::on_player_death_resolve>(target, tried_save);
         target->m_game->queue_action_front([origin=origin, target=target]{
             if (target->m_hp <= 0) {

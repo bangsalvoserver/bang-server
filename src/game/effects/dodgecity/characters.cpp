@@ -27,7 +27,7 @@ namespace banggame {
     void effect_claus_the_saint::on_enable(card *target_card, player *target) {
         target->m_game->add_event<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (origin == target) {
-                target->m_game->pop_request_noupdate<request_draw>();
+                target->m_game->pop_request();
                 int ncards = target->m_game->num_alive() + target->m_num_cards_to_draw - 1;
                 for (int i=0; i<ncards; ++i) {
                     target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
@@ -61,7 +61,7 @@ namespace banggame {
             target->m_game->add_log(update_target::includes(target, next_target), "LOG_GIFTED_CARD", target, next_target, last_card);
             target->m_game->add_log(update_target::excludes(target, next_target), "LOG_GIFTED_A_CARD", target, last_card);
             next_target->add_to_hand(last_card);
-            target->m_game->pop_request<request_claus_the_saint>();
+            target->m_game->pop_request_update();
         } else {
             target->m_game->update_request();
         }
@@ -198,7 +198,7 @@ namespace banggame {
     }
 
     void request_vera_custer::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request<request_vera_custer>();
+        target->m_game->pop_request_update();
         effect_vera_custer::copy_characters(target, target_player);
     }
 

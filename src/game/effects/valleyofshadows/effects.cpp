@@ -18,7 +18,7 @@ namespace banggame {
     }
     
     opt_error effect_backfire::verify(card *origin_card, player *origin) {
-        if (origin->m_game->m_requests.empty() || !origin->m_game->top_request().origin()) {
+        if (!origin->m_game->pending_requests() || !origin->m_game->top_request().origin()) {
             return game_error("ERROR_CANT_PLAY_CARD", origin_card);
         }
         return std::nullopt;
@@ -99,17 +99,17 @@ namespace banggame {
             }
         });
         if (0 == --req.damage) {
-            origin->m_game->pop_request<timer_damaging>();
+            origin->m_game->pop_request_update();
         }
     }
 
     bool effect_escape::can_respond(card *origin_card, player *origin) {
-        return !origin->m_game->m_requests.empty() && origin->m_game->top_request().target() == origin
+        return origin->m_game->pending_requests() && origin->m_game->top_request().target() == origin
             && bool(origin->m_game->top_request().flags() & effect_flags::escapable);
     }
 
     void effect_escape::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request();
+        origin->m_game->pop_request_update();
     }
 
     opt_error handler_fanning::verify(card *origin_card, player *origin, player *player1, player *player2) {

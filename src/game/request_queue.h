@@ -9,9 +9,19 @@
 namespace banggame {
 
     template<typename Derived>
-    struct request_queue {
+    class request_queue {
+    private:
         std::deque<request_holder> m_requests;
         std::deque<std::function<void()>> m_delayed_actions;
+
+    public:
+        size_t pending_requests() const {
+            return m_requests.size();
+        }
+
+        size_t pending_actions() const {
+            return m_delayed_actions.size();
+        }
 
         request_holder &top_request() {
             return m_requests.front();
@@ -19,7 +29,7 @@ namespace banggame {
 
         template<typename T = request_base>
         T *top_request_if(player *target = nullptr) {
-            if (m_requests.empty()) return nullptr;
+            if (!pending_requests()) return nullptr;
             request_holder &req = top_request();
             return !target || req.target() == target ? req.get_if<T>() : nullptr;
         }
@@ -31,7 +41,7 @@ namespace banggame {
         
         void update_request() {
             static_cast<Derived &>(*this).send_request_update();
-            while (m_requests.empty() && !m_delayed_actions.empty()) {
+            while (!pending_requests() && pending_actions()) {
                 auto fun = std::move(m_delayed_actions.front());
                 m_delayed_actions.pop_front();
                 std::invoke(fun);
@@ -60,20 +70,13 @@ namespace banggame {
             queue_request(std::make_shared<T>(FWD(args) ... ));
         }
 
-        template<typename T = request_base>
-        bool pop_request_noupdate() {
-            if (!top_request_is<T>()) return false;
+        void pop_request() {
             m_requests.pop_front();
-            return true;
         }
 
-        template<typename T = request_base>
-        bool pop_request() {
-            if (pop_request_noupdate<T>()) {
-                update_request();
-                return true;
-            }
-            return false;
+        void pop_request_update() {
+            pop_request();
+            update_request();
         }
 
         template<std::invocable Function>
@@ -84,14 +87,14 @@ namespace banggame {
         }
 
         void tick() {
-            if (!m_requests.empty()) {
+            if (pending_requests()) {
                 top_request().tick();
             }
         }
 
         template<std::invocable Function>
         void queue_action(Function &&fun) {
-            if (m_requests.empty() && m_delayed_actions.empty()) {
+            if (!pending_requests() && !pending_actions()) {
                 std::invoke(std::forward<Function>(fun));
             } else {
                 m_delayed_actions.push_back(std::forward<Function>(fun));
@@ -100,7 +103,7 @@ namespace banggame {
 
         template<std::invocable Function>
         void queue_action_front(Function &&fun) {
-            if (m_requests.empty() && m_delayed_actions.empty()) {
+            if (!pending_requests() && !pending_actions()) {
                 std::invoke(std::forward<Function>(fun));
             } else {
                 m_delayed_actions.push_front(std::forward<Function>(fun));

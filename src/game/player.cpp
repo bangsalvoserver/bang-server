@@ -277,7 +277,7 @@ namespace banggame {
             throw game_error("ERROR_INVALID_ACTION");
         }
         
-        if (m_game->m_requests.empty()) {
+        if (!m_game->pending_requests()) {
             throw game_error("ERROR_INVALID_ACTION");
         }
 
@@ -342,7 +342,7 @@ namespace banggame {
             throw game_error("ERROR_INVALID_ACTION");
         }
 
-        if (!m_game->m_requests.empty() || m_game->m_playing != this) {
+        if (m_game->pending_requests() || m_game->m_playing != this) {
             throw game_error("ERROR_INVALID_ACTION");
         }
 
@@ -414,7 +414,8 @@ namespace banggame {
     void player::draw_from_deck() {
         int save_numcards = m_num_cards_to_draw;
         m_game->call_event<event_type::on_draw_from_deck>(this);
-        if (m_game->pop_request<request_draw>()) {
+        if (m_game->top_request_is<request_draw>()) {
+            m_game->pop_request_update();
             m_game->add_log("LOG_DRAWN_FROM_DECK", this);
             while (m_num_drawn_cards<m_num_cards_to_draw) {
                 ++m_num_drawn_cards;
@@ -501,8 +502,9 @@ namespace banggame {
     void player::request_drawing() {
         m_game->call_event<event_type::on_turn_start>(this);
         m_game->queue_action([this]{
-            m_game->call_event<event_type::on_request_draw>(this);
-            if (m_game->m_requests.empty()) {
+            if (!m_game->num_queued_requests([&]{
+                m_game->call_event<event_type::on_request_draw>(this);
+            })) {
                 m_game->queue_request<request_draw>(this);
             }
         });

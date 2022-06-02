@@ -34,7 +34,7 @@ namespace banggame {
     void request_thedaltons::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_card(target_card);
-        target->m_game->pop_request<request_thedaltons>();
+        target->m_game->pop_request_update();
     }
 
     game_formatted_string request_thedaltons::status_text(player *owner) const {
@@ -203,7 +203,7 @@ namespace banggame {
         while (!target->m_game->m_selection.empty()) {
             target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, show_card_flags::instant);
         }
-        target->m_game->pop_request<request_handcuffs>();
+        target->m_game->pop_request_update();
     }
 
     game_formatted_string request_handcuffs::status_text(player *owner) const {
@@ -251,7 +251,7 @@ namespace banggame {
         } else {
             target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::player_backup, target, show_card_flags::hidden);
         }
-        target->m_game->pop_request<request_newidentity>();
+        target->m_game->pop_request_update();
     }
 
     game_formatted_string request_newidentity::status_text(player *owner) const {

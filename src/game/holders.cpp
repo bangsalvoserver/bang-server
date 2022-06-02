@@ -213,7 +213,7 @@ namespace banggame {
     }
 
     void timer_request::on_finished() {
-        target->m_game->pop_request<timer_request>();
+        target->m_game->pop_request_update();
     }
 
 }

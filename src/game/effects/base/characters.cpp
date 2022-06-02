@@ -46,7 +46,7 @@ namespace banggame {
     void effect_kit_carlson::on_enable(card *target_card, player *target) {
         target->m_game->add_event<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (target == origin && target->m_num_cards_to_draw < 3) {
-                target->m_game->pop_request_noupdate<request_draw>();
+                target->m_game->pop_request();
                 for (int i=0; i<3; ++i) {
                     target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
                 }
@@ -65,7 +65,7 @@ namespace banggame {
             while (!target->m_game->m_selection.empty()) {
                 target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, show_card_flags::hidden);
             }
-            target->m_game->pop_request<request_kit_carlson>();
+            target->m_game->pop_request_update();
         }
     }
 

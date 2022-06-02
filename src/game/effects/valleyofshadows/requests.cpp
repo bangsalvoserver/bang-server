@@ -8,7 +8,7 @@
 namespace banggame {
 
     void timer_damaging::on_finished() {
-        target->m_game->pop_request_noupdate<timer_damaging>();
+        target->m_game->pop_request();
         target->damage(origin_card, origin, damage, is_bang, true);
         target->m_game->update_request();
     }
@@ -19,7 +19,7 @@ namespace banggame {
 
     void request_destroy::on_finished() {
         effect_destroy::resolver{origin_card, origin, target_card}.resolve();
-        target->m_game->pop_request<request_destroy>();
+        target->m_game->pop_request_update();
     }
 
     game_formatted_string request_destroy::status_text(player *owner) const {
@@ -40,7 +40,7 @@ namespace banggame {
 
     void request_steal::on_finished() {
         effect_steal::resolver{origin_card, origin, target_card}.resolve();
-        target->m_game->pop_request<request_steal>();
+        target->m_game->pop_request_update();
     }
 
     game_formatted_string request_steal::status_text(player *owner) const {
@@ -75,12 +75,12 @@ namespace banggame {
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_card(target_card);
         if (--num_cards == 0 || target->m_hand.empty()) {
-            target->m_game->pop_request<request_bandidos>();
+            target->m_game->pop_request_update();
         }
     }
 
     void request_bandidos::on_resolve() {
-        target->m_game->pop_request_noupdate<request_bandidos>();
+        target->m_game->pop_request();
         target->damage(origin_card, origin, 1);
         target->m_game->update_request();
     }
@@ -101,7 +101,7 @@ namespace banggame {
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_card(target_card);
         target->draw_card(2, origin_card);
-        target->m_game->pop_request<request_tornado>();
+        target->m_game->pop_request_update();
     }
 
     game_formatted_string request_tornado::status_text(player *owner) const {
@@ -119,7 +119,7 @@ namespace banggame {
     void request_poker::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->m_game->add_log("LOG_DISCARDED_A_CARD_FOR", origin_card, target);
         target->m_game->move_card(target_card, pocket_type::selection, origin);
-        target->m_game->pop_request<request_poker>();
+        target->m_game->pop_request_update();
     }
 
     game_formatted_string request_poker::status_text(player *owner) const {
@@ -137,7 +137,7 @@ namespace banggame {
             for (auto *c : target->m_game->m_selection) {
                 target->m_game->move_card(c, pocket_type::discard_pile);
             }
-            target->m_game->pop_request<request_poker_draw>();
+            target->m_game->pop_request_update();
         }
     }
 
@@ -158,7 +158,7 @@ namespace banggame {
         switch (pocket) {
         case pocket_type::main_deck:
             target->draw_card(2, origin_card);
-            target->m_game->pop_request<request_saved>();
+            target->m_game->pop_request_update();
             break;
         case pocket_type::player_hand:
             for (int i=0; i<2 && !saved->m_hand.empty(); ++i) {
@@ -167,7 +167,7 @@ namespace banggame {
                 target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
                 target->steal_card(stolen_card);
             }
-            target->m_game->pop_request<request_saved>();
+            target->m_game->pop_request_update();
             break;
         }
     }

@@ -193,13 +193,13 @@ namespace banggame {
     }
 
     void effect_tumbleweed::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request_noupdate<timer_tumbleweed>();
+        origin->m_game->pop_request();
         origin->m_game->m_current_check.restart();
         origin->m_game->update_request();
     }
 
     void timer_tumbleweed::on_finished() {
-        target->m_game->pop_request_noupdate<timer_tumbleweed>();
+        target->m_game->pop_request();
         origin->m_game->m_current_check.resolve(drawn_card);
         target->m_game->update_request();
     }
@@ -233,6 +233,6 @@ namespace banggame {
             origin_card->on_equip(target);
             target->equip_card(origin_card);
         }
-        origin->m_game->pop_request<request_move_bomb>();
+        origin->m_game->pop_request_update();
     }
 }

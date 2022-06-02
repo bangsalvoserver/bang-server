@@ -102,7 +102,7 @@ namespace banggame {
             while (!target->m_game->m_selection.empty()) {
                 target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, show_card_flags::instant);
             }
-            target->m_game->pop_request<request_peyote>();
+            target->m_game->pop_request_update();
             target->m_game->call_event<event_type::post_draw_cards>(target);
         }
     }
@@ -121,7 +121,7 @@ namespace banggame {
 
     void request_ricochet::on_finished() {
         effect_destroy::resolver{origin_card, origin, target_card}.resolve();
-        origin->m_game->pop_request<request_ricochet>();
+        origin->m_game->pop_request_update();
     }
 
     game_formatted_string request_ricochet::status_text(player *owner) const {
