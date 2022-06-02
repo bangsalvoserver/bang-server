@@ -210,39 +210,43 @@ namespace banggame {
         if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
             origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
         } else {
-            on_resolve(origin_card, origin, target_card);
+            resolver{origin_card, origin, target_card}.resolve();
         }
     }
 
-    void effect_steal::on_resolve(card *origin_card, player *origin, card *target_card) {
-        auto fun = [=]{
-            if (origin->alive()) {
-                auto priv_target = update_target::includes(origin, target_card->owner);
-                auto inv_target = update_target::excludes(origin, target_card->owner);
-                if (origin != target_card->owner) {
-                    origin->m_game->add_log(priv_target, "LOG_STOLEN_CARD", origin, target_card->owner, target_card);
-                    if (target_card->pocket == pocket_type::player_hand) {
-                        origin->m_game->add_log(inv_target, "LOG_STOLEN_CARD_FROM_HAND", origin, target_card->owner);
-                    } else {
-                        origin->m_game->add_log(inv_target, "LOG_STOLEN_CARD", origin, target_card->owner, target_card);
-                    }
-                } else {
-                    origin->m_game->add_log(priv_target, "LOG_STOLEN_SELF_CARD", origin, target_card);
-                    if (target_card->pocket == pocket_type::player_hand) {
-                        origin->m_game->add_log(inv_target, "LOG_STOLEN_SELF_CARD_FROM_HAND", origin);
-                    } else {
-                        origin->m_game->add_log(inv_target, "LOG_STOLEN_SELF_CARD", origin, target_card);
-                    }
-                }
-                origin->steal_card(target_card);
-            }
-        };
+    void effect_steal::resolver::resolve() const {
         if (origin->m_game->num_queued_requests([&]{
             origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
         })) {
-            origin->m_game->queue_action_front(std::move(fun));
+            origin->m_game->queue_action_front([*this]{ finalize(); });
         } else {
-            fun();
+            finalize();
+        }
+    }
+
+    void effect_steal::resolver::finalize() const {
+        if (origin->alive()) {
+            auto priv_target = update_target::includes(origin, target_card->owner);
+            auto inv_target = update_target::excludes(origin, target_card->owner);
+            if (origin != target_card->owner) {
+                origin->m_game->add_log(priv_target, "LOG_STOLEN_CARD", origin, target_card->owner, target_card);
+                if (target_card->pocket == pocket_type::player_hand) {
+                    origin->m_game->add_log(inv_target, "LOG_STOLEN_CARD_FROM_HAND", origin, target_card->owner);
+                } else {
+                    origin->m_game->add_log(inv_target, "LOG_STOLEN_CARD", origin, target_card->owner, target_card);
+                }
+            } else {
+                origin->m_game->add_log(priv_target, "LOG_STOLEN_SELF_CARD", origin, target_card);
+                if (target_card->pocket == pocket_type::player_hand) {
+                    origin->m_game->add_log(inv_target, "LOG_STOLEN_SELF_CARD_FROM_HAND", origin);
+                } else {
+                    origin->m_game->add_log(inv_target, "LOG_STOLEN_SELF_CARD", origin, target_card);
+                }
+            }
+            origin->steal_card(target_card);
+        } else {
+            origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
+            target_card->owner->discard_card(target_card);
         }
     }
 
@@ -250,28 +254,27 @@ namespace banggame {
         if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
             origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
         } else {
-            on_resolve(origin_card, origin, target_card);
+            resolver{origin_card, origin, target_card}.resolve();
         }
     }
 
-    void effect_discard::on_resolve(card *origin_card, player *origin, card *target_card) {
-        auto fun = [=]{
-            if (origin->alive()) {
-                if (origin != target_card->owner) {
-                    origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
-                } else {
-                    origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", origin, target_card);
-                }
-                target_card->owner->discard_card(target_card);
-            }
-        };
+    void effect_discard::resolver::resolve() const {
         if (origin->m_game->num_queued_requests([&]{
             origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
         })) {
-            origin->m_game->queue_action_front(std::move(fun));
+            origin->m_game->queue_action_front([*this]{ finalize(); });
         } else {
-            fun();
+            finalize();
         }
+    }
+
+    void effect_discard::resolver::finalize() const {
+        if (origin->alive() && origin != target_card->owner) {
+            origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
+        } else {
+            origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
+        }
+        target_card->owner->discard_card(target_card);
     }
 
     bool effect_while_drawing::can_respond(card *origin_card, player *origin) {

@@ -110,12 +110,28 @@ namespace banggame {
 
     struct effect_steal : prompt_target_self_hand {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
-        void on_resolve(card *origin_card, player *origin, card *target);
+
+        struct resolver {
+            card *origin_card;
+            player *origin;
+            card *target_card;
+
+            void resolve() const;
+            void finalize() const;
+        };
     };
 
     struct effect_discard {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
-        void on_resolve(card *origin_card, player *origin, card *target);
+        
+        struct resolver {
+            card *origin_card;
+            player *origin;
+            card *target_card;
+
+            void resolve() const;
+            void finalize() const;
+        };
     };
 
     struct effect_destroy : effect_discard, prompt_target_self_hand {};

@@ -18,7 +18,7 @@ namespace banggame {
     }
 
     void request_destroy::on_finished() {
-        effect_destroy{}.on_resolve(origin_card, origin, target_card);
+        effect_destroy::resolver{origin_card, origin, target_card}.resolve();
         target->m_game->pop_request<request_destroy>();
     }
 
@@ -39,7 +39,7 @@ namespace banggame {
     }
 
     void request_steal::on_finished() {
-        effect_steal{}.on_resolve(origin_card, origin, target_card);
+        effect_steal::resolver{origin_card, origin, target_card}.resolve();
         target->m_game->pop_request<request_steal>();
     }
 
