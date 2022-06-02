@@ -44,11 +44,7 @@ namespace banggame {
 
     void request_claus_the_saint::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         if (target->m_num_drawn_cards < target->m_num_cards_to_draw) {
-            ++target->m_num_drawn_cards;
-            target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, target_card);
-            target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_A_CARD", target);
-            target->add_to_hand(target_card);
-            target->m_game->call_event<event_type::on_card_drawn>(target, target_card);
+            target->add_to_hand_phase_one(target_card);
         } else {
             player *next_target = get_next_target();
             target->m_game->add_log(update_target::includes(target, next_target), "LOG_GIFTED_CARD", target, next_target, target_card);

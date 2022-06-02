@@ -321,12 +321,8 @@ namespace banggame {
     void effect_draw_one_less::on_play(card *origin_card, player *target) {
         target->m_game->queue_action([=]{
             ++target->m_num_drawn_cards;
-            while (target->m_num_drawn_cards++ < target->m_num_cards_to_draw) {
-                card *drawn_card = target->m_game->phase_one_drawn_card();
-                target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_A_CARD", target);
-                target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, drawn_card);
-                target->m_game->move_card(drawn_card, pocket_type::player_hand, target);
-                target->m_game->call_event<event_type::on_card_drawn>(target, drawn_card);
+            while (target->m_num_drawn_cards < target->m_num_cards_to_draw) {
+                target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
             }
         });
     }

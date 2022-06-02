@@ -88,7 +88,7 @@ namespace banggame {
         EVENT(on_draw_from_deck, player *origin)
 
         // viene chiamato quando si pesca una carta in fase di pesca
-        EVENT(on_card_drawn, player *origin, card *target_card)
+        EVENT(on_card_drawn, player *origin, card *target_card, bool &reveal)
 
         // viene chiamato dopo che un giocatore finisce la fase di pesca
         EVENT(post_draw_cards, player *origin)

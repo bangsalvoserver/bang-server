@@ -23,20 +23,18 @@ namespace banggame {
     }
 
     void effect_black_jack::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_card_drawn>(target_card, [target](player *origin, card *drawn_card) {
+        target->m_game->add_event<event_type::on_card_drawn>(target_card, [target, target_card](player *origin, card *drawn_card, bool &reveal) {
             if (origin == target && origin->m_num_drawn_cards == 2) {
+                reveal = true;
+
                 card_suit suit = target->get_card_sign(drawn_card).suit;
-                target->m_game->add_log(update_target::excludes(target), "LOG_REVEALED_CARD", target, drawn_card);
-                target->m_game->send_card_update(drawn_card, nullptr, show_card_flags::short_pause);
-                target->m_game->send_card_update(drawn_card, target);
                 if (suit == card_suit::hearts || suit == card_suit::diamonds) {
-                    origin->m_game->queue_action([=]{
-                        ++origin->m_num_drawn_cards;
-                        card *drawn_card = origin->m_game->phase_one_drawn_card();
-                        target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_A_CARD", target);
-                        target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, drawn_card);
-                        origin->m_game->move_card(drawn_card, pocket_type::player_hand, origin);
-                        origin->m_game->call_event<event_type::on_card_drawn>(target, drawn_card);
+                    event_card_key key{target_card, 1};
+                    origin->m_game->add_event<event_type::post_draw_cards>(key, [=](player *p) {
+                        if (p == origin) {
+                            origin->add_to_hand_phase_one(origin->m_game->phase_one_drawn_card());
+                            origin->m_game->remove_events(key);
+                        }
                     });
                 }
             }
@@ -56,11 +54,7 @@ namespace banggame {
     }
 
     void request_kit_carlson::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        ++target->m_num_drawn_cards;
-        target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_A_CARD", target);
-        target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, target_card);
-        target->add_to_hand(target_card);
-        target->m_game->call_event<event_type::on_card_drawn>(target, target_card);
+        target->add_to_hand_phase_one(target_card);
         if (target->m_num_drawn_cards >= target->m_num_cards_to_draw) {
             while (!target->m_game->m_selection.empty()) {
                 target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, show_card_flags::hidden);

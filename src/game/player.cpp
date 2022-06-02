@@ -226,6 +226,22 @@ namespace banggame {
         m_game->move_card(target, pocket_type::player_hand, this);
     }
 
+    void player::add_to_hand_phase_one(card *drawn_card) {
+        ++m_num_drawn_cards;
+        
+        bool reveal = false;
+        m_game->call_event<event_type::on_card_drawn>(this, drawn_card, reveal);
+        if (reveal) {
+            m_game->add_log("LOG_DRAWN_CARD", this, drawn_card);
+            m_game->move_card(drawn_card, pocket_type::player_hand, this, show_card_flags::shown | show_card_flags::short_pause);
+            m_game->send_card_update(drawn_card, this);
+        } else {
+            m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);
+            m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);
+            m_game->move_card(drawn_card, pocket_type::player_hand, this);
+        }
+    }
+
     void player::draw_card(int ncards, card *origin_card) {
         if (ncards == 1) {
             if (origin_card) {
@@ -416,14 +432,8 @@ namespace banggame {
         m_game->call_event<event_type::on_draw_from_deck>(this);
         if (m_game->top_request_is<request_draw>()) {
             m_game->pop_request_update();
-            m_game->add_log("LOG_DRAWN_FROM_DECK", this);
-            while (m_num_drawn_cards<m_num_cards_to_draw) {
-                ++m_num_drawn_cards;
-                card *drawn_card = m_game->phase_one_drawn_card();
-                m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);
-                m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);
-                m_game->move_card(drawn_card, pocket_type::player_hand, this);
-                m_game->call_event<event_type::on_card_drawn>(this, drawn_card);
+            while (m_num_drawn_cards < m_num_cards_to_draw) {
+                add_to_hand_phase_one(m_game->phase_one_drawn_card());
             }
         }
         m_num_cards_to_draw = save_numcards;

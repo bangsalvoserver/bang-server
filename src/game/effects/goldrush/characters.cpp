@@ -43,11 +43,7 @@ namespace banggame {
     }
 
     void request_dutch_will::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        ++target->m_num_drawn_cards;
-        target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, target_card);
-        target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_A_CARD", target);
-        target->add_to_hand(target_card);
-        target->m_game->call_event<event_type::on_card_drawn>(target, target_card);
+        target->add_to_hand_phase_one(target_card);
         if (target->m_game->m_selection.size() == 1) {
             target->m_game->pop_request_update();
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_game->m_selection.front());
