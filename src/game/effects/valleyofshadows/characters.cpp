@@ -57,9 +57,16 @@ namespace banggame {
         origin->m_game->pop_request<timer_lemonade_jim>();
     }
 
+    struct verify_target_unique {
+        card *origin_card;
+        player *origin;
+        player *target;
+        bool &valid;
+    };
+
     opt_error effect_evelyn_shebang::verify(card *origin_card, player *origin, player *target) {
         bool valid = true;
-        origin->m_game->call_event<event_type::verify_target_unique>(origin_card, origin, target, valid);
+        origin->m_game->call_custom_event<verify_target_unique>(origin_card, origin, target, valid);
         if (!valid) {
             return game_error("ERROR_TARGET_NOT_UNIQUE");
         }
@@ -67,9 +74,9 @@ namespace banggame {
     }
 
     void effect_evelyn_shebang::on_play(card *origin_card, player *origin, player *target) {
-        origin->m_game->add_event<event_type::verify_target_unique>(origin_card, [=](card *e_origin_card, player *e_origin, player *e_target, bool &value) {
-            if (e_origin_card == origin_card && e_origin == origin && e_target == target) {
-                value = false;
+        origin->m_game->add_custom_event<verify_target_unique>(origin_card, [=](const verify_target_unique &args) {
+            if (args.origin_card == origin_card && args.origin == origin && args.target == target) {
+                args.valid = false;
             }
         });
 

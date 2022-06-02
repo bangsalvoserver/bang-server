@@ -2,6 +2,7 @@
 #define __EVENTS_H__
 
 #include <map>
+#include <any>
 #include <functional>
 #include <cassert>
 #include <span>
@@ -18,6 +19,8 @@ namespace banggame {
     #define EVENT(name, ...) (name, std::function<void(__VA_ARGS__)>)
     
     DEFINE_ENUM_TYPES(event_type,
+        EVENT(custom_event, const std::any &args)
+
         EVENT(apply_sign_modifier,              player *origin, card_sign &value)
         EVENT(apply_beer_modifier,              player *origin, int &value)
         EVENT(apply_maxcards_modifier,          player *origin, int &value)
@@ -27,9 +30,8 @@ namespace banggame {
         EVENT(apply_initial_cards_modifier,     player *origin, int &value)
         EVENT(apply_bang_modifier,              player *origin, request_bang *req)
 
-        EVENT(verify_target_unique,             card *origin_card, player *origin, player *target, bool &value)
-
-        EVENT(verify_revivers,                  player *origin)
+        // viene chiamato quando si sta cercando il prossimo giocatore di turno
+        EVENT(verify_revivers, player *origin)
         
         // viene chiamato quando scarti una carta a fine turno
         EVENT(on_discard_pass, player *origin, card *target_card)
@@ -154,6 +156,15 @@ namespace banggame {
             m_event_handlers.add(key, enums::enum_tag<E>, std::forward<Function>(fun));
         }
 
+        template<typename T, std::invocable<T> Function>
+        void add_custom_event(event_card_key key, Function &&fun) {
+            add_event<event_type::custom_event>(key, [fun = std::move(fun)](const std::any &args) {
+                if (auto *evt = std::any_cast<T>(&args)) {
+                    fun(*evt);
+                }
+            });
+        }
+
         void remove_events(auto key) {
             m_event_handlers.erase(key);
         }
@@ -178,6 +189,11 @@ namespace banggame {
             for (auto &[key, fun] : handlers) {
                 std::invoke(*fun, args ...);
             }
+        }
+
+        template<typename T>
+        void call_custom_event(auto && ... args) {
+            call_event<event_type::custom_event>(T{FWD(args) ...});
         }
     };
 
