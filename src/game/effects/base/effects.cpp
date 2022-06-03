@@ -244,9 +244,6 @@ namespace banggame {
                 }
             }
             origin->steal_card(target_card);
-        } else {
-            origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
-            target_card->owner->discard_card(target_card);
         }
     }
 
@@ -269,12 +266,14 @@ namespace banggame {
     }
 
     void effect_discard::resolver::finalize() const {
-        if (origin->alive() && origin != target_card->owner) {
-            origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
-        } else {
-            origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
+        if (origin->alive()) {
+            if (origin != target_card->owner) {
+                origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
+            } else {
+                origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
+            }
+            target_card->owner->discard_card(target_card);
         }
-        target_card->owner->discard_card(target_card);
     }
 
     bool effect_while_drawing::can_respond(card *origin_card, player *origin) {
