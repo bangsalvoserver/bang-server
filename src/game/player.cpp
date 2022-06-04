@@ -231,7 +231,10 @@ namespace banggame {
         
         bool reveal = false;
         m_game->call_event<event_type::on_card_drawn>(this, drawn_card, reveal);
-        if (reveal) {
+        if (drawn_card->pocket == pocket_type::discard_pile) {
+            m_game->add_log("LOG_DRAWN_FROM_DISCARD", this, drawn_card);
+            m_game->move_card(drawn_card, pocket_type::player_hand, this);
+        } else if (reveal) {
             m_game->add_log("LOG_DRAWN_CARD", this, drawn_card);
             m_game->move_card(drawn_card, pocket_type::player_hand, this, show_card_flags::shown | show_card_flags::short_pause);
             m_game->send_card_update(drawn_card, this);

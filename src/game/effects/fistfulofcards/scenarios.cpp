@@ -167,13 +167,15 @@ namespace banggame {
     }
 
     void effect_lawofthewest::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_card_drawn>(target_card, [](player *origin, card *drawn_card, bool &reveal) {
+        target->m_game->add_event<event_type::on_card_drawn>(target_card, [=](player *origin, card *drawn_card, bool &reveal) {
             if (origin->m_num_drawn_cards == 2) {
                 reveal = true;
-                origin->m_game->queue_action([=]{
-                    if (origin->is_possible_to_play(drawn_card)) {
+                event_card_key key{target_card, 1};
+                origin->m_game->add_event<event_type::post_draw_cards>(key, [=](player *p) {
+                    if (p == origin) {
                         origin->m_game->add_log("LOG_MANDATORY_CARD", origin, drawn_card);
                         origin->set_mandatory_card(drawn_card);
+                        origin->m_game->remove_events(key);
                     }
                 });
             }
