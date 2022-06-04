@@ -23,7 +23,8 @@ namespace banggame {
     }
 
     void effect_al_preacher::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request_update();
+        origin->m_game->pop_request();
+        origin->m_game->update_request();
     }
 
     void effect_julie_cutter::on_enable(card *target_card, player *p) {
@@ -109,7 +110,8 @@ namespace banggame {
     }
 
     void effect_ms_abigail::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request_update();
+        origin->m_game->pop_request();
+        origin->m_game->update_request();
     }
 
     void effect_ms_abigail::on_enable(card *origin_card, player *origin) {

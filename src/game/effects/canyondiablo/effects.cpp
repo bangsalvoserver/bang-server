@@ -66,8 +66,9 @@ namespace banggame {
         card *chosen_card;
 
         void on_finished() override {
-            target->m_game->pop_request_update();
+            target->m_game->pop_request();
             handler_card_sharper{}.on_resolve(origin_card, origin, chosen_card, target_card);
+            target->m_game->update_request();
         }
 
         game_formatted_string status_text(player *owner) const override {
@@ -121,6 +122,7 @@ namespace banggame {
                 origin->draw_card(2 + fatal, origin_card);
             }
         });
+        origin->m_game->update_request();
     }
 
     struct request_lastwill : request_base, resolvable_request {
@@ -128,7 +130,8 @@ namespace banggame {
             : request_base(origin_card, nullptr, target) {}
 
         void on_resolve() override {
-            target->m_game->pop_request_update();
+            target->m_game->pop_request();
+            target->m_game->update_request();
         }
         
         game_formatted_string status_text(player *owner) const override {
@@ -155,6 +158,8 @@ namespace banggame {
     void handler_lastwill::on_play(card *origin_card, player *origin, const target_list &targets) {
         player *target = targets[0].get<target_type::player>();
 
+        origin->m_game->pop_request();
+
         for (auto c : targets | std::views::drop(1)) {
             card *chosen_card = c.get<target_type::card>();
             if (chosen_card->pocket == pocket_type::player_hand) {
@@ -166,6 +171,6 @@ namespace banggame {
             target->add_to_hand(chosen_card);
         }
 
-        origin->m_game->pop_request_update();
+        origin->m_game->update_request();
     }
 }

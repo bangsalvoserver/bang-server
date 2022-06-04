@@ -40,7 +40,9 @@ namespace banggame {
         }
         
         void update_request() {
-            static_cast<Derived &>(*this).send_request_update();
+            if (pending_requests()) {
+                static_cast<Derived &>(*this).send_request_update();
+            }
             while (!pending_requests() && pending_actions()) {
                 auto fun = std::move(m_delayed_actions.front());
                 m_delayed_actions.pop_front();
@@ -72,11 +74,7 @@ namespace banggame {
 
         void pop_request() {
             m_requests.pop_front();
-        }
-
-        void pop_request_update() {
-            pop_request();
-            update_request();
+            static_cast<Derived &>(*this).send_request_status_clear();
         }
 
         template<std::invocable Function>

@@ -56,11 +56,12 @@ namespace banggame {
     void request_kit_carlson::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->add_to_hand_phase_one(target_card);
         if (target->m_num_drawn_cards >= target->m_num_cards_to_draw) {
+            target->m_game->pop_request();
             while (!target->m_game->m_selection.empty()) {
                 target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, show_card_flags::hidden);
             }
-            target->m_game->pop_request_update();
         }
+        target->m_game->update_request();
     }
 
     game_formatted_string request_kit_carlson::status_text(player *owner) const {

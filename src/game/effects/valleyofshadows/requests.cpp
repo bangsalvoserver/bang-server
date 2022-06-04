@@ -18,8 +18,9 @@ namespace banggame {
     }
 
     void request_destroy::on_finished() {
+        target->m_game->pop_request();
         effect_destroy::resolver{origin_card, origin, target_card}.resolve();
-        target->m_game->pop_request_update();
+        target->m_game->update_request();
     }
 
     game_formatted_string request_destroy::status_text(player *owner) const {
@@ -39,8 +40,9 @@ namespace banggame {
     }
 
     void request_steal::on_finished() {
+        target->m_game->pop_request();
         effect_steal::resolver{origin_card, origin, target_card}.resolve();
-        target->m_game->pop_request_update();
+        target->m_game->update_request();
     }
 
     game_formatted_string request_steal::status_text(player *owner) const {
@@ -72,11 +74,15 @@ namespace banggame {
     }
 
     void request_bandidos::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+        if (--num_cards == 0 || target->m_hand.empty()) {
+            target->m_game->pop_request();
+        } else {
+            using namespace enums::flag_operators;
+            flags &= ~effect_flags::escapable;
+        }
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_card(target_card);
-        if (--num_cards == 0 || target->m_hand.empty()) {
-            target->m_game->pop_request_update();
-        }
+        target->m_game->update_request();
     }
 
     void request_bandidos::on_resolve() {
@@ -98,10 +104,11 @@ namespace banggame {
     }
 
     void request_tornado::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+        target->m_game->pop_request();
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_card(target_card);
         target->draw_card(2, origin_card);
-        target->m_game->pop_request_update();
+        target->m_game->update_request();
     }
 
     game_formatted_string request_tornado::status_text(player *owner) const {
@@ -117,9 +124,10 @@ namespace banggame {
     }
 
     void request_poker::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+        target->m_game->pop_request();
         target->m_game->add_log("LOG_DISCARDED_A_CARD_FOR", origin_card, target);
         target->m_game->move_card(target_card, pocket_type::selection, origin);
-        target->m_game->pop_request_update();
+        target->m_game->update_request();
     }
 
     game_formatted_string request_poker::status_text(player *owner) const {
@@ -134,11 +142,12 @@ namespace banggame {
         target->m_game->add_log("LOG_DRAWN_CARD", target, target_card);
         target->add_to_hand(target_card);
         if (--num_cards == 0 || target->m_game->m_selection.size() == 0) {
+            target->m_game->pop_request();
             for (auto *c : target->m_game->m_selection) {
                 target->m_game->move_card(c, pocket_type::discard_pile);
             }
-            target->m_game->pop_request_update();
         }
+        target->m_game->update_request();
     }
 
     game_formatted_string request_poker_draw::status_text(player *owner) const {
@@ -155,21 +164,18 @@ namespace banggame {
     }
 
     void request_saved::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        switch (pocket) {
-        case pocket_type::main_deck:
-            target->draw_card(2, origin_card);
-            target->m_game->pop_request_update();
-            break;
-        case pocket_type::player_hand:
+        target->m_game->pop_request();
+        if (pocket == pocket_type::player_hand) {
             for (int i=0; i<2 && !saved->m_hand.empty(); ++i) {
                 card *stolen_card = saved->random_hand_card();
                 target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
                 target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
                 target->steal_card(stolen_card);
             }
-            target->m_game->pop_request_update();
-            break;
+        } else {
+            target->draw_card(2, origin_card);
         }
+        target->m_game->update_request();
     }
 
     game_formatted_string request_saved::status_text(player *owner) const {

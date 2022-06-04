@@ -96,14 +96,15 @@ namespace banggame {
         {
             target->draw_card();
         } else {
+            target->m_game->pop_request();
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_game->m_deck.back());
             target->m_game->draw_card_to(pocket_type::discard_pile);
 
             while (!target->m_game->m_selection.empty()) {
                 target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, show_card_flags::instant);
             }
-            target->m_game->pop_request_update();
             target->m_game->call_event<event_type::post_draw_cards>(target);
+            target->m_game->update_request();
         }
     }
 
@@ -120,8 +121,9 @@ namespace banggame {
     }
 
     void request_ricochet::on_finished() {
+        origin->m_game->pop_request();
         effect_destroy::resolver{origin_card, origin, target_card}.resolve();
-        origin->m_game->pop_request_update();
+        origin->m_game->update_request();
     }
 
     game_formatted_string request_ricochet::status_text(player *owner) const {

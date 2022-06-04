@@ -32,9 +32,10 @@ namespace banggame {
     }
 
     void request_thedaltons::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+        target->m_game->pop_request();
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_card(target_card);
-        target->m_game->pop_request_update();
+        target->m_game->update_request();
     }
 
     game_formatted_string request_thedaltons::status_text(player *owner) const {
@@ -200,10 +201,11 @@ namespace banggame {
             return c->owner == target && c->sign && c->sign.suit != declared_suit;
         });
 
+        target->m_game->pop_request();
         while (!target->m_game->m_selection.empty()) {
             target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, show_card_flags::instant);
         }
-        target->m_game->pop_request_update();
+        target->m_game->update_request();
     }
 
     game_formatted_string request_handcuffs::status_text(player *owner) const {
@@ -227,6 +229,7 @@ namespace banggame {
     }
 
     void request_newidentity::on_pick(pocket_type pocket, player *, card *target_card) {
+        target->m_game->pop_request();
         if (pocket == pocket_type::selection) {
             for (card *c : target->m_characters) {
                 target->disable_equip(c);
@@ -251,7 +254,7 @@ namespace banggame {
         } else {
             target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::player_backup, target, show_card_flags::hidden);
         }
-        target->m_game->pop_request_update();
+        target->m_game->update_request();
     }
 
     game_formatted_string request_newidentity::status_text(player *owner) const {

@@ -99,8 +99,9 @@ namespace banggame {
             }
         });
         if (0 == --req.damage) {
-            origin->m_game->pop_request_update();
+            origin->m_game->pop_request();
         }
+        origin->m_game->update_request();
     }
 
     bool effect_escape::can_respond(card *origin_card, player *origin) {
@@ -109,7 +110,8 @@ namespace banggame {
     }
 
     void effect_escape::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request_update();
+        origin->m_game->pop_request();
+        origin->m_game->update_request();
     }
 
     opt_error handler_fanning::verify(card *origin_card, player *origin, player *player1, player *player2) {

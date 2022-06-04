@@ -193,9 +193,11 @@ namespace banggame {
     }
 
     void effect_deathsave::on_play(card *origin_card, player *origin) {
-        origin->m_game->top_request().get<request_death>().tried_save = true;
         if (origin->m_hp > 0) {
-            origin->m_game->pop_request_update();
+            origin->m_game->pop_request();
+            origin->m_game->update_request();
+        } else {
+            origin->m_game->top_request().get<request_death>().tried_save = true;
         }
     }
 
@@ -282,7 +284,7 @@ namespace banggame {
 
     void effect_end_drawing::on_play(card *origin_card, player *origin) {
         if (origin->m_game->top_request_is<request_draw>()) {
-            origin->m_game->pop_request_update();
+            origin->m_game->pop_request();
             origin->m_game->add_event<event_type::on_effect_end>(origin_card, [=](player *p, card *c) {
                 if (p == origin && c == origin_card) {
                     origin->m_game->queue_action([=]{
@@ -291,6 +293,7 @@ namespace banggame {
                     origin->m_game->remove_events(origin_card);
                 }
             });
+            origin->m_game->update_request();
         }
     }
 

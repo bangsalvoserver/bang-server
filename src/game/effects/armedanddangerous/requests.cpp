@@ -18,12 +18,11 @@ namespace banggame {
         if (pocket == pocket_type::player_character) {
             target_card = target->m_characters.front();
         }
-        target->add_cubes(target_card, 1);
         if (--ncubes == 0) {
-            target->m_game->pop_request_update();
-        } else {
-            target->m_game->update_request();
+            target->m_game->pop_request();
         }
+        target->add_cubes(target_card, 1);
+        target->m_game->update_request();
     }
 
     game_formatted_string request_add_cube::status_text(player *owner) const {

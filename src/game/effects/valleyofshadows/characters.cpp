@@ -54,7 +54,8 @@ namespace banggame {
     }
 
     void effect_lemonade_jim::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request_update();
+        origin->m_game->pop_request();
+        origin->m_game->update_request();
     }
 
     struct verify_target_unique {

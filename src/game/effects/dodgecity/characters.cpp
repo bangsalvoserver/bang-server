@@ -52,15 +52,14 @@ namespace banggame {
             next_target->add_to_hand(target_card);
         }
         if (target->m_game->m_selection.size() == 1) {
+            target->m_game->pop_request();
             player *next_target = get_next_target();
             card *last_card = target->m_game->m_selection.front();
             target->m_game->add_log(update_target::includes(target, next_target), "LOG_GIFTED_CARD", target, next_target, last_card);
             target->m_game->add_log(update_target::excludes(target, next_target), "LOG_GIFTED_A_CARD", target, last_card);
             next_target->add_to_hand(last_card);
-            target->m_game->pop_request_update();
-        } else {
-            target->m_game->update_request();
         }
+        target->m_game->update_request();
     }
 
     game_formatted_string request_claus_the_saint::status_text(player *owner) const {
@@ -194,8 +193,9 @@ namespace banggame {
     }
 
     void request_vera_custer::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request_update();
+        target->m_game->pop_request();
         effect_vera_custer::copy_characters(target, target_player);
+        target->m_game->update_request();
     }
 
     game_formatted_string request_vera_custer::status_text(player *owner) const {

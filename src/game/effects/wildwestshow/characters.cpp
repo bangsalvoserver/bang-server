@@ -82,11 +82,12 @@ namespace banggame {
     }
 
     void request_youl_grinner::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request_update();
+        target->m_game->pop_request();
         target->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", target, origin, target_card);
         target->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", target, origin);
         origin->steal_card(target_card);
         target->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
+        target->m_game->update_request();
     }
 
     game_formatted_string request_youl_grinner::status_text(player *owner) const {
