@@ -115,7 +115,7 @@ namespace banggame {
     }
 
     opt_error handler_fanning::verify(card *origin_card, player *origin, player *player1, player *player2) {
-        if (origin->m_game->calc_distance(player1, player2) > 1 && player1 != player2) {
+        if (player1 == player2 || origin->m_game->calc_distance(player1, player2) > 1) {
             return game_error("ERROR_TARGET_NOT_IN_RANGE");
         }
         return std::nullopt;
