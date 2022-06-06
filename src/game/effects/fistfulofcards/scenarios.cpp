@@ -27,7 +27,7 @@ namespace banggame {
     }
 
     void effect_deadman::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_event<event_type::verify_revivers>(target_card, [=](player *target) {
+        origin->m_game->add_listener<event_type::verify_revivers>(target_card, [=](player *target) {
             if (!target->alive() && target == origin->m_game->m_first_dead) {
                 origin->m_game->add_log("LOG_REVIVE", target, target_card);
 
@@ -61,7 +61,7 @@ namespace banggame {
     }
 
     void effect_peyote::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_request_draw>(target_card, [=](player *p) {
+        target->m_game->add_listener<event_type::on_request_draw>(target_card, [=](player *p) {
             std::vector<card *> target_cards;
             for (card *c : p->m_game->m_hidden_deck) {
                 if (c->has_tag(tag_type::peyote)) {
@@ -141,20 +141,20 @@ namespace banggame {
             target->m_game->queue_request(std::move(req));
         };
         queue_russianroulette_request(target);
-        target->m_game->add_event<event_type::on_missed>(target_card, [=](card *origin_card, player *origin, player *target, bool is_bang) {
+        target->m_game->add_listener<event_type::on_missed>(target_card, [=](card *origin_card, player *origin, player *target, bool is_bang) {
             if (target_card == origin_card) {
                 queue_russianroulette_request(std::next(player_iterator(target)));
             }
         });
-        target->m_game->add_event<event_type::on_hit>(target_card, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
+        target->m_game->add_listener<event_type::on_hit>(target_card, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
             if (target_card == origin_card) {
-                target->m_game->remove_events(target_card);
+                target->m_game->remove_listeners(target_card);
             }
         });
     }
 
     void effect_fistfulofcards::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::pre_turn_start>(target_card, [=](player *p) {
+        target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player *p) {
             p->m_game->add_log("LOG_RECEIVED_N_BANGS_FOR", p, target_card, p->m_hand.size());
             for (int i=0; i<p->m_hand.size(); ++i) {
                 p->m_game->queue_action([=]{
@@ -167,15 +167,15 @@ namespace banggame {
     }
 
     void effect_lawofthewest::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_card_drawn>(target_card, [=](player *origin, card *drawn_card, bool &reveal) {
+        target->m_game->add_listener<event_type::on_card_drawn>(target_card, [=](player *origin, card *drawn_card, bool &reveal) {
             if (origin->m_num_drawn_cards == 2) {
                 reveal = true;
                 event_card_key key{target_card, 1};
-                origin->m_game->add_event<event_type::post_draw_cards>(key, [=](player *p) {
+                origin->m_game->add_listener<event_type::post_draw_cards>(key, [=](player *p) {
                     if (p == origin) {
                         origin->m_game->add_log("LOG_MANDATORY_CARD", origin, drawn_card);
                         origin->set_mandatory_card(drawn_card);
-                        origin->m_game->remove_events(key);
+                        origin->m_game->remove_listeners(key);
                     }
                 });
             }
@@ -183,7 +183,7 @@ namespace banggame {
     }
 
     void effect_vendetta::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::post_turn_end>({target_card, 2}, [target_card](player *target) {
+        p->m_game->add_listener<event_type::post_turn_end>({target_card, 2}, [target_card](player *target) {
             target->m_game->queue_action([target, target_card] {
                 target->m_game->draw_check_then(target, target_card, [target, target_card](card *drawn_card) {
                     if (target->get_card_sign(drawn_card).suit == card_suit::hearts) {

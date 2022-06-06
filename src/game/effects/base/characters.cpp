@@ -15,7 +15,7 @@ namespace banggame {
     }
 
     void effect_slab_the_killer::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::apply_bang_modifier>(target_card, [p](player *target, request_bang *req) {
+        p->m_game->add_listener<event_type::apply_bang_modifier>(target_card, [p](player *target, request_bang *req) {
             if (p == target) {
                 ++req->bang_strength;
             }
@@ -23,17 +23,17 @@ namespace banggame {
     }
 
     void effect_black_jack::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_card_drawn>(target_card, [target, target_card](player *origin, card *drawn_card, bool &reveal) {
+        target->m_game->add_listener<event_type::on_card_drawn>(target_card, [target, target_card](player *origin, card *drawn_card, bool &reveal) {
             if (origin == target && origin->m_num_drawn_cards == 2) {
                 reveal = true;
 
                 card_suit suit = target->get_card_sign(drawn_card).suit;
                 if (suit == card_suit::hearts || suit == card_suit::diamonds) {
                     event_card_key key{target_card, 2};
-                    origin->m_game->add_event<event_type::post_draw_cards>(key, [=](player *p) {
+                    origin->m_game->add_listener<event_type::post_draw_cards>(key, [=](player *p) {
                         if (p == origin) {
                             origin->add_to_hand_phase_one(origin->m_game->phase_one_drawn_card());
-                            origin->m_game->remove_events(key);
+                            origin->m_game->remove_listeners(key);
                         }
                     });
                 }
@@ -42,7 +42,7 @@ namespace banggame {
     }
 
     void effect_kit_carlson::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (target == origin && target->m_num_cards_to_draw < 3) {
                 target->m_game->pop_request();
                 for (int i=0; i<3; ++i) {
@@ -73,7 +73,7 @@ namespace banggame {
     }
 
     void effect_el_gringo::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_hit>({target_card, 2}, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
+        p->m_game->add_listener<event_type::on_hit>({target_card, 2}, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
             if (origin && p == target && p->m_game->m_playing != p) {
                 target->m_game->queue_action([=]{
                     if (target->alive() && !origin->m_hand.empty()) {
@@ -89,7 +89,7 @@ namespace banggame {
     }
 
     void effect_suzy_lafayette::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_event<event_type::on_effect_end>(origin_card, [origin, origin_card](player *, card *) {
+        origin->m_game->add_listener<event_type::on_effect_end>(origin_card, [origin, origin_card](player *, card *) {
             origin->m_game->queue_action([origin, origin_card]{
                 if (origin->alive() && origin->m_hand.empty()) {
                     origin->draw_card(1, origin_card);
@@ -99,7 +99,7 @@ namespace banggame {
     }
 
     void effect_vulture_sam::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_player_death>(target_card, [p](player *origin, player *target) {
+        p->m_game->add_listener<event_type::on_player_death>(target_card, [p](player *origin, player *target) {
             if (p != target) {
                 std::vector<card *> target_cards;
                 for (card *c : target->m_table) {

@@ -6,7 +6,7 @@
 namespace banggame {
 
     void effect_bomb::on_equip(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_discard_orange_card>(target_card, [=](player *e_target, card *e_card) {
+        target->m_game->add_listener<event_type::on_discard_orange_card>(target_card, [=](player *e_target, card *e_card) {
             if (e_target == target && e_card == target_card
                 && !target->m_game->is_disabled(target_card) && !target->immune_to(target_card)) {
                 target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
@@ -14,7 +14,7 @@ namespace banggame {
             }
         });
         
-        target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
+        target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
             if (p == target && e_card == target_card) {
                 target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
                     card_suit suit = target->get_card_sign(drawn_card).suit;
@@ -30,6 +30,6 @@ namespace banggame {
     }
 
     void effect_bomb::on_unequip(card *target_card, player *target) {
-        target->m_game->remove_events(target_card);
+        target->m_game->remove_listeners(target_card);
     }
 }

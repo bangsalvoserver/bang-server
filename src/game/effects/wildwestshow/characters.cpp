@@ -13,7 +13,7 @@ namespace banggame {
                 && c->owner == p
                 && c->has_tag(tag_type::missedcard);
         });
-        p->m_game->add_event<event_type::apply_initial_cards_modifier>(target_card, [=](player *target, int &value) {
+        p->m_game->add_listener<event_type::apply_initial_cards_modifier>(target_card, [=](player *target, int &value) {
             if (p == target) {
                 value = 5;
             }
@@ -22,11 +22,11 @@ namespace banggame {
 
     void effect_big_spencer::on_disable(card *target_card, player *p) {
         p->m_game->remove_disablers(target_card);
-        p->m_game->remove_events(target_card);
+        p->m_game->remove_listeners(target_card);
     }
 
     void effect_gary_looter::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_discard_pass>(target_card, [player_end = p](player *player_begin, card *discarded_card) {
+        p->m_game->add_listener<event_type::on_discard_pass>(target_card, [player_end = p](player *player_begin, card *discarded_card) {
             const auto is_valid_target = [](const player &target) {
                 return target.has_character_tag(tag_type::gary_looter);
             };
@@ -38,7 +38,7 @@ namespace banggame {
     }
 
     void effect_john_pain::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_draw_check>(target_card, [player_end = p](player *player_begin, card *drawn_card) {
+        p->m_game->add_listener<event_type::on_draw_check>(target_card, [player_end = p](player *player_begin, card *drawn_card) {
             const auto is_valid_target = [](const player &target) {
                 return target.alive() && target.has_character_tag(tag_type::john_pain) && target.m_hand.size() < 6;
             };
@@ -53,7 +53,7 @@ namespace banggame {
     }
 
     void effect_teren_kill::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_event<event_type::on_player_death_resolve>(origin_card, [=](player *target, bool tried_save) {
+        origin->m_game->add_listener<event_type::on_player_death_resolve>(origin_card, [=](player *target, bool tried_save) {
             if (origin == target && !tried_save) {
                 origin->m_game->draw_check_then(origin, origin_card, [=](card *drawn_card) {
                     if (origin->get_card_sign(drawn_card).suit != card_suit::spades) {
@@ -66,7 +66,7 @@ namespace banggame {
     }
 
     void effect_youl_grinner::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_turn_start>(target_card, [=](player *origin) {
+        target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player *origin) {
             if (target == origin) {
                 for (player &p : range_other_players(target)) {
                     if (p.m_hand.size() > target->m_hand.size()) {

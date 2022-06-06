@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    struct game : game_table, event_handler_map, request_queue<game> {
+    struct game : game_table, listener_map, request_queue<game> {
         draw_check_handler m_current_check;
 
         player *m_playing = nullptr;

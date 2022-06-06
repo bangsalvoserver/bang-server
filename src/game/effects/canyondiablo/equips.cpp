@@ -7,7 +7,7 @@ namespace banggame {
     using namespace enums::flag_operators;
 
     void effect_packmule::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::apply_maxcards_modifier>(target_card, [p](player *origin, int &value) {
+        p->m_game->add_listener<event_type::apply_maxcards_modifier>(target_card, [p](player *origin, int &value) {
             if (origin == p) {
                 ++value;
             }
@@ -15,13 +15,13 @@ namespace banggame {
     }
 
     void effect_indianguide::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::apply_immunity_modifier>(target_card, [p](card *origin_card, player *origin, bool &value) {
+        p->m_game->add_listener<event_type::apply_immunity_modifier>(target_card, [p](card *origin_card, player *origin, bool &value) {
             value = value || (origin == p && origin_card->has_tag(tag_type::indians));
         });
     }
 
     void effect_taxman::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
+        target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
             if (p == target && e_card == target_card && !target->m_game->check_flags(game_flags::phase_one_override)) {
                 target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
                     auto suit = target->get_card_sign(drawn_card).suit;
@@ -29,10 +29,10 @@ namespace banggame {
                         target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
                         --target->m_num_cards_to_draw;
                         event_card_key key{target_card, 1};
-                        target->m_game->add_event<event_type::post_draw_cards>(key, [=](player *origin) {
+                        target->m_game->add_listener<event_type::post_draw_cards>(key, [=](player *origin) {
                             if (origin == target) {
                                 ++target->m_num_cards_to_draw;
-                                origin->m_game->remove_events(key);
+                                origin->m_game->remove_listeners(key);
                             }
                         });
                     }
@@ -42,7 +42,7 @@ namespace banggame {
     }
 
     void effect_brothel::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
+        target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
             if (p == target && e_card == target_card) {
                 target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
                     target->discard_card(target_card);
@@ -56,11 +56,11 @@ namespace banggame {
                         auto clear_events = [target, event_key](player *p) {
                             if (p == target) {
                                 target->m_game->remove_disablers(event_key);
-                                target->m_game->remove_events(event_key);
+                                target->m_game->remove_listeners(event_key);
                             }
                         };
-                        target->m_game->add_event<event_type::pre_turn_start>(event_key, clear_events);
-                        target->m_game->add_event<event_type::on_player_death>(event_key, [=](player *killer, player *p) {
+                        target->m_game->add_listener<event_type::pre_turn_start>(event_key, clear_events);
+                        target->m_game->add_listener<event_type::on_player_death>(event_key, [=](player *killer, player *p) {
                             clear_events(p);
                         });
                     }

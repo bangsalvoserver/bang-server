@@ -68,8 +68,7 @@ namespace banggame {
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
-    void handler_bangcard::on_play(card *origin_card, player *origin, player *target) {
-        origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
+    static void queue_request_bang(card *origin_card, player *origin, player *target) {
         auto req = std::make_shared<request_bang>(origin_card, origin, target, effect_flags::single_target);
         req->is_bang_card = true;
         origin->m_game->call_event<event_type::apply_bang_modifier>(origin, req.get());
@@ -84,21 +83,15 @@ namespace banggame {
         });
     }
 
+    void handler_bangcard::on_play(card *origin_card, player *origin, player *target) {
+        origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
+        queue_request_bang(origin_card, origin, target);
+    }
+
     void handler_play_as_bang::on_play(card *origin_card, player *origin, card *chosen_card, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
         origin->discard_card(chosen_card);
-        auto req = std::make_shared<request_card_as_bang>(chosen_card, origin, target, effect_flags::single_target);
-        req->is_bang_card = true;
-        origin->m_game->call_event<event_type::apply_bang_modifier>(origin, req.get());
-        origin->m_game->queue_action([req = std::move(req)]() mutable {
-            if (!req->target->immune_to(req->origin_card)) {
-                if (req->unavoidable) {
-                    req->resolve_unavoidable();
-                } else {
-                    req->origin->m_game->queue_request(std::move(req));
-                }
-            }
-        });
+        queue_request_bang(chosen_card, origin, target);
     }
 
     bool effect_missedlike::can_respond(card *origin_card, player *origin) {
@@ -285,12 +278,12 @@ namespace banggame {
     void effect_end_drawing::on_play(card *origin_card, player *origin) {
         if (origin->m_game->top_request_is<request_draw>()) {
             origin->m_game->pop_request();
-            origin->m_game->add_event<event_type::on_effect_end>(origin_card, [=](player *p, card *c) {
+            origin->m_game->add_listener<event_type::on_effect_end>(origin_card, [=](player *p, card *c) {
                 if (p == origin && c == origin_card) {
                     origin->m_game->queue_action([=]{
                         origin->m_game->call_event<event_type::post_draw_cards>(origin);
                     });
-                    origin->m_game->remove_events(origin_card);
+                    origin->m_game->remove_listeners(origin_card);
                 }
             });
             origin->m_game->update_request();

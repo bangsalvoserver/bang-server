@@ -8,7 +8,7 @@
 namespace banggame {
 
     void effect_snake::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
+        target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
             if (p == target && e_card == target_card) {
                 target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
                     if (target->get_card_sign(drawn_card).suit == card_suit::spades) {
@@ -44,7 +44,7 @@ namespace banggame {
     }
 
     void effect_shotgun::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_hit>({target_card, 4}, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
+        p->m_game->add_listener<event_type::on_hit>({target_card, 4}, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
             if (origin == p && target != p && is_bang) {
                 target->m_game->queue_action([=]{
                     if (target->alive() && !target->m_hand.empty()) {
@@ -56,7 +56,7 @@ namespace banggame {
     }
 
     void effect_bounty::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_hit>({target_card, 3}, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
+        p->m_game->add_listener<event_type::on_hit>({target_card, 3}, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
             if (origin && target == p && is_bang) {
                 origin->draw_card(1, target_card);
             }

@@ -9,7 +9,7 @@ namespace banggame {
     using namespace enums::flag_operators;
 
     void effect_bill_noface::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_draw_from_deck>(target_card, [target](player *origin) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [target](player *origin) {
             if (target == origin) {
                 target->m_num_cards_to_draw = target->m_num_cards_to_draw - 1 + target->m_max_hp - target->m_hp;
             }
@@ -17,7 +17,7 @@ namespace banggame {
     }
 
     void effect_tequila_joe::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::apply_beer_modifier>(target_card, [target](player *origin, int &value) {
+        target->m_game->add_listener<event_type::apply_beer_modifier>(target_card, [target](player *origin, int &value) {
             if (target == origin) {
                 ++value;
             }
@@ -25,7 +25,7 @@ namespace banggame {
     }
 
     void effect_claus_the_saint::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (origin == target) {
                 target->m_game->pop_request();
                 int ncards = target->m_game->num_alive() + target->m_num_cards_to_draw - 1;
@@ -79,7 +79,7 @@ namespace banggame {
     }
     
     void effect_herb_hunter::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_player_death>(target_card, [p, target_card](player *origin, player *target) {
+        p->m_game->add_listener<event_type::on_player_death>(target_card, [p, target_card](player *origin, player *target) {
             if (p != target) {
                 p->draw_card(2, target_card);
             }
@@ -87,7 +87,7 @@ namespace banggame {
     }
 
     void effect_johnny_kisch::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_equip_card>(target_card, [=](player *origin, player *target, card *equipped_card) {
+        p->m_game->add_listener<event_type::on_equip_card>(target_card, [=](player *origin, player *target, card *equipped_card) {
             if (p == origin) {
                 for (player &other : range_other_players(target)) {
                     if (card *card = other.find_equipped_card(equipped_card)) {
@@ -100,7 +100,7 @@ namespace banggame {
     }
 
     void effect_molly_stark::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_play_hand_card>(target_card, [p, target_card](player *target, card *card) {
+        p->m_game->add_listener<event_type::on_play_hand_card>(target_card, [p, target_card](player *target, card *card) {
             if (p == target && p->m_game->m_playing != p) {
                 p->m_game->queue_action([p, target_card]{
                     if (p->alive()) {
@@ -112,14 +112,14 @@ namespace banggame {
     }
 
     void effect_bellestar::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_turn_start>(target_card, [=](player *target) {
+        p->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player *target) {
             if (p == target) {
                 p->m_game->add_disabler(target_card, [=](card *c) {
                     return c->pocket == pocket_type::player_table && c->owner != target;
                 });
             }
         });
-        p->m_game->add_event<event_type::on_turn_end>(target_card, [=](player *target) {
+        p->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player *target) {
             if (p == target) {
                 p->m_game->remove_disablers(target_card);
             }
@@ -128,7 +128,7 @@ namespace banggame {
 
     void effect_bellestar::on_disable(card *target_card, player *target) {
         target->m_game->remove_disablers(target_card);
-        target->m_game->remove_events(target_card);
+        target->m_game->remove_listeners(target_card);
     }
 
     void effect_vera_custer::copy_characters(player *origin, player *target) {
@@ -170,7 +170,7 @@ namespace banggame {
     }
 
     void effect_vera_custer::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_event<event_type::on_turn_start>({origin_card, 1}, [=, &usages = origin_card->usages](player *target) {
+        origin->m_game->add_listener<event_type::on_turn_start>({origin_card, 1}, [=, &usages = origin_card->usages](player *target) {
             if (origin == target) {
                 ++usages;
                 if (origin->m_game->num_alive() == 2) {
@@ -180,7 +180,7 @@ namespace banggame {
                 }
             }
         });
-        origin->m_game->add_event<event_type::on_turn_end>(origin_card, [origin, &usages = origin_card->usages](player *target) {
+        origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [origin, &usages = origin_card->usages](player *target) {
             if (origin == target && usages == 0) {
                 remove_characters(origin);
             }
@@ -215,7 +215,7 @@ namespace banggame {
     }
 
     void effect_greg_digger::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_player_death>(target_card, [p](player *origin, player *target) {
+        p->m_game->add_listener<event_type::on_player_death>(target_card, [p](player *origin, player *target) {
             if (p != target) {
                 p->heal(2);
             }

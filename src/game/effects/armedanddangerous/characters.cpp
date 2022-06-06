@@ -9,7 +9,7 @@ namespace banggame {
     using namespace enums::flag_operators;
 
     void effect_al_preacher::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_equip_card>(target_card, [=](player *origin, player *target, card *equipped_card) {
+        p->m_game->add_listener<event_type::on_equip_card>(target_card, [=](player *origin, player *target, card *equipped_card) {
             if (p != origin && (equipped_card->color == card_color_type::blue || equipped_card->color == card_color_type::orange)) {
                 if (p->count_cubes() >= 2) {
                     p->m_game->queue_request<timer_al_preacher>(target_card, origin, p);
@@ -28,7 +28,7 @@ namespace banggame {
     }
 
     void effect_julie_cutter::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_hit>(target_card, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
+        p->m_game->add_listener<event_type::on_hit>(target_card, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
             if (origin && p == target && origin != target) {
                 target->m_game->queue_action([=]{
                     if (target->alive()) {
@@ -61,7 +61,7 @@ namespace banggame {
     }
 
     void effect_bloody_mary::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_missed>(target_card, [=](card *origin_card, player *origin, player *target, bool is_bang) {
+        p->m_game->add_listener<event_type::on_missed>(target_card, [=](card *origin_card, player *origin, player *target, bool is_bang) {
             if (origin == p && is_bang) {
                 p->draw_card(1, target_card);
             }
@@ -115,7 +115,7 @@ namespace banggame {
     }
 
     void effect_ms_abigail::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_event<event_type::apply_escapable_modifier>(origin_card,
+        origin->m_game->add_listener<event_type::apply_escapable_modifier>(origin_card,
             [=](card *e_origin_card, player *e_origin, const player *e_target, effect_flags e_flags, bool &value) {
                 value = value || (e_target == origin) && effect_ms_abigail{}.can_escape(e_origin, e_origin_card, e_flags);
             });

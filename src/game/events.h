@@ -148,25 +148,25 @@ namespace banggame {
     template<typename T, event_type E>
     concept invocable_for_event = same_function_args<T, enums::enum_type_t<E>>::value;
 
-    struct event_handler_map {
-        card_multimap<event_function> m_event_handlers;
+    struct listener_map {
+        card_multimap<event_function> m_listeners;
 
         template<event_type E, invocable_for_event<E> Function>
-        void add_event(event_card_key key, Function &&fun) {
-            m_event_handlers.add(key, enums::enum_tag<E>, std::forward<Function>(fun));
+        void add_listener(event_card_key key, Function &&fun) {
+            m_listeners.add(key, enums::enum_tag<E>, std::forward<Function>(fun));
         }
 
         template<typename T, std::invocable<T> Function>
-        void add_custom_event(event_card_key key, Function &&fun) {
-            add_event<event_type::custom_event>(key, [fun = std::move(fun)](const std::any &args) {
+        void add_custom_listener(event_card_key key, Function &&fun) {
+            add_listener<event_type::custom_event>(key, [fun = std::move(fun)](const std::any &args) {
                 if (auto *evt = std::any_cast<T>(&args)) {
                     fun(*evt);
                 }
             });
         }
 
-        void remove_events(auto key) {
-            m_event_handlers.erase(key);
+        void remove_listeners(auto key) {
+            m_listeners.erase(key);
         }
 
         template<event_type E, typename ... Ts>
@@ -176,7 +176,7 @@ namespace banggame {
             std::array<priority_handler_pair, 16> buffer;
             auto next = buffer.begin();
 
-            for (auto &[key, handler] : m_event_handlers) {
+            for (auto &[key, handler] : m_listeners) {
                 if (auto *fun = std::get_if<enums::indexof(E)>(&handler)) {
                     assert(next - buffer.begin() < buffer.size());
                     *next++ = std::make_pair(key.priority, fun);

@@ -6,13 +6,13 @@ namespace banggame {
     using namespace enums::flag_operators;
 
     void effect_blessing::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::apply_sign_modifier>(target_card, [](player *, card_sign &value) {
+        target->m_game->add_listener<event_type::apply_sign_modifier>(target_card, [](player *, card_sign &value) {
             value.suit = card_suit::hearts;
         });
     }
 
     void effect_curse::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::apply_sign_modifier>(target_card, [](player *, card_sign &value) {
+        target->m_game->add_listener<event_type::apply_sign_modifier>(target_card, [](player *, card_sign &value) {
             value.suit = card_suit::spades;
         });
     }
@@ -83,13 +83,13 @@ namespace banggame {
     }
 
     void effect_highnoon::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::pre_turn_start>(target_card, [=](player *p) {
+        target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player *p) {
             p->damage(target_card, nullptr, 1);
         });
     }
 
     void effect_shootout::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_turn_start>(target_card, [](player *p) {
+        target->m_game->add_listener<event_type::on_turn_start>(target_card, [](player *p) {
             ++p->m_bangs_per_turn;
         });
     }
@@ -121,23 +121,23 @@ namespace banggame {
     }
 
     void effect_sermon::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::pre_turn_start>(target_card, [=](player *p) {
+        target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player *p) {
             target->m_game->add_disabler(target_card, [=](card *c) {
                 return c->owner == p && (c->has_tag(tag_type::bangcard) || c->has_tag(tag_type::play_as_bang));
             });
         });
-        target->m_game->add_event<event_type::on_turn_end>(target_card, [=](player *p) {
+        target->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player *p) {
             target->m_game->remove_disablers(target_card);
         });
     }
 
     void effect_sermon::on_disable(card *target_card, player *target) {
         target->m_game->remove_disablers(target_card);
-        target->m_game->remove_events(target_card);
+        target->m_game->remove_listeners(target_card);
     }
 
     void effect_ghosttown::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_event<event_type::verify_revivers>(target_card,
+        origin->m_game->add_listener<event_type::verify_revivers>(target_card,
             [=, last_revived = static_cast<player*>(nullptr)](player *target) mutable {
                 if (last_revived) {
                     last_revived->remove_player_flags(player_flags::temp_ghost);
@@ -163,7 +163,7 @@ namespace banggame {
     }
 
     void effect_handcuffs::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::post_draw_cards>(target_card, [=](player *origin) {
+        target->m_game->add_listener<event_type::post_draw_cards>(target_card, [=](player *origin) {
             std::vector<card *> target_cards;
             for (card *c : origin->m_game->m_hidden_deck) {
                 if (c->has_tag(tag_type::handcuffs)) {
@@ -175,7 +175,7 @@ namespace banggame {
             }
             origin->m_game->queue_request<request_handcuffs>(target_card, origin);
         });
-        target->m_game->add_event<event_type::on_turn_end>(target_card, [target_card](player *p) {
+        target->m_game->add_listener<event_type::on_turn_end>(target_card, [target_card](player *p) {
             p->m_game->remove_disablers(target_card);
         });
     }
@@ -217,7 +217,7 @@ namespace banggame {
     }
 
     void effect_newidentity::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::pre_turn_start>(target_card, [=](player *p) {
+        target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player *p) {
             target->m_game->move_card(p->m_backup_character.front(), pocket_type::selection);
             target->m_game->queue_request<request_newidentity>(target_card, p);
         });

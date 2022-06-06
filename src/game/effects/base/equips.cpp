@@ -5,7 +5,7 @@
 namespace banggame {
 
     void event_based_effect::on_disable(card *target_card, player *target) {
-        target->m_game->remove_events(target_card);
+        target->m_game->remove_listeners(target_card);
     }
 
     void effect_mustang::on_enable(card *target_card, player *target) {
@@ -45,7 +45,7 @@ namespace banggame {
     }
 
     void effect_jail::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
+        target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
             if (p == target && e_card == target_card) {
                 target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
                     target->discard_card(target_card);
@@ -61,7 +61,7 @@ namespace banggame {
     }
 
     void effect_dynamite::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_predraw_check>(target_card, [=](player *e_player, card *e_card) {
+        target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *e_player, card *e_card) {
             if (e_player == target && e_card == target_card) {
                 target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
                     card_sign sign = target->get_card_sign(drawn_card);
@@ -135,13 +135,13 @@ namespace banggame {
     }
 
     void effect_volcanic::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::apply_volcanic_modifier>(target_card, [=](player *p, bool &value) {
+        target->m_game->add_listener<event_type::apply_volcanic_modifier>(target_card, [=](player *p, bool &value) {
             value = value || p == target;
         });
     }
 
     void effect_boots::on_enable(card *target_card, player *p) {
-        p->m_game->add_event<event_type::on_hit>({target_card, 1}, [p, target_card](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
+        p->m_game->add_listener<event_type::on_hit>({target_card, 1}, [p, target_card](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
             if (p == target) {
                 target->m_game->queue_action([=]{
                     if (target->alive()) {

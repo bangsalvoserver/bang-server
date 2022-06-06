@@ -72,41 +72,41 @@ namespace banggame {
     }
 
     void effect_doublebarrel::on_play(card *origin_card, player *origin) {
-        origin->m_game->add_event<event_type::apply_bang_modifier>(origin_card, [=](player *p, request_bang *req) {
+        origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player *p, request_bang *req) {
             if (p == origin) {
                 req->unavoidable = origin->get_card_sign(req->origin_card).suit == card_suit::diamonds;
-                origin->m_game->remove_events(origin_card);
+                origin->m_game->remove_listeners(origin_card);
             }
         });
     }
 
     void effect_thunderer::on_play(card *origin_card, player *origin) {
-        origin->m_game->add_event<event_type::apply_bang_modifier>(origin_card, [=](player *p, request_bang *req) {
+        origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player *p, request_bang *req) {
             if (p == origin) {
                 req->origin->m_game->add_log("LOG_STOLEN_SELF_CARD", req->origin, req->origin_card);
                 req->origin->m_game->move_card(req->origin_card, pocket_type::player_hand, req->origin, show_card_flags::short_pause);
-                origin->m_game->remove_events(origin_card);
+                origin->m_game->remove_listeners(origin_card);
             }
         });
     }
 
     void effect_buntlinespecial::on_play(card *origin_card, player *p) {
-        p->m_game->add_event<event_type::apply_bang_modifier>(origin_card, [=](player *origin, request_bang *req) {
+        p->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player *origin, request_bang *req) {
             if (p == origin) {
-                p->m_game->add_event<event_type::on_missed>(origin_card, [=](card *bang_card, player *origin, player *target, bool is_bang) {
+                p->m_game->add_listener<event_type::on_missed>(origin_card, [=](card *bang_card, player *origin, player *target, bool is_bang) {
                     if (target && origin == p && is_bang && !target->m_hand.empty()) {
                         target->m_game->queue_request<request_discard>(origin_card, origin, target);
                     }
                 });
                 req->on_cleanup([=]{
-                    p->m_game->remove_events(origin_card);
+                    p->m_game->remove_listeners(origin_card);
                 });
             }
         });
     }
 
     void effect_bigfifty::on_play(card *origin_card, player *p) {
-        p->m_game->add_event<event_type::apply_bang_modifier>(origin_card, [=](player *origin, request_bang *req) {
+        p->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player *origin, request_bang *req) {
             if (origin == p) {
                 origin->m_game->add_disabler(origin_card, [target = req->target](card *c) {
                     return (c->pocket == pocket_type::player_table
@@ -116,7 +116,7 @@ namespace banggame {
                 req->on_cleanup([=]{
                     p->m_game->remove_disablers(origin_card);
                 });
-                origin->m_game->remove_events(origin_card);
+                origin->m_game->remove_listeners(origin_card);
             }
         });
     }
@@ -125,14 +125,14 @@ namespace banggame {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         auto req = std::make_shared<request_bang>(origin_card, origin, target, effect_flags::escapable | effect_flags::single_target);
         if (paid_cubes) {
-            origin->m_game->add_event<event_type::on_missed>(origin_card, [=](card *origin_card, player *p, player *target, bool is_bang) {
+            origin->m_game->add_listener<event_type::on_missed>(origin_card, [=](card *origin_card, player *p, player *target, bool is_bang) {
                 if (origin == p) {
                     origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
                     origin->add_to_hand(origin_card);
                 }
             });
             req->on_cleanup([=]{
-                origin->m_game->remove_events(origin_card);
+                origin->m_game->remove_listeners(origin_card);
             });
         }
         origin->m_game->queue_request(std::move(req));
@@ -183,7 +183,7 @@ namespace banggame {
     }
 
     void effect_tumbleweed::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::on_draw_check_select>(target_card, [=](player *origin, card *origin_card, card *drawn_card) {
+        target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player *origin, card *origin_card, card *drawn_card) {
             target->m_game->queue_request_front<timer_tumbleweed>(target_card, origin, target, drawn_card, origin_card);
         });
     }
