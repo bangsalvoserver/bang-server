@@ -74,14 +74,14 @@ namespace banggame {
     }
 
     void request_bandidos::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+        target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
+        target->discard_card(target_card);
         if (--num_cards == 0 || target->m_hand.empty()) {
             target->m_game->pop_request();
         } else {
             using namespace enums::flag_operators;
             flags &= ~effect_flags::escapable;
         }
-        target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
-        target->discard_card(target_card);
         target->m_game->update_request();
     }
 
