@@ -148,6 +148,11 @@ namespace banggame {
     template<typename T, event_type E>
     concept invocable_for_event = same_function_args<T, enums::enum_type_t<E>>::value;
 
+    template<typename Function> struct function_argument;
+    template<typename T, typename Arg> struct function_argument<void (T::*) (Arg)> : std::type_identity<Arg> {};
+    template<typename T, typename Arg> struct function_argument<void (T::*) (Arg) const> : std::type_identity<Arg> {};
+    template<typename Function> struct deduce_event_args : function_argument<decltype(&Function::operator())> {};
+
     struct listener_map {
         card_multimap<event_function> m_listeners;
 
@@ -156,10 +161,11 @@ namespace banggame {
             m_listeners.add(key, enums::enum_tag<E>, std::forward<Function>(fun));
         }
 
-        template<typename T, std::invocable<T> Function>
+        template<typename Function>
         void add_custom_listener(event_card_key key, Function &&fun) {
+            using event_args = std::remove_cvref_t<typename deduce_event_args<Function>::type>;
             add_listener<event_type::custom_event>(key, [fun = std::move(fun)](const std::any &args) {
-                if (auto *evt = std::any_cast<T>(&args)) {
+                if (auto *evt = std::any_cast<event_args>(&args)) {
                     fun(*evt);
                 }
             });
