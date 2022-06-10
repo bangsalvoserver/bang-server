@@ -143,7 +143,7 @@ namespace banggame {
                     last_revived->remove_player_flags(player_flags::temp_ghost);
                     --last_revived->m_num_cards_to_draw;
                     if (!last_revived->alive()) {
-                        origin->m_game->player_death(nullptr, last_revived);
+                        origin->m_game->handle_player_death(nullptr, last_revived, true);
                     }
                     last_revived = nullptr;
                 }

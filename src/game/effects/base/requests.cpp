@@ -298,8 +298,7 @@ namespace banggame {
         target->m_game->call_event<event_type::on_player_death_resolve>(target, tried_save);
         target->m_game->queue_action_front([origin=origin, target=target]{
             if (target->m_hp <= 0) {
-                target->m_game->player_death(origin, target);
-                target->m_game->check_game_over(origin, target);
+                target->m_game->handle_player_death(origin, target);
             }
         });
         target->m_game->update_request();
@@ -310,6 +309,41 @@ namespace banggame {
             return "STATUS_DEATH";
         } else {
             return {"STATUS_DEATH_OTHER", target};
+        }
+    }
+
+    bool request_discard_all::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
+        return (pocket == pocket_type::player_hand || pocket == pocket_type::player_table) && target_player == target;
+    }
+
+    void request_discard_all::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+        target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
+        target->discard_card(target_card);
+        
+        if (target->m_hand.empty() && target->m_table.empty()) {
+            target->m_game->pop_request();
+        }
+        target->m_game->update_request();
+    }
+
+    void request_discard_all::on_resolve() {
+        target->m_game->pop_request();
+        while (!target->m_table.empty()) {
+            target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_table.front());
+            target->discard_card(target->m_table.front());
+        }
+        while (!target->m_hand.empty()) {
+            target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_hand.front());
+            target->m_game->move_card(target->m_hand.front(), pocket_type::discard_pile);
+        }
+        target->m_game->update_request();
+    }
+
+    game_formatted_string request_discard_all::status_text(player *owner) const {
+        if (target == owner) {
+            return "STATUS_DISCARD_ALL";
+        } else {
+            return {"STATUS_DISCARD_ALL_OTHER", target};
         }
     }
 }

@@ -565,14 +565,20 @@ namespace banggame {
     }
 
     void player::discard_all() {
-        while (!m_table.empty()) {
-            m_game->add_log("LOG_DISCARDED_SELF_CARD", this, m_table.front());
-            discard_card(m_table.front());
-        }
+        add_gold(-m_gold);
         drop_all_cubes(m_characters.front());
-        while (!m_hand.empty()) {
-            m_game->add_log("LOG_DISCARDED_SELF_CARD", this, m_hand.front());
-            m_game->move_card(m_hand.front(), pocket_type::discard_pile);
+        std::vector<card *> black_cards;
+        for (card *c : m_table) {
+            if (c->color == card_color_type::black) {
+                black_cards.push_back(c);
+            }
+        }
+        for (card *c : black_cards) {
+            m_game->add_log("LOG_DISCARDED_SELF_CARD", this, c);
+            discard_card(c);
+        }
+        if (!m_hand.empty() || !m_table.empty()) {
+            m_game->queue_request_front<request_discard_all>(this);
         }
     }
 

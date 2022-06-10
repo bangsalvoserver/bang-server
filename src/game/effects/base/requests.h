@@ -144,6 +144,17 @@ namespace banggame {
         game_formatted_string status_text(player *owner) const override;
     };
 
+    struct request_discard_all : request_base, resolvable_request {
+        request_discard_all(player *target)
+            : request_base(nullptr, nullptr, target) {}
+        
+        bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override;
+        void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
+
+        void on_resolve() override;
+        game_formatted_string status_text(player *owner) const override;
+    };
+
 }
 
 #endif

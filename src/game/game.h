@@ -29,8 +29,7 @@ namespace banggame {
 
         void draw_check_then(player *origin, card *origin_card, draw_check_function fun);
 
-        void check_game_over(player *killer, player *target);
-        void player_death(player *killer, player *target);
+        void handle_player_death(player *killer, player *target, bool no_check_game_over = false);
     };
 
 }
