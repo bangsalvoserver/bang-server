@@ -28,6 +28,7 @@ namespace banggame {
         (pause_before_move)
         (short_pause)
         (instant)
+        (fast)
         (shown)
         (hidden)
     )
