@@ -68,11 +68,10 @@ namespace banggame {
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
-    static void queue_request_bang(card *origin_card, player *origin, player *target) {
-        auto req = std::make_shared<request_bang>(origin_card, origin, target, effect_flags::single_target);
+    static void queue_request_bang(std::shared_ptr<request_bang> &&req) {
         req->is_bang_card = true;
-        origin->m_game->call_event<event_type::apply_bang_modifier>(origin, req.get());
-        origin->m_game->queue_action([req = std::move(req)]() mutable {
+        req->origin->m_game->call_event<event_type::apply_bang_modifier>(req->origin, req.get());
+        req->origin->m_game->queue_action([req = std::move(req)]() mutable {
             if (!req->target->immune_to(req->origin_card)) {
                 if (req->unavoidable) {
                     req->resolve_unavoidable();
@@ -85,13 +84,13 @@ namespace banggame {
 
     void handler_bangcard::on_play(card *origin_card, player *origin, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
-        queue_request_bang(origin_card, origin, target);
+        queue_request_bang(std::make_shared<request_bang>(origin_card, origin, target, effect_flags::single_target));
     }
 
     void handler_play_as_bang::on_play(card *origin_card, player *origin, card *chosen_card, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
         origin->discard_card(chosen_card);
-        queue_request_bang(chosen_card, origin, target);
+        queue_request_bang(std::make_shared<request_card_as_bang>(chosen_card, origin, target, effect_flags::single_target));
     }
 
     bool effect_missedlike::can_respond(card *origin_card, player *origin) {
