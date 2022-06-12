@@ -74,7 +74,7 @@ namespace banggame {
     };
 
     struct timer_base : virtual tick_interface, std::enable_shared_from_this<timer_base> {
-        static constexpr int default_duration = 200;
+        static constexpr int default_duration = 400;
 
         timer_base(int duration = default_duration) : duration(duration) {}
 

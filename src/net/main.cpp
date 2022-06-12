@@ -27,16 +27,16 @@ int main(int argc, char **argv) {
             g_stop = true;
         });
 
-        using frames = std::chrono::duration<int64_t, std::ratio<1, banggame::fps>>;
-        auto next_frame = std::chrono::steady_clock::now() + frames{0};
+        using ticks = std::chrono::duration<int64_t, std::ratio<1, banggame::server_tickrate>>;
+        auto next_tick = std::chrono::steady_clock::now() + ticks{0};
 
         while (!g_stop) {
-            next_frame += frames{1};
+            next_tick += ticks{1};
 
             ctx.poll();
             server.tick();
 
-            std::this_thread::sleep_until(next_frame);
+            std::this_thread::sleep_until(next_tick);
         }
 
         std::cout << "Server stopped" << std::endl;

@@ -8,8 +8,10 @@
 namespace banggame {
 
     struct request_targeting : timer_request {
+        static constexpr int targeting_duration = 300;
+
         request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
-            : timer_request(origin_card, origin, target, flags)
+            : timer_request(origin_card, origin, target, flags, targeting_duration)
             , target_card(target_card) {}
 
         card *target_card;
@@ -72,8 +74,10 @@ namespace banggame {
     };
 
     struct timer_damaging : timer_request, cleanup_request {
+        static constexpr int damaging_duration = 300;
+
         timer_damaging(card *origin_card, player *origin, player *target, int damage, bool is_bang)
-            : timer_request(origin_card, origin, target, {}, 140)
+            : timer_request(origin_card, origin, target, {}, damaging_duration)
             , damage(damage)
             , is_bang(is_bang) {}
         
