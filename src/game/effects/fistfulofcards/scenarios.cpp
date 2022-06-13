@@ -121,9 +121,12 @@ namespace banggame {
     }
 
     void request_ricochet::on_finished() {
-        origin->m_game->pop_request();
         effect_destroy::resolver{origin_card, origin, target_card}.resolve();
-        origin->m_game->update_request();
+    }
+
+    void request_ricochet::on_miss() {
+        target->m_game->pop_request();
+        target->m_game->update_request();
     }
 
     game_formatted_string request_ricochet::status_text(player *owner) const {

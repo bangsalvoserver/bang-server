@@ -49,11 +49,7 @@ namespace banggame {
         opt_fmt_str on_prompt(card *target_card, player *target);
     };
 
-    struct tick_interface {
-        virtual void tick() {}
-    };
-
-    struct request_base : virtual tick_interface {
+    struct request_base {
         request_base(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : origin_card(origin_card), origin(origin), target(target), flags(flags) {}
         
@@ -64,6 +60,8 @@ namespace banggame {
         player *target;
         effect_flags flags;
 
+        virtual void tick() {}
+
         virtual game_formatted_string status_text(player *owner) const = 0;
 
         virtual bool can_pick(pocket_type pocket, player *target, card *target_card) const {
@@ -73,24 +71,18 @@ namespace banggame {
         virtual void on_pick(pocket_type pocket, player *target, card *target_card);
     };
 
-    struct timer_base : virtual tick_interface, std::enable_shared_from_this<timer_base> {
+    struct timer_request : request_base, std::enable_shared_from_this<timer_request> {
         static constexpr int default_duration = 400;
 
-        timer_base(int duration = default_duration) : duration(duration) {}
+        timer_request(card *origin_card, player *origin, player *target, effect_flags flags = {}
+            , int duration = default_duration)
+            : request_base(origin_card, origin, target, flags)
+            , duration(duration) {}
 
-        int duration = default_duration;
+        int duration;
 
         void tick() override final;
         virtual void on_finished() {}
-    };
-
-    struct timer_request : request_base, timer_base {
-        timer_request(card *origin_card, player *origin, player *target, effect_flags flags = {}
-            , int duration = timer_base::default_duration)
-            : request_base(origin_card, origin, target, flags)
-            , timer_base(duration) {}
-
-        virtual void on_finished() override;
     };
 
     class cleanup_request {

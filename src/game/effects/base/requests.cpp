@@ -234,25 +234,6 @@ namespace banggame {
         }
     }
 
-    void missable_request::on_miss() {
-        target->m_game->pop_request();
-        target->m_game->update_request();
-    }
-        
-    bool missable_request::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return pocket == pocket_type::player_hand && target_player == target
-            && target->check_player_flags(player_flags::treat_missed_as_bang)
-            && target_card->has_tag(tag_type::bangcard)
-            && can_respond(target_card);
-    }
-
-    void missable_request::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->add_log("LOG_RESPONDED_WITH_CARD_AS_MISSED", target_card, origin);
-        target->discard_card(target_card);
-        target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
-        on_miss();
-    }
-
     void request_bang::on_miss() {
         target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, is_bang_card);
         if (--bang_strength == 0) {

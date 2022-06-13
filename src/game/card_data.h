@@ -29,7 +29,8 @@ namespace banggame {
         (card_deck_type) deck,
 
         (card_modifier_type) modifier,
-        (mth_holder) multi_target_handler,
+        (mth_holder) mth_effect,
+        (mth_holder) mth_response,
         (target_player_filter) equip_target,
         
         (card_color_type) color,

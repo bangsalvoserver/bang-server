@@ -249,7 +249,7 @@ namespace banggame {
             }
         }
 
-        return card_ptr->multi_target_handler.verify(card_ptr, origin, mth_targets);
+        return (is_response ? card_ptr->mth_response : card_ptr->mth_effect).verify(card_ptr, origin, mth_targets);
     }
 
     opt_fmt_str play_card_verify::check_prompt() const {
@@ -277,7 +277,7 @@ namespace banggame {
             }
         }
 
-        return card_ptr->multi_target_handler.on_prompt(card_ptr, origin, mth_targets);
+        return (is_response ? card_ptr->mth_response : card_ptr->mth_effect).on_prompt(card_ptr, origin, mth_targets);
     }
 
     opt_fmt_str play_card_verify::check_prompt_equip() const {
@@ -322,7 +322,7 @@ namespace banggame {
             }
         }
 
-        card_ptr->multi_target_handler.on_play(card_ptr, origin, mth_targets);
+        (is_response ? card_ptr->mth_response : card_ptr->mth_effect).on_play(card_ptr, origin, mth_targets);
         origin->m_game->call_event<event_type::on_effect_end>(origin, card_ptr);
     }
 

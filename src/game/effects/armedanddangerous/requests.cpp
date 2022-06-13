@@ -60,9 +60,7 @@ namespace banggame {
     }
 
     void request_rust::on_finished() {
-        target->m_game->pop_request();
         effect_rust{}.on_resolve(origin_card, origin, target);
-        target->m_game->update_request();
     }
 
     game_formatted_string request_rust::status_text(player *owner) const {

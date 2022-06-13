@@ -66,9 +66,7 @@ namespace banggame {
         card *chosen_card;
 
         void on_finished() override {
-            target->m_game->pop_request();
             handler_card_sharper{}.on_resolve(origin_card, origin, chosen_card, target_card);
-            target->m_game->update_request();
         }
 
         game_formatted_string status_text(player *owner) const override {

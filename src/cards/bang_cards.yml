@@ -127,7 +127,7 @@ main_deck:
     effects:
       - banglimit
       - mth_add player reachable notself
-    multitarget: bangcard
+    mth_effect: bangcard
     tags:
       - bangcard
   - name: BEER
@@ -319,7 +319,7 @@ main_deck:
     effects:
       - banglimit
       - mth_add player reachable notself
-    multitarget: bangcard
+    mth_effect: bangcard
     tags:
       - bangcard
   - name: BEER
@@ -579,7 +579,7 @@ main_deck:
       - banglimit
       - mth_add card self | hand
       - mth_add player reachable notself
-    multitarget: play_as_bang
+    mth_effect: play_as_bang
     tags:
       - weapon
       - play_as_bang
@@ -677,7 +677,7 @@ main_deck:
       - mth_add player reachable notself
       - mth_add player notself
       - banglimit
-    multitarget: fanning
+    mth_effect: fanning
     tags:
       - discard_if_two_players
   - name: TOMAHAWK
@@ -716,7 +716,7 @@ main_deck:
     effects:
       - banglimit
       - mth_add player reachable notself
-    multitarget: bangcard
+    mth_effect: bangcard
     tags:
       - bangcard
   - name: CARAVAN
@@ -731,9 +731,9 @@ main_deck:
     optional:
       - select_cube(2) cube
       - mth_add
+    mth_effect: draw_atend
     tags:
       - repeatable
-    multitarget: draw_atend
   - name: CAT_BALOU
     signs:
       - 3 hearts
@@ -755,7 +755,7 @@ main_deck:
       - mth_add
     tags:
       - repeatable
-    multitarget: heal_multi
+    mth_effect: heal_multi
   - name: QUICK_SHOT
     signs:
       - 3 spades
@@ -781,7 +781,7 @@ main_deck:
     optional:
       - select_cube(2) cube
       - mth_add
-    multitarget: flintlock
+    mth_effect: flintlock
   - name: ARROW
     signs:
       - 5 diamonds
@@ -808,7 +808,7 @@ main_deck:
     optional:
       - select_cube(2) cube
       - mth_add
-    multitarget: duck
+    mth_response: duck
   - name: MISSED
     signs:
       - K spades
@@ -845,7 +845,7 @@ main_deck:
       - mth_add card | table
     optional:
       - mth_add(2) cube
-    multitarget: squaw
+    mth_effect: squaw
   - name: ACE_UP_THE_SLEEVE
     signs:
       - A hearts
@@ -894,7 +894,7 @@ main_deck:
     responses:
       - move_bomb
       - mth_add player
-    multitarget: move_bomb
+    mth_response: move_bomb
   - name: BUNTLINE_SPECIAL
     signs:
       - J spades
@@ -1011,7 +1011,7 @@ main_deck:
     effects:
       - mth_add card self | table blue
       - mth_add card notself | table blue
-    multitarget: card_sharper
+    mth_effect: card_sharper
   - name: MIRAGE
     signs:
       - 8 hearts
@@ -1082,7 +1082,7 @@ main_deck:
     effects:
       - banglimit
       - mth_add player reachable notself
-    multitarget: bangcard
+    mth_effect: bangcard
     tags:
       - bangcard
   - name: PANIC
@@ -1126,7 +1126,7 @@ main_deck:
       - max_usages(1)
       - mth_add card self | hand bang
       - discard card self | hand
-    multitarget: play_as_gatling
+    mth_effect: play_as_gatling
     tags:
       - weapon
   - name: LAST_WILL
@@ -1144,10 +1144,10 @@ main_deck:
       - mth_add card self
     optional:
       - mth_add card self
+    mth_response: lastwill
     tags:
       - repeatable(2)
       - discard_if_two_players
-    multitarget: lastwill
   - name: INDIAN_GUIDE
     signs:
       - 8 clubs
@@ -1305,7 +1305,10 @@ character:
       - banglimit
       - mth_add card self | hand missed
       - mth_add player reachable notself
-    multitarget: play_as_bang
+    mth_effect: play_as_bang
+    responses:
+      - discard card self | hand bang
+      - missed
     tags:
       - play_as_bang
   - name: EL_GRINGO
@@ -1408,7 +1411,7 @@ character:
       - banglimit
       - mth_add card self | hand
       - mth_add player reachable notself
-    multitarget: play_as_bang
+    mth_effect: play_as_bang
     tags:
       - play_as_bang
   - name: APACHE_KID
@@ -1442,7 +1445,7 @@ character:
       - mth_add card self | hand
       - mth_add card self | hand
       - mth_add player reachable notself
-    multitarget: doc_holyday
+    mth_effect: doc_holyday
   - name: ELENA_FUENTE
     image: 03_elena_fuente
     expansion: dodgecity
@@ -1529,7 +1532,7 @@ character:
     effects:
       - max_usages(1)
       - mth_add card self | hand bang
-    multitarget: play_as_gatling
+    mth_effect: play_as_gatling
   - name: EVELYN_SHEBANG
     image: 07_evelynshebang
     expansion: valleyofshadows
@@ -1579,7 +1582,7 @@ character:
       - max_usages(1)
       - mth_add card self | hand
       - mth_add card notself | hand
-    multitarget: flint_westwood
+    mth_effect: flint_westwood
   - name: GARY_LOOTER
     image: 06_garylooter
     expansion: wildwestshow
@@ -1892,7 +1895,7 @@ fistfulofcards:
       - mth_add
     tags:
       - repeatable
-    multitarget: draw_atend
+    mth_effect: draw_atend
   - name: RICOCHET
     image: 05_rimbalzo
     effects:

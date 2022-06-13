@@ -52,14 +52,16 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, card *target);
     };
     
-    struct request_ricochet : missable_request, timer_base {
+    struct request_ricochet : timer_request, missable_request {
         request_ricochet(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
-            : missable_request(origin_card, origin, target, flags)
+            : timer_request(origin_card, origin, target, flags)
             , target_card(target_card) {}
         
         card *target_card;
 
         void on_finished() override;
+
+        void on_miss() override;
 
         game_formatted_string status_text(player *owner) const override;
     };

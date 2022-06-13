@@ -94,10 +94,8 @@ namespace banggame {
         game_formatted_string status_text(player *owner) const override;
     };
 
-    class missable_request : public request_base {
+    class missable_request {
     public:
-        using request_base::request_base;
-
         void add_card(card *c) {
             m_cards_used.push_back(c);
         }
@@ -106,17 +104,14 @@ namespace banggame {
             return std::ranges::find(m_cards_used, c) == m_cards_used.end();
         }
 
-        virtual void on_miss();
-        
-        bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override;
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
+        virtual void on_miss() = 0;
 
     private:
         std::vector<card *> m_cards_used;
     };
 
-    struct request_bang : missable_request, cleanup_request, resolvable_request {
-        using missable_request::missable_request;
+    struct request_bang : request_base, missable_request, cleanup_request, resolvable_request {
+        using request_base::request_base;
 
         int bang_strength = 1;
         int bang_damage = 1;
@@ -126,6 +121,7 @@ namespace banggame {
         void on_miss() override;
         void on_resolve() override;
         void resolve_unavoidable();
+
         game_formatted_string status_text(player *owner) const override;
     };
 

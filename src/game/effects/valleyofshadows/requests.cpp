@@ -8,9 +8,7 @@
 namespace banggame {
 
     void timer_damaging::on_finished() {
-        target->m_game->pop_request();
         target->damage(origin_card, origin, damage, is_bang, true);
-        target->m_game->update_request();
     }
 
     game_formatted_string timer_damaging::status_text(player *owner) const {
@@ -18,9 +16,7 @@ namespace banggame {
     }
 
     void request_destroy::on_finished() {
-        target->m_game->pop_request();
         effect_destroy::resolver{origin_card, origin, target_card}.resolve();
-        target->m_game->update_request();
     }
 
     game_formatted_string request_destroy::status_text(player *owner) const {
@@ -40,9 +36,7 @@ namespace banggame {
     }
 
     void request_steal::on_finished() {
-        target->m_game->pop_request();
         effect_steal::resolver{origin_card, origin, target_card}.resolve();
-        target->m_game->update_request();
     }
 
     game_formatted_string request_steal::status_text(player *owner) const {

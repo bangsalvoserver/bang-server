@@ -205,16 +205,13 @@ namespace banggame {
         throw std::runtime_error("missing on_pick(pocket, target, target_card)");
     }
 
-    void timer_base::tick() {
+    void timer_request::tick() {
         if (duration && --duration == 0) {
             auto copy = shared_from_this();
+            target->m_game->pop_request();
             on_finished();
+            target->m_game->update_request();
         }
-    }
-
-    void timer_request::on_finished() {
-        target->m_game->pop_request();
-        target->m_game->update_request();
     }
 
 }

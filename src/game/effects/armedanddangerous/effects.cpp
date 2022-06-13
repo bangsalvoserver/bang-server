@@ -201,9 +201,7 @@ namespace banggame {
     }
 
     void timer_tumbleweed::on_finished() {
-        target->m_game->pop_request();
         origin->m_game->m_current_check.resolve(drawn_card);
-        target->m_game->update_request();
     }
 
     bool effect_move_bomb::can_respond(card *origin_card, player *origin) {

@@ -39,6 +39,10 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, card *chosen_card, player *target);
     };
 
+    struct handler_play_as_missed {
+        void on_play(card *origin_card, player *origin, card *chosen_card);
+    };
+
     struct effect_banglimit {
         opt_error verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);

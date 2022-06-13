@@ -169,8 +169,11 @@ void parse_all_effects(std::ostream &out, YAML::Node card) {
         if (auto modifier = card["modifier"]) {
             out << fmt::format(",\n      .modifier {{card_modifier_type::{}}}", modifier.as<std::string>());
         }
-        if (auto multitarget = card["multitarget"]) {
-            out << fmt::format(",\n      .multi_target_handler {{mth_type::{}}}", multitarget.as<std::string>());
+        if (auto mth_effect = card["mth_effect"]) {
+            out << fmt::format(",\n      .mth_effect {{mth_type::{}}}", mth_effect.as<std::string>());
+        }
+        if (auto mth_response = card["mth_response"]) {
+            out << fmt::format(",\n      .mth_response {{mth_type::{}}}", mth_response.as<std::string>());
         }
         if (auto equip_target = card["equip_target"]) {
             out << fmt::format(",\n      .equip_target {{target_player_filter::{}}}", equip_target.as<std::string>());
