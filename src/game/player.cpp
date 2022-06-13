@@ -578,6 +578,7 @@ namespace banggame {
             discard_card(c);
         }
         if (!m_hand.empty() || !m_table.empty()) {
+            untap_inactive_cards();
             m_game->queue_request_front<request_discard_all>(this);
         }
     }
