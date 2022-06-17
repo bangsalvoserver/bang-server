@@ -435,8 +435,7 @@ namespace banggame {
         });
     }
 
-    void game::handle_player_death(player *killer, player *target, bool no_check_game_over) {
-        if (check_flags(game_flags::game_over)) return;
+    void game::handle_player_death(player *killer, player *target, bool no_handle_game_over) {
         if (killer != m_playing) killer = nullptr;
         
         for (card *c : target->m_characters) {
@@ -465,7 +464,13 @@ namespace banggame {
         call_event<event_type::on_player_death>(killer, target);
         target->discard_all();
 
-        if (!no_check_game_over) queue_action([this, killer, target] {
+        if (no_handle_game_over) {
+            return;
+        }
+
+        queue_action([this, killer, target] {
+            if (check_flags(game_flags::game_over)) return;
+
             player_role winner_role = player_role::unknown;
 
             auto alive_players_view = m_players | std::views::filter(&player::alive);
@@ -522,7 +527,7 @@ namespace banggame {
                 }
             }
             
-            if (target == m_first_player) {
+            if (target == m_first_player && num_alive > 1) {
                 m_first_player = std::next(player_iterator(m_first_player));
                 add_update<game_update_type::move_scenario_deck>(m_first_player->id);
             }
