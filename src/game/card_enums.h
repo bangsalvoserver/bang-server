@@ -249,6 +249,7 @@ namespace banggame {
         (horseshoe,             effect_horseshoe)
         (luckycharm,            effect_luckycharm)
         (gunbelt,               effect_gunbelt)
+        (initialcards,          effect_initialcards)
         (wanted,                effect_wanted)
         (bomb,                  effect_bomb)
         (tumbleweed,            effect_tumbleweed)

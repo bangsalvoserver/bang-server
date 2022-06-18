@@ -66,6 +66,13 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);
     };
+
+    struct effect_initialcards : event_based_effect {
+        int value;
+        effect_initialcards(int value) : value(value) {}
+        
+        void on_enable(card *target_card, player *target);
+    };
 }
 
 #endif

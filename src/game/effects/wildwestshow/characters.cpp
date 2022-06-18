@@ -13,16 +13,10 @@ namespace banggame {
                 && c->owner == p
                 && c->has_tag(tag_type::missedcard);
         });
-        p->m_game->add_listener<event_type::apply_initial_cards_modifier>(target_card, [=](player *target, int &value) {
-            if (p == target) {
-                value = 5;
-            }
-        });
     }
 
     void effect_big_spencer::on_disable(card *target_card, player *p) {
         p->m_game->remove_disablers(target_card);
-        p->m_game->remove_listeners(target_card);
     }
 
     void effect_gary_looter::on_enable(card *target_card, player *p) {
