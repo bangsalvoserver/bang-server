@@ -139,7 +139,7 @@ namespace banggame {
         return !m_game->is_disabled(c) && !c->responses.empty()
             && std::ranges::all_of(c->responses, [&](const effect_holder &e) {
                 return !e.verify(c, this);
-            });
+            }) && is_possible_to_play(c, true);
     }
 
     void player::queue_request_add_cube(card *origin_card, int ncubes) {

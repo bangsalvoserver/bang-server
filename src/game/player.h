@@ -154,9 +154,10 @@ namespace banggame {
         void set_last_played_card(card *c);
 
         std::vector<player *> make_equip_set(card *origin_card);
-        target_list make_card_target_set(card *origin_card, const effect_holder &effect);
+        std::vector<player *> make_player_target_set(card *origin_card, const effect_holder &effect);
+        std::vector<card *> make_card_target_set(card *origin_card, const effect_holder &effect);
 
-        bool is_possible_to_play(card *c);
+        bool is_possible_to_play(card *c, bool is_response = false);
         void set_forced_card(card *c);
         void set_mandatory_card(card *c);
 

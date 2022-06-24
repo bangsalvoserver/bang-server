@@ -41,7 +41,7 @@ namespace banggame {
     opt_error play_visitor<target_type::conditional_player>::verify(const play_card_verify *verifier, const effect_holder &effect, nullable<player> target) {
         if (target) {
             return play_visitor<target_type::player>{}.verify(verifier, effect, target);
-        } else if (!verifier->origin->make_card_target_set(verifier->card_ptr, effect).empty()) {
+        } else if (!verifier->origin->make_player_target_set(verifier->card_ptr, effect).empty()) {
             return game_error("ERROR_INVALID_ACTION");
         } else {
             return std::nullopt;
