@@ -23,8 +23,16 @@ namespace banggame {
     }
 
     opt_error effect_pass_turn::verify(card *origin_card, player *origin) {
-        if (origin->m_mandatory_card && origin->m_mandatory_card->owner == origin && origin->is_possible_to_play(origin->m_mandatory_card)) {
-            return game_error("ERROR_MANDATORY_CARD", origin->m_mandatory_card);
+        if (origin->m_mandatory_card && origin->m_mandatory_card->owner == origin) {
+            if (origin->m_mandatory_card->color == card_color_type::brown) {
+                if (origin->is_possible_to_play(origin->m_mandatory_card)) {
+                    return game_error("ERROR_MANDATORY_CARD", origin->m_mandatory_card);
+                }
+            } else if (!origin->m_game->check_flags(game_flags::disable_equipping)) {
+                if (!origin->make_equip_set(origin->m_mandatory_card).empty()) {
+                    return game_error("ERROR_MANDATORY_CARD", origin->m_mandatory_card);
+                }
+            }
         }
         return std::nullopt;
     }
