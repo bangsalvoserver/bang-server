@@ -322,9 +322,11 @@ namespace banggame {
 
     void effect_draw_one_less::on_play(card *origin_card, player *target) {
         target->m_game->queue_action([=]{
-            ++target->m_num_drawn_cards;
-            while (target->m_num_drawn_cards < target->m_num_cards_to_draw) {
-                target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
+            if (target->alive()) {
+                ++target->m_num_drawn_cards;
+                while (target->m_num_drawn_cards < target->m_num_cards_to_draw) {
+                    target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
+                }
             }
         });
     }
