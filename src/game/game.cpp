@@ -396,6 +396,20 @@ namespace banggame {
     }
 
     void game::send_request_update() {
+        auto &req = top_request();
+        if (req.target() && bool(req.flags() & effect_flags::auto_pick)) {
+            auto target_request_update = make_request_update(req.target());
+            if (target_request_update.pick_ids.size() == 1 && target_request_update.respond_ids.empty()) {
+                const auto &args = target_request_update.pick_ids.front();
+                req.target()->handle_action(enums::enum_tag<game_action_type::pick_card>, pick_card_args{
+                    .pocket = args.pocket,
+                    .player_id = args.player_id,
+                    .card_id = args.card_id
+                });
+                return;
+            }
+        }
+
         auto spectator_target = update_target::excludes_public();
         for (auto &p : m_players) {
             spectator_target.add(&p);

@@ -25,7 +25,7 @@ namespace banggame {
 
     struct request_draw : request_base {
         request_draw(player *target)
-            : request_base(nullptr, nullptr, target) {}
+            : request_base(nullptr, nullptr, target, effect_flags::auto_pick) {}
 
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;

@@ -154,6 +154,7 @@ namespace banggame {
     DEFINE_ENUM_FLAGS(effect_flags,
         (escapable)
         (single_target)
+        (auto_pick)
     )
     
     DEFINE_ENUM_FWD_TYPES(effect_type,
