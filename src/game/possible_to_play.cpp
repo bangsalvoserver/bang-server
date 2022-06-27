@@ -26,7 +26,8 @@ namespace banggame {
     std::vector<player *> player::make_player_target_set(card *origin_card, const effect_holder &holder) {
         std::vector<player *> ret;
         for (player &target : m_game->m_players) {
-            if (!check_player_filter(origin_card, this, holder.player_filter, &target)) {
+            if (!check_player_filter(origin_card, this, holder.player_filter, &target)
+                && !holder.verify(origin_card, this, &target)) {
                 ret.push_back(&target);
             }
         }
@@ -37,7 +38,8 @@ namespace banggame {
         std::vector<card *> ret;
         auto add_if_valid = [&](card *target_card) {
             if (target_card != origin_card || origin_card->has_tag(tag_type::can_target_self)) {
-                if (!check_card_filter(origin_card, this, holder.card_filter, target_card)) {
+                if (!check_card_filter(origin_card, this, holder.card_filter, target_card)
+                    && !holder.verify(origin_card, this, target_card)) {
                     ret.push_back(target_card);
                 }
             }
