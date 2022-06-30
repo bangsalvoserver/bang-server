@@ -79,7 +79,7 @@ namespace banggame {
             } else {
                 discard_drawn_card();
             }
-        } else if (target->is_possible_to_play(card)) {
+        } else if (card->has_tag(tag_type::shopchoice) || target->is_possible_to_play(card)) {
             target->set_forced_card(card);
         } else {
             discard_drawn_card();

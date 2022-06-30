@@ -53,25 +53,19 @@ namespace banggame {
 
     bool player::is_possible_to_play(card *target_card, bool is_response) {
         auto &effects = is_response ? target_card->responses : target_card->effects;
-        switch (target_card->modifier) {
-        case card_modifier_type::none:
-            if (effects.empty()) return false;
-            return std::ranges::all_of(effects, [&](const effect_holder &holder) {
-                switch (holder.target) {
-                case target_type::none:
-                    return !holder.verify(target_card, this);
-                case target_type::player:
-                    return !make_player_target_set(target_card, holder).empty();
-                case target_type::card:
-                    return !make_card_target_set(target_card, holder).empty();
-                default:
-                    return true;
-                }
-            });
-        case card_modifier_type::bangmod:
-            // HACK per lawofthewest: ignora la carta mira
-            return false;
-        default: return true;
-        }
+        if (effects.empty()) return false;
+
+        return std::ranges::all_of(effects, [&](const effect_holder &holder) {
+            switch (holder.target) {
+            case target_type::none:
+                return !holder.verify(target_card, this);
+            case target_type::player:
+                return !make_player_target_set(target_card, holder).empty();
+            case target_type::card:
+                return !make_card_target_set(target_card, holder).empty();
+            default:
+                return true;
+            }
+        });
     }
 }

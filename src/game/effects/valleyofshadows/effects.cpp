@@ -8,6 +8,28 @@
 namespace banggame {
     using namespace enums::flag_operators;
 
+    opt_error effect_aim::verify(card *origin_card, player *origin) {
+        if (auto error = effect_banglimit{}.verify(origin_card, origin))
+            return error;
+
+        auto is_bangcard = [origin](card *c) {
+            return origin->is_bangcard(c) || c->has_tag(tag_type::play_as_bang);
+        };
+
+        constexpr effect_holder bang_holder{
+            .player_filter{target_player_filter::reachable | target_player_filter::notself}
+        };
+        
+        if (std::ranges::none_of(origin->m_hand, is_bangcard)
+         || std::ranges::none_of(origin->m_table, is_bangcard)
+         || std::ranges::none_of(origin->m_characters, is_bangcard)
+
+         || origin->make_player_target_set(origin_card, bang_holder).empty())
+            return game_error("ERROR_INVALID_ACTION");
+        
+        return std::nullopt;
+    }
+
     void effect_aim::on_play(card *origin_card, player *origin) {
         origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player *p, request_bang *req) {
             if (p == origin) {
