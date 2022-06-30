@@ -357,7 +357,7 @@ namespace banggame {
 
         auto add_ids_for = [&](auto &&cards) {
             for (card *c : cards) {
-                if (p->is_possible_to_play(c, true)) {
+                if (!is_disabled(c) && p->is_possible_to_play(c, true)) {
                     ret.respond_ids.push_back(c->id);
                 }
             }

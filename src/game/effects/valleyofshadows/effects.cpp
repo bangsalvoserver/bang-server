@@ -136,6 +136,22 @@ namespace banggame {
         origin->m_game->update_request();
     }
 
+    opt_error effect_fanning::verify(card *origin_card, player *origin) {
+        auto set1 = origin->make_player_target_set(origin_card, effect_holder{
+            .player_filter{target_player_filter::reachable | target_player_filter::notself}
+        });
+        auto set2 = origin->make_player_target_set(origin_card, effect_holder{
+            .player_filter{target_player_filter::notself}
+        });
+
+        if (std::ranges::none_of(set1, [&](player *player1) {
+            return std::ranges::any_of(set2, [&](player *player2) {
+                return player1 != player2 && origin->m_game->calc_distance(player1, player2) <= 1;
+            });
+        })) return game_error("ERROR_INVALID_ACTION");
+        return std::nullopt;
+    }
+
     opt_error handler_fanning::verify(card *origin_card, player *origin, player *player1, player *player2) {
         if (player1 == player2 || origin->m_game->calc_distance(player1, player2) > 1) {
             return game_error("ERROR_TARGET_NOT_IN_RANGE");

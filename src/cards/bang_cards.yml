@@ -677,6 +677,7 @@ main_deck:
       - mth_add player reachable notself
       - mth_add player notself
       - banglimit
+      - fanning
     mth_effect: fanning
     tags:
       - discard_if_two_players

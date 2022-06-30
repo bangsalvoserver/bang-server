@@ -188,6 +188,7 @@ namespace banggame {
         (deathsave,             effect_deathsave)
         (backfire,              effect_backfire)
         (bandidos,              effect_bandidos)
+        (fanning,               effect_fanning)
         (aim,                   effect_aim)
         (poker,                 effect_poker)
         (tornado,               effect_tornado)

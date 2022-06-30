@@ -37,6 +37,10 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
+    struct effect_fanning : effect_empty {
+        opt_error verify(card *origin_card, player *origin);
+    };
+
     struct handler_fanning {
         opt_error verify(card *origin_card, player *origin, player *player1, player *player2);
         void on_play(card *origin_card, player *origin, player *player1, player *player2);
