@@ -30,6 +30,9 @@ namespace banggame {
         EVENT(apply_initial_cards_modifier,     player *origin, int &value)
         EVENT(apply_bang_modifier,              player *origin, request_bang *req)
 
+        // verifica se sei obbligato a giocare una carta prima di passare
+        EVENT(verify_mandatory_card, player *origin, card* &value)
+
         // viene chiamato quando si sta cercando il prossimo giocatore di turno
         EVENT(verify_revivers, player *origin)
         

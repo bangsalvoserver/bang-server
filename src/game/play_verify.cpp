@@ -184,13 +184,6 @@ namespace banggame {
             return game_error("ERROR_CARD_INACTIVE", card_ptr);
         }
 
-        if (origin->m_mandatory_card && origin->m_mandatory_card != card_ptr
-            && std::ranges::find(origin->m_mandatory_card->effects, effect_type::banglimit, &effect_holder::type) != origin->m_mandatory_card->effects.end()
-            && std::ranges::find(effects, effect_type::banglimit, &effect_holder::type) != effects.end())
-        {
-            return game_error("ERROR_MANDATORY_CARD", origin->m_mandatory_card);
-        }
-
         if (origin->m_forced_card
             && card_ptr != origin->m_forced_card
             && std::ranges::find(modifiers, origin->m_forced_card) == modifiers.end()) {
@@ -291,9 +284,6 @@ namespace banggame {
     }
 
     void play_card_verify::do_play_card() const {
-        if (origin->m_mandatory_card == card_ptr) {
-            origin->m_mandatory_card = nullptr;
-        }
         origin->m_forced_card = nullptr;
         
         auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
@@ -362,9 +352,6 @@ namespace banggame {
                 }
                 origin->prompt_then(check_prompt_equip(), [*this]{
                     player *target = get_equip_target();
-                    if (origin->m_mandatory_card == card_ptr) {
-                        origin->m_mandatory_card = nullptr;
-                    }
                     origin->m_forced_card = nullptr;
                     card_ptr->on_equip(target);
                     if (origin == target) {

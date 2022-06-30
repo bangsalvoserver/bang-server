@@ -58,6 +58,8 @@ namespace banggame {
             if (effects.empty()) return false;
             return std::ranges::all_of(effects, [&](const effect_holder &holder) {
                 switch (holder.target) {
+                case target_type::none:
+                    return !holder.verify(target_card, this);
                 case target_type::player:
                     return !make_player_target_set(target_card, holder).empty();
                 case target_type::card:
@@ -67,12 +69,8 @@ namespace banggame {
                 }
             });
         case card_modifier_type::bangmod:
-            return std::ranges::any_of(m_hand, [](card *c) {
-                return c->owner->is_bangcard(c);
-            }) && !make_player_target_set(target_card, effect_holder{
-                .target {target_type::player},
-                .player_filter {target_player_filter::reachable | target_player_filter::notself}
-            }).empty();
+            // HACK per lawofthewest: ignora la carta mira
+            return false;
         default: return true;
         }
     }

@@ -281,10 +281,6 @@ namespace banggame {
         m_game->add_update<game_update_type::force_play_card>(update_target::includes_private(this), c ? c->id : 0);
     }
 
-    void player::set_mandatory_card(card *c) {
-        m_mandatory_card = c;
-    }
-
     bool player::is_bangcard(card *card_ptr) {
         return (check_player_flags(player_flags::treat_missed_as_bang)
                 && card_ptr->has_tag(tag_type::missedcard))
@@ -455,7 +451,6 @@ namespace banggame {
     void player::start_of_turn() {
         m_game->m_playing = this;
 
-        m_mandatory_card = nullptr;
         m_bangs_played = 0;
         m_bangs_per_turn = 1;
         m_num_drawn_cards = 0;
@@ -525,7 +520,6 @@ namespace banggame {
     }
 
     void player::pass_turn() {
-        m_mandatory_card = nullptr;
         if (m_hand.size() > max_cards_end_of_turn()) {
             m_game->queue_request<request_discard_pass>(this);
         } else {
