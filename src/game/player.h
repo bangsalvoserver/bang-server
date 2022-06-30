@@ -141,7 +141,6 @@ namespace banggame {
         void add_gold(int amount);
 
         bool immune_to(card *c);
-        bool can_respond_with(card *c);
         
         void discard_all();
 

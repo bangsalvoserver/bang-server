@@ -135,13 +135,6 @@ namespace banggame {
         return value;
     }
 
-    bool player::can_respond_with(card *c) {
-        return !m_game->is_disabled(c) && !c->responses.empty()
-            && std::ranges::all_of(c->responses, [&](const effect_holder &e) {
-                return !e.verify(c, this);
-            });
-    }
-
     void player::queue_request_add_cube(card *origin_card, int ncubes) {
         int nslots = max_cubes - m_characters.front()->num_cubes;
         int ncards = nslots > 0;
@@ -385,10 +378,9 @@ namespace banggame {
             target_converter<std::vector<card *>>{}(m_game, args.modifier_ids)
         };
 
-        if (!can_respond_with(verifier.card_ptr)
-            || (verifier.card_ptr->pocket == pocket_type::player_hand
+        if ((verifier.card_ptr->pocket == pocket_type::player_hand
             && verifier.card_ptr->color != card_color_type::brown)
-            || (!verifier.modifiers.empty())
+            || !verifier.modifiers.empty()
         ) {
             throw game_error("ERROR_INVALID_ACTION");
         }

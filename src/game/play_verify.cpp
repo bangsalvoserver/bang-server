@@ -177,6 +177,9 @@ namespace banggame {
     opt_error play_card_verify::verify_card_targets() const {
         auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
 
+        if (effects.empty()) {
+            return game_error("ERROR_INVALID_ACTION");
+        }
         if (card *disabler = origin->m_game->get_disabler(card_ptr)) {
             return game_error("ERROR_CARD_DISABLED_BY", card_ptr, disabler);
         }
