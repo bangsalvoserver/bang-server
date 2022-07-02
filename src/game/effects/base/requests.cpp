@@ -209,7 +209,9 @@ namespace banggame {
     }
 
     bool request_duel::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return pocket == pocket_type::player_hand && target_player == target && target->is_bangcard(target_card);
+        return pocket == pocket_type::player_hand && target_player == target
+            && target->is_bangcard(target_card)
+            && !target->m_game->is_disabled(target_card);
     }
 
     void request_duel::on_pick(pocket_type pocket, player *target_player, card *target_card) {
