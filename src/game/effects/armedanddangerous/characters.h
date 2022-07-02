@@ -20,9 +20,11 @@ namespace banggame {
 
     struct effect_red_ringo : event_based_effect {
         void on_equip(card *target_card, player *target);
+    };
 
-        opt_error verify(card *origin_card, player *origin, card *target);
-        void on_play(card *origin_card, player *origin, card *target);
+    struct handler_red_ringo {
+        opt_error verify(card *origin_card, player *origin, const target_list &targets);
+        void on_play(card *origin_card, player *origin, const target_list &targets);
     };
 
     struct effect_al_preacher : event_based_effect {

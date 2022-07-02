@@ -1680,12 +1680,14 @@ character:
       - red_ringo
     effects:
       - max_usages(1)
-      - red_ringo card self | cube_slot table
+      - mth_add card self | cube_slot table
     optional:
-      - red_ringo card self | cube_slot table
+      - mth_add card self | cube_slot table
+    mth_effect: red_ringo
     tags:
       - max_hp(5)
       - can_repeat
+      - auto_confirm_red_ringo
   - name: DON_BELL
     image: 04_don_bell
     expansion: goldrush

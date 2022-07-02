@@ -72,18 +72,23 @@ namespace banggame {
         target->add_cubes(target->m_characters.front(), max_cubes);
     }
 
-    opt_error effect_red_ringo::verify(card *origin_card, player *origin, card *target_card) {
-        if (origin->m_characters.front()->num_cubes == 0) {
+    opt_error handler_red_ringo::verify(card *origin_card, player *origin, const target_list &targets) {
+        if (origin->m_characters.front()->num_cubes < targets.size()) {
             return game_error("ERROR_NOT_ENOUGH_CUBES_ON", origin->m_characters.front());
         }
-        if (target_card->num_cubes >= max_cubes) {
-            return game_error("ERROR_CARD_HAS_FULL_CUBES", target_card);
+        for (const auto &target : targets) {
+            card *target_card = target.get<target_type::card>();
+            if (target_card->num_cubes >= max_cubes) {
+                return game_error("ERROR_CARD_HAS_FULL_CUBES", target_card);
+            }
         }
         return std::nullopt;
     }
 
-    void effect_red_ringo::on_play(card *origin_card, player *origin, card *target_card) {
-        origin->move_cubes(origin->m_characters.front(), target_card, 1);
+    void handler_red_ringo::on_play(card *origin_card, player *origin, const target_list &targets) {
+        for (const auto &target : targets) {
+            origin->move_cubes(origin->m_characters.front(), target.get<target_type::card>(), 1);
+        }
     }
 
     bool effect_ms_abigail::can_escape(player *origin, card *origin_card, effect_flags flags) {

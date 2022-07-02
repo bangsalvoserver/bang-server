@@ -62,6 +62,7 @@ namespace banggame {
             case target_type::player:
                 return !make_player_target_set(target_card, holder).empty();
             case target_type::card:
+            case target_type::extra_card:
                 return !make_card_target_set(target_card, holder).empty();
             default:
                 return true;
