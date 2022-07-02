@@ -360,6 +360,7 @@ namespace banggame {
         (can_repeat)
         (can_target_self)
         (shopchoice)
+        (last_scenario_card)
         (peyote)
         (handcuffs)
         (buy_cost)

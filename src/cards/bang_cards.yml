@@ -1824,6 +1824,8 @@ highnoon:
     image: 05_mezzogiornodifuoco
     equip:
       - highnoon
+    tags:
+      - last_scenario_card
 fistfulofcards:
   - name: AMBUSH
     image: 05_agguato
@@ -1915,6 +1917,8 @@ fistfulofcards:
     image: 05_perunpugnodicarte
     equip:
       - fistfulofcards
+    tags:
+      - last_scenario_card
 wildwestshow:
   - name: GAG
     image: 06_bavaglio

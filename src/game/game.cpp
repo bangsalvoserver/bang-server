@@ -124,14 +124,24 @@ namespace banggame {
     
         add_update<game_update_type::game_options>(options);
         
-        auto add_card = [&](pocket_type pocket, const card_data &c) {
-            card copy(c);
-            copy.id = m_cards.first_available_id();
-            copy.owner = nullptr;
-            copy.pocket = pocket;
-            auto *new_card = &m_cards.emplace(std::move(copy));
+        auto add_cards = [&](const std::vector<card_data> &cards, pocket_type pocket, std::vector<card *> *out_pocket = nullptr) {
+            if (!out_pocket) out_pocket = &get_pocket(pocket);
 
-            get_pocket(pocket).push_back(new_card);
+            size_t count = 0;
+            for (const auto &c : cards) {
+                if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;;
+                if ((c.expansion & m_options.expansions) != c.expansion) continue;
+
+                card copy(c);
+                copy.id = m_cards.first_available_id();
+                copy.owner = nullptr;
+                copy.pocket = pocket;
+                auto *new_card = &m_cards.emplace(std::move(copy));
+
+                out_pocket->push_back(new_card);
+                ++count;
+            }
+            return count;
         };
 
         auto move_testing_cards_back = [](auto &deck) {
@@ -142,32 +152,20 @@ namespace banggame {
 #endif
         };
 
-        for (const auto &c : all_cards.specials) {
-            if ((c.expansion & m_options.expansions) == c.expansion) {
-                add_card(pocket_type::specials, c);
-            }
-        }
-        add_update<game_update_type::add_cards>(make_id_vector(m_specials), pocket_type::specials);
-        for (card *c : m_specials) {
-            send_card_update(c, nullptr, show_card_flags::instant);
-        }
-
-        for (const auto &c : all_cards.deck) {
-            if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;
-            if ((c.expansion & m_options.expansions) == c.expansion) {
-                add_card(pocket_type::main_deck, c);
+        if (add_cards(all_cards.specials, pocket_type::specials)) {
+            add_update<game_update_type::add_cards>(make_id_vector(m_specials), pocket_type::specials);
+            for (card *c : m_specials) {
+                send_card_update(c, nullptr, show_card_flags::instant);
             }
         }
 
-        shuffle_cards_and_ids(m_deck);
-        move_testing_cards_back(m_deck);
-        add_update<game_update_type::add_cards>(make_id_vector(m_deck), pocket_type::main_deck);
+        if (add_cards(all_cards.deck, pocket_type::main_deck)) {
+            shuffle_cards_and_ids(m_deck);
+            move_testing_cards_back(m_deck);
+            add_update<game_update_type::add_cards>(make_id_vector(m_deck), pocket_type::main_deck);
+        }
 
-        if (has_expansion(card_expansion_type::goldrush)) {
-            for (const auto &c : all_cards.goldrush) {
-                if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;
-                add_card(pocket_type::shop_deck, c);
-            }
+        if (add_cards(all_cards.goldrush, pocket_type::shop_deck)) {
             shuffle_cards_and_ids(m_shop_deck);
             move_testing_cards_back(m_shop_deck);
             add_update<game_update_type::add_cards>(make_id_vector(m_shop_deck), pocket_type::shop_deck);
@@ -178,35 +176,15 @@ namespace banggame {
             add_update<game_update_type::add_cubes>(num_cubes, 0);
         }
 
-        std::vector<card *> last_scenario_cards;
-
-        if (has_expansion(card_expansion_type::highnoon)) {
-            for (const auto &c : all_cards.highnoon) {
-                if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;
-                if ((c.expansion & m_options.expansions) == c.expansion) {
-                    add_card(pocket_type::scenario_deck, c);
-                }
+        if (add_cards(all_cards.highnoon, pocket_type::scenario_deck) || add_cards(all_cards.fistfulofcards, pocket_type::scenario_deck)) {
+            shuffle_cards_and_ids(m_scenario_deck);
+            auto last_scenario_cards = std::ranges::partition(m_scenario_deck, [](card *c) {
+                return c->has_tag(tag_type::last_scenario_card);
+            });
+            if (last_scenario_cards.begin() != m_scenario_deck.begin()) {
+                m_scenario_deck.erase(m_scenario_deck.begin() + 1, last_scenario_cards.begin());
             }
-            last_scenario_cards.push_back(m_scenario_deck.back());
-            m_scenario_deck.pop_back();
-        }
-        
-        if (has_expansion(card_expansion_type::fistfulofcards)) {
-            for (const auto &c : all_cards.fistfulofcards) {
-                if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;
-                if ((c.expansion & m_options.expansions) == c.expansion) {
-                    add_card(pocket_type::scenario_deck, c);
-                }
-            }
-            last_scenario_cards.push_back(m_scenario_deck.back());
-            m_scenario_deck.pop_back();
-        }
-
-        if (!m_scenario_deck.empty()) {
-            m_scenario_deck.push_back(last_scenario_cards[std::uniform_int_distribution<>(0, last_scenario_cards.size() - 1)(rng)]);
-            std::swap(m_scenario_deck.back(), m_scenario_deck.front());
-
-            shuffle_cards_and_ids(std::span(m_scenario_deck).subspan(1));
+            
             move_testing_cards_back(m_scenario_deck);
             if (m_scenario_deck.size() > m_options.scenario_deck_size) {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
@@ -215,14 +193,7 @@ namespace banggame {
             add_update<game_update_type::add_cards>(make_id_vector(m_scenario_deck), pocket_type::scenario_deck);
         }
 
-        for (const auto &c : all_cards.hidden) {
-            if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;
-            if ((c.expansion & m_options.expansions) == c.expansion) {
-                add_card(pocket_type::hidden_deck, c);
-            }
-        }
-
-        if (!m_hidden_deck.empty()) {
+        if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
             add_update<game_update_type::add_cards>(make_id_vector(m_hidden_deck), pocket_type::hidden_deck);
         }
         
@@ -256,21 +227,11 @@ namespace banggame {
             m_first_player = &*std::ranges::find(m_players, player_role::deputy_3p, &player::m_role);
         }
 
-        add_log("LOG_GAME_START");
-
         std::vector<card *> character_ptrs;
-        for (const auto &c : all_cards.characters) {
-            if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;
-            if (c.expansion == card_expansion_type{} || bool(c.expansion & options.expansions)) {
-                card copy(c);
-                copy.id = m_cards.first_available_id();
-                auto *new_card = &m_cards.emplace(std::move(copy));
-                character_ptrs.push_back(new_card);
-            }
+        if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
+            std::ranges::shuffle(character_ptrs, rng);
+            move_testing_cards_back(character_ptrs);
         }
-
-        std::ranges::shuffle(character_ptrs, rng);
-        move_testing_cards_back(character_ptrs);
 
         auto add_character_to = [&](card *c, player &p) {
             p.m_characters.push_back(c);
@@ -317,6 +278,8 @@ namespace banggame {
         }
 
         queue_action([this] {
+            add_log("LOG_GAME_START");
+
             for (auto &p : m_players) {
                 p.m_characters.front()->on_equip(&p);
             }
