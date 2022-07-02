@@ -20,9 +20,9 @@ namespace banggame {
             .player_filter{target_player_filter::reachable | target_player_filter::notself}
         };
         
-        if (std::ranges::none_of(origin->m_hand, is_bangcard)
-         || std::ranges::none_of(origin->m_table, is_bangcard)
-         || std::ranges::none_of(origin->m_characters, is_bangcard)
+        if ((std::ranges::none_of(origin->m_hand, is_bangcard)
+         && std::ranges::none_of(origin->m_table, is_bangcard)
+         && std::ranges::none_of(origin->m_characters, is_bangcard))
 
          || origin->make_player_target_set(origin_card, bang_holder).empty())
             return game_error("ERROR_INVALID_ACTION");
