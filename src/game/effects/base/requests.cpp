@@ -189,8 +189,8 @@ namespace banggame {
     void request_indians::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->m_game->pop_request();
         target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
-        target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
         target->discard_card(target_card);
+        target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
         target->m_game->update_request();
     }
 
@@ -217,8 +217,8 @@ namespace banggame {
     void request_duel::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->m_game->pop_request();
         target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
-        target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
         target->discard_card(target_card);
+        target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
         target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target);
     }
 
