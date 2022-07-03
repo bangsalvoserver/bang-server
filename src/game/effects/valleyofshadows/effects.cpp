@@ -66,6 +66,15 @@ namespace banggame {
         }
     }
 
+    opt_fmt_str effect_poker::on_prompt(card *origin_card, player *origin) {
+        if (std::ranges::empty(range_other_players(origin) | std::views::filter([](const player &p) {
+            return !p.m_hand.empty();
+        }))) {
+            return game_formatted_string{"PROMPT_CARD_NO_EFFECT", origin_card};
+        }
+        return std::nullopt;
+    }
+
     void effect_poker::on_play(card *origin_card, player *origin) {
         auto targets = range_other_players(origin) | std::views::filter([](const player &p) {
             return !p.m_hand.empty();

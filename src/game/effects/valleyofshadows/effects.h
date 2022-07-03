@@ -24,6 +24,7 @@ namespace banggame {
     };
 
     struct effect_poker {
+        opt_fmt_str on_prompt(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
