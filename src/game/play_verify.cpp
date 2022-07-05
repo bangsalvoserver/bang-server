@@ -91,8 +91,13 @@ namespace banggame {
             switch(mod_card->modifier) {
             case card_modifier_type::bangmod:
             case card_modifier_type::bandolier:
-                if (!origin->is_bangcard(card_ptr) && !card_ptr->has_tag(tag_type::play_as_bang))
+                if (card_ptr->pocket == pocket_type::player_hand) {
+                    if (!origin->is_bangcard(card_ptr)) {
+                        return game_error("ERROR_INVALID_ACTION");
+                    }
+                } else if (!card_ptr->has_tag(tag_type::play_as_bang)) {
                     return game_error("ERROR_INVALID_ACTION");
+                }
                 break;
             case card_modifier_type::leevankliff:
                 if (card_ptr != origin->m_last_played_card)

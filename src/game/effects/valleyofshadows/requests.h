@@ -90,7 +90,7 @@ namespace banggame {
 
     struct request_saved : request_base {
         request_saved(card *origin_card, player *target, player *saved)
-            : request_base(origin_card, nullptr, target)
+            : request_base(origin_card, nullptr, target, effect_flags::auto_pick)
             , saved(saved) {}
 
         player *saved = nullptr;
