@@ -201,6 +201,13 @@ namespace banggame {
         }, type);
     }
 
+    bool request_base::can_respond(player *target, card *target_card) const {
+        using namespace enums::flag_operators;
+
+        const bool is_response = !bool(flags & effect_flags::force_play);
+        return !target->m_game->is_disabled(target_card) && target->is_possible_to_play(target_card, is_response);
+    }
+
     void request_base::on_pick(pocket_type pocket, player *target, card *target_card) {
         throw std::runtime_error("missing on_pick(pocket, target, target_card)");
     }

@@ -5,6 +5,8 @@
 
 namespace banggame {
 
+    using namespace enums::flag_operators;
+
     struct request_characterchoice : request_base {
         request_characterchoice(player *target)
             : request_base(nullptr, nullptr, target) {}
@@ -132,7 +134,7 @@ namespace banggame {
 
     struct request_death : request_base, resolvable_request {
         request_death(card *origin_card, player *origin, player *target)
-            : request_base(origin_card, origin, target) {}
+            : request_base(origin_card, origin, target, effect_flags::auto_respond) {}
 
         bool tried_save = false;
         
@@ -148,6 +150,18 @@ namespace banggame {
         void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
 
         void on_resolve() override;
+        game_formatted_string status_text(player *owner) const override;
+    };
+
+    struct request_force_play_card : request_base {
+        request_force_play_card(card *origin_card, player *target, card *target_card)
+            : request_base(origin_card, nullptr, target, effect_flags::force_play | effect_flags::auto_respond)
+            , target_card(target_card) {}
+        
+        card *target_card;
+
+        bool can_respond(player *target, card *target_card) const override;
+
         game_formatted_string status_text(player *owner) const override;
     };
 

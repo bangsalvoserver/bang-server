@@ -32,6 +32,7 @@ namespace banggame {
         void do_play_card() const;
 
         [[nodiscard]] opt_error verify_and_play();
+        [[nodiscard]] opt_error verify_and_respond();
     };
 
 }

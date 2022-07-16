@@ -42,7 +42,7 @@ namespace banggame {
         if (target) {
             return play_visitor<target_type::player>{}.verify(verifier, effect, target);
         } else if (!verifier->origin->make_player_target_set(verifier->card_ptr, effect).empty()) {
-            return game_error("ERROR_INVALID_ACTION");
+            return game_error("ERROR_TARGET_SET_NOT_EMPTY");
         } else {
             return std::nullopt;
         }
@@ -129,7 +129,7 @@ namespace banggame {
 
     opt_error play_visitor<target_type::card>::verify(const play_card_verify *verifier, const effect_holder &effect, card *target) {
         if (!target->owner) {
-            return game_error("ERROR_INVALID_ACTION");
+            return game_error("ERROR_CARD_HAS_NO_OWNER");
         } else if (auto error = check_player_filter(verifier->card_ptr, verifier->origin, effect.player_filter, target->owner)) {
             return error;
         } else if (auto error = check_card_filter(verifier->card_ptr, verifier->origin, effect.card_filter, target)) {
@@ -162,12 +162,12 @@ namespace banggame {
     opt_error play_visitor<target_type::extra_card>::verify(const play_card_verify *verifier, const effect_holder &effect, nullable<card> target) {
         if (!target) {
             if (verifier->card_ptr != verifier->origin->m_last_played_card) {
-                return game_error("ERROR_INVALID_ACTION");
+                return game_error("ERROR_TARGET_SET_NOT_EMPTY");
             } else {
                 return std::nullopt;
             }
         } else if (target->owner != verifier->origin || target->pocket != pocket_type::player_hand || target == verifier->card_ptr) {
-            throw game_error("ERROR_INVALID_ACTION");
+            throw game_error("ERROR_TARGET_NOT_SELF");
         } else {
             return effect.verify(verifier->card_ptr, verifier->origin, target);
         }
@@ -234,7 +234,7 @@ namespace banggame {
     opt_error play_visitor<target_type::cube>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
         for (card *c : target_cards) {
             if (!c || c->owner != verifier->origin) {
-                return game_error("ERROR_INVALID_ACTION");
+                return game_error("ERROR_TARGET_NOT_SELF");
             }
             if (auto error = effect.verify(verifier->card_ptr, verifier->origin, c)) {
                 return error;

@@ -143,6 +143,7 @@ namespace banggame {
         (int) origin_id,
         (int) target_id,
         (game_formatted_string) status_text,
+        (effect_flags) flags,
         (std::vector<int>) respond_ids,
         (std::vector<picking_args>) pick_ids
     )};
@@ -171,7 +172,6 @@ namespace banggame {
         (hide_card, hide_card_update)
         (tap_card, tap_card_update)
         (last_played_card, card_id_args)
-        (force_play_card, card_id_args)
         (player_add, player_user_update)
         (player_remove, player_remove_update)
         (player_hp, player_hp_update)

@@ -159,7 +159,7 @@ namespace banggame {
         if (paid_cubes) {
             for (auto target_card : paid_cubes->value) {
                 if (target_card == discarded_card) {
-                    return game_error("ERROR_INVALID_ACTION");
+                    return game_error("ERROR_SQUAW_TARGET");
                 }
                 if (auto error = effect_select_cube().verify(origin_card, origin, target_card)) {
                     return error;

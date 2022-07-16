@@ -93,38 +93,38 @@ namespace banggame {
             case card_modifier_type::bandolier:
                 if (card_ptr->pocket == pocket_type::player_hand) {
                     if (!origin->is_bangcard(card_ptr)) {
-                        return game_error("ERROR_INVALID_ACTION");
+                        return game_error("ERROR_INVALID_MODIFIER_CARD");
                     }
                 } else if (!card_ptr->has_tag(tag_type::play_as_bang)) {
-                    return game_error("ERROR_INVALID_ACTION");
+                    return game_error("ERROR_INVALID_MODIFIER_CARD");
                 }
                 break;
             case card_modifier_type::leevankliff:
                 if (card_ptr != origin->m_last_played_card)
-                    return game_error("ERROR_INVALID_ACTION");
+                    return game_error("ERROR_INVALID_MODIFIER_CARD");
                 break;
             case card_modifier_type::shopchoice:
             case card_modifier_type::discount:
                 if (card_ptr->expansion != card_expansion_type::goldrush)
-                    return game_error("ERROR_INVALID_ACTION");
+                    return game_error("ERROR_INVALID_MODIFIER_CARD");
                 break;
             case card_modifier_type::belltower:
                 switch (card_ptr->pocket) {
                 case pocket_type::player_hand:
                     if (card_ptr->color != card_color_type::brown)
-                        return game_error("ERROR_INVALID_ACTION");
+                        return game_error("ERROR_INVALID_MODIFIER_CARD");
                     break;
                 case pocket_type::player_table:
                     if (card_ptr->effects.empty())
-                        return game_error("ERROR_INVALID_ACTION");
+                        return game_error("ERROR_INVALID_MODIFIER_CARD");
                     break;
                 default:
                     if (card_ptr->color == card_color_type::black)
-                        return game_error("ERROR_INVALID_ACTION");
+                        return game_error("ERROR_INVALID_MODIFIER_CARD");
                 }
                 break;
             default:
-                return game_error("ERROR_INVALID_ACTION");
+                return game_error("ERROR_INVALID_MODIFIER_CARD");
             }
             for (const auto &effect : mod_card->effects) {
                 if (opt_error e = effect.verify(mod_card, origin)) {
@@ -155,7 +155,7 @@ namespace banggame {
         player *target = origin;
         if (!card_ptr->self_equippable()) {
             if (targets.size() != 1 || !targets.front().is(target_type::player)) {
-                return game_error("ERROR_INVALID_ACTION");
+                return game_error("ERROR_INVALID_EQUIP_TARGET");
             }
             target = targets.front().get<target_type::player>();
             if (auto error = check_player_filter(card_ptr, origin, card_ptr->equip_target, target)) {
@@ -183,19 +183,13 @@ namespace banggame {
         auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
 
         if (effects.empty()) {
-            return game_error("ERROR_INVALID_ACTION");
+            return game_error("ERROR_EFFECT_LIST_EMPTY");
         }
         if (card *disabler = origin->m_game->get_disabler(card_ptr)) {
             return game_error("ERROR_CARD_DISABLED_BY", card_ptr, disabler);
         }
         if (card_ptr->inactive) {
             return game_error("ERROR_CARD_INACTIVE", card_ptr);
-        }
-
-        if (origin->m_forced_card
-            && card_ptr != origin->m_forced_card
-            && std::ranges::find(modifiers, origin->m_forced_card) == modifiers.end()) {
-            return game_error("ERROR_INVALID_ACTION");
         }
 
         struct {
@@ -236,7 +230,7 @@ namespace banggame {
             }
 
             if (!t.is(e.target)) {
-                return game_error("ERROR_INVALID_ACTION");
+                return game_error("ERROR_INVALID_TARGET_TYPE");
             } else if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
             }
@@ -292,8 +286,6 @@ namespace banggame {
     }
 
     void play_card_verify::do_play_card() const {
-        origin->m_forced_card = nullptr;
-        
         auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
         origin->log_played_card(card_ptr, is_response);
         if (std::ranges::find(effects, effect_type::play_card_action, &effect_holder::type) == effects.end()) {
@@ -325,12 +317,27 @@ namespace banggame {
     }
 
     opt_error play_card_verify::verify_and_play() {
+        if (origin->m_game->pending_requests()) {
+            const auto &req = origin->m_game->top_request();
+            if (bool(req.flags() & effect_flags::force_play)) {
+                if (!req.can_respond(origin, card_ptr) && std::ranges::none_of(modifiers, [&](card *c) {
+                    return req.can_respond(origin, c);
+                })) {
+                    return game_error("ERROR_FORCED_CARD");
+                }
+            } else {
+                return game_error("ERROR_MUST_RESPOND_TO_REQUEST");
+            }
+        } else if (origin->m_game->m_playing != origin) {
+            return game_error("ERROR_PLAYER_NOT_IN_TURN");
+        }
+
         switch(card_ptr->pocket) {
         case pocket_type::player_hand:
             if (!modifiers.empty() && modifiers.front()->modifier == card_modifier_type::leevankliff) {
                 card *bang_card = std::exchange(card_ptr, origin->m_last_played_card);
                 if (!origin->is_bangcard(bang_card)) {
-                    return game_error("ERROR_INVALID_ACTION");
+                    return game_error("ERROR_INVALID_MODIFIER_CARD");
                 }
                 if (auto error = verify_modifiers()) {
                     return error;
@@ -360,7 +367,6 @@ namespace banggame {
                 }
                 origin->prompt_then(check_prompt_equip(), [*this]{
                     player *target = get_equip_target();
-                    origin->m_forced_card = nullptr;
                     card_ptr->on_equip(target);
                     if (origin == target) {
                         origin->m_game->add_log("LOG_EQUIPPED_CARD", card_ptr, origin);
@@ -405,7 +411,7 @@ namespace banggame {
             break;
         case pocket_type::hidden_deck:
             if (std::ranges::find(modifiers, card_modifier_type::shopchoice, &card::modifier) == modifiers.end()) {
-                return game_error("ERROR_INVALID_ACTION");
+                return game_error("ERROR_INVALID_MODIFIER_CARD");
             }
             [[fallthrough]];
         case pocket_type::shop_selection: {
@@ -420,7 +426,7 @@ namespace banggame {
                     break;
                 case card_modifier_type::shopchoice:
                     if (c->get_tag_value(tag_type::shopchoice) != card_ptr->get_tag_value(tag_type::shopchoice)) {
-                        return game_error("ERROR_INVALID_ACTION");
+                        return game_error("ERROR_INVALID_MODIFIER_CARD");
                     }
                     cost += c->buy_cost();
                     break;
@@ -453,7 +459,6 @@ namespace banggame {
                 }
                 origin->prompt_then(check_prompt_equip(), [*this, cost]{
                     player *target = get_equip_target();
-                    origin->m_forced_card = nullptr;
                     card_ptr->on_equip(target);
                     if (origin == target) {
                         origin->m_game->add_log("LOG_BOUGHT_EQUIP", card_ptr, origin);
@@ -476,6 +481,24 @@ namespace banggame {
         default:
             throw std::runtime_error("play_card: invalid card");
         }
+        return std::nullopt;
+    }
+
+    opt_error play_card_verify::verify_and_respond() {
+        if ((card_ptr->pocket == pocket_type::player_hand
+            && card_ptr->color != card_color_type::brown)
+            || !modifiers.empty()
+        ) {
+            return game_error("ERROR_INVALID_RESPONSE_CARD");
+        }
+        
+        if (auto error = verify_card_targets()) {
+            return *error;
+        }
+        origin->prompt_then(check_prompt(), [*this]{
+            do_play_card();
+            origin->set_last_played_card(nullptr);
+        });
         return std::nullopt;
     }
 }

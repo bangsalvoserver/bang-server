@@ -47,7 +47,7 @@ namespace banggame {
 
     opt_error effect_frankie_canton::verify(card *origin_card, player *origin, card *target_card) {
         if (target_card == origin->m_characters.front()) {
-            return game_error("ERROR_INVALID_ACTION");
+            return game_error("ERROR_TARGET_PLAYING_CARD");
         }
         if (target_card->num_cubes == 0) {
             return game_error("ERROR_NOT_ENOUGH_CUBES_ON", target_card);

@@ -88,7 +88,6 @@ namespace banggame {
         int8_t m_extra_turns = 0;
 
         card *m_last_played_card = nullptr;
-        card *m_forced_card = nullptr;
 
         player_flags m_player_flags{};
 
@@ -156,7 +155,6 @@ namespace banggame {
         std::vector<card *> make_card_target_set(card *origin_card, const effect_holder &effect);
 
         bool is_possible_to_play(card *c, bool is_response = false);
-        void set_forced_card(card *c);
 
         bool is_bangcard(card *card_ptr);
 

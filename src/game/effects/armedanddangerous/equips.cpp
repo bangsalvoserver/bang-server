@@ -22,7 +22,6 @@ namespace banggame {
                         target->pay_cubes(target_card, 2);
                     } else {
                         target->m_game->queue_request_front<request_move_bomb>(target_card, target);
-                        target->set_forced_card(target_card);
                     }
                 });
             }

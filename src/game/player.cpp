@@ -269,11 +269,6 @@ namespace banggame {
         remove_player_flags(player_flags::start_of_turn);
     }
 
-    void player::set_forced_card(card *c) {
-        m_forced_card = c;
-        m_game->add_update<game_update_type::force_play_card>(update_target::includes_private(this), c ? c->id : 0);
-    }
-
     bool player::is_bangcard(card *card_ptr) {
         return (check_player_flags(player_flags::treat_missed_as_bang)
                 && card_ptr->has_tag(tag_type::missedcard))
@@ -282,16 +277,16 @@ namespace banggame {
 
     void player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, const pick_card_args &args) {
         if (m_prompt) {
-            throw game_error("ERROR_INVALID_ACTION");
+            throw game_error("ERROR_MUST_RESPOND_PROMPT");
         }
         
         if (!m_game->pending_requests()) {
-            throw game_error("ERROR_INVALID_ACTION");
+            throw game_error("ERROR_NO_PENDING_REQUEST");
         }
 
         auto &req = m_game->top_request();
         if (req.target() != this) {
-            throw game_error("ERROR_INVALID_ACTION");
+            throw game_error("ERROR_PLAYER_NOT_IN_TURN");
         }
 
         m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
@@ -347,11 +342,7 @@ namespace banggame {
 
     void player::handle_action(enums::enum_tag_t<game_action_type::play_card>, const play_card_args &args) {
         if (m_prompt) {
-            throw game_error("ERROR_INVALID_ACTION");
-        }
-
-        if (m_game->pending_requests() || m_game->m_playing != this) {
-            throw game_error("ERROR_INVALID_ACTION");
+            throw game_error("ERROR_MUST_RESPOND_PROMPT");
         }
 
         if (auto error = play_card_verify{
@@ -367,31 +358,18 @@ namespace banggame {
     
     void player::handle_action(enums::enum_tag_t<game_action_type::respond_card>, const play_card_args &args) {
         if (m_prompt) {
-            throw game_error("ERROR_INVALID_ACTION");
+            throw game_error("ERROR_MUST_RESPOND_PROMPT");
         }
-        
-        play_card_verify verifier{
+
+        if (auto error = play_card_verify{
             this,
             m_game->find_card(args.card_id),
             true,
             target_converter<std::vector<play_card_target>>{}(m_game, args.targets),
             target_converter<std::vector<card *>>{}(m_game, args.modifier_ids)
-        };
-
-        if ((verifier.card_ptr->pocket == pocket_type::player_hand
-            && verifier.card_ptr->color != card_color_type::brown)
-            || !verifier.modifiers.empty()
-        ) {
-            throw game_error("ERROR_INVALID_ACTION");
-        }
-        
-        if (auto error = verifier.verify_card_targets()) {
+        }.verify_and_respond()) {
             throw *error;
         }
-        prompt_then(verifier.check_prompt(), [=, this]{
-            verifier.do_play_card();
-            set_last_played_card(nullptr);
-        });
     }
 
     void player::prompt_then(opt_fmt_str &&message, std::function<void()> &&fun) {
@@ -399,6 +377,9 @@ namespace banggame {
             m_prompt.emplace(std::move(fun), *message);
             m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(*message));
         } else {
+            if (m_game->pending_requests() && bool(m_game->top_request().flags() & effect_flags::force_play)) {
+                m_game->pop_request();
+            }
             m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
             std::invoke(fun);
         }
@@ -406,16 +387,19 @@ namespace banggame {
 
     void player::handle_action(enums::enum_tag_t<game_action_type::prompt_respond>, bool response) {
         if (!m_prompt) {
-            throw game_error("ERROR_INVALID_ACTION");
+            throw game_error("ERROR_NO_PROMPT");
         }
 
+        auto fun = std::move(m_prompt->first);
+        m_prompt.reset();
+
+        if (response && m_game->pending_requests() && bool(m_game->top_request().flags() & effect_flags::force_play)) {
+            m_game->pop_request();
+        }
         m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
         if (response) {
-            std::invoke(m_prompt->first);
-        } else if (m_forced_card) {
-            set_forced_card(m_forced_card);
+            std::invoke(fun);
         }
-        m_prompt.reset();
     }
 
     void player::draw_from_deck() {

@@ -155,6 +155,8 @@ namespace banggame {
         (escapable)
         (single_target)
         (auto_pick)
+        (auto_respond)
+        (force_play)
     )
     
     DEFINE_ENUM_FWD_TYPES(effect_type,

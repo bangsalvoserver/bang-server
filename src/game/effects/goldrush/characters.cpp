@@ -2,6 +2,7 @@
 #include "../base/requests.h"
 
 #include "../../game.h"
+#include "../../play_verify.h"
 
 namespace banggame {
     using namespace enums::flag_operators;
@@ -74,13 +75,21 @@ namespace banggame {
                 } else if (equip_set.size() == 1) {
                     equip_set.front()->equip_card(card);
                 } else {
-                    target->set_forced_card(card);
+                    target->m_game->queue_request<request_force_play_card>(origin_card, target, card);
                 }
             } else {
                 discard_drawn_card();
             }
         } else if (card->has_tag(tag_type::shopchoice) || target->is_possible_to_play(card)) {
-            target->set_forced_card(card);
+            if (card->modifier == card_modifier_type::none && std::ranges::all_of(card->effects, [](const effect_holder &holder) {
+                return holder.target == target_type::none;
+            })) {
+                play_card_verify{target, card, false,
+                    target_list{card->effects.size(), play_card_target{enums::enum_tag<target_type::none>}}}
+                    .do_play_card();
+            } else {
+                target->m_game->queue_request<request_force_play_card>(origin_card, target, card);
+            }
         } else {
             discard_drawn_card();
         }

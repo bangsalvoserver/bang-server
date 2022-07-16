@@ -331,4 +331,16 @@ namespace banggame {
             return {"STATUS_DISCARD_ALL_OTHER", target};
         }
     }
+
+    bool request_force_play_card::can_respond(player *e_target, card *e_target_card) const {
+        return e_target == target && e_target_card == target_card;
+    }
+
+    game_formatted_string request_force_play_card::status_text(player *owner) const {
+        if (owner == target) {
+            return {"STATUS_FORCE_PLAY_CARD", target_card};
+        } else {
+            return {"STATUS_FORCE_PLAY_CARD_OTHER", target, target_card};
+        }
+    }
 }

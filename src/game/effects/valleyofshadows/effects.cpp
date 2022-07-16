@@ -25,7 +25,7 @@ namespace banggame {
          && std::ranges::none_of(origin->m_characters, is_bangcard))
 
          || origin->make_player_target_set(origin_card, bang_holder).empty())
-            return game_error("ERROR_INVALID_ACTION");
+            return game_error("ERROR_INVALID_MODIFIER_CARD");
         
         return std::nullopt;
     }
@@ -157,7 +157,7 @@ namespace banggame {
             return std::ranges::any_of(set2, [&](player *player2) {
                 return player1 != player2 && origin->m_game->calc_distance(player1, player2) <= 1;
             });
-        })) return game_error("ERROR_INVALID_ACTION");
+        })) return game_error("ERROR_TARGET_NOT_IN_RANGE");
         return std::nullopt;
     }
 

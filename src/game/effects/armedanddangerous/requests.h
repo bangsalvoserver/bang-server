@@ -19,7 +19,7 @@ namespace banggame {
 
     struct request_move_bomb : request_base {
         request_move_bomb(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target) {}
+            : request_base(origin_card, nullptr, target, effect_flags::auto_respond) {}
 
         game_formatted_string status_text(player *owner) const override;
     };

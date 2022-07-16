@@ -108,9 +108,6 @@ namespace banggame {
                 ADD_TO_RET(game_log, str);
             }
         }
-        if (owner && owner->m_forced_card) {
-            ADD_TO_RET(force_play_card, owner->m_forced_card->id);
-        }
         if (owner && owner->m_prompt) {
             ADD_TO_RET(game_prompt, owner->m_prompt->second);
         }
@@ -313,14 +310,15 @@ namespace banggame {
         request_status_args ret{
             req.origin() ? req.origin()->id : 0,
             req.target() ? req.target()->id : 0,
-            req.status_text(p)
+            req.status_text(p),
+            req.flags()
         };
 
         if (!p) return ret;
 
         auto add_ids_for = [&](auto &&cards) {
             for (card *c : cards) {
-                if (!is_disabled(c) && p->is_possible_to_play(c, true)) {
+                if (req.can_respond(p, c)) {
                     ret.respond_ids.push_back(c->id);
                 }
             }
@@ -329,6 +327,7 @@ namespace banggame {
         add_ids_for(p->m_hand | std::views::filter([](card *c) { return c->color == card_color_type::brown; }));
         add_ids_for(p->m_table | std::views::filter(std::not_fn(&card::inactive)));
         add_ids_for(p->m_characters);
+        add_ids_for(m_shop_selection);
         add_ids_for(m_scenario_cards | std::views::reverse | std::views::take(1));
         add_ids_for(m_specials);
 
@@ -364,11 +363,9 @@ namespace banggame {
             auto target_request_update = make_request_update(req.target());
             if (target_request_update.pick_ids.size() == 1 && target_request_update.respond_ids.empty()) {
                 const auto &args = target_request_update.pick_ids.front();
-                req.target()->handle_action(enums::enum_tag<game_action_type::pick_card>, pick_card_args{
-                    .pocket = args.pocket,
-                    .player_id = args.player_id,
-                    .card_id = args.card_id
-                });
+                req.on_pick(args.pocket,
+                    args.player_id ? find_player(args.player_id) : nullptr,
+                    args.card_id ? find_card(args.card_id) : nullptr);
                 return;
             }
         }
