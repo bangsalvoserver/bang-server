@@ -5,6 +5,7 @@
 
 #include "effects/armedanddangerous/requests.h"
 #include "effects/base/requests.h"
+#include "play_verify.h"
 
 #include <array>
 
@@ -327,9 +328,12 @@ namespace banggame {
         add_ids_for(p->m_hand | std::views::filter([](card *c) { return c->color == card_color_type::brown; }));
         add_ids_for(p->m_table | std::views::filter(std::not_fn(&card::inactive)));
         add_ids_for(p->m_characters);
-        add_ids_for(m_shop_selection);
         add_ids_for(m_scenario_cards | std::views::reverse | std::views::take(1));
         add_ids_for(m_specials);
+        
+        if (bool(req.flags() & effect_flags::force_play)) {
+            add_ids_for(m_shop_selection);
+        }
 
         if (req.target() != p) return ret;
 
@@ -359,14 +363,30 @@ namespace banggame {
 
     void game::send_request_update() {
         auto &req = top_request();
-        if (req.target() && bool(req.flags() & effect_flags::auto_pick)) {
+        if (req.target() && bool(req.flags() & (effect_flags::auto_pick | effect_flags::auto_respond))) {
             auto target_request_update = make_request_update(req.target());
-            if (target_request_update.pick_ids.size() == 1 && target_request_update.respond_ids.empty()) {
+            if (bool(req.flags() & effect_flags::auto_pick) && target_request_update.pick_ids.size() == 1 && target_request_update.respond_ids.empty()) {
                 const auto &args = target_request_update.pick_ids.front();
                 req.on_pick(args.pocket,
                     args.player_id ? find_player(args.player_id) : nullptr,
                     args.card_id ? find_card(args.card_id) : nullptr);
                 return;
+            }
+            if (bool(req.flags() & effect_flags::auto_respond) && target_request_update.pick_ids.empty() && target_request_update.respond_ids.size() == 1) {
+                player *target = req.target();
+                card *card_ptr = find_card(target_request_update.respond_ids.front());
+                bool is_response = !bool(req.flags() & effect_flags::force_play);
+                auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
+                if (card_ptr->modifier == card_modifier_type::none && std::ranges::all_of(effects, [](const effect_holder &holder) {
+                    return holder.target == target_type::none;
+                })) {
+                    if (!is_response) {
+                        pop_request();
+                    }
+                    play_card_verify{target, card_ptr, is_response,
+                        target_list{effects.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
+                    return;
+                }
             }
         }
 

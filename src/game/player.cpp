@@ -399,6 +399,8 @@ namespace banggame {
         m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
         if (response) {
             std::invoke(fun);
+        } else if (m_game->pending_requests()) {
+            m_game->update_request();
         }
     }
 
