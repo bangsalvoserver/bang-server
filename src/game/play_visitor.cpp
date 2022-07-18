@@ -31,7 +31,7 @@ namespace banggame {
     void play_visitor<target_type::player>::play(const play_card_verify *verifier, const effect_holder &effect, player *target) {
         if (target == verifier->origin || !target->immune_to(verifier->card_ptr)) {
             auto flags = effect_flags::single_target;
-            if (verifier->card_ptr->sign && verifier->card_ptr->color == card_color_type::brown) {
+            if (verifier->card_ptr->color == card_color_type::brown) {
                 flags |= effect_flags::escapable;
             }
             effect.on_play(verifier->card_ptr, verifier->origin, target, flags);
@@ -84,7 +84,7 @@ namespace banggame {
         auto targets = range_other_players(verifier->origin);
         
         effect_flags flags{};
-        if (verifier->card_ptr->sign && verifier->card_ptr->color == card_color_type::brown) {
+        if (verifier->card_ptr->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
         }
         if (std::ranges::distance(targets) == 1) {
@@ -117,7 +117,7 @@ namespace banggame {
 
     void play_visitor<target_type::all_players>::play(const play_card_verify *verifier, const effect_holder &effect) {
         effect_flags flags{};
-        if (verifier->card_ptr->sign && verifier->card_ptr->color == card_color_type::brown) {
+        if (verifier->card_ptr->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
         }
         for (player &p : range_all_players(verifier->origin)) {
@@ -145,7 +145,7 @@ namespace banggame {
 
     void play_visitor<target_type::card>::play(const play_card_verify *verifier, const effect_holder &effect, card *target) {
         auto flags = effect_flags::single_target;
-        if (verifier->card_ptr->sign && verifier->card_ptr->color == card_color_type::brown) {
+        if (verifier->card_ptr->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
         }
         if (target->owner == verifier->origin) {
@@ -216,7 +216,7 @@ namespace banggame {
 
     void play_visitor<target_type::cards_other_players>::play(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
         effect_flags flags{};
-        if (verifier->card_ptr->sign && verifier->card_ptr->color == card_color_type::brown) {
+        if (verifier->card_ptr->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
         }
         if (target_cards.size() == 1) {
