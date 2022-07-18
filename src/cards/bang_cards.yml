@@ -1366,7 +1366,7 @@ character:
       - discard card self | hand
       - discard card self | hand
       - heal
-      - deathsave
+      - sid_ketchum
   - name: SLAB_THE_KILLER
     image: 01_slab
     equip:

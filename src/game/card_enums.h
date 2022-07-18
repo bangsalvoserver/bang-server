@@ -217,6 +217,7 @@ namespace banggame {
         (tumbleweed,            effect_tumbleweed)
         (sniper,                effect_sniper)
         (ricochet,              effect_ricochet)
+        (sid_ketchum,           effect_sid_ketchum)
         (greygory_deck,         effect_greygory_deck)
         (lemonade_jim,          effect_lemonade_jim)
         (josh_mccloud,          effect_josh_mccloud)

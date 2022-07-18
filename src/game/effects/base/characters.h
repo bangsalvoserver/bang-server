@@ -2,6 +2,7 @@
 #define __BASE_CHARACTERS_H__
 
 #include "../card_effect.h"
+#include "effects.h"
 
 namespace banggame {
 
@@ -40,6 +41,10 @@ namespace banggame {
 
     struct effect_vulture_sam : event_based_effect {
         void on_enable(card *target_card, player *target);
+    };
+
+    struct effect_sid_ketchum : effect_deathsave {
+        bool can_respond(card *origin_card, player *origin);
     };
 }
 
