@@ -290,10 +290,26 @@ namespace banggame {
     }
 
     game_formatted_string request_death::status_text(player *owner) const {
-        if (target == owner) {
-            return "STATUS_DEATH";
+        card *saving_card = [this]() -> card * {
+            for (card *c : target->m_characters) {
+                if (can_respond(target, c)) return c;
+            }
+            for (card *c : target->m_table) {
+                if (can_respond(target, c)) return c;
+            }
+            for (card *c : target->m_hand) {
+                if (can_respond(target, c)) return c;
+            }
+            return nullptr;
+        }();
+        if (saving_card) {
+            if (target == owner) {
+                return {"STATUS_DEATH", saving_card};
+            } else {
+                return {"STATUS_DEATH_OTHER", target, saving_card};
+            }
         } else {
-            return {"STATUS_DEATH_OTHER", target};
+            return "STATUS_DEATH";
         }
     }
 
