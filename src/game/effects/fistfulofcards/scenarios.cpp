@@ -121,7 +121,7 @@ namespace banggame {
     }
 
     void request_ricochet::on_finished() {
-        effect_destroy::resolver{origin_card, origin, target_card}.resolve();
+        effect_discard::resolver{origin_card, origin, target_card}.resolve();
     }
 
     void request_ricochet::on_miss() {

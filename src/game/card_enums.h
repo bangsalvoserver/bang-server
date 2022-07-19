@@ -98,6 +98,7 @@ namespace banggame {
         (beer)
         (bronco)
         (cube_slot)
+        (notownhand)
     )
 
     DEFINE_ENUM(target_type,
@@ -172,7 +173,6 @@ namespace banggame {
         (missed,                effect_missed)
         (barrel,                effect_barrel)
         (discard,               effect_discard)
-        (destroy,               effect_destroy)
         (startofturn,           effect_startofturn)
         (while_drawing,         effect_while_drawing)
         (end_drawing,           effect_end_drawing)
