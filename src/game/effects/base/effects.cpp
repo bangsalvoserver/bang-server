@@ -195,6 +195,13 @@ namespace banggame {
         }
     }
 
+    opt_fmt_str prompt_target_self_hand::on_prompt(card *origin_card, player *origin, card *target_card) {
+        if (origin == target_card->owner && target_card->pocket == pocket_type::player_hand) {
+            return game_formatted_string{"PROMPT_TARGET_OWN_HAND", origin_card};
+        }
+        return std::nullopt;
+    }
+
     void effect_steal::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
         if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
             origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);

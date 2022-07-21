@@ -207,8 +207,8 @@ namespace banggame {
     }
 
     void handler_doc_holyday::on_play(card *origin_card, player *origin, card *card1, card *card2, player *target) {
-        effect_discard{}.on_play(origin_card, origin, card1);
-        effect_discard{}.on_play(origin_card, origin, card2);
+        effect_destroy{}.on_play(origin_card, origin, card1);
+        effect_destroy{}.on_play(origin_card, origin, card2);
         if (!target->immune_to(card1) || !target->immune_to(card2)) {
             effect_bang{}.on_play(origin_card, origin, target);
         }

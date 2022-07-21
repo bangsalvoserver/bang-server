@@ -74,9 +74,6 @@ namespace banggame {
         if (bool(filter & target_card_filter::black) != (target->color == card_color_type::black))
             return game_error("ERROR_TARGET_BLACK_CARD");
 
-        if (bool(filter & target_card_filter::notownhand) && target->owner == origin && target->pocket == pocket_type::player_hand)
-            return game_error("ERROR_TARGET_OWN_HAND");
-
         if (bool(filter & target_card_filter::table) && target->pocket != pocket_type::player_table)
             return game_error("ERROR_TARGET_NOT_TABLE_CARD");
 

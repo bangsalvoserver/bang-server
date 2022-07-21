@@ -180,7 +180,7 @@ namespace banggame {
                 effect_steal{}.on_play(origin_card, origin, target_card, effect_flags::escapable | effect_flags::single_target);
             }
         } else if (!immune) {
-            effect_discard{}.on_play(origin_card, origin, target_card, effect_flags::escapable | effect_flags::single_target);
+            effect_destroy{}.on_play(origin_card, origin, target_card, effect_flags::escapable | effect_flags::single_target);
         }
     }
 

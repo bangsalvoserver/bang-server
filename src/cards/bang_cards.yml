@@ -156,7 +156,7 @@ main_deck:
     image: 01_catbalou
     color: brown
     effects:
-      - discard card | notownhand
+      - destroy card
   - name: STAGECOACH
     signs:
       - 9 spades
@@ -228,7 +228,7 @@ main_deck:
     image: 01_panico
     color: brown
     effects:
-      - steal card range_1 | notownhand
+      - steal card range_1
   - name: SALOON
     signs:
       - 5 hearts
@@ -343,7 +343,7 @@ main_deck:
     expansion: dodgecity
     color: brown
     effects:
-      - discard card | notownhand
+      - destroy card
   - name: GENERAL_STORE
     signs:
       - A spades
@@ -379,7 +379,7 @@ main_deck:
     expansion: dodgecity
     color: brown
     effects:
-      - steal card range_1 | notownhand
+      - steal card range_1
   - name: PUNCH
     signs:
       - 10 spades
@@ -397,7 +397,7 @@ main_deck:
     effects:
       - discard extra_card
       - play_card_action
-      - steal card | notownhand
+      - steal card
   - name: BRAWL
     signs:
       - J spades
@@ -407,7 +407,7 @@ main_deck:
     effects:
       - discard extra_card
       - play_card_action
-      - discard cards_other_players
+      - destroy cards_other_players
   - name: DODGE
     signs:
       - 7 diamonds
@@ -472,7 +472,7 @@ main_deck:
     expansion: dodgecity
     color: green
     effects:
-      - discard card | notownhand
+      - destroy card
   - name: TEN_GALLON_HAT
     signs:
       - J diamonds
@@ -488,7 +488,7 @@ main_deck:
     expansion: dodgecity
     color: green
     effects:
-      - steal card | notownhand
+      - steal card
   - name: DERRINGER
     signs:
       - 7 spades
@@ -742,7 +742,7 @@ main_deck:
     expansion: armedanddangerous
     color: brown
     effects:
-      - discard card | notownhand
+      - destroy card
   - name: A_LITTLE_NIP
     signs:
       - 5 hearts
@@ -961,7 +961,7 @@ main_deck:
     color: orange
     effects:
       - pay_cube(3)
-      - discard card | table
+      - destroy card | table
   - name: BEER_KEG
     signs:
       - 4 hearts
@@ -1093,7 +1093,7 @@ main_deck:
     expansion: canyondiablo
     color: brown
     effects:
-      - steal card range_1 | notownhand
+      - steal card range_1
   - name: BEER
     signs:
       - Q hearts
@@ -1114,7 +1114,7 @@ main_deck:
     expansion: canyondiablo
     color: brown
     effects:
-      - discard card | notownhand
+      - destroy card
   - name: BULLDOG
     signs:
       - 7 diamonds
@@ -1230,7 +1230,7 @@ main_deck:
     expansion: canyondiablo
     color: green
     effects:
-      - discard cards_other_players
+      - destroy cards_other_players
   - name: FLYING_BULLET
     signs:
       - 10 diamonds
@@ -1270,7 +1270,7 @@ main_deck:
     expansion: canyondiablo
     color: green
     effects:
-      - steal card range_1 | notownhand
+      - steal card range_1
   - name: SHYLOCK
     signs:
       - 9 diamonds
@@ -1963,7 +1963,7 @@ goldrush:
     image: 04_bottiglia_panico
     color: brown
     effects:
-      - steal card range_1 | notownhand
+      - steal card range_1
     tags:
       - shopchoice(1)
       - hidden
@@ -2025,7 +2025,7 @@ goldrush:
     image: 04_complice_catbalou
     color: brown
     effects:
-      - discard card | notownhand
+      - destroy card
     tags:
       - shopchoice(2)
       - hidden
@@ -2132,7 +2132,7 @@ specials:
     effects:
       - discard card self | hand
       - discard card self | hand
-      - discard card | table bronco
+      - destroy card | table bronco
     tags:
       - bronco
       - hidden
