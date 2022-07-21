@@ -446,7 +446,7 @@ namespace banggame {
 
         if (!m_first_dead) m_first_dead = target;
 
-        if (killer) {
+        if (killer != target) {
             add_log("LOG_PLAYER_KILLED", killer, target);
         } else {
             add_log("LOG_PLAYER_DIED", target);
@@ -456,7 +456,7 @@ namespace banggame {
         target->add_player_flags(player_flags::role_revealed);
 
         call_event<event_type::on_player_death>(killer, target);
-        target->discard_all();
+        target->discard_all(true);
 
         if (no_handle_game_over) {
             return;
@@ -511,7 +511,7 @@ namespace banggame {
                         if (killer->m_role == player_role::sheriff) {
                             queue_action([this, killer]{
                                 add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                                killer->discard_all();
+                                killer->discard_all(false);
                             });
                         }
                         break;

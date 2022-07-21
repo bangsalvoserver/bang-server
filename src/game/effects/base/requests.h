@@ -153,6 +153,12 @@ namespace banggame {
         game_formatted_string status_text(player *owner) const override;
     };
 
+    struct request_sheriff_killed_deputy : request_discard_all {
+        using request_discard_all::request_discard_all;
+        
+        game_formatted_string status_text(player *owner) const override;
+    };
+
     struct request_force_play_card : request_base {
         request_force_play_card(card *origin_card, player *target, card *target_card)
             : request_base(origin_card, nullptr, target, effect_flags::force_play | effect_flags::auto_respond)

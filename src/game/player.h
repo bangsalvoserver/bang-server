@@ -141,7 +141,7 @@ namespace banggame {
 
         bool immune_to(card *c);
         
-        void discard_all();
+        void discard_all(bool death);
 
         void next_predraw_check(card *target_card);
 

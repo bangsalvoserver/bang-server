@@ -348,6 +348,14 @@ namespace banggame {
         }
     }
 
+    game_formatted_string request_sheriff_killed_deputy::status_text(player *owner) const {
+        if (target == owner) {
+            return "STATUS_SHERIFF_KILLED_DEPUTY";
+        } else {
+            return {"STATUS_SHERIFF_KILLED_DEPUTY_OTHER", target};
+        }
+    }
+
     bool request_force_play_card::can_respond(player *e_target, card *e_target_card) const {
         return e_target == target && e_target_card == target_card;
     }

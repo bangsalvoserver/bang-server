@@ -516,7 +516,7 @@ namespace banggame {
         }
     }
 
-    void player::discard_all() {
+    void player::discard_all(bool death) {
         add_gold(-m_gold);
         drop_all_cubes(m_characters.front());
         std::vector<card *> black_cards;
@@ -531,7 +531,11 @@ namespace banggame {
         }
         if (!m_hand.empty() || !m_table.empty()) {
             untap_inactive_cards();
-            m_game->queue_request_front<request_discard_all>(this);
+            if (death) {
+                m_game->queue_request_front<request_discard_all>(this);
+            } else {
+                m_game->queue_request_front<request_sheriff_killed_deputy>(this);
+            }
         }
     }
 
