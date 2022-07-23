@@ -446,7 +446,7 @@ namespace banggame {
 
         if (!m_first_dead) m_first_dead = target;
 
-        if (killer != target) {
+        if (killer && killer != target) {
             add_log("LOG_PLAYER_KILLED", killer, target);
         } else {
             add_log("LOG_PLAYER_DIED", target);
