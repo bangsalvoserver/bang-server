@@ -236,6 +236,10 @@ namespace banggame {
         }
     }
 
+    bool request_bang::can_respond(card *c) const {
+        return !unavoidable && missable_request::can_respond(c);
+    }
+
     void request_bang::on_miss() {
         target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, is_bang_card);
         if (--bang_strength == 0) {
@@ -246,16 +250,17 @@ namespace banggame {
 
     void request_bang::on_resolve() {
         target->m_game->pop_request();
-        resolve_unavoidable();
-    }
-     
-    void request_bang::resolve_unavoidable() {
         target->damage(origin_card, origin, bang_damage, is_bang_card);
         if (auto *req = target->m_game->top_request_if<timer_damaging>(target)) {
             static_cast<cleanup_request &>(*req) = std::move(*this);
         } else {
             target->m_game->update_request();
         }
+    }
+     
+    void request_bang::set_unavoidable() {
+        unavoidable = true;
+        flags |= effect_flags::auto_respond;
     }
 
     game_formatted_string request_bang::status_text(player *owner) const {

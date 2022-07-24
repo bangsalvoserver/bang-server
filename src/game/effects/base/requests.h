@@ -120,9 +120,12 @@ namespace banggame {
         bool unavoidable = false;
         bool is_bang_card = false;
 
+        bool can_respond(card *c) const override;
+
         void on_miss() override;
         void on_resolve() override;
-        void resolve_unavoidable();
+
+        void set_unavoidable();
 
         game_formatted_string status_text(player *owner) const override;
     };

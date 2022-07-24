@@ -75,11 +75,7 @@ namespace banggame {
         req->origin->m_game->call_event<event_type::apply_bang_modifier>(req->origin, req.get());
         req->origin->m_game->queue_action([req = std::move(req)]() mutable {
             if (!req->target->immune_to(req->origin_card)) {
-                if (req->unavoidable) {
-                    req->resolve_unavoidable();
-                } else {
-                    req->origin->m_game->queue_request(std::move(req));
-                }
+                req->origin->m_game->queue_request(std::move(req));
             }
         });
     }
