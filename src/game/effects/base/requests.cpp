@@ -336,13 +336,14 @@ namespace banggame {
 
     void request_discard_all::on_resolve() {
         target->m_game->pop_request();
-        while (std::ranges::any_of(target->m_table, [](card *c) { return c->color != card_color_type::black; })) {
-            target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_table.front());
-            target->discard_card(target->m_table.front());
-        }
-        while (!target->m_hand.empty()) {
-            target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_hand.front());
-            target->m_game->move_card(target->m_hand.front(), pocket_type::discard_pile);
+        std::vector<card *> target_cards;
+        std::ranges::move(target->m_table | std::views::filter([](card *c) {
+            return c->color != card_color_type::black;
+        }), std::back_inserter(target_cards));
+        std::ranges::move(target->m_hand, std::back_inserter(target_cards));
+        for (card *c : target_cards) {
+            target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
+            target->discard_card(c);
         }
         target->m_game->update_request();
     }
