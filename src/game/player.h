@@ -143,6 +143,8 @@ namespace banggame {
         
         void discard_all(bool death);
 
+        bool only_black_cards_equipped() const;
+
         void next_predraw_check(card *target_card);
 
         void set_role(player_role role);

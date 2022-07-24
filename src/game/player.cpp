@@ -517,19 +517,7 @@ namespace banggame {
     }
 
     void player::discard_all(bool death) {
-        add_gold(-m_gold);
-        drop_all_cubes(m_characters.front());
-        std::vector<card *> black_cards;
-        for (card *c : m_table) {
-            if (c->color == card_color_type::black) {
-                black_cards.push_back(c);
-            }
-        }
-        for (card *c : black_cards) {
-            m_game->add_log("LOG_DISCARDED_SELF_CARD", this, c);
-            discard_card(c);
-        }
-        if (!m_hand.empty() || !m_table.empty()) {
+        if (!only_black_cards_equipped()) {
             untap_inactive_cards();
             if (death) {
                 m_game->queue_request_front<request_discard_all>(this);
@@ -537,6 +525,26 @@ namespace banggame {
                 m_game->queue_request_front<request_sheriff_killed_deputy>(this);
             }
         }
+        m_game->queue_action_front([this]{
+            std::vector<card *> black_cards;
+            for (card *c : m_table) {
+                if (c->color == card_color_type::black) {
+                    black_cards.push_back(c);
+                }
+            }
+            for (card *c : black_cards) {
+                m_game->add_log("LOG_DISCARDED_SELF_CARD", this, c);
+                discard_card(c);
+            }
+            add_gold(-m_gold);
+            drop_all_cubes(m_characters.front());
+        });
+    }
+
+    bool player::only_black_cards_equipped() const {
+        return std::ranges::all_of(m_table, [](card *c) {
+            return c->color == card_color_type::black;
+        }) && m_hand.empty();
     }
 
     void player::set_role(player_role role) {

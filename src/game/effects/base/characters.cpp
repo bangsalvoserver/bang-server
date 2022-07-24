@@ -99,8 +99,11 @@ namespace banggame {
     }
 
     void effect_vulture_sam::on_enable(card *target_card, player *p) {
-        p->m_game->add_listener<event_type::on_player_death>(target_card, [p](player *origin, player *target) {
-            if (p != target) {
+        p->m_game->add_listener<event_type::on_player_death>(target_card, [=](player *origin, player *target) {
+            auto range_targets = range_all_players(target) | std::views::filter([target](const player &p) {
+                return p.has_character_tag(tag_type::vulture_sam) && &p != target;
+            });
+            if (std::ranges::distance(range_targets) == 1) {
                 std::vector<card *> target_cards;
                 for (card *c : target->m_table) {
                     if (c->color != card_color_type::black) {
@@ -111,23 +114,17 @@ namespace banggame {
                     target_cards.push_back(c);
                 }
 
-                auto next_vulture_sam = [p = player_iterator(target), target]() mutable -> player * {
-                    do {
-                        ++p;
-                    } while (p == target || !p->has_character_tag(tag_type::vulture_sam));
-                    return p;
-                };
-
                 for (card *c : target_cards) {
-                    player *vulture_sam = next_vulture_sam();
                     if (c->pocket == pocket_type::player_hand) {
-                        target->m_game->add_log(update_target::includes(target, vulture_sam), "LOG_STOLEN_CARD", vulture_sam, target, c);
-                        target->m_game->add_log(update_target::excludes(target, vulture_sam), "LOG_STOLEN_CARD_FROM_HAND", vulture_sam, target);
+                        target->m_game->add_log(update_target::includes(target, p), "LOG_STOLEN_CARD", p, target, c);
+                        target->m_game->add_log(update_target::excludes(target, p), "LOG_STOLEN_CARD_FROM_HAND", p, target);
                     } else {
-                        target->m_game->add_log("LOG_STOLEN_CARD", vulture_sam, target, c);
+                        target->m_game->add_log("LOG_STOLEN_CARD", p, target, c);
                     }
-                    vulture_sam->steal_card(c);
+                    p->steal_card(c);
                 }
+            } else if (!range_targets.empty() && &range_targets.front() == p) {
+                p->m_game->queue_request_front<request_multi_vulture_sam>(target_card, target, p, effect_flags::auto_pick);
             }
         });
     }

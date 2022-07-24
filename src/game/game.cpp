@@ -441,9 +441,6 @@ namespace banggame {
             target->m_characters.resize(1);
         }
 
-        target->add_player_flags(player_flags::dead);
-        target->set_hp(0, true);
-
         if (!m_first_dead) m_first_dead = target;
 
         if (killer && killer != target) {
@@ -456,7 +453,10 @@ namespace banggame {
         target->add_player_flags(player_flags::role_revealed);
 
         call_event<event_type::on_player_death>(killer, target);
-        target->discard_all(true);
+        
+        queue_action([target]{
+            target->discard_all(true);
+        });
 
         if (no_handle_game_over) {
             return;
@@ -464,6 +464,9 @@ namespace banggame {
 
         queue_action([this, killer, target] {
             if (check_flags(game_flags::game_over)) return;
+
+            target->add_player_flags(player_flags::dead);
+            target->set_hp(0, true);
 
             player_role winner_role = player_role::unknown;
 

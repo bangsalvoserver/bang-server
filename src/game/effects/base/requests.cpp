@@ -314,14 +314,16 @@ namespace banggame {
     }
 
     bool request_discard_all::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return (pocket == pocket_type::player_hand || pocket == pocket_type::player_table) && target_player == target;
+        return (pocket == pocket_type::player_hand || pocket == pocket_type::player_table)
+            && target_player == target
+            && target_card->color != card_color_type::black;
     }
 
     void request_discard_all::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
         target->discard_card(target_card);
         
-        if (target->m_hand.empty() && target->m_table.empty()) {
+        if (target->only_black_cards_equipped()) {
             target->m_game->pop_request();
         }
         target->m_game->update_request();
@@ -329,7 +331,7 @@ namespace banggame {
 
     void request_discard_all::on_resolve() {
         target->m_game->pop_request();
-        while (!target->m_table.empty()) {
+        while (std::ranges::any_of(target->m_table, [](card *c) { return c->color != card_color_type::black; })) {
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_table.front());
             target->discard_card(target->m_table.front());
         }
@@ -365,6 +367,43 @@ namespace banggame {
             return {"STATUS_FORCE_PLAY_CARD", target_card};
         } else {
             return {"STATUS_FORCE_PLAY_CARD_OTHER", target, target_card};
+        }
+    }
+
+    bool request_multi_vulture_sam::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
+        return (pocket == pocket_type::player_hand || pocket == pocket_type::player_table)
+            && target_player == origin
+            && target_card->color != card_color_type::black;
+    }
+
+    void request_multi_vulture_sam::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+        target->m_game->pop_request();
+
+        if (pocket == pocket_type::player_hand) {
+            target_card = origin->random_hand_card();
+            target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", target, origin, target_card);
+            target->m_game->add_log(update_target::excludes(origin, target), "LOG_STOLEN_CARD_FROM_HAND", target, origin);
+        } else {
+            target->m_game->add_log("LOG_STOLEN_CARD", target, origin, target_card);
+        }
+        target->steal_card(target_card);
+
+        if (origin->only_black_cards_equipped()) {
+            target->m_game->update_request();
+        } else {
+            player_iterator next_target(target);
+            do {
+                ++next_target;
+            } while (next_target == origin || !next_target->has_character_tag(tag_type::vulture_sam));
+            target->m_game->queue_request_front<request_multi_vulture_sam>(origin_card, origin, next_target);
+        }
+    }
+
+    game_formatted_string request_multi_vulture_sam::status_text(player *owner) const {
+        if (owner == target) {
+            return {"STATUS_MULTI_VULTURE_SAM", origin_card, origin};
+        } else {
+            return {"STATUS_MULT_VULTURE_SAM_OTHER", origin_card, target, origin};
         }
     }
 }

@@ -171,6 +171,14 @@ namespace banggame {
         game_formatted_string status_text(player *owner) const override;
     };
 
+    struct request_multi_vulture_sam : request_base {
+        using request_base::request_base;
+
+        bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override;
+        void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
+        game_formatted_string status_text(player *owner) const override;
+    };
+
 }
 
 #endif
