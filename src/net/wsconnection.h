@@ -68,10 +68,7 @@ namespace net {
             if (auto con = m_con.lock()) {
                 switch (con->get_state()) {
                 case websocketpp::session::state::connecting:
-                    con->terminate(make_error_code(websocketpp::error::http_connection_ended));
-                    if constexpr (requires (Derived obj) { obj.on_close(); }) {
-                        static_cast<Derived &>(*this).on_close();
-                    }
+                    con->terminate(make_error_code(websocketpp::error::operation_canceled));
                     break;
                 case websocketpp::session::state::open:
                     con->close(0, "");
