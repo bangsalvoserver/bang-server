@@ -207,6 +207,10 @@ namespace banggame {
             }
         }
 
+        if (auto error = verify_modifiers()) {
+            return error;
+        }
+
         int diff = targets.size() - effects.size();
         if (auto repeatable = card_ptr->get_tag_value(tag_type::repeatable)) {
             if (diff < 0 || diff % card_ptr->optionals.size() != 0
@@ -339,9 +343,7 @@ namespace banggame {
                 if (!origin->is_bangcard(bang_card)) {
                     return game_error("ERROR_INVALID_MODIFIER_CARD");
                 }
-                if (auto error = verify_modifiers()) {
-                    return error;
-                } else if (auto error = verify_card_targets()) {
+                if (auto error = verify_card_targets()) {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this, bang_card]{
@@ -351,9 +353,7 @@ namespace banggame {
                     origin->set_last_played_card(nullptr);
                 });
             } else if (card_ptr->color == card_color_type::brown) {
-                if (auto error = verify_modifiers()) {
-                    return error;
-                } else if (auto error = verify_card_targets()) {
+                if (auto error = verify_card_targets()) {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this]{
@@ -398,9 +398,7 @@ namespace banggame {
         case pocket_type::player_table:
         case pocket_type::scenario_card:
         case pocket_type::specials:
-            if (auto error = verify_modifiers()) {
-                return error;
-            } else if (auto error = verify_card_targets()) {
+            if (auto error = verify_card_targets()) {
                 return error;
             }
             origin->prompt_then(check_prompt(), [*this]{
@@ -416,9 +414,6 @@ namespace banggame {
             [[fallthrough]];
         case pocket_type::shop_selection: {
             int cost = card_ptr->buy_cost();
-            if (auto error = verify_modifiers()) {
-                return error;
-            }
             for (card *c : modifiers) {
                 switch (c->modifier) {
                 case card_modifier_type::discount:
@@ -454,7 +449,9 @@ namespace banggame {
                     });
                 });
             } else {
-                if (auto error = verify_equip_target()) {
+                if (auto error = verify_modifiers()) {
+                    return error;
+                } else if (auto error = verify_equip_target()) {
                     return error;
                 }
                 origin->prompt_then(check_prompt_equip(), [*this, cost]{
