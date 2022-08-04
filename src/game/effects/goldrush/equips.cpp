@@ -25,8 +25,10 @@ namespace banggame {
     }
 
     void effect_calumet::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::apply_immunity_modifier>(target_card, [=](card *origin_card, player *p, bool &value) {
-            value = value || (p == target && p->get_card_sign(origin_card).suit == card_suit::diamonds);
+        target->m_game->add_listener<event_type::apply_immunity_modifier>(target_card, [=](card *origin_card, player *e_origin, const player *e_target, effect_flags flags, bool &value) {
+            if (e_origin != e_target && e_target == target && target->get_card_sign(origin_card).suit == card_suit::diamonds) {
+                value = true;
+            }
         });
     }
 

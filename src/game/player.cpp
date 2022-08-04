@@ -129,9 +129,9 @@ namespace banggame {
         }
     }
 
-    bool player::immune_to(card *c) {
+    bool player::immune_to(card *origin_card, player *origin, effect_flags flags) const {
         bool value = false;
-        m_game->call_event<event_type::apply_immunity_modifier>(c, this, value);
+        m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, value);
         return value;
     }
 

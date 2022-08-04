@@ -170,7 +170,8 @@ namespace banggame {
     }
 
     void handler_squaw::on_play(card *origin_card, player *origin, card *target_card, opt_tagged_value<target_type::cube> paid_cubes) {
-        bool immune = target_card->owner->immune_to(origin_card);
+        const auto flags = effect_flags::escapable | effect_flags::single_target;
+        bool immune = target_card->owner->immune_to(origin_card, origin, flags);
         if (paid_cubes) {
             for (auto target_card : paid_cubes->value) {
                 effect_select_cube().on_play(origin_card, origin, target_card);

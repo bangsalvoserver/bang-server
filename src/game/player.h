@@ -139,7 +139,7 @@ namespace banggame {
 
         void add_gold(int amount);
 
-        bool immune_to(card *c);
+        bool immune_to(card *origin_card, player *origin, effect_flags flags) const;
         
         void discard_all(bool death);
 

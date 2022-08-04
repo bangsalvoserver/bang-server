@@ -180,7 +180,7 @@ namespace banggame {
         auto targets = range_other_players(origin);
         auto flags = std::ranges::distance(targets) == 1 ? effect_flags::single_target : effect_flags{};
         for (player &p : targets) {
-            if (!p.immune_to(chosen_card)) {
+            if (!p.immune_to(chosen_card, origin, flags)) {
                 origin->m_game->queue_request<request_card_as_gatling>(chosen_card, origin, &p, flags);
             }
         }

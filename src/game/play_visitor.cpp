@@ -29,11 +29,11 @@ namespace banggame {
     }
 
     void play_visitor<target_type::player>::play(const play_card_verify *verifier, const effect_holder &effect, player *target) {
-        if (target == verifier->origin || !target->immune_to(verifier->card_ptr)) {
-            auto flags = effect_flags::single_target;
-            if (verifier->card_ptr->color == card_color_type::brown) {
-                flags |= effect_flags::escapable;
-            }
+        auto flags = effect_flags::single_target;
+        if (verifier->card_ptr->color == card_color_type::brown) {
+            flags |= effect_flags::escapable;
+        }
+        if (!target->immune_to(verifier->card_ptr, verifier->origin, flags)) {
             effect.on_play(verifier->card_ptr, verifier->origin, target, flags);
         }
     }
@@ -91,7 +91,7 @@ namespace banggame {
             flags |= effect_flags::single_target;
         }
         for (player &p : targets) {
-            if (!p.immune_to(verifier->card_ptr)) {
+            if (!p.immune_to(verifier->card_ptr, verifier->origin, flags)) {
                 effect.on_play(verifier->card_ptr, verifier->origin, &p, flags);
             }
         }
@@ -121,7 +121,7 @@ namespace banggame {
             flags |= effect_flags::escapable;
         }
         for (player &p : range_all_players(verifier->origin)) {
-            if (&p == verifier->origin || !p.immune_to(verifier->card_ptr)) {
+            if (!p.immune_to(verifier->card_ptr, verifier->origin, flags)) {
                 effect.on_play(verifier->card_ptr, verifier->origin, &p, flags);
             }
         }
@@ -150,7 +150,7 @@ namespace banggame {
         }
         if (target->owner == verifier->origin) {
             effect.on_play(verifier->card_ptr, verifier->origin, target, flags);
-        } else if (!target->owner->immune_to(verifier->card_ptr)) {
+        } else if (!target->owner->immune_to(verifier->card_ptr, verifier->origin, flags)) {
             if (target->pocket == pocket_type::player_hand) {
                 effect.on_play(verifier->card_ptr, verifier->origin, target->owner->random_hand_card(), flags);
             } else {
