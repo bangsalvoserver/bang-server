@@ -6,6 +6,7 @@
 #include <functional>
 #include <cassert>
 #include <span>
+#include <set>
 
 #include "utils/enum_variant.h"
 
@@ -103,8 +104,6 @@ namespace banggame {
         EVENT(post_turn_end, player *origin)
     )
 
-    using event_function = enums::enum_variant<event_type>;
-
     struct event_card_key {
         card *target_card;
         int priority;
@@ -143,6 +142,69 @@ namespace banggame {
         }
     };
 
+    template<typename T>
+    struct priority_pair {
+        int priority;
+        T value;
+
+        auto operator <=> (const priority_pair &other) const {
+            return priority <=> other.priority;
+        }
+    };
+
+    template<typename T> using priority_list = std::multiset<priority_pair<T>, std::greater<>>;
+    template<event_type E> using event_set = priority_list<enums::enum_type_t<E>>;
+    template<event_type E> struct event_iterator : event_set<E>::iterator {};
+
+    template<typename> struct make_event_table;
+    template<event_type ... Es> struct make_event_table<enums::enum_sequence<Es ...>> {
+        using type = std::tuple<event_set<Es> ...>;
+    };
+    using event_table = typename make_event_table<enums::make_enum_sequence<event_type>>::type;
+
+    template<typename> struct make_iterator_variant;
+    template<event_type ... Es> struct make_iterator_variant<enums::enum_sequence<Es ...>> {
+        using type = std::variant<event_iterator<Es> ...>;
+    };
+    using iterator_variant = typename make_iterator_variant<enums::make_enum_sequence<event_type>>::type;
+
+    using event_iterator_map = std::multimap<event_card_key, iterator_variant, std::less<>>;
+
+    struct event_double_map {
+    private:
+        event_table m_table;
+        event_iterator_map m_map;
+
+        template<event_type E>
+        auto &get_table() {
+            return std::get<enums::indexof(E)>(m_table);
+        }
+
+    public:
+        template<event_type E, typename Function>
+        void add(event_card_key key, Function &&fun) {
+            event_iterator<E> it{get_table<E>().emplace(key.priority, std::forward<Function>(fun))};
+            m_map.emplace(std::make_pair(key, it));
+        }
+
+        void erase(auto key) {
+            auto [low, high] = m_map.equal_range(key);
+            std::for_each(low, high, [this](const auto &pair) {
+                std::visit([this]<event_type E>(event_iterator<E> it) {
+                    get_table<E>().erase(it);
+                }, pair.second);
+            });
+            m_map.erase(low, high);
+        }
+
+        template<event_type E, typename ... Ts>
+        void call(Ts && ... args) {
+            for (auto &&fun : get_table<E>()) {
+                std::invoke(fun.value, args ...);
+            }
+        }
+    };
+
     template<typename T, typename U> struct same_function_args {};
 
     template<typename Function, typename RetType, typename ... Ts>
@@ -157,11 +219,11 @@ namespace banggame {
     template<typename Function> struct deduce_event_args : function_argument<decltype(&Function::operator())> {};
 
     struct listener_map {
-        card_multimap<event_function> m_listeners;
+        event_double_map m_listeners;
 
         template<event_type E, invocable_for_event<E> Function>
         void add_listener(event_card_key key, Function &&fun) {
-            m_listeners.add(key, enums::enum_tag<E>, std::forward<Function>(fun));
+            m_listeners.add<E>(key, std::forward<Function>(fun));
         }
 
         template<typename Function>
@@ -180,24 +242,7 @@ namespace banggame {
 
         template<event_type E, typename ... Ts>
         void call_event(Ts && ... args) {
-            using priority_handler_pair = std::pair<int, enums::enum_type_t<E> *>;
-
-            std::array<priority_handler_pair, 16> buffer;
-            auto next = buffer.begin();
-
-            for (auto &[key, handler] : m_listeners) {
-                if (auto *fun = std::get_if<enums::indexof(E)>(&handler)) {
-                    assert(next - buffer.begin() < buffer.size());
-                    *next++ = std::make_pair(key.priority, fun);
-                }
-            }
-
-            std::span handlers{buffer.begin(), next};
-            std::ranges::sort(handlers, std::greater(), &priority_handler_pair::first);
-
-            for (auto &[key, fun] : handlers) {
-                std::invoke(*fun, args ...);
-            }
+            m_listeners.call<E>(std::forward<Ts>(args) ...);
         }
 
         template<typename T>
