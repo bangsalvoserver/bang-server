@@ -119,24 +119,6 @@ namespace banggame {
         }
     };
 
-    template<typename T>
-    struct card_multimap : std::multimap<event_card_key, T, std::less<>> {
-        using base = std::multimap<event_card_key, T, std::less<>>;
-
-        void add(event_card_key key, auto && ... args) {
-            base::emplace(std::piecewise_construct, std::make_tuple(key), std::make_tuple(FWD(args) ... ));
-        }
-
-        void erase(card *target_card) {
-            auto [low, high] = base::equal_range(target_card);
-            base::erase(low, high);
-        }
-
-        void erase(event_card_key key) {
-            base::erase(key);
-        }
-    };
-
     template<typename Key, enums::reflected_enum EnumType, typename Compare = std::less<Key>>
     struct priority_double_map {
     private:

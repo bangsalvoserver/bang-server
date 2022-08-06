@@ -191,7 +191,7 @@ namespace banggame {
             std::ranges::for_each(p.m_characters, disable_if_new);
         }
 
-        m_disablers.add(key, std::move(fun));
+        m_disablers.emplace(std::make_pair(key, std::move(fun)));
     }
 
     void game_table::remove_disablers(event_card_key key) {

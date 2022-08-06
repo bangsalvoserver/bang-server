@@ -42,7 +42,7 @@ namespace banggame {
         player *m_first_player = nullptr;
         player *m_first_dead = nullptr;
 
-        card_multimap<card_disabler_fun> m_disablers;
+        std::multimap<event_card_key, card_disabler_fun, std::less<>> m_disablers;
 
         game_table() {
             std::random_device rd;
