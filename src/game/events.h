@@ -1,16 +1,10 @@
 #ifndef __EVENTS_H__
 #define __EVENTS_H__
 
-#include <map>
-#include <any>
 #include <functional>
-#include <cassert>
-#include <span>
+#include <map>
 #include <set>
 
-#include "utils/enum_variant.h"
-
-#include "card_enums.h"
 #include "player.h"
 
 namespace banggame {
@@ -20,8 +14,6 @@ namespace banggame {
     #define EVENT(name, ...) (name, std::function<void(__VA_ARGS__)>)
     
     DEFINE_ENUM_TYPES(event_type,
-        EVENT(custom_event, const std::any &args)
-
         EVENT(apply_sign_modifier,              player *origin, card_sign &value)
         EVENT(apply_beer_modifier,              player *origin, int &value)
         EVENT(apply_maxcards_modifier,          player *origin, int &value)
@@ -30,6 +22,9 @@ namespace banggame {
         EVENT(apply_escapable_modifier,         card *origin_card, player *origin, const player *target, effect_flags flags, bool &value)
         EVENT(apply_initial_cards_modifier,     player *origin, int &value)
         EVENT(apply_bang_modifier,              player *origin, request_bang *req)
+
+        // verifica l'effetto ha un bersaglio unico
+        EVENT(verify_target_unique, card *origin_card, player *origin, player *target, bool &valid)
 
         // verifica se sei obbligato a giocare una carta prima di passare
         EVENT(verify_mandatory_card, player *origin, card* &value)
@@ -142,66 +137,62 @@ namespace banggame {
         }
     };
 
-    template<typename T>
-    struct priority_pair {
-        int priority;
-        T value;
-
-        auto operator <=> (const priority_pair &other) const {
-            return priority <=> other.priority;
-        }
-    };
-
-    template<typename T> using priority_list = std::multiset<priority_pair<T>, std::greater<>>;
-    template<event_type E> using event_set = priority_list<enums::enum_type_t<E>>;
-    template<event_type E> struct event_iterator : event_set<E>::iterator {};
-
-    template<typename> struct make_event_table;
-    template<event_type ... Es> struct make_event_table<enums::enum_sequence<Es ...>> {
-        using type = std::tuple<event_set<Es> ...>;
-    };
-    using event_table = typename make_event_table<enums::make_enum_sequence<event_type>>::type;
-
-    template<typename> struct make_iterator_variant;
-    template<event_type ... Es> struct make_iterator_variant<enums::enum_sequence<Es ...>> {
-        using type = std::variant<event_iterator<Es> ...>;
-    };
-    using iterator_variant = typename make_iterator_variant<enums::make_enum_sequence<event_type>>::type;
-
-    using event_iterator_map = std::multimap<event_card_key, iterator_variant, std::less<>>;
-
-    struct event_double_map {
+    template<typename Key, enums::reflected_enum EnumType, typename Compare = std::less<Key>>
+    struct priority_double_map {
     private:
-        event_table m_table;
-        event_iterator_map m_map;
+        template<typename T>
+        struct priority_pair : T {
+            int priority;
 
-        template<event_type E>
+            template<typename ... Ts>
+            priority_pair(int priority, Ts ... args)
+                : T{args ...}
+                , priority{priority} {}
+
+            auto operator <=> (const priority_pair &other) const {
+                return priority <=> other.priority;
+            }
+        };
+
+        template<typename T> using priority_set = std::multiset<priority_pair<T>, std::greater<>>;
+        template<EnumType E> using enum_value_set = priority_set<enums::enum_type_t<E>>;
+        template<EnumType E> struct enum_value_iterator : enum_value_set<E>::iterator {};
+
+        template<typename> struct make_enum_table;
+        template<EnumType ... Es> struct make_enum_table<enums::enum_sequence<Es ...>> {
+            using type = std::tuple<enum_value_set<Es> ...>;
+        };
+        using enum_table = typename make_enum_table<enums::make_enum_sequence<EnumType>>::type;
+
+        template<typename> struct make_iterator_variant;
+        template<EnumType ... Es> struct make_iterator_variant<enums::enum_sequence<Es ...>> {
+            using type = std::variant<enum_value_iterator<Es> ...>;
+        };
+        using iterator_variant = typename make_iterator_variant<enums::make_enum_sequence<EnumType>>::type;
+
+        enum_table m_table;
+        std::multimap<Key, iterator_variant, Compare> m_map;
+
+    public:
+        template<EnumType E>
         auto &get_table() {
             return std::get<enums::indexof(E)>(m_table);
         }
 
-    public:
-        template<event_type E, typename Function>
-        void add(event_card_key key, Function &&fun) {
-            event_iterator<E> it{get_table<E>().emplace(key.priority, std::forward<Function>(fun))};
-            m_map.emplace(std::make_pair(key, it));
+        template<EnumType E, typename ... Ts>
+        void add(Key key, int priority, Ts && ... args) {
+            enum_value_iterator<E> it{get_table<E>().emplace(priority, std::forward<Ts>(args) ...)};
+            m_map.emplace(std::make_pair(std::move(key), it));
         }
 
         void erase(auto key) {
             auto [low, high] = m_map.equal_range(key);
             std::for_each(low, high, [this](const auto &pair) {
-                std::visit([this]<event_type E>(event_iterator<E> it) {
+                std::visit([this]<EnumType E>(enum_value_iterator<E> it) {
                     get_table<E>().erase(it);
                 }, pair.second);
             });
             m_map.erase(low, high);
-        }
-
-        template<event_type E, typename ... Ts>
-        void call(Ts && ... args) {
-            for (auto &&fun : get_table<E>()) {
-                std::invoke(fun.value, args ...);
-            }
         }
     };
 
@@ -219,21 +210,11 @@ namespace banggame {
     template<typename Function> struct deduce_event_args : function_argument<decltype(&Function::operator())> {};
 
     struct listener_map {
-        event_double_map m_listeners;
+        priority_double_map<event_card_key, event_type, std::less<>> m_listeners;
 
         template<event_type E, invocable_for_event<E> Function>
         void add_listener(event_card_key key, Function &&fun) {
-            m_listeners.add<E>(key, std::forward<Function>(fun));
-        }
-
-        template<typename Function>
-        void add_custom_listener(event_card_key key, Function &&fun) {
-            using event_args = std::remove_cvref_t<typename deduce_event_args<Function>::type>;
-            add_listener<event_type::custom_event>(key, [fun = std::move(fun)](const std::any &args) {
-                if (auto *evt = std::any_cast<event_args>(&args)) {
-                    fun(*evt);
-                }
-            });
+            m_listeners.add<E>(key, key.priority, std::forward<Function>(fun));
         }
 
         void remove_listeners(auto key) {
@@ -242,12 +223,12 @@ namespace banggame {
 
         template<event_type E, typename ... Ts>
         void call_event(Ts && ... args) {
-            m_listeners.call<E>(std::forward<Ts>(args) ...);
-        }
-
-        template<typename T>
-        void call_custom_event(auto && ... args) {
-            call_event<event_type::custom_event>(T{FWD(args) ...});
+            auto &table = m_listeners.get_table<E>();
+            auto it = table.begin();
+            while (it != table.end()) {
+                auto current = it++;
+                std::invoke(*current, args ...);
+            }
         }
     };
 
