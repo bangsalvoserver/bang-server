@@ -189,7 +189,7 @@ namespace banggame {
 
     opt_error play_visitor<target_type::cards_other_players>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
         if (!std::ranges::all_of(verifier->origin->m_game->m_players | std::views::filter(&player::alive), [&](const player &p) {
-            int found = std::ranges::count(target_cards, &p, &card::owner);
+            size_t found = std::ranges::count(target_cards, &p, &card::owner);
             if (p.m_hand.empty() && p.m_table.empty()) return found == 0;
             if (&p == verifier->origin) return found == 0;
             else return found == 1;

@@ -54,7 +54,7 @@ namespace banggame {
             }
         }
         std::sort(suits.begin(), suits.end());
-        origin->heal(std::unique(suits.begin(), suits.end()) - suits.begin());
+        origin->heal(static_cast<int>(std::unique(suits.begin(), suits.end()) - suits.begin()));
     }
 
     void effect_goldrush::on_play(card *origin_card, player *origin) {

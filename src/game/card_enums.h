@@ -4,6 +4,11 @@
 #include "utils/enum_variant.h"
 #include "utils/reflector.h"
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4566)
+#endif
+
 namespace banggame {
 
     DEFINE_ENUM_DATA(card_suit,
@@ -376,5 +381,9 @@ namespace banggame {
     )
 
 }
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 #endif

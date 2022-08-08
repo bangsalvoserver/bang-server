@@ -4,19 +4,11 @@
 #include "game/game_update.h"
 
 namespace sdl {
-    struct surface;
-
-    struct image_pixels {
-        REFLECTABLE(
-            (int) width,
-            (int) height,
-            (std::vector<std::byte>) pixels
-        )
-
-        image_pixels() = default;
-        image_pixels(const surface &);
-        operator surface() const;
-    };
+    struct image_pixels {REFLECTABLE(
+        (int) width,
+        (int) height,
+        (std::vector<std::byte>) pixels
+    )};
 }
 
 namespace banggame {

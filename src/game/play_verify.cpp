@@ -211,7 +211,7 @@ namespace banggame {
             return error;
         }
 
-        int diff = targets.size() - effects.size();
+        size_t diff = targets.size() - effects.size();
         if (auto repeatable = card_ptr->get_tag_value(tag_type::repeatable)) {
             if (diff < 0 || diff % card_ptr->optionals.size() != 0
                 || (*repeatable > 0 && diff > (card_ptr->optionals.size() * *repeatable)))

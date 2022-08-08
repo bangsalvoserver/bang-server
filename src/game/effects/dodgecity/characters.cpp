@@ -39,7 +39,7 @@ namespace banggame {
 
     player *request_claus_the_saint::get_next_target() const {
         return std::next(player_iterator(target),
-            target->m_game->num_alive() - target->m_game->m_selection.size());
+            static_cast<int>(target->m_game->num_alive() - target->m_game->m_selection.size()));
     }
 
     void request_claus_the_saint::on_pick(pocket_type pocket, player *target_player, card *target_card) {
@@ -143,7 +143,7 @@ namespace banggame {
                 origin->m_game->add_log("LOG_COPY_CHARACTER", origin, target_card);
                 
                 auto card_copy = std::make_unique<card>(static_cast<const card_data &>(*target_card));
-                card_copy->id = origin->m_game->m_cards.first_available_id();
+                card_copy->id = static_cast<int>(origin->m_game->m_cards.first_available_id());
                 card_copy->pocket = pocket_type::player_character;
                 card_copy->owner = origin;
 

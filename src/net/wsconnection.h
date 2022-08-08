@@ -50,7 +50,7 @@ namespace net {
                     Json::Value json_value;
                     ss >> json_value;
                     static_cast<Derived &>(*this).on_message(json::deserialize<InputMessage>(json_value));
-                } catch (const std::exception &e) {
+                } catch (const std::exception &) {
                     // ignore
                 }
             });

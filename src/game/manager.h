@@ -11,7 +11,7 @@
 namespace banggame {
 
 class game_manager;
-class game_user;
+struct game_user;
 
 using client_handle = std::weak_ptr<void>;
 using user_map = std::map<client_handle, game_user, std::owner_less<client_handle>>;
@@ -110,7 +110,7 @@ private:
     send_message_function m_send_message;
     print_error_function m_print_error;
 
-    friend class lobby;
+    friend struct lobby;
 };
 
 }

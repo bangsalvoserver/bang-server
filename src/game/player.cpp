@@ -12,6 +12,7 @@
 #include "effects/valleyofshadows/requests.h"
 
 #include <cassert>
+#include <numeric>
 
 namespace banggame {
     using namespace enums::flag_operators;
@@ -56,7 +57,7 @@ namespace banggame {
     }
 
     card *player::random_hand_card() {
-        return m_hand[std::uniform_int_distribution<int>(0, m_hand.size() - 1)(m_game->rng)];
+        return m_hand[std::uniform_int_distribution(0, static_cast<int>(m_hand.size() - 1))(m_game->rng)];
     }
 
     static void move_owned_card(player *owner, card *target_card, pocket_type pocket, player *target = nullptr, show_card_flags flags = {}) {

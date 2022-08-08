@@ -32,7 +32,7 @@ namespace banggame {
     }
 
     opt_fmt_str effect_pass_turn::on_prompt(card *origin_card, player *origin) {
-        int diff = origin->m_hand.size() - origin->max_cards_end_of_turn();
+        int diff = static_cast<int>(origin->m_hand.size() - origin->max_cards_end_of_turn());
         if (diff == 1) {
             return game_formatted_string{"PROMPT_PASS_DISCARD"};
         } else if (diff > 1) {

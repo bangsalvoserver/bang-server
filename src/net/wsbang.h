@@ -8,6 +8,7 @@
 #include "game/net_options.h"
 
 #include <iostream>
+#include <thread>
 
 namespace banggame {
 

@@ -125,13 +125,13 @@ namespace banggame {
         auto add_cards = [&](const std::vector<card_data> &cards, pocket_type pocket, std::vector<card *> *out_pocket = nullptr) {
             if (!out_pocket) out_pocket = &get_pocket(pocket);
 
-            size_t count = 0;
+            int count = 0;
             for (const auto &c : cards) {
                 if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;;
                 if ((c.expansion & m_options.expansions) != c.expansion) continue;
 
                 card copy(c);
-                copy.id = m_cards.first_available_id();
+                copy.id = static_cast<int>(m_cards.first_available_id());
                 copy.owner = nullptr;
                 copy.pocket = pocket;
                 auto *new_card = &m_cards.emplace(std::move(copy));
@@ -195,7 +195,7 @@ namespace banggame {
             add_update<game_update_type::add_cards>(make_id_vector(m_hidden_deck), pocket_type::hidden_deck);
         }
         
-        std::array roles {
+        player_role roles[] = {
             player_role::sheriff,
             player_role::outlaw,
             player_role::outlaw,
@@ -206,17 +206,17 @@ namespace banggame {
             player_role::renegade
         };
 
-        std::array roles_3players {
+        player_role roles_3players[] = {
             player_role::deputy_3p,
             player_role::outlaw_3p,
             player_role::renegade_3p
         };
 
-        auto role_it = m_players.size() > 3 ? roles.begin() : roles_3players.begin();
+        auto role_ptr = m_players.size() > 3 ? roles : roles_3players;
 
-        std::ranges::shuffle(role_it, role_it + m_players.size(), rng);
+        std::ranges::shuffle(role_ptr, role_ptr + m_players.size(), rng);
         for (auto &p : m_players) {
-            p.set_role(*role_it++);
+            p.set_role(*role_ptr++);
         }
 
         if (m_players.size() > 3) {
@@ -471,7 +471,7 @@ namespace banggame {
             player_role winner_role = player_role::unknown;
 
             auto alive_players_view = m_players | std::views::filter(&player::alive);
-            int num_alive = std::ranges::distance(alive_players_view);
+            size_t num_alive = std::ranges::distance(alive_players_view);
 
             if (num_alive == 0) {
                 winner_role = player_role::outlaw;

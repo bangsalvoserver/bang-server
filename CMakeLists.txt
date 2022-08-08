@@ -43,7 +43,7 @@ add_subdirectory(external/cpputils)
 
 add_library(networking INTERFACE)
 target_link_libraries(networking INTERFACE asio)
-target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
+target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_STL_)
 target_include_directories(networking INTERFACE external/websocketpp)
 
 find_package(yaml-cpp REQUIRED)
@@ -70,7 +70,7 @@ add_library(bangcommon INTERFACE)
 target_include_directories(bangcommon INTERFACE src)
 target_link_libraries(bangcommon INTERFACE cpputils networking)
 
-if(MSYS)
+if(MSYS OR MSVC)
     find_package(jsoncpp)
     if(TARGET jsoncpp_static)
         target_link_libraries(bangcommon INTERFACE jsoncpp_static)
