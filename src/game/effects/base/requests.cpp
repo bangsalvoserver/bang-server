@@ -241,6 +241,7 @@ namespace banggame {
     }
 
     void request_bang::on_miss() {
+        auto target = this->target;
         target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, is_bang_card);
         if (--bang_strength == 0) {
             target->m_game->pop_request();
