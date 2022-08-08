@@ -4,19 +4,14 @@
 #include "utils/enum_variant.h"
 #include "utils/reflector.h"
 
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4566)
-#endif
-
 namespace banggame {
 
     DEFINE_ENUM_DATA(card_suit,
-        (none,      "")
-        (hearts,    "\u2665")
-        (diamonds,  "\u2666")
-        (clubs,     "\u2663")
-        (spades,    "\u2660")
+        (none,      u8"")
+        (hearts,    u8"\u2665")
+        (diamonds,  u8"\u2666")
+        (clubs,     u8"\u2663")
+        (spades,    u8"\u2660")
     )
 
     DEFINE_ENUM_DATA(card_rank,
@@ -381,9 +376,5 @@ namespace banggame {
     )
 
 }
-
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
 
 #endif
