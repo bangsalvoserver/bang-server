@@ -17,6 +17,10 @@ using client_handle = std::weak_ptr<void>;
 using user_map = std::map<client_handle, game_user, std::owner_less<client_handle>>;
 using user_ptr = user_map::iterator;
 
+struct lobby_error : std::runtime_error {
+    using std::runtime_error::runtime_error;
+};
+
 struct lobby : lobby_info {
     std::vector<user_ptr> users;
     user_ptr owner;
@@ -34,7 +38,14 @@ struct game_user {
     int user_id;
     std::string name;
     sdl::image_pixels profile_image;
-    lobby_ptr in_lobby{};
+    std::optional<lobby_ptr> in_lobby;
+
+    lobby &get_lobby() {
+        if (!in_lobby) {
+            throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
+        }
+        return (*in_lobby)->second;
+    }
 };
 
 template<server_message_type E>

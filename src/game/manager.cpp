@@ -12,10 +12,6 @@
 using namespace banggame;
 using namespace enums::flag_operators;
 
-struct lobby_error : std::runtime_error {
-    using std::runtime_error::runtime_error;
-};
-
 void game_manager::on_receive_message(client_handle client, const client_message &msg) {
     try {
         enums::visit_indexed([&]<client_message_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
@@ -77,7 +73,7 @@ void game_manager::HANDLE_MESSAGE(lobby_list, user_ptr user) {
 }
 
 void game_manager::HANDLE_MESSAGE(lobby_make, user_ptr user, const lobby_info &value) {
-    if (user->second.in_lobby != lobby_ptr{}) {
+    if (user->second.in_lobby) {
         throw lobby_error("ERROR_PLAYER_IN_LOBBY");
     }
 
@@ -97,11 +93,7 @@ void game_manager::HANDLE_MESSAGE(lobby_make, user_ptr user, const lobby_info &v
 }
 
 void game_manager::HANDLE_MESSAGE(lobby_edit, user_ptr user, const lobby_info &args) {
-    if (user->second.in_lobby == lobby_ptr{}) {
-        throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
-    }
-
-    auto &lobby = user->second.in_lobby->second;
+    auto &lobby = user->second.get_lobby();
 
     if (lobby.owner != user) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
@@ -174,10 +166,11 @@ bool game_manager::client_validated(client_handle client) const {
 }
 
 void game_manager::HANDLE_MESSAGE(lobby_leave, user_ptr user) {
-    if (user->second.in_lobby == lobby_ptr{}) return;
+    if (!user->second.in_lobby) return;
 
-    auto lobby_it = std::exchange(user->second.in_lobby, lobby_ptr{});
+    auto lobby_it = *user->second.in_lobby;
     auto &lobby = lobby_it->second;
+    user->second.in_lobby.reset();
 
     if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
         it->user_id = 0;
@@ -190,7 +183,7 @@ void game_manager::HANDLE_MESSAGE(lobby_leave, user_ptr user) {
     if (lobby.state == lobby_state::waiting && user == lobby.owner) {
         for (user_ptr u : lobby.users) {
             broadcast_message<server_message_type::lobby_remove_user>(lobby, u->second.user_id);
-            u->second.in_lobby = lobby_ptr{};
+            u->second.in_lobby.reset();
         }
         lobby.users.clear();
     }
@@ -203,19 +196,11 @@ void game_manager::HANDLE_MESSAGE(lobby_leave, user_ptr user) {
 }
 
 void game_manager::HANDLE_MESSAGE(lobby_chat, user_ptr user, const lobby_chat_client_args &value) {
-    if (user->second.in_lobby == lobby_ptr{}) {
-        throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
-    }
-
-    broadcast_message<server_message_type::lobby_chat>(user->second.in_lobby->second, user->second.user_id, value.message);
+    broadcast_message<server_message_type::lobby_chat>(user->second.get_lobby(), user->second.user_id, value.message);
 }
 
 void game_manager::HANDLE_MESSAGE(lobby_return, user_ptr user) {
-    if (user->second.in_lobby == lobby_ptr{}) {
-        throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
-    }
-
-    auto &lobby = user->second.in_lobby->second;
+    auto &lobby = user->second.get_lobby();
 
     if (user != lobby.owner) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
@@ -225,23 +210,23 @@ void game_manager::HANDLE_MESSAGE(lobby_return, user_ptr user) {
         throw lobby_error("ERROR_LOBBY_NOT_FINISHED");
     }
 
-#ifdef DEBUG_PRINT_PUBLIC_LOGS
-    if (!lobby.game.m_public_updates.empty()) {
-        std::stringstream filename;
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        filename << "game_log_" << std::put_time(&tm, "%Y%m%d%H%M%S") << ".json";
-        std::ofstream ofs(filename.str());
-        Json::Value val = Json::arrayValue;
-        for (const auto &obj : lobby.game.m_public_updates) {
-            val.append(json::serialize(obj));
+    #ifdef DEBUG_PRINT_PUBLIC_LOGS
+        if (!lobby.game.m_public_updates.empty()) {
+            std::stringstream filename;
+            auto t = std::time(nullptr);
+            auto tm = *std::localtime(&t);
+            filename << "game_log_" << std::put_time(&tm, "%Y%m%d%H%M%S") << ".json";
+            std::ofstream ofs(filename.str());
+            Json::Value val = Json::arrayValue;
+            for (const auto &obj : lobby.game.m_public_updates) {
+                val.append(json::serialize(obj));
+            }
+            ofs << val;
         }
-        ofs << val;
-    }
-#endif
+    #endif
 
     lobby.state = lobby_state::waiting;
-    send_lobby_update(user->second.in_lobby);
+    send_lobby_update(*(user->second.in_lobby));
 
     broadcast_message<server_message_type::lobby_entered>(lobby, lobby, user->second.user_id);
     for (user_ptr p : lobby.users) {
@@ -250,11 +235,7 @@ void game_manager::HANDLE_MESSAGE(lobby_return, user_ptr user) {
 }
 
 void game_manager::HANDLE_MESSAGE(game_start, user_ptr user) {
-    if (user->second.in_lobby == lobby_ptr{}) {
-        throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
-    }
-
-    auto &lobby = user->second.in_lobby->second;
+    auto &lobby = user->second.get_lobby();
 
     if (user != lobby.owner) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
@@ -269,19 +250,17 @@ void game_manager::HANDLE_MESSAGE(game_start, user_ptr user) {
     }
 
     lobby.state = lobby_state::playing;
-    send_lobby_update(user->second.in_lobby);
+    send_lobby_update(*(user->second.in_lobby));
 
     lobby.start_game(*this);
 }
 
 void game_manager::HANDLE_MESSAGE(game_action, user_ptr user, const game_action &value) {
-#ifdef DEBUG_PRINT_GAME_UPDATES
-    std::cout << "/*** GAME ACTION *** ID = " << user->second.user_id << " ***/ " << json::serialize(value) << '\n';
-#endif
-    if (user->second.in_lobby == lobby_ptr{}) {
-        throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
-    }
-    auto &lobby = user->second.in_lobby->second;
+    #ifdef DEBUG_PRINT_GAME_UPDATES
+        std::cout << "/*** GAME ACTION *** ID = " << user->second.user_id << " ***/ " << json::serialize(value) << '\n';
+    #endif
+
+    auto &lobby = user->second.get_lobby();
 
     if (lobby.state != lobby_state::playing) {
         throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
