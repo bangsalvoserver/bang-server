@@ -44,6 +44,7 @@ add_subdirectory(external/cpputils)
 add_library(networking INTERFACE)
 target_link_libraries(networking INTERFACE asio)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_STL_)
+target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
 target_include_directories(networking INTERFACE external/websocketpp)
 
 find_package(yaml-cpp REQUIRED)
