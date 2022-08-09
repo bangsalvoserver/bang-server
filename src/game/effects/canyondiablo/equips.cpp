@@ -78,8 +78,9 @@ namespace banggame {
     void effect_bronco::on_equip(card *origin_card, player *target) {
         auto it = std::ranges::find_if(target->m_game->m_hidden_deck, is_discard_bronco);
         if (it != target->m_game->m_hidden_deck.end()) {
-            target->m_game->move_card(*it, pocket_type::specials, nullptr, show_card_flags::instant | show_card_flags::hidden);
-            target->m_game->send_card_update(*it, nullptr, show_card_flags::instant);
+            card *found_card = *it;
+            target->m_game->move_card(found_card, pocket_type::specials, nullptr, show_card_flags::instant | show_card_flags::hidden);
+            target->m_game->send_card_update(found_card, nullptr, show_card_flags::instant);
         }
     }
 
