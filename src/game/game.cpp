@@ -450,7 +450,8 @@ namespace banggame {
         }
         
         add_update<game_update_type::player_show_role>(target->id, target->m_role);
-        target->add_player_flags(player_flags::role_revealed);
+        target->add_player_flags(player_flags::role_revealed | player_flags::dead);
+        target->set_hp(0, true);
 
         call_event<event_type::on_player_death>(killer, target);
         
@@ -464,9 +465,6 @@ namespace banggame {
 
         queue_action([this, killer, target] {
             if (check_flags(game_flags::game_over)) return;
-
-            target->add_player_flags(player_flags::dead);
-            target->set_hp(0, true);
 
             player_role winner_role = player_role::unknown;
 

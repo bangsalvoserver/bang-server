@@ -470,9 +470,9 @@ namespace banggame {
     void player::request_drawing() {
         m_game->call_event<event_type::on_turn_start>(this);
         m_game->queue_action([this]{
-            if (!m_game->num_queued_requests([&]{
-                m_game->call_event<event_type::on_request_draw>(this);
-            })) {
+            if (m_game->check_flags(game_flags::phase_one_override)) {
+                m_game->call_event<event_type::phase_one_override>(this);
+            } else {
                 m_game->queue_request<request_draw>(this);
             }
         });
