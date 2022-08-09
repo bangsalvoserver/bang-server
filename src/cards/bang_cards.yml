@@ -1870,6 +1870,7 @@ fistfulofcards:
   - name: HARD_LIQUOR
     image: 05_liquoreforte
     responses:
+      - startofturn
       - end_drawing
       - heal
   - name: ABANDONED_MINE
