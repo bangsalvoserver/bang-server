@@ -138,6 +138,7 @@ namespace banggame {
     )};
 
     struct request_status_args {REFLECTABLE(
+        (int) origin_card_id,
         (int) origin_id,
         (int) target_id,
         (game_formatted_string) status_text,

@@ -309,6 +309,7 @@ namespace banggame {
     request_status_args game::make_request_update(player *p) {
         const auto &req = top_request();
         request_status_args ret{
+            req.origin_card() ? req.origin_card()->id : 0,
             req.origin() ? req.origin()->id : 0,
             req.target() ? req.target()->id : 0,
             req.status_text(p),
