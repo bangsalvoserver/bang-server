@@ -392,7 +392,7 @@ namespace banggame {
 
         auto spectator_target = update_target::excludes_public();
         for (auto &p : m_players) {
-            if (p.user_id) {
+            if (p.user_id && p.alive()) {
                 req.add_pending_confirm(&p);
             }
             spectator_target.add(&p);
