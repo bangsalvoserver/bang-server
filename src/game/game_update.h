@@ -115,7 +115,6 @@ namespace banggame {
         (ghost)
         (temp_ghost)
         (targetable)
-        (start_of_turn)
         (extra_turn)
         (treat_missed_as_bang)
         (role_revealed)

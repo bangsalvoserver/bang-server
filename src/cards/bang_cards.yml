@@ -1893,16 +1893,16 @@ fistfulofcards:
       - hidden
   - name: RANCH
     image: 05_ranch
-    effects:
-      - startofturn
-      - discard card self | hand
-      - mth_add
+    equip:
+      - ranch
+    responses:
+      - ranch
     optional:
       - discard card self | hand
       - mth_add
     tags:
       - repeatable
-    mth_effect: draw_atend
+    mth_response: draw_atend
   - name: RICOCHET
     image: 05_rimbalzo
     effects:

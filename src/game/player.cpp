@@ -267,7 +267,6 @@ namespace banggame {
     void player::set_last_played_card(card *c) {
         m_last_played_card = c;
         m_game->add_update<game_update_type::last_played_card>(update_target::includes_private(this), c ? c->id : 0);
-        remove_player_flags(player_flags::start_of_turn);
     }
 
     bool player::is_bangcard(card *card_ptr) {
@@ -433,7 +432,6 @@ namespace banggame {
         m_bangs_played = 0;
         m_bangs_per_turn = 1;
         m_num_drawn_cards = 0;
-        add_player_flags(player_flags::start_of_turn);
         
         for (card *c : m_characters) {
             c->usages = 0;

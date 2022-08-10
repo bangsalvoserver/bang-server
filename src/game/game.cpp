@@ -377,7 +377,7 @@ namespace banggame {
                 card *card_ptr = find_card(target_request_update.respond_ids.front());
                 bool is_response = !bool(req.flags() & effect_flags::force_play);
                 auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
-                if (card_ptr->modifier == card_modifier_type::none && std::ranges::all_of(effects, [](const effect_holder &holder) {
+                if (card_ptr->optionals.empty() && card_ptr->modifier == card_modifier_type::none && std::ranges::all_of(effects, [](const effect_holder &holder) {
                     return holder.target == target_type::none;
                 })) {
                     if (!is_response) {

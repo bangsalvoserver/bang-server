@@ -19,6 +19,12 @@ namespace banggame {
         opt_error verify(card *origin_card, player *origin) const;
     };
 
+    struct effect_ranch : event_based_effect {
+        void on_enable(card *target_card, player *target);
+        bool can_respond(card *origin_card, player *origin);
+        void on_play(card *origin_card, player *origin);
+    };
+
     struct effect_deadman : event_based_effect {
         void on_enable(card *target_card, player *target);
     };
