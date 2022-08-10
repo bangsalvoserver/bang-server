@@ -213,11 +213,22 @@ namespace banggame {
     }
 
     void timer_request::tick() {
-        if (duration && --duration == 0) {
+        if (awaiting_confirms.empty() && duration && --duration == 0) {
             auto copy = shared_from_this();
             target->m_game->pop_request();
             on_finished();
             target->m_game->update_request();
+        }
+    }
+
+    void timer_request::add_pending_confirm(player *p) {
+        awaiting_confirms.push_back(p);
+    }
+
+    void timer_request::confirm_player(player *p) {
+        auto it = std::ranges::find(awaiting_confirms, p);
+        if (it != awaiting_confirms.end()) {
+            awaiting_confirms.erase(it);
         }
     }
 

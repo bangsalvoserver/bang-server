@@ -153,6 +153,7 @@ namespace banggame {
     }
 
     void request_ricochet::on_miss() {
+        auto target = this->target;
         target->m_game->pop_request();
         target->m_game->update_request();
     }

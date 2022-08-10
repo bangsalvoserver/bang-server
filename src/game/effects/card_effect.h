@@ -62,6 +62,9 @@ namespace banggame {
 
         virtual void tick() {}
 
+        virtual void add_pending_confirm(player *p) {}
+        virtual void confirm_player(player *p) {}
+
         virtual game_formatted_string status_text(player *owner) const = 0;
 
         virtual bool can_pick(pocket_type pocket, player *target, card *target_card) const {
@@ -82,6 +85,10 @@ namespace banggame {
             , duration(duration) {}
 
         int duration;
+
+        std::vector<player *> awaiting_confirms;
+        void add_pending_confirm(player *p) override final;
+        void confirm_player(player *p) override final;
 
         void tick() override final;
         virtual void on_finished() {}

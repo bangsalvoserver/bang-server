@@ -392,6 +392,9 @@ namespace banggame {
 
         auto spectator_target = update_target::excludes_public();
         for (auto &p : m_players) {
+            if (p.user_id) {
+                req.add_pending_confirm(&p);
+            }
             spectator_target.add(&p);
             add_update<game_update_type::request_status>(update_target::includes_private(&p), make_request_update(&p));
         }

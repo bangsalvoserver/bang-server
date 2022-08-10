@@ -15,7 +15,7 @@ namespace banggame {
         if (m_origin->m_num_checks > 1) {
             for (int i=0; i<m_origin->m_num_checks; ++i) {
                 m_origin->m_game->add_log("LOG_REVEALED_CARD", m_origin, m_origin->m_game->m_deck.back());
-                m_origin->m_game->draw_card_to(pocket_type::selection, nullptr, show_card_flags::fast);
+                m_origin->m_game->draw_card_to(pocket_type::selection, nullptr);
             }
             m_origin->m_game->queue_request_front<request_check>(m_origin_card, m_origin);
         } else {
@@ -45,7 +45,7 @@ namespace banggame {
                 card *c = m_origin->m_game->m_selection.front();
                 m_origin->m_game->call_event<event_type::on_draw_check>(m_origin, c);
                 if (c->pocket == pocket_type::selection) {
-                    m_origin->m_game->move_card(c, pocket_type::discard_pile, nullptr, show_card_flags::fast);
+                    m_origin->m_game->move_card(c, pocket_type::discard_pile, nullptr);
                 }
             }
         } else {

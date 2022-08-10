@@ -404,6 +404,12 @@ namespace banggame {
         }
     }
 
+    void player::handle_action(enums::enum_tag_t<game_action_type::request_confirm>) {
+        if (m_game->pending_requests()) {
+            m_game->top_request().confirm_player(this);
+        }
+    }
+
     void player::draw_from_deck() {
         int save_numcards = m_num_cards_to_draw;
         m_game->call_event<event_type::on_draw_from_deck>(this);

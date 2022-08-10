@@ -78,6 +78,12 @@ namespace banggame {
         game_formatted_string status_text(player *owner) const {
             return m_value->status_text(owner);
         }
+        void add_pending_confirm(player *p) {
+            m_value->add_pending_confirm(p);
+        }
+        void confirm_player(player *p) {
+            m_value->confirm_player(p);
+        }
 
         bool can_pick(pocket_type pocket, player *target, card *target_card) const {
             return m_value->can_pick(pocket, target, target_card);

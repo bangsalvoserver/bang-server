@@ -189,6 +189,7 @@ namespace banggame {
         void handle_action(enums::enum_tag_t<game_action_type::play_card>, const play_card_args &args);
         void handle_action(enums::enum_tag_t<game_action_type::respond_card>, const play_card_args &args);
         void handle_action(enums::enum_tag_t<game_action_type::prompt_respond>, bool response);
+        void handle_action(enums::enum_tag_t<game_action_type::request_confirm>);
     };
 
 }
