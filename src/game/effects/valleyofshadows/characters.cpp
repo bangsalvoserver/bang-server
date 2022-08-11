@@ -68,8 +68,8 @@ namespace banggame {
     }
 
     void effect_evelyn_shebang::on_play(card *origin_card, player *origin, player *target) {
-        origin->m_game->add_listener<event_type::verify_target_unique>(origin_card, [=](card *origin_card, player *origin, player *target, bool &valid) {
-            if (origin_card == origin_card && origin == origin && target == target) {
+        origin->m_game->add_listener<event_type::verify_target_unique>(origin_card, [=](card *e_origin_card, player *e_origin, player *e_target, bool &valid) {
+            if (e_origin_card == origin_card && e_origin == origin && e_target == target) {
                 valid = false;
             }
         });
