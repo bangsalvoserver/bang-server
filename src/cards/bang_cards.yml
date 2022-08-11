@@ -1380,7 +1380,6 @@ character:
     equip:
       - vulture_sam
     tags:
-      - vulture_sam
       - discard_if_two_players
   - name: WILLY_THE_KID
     image: 01_willythekid
@@ -1592,7 +1591,6 @@ character:
       - gary_looter
     tags:
       - max_hp(5)
-      - gary_looter
   - name: GREYGORY_DECK
     image: 06_greygorydeck
     expansion: wildwestshow
@@ -1606,8 +1604,6 @@ character:
     image: 06_johnpain
     expansion: wildwestshow
     equip:
-      - john_pain
-    tags:
       - john_pain
   - name: LEE_VAN_KLIFF
     image: 06_leevankliff

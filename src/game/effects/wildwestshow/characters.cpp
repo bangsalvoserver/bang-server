@@ -19,10 +19,17 @@ namespace banggame {
         p->m_game->remove_disablers(target_card);
     }
 
-    void effect_gary_looter::on_enable(card *target_card, player *p) {
-        p->m_game->add_listener<event_type::on_discard_pass>(target_card, [player_end = p](player *player_begin, card *discarded_card) {
-            const auto is_valid_target = [](const player &target) {
-                return target.has_character_tag(tag_type::gary_looter);
+    void effect_gary_looter::on_enable(card *target_card, player *player_end) {
+        player_end->m_game->add_listener<event_type::verify_card_taker>(target_card, [=](player *e_target, equip_type type, bool &value) {
+            if (type == equip_type::gary_looter && e_target == player_end) {
+                value = true;
+            }
+        });
+        player_end->m_game->add_listener<event_type::on_discard_pass>(target_card, [=](player *player_begin, card *discarded_card) {
+            const auto is_valid_target = [=](player &target) {
+                bool valid = false;
+                target.m_game->call_event<event_type::verify_card_taker>(&target, equip_type::gary_looter, valid);
+                return valid;
             };
             if (player_begin != player_end && std::none_of(player_iterator(player_begin), player_iterator(player_end), is_valid_target)) {
                 player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, discarded_card);
@@ -31,10 +38,17 @@ namespace banggame {
         });
     }
 
-    void effect_john_pain::on_enable(card *target_card, player *p) {
-        p->m_game->add_listener<event_type::on_draw_check>(target_card, [player_end = p](player *player_begin, card *drawn_card) {
-            const auto is_valid_target = [](const player &target) {
-                return target.alive() && target.has_character_tag(tag_type::john_pain) && target.m_hand.size() < 6;
+    void effect_john_pain::on_enable(card *target_card, player *player_end) {
+        player_end->m_game->add_listener<event_type::verify_card_taker>(target_card, [=](player *e_target, equip_type type, bool &value) {
+            if (type == equip_type::john_pain && e_target == player_end && e_target->m_hand.size() < 6) {
+                value = true;
+            }
+        });
+        player_end->m_game->add_listener<event_type::on_draw_check>(target_card, [=](player *player_begin, card *drawn_card) {
+            const auto is_valid_target = [=](player &target) {
+                bool valid = false;
+                target.m_game->call_event<event_type::verify_card_taker>(&target, equip_type::john_pain, valid);
+                return valid;
             };
             if (drawn_card->pocket != pocket_type::player_hand
                 && std::none_of(player_iterator(player_begin), player_iterator(player_end), is_valid_target)

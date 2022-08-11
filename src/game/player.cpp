@@ -593,12 +593,6 @@ namespace banggame {
         return (m_player_flags & flags) == flags;
     }
 
-    bool player::has_character_tag(tag_type tag) const {
-        return std::ranges::any_of(m_characters, [=](const card *c) {
-            return c->has_tag(tag);
-        });
-    }
-
     int player::count_cubes() const {
         return m_characters.front()->num_cubes
             + std::transform_reduce(

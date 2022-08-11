@@ -397,13 +397,19 @@ namespace banggame {
         }
         target->steal_card(target_card);
 
+        auto is_valid_target = [=](player *p) {
+            bool valid = false;
+            origin->m_game->call_event<event_type::verify_card_taker>(p, equip_type::vulture_sam, valid);
+            return valid;
+        };
+
         if (origin->only_black_cards_equipped()) {
             target->m_game->update_request();
         } else {
             player_iterator next_target(target);
             do {
                 ++next_target;
-            } while (next_target == origin || !next_target->has_character_tag(tag_type::vulture_sam));
+            } while (next_target == origin || !is_valid_target(next_target));
             target->m_game->queue_request_front<request_multi_vulture_sam>(origin_card, origin, next_target);
         }
     }

@@ -174,7 +174,6 @@ namespace banggame {
         bool add_player_flags(player_flags flags);
         bool remove_player_flags(player_flags flags);
         bool check_player_flags(player_flags flags) const;
-        bool has_character_tag(tag_type tag) const;
 
         int count_cubes() const;
 

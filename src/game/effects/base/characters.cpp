@@ -99,11 +99,24 @@ namespace banggame {
     }
 
     void effect_vulture_sam::on_enable(card *target_card, player *p) {
+        p->m_game->add_listener<event_type::verify_card_taker>(target_card, [=](player *e_target, equip_type type, bool &value){
+            if (type == equip_type::vulture_sam && e_target == p) {
+                value = true;
+            }
+        });
         p->m_game->add_listener<event_type::on_player_death>(target_card, [=](player *origin, player *target) {
-            auto range_targets = range_all_players(target) | std::views::filter([target](const player &p) {
-                return p.has_character_tag(tag_type::vulture_sam) && &p != target;
-            });
-            if (std::ranges::distance(range_targets) == 1) {
+            std::vector<player *> range_targets;
+            int count = origin->m_game->num_alive();
+            player_iterator it{target};
+            do {
+                ++it;
+                bool valid = false;
+                origin->m_game->call_event<event_type::verify_card_taker>(it, equip_type::vulture_sam, valid);
+                if (valid) {
+                    range_targets.push_back(it);
+                }
+            } while (--count != 0);
+            if (range_targets.size() == 1) {
                 std::vector<card *> target_cards;
                 for (card *c : target->m_table) {
                     if (c->color != card_color_type::black) {
@@ -123,7 +136,7 @@ namespace banggame {
                     }
                     p->steal_card(c);
                 }
-            } else if (!range_targets.empty() && &range_targets.front() == p) {
+            } else if (!range_targets.empty() && range_targets.front() == p) {
                 p->m_game->queue_request_front<request_multi_vulture_sam>(target_card, target, p, effect_flags::auto_pick);
             }
         });

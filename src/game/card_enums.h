@@ -371,9 +371,6 @@ namespace banggame {
         (handcuffs)
         (buy_cost)
         (max_hp)
-        (vulture_sam)
-        (gary_looter)
-        (john_pain)
         (bronco)
     )
 
