@@ -167,7 +167,7 @@ namespace banggame {
                 return std::nullopt;
             }
         } else if (target->owner != verifier->origin || target->pocket != pocket_type::player_hand || target == verifier->card_ptr) {
-            throw game_error("ERROR_TARGET_NOT_SELF");
+            return game_error("ERROR_TARGET_NOT_SELF");
         } else {
             return effect.verify(verifier->card_ptr, verifier->origin, target);
         }
