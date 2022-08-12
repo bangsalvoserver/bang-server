@@ -56,14 +56,14 @@ namespace banggame {
     }
 
     void effect_tornado::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
-        if (target->m_hand.empty()) {
-            target->m_game->queue_action([=]{
+        target->m_game->queue_action([=]{
+            if (target->m_hand.empty()) {
                 target->draw_card(2, origin_card);
-            });
-        } else {
-            // ignore flags ... why would you ever play escape vs tornado?
-            target->m_game->queue_request<request_tornado>(origin_card, origin, target);
-        }
+            } else {
+                // ignore flags ... why would you ever play escape vs tornado?
+                target->m_game->queue_request<request_tornado>(origin_card, origin, target);
+            }
+        });
     }
 
     opt_fmt_str effect_poker::on_prompt(card *origin_card, player *origin) {

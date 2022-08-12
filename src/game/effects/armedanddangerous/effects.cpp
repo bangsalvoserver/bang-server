@@ -56,11 +56,13 @@ namespace banggame {
     
     void effect_rust::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
         if (target->count_cubes() == 0) return;
-        if (target->can_escape(origin, origin_card, flags)) {
-            origin->m_game->queue_request<request_rust>(origin_card, origin, target, flags);
-        } else {
-            on_resolve(origin_card, origin, target);
-        }
+        origin->m_game->queue_action([=]{
+            if (target->can_escape(origin, origin_card, flags)) {
+                origin->m_game->queue_request<request_rust>(origin_card, origin, target, flags);
+            } else {
+                on_resolve(origin_card, origin, target);
+            }
+        });
     }
 
     void effect_rust::on_resolve(card *origin_card, player *origin, player *target) {
@@ -71,6 +73,8 @@ namespace banggame {
         for (card *c : orange_cards) {
             target->move_cubes(c, origin->m_characters.front(), 1);
         }
+
+        target->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
     }
 
     void effect_doublebarrel::on_play(card *origin_card, player *origin) {
