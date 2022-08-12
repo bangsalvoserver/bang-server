@@ -32,7 +32,9 @@ namespace banggame {
     };
 
     struct timer_al_preacher : timer_request {
-        using timer_request::timer_request;
+        timer_al_preacher(card *origin_card, player *origin, player *target)
+            : timer_request(origin_card, origin, target, effect_flags::auto_respond) {}
+
         game_formatted_string status_text(player *owner) const override;
     };
 

@@ -101,7 +101,9 @@ namespace banggame {
     };
 
     struct timer_lemonade_jim : timer_request {
-        using timer_request::timer_request;
+        timer_lemonade_jim(card *origin_card, player *origin, player *target)
+            : timer_request(origin_card, origin, target, effect_flags::auto_respond) {}
+        
         game_formatted_string status_text(player *owner) const override;
     };
 
