@@ -38,7 +38,7 @@ namespace banggame {
             (equip_type) type
         )
 
-        opt_fmt_str on_prompt(card *target_card, player *target) const;
+        opt_fmt_str on_prompt(player *origin, card *target_card, player *target) const;
         void on_equip(card *target_card, player *target) const;
         void on_enable(card *target_card, player *target) const;
         void on_disable(card *target_card, player *target) const;

@@ -127,10 +127,10 @@ namespace banggame {
         }, *this);
     }
 
-    opt_fmt_str equip_holder::on_prompt(card *target_card, player *target) const {
+    opt_fmt_str equip_holder::on_prompt(player *origin, card *target_card, player *target) const {
         return visit_effect([=](auto &&value) -> opt_fmt_str {
-            if constexpr (requires { value.on_prompt(target_card, target); }) {
-                return value.on_prompt(target_card, target);
+            if constexpr (requires { value.on_prompt(origin, target_card, target); }) {
+                return value.on_prompt(origin, target_card, target);
             }
             return std::nullopt;
         }, *this);

@@ -282,7 +282,7 @@ namespace banggame {
     opt_fmt_str play_card_verify::check_prompt_equip() const {
         player *target = get_equip_target();
         for (const auto &e : card_ptr->equips) {
-            if (auto prompt_message = e.on_prompt(card_ptr, target)) {
+            if (auto prompt_message = e.on_prompt(origin, card_ptr, target)) {
                 return prompt_message;
             }
         }

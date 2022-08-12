@@ -32,7 +32,7 @@ namespace banggame {
     };
 
     struct effect_horse {
-        opt_fmt_str on_prompt(card *target_card, player *target);
+        opt_fmt_str on_prompt(player *origin, card *target_card, player *target);
         void on_equip(card *target_card, player *target);
     };
 
@@ -47,7 +47,7 @@ namespace banggame {
 
     struct effect_weapon : effect_weapon_base {
         effect_weapon(int value) : effect_weapon_base(value) {}
-        opt_fmt_str on_prompt(card *target_card, player *target);
+        opt_fmt_str on_prompt(player *origin, card *target_card, player *target);
     };
 
     struct effect_guitar : effect_weapon_base {
