@@ -43,7 +43,7 @@ void game_manager::tick() {
     }
 }
 
-void game_manager::HANDLE_MESSAGE(connect, client_handle client, const connect_args &args) {
+void game_manager::handle_message(MSG_TAG(connect), client_handle client, const connect_args &args) {
     if (auto [it, inserted] = users.try_emplace(client, ++m_user_counter, args.user_name, args.profile_image); inserted) {
         send_message<server_message_type::client_accepted>(client, it->second.user_id);
     }
@@ -66,13 +66,13 @@ void game_manager::send_lobby_update(lobby_ptr it) {
     }
 }
 
-void game_manager::HANDLE_MESSAGE(lobby_list, user_ptr user) {
+void game_manager::handle_message(MSG_TAG(lobby_list), user_ptr user) {
     for (auto it = m_lobbies.begin(); it != m_lobbies.end(); ++it) {
         send_message<server_message_type::lobby_update>(user->first, make_lobby_data(it));
     }
 }
 
-void game_manager::HANDLE_MESSAGE(lobby_make, user_ptr user, const lobby_info &value) {
+void game_manager::handle_message(MSG_TAG(lobby_make), user_ptr user, const lobby_info &value) {
     if (user->second.in_lobby) {
         throw lobby_error("ERROR_PLAYER_IN_LOBBY");
     }
@@ -92,7 +92,7 @@ void game_manager::HANDLE_MESSAGE(lobby_make, user_ptr user, const lobby_info &v
     send_message<server_message_type::lobby_add_user>(user->first, user->second.user_id, user->second.name, user->second.profile_image);
 }
 
-void game_manager::HANDLE_MESSAGE(lobby_edit, user_ptr user, const lobby_info &args) {
+void game_manager::handle_message(MSG_TAG(lobby_edit), user_ptr user, const lobby_info &args) {
     auto &lobby = user->second.get_lobby();
 
     if (lobby.owner != user) {
@@ -111,7 +111,7 @@ void game_manager::HANDLE_MESSAGE(lobby_edit, user_ptr user, const lobby_info &a
     }
 }
 
-void game_manager::HANDLE_MESSAGE(lobby_join, user_ptr user, const lobby_join_args &value) {
+void game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, const lobby_join_args &value) {
     auto lobby_it = m_lobbies.find(value.lobby_id);
     if (lobby_it == m_lobbies.end()) {
         throw lobby_error("ERROR_INVALID_LOBBY");
@@ -156,7 +156,7 @@ void game_manager::HANDLE_MESSAGE(lobby_join, user_ptr user, const lobby_join_ar
 
 void game_manager::client_disconnected(client_handle client) {
     if (auto it = users.find(client); it != users.end()) {
-        handle_message(MESSAGE_TAG(lobby_leave){}, it);
+        handle_message(MSG_TAG(lobby_leave){}, it);
         users.erase(it);
     }
 }
@@ -165,7 +165,7 @@ bool game_manager::client_validated(client_handle client) const {
     return users.find(client) != users.end();
 }
 
-void game_manager::HANDLE_MESSAGE(lobby_leave, user_ptr user) {
+void game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
     if (!user->second.in_lobby) return;
 
     auto lobby_it = *user->second.in_lobby;
@@ -195,11 +195,11 @@ void game_manager::HANDLE_MESSAGE(lobby_leave, user_ptr user) {
     }
 }
 
-void game_manager::HANDLE_MESSAGE(lobby_chat, user_ptr user, const lobby_chat_client_args &value) {
+void game_manager::handle_message(MSG_TAG(lobby_chat), user_ptr user, const lobby_chat_client_args &value) {
     broadcast_message<server_message_type::lobby_chat>(user->second.get_lobby(), user->second.user_id, value.message);
 }
 
-void game_manager::HANDLE_MESSAGE(lobby_return, user_ptr user) {
+void game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
     auto &lobby = user->second.get_lobby();
 
     if (user != lobby.owner) {
@@ -234,7 +234,7 @@ void game_manager::HANDLE_MESSAGE(lobby_return, user_ptr user) {
     }
 }
 
-void game_manager::HANDLE_MESSAGE(game_start, user_ptr user) {
+void game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
     auto &lobby = user->second.get_lobby();
 
     if (user != lobby.owner) {
@@ -255,7 +255,7 @@ void game_manager::HANDLE_MESSAGE(game_start, user_ptr user) {
     lobby.start_game(*this);
 }
 
-void game_manager::HANDLE_MESSAGE(game_action, user_ptr user, const game_action &value) {
+void game_manager::handle_message(MSG_TAG(game_action), user_ptr user, const game_action &value) {
     #ifdef DEBUG_PRINT_GAME_UPDATES
         std::cout << "/*** GAME ACTION *** ID = " << user->second.user_id << " ***/ " << json::serialize(value) << '\n';
     #endif

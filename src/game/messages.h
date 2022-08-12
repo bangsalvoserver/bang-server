@@ -45,6 +45,7 @@ namespace banggame {
     )
 
     using client_message = enums::enum_variant<client_message_type>;
+    #define MSG_TAG(name) enums::enum_tag_t<banggame::client_message_type::name>
 
     DEFINE_ENUM(lobby_state,
         (waiting)
@@ -97,6 +98,7 @@ namespace banggame {
     )
 
     using server_message = enums::enum_variant<server_message_type>;
+    #define SRV_TAG(name) enums::enum_tag_t<banggame::server_message_type::name>
 
 }
 

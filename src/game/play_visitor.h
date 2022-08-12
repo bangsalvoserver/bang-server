@@ -6,16 +6,20 @@
 #include "player.h"
 #include "game.h"
 
+#define OPT_ARG(...) OPT_ARG_1(,##__VA_ARGS__, OPT_ARG_2(__VA_ARGS__),)
+#define OPT_ARG_1(arg1, arg2, arg3, ...) arg3
+#define OPT_ARG_2(...) , __VA_ARGS__
+
 namespace banggame {
 
     template<target_type E> struct play_visitor;
 
     #define DECLARE_VISITOR(type, ...) \
     template<> struct play_visitor<target_type::type> { \
-        opt_error verify(const play_card_verify *verifier, const effect_holder &effect __VA_OPT__(,) __VA_ARGS__); \
-        opt_fmt_str prompt(const play_card_verify *verifier, const effect_holder &effect __VA_OPT__(,) __VA_ARGS__); \
-        void play(const play_card_verify *verifier, const effect_holder &effect __VA_OPT__(,) __VA_ARGS__); \
-    }; \
+        opt_error verify(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
+        opt_fmt_str prompt(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
+        void play(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
+    };
 
     DECLARE_VISITOR(none)
     DECLARE_VISITOR(player, player *target)

@@ -28,33 +28,39 @@ namespace banggame {
         }
     }
 
+    struct game_update_vector : std::vector<game_update> {
+        template<game_update_type E, typename ... Ts>
+        auto &add(Ts && ... args) {
+            return emplace_back(enums::enum_tag<E>, FWD(args) ...);
+        }
+    };
+
     std::vector<game_update> game::get_game_state_updates(player *owner) {
-        std::vector<game_update> ret;
-#define ADD_TO_RET(name, ...) ret.emplace_back(enums::enum_tag<game_update_type::name> __VA_OPT__(,) __VA_ARGS__)
+        game_update_vector ret;
         
-        ADD_TO_RET(add_cards, make_id_vector(m_cards | std::views::transform([](const card &c) { return &c; })), pocket_type::hidden_deck);
+        ret.add<game_update_type::add_cards>(make_id_vector(m_cards | std::views::transform([](const card &c) { return &c; })), pocket_type::hidden_deck);
 
         const auto show_never = [](const card &c) { return false; };
         const auto show_always = [](const card &c) { return true; };
 
         auto move_cards = [&](auto &&range, auto do_show_card) {
             for (card *c : range) {
-                ADD_TO_RET(move_card, c->id, c->owner ? c->owner->id : 0, c->pocket, show_card_flags::instant);
+                ret.add<game_update_type::move_card>(c->id, c->owner ? c->owner->id : 0, c->pocket, show_card_flags::instant);
 
                 if (do_show_card(*c)) {
-                    ADD_TO_RET(show_card, *c, show_card_flags::instant);
+                    ret.add<game_update_type::show_card>(*c, show_card_flags::instant);
                     if (c->num_cubes > 0) {
-                        ADD_TO_RET(add_cubes, c->num_cubes, c->id);
+                        ret.add<game_update_type::add_cubes>(c->num_cubes, c->id);
                     }
 
                     if (c->inactive) {
-                        ADD_TO_RET(tap_card, c->id, true, true);
+                        ret.add<game_update_type::tap_card>(c->id, true, true);
                     }
                 }
             }
         };
 
-        ADD_TO_RET(game_options, m_options);
+        ret.add<game_update_type::game_options>(m_options);
 
         move_cards(m_specials, show_always);
         move_cards(m_deck, show_never);
@@ -67,19 +73,19 @@ namespace banggame {
         move_cards(m_hidden_deck, show_always);
 
         if (!m_scenario_deck.empty()) {
-            ADD_TO_RET(move_scenario_deck, m_first_player->id);
+            ret.add<game_update_type::move_scenario_deck>(m_first_player->id);
         }
 
         move_cards(m_scenario_deck, [&](const card &c) { return &c == m_scenario_deck.back(); });
         move_cards(m_scenario_cards, [&](const card &c) { return &c == m_scenario_cards.back(); });
         
         if (num_cubes > 0) {
-            ADD_TO_RET(add_cubes, num_cubes, 0);
+            ret.add<game_update_type::add_cubes>(num_cubes, 0);
         }
 
         for (auto &p : m_players) {
             if (p.check_player_flags(player_flags::role_revealed) || &p == owner) {
-                ADD_TO_RET(player_show_role, p.id, p.m_role, true);
+                ret.add<game_update_type::player_show_role>(p.id, p.m_role, true);
             }
 
             if (p.alive() || has_expansion(card_expansion_type::ghostcards)) {
@@ -89,31 +95,30 @@ namespace banggame {
                 move_cards(p.m_table, show_always);
                 move_cards(p.m_hand, [&](const card &c){ return c.owner == owner || c.deck == card_deck_type::character; });
 
-                ADD_TO_RET(player_hp, p.id, p.m_hp, true);
-                ADD_TO_RET(player_status, p.id, p.m_player_flags, p.m_range_mod, p.m_weapon_range, p.m_distance_mod);
+                ret.add<game_update_type::player_hp>(p.id, p.m_hp, true);
+                ret.add<game_update_type::player_status>(p.id, p.m_player_flags, p.m_range_mod, p.m_weapon_range, p.m_distance_mod);
                 
                 if (p.m_gold != 0) {
-                    ADD_TO_RET(player_gold, p.id, p.m_gold);
+                    ret.add<game_update_type::player_gold>(p.id, p.m_gold);
                 }
             }
         }
 
         if (m_playing) {
-            ADD_TO_RET(switch_turn, m_playing->id);
+            ret.add<game_update_type::switch_turn>(m_playing->id);
         }
         if (pending_requests()) {
-            ADD_TO_RET(request_status, make_request_update(owner));
+            ret.add<game_update_type::request_status>(make_request_update(owner));
         }
         for (const auto &[target, str] : m_saved_log) {
             if (target.matches(owner ? owner->user_id : -1)) {
-                ADD_TO_RET(game_log, str);
+                ret.add<game_update_type::game_log>(str);
             }
         }
         if (owner && owner->m_prompt) {
-            ADD_TO_RET(game_prompt, owner->m_prompt->second);
+            ret.add<game_update_type::game_prompt>(owner->m_prompt->second);
         }
 
-#undef ADD_TO_RET
         return ret;
     }
 

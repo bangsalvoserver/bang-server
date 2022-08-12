@@ -186,6 +186,7 @@ namespace banggame {
     )
 
     using game_update = enums::enum_variant<game_update_type>;
+    #define UPD_TAG(name) enums::enum_tag_t<game_update_type::name>
 }
 
 #endif

@@ -53,9 +53,6 @@ server_message make_message(auto && ... args) {
     return server_message{enums::enum_tag<E>, FWD(args) ...};
 }
 
-#define MESSAGE_TAG(name) enums::enum_tag_t<banggame::client_message_type::name>
-#define HANDLE_MESSAGE(name, ...) handle_message(MESSAGE_TAG(name) __VA_OPT__(,) __VA_ARGS__)
-
 using send_message_function = std::function<void(client_handle, server_message)>;
 using print_error_function = std::function<void(const std::string &message)>;
 
@@ -100,16 +97,16 @@ private:
         }
     }
 
-    void HANDLE_MESSAGE(connect,        client_handle client, const connect_args &value);
-    void HANDLE_MESSAGE(lobby_list,     user_ptr user);
-    void HANDLE_MESSAGE(lobby_make,     user_ptr user, const lobby_info &value);
-    void HANDLE_MESSAGE(lobby_edit,     user_ptr user, const lobby_info &args);
-    void HANDLE_MESSAGE(lobby_join,     user_ptr user, const lobby_join_args &value);
-    void HANDLE_MESSAGE(lobby_leave,    user_ptr user);
-    void HANDLE_MESSAGE(lobby_chat,     user_ptr user, const lobby_chat_client_args &value);
-    void HANDLE_MESSAGE(lobby_return,   user_ptr user);
-    void HANDLE_MESSAGE(game_start,     user_ptr user);
-    void HANDLE_MESSAGE(game_action,    user_ptr user, const banggame::game_action &value);
+    void handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
+    void handle_message(MSG_TAG(lobby_list),     user_ptr user);
+    void handle_message(MSG_TAG(lobby_make),     user_ptr user, const lobby_info &value);
+    void handle_message(MSG_TAG(lobby_edit),     user_ptr user, const lobby_info &args);
+    void handle_message(MSG_TAG(lobby_join),     user_ptr user, const lobby_join_args &value);
+    void handle_message(MSG_TAG(lobby_leave),    user_ptr user);
+    void handle_message(MSG_TAG(lobby_chat),     user_ptr user, const lobby_chat_client_args &value);
+    void handle_message(MSG_TAG(lobby_return),   user_ptr user);
+    void handle_message(MSG_TAG(game_start),     user_ptr user);
+    void handle_message(MSG_TAG(game_action),    user_ptr user, const banggame::game_action &value);
 
 private:
     user_map users;
