@@ -64,7 +64,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_kit_carlson::status_text(player *owner) const {
+    game_string request_kit_carlson::status_text(player *owner) const {
         if (owner == target) {
             return {"STATUS_KIT_CARLSON", origin_card};
         } else {

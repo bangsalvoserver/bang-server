@@ -19,10 +19,10 @@ namespace banggame {
         origin->m_game->queue_request<request_generalstore>(origin_card, origin, origin);
     }
 
-    opt_error effect_mirage::verify(card *origin_card, player *origin) {
+    opt_game_str effect_mirage::verify(card *origin_card, player *origin) {
         if (!origin->m_game->pending_requests()
             || origin->m_game->top_request().origin() != origin->m_game->m_playing) {
-            return game_error("ERROR_CANT_PLAY_CARD", origin_card);
+            return game_string("ERROR_CANT_PLAY_CARD", origin_card);
         }
         return std::nullopt;
     }
@@ -32,9 +32,9 @@ namespace banggame {
         origin->m_game->m_playing->skip_turn();
     }
 
-    opt_error effect_disarm::verify(card *origin_card, player *origin) {
+    opt_game_str effect_disarm::verify(card *origin_card, player *origin) {
         if (!origin->m_game->pending_requests() || !origin->m_game->top_request().origin()) {
-            return game_error("ERROR_CANT_PLAY_CARD", origin_card);
+            return game_string("ERROR_CANT_PLAY_CARD", origin_card);
         }
         return std::nullopt;
     }
@@ -48,12 +48,12 @@ namespace banggame {
         }
     }
 
-    opt_error handler_card_sharper::verify(card *origin_card, player *origin, card *chosen_card, card *target_card) {
+    opt_game_str handler_card_sharper::verify(card *origin_card, player *origin, card *chosen_card, card *target_card) {
         if (auto *c = origin->find_equipped_card(target_card)) {
-            return game_error("ERROR_DUPLICATED_CARD", c);
+            return game_string("ERROR_DUPLICATED_CARD", c);
         }
         if (auto *c = target_card->owner->find_equipped_card(chosen_card)) {
-            return game_error("ERROR_DUPLICATED_CARD", c);
+            return game_string("ERROR_DUPLICATED_CARD", c);
         }
         return std::nullopt;
     }
@@ -69,7 +69,7 @@ namespace banggame {
             handler_card_sharper{}.on_resolve(origin_card, origin, chosen_card, target_card);
         }
 
-        game_formatted_string status_text(player *owner) const override {
+        game_string status_text(player *owner) const override {
             if (target == owner) {
                 return {"STATUS_CARD_SHARPER", origin_card, target_card, chosen_card};
             } else {
@@ -132,7 +132,7 @@ namespace banggame {
             target->m_game->update_request();
         }
         
-        game_formatted_string status_text(player *owner) const override {
+        game_string status_text(player *owner) const override {
             if (owner == target) {
                 return {"STATUS_LASTWILL", origin_card};
             } else {

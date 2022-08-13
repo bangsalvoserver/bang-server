@@ -30,21 +30,21 @@ namespace banggame {
         }, holder.type);
     }
 
-    opt_error effect_holder::verify(card *origin_card, player *origin) const {
-        return visit_effect([=](auto &&value) -> opt_error {
+    opt_game_str effect_holder::verify(card *origin_card, player *origin) const {
+        return visit_effect([=](auto &&value) -> opt_game_str {
             if constexpr (requires { value.verify(origin_card, origin); }) {
                 return value.verify(origin_card, origin);
             } else if constexpr (requires { value.can_respond(origin_card, origin); }) {
                 if (!value.can_respond(origin_card, origin)) {
-                    return game_error("ERROR_INVALID_RESPONSE");
+                    return game_string("ERROR_INVALID_RESPONSE");
                 }
             }
             return std::nullopt;
         }, *this);
     }
 
-    opt_error effect_holder::verify(card *origin_card, player *origin, player *target) const {
-        return visit_effect([=](auto &&value) -> opt_error {
+    opt_game_str effect_holder::verify(card *origin_card, player *origin, player *target) const {
+        return visit_effect([=](auto &&value) -> opt_game_str {
             if constexpr (requires { value.verify(origin_card, origin, target); }) {
                 return value.verify(origin_card, origin, target);
             }
@@ -52,8 +52,8 @@ namespace banggame {
         }, *this);
     }
 
-    opt_error effect_holder::verify(card *origin_card, player *origin, card *target) const {
-        return visit_effect([=](auto &&value) -> opt_error {
+    opt_game_str effect_holder::verify(card *origin_card, player *origin, card *target) const {
+        return visit_effect([=](auto &&value) -> opt_game_str {
             if constexpr (requires { value.verify(origin_card, origin, target); }) {
                 return value.verify(origin_card, origin, target);
             }
@@ -61,8 +61,8 @@ namespace banggame {
         }, *this);
     }
 
-    opt_fmt_str effect_holder::on_prompt(card *origin_card, player *origin) const {
-        return visit_effect([=](auto &&value) -> opt_fmt_str {
+    opt_game_str effect_holder::on_prompt(card *origin_card, player *origin) const {
+        return visit_effect([=](auto &&value) -> opt_game_str {
             if constexpr (requires { value.on_prompt(origin_card, origin); }) {
                 return value.on_prompt(origin_card, origin);
             } else {
@@ -71,8 +71,8 @@ namespace banggame {
         }, *this);
     }
 
-    opt_fmt_str effect_holder::on_prompt(card *origin_card, player *origin, player *target) const {
-        return visit_effect([=](auto &&value) -> opt_fmt_str {
+    opt_game_str effect_holder::on_prompt(card *origin_card, player *origin, player *target) const {
+        return visit_effect([=](auto &&value) -> opt_game_str {
             if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                 return value.on_prompt(origin_card, origin, target);
             } else {
@@ -81,8 +81,8 @@ namespace banggame {
         }, *this);
     }
 
-    opt_fmt_str effect_holder::on_prompt(card *origin_card, player *origin, card *target) const {
-        return visit_effect([=](auto &&value) -> opt_fmt_str {
+    opt_game_str effect_holder::on_prompt(card *origin_card, player *origin, card *target) const {
+        return visit_effect([=](auto &&value) -> opt_game_str {
             if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                 return value.on_prompt(origin_card, origin, target);
             } else {
@@ -127,8 +127,8 @@ namespace banggame {
         }, *this);
     }
 
-    opt_fmt_str equip_holder::on_prompt(player *origin, card *target_card, player *target) const {
-        return visit_effect([=](auto &&value) -> opt_fmt_str {
+    opt_game_str equip_holder::on_prompt(player *origin, card *target_card, player *target) const {
+        return visit_effect([=](auto &&value) -> opt_game_str {
             if constexpr (requires { value.on_prompt(origin, target_card, target); }) {
                 return value.on_prompt(origin, target_card, target);
             }
@@ -168,8 +168,8 @@ namespace banggame {
         }, *this);
     }
 
-    opt_error mth_holder::verify(card *origin_card, player *origin, const target_list &targets) const {
-        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> opt_error {
+    opt_game_str mth_holder::verify(card *origin_card, player *origin, const target_list &targets) const {
+        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> opt_game_str {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
                 if constexpr (requires { handler_type::verify; }) {
@@ -180,8 +180,8 @@ namespace banggame {
         }, type);
     }
 
-    opt_fmt_str mth_holder::on_prompt(card *origin_card, player *origin, const target_list &targets) const {
-        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> opt_fmt_str {
+    opt_game_str mth_holder::on_prompt(card *origin_card, player *origin, const target_list &targets) const {
+        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> opt_game_str {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
                 if constexpr (requires { handler_type::on_prompt; }) {

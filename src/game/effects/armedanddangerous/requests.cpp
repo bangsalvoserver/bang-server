@@ -25,7 +25,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_add_cube::status_text(player *owner) const {
+    game_string request_add_cube::status_text(player *owner) const {
         if (owner == target) {
             if (ncubes == 1) {
                 if (origin_card) {
@@ -51,7 +51,7 @@ namespace banggame {
         }
     }
 
-    game_formatted_string request_move_bomb::status_text(player *owner) const {
+    game_string request_move_bomb::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_MOVE_BOMB", origin_card};
         } else {
@@ -63,7 +63,7 @@ namespace banggame {
         effect_rust{}.on_resolve(origin_card, origin, target);
     }
 
-    game_formatted_string request_rust::status_text(player *owner) const {
+    game_string request_rust::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_RUST", origin_card};
         } else {
@@ -71,7 +71,7 @@ namespace banggame {
         }
     }
 
-    game_formatted_string timer_al_preacher::status_text(player *owner) const {
+    game_string timer_al_preacher::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_CAN_PLAY_CARD", origin_card};
         } else {
@@ -79,7 +79,7 @@ namespace banggame {
         }
     }
 
-    game_formatted_string timer_tumbleweed::status_text(player *owner) const {
+    game_string timer_tumbleweed::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_CAN_PLAY_TUMBLEWEED", origin, origin_card, target_card, drawn_card};
         } else {

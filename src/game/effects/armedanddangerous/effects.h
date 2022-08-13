@@ -10,12 +10,12 @@ namespace banggame {
     };
 
     struct handler_heal_multi {
-        opt_fmt_str on_prompt(card *origin_card, player *origin, size_t amount);
+        opt_game_str on_prompt(card *origin_card, player *origin, size_t amount);
         void on_play(card *origin_card, player *origin, size_t amount);
     };
 
     struct effect_select_cube {
-        opt_error verify(card *origin_card, player *origin, card *target);
+        opt_game_str verify(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target);
     };
 
@@ -23,7 +23,7 @@ namespace banggame {
         int ncubes;
         effect_pay_cube(int value) : ncubes(std::max(1, value)) {}
         
-        opt_error verify(card *origin_card, player *origin);
+        opt_game_str verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
@@ -64,7 +64,7 @@ namespace banggame {
     };
 
     struct effect_bandolier : effect_empty {
-        opt_error verify(card *origin_card, player *origin);
+        opt_game_str verify(card *origin_card, player *origin);
     };
 
     struct handler_duck {
@@ -72,7 +72,7 @@ namespace banggame {
     };
 
     struct handler_squaw {
-        opt_error verify(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::cube> paid_cubes);
+        opt_game_str verify(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::cube> paid_cubes);
         void on_play(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::cube> paid_cubes);
     };
 
@@ -81,8 +81,8 @@ namespace banggame {
     };
 
     struct handler_move_bomb {
-        opt_fmt_str on_prompt(card *origin_card, player *origin, player *target);
-        opt_error verify(card *origin_card, player *origin, player *target);
+        opt_game_str on_prompt(card *origin_card, player *origin, player *target);
+        opt_game_str verify(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };
 }

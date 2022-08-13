@@ -141,7 +141,7 @@ namespace banggame {
         (int) origin_card_id,
         (int) origin_id,
         (int) target_id,
-        (game_formatted_string) status_text,
+        (game_string) status_text,
         (effect_flags) flags,
         (std::vector<int>) respond_ids,
         (std::vector<picking_args>) pick_ids
@@ -157,9 +157,9 @@ namespace banggame {
 
     DEFINE_ENUM_TYPES(game_update_type,
         (game_over, game_over_update)
-        (game_error, game_formatted_string)
-        (game_log, game_formatted_string)
-        (game_prompt, game_formatted_string)
+        (game_error, game_string)
+        (game_log, game_string)
+        (game_prompt, game_string)
         (add_cards, add_cards_update)
         (remove_cards, remove_cards_update)
         (move_card, move_card_update)

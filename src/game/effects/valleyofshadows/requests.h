@@ -21,19 +21,19 @@ namespace banggame {
         using request_targeting::request_targeting;
         
         void on_finished() override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_steal : request_targeting {
         using request_targeting::request_targeting;
 
         void on_finished() override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
     
     struct request_card_as_gatling : request_bang {
         using request_bang::request_bang;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_bandidos : request_base, resolvable_request {
@@ -44,7 +44,7 @@ namespace banggame {
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
         void on_resolve() override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_tornado : request_base {
@@ -52,7 +52,7 @@ namespace banggame {
         
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_poker : request_base {
@@ -60,7 +60,7 @@ namespace banggame {
 
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_poker_draw : selection_picker {
@@ -70,7 +70,7 @@ namespace banggame {
         int num_cards = 2;
 
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct timer_damaging : timer_request, cleanup_request {
@@ -85,7 +85,7 @@ namespace banggame {
         bool is_bang;
 
         void on_finished() override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_saved : request_base {
@@ -97,14 +97,14 @@ namespace banggame {
 
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct timer_lemonade_jim : timer_request {
         timer_lemonade_jim(card *origin_card, player *origin, player *target)
             : timer_request(origin_card, origin, target, effect_flags::auto_respond) {}
         
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
 }

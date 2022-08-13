@@ -19,9 +19,9 @@ namespace banggame {
         target->m_game->queue_request(std::move(req));
     }
 
-    opt_error effect_startofturn::verify(card *origin_card, player *origin) const {
+    opt_game_str effect_startofturn::verify(card *origin_card, player *origin) const {
         if (origin->m_num_drawn_cards != 0) {
-            return game_error("ERROR_NOT_START_OF_TURN");
+            return game_string("ERROR_NOT_START_OF_TURN");
         }
         return std::nullopt;
     }
@@ -30,7 +30,7 @@ namespace banggame {
         request_ranch(card *target_card, player *target)
             : request_base(target_card, nullptr, target, effect_flags::auto_respond) {}
 
-        game_formatted_string status_text(player *owner) const override {
+        game_string status_text(player *owner) const override {
             if (owner == target) {
                 return {"STATUS_RANCH", origin_card};
             } else {
@@ -136,7 +136,7 @@ namespace banggame {
         }
     }
 
-    game_formatted_string request_peyote::status_text(player *owner) const {
+    game_string request_peyote::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_PEYOTE", origin_card};
         } else {
@@ -158,7 +158,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_ricochet::status_text(player *owner) const {
+    game_string request_ricochet::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_RICOCHET", origin_card, target_card};
         } else {

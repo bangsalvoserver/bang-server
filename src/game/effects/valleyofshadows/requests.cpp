@@ -11,7 +11,7 @@ namespace banggame {
         target->damage(origin_card, origin, damage, is_bang, true);
     }
 
-    game_formatted_string timer_damaging::status_text(player *owner) const {
+    game_string timer_damaging::status_text(player *owner) const {
         return {damage > 1 ? "STATUS_DAMAGING_PLURAL" : "STATUS_DAMAGING", target, origin_card, damage};
     }
 
@@ -19,7 +19,7 @@ namespace banggame {
         effect_destroy::resolver{origin_card, origin, target_card}.resolve();
     }
 
-    game_formatted_string request_destroy::status_text(player *owner) const {
+    game_string request_destroy::status_text(player *owner) const {
         if (target == owner) {
             if (target_card->pocket == pocket_type::player_hand) {
                 return {"STATUS_DESTROY_FROM_HAND", origin_card};
@@ -39,7 +39,7 @@ namespace banggame {
         effect_steal::resolver{origin_card, origin, target_card}.resolve();
     }
 
-    game_formatted_string request_steal::status_text(player *owner) const {
+    game_string request_steal::status_text(player *owner) const {
         if (target == owner) {
             if (target_card->pocket == pocket_type::player_hand) {
                 return {"STATUS_STEAL_FROM_HAND", origin_card};
@@ -55,7 +55,7 @@ namespace banggame {
         }
     }
 
-    game_formatted_string request_card_as_gatling::status_text(player *owner) const {
+    game_string request_card_as_gatling::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_CARD_AS_GATLING", origin_card};
         } else {
@@ -85,7 +85,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_bandidos::status_text(player *owner) const {
+    game_string request_bandidos::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_BANDIDOS", origin_card};
         } else {
@@ -105,7 +105,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_tornado::status_text(player *owner) const {
+    game_string request_tornado::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_TORNADO", origin_card};
         } else {
@@ -124,7 +124,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_poker::status_text(player *owner) const {
+    game_string request_poker::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_POKER", origin_card};
         } else {
@@ -144,7 +144,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_poker_draw::status_text(player *owner) const {
+    game_string request_poker_draw::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_POKER_DRAW", origin_card};
         } else {
@@ -172,7 +172,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_saved::status_text(player *owner) const {
+    game_string request_saved::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_SAVED", origin_card, saved};
         } else {
@@ -180,7 +180,7 @@ namespace banggame {
         }
     }
 
-    game_formatted_string timer_lemonade_jim::status_text(player *owner) const {
+    game_string timer_lemonade_jim::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_CAN_PLAY_CARD", origin_card};
         } else {

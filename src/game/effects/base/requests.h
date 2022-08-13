@@ -13,7 +13,7 @@ namespace banggame {
         
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_predraw : request_base {
@@ -22,7 +22,7 @@ namespace banggame {
         
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_draw : request_base {
@@ -31,7 +31,7 @@ namespace banggame {
 
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_check : selection_picker {
@@ -39,7 +39,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
 
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_generalstore : selection_picker {
@@ -47,7 +47,7 @@ namespace banggame {
             : selection_picker(origin_card, origin, target) {}
 
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_discard : request_base {
@@ -58,7 +58,7 @@ namespace banggame {
         
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_discard_pass : request_base {
@@ -69,7 +69,7 @@ namespace banggame {
 
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_indians : request_base, resolvable_request {
@@ -79,7 +79,7 @@ namespace banggame {
         void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
 
         void on_resolve() override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_duel : request_base, resolvable_request {
@@ -93,7 +93,7 @@ namespace banggame {
         void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
 
         void on_resolve() override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     class missable_request {
@@ -127,12 +127,12 @@ namespace banggame {
 
         void set_unavoidable();
 
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_card_as_bang : request_bang {
         using request_bang::request_bang;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_death : request_base, resolvable_request {
@@ -142,7 +142,7 @@ namespace banggame {
         bool tried_save = false;
         
         void on_resolve() override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_discard_all : request_base, resolvable_request {
@@ -153,13 +153,13 @@ namespace banggame {
         void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
 
         void on_resolve() override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_sheriff_killed_deputy : request_discard_all {
         using request_discard_all::request_discard_all;
         
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_force_play_card : request_base {
@@ -171,7 +171,7 @@ namespace banggame {
 
         bool can_respond(player *target, card *target_card) const override;
 
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_multi_vulture_sam : request_base {
@@ -179,7 +179,7 @@ namespace banggame {
 
         bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
 }

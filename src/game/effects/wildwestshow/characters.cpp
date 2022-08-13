@@ -98,7 +98,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_youl_grinner::status_text(player *owner) const {
+    game_string request_youl_grinner::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_YOUL_GRINNER", origin_card};
         } else {

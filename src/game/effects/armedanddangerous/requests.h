@@ -14,28 +14,28 @@ namespace banggame {
         
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_move_bomb : request_base {
         request_move_bomb(card *origin_card, player *target)
             : request_base(origin_card, nullptr, target, effect_flags::auto_respond) {}
 
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct request_rust : timer_request {
         using timer_request::timer_request;
 
         void on_finished() override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct timer_al_preacher : timer_request {
         timer_al_preacher(card *origin_card, player *origin, player *target)
             : timer_request(origin_card, origin, target, effect_flags::auto_respond) {}
 
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct timer_tumbleweed : timer_request {
@@ -48,7 +48,7 @@ namespace banggame {
         card *drawn_card;
 
         void on_finished() override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 }
 

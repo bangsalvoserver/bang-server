@@ -12,9 +12,9 @@ namespace banggame {
         origin->m_game->call_event<event_type::on_play_beer>(origin);
     }
 
-    opt_error effect_discard_black::verify(card *origin_card, player *origin, card *target_card) {
+    opt_game_str effect_discard_black::verify(card *origin_card, player *origin, card *target_card) {
         if (origin->m_gold < target_card->buy_cost() + 1) {
-            return game_error("ERROR_NOT_ENOUGH_GOLD");
+            return game_string("ERROR_NOT_ENOUGH_GOLD");
         }
         return std::nullopt;
     }
@@ -29,9 +29,9 @@ namespace banggame {
         target->add_gold(amount);
     }
 
-    opt_error effect_pay_gold::verify(card *origin_card, player *origin) {
+    opt_game_str effect_pay_gold::verify(card *origin_card, player *origin) {
         if (origin->m_gold < amount) {
-            return game_error("ERROR_NOT_ENOUGH_GOLD");
+            return game_string("ERROR_NOT_ENOUGH_GOLD");
         }
         return std::nullopt;
     }

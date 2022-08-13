@@ -19,16 +19,16 @@ namespace banggame {
             (effect_type) type
         )
 
-        opt_error verify(card *origin_card, player *origin) const;
-        opt_fmt_str on_prompt(card *origin_card, player *origin) const;
+        opt_game_str verify(card *origin_card, player *origin) const;
+        opt_game_str on_prompt(card *origin_card, player *origin) const;
         void on_play(card *origin_card, player *origin, effect_flags flags) const;
         
-        opt_error verify(card *origin_card, player *origin, player *target) const;
-        opt_fmt_str on_prompt(card *origin_card, player *origin, player *target) const;
+        opt_game_str verify(card *origin_card, player *origin, player *target) const;
+        opt_game_str on_prompt(card *origin_card, player *origin, player *target) const;
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags) const;
         
-        opt_error verify(card *origin_card, player *origin, card *target) const;
-        opt_fmt_str on_prompt(card *origin_card, player *origin, card *target) const;
+        opt_game_str verify(card *origin_card, player *origin, card *target) const;
+        opt_game_str on_prompt(card *origin_card, player *origin, card *target) const;
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags) const;
     };
     
@@ -38,7 +38,7 @@ namespace banggame {
             (equip_type) type
         )
 
-        opt_fmt_str on_prompt(player *origin, card *target_card, player *target) const;
+        opt_game_str on_prompt(player *origin, card *target_card, player *target) const;
         void on_equip(card *target_card, player *target) const;
         void on_enable(card *target_card, player *target) const;
         void on_disable(card *target_card, player *target) const;
@@ -48,8 +48,8 @@ namespace banggame {
     struct mth_holder {
         REFLECTABLE((mth_type) type)
         
-        opt_error verify(card *origin_card, player *origin, const target_list &targets) const;
-        opt_fmt_str on_prompt(card *origin_card, player *origin, const target_list &targets) const;
+        opt_game_str verify(card *origin_card, player *origin, const target_list &targets) const;
+        opt_game_str on_prompt(card *origin_card, player *origin, const target_list &targets) const;
         void on_play(card *origin_card, player *origin, const target_list &targets) const;
     };
 
@@ -75,7 +75,7 @@ namespace banggame {
         effect_flags flags() const {
             return m_value->flags;
         }
-        game_formatted_string status_text(player *owner) const {
+        game_string status_text(player *owner) const {
             return m_value->status_text(owner);
         }
         void add_pending_confirm(player *p) {

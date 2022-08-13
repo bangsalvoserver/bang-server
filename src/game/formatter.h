@@ -23,7 +23,7 @@ namespace banggame{
         }
     };
 
-    game_formatted_string::game_formatted_string(
+    game_string::game_string(
             std::convertible_to<std::string> auto &&message,
             auto && ... args)
         : format_str(FWD(message))

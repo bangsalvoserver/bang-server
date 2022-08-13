@@ -16,8 +16,8 @@ namespace banggame {
 
     #define DECLARE_VISITOR(type, ...) \
     template<> struct play_visitor<target_type::type> { \
-        opt_error verify(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
-        opt_fmt_str prompt(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
+        opt_game_str verify(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
+        opt_game_str prompt(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
         void play(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
     };
 

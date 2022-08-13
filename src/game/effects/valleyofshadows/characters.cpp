@@ -58,11 +58,11 @@ namespace banggame {
         origin->m_game->update_request();
     }
 
-    opt_error effect_evelyn_shebang::verify(card *origin_card, player *origin, player *target) {
+    opt_game_str effect_evelyn_shebang::verify(card *origin_card, player *origin, player *target) {
         bool valid = true;
         origin->m_game->call_event<event_type::verify_target_unique>(origin_card, origin, target, valid);
         if (!valid) {
-            return game_error("ERROR_TARGET_NOT_UNIQUE");
+            return game_string("ERROR_TARGET_NOT_UNIQUE");
         }
         return std::nullopt;
     }

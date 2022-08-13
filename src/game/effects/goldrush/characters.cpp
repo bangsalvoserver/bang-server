@@ -53,7 +53,7 @@ namespace banggame {
         }
     }
 
-    game_formatted_string request_dutch_will::status_text(player *owner) const {
+    game_string request_dutch_will::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_DUTCH_WILL", origin_card};
         } else {

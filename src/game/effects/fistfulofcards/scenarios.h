@@ -16,7 +16,7 @@ namespace banggame {
     };
 
     struct effect_startofturn : effect_empty {
-        opt_error verify(card *origin_card, player *origin) const;
+        opt_game_str verify(card *origin_card, player *origin) const;
     };
 
     struct effect_ranch : event_based_effect {
@@ -51,7 +51,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
 
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct effect_ricochet {
@@ -69,7 +69,7 @@ namespace banggame {
 
         void on_miss() override;
 
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
     
     struct effect_russianroulette  {

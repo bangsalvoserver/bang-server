@@ -23,8 +23,6 @@ void game_manager::on_receive_message(client_handle client, const client_message
         }, msg);
     } catch (const lobby_error &e) {
         send_message<server_message_type::lobby_error>(client, e.what());
-    } catch (const game_error &e) {
-        send_message<server_message_type::game_update>(client, enums::enum_tag_t<game_update_type::game_error>(), e);
     } catch (const std::exception &e) {
         print_error(fmt::format("Error in game_manager: {}", e.what()));
     }

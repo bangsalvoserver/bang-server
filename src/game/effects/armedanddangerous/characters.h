@@ -10,7 +10,7 @@ namespace banggame {
     };
 
     struct effect_frankie_canton {
-        opt_error verify(card *origin_card, player *origin, card *target);
+        opt_game_str verify(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target);
     };
 
@@ -23,7 +23,7 @@ namespace banggame {
     };
 
     struct handler_red_ringo {
-        opt_error verify(card *origin_card, player *origin, const target_list &targets);
+        opt_game_str verify(card *origin_card, player *origin, const target_list &targets);
         void on_play(card *origin_card, player *origin, const target_list &targets);
     };
 

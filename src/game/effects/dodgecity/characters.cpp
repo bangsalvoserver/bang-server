@@ -62,7 +62,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_claus_the_saint::status_text(player *owner) const {
+    game_string request_claus_the_saint::status_text(player *owner) const {
         if (owner == target) {
             if (target->m_num_drawn_cards < target->m_num_cards_to_draw) {
                 return {"STATUS_CLAUS_THE_SAINT_DRAW", origin_card};
@@ -198,7 +198,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_vera_custer::status_text(player *owner) const {
+    game_string request_vera_custer::status_text(player *owner) const {
         if (owner == target) {
             return {"STATUS_VERA_CUSTER", origin_card};
         } else {

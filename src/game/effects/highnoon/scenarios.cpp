@@ -38,7 +38,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_thedaltons::status_text(player *owner) const {
+    game_string request_thedaltons::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_THEDALTONS", origin_card};
         } else {
@@ -214,7 +214,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_handcuffs::status_text(player *owner) const {
+    game_string request_handcuffs::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_HANDCUFFS", origin_card};
         } else {
@@ -263,7 +263,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    game_formatted_string request_newidentity::status_text(player *owner) const {
+    game_string request_newidentity::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_NEWIDENTITY", origin_card};
         } else {

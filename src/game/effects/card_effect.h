@@ -46,7 +46,7 @@ namespace banggame {
     };
 
     struct effect_prompt_on_self_equip {
-        opt_fmt_str on_prompt(player *origin, card *target_card, player *target);
+        opt_game_str on_prompt(player *origin, card *target_card, player *target);
     };
 
     struct request_base {
@@ -65,7 +65,7 @@ namespace banggame {
         virtual void add_pending_confirm(player *p) {}
         virtual void confirm_player(player *p) {}
 
-        virtual game_formatted_string status_text(player *owner) const = 0;
+        virtual game_string status_text(player *owner) const = 0;
 
         virtual bool can_pick(pocket_type pocket, player *target, card *target_card) const {
             return false;

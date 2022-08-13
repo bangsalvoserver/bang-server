@@ -22,7 +22,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
 
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct effect_josh_mccloud {

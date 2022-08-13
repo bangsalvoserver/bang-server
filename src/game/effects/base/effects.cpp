@@ -12,9 +12,9 @@ namespace banggame {
         origin->play_card_action(origin_card);
     }
 
-    opt_error effect_max_usages::verify(card *origin_card, player *origin) {
+    opt_game_str effect_max_usages::verify(card *origin_card, player *origin) {
         if (origin_card->usages >= max_usages) {
-            return game_error("ERROR_MAX_USAGES", origin_card, max_usages);
+            return game_string("ERROR_MAX_USAGES", origin_card, max_usages);
         }
         return std::nullopt;
     }
@@ -22,21 +22,21 @@ namespace banggame {
         ++origin_card->usages;
     }
 
-    opt_error effect_pass_turn::verify(card *origin_card, player *origin) {
+    opt_game_str effect_pass_turn::verify(card *origin_card, player *origin) {
         card *mandatory_card = nullptr;
         origin->m_game->call_event<event_type::verify_mandatory_card>(origin, mandatory_card);
         if (mandatory_card) {
-            return game_error("ERROR_MANDATORY_CARD", mandatory_card);
+            return game_string("ERROR_MANDATORY_CARD", mandatory_card);
         }
         return std::nullopt;
     }
 
-    opt_fmt_str effect_pass_turn::on_prompt(card *origin_card, player *origin) {
+    opt_game_str effect_pass_turn::on_prompt(card *origin_card, player *origin) {
         int diff = static_cast<int>(origin->m_hand.size() - origin->max_cards_end_of_turn());
         if (diff == 1) {
-            return game_formatted_string{"PROMPT_PASS_DISCARD"};
+            return game_string{"PROMPT_PASS_DISCARD"};
         } else if (diff > 1) {
-            return game_formatted_string{"PROMPT_PASS_DISCARD_PLURAL", diff};
+            return game_string{"PROMPT_PASS_DISCARD_PLURAL", diff};
         }
         return std::nullopt;
     }
@@ -54,9 +54,9 @@ namespace banggame {
         copy.get<resolvable_request>().on_resolve();
     }
 
-    opt_error effect_self_damage::verify(card *origin_card, player *origin) {
+    opt_game_str effect_self_damage::verify(card *origin_card, player *origin) {
         if (origin->m_hp <= 1) {
-            return game_error("ERROR_CANT_SELF_DAMAGE");
+            return game_string("ERROR_CANT_SELF_DAMAGE");
         }
         return std::nullopt;
     }
@@ -113,11 +113,11 @@ namespace banggame {
         });
     }
 
-    opt_error effect_banglimit::verify(card *origin_card, player *origin) {
+    opt_game_str effect_banglimit::verify(card *origin_card, player *origin) {
         bool value = origin->m_bangs_played < origin->m_bangs_per_turn;
         origin->m_game->call_event<event_type::apply_volcanic_modifier>(origin, value);
         if (!value) {
-            return game_error("ERROR_ONE_BANG_PER_TURN");
+            return game_string("ERROR_ONE_BANG_PER_TURN");
         }
         return std::nullopt;
     }
@@ -143,9 +143,9 @@ namespace banggame {
         origin->m_game->queue_request<request_generalstore>(origin_card, origin, origin);
     }
 
-    opt_fmt_str effect_heal::on_prompt(card *origin_card, player *origin, player *target) {
+    opt_game_str effect_heal::on_prompt(card *origin_card, player *origin, player *target) {
         if (target->m_hp == target->m_max_hp) {
-            return game_formatted_string{"PROMPT_CARD_NO_EFFECT", origin_card};
+            return game_string{"PROMPT_CARD_NO_EFFECT", origin_card};
         }
         return std::nullopt;
     }
@@ -154,17 +154,17 @@ namespace banggame {
         target->heal(amount);
     }
 
-    opt_error effect_heal_notfull::verify(card *origin_card, player *origin, player *target) {
+    opt_game_str effect_heal_notfull::verify(card *origin_card, player *origin, player *target) {
         if (target->m_hp == target->m_max_hp) {
-            return game_error("ERROR_CANT_HEAL_PAST_FULL_HP");
+            return game_string("ERROR_CANT_HEAL_PAST_FULL_HP");
         }
         return std::nullopt;
     }
 
-    opt_fmt_str effect_beer::on_prompt(card *origin_card, player *origin, player *target) {
+    opt_game_str effect_beer::on_prompt(card *origin_card, player *origin, player *target) {
         if ((target->m_game->m_players.size() > 2 && target->m_game->num_alive() == 2)
             || (target->m_hp == target->m_max_hp)) {
-            return game_formatted_string{"PROMPT_CARD_NO_EFFECT", origin_card};
+            return game_string{"PROMPT_CARD_NO_EFFECT", origin_card};
         }
         return std::nullopt;
     }
@@ -191,9 +191,9 @@ namespace banggame {
         }
     }
 
-    opt_fmt_str prompt_target_self_hand::on_prompt(card *origin_card, player *origin, card *target_card) {
+    opt_game_str prompt_target_self_hand::on_prompt(card *origin_card, player *origin, card *target_card) {
         if (origin == target_card->owner && target_card->pocket == pocket_type::player_hand) {
-            return game_formatted_string{"PROMPT_TARGET_OWN_HAND", origin_card};
+            return game_string{"PROMPT_TARGET_OWN_HAND", origin_card};
         }
         return std::nullopt;
     }
@@ -291,9 +291,9 @@ namespace banggame {
         target->draw_card(ncards, origin_card);
     }
 
-    opt_error effect_draw_discard::verify(card *origin_card, player *origin, player *target) {
+    opt_game_str effect_draw_discard::verify(card *origin_card, player *origin, player *target) {
         if (target->m_game->m_discards.empty()) {
-            return game_error("ERROR_DISCARD_PILE_EMPTY");
+            return game_string("ERROR_DISCARD_PILE_EMPTY");
         }
         return std::nullopt;
     }

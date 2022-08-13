@@ -62,7 +62,7 @@ namespace banggame {
 
     struct game_net_manager {
         std::deque<std::pair<update_target, game_update>> m_updates;
-        std::deque<std::pair<update_target, game_formatted_string>> m_saved_log;
+        std::deque<std::pair<update_target, game_string>> m_saved_log;
         std::deque<game_update> m_public_updates;
 
         template<game_update_type E>
@@ -90,6 +90,11 @@ namespace banggame {
 
         void add_log(auto && ... args) {
             add_log(update_target::excludes(), FWD(args) ... );
+        }
+
+        template<typename ... Ts>
+        void add_error(player *target, auto && ... args) {
+            add_update<game_update_type::game_error>(update_target::includes_private(target), FWD(args) ... );
         }
     };
 

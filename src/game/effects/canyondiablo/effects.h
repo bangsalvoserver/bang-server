@@ -10,17 +10,17 @@ namespace banggame {
     };
 
     struct effect_mirage {
-        opt_error verify(card *origin_card, player *origin);
+        opt_game_str verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct effect_disarm {
-        opt_error verify(card *origin_card, player *origin);
+        opt_game_str verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     struct handler_card_sharper {
-        opt_error verify(card *origin_card, player *origin, card *chosen_card, card *target_card);
+        opt_game_str verify(card *origin_card, player *origin, card *chosen_card, card *target_card);
         void on_play(card *origin_card, player *origin, card *chosen_card, card *target_card);
         void on_resolve(card *origin_card, player *origin, card *chosen_card, card *target_card);
     };

@@ -32,7 +32,7 @@ namespace banggame {
 
         bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_formatted_string status_text(player *owner) const override;
+        game_string status_text(player *owner) const override;
     };
 
     struct handler_flint_westwood {
