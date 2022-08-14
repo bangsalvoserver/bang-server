@@ -128,6 +128,7 @@ namespace banggame {
         template<typename T>
         struct priority_pair : T {
             int priority;
+            mutable bool active = false;
 
             template<typename ... Ts>
             priority_pair(int priority, Ts ... args)
@@ -158,6 +159,9 @@ namespace banggame {
         enum_table m_table;
         std::multimap<Key, iterator_variant, Compare> m_map;
 
+        enum change_type : uint8_t {added, erased};
+        std::vector<std::pair<change_type, iterator_variant>> m_changes;
+
     public:
         template<EnumType E>
         auto &get_table() {
@@ -168,16 +172,34 @@ namespace banggame {
         void add(Key key, int priority, Ts && ... args) {
             enum_value_iterator<E> it{get_table<E>().emplace(priority, std::forward<Ts>(args) ...)};
             m_map.emplace(std::make_pair(std::move(key), it));
+            m_changes.emplace_back(added, it);
         }
 
         void erase(auto key) {
             auto [low, high] = m_map.equal_range(key);
             std::for_each(low, high, [this](const auto &pair) {
-                std::visit([this]<EnumType E>(enum_value_iterator<E> it) {
-                    get_table<E>().erase(it);
-                }, pair.second);
+                m_changes.emplace_back(erased, pair.second);
+                std::visit([](auto it){ it->active = false; }, pair.second);
             });
             m_map.erase(low, high);
+        }
+
+        template<typename T>
+        bool is_active(const priority_pair<T> &obj) const {
+            return obj.active;
+        }
+
+        void commit_changes() {
+            for (auto &pair : m_changes) {
+                if (pair.first == erased) {
+                    std::visit([this]<EnumType E>(enum_value_iterator<E> it) {
+                        get_table<E>().erase(it);
+                    }, pair.second);
+                } else {
+                    std::visit([](auto it){ it->active = true; }, pair.second);
+                }
+            }
+            m_changes.clear();
         }
     };
 
@@ -196,23 +218,38 @@ namespace banggame {
 
     struct listener_map {
         priority_double_map<event_card_key, event_type, std::less<>> m_listeners;
+        bool m_calling = false;
 
         template<event_type E, invocable_for_event<E> Function>
         void add_listener(event_card_key key, Function &&fun) {
             m_listeners.add<E>(key, key.priority, std::forward<Function>(fun));
+            if (!m_calling) {
+                m_listeners.commit_changes();
+            }
         }
 
         void remove_listeners(auto key) {
             m_listeners.erase(key);
+            if (!m_calling) {
+                m_listeners.commit_changes();
+            }
         }
 
         template<event_type E, typename ... Ts>
         void call_event(Ts && ... args) {
+            bool prev_calling = m_calling;
+            m_calling = true;
             auto &table = m_listeners.get_table<E>();
             auto it = table.begin();
             while (it != table.end()) {
                 auto current = it++;
-                std::invoke(*current, args ...);
+                if (m_listeners.is_active(*current)) {
+                    std::invoke(*current, args ...);
+                }
+            }
+            m_calling = prev_calling;
+            if (!m_calling) {
+                m_listeners.commit_changes();
             }
         }
     };
