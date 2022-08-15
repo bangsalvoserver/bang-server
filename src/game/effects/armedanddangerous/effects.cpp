@@ -164,9 +164,6 @@ namespace banggame {
     opt_game_str handler_squaw::verify(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::cube> paid_cubes) {
         if (paid_cubes) {
             for (auto target_card : paid_cubes->value) {
-                if (target_card == discarded_card) {
-                    return game_string("ERROR_SQUAW_TARGET");
-                }
                 if (auto error = effect_select_cube().verify(origin_card, origin, target_card)) {
                     return error;
                 }
@@ -183,7 +180,7 @@ namespace banggame {
                 effect_select_cube().on_play(origin_card, origin, target_card);
             }
 
-            if (!immune) {
+            if (!immune && target_card->owner) {
                 effect_steal{}.on_play(origin_card, origin, target_card, effect_flags::escapable | effect_flags::single_target);
             }
         } else if (!immune) {
