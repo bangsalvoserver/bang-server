@@ -120,86 +120,95 @@ namespace banggame {
         auto operator <=> (card *other) const {
             return target_card->id <=> other->id;
         }
+
+        bool priority_greater(const event_card_key &other) const {
+            return priority == other.priority ?
+                target_card->id < other.target_card->id :
+                priority > other.priority;
+        }
     };
 
-    template<typename Key, enums::reflected_enum EnumType, typename Compare = std::less<Key>>
+    template<typename T>
+    concept priority_key = requires (T value) {
+        { value.priority_greater(value) } -> std::convertible_to<bool>;
+    };
+
+    template<priority_key Key, enums::reflected_enum EnumType, typename Compare = std::less<Key>>
     struct priority_double_map {
     private:
-        template<typename T>
-        struct priority_pair : T {
-            int priority;
-            mutable bool active = false;
+        enum value_status : uint8_t {
+            inactive, active, erased
+        };
+
+        struct value_variant {
+            enums::enum_variant<EnumType> value;
+            value_status status = inactive;
 
             template<typename ... Ts>
-            priority_pair(int priority, Ts ... args)
-                : T{args ...}
-                , priority{priority} {}
-
-            auto operator <=> (const priority_pair &other) const {
-                return priority <=> other.priority;
+            value_variant(Ts && ... args) : value{FWD(args)...} {}
+        };
+        
+        struct iterator_compare {
+            template<typename T>
+            bool operator()(const T &lhs, const T &rhs) const {
+                return lhs->first.priority_greater(rhs->first)
+                    || !rhs->first.priority_greater(lhs->first)
+                    && (&*lhs < &*rhs);
             }
         };
 
-        template<typename T> using priority_set = std::multiset<priority_pair<T>, std::greater<>>;
-        template<EnumType E> using enum_value_set = priority_set<enums::enum_type_t<E>>;
-        template<EnumType E> struct enum_value_iterator : enum_value_set<E>::iterator {};
+        using container_map = std::multimap<Key, value_variant, Compare>;
+        using container_iterator = typename container_map::iterator;
+        using iterator_set = std::set<container_iterator, iterator_compare>;
+        using iterator_table = std::array<iterator_set, enums::num_members_v<EnumType>>;
+        using iterator_vector = std::vector<container_iterator>;
 
-        template<typename> struct make_enum_table;
-        template<EnumType ... Es> struct make_enum_table<enums::enum_sequence<Es ...>> {
-            using type = std::tuple<enum_value_set<Es> ...>;
-        };
-        using enum_table = typename make_enum_table<enums::make_enum_sequence<EnumType>>::type;
-
-        template<typename> struct make_iterator_variant;
-        template<EnumType ... Es> struct make_iterator_variant<enums::enum_sequence<Es ...>> {
-            using type = std::variant<enum_value_iterator<Es> ...>;
-        };
-        using iterator_variant = typename make_iterator_variant<enums::make_enum_sequence<EnumType>>::type;
-
-        enum_table m_table;
-        std::multimap<Key, iterator_variant, Compare> m_map;
-
-        enum change_type : uint8_t {added, erased};
-        std::vector<std::pair<change_type, iterator_variant>> m_changes;
+        container_map m_map;
+        iterator_table m_table;
+        iterator_vector m_changes;
 
     public:
-        template<EnumType E>
-        auto &get_table() {
-            return std::get<enums::indexof(E)>(m_table);
-        }
-
         template<EnumType E, typename ... Ts>
-        void add(Key key, int priority, Ts && ... args) {
-            enum_value_iterator<E> it{get_table<E>().emplace(priority, std::forward<Ts>(args) ...)};
-            m_map.emplace(std::make_pair(std::move(key), it));
-            m_changes.emplace_back(added, it);
-        }
-
-        void erase(auto key) {
-            auto [low, high] = m_map.equal_range(key);
-            std::for_each(low, high, [this](const auto &pair) {
-                m_changes.emplace_back(erased, pair.second);
-                std::visit([](auto it){ it->active = false; }, pair.second);
-            });
-            m_map.erase(low, high);
+        void add(Key key, Ts && ... args) {
+            auto it = m_map.emplace(std::piecewise_construct,
+                std::make_tuple(std::move(key)),
+                std::make_tuple(enums::enum_tag<E>, FWD(args) ...));
+            m_table[enums::indexof(E)].emplace(it);
+            m_changes.push_back(it);
         }
 
         template<typename T>
-        bool is_active(const priority_pair<T> &obj) const {
-            return obj.active;
+        void erase(const T &key) {
+            auto [low, high] = m_map.equal_range(key);
+            for (; low != high; ++low) {
+                low->second.status = erased;
+                m_changes.push_back(low);
+            }
         }
 
         void commit_changes() {
-            for (auto &pair : m_changes) {
-                if (pair.first == erased) {
-                    std::visit([this]<EnumType E>(enum_value_iterator<E> it) {
-                        get_table<E>().erase(it);
-                    }, pair.second);
-                } else {
-                    std::visit([](auto it){ it->active = true; }, pair.second);
+            for (auto it : m_changes) {
+                switch (it->second.status) {
+                case inactive:
+                    it->second.status = active;
+                    break;
+                case erased:
+                    m_table[it->second.value.index()].erase(it);
+                    m_map.erase(it);
                 }
             }
             m_changes.clear();
+        }
+
+        template<EnumType E>
+        auto get_table() {
+            return m_table[enums::indexof(E)]
+                | std::views::filter([](auto it) {
+                    return it->second.status == active;
+                })
+                | std::views::transform([](auto it) {
+                    return it->second.value.template get<E>();
+                });
         }
     };
 
@@ -222,7 +231,7 @@ namespace banggame {
 
         template<event_type E, invocable_for_event<E> Function>
         void add_listener(event_card_key key, Function &&fun) {
-            m_listeners.add<E>(key, key.priority, std::forward<Function>(fun));
+            m_listeners.add<E>(key, std::forward<Function>(fun));
             if (!m_calling) {
                 m_listeners.commit_changes();
             }
@@ -239,13 +248,8 @@ namespace banggame {
         void call_event(Ts && ... args) {
             bool prev_calling = m_calling;
             m_calling = true;
-            auto &table = m_listeners.get_table<E>();
-            auto it = table.begin();
-            while (it != table.end()) {
-                auto current = it++;
-                if (m_listeners.is_active(*current)) {
-                    std::invoke(*current, args ...);
-                }
+            for (const auto &fun : m_listeners.get_table<E>()) {
+                std::invoke(fun, args ...);
             }
             m_calling = prev_calling;
             if (!m_calling) {
