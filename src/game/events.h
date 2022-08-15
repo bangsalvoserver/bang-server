@@ -107,23 +107,24 @@ namespace banggame {
         int priority;
 
         event_card_key(card *target_card, int priority = 0)
-            : target_card(target_card), priority(priority) {}
+            : target_card(target_card)
+            , priority(priority) {}
 
         bool operator == (const event_card_key &other) const = default;
 
         auto operator <=> (const event_card_key &other) const {
             return target_card == other.target_card ?
                 priority <=> other.priority :
-                target_card->id <=> other.target_card->id;
+                target_card <=> other.target_card;
         }
 
         auto operator <=> (card *other) const {
-            return target_card->id <=> other->id;
+            return target_card <=> other;
         }
 
         bool priority_greater(const event_card_key &other) const {
             return priority == other.priority ?
-                target_card->id < other.target_card->id :
+                target_card < other.target_card :
                 priority > other.priority;
         }
     };
