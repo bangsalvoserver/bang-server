@@ -397,7 +397,7 @@ namespace banggame {
         }
         target->steal_card(target_card);
 
-        auto is_valid_target = [=](player *p) {
+        auto is_valid_target = [&](player *p) {
             bool valid = false;
             origin->m_game->call_event<event_type::verify_card_taker>(p, equip_type::vulture_sam, valid);
             return valid;

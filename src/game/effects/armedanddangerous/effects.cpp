@@ -60,7 +60,7 @@ namespace banggame {
             if (target->can_escape(origin, origin_card, flags)) {
                 origin->m_game->queue_request<request_rust>(origin_card, origin, target, flags);
             } else {
-                on_resolve(origin_card, origin, target);
+                effect_rust{}.on_resolve(origin_card, origin, target);
             }
         });
     }
