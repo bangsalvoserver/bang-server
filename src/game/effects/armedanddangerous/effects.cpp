@@ -53,6 +53,14 @@ namespace banggame {
     void effect_reload::on_play(card *origin_card, player *origin) {
         origin->queue_request_add_cube(origin_card, 3);
     }
+
+    opt_game_str effect_rust::on_prompt(card *origin_card, player *origin, player *target) {
+        if (target->count_cubes() == 0) {
+            return game_string{"PROMPT_CARD_NO_EFFECT", origin_card};
+        } else {
+            return std::nullopt;
+        }
+    }
     
     void effect_rust::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
         if (target->count_cubes() == 0) return;

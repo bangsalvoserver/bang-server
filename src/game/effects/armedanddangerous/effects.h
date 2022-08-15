@@ -39,6 +39,7 @@ namespace banggame {
     };
 
     struct effect_rust {
+        opt_game_str on_prompt(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, player *target);
     };
