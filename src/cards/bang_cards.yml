@@ -845,7 +845,8 @@ main_deck:
     effects:
       - mth_add card | table
     optional:
-      - mth_add(2) cube
+      - select_cube(2) cube
+      - mth_add
     mth_effect: squaw
   - name: ACE_UP_THE_SLEEVE
     signs:

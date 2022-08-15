@@ -73,8 +73,7 @@ namespace banggame {
     };
 
     struct handler_squaw {
-        opt_game_str verify(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::cube> paid_cubes);
-        void on_play(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::cube> paid_cubes);
+        void on_play(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::none> paid_cubes);
     };
 
     struct effect_move_bomb : effect_empty {

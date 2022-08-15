@@ -169,30 +169,14 @@ namespace banggame {
         effect_missed().on_play(origin_card, origin);
     }
 
-    opt_game_str handler_squaw::verify(card *origin_card, player *origin, card *discarded_card, opt_tagged_value<target_type::cube> paid_cubes) {
-        if (paid_cubes) {
-            for (auto target_card : paid_cubes->value) {
-                if (auto error = effect_select_cube().verify(origin_card, origin, target_card)) {
-                    return error;
-                }
-            };
-        }
-        return std::nullopt;
-    }
-
-    void handler_squaw::on_play(card *origin_card, player *origin, card *target_card, opt_tagged_value<target_type::cube> paid_cubes) {
+    void handler_squaw::on_play(card *origin_card, player *origin, card *target_card, opt_tagged_value<target_type::none> paid_cubes) {
         const auto flags = effect_flags::escapable | effect_flags::single_target;
-        bool immune = target_card->owner->immune_to(origin_card, origin, flags);
-        if (paid_cubes) {
-            for (auto target_card : paid_cubes->value) {
-                effect_select_cube().on_play(origin_card, origin, target_card);
+        if (target_card->owner && !target_card->owner->immune_to(origin_card, origin, flags)) {
+            if (paid_cubes) {
+                effect_steal{}.on_play(origin_card, origin, target_card, flags);
+            } else {
+                effect_destroy{}.on_play(origin_card, origin, target_card, flags);
             }
-
-            if (!immune && target_card->owner) {
-                effect_steal{}.on_play(origin_card, origin, target_card, effect_flags::escapable | effect_flags::single_target);
-            }
-        } else if (!immune) {
-            effect_destroy{}.on_play(origin_card, origin, target_card, effect_flags::escapable | effect_flags::single_target);
         }
     }
 
