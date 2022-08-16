@@ -142,7 +142,7 @@ namespace banggame {
         };
 
         struct value_variant {
-            enums::enum_variant<EnumType> value;
+            const enums::enum_variant<EnumType> value;
             value_status status = inactive;
 
             template<typename ... Ts>
