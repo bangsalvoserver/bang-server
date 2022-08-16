@@ -1436,8 +1436,8 @@ character:
     image: 03_chuck_wengam
     expansion: dodgecity
     effects:
-      - self_damage
       - draw(2)
+      - self_damage
   - name: DOC_HOLYDAY
     image: 03_doc_holyday
     expansion: dodgecity
@@ -1850,8 +1850,8 @@ fistfulofcards:
     responses:
       - while_drawing
       - startofturn
-      - self_damage
       - heal_notfull player notself
+      - self_damage
   - name: THE_JUDGE
     image: 05_ilgiudice
     equip:
