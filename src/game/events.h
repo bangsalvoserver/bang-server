@@ -134,7 +134,7 @@ namespace banggame {
         { value.priority_greater(value) } -> std::convertible_to<bool>;
     };
 
-    template<priority_key Key, enums::reflected_enum EnumType, typename Compare = std::less<Key>>
+    template<priority_key Key, enums::reflected_enum EnumType>
     struct priority_double_map {
     private:
         enum value_status : uint8_t {
@@ -158,7 +158,7 @@ namespace banggame {
             }
         };
 
-        using container_map = std::multimap<Key, value_variant, Compare>;
+        using container_map = std::multimap<Key, value_variant, std::less<>>;
         using container_iterator = typename container_map::iterator;
         using iterator_set = std::set<container_iterator, iterator_compare>;
         using iterator_table = std::array<iterator_set, enums::num_members_v<EnumType>>;
@@ -226,34 +226,36 @@ namespace banggame {
     template<typename T, typename Arg> struct function_argument<void (T::*) (Arg) const> : std::type_identity<Arg> {};
     template<typename Function> struct deduce_event_args : function_argument<decltype(&Function::operator())> {};
 
-    struct listener_map {
-        priority_double_map<event_card_key, event_type, std::less<>> m_listeners;
-        bool m_calling = false;
+    class listener_map {
+    private:
+        priority_double_map<event_card_key, event_type> m_listeners;
+        bool m_lock = false;
 
+    public:
         template<event_type E, invocable_for_event<E> Function>
         void add_listener(event_card_key key, Function &&fun) {
             m_listeners.add<E>(key, std::forward<Function>(fun));
-            if (!m_calling) {
+            if (!m_lock) {
                 m_listeners.commit_changes();
             }
         }
 
         void remove_listeners(auto key) {
             m_listeners.erase(key);
-            if (!m_calling) {
+            if (!m_lock) {
                 m_listeners.commit_changes();
             }
         }
 
         template<event_type E, typename ... Ts>
         void call_event(Ts && ... args) {
-            bool prev_calling = m_calling;
-            m_calling = true;
+            bool prev_lock = m_lock;
+            m_lock = true;
             for (const auto &fun : m_listeners.get_table<E>()) {
                 std::invoke(fun, args ...);
             }
-            m_calling = prev_calling;
-            if (!m_calling) {
+            m_lock = prev_lock;
+            if (!m_lock) {
                 m_listeners.commit_changes();
             }
         }
