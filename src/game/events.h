@@ -167,39 +167,35 @@ namespace banggame {
             iterator_set set;
         };
 
-        template<typename T>
-        class lock_incrementor : public T {
+        template<std::invocable Function, typename T>
+        class on_destroy_do : public T {
         private:
-            uint8_t *m_count = nullptr;
-            
+            Function m_fun;
+        
         public:
-            lock_incrementor(uint8_t &count, T &&value)
-                : T{std::move(value)}, m_count{&count}
-            {
-                ++(*m_count);
-            }
+            on_destroy_do(Function &&fun, T &&value)
+                : T{std::move(value)}
+                , m_fun(fun) {}
 
-            lock_incrementor(const lock_incrementor &) = delete;
-            lock_incrementor(lock_incrementor &&other)
-                noexcept(std::is_nothrow_move_constructible_v<T>)
+            on_destroy_do(const on_destroy_do &) = delete;
+            on_destroy_do(on_destroy_do &&other)
+                noexcept(std::is_nothrow_move_constructible_v<T>
+                    && std::is_nothrow_move_constructible_v<Function>)
                 : T{std::move(other)}
-                , m_count{other.m_count}
-            {
-                other.m_count = nullptr;
-            }
+                , m_fun{std::move(other.m_fun)} {}
 
-            auto operator = (const lock_incrementor &) = delete;
-            auto operator = (lock_incrementor &&other)
-                noexcept(std::is_nothrow_move_assignable_v<T>)
+            on_destroy_do &operator = (const on_destroy_do &) = delete;
+            on_destroy_do &operator = (on_destroy_do &&other)
+                noexcept(std::is_nothrow_move_assignable_v<T>
+                    && std::is_nothrow_move_assignable_v<Function>)
             {
                 static_cast<T &>(*this) = std::move(other);
-                std::swap(m_count, other.m_count);
+                std::swap(m_fun, other.m_fun);
+                return *this;
             }
 
-            ~lock_incrementor() {
-                if (m_count) {
-                    --(*m_count);
-                }
+            ~on_destroy_do() noexcept(noexcept(std::invoke(m_fun))) {
+                std::invoke(m_fun);
             }
         };
 
@@ -250,13 +246,16 @@ namespace banggame {
         template<EnumType E>
         auto get_table() {
             auto &set = m_table[enums::indexof(E)];
-            return lock_incrementor{set.lock_count, set.set
+            ++set.lock_count;
+            return on_destroy_do([&]{
+                --set.lock_count;
+            }, set.set
                 | std::views::filter([](container_iterator it) {
                     return it->second.status == active;
                 })
                 | std::views::transform([](container_iterator it) {
                     return it->second.value.template get<E>();
-                })};
+                }));
         }
     };
 
