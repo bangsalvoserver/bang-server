@@ -161,23 +161,54 @@ namespace banggame {
         using container_map = std::multimap<Key, value_variant, std::less<>>;
         using container_iterator = typename container_map::iterator;
         using iterator_set = std::set<container_iterator, iterator_compare>;
-        using iterator_table = std::array<iterator_set, enums::num_members_v<EnumType>>;
+
+        struct set_lock_pair {
+            uint8_t lock_count = 0;
+            iterator_set set;
+        };
+
+        template<typename T>
+        class lock_incrementor : public T {
+        private:
+            uint8_t *m_count = nullptr;
+            
+        public:
+            lock_incrementor(uint8_t &count, T &&value)
+                : T{std::move(value)}, m_count{&count}
+            {
+                ++(*m_count);
+            }
+
+            lock_incrementor(const lock_incrementor &) = delete;
+            lock_incrementor(lock_incrementor &&other)
+                noexcept(std::is_nothrow_move_constructible_v<T>)
+                : T{std::move(other)}
+                , m_count{other.m_count}
+            {
+                other.m_count = nullptr;
+            }
+
+            auto operator = (const lock_incrementor &) = delete;
+            auto operator = (lock_incrementor &&other)
+                noexcept(std::is_nothrow_move_assignable_v<T>)
+            {
+                static_cast<T &>(*this) = std::move(other);
+                std::swap(m_count, other.m_count);
+            }
+
+            ~lock_incrementor() {
+                if (m_count) {
+                    --(*m_count);
+                }
+            }
+        };
+
+        using iterator_table = std::array<set_lock_pair, enums::num_members_v<EnumType>>;
         using iterator_vector = std::vector<container_iterator>;
 
         container_map m_map;
         iterator_table m_table;
         iterator_vector m_changes;
-
-        void commit_change(container_iterator it) {
-            switch (it->second.status) {
-            case inactive:
-                it->second.status = active;
-                break;
-            case erased:
-                m_table[it->second.value.index()].erase(it);
-                m_map.erase(it);
-            }
-        }
 
     public:
         template<EnumType E, typename ... Ts>
@@ -185,7 +216,7 @@ namespace banggame {
             auto it = m_map.emplace(std::piecewise_construct,
                 std::make_tuple(std::move(key)),
                 std::make_tuple(enums::enum_tag<E>, FWD(args) ...));
-            m_table[enums::indexof(E)].emplace(it);
+            m_table[enums::indexof(E)].set.emplace(it);
             m_changes.push_back(it);
         }
 
@@ -199,16 +230,17 @@ namespace banggame {
         }
 
         void commit_changes() {
-            for (container_iterator it : m_changes) {
-                commit_change(it);
-            }
-            m_changes.clear();
-        }
-
-        void commit_changes(EnumType filter) {
             std::erase_if(m_changes, [&](container_iterator it) {
-                if (it->second.value.enum_index() == filter) {
-                    commit_change(it);
+                auto &set = m_table[it->second.value.index()];
+                if (set.lock_count == 0) {
+                    switch (it->second.status) {
+                    case inactive:
+                        it->second.status = active;
+                        break;
+                    case erased:
+                        set.set.erase(it);
+                        m_map.erase(it);
+                    }
                     return true;
                 }
                 return false;
@@ -217,13 +249,14 @@ namespace banggame {
 
         template<EnumType E>
         auto get_table() {
-            return m_table[enums::indexof(E)]
+            auto &set = m_table[enums::indexof(E)];
+            return lock_incrementor{set.lock_count, set.set
                 | std::views::filter([](container_iterator it) {
                     return it->second.status == active;
                 })
                 | std::views::transform([](container_iterator it) {
                     return it->second.value.template get<E>();
-                });
+                })};
         }
     };
 
@@ -235,43 +268,28 @@ namespace banggame {
     template<typename T, event_type E>
     concept invocable_for_event = same_function_args<T, enums::enum_type_t<E>>::value;
 
-    template<typename Function> struct function_argument;
-    template<typename T, typename Arg> struct function_argument<void (T::*) (Arg)> : std::type_identity<Arg> {};
-    template<typename T, typename Arg> struct function_argument<void (T::*) (Arg) const> : std::type_identity<Arg> {};
-    template<typename Function> struct deduce_event_args : function_argument<decltype(&Function::operator())> {};
-
     class listener_map {
     private:
         priority_double_map<event_card_key, event_type> m_listeners;
-        std::array<bool, enums::num_members_v<event_type>> m_locks{};
 
     public:
         template<event_type E, invocable_for_event<E> Function>
         void add_listener(event_card_key key, Function &&fun) {
             m_listeners.add<E>(key, std::forward<Function>(fun));
-            if (!m_locks[enums::indexof(E)]) {
-                m_listeners.commit_changes(E);
-            }
+            m_listeners.commit_changes();
         }
 
         void remove_listeners(auto key) {
             m_listeners.erase(key);
-            if (std::ranges::none_of(m_locks, std::identity{})) {
-                m_listeners.commit_changes();
-            }
+            m_listeners.commit_changes();
         }
 
         template<event_type E, typename ... Ts>
         void call_event(Ts && ... args) {
-            bool &lock = m_locks[enums::indexof(E)];
-            bool prev_lock = std::exchange(lock, true);
             for (const auto &fun : m_listeners.get_table<E>()) {
                 std::invoke(fun, args ...);
             }
-            lock = prev_lock;
-            if (!lock) {
-                m_listeners.commit_changes(E);
-            }
+            m_listeners.commit_changes();
         }
     };
 
