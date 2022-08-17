@@ -168,6 +168,17 @@ namespace banggame {
         iterator_table m_table;
         iterator_vector m_changes;
 
+        void commit_change(container_iterator it) {
+            switch (it->second.status) {
+            case inactive:
+                it->second.status = active;
+                break;
+            case erased:
+                m_table[it->second.value.index()].erase(it);
+                m_map.erase(it);
+            }
+        }
+
     public:
         template<EnumType E, typename ... Ts>
         void add(Key key, Ts && ... args) {
@@ -188,26 +199,29 @@ namespace banggame {
         }
 
         void commit_changes() {
-            for (auto it : m_changes) {
-                switch (it->second.status) {
-                case inactive:
-                    it->second.status = active;
-                    break;
-                case erased:
-                    m_table[it->second.value.index()].erase(it);
-                    m_map.erase(it);
-                }
+            for (container_iterator it : m_changes) {
+                commit_change(it);
             }
             m_changes.clear();
+        }
+
+        void commit_changes(EnumType filter) {
+            std::erase_if(m_changes, [&](container_iterator it) {
+                if (it->second.value.enum_index() == filter) {
+                    commit_change(it);
+                    return true;
+                }
+                return false;
+            });
         }
 
         template<EnumType E>
         auto get_table() {
             return m_table[enums::indexof(E)]
-                | std::views::filter([](auto it) {
+                | std::views::filter([](container_iterator it) {
                     return it->second.status == active;
                 })
-                | std::views::transform([](auto it) {
+                | std::views::transform([](container_iterator it) {
                     return it->second.value.template get<E>();
                 });
         }
@@ -229,34 +243,34 @@ namespace banggame {
     class listener_map {
     private:
         priority_double_map<event_card_key, event_type> m_listeners;
-        bool m_lock = false;
+        std::array<bool, enums::num_members_v<event_type>> m_locks{};
 
     public:
         template<event_type E, invocable_for_event<E> Function>
         void add_listener(event_card_key key, Function &&fun) {
             m_listeners.add<E>(key, std::forward<Function>(fun));
-            if (!m_lock) {
-                m_listeners.commit_changes();
+            if (!m_locks[enums::indexof(E)]) {
+                m_listeners.commit_changes(E);
             }
         }
 
         void remove_listeners(auto key) {
             m_listeners.erase(key);
-            if (!m_lock) {
+            if (std::ranges::none_of(m_locks, std::identity{})) {
                 m_listeners.commit_changes();
             }
         }
 
         template<event_type E, typename ... Ts>
         void call_event(Ts && ... args) {
-            bool prev_lock = m_lock;
-            m_lock = true;
+            bool &lock = m_locks[enums::indexof(E)];
+            bool prev_lock = std::exchange(lock, true);
             for (const auto &fun : m_listeners.get_table<E>()) {
                 std::invoke(fun, args ...);
             }
-            m_lock = prev_lock;
-            if (!m_lock) {
-                m_listeners.commit_changes();
+            lock = prev_lock;
+            if (!lock) {
+                m_listeners.commit_changes(E);
             }
         }
     };
