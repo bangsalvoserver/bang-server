@@ -1848,6 +1848,7 @@ fistfulofcards:
   - name: BLOOD_BROTHERS
     image: 05_fratellidisangue
     responses:
+      - max_usages(1)
       - while_drawing
       - startofturn
       - heal_notfull player notself
