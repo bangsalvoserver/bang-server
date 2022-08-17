@@ -2,39 +2,33 @@
 #define __PLAY_VISITOR_H__
 
 #include "play_verify.h"
-
 #include "player.h"
 #include "game.h"
 
-#define OPT_ARG(...) OPT_ARG_1(,##__VA_ARGS__, OPT_ARG_2(__VA_ARGS__),)
-#define OPT_ARG_1(arg1, arg2, arg3, ...) arg3
-#define OPT_ARG_2(...) , __VA_ARGS__
-
 namespace banggame {
 
-    template<target_type E> struct play_visitor;
-
-    #define DECLARE_VISITOR(type, ...) \
-    template<> struct play_visitor<target_type::type> { \
-        opt_game_str verify(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
-        opt_game_str prompt(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
-        void play(const play_card_verify *verifier, const effect_holder &effect OPT_ARG(__VA_ARGS__)); \
+    template<typename T> struct const_ref_if_non_trivial {
+        using type = const T &;
     };
 
-    DECLARE_VISITOR(none)
-    DECLARE_VISITOR(player, player *target)
-    DECLARE_VISITOR(conditional_player, nullable<player> target)
-    DECLARE_VISITOR(card, card *target)
-    DECLARE_VISITOR(extra_card, nullable<card>)
-    DECLARE_VISITOR(all_players)
-    DECLARE_VISITOR(other_players)
-    DECLARE_VISITOR(cards_other_players, const std::vector<card *> &target_cards)
-    DECLARE_VISITOR(cube, const std::vector<card *> &target_cards)
+    template<typename T> requires std::is_trivially_copyable_v<T> struct const_ref_if_non_trivial<T> {
+        using type = T;
+    };
 
-    static_assert([]<target_type ... Es>(enums::enum_sequence<Es ...>){
-        return (requires { play_visitor<Es>{}; } && ... );
-    }(enums::make_enum_sequence<target_type>()),
-        "All visitors for target_type must be defined");
+    template<target_type E> struct play_visitor {
+        opt_game_str verify(const play_card_verify *verifier, const effect_holder &effect);
+        opt_game_str prompt(const play_card_verify *verifier, const effect_holder &efffect);
+        void play(const play_card_verify *verifier, const effect_holder &holder);
+    };
+
+    template<target_type E> requires (play_card_target::has_type<E>)
+    struct play_visitor<E> {
+        using arg_type = typename const_ref_if_non_trivial<typename play_card_target::value_type<E>>::type;
+
+        opt_game_str verify(const play_card_verify *verifier, const effect_holder &effect, arg_type arg);
+        opt_game_str prompt(const play_card_verify *verifier, const effect_holder &efffect, arg_type arg);
+        void play(const play_card_verify *verifier, const effect_holder &holder, arg_type arg);
+    };
 
 }
 
