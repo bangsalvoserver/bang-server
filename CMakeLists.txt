@@ -41,8 +41,10 @@ set(bangserver_srcs
 
 add_subdirectory(external/cpputils)
 
+find_package(Threads REQUIRED)
+
 add_library(networking INTERFACE)
-target_link_libraries(networking INTERFACE asio)
+target_link_libraries(networking INTERFACE asio Threads::Threads)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_STL_)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
 target_include_directories(networking INTERFACE external/websocketpp)
