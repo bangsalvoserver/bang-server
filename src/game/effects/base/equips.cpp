@@ -71,15 +71,11 @@ namespace banggame {
                         target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
                         target->discard_card(target_card);
                         target->damage(target_card, nullptr, 3);
-                    } else if (auto view = range_other_players(target)
-                        | std::views::filter([target_card](player &p) {
-                            return !p.find_equipped_card(target_card);
-                        }))
-                    {
-                        player &dest = view.front();
+                    } else if (auto dest = std::ranges::find_if(range_other_players(target), [target_card](player &p) {
+                        return !p.find_equipped_card(target_card);
+                    }); dest != target) {
                         target_card->on_disable(target);
-                        target_card->on_equip(&dest);
-                        dest.equip_card(target_card);
+                        dest->equip_card(target_card);
                     }
                 });
             }
