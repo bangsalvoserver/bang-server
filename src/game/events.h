@@ -194,7 +194,7 @@ namespace banggame {
                 return *this;
             }
 
-            ~on_destroy_do() noexcept(noexcept(std::invoke(m_fun))) {
+            ~on_destroy_do() {
                 std::invoke(m_fun);
             }
         };
