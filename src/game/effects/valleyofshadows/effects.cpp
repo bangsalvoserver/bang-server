@@ -67,24 +67,27 @@ namespace banggame {
     }
 
     opt_game_str effect_poker::on_prompt(card *origin_card, player *origin) {
-        if (std::ranges::empty(range_other_players(origin) | std::views::filter([](const player &p) {
-            return !p.m_hand.empty();
-        }))) {
+        if (std::ranges::all_of(range_other_players(origin), [](const player &p) {
+            return p.m_hand.empty();
+        })) {
             return game_string{"PROMPT_CARD_NO_EFFECT", origin_card};
         }
         return std::nullopt;
     }
 
     void effect_poker::on_play(card *origin_card, player *origin) {
-        auto targets = range_other_players(origin) | std::views::filter([](const player &p) {
-            return !p.m_hand.empty();
-        });
+        std::vector<player *> targets;
+        for (player &p : range_other_players(origin)) {
+            if (!p.m_hand.empty()) {
+                targets.push_back(&p);
+            }
+        }
 
         effect_flags flags = effect_flags::escapable;
-        if (std::ranges::distance(targets) == 1) flags |= effect_flags::single_target;
+        if (targets.size() == 1) flags |= effect_flags::single_target;
         
-        for (player &p : targets) {
-            origin->m_game->queue_request<request_poker>(origin_card, origin, &p, flags);
+        for (player *p : targets) {
+            origin->m_game->queue_request<request_poker>(origin_card, origin, p, flags);
         }
         origin->m_game->queue_action([=]{
             for (auto it = origin->m_game->m_selection.begin(); it != origin->m_game->m_selection.end(); ++it) {
