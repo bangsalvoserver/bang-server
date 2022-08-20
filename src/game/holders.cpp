@@ -172,7 +172,7 @@ namespace banggame {
         return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> opt_game_str {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
-                if constexpr (requires { handler_type::verify; }) {
+                if constexpr (requires { mth_unwrapper{&handler_type::verify}; }) {
                     return mth_unwrapper{&handler_type::verify}(origin_card, origin, targets);
                 }
             }
@@ -184,7 +184,7 @@ namespace banggame {
         return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> opt_game_str {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
-                if constexpr (requires { handler_type::on_prompt; }) {
+                if constexpr (requires { mth_unwrapper{&handler_type::on_prompt}; }) {
                     return mth_unwrapper{&handler_type::on_prompt}(origin_card, origin, targets);
                 }
             }
