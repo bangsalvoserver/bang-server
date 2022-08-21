@@ -158,7 +158,7 @@ namespace banggame {
                     do_add_cubes(c);
                 }
             }
-        } else {
+        } else if (ncubes > 0) {
             m_game->queue_request<request_add_cube>(origin_card, this, ncubes);
         }
     }
