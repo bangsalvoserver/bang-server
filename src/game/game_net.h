@@ -19,16 +19,22 @@ namespace banggame {
 
     class update_target {
     private:
-        std::vector<player *> m_targets;
+        player *m_targets[8];
 
-        bool m_inclusive:1 = false;
-        bool m_invert_public:1 = false;
-
-        update_target(bool inclusive, std::same_as<player *> auto ... targets)
-            : m_targets{targets ...}, m_inclusive{inclusive} {}
+        struct {
+            bool m_inclusive:1;
+            bool m_invert_public:1;
+            int m_num_targets:6;
+        };
 
         update_target(bool inclusive, bool invert_public, std::same_as<player *> auto ... targets)
-            : m_targets{targets ...}, m_inclusive{inclusive}, m_invert_public(invert_public) {}
+            : m_targets{targets ...}
+            , m_inclusive{inclusive}
+            , m_invert_public{invert_public}
+            , m_num_targets{sizeof...(targets)} {}
+
+        update_target(bool inclusive, std::same_as<player *> auto ... targets)
+            : update_target(inclusive, false, targets...) {}
 
     public:
         static update_target includes(std::same_as<player *> auto ... targets) {
@@ -48,15 +54,16 @@ namespace banggame {
         }
 
         void add(player *target) {
-            m_targets.push_back(target);
+            m_targets[m_num_targets++] = target;
         }
 
         bool matches(int user_id) const {
-            return (std::ranges::find(m_targets, user_id, &player::user_id) != m_targets.end()) == m_inclusive;
+            std::span targets{m_targets, m_targets + m_num_targets};
+            return (std::ranges::find(targets, user_id, &player::user_id) != targets.end()) == m_inclusive;
         }
 
         bool is_public() const {
-            return m_invert_public != m_inclusive != m_targets.empty();
+            return m_invert_public != m_inclusive != (m_num_targets == 0);
         }
     };
 
