@@ -10,18 +10,18 @@
 namespace banggame {
     using namespace enums::flag_operators;
 
-    void handler_draw_atend::on_play(card *origin_card, player *origin, size_t amount) {
+    void handler_draw_atend::on_play(card *origin_card, player *origin, int amount) {
         if (amount > 0) {
-            effect_draw(static_cast<int>(amount)).on_play(origin_card, origin);
+            effect_draw(amount).on_play(origin_card, origin);
         }
     }
 
-    opt_game_str handler_heal_multi::on_prompt(card *origin_card, player *origin, size_t amount) {
-        return effect_heal(static_cast<int>(amount)).on_prompt(origin_card, origin);
+    opt_game_str handler_heal_multi::on_prompt(card *origin_card, player *origin, int amount) {
+        return effect_heal(amount).on_prompt(origin_card, origin);
     }
 
-    void handler_heal_multi::on_play(card *origin_card, player *origin, size_t amount) {
-        effect_heal(static_cast<int>(amount)).on_play(origin_card, origin);
+    void handler_heal_multi::on_play(card *origin_card, player *origin, int amount) {
+        effect_heal(amount).on_play(origin_card, origin);
     }
 
     opt_game_str effect_select_cube::verify(card *origin_card, player *origin, card *target) {

@@ -80,9 +80,9 @@ namespace banggame {
 
         template<std::invocable Function>
         int num_queued_requests(Function &&fun) {
-            size_t nreqs = m_requests.size();
+            int nreqs = static_cast<int>(m_requests.size());
             std::invoke(std::forward<Function>(fun));
-            return static_cast<int>(m_requests.size() - nreqs);
+            return static_cast<int>(m_requests.size()) - nreqs;
         }
 
         void tick() {

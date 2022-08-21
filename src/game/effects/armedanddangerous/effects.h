@@ -6,12 +6,12 @@
 namespace banggame {
 
     struct handler_draw_atend {
-        void on_play(card *origin_card, player *origin, size_t amount);
+        void on_play(card *origin_card, player *origin, int amount);
     };
 
     struct handler_heal_multi {
-        opt_game_str on_prompt(card *origin_card, player *origin, size_t amount);
-        void on_play(card *origin_card, player *origin, size_t amount);
+        opt_game_str on_prompt(card *origin_card, player *origin, int amount);
+        void on_play(card *origin_card, player *origin, int amount);
     };
 
     struct effect_select_cube {

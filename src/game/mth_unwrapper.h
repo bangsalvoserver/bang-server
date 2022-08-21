@@ -63,12 +63,12 @@ struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, const target_list &>> {
     }
 };
 
-template<typename RetType, typename HandlerType>
-struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, size_t>> {
-    fun_mem_ptr_t<RetType, HandlerType, size_t> m_value;
+template<typename RetType, typename HandlerType, std::integral SizeType>
+struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, SizeType>> {
+    fun_mem_ptr_t<RetType, HandlerType, SizeType> m_value;
 
     RetType operator()(card *origin_card, player *origin, const target_list &targets) {
-        return (HandlerType{}.*m_value)(origin_card, origin, targets.size());
+        return (HandlerType{}.*m_value)(origin_card, origin, static_cast<SizeType>(targets.size()));
     }
 };
 
