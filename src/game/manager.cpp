@@ -139,9 +139,10 @@ void game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, const lobb
             }
 
             for (const player &p : lobby.game.m_players) {
-                if (&p != controlling && (p.alive() || lobby.game.has_expansion(card_expansion_type::ghostcards))) {
-                    send_message<server_message_type::game_update>(user->first, enums::enum_tag<game_update_type::player_add>,
-                        p.id, p.user_id);
+                if (&p == controlling) continue;
+                send_message<server_message_type::game_update>(user->first, enums::enum_tag<game_update_type::player_add>, p.id, p.user_id);
+                if (!p.alive() && !lobby.game.has_expansion(card_expansion_type::ghostcards)) {
+                    send_message<server_message_type::game_update>(user->first, enums::enum_tag<game_update_type::player_remove>, p.id);
                 }
             }
 
