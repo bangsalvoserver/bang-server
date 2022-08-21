@@ -502,6 +502,10 @@ namespace banggame {
                 }
             }
 
+            if (!has_expansion(card_expansion_type::ghostcards)) {
+                add_update<game_update_type::player_remove>(target->id);
+            }
+
             if (winner_role != player_role::unknown) {
                 for (const auto &p : m_players) {
                     if (!p.check_player_flags(player_flags::role_revealed)) {
@@ -536,10 +540,6 @@ namespace banggame {
             if (target == m_first_player && num_alive > 1) {
                 m_first_player = std::next(player_iterator(m_first_player));
                 add_update<game_update_type::move_scenario_deck>(m_first_player->id);
-            }
-
-            if (!has_expansion(card_expansion_type::ghostcards)) {
-                add_update<game_update_type::player_remove>(target->id);
             }
         });
     }
