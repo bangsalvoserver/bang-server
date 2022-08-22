@@ -141,6 +141,7 @@ namespace banggame {
             if (p == target) {
                 target->m_game->queue_action([=]{
                     if (target->alive()) {
+                        target->m_game->flash_card(target_card);
                         target->draw_card(damage, target_card);
                     }
                 });

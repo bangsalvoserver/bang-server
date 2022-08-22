@@ -414,6 +414,7 @@ namespace banggame {
     }
     
     void game::draw_check_then(player *origin, card *origin_card, draw_check_function fun) {
+        flash_card(origin_card);
         m_current_check.set(origin, origin_card, std::move(fun));
         m_current_check.start();
     }

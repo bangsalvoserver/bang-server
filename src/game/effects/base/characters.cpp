@@ -77,6 +77,7 @@ namespace banggame {
             if (origin && p == target && p->m_game->m_playing != p) {
                 target->m_game->queue_action([=]{
                     if (target->alive() && !origin->m_hand.empty()) {
+                        target->m_game->flash_card(target_card);
                         card *stolen_card = origin->random_hand_card();
                         target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", target, origin, stolen_card);
                         target->m_game->add_log(update_target::excludes(origin, target), "LOG_STOLEN_CARD_FROM_HAND", target, origin);
@@ -92,6 +93,7 @@ namespace banggame {
         origin->m_game->add_listener<event_type::on_effect_end>(origin_card, [origin, origin_card](player *, card *) {
             origin->m_game->queue_action([origin, origin_card]{
                 if (origin->alive() && origin->m_hand.empty()) {
+                    origin->m_game->flash_card(origin_card);
                     origin->draw_card(1, origin_card);
                 }
             });

@@ -187,6 +187,8 @@ namespace banggame {
     }
 
     void request_handcuffs::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+        target->m_game->flash_card(target_card);
+        
         auto declared_suit = static_cast<card_suit>(*target_card->get_tag_value(tag_type::handcuffs));
         switch (declared_suit) {
         case card_suit::clubs:
