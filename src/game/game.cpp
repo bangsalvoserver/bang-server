@@ -124,6 +124,10 @@ namespace banggame {
 
     void game::start_game(const game_options &options) {
         m_options = options;
+
+        for (auto &p : m_players) {
+            add_update<game_update_type::player_add>(p.id, p.user_id);
+        }
     
         add_update<game_update_type::game_options>(options);
         

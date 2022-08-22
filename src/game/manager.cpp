@@ -303,7 +303,6 @@ void lobby::start_game(game_manager &mgr) {
     auto it = users.begin();
     for (player *p : ids) {
         p->user_id = (*it)->second.user_id;
-        game.add_update<game_update_type::player_add>(p->id, (*it)->second.user_id);
         ++it;
     }
 
