@@ -179,6 +179,10 @@ namespace banggame {
         m_scenario_cards.back()->on_enable(m_first_player);
     }
 
+    void game_table::flash_card(card *c) {
+        add_update<game_update_type::flash_card>(c->id);
+    }
+
     void game_table::add_disabler(event_card_key key, card_disabler_fun &&fun) {
         const auto disable_if_new = [&](card *c) {
             if (!is_disabled(c) && fun(c)) {

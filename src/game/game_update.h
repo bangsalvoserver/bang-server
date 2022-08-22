@@ -70,6 +70,10 @@ namespace banggame {
         (bool) instant
     )};
 
+    struct flash_card_update {REFLECTABLE(
+        (int) card_id
+    )};
+
     struct card_id_args {REFLECTABLE(
         (int) card_id
     )};
@@ -170,6 +174,7 @@ namespace banggame {
         (show_card, show_card_update)
         (hide_card, hide_card_update)
         (tap_card, tap_card_update)
+        (flash_card, flash_card_update)
         (last_played_card, card_id_args)
         (player_add, player_user_update)
         (player_remove, player_remove_update)

@@ -71,6 +71,8 @@ namespace banggame {
         
         void draw_scenario_card();
 
+        void flash_card(card *c);
+
         void add_disabler(event_card_key key, card_disabler_fun &&fun);
         void remove_disablers(event_card_key key);
 
