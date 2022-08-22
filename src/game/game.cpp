@@ -183,23 +183,6 @@ namespace banggame {
             add_update<game_update_type::add_cubes>(num_cubes, 0);
         }
 
-        if (add_cards(all_cards.highnoon, pocket_type::scenario_deck) || add_cards(all_cards.fistfulofcards, pocket_type::scenario_deck)) {
-            shuffle_cards_and_ids(m_scenario_deck);
-            auto last_scenario_cards = std::ranges::partition(m_scenario_deck, [](card *c) {
-                return c->has_tag(tag_type::last_scenario_card);
-            });
-            if (last_scenario_cards.begin() != m_scenario_deck.begin()) {
-                m_scenario_deck.erase(m_scenario_deck.begin() + 1, last_scenario_cards.begin());
-            }
-            
-            move_testing_cards_back(m_scenario_deck);
-            if (m_scenario_deck.size() > m_options.scenario_deck_size) {
-                m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
-            }
-
-            add_update<game_update_type::add_cards>(make_id_vector(m_scenario_deck), pocket_type::scenario_deck);
-        }
-
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
             add_update<game_update_type::add_cards>(make_id_vector(m_hidden_deck), pocket_type::hidden_deck);
         }
@@ -232,6 +215,25 @@ namespace banggame {
             m_first_player = &*std::ranges::find(m_players, player_role::sheriff, &player::m_role);
         } else {
             m_first_player = &*std::ranges::find(m_players, player_role::deputy_3p, &player::m_role);
+        }
+
+        add_update<game_update_type::move_scenario_deck>(m_first_player->id);
+
+        if (add_cards(all_cards.highnoon, pocket_type::scenario_deck) || add_cards(all_cards.fistfulofcards, pocket_type::scenario_deck)) {
+            shuffle_cards_and_ids(m_scenario_deck);
+            auto last_scenario_cards = std::ranges::partition(m_scenario_deck, [](card *c) {
+                return c->has_tag(tag_type::last_scenario_card);
+            });
+            if (last_scenario_cards.begin() != m_scenario_deck.begin()) {
+                m_scenario_deck.erase(m_scenario_deck.begin() + 1, last_scenario_cards.begin());
+            }
+            
+            move_testing_cards_back(m_scenario_deck);
+            if (m_scenario_deck.size() > m_options.scenario_deck_size) {
+                m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
+            }
+
+            add_update<game_update_type::add_cards>(make_id_vector(m_scenario_deck), pocket_type::scenario_deck);
         }
 
         std::vector<card *> character_ptrs;
@@ -306,7 +308,6 @@ namespace banggame {
             }
 
             if (!m_scenario_deck.empty()) {
-                add_update<game_update_type::move_scenario_deck>(m_first_player->id);
                 send_card_update(m_scenario_deck.back(), nullptr, show_card_flags::instant);
             }
 
@@ -506,6 +507,11 @@ namespace banggame {
                     winner_role = player_role::outlaw_3p;
                 }
             }
+            
+            if (target == m_first_player && num_alive > 1 && winner_role == player_role::unknown) {
+                m_first_player = std::next(player_iterator(m_first_player));
+                add_update<game_update_type::move_scenario_deck>(m_first_player->id);
+            }
 
             if (!has_expansion(card_expansion_type::ghostcards)) {
                 add_update<game_update_type::player_remove>(target->id);
@@ -540,11 +546,6 @@ namespace banggame {
                 } else {
                     killer->draw_card(3);
                 }
-            }
-            
-            if (target == m_first_player && num_alive > 1) {
-                m_first_player = std::next(player_iterator(m_first_player));
-                add_update<game_update_type::move_scenario_deck>(m_first_player->id);
             }
         });
     }
