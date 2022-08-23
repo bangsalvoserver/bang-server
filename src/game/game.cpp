@@ -37,6 +37,13 @@ namespace banggame {
 
     std::vector<game_update> game::get_game_state_updates(player *owner) {
         game_update_vector ret;
+
+        for (const player &p : m_players) {
+            ret.add<game_update_type::player_add>(p.id, p.user_id);
+            if (!p.alive() && !has_expansion(card_expansion_type::ghostcards)) {
+                ret.add<game_update_type::player_remove>(p.id, true);
+            }
+        }
         
         ret.add<game_update_type::add_cards>(make_id_vector(m_cards | std::views::transform([](const card &c) { return &c; })), pocket_type::hidden_deck);
 

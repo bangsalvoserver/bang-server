@@ -84,7 +84,8 @@ namespace banggame {
     )};
 
     struct player_remove_update {REFLECTABLE(
-        (int) player_id
+        (int) player_id,
+        (bool) instant
     )};
 
     struct player_hp_update {REFLECTABLE(
