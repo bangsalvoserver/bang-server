@@ -86,7 +86,7 @@ namespace banggame {
         effect_bang().on_play(origin_card, origin, target);
 
         origin->m_game->queue_action([=]{
-            if (origin->m_num_drawn_cards < origin->m_num_cards_to_draw && origin->m_game->m_playing == origin) {
+            if (origin->alive() && origin->m_num_drawn_cards < origin->m_num_cards_to_draw && origin->m_game->m_playing == origin) {
                 origin->request_drawing();
             }
         });
