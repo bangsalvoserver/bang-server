@@ -85,8 +85,10 @@ namespace banggame {
             , duration(duration) {}
 
         int duration;
-
+        
         std::vector<player *> awaiting_confirms;
+        int auto_confirm_timer = 600;
+
         void add_pending_confirm(player *p) override final;
         void confirm_player(player *p) override final;
 

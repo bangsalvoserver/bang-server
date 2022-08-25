@@ -213,6 +213,9 @@ namespace banggame {
     }
 
     void timer_request::tick() {
+        if (auto_confirm_timer && --auto_confirm_timer == 0) {
+            awaiting_confirms.clear();
+        }
         if (awaiting_confirms.empty() && duration && --duration == 0) {
             auto copy = shared_from_this();
             target->m_game->pop_request();
