@@ -73,6 +73,11 @@ namespace banggame {
         std::deque<game_update> m_public_updates;
 
         template<game_update_type E>
+        void add_update(std::vector<game_update> &update_vector, auto && ... args) {
+            update_vector.emplace_back(enums::enum_tag<E>, FWD(args) ... );
+        }
+
+        template<game_update_type E>
         void add_update(update_target target, auto && ... args) {
             const auto &update = m_updates.emplace_back(std::piecewise_construct,
                 std::make_tuple(std::move(target)),

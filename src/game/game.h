@@ -14,9 +14,8 @@ namespace banggame {
 
         player *m_playing = nullptr;
 
-        player *find_disconnected_player();
-
-        std::vector<game_update> get_game_state_updates(player *owner);
+        std::vector<game_update> get_spectator_updates();
+        std::vector<game_update> get_rejoin_updates(player *target);
 
         void start_game(const game_options &options);
 

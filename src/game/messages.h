@@ -27,6 +27,10 @@ namespace banggame {
         (int) lobby_id
     )};
 
+    struct lobby_rejoin_args {REFLECTABLE(
+        (int) player_id
+    )};
+
     struct lobby_chat_client_args {REFLECTABLE(
         (std::string) message
     )};
@@ -37,6 +41,7 @@ namespace banggame {
         (lobby_make, lobby_info)
         (lobby_edit, lobby_info)
         (lobby_join, lobby_join_args)
+        (lobby_rejoin, lobby_rejoin_args)
         (lobby_leave)
         (lobby_chat, lobby_chat_client_args)
         (lobby_return)

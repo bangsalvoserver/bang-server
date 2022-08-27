@@ -13,86 +13,66 @@ namespace banggame {
 
     using namespace enums::flag_operators;
 
-    player *game::find_disconnected_player() {
-        auto dc_view = std::ranges::filter_view(m_players, [](const player &p) { return p.user_id == 0; });
-        if (dc_view.empty()) return nullptr;
+    std::vector<game_update> game::get_spectator_updates() {
+        std::vector<game_update> ret;
 
-        auto first_alive = std::ranges::find_if(dc_view, &player::alive);
-        if (first_alive != dc_view.end()) {
-            return &*first_alive;
-        }
-        if (has_expansion(card_expansion_type::ghostcards)) {
-            return &dc_view.front();
-        } else {
-            return nullptr;
-        }
-    }
-
-    struct game_update_vector : std::vector<game_update> {
-        template<game_update_type E, typename ... Ts>
-        auto &add(Ts && ... args) {
-            return emplace_back(enums::enum_tag<E>, FWD(args) ...);
-        }
-    };
-
-    std::vector<game_update> game::get_game_state_updates(player *owner) {
-        game_update_vector ret;
+        add_update<game_update_type::player_add>(ret, static_cast<int>(m_players.size()));
 
         for (const player &p : m_players) {
-            ret.add<game_update_type::player_add>(p.id, p.user_id);
+            add_update<game_update_type::player_user>(ret, p.id, p.user_id);
             if (!p.alive() && !has_expansion(card_expansion_type::ghostcards)) {
-                ret.add<game_update_type::player_remove>(p.id, true);
+                add_update<game_update_type::player_remove>(ret, p.id, true);
             }
         }
         
-        ret.add<game_update_type::add_cards>(make_id_vector(m_cards | std::views::transform([](const card &c) { return &c; })), pocket_type::hidden_deck);
+        add_update<game_update_type::add_cards>(ret, make_id_vector(m_cards | std::views::transform([](const card &c) { return &c; })), pocket_type::hidden_deck);
 
         const auto show_never = [](const card &c) { return false; };
         const auto show_always = [](const card &c) { return true; };
 
         auto move_cards = [&](auto &&range, auto do_show_card) {
             for (card *c : range) {
-                ret.add<game_update_type::move_card>(c->id, c->owner ? c->owner->id : 0, c->pocket, show_card_flags::instant);
+                add_update<game_update_type::move_card>(ret, c->id, c->owner ? c->owner->id : 0, c->pocket, show_card_flags::instant);
 
                 if (do_show_card(*c)) {
-                    ret.add<game_update_type::show_card>(*c, show_card_flags::instant);
+                    add_update<game_update_type::show_card>(ret, *c, show_card_flags::instant);
                     if (c->num_cubes > 0) {
-                        ret.add<game_update_type::add_cubes>(c->num_cubes, c->id);
+                        add_update<game_update_type::add_cubes>(ret, c->num_cubes, c->id);
                     }
 
                     if (c->inactive) {
-                        ret.add<game_update_type::tap_card>(c->id, true, true);
+                        add_update<game_update_type::tap_card>(ret, c->id, true, true);
                     }
                 }
             }
         };
 
-        ret.add<game_update_type::game_options>(m_options);
+        add_update<game_update_type::game_options>(ret, m_options);
 
         move_cards(m_specials, show_always);
         move_cards(m_deck, show_never);
         move_cards(m_shop_deck, show_never);
 
         move_cards(m_discards, show_always);
-        move_cards(m_selection, [&](const card &c){ return c.owner == owner; });
+        move_cards(m_selection, [&](const card &c){ return !c.owner; });
         move_cards(m_shop_discards, show_always);
         move_cards(m_shop_selection, show_always);
         move_cards(m_hidden_deck, show_always);
 
         if (!m_scenario_deck.empty()) {
-            ret.add<game_update_type::move_scenario_deck>(m_first_player->id);
+            add_update<game_update_type::move_scenario_deck>(ret, m_first_player->id);
         }
 
         move_cards(m_scenario_deck, [&](const card &c) { return &c == m_scenario_deck.back(); });
         move_cards(m_scenario_cards, [&](const card &c) { return &c == m_scenario_cards.back(); });
         
         if (num_cubes > 0) {
-            ret.add<game_update_type::add_cubes>(num_cubes, 0);
+            add_update<game_update_type::add_cubes>(ret, num_cubes, 0);
         }
 
         for (auto &p : m_players) {
-            if (p.check_player_flags(player_flags::role_revealed) || &p == owner) {
-                ret.add<game_update_type::player_show_role>(p.id, p.m_role, true);
+            if (p.check_player_flags(player_flags::role_revealed)) {
+                add_update<game_update_type::player_show_role>(ret, p.id, p.m_role, true);
             }
 
             if (p.alive() || has_expansion(card_expansion_type::ghostcards)) {
@@ -100,30 +80,50 @@ namespace banggame {
                 move_cards(p.m_backup_character, show_never);
 
                 move_cards(p.m_table, show_always);
-                move_cards(p.m_hand, [&](const card &c){ return c.owner == owner || c.deck == card_deck_type::character; });
+                move_cards(p.m_hand, [&](const card &c){ return c.deck == card_deck_type::character; });
 
-                ret.add<game_update_type::player_hp>(p.id, p.m_hp, true);
-                ret.add<game_update_type::player_status>(p.id, p.m_player_flags, p.m_range_mod, p.m_weapon_range, p.m_distance_mod);
+                add_update<game_update_type::player_hp>(ret, p.id, p.m_hp, true);
+                add_update<game_update_type::player_status>(ret, p.id, p.m_player_flags, p.m_range_mod, p.m_weapon_range, p.m_distance_mod);
                 
                 if (p.m_gold != 0) {
-                    ret.add<game_update_type::player_gold>(p.id, p.m_gold);
+                    add_update<game_update_type::player_gold>(ret, p.id, p.m_gold);
                 }
             }
         }
 
         if (m_playing) {
-            ret.add<game_update_type::switch_turn>(m_playing->id);
+            add_update<game_update_type::switch_turn>(ret, m_playing->id);
         }
         if (pending_requests()) {
-            ret.add<game_update_type::request_status>(make_request_update(owner));
+            add_update<game_update_type::request_status>(ret, make_request_update(nullptr));
         }
-        for (const auto &[target, str] : m_saved_log) {
-            if (target.matches(owner ? owner->user_id : -1)) {
-                ret.add<game_update_type::game_log>(str);
+
+        return ret;
+    }
+
+    std::vector<game_update> game::get_rejoin_updates(player *target) {
+        std::vector<game_update> ret;
+
+        if (!target->check_player_flags(player_flags::role_revealed)) {
+            add_update<game_update_type::player_show_role>(ret, target->id, target->m_role, true);
+        }
+
+        for (card *c : target->m_hand) {
+            add_update<game_update_type::show_card>(ret, *c, show_card_flags::instant);
+        }
+
+        for (card *c : m_selection) {
+            if (c->owner == target) {
+                add_update<game_update_type::show_card>(ret, *c, show_card_flags::instant);
             }
         }
-        if (owner && owner->m_prompt) {
-            ret.add<game_update_type::game_prompt>(owner->m_prompt->second);
+
+        if (pending_requests()) {
+            add_update<game_update_type::request_status>(ret, make_request_update(target));
+        }
+
+        if (target->m_prompt) {
+            add_update<game_update_type::game_prompt>(ret, target->m_prompt->second);
         }
 
         return ret;
@@ -132,8 +132,10 @@ namespace banggame {
     void game::start_game(const game_options &options) {
         m_options = options;
 
+        add_update<game_update_type::player_add>(static_cast<int>(m_players.size()));
+
         for (auto &p : m_players) {
-            add_update<game_update_type::player_add>(p.id, p.user_id);
+            add_update<game_update_type::player_user>(p.id, p.user_id);
         }
     
         add_update<game_update_type::game_options>(options);

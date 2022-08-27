@@ -131,20 +131,26 @@ void game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, const lobb
         if (lobby.state != lobby_state::waiting) {
             send_message<server_message_type::game_started>(user->first);
 
-            player *controlling = lobby.game.find_disconnected_player();
-            if (controlling) {
-                controlling->user_id = user->second.user_id;
-            }
-
-            for (const auto &msg : lobby.game.get_game_state_updates(controlling)) {
+            for (const auto &msg : lobby.game.get_spectator_updates()) {
                 send_message<server_message_type::game_update>(user->first, msg);
             }
-
-            if (controlling) {
-                broadcast_message<server_message_type::game_update>(lobby,
-                    enums::enum_tag<game_update_type::player_add>, controlling->id, controlling->user_id);
-            }
         }
+    }
+}
+
+void game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, const lobby_rejoin_args &value) {
+    auto &lobby = user->second.get_lobby();
+
+    player *target = lobby.game.find_player(value.player_id);
+    if (!target || target->user_id != 0) return;
+
+    target->user_id = user->second.user_id;
+
+    broadcast_message<server_message_type::game_update>(lobby,
+            enums::enum_tag<game_update_type::player_user>, target->id, target->user_id);
+    
+    for (const auto &msg : lobby.game.get_rejoin_updates(target)) {
+        send_message<server_message_type::game_update>(user->first, msg);
     }
 }
 
@@ -168,7 +174,7 @@ void game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
 
     if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
         it->user_id = 0;
-        broadcast_message<server_message_type::game_update>(lobby, enums::enum_tag<game_update_type::player_add>, it->id, 0);
+        broadcast_message<server_message_type::game_update>(lobby, enums::enum_tag<game_update_type::player_user>, it->id, 0);
     }
     
     broadcast_message<server_message_type::lobby_remove_user>(lobby, user->second.user_id);

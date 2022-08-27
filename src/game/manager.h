@@ -102,6 +102,7 @@ private:
     void handle_message(MSG_TAG(lobby_make),     user_ptr user, const lobby_info &value);
     void handle_message(MSG_TAG(lobby_edit),     user_ptr user, const lobby_info &args);
     void handle_message(MSG_TAG(lobby_join),     user_ptr user, const lobby_join_args &value);
+    void handle_message(MSG_TAG(lobby_rejoin),   user_ptr user, const lobby_rejoin_args &value);
     void handle_message(MSG_TAG(lobby_leave),    user_ptr user);
     void handle_message(MSG_TAG(lobby_chat),     user_ptr user, const lobby_chat_client_args &value);
     void handle_message(MSG_TAG(lobby_return),   user_ptr user);
