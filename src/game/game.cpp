@@ -20,7 +20,7 @@ namespace banggame {
 
         for (const player &p : m_players) {
             add_update<game_update_type::player_user>(ret, p.id, p.user_id);
-            if (!p.alive() && !has_expansion(card_expansion_type::ghostcards)) {
+            if (p.check_player_flags(player_flags::removed)) {
                 add_update<game_update_type::player_remove>(ret, p.id, true);
             }
         }
@@ -75,7 +75,7 @@ namespace banggame {
                 add_update<game_update_type::player_show_role>(ret, p.id, p.m_role, true);
             }
 
-            if (p.alive() || has_expansion(card_expansion_type::ghostcards)) {
+            if (!p.check_player_flags(player_flags::removed)) {
                 move_cards(p.m_characters, show_always);
                 move_cards(p.m_backup_character, show_never);
 
@@ -523,6 +523,7 @@ namespace banggame {
             }
 
             if (!has_expansion(card_expansion_type::ghostcards)) {
+                target->add_player_flags(player_flags::removed);
                 add_update<game_update_type::player_remove>(target->id);
             }
 

@@ -126,6 +126,7 @@ namespace banggame {
         (extra_turn)
         (treat_missed_as_bang)
         (role_revealed)
+        (removed)
     )
 
     struct player_status_update {REFLECTABLE(
