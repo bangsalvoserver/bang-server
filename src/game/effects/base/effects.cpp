@@ -217,7 +217,7 @@ namespace banggame {
     }
 
     void effect_steal::resolver::finalize() const {
-        if (origin->alive()) {
+        if (origin->alive() && target_card->owner) {
             auto priv_target = update_target::includes(origin, target_card->owner);
             auto inv_target = update_target::excludes(origin, target_card->owner);
             if (origin != target_card->owner) {
@@ -258,7 +258,7 @@ namespace banggame {
     }
 
     void effect_discard::resolver::finalize() const {
-        if (origin->alive()) {
+        if (origin->alive() && target_card->owner) {
             if (origin != target_card->owner) {
                 origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
             } else {
