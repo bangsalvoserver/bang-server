@@ -6,12 +6,12 @@
 namespace banggame {
 
     struct effect_aim {
-        opt_game_str verify(card *origin_card, player *origin);
+        game_string verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
     
     struct effect_backfire {
-        opt_game_str verify(card *origin_card, player *origin);
+        game_string verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
@@ -24,7 +24,7 @@ namespace banggame {
     };
 
     struct effect_poker {
-        opt_game_str on_prompt(card *origin_card, player *origin);
+        game_string on_prompt(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
@@ -39,11 +39,11 @@ namespace banggame {
     };
 
     struct effect_fanning : effect_empty {
-        opt_game_str verify(card *origin_card, player *origin);
+        game_string verify(card *origin_card, player *origin);
     };
 
     struct handler_fanning {
-        opt_game_str verify(card *origin_card, player *origin, player *player1, player *player2);
+        game_string verify(card *origin_card, player *origin, player *player1, player *player2);
         void on_play(card *origin_card, player *origin, player *player1, player *player2);
     };
 

@@ -19,11 +19,11 @@ namespace banggame {
         target->m_game->queue_request(std::move(req));
     }
 
-    opt_game_str effect_startofturn::verify(card *origin_card, player *origin) const {
+    game_string effect_startofturn::verify(card *origin_card, player *origin) const {
         if (origin->m_num_drawn_cards != 0) {
-            return game_string("ERROR_NOT_START_OF_TURN");
+            return "ERROR_NOT_START_OF_TURN";
         }
-        return std::nullopt;
+        return {};
     }
 
     struct request_ranch : request_base {

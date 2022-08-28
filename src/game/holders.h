@@ -19,16 +19,16 @@ namespace banggame {
             (effect_type) type
         )
 
-        opt_game_str verify(card *origin_card, player *origin) const;
-        opt_game_str on_prompt(card *origin_card, player *origin) const;
+        game_string verify(card *origin_card, player *origin) const;
+        game_string on_prompt(card *origin_card, player *origin) const;
         void on_play(card *origin_card, player *origin, effect_flags flags) const;
         
-        opt_game_str verify(card *origin_card, player *origin, player *target) const;
-        opt_game_str on_prompt(card *origin_card, player *origin, player *target) const;
+        game_string verify(card *origin_card, player *origin, player *target) const;
+        game_string on_prompt(card *origin_card, player *origin, player *target) const;
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags) const;
         
-        opt_game_str verify(card *origin_card, player *origin, card *target) const;
-        opt_game_str on_prompt(card *origin_card, player *origin, card *target) const;
+        game_string verify(card *origin_card, player *origin, card *target) const;
+        game_string on_prompt(card *origin_card, player *origin, card *target) const;
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags) const;
     };
     
@@ -38,7 +38,7 @@ namespace banggame {
             (equip_type) type
         )
 
-        opt_game_str on_prompt(player *origin, card *target_card, player *target) const;
+        game_string on_prompt(player *origin, card *target_card, player *target) const;
         void on_equip(card *target_card, player *target) const;
         void on_enable(card *target_card, player *target) const;
         void on_disable(card *target_card, player *target) const;
@@ -48,8 +48,8 @@ namespace banggame {
     struct mth_holder {
         REFLECTABLE((mth_type) type)
         
-        opt_game_str verify(card *origin_card, player *origin, const target_list &targets) const;
-        opt_game_str on_prompt(card *origin_card, player *origin, const target_list &targets) const;
+        game_string verify(card *origin_card, player *origin, const target_list &targets) const;
+        game_string on_prompt(card *origin_card, player *origin, const target_list &targets) const;
         void on_play(card *origin_card, player *origin, const target_list &targets) const;
     };
 

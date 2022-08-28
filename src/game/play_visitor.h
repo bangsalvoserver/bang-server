@@ -16,8 +16,8 @@ namespace banggame {
     };
 
     template<target_type E> struct play_visitor {
-        opt_game_str verify(const play_card_verify *verifier, const effect_holder &effect);
-        opt_game_str prompt(const play_card_verify *verifier, const effect_holder &efffect);
+        game_string verify(const play_card_verify *verifier, const effect_holder &effect);
+        game_string prompt(const play_card_verify *verifier, const effect_holder &efffect);
         void play(const play_card_verify *verifier, const effect_holder &holder);
     };
 
@@ -25,8 +25,8 @@ namespace banggame {
     struct play_visitor<E> {
         using arg_type = typename const_ref_if_non_trivial<typename play_card_target::value_type<E>>::type;
 
-        opt_game_str verify(const play_card_verify *verifier, const effect_holder &effect, arg_type arg);
-        opt_game_str prompt(const play_card_verify *verifier, const effect_holder &efffect, arg_type arg);
+        game_string verify(const play_card_verify *verifier, const effect_holder &effect, arg_type arg);
+        game_string prompt(const play_card_verify *verifier, const effect_holder &efffect, arg_type arg);
         void play(const play_card_verify *verifier, const effect_holder &holder, arg_type arg);
     };
 

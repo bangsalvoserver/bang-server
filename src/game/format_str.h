@@ -29,9 +29,11 @@ namespace banggame {
     
         template<std::convertible_to<std::string> T, typename ... Ts>
         game_string(T &&message, Ts && ... args);
-    };
 
-    using opt_game_str = std::optional<game_string>;
+        explicit operator bool() const {
+            return !format_str.empty();
+        }
+    };
 }
 
 #endif

@@ -338,35 +338,35 @@ namespace banggame {
     void player::handle_action(enums::enum_tag_t<game_action_type::play_card>, const play_card_args &args) {
         if (m_prompt) {
             m_game->add_error(this, "ERROR_MUST_RESPOND_PROMPT");
-        } else if (auto error = play_card_verify{
+        } else if (game_string error = play_card_verify{
             this,
             m_game->find_card(args.card_id),
             false,
             target_converter<std::vector<play_card_target>>{}(m_game, args.targets),
             target_converter<std::vector<card *>>{}(m_game, args.modifier_ids)
         }.verify_and_play()) {
-            m_game->add_error(this, std::move(*error));
+            m_game->add_error(this, std::move(error));
         }
     }
     
     void player::handle_action(enums::enum_tag_t<game_action_type::respond_card>, const play_card_args &args) {
         if (m_prompt) {
             m_game->add_error(this, "ERROR_MUST_RESPOND_PROMPT");
-        } else if (auto error = play_card_verify{
+        } else if (game_string error = play_card_verify{
             this,
             m_game->find_card(args.card_id),
             true,
             target_converter<std::vector<play_card_target>>{}(m_game, args.targets),
             target_converter<std::vector<card *>>{}(m_game, args.modifier_ids)
         }.verify_and_respond()) {
-            m_game->add_error(this, std::move(*error));
+            m_game->add_error(this, std::move(error));
         }
     }
 
-    void player::prompt_then(opt_game_str &&message, std::function<void()> &&fun) {
+    void player::prompt_then(game_string &&message, std::function<void()> &&fun) {
         if (message) {
-            m_prompt.emplace(std::move(fun), *message);
-            m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(*message));
+            m_prompt.emplace(std::move(fun), message);
+            m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(message));
         } else {
             if (m_game->pending_requests() && bool(m_game->top_request().flags() & effect_flags::force_play)) {
                 m_game->pop_request();

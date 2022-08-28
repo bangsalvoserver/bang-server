@@ -46,7 +46,7 @@ namespace banggame {
     };
 
     struct effect_prompt_on_self_equip {
-        opt_game_str on_prompt(player *origin, card *target_card, player *target);
+        game_string on_prompt(player *origin, card *target_card, player *target);
     };
 
     struct request_base {

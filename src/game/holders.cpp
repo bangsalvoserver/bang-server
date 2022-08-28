@@ -30,63 +30,63 @@ namespace banggame {
         }, holder.type);
     }
 
-    opt_game_str effect_holder::verify(card *origin_card, player *origin) const {
-        return visit_effect([=](auto &&value) -> opt_game_str {
+    game_string effect_holder::verify(card *origin_card, player *origin) const {
+        return visit_effect([=](auto &&value) -> game_string {
             if constexpr (requires { value.verify(origin_card, origin); }) {
                 return value.verify(origin_card, origin);
             } else if constexpr (requires { value.can_respond(origin_card, origin); }) {
                 if (!value.can_respond(origin_card, origin)) {
-                    return game_string("ERROR_INVALID_RESPONSE");
+                    return "ERROR_INVALID_RESPONSE";
                 }
             }
-            return std::nullopt;
+            return {};
         }, *this);
     }
 
-    opt_game_str effect_holder::verify(card *origin_card, player *origin, player *target) const {
-        return visit_effect([=](auto &&value) -> opt_game_str {
+    game_string effect_holder::verify(card *origin_card, player *origin, player *target) const {
+        return visit_effect([=](auto &&value) -> game_string {
             if constexpr (requires { value.verify(origin_card, origin, target); }) {
                 return value.verify(origin_card, origin, target);
             }
-            return std::nullopt;
+            return {};
         }, *this);
     }
 
-    opt_game_str effect_holder::verify(card *origin_card, player *origin, card *target) const {
-        return visit_effect([=](auto &&value) -> opt_game_str {
+    game_string effect_holder::verify(card *origin_card, player *origin, card *target) const {
+        return visit_effect([=](auto &&value) -> game_string {
             if constexpr (requires { value.verify(origin_card, origin, target); }) {
                 return value.verify(origin_card, origin, target);
             }
-            return std::nullopt;
+            return {};
         }, *this);
     }
 
-    opt_game_str effect_holder::on_prompt(card *origin_card, player *origin) const {
-        return visit_effect([=](auto &&value) -> opt_game_str {
+    game_string effect_holder::on_prompt(card *origin_card, player *origin) const {
+        return visit_effect([=](auto &&value) -> game_string {
             if constexpr (requires { value.on_prompt(origin_card, origin); }) {
                 return value.on_prompt(origin_card, origin);
             } else {
-                return std::nullopt;
+                return {};
             }
         }, *this);
     }
 
-    opt_game_str effect_holder::on_prompt(card *origin_card, player *origin, player *target) const {
-        return visit_effect([=](auto &&value) -> opt_game_str {
+    game_string effect_holder::on_prompt(card *origin_card, player *origin, player *target) const {
+        return visit_effect([=](auto &&value) -> game_string {
             if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                 return value.on_prompt(origin_card, origin, target);
             } else {
-                return std::nullopt;
+                return {};
             }
         }, *this);
     }
 
-    opt_game_str effect_holder::on_prompt(card *origin_card, player *origin, card *target) const {
-        return visit_effect([=](auto &&value) -> opt_game_str {
+    game_string effect_holder::on_prompt(card *origin_card, player *origin, card *target) const {
+        return visit_effect([=](auto &&value) -> game_string {
             if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                 return value.on_prompt(origin_card, origin, target);
             } else {
-                return std::nullopt;
+                return {};
             }
         }, *this);
     }
@@ -127,12 +127,12 @@ namespace banggame {
         }, *this);
     }
 
-    opt_game_str equip_holder::on_prompt(player *origin, card *target_card, player *target) const {
-        return visit_effect([=](auto &&value) -> opt_game_str {
+    game_string equip_holder::on_prompt(player *origin, card *target_card, player *target) const {
+        return visit_effect([=](auto &&value) -> game_string {
             if constexpr (requires { value.on_prompt(origin, target_card, target); }) {
                 return value.on_prompt(origin, target_card, target);
             }
-            return std::nullopt;
+            return {};
         }, *this);
     }
 
@@ -168,27 +168,27 @@ namespace banggame {
         }, *this);
     }
 
-    opt_game_str mth_holder::verify(card *origin_card, player *origin, const target_list &targets) const {
-        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> opt_game_str {
+    game_string mth_holder::verify(card *origin_card, player *origin, const target_list &targets) const {
+        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
                 if constexpr (requires { mth_unwrapper{&handler_type::verify}; }) {
                     return mth_unwrapper{&handler_type::verify}(origin_card, origin, targets);
                 }
             }
-            return std::nullopt;
+            return {};
         }, type);
     }
 
-    opt_game_str mth_holder::on_prompt(card *origin_card, player *origin, const target_list &targets) const {
-        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> opt_game_str {
+    game_string mth_holder::on_prompt(card *origin_card, player *origin, const target_list &targets) const {
+        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
                 if constexpr (requires { mth_unwrapper{&handler_type::on_prompt}; }) {
                     return mth_unwrapper{&handler_type::on_prompt}(origin_card, origin, targets);
                 }
             }
-            return std::nullopt;
+            return {};
         }, type);
     }
     

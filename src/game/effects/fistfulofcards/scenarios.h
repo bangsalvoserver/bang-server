@@ -16,7 +16,7 @@ namespace banggame {
     };
 
     struct effect_startofturn : effect_empty {
-        opt_game_str verify(card *origin_card, player *origin) const;
+        game_string verify(card *origin_card, player *origin) const;
     };
 
     struct effect_ranch : event_based_effect {

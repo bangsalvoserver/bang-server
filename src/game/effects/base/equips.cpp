@@ -28,11 +28,11 @@ namespace banggame {
         target->send_player_status();
     }
 
-    opt_game_str effect_prompt_on_self_equip::on_prompt(player *origin, card *target_card, player *target) {
+    game_string effect_prompt_on_self_equip::on_prompt(player *origin, card *target_card, player *target) {
         if (target == origin) {
-            return game_string{"PROMPT_EQUIP_ON_SELF", target_card};
+            return {"PROMPT_EQUIP_ON_SELF", target_card};
         } else {
-            return std::nullopt;
+            return {};
         }
     }
 
@@ -86,11 +86,11 @@ namespace banggame {
         return c->has_tag(tag_type::horse);
     }
 
-    opt_game_str effect_horse::on_prompt(player *origin, card *target_card, player *target) {
+    game_string effect_horse::on_prompt(player *origin, card *target_card, player *target) {
         if (auto it = std::ranges::find_if(target->m_table, is_horse); it != target->m_table.end()) {
-            return game_string{"PROMPT_REPLACE", target_card, *it};
+            return {"PROMPT_REPLACE", target_card, *it};
         } else {
-            return std::nullopt;
+            return {};
         }
     }
 
@@ -104,13 +104,13 @@ namespace banggame {
         return c->has_tag(tag_type::weapon);
     }
 
-    opt_game_str effect_weapon::on_prompt(player *origin, card *target_card, player *target) {
+    game_string effect_weapon::on_prompt(player *origin, card *target_card, player *target) {
         if (target == origin) {
             if (auto it = std::ranges::find_if(target->m_table, is_weapon); it != target->m_table.end()) {
-                return game_string{"PROMPT_REPLACE", target_card, *it};
+                return {"PROMPT_REPLACE", target_card, *it};
             }
         }
-        return std::nullopt;
+        return {};
     }
 
     void effect_weapon_base::on_equip(card *target_card, player *target) {

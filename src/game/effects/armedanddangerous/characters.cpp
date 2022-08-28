@@ -45,14 +45,14 @@ namespace banggame {
         });
     }
 
-    opt_game_str effect_frankie_canton::verify(card *origin_card, player *origin, card *target_card) {
+    game_string effect_frankie_canton::verify(card *origin_card, player *origin, card *target_card) {
         if (target_card == origin->m_characters.front()) {
-            return game_string("ERROR_TARGET_PLAYING_CARD");
+            return "ERROR_TARGET_PLAYING_CARD";
         }
         if (target_card->num_cubes == 0) {
-            return game_string("ERROR_NOT_ENOUGH_CUBES_ON", target_card);
+            return {"ERROR_NOT_ENOUGH_CUBES_ON", target_card};
         }
-        return std::nullopt;
+        return {};
     }
 
     void effect_frankie_canton::on_play(card *origin_card, player *origin, card *target_card) {
@@ -73,17 +73,17 @@ namespace banggame {
         target->add_cubes(target->m_characters.front(), max_cubes);
     }
 
-    opt_game_str handler_red_ringo::verify(card *origin_card, player *origin, const target_list &targets) {
+    game_string handler_red_ringo::verify(card *origin_card, player *origin, const target_list &targets) {
         if (origin->m_characters.front()->num_cubes < targets.size()) {
-            return game_string("ERROR_NOT_ENOUGH_CUBES_ON", origin->m_characters.front());
+            return {"ERROR_NOT_ENOUGH_CUBES_ON", origin->m_characters.front()};
         }
         for (const auto &target : targets) {
             card *target_card = target.get<target_type::card>();
             if (target_card->num_cubes >= max_cubes) {
-                return game_string("ERROR_CARD_HAS_FULL_CUBES", target_card);
+                return {"ERROR_CARD_HAS_FULL_CUBES", target_card};
             }
         }
-        return std::nullopt;
+        return {};
     }
 
     void handler_red_ringo::on_play(card *origin_card, player *origin, const target_list &targets) {

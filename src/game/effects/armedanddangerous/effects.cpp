@@ -16,7 +16,7 @@ namespace banggame {
         }
     }
 
-    opt_game_str handler_heal_multi::on_prompt(card *origin_card, player *origin, int amount) {
+    game_string handler_heal_multi::on_prompt(card *origin_card, player *origin, int amount) {
         return effect_heal(amount).on_prompt(origin_card, origin);
     }
 
@@ -24,22 +24,22 @@ namespace banggame {
         effect_heal(amount).on_play(origin_card, origin);
     }
 
-    opt_game_str effect_select_cube::verify(card *origin_card, player *origin, card *target) {
+    game_string effect_select_cube::verify(card *origin_card, player *origin, card *target) {
         if (target->num_cubes == 0) {
-            return game_string("ERROR_NOT_ENOUGH_CUBES_ON", target);
+            return {"ERROR_NOT_ENOUGH_CUBES_ON", target};
         }
-        return std::nullopt;
+        return {};
     }
 
     void effect_select_cube::on_play(card *origin_card, player *origin, card *target) {
         target->owner->pay_cubes(target, 1);
     }
 
-    opt_game_str effect_pay_cube::verify(card *origin_card, player *origin) {
+    game_string effect_pay_cube::verify(card *origin_card, player *origin) {
         if (origin_card->num_cubes < ncubes) {
-            return game_string("ERROR_NOT_ENOUGH_CUBES_ON", origin_card);
+            return {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
         }
-        return std::nullopt;
+        return {};
     }
 
     void effect_pay_cube::on_play(card *origin_card, player *origin) {
@@ -54,11 +54,11 @@ namespace banggame {
         origin->queue_request_add_cube(origin_card, 3);
     }
 
-    opt_game_str effect_rust::on_prompt(card *origin_card, player *origin, player *target) {
+    game_string effect_rust::on_prompt(card *origin_card, player *origin, player *target) {
         if (target->count_cubes() == 0) {
-            return game_string{"PROMPT_CARD_NO_EFFECT", origin_card};
+            return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
-            return std::nullopt;
+            return {};
         }
     }
     
@@ -154,11 +154,11 @@ namespace banggame {
         origin->m_game->queue_request(std::move(req));
     }
 
-    opt_game_str effect_bandolier::verify(card *origin_card, player *origin) {
+    game_string effect_bandolier::verify(card *origin_card, player *origin) {
         if (origin->m_bangs_played == 0) {
-            return game_string("ERROR_CANT_PLAY_CARD", origin_card);
+            return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
-        return std::nullopt;
+        return {};
     }
 
     void handler_duck::on_play(card *origin_card, player *origin, opt_tagged_value<target_type::none> paid_cubes) {
@@ -204,21 +204,21 @@ namespace banggame {
         return origin->m_game->top_request_is<request_move_bomb>(origin);
     }
 
-    opt_game_str handler_move_bomb::on_prompt(card *origin_card, player *origin, player *target) {
+    game_string handler_move_bomb::on_prompt(card *origin_card, player *origin, player *target) {
         if (origin == target) {
-            return game_string{"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
+            return {"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
         } else {
-            return std::nullopt;
+            return {};
         }
     }
 
-    opt_game_str handler_move_bomb::verify(card *origin_card, player *origin, player *target) {
+    game_string handler_move_bomb::verify(card *origin_card, player *origin, player *target) {
         if (target != origin) {
             if (auto c = target->find_equipped_card(origin_card)) {
-                return game_string("ERROR_DUPLICATED_CARD", c);
+                return {"ERROR_DUPLICATED_CARD", c};
             }
         }
-        return std::nullopt;
+        return {};
     }
 
     void handler_move_bomb::on_play(card *origin_card, player *origin, player *target) {

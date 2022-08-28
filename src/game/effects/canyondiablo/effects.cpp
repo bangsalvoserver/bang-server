@@ -19,12 +19,12 @@ namespace banggame {
         origin->m_game->queue_request<request_generalstore>(origin_card, origin, origin);
     }
 
-    opt_game_str effect_mirage::verify(card *origin_card, player *origin) {
+    game_string effect_mirage::verify(card *origin_card, player *origin) {
         if (!origin->m_game->pending_requests()
             || origin->m_game->top_request().origin() != origin->m_game->m_playing) {
-            return game_string("ERROR_CANT_PLAY_CARD", origin_card);
+            return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
-        return std::nullopt;
+        return {};
     }
 
     void effect_mirage::on_play(card *origin_card, player *origin) {
@@ -32,11 +32,11 @@ namespace banggame {
         origin->m_game->m_playing->skip_turn();
     }
 
-    opt_game_str effect_disarm::verify(card *origin_card, player *origin) {
+    game_string effect_disarm::verify(card *origin_card, player *origin) {
         if (!origin->m_game->pending_requests() || !origin->m_game->top_request().origin()) {
-            return game_string("ERROR_CANT_PLAY_CARD", origin_card);
+            return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
-        return std::nullopt;
+        return {};
     }
 
     void effect_disarm::on_play(card *origin_card, player *origin) {
@@ -48,14 +48,14 @@ namespace banggame {
         }
     }
 
-    opt_game_str handler_card_sharper::verify(card *origin_card, player *origin, card *chosen_card, card *target_card) {
+    game_string handler_card_sharper::verify(card *origin_card, player *origin, card *chosen_card, card *target_card) {
         if (auto *c = origin->find_equipped_card(target_card)) {
-            return game_string("ERROR_DUPLICATED_CARD", c);
+            return {"ERROR_DUPLICATED_CARD", c};
         }
         if (auto *c = target_card->owner->find_equipped_card(chosen_card)) {
-            return game_string("ERROR_DUPLICATED_CARD", c);
+            return {"ERROR_DUPLICATED_CARD", c};
         }
-        return std::nullopt;
+        return {};
     }
 
     struct request_card_sharper : request_targeting {

@@ -10,12 +10,12 @@ namespace banggame {
     };
 
     struct handler_heal_multi {
-        opt_game_str on_prompt(card *origin_card, player *origin, int amount);
+        game_string on_prompt(card *origin_card, player *origin, int amount);
         void on_play(card *origin_card, player *origin, int amount);
     };
 
     struct effect_select_cube {
-        opt_game_str verify(card *origin_card, player *origin, card *target);
+        game_string verify(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target);
     };
 
@@ -23,7 +23,7 @@ namespace banggame {
         int ncubes;
         effect_pay_cube(int value) : ncubes(std::max(1, value)) {}
         
-        opt_game_str verify(card *origin_card, player *origin);
+        game_string verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
@@ -39,7 +39,7 @@ namespace banggame {
     };
 
     struct effect_rust {
-        opt_game_str on_prompt(card *origin_card, player *origin, player *target);
+        game_string on_prompt(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, player *target);
     };
@@ -65,7 +65,7 @@ namespace banggame {
     };
 
     struct effect_bandolier : effect_empty {
-        opt_game_str verify(card *origin_card, player *origin);
+        game_string verify(card *origin_card, player *origin);
     };
 
     struct handler_duck {
@@ -81,8 +81,8 @@ namespace banggame {
     };
 
     struct handler_move_bomb {
-        opt_game_str on_prompt(card *origin_card, player *origin, player *target);
-        opt_game_str verify(card *origin_card, player *origin, player *target);
+        game_string on_prompt(card *origin_card, player *origin, player *target);
+        game_string verify(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };
 }

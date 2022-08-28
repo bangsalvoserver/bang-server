@@ -8,8 +8,8 @@
 namespace banggame {
     using namespace enums::flag_operators;
 
-    opt_game_str effect_aim::verify(card *origin_card, player *origin) {
-        if (auto error = effect_banglimit{}.verify(origin_card, origin))
+    game_string effect_aim::verify(card *origin_card, player *origin) {
+        if (game_string error = effect_banglimit{}.verify(origin_card, origin))
             return error;
 
         auto is_bangcard = [origin](card *c) {
@@ -25,9 +25,9 @@ namespace banggame {
          && std::ranges::none_of(origin->m_characters, is_bangcard))
 
          || origin->make_player_target_set(origin_card, bang_holder).empty())
-            return game_string("ERROR_INVALID_MODIFIER_CARD");
+            return "ERROR_INVALID_MODIFIER_CARD";
         
-        return std::nullopt;
+        return {};
     }
 
     void effect_aim::on_play(card *origin_card, player *origin) {
@@ -39,11 +39,11 @@ namespace banggame {
         });
     }
     
-    opt_game_str effect_backfire::verify(card *origin_card, player *origin) {
+    game_string effect_backfire::verify(card *origin_card, player *origin) {
         if (!origin->m_game->pending_requests() || !origin->m_game->top_request().origin()) {
-            return game_string("ERROR_CANT_PLAY_CARD", origin_card);
+            return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
-        return std::nullopt;
+        return {};
     }
 
     void effect_backfire::on_play(card *origin_card, player *origin) {
@@ -66,13 +66,13 @@ namespace banggame {
         });
     }
 
-    opt_game_str effect_poker::on_prompt(card *origin_card, player *origin) {
+    game_string effect_poker::on_prompt(card *origin_card, player *origin) {
         if (std::ranges::all_of(range_other_players(origin), [](const player &p) {
             return p.m_hand.empty();
         })) {
-            return game_string{"PROMPT_CARD_NO_EFFECT", origin_card};
+            return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
-        return std::nullopt;
+        return {};
     }
 
     void effect_poker::on_play(card *origin_card, player *origin) {
@@ -148,7 +148,7 @@ namespace banggame {
         origin->m_game->update_request();
     }
 
-    opt_game_str effect_fanning::verify(card *origin_card, player *origin) {
+    game_string effect_fanning::verify(card *origin_card, player *origin) {
         auto set1 = origin->make_player_target_set(origin_card, effect_holder{
             .player_filter{target_player_filter::reachable | target_player_filter::notself}
         });
@@ -160,15 +160,15 @@ namespace banggame {
             return std::ranges::any_of(set2, [&](player *player2) {
                 return player1 != player2 && origin->m_game->calc_distance(player1, player2) <= 1;
             });
-        })) return game_string("ERROR_TARGET_NOT_IN_RANGE");
-        return std::nullopt;
+        })) return "ERROR_TARGET_NOT_IN_RANGE";
+        return {};
     }
 
-    opt_game_str handler_fanning::verify(card *origin_card, player *origin, player *player1, player *player2) {
+    game_string handler_fanning::verify(card *origin_card, player *origin, player *player1, player *player2) {
         if (player1 == player2 || origin->m_game->calc_distance(player1, player2) > 1) {
-            return game_string("ERROR_TARGET_NOT_IN_RANGE");
+            return "ERROR_TARGET_NOT_IN_RANGE";
         }
-        return std::nullopt;
+        return {};
     }
 
     void handler_fanning::on_play(card *origin_card, player *origin, player *player1, player *player2) {

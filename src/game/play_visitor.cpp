@@ -4,11 +4,11 @@ namespace banggame {
 
     using namespace enums::flag_operators;
 
-    template<> opt_game_str play_visitor<target_type::none>::verify(const play_card_verify *verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::none>::verify(const play_card_verify *verifier, const effect_holder &effect) {
         return effect.verify(verifier->card_ptr, verifier->origin);
     }
 
-    template<> opt_game_str play_visitor<target_type::none>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::none>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
         return effect.on_prompt(verifier->card_ptr, verifier->origin);
     }
 
@@ -16,15 +16,15 @@ namespace banggame {
         effect.on_play(verifier->card_ptr, verifier->origin, effect_flags{});
     }
 
-    template<> opt_game_str play_visitor<target_type::player>::verify(const play_card_verify *verifier, const effect_holder &effect, player *target) {
-        if (auto error = check_player_filter(verifier->card_ptr, verifier->origin, effect.player_filter, target)) {
+    template<> game_string play_visitor<target_type::player>::verify(const play_card_verify *verifier, const effect_holder &effect, player *target) {
+        if (game_string error = check_player_filter(verifier->card_ptr, verifier->origin, effect.player_filter, target)) {
             return error;
         } else {
             return effect.verify(verifier->card_ptr, verifier->origin, target);
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::player>::prompt(const play_card_verify *verifier, const effect_holder &effect, player *target) {
+    template<> game_string play_visitor<target_type::player>::prompt(const play_card_verify *verifier, const effect_holder &effect, player *target) {
         return effect.on_prompt(verifier->card_ptr, verifier->origin, target);
     }
 
@@ -38,21 +38,21 @@ namespace banggame {
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::conditional_player>::verify(const play_card_verify *verifier, const effect_holder &effect, nullable<player> target) {
+    template<> game_string play_visitor<target_type::conditional_player>::verify(const play_card_verify *verifier, const effect_holder &effect, nullable<player> target) {
         if (target) {
             return play_visitor<target_type::player>{}.verify(verifier, effect, target);
         } else if (!verifier->origin->make_player_target_set(verifier->card_ptr, effect).empty()) {
-            return game_string("ERROR_TARGET_SET_NOT_EMPTY");
+            return "ERROR_TARGET_SET_NOT_EMPTY";
         } else {
-            return std::nullopt;
+            return {};
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::conditional_player>::prompt(const play_card_verify *verifier, const effect_holder &effect, nullable<player> target) {
+    template<> game_string play_visitor<target_type::conditional_player>::prompt(const play_card_verify *verifier, const effect_holder &effect, nullable<player> target) {
         if (target) {
             return play_visitor<target_type::player>{}.prompt(verifier, effect, target);
         } else {
-            return std::nullopt;
+            return {};
         }
     }
 
@@ -62,17 +62,17 @@ namespace banggame {
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::other_players>::verify(const play_card_verify *verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::other_players>::verify(const play_card_verify *verifier, const effect_holder &effect) {
         for (player &p : range_other_players(verifier->origin)) {
-            if (auto error = effect.verify(verifier->card_ptr, verifier->origin, &p)) {
+            if (game_string error = effect.verify(verifier->card_ptr, verifier->origin, &p)) {
                 return error;
             }
         }
-        return std::nullopt;
+        return {};
     }
 
-    template<> opt_game_str play_visitor<target_type::other_players>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
-        opt_game_str msg = std::nullopt;
+    template<> game_string play_visitor<target_type::other_players>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
+        game_string msg;
         for (player &p : range_other_players(verifier->origin)) {
             msg = effect.on_prompt(verifier->card_ptr, verifier->origin, &p);
             if (!msg) break;
@@ -97,17 +97,17 @@ namespace banggame {
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::all_players>::verify(const play_card_verify *verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::all_players>::verify(const play_card_verify *verifier, const effect_holder &effect) {
         for (player &p : range_all_players(verifier->origin)) {
-            if (auto error = effect.verify(verifier->card_ptr, verifier->origin, &p)) {
+            if (game_string error = effect.verify(verifier->card_ptr, verifier->origin, &p)) {
                 return error;
             }
         }
-        return std::nullopt;
+        return {};
     }
 
-    template<> opt_game_str play_visitor<target_type::all_players>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
-        opt_game_str msg = std::nullopt;
+    template<> game_string play_visitor<target_type::all_players>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
+        game_string msg;
         for (player &p : range_all_players(verifier->origin)) {
             msg = effect.on_prompt(verifier->card_ptr, verifier->origin, &p);
             if (!msg) break;
@@ -127,19 +127,19 @@ namespace banggame {
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::card>::verify(const play_card_verify *verifier, const effect_holder &effect, card *target) {
+    template<> game_string play_visitor<target_type::card>::verify(const play_card_verify *verifier, const effect_holder &effect, card *target) {
         if (!target->owner) {
-            return game_string("ERROR_CARD_HAS_NO_OWNER");
-        } else if (auto error = check_player_filter(verifier->card_ptr, verifier->origin, effect.player_filter, target->owner)) {
+            return "ERROR_CARD_HAS_NO_OWNER";
+        } else if (game_string error = check_player_filter(verifier->card_ptr, verifier->origin, effect.player_filter, target->owner)) {
             return error;
-        } else if (auto error = check_card_filter(verifier->card_ptr, verifier->origin, effect.card_filter, target)) {
+        } else if (game_string error = check_card_filter(verifier->card_ptr, verifier->origin, effect.card_filter, target)) {
             return error;
         } else {
             return effect.verify(verifier->card_ptr, verifier->origin, target);
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::card>::prompt(const play_card_verify *verifier, const effect_holder &effect, card *target) {
+    template<> game_string play_visitor<target_type::card>::prompt(const play_card_verify *verifier, const effect_holder &effect, card *target) {
         return effect.on_prompt(verifier->card_ptr, verifier->origin, target);
     }
 
@@ -159,25 +159,25 @@ namespace banggame {
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::extra_card>::verify(const play_card_verify *verifier, const effect_holder &effect, nullable<card> target) {
+    template<> game_string play_visitor<target_type::extra_card>::verify(const play_card_verify *verifier, const effect_holder &effect, nullable<card> target) {
         if (!target) {
             if (verifier->card_ptr != verifier->origin->m_last_played_card) {
-                return game_string("ERROR_TARGET_SET_NOT_EMPTY");
+                return "ERROR_TARGET_SET_NOT_EMPTY";
             } else {
-                return std::nullopt;
+                return {};
             }
         } else if (target->owner != verifier->origin || target->pocket != pocket_type::player_hand || target == verifier->card_ptr) {
-            return game_string("ERROR_TARGET_NOT_SELF");
+            return "ERROR_TARGET_NOT_SELF";
         } else {
             return effect.verify(verifier->card_ptr, verifier->origin, target);
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::extra_card>::prompt(const play_card_verify *verifier, const effect_holder &effect, nullable<card> target) {
+    template<> game_string play_visitor<target_type::extra_card>::prompt(const play_card_verify *verifier, const effect_holder &effect, nullable<card> target) {
         if (target) {
             return effect.on_prompt(verifier->card_ptr, verifier->origin, target);
         } else {
-            return std::nullopt;
+            return {};
         }
     }
 
@@ -187,26 +187,26 @@ namespace banggame {
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::cards_other_players>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
+    template<> game_string play_visitor<target_type::cards_other_players>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
         if (!std::ranges::all_of(verifier->origin->m_game->m_players | std::views::filter(&player::alive), [&](const player &p) {
             size_t found = std::ranges::count(target_cards, &p, &card::owner);
             if (p.m_hand.empty() && p.m_table.empty()) return found == 0;
             if (&p == verifier->origin) return found == 0;
             else return found == 1;
         })) {
-            return game_string("ERROR_INVALID_TARGETS");
+            return "ERROR_INVALID_TARGETS";
         } else {
             for (card *c : target_cards) {
-                if (auto error = effect.verify(verifier->card_ptr, verifier->origin, c)) {
+                if (game_string error = effect.verify(verifier->card_ptr, verifier->origin, c)) {
                     return error;
                 }
             }
-            return std::nullopt;
+            return {};
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::cards_other_players>::prompt(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
-        opt_game_str msg = std::nullopt;
+    template<> game_string play_visitor<target_type::cards_other_players>::prompt(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
+        game_string msg;
         for (card *target_card : target_cards) {
             msg = effect.on_prompt(verifier->card_ptr, verifier->origin, target_card);
             if (!msg) break;
@@ -231,20 +231,20 @@ namespace banggame {
         }
     }
 
-    template<> opt_game_str play_visitor<target_type::cube>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
+    template<> game_string play_visitor<target_type::cube>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
         for (card *c : target_cards) {
             if (!c || c->owner != verifier->origin) {
-                return game_string("ERROR_TARGET_NOT_SELF");
+                return "ERROR_TARGET_NOT_SELF";
             }
-            if (auto error = effect.verify(verifier->card_ptr, verifier->origin, c)) {
+            if (game_string error = effect.verify(verifier->card_ptr, verifier->origin, c)) {
                 return error;
             }
         }
-        return std::nullopt;
+        return {};
     }
 
-    template<> opt_game_str play_visitor<target_type::cube>::prompt(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
-        opt_game_str msg = std::nullopt;
+    template<> game_string play_visitor<target_type::cube>::prompt(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
+        game_string msg;
         for (card *target_card : target_cards) {
             msg = effect.on_prompt(verifier->card_ptr, verifier->origin, target_card);
             if (!msg) break;
