@@ -441,7 +441,7 @@ namespace banggame {
                     play_modifiers();
                     origin->add_gold(-cost);
                     do_play_card();
-                    origin->set_last_played_card(nullptr);
+                    origin->set_last_played_card(card_ptr);
                     origin->m_game->queue_action([m_game = origin->m_game]{
                         while (m_game->m_shop_selection.size() < 3) {
                             m_game->draw_shop_card();
