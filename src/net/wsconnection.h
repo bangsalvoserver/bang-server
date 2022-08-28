@@ -21,6 +21,10 @@ namespace net {
 
         std::string m_address;
 
+        bool check_client_handle(client_handle hdl) const {
+            return !hdl.owner_before(m_con) && !m_con.owner_before(hdl);
+        }
+
     public:
         wsconnection(asio::io_context &ctx) {
             m_client.init_asio(&ctx);
@@ -29,29 +33,36 @@ namespace net {
         }
             
         void connect(const std::string &url) {
-            if constexpr (requires (Derived obj) { obj.on_open(); }) {
-                m_client.set_open_handler([this](client_handle) {
-                    static_cast<Derived &>(*this).on_open();
-                });
-            }
+            m_client.set_open_handler([this](client_handle hdl) {
+                if (check_client_handle(hdl)) {
+                    if constexpr (requires (Derived obj) { obj.on_open(); }) {
+                        static_cast<Derived &>(*this).on_open();
+                    }
+                }
+            });
 
-            if constexpr (requires (Derived obj) { obj.on_close(); }) {
-                auto handler = [this](client_handle) {
-                    static_cast<Derived &>(*this).on_close();
-                };
+            auto handler = [this](client_handle hdl) {
+                if (check_client_handle(hdl)) {
+                    if constexpr (requires (Derived obj) { obj.on_close(); }) {
+                        static_cast<Derived &>(*this).on_close();
+                    }
+                    m_con.reset();
+                }
+            };
 
-                m_client.set_close_handler(handler);
-                m_client.set_fail_handler(handler);
-            }
+            m_client.set_close_handler(handler);
+            m_client.set_fail_handler(handler);
 
-            m_client.set_message_handler([this](client_handle, client_type::message_ptr msg) {
-                try {
-                    std::stringstream ss(msg->get_payload());
-                    Json::Value json_value;
-                    ss >> json_value;
-                    static_cast<Derived &>(*this).on_message(json::deserialize<InputMessage>(json_value));
-                } catch (const std::exception &) {
-                    // ignore
+            m_client.set_message_handler([this](client_handle hdl, client_type::message_ptr msg) {
+                if (check_client_handle(hdl)) {
+                    try {
+                        std::stringstream ss(msg->get_payload());
+                        Json::Value json_value;
+                        ss >> json_value;
+                        static_cast<Derived &>(*this).on_message(json::deserialize<InputMessage>(json_value));
+                    } catch (const std::exception &) {
+                        disconnect();
+                    }
                 }
             });
 

@@ -76,7 +76,7 @@ public:
                 ss >> json_value;
                 static_cast<Derived &>(*this).on_message(con, json::deserialize<InputMessage>(json_value));
             } catch (const std::exception &) {
-                // ignore
+                m_server.close(con, 0, "");
             }
         });
 
