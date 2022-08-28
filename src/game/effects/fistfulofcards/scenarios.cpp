@@ -181,7 +181,7 @@ namespace banggame {
                 queue_russianroulette_request(std::next(player_iterator(target)));
             }
         });
-        target->m_game->add_listener<event_type::on_hit>(target_card, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
+        target->m_game->add_listener<event_type::before_hit>(target_card, [=](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
             if (target_card == origin_card) {
                 target->m_game->remove_listeners(target_card);
             }

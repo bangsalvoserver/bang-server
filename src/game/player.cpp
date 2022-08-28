@@ -93,6 +93,7 @@ namespace banggame {
         if (instant || !m_game->has_expansion(card_expansion_type::valleyofshadows | card_expansion_type::canyondiablo)) {
             m_game->add_log(value == 1 ? "LOG_TAKEN_DAMAGE" : "LOG_TAKEN_DAMAGE_PLURAL", origin_card, this, value);
             set_hp(m_hp - value);
+            m_game->call_event<event_type::before_hit>(origin_card, origin, this, value, is_bang);
             if (m_hp <= 0) {
                 m_game->queue_request<request_death>(origin_card, origin, this);
             }
@@ -101,7 +102,11 @@ namespace banggame {
                     origin->add_gold(value);
                 }
             }
-            m_game->call_event<event_type::on_hit>(origin_card, origin, this, value, is_bang);
+            m_game->queue_action([=, this]{
+                if (alive()) {
+                    m_game->call_event<event_type::after_hit>(origin_card, origin, this, value, is_bang);
+                }
+            });
         } else {
             m_game->queue_request_front<timer_damaging>(origin_card, origin, this, value, is_bang);
         }

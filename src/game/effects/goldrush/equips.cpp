@@ -5,13 +5,9 @@
 namespace banggame {
 
     void effect_luckycharm::on_enable(card *target_card, player *p) {
-        p->m_game->add_listener<event_type::on_hit>(target_card, [p](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
+        p->m_game->add_listener<event_type::after_hit>(target_card, [p](card *origin_card, player *origin, player *target, int damage, bool is_bang) {
             if (p == target) {
-                target->m_game->queue_action([=]{
-                    if (target->alive()) {
-                        target->add_gold(damage);
-                    }
-                });
+                target->add_gold(damage);
             }
         });
     }
