@@ -73,6 +73,18 @@ add_library(bangcommon INTERFACE)
 target_include_directories(bangcommon INTERFACE src)
 target_link_libraries(bangcommon INTERFACE cpputils networking)
 
+if (CMAKE_BUILD_TYPE STREQUAL Release)
+    set(PRE_CONFIGURE_FILE .cmake/git_version.cpp.in)
+    set(POST_CONFIGURE_FILE "${CMAKE_CURRENT_BINARY_DIR}/git_version.cpp")
+    set(GIT_WORKING_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    include(git_watcher.cmake)
+
+    add_library(git_version STATIC "${POST_CONFIGURE_FILE}")
+    add_dependencies(git_version check_git)
+
+    target_link_libraries(bangcommon INTERFACE git_version)
+endif()
+
 add_executable(bangserver ${bangserver_srcs})
 target_link_libraries(bangserver PUBLIC bang_cards_obj bangcommon)
 

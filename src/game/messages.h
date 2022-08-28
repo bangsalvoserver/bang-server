@@ -15,7 +15,8 @@ namespace banggame {
 
     struct connect_args {REFLECTABLE(
         (std::string) user_name,
-        (sdl::image_pixels) profile_image
+        (sdl::image_pixels) profile_image,
+        (std::string) commit_hash
     )};
 
     struct lobby_info {REFLECTABLE(

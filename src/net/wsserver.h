@@ -94,6 +94,10 @@ public:
             websocketpp::frame::opcode::text, ec);
     }
 
+    void kick_client(client_handle con, const std::string &msg) {
+        m_server.close(con, 0, msg);
+    }
+
 };
 
 }

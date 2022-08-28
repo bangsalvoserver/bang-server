@@ -8,6 +8,7 @@
 #include <ctime>
 
 #include "utils/json_serial.h"
+#include "net/git_version.h"
 
 using namespace banggame;
 using namespace enums::flag_operators;
@@ -19,6 +20,8 @@ void game_manager::on_receive_message(client_handle client, const client_message
                 handle_message(tag, client, FWD(args) ...);
             } else if (auto it = users.find(client); it != users.end()) {
                 handle_message(tag, it, FWD(args) ...);
+            } else {
+                kick_client(client, "INVALID_MESSAGE");
             }
         }, msg);
     } catch (const lobby_error &e) {
@@ -42,7 +45,9 @@ void game_manager::tick() {
 }
 
 void game_manager::handle_message(MSG_TAG(connect), client_handle client, const connect_args &args) {
-    if (auto [it, inserted] = users.try_emplace(client, ++m_user_counter, args.user_name, args.profile_image); inserted) {
+    if (!net::validate_commit_hash(args.commit_hash)) {
+        kick_client(client, "INVALID_CLIENT_COMMIT_HASH");
+    } else if (auto [it, inserted] = users.try_emplace(client, ++m_user_counter, args.user_name, args.profile_image); inserted) {
         send_message<server_message_type::client_accepted>(client, it->second.user_id);
     }
 }

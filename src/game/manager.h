@@ -55,6 +55,7 @@ server_message make_message(auto && ... args) {
 
 using send_message_function = std::function<void(client_handle, server_message)>;
 using print_error_function = std::function<void(const std::string &message)>;
+using kick_client_function = std::function<void(client_handle, const std::string &message)>;
 
 class game_manager {
 public:
@@ -64,6 +65,10 @@ public:
 
     void set_print_error_function(print_error_function &&fun) {
         m_print_error = std::move(fun);
+    }
+
+    void set_kick_client_function(kick_client_function &&fun) {
+        m_kick_client = std::move(fun);
     }
 
     void on_receive_message(client_handle client, const client_message &msg);
@@ -97,6 +102,12 @@ private:
         }
     }
 
+    void kick_client(client_handle client, const std::string &message) {
+        if (m_kick_client) {
+            m_kick_client(client, message);
+        }
+    }
+
     void handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
     void handle_message(MSG_TAG(lobby_list),     user_ptr user);
     void handle_message(MSG_TAG(lobby_make),     user_ptr user, const lobby_info &value);
@@ -118,6 +129,7 @@ private:
     
     send_message_function m_send_message;
     print_error_function m_print_error;
+    kick_client_function m_kick_client;
 
     friend struct lobby;
 };
