@@ -81,6 +81,7 @@ if (CMAKE_BUILD_TYPE STREQUAL Release)
 
     add_library(git_version STATIC "${POST_CONFIGURE_FILE}")
     add_dependencies(git_version check_git)
+    target_compile_definitions(git_version PUBLIC HAVE_GIT_VERSION)
 
     target_link_libraries(bangcommon INTERFACE git_version)
 endif()

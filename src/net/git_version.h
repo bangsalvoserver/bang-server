@@ -5,7 +5,7 @@
 
 namespace net {
 
-#ifdef NDEBUG
+#ifdef HAVE_GIT_VERSION
 
     extern const std::string_view server_commit_hash;
 
