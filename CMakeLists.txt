@@ -73,7 +73,11 @@ add_library(bangcommon INTERFACE)
 target_include_directories(bangcommon INTERFACE src)
 target_link_libraries(bangcommon INTERFACE cpputils networking)
 
+add_executable(bangserver ${bangserver_srcs})
+target_link_libraries(bangserver PUBLIC bang_cards_obj bangcommon)
+
 if (CMAKE_BUILD_TYPE STREQUAL Release)
+
     set(PRE_CONFIGURE_FILE .cmake/git_version.cpp.in)
     set(POST_CONFIGURE_FILE "${CMAKE_CURRENT_BINARY_DIR}/git_version.cpp")
     set(GIT_WORKING_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -84,12 +88,9 @@ if (CMAKE_BUILD_TYPE STREQUAL Release)
     target_compile_definitions(git_version PUBLIC HAVE_GIT_VERSION)
 
     target_link_libraries(bangcommon INTERFACE git_version)
-endif()
 
-add_executable(bangserver ${bangserver_srcs})
-target_link_libraries(bangserver PUBLIC bang_cards_obj bangcommon)
+else()
 
-if (NOT CMAKE_BUILD_TYPE STREQUAL Release)
     option(DEBUG_PRINT_GAME_UPDATES "Debug Option: Print Game Updates" OFF)
     if (DEBUG_PRINT_GAME_UPDATES)
         target_compile_definitions(bangserver PUBLIC DEBUG_PRINT_GAME_UPDATES)
@@ -104,6 +105,5 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL Release)
     if (TESTING_CARDS)
         target_compile_definitions(bangserver PUBLIC TESTING_CARDS)
     endif()
-endif()
 
-install(TARGETS bangserver)
+endif()
