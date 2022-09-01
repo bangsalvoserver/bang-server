@@ -76,7 +76,9 @@ target_link_libraries(bangcommon INTERFACE cpputils networking)
 add_executable(bangserver ${bangserver_srcs})
 target_link_libraries(bangserver PUBLIC bang_cards_obj bangcommon)
 
-if (CMAKE_BUILD_TYPE STREQUAL Release)
+option(BUILD_GAME_RELEASE "Build Game Release" OFF)
+
+if (BUILD_GAME_RELEASE)
 
     set(PRE_CONFIGURE_FILE .cmake/git_version.cpp.in)
     set(POST_CONFIGURE_FILE "${CMAKE_CURRENT_BINARY_DIR}/git_version.cpp")
