@@ -24,7 +24,7 @@ namespace banggame {
         (game_options) options
     )};
 
-    struct lobby_join_args {REFLECTABLE(
+    struct lobby_id_args {REFLECTABLE(
         (int) lobby_id
     )};
 
@@ -41,7 +41,7 @@ namespace banggame {
         (lobby_list)
         (lobby_make, lobby_info)
         (lobby_edit, lobby_info)
-        (lobby_join, lobby_join_args)
+        (lobby_join, lobby_id_args)
         (lobby_rejoin, lobby_rejoin_args)
         (lobby_leave)
         (lobby_chat, lobby_chat_client_args)
@@ -76,12 +76,7 @@ namespace banggame {
         (sdl::image_pixels) profile_image
     )};
 
-    struct lobby_entered_args {REFLECTABLE(
-        (lobby_info) info,
-        (int) owner_id
-    )};
-
-    struct lobby_remove_user_args {REFLECTABLE(
+    struct user_id_args {REFLECTABLE(
         (int) user_id
     )};
 
@@ -94,10 +89,12 @@ namespace banggame {
         (client_accepted, client_accepted_args)
         (lobby_error, std::string)
         (lobby_update, lobby_data)
-        (lobby_entered, lobby_entered_args)
+        (lobby_entered, lobby_info)
         (lobby_edited, lobby_info)
+        (lobby_removed, lobby_id_args)
+        (lobby_owner, user_id_args)
         (lobby_add_user, lobby_add_user_args)
-        (lobby_remove_user, lobby_remove_user_args)
+        (lobby_remove_user, user_id_args)
         (lobby_chat, lobby_chat_args)
         (game_update, game_update)
         (game_started)

@@ -22,9 +22,12 @@ struct lobby_error : std::runtime_error {
 };
 
 struct lobby : lobby_info {
+    static constexpr int lifetime_seconds = 10;
+
     std::vector<user_ptr> users;
     user_ptr owner;
     lobby_state state;
+    int lifetime;
 
     banggame::game game;
     void start_game(game_manager &mgr);
@@ -89,7 +92,15 @@ private:
     }
 
     template<server_message_type E>
-    void broadcast_message(const lobby &lobby, auto && ... args) {
+    void broadcast_message(auto && ... args) {
+        auto msg = make_message<E>(FWD(args) ... );
+        for (client_handle client : users | std::views::keys) {
+            m_send_message(client, msg);
+        }
+    }
+
+    template<server_message_type E>
+    void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
         auto msg = make_message<E>(FWD(args) ... );
         for (user_ptr it : lobby.users) {
             m_send_message(it->first, msg);
@@ -112,7 +123,7 @@ private:
     void handle_message(MSG_TAG(lobby_list),     user_ptr user);
     void handle_message(MSG_TAG(lobby_make),     user_ptr user, const lobby_info &value);
     void handle_message(MSG_TAG(lobby_edit),     user_ptr user, const lobby_info &args);
-    void handle_message(MSG_TAG(lobby_join),     user_ptr user, const lobby_join_args &value);
+    void handle_message(MSG_TAG(lobby_join),     user_ptr user, const lobby_id_args &value);
     void handle_message(MSG_TAG(lobby_rejoin),   user_ptr user, const lobby_rejoin_args &value);
     void handle_message(MSG_TAG(lobby_leave),    user_ptr user);
     void handle_message(MSG_TAG(lobby_chat),     user_ptr user, const lobby_chat_client_args &value);
