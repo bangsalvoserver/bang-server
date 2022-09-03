@@ -256,7 +256,7 @@ namespace banggame {
                 | std::views::filter([](container_iterator it) {
                     return it->second.status == active;
                 })
-                | std::views::transform([](container_iterator it) {
+                | std::views::transform([](container_iterator it) -> decltype(auto) {
                     return it->second.value.template get<E>();
                 }));
         }
@@ -288,7 +288,7 @@ namespace banggame {
 
         template<event_type E, typename ... Ts>
         void call_event(Ts && ... args) {
-            for (const auto &fun : m_listeners.get_table<E>()) {
+            for (auto &fun : m_listeners.get_table<E>()) {
                 std::invoke(fun, args ...);
             }
             m_listeners.commit_changes();
