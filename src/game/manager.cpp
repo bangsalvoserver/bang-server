@@ -90,7 +90,6 @@ void game_manager::handle_message(MSG_TAG(lobby_make), user_ptr user, const lobb
     user->second.in_lobby = lobby_it;
 
     static_cast<lobby_info &>(new_lobby) = value;
-    new_lobby.owner = user;
     new_lobby.state = lobby_state::waiting;
     send_lobby_update(lobby_it);
 
@@ -102,7 +101,7 @@ void game_manager::handle_message(MSG_TAG(lobby_make), user_ptr user, const lobb
 void game_manager::handle_message(MSG_TAG(lobby_edit), user_ptr user, const lobby_info &args) {
     auto &lobby = user->second.get_lobby();
 
-    if (lobby.owner != user) {
+    if (lobby.users.front() != user) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 
@@ -137,10 +136,7 @@ void game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, const lobb
             }
             send_message<server_message_type::lobby_add_user>(user->first, p->second.user_id, p->second.name, p->second.profile_image);
         }
-        if (lobby.users.size() == 1) {
-            lobby.owner = user;
-        }
-        send_message<server_message_type::lobby_owner>(user->first, lobby.owner->second.user_id);
+        send_message<server_message_type::lobby_owner>(user->first, lobby.users.front()->second.user_id);
         if (lobby.state != lobby_state::waiting) {
             send_message<server_message_type::game_started>(user->first);
 
@@ -191,7 +187,10 @@ void game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
     }
     
     broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user->second.user_id);
-    lobby.users.erase(std::ranges::find(lobby.users, user));
+
+    auto it = std::ranges::find(lobby.users, user);
+    bool is_owner = it == lobby.users.begin();
+    lobby.users.erase(it);
 
     send_lobby_update(lobby_it);
 
@@ -202,9 +201,8 @@ void game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
             broadcast_message<server_message_type::lobby_removed>(lobby_it->first);
             m_lobbies.erase(lobby_it);
         }
-    } else if (user == lobby.owner) {
-        lobby.owner = lobby.users.front();
-        broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.owner->second.user_id);
+    } else if (is_owner) {
+        broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front()->second.user_id);
     }
 }
 
@@ -215,7 +213,7 @@ void game_manager::handle_message(MSG_TAG(lobby_chat), user_ptr user, const lobb
 void game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
     auto &lobby = user->second.get_lobby();
 
-    if (user != lobby.owner) {
+    if (user != lobby.users.front()) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 
@@ -245,13 +243,13 @@ void game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
     for (user_ptr p : lobby.users) {
         broadcast_message_lobby<server_message_type::lobby_add_user>(lobby, p->second.user_id, p->second.name, p->second.profile_image);
     }
-    broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.owner->second.user_id);
+    broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front()->second.user_id);
 }
 
 void game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
     auto &lobby = user->second.get_lobby();
 
-    if (user != lobby.owner) {
+    if (user != lobby.users.front()) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 

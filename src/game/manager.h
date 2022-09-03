@@ -25,7 +25,6 @@ struct lobby : lobby_info {
     static constexpr int lifetime_seconds = 10;
 
     std::vector<user_ptr> users;
-    user_ptr owner;
     lobby_state state;
     int lifetime;
 
