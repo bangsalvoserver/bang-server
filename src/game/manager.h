@@ -17,10 +17,6 @@ using client_handle = std::weak_ptr<void>;
 using user_map = std::map<client_handle, game_user, std::owner_less<client_handle>>;
 using user_ptr = user_map::iterator;
 
-struct lobby_error : std::runtime_error {
-    using std::runtime_error::runtime_error;
-};
-
 struct lobby : lobby_info {
     static constexpr int lifetime_seconds = 10;
 
@@ -41,13 +37,6 @@ struct game_user {
     std::string name;
     sdl::image_pixels profile_image;
     std::optional<lobby_ptr> in_lobby;
-
-    lobby &get_lobby() {
-        if (!in_lobby) {
-            throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
-        }
-        return (*in_lobby)->second;
-    }
 };
 
 template<server_message_type E>
@@ -118,17 +107,17 @@ private:
         }
     }
 
-    void handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
-    void handle_message(MSG_TAG(lobby_list),     user_ptr user);
-    void handle_message(MSG_TAG(lobby_make),     user_ptr user, const lobby_info &value);
-    void handle_message(MSG_TAG(lobby_edit),     user_ptr user, const lobby_info &args);
-    void handle_message(MSG_TAG(lobby_join),     user_ptr user, const lobby_id_args &value);
-    void handle_message(MSG_TAG(lobby_rejoin),   user_ptr user, const lobby_rejoin_args &value);
-    void handle_message(MSG_TAG(lobby_leave),    user_ptr user);
-    void handle_message(MSG_TAG(lobby_chat),     user_ptr user, const lobby_chat_client_args &value);
-    void handle_message(MSG_TAG(lobby_return),   user_ptr user);
-    void handle_message(MSG_TAG(game_start),     user_ptr user);
-    void handle_message(MSG_TAG(game_action),    user_ptr user, const banggame::game_action &value);
+    std::string handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
+    std::string handle_message(MSG_TAG(lobby_list),     user_ptr user);
+    std::string handle_message(MSG_TAG(lobby_make),     user_ptr user, const lobby_info &value);
+    std::string handle_message(MSG_TAG(lobby_edit),     user_ptr user, const lobby_info &args);
+    std::string handle_message(MSG_TAG(lobby_join),     user_ptr user, const lobby_id_args &value);
+    std::string handle_message(MSG_TAG(lobby_rejoin),   user_ptr user, const lobby_rejoin_args &value);
+    std::string handle_message(MSG_TAG(lobby_leave),    user_ptr user);
+    std::string handle_message(MSG_TAG(lobby_chat),     user_ptr user, const lobby_chat_client_args &value);
+    std::string handle_message(MSG_TAG(lobby_return),   user_ptr user);
+    std::string handle_message(MSG_TAG(game_start),     user_ptr user);
+    std::string handle_message(MSG_TAG(game_action),    user_ptr user, const banggame::game_action &value);
 
 private:
     user_map users;

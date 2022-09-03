@@ -103,11 +103,6 @@ namespace banggame {
         void add_log(auto && ... args) {
             add_log(update_target::excludes(), FWD(args) ... );
         }
-
-        template<typename ... Ts>
-        void add_error(player *target, auto && ... args) {
-            add_update<game_update_type::game_error>(update_target::includes_private(target), FWD(args) ... );
-        }
     };
 
 }
