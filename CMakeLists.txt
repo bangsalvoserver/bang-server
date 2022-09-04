@@ -49,20 +49,16 @@ target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_STL_)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
 target_include_directories(networking INTERFACE external/websocketpp)
 
-find_package(yaml-cpp REQUIRED)
-add_executable(parse_bang_cards src/cards/parse_bang_cards.cpp)
-target_link_libraries(parse_bang_cards PRIVATE cpputils yaml-cpp)
-
 set(bang_cards_cpp "${CMAKE_CURRENT_BINARY_DIR}/bang_cards.cpp")
 add_custom_command(
     OUTPUT "${bang_cards_cpp}"
-    COMMAND parse_bang_cards
+    COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/src/cards/parse_bang_cards.py"
         src/cards/bang_cards.yml
         "${bang_cards_cpp}"
     VERBATIM
     DEPENDS
         src/cards/bang_cards.yml
-        parse_bang_cards
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/cards/parse_bang_cards.py"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 add_library(bang_cards_obj OBJECT "${bang_cards_cpp}")
