@@ -182,7 +182,7 @@ namespace banggame {
             origin->m_game->queue_request<request_handcuffs>(target_card, origin);
         });
         target->m_game->add_listener<event_type::on_turn_end>(target_card, [target_card](player *p) {
-            p->m_game->remove_disablers(target_card);
+            p->m_game->remove_listeners(event_card_key{target_card, 1});
         });
     }
 
@@ -205,9 +205,12 @@ namespace banggame {
             break;
         }
 
-        target->m_game->add_disabler(origin_card, [target=target, declared_suit](card *c) {
-            return c->owner == target && c->sign && c->sign.suit != declared_suit;
-        });
+        target->m_game->add_listener<event_type::verify_play_card>({origin_card, 1},
+            [origin_card=origin_card, target=target, declared_suit](player *origin, card *c, game_string &out_error) {
+                if (c->owner == target && c->sign && c->sign.suit != declared_suit) {
+                    out_error = {"ERROR_INVALID_SUIT", origin_card, c};
+                }
+            });
 
         target->m_game->pop_request();
         while (!target->m_game->m_selection.empty()) {
