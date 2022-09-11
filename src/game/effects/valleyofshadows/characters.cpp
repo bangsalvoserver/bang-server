@@ -59,7 +59,7 @@ namespace banggame {
     }
 
     game_string effect_evelyn_shebang::verify(card *origin_card, player *origin, player *target) {
-        if (!origin->m_game->call_event<event_type::verify_target_unique>(origin_card, origin, target, false)) {
+        if (!origin->m_game->call_event<event_type::verify_target_unique>(origin_card, origin, target, true)) {
             return "ERROR_TARGET_NOT_UNIQUE";
         }
         return {};

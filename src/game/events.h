@@ -280,7 +280,6 @@ namespace banggame {
         static constexpr size_t value = (std::is_lvalue_reference_v<Ts> + ...);
     };
 
-
     template<typename Function> struct find_reference_param;
     template<typename Function> static constexpr size_t find_reference_param_v = find_reference_param<Function>::value;
 
@@ -334,8 +333,8 @@ namespace banggame {
             }
             m_listeners.commit_changes();
             
-            if constexpr (count_reference_params_v<enums::enum_type_t<E>> == 1) {
-                return std::get<find_reference_param_v<enums::enum_type_t<E>>>(tup);
+            if constexpr (count_reference_params_v<function_type> == 1) {
+                return std::get<find_reference_param_v<function_type>>(tup);
             }
         }
     };
