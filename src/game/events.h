@@ -272,6 +272,42 @@ namespace banggame {
     template<typename T, event_type E>
     concept invocable_for_event = same_function_args<T, enums::enum_type_t<E>>::value;
 
+    template<typename Function> struct count_reference_params;
+    template<typename Function> static constexpr size_t count_reference_params_v = count_reference_params<Function>::value;
+
+    template<typename RetType, typename ... Ts>
+    struct count_reference_params<std::function<RetType(Ts...)>> {
+        static constexpr size_t value = (std::is_lvalue_reference_v<Ts> + ...);
+    };
+
+
+    template<typename Function> struct find_reference_param;
+    template<typename Function> static constexpr size_t find_reference_param_v = find_reference_param<Function>::value;
+
+    template<typename ... Ts> struct find_reference;
+
+    template<typename First, typename ... Ts>
+    struct find_reference<First, Ts ...> {
+        static constexpr size_t value = 1 + find_reference<Ts...>::value;
+    };
+
+    template<typename First, typename ... Ts>
+    requires std::is_lvalue_reference_v<First>
+    struct find_reference<First, Ts ...> {
+        static constexpr size_t value = 0;
+    };
+
+    template<typename RetType, typename ... Ts>
+    struct find_reference_param<std::function<RetType(Ts...)>> : find_reference<Ts...> {};
+
+    template<typename Function> struct function_argument_tuple;
+    template<typename Function> using function_argument_tuple_t = typename function_argument_tuple<Function>::type;
+
+    template<typename RetType, typename ... Ts>
+    struct function_argument_tuple<std::function<RetType(Ts...)>> {
+        using type = std::tuple<std::remove_reference_t<Ts> ...>;
+    };
+
     class listener_map {
     private:
         priority_double_map<event_card_key, event_type> m_listeners;
@@ -289,11 +325,18 @@ namespace banggame {
         }
 
         template<event_type E, typename ... Ts>
-        void call_event(Ts && ... args) {
+        auto call_event(Ts && ... args) {
+            using function_type = enums::enum_type_t<E>;
+            function_argument_tuple_t<function_type> tup{FWD(args) ...};
+
             for (auto &fun : m_listeners.get_table<E>()) {
-                std::invoke(fun, args ...);
+                std::apply(fun, tup);
             }
             m_listeners.commit_changes();
+            
+            if constexpr (count_reference_params_v<enums::enum_type_t<E>> == 1) {
+                return std::get<find_reference_param_v<enums::enum_type_t<E>>>(tup);
+            }
         }
     };
 

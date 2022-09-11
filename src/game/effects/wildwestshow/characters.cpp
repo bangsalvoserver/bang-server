@@ -27,9 +27,7 @@ namespace banggame {
         });
         player_end->m_game->add_listener<event_type::on_discard_pass>(target_card, [=](player *player_begin, card *discarded_card) {
             const auto is_valid_target = [=](player &target) {
-                bool valid = false;
-                target.m_game->call_event<event_type::verify_card_taker>(&target, equip_type::gary_looter, valid);
-                return valid;
+                return target.m_game->call_event<event_type::verify_card_taker>(&target, equip_type::gary_looter, false);
             };
             if (player_begin != player_end && std::none_of(player_iterator(player_begin), player_iterator(player_end), is_valid_target)) {
                 player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, discarded_card);
@@ -46,9 +44,7 @@ namespace banggame {
         });
         player_end->m_game->add_listener<event_type::on_draw_check>(target_card, [=](player *player_begin, card *drawn_card) {
             const auto is_valid_target = [=](player &target) {
-                bool valid = false;
-                target.m_game->call_event<event_type::verify_card_taker>(&target, equip_type::john_pain, valid);
-                return valid;
+                return target.m_game->call_event<event_type::verify_card_taker>(&target, equip_type::john_pain, false);
             };
             if (drawn_card->pocket != pocket_type::player_hand
                 && std::none_of(player_iterator(player_begin), player_iterator(player_end), is_valid_target)

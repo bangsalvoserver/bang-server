@@ -23,9 +23,7 @@ namespace banggame {
     }
 
     game_string effect_pass_turn::verify(card *origin_card, player *origin) {
-        card *mandatory_card = nullptr;
-        origin->m_game->call_event<event_type::verify_mandatory_card>(origin, mandatory_card);
-        if (mandatory_card) {
+        if (card *mandatory_card = origin->m_game->call_event<event_type::verify_mandatory_card>(origin, nullptr)) {
             return {"ERROR_MANDATORY_CARD", mandatory_card};
         }
         return {};
@@ -114,9 +112,7 @@ namespace banggame {
     }
 
     game_string effect_banglimit::verify(card *origin_card, player *origin) {
-        bool value = origin->m_bangs_played < origin->m_bangs_per_turn;
-        origin->m_game->call_event<event_type::apply_volcanic_modifier>(origin, value);
-        if (!value) {
+        if (!origin->m_game->call_event<event_type::apply_volcanic_modifier>(origin, origin->m_bangs_played < origin->m_bangs_per_turn)) {
             return "ERROR_ONE_BANG_PER_TURN";
         }
         return {};
@@ -172,9 +168,7 @@ namespace banggame {
     void effect_beer::on_play(card *origin_card, player *origin, player *target) {
         target->m_game->call_event<event_type::on_play_beer>(target);
         if (target->m_game->m_players.size() <= 2 || target->m_game->num_alive() > 2) {
-            int amt = 1;
-            target->m_game->call_event<event_type::apply_beer_modifier>(target, amt);
-            target->heal(amt);
+            target->heal(target->m_game->call_event<event_type::apply_beer_modifier>(target, 1));
         }
     }
 

@@ -36,15 +36,11 @@ namespace banggame {
     }
 
     int player::get_initial_cards() {
-        int value = m_max_hp;
-        m_game->call_event<event_type::apply_initial_cards_modifier>(this, value);
-        return value;
+        return m_game->call_event<event_type::apply_initial_cards_modifier>(this, m_max_hp);
     }
 
     int player::max_cards_end_of_turn() {
-        int n = m_hp;
-        m_game->call_event<event_type::apply_maxcards_modifier>(this, n);
-        return n;
+        return m_game->call_event<event_type::apply_maxcards_modifier>(this, m_hp);
     }
 
     card *player::find_equipped_card(card *card) {
@@ -136,9 +132,7 @@ namespace banggame {
     }
 
     bool player::immune_to(card *origin_card, player *origin, effect_flags flags) const {
-        bool value = false;
-        m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, value);
-        return value;
+        return m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, false);
     }
 
     void player::queue_request_add_cube(card *origin_card, int ncubes) {
@@ -172,9 +166,7 @@ namespace banggame {
         if (bool(flags & effect_flags::escapable)
             && m_game->has_expansion(card_expansion_type::valleyofshadows)) return true;
         
-        bool value = false;
-        m_game->call_event<event_type::apply_escapable_modifier>(origin_card, origin, this, flags, value);
-        return value;
+        return m_game->call_event<event_type::apply_escapable_modifier>(origin_card, origin, this, flags, false);
     }
     
     void player::add_cubes(card *target, int ncubes) {
@@ -228,8 +220,7 @@ namespace banggame {
     void player::add_to_hand_phase_one(card *drawn_card) {
         ++m_num_drawn_cards;
         
-        bool reveal = false;
-        m_game->call_event<event_type::on_card_drawn>(this, drawn_card, reveal);
+        bool reveal = m_game->call_event<event_type::on_card_drawn>(this, drawn_card, false);
         if (drawn_card->pocket == pocket_type::discard_pile) {
             m_game->add_log("LOG_DRAWN_FROM_DISCARD", this, drawn_card);
             m_game->move_card(drawn_card, pocket_type::player_hand, this);
@@ -425,9 +416,7 @@ namespace banggame {
     }
 
     card_sign player::get_card_sign(card *target_card) {
-        card_sign sign = target_card->sign;
-        m_game->call_event<event_type::apply_sign_modifier>(this, sign);
-        return sign;
+        return m_game->call_event<event_type::apply_sign_modifier>(this, target_card->sign);
     }
 
     void player::start_of_turn() {

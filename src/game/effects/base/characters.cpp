@@ -108,9 +108,7 @@ namespace banggame {
             player_iterator it{target};
             do {
                 ++it;
-                bool valid = false;
-                origin->m_game->call_event<event_type::verify_card_taker>(it, equip_type::vulture_sam, valid);
-                if (valid) {
+                if (origin->m_game->call_event<event_type::verify_card_taker>(it, equip_type::vulture_sam, false)) {
                     range_targets.push_back(it);
                 }
             } while (--count != 0);

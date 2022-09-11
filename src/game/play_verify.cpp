@@ -152,10 +152,8 @@ namespace banggame {
         if (origin->m_game->check_flags(game_flags::disable_equipping)) {
             return "ERROR_CANT_EQUIP_CARDS";
         }
-        {
-            game_string error;
-            origin->m_game->call_event<event_type::verify_play_card>(origin, card_ptr, error);
-            if (error) return error;
+        if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, card_ptr, game_string{})) {
+            return error;
         }
         player *target = origin;
         if (!card_ptr->self_equippable()) {
@@ -196,10 +194,8 @@ namespace banggame {
         if (card_ptr->inactive) {
             return {"ERROR_CARD_INACTIVE", card_ptr};
         }
-        {
-            game_string error;
-            origin->m_game->call_event<event_type::verify_play_card>(origin, card_ptr, error);
-            if (error) return error;
+        if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, card_ptr, game_string{})) {
+            return error;
         }
 
         struct {
