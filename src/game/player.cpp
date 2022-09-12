@@ -98,11 +98,7 @@ namespace banggame {
                     origin->add_gold(value);
                 }
             }
-            m_game->queue_action([=, this]{
-                if (alive()) {
-                    m_game->call_event<event_type::after_hit>(origin_card, origin, this, value, is_bang);
-                }
-            });
+            m_game->call_event<event_type::after_hit>(origin_card, origin, this, value, is_bang);
         } else {
             m_game->queue_request_front<timer_damaging>(origin_card, origin, this, value, is_bang);
         }
