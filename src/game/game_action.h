@@ -19,7 +19,7 @@ namespace banggame {
         (card,                  int)
         (extra_card,            int)
         (cards_other_players,   std::vector<int>)
-        (cube,                  std::vector<int>)
+        (select_cubes,          std::vector<int>)
     )
 
     struct play_card_args {REFLECTABLE(

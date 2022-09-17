@@ -109,7 +109,7 @@ namespace banggame {
         (all_players)
         (other_players)
         (cards_other_players)
-        (cube)
+        (select_cubes)
     )
 
     DEFINE_ENUM(card_deck_type,
@@ -203,7 +203,6 @@ namespace banggame {
         (pay_gold,              effect_pay_gold)
         (rum,                   effect_rum)
         (goldrush,              effect_goldrush)
-        (select_cube,           effect_select_cube)
         (pay_cube,              effect_pay_cube)
         (add_cube,              effect_add_cube)
         (reload,                effect_reload)

@@ -730,7 +730,7 @@ main_deck:
       - mth_add
       - mth_add
     optional:
-      - select_cube(2) cube
+      - pay_cube select_cubes(2)
       - mth_add
     mth_effect: draw_atend
     tags:
@@ -752,7 +752,7 @@ main_deck:
     effects:
       - mth_add
     optional:
-      - select_cube(3) cube
+      - pay_cube select_cubes(3)
       - mth_add
     tags:
       - repeatable
@@ -766,7 +766,7 @@ main_deck:
     effects:
       - bang player reachable notself
     optional:
-      - select_cube cube
+      - pay_cube select_cubes(1)
       - bang player reachable notself
     tags:
       - repeatable
@@ -780,7 +780,7 @@ main_deck:
     effects:
       - mth_add player reachable notself
     optional:
-      - select_cube(2) cube
+      - pay_cube select_cubes(2)
       - mth_add
     mth_effect: flintlock
   - name: ARROW
@@ -792,7 +792,7 @@ main_deck:
     effects:
       - indians player notself
     optional:
-      - select_cube cube
+      - pay_cube select_cubes(1)
       - indians player notself
     tags:
       - repeatable
@@ -807,7 +807,7 @@ main_deck:
     responses:
       - missedlike
     optional:
-      - select_cube(2) cube
+      - pay_cube select_cubes(2)
       - mth_add
     mth_response: duck
   - name: MISSED
@@ -845,7 +845,7 @@ main_deck:
     effects:
       - mth_add card | table
     optional:
-      - select_cube(2) cube
+      - pay_cube select_cubes(2)
       - mth_add
     mth_effect: squaw
   - name: ACE_UP_THE_SLEEVE
@@ -1629,7 +1629,7 @@ character:
       - al_preacher
     responses:
       - al_preacher
-      - select_cube(2) cube
+      - pay_cube select_cubes(2)
       - draw
   - name: BASS_GREEVES
     image: 17_bassgreeves
@@ -1661,7 +1661,7 @@ character:
     expansion: armedanddangerous
     effects:
       - max_usages(1)
-      - select_cube(2) cube
+      - pay_cube select_cubes(2)
       - bang player reachable notself
   - name: MS_ABIGAIL
     image: 17_msabigail

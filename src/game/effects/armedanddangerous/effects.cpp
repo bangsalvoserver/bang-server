@@ -24,26 +24,15 @@ namespace banggame {
         effect_heal(amount).on_play(origin_card, origin);
     }
 
-    game_string effect_select_cube::verify(card *origin_card, player *origin, card *target) {
-        if (target->num_cubes == 0) {
+    game_string effect_pay_cube::verify(card *origin_card, player *origin, card *target) {
+        if (target->num_cubes < ncubes) {
             return {"ERROR_NOT_ENOUGH_CUBES_ON", target};
         }
         return {};
     }
 
-    void effect_select_cube::on_play(card *origin_card, player *origin, card *target) {
-        target->owner->pay_cubes(target, 1);
-    }
-
-    game_string effect_pay_cube::verify(card *origin_card, player *origin) {
-        if (origin_card->num_cubes < ncubes) {
-            return {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
-        }
-        return {};
-    }
-
-    void effect_pay_cube::on_play(card *origin_card, player *origin) {
-        origin->pay_cubes(origin_card, ncubes);
+    void effect_pay_cube::on_play(card *origin_card, player *origin, card *target) {
+        target->owner->pay_cubes(target, ncubes);
     }
 
     void effect_add_cube::on_play(card *origin_card, player *origin, card *target) {

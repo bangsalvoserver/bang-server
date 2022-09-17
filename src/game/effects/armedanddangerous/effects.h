@@ -14,17 +14,21 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, int amount);
     };
 
-    struct effect_select_cube {
-        game_string verify(card *origin_card, player *origin, card *target);
-        void on_play(card *origin_card, player *origin, card *target);
-    };
-
     struct effect_pay_cube {
         int ncubes;
         effect_pay_cube(int value) : ncubes(std::max(1, value)) {}
         
-        game_string verify(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+        game_string verify(card *origin_card, player *origin) {
+            return verify(origin_card, origin, origin_card);
+        }
+
+        game_string verify(card *origin_card, player *origin, card *target);
+
+        void on_play(card *origin_card, player *origin) {
+            on_play(origin_card, origin, origin_card);
+        }
+
+        void on_play(card *origin_card, player *origin, card *target);
     };
 
     struct effect_add_cube {

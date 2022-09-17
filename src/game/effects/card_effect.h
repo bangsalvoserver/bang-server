@@ -19,7 +19,7 @@ namespace banggame {
         (card,                  card *)
         (extra_card,            nullable<card>)
         (cards_other_players,   std::vector<card *>)
-        (cube,                  std::vector<card *>)
+        (select_cubes,          std::vector<card *>)
     )
 
     template<target_type E> struct tagged_value {};

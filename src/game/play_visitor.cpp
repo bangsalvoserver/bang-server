@@ -231,7 +231,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::cube>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
+    template<> game_string play_visitor<target_type::select_cubes>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
         for (card *c : target_cards) {
             if (!c || c->owner != verifier->origin) {
                 return "ERROR_TARGET_NOT_SELF";
@@ -243,7 +243,7 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::cube>::prompt(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
+    template<> game_string play_visitor<target_type::select_cubes>::prompt(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
         game_string msg;
         for (card *target_card : target_cards) {
             msg = effect.on_prompt(verifier->card_ptr, verifier->origin, target_card);
@@ -252,7 +252,7 @@ namespace banggame {
         return msg;
     }
 
-    template<> void play_visitor<target_type::cube>::play(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
+    template<> void play_visitor<target_type::select_cubes>::play(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
         for (card *target_card : target_cards) {
             effect.on_play(verifier->card_ptr, verifier->origin, target_card, effect_flags{});
         }

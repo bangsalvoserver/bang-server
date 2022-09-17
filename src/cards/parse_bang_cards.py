@@ -31,7 +31,8 @@ def parse_effects(out, list, name):
         match = re.match(
             r'^\s*(\w+)' # type
             r'(?:\s*\((-?\d+)\))?' # effect_value
-            r'(?:\s*(\w+)\s*)?' # target
+            r'(?:\s*(\w+)' # target
+            r'\s*(?:\((-?\d+)\))?)?' # target_value
             r'([\w\s]*?)' # player_filter
             r'(?:\s*\|\s*([\w\s]+))?\s*$', # card_filter
             effect
@@ -42,8 +43,9 @@ def parse_effects(out, list, name):
         type = match.group(1)
         effect_value = match.group(2)
         target = match.group(3)
-        player_filter = match.group(4)
-        card_filter = match.group(5)
+        target_value = match.group(4)
+        player_filter = match.group(5)
+        card_filter = match.group(6)
 
         print('        {', file=out)
 
@@ -59,6 +61,8 @@ def parse_effects(out, list, name):
             print('          .card_filter {{{}}},'.format(enum_flags(card_filter, 'target_card_filter')), file=out)
         if effect_value:
             print('          .effect_value {{{}}},'.format(effect_value), file=out)
+        if target_value:
+            print('          .target_value {{{}}},'.format(target_value), file=out)
         print('          .type {{effect_type::{}}}\n        }}'.format(type), end='', file=out)
         if i == len(list)-1:
             print('', file=out)

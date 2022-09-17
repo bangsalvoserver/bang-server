@@ -15,7 +15,8 @@ namespace banggame {
             (target_type) target,
             (target_player_filter) player_filter,
             (target_card_filter) card_filter,
-            (short) effect_value,
+            (int8_t) effect_value,
+            (int8_t) target_value,
             (effect_type) type
         )
 
