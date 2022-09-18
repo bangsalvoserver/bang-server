@@ -79,6 +79,12 @@ namespace banggame {
         }
     }
 
+    void request_tumbleweed::on_resolve() {
+        origin->m_game->pop_request();
+        origin->m_game->m_current_check.resolve(drawn_card);
+        origin->m_game->update_request();
+    }
+
     game_string request_tumbleweed::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_CAN_PLAY_TUMBLEWEED", origin, origin_card, target_card, drawn_card};

@@ -38,15 +38,16 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
-    struct request_tumbleweed : request_base {
+    struct request_tumbleweed : request_base, resolvable_request {
         request_tumbleweed(card *origin_card, player *origin, player *target, card *drawn_card, card *drawing_card)
-            : request_base(origin_card, origin, target, effect_flags::auto_respond)
+            : request_base(origin_card, origin, target)
             , target_card(drawing_card)
             , drawn_card(drawn_card) {}
         
         card *target_card;
         card *drawn_card;
 
+        void on_resolve() override;
         game_string status_text(player *owner) const override;
     };
 }

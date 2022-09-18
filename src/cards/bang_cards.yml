@@ -938,11 +938,8 @@ main_deck:
     equip:
       - tumbleweed
     responses:
-      - tumbleweed
-    optional:
-      - mth_add card | self
       - pay_cube self_cubes(1)
-    mth_response: tumbleweed
+      - tumbleweed
   - name: DOUBLE_BARREL
     signs:
       - 6 clubs
@@ -2116,9 +2113,11 @@ specials:
   - name: GAME_PASS
     effects:
       - pass_turn
-  - name: GAME_RESOLVE
+  - name: GAME_CONFIRM
     responses:
       - resolve
+    tags:
+      - confirm
   - name: GAME_SELL_BEER
     expansion: goldrush
     effects:
