@@ -187,6 +187,33 @@ namespace banggame {
         }
     }
 
+    template<> game_string play_visitor<target_type::cards>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &targets) {
+        if (targets.size() != std::max<size_t>(1, effect.target_value)) {
+            return "ERROR_INVALID_TARGETS";
+        }
+        for (card *c : targets) {
+            if (game_string err = play_visitor<target_type::card>{}.verify(verifier, effect, c)) {
+                return err;
+            }
+        }
+        return {};
+    }
+
+    template<> game_string play_visitor<target_type::cards>::prompt(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &targets) {
+        for (card *c : targets) {
+            if (game_string err = play_visitor<target_type::card>{}.prompt(verifier, effect, c)) {
+                return err;
+            }
+        }
+        return {};
+    }
+
+    template<> void play_visitor<target_type::cards>::play(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &targets) {
+        for (card *c : targets) {
+            play_visitor<target_type::card>{}.play(verifier, effect, c);
+        }
+    }
+
     template<> game_string play_visitor<target_type::cards_other_players>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
         if (!std::ranges::all_of(verifier->origin->m_game->m_players | std::views::filter(&player::alive), [&](const player &p) {
             size_t found = std::ranges::count(target_cards, &p, &card::owner);

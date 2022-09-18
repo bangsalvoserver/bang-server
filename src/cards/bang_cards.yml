@@ -1360,14 +1360,12 @@ character:
   - name: SID_KETCHUM
     image: 01_sidketchum
     effects:
-      - discard card self | hand
-      - discard card self | hand
+      - discard cards(2) self | hand
       - heal
     responses:
-      - discard card self | hand
-      - discard card self | hand
+      - discard cards(2) self | hand
       - heal
-      - sid_ketchum
+      - deathsave
   - name: SLAB_THE_KILLER
     image: 01_slab
     equip:
@@ -1443,8 +1441,7 @@ character:
     expansion: dodgecity
     effects:
       - max_usages(1)
-      - mth_add card self | hand
-      - mth_add card self | hand
+      - mth_add cards(2) self | hand
       - mth_add player reachable notself
     mth_effect: doc_holyday
   - name: ELENA_FUENTE
@@ -1835,8 +1832,7 @@ fistfulofcards:
   - name: SNIPER
     image: 05_cecchino
     effects:
-      - discard card self | hand bang
-      - discard card self | hand bang
+      - discard cards(2) self | hand bang
       - sniper player reachable notself
   - name: DEAD_MAN
     image: 05_deadman
@@ -2129,8 +2125,7 @@ specials:
   - name: GAME_DISCARD_BRONCO
     expansion: canyondiablo
     effects:
-      - discard card self | hand
-      - discard card self | hand
+      - discard cards(2) self | hand
       - destroy card | table bronco
     tags:
       - bronco

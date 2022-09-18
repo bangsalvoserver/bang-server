@@ -208,10 +208,13 @@ namespace banggame {
         }
     }
 
-    void handler_doc_holyday::on_play(card *origin_card, player *origin, card *card1, card *card2, player *target) {
-        effect_destroy{}.on_play(origin_card, origin, card1);
-        effect_destroy{}.on_play(origin_card, origin, card2);
-        if (!target->immune_to(card1, origin, {}) || !target->immune_to(card2, origin, {})) {
+    void handler_doc_holyday::on_play(card *origin_card, player *origin, tagged_value<target_type::cards> target_cards, player *target) {
+        for (card *c : target_cards.value) {
+            effect_destroy{}.on_play(origin_card, origin, c);
+        }
+        if (!std::ranges::all_of(target_cards.value, [&](card *c) {
+            return target->immune_to(c, origin, {});
+        })) {
             effect_bang{}.on_play(origin_card, origin, target);
         }
     }

@@ -64,6 +64,8 @@ namespace banggame {
             case target_type::card:
             case target_type::extra_card:
                 return !make_card_target_set(target_card, holder).empty();
+            case target_type::cards:
+                return make_card_target_set(target_card, holder).size() >= std::max<size_t>(1, holder.target_value);
             default:
                 return true;
             }

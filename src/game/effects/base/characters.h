@@ -43,9 +43,6 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
-    struct effect_sid_ketchum : effect_deathsave {
-        bool can_respond(card *origin_card, player *origin);
-    };
 }
 
 #endif

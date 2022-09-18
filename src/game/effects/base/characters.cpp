@@ -142,8 +142,4 @@ namespace banggame {
         });
     }
 
-    bool effect_sid_ketchum::can_respond(card *origin_card, player *origin) {
-        return origin->m_hand.size() >= 2 && effect_deathsave::can_respond(origin_card, origin);
-    }
-
 }

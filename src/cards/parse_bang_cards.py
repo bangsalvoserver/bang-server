@@ -52,12 +52,12 @@ def parse_effects(out, list, name):
         if target:
             print('          .target {{target_type::{}}},'.format(target), file=out)
         if player_filter:
-            if target not in ('player', 'conditional_player', 'card'):
+            if target not in ('player', 'conditional_player', 'card', 'cards'):
                 raise RuntimeError('Invalid effect string: {0}\nPlayer filter not allowed with {1}'.format(effect, target))
             print('          .player_filter {{{}}},'.format(enum_flags(player_filter, 'target_player_filter')), file=out)
         if card_filter:
-            if target != 'card':
-                raise RuntimeError('Invalid effect string: {0}\nCard filter not alowed with {1}'.format(effect, target))
+            if target not in ('card', 'cards'):
+                raise RuntimeError('Invalid effect string: {0}\nCard filter not allowed with {1}'.format(effect, target))
             print('          .card_filter {{{}}},'.format(enum_flags(card_filter, 'target_card_filter')), file=out)
         if effect_value:
             print('          .effect_value {{{}}},'.format(effect_value), file=out)
