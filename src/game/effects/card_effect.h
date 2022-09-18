@@ -79,7 +79,7 @@ namespace banggame {
     };
 
     struct timer_request : request_base, std::enable_shared_from_this<timer_request> {
-        static constexpr int default_duration = 400;
+        static constexpr int default_duration = 300;
 
         timer_request(card *origin_card, player *origin, player *target, effect_flags flags = {}
             , int duration = default_duration)

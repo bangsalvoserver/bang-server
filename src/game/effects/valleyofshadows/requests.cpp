@@ -15,8 +15,10 @@ namespace banggame {
         return {damage > 1 ? "STATUS_DAMAGING_PLURAL" : "STATUS_DAMAGING", target, origin_card, damage};
     }
 
-    void request_destroy::on_finished() {
+    void request_destroy::on_resolve() {
+        origin->m_game->pop_request();
         effect_destroy::resolver{origin_card, origin, target_card}.resolve();
+        origin->m_game->update_request();
     }
 
     game_string request_destroy::status_text(player *owner) const {
@@ -35,8 +37,10 @@ namespace banggame {
         }
     }
 
-    void request_steal::on_finished() {
+    void request_steal::on_resolve() {
+        origin->m_game->pop_request();
         effect_steal::resolver{origin_card, origin, target_card}.resolve();
+        origin->m_game->update_request();
     }
 
     game_string request_steal::status_text(player *owner) const {

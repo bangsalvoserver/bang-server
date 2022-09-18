@@ -7,27 +7,25 @@
 
 namespace banggame {
 
-    struct request_targeting : timer_request {
-        static constexpr int targeting_duration = 300;
-
-        request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
-            : timer_request(origin_card, origin, target, flags, targeting_duration)
+    struct request_destroy : request_base, resolvable_request {
+        request_destroy(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
+            : request_base(origin_card, origin, target, flags)
             , target_card(target_card) {}
 
         card *target_card;
-    };
 
-    struct request_destroy : request_targeting {
-        using request_targeting::request_targeting;
-        
-        void on_finished() override;
+        void on_resolve() override;
         game_string status_text(player *owner) const override;
     };
 
-    struct request_steal : request_targeting {
-        using request_targeting::request_targeting;
+    struct request_steal : request_base, resolvable_request {
+        request_steal(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
+            : request_base(origin_card, origin, target, flags)
+            , target_card(target_card) {}
 
-        void on_finished() override;
+        card *target_card;
+
+        void on_resolve() override;
         game_string status_text(player *owner) const override;
     };
     
@@ -74,10 +72,8 @@ namespace banggame {
     };
 
     struct timer_damaging : timer_request, cleanup_request {
-        static constexpr int damaging_duration = 300;
-
         timer_damaging(card *origin_card, player *origin, player *target, int damage, bool is_bang)
-            : timer_request(origin_card, origin, target, {}, damaging_duration)
+            : timer_request(origin_card, origin, target)
             , damage(damage)
             , is_bang(is_bang) {}
         

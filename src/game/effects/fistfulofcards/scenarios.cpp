@@ -151,8 +151,10 @@ namespace banggame {
         origin->m_game->queue_request<request_ricochet>(origin_card, origin, target_card->owner, target_card);
     }
 
-    void request_ricochet::on_finished() {
+    void request_ricochet::on_resolve() {
+        origin->m_game->pop_request();
         effect_destroy::resolver{origin_card, origin, target_card}.resolve();
+        origin->m_game->update_request();
     }
 
     void request_ricochet::on_miss() {

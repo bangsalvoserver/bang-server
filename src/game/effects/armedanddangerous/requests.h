@@ -24,10 +24,10 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
-    struct request_rust : timer_request {
-        using timer_request::timer_request;
+    struct request_rust : request_base, resolvable_request {
+        using request_base::request_base;
 
-        void on_finished() override;
+        void on_resolve() override;
         game_string status_text(player *owner) const override;
     };
 
