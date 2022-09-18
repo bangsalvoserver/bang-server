@@ -231,21 +231,23 @@ namespace banggame {
         }
 
         void commit_changes() {
-            std::erase_if(m_changes, [&](container_iterator it) {
-                auto &set = m_table[it->second.value.index()];
+            for (auto it = m_changes.begin(); it != m_changes.end();) {
+                auto map_it = *it;
+                auto &set = m_table[map_it->second.value.index()];
                 if (set.lock_count == 0) {
-                    switch (it->second.status) {
+                    switch (map_it->second.status) {
                     case inactive:
-                        it->second.status = active;
+                        map_it->second.status = active;
                         break;
                     case erased:
-                        set.set.erase(it);
-                        m_map.erase(it);
+                        set.set.erase(map_it);
+                        m_map.erase(map_it);
                     }
-                    return true;
+                    it = m_changes.erase(it);
+                } else {
+                    ++it;
                 }
-                return false;
-            });
+            }
         }
 
         template<EnumType E>
