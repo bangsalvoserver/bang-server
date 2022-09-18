@@ -388,6 +388,16 @@ namespace banggame {
         return {};
     }
 
+    struct card_cube_ordering {
+        bool operator()(card *lhs, card *rhs) const {
+            if (lhs->pocket == pocket_type::player_table && rhs->pocket == pocket_type::player_table) {
+                return std::ranges::find(lhs->owner->m_table, lhs) < std::ranges::find(rhs->owner->m_table, rhs);
+            } else {
+                return lhs->pocket == pocket_type::player_table;
+            }
+        }
+    };
+
     void play_card_verify::do_play_card() const {
         auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
         origin->log_played_card(card_ptr, is_response);
@@ -399,7 +409,7 @@ namespace banggame {
         auto effect_end = effects.end();
 
         std::vector<std::pair<const effect_holder *, const play_card_target *>> delay_effects;
-        std::map<card *, int> selected_cubes;
+        std::map<card *, int, card_cube_ordering> selected_cubes;
 
         target_list mth_targets;
         for (const auto &t : targets) {
