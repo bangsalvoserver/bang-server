@@ -64,6 +64,9 @@ namespace banggame {
         if (bool(filter & target_card_filter::bang) && !origin->is_bangcard(target))
             return "ERROR_TARGET_NOT_BANG";
 
+        if (bool(filter & target_card_filter::bangcard) && !target->has_tag(tag_type::bangcard))
+            return "ERROR_TARGET_NOT_BANG";
+
         if (bool(filter & target_card_filter::missed) && !target->has_tag(tag_type::missedcard))
             return "ERROR_TARGET_NOT_MISSED";
 

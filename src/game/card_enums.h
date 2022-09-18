@@ -94,6 +94,7 @@ namespace banggame {
         (black)
         (clubs)
         (bang)
+        (bangcard)
         (missed)
         (beer)
         (bronco)

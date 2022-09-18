@@ -1309,7 +1309,7 @@ character:
       - mth_add player reachable notself
     mth_effect: play_as_bang
     responses:
-      - discard card self | hand bang
+      - discard card self | hand bangcard
       - missed
     tags:
       - play_as_bang
