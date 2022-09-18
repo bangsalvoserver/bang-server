@@ -6,8 +6,13 @@
 
 #include "utils/raii_editor.h"
 
+#include <set>
+
 namespace banggame {
     using namespace enums::flag_operators;
+
+    template<typename ... Ts> struct overloaded : Ts ... { using Ts::operator() ...; };
+    template<typename ... Ts> overloaded(Ts ...) -> overloaded<Ts ...>;
 
     game_string check_player_filter(card *origin_card, player *origin, target_player_filter filter, player *target) {
         if (bool(filter & target_player_filter::dead)) {
@@ -135,12 +140,92 @@ namespace banggame {
         return {};
     }
 
+    game_string play_card_verify::verify_duplicates() const {
+        if (card_ptr->has_tag(tag_type::can_repeat)) {
+            return {};
+        }
+
+        std::set<player *> selected_players;
+        std::set<card *> selected_cards;
+        std::map<card *, int> selected_cubes;
+
+        for (const auto &target : targets) {
+            if (game_string error = enums::visit_indexed(overloaded{
+                []<target_type E>(enums::enum_tag_t<E>) -> game_string {
+                    return {};
+                },
+                [&](enums::enum_tag_t<target_type::player>, player *p) -> game_string {
+                    if (!selected_players.emplace(p).second) {
+                        return "ERROR_DUPLICATE_PLAYER";
+                    } else {
+                        return {};
+                    }
+                },
+                [&](enums::enum_tag_t<target_type::conditional_player>, nullable<player> p) -> game_string {
+                    if (p && !selected_players.emplace(p).second) {
+                        return "ERROR_DUPLICATE_PLAYER";
+                    } else {
+                        return {};
+                    }
+                },
+                [&](enums::enum_tag_t<target_type::card>, card *c) -> game_string {
+                    if (!selected_cards.emplace(c).second) {
+                        return "ERROR_DUPLICATE_CARD";
+                    } else {
+                        return {};
+                    }
+                },
+                [&](enums::enum_tag_t<target_type::extra_card>, nullable<card> c) -> game_string {
+                    if (c && !selected_cards.emplace(c).second) {
+                        return "ERROR_DUPLICATE_CARD";
+                    } else {
+                        return {};
+                    }
+                },
+                [&](enums::enum_tag_t<target_type::cards>, const std::vector<card *> &cs) -> game_string {
+                    for (card *c : cs) {
+                        if (!selected_cards.emplace(c).second) {
+                            return "ERROR_DUPLICATE_CARD";
+                        }
+                    }
+                    return {};
+                },
+                [](enums::enum_tag_t<target_type::cards_other_players>, const std::vector<card *> &cs) -> game_string {
+                    return {};
+                },
+                [&](enums::enum_tag_t<target_type::select_cubes>, const std::vector<card *> &cs) -> game_string {
+                    for (card *c : cs) {
+                        if (++selected_cubes[c] > c->num_cubes) {
+                            return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
+                        }
+                    }
+                    return {};
+                },
+                [&](enums::enum_tag_t<target_type::self_cubes>, int ncubes) -> game_string {
+                    if ((selected_cubes[card_ptr] += ncubes) > card_ptr->num_cubes) {
+                        return  {"ERROR_NOT_ENOUGH_CUBES_ON", card_ptr};
+                    }
+                    return {};
+                }
+            }, target)) {
+                return error;
+            }
+        }
+        return {};
+    }
+
     void play_card_verify::play_modifiers() const {
         for (card *mod_card : modifiers) {
             origin->log_played_card(mod_card, false);
             origin->play_card_action(mod_card);
             for (effect_holder &e : mod_card->effects) {
-                e.on_play(mod_card, origin, effect_flags{});
+                if (e.target == target_type::none) {
+                    e.on_play(mod_card, origin, effect_flags{});
+                } else if (e.target == target_type::self_cubes) {
+                    origin->pay_cubes(mod_card, e.target_value);
+                } else {
+                    throw std::runtime_error("Invalid target_type in modifier card");
+                }
             }
         }
     }
@@ -254,7 +339,15 @@ namespace banggame {
             }
         }
 
-        return (is_response ? card_ptr->mth_response : card_ptr->mth_effect).verify(card_ptr, origin, mth_targets);
+        if (game_string error = (is_response ? card_ptr->mth_response : card_ptr->mth_effect).verify(card_ptr, origin, mth_targets)) {
+            return error;
+        }
+
+        if (game_string error = verify_duplicates()) {
+            return error;
+        }
+
+        return {};
     }
 
     game_string play_card_verify::check_prompt() const {

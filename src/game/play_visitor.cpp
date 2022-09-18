@@ -259,29 +259,45 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::select_cubes>::verify(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
+        if (effect.type != effect_type::pay_cube) {
+            return "ERROR_INVALID_EFFECT_TYPE";
+        }
         for (card *c : target_cards) {
             if (!c || c->owner != verifier->origin) {
                 return "ERROR_TARGET_NOT_SELF";
-            }
-            if (game_string error = effect.verify(verifier->card_ptr, verifier->origin, c)) {
-                return error;
             }
         }
         return {};
     }
 
     template<> game_string play_visitor<target_type::select_cubes>::prompt(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
-        game_string msg;
-        for (card *target_card : target_cards) {
-            msg = effect.on_prompt(verifier->card_ptr, verifier->origin, target_card);
-            if (!msg) break;
-        }
-        return msg;
+        return {};
     }
 
     template<> void play_visitor<target_type::select_cubes>::play(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
-        for (card *target_card : target_cards) {
-            effect.on_play(verifier->card_ptr, verifier->origin, target_card, effect_flags{});
+        std::map<card *, int> selected_cubes;
+        for (card *c : target_cards) {
+            ++selected_cubes[c];
         }
+        for (const auto &[c, ncubes] : selected_cubes) {
+            verifier->origin->pay_cubes(c, ncubes);
+        }
+    }
+
+    template<> game_string play_visitor<target_type::self_cubes>::verify(const play_card_verify *verifier, const effect_holder &effect, int ncubes) {
+        if (effect.type != effect_type::pay_cube) {
+            return "ERROR_INVALID_EFFECT_TYPE";
+        } else if (ncubes != effect.target_value) {
+            return "ERROR_INVALID_NCUBES";
+        }
+        return {};
+    }
+
+    template<> game_string play_visitor<target_type::self_cubes>::prompt(const play_card_verify *verifier, const effect_holder &effect, int ncubes) {
+        return {};
+    }
+
+    template<> void play_visitor<target_type::self_cubes>::play(const play_card_verify *verifier, const effect_holder &effect, int ncubes) {
+        verifier->origin->pay_cubes(verifier->card_ptr, ncubes);
     }
 }

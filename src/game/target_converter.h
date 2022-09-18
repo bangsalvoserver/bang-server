@@ -19,6 +19,12 @@ namespace banggame {
         }
     };
 
+    template<> struct target_converter<int> {
+        int operator()(game *game, int value) {
+            return value;
+        }
+    };
+
     template<typename T> struct target_converter<nullable<T>> {
         nullable<T> operator()(game *game, int id) {
             if (id) {

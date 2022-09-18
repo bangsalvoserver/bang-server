@@ -855,7 +855,7 @@ main_deck:
     expansion: armedanddangerous
     color: orange
     effects:
-      - pay_cube(2)
+      - pay_cube self_cubes(2)
       - draw
   - name: BANDOLIER
     signs:
@@ -866,7 +866,7 @@ main_deck:
     modifier: bandolier
     effects:
       - max_usages(1)
-      - pay_cube
+      - pay_cube self_cubes(1)
       - bandolier
   - name: BIG_FIFTY
     signs:
@@ -878,7 +878,7 @@ main_deck:
     equip:
       - weapon(6)
     effects:
-      - pay_cube
+      - pay_cube self_cubes(1)
       - bigfifty
     tags:
       - weapon
@@ -907,7 +907,7 @@ main_deck:
     equip:
       - weapon(2)
     effects:
-      - pay_cube
+      - pay_cube self_cubes(1)
       - buntlinespecial
     tags:
       - weapon
@@ -919,7 +919,7 @@ main_deck:
     color: orange
     modifier: belltower
     effects:
-      - pay_cube
+      - pay_cube self_cubes(1)
   - name: CRATE
     signs:
       - 3 hearts
@@ -927,7 +927,7 @@ main_deck:
     expansion: armedanddangerous
     color: orange
     responses:
-      - pay_cube(2)
+      - pay_cube self_cubes(2)
       - missed
   - name: TUMBLEWEED
     signs:
@@ -938,7 +938,7 @@ main_deck:
     equip:
       - tumbleweed
     responses:
-      - pay_cube
+      - pay_cube self_cubes(1)
       - tumbleweed
   - name: DOUBLE_BARREL
     signs:
@@ -950,7 +950,7 @@ main_deck:
     equip:
       - weapon(1)
     effects:
-      - pay_cube
+      - pay_cube self_cubes(1)
       - doublebarrel
     tags:
       - weapon
@@ -961,7 +961,7 @@ main_deck:
     expansion: armedanddangerous
     color: orange
     effects:
-      - pay_cube(3)
+      - pay_cube self_cubes(3)
       - destroy card | table
   - name: BEER_KEG
     signs:
@@ -970,7 +970,7 @@ main_deck:
     expansion: armedanddangerous
     color: orange
     effects:
-      - pay_cube(3)
+      - pay_cube self_cubes(3)
       - heal
   - name: LOCKPICK
     signs:
@@ -979,7 +979,7 @@ main_deck:
     expansion: armedanddangerous
     color: orange
     effects:
-      - pay_cube(3)
+      - pay_cube self_cubes(3)
       - steal card notself | hand
   - name: THUNDERER
     signs:
@@ -991,7 +991,7 @@ main_deck:
     equip:
       - weapon(3)
     effects:
-      - pay_cube
+      - pay_cube self_cubes(1)
       - thunderer
     tags:
       - weapon

@@ -19,9 +19,10 @@ namespace banggame {
         target_list targets;
         std::vector<card *> modifiers;
 
-        [[nodiscard]] game_string verify_modifiers() const;
-        [[nodiscard]] game_string verify_equip_target() const;
-        [[nodiscard]] game_string verify_card_targets() const;
+        game_string verify_modifiers() const;
+        game_string verify_duplicates() const;
+        game_string verify_equip_target() const;
+        game_string verify_card_targets() const;
 
         game_string check_prompt() const;
         game_string check_prompt_equip() const;
@@ -31,8 +32,8 @@ namespace banggame {
         void play_modifiers() const;
         void do_play_card() const;
 
-        [[nodiscard]] game_string verify_and_play();
-        [[nodiscard]] game_string verify_and_respond();
+        game_string verify_and_play();
+        game_string verify_and_respond();
     };
 
 }

@@ -21,6 +21,7 @@ namespace banggame {
         (cards,                 std::vector<card *>)
         (cards_other_players,   std::vector<card *>)
         (select_cubes,          std::vector<card *>)
+        (self_cubes,            int)
     )
 
     template<target_type E> struct tagged_value {};

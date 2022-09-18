@@ -111,6 +111,7 @@ namespace banggame {
         (cards)
         (cards_other_players)
         (select_cubes)
+        (self_cubes)
     )
 
     DEFINE_ENUM(card_deck_type,
