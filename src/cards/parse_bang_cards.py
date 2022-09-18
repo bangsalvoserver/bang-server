@@ -150,7 +150,7 @@ def parse_file(out, data):
     for card in data['character']:
         card['deck'] = 'character'
         parse_all_effects(out, card)
-        print('    },', file=out)
+        print('\n    },', file=out)
     print('  },', file=out)
 
     print('  .goldrush {', file=out)
