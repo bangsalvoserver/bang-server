@@ -938,8 +938,11 @@ main_deck:
     equip:
       - tumbleweed
     responses:
-      - pay_cube self_cubes(1)
       - tumbleweed
+    optional:
+      - mth_add card | self
+      - pay_cube self_cubes(1)
+    mth_response: tumbleweed
   - name: DOUBLE_BARREL
     signs:
       - 6 clubs
@@ -1551,6 +1554,7 @@ character:
       - lemonade_jim
     responses:
       - lemonade_jim
+    optional:
       - discard card self | hand
       - heal
   - name: MICK_DEFENDER
@@ -1626,6 +1630,7 @@ character:
       - al_preacher
     responses:
       - al_preacher
+    optional:
       - pay_cube select_cubes(2)
       - draw
   - name: BASS_GREEVES

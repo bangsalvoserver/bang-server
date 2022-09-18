@@ -160,22 +160,23 @@ namespace banggame {
 
     void effect_tumbleweed::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player *origin, card *origin_card, card *drawn_card) {
-            target->m_game->queue_request_front<timer_tumbleweed>(target_card, origin, target, drawn_card, origin_card);
+            target->m_game->queue_request_front<request_tumbleweed>(target_card, origin, target, drawn_card, origin_card);
         });
     }
 
     bool effect_tumbleweed::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_is<timer_tumbleweed>(origin);
+        return origin->m_game->top_request_is<request_tumbleweed>(origin);
     }
 
-    void effect_tumbleweed::on_play(card *origin_card, player *origin) {
+    void handler_tumbleweed::on_play(card *origin_card, player *origin, opt_tagged_value<target_type::card> paid_cube) {
+        card *drawn_card = origin->m_game->top_request().get<request_tumbleweed>().drawn_card;
         origin->m_game->pop_request();
-        origin->m_game->m_current_check.restart();
+        if (paid_cube) {
+            origin->m_game->m_current_check.restart();
+        } else {
+            origin->m_game->m_current_check.resolve(drawn_card);
+        }
         origin->m_game->update_request();
-    }
-
-    void timer_tumbleweed::on_finished() {
-        origin->m_game->m_current_check.resolve(drawn_card);
     }
 
     bool effect_move_bomb::can_respond(card *origin_card, player *origin) {

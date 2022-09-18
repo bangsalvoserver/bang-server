@@ -31,23 +31,22 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
-    struct timer_al_preacher : timer_request {
-        timer_al_preacher(card *origin_card, player *origin, player *target)
-            : timer_request(origin_card, origin, target, effect_flags::auto_respond) {}
+    struct request_al_preacher : request_base {
+        request_al_preacher(card *origin_card, player *origin, player *target)
+            : request_base(origin_card, origin, target, effect_flags::auto_respond) {}
 
         game_string status_text(player *owner) const override;
     };
 
-    struct timer_tumbleweed : timer_request {
-        timer_tumbleweed(card *origin_card, player *origin, player *target, card *drawn_card, card *drawing_card)
-            : timer_request(origin_card, origin, target)
+    struct request_tumbleweed : request_base {
+        request_tumbleweed(card *origin_card, player *origin, player *target, card *drawn_card, card *drawing_card)
+            : request_base(origin_card, origin, target, effect_flags::auto_respond)
             , target_card(drawing_card)
             , drawn_card(drawn_card) {}
         
         card *target_card;
         card *drawn_card;
 
-        void on_finished() override;
         game_string status_text(player *owner) const override;
     };
 }

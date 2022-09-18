@@ -180,7 +180,7 @@ namespace banggame {
         }
     }
 
-    game_string timer_lemonade_jim::status_text(player *owner) const {
+    game_string request_lemonade_jim::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_CAN_PLAY_CARD", origin_card};
         } else {

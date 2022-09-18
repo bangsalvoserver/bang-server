@@ -43,14 +43,14 @@ namespace banggame {
         origin->m_game->add_listener<event_type::on_play_beer>(target_card, [=](player *target) {
             if (origin != target) {
                 if (!origin->m_hand.empty() && origin->m_hp < origin->m_max_hp) {
-                    target->m_game->queue_request<timer_lemonade_jim>(target_card, target, origin);
+                    target->m_game->queue_request<request_lemonade_jim>(target_card, target, origin);
                 }
             }
         });
     }
 
     bool effect_lemonade_jim::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_is<timer_lemonade_jim>(origin);
+        return origin->m_game->top_request_is<request_lemonade_jim>(origin);
     }
 
     void effect_lemonade_jim::on_play(card *origin_card, player *origin) {

@@ -12,14 +12,14 @@ namespace banggame {
         p->m_game->add_listener<event_type::on_equip_card>(target_card, [=](player *origin, player *target, card *equipped_card) {
             if (p != origin && (equipped_card->color == card_color_type::blue || equipped_card->color == card_color_type::orange)) {
                 if (p->count_cubes() >= 2) {
-                    p->m_game->queue_request<timer_al_preacher>(target_card, origin, p);
+                    p->m_game->queue_request<request_al_preacher>(target_card, origin, p);
                 }
             }
         });
     }
 
     bool effect_al_preacher::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_is<timer_al_preacher>(origin);
+        return origin->m_game->top_request_is<request_al_preacher>(origin);
     }
 
     void effect_al_preacher::on_play(card *origin_card, player *origin) {

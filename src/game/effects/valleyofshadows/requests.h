@@ -100,9 +100,9 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
-    struct timer_lemonade_jim : timer_request {
-        timer_lemonade_jim(card *origin_card, player *origin, player *target)
-            : timer_request(origin_card, origin, target, effect_flags::auto_respond) {}
+    struct request_lemonade_jim : request_base {
+        request_lemonade_jim(card *origin_card, player *origin, player *target)
+            : request_base(origin_card, origin, target, effect_flags::auto_respond) {}
         
         game_string status_text(player *owner) const override;
     };

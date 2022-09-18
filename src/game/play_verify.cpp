@@ -48,8 +48,13 @@ namespace banggame {
     }
 
     game_string check_card_filter(card *origin_card, player *origin, target_card_filter filter, card *target) {
-        if (!origin_card->has_tag(tag_type::can_target_self) && target == origin_card)
-            return "ERROR_TARGET_PLAYING_CARD";
+        if (target == origin_card) {
+            if (!bool(filter & target_card_filter::self) && !origin_card->has_tag(tag_type::can_target_self)) {
+                return "ERROR_TARGET_PLAYING_CARD";
+            }
+        } else if (bool(filter & target_card_filter::self)) {
+            return "ERROR_TARGET_NOT_PLAYING_CARD";
+        }
         
         if (bool(filter & target_card_filter::cube_slot)) {
             if (target != target->owner->m_characters.front() && target->color != card_color_type::orange)

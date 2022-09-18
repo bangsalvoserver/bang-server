@@ -71,7 +71,7 @@ namespace banggame {
         }
     }
 
-    game_string timer_al_preacher::status_text(player *owner) const {
+    game_string request_al_preacher::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_CAN_PLAY_CARD", origin_card};
         } else {
@@ -79,7 +79,7 @@ namespace banggame {
         }
     }
 
-    game_string timer_tumbleweed::status_text(player *owner) const {
+    game_string request_tumbleweed::status_text(player *owner) const {
         if (target == owner) {
             return {"STATUS_CAN_PLAY_TUMBLEWEED", origin, origin_card, target_card, drawn_card};
         } else {

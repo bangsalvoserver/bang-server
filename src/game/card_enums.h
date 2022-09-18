@@ -98,6 +98,7 @@ namespace banggame {
         (beer)
         (bronco)
         (cube_slot)
+        (self)
     )
 
     DEFINE_ENUM(target_type,
@@ -340,6 +341,7 @@ namespace banggame {
         (fanning,               handler_fanning)
         (flintlock,             handler_flintlock)
         (duck,                  handler_duck)
+        (tumbleweed,            handler_tumbleweed)
         (move_bomb,             handler_move_bomb)
         (squaw,                 handler_squaw)
         (red_ringo,             handler_red_ringo)
