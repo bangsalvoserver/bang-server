@@ -274,15 +274,7 @@ namespace banggame {
         return {};
     }
 
-    template<> void play_visitor<target_type::select_cubes>::play(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {
-        std::map<card *, int> selected_cubes;
-        for (card *c : target_cards) {
-            ++selected_cubes[c];
-        }
-        for (const auto &[c, ncubes] : selected_cubes) {
-            verifier->origin->pay_cubes(c, ncubes);
-        }
-    }
+    template<> void play_visitor<target_type::select_cubes>::play(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {}
 
     template<> game_string play_visitor<target_type::self_cubes>::verify(const play_card_verify *verifier, const effect_holder &effect, int ncubes) {
         if (effect.type != effect_type::pay_cube) {
@@ -297,7 +289,5 @@ namespace banggame {
         return {};
     }
 
-    template<> void play_visitor<target_type::self_cubes>::play(const play_card_verify *verifier, const effect_holder &effect, int ncubes) {
-        verifier->origin->pay_cubes(verifier->card_ptr, ncubes);
-    }
+    template<> void play_visitor<target_type::self_cubes>::play(const play_card_verify *verifier, const effect_holder &effect, int ncubes) {}
 }

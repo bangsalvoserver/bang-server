@@ -398,6 +398,9 @@ namespace banggame {
         auto effect_it = effects.begin();
         auto effect_end = effects.end();
 
+        std::vector<std::pair<const effect_holder *, const play_card_target *>> delay_effects;
+        std::map<card *, int> selected_cubes;
+
         target_list mth_targets;
         for (const auto &t : targets) {
             auto &e = *effect_it;
@@ -408,11 +411,25 @@ namespace banggame {
 
             if (e.type == effect_type::mth_add) {
                 mth_targets.push_back(t);
+            } else if (e.type == effect_type::pay_cube) {
+                if (auto *cs = t.get_if<target_type::select_cubes>()) {
+                    for (card *c : *cs) {
+                        ++selected_cubes[c];
+                    }
+                } else if (auto *ncubes = t.get_if<target_type::self_cubes>()) {
+                    selected_cubes[card_ptr] += *ncubes;
+                }
             } else {
-                enums::visit_indexed([this, &e]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    play_visitor<E>{}.play(this, e, FWD(args) ... );
-                }, t);
+                delay_effects.emplace_back(&e, &t);
             }
+        }
+        for (const auto &[c, ncubes] : selected_cubes) {
+            origin->pay_cubes(c, ncubes);
+        }
+        for (const auto &[e, t] : delay_effects) {
+            enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                play_visitor<E>{}.play(this, *e, FWD(args) ... );
+            }, *t);
         }
 
         (is_response ? card_ptr->mth_response : card_ptr->mth_effect).on_play(card_ptr, origin, mth_targets);
