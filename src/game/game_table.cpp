@@ -37,7 +37,7 @@ namespace banggame {
         case pocket_type::hidden_deck:       return m_hidden_deck;
         case pocket_type::scenario_deck:     return m_scenario_deck;
         case pocket_type::scenario_card:     return m_scenario_cards;
-        case pocket_type::specials:          return m_specials;
+        case pocket_type::button_row:        return m_button_row;
         default: throw std::runtime_error("Invalid pocket");
         }
     }

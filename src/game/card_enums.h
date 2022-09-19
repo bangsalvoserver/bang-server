@@ -141,7 +141,7 @@ namespace banggame {
         (hidden_deck)
         (scenario_deck)
         (scenario_card)
-        (specials)
+        (button_row)
     )
 
     DEFINE_ENUM(card_modifier_type,

@@ -2109,7 +2109,7 @@ goldrush:
       - deathsave
     tags:
       - buy_cost(3)
-specials:
+button_row:
   - name: GAME_PASS_CONFIRM
     effects:
       - pass_turn

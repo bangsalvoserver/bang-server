@@ -199,8 +199,8 @@ def parse_file(out, data):
             print('\n    },', file=out)
     print('  },', file=out)
 
-    print('  .specials {', file=out)
-    for card in data['specials']:
+    print('  .button_row {', file=out)
+    for card in data['button_row']:
         if is_hidden(card):
             hidden_cards.append(card)
         else:

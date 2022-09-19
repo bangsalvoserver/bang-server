@@ -65,7 +65,7 @@ namespace banggame {
         std::vector<card_data> highnoon;
         std::vector<card_data> fistfulofcards;
         std::vector<card_data> wildwestshow;
-        std::vector<card_data> specials;
+        std::vector<card_data> button_row;
         std::vector<card_data> hidden;
     };
 

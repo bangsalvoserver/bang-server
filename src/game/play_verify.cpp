@@ -526,7 +526,7 @@ namespace banggame {
         case pocket_type::player_character:
         case pocket_type::player_table:
         case pocket_type::scenario_card:
-        case pocket_type::specials:
+        case pocket_type::button_row:
             if (game_string error = verify_card_targets()) {
                 return error;
             }

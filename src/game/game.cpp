@@ -49,7 +49,7 @@ namespace banggame {
 
         add_update<game_update_type::game_options>(ret, m_options);
 
-        move_cards(m_specials, show_always);
+        move_cards(m_button_row, show_always);
         move_cards(m_deck, show_never);
         move_cards(m_shop_deck, show_never);
 
@@ -168,9 +168,9 @@ namespace banggame {
 #endif
         };
 
-        if (add_cards(all_cards.specials, pocket_type::specials)) {
-            add_update<game_update_type::add_cards>(make_id_vector(m_specials), pocket_type::specials);
-            for (card *c : m_specials) {
+        if (add_cards(all_cards.button_row, pocket_type::button_row)) {
+            add_update<game_update_type::add_cards>(make_id_vector(m_button_row), pocket_type::button_row);
+            for (card *c : m_button_row) {
                 send_card_update(c, nullptr, show_card_flags::instant);
             }
         }
@@ -349,7 +349,7 @@ namespace banggame {
         add_ids_for(p->m_table | std::views::filter(std::not_fn(&card::inactive)));
         add_ids_for(p->m_characters);
         add_ids_for(m_scenario_cards | std::views::reverse | std::views::take(1));
-        add_ids_for(m_specials);
+        add_ids_for(m_button_row);
         
         if (bool(req.flags() & effect_flags::force_play)) {
             add_ids_for(m_shop_selection);
