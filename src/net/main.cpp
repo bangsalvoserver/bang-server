@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
             g_stop = true;
         });
 
-        using ticks = std::chrono::duration<int64_t, std::ratio<1, banggame::server_tickrate>>;
+        using ticks = banggame::ticks_t<int64_t>;
         auto next_tick = std::chrono::steady_clock::now() + ticks{0};
 
         while (!g_stop) {

@@ -7,6 +7,7 @@
 #include "messages.h"
 
 #include "game.h"
+#include "durations.h"
 
 namespace banggame {
 
@@ -18,11 +19,9 @@ using user_map = std::map<client_handle, game_user, std::owner_less<client_handl
 using user_ptr = user_map::iterator;
 
 struct lobby : lobby_info {
-    static constexpr int lifetime_seconds = 10;
-
     std::vector<user_ptr> users;
     lobby_state state;
-    int lifetime;
+    ticks lifetime = lobby_lifetime;
 
     banggame::game game;
     void start_game(game_manager &mgr);

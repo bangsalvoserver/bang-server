@@ -3,6 +3,7 @@
 
 #include "../card_enums.h"
 #include "../format_str.h"
+#include "../durations.h"
 
 #include "utils/nullable.h"
 
@@ -79,17 +80,15 @@ namespace banggame {
     };
 
     struct timer_request : request_base, std::enable_shared_from_this<timer_request> {
-        static constexpr int default_duration = 300;
-
         timer_request(card *origin_card, player *origin, player *target, effect_flags flags = {}
-            , int duration = default_duration)
+            , ticks duration = default_timer_duration)
             : request_base(origin_card, origin, target, flags)
             , duration(duration) {}
 
-        int duration;
+        ticks duration;
         
         std::vector<player *> awaiting_confirms;
-        int auto_confirm_timer = 600;
+        ticks auto_confirm_timer = auto_confirm_duration;
 
         void add_pending_confirm(player *p) override final;
         void confirm_player(player *p) override final;

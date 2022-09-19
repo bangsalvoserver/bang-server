@@ -213,14 +213,13 @@ namespace banggame {
     }
 
     void timer_request::tick() {
-        if (auto_confirm_timer && --auto_confirm_timer == 0) {
-            awaiting_confirms.clear();
-        }
-        if (awaiting_confirms.empty() && duration && --duration == 0) {
+        if (awaiting_confirms.empty() && duration != ticks{0} && --duration == ticks{0}) {
             auto copy = shared_from_this();
             target->m_game->pop_request();
             on_finished();
             target->m_game->update_request();
+        } else if (auto_confirm_timer != ticks{0} && --auto_confirm_timer == ticks{0}) {
+            awaiting_confirms.clear();
         }
     }
 

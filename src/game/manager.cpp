@@ -43,7 +43,7 @@ void game_manager::tick() {
         if (l.state == lobby_state::finished) {
             send_lobby_update(it);
         }
-        if (l.users.empty() && --l.lifetime == 0) {
+        if (l.users.empty() && --l.lifetime == ticks{0}) {
             broadcast_message<server_message_type::lobby_removed>(it->first);
             it = m_lobbies.erase(it);
         } else {
@@ -218,9 +218,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
     send_lobby_update(lobby_it);
 
     if (lobby.users.empty()) {
-        if (lobby.state == lobby_state::playing) {
-            lobby.lifetime = banggame::server_tickrate * lobby::lifetime_seconds;
-        } else {
+        if (lobby.state != lobby_state::playing) {
             broadcast_message<server_message_type::lobby_removed>(lobby_it->first);
             m_lobbies.erase(lobby_it);
         }
