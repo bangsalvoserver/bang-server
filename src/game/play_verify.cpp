@@ -151,6 +151,19 @@ namespace banggame {
         std::set<player *> selected_players;
         std::set<card *> selected_cards;
         std::map<card *, int> selected_cubes;
+        
+        for (card *mod_card : modifiers) {
+            if (!selected_cards.emplace(mod_card).second) {
+                return {"ERROR_DUPLICATE_CARD", mod_card};
+            }
+            for (const auto &effect : mod_card->effects) {
+                if (effect.target == target_type::self_cubes) {
+                    if (selected_cubes[mod_card] += effect.target_value > mod_card->num_cubes) {
+                        return  {"ERROR_NOT_ENOUGH_CUBES_ON", mod_card};
+                    }
+                }
+            }
+        }
 
         for (const auto &target : targets) {
             if (game_string error = enums::visit_indexed(overloaded{
@@ -159,28 +172,28 @@ namespace banggame {
                 },
                 [&](enums::enum_tag_t<target_type::player>, player *p) -> game_string {
                     if (!selected_players.emplace(p).second) {
-                        return "ERROR_DUPLICATE_PLAYER";
+                        return {"ERROR_DUPLICATE_PLAYER", p};
                     } else {
                         return {};
                     }
                 },
                 [&](enums::enum_tag_t<target_type::conditional_player>, nullable<player> p) -> game_string {
                     if (p && !selected_players.emplace(p).second) {
-                        return "ERROR_DUPLICATE_PLAYER";
+                        return {"ERROR_DUPLICATE_PLAYER", &*p};
                     } else {
                         return {};
                     }
                 },
                 [&](enums::enum_tag_t<target_type::card>, card *c) -> game_string {
                     if (!selected_cards.emplace(c).second) {
-                        return "ERROR_DUPLICATE_CARD";
+                        return {"ERROR_DUPLICATE_CARD", c};
                     } else {
                         return {};
                     }
                 },
                 [&](enums::enum_tag_t<target_type::extra_card>, nullable<card> c) -> game_string {
                     if (c && !selected_cards.emplace(c).second) {
-                        return "ERROR_DUPLICATE_CARD";
+                        return {"ERROR_DUPLICATE_CARD", &*c};
                     } else {
                         return {};
                     }
@@ -188,7 +201,7 @@ namespace banggame {
                 [&](enums::enum_tag_t<target_type::cards>, const std::vector<card *> &cs) -> game_string {
                     for (card *c : cs) {
                         if (!selected_cards.emplace(c).second) {
-                            return "ERROR_DUPLICATE_CARD";
+                            return {"ERROR_DUPLICATE_CARD", c};
                         }
                     }
                     return {};
