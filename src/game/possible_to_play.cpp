@@ -66,6 +66,10 @@ namespace banggame {
                 return !make_card_target_set(target_card, holder).empty();
             case target_type::cards:
                 return make_card_target_set(target_card, holder).size() >= std::max<size_t>(1, holder.target_value);
+            case target_type::select_cubes:
+                return count_cubes() >= holder.target_value;
+            case target_type::self_cubes:
+                return target_card->num_cubes >= holder.target_value;
             default:
                 return true;
             }
