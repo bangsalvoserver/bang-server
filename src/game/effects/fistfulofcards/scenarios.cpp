@@ -218,15 +218,15 @@ namespace banggame {
                 }
                 
                 if (drawn_card->color == card_color_type::brown) {
-                    origin->m_game->add_listener<event_type::verify_mandatory_card>(key, [=](player *p, card* &value) {
+                    origin->m_game->add_listener<event_type::verify_pass_turn>(key, [=](player *p, game_string &out_error) {
                         if (p == origin && drawn_card->owner == origin && origin->is_possible_to_play(drawn_card)) {
-                            value = drawn_card;
+                            out_error = {"ERROR_MANDATORY_CARD", drawn_card};
                         }
                     });
                 } else {
-                    origin->m_game->add_listener<event_type::verify_mandatory_card>(key, [=](player *p, card* &value) {
+                    origin->m_game->add_listener<event_type::verify_pass_turn>(key, [=](player *p, game_string &out_error) {
                         if (p == origin && drawn_card->owner == origin && !origin->make_equip_set(drawn_card).empty()) {
-                            value = drawn_card;
+                            out_error = {"ERROR_MANDATORY_CARD", drawn_card};
                         }
                     });
                 }

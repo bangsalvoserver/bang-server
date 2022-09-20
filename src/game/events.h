@@ -31,8 +31,8 @@ namespace banggame {
         // verifica l'effetto ha un bersaglio unico
         EVENT(verify_target_unique, card *origin_card, player *origin, player *target, game_string &out_error)
 
-        // verifica se sei obbligato a giocare una carta prima di passare
-        EVENT(verify_mandatory_card, player *origin, card* &value)
+        // verifica prima di passare il turno
+        EVENT(verify_pass_turn, player *origin, game_string &out_error)
 
         // viene chiamato quando si sta cercando il prossimo giocatore di turno
         EVENT(verify_revivers, player *origin)

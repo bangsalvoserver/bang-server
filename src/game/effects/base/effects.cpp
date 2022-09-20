@@ -23,10 +23,7 @@ namespace banggame {
     }
 
     game_string effect_pass_turn::verify(card *origin_card, player *origin) {
-        if (card *mandatory_card = origin->m_game->call_event<event_type::verify_mandatory_card>(origin, nullptr)) {
-            return {"ERROR_MANDATORY_CARD", mandatory_card};
-        }
-        return {};
+        return origin->m_game->call_event<event_type::verify_pass_turn>(origin, game_string{});
     }
 
     game_string effect_pass_turn::on_prompt(card *origin_card, player *origin) {
