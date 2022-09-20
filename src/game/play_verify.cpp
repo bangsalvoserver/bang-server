@@ -624,8 +624,8 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_and_respond() {
-        if ((card_ptr->pocket == pocket_type::player_hand
-            && card_ptr->color != card_color_type::brown)
+        if ((card_ptr->pocket == pocket_type::player_hand && card_ptr->color != card_color_type::brown)
+            || card_ptr->pocket == pocket_type::shop_selection
             || !modifiers.empty()
         ) {
             return "ERROR_INVALID_RESPONSE_CARD";

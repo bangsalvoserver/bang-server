@@ -102,7 +102,7 @@ namespace banggame {
             m_cards_used.push_back(c);
         }
 
-        virtual bool can_respond(card *c) const {
+        virtual bool can_miss(card *c) const {
             return std::ranges::find(m_cards_used, c) == m_cards_used.end();
         }
 
@@ -120,7 +120,7 @@ namespace banggame {
         bool unavoidable = false;
         bool is_bang_card = false;
 
-        bool can_respond(card *c) const override;
+        bool can_miss(card *c) const override;
 
         void on_miss() override;
         void on_resolve() override;

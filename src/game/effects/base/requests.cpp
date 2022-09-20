@@ -237,8 +237,8 @@ namespace banggame {
         }
     }
 
-    bool request_bang::can_respond(card *c) const {
-        return !unavoidable && missable_request::can_respond(c);
+    bool request_bang::can_miss(card *c) const {
+        return !unavoidable && missable_request::can_miss(c);
     }
 
     void request_bang::on_miss() {
