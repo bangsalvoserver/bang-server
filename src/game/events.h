@@ -274,32 +274,48 @@ namespace banggame {
     template<typename T, event_type E>
     concept invocable_for_event = same_function_args<T, enums::enum_type_t<E>>::value;
 
-    template<typename Function> struct count_reference_params;
-    template<typename Function> static constexpr size_t count_reference_params_v = count_reference_params<Function>::value;
+    template<typename Tuple, typename ISeqIn, typename ISeqOut>
+    struct find_reference_params_impl;
+
+    template<typename First, typename ... Ts, size_t IFirst, size_t ... Is, size_t ... Os>
+    struct find_reference_params_impl<std::tuple<First, Ts...>, std::index_sequence<IFirst, Is...>, std::index_sequence<Os...>>
+        : find_reference_params_impl<std::tuple<Ts...>, std::index_sequence<Is...>, std::index_sequence<Os...>> {};
+
+    template<typename First, typename ... Ts, size_t IFirst, size_t ... Is, size_t ... Os>
+    struct find_reference_params_impl<std::tuple<First&, Ts...>, std::index_sequence<IFirst, Is...>, std::index_sequence<Os...>>
+        : find_reference_params_impl<std::tuple<Ts...>, std::index_sequence<Is...>, std::index_sequence<Os..., IFirst>> {};
+
+    template<size_t ... Os>
+    struct find_reference_params_impl<std::tuple<>, std::index_sequence<>, std::index_sequence<Os...>> {
+        using type = std::index_sequence<Os...>;
+    };
+
+    template<typename ... Ts>
+    struct find_reference_params : find_reference_params_impl<std::tuple<Ts...>, std::index_sequence_for<Ts...>, std::index_sequence<>> {};
+
+    template<typename ... Ts>
+    using find_reference_params_t = typename find_reference_params<Ts...>::type;
+
+    template<typename Function>
+    struct filter_reference_params_impl;
 
     template<typename RetType, typename ... Ts>
-    struct count_reference_params<std::function<RetType(Ts...)>> {
-        static constexpr size_t value = (std::is_lvalue_reference_v<Ts> + ...);
+    struct filter_reference_params_impl<std::function<RetType(Ts...)>> {
+        template<typename Tuple, size_t ... Is>
+        auto operator ()(const Tuple &tup, std::index_sequence<Is ...>) const {
+            return std::make_tuple(std::get<Is>(tup) ... );
+        }
+
+        template<typename Tuple>
+        auto operator ()(const Tuple &tup) const {
+            return (*this)(tup, find_reference_params_t<Ts...>{});
+        }
     };
 
-    template<typename Function> struct find_reference_param;
-    template<typename Function> static constexpr size_t find_reference_param_v = find_reference_param<Function>::value;
-
-    template<typename ... Ts> struct find_reference;
-
-    template<typename First, typename ... Ts>
-    struct find_reference<First, Ts ...> {
-        static constexpr size_t value = 1 + find_reference<Ts...>::value;
-    };
-
-    template<typename First, typename ... Ts>
-    requires std::is_lvalue_reference_v<First>
-    struct find_reference<First, Ts ...> {
-        static constexpr size_t value = 0;
-    };
-
-    template<typename RetType, typename ... Ts>
-    struct find_reference_param<std::function<RetType(Ts...)>> : find_reference<Ts...> {};
+    template<typename Function, typename Tuple>
+    auto filter_reference_params(const Tuple &tup) {
+        return filter_reference_params_impl<Function>{}(tup);
+    }
 
     template<typename Function> struct function_argument_tuple;
     template<typename Function> using function_argument_tuple_t = typename function_argument_tuple<Function>::type;
@@ -335,8 +351,11 @@ namespace banggame {
             }
             m_listeners.commit_changes();
             
-            if constexpr (count_reference_params_v<function_type> == 1) {
-                return std::get<find_reference_param_v<function_type>>(tup);
+            auto ret = filter_reference_params<function_type>(tup);
+            if constexpr (std::tuple_size_v<decltype(ret)> == 1) {
+                return std::get<0>(ret);
+            } else if constexpr (std::tuple_size_v<decltype(ret)> > 1) {
+                return ret;
             }
         }
     };
