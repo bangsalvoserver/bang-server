@@ -7,23 +7,24 @@
 
 namespace banggame {
 
-    struct request_destroy : request_base, resolvable_request {
-        request_destroy(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
+    struct request_targeting : request_base {
+        request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags)
             , target_card(target_card) {}
-
+        
         card *target_card;
+        virtual std::vector<card *> get_highlights() const override;
+    };
+
+    struct request_destroy : request_targeting, resolvable_request {
+        using request_targeting::request_targeting;
 
         void on_resolve() override;
         game_string status_text(player *owner) const override;
     };
 
-    struct request_steal : request_base, resolvable_request {
-        request_steal(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags)
-            , target_card(target_card) {}
-
-        card *target_card;
+    struct request_steal : request_targeting, resolvable_request {
+        using request_targeting::request_targeting;
 
         void on_resolve() override;
         game_string status_text(player *owner) const override;

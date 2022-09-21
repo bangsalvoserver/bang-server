@@ -374,6 +374,10 @@ namespace banggame {
         maybe_add_pick_id(pocket_type::discard_pile, nullptr, nullptr);
         std::ranges::for_each(m_selection, std::bind_front(maybe_add_pick_id, pocket_type::selection, nullptr));
 
+        for (card*c : req.get_highlights()) {
+            ret.highlight_ids.push_back(c->id);
+        }
+
         return ret;
     }
 

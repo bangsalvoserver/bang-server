@@ -154,7 +154,8 @@ namespace banggame {
         (game_string) status_text,
         (effect_flags) flags,
         (std::vector<int>) respond_ids,
-        (std::vector<picking_args>) pick_ids
+        (std::vector<picking_args>) pick_ids,
+        (std::vector<int>) highlight_ids
     )};
 
     struct game_options {REFLECTABLE(

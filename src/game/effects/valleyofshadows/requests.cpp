@@ -15,6 +15,14 @@ namespace banggame {
         return {damage > 1 ? "STATUS_DAMAGING_PLURAL" : "STATUS_DAMAGING", target, origin_card, damage};
     }
 
+    std::vector<card *> request_targeting::get_highlights() const {
+        if (target_card->pocket == pocket_type::player_hand) {
+            return target->m_hand;
+        } else {
+            return {target_card};
+        }
+    }
+
     void request_destroy::on_resolve() {
         origin->m_game->pop_request();
         effect_destroy::resolver{origin_card, origin, target_card}.resolve();

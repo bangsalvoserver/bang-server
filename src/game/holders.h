@@ -99,6 +99,10 @@ namespace banggame {
             return m_value->can_respond(target, target_card);
         }
 
+        std::vector<card *> get_highlights() const {
+            return m_value->get_highlights();
+        }
+
         void tick() {
             m_value->tick();
         }

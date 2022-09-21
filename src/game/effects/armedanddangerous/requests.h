@@ -47,6 +47,7 @@ namespace banggame {
         card *target_card;
         card *drawn_card;
 
+        std::vector<card *> get_highlights() const override;
         void on_resolve() override;
         game_string status_text(player *owner) const override;
     };

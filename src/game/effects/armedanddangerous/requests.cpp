@@ -81,6 +81,10 @@ namespace banggame {
         }
     }
 
+    std::vector<card *> request_tumbleweed::get_highlights() const {
+        return {target_card, drawn_card};
+    }
+
     void request_tumbleweed::on_resolve() {
         origin->m_game->pop_request();
         origin->m_game->m_current_check.resolve(drawn_card);

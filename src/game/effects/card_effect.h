@@ -77,6 +77,10 @@ namespace banggame {
         virtual void on_pick(pocket_type pocket, player *target, card *target_card);
 
         virtual bool can_respond(player *target, card *target_card) const;
+
+        virtual std::vector<card *> get_highlights() const {
+            return {};
+        }
     };
 
     struct timer_request : request_base, std::enable_shared_from_this<timer_request> {

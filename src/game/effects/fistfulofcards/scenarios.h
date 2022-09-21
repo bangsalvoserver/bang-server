@@ -4,6 +4,7 @@
 #include "../card_effect.h"
 
 #include "../base/requests.h"
+#include "../valleyofshadows/requests.h"
 
 namespace banggame {
 
@@ -58,12 +59,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, card *target);
     };
     
-    struct request_ricochet : request_base, resolvable_request, missable_request {
-        request_ricochet(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags)
-            , target_card(target_card) {}
-        
-        card *target_card;
+    struct request_ricochet : request_targeting, resolvable_request, missable_request {
+        using request_targeting::request_targeting;
 
         void on_resolve() override;
         void on_miss() override;
