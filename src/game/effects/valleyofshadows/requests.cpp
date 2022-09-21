@@ -7,6 +7,10 @@
 
 namespace banggame {
 
+    std::vector<card *> timer_damaging::get_highlights() const {
+        return target->m_backup_character;
+    }
+
     void timer_damaging::on_finished() {
         target->damage(origin_card, origin, damage, is_bang, true);
     }

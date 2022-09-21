@@ -81,6 +81,7 @@ namespace banggame {
         int damage;
         bool is_bang;
 
+        std::vector<card *> get_highlights() const override;
         void on_finished() override;
         game_string status_text(player *owner) const override;
     };
