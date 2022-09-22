@@ -526,7 +526,7 @@ namespace banggame {
                 add_update<game_update_type::move_scenario_deck>(m_first_player->id);
             }
 
-            if (!has_expansion(card_expansion_type::ghostcards)) {
+            if (winner_role == player_role::unknown && !has_expansion(card_expansion_type::ghostcards)) {
                 target->add_player_flags(player_flags::removed);
                 add_update<game_update_type::player_remove>(target->id);
             }
