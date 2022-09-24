@@ -104,6 +104,12 @@ def parse_all_effects(card):
     except RuntimeError as error:
         raise RuntimeError(f"Error in card {card['name']}:\n{error}") from error
 
+def add_expansion(card, name):
+    if 'expansion' in card:
+        card['expansion'] += ' ' + name
+    else:
+        card['expansion'] = name
+
 def parse_file(data):
     result = {
         'deck': [],
@@ -128,6 +134,7 @@ def parse_file(data):
     
     for card in data['goldrush']:
         card['deck'] = 'goldrush'
+        add_expansion(card, 'goldrush')
         count = card['count'] if 'count' in card else 1
         for _ in range(count):
             if is_hidden(card):
@@ -138,10 +145,7 @@ def parse_file(data):
     for name in ('highnoon', 'fistfulofcards', 'wildwestshow'):
         for card in data[name]:
             card['deck'] = name
-            if 'expansion' in card:
-                card['expansion'] += ' ' + name
-            else:
-                card['expansion'] = name
+            add_expansion(card, name)
             if is_hidden(card):
                 result['hidden'].append(parse_all_effects(card))
             else:
