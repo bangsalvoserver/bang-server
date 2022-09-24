@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
 
-from ast import parse
-import enum
-import yaml
 import re
 import sys
-
-def set_expansion(card, value):
-    if 'expansion' in card:
-        card['expansion'] = '{} {}'.format(value, str(card['expansion']))
-    else:
-        card['expansion'] = value
+import yaml
+from cpp_generator import CppEnum, print_cpp_file
 
 def is_hidden(card):
     return 'tags' in card and any(value == 'hidden' for value in card['tags'])
@@ -18,20 +11,23 @@ def is_hidden(card):
 def parse_sign(sign):
     match = re.match(r'^\s*([\w\d]+)\s*(\w+)\s*$', sign)
     if match:
-        return 'card_suit::{}, card_rank::rank_{}'.format(match.group(2), match.group(1))
+        return {
+            'suit': CppEnum('card_suit', match.group(2)),
+            'rank' : CppEnum('card_rank', 'rank_' + match.group(1))
+        }
     else:
         raise RuntimeError(f'Invalid sign string: {sign}')
 
-def enum_flags(signs, enum_name):
-    return ' | '.join('{}::{}'.format(enum_name, sign) for sign in signs.split())
+def parse_effects(effect_list):
+    if not isinstance(effect_list, list):
+        raise RuntimeError(f'in parse_effects: expected list, got {effect_list}')
 
-def parse_effects(out, list, name):
-    print(',\n      .{} {{'.format(name), file=out)
-    for i, effect in enumerate(list):
+    result = []
+    for effect in effect_list:
         match = re.match(
-            r'^\s*(\w+)' # type
+            r'^\s*(\w+)' # effect_type
             r'(?:\s*\((-?\d+)\))?' # effect_value
-            r'(?:\s*(\w+)' # target
+            r'(?:\s*(\w+)' # target_type
             r'\s*(?:\((-?\d+)\))?)?' # target_value
             r'([\w\s]*?)' # player_filter
             r'(?:\s*\|\s*([\w\s]+))?\s*$', # card_filter
@@ -39,191 +35,140 @@ def parse_effects(out, list, name):
         )
         if not match:
             raise RuntimeError(f'Invalid effect string: {effect}')
-        
-        type = match.group(1)
+
+        effect_type = match.group(1)
         effect_value = match.group(2)
-        target = match.group(3)
+        target_type = match.group(3)
         target_value = match.group(4)
         player_filter = match.group(5)
         card_filter = match.group(6)
 
-        print('        {', file=out)
+        if player_filter and target_type not in ('player', 'conditional_player', 'card', 'cards'):
+            raise RuntimeError(f'Invalid effect string: {effect}\nPlayer filter not allowed with {target_type}')
+            
+        if card_filter and target_type not in ('card', 'cards'):
+            raise RuntimeError(f'Invalid effect string: {effect}\nCard filter not allowed with {target_type}')
 
-        if target:
-            print('          .target {{target_type::{}}},'.format(target), file=out)
-        if player_filter:
-            if target not in ('player', 'conditional_player', 'card', 'cards'):
-                raise RuntimeError('Invalid effect string: {0}\nPlayer filter not allowed with {1}'.format(effect, target))
-            print('          .player_filter {{{}}},'.format(enum_flags(player_filter, 'target_player_filter')), file=out)
-        if card_filter:
-            if target not in ('card', 'cards'):
-                raise RuntimeError('Invalid effect string: {0}\nCard filter not allowed with {1}'.format(effect, target))
-            print('          .card_filter {{{}}},'.format(enum_flags(card_filter, 'target_card_filter')), file=out)
-        if effect_value:
-            print('          .effect_value {{{}}},'.format(effect_value), file=out)
-        if target_value:
-            print('          .target_value {{{}}},'.format(target_value), file=out)
-        print('          .type {{effect_type::{}}}\n        }}'.format(type), end='', file=out)
-        if i == len(list)-1:
-            print('', file=out)
-        else:
-            print(',', file=out)
-    print('      }', end='', file=out)
+        result.append({
+            'target':           CppEnum('target_type', target_type) if target_type else None,
+            'player_filter':    CppEnum('target_player_filter', player_filter) if player_filter else None,
+            'card_filter':      CppEnum('target_card_filter', card_filter) if card_filter else None,
+            'effect_value':     int(effect_value) if effect_value else None,
+            'target_value':     int(target_value) if target_value else None,
+            'type':             CppEnum('effect_type', effect_type)
+        })
+    return result
 
-def parse_effect_simple(out, list, name, value_name, type_name):
-    print(',\n      .{} {{'.format(name), file=out)
-    for i, effect in enumerate(list):
+def parse_effect_simple(effect_list, value_name, type_name):
+    if not isinstance(effect_list, list):
+        raise RuntimeError(f'in parse_effect_simple: expected list, got {effect_list}')
+
+    result = []
+    for effect in effect_list:
         match = re.match(
             r'^\s*(\w+)' # type
             r'(?:\s*\((-?\d+)\))?\s*$', # effect_value
             effect
         )
         if not match:
-            raise RuntimeError(f'Invalid {name} string: {effect}')
+            raise RuntimeError(f'Invalid effect string: {effect}')
         
-        type = match.group(1)
-        value = match.group(2)
+        effect_type = match.group(1)
+        effect_value = match.group(2)
 
-        print('        {', file=out)
-        if value:
-            print('          .{0} {{{1}}},'.format(value_name, value), file=out)
-        print('          .type {{{0}::{1}}}\n        }}'.format(type_name, type), end='', file=out)
-        if i == len(list)-1:
-            print('', file=out)
-        else:
-            print(',', file=out)
-    print('      }', end='', file=out)
+        result.append({
+            value_name: int(effect_value) if effect_value else None,
+            'type': CppEnum(type_name, effect_type)
+        })
+    return result
 
-def parse_all_effects(out, card):
+def parse_all_effects(card):
     try:
-        print('    {{\n      .name {{\"{}\"}}'.format(card['name']), end='', file=out)
-        if 'image' in card:
-            print(',\n      .image {{\"{}\"}}'.format(card['image']), end='', file=out)
-        if 'effects' in card:
-            parse_effects(out, card['effects'], 'effects')
-        if 'responses' in card:
-            parse_effects(out, card['responses'], 'responses')
-        if 'optional' in card:
-            parse_effects(out, card['optional'], 'optionals')
-        if 'equip' in card:
-            parse_effect_simple(out, card['equip'], 'equips', 'effect_value', 'equip_type')
-        if 'tags' in card:
-            parse_effect_simple(out, card['tags'], 'tags', 'tag_value', 'tag_type')
-        if 'expansion' in card:
-            print(',\n      .expansion {{{}}}'.format(enum_flags(card['expansion'], 'card_expansion_type')), end='', file=out)
-        if 'deck' in card:
-            print(',\n      .deck {{card_deck_type::{}}}'.format(card['deck']), end='', file=out)
-        if 'modifier' in card:
-            print(',\n      .modifier {{card_modifier_type::{}}}'.format(card['modifier']), end='', file=out)
-        if 'mth_effect' in card:
-            print(',\n      .mth_effect {{mth_type::{}}}'.format(card['mth_effect']), end='', file=out)
-        if 'mth_response' in card:
-            print(',\n      .mth_response {{mth_type::{}}}'.format(card['mth_response']), end='', file=out)
-        if 'equip_target' in card:
-            print(',\n      .equip_target {{target_player_filter::{}}}'.format(card['equip_target']), end='', file=out)
-        if 'color' in card:
-            print(',\n      .color {{card_color_type::{}}}'.format(card['color']), end='', file=out)
-    except RuntimeError as e:
-        raise RuntimeError(f"Error in card {card['name']}:\n{e}")
+        return {
+            'name':         card['name'],
+            'image':        card['image'] if 'image' in card else None,
+            'effects':      parse_effects(card['effects']) if 'effects' in card else None,
+            'responses':    parse_effects(card['responses']) if 'responses' in card else None,
+            'optionals':    parse_effects(card['optional']) if 'optional' in card else None,
+            'equips':       parse_effect_simple(card['equip'], 'effect_value', 'equip_type') if 'equip' in card else None,
+            'tags':         parse_effect_simple(card['tags'], 'tag_value', 'tag_type') if 'tags' in card else None,
+            'expansion':    CppEnum('card_expansion_type', card['expansion']) if 'expansion' in card else None,
+            'deck':         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
+            'modifier':     CppEnum('card_modifier_type', card['modifier']) if 'modifier' in card else None,
+            'mth_effect':   {'type': CppEnum('mth_type', card['mth_effect'])} if 'mth_effect' in card else None,
+            'mth_response': {'type': CppEnum('mth_type', card['mth_response'])} if 'mth_response' in card else None,
+            'equip_target': CppEnum('target_player_filter', card['equip_target']) if 'equip_target' in card else None,
+            'color':        CppEnum('card_color_type', card['color']) if 'color' in card else None,
+            'sign':         parse_sign(card['sign']) if 'sign' in card else None
+        }
+    except RuntimeError as error:
+        raise RuntimeError(f"Error in card {card['name']}:\n{error}") from error
 
-def parse_file(out, data):
-    hidden_cards = []
+def parse_file(data):
+    result = {
+        'deck': [],
+        'characters': [],
+        'goldrush': [],
+        'highnoon': [],
+        'fistfulofcards': [],
+        'wildwestshow': [],
+        'button_row': [],
+        'hidden': []
+    }
 
-    print(
-        "// AUTO GENERATED FILE\n\n"
-        "#include \"game/card_data.h\"\n\n"
-        "namespace banggame {\n\n"
-        "using namespace enums::flag_operators;\n\n"
-        "const all_cards_t all_cards {",
-        file=out
-    )
-
-    print('  .deck {', file=out)
     for card in data['main_deck']:
         card['deck'] = 'main_deck'
         for sign in card['signs']:
-            parse_all_effects(out, card)
-            print(',\n      .sign {{{}}}\n    }},'.format(parse_sign(sign)), file=out)
-    print('  },', file=out)
-
-    print('  .characters {', file=out)
+            card['sign'] = sign
+            result['deck'].append(parse_all_effects(card))
+    
     for card in data['character']:
         card['deck'] = 'character'
-        parse_all_effects(out, card)
-        print('\n    },', file=out)
-    print('  },', file=out)
-
-    print('  .goldrush {', file=out)
+        result['characters'].append(parse_all_effects(card))
+    
     for card in data['goldrush']:
-        set_expansion(card, 'goldrush')
         card['deck'] = 'goldrush'
         count = card['count'] if 'count' in card else 1
         for _ in range(count):
             if is_hidden(card):
-                hidden_cards.append(card)
+                result['hidden'].append(parse_all_effects(card))
             else:
-                parse_all_effects(out, card)
-                print('\n    },', file=out)
-    print('  },', file=out)
+                result['goldrush'].append(parse_all_effects(card))
 
-    print('  .highnoon {', file=out)
-    for card in data['highnoon']:
-        set_expansion(card, 'highnoon')
-        card['deck'] = 'highnoon'
-        if is_hidden(card):
-            hidden_cards.append(card)
-        else:
-            parse_all_effects(out, card)
-            print('\n    },', file=out)
-    print('  },', file=out)
+    for name in ('highnoon', 'fistfulofcards', 'wildwestshow'):
+        for card in data[name]:
+            card['deck'] = name
+            if 'expansion' in card:
+                card['expansion'] += ' ' + name
+            else:
+                card['expansion'] = name
+            if is_hidden(card):
+                result['hidden'].append(parse_all_effects(card))
+            else:
+                result[name].append(parse_all_effects(card))
 
-    print('  .fistfulofcards {', file=out)
-    for card in data['fistfulofcards']:
-        set_expansion(card, 'fistfulofcards')
-        card['deck'] = 'fistfulofcards'
-        if is_hidden(card):
-            hidden_cards.append(card)
-        else:
-            parse_all_effects(out, card)
-            print('\n    },', file=out)
-    print('  },', file=out)
-
-    print('  .wildwestshow {', file=out)
-    for card in data['wildwestshow']:
-        set_expansion(card, 'wildwestshow')
-        card['deck'] = 'wildwestshow'
-        if is_hidden(card):
-            hidden_cards.append(card)
-        else:
-            parse_all_effects(out, card)
-            print('\n    },', file=out)
-    print('  },', file=out)
-
-    print('  .button_row {', file=out)
     for card in data['button_row']:
         if is_hidden(card):
-            hidden_cards.append(card)
+            result['hidden'].append(parse_all_effects(card))
         else:
-            parse_all_effects(out, card)
-            print('\n    },', file=out)
-    print('  },', file=out)
+            result['button_row'].append(parse_all_effects(card))
 
-    print('  .hidden {', file=out)
-    for card in hidden_cards:
-        parse_all_effects(out, card)
-        print('\n    },', file=out)
-    print('  },', file=out)
+    return result
 
-    print('};\n\n}', file=out)
-
-def main():
-    if len(sys.argv) < 3:
-        print(f'Usage: {sys.argv[0]} bang_cards.yml bang_cards.cpp')
-        exit(1)
-    
-    with open(sys.argv[1], 'r') as ifile:
-        with open(sys.argv[2], 'w') as ofile:
-            parse_file(ofile, yaml.safe_load(ifile))
+INCLUDE_FILENAME = 'game/card_data.h'
+DECLARATIONS = 'using namespace enums::flag_operators;'
+OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) < 3:
+        print(f'Usage: {sys.argv[0]} bang_cards.yml bang_cards.cpp')
+        sys.exit(1)
+
+    with open(sys.argv[1], 'r', encoding='utf8') as file:
+        bang_cards = parse_file(yaml.safe_load(file))
+    
+    with open(sys.argv[2], 'w', encoding='utf8') as file:
+        print_cpp_file(bang_cards, OBJECT_DECLARATION,
+            include_filename=INCLUDE_FILENAME,
+            declarations=DECLARATIONS,
+            file=file)
