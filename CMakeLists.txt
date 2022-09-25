@@ -79,10 +79,11 @@ if (BUILD_GAME_RELEASE)
     set(PRE_CONFIGURE_FILE .cmake/git_version.cpp.in)
     set(POST_CONFIGURE_FILE "${CMAKE_CURRENT_BINARY_DIR}/git_version.cpp")
     set(GIT_WORKING_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    set(CHECK_GIT_TARGET_NAME check_git_server)
     include(git_watcher.cmake)
 
     add_library(git_version STATIC "${POST_CONFIGURE_FILE}")
-    add_dependencies(git_version check_git)
+    add_dependencies(git_version check_git_server)
     target_compile_definitions(git_version PUBLIC HAVE_GIT_VERSION)
 
     target_link_libraries(bangcommon INTERFACE git_version)
