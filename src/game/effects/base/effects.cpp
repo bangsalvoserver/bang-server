@@ -163,10 +163,10 @@ namespace banggame {
     }
 
     void effect_beer::on_play(card *origin_card, player *origin, player *target) {
-        target->m_game->call_event<event_type::on_play_beer>(target);
         if (target->m_game->m_players.size() <= 2 || target->m_game->num_alive() > 2) {
             target->heal(target->m_game->call_event<event_type::apply_beer_modifier>(target, 1));
         }
+        target->m_game->call_event<event_type::on_play_beer>(target);
     }
 
     bool effect_deathsave::can_respond(card *origin_card, player *origin) {
