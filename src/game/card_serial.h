@@ -9,6 +9,9 @@ namespace banggame {
     struct player;
 }
 
+template<typename T, typename ... Ts>
+static constexpr bool is_one_of = (std::is_same_v<T, Ts> || ...);
+
 #ifdef BUILD_BANG_CLIENT
 
 namespace banggame {
@@ -27,6 +30,9 @@ namespace banggame {
         using player = banggame::player_view *;
         using cube = banggame::card_cube_pair;
         using player_card = banggame::player_card_pair;
+
+        template<typename T>
+        concept serializable = is_one_of<T, card, player, cube, player_card>;
     }
 }
 
@@ -38,6 +44,9 @@ namespace banggame::serial {
     using player = banggame::player *;
     using cube = banggame::card *;
     using player_card = banggame::card *;
+
+    template<typename T>
+    concept serializable = is_one_of<T, card, player>;
 }
 
 #ifndef BUILD_BANG_SERVER
@@ -49,51 +58,15 @@ namespace banggame::serial {
 #ifndef NO_DEFINE_SERIALIZERS
 
 namespace json {
-    namespace serial = banggame::serial;
-
-    template<> struct serializer<serial::card, serial::context> {
-        const serial::context &context;
-        Json::Value operator()(serial::card card) const;
+    template<banggame::serial::serializable T> struct serializer<T, banggame::serial::context> {
+        const banggame::serial::context &context;
+        Json::Value operator()(T value) const;
     };
 
-    template<> struct serializer<serial::player, serial::context> {
-        const serial::context &context;
-        Json::Value operator()(serial::player player) const;
+    template<banggame::serial::serializable T> struct deserializer<T, banggame::serial::context> {
+        const banggame::serial::context &context;
+        T operator()(const Json::Value &value) const;
     };
-
-    template<> struct deserializer<serial::card, serial::context> {
-        const serial::context &context;
-        serial::card operator()(const Json::Value &value) const;
-    };
-
-    template<> struct deserializer<serial::player, serial::context> {
-        const serial::context &context;
-        serial::player operator()(const Json::Value &value) const;
-    };
-
-#ifdef BUILD_BANG_CLIENT
-
-    template<> struct serializer<serial::cube, serial::context> {
-        const serial::context &context;
-        Json::Value operator()(serial::cube cube) const;
-    };
-
-    template<> struct serializer<serial::player_card, serial::context> {
-        const serial::context &context;
-        Json::Value operator()(serial::player_card pair) const;
-    };
-
-    template<> struct deserializer<serial::cube, serial::context> {
-        const serial::context &context;
-        serial::cube operator()(const Json::Value &value) const;
-    };
-
-    template<> struct deserializer<serial::player_card, serial::context> {
-        const serial::context &context;
-        serial::player_card operator()(const Json::Value &value) const;
-    };
-
-#endif
 
 }
 
