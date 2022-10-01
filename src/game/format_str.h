@@ -13,11 +13,7 @@ namespace banggame {
         (card_sign) sign
     )};
 
-    struct player_format_id {REFLECTABLE(
-        (int) player_id
-    )};
-
-    using game_format_arg = std::variant<int, std::string, card_format_id, player_format_id>;
+    using game_format_arg = std::variant<int, std::string, card_format_id, serial::player>;
     
     struct game_string {
         REFLECTABLE(

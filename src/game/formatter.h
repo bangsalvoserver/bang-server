@@ -15,7 +15,7 @@ namespace banggame{
         }
 
         game_format_arg operator()(player *value) const {
-            return player_format_id{value->id};
+            return value;
         }
 
         game_format_arg operator()(card *value) const {
