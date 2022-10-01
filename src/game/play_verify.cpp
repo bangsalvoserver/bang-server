@@ -99,35 +99,35 @@ namespace banggame {
             switch(mod_card->modifier) {
             case card_modifier_type::bangmod:
             case card_modifier_type::bandolier:
-                if (card_ptr->pocket == pocket_type::player_hand) {
-                    if (!origin->is_bangcard(card_ptr)) {
+                if (origin_card->pocket == pocket_type::player_hand) {
+                    if (!origin->is_bangcard(origin_card)) {
                         return "ERROR_INVALID_MODIFIER_CARD";
                     }
-                } else if (!card_ptr->has_tag(tag_type::play_as_bang)) {
+                } else if (!origin_card->has_tag(tag_type::play_as_bang)) {
                     return "ERROR_INVALID_MODIFIER_CARD";
                 }
                 break;
             case card_modifier_type::leevankliff:
-                if (card_ptr != origin->m_last_played_card)
+                if (origin_card != origin->m_last_played_card)
                     return "ERROR_INVALID_MODIFIER_CARD";
                 break;
             case card_modifier_type::shopchoice:
             case card_modifier_type::discount:
-                if (card_ptr->expansion != card_expansion_type::goldrush)
+                if (origin_card->expansion != card_expansion_type::goldrush)
                     return "ERROR_INVALID_MODIFIER_CARD";
                 break;
             case card_modifier_type::belltower:
-                switch (card_ptr->pocket) {
+                switch (origin_card->pocket) {
                 case pocket_type::player_hand:
-                    if (card_ptr->color != card_color_type::brown)
+                    if (origin_card->color != card_color_type::brown)
                         return "ERROR_INVALID_MODIFIER_CARD";
                     break;
                 case pocket_type::player_table:
-                    if (card_ptr->effects.empty())
+                    if (origin_card->effects.empty())
                         return "ERROR_INVALID_MODIFIER_CARD";
                     break;
                 default:
-                    if (card_ptr->color == card_color_type::black)
+                    if (origin_card->color == card_color_type::black)
                         return "ERROR_INVALID_MODIFIER_CARD";
                 }
                 break;
@@ -144,7 +144,7 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_duplicates() const {
-        if (card_ptr->has_tag(tag_type::can_repeat)) {
+        if (origin_card->has_tag(tag_type::can_repeat)) {
             return {};
         }
 
@@ -177,7 +177,7 @@ namespace banggame {
                         return {};
                     }
                 },
-                [&](enums::enum_tag_t<target_type::conditional_player>, nullable<player> p) -> game_string {
+                [&](enums::enum_tag_t<target_type::conditional_player>, player *p) -> game_string {
                     if (p && !selected_players.emplace(p).second) {
                         return {"ERROR_DUPLICATE_PLAYER", &*p};
                     } else {
@@ -191,7 +191,7 @@ namespace banggame {
                         return {};
                     }
                 },
-                [&](enums::enum_tag_t<target_type::extra_card>, nullable<card> c) -> game_string {
+                [&](enums::enum_tag_t<target_type::extra_card>, card *c) -> game_string {
                     if (c && !selected_cards.emplace(c).second) {
                         return {"ERROR_DUPLICATE_CARD", &*c};
                     } else {
@@ -218,8 +218,8 @@ namespace banggame {
                     return {};
                 },
                 [&](enums::enum_tag_t<target_type::self_cubes>, int ncubes) -> game_string {
-                    if ((selected_cubes[card_ptr] += ncubes) > card_ptr->num_cubes) {
-                        return  {"ERROR_NOT_ENOUGH_CUBES_ON", card_ptr};
+                    if ((selected_cubes[origin_card] += ncubes) > origin_card->num_cubes) {
+                        return  {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
                     }
                     return {};
                 }
@@ -247,36 +247,36 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_equip_target() const {
-        if (card *disabler = origin->m_game->get_disabler(card_ptr)) {
-            return {"ERROR_CARD_DISABLED_BY", card_ptr, disabler};
+        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
+            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
         if (origin->m_game->check_flags(game_flags::disable_equipping)) {
             return "ERROR_CANT_EQUIP_CARDS";
         }
-        if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, card_ptr, game_string{})) {
+        if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{})) {
             return error;
         }
         player *target = origin;
-        if (!card_ptr->self_equippable()) {
+        if (!origin_card->self_equippable()) {
             if (targets.size() != 1 || !targets.front().is(target_type::player)) {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
             target = targets.front().get<target_type::player>();
-            if (game_string error = check_player_filter(card_ptr, origin, card_ptr->equip_target, target)) {
+            if (game_string error = check_player_filter(origin_card, origin, origin_card->equip_target, target)) {
                 return error;
             }
         }
-        if (card *equipped = target->find_equipped_card(card_ptr)) {
+        if (card *equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};
         }
-        if (card_ptr->color == card_color_type::orange && origin->m_game->num_cubes < 3) {
+        if (origin_card->color == card_color_type::orange && origin->m_game->num_cubes < 3) {
             return "ERROR_NOT_ENOUGH_CUBES";
         }
         return {};
     }
 
     player *play_card_verify::get_equip_target() const {
-        if (card_ptr->self_equippable()) {
+        if (origin_card->self_equippable()) {
             return origin;
         } else {
             return targets.front().get<target_type::player>();
@@ -284,18 +284,18 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_card_targets() const {
-        auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
+        auto &effects = is_response ? origin_card->responses : origin_card->effects;
 
         if (effects.empty()) {
             return "ERROR_EFFECT_LIST_EMPTY";
         }
-        if (card *disabler = origin->m_game->get_disabler(card_ptr)) {
-            return {"ERROR_CARD_DISABLED_BY", card_ptr, disabler};
+        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
+            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
-        if (card_ptr->inactive) {
-            return {"ERROR_CARD_INACTIVE", card_ptr};
+        if (origin_card->inactive) {
+            return {"ERROR_CARD_INACTIVE", origin_card};
         }
-        if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, card_ptr, game_string{})) {
+        if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{})) {
             return error;
         }
 
@@ -319,13 +319,13 @@ namespace banggame {
         }
 
         size_t diff = targets.size() - effects.size();
-        if (auto repeatable = card_ptr->get_tag_value(tag_type::repeatable)) {
-            if (diff < 0 || diff % card_ptr->optionals.size() != 0
-                || (*repeatable > 0 && diff > (card_ptr->optionals.size() * *repeatable)))
+        if (auto repeatable = origin_card->get_tag_value(tag_type::repeatable)) {
+            if (diff < 0 || diff % origin_card->optionals.size() != 0
+                || (*repeatable > 0 && diff > (origin_card->optionals.size() * *repeatable)))
             {
                 return "ERROR_INVALID_TARGETS";
             }
-        } else if (diff != 0 && diff != card_ptr->optionals.size()) {
+        } else if (diff != 0 && diff != origin_card->optionals.size()) {
             return "ERROR_INVALID_TARGETS";
         }
         
@@ -336,8 +336,8 @@ namespace banggame {
         for (const auto &t : targets) {
             const auto &e = *effect_it;
             if (++effect_it == effect_end) {
-                effect_it = card_ptr->optionals.begin();
-                effect_end = card_ptr->optionals.end();
+                effect_it = origin_card->optionals.begin();
+                effect_end = origin_card->optionals.end();
             }
 
             if (!t.is(e.target)) {
@@ -355,7 +355,7 @@ namespace banggame {
             }
         }
 
-        if (game_string error = (is_response ? card_ptr->mth_response : card_ptr->mth_effect).verify(card_ptr, origin, mth_targets)) {
+        if (game_string error = (is_response ? origin_card->mth_response : origin_card->mth_effect).verify(origin_card, origin, mth_targets)) {
             return error;
         }
 
@@ -367,7 +367,7 @@ namespace banggame {
     }
 
     game_string play_card_verify::check_prompt() const {
-        auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
+        auto &effects = is_response ? origin_card->responses : origin_card->effects;
         
         auto effect_it = effects.begin();
         auto effect_end = effects.end();
@@ -376,8 +376,8 @@ namespace banggame {
         for (const auto &t : targets) {
             const auto &e = *effect_it;
             if (++effect_it == effect_end) {
-                effect_it = card_ptr->optionals.begin();
-                effect_end = card_ptr->optionals.end();
+                effect_it = origin_card->optionals.begin();
+                effect_end = origin_card->optionals.end();
             }
 
             if (e.type == effect_type::mth_add) {
@@ -391,13 +391,13 @@ namespace banggame {
             }
         }
 
-        return (is_response ? card_ptr->mth_response : card_ptr->mth_effect).on_prompt(card_ptr, origin, mth_targets);
+        return (is_response ? origin_card->mth_response : origin_card->mth_effect).on_prompt(origin_card, origin, mth_targets);
     }
 
     game_string play_card_verify::check_prompt_equip() const {
         player *target = get_equip_target();
-        for (const auto &e : card_ptr->equips) {
-            if (auto prompt_message = e.on_prompt(origin, card_ptr, target)) {
+        for (const auto &e : origin_card->equips) {
+            if (auto prompt_message = e.on_prompt(origin, origin_card, target)) {
                 return prompt_message;
             }
         }
@@ -415,10 +415,10 @@ namespace banggame {
     };
 
     void play_card_verify::do_play_card() const {
-        auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
-        origin->log_played_card(card_ptr, is_response);
+        auto &effects = is_response ? origin_card->responses : origin_card->effects;
+        origin->log_played_card(origin_card, is_response);
         if (std::ranges::find(effects, effect_type::play_card_action, &effect_holder::type) == effects.end()) {
-            origin->play_card_action(card_ptr);
+            origin->play_card_action(origin_card);
         }
         
         auto effect_it = effects.begin();
@@ -431,8 +431,8 @@ namespace banggame {
         for (const auto &t : targets) {
             auto &e = *effect_it;
             if (++effect_it == effect_end) {
-                effect_it = card_ptr->optionals.begin();
-                effect_end = card_ptr->optionals.end();
+                effect_it = origin_card->optionals.begin();
+                effect_end = origin_card->optionals.end();
             }
 
             if (e.type == effect_type::mth_add) {
@@ -443,7 +443,7 @@ namespace banggame {
                         ++selected_cubes[c];
                     }
                 } else if (auto *ncubes = t.get_if<target_type::self_cubes>()) {
-                    selected_cubes[card_ptr] += *ncubes;
+                    selected_cubes[origin_card] += *ncubes;
                 }
             } else {
                 delay_effects.emplace_back(&e, &t);
@@ -458,15 +458,15 @@ namespace banggame {
             }, *t);
         }
 
-        (is_response ? card_ptr->mth_response : card_ptr->mth_effect).on_play(card_ptr, origin, mth_targets);
-        origin->m_game->call_event<event_type::on_effect_end>(origin, card_ptr);
+        (is_response ? origin_card->mth_response : origin_card->mth_effect).on_play(origin_card, origin, mth_targets);
+        origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
     }
 
     game_string play_card_verify::verify_and_play() {
         if (origin->m_game->pending_requests()) {
             const auto &req = origin->m_game->top_request();
             if (bool(req.flags() & effect_flags::force_play)) {
-                if (!req.can_respond(origin, card_ptr) && std::ranges::none_of(modifiers, [&](card *c) {
+                if (!req.can_respond(origin, origin_card) && std::ranges::none_of(modifiers, [&](card *c) {
                     return req.can_respond(origin, c);
                 })) {
                     return "ERROR_FORCED_CARD";
@@ -478,10 +478,10 @@ namespace banggame {
             return "ERROR_PLAYER_NOT_IN_TURN";
         }
 
-        switch(card_ptr->pocket) {
+        switch(origin_card->pocket) {
         case pocket_type::player_hand:
             if (!modifiers.empty() && modifiers.front()->modifier == card_modifier_type::leevankliff) {
-                card *bang_card = std::exchange(card_ptr, origin->m_last_played_card);
+                card *bang_card = std::exchange(origin_card, origin->m_last_played_card);
                 if (!origin->is_bangcard(bang_card)) {
                     return "ERROR_INVALID_MODIFIER_CARD";
                 }
@@ -494,14 +494,14 @@ namespace banggame {
                     do_play_card();
                     origin->set_last_played_card(nullptr);
                 });
-            } else if (card_ptr->color == card_color_type::brown) {
+            } else if (origin_card->color == card_color_type::brown) {
                 if (game_string error = verify_card_targets()) {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this]{
                     play_modifiers();
                     do_play_card();
-                    origin->set_last_played_card(card_ptr);
+                    origin->set_last_played_card(origin_card);
                 });
             } else {
                 if (game_string error = verify_equip_target()) {
@@ -509,30 +509,30 @@ namespace banggame {
                 }
                 origin->prompt_then(check_prompt_equip(), [*this]{
                     player *target = get_equip_target();
-                    card_ptr->on_equip(target);
+                    origin_card->on_equip(target);
                     if (origin == target) {
-                        origin->m_game->add_log("LOG_EQUIPPED_CARD", card_ptr, origin);
+                        origin->m_game->add_log("LOG_EQUIPPED_CARD", origin_card, origin);
                     } else {
-                        origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", card_ptr, origin, target);
+                        origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", origin_card, origin, target);
                     }
-                    target->equip_card(card_ptr);
-                    switch (card_ptr->color) {
+                    target->equip_card(origin_card);
+                    switch (origin_card->color) {
                     case card_color_type::blue:
                         if (origin->m_game->has_expansion(card_expansion_type::armedanddangerous)) {
-                            origin->queue_request_add_cube(card_ptr);
+                            origin->queue_request_add_cube(origin_card);
                         }
                         break;
                     case card_color_type::green:
-                        card_ptr->inactive = true;
-                        origin->m_game->add_update<game_update_type::tap_card>(card_ptr->id, true);
+                        origin_card->inactive = true;
+                        origin->m_game->add_update<game_update_type::tap_card>(origin_card->id, true);
                         break;
                     case card_color_type::orange:
-                        origin->add_cubes(card_ptr, 3);
+                        origin->add_cubes(origin_card, 3);
                         break;
                     }
-                    origin->m_game->call_event<event_type::on_equip_card>(origin, target, card_ptr);
+                    origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card);
                     origin->set_last_played_card(nullptr);
-                    origin->m_game->call_event<event_type::on_effect_end>(origin, card_ptr);
+                    origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
                 });
             }
             break;
@@ -555,14 +555,14 @@ namespace banggame {
             }
             [[fallthrough]];
         case pocket_type::shop_selection: {
-            int cost = card_ptr->buy_cost();
+            int cost = origin_card->buy_cost();
             for (card *c : modifiers) {
                 switch (c->modifier) {
                 case card_modifier_type::discount:
                     --cost;
                     break;
                 case card_modifier_type::shopchoice:
-                    if (c->get_tag_value(tag_type::shopchoice) != card_ptr->get_tag_value(tag_type::shopchoice)) {
+                    if (c->get_tag_value(tag_type::shopchoice) != origin_card->get_tag_value(tag_type::shopchoice)) {
                         return "ERROR_INVALID_MODIFIER_CARD";
                     }
                     cost += c->buy_cost();
@@ -575,7 +575,7 @@ namespace banggame {
             if (origin->m_gold < cost) {
                 return "ERROR_NOT_ENOUGH_GOLD";
             }
-            if (card_ptr->color == card_color_type::brown) {
+            if (origin_card->color == card_color_type::brown) {
                 if (game_string error = verify_card_targets()) {
                     return error;
                 }
@@ -583,7 +583,7 @@ namespace banggame {
                     play_modifiers();
                     origin->add_gold(-cost);
                     do_play_card();
-                    origin->set_last_played_card(card_ptr);
+                    origin->set_last_played_card(origin_card);
                     origin->m_game->queue_action([m_game = origin->m_game]{
                         while (m_game->m_shop_selection.size() < 3) {
                             m_game->draw_shop_card();
@@ -598,15 +598,15 @@ namespace banggame {
                 }
                 origin->prompt_then(check_prompt_equip(), [*this, cost]{
                     player *target = get_equip_target();
-                    card_ptr->on_equip(target);
+                    origin_card->on_equip(target);
                     if (origin == target) {
-                        origin->m_game->add_log("LOG_BOUGHT_EQUIP", card_ptr, origin);
+                        origin->m_game->add_log("LOG_BOUGHT_EQUIP", origin_card, origin);
                     } else {
-                        origin->m_game->add_log("LOG_BOUGHT_EQUIP_TO", card_ptr, origin, target);
+                        origin->m_game->add_log("LOG_BOUGHT_EQUIP_TO", origin_card, origin, target);
                     }
                     play_modifiers();
                     origin->add_gold(-cost);
-                    target->equip_card(card_ptr);
+                    target->equip_card(origin_card);
                     origin->set_last_played_card(nullptr);
                     origin->m_game->queue_action([m_game = origin->m_game]{
                         while (m_game->m_shop_selection.size() < 3) {
@@ -624,8 +624,8 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_and_respond() {
-        if ((card_ptr->pocket == pocket_type::player_hand && card_ptr->color != card_color_type::brown)
-            || card_ptr->pocket == pocket_type::shop_selection
+        if ((origin_card->pocket == pocket_type::player_hand && origin_card->color != card_color_type::brown)
+            || origin_card->pocket == pocket_type::shop_selection
             || !modifiers.empty()
         ) {
             return "ERROR_INVALID_RESPONSE_CARD";

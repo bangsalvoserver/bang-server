@@ -1,7 +1,8 @@
 #ifndef __MESSAGES_H__
 #define __MESSAGES_H__
 
-#include "game/game_update.h"
+#include "game_update.h"
+#include "json/value.h"
 
 namespace sdl {
     struct image_pixels {REFLECTABLE(
@@ -47,7 +48,7 @@ namespace banggame {
         (lobby_chat, lobby_chat_client_args)
         (lobby_return)
         (game_start)
-        (game_action, game_action)
+        (game_action, Json::Value)
     )
 
     using client_message = enums::enum_variant<client_message_type>;
@@ -96,7 +97,7 @@ namespace banggame {
         (lobby_add_user, lobby_add_user_args)
         (lobby_remove_user, user_id_args)
         (lobby_chat, lobby_chat_args)
-        (game_update, game_update)
+        (game_update, Json::Value)
         (game_started)
     )
 

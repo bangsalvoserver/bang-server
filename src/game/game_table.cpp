@@ -8,14 +8,14 @@ namespace banggame {
 
     using namespace enums::flag_operators;
 
-    card *game_table::find_card(int card_id) {
+    card *game_table::find_card(int card_id) const {
         if (auto it = m_cards.find(card_id); it != m_cards.end()) {
             return &*it;
         }
         throw std::runtime_error("server.find_card: ID not found");
     }
 
-    player *game_table::find_player(int player_id) {
+    player *game_table::find_player(int player_id) const {
         if (auto it = m_players.find(player_id); it != m_players.end()) {
             return &*it;
         }

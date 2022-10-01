@@ -26,6 +26,7 @@ set(bangserver_srcs
     src/game/effects/armedanddangerous/requests.cpp
     src/game/effects/canyondiablo/effects.cpp
     src/game/effects/canyondiablo/equips.cpp
+    src/game/card_serial.cpp
     src/game/holders.cpp
     src/game/game.cpp
     src/game/game_table.cpp
@@ -71,6 +72,7 @@ target_link_libraries(bangcommon INTERFACE cpputils networking)
 
 add_executable(bangserver ${bangserver_srcs})
 target_link_libraries(bangserver PUBLIC bang_cards_obj bangcommon)
+target_compile_definitions(bangserver PRIVATE BUILD_BANG_SERVER)
 
 option(BUILD_GAME_RELEASE "Build Game Release" OFF)
 
@@ -89,11 +91,6 @@ if (BUILD_GAME_RELEASE)
     target_link_libraries(bangcommon INTERFACE git_version)
 
 else()
-
-    option(DEBUG_PRINT_GAME_UPDATES "Debug Option: Print Game Updates" OFF)
-    if (DEBUG_PRINT_GAME_UPDATES)
-        target_compile_definitions(bangserver PUBLIC DEBUG_PRINT_GAME_UPDATES)
-    endif()
 
     option(DEBUG_PRINT_PUBLIC_LOGS "Debug Option: Print Public Logs" OFF)
     if (DEBUG_PRINT_PUBLIC_LOGS)

@@ -116,7 +116,7 @@ private:
     std::string handle_message(MSG_TAG(lobby_chat),     user_ptr user, const lobby_chat_client_args &value);
     std::string handle_message(MSG_TAG(lobby_return),   user_ptr user);
     std::string handle_message(MSG_TAG(game_start),     user_ptr user);
-    std::string handle_message(MSG_TAG(game_action),    user_ptr user, const banggame::game_action &value);
+    std::string handle_message(MSG_TAG(game_action),    user_ptr user, const Json::Value &value);
 
 private:
     user_map users;

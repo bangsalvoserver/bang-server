@@ -398,18 +398,18 @@ namespace banggame {
             }
             if (bool(req.flags() & effect_flags::auto_respond) && target_request_update.pick_ids.empty() && target_request_update.respond_ids.size() == 1) {
                 player *target = req.target();
-                card *card_ptr = find_card(target_request_update.respond_ids.front());
+                card *origin_card = find_card(target_request_update.respond_ids.front());
                 bool is_response = !bool(req.flags() & effect_flags::force_play);
-                auto &effects = is_response ? card_ptr->responses : card_ptr->effects;
-                if (card_ptr->equips.empty()
-                    && card_ptr->optionals.empty()
-                    && card_ptr->modifier == card_modifier_type::none
+                auto &effects = is_response ? origin_card->responses : origin_card->effects;
+                if (origin_card->equips.empty()
+                    && origin_card->optionals.empty()
+                    && origin_card->modifier == card_modifier_type::none
                     && std::ranges::all_of(effects, [](const effect_holder &holder) { return holder.target == target_type::none; })
                 ) {
                     if (!is_response) {
                         pop_request();
                     }
-                    play_card_verify{target, card_ptr, is_response,
+                    play_card_verify{target, origin_card, is_response,
                         target_list{effects.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
                     return;
                 }

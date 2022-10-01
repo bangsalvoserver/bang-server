@@ -14,7 +14,7 @@ namespace banggame {
 
     struct play_card_verify {
         player *origin;
-        card *card_ptr;
+        card *origin_card;
         bool is_response;
         target_list targets;
         std::vector<card *> modifiers;

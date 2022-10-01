@@ -153,7 +153,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
             send_message<server_message_type::game_started>(user->first);
 
             for (const auto &msg : lobby.game.get_spectator_updates()) {
-                send_message<server_message_type::game_update>(user->first, msg);
+                send_message<server_message_type::game_update>(user->first, json::serialize(msg, lobby.game));
             }
         }
     }
@@ -174,11 +174,11 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
 
     target->user_id = user->second.user_id;
 
-    broadcast_message_lobby<server_message_type::game_update>(lobby,
-            enums::enum_tag<game_update_type::player_user>, target->id, target->user_id);
+    broadcast_message_lobby<server_message_type::game_update>(lobby, json::serialize(game_update{
+            enums::enum_tag<game_update_type::player_user>, target->id, target->user_id}, lobby.game));
     
     for (const auto &msg : lobby.game.get_rejoin_updates(target)) {
-        send_message<server_message_type::game_update>(user->first, msg);
+        send_message<server_message_type::game_update>(user->first, json::serialize(msg, lobby.game));
     }
 
     return {};
@@ -206,7 +206,8 @@ std::string game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
 
     if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
         it->user_id = 0;
-        broadcast_message_lobby<server_message_type::game_update>(lobby, enums::enum_tag<game_update_type::player_user>, it->id, 0);
+        broadcast_message_lobby<server_message_type::game_update>(lobby, json::serialize(game_update{
+            enums::enum_tag<game_update_type::player_user>, it->id, 0}, lobby.game));
     }
     
     broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user->second.user_id);
@@ -305,11 +306,7 @@ std::string game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
     return {};
 }
 
-std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, const game_action &value) {
-    #ifdef DEBUG_PRINT_GAME_UPDATES
-        std::cout << "/*** GAME ACTION *** ID = " << user->second.user_id << " ***/ " << json::serialize(value) << '\n';
-    #endif
-
+std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, const Json::Value &value) {
     if (!user->second.in_lobby) {
         return "ERROR_PLAYER_NOT_IN_LOBBY";
     }
@@ -320,9 +317,10 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
     }
 
     if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
+        game_action action = json::deserialize<banggame::game_action>(value, lobby.game);
         if (auto error = enums::visit_indexed([&]<game_action_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
             return it->handle_action(tag, FWD(args) ...);
-        }, value)) {
+        }, action)) {
             lobby.game.add_update<game_update_type::game_error>(update_target::includes_private(&*it), std::move(error));
         }
     } else {
@@ -337,9 +335,10 @@ void lobby::send_updates(game_manager &mgr) {
         if (update.is(game_update_type::game_over)) {
             state = lobby_state::finished;
         }
+        Json::Value serialized = json::serialize(update, game);
         for (auto it : users) {
             if (target.matches(it->second.user_id)) {
-                mgr.send_message<server_message_type::game_update>(it->first, update);
+                mgr.send_message<server_message_type::game_update>(it->first, serialized);
             }
         }
         game.m_updates.pop_front();

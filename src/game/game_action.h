@@ -9,25 +9,16 @@ namespace banggame {
 
     struct pick_card_args {REFLECTABLE(
         (pocket_type) pocket,
-        (int) player_id,
-        (int) card_id
+        (serial::player) player,
+        (serial::card) card
     )};
 
-    DEFINE_ENUM_VARIANT(play_card_target_id, target_type,
-        (player,                int)
-        (conditional_player,    int)
-        (card,                  int)
-        (extra_card,            int)
-        (cards,                 std::vector<int>)
-        (cards_other_players,   std::vector<int>)
-        (select_cubes,          std::vector<int>)
-        (self_cubes,            int)
-    )
+    using target_vector = std::vector<play_card_target>;
 
     struct play_card_args {REFLECTABLE(
-        (int) card_id,
-        (std::vector<int>) modifier_ids,
-        (std::vector<play_card_target_id>) targets
+        (serial::card) card,
+        (std::vector<serial::card>) modifiers,
+        (target_vector) targets
     )};
 
     DEFINE_ENUM_TYPES(game_action_type,

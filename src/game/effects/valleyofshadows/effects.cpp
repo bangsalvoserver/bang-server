@@ -98,8 +98,8 @@ namespace banggame {
                 }
                 origin->m_game->send_card_update(*it, nullptr, flags);
             }
-            if (std::ranges::any_of(origin->m_game->m_selection, [origin](card *card_ptr) {
-                return origin->get_card_sign(card_ptr).rank == card_rank::rank_A;
+            if (std::ranges::any_of(origin->m_game->m_selection, [origin](card *c) {
+                return origin->get_card_sign(c).rank == card_rank::rank_A;
             })) {
                 origin->m_game->add_log("LOG_POKER_ACE");
                 while (!origin->m_game->m_selection.empty()) {

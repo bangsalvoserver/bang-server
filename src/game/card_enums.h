@@ -4,6 +4,8 @@
 #include "utils/enum_variant.h"
 #include "utils/reflector.h"
 
+#include "card_serial.h"
+
 namespace banggame {
 
     DEFINE_ENUM_DATA(card_suit,
@@ -101,19 +103,21 @@ namespace banggame {
         (cube_slot)
     )
 
-    DEFINE_ENUM(target_type,
+    DEFINE_ENUM_TYPES(target_type,
         (none)
-        (player)
-        (conditional_player)
-        (card)
-        (extra_card)
+        (player,                serial::player)
+        (conditional_player,    serial::player)
+        (card,                  serial::card)
+        (extra_card,            serial::card)
         (all_players)
         (other_players)
-        (cards)
-        (cards_other_players)
-        (select_cubes)
-        (self_cubes)
+        (cards,                 std::vector<serial::card>)
+        (cards_other_players,   std::vector<serial::player_card>)
+        (select_cubes,          std::vector<serial::cube>)
+        (self_cubes,            int)
     )
+
+    using play_card_target = enums::enum_variant<target_type>;
 
     DEFINE_ENUM(card_deck_type,
         (none)

@@ -5,7 +5,6 @@
 #include "holders.h"
 #include "play_verify.h"
 #include "game_update.h"
-#include "target_converter.h"
 
 #include "effects/base/requests.h"
 #include "effects/armedanddangerous/requests.h"
@@ -259,10 +258,10 @@ namespace banggame {
         m_game->add_update<game_update_type::last_played_card>(update_target::includes_private(this), c ? c->id : 0);
     }
 
-    bool player::is_bangcard(card *card_ptr) {
+    bool player::is_bangcard(card *origin_card) {
         return (check_player_flags(player_flags::treat_missed_as_bang)
-                && card_ptr->has_tag(tag_type::missedcard))
-            || card_ptr->has_tag(tag_type::bangcard);
+                && origin_card->has_tag(tag_type::missedcard))
+            || origin_card->has_tag(tag_type::bangcard);
     };
 
     game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, const pick_card_args &args) {
@@ -274,10 +273,8 @@ namespace banggame {
             return "ERROR_PLAYER_NOT_IN_TURN";
         } else {
             m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
-            player *target_player = args.player_id ? m_game->find_player(args.player_id) : nullptr;
-            card *target_card = args.card_id ? m_game->find_card(args.card_id) : nullptr;
-            if (req.can_pick(args.pocket, target_player, target_card)) {
-                req.on_pick(args.pocket, target_player, target_card);
+            if (req.can_pick(args.pocket, args.player, args.card)) {
+                req.on_pick(args.pocket, args.player, args.card);
                 return {};
             } else {
                 return "ERROR_INVALID_PICK";
@@ -285,20 +282,20 @@ namespace banggame {
         }
     }
 
-    void player::play_card_action(card *card_ptr) {
-        switch (card_ptr->pocket) {
+    void player::play_card_action(card *origin_card) {
+        switch (origin_card->pocket) {
         case pocket_type::player_hand:
-            m_game->move_card(card_ptr, pocket_type::discard_pile);
-            m_game->call_event<event_type::on_play_hand_card>(this, card_ptr);
+            m_game->move_card(origin_card, pocket_type::discard_pile);
+            m_game->call_event<event_type::on_play_hand_card>(this, origin_card);
             break;
         case pocket_type::player_table:
-            if (card_ptr->color == card_color_type::green) {
-                m_game->move_card(card_ptr, pocket_type::discard_pile);
+            if (origin_card->color == card_color_type::green) {
+                m_game->move_card(origin_card, pocket_type::discard_pile);
             }
             break;
         case pocket_type::shop_selection:
-            if (card_ptr->color == card_color_type::brown) {
-                m_game->move_card(card_ptr, pocket_type::shop_discard);
+            if (origin_card->color == card_color_type::brown) {
+                m_game->move_card(origin_card, pocket_type::shop_discard);
             }
             break;
         default:
@@ -306,24 +303,24 @@ namespace banggame {
         }
     }
 
-    void player::log_played_card(card *card_ptr, bool is_response) {
-        switch (card_ptr->pocket) {
+    void player::log_played_card(card *origin_card, bool is_response) {
+        switch (origin_card->pocket) {
         case pocket_type::player_hand:
         case pocket_type::scenario_card:
-            m_game->add_log(is_response ? "LOG_RESPONDED_WITH_CARD" : "LOG_PLAYED_CARD", card_ptr, this);
+            m_game->add_log(is_response ? "LOG_RESPONDED_WITH_CARD" : "LOG_PLAYED_CARD", origin_card, this);
             break;
         case pocket_type::player_table:
-            m_game->add_log(is_response ? "LOG_RESPONDED_WITH_CARD" : "LOG_PLAYED_TABLE_CARD", card_ptr, this);
+            m_game->add_log(is_response ? "LOG_RESPONDED_WITH_CARD" : "LOG_PLAYED_TABLE_CARD", origin_card, this);
             break;
         case pocket_type::player_character:
             m_game->add_log(is_response ?
-                card_ptr->has_tag(tag_type::drawing)
+                origin_card->has_tag(tag_type::drawing)
                     ? "LOG_DRAWN_WITH_CHARACTER"
                     : "LOG_RESPONDED_WITH_CHARACTER"
-                : "LOG_PLAYED_CHARACTER", card_ptr, this);
+                : "LOG_PLAYED_CHARACTER", origin_card, this);
             break;
         case pocket_type::shop_selection:
-            m_game->add_log("LOG_BOUGHT_CARD", card_ptr, this);
+            m_game->add_log("LOG_BOUGHT_CARD", origin_card, this);
             break;
         }
     }
@@ -332,26 +329,14 @@ namespace banggame {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         }
-        return play_card_verify{
-            this,
-            m_game->find_card(args.card_id),
-            false,
-            target_converter<std::vector<play_card_target>>{}(m_game, args.targets),
-            target_converter<std::vector<card *>>{}(m_game, args.modifier_ids)
-        }.verify_and_play();
+        return play_card_verify{this, args.card, false, args.targets, args.modifiers}.verify_and_play();
     }
     
     game_string player::handle_action(enums::enum_tag_t<game_action_type::respond_card>, const play_card_args &args) {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         }
-        return play_card_verify{
-            this,
-            m_game->find_card(args.card_id),
-            true,
-            target_converter<std::vector<play_card_target>>{}(m_game, args.targets),
-            target_converter<std::vector<card *>>{}(m_game, args.modifier_ids)
-        }.verify_and_respond();
+        return play_card_verify{this, args.card, true, args.targets, args.modifiers}.verify_and_respond();
     }
 
     void player::prompt_then(game_string &&message, std::function<void()> &&fun) {

@@ -11,9 +11,6 @@
 
 namespace banggame {
 
-    struct game;
-    struct player;
-
     constexpr int max_cubes = 4;
     
     struct card : card_data {
@@ -158,7 +155,7 @@ namespace banggame {
 
         bool is_possible_to_play(card *c, bool is_response = false);
 
-        bool is_bangcard(card *card_ptr);
+        bool is_bangcard(card *origin_card);
 
         void draw_from_deck();
 
@@ -179,8 +176,8 @@ namespace banggame {
 
         void untap_inactive_cards();
 
-        void play_card_action(card *card_ptr);
-        void log_played_card(card *card_ptr, bool is_response);
+        void play_card_action(card *origin_card);
+        void log_played_card(card *origin_card, bool is_response);
 
         void prompt_then(game_string &&message, std::function<void()> &&args);
 

@@ -49,8 +49,8 @@ namespace banggame {
             rng.seed(rd());
         }
         
-        card *find_card(int card_id);
-        player *find_player(int player_id);
+        card *find_card(int card_id) const;
+        player *find_player(int player_id) const;
         
         std::vector<card *> &get_pocket(pocket_type pocket, player *owner = nullptr);
 

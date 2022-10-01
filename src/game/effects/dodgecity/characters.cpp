@@ -149,14 +149,14 @@ namespace banggame {
                 card_copy->pocket = pocket_type::player_character;
                 card_copy->owner = origin;
 
-                card *card_ptr = origin->m_game->m_cards.insert(std::move(card_copy)).get();
+                card *new_card = origin->m_game->m_cards.insert(std::move(card_copy)).get();
                 
-                origin->m_characters.emplace_back(card_ptr);
-                card_ptr->on_enable(origin);
+                origin->m_characters.emplace_back(new_card);
+                new_card->on_enable(origin);
 
                 origin->m_game->add_update<game_update_type::add_cards>(
-                    make_id_vector(std::views::single(card_ptr)), pocket_type::player_character, origin->id);
-                origin->m_game->send_card_update(card_ptr, origin, show_card_flags::instant | show_card_flags::shown);
+                    make_id_vector(std::views::single(new_card)), pocket_type::player_character, origin->id);
+                origin->m_game->send_card_update(new_card, origin, show_card_flags::instant | show_card_flags::shown);
             });
     }
 

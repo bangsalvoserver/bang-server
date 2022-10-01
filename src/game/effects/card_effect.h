@@ -5,25 +5,9 @@
 #include "../format_str.h"
 #include "../durations.h"
 
-#include "utils/nullable.h"
-
 #include <memory>
 
 namespace banggame {
-
-    struct player;
-    struct card;
-
-    DEFINE_ENUM_VARIANT(play_card_target, target_type,
-        (player,                player *)
-        (conditional_player,    nullable<player>)
-        (card,                  card *)
-        (extra_card,            nullable<card>)
-        (cards,                 std::vector<card *>)
-        (cards_other_players,   std::vector<card *>)
-        (select_cubes,          std::vector<card *>)
-        (self_cubes,            int)
-    )
 
     template<target_type E> struct tagged_value {};
 

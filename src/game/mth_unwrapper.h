@@ -11,6 +11,18 @@ template<typename T> struct target_getter {
     }
 };
 
+template<> struct target_getter<card *> {
+    card *operator()(const target_list &targets, size_t index) {
+        return targets.at(index).get<target_type::card>();
+    }
+};
+
+template<> struct target_getter<player *> {
+    player *operator()(const target_list &targets, size_t index) {
+        return targets.at(index).get<target_type::player>();
+    }
+};
+
 template<target_type E> struct target_getter<tagged_value<E>> {
     tagged_value<E> operator()(const target_list &targets, size_t index) {
         if (index >= targets.size() || !targets[index].is(E)) {
