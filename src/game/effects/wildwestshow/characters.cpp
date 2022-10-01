@@ -128,7 +128,7 @@ namespace banggame {
 
         target->m_game->add_update<game_update_type::add_cards>(
             make_id_vector(base_characters | std::views::take(2)),
-            pocket_type::player_character, target->id);
+            pocket_type::player_character, target);
         for (int i=0; i<2; ++i) {
             auto *c = target->m_characters.emplace_back(base_characters[i]);
             target->m_game->add_log("LOG_CHARACTER_CHOICE", target, c);
@@ -147,7 +147,7 @@ namespace banggame {
             c->owner = nullptr;
         }
         if (target->m_characters.size() > 1) {
-            target->m_game->add_update<game_update_type::remove_cards>(make_id_vector(target->m_characters | std::views::drop(1)));
+            target->m_game->add_update<game_update_type::remove_cards>(to_vector(target->m_characters | std::views::drop(1)));
             target->m_characters.resize(1);
         }
         on_equip(target_card, target);

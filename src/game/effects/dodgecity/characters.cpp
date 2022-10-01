@@ -155,14 +155,14 @@ namespace banggame {
                 new_card->on_enable(origin);
 
                 origin->m_game->add_update<game_update_type::add_cards>(
-                    make_id_vector(std::views::single(new_card)), pocket_type::player_character, origin->id);
+                    make_id_vector(std::views::single(new_card)), pocket_type::player_character, origin);
                 origin->m_game->send_card_update(new_card, origin, show_card_flags::instant | show_card_flags::shown);
             });
     }
 
     void effect_vera_custer::remove_characters(player *origin) {
         if (origin->m_characters.size() > 1) {
-            origin->m_game->add_update<game_update_type::remove_cards>(make_id_vector(origin->m_characters | std::views::drop(1)));
+            origin->m_game->add_update<game_update_type::remove_cards>(to_vector(origin->m_characters | std::views::drop(1)));
             while (origin->m_characters.size() > 1) {
                 origin->disable_equip(origin->m_characters.back());
                 origin->m_game->m_cards.erase(origin->m_characters.back()->id);

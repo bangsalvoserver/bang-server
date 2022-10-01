@@ -14,6 +14,8 @@ namespace banggame {
     constexpr int max_cubes = 4;
     
     struct card : card_data {
+        int id;
+        
         int8_t usages = 0;
         bool inactive = false;
         int8_t num_cubes = 0;

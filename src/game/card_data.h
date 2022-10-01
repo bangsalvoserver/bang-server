@@ -14,8 +14,6 @@ namespace banggame {
     using tag_list = std::vector<tag_holder>;
 
     struct card_data {REFLECTABLE(
-        (int) id,
-
         (std::string) name,
         (std::string) image,
 

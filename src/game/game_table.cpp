@@ -76,12 +76,12 @@ namespace banggame {
 
     void game_table::send_card_update(card *c, player *owner, show_card_flags flags) {
         if (bool(flags & show_card_flags::hidden)) {
-            add_update<game_update_type::hide_card>(c->id, flags);
+            add_update<game_update_type::hide_card>(c, flags);
         } else if (!owner || bool(flags & show_card_flags::shown)) {
-            add_update<game_update_type::show_card>(*c, flags);
+            add_update<game_update_type::show_card>(c, *c, flags);
         } else {
-            add_update<game_update_type::hide_card>(update_target::excludes(owner), c->id, flags);
-            add_update<game_update_type::show_card>(update_target::includes(owner), *c, flags);
+            add_update<game_update_type::hide_card>(update_target::excludes(owner), c, flags);
+            add_update<game_update_type::show_card>(update_target::includes(owner), c, *c, flags);
         }
     }
 
@@ -98,7 +98,7 @@ namespace banggame {
             c->pocket = pocket;
             c->owner = owner;
             
-            add_update<game_update_type::move_card>(c->id, owner ? owner->id : 0, pocket, flags);
+            add_update<game_update_type::move_card>(c, owner, pocket, flags);
         }
         if (prev_pocket == pocket_type::main_deck && m_deck.empty()) {
             card *top_discards = m_discards.back();
@@ -180,7 +180,7 @@ namespace banggame {
     }
 
     void game_table::flash_card(card *c) {
-        add_update<game_update_type::flash_card>(c->id);
+        add_update<game_update_type::flash_card>(c);
     }
 
     void game_table::add_disabler(event_card_key key, card_disabler_fun &&fun) {

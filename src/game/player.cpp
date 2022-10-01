@@ -60,7 +60,7 @@ namespace banggame {
             if (target_card->pocket == pocket_type::player_table) {
                 if (target_card->inactive) {
                     target_card->inactive = false;
-                    owner->m_game->add_update<game_update_type::tap_card>(target_card->id, false);
+                    owner->m_game->add_update<game_update_type::tap_card>(target_card, false);
                 }
                 owner->disable_equip(target_card);
                 owner->drop_all_cubes(target_card);
@@ -116,13 +116,13 @@ namespace banggame {
 
     void player::set_hp(int value, bool instant) {
         m_hp = value;
-        m_game->add_update<game_update_type::player_hp>(id, value, instant);
+        m_game->add_update<game_update_type::player_hp>(this, value, instant);
     }
 
     void player::add_gold(int amount) {
         if (amount) {
             m_gold += amount;
-            m_game->add_update<game_update_type::player_gold>(id, m_gold);
+            m_game->add_update<game_update_type::player_gold>(this, m_gold);
         }
     }
 
@@ -169,7 +169,7 @@ namespace banggame {
         if (ncubes > 0) {
             m_game->num_cubes -= ncubes;
             target->num_cubes += ncubes;
-            m_game->add_update<game_update_type::move_cubes>(ncubes, 0, target->id);
+            m_game->add_update<game_update_type::move_cubes>(ncubes, nullptr, target);
         }
     }
 
@@ -184,12 +184,12 @@ namespace banggame {
             target->num_cubes += added_cubes;
             origin->num_cubes -= added_cubes;
             ncubes -= added_cubes;
-            m_game->add_update<game_update_type::move_cubes>(added_cubes, origin->id, target->id);
+            m_game->add_update<game_update_type::move_cubes>(added_cubes, origin, target);
         }
         if (ncubes > 0) {
             origin->num_cubes -= ncubes;
             m_game->num_cubes += ncubes;
-            m_game->add_update<game_update_type::move_cubes>(ncubes, origin->id, 0);
+            m_game->add_update<game_update_type::move_cubes>(ncubes, origin, nullptr);
         }
         if (origin->sign && origin->num_cubes == 0) {
             m_game->add_log("LOG_DISCARDED_ORANGE_CARD", this, origin);
@@ -203,7 +203,7 @@ namespace banggame {
     void player::drop_all_cubes(card *target) {
         if (target->num_cubes > 0) {
             m_game->num_cubes += target->num_cubes;
-            m_game->add_update<game_update_type::move_cubes>(target->num_cubes, target->id, 0);
+            m_game->add_update<game_update_type::move_cubes>(target->num_cubes, target, nullptr);
             target->num_cubes = 0;
         }
     }
@@ -255,7 +255,7 @@ namespace banggame {
 
     void player::set_last_played_card(card *c) {
         m_last_played_card = c;
-        m_game->add_update<game_update_type::last_played_card>(update_target::includes_private(this), c ? c->id : 0);
+        m_game->add_update<game_update_type::last_played_card>(update_target::includes_private(this), c);
     }
 
     bool player::is_bangcard(card *origin_card) {
@@ -415,7 +415,7 @@ namespace banggame {
             obj.resolved = false;
         }
         
-        m_game->add_update<game_update_type::switch_turn>(id);
+        m_game->add_update<game_update_type::switch_turn>(this);
         m_game->add_log("LOG_TURN_START", this);
         m_game->call_event<event_type::pre_turn_start>(this);
 
@@ -482,7 +482,7 @@ namespace banggame {
         for (card *c : m_table) {
             if (c->inactive) {
                 c->inactive = false;
-                m_game->add_update<game_update_type::tap_card>(c->id, false);
+                m_game->add_update<game_update_type::tap_card>(c, false);
             }
         }
     }
@@ -522,10 +522,10 @@ namespace banggame {
         m_role = role;
 
         if (role == player_role::sheriff || m_game->m_players.size() <= 3) {
-            m_game->add_update<game_update_type::player_show_role>(id, m_role, true);
+            m_game->add_update<game_update_type::player_show_role>(this, m_role, true);
             add_player_flags(player_flags::role_revealed);
         } else {
-            m_game->add_update<game_update_type::player_show_role>(update_target::includes(this), id, m_role, true);
+            m_game->add_update<game_update_type::player_show_role>(update_target::includes(this), this, m_role, true);
         }
     }
 
@@ -534,7 +534,7 @@ namespace banggame {
     }
 
     void player::send_player_status() {
-        m_game->add_update<game_update_type::player_status>(id, m_player_flags, m_range_mod, m_weapon_range, m_distance_mod);
+        m_game->add_update<game_update_type::player_status>(this, m_player_flags, m_range_mod, m_weapon_range, m_distance_mod);
     }
 
     bool player::add_player_flags(player_flags flags) {

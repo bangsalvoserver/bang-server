@@ -524,7 +524,7 @@ namespace banggame {
                         break;
                     case card_color_type::green:
                         origin_card->inactive = true;
-                        origin->m_game->add_update<game_update_type::tap_card>(origin_card->id, true);
+                        origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
                         break;
                     case card_color_type::orange:
                         origin->add_cubes(origin_card, 3);

@@ -10,12 +10,20 @@
 
 namespace banggame {
 
-    inline std::vector<card_backface> make_id_vector(auto &&range) {
-        auto view = range | std::views::transform([](const card *c) {
+    inline auto to_vector(std::ranges::range auto &&range) {
+        std::vector<std::ranges::range_value_t<decltype(range)>> ret;
+        if constexpr(std::ranges::sized_range<decltype(range)>) {
+            ret.reserve(std::ranges::size(range));
+        }
+        std::ranges::copy(range, std::back_inserter(ret));
+        return ret;
+    }
+
+    inline std::vector<card_backface> make_id_vector(std::ranges::range auto &&range) {
+        return to_vector(range | std::views::transform([](const card *c) {
             return card_backface{c->id, c->deck};
-        });
-        return {view.begin(), view.end()};
-    };
+        }));
+    }
 
     class update_target {
     private:

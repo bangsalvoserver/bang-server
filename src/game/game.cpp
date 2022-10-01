@@ -18,10 +18,10 @@ namespace banggame {
 
         add_update<game_update_type::player_add>(ret, static_cast<int>(m_players.size()));
 
-        for (const player &p : m_players) {
-            add_update<game_update_type::player_user>(ret, p.id, p.user_id);
+        for (player &p : m_players) {
+            add_update<game_update_type::player_user>(ret, &p, p.user_id);
             if (p.check_player_flags(player_flags::removed)) {
-                add_update<game_update_type::player_remove>(ret, p.id, true);
+                add_update<game_update_type::player_remove>(ret, &p, true);
             }
         }
         
@@ -32,16 +32,16 @@ namespace banggame {
 
         auto move_cards = [&](auto &&range, auto do_show_card) {
             for (card *c : range) {
-                add_update<game_update_type::move_card>(ret, c->id, c->owner ? c->owner->id : 0, c->pocket, show_card_flags::instant);
+                add_update<game_update_type::move_card>(ret, c, c->owner, c->pocket, show_card_flags::instant);
 
                 if (do_show_card(*c)) {
-                    add_update<game_update_type::show_card>(ret, *c, show_card_flags::instant);
+                    add_update<game_update_type::show_card>(ret, c, *c, show_card_flags::instant);
                     if (c->num_cubes > 0) {
-                        add_update<game_update_type::add_cubes>(ret, c->num_cubes, c->id);
+                        add_update<game_update_type::add_cubes>(ret, c->num_cubes, c);
                     }
 
                     if (c->inactive) {
-                        add_update<game_update_type::tap_card>(ret, c->id, true, true);
+                        add_update<game_update_type::tap_card>(ret, c, true, true);
                     }
                 }
             }
@@ -60,19 +60,19 @@ namespace banggame {
         move_cards(m_hidden_deck, show_always);
 
         if (!m_scenario_deck.empty()) {
-            add_update<game_update_type::move_scenario_deck>(ret, m_first_player->id);
+            add_update<game_update_type::move_scenario_deck>(ret, m_first_player);
         }
 
         move_cards(m_scenario_deck, [&](const card &c) { return &c == m_scenario_deck.back(); });
         move_cards(m_scenario_cards, [&](const card &c) { return &c == m_scenario_cards.back(); });
         
         if (num_cubes > 0) {
-            add_update<game_update_type::add_cubes>(ret, num_cubes, 0);
+            add_update<game_update_type::add_cubes>(ret, num_cubes);
         }
 
-        for (auto &p : m_players) {
+        for (player &p : m_players) {
             if (p.check_player_flags(player_flags::role_revealed)) {
-                add_update<game_update_type::player_show_role>(ret, p.id, p.m_role, true);
+                add_update<game_update_type::player_show_role>(ret, &p, p.m_role, true);
             }
 
             if (!p.check_player_flags(player_flags::removed)) {
@@ -82,17 +82,17 @@ namespace banggame {
                 move_cards(p.m_table, show_always);
                 move_cards(p.m_hand, [&](const card &c){ return c.deck == card_deck_type::character; });
 
-                add_update<game_update_type::player_hp>(ret, p.id, p.m_hp, true);
-                add_update<game_update_type::player_status>(ret, p.id, p.m_player_flags, p.m_range_mod, p.m_weapon_range, p.m_distance_mod);
+                add_update<game_update_type::player_hp>(ret, &p, p.m_hp, true);
+                add_update<game_update_type::player_status>(ret, &p, p.m_player_flags, p.m_range_mod, p.m_weapon_range, p.m_distance_mod);
                 
                 if (p.m_gold != 0) {
-                    add_update<game_update_type::player_gold>(ret, p.id, p.m_gold);
+                    add_update<game_update_type::player_gold>(ret, &p, p.m_gold);
                 }
             }
         }
 
         if (m_playing) {
-            add_update<game_update_type::switch_turn>(ret, m_playing->id);
+            add_update<game_update_type::switch_turn>(ret, m_playing);
         }
         if (pending_requests()) {
             add_update<game_update_type::request_status>(ret, make_request_update(nullptr));
@@ -105,16 +105,16 @@ namespace banggame {
         std::vector<game_update> ret;
 
         if (!target->check_player_flags(player_flags::role_revealed)) {
-            add_update<game_update_type::player_show_role>(ret, target->id, target->m_role, true);
+            add_update<game_update_type::player_show_role>(ret, target, target->m_role, true);
         }
 
         for (card *c : target->m_hand) {
-            add_update<game_update_type::show_card>(ret, *c, show_card_flags::instant);
+            add_update<game_update_type::show_card>(ret, c, *c, show_card_flags::instant);
         }
 
         for (card *c : m_selection) {
             if (c->owner == target) {
-                add_update<game_update_type::show_card>(ret, *c, show_card_flags::instant);
+                add_update<game_update_type::show_card>(ret, c, *c, show_card_flags::instant);
             }
         }
 
@@ -134,8 +134,8 @@ namespace banggame {
 
         add_update<game_update_type::player_add>(static_cast<int>(m_players.size()));
 
-        for (auto &p : m_players) {
-            add_update<game_update_type::player_user>(p.id, p.user_id);
+        for (player &p : m_players) {
+            add_update<game_update_type::player_user>(&p, p.user_id);
         }
     
         add_update<game_update_type::game_options>(options);
@@ -189,7 +189,7 @@ namespace banggame {
 
         if (has_expansion(card_expansion_type::armedanddangerous)) {
             num_cubes = 32;
-            add_update<game_update_type::add_cubes>(num_cubes, 0);
+            add_update<game_update_type::add_cubes>(num_cubes);
         }
 
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
@@ -216,7 +216,7 @@ namespace banggame {
         auto role_ptr = m_players.size() > 3 ? roles : roles_3players;
 
         std::ranges::shuffle(role_ptr, role_ptr + m_players.size(), rng);
-        for (auto &p : m_players) {
+        for (player &p : m_players) {
             p.set_role(*role_ptr++);
         }
 
@@ -226,7 +226,7 @@ namespace banggame {
             m_first_player = &*std::ranges::find(m_players, player_role::deputy_3p, &player::m_role);
         }
 
-        add_update<game_update_type::move_scenario_deck>(m_first_player->id);
+        add_update<game_update_type::move_scenario_deck>(m_first_player);
 
         if (add_cards(all_cards.highnoon, pocket_type::scenario_deck) || add_cards(all_cards.fistfulofcards, pocket_type::scenario_deck)) {
             shuffle_cards_and_ids(m_scenario_deck);
@@ -255,27 +255,27 @@ namespace banggame {
             p.m_characters.push_back(c);
             c->pocket = pocket_type::player_character;
             c->owner = &p;
-            add_update<game_update_type::add_cards>(make_id_vector(std::views::single(c)), pocket_type::player_character, p.id);
+            add_update<game_update_type::add_cards>(make_id_vector(std::views::single(c)), pocket_type::player_character, &p);
         };
 
         auto character_it = character_ptrs.rbegin();
 
 #ifdef TESTING_CARDS
-        for (auto &p : m_players) {
+        for (player &p : m_players) {
             add_character_to(*character_it++, p);
         }
-        for (auto &p : m_players) {
+        for (player &p : m_players) {
             add_character_to(*character_it++, p);
         }
 #else
-        for (auto &p : m_players) {
+        for (player &p : m_players) {
             add_character_to(*character_it++, p);
             add_character_to(*character_it++, p);
         }
 #endif
 
         if (has_expansion(card_expansion_type::characterchoice)) {
-            for (auto &p : m_players) {
+            for (player &p : m_players) {
                 while (!p.m_characters.empty()) {
                     move_card(p.m_characters.front(), pocket_type::player_hand, &p, show_card_flags::instant | show_card_flags::shown);
                 }
@@ -284,7 +284,7 @@ namespace banggame {
                 queue_request<request_characterchoice>(&p);
             }
         } else {
-            for (auto &p : m_players) {
+            for (player &p : m_players) {
                 add_log("LOG_CHARACTER_CHOICE", &p, p.m_characters.front());
                 send_card_update(p.m_characters.front(), &p, show_card_flags::instant | show_card_flags::shown);
                 p.reset_max_hp();
@@ -298,7 +298,7 @@ namespace banggame {
         queue_action([this] {
             add_log("LOG_GAME_START");
 
-            for (auto &p : m_players) {
+            for (player &p : m_players) {
                 p.m_characters.front()->on_equip(&p);
             }
 
@@ -328,23 +328,21 @@ namespace banggame {
     request_status_args game::make_request_update(player *p) {
         const auto &req = top_request();
         request_status_args ret{
-            req.origin_card() ? req.origin_card()->id : 0,
-            req.origin() ? req.origin()->id : 0,
-            req.target() ? req.target()->id : 0,
+            req.origin_card(),
+            req.origin(),
+            req.target(),
             req.status_text(p),
             req.flags()
         };
 
-        for (card *c : req.get_highlights()) {
-            ret.highlight_ids.push_back(c->id);
-        }
+        ret.highlight_cards = req.get_highlights();
 
         if (!p) return ret;
 
         auto add_ids_for = [&](auto &&cards) {
             for (card *c : cards) {
                 if (req.can_respond(p, c)) {
-                    ret.respond_ids.push_back(c->id);
+                    ret.respond_cards.push_back(c);
                 }
             }
         };
@@ -363,9 +361,7 @@ namespace banggame {
 
         auto maybe_add_pick_id = [&](pocket_type pocket, player *target_player, card *target_card) {
             if (req.can_pick(pocket, target_player, target_card)) {
-                ret.pick_ids.emplace_back(pocket,
-                    target_player ? target_player->id : 0,
-                    target_card ? target_card->id : 0);
+                ret.pick_cards.emplace_back(pocket, target_player, target_card);
             }
         };
 
@@ -389,16 +385,14 @@ namespace banggame {
         auto &req = top_request();
         if (req.target() && bool(req.flags() & (effect_flags::auto_pick | effect_flags::auto_respond))) {
             auto target_request_update = make_request_update(req.target());
-            if (bool(req.flags() & effect_flags::auto_pick) && target_request_update.pick_ids.size() == 1 && target_request_update.respond_ids.empty()) {
-                const auto &args = target_request_update.pick_ids.front();
-                req.on_pick(args.pocket,
-                    args.player_id ? find_player(args.player_id) : nullptr,
-                    args.card_id ? find_card(args.card_id) : nullptr);
+            if (bool(req.flags() & effect_flags::auto_pick) && target_request_update.pick_cards.size() == 1 && target_request_update.respond_cards.empty()) {
+                const auto &[pocket, player, card] = target_request_update.pick_cards.front();
+                req.on_pick(pocket, player, card);
                 return;
             }
-            if (bool(req.flags() & effect_flags::auto_respond) && target_request_update.pick_ids.empty() && target_request_update.respond_ids.size() == 1) {
+            if (bool(req.flags() & effect_flags::auto_respond) && target_request_update.pick_cards.empty() && target_request_update.respond_cards.size() == 1) {
                 player *target = req.target();
-                card *origin_card = find_card(target_request_update.respond_ids.front());
+                card *origin_card = target_request_update.respond_cards.front();
                 bool is_response = !bool(req.flags() & effect_flags::force_play);
                 auto &effects = is_response ? origin_card->responses : origin_card->effects;
                 if (origin_card->equips.empty()
@@ -417,7 +411,7 @@ namespace banggame {
         }
 
         auto spectator_target = update_target::excludes_public();
-        for (auto &p : m_players) {
+        for (player &p : m_players) {
             if (p.user_id && p.alive()) {
                 req.add_pending_confirm(&p);
             }
@@ -467,7 +461,7 @@ namespace banggame {
         }
 
         if (target->m_characters.size() > 1) {
-            add_update<game_update_type::remove_cards>(make_id_vector(target->m_characters | std::views::drop(1)));
+            add_update<game_update_type::remove_cards>(to_vector(target->m_characters | std::views::drop(1)));
             target->m_characters.resize(1);
         }
 
@@ -479,7 +473,7 @@ namespace banggame {
             add_log("LOG_PLAYER_DIED", target);
         }
         
-        add_update<game_update_type::player_show_role>(target->id, target->m_role);
+        add_update<game_update_type::player_show_role>(target, target->m_role);
         target->add_player_flags(player_flags::role_revealed | player_flags::dead);
         target->set_hp(0, true);
 
@@ -523,18 +517,18 @@ namespace banggame {
             
             if (target == m_first_player && num_alive > 1 && winner_role == player_role::unknown) {
                 m_first_player = std::next(player_iterator(m_first_player));
-                add_update<game_update_type::move_scenario_deck>(m_first_player->id);
+                add_update<game_update_type::move_scenario_deck>(m_first_player);
             }
 
             if (winner_role == player_role::unknown && !has_expansion(card_expansion_type::ghostcards)) {
                 target->add_player_flags(player_flags::removed);
-                add_update<game_update_type::player_remove>(target->id);
+                add_update<game_update_type::player_remove>(target);
             }
 
             if (winner_role != player_role::unknown) {
-                for (const auto &p : m_players) {
+                for (player &p : m_players) {
                     if (!p.check_player_flags(player_flags::role_revealed)) {
-                        add_update<game_update_type::player_show_role>(p.id, p.m_role);
+                        add_update<game_update_type::player_show_role>(&p, p.m_role);
                     }
                 }
                 add_log("LOG_GAME_OVER");
