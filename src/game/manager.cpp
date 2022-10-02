@@ -317,10 +317,9 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
     }
 
     if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
-        game_action action = json::deserialize<banggame::game_action>(value, lobby.game);
         if (auto error = enums::visit_indexed([&]<game_action_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
             return it->handle_action(tag, FWD(args) ...);
-        }, action)) {
+        }, json::deserialize<banggame::game_action>(value, lobby.game))) {
             lobby.game.add_update<game_update_type::game_error>(update_target::includes_private(&*it), std::move(error));
         }
     } else {
