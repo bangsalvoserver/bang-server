@@ -183,7 +183,7 @@ namespace banggame {
 
         void prompt_then(game_string &&message, std::function<void()> &&args);
 
-        game_string handle_action(enums::enum_tag_t<game_action_type::pick_card>, const pick_card_args &args);
+        game_string handle_action(enums::enum_tag_t<game_action_type::pick_card>, const picking_args &args);
         game_string handle_action(enums::enum_tag_t<game_action_type::play_card>, const play_card_args &args);
         game_string handle_action(enums::enum_tag_t<game_action_type::respond_card>, const play_card_args &args);
         game_string handle_action(enums::enum_tag_t<game_action_type::prompt_respond>, bool response);

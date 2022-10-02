@@ -264,7 +264,7 @@ namespace banggame {
             || origin_card->has_tag(tag_type::bangcard);
     };
 
-    game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, const pick_card_args &args) {
+    game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, const picking_args &args) {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         } else if (!m_game->pending_requests()) {

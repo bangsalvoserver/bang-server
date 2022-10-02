@@ -6,7 +6,6 @@
 
 #include "utils/reflector.h"
 #include "effects/card_effect.h"
-#include "game_action.h"
 
 namespace banggame {
 

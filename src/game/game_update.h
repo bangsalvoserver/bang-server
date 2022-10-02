@@ -187,6 +187,24 @@ namespace banggame {
 
     using game_update = enums::enum_variant<game_update_type>;
     #define UPD_TAG(name) enums::enum_tag_t<game_update_type::name>
+
+    using target_vector = std::vector<play_card_target>;
+
+    struct play_card_args {REFLECTABLE(
+        (serial::card) card,
+        (std::vector<serial::card>) modifiers,
+        (target_vector) targets
+    )};
+
+    DEFINE_ENUM_TYPES(game_action_type,
+        (pick_card, picking_args)
+        (play_card, play_card_args)
+        (respond_card, play_card_args)
+        (prompt_respond, bool)
+        (request_confirm)
+    )
+
+    using game_action = enums::enum_variant<game_action_type>;
 }
 
 #endif
