@@ -1,7 +1,10 @@
 #ifndef __CARD_SERIAL_H__
 #define __CARD_SERIAL_H__
 
+#include <span>
+
 #include "utils/json_serial.h"
+#include "utils/utils.h"
 
 namespace banggame {
     struct game;
@@ -30,6 +33,7 @@ namespace banggame {
         using player = banggame::player_view *;
         using cube = banggame::card_cube_pair;
         using player_card = banggame::player_card_pair;
+        using card_id_vector = std::vector<card>;
 
         template<typename T>
         concept serializable = is_one_of<T, card, player, cube, player_card>;
@@ -45,8 +49,15 @@ namespace banggame::serial {
     using cube = banggame::card *;
     using player_card = banggame::card *;
 
+    struct card_id_vector {
+        std::vector<int> card_ids;
+
+        card_id_vector() = default;
+        card_id_vector(std::span<banggame::card *> cards);
+    };
+
     template<typename T>
-    concept serializable = is_one_of<T, card, player>;
+    concept serializable = is_one_of<T, card, player, card_id_vector>;
 }
 
 #ifndef BUILD_BANG_SERVER
@@ -60,7 +71,7 @@ namespace banggame::serial {
 namespace json {
     template<banggame::serial::serializable T> struct serializer<T, banggame::serial::context> {
         const banggame::serial::context &context;
-        Json::Value operator()(T value) const;
+        Json::Value operator()(same_if_trivial_t<T> value) const;
     };
 
     template<banggame::serial::serializable T> struct deserializer<T, banggame::serial::context> {

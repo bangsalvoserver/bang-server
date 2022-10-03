@@ -147,7 +147,7 @@ namespace banggame {
             c->owner = nullptr;
         }
         if (target->m_characters.size() > 1) {
-            target->m_game->add_update<game_update_type::remove_cards>(to_vector(target->m_characters | std::views::drop(1)));
+            target->m_game->add_update<game_update_type::remove_cards>(std::span(target->m_characters).subspan(1));
             target->m_characters.resize(1);
         }
         on_equip(target_card, target);

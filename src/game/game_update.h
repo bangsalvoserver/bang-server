@@ -21,7 +21,7 @@ namespace banggame {
     )};
 
     struct remove_cards_update {REFLECTABLE(
-        (std::vector<serial::card>) cards
+        (serial::card_id_vector) cards
     )};
 
     DEFINE_ENUM_FLAGS(show_card_flags,

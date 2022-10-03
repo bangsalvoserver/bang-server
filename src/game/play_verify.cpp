@@ -5,14 +5,12 @@
 #include "effects/base/requests.h"
 
 #include "utils/raii_editor.h"
+#include "utils/utils.h"
 
 #include <set>
 
 namespace banggame {
     using namespace enums::flag_operators;
-
-    template<typename ... Ts> struct overloaded : Ts ... { using Ts::operator() ...; };
-    template<typename ... Ts> overloaded(Ts ...) -> overloaded<Ts ...>;
 
     game_string check_player_filter(card *origin_card, player *origin, target_player_filter filter, player *target) {
         if (bool(filter & target_player_filter::dead)) {

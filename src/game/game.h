@@ -6,6 +6,7 @@
 #include "request_queue.h"
 #include "draw_check_handler.h"
 #include "player_iterator.h"
+#include "utils/utils.h"
 
 namespace banggame {
 
