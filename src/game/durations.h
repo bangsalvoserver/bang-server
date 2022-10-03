@@ -14,7 +14,7 @@ namespace banggame {
     
     using ticks = ticks_t<int>;
 
-    static constexpr ticks default_timer_duration = std::chrono::duration_cast<ticks>(2500ms);
+    static constexpr ticks default_timer_duration = 2s;
 
     static constexpr ticks auto_confirm_duration = 5s;
 
