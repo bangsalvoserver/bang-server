@@ -40,7 +40,7 @@ void game_manager::tick() {
             l.game.tick();
         }
         l.send_updates(*this);
-        if (l.game.check_flags(game_flags::game_over)) {
+        if (l.game.check_flags(game_flags::game_over) && l.state != lobby_state::finished) {
             l.state = lobby_state::finished;
             send_lobby_update(it);
         }
@@ -254,6 +254,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
         return "ERROR_LOBBY_NOT_FINISHED";
     }
 
+    lobby.game = {};
     lobby.state = lobby_state::waiting;
     send_lobby_update(*(user->second.in_lobby));
 
@@ -328,8 +329,6 @@ void lobby::send_updates(game_manager &mgr) {
 
 void lobby::start_game(game_manager &mgr) {
     mgr.broadcast_message_lobby<server_message_type::game_started>(*this);
-
-    game = {};
     
     std::vector<player *> ids;
     for (const auto &_ : users) {
