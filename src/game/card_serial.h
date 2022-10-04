@@ -24,8 +24,18 @@ namespace banggame {
     class game_scene;
     struct cube_widget;
 
-    using player_card_pair = std::pair<player_view *, card_view *>;
-    using card_cube_pair = std::pair<card_view *, cube_widget *>;
+    struct player_card_pair {
+        player_view *player;
+        card_view *card;
+
+        bool operator == (const player_card_pair &) const = default;
+    };
+    struct card_cube_pair {
+        card_view *card;
+        cube_widget *cube;
+
+        bool operator == (const card_cube_pair &) const = default;
+    };
 
     namespace serial {
         using context = banggame::game_scene;
