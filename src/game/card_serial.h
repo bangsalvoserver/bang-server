@@ -1,8 +1,6 @@
 #ifndef __CARD_SERIAL_H__
 #define __CARD_SERIAL_H__
 
-#include <span>
-
 #include "utils/json_serial.h"
 #include "utils/utils.h"
 
@@ -43,7 +41,6 @@ namespace banggame {
         using player = banggame::player_view *;
         using cube = banggame::card_cube_pair;
         using player_card = banggame::player_card_pair;
-        using card_id_vector = std::vector<card>;
 
         template<typename T>
         concept serializable = is_one_of<T, card, player, cube, player_card>;
@@ -59,15 +56,8 @@ namespace banggame::serial {
     using cube = banggame::card *;
     using player_card = banggame::card *;
 
-    struct card_id_vector {
-        std::vector<int> card_ids;
-
-        card_id_vector() = default;
-        card_id_vector(std::span<banggame::card *> cards);
-    };
-
     template<typename T>
-    concept serializable = is_one_of<T, card, player, card_id_vector>;
+    concept serializable = is_one_of<T, card, player>;
 }
 
 #ifndef BUILD_BANG_SERVER
