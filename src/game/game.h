@@ -15,8 +15,8 @@ namespace banggame {
 
         player *m_playing = nullptr;
 
-        std::vector<game_update> get_spectator_updates();
-        std::vector<game_update> get_rejoin_updates(player *target);
+        std::vector<Json::Value> get_spectator_updates();
+        std::vector<Json::Value> get_rejoin_updates(player *target);
 
         void start_game(const game_options &options);
 

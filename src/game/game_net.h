@@ -66,25 +66,23 @@ namespace banggame {
         }
     };
 
+    template<typename Context>
     struct game_net_manager {
-        std::deque<std::pair<update_target, game_update>> m_updates;
+        std::deque<std::pair<update_target, Json::Value>> m_updates;
         std::deque<std::pair<update_target, game_string>> m_saved_log;
-        std::deque<game_update> m_public_updates;
+
+        const Context &context() const {
+            return static_cast<const Context &>(*this);
+        }
 
         template<game_update_type E>
-        void add_update(std::vector<game_update> &update_vector, auto && ... args) {
-            update_vector.emplace_back(enums::enum_tag<E>, FWD(args) ... );
+        void add_update(std::vector<Json::Value> &update_vector, auto && ... args) {
+            update_vector.emplace_back(json::serialize(game_update{enums::enum_tag<E>, FWD(args) ... }, context()));
         }
 
         template<game_update_type E>
         void add_update(update_target target, auto && ... args) {
-            const auto &update = m_updates.emplace_back(std::piecewise_construct,
-                std::make_tuple(std::move(target)),
-                std::make_tuple(enums::enum_tag<E>, FWD(args) ... ));
-            
-            if (update.first.is_public()) {
-                m_public_updates.push_back(update.second);
-            }
+            m_updates.emplace_back(target, json::serialize(game_update{enums::enum_tag<E>, FWD(args) ... }, context()));
         }
 
         template<game_update_type E>

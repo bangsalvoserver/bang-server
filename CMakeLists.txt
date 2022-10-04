@@ -92,11 +92,6 @@ if (BUILD_GAME_RELEASE)
 
 else()
 
-    option(DEBUG_PRINT_PUBLIC_LOGS "Debug Option: Print Public Logs" OFF)
-    if (DEBUG_PRINT_PUBLIC_LOGS)
-        target_compile_definitions(bangserver PUBLIC DEBUG_PRINT_PUBLIC_LOGS)
-    endif()
-
     option(TESTING_CARDS "Debug Option: Enable Testing Cards" ON)
     if (TESTING_CARDS)
         target_compile_definitions(bangserver PUBLIC TESTING_CARDS)

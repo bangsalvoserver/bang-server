@@ -12,14 +12,14 @@ namespace banggame {
         if (auto it = m_cards.find(card_id); it != m_cards.end()) {
             return &*it;
         }
-        throw std::runtime_error("server.find_card: ID not found");
+        throw std::runtime_error(fmt::format("server.find_card: ID {} not found", card_id));
     }
 
     player *game_table::find_player(int player_id) const {
         if (auto it = m_players.find(player_id); it != m_players.end()) {
             return &*it;
         }
-        throw std::runtime_error("server.find_player: ID not found");
+        throw std::runtime_error(fmt::format("server.find_player: ID {} not found", player_id));
     }
     
     std::vector<card *> &game_table::get_pocket(pocket_type pocket, player *owner) {

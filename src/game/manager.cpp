@@ -40,7 +40,8 @@ void game_manager::tick() {
             l.game.tick();
         }
         l.send_updates(*this);
-        if (l.state == lobby_state::finished) {
+        if (l.game.check_flags(game_flags::game_over)) {
+            l.state = lobby_state::finished;
             send_lobby_update(it);
         }
         if (l.users.empty() && --l.lifetime == ticks{0}) {
@@ -153,7 +154,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
             send_message<server_message_type::game_started>(user->first);
 
             for (const auto &msg : lobby.game.get_spectator_updates()) {
-                send_message<server_message_type::game_update>(user->first, json::serialize(msg, lobby.game));
+                send_message<server_message_type::game_update>(user->first, msg);
             }
         }
     }
@@ -175,10 +176,10 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
     target->user_id = user->second.user_id;
 
     broadcast_message_lobby<server_message_type::game_update>(lobby, json::serialize(game_update{
-            enums::enum_tag<game_update_type::player_user>, target, target->user_id}, lobby.game));
+            enums::enum_tag<game_update_type::player_user>, target, target->user_id}, lobby.game.context()));
     
     for (const auto &msg : lobby.game.get_rejoin_updates(target)) {
-        send_message<server_message_type::game_update>(user->first, json::serialize(msg, lobby.game));
+        send_message<server_message_type::game_update>(user->first, json::serialize(msg, lobby.game.context()));
     }
 
     return {};
@@ -207,7 +208,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
     if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
         it->user_id = 0;
         broadcast_message_lobby<server_message_type::game_update>(lobby, json::serialize(game_update{
-            enums::enum_tag<game_update_type::player_user>, &*it, 0}, lobby.game));
+            enums::enum_tag<game_update_type::player_user>, &*it, 0}, lobby.game.context()));
     }
     
     broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user->second.user_id);
@@ -252,21 +253,6 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
     if (lobby.state != lobby_state::finished) {
         return "ERROR_LOBBY_NOT_FINISHED";
     }
-
-    #ifdef DEBUG_PRINT_PUBLIC_LOGS
-        if (!lobby.game.m_public_updates.empty()) {
-            std::stringstream filename;
-            auto t = std::time(nullptr);
-            auto tm = *std::localtime(&t);
-            filename << "game_log_" << std::put_time(&tm, "%Y%m%d%H%M%S") << ".json";
-            std::ofstream ofs(filename.str());
-            Json::Value val = Json::arrayValue;
-            for (const auto &obj : lobby.game.m_public_updates) {
-                val.append(json::serialize(obj));
-            }
-            ofs << val;
-        }
-    #endif
 
     lobby.state = lobby_state::waiting;
     send_lobby_update(*(user->second.in_lobby));
@@ -319,7 +305,7 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
     if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
         if (auto error = enums::visit_indexed([&]<game_action_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
             return it->handle_action(tag, FWD(args) ...);
-        }, json::deserialize<banggame::game_action>(value, lobby.game))) {
+        }, json::deserialize<banggame::game_action>(value, lobby.game.context()))) {
             lobby.game.add_update<game_update_type::game_error>(update_target::includes_private(&*it), std::move(error));
         }
     } else {
@@ -331,13 +317,9 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
 void lobby::send_updates(game_manager &mgr) {
     while (state == lobby_state::playing && !game.m_updates.empty()) {
         auto &[target, update] = game.m_updates.front();
-        if (update.is(game_update_type::game_over)) {
-            state = lobby_state::finished;
-        }
-        Json::Value serialized = json::serialize(update, game);
         for (auto it : users) {
             if (target.matches(it->second.user_id)) {
-                mgr.send_message<server_message_type::game_update>(it->first, serialized);
+                mgr.send_message<server_message_type::game_update>(it->first, update);
             }
         }
         game.m_updates.pop_front();

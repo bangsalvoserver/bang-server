@@ -5,6 +5,7 @@
 #include "utils/utils.h"
 
 namespace banggame {
+    struct game_table;
     struct game;
     struct card;
     struct player;
@@ -50,7 +51,7 @@ namespace banggame {
 #else
 
 namespace banggame::serial {
-    using context = banggame::game;
+    using context = banggame::game_table;
     using card = banggame::card *;
     using player = banggame::player *;
     using cube = banggame::card *;

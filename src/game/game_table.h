@@ -15,7 +15,7 @@ namespace banggame {
 
     using card_disabler_fun = std::function<bool(card *)>;
 
-    struct game_table : game_net_manager {
+    struct game_table : game_net_manager<game_table> {
         std::default_random_engine rng;
 
         util::id_map<card> m_cards;

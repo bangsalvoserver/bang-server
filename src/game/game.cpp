@@ -13,8 +13,8 @@ namespace banggame {
 
     using namespace enums::flag_operators;
 
-    std::vector<game_update> game::get_spectator_updates() {
-        std::vector<game_update> ret;
+    std::vector<Json::Value> game::get_spectator_updates() {
+        std::vector<Json::Value> ret;
 
         add_update<game_update_type::player_add>(ret, static_cast<int>(m_players.size()));
 
@@ -101,8 +101,8 @@ namespace banggame {
         return ret;
     }
 
-    std::vector<game_update> game::get_rejoin_updates(player *target) {
-        std::vector<game_update> ret;
+    std::vector<Json::Value> game::get_rejoin_updates(player *target) {
+        std::vector<Json::Value> ret;
 
         if (!target->check_player_flags(player_flags::role_revealed)) {
             add_update<game_update_type::player_show_role>(ret, target, target->m_role, true);
