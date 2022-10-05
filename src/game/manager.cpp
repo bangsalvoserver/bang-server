@@ -131,6 +131,10 @@ std::string game_manager::handle_message(MSG_TAG(lobby_edit), user_ptr user, con
 }
 
 std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, const lobby_id_args &value) {
+    if (user->second.in_lobby) {
+        return "ERROR_PLAYER_IN_LOBBY";
+    }
+
     auto lobby_it = m_lobbies.find(value.lobby_id);
     if (lobby_it == m_lobbies.end()) {
         return "ERROR_INVALID_LOBBY";
@@ -168,9 +172,13 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
     }
     auto &lobby = (*user->second.in_lobby)->second;
 
+    if (ranges_contains(lobby.game.m_players, user->second.user_id, &player::user_id)) {
+        return "ERROR_USER_CONTROLLING_PLAYER";
+    }
+
     player *target = lobby.game.find_player(value.player_id);
     if (!target || target->user_id != 0) {
-        return "INVALID_REJOIN_TARGET";
+        return "ERROR_INVALID_REJOIN_TARGET";
     }
 
     target->user_id = user->second.user_id;
