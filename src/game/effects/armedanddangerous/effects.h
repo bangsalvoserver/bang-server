@@ -55,6 +55,7 @@ namespace banggame {
     };
 
     struct handler_duck {
+        game_string on_prompt(card *origin_card, player *origin, opt_tagged_value<target_type::none> paid_cubes);
         void on_play(card *origin_card, player *origin, opt_tagged_value<target_type::none> paid_cubes);
     };
 
