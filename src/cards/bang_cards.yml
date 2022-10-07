@@ -1868,7 +1868,7 @@ fistfulofcards:
     responses:
       - startofturn
       - end_drawing
-      - heal
+      - heal_notfull
   - name: ABANDONED_MINE
     image: 05_minieraabbandonata
     equip:
@@ -2124,7 +2124,7 @@ button_row:
   - name: GAME_DISCARD_BLACK
     expansion: goldrush
     effects:
-      - discard_black card notself | table black
+      - discard_black card | table black
   - name: GAME_DISCARD_BRONCO
     expansion: canyondiablo
     effects:
