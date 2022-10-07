@@ -114,7 +114,7 @@ namespace banggame {
         (cards,                 std::vector<serial::card>)
         (cards_other_players,   std::vector<serial::player_card>)
         (select_cubes,          std::vector<serial::cube>)
-        (self_cubes,            int)
+        (self_cubes)
     )
 
     using play_card_target = enums::enum_variant<target_type>;

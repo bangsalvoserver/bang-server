@@ -3,6 +3,7 @@
 #include "play_visitor.h"
 
 #include "effects/base/requests.h"
+#include "effect_list_zip.h"
 
 #include "utils/raii_editor.h"
 #include "utils/utils.h"
@@ -163,7 +164,8 @@ namespace banggame {
             }
         }
 
-        for (const auto &target : targets) {
+        auto &effects = is_response ? origin_card->responses : origin_card->effects;
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
             if (game_string error = enums::visit_indexed(overloaded{
                 []<target_type E>(enums::enum_tag_t<E>) -> game_string {
                     return {};
@@ -215,9 +217,9 @@ namespace banggame {
                     }
                     return {};
                 },
-                [&](enums::enum_tag_t<target_type::self_cubes>, int ncubes) -> game_string {
-                    if ((selected_cubes[origin_card] += ncubes) > origin_card->num_cubes) {
-                        return  {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
+                [&](enums::enum_tag_t<target_type::self_cubes>) -> game_string {
+                    if ((selected_cubes[origin_card] += effect.target_value) > origin_card->num_cubes) {
+                        return {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
                     }
                     return {};
                 }
@@ -326,28 +328,19 @@ namespace banggame {
         } else if (diff != 0 && diff != origin_card->optionals.size()) {
             return "ERROR_INVALID_TARGETS";
         }
-        
-        auto effect_it = effects.begin();
-        auto effect_end = effects.end();
 
         target_list mth_targets;
-        for (const auto &t : targets) {
-            const auto &e = *effect_it;
-            if (++effect_it == effect_end) {
-                effect_it = origin_card->optionals.begin();
-                effect_end = origin_card->optionals.end();
-            }
-
-            if (!t.is(e.target)) {
+        for (auto [target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+            if (!target.is(effect.target)) {
                 return "ERROR_INVALID_TARGET_TYPE";
-            } else if (e.type == effect_type::mth_add) {
-                mth_targets.push_back(t);
+            } else if (effect.type == effect_type::mth_add) {
+                mth_targets.push_back(target);
             }
             
             if (game_string error = enums::visit_indexed(
-                [this, &e]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return play_visitor<E>{}.verify(this, e, FWD(args) ... );
-                }, t))
+                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                    return play_visitor<E>{}.verify(this, effect, FWD(args) ... );
+                }, target))
             {
                 return error;
             }
@@ -366,24 +359,15 @@ namespace banggame {
 
     game_string play_card_verify::check_prompt() const {
         auto &effects = is_response ? origin_card->responses : origin_card->effects;
-        
-        auto effect_it = effects.begin();
-        auto effect_end = effects.end();
 
         target_list mth_targets;
-        for (const auto &t : targets) {
-            const auto &e = *effect_it;
-            if (++effect_it == effect_end) {
-                effect_it = origin_card->optionals.begin();
-                effect_end = origin_card->optionals.end();
-            }
-
-            if (e.type == effect_type::mth_add) {
-                mth_targets.push_back(t);
+        for (auto [target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+            if (effect.type == effect_type::mth_add) {
+                mth_targets.push_back(target);
             } else if (auto prompt_message = enums::visit_indexed(
-                [this, &e]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return play_visitor<E>{}.prompt(this, e, FWD(args) ... );
-                }, t))
+                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                    return play_visitor<E>{}.prompt(this, effect, FWD(args) ... );
+                }, target))
             {
                 return prompt_message;
             }
@@ -418,33 +402,24 @@ namespace banggame {
         if (std::ranges::find(effects, effect_type::play_card_action, &effect_holder::type) == effects.end()) {
             origin->play_card_action(origin_card);
         }
-        
-        auto effect_it = effects.begin();
-        auto effect_end = effects.end();
 
         std::vector<std::pair<const effect_holder *, const play_card_target *>> delay_effects;
         std::map<card *, int, card_cube_ordering> selected_cubes;
 
         target_list mth_targets;
-        for (const auto &t : targets) {
-            auto &e = *effect_it;
-            if (++effect_it == effect_end) {
-                effect_it = origin_card->optionals.begin();
-                effect_end = origin_card->optionals.end();
-            }
-
-            if (e.type == effect_type::mth_add) {
-                mth_targets.push_back(t);
-            } else if (e.type == effect_type::pay_cube) {
-                if (auto *cs = t.get_if<target_type::select_cubes>()) {
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+            if (effect.type == effect_type::mth_add) {
+                mth_targets.push_back(target);
+            } else if (effect.type == effect_type::pay_cube) {
+                if (auto *cs = target.get_if<target_type::select_cubes>()) {
                     for (card *c : *cs) {
                         ++selected_cubes[c];
                     }
-                } else if (auto *ncubes = t.get_if<target_type::self_cubes>()) {
-                    selected_cubes[origin_card] += *ncubes;
+                } else if (target.is(target_type::self_cubes)) {
+                    selected_cubes[origin_card] += effect.target_value;
                 }
             } else {
-                delay_effects.emplace_back(&e, &t);
+                delay_effects.emplace_back(&effect, &target);
             }
         }
         for (const auto &[c, ncubes] : selected_cubes) {

@@ -276,18 +276,16 @@ namespace banggame {
 
     template<> void play_visitor<target_type::select_cubes>::play(const play_card_verify *verifier, const effect_holder &effect, const std::vector<card *> &target_cards) {}
 
-    template<> game_string play_visitor<target_type::self_cubes>::verify(const play_card_verify *verifier, const effect_holder &effect, int ncubes) {
+    template<> game_string play_visitor<target_type::self_cubes>::verify(const play_card_verify *verifier, const effect_holder &effect) {
         if (effect.type != effect_type::pay_cube) {
             return "ERROR_INVALID_EFFECT_TYPE";
-        } else if (ncubes != effect.target_value) {
-            return "ERROR_INVALID_NCUBES";
         }
         return {};
     }
 
-    template<> game_string play_visitor<target_type::self_cubes>::prompt(const play_card_verify *verifier, const effect_holder &effect, int ncubes) {
+    template<> game_string play_visitor<target_type::self_cubes>::prompt(const play_card_verify *verifier, const effect_holder &effect) {
         return {};
     }
 
-    template<> void play_visitor<target_type::self_cubes>::play(const play_card_verify *verifier, const effect_holder &effect, int ncubes) {}
+    template<> void play_visitor<target_type::self_cubes>::play(const play_card_verify *verifier, const effect_holder &effect) {}
 }
