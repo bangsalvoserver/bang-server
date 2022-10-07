@@ -47,7 +47,7 @@ namespace banggame {
     }
 
     game_string check_card_filter(card *origin_card, player *origin, target_card_filter filter, card *target) {
-        if (!origin_card->has_tag(tag_type::can_target_self) && target == origin_card)
+        if (!bool(filter & target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";
         
         if (bool(filter & target_card_filter::cube_slot)) {
@@ -143,10 +143,6 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_duplicates() const {
-        if (origin_card->has_tag(tag_type::can_repeat)) {
-            return {};
-        }
-
         std::set<player *> selected_players;
         std::set<card *> selected_cards;
         std::map<card *, int> selected_cubes;
@@ -185,14 +181,14 @@ namespace banggame {
                     }
                 },
                 [&](enums::enum_tag_t<target_type::card>, card *c) -> game_string {
-                    if (!selected_cards.emplace(c).second) {
+                    if (!bool(effect.card_filter & target_card_filter::can_repeat) && !selected_cards.emplace(c).second) {
                         return {"ERROR_DUPLICATE_CARD", c};
                     } else {
                         return {};
                     }
                 },
                 [&](enums::enum_tag_t<target_type::extra_card>, card *c) -> game_string {
-                    if (c && !selected_cards.emplace(c).second) {
+                    if (c && !bool(effect.card_filter & target_card_filter::can_repeat) && !selected_cards.emplace(c).second) {
                         return {"ERROR_DUPLICATE_CARD", &*c};
                     } else {
                         return {};
@@ -200,7 +196,7 @@ namespace banggame {
                 },
                 [&](enums::enum_tag_t<target_type::cards>, const std::vector<card *> &cs) -> game_string {
                     for (card *c : cs) {
-                        if (!selected_cards.emplace(c).second) {
+                        if (!bool(effect.card_filter & target_card_filter::can_repeat) && !selected_cards.emplace(c).second) {
                             return {"ERROR_DUPLICATE_CARD", c};
                         }
                     }

@@ -101,6 +101,8 @@ namespace banggame {
         (beer)
         (bronco)
         (cube_slot)
+        (can_repeat)
+        (can_target_self)
     )
 
     DEFINE_ENUM_TYPES(target_type,
@@ -369,8 +371,6 @@ namespace banggame {
         (repeatable)
         (auto_confirm)
         (auto_confirm_red_ringo)
-        (can_repeat)
-        (can_target_self)
         (shopchoice)
         (last_scenario_card)
         (peyote)

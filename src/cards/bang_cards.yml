@@ -1636,9 +1636,7 @@ character:
     effects:
       - max_usages(1)
       - discard card self | hand
-      - add_cube(2) card self | cube_slot
-    tags:
-      - can_target_self
+      - add_cube(2) card self | cube_slot can_target_self
   - name: BLOODY_MARY
     image: 17_bloodymary
     expansion: armedanddangerous
@@ -1678,11 +1676,10 @@ character:
       - max_usages(1)
       - mth_add card self | cube_slot table
     optional:
-      - mth_add card self | cube_slot table
+      - mth_add card self | cube_slot table can_repeat
     mth_effect: red_ringo
     tags:
       - max_hp(5)
-      - can_repeat
       - auto_confirm_red_ringo
   - name: DON_BELL
     image: 04_don_bell
