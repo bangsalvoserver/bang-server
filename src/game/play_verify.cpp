@@ -8,8 +8,6 @@
 #include "utils/raii_editor.h"
 #include "utils/utils.h"
 
-#include <set>
-
 namespace banggame {
     using namespace enums::flag_operators;
 
@@ -143,17 +141,15 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_duplicates() const {
-        std::set<player *> selected_players;
-        std::set<card *> selected_cards;
-        std::map<card *, int> selected_cubes;
-        
+        duplicate_sets selected;
+
         for (card *mod_card : modifiers) {
-            if (!selected_cards.emplace(mod_card).second) {
+            if (!selected.cards.emplace(mod_card).second) {
                 return {"ERROR_DUPLICATE_CARD", mod_card};
             }
             for (const auto &effect : mod_card->effects) {
                 if (effect.target == target_type::self_cubes) {
-                    if (selected_cubes[mod_card] += effect.target_value > mod_card->num_cubes) {
+                    if (selected.cubes[mod_card] += effect.target_value > mod_card->num_cubes) {
                         return  {"ERROR_NOT_ENOUGH_CUBES_ON", mod_card};
                     }
                 }
@@ -162,67 +158,15 @@ namespace banggame {
 
         auto &effects = is_response ? origin_card->responses : origin_card->effects;
         for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
-            if (game_string error = enums::visit_indexed(overloaded{
-                []<target_type E>(enums::enum_tag_t<E>) -> game_string {
-                    return {};
-                },
-                [&](enums::enum_tag_t<target_type::player>, player *p) -> game_string {
-                    if (!selected_players.emplace(p).second) {
-                        return {"ERROR_DUPLICATE_PLAYER", p};
-                    } else {
-                        return {};
-                    }
-                },
-                [&](enums::enum_tag_t<target_type::conditional_player>, player *p) -> game_string {
-                    if (p && !selected_players.emplace(p).second) {
-                        return {"ERROR_DUPLICATE_PLAYER", &*p};
-                    } else {
-                        return {};
-                    }
-                },
-                [&](enums::enum_tag_t<target_type::card>, card *c) -> game_string {
-                    if (!bool(effect.card_filter & target_card_filter::can_repeat) && !selected_cards.emplace(c).second) {
-                        return {"ERROR_DUPLICATE_CARD", c};
-                    } else {
-                        return {};
-                    }
-                },
-                [&](enums::enum_tag_t<target_type::extra_card>, card *c) -> game_string {
-                    if (c && !bool(effect.card_filter & target_card_filter::can_repeat) && !selected_cards.emplace(c).second) {
-                        return {"ERROR_DUPLICATE_CARD", &*c};
-                    } else {
-                        return {};
-                    }
-                },
-                [&](enums::enum_tag_t<target_type::cards>, const std::vector<card *> &cs) -> game_string {
-                    for (card *c : cs) {
-                        if (!bool(effect.card_filter & target_card_filter::can_repeat) && !selected_cards.emplace(c).second) {
-                            return {"ERROR_DUPLICATE_CARD", c};
-                        }
-                    }
-                    return {};
-                },
-                [](enums::enum_tag_t<target_type::cards_other_players>, const std::vector<card *> &cs) -> game_string {
-                    return {};
-                },
-                [&](enums::enum_tag_t<target_type::select_cubes>, const std::vector<card *> &cs) -> game_string {
-                    for (card *c : cs) {
-                        if (++selected_cubes[c] > c->num_cubes) {
-                            return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
-                        }
-                    }
-                    return {};
-                },
-                [&](enums::enum_tag_t<target_type::self_cubes>) -> game_string {
-                    if ((selected_cubes[origin_card] += effect.target_value) > origin_card->num_cubes) {
-                        return {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
-                    }
-                    return {};
-                }
-            }, target)) {
+            if (game_string error = enums::visit_indexed(
+                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                    return play_visitor<E>{}.verify_duplicates(this, selected, effect, FWD(args) ... );
+                }, target))
+            {
                 return error;
             }
         }
+
         return {};
     }
 

@@ -3,6 +3,7 @@
 
 #include <variant>
 #include <vector>
+#include <set>
 
 #include "card_enums.h"
 #include "holders.h"
@@ -34,6 +35,12 @@ namespace banggame {
 
         game_string verify_and_play();
         game_string verify_and_respond();
+    };
+
+    struct duplicate_sets {
+        std::set<player *> players;
+        std::set<card *> cards;
+        std::map<card *, int> cubes;
     };
 
 }
