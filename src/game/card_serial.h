@@ -39,7 +39,9 @@ namespace banggame {
     namespace serial {
         using context = banggame::game_scene;
         using card = banggame::card_view *;
+        using opt_card = card;
         using player = banggame::player_view *;
+        using opt_player = player;
         using cube = banggame::card_cube_pair;
         using player_card = banggame::player_card_pair;
 
@@ -52,13 +54,15 @@ namespace banggame {
 
 namespace banggame::serial {
     using context = banggame::game_table;
-    using card = banggame::card *;
-    using player = banggame::player *;
-    using cube = banggame::card *;
-    using player_card = banggame::card *;
+    using opt_card = banggame::card *;
+    using card = not_null<opt_card>;
+    using opt_player = banggame::player *;
+    using player = not_null<opt_player>;
+    using cube = card;
+    using player_card = card;
 
     template<typename T>
-    concept serializable = is_one_of<T, card, player>;
+    concept serializable = is_one_of<T, opt_card, card, opt_player, player>;
 }
 
 #ifndef BUILD_BANG_SERVER

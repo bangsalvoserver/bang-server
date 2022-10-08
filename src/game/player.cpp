@@ -329,14 +329,14 @@ namespace banggame {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         }
-        return play_card_verify{this, args.card, false, args.targets, args.modifiers}.verify_and_play();
+        return play_card_verify{this, args.card, false, args.targets, unwrap_vector_not_null(args.modifiers)}.verify_and_play();
     }
     
     game_string player::handle_action(enums::enum_tag_t<game_action_type::respond_card>, const play_card_args &args) {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         }
-        return play_card_verify{this, args.card, true, args.targets, args.modifiers}.verify_and_respond();
+        return play_card_verify{this, args.card, true, args.targets, unwrap_vector_not_null(args.modifiers)}.verify_and_respond();
     }
 
     void player::prompt_then(game_string &&message, std::function<void()> &&fun) {
@@ -485,6 +485,13 @@ namespace banggame {
                 m_game->add_update<game_update_type::tap_card>(c, false);
             }
         }
+    }
+
+    void player::remove_extra_characters() {
+        if (m_characters.size() <= 1) return;
+
+        m_game->add_update<game_update_type::remove_cards>(to_vector_not_null(m_characters | std::views::drop(1)));
+        m_characters.resize(1);
     }
 
     void player::discard_all(bool death) {

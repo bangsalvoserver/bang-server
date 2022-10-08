@@ -17,7 +17,7 @@ namespace banggame {
     struct add_cards_update {REFLECTABLE(
         (std::vector<card_backface>) card_ids,
         (pocket_type) pocket,
-        (serial::player) player
+        (serial::opt_player) player
     )};
 
     struct remove_cards_update {REFLECTABLE(
@@ -34,20 +34,20 @@ namespace banggame {
 
     struct move_card_update {REFLECTABLE(
         (serial::card) card,
-        (serial::player) player,
+        (serial::opt_player) player,
         (pocket_type) pocket,
         (show_card_flags) flags
     )};
 
     struct add_cubes_update {REFLECTABLE(
         (int) num_cubes,
-        (serial::card) target_card
+        (serial::opt_card) target_card
     )};
 
     struct move_cubes_update {REFLECTABLE(
         (int) num_cubes,
-        (serial::card) origin_card,
-        (serial::card) target_card
+        (serial::opt_card) origin_card,
+        (serial::opt_card) target_card
     )};
 
     struct show_card_update {REFLECTABLE(
@@ -128,16 +128,16 @@ namespace banggame {
 
     struct picking_args {REFLECTABLE(
         (pocket_type) pocket,
-        (serial::player) player,
-        (serial::card) card
+        (serial::opt_player) player,
+        (serial::opt_card) card
     )
         bool operator == (const picking_args &) const = default;
     };
 
     struct request_status_args {REFLECTABLE(
-        (serial::card) origin_card,
-        (serial::player) origin,
-        (serial::player) target,
+        (serial::opt_card) origin_card,
+        (serial::opt_player) origin,
+        (serial::opt_player) target,
         (game_string) status_text,
         (effect_flags) flags,
         (std::vector<serial::card>) respond_cards,
@@ -169,7 +169,7 @@ namespace banggame {
         (hide_card, hide_card_update)
         (tap_card, tap_card_update)
         (flash_card, serial::card)
-        (last_played_card, serial::card)
+        (last_played_card, serial::opt_card)
         (player_add, player_add_update)
         (player_user, player_user_update)
         (player_remove, player_remove_update)
@@ -188,12 +188,10 @@ namespace banggame {
     using game_update = enums::enum_variant<game_update_type>;
     #define UPD_TAG(name) enums::enum_tag_t<game_update_type::name>
 
-    using target_vector = std::vector<play_card_target>;
-
     struct play_card_args {REFLECTABLE(
         (serial::card) card,
         (std::vector<serial::card>) modifiers,
-        (target_vector) targets
+        (target_list) targets
     )};
 
     DEFINE_ENUM_TYPES(game_action_type,

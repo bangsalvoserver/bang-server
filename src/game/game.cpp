@@ -335,7 +335,7 @@ namespace banggame {
             req.flags()
         };
 
-        ret.highlight_cards = req.get_highlights();
+        ret.highlight_cards = to_vector_not_null(req.get_highlights());
 
         if (!p) return ret;
 
@@ -460,10 +460,7 @@ namespace banggame {
             target->disable_equip(c);
         }
 
-        if (target->m_characters.size() > 1) {
-            add_update<game_update_type::remove_cards>(to_vector(target->m_characters | std::views::drop(1)));
-            target->m_characters.resize(1);
-        }
+        target->remove_extra_characters();
 
         if (!m_first_dead) m_first_dead = target;
 

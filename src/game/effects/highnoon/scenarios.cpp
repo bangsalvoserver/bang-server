@@ -245,10 +245,7 @@ namespace banggame {
             for (card *c : target->m_characters) {
                 target->disable_equip(c);
             }
-            if (target->m_characters.size() > 1) {
-                target->m_game->add_update<game_update_type::remove_cards>(to_vector(target->m_characters | std::views::drop(1)));
-                target->m_characters.resize(1);
-            }
+            target->remove_extra_characters();
 
             target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
 

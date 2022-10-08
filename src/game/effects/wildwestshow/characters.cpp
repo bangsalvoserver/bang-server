@@ -146,10 +146,7 @@ namespace banggame {
             c->pocket = pocket_type::none;
             c->owner = nullptr;
         }
-        if (target->m_characters.size() > 1) {
-            target->m_game->add_update<game_update_type::remove_cards>(to_vector(target->m_characters | std::views::drop(1)));
-            target->m_characters.resize(1);
-        }
+        target->remove_extra_characters();
         on_equip(target_card, target);
         target->m_game->update_request();
     }

@@ -108,9 +108,9 @@ namespace banggame {
     DEFINE_ENUM_TYPES(target_type,
         (none)
         (player,                serial::player)
-        (conditional_player,    serial::player)
+        (conditional_player,    serial::opt_player)
         (card,                  serial::card)
-        (extra_card,            serial::card)
+        (extra_card,            serial::opt_card)
         (all_players)
         (other_players)
         (cards,                 std::vector<serial::card>)
@@ -120,6 +120,7 @@ namespace banggame {
     )
 
     using play_card_target = enums::enum_variant<target_type>;
+    using target_list = std::vector<play_card_target>;
 
     DEFINE_ENUM(card_deck_type,
         (none)

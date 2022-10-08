@@ -162,7 +162,8 @@ namespace banggame {
 
     void effect_vera_custer::remove_characters(player *origin) {
         if (origin->m_characters.size() > 1) {
-            origin->m_game->add_update<game_update_type::remove_cards>(to_vector(origin->m_characters | std::views::drop(1)));
+            origin->remove_extra_characters();
+            
             while (origin->m_characters.size() > 1) {
                 origin->disable_equip(origin->m_characters.back());
                 origin->m_game->m_cards.erase(origin->m_characters.back()->id);
