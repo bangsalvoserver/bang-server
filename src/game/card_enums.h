@@ -114,7 +114,7 @@ namespace banggame {
         (all_players)
         (other_players)
         (cards,                 std::vector<serial::card>)
-        (cards_other_players,   std::vector<serial::player_card>)
+        (cards_other_players,   std::vector<serial::card>)
         (select_cubes,          std::vector<serial::cube>)
         (self_cubes)
     )
