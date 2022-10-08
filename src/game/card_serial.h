@@ -21,14 +21,6 @@ namespace banggame {
     class card_view;
     class player_view;
     class game_scene;
-    struct cube_widget;
-
-    struct card_cube_pair {
-        card_view *card;
-        cube_widget *cube;
-
-        bool operator == (const card_cube_pair &) const = default;
-    };
 
     namespace serial {
         using context = banggame::game_scene;
@@ -36,10 +28,9 @@ namespace banggame {
         using opt_card = card;
         using player = banggame::player_view *;
         using opt_player = player;
-        using cube = banggame::card_cube_pair;
 
         template<typename T>
-        concept serializable = is_one_of<T, card, player, cube>;
+        concept serializable = is_one_of<T, card, player>;
     }
 }
 
@@ -51,7 +42,6 @@ namespace banggame::serial {
     using card = not_null<opt_card>;
     using opt_player = banggame::player *;
     using player = not_null<opt_player>;
-    using cube = card;
 
     template<typename T>
     concept serializable = is_one_of<T, opt_card, card, opt_player, player>;
