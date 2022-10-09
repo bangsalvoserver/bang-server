@@ -225,8 +225,10 @@ namespace banggame {
         void erase(const T &key) {
             auto [low, high] = m_map.equal_range(key);
             for (; low != high; ++low) {
-                low->second.status = erased;
-                m_changes.push_back(low);
+                if (low->second.status != erased) {
+                    low->second.status = erased;
+                    m_changes.push_back(low);
+                }
             }
         }
 
