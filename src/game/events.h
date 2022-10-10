@@ -23,6 +23,8 @@ namespace banggame {
         EVENT(apply_initial_cards_modifier,     player *origin, int &value)
         EVENT(apply_bang_modifier,              player *origin, request_bang *req)
 
+        EVENT(verify_count_usages, player *origin, card *origin_card, int &usages)
+
         EVENT(verify_play_card, player *origin, card *origin_card, game_string &out_error)
 
         // verifica per gli effetti che rubano carte in alcune condizioni

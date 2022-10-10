@@ -19,7 +19,6 @@ namespace banggame {
     void player::equip_card(card *target) {
         m_game->move_card(target, pocket_type::player_table, this, show_card_flags::shown);
         enable_equip(target);
-        target->usages = 0;
     }
 
     void player::enable_equip(card *target_card) {
@@ -405,12 +404,6 @@ namespace banggame {
         m_bangs_per_turn = 1;
         m_num_drawn_cards = 0;
         
-        for (card *c : m_characters) {
-            c->usages = 0;
-        }
-        for (card *c : m_table) {
-            c->usages = 0;
-        }
         for (auto &[card_id, obj] : m_predraw_checks) {
             obj.resolved = false;
         }

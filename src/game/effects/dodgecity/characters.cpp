@@ -173,9 +173,10 @@ namespace banggame {
     }
 
     void effect_vera_custer::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_turn_start>({origin_card, 1}, [=, &usages = origin_card->usages](player *target) {
+        auto used = std::make_shared<bool>();
+        origin->m_game->add_listener<event_type::on_turn_start>({origin_card, 1}, [=](player *target) {
             if (origin == target) {
-                ++usages;
+                *used = true;
                 if (origin->m_game->num_alive() == 2) {
                     copy_characters(origin, std::next(player_iterator(origin)));
                 } else {
@@ -183,9 +184,12 @@ namespace banggame {
                 }
             }
         });
-        origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [origin, &usages = origin_card->usages](player *target) {
-            if (origin == target && usages == 0) {
-                remove_characters(origin);
+        origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [=](player *target) {
+            if (origin == target) {
+                if (!(*used)) {
+                    remove_characters(origin);
+                }
+                *used = false;
             }
         });
     }
