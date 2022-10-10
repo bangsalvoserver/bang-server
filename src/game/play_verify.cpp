@@ -36,7 +36,7 @@ namespace banggame {
             } else if (bool(filter & target_player_filter::range_2)) {
                 distance += 2;
             }
-            if (origin->m_game->calc_distance(origin, target) > distance) {
+            if (origin->m_game->call_event<event_type::apply_distance_modifier>(origin, origin->m_game->calc_distance(origin, target)) > distance) {
                 return "ERROR_TARGET_NOT_IN_RANGE";
             }
         }
@@ -223,6 +223,37 @@ namespace banggame {
         }
     }
 
+    struct check_disabler {
+        game *m_game = nullptr;
+        event_card_key key;
+
+        template<event_type E, invocable_for_event<E> Function>
+        check_disabler(game *m_game, event_card_key key, enums::enum_tag_t<E>, Function &&fun)
+            : m_game(m_game), key(key)
+        {
+            m_game->add_listener<E>(key, std::move(fun));
+        }
+
+        check_disabler(const check_disabler &) = delete;
+        check_disabler(check_disabler &&other) noexcept
+            : m_game(std::exchange(other.m_game, nullptr))
+            , key(other.key) {}
+
+        check_disabler &operator = (const check_disabler &) = delete;
+        check_disabler &operator = (check_disabler &&other) noexcept {
+            m_game = std::exchange(other.m_game, nullptr);
+            key = other.key;
+            return *this;
+        }
+
+        ~check_disabler() {
+            if (m_game) {
+                m_game->remove_listeners(key);
+                m_game = nullptr;
+            }
+        }
+    };
+
     game_string play_card_verify::verify_card_targets() const {
         auto &effects = is_response ? origin_card->responses : origin_card->effects;
 
@@ -239,23 +270,31 @@ namespace banggame {
             return error;
         }
 
-        struct {
-            raii_editor_stack<int8_t> data;
-            void add(int8_t &value, int8_t diff) {
-                data.add(value, value + diff);
-            }
-        } editors;
-
-        for (card *c : modifiers) {
-            switch (c->modifier) {
-            case card_modifier_type::belltower: editors.add(origin->m_range_mod, 50); break;
-            case card_modifier_type::bandolier: editors.add(origin->m_bangs_per_turn, 1); break;
-            case card_modifier_type::leevankliff: editors.add(origin->m_bangs_per_turn, 10); break;
-            }
-        }
-
         if (game_string error = verify_modifiers()) {
             return error;
+        }
+
+        std::vector<check_disabler> check_disablers;
+        for (card *c : modifiers) {
+            switch (c->modifier) {
+            case card_modifier_type::belltower:
+                check_disablers.emplace_back(origin->m_game, event_card_key{origin_card, -1},
+                    enums::enum_tag<event_type::apply_distance_modifier>, [origin=origin](player *p, int &value) {
+                        if (p == origin) {
+                            value = 1;
+                        }
+                    });
+                break;
+            case card_modifier_type::bandolier:
+            case card_modifier_type::leevankliff:
+                check_disablers.emplace_back(origin->m_game, event_card_key{origin_card, -1},
+                    enums::enum_tag<event_type::count_bangs_played>, [origin=origin](player *p, int &value) {
+                        if (p == origin) {
+                            value = 0;
+                        }
+                    });
+                break;
+            }
         }
 
         size_t diff = targets.size() - effects.size();

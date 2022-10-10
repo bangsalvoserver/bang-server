@@ -41,6 +41,14 @@ namespace banggame {
         return m_game->call_event<event_type::apply_maxcards_modifier>(this, m_hp);
     }
 
+    int player::get_num_checks() {
+        return m_game->call_event<event_type::count_num_checks>(this, 1);
+    }
+
+    int player::get_bangs_played() {
+        return m_game->call_event<event_type::count_bangs_played>(this, 0);
+    }
+
     card *player::find_equipped_card(card *card) {
         auto it = std::ranges::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {
@@ -400,8 +408,6 @@ namespace banggame {
     void player::start_of_turn() {
         m_game->m_playing = this;
 
-        m_bangs_played = 0;
-        m_bangs_per_turn = 1;
         m_num_drawn_cards = 0;
         
         for (auto &[card_id, obj] : m_predraw_checks) {

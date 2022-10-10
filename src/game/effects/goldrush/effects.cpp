@@ -42,7 +42,9 @@ namespace banggame {
 
     void effect_rum::on_play(card *origin_card, player *origin) {
         std::vector<card_suit> suits;
-        for (int i=0; i < 3 + origin->m_num_checks; ++i) {
+
+        int num_cards = 3 + origin->get_num_checks();
+        for (int i=0; i < num_cards; ++i) {
             origin->m_game->add_log("LOG_REVEALED_CARD", origin, origin->m_game->m_deck.back());
             suits.push_back(origin->get_card_sign(origin->m_game->draw_card_to(pocket_type::selection, nullptr)).suit);
         }

@@ -13,7 +13,7 @@ namespace banggame {
     }
 
     game_string effect_max_usages::verify(card *origin_card, player *origin) {
-        if (origin->m_game->call_event<event_type::verify_count_usages>(origin, origin_card, 0) >= max_usages) {
+        if (origin->m_game->call_event<event_type::count_usages>(origin, origin_card, 0) >= max_usages) {
             return {"ERROR_MAX_USAGES", origin_card, max_usages};
         }
         return {};
@@ -21,7 +21,7 @@ namespace banggame {
     
     void effect_max_usages::on_play(card *origin_card, player *origin) {
         event_card_key key{origin_card, 5};
-        origin->m_game->add_listener<event_type::verify_count_usages>(key, [=](player *e_origin, card *e_card, int &usages) {
+        origin->m_game->add_listener<event_type::count_usages>(key, [=](player *e_origin, card *e_card, int &usages) {
             if (origin_card == e_card && origin == e_origin) {
                 ++usages;
             }
@@ -120,14 +120,24 @@ namespace banggame {
     }
 
     game_string effect_banglimit::verify(card *origin_card, player *origin) {
-        if (!origin->m_game->call_event<event_type::apply_volcanic_modifier>(origin, origin->m_bangs_played < origin->m_bangs_per_turn)) {
+        if (origin->get_bangs_played() >= 1) {
             return "ERROR_ONE_BANG_PER_TURN";
         }
         return {};
     }
 
     void effect_banglimit::on_play(card *origin_card, player *origin) {
-        ++origin->m_bangs_played;
+        event_card_key key{origin_card, 4};
+        origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](player *p, int &value) {
+            if (origin == p) {
+                ++value;
+            }
+        });
+        origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player *p) {
+            if (origin == p) {
+                origin->m_game->remove_listeners(key);
+            }
+        });
     }
 
     void effect_indians::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {

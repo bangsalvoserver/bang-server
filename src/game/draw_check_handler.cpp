@@ -12,8 +12,9 @@ namespace banggame {
     }
 
     void draw_check_handler::start() {
-        if (m_origin->m_num_checks > 1) {
-            for (int i=0; i<m_origin->m_num_checks; ++i) {
+        int num_checks = m_origin->get_num_checks();
+        if (num_checks > 1) {
+            for (int i=0; i<num_checks; ++i) {
                 m_origin->m_game->add_log("LOG_REVEALED_CARD", m_origin, m_origin->m_game->m_deck.back());
                 m_origin->m_game->draw_card_to(pocket_type::selection, nullptr);
             }
@@ -40,7 +41,7 @@ namespace banggame {
     }
 
     void draw_check_handler::resolve(card *drawn_card) {
-        if (m_origin->m_num_checks > 1) {
+        if (m_origin->get_num_checks() > 1) {
             while (!m_origin->m_game->m_selection.empty()) {
                 card *c = m_origin->m_game->m_selection.front();
                 m_origin->m_game->call_event<event_type::on_draw_check>(m_origin, c);

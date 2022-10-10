@@ -74,11 +74,6 @@ namespace banggame {
 
         int8_t m_hp = 0;
         int8_t m_max_hp = 0;
-
-        int8_t m_bangs_played = 0;
-        int8_t m_bangs_per_turn = 1;
-
-        int8_t m_num_checks = 1;
         
         int8_t m_num_cards_to_draw = 2;
         int8_t m_num_drawn_cards = 0;
@@ -120,6 +115,9 @@ namespace banggame {
         int get_initial_cards();
 
         int max_cards_end_of_turn();
+
+        int get_num_checks();
+        int get_bangs_played();
 
         bool is_ghost() const {
             return check_player_flags(player_flags::ghost)

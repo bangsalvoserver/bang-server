@@ -62,9 +62,8 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
-    struct effect_horseshoe {
+    struct effect_horseshoe : event_based_effect {
         void on_enable(card *target_card, player *target);
-        void on_disable(card *target_card, player *target);
     };
 
     struct effect_initialcards : event_based_effect {

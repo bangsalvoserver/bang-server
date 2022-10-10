@@ -131,8 +131,10 @@ namespace banggame {
     }
 
     void effect_volcanic::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::apply_volcanic_modifier>(target_card, [=](player *p, bool &value) {
-            value = value || p == target;
+        target->m_game->add_listener<event_type::count_bangs_played>(target_card, [=](player *origin, int &value) {
+            if (origin == target) {
+                value = 0;
+            }
         });
     }
 
@@ -150,11 +152,11 @@ namespace banggame {
     }
 
     void effect_horseshoe::on_enable(card *target_card, player *target) {
-        ++target->m_num_checks;
-    }
-
-    void effect_horseshoe::on_disable(card *target_card, player *target) {
-        --target->m_num_checks;
+        target->m_game->add_listener<event_type::count_num_checks>(target_card, [=](player *origin, int &num_checks) {
+            if (origin == target) {
+                ++num_checks;
+            }
+        });
     }
 
     void effect_initialcards::on_enable(card *target_card, player *target) {
