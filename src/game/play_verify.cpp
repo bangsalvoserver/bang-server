@@ -160,7 +160,7 @@ namespace banggame {
         for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
             if (game_string error = enums::visit_indexed(
                 [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return play_visitor<E>{}.verify_duplicates(this, selected, effect, FWD(args) ... );
+                    return play_visitor<E>{}.verify_duplicates(*this, selected, effect, FWD(args) ... );
                 }, target))
             {
                 return error;
@@ -270,7 +270,7 @@ namespace banggame {
         }
 
         target_list mth_targets;
-        for (auto [target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
             if (!target.is(effect.target)) {
                 return "ERROR_INVALID_TARGET_TYPE";
             } else if (effect.type == effect_type::mth_add) {
@@ -279,7 +279,7 @@ namespace banggame {
             
             if (game_string error = enums::visit_indexed(
                 [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return play_visitor<E>{}.verify(this, effect, FWD(args) ... );
+                    return play_visitor<E>{}.verify(*this, effect, FWD(args) ... );
                 }, target))
             {
                 return error;
@@ -301,12 +301,12 @@ namespace banggame {
         auto &effects = is_response ? origin_card->responses : origin_card->effects;
 
         target_list mth_targets;
-        for (auto [target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
             if (effect.type == effect_type::mth_add) {
                 mth_targets.push_back(target);
             } else if (auto prompt_message = enums::visit_indexed(
                 [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return play_visitor<E>{}.prompt(this, effect, FWD(args) ... );
+                    return play_visitor<E>{}.prompt(*this, effect, FWD(args) ... );
                 }, target))
             {
                 return prompt_message;
@@ -343,7 +343,7 @@ namespace banggame {
             origin->play_card_action(origin_card);
         }
 
-        std::vector<std::pair<const effect_holder *, const play_card_target *>> delay_effects;
+        std::vector<std::pair<const effect_holder &, const play_card_target &>> delay_effects;
         std::map<card *, int, card_cube_ordering> selected_cubes;
 
         target_list mth_targets;
@@ -359,7 +359,7 @@ namespace banggame {
                     selected_cubes[origin_card] += effect.target_value;
                 }
             } else {
-                delay_effects.emplace_back(&effect, &target);
+                delay_effects.emplace_back(effect, target);
             }
         }
         for (const auto &[c, ncubes] : selected_cubes) {
@@ -367,8 +367,8 @@ namespace banggame {
         }
         for (const auto &[e, t] : delay_effects) {
             enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                play_visitor<E>{}.play(this, *e, FWD(args) ... );
-            }, *t);
+                play_visitor<E>{}.play(*this, e, FWD(args) ... );
+            }, t);
         }
 
         (is_response ? origin_card->mth_response : origin_card->mth_effect).on_play(origin_card, origin, mth_targets);
