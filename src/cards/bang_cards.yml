@@ -496,8 +496,8 @@ main_deck:
     expansion: dodgecity
     color: green
     effects:
-      - bang player notself range_1
       - draw
+      - bang player notself range_1
   - name: BUFFALO_RIFLE
     signs:
       - 9 clubs
