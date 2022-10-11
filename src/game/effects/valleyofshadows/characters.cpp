@@ -69,7 +69,7 @@ namespace banggame {
             }
         });
 
-        origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [=](player *e_origin) {
+        origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [=](player *e_origin, bool skipped) {
             if (origin == e_origin) {
                 origin->m_game->remove_listeners(origin_card);
             }

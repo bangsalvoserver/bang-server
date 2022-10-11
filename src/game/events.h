@@ -106,10 +106,7 @@ namespace banggame {
         EVENT(post_draw_cards, player *origin)
         
         // viene chiamato alla fine del turno
-        EVENT(on_turn_end, player *origin)
-
-        // viene chiamato dopo la fine del turno, prima dei turni extra
-        EVENT(post_turn_end, player *origin)
+        EVENT(on_turn_end, player *origin, bool skipped)
     )
 
     struct event_card_key {

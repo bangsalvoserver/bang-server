@@ -121,7 +121,7 @@ namespace banggame {
                 });
             }
         });
-        p->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player *target) {
+        p->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player *target, bool skipped) {
             if (p == target) {
                 p->m_game->remove_disablers(target_card);
             }
@@ -184,7 +184,7 @@ namespace banggame {
                 }
             }
         });
-        origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [=](player *target) {
+        origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [=](player *target, bool skipped) {
             if (origin == target) {
                 if (!(*used)) {
                     remove_characters(origin);

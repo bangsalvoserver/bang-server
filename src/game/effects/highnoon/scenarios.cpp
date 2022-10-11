@@ -122,7 +122,7 @@ namespace banggame {
                 }
             });
         });
-        target->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player *p) {
+        target->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player *p, bool skipped) {
             target->m_game->remove_disablers(target_card);
         });
     }
@@ -133,27 +133,24 @@ namespace banggame {
     }
 
     void effect_ghosttown::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_listener<event_type::verify_revivers>(target_card,
-            [=, last_revived = static_cast<player*>(nullptr)](player *target) mutable {
-                if (last_revived) {
-                    last_revived->remove_player_flags(player_flags::temp_ghost);
-                    if (!last_revived->alive()) {
-                        origin->m_game->handle_player_death(nullptr, last_revived, true);
-                    }
-                    last_revived = nullptr;
+        origin->m_game->add_listener<event_type::verify_revivers>(target_card, [=](player *target) {
+            if (!target->alive()) {
+                origin->m_game->add_log("LOG_REVIVE", target, target_card);
+                target->add_player_flags(player_flags::temp_ghost);
+                for (auto *c : target->m_characters) {
+                    c->on_enable(target);
                 }
-                if (!target->alive()) {
-                    origin->m_game->add_log("LOG_REVIVE", target, target_card);
-
-                    target->add_player_flags(player_flags::temp_ghost);
-                    
-                    for (auto *c : target->m_characters) {
-                        c->on_enable(target);
+            }
+        });
+        origin->m_game->add_listener<event_type::on_turn_end>({target_card, -3}, [](player *target, bool skipped) {
+            if (target->check_player_flags(player_flags::temp_ghost)) {
+                target->m_game->queue_action([=]{
+                    if (target->m_extra_turns == 0 && target->remove_player_flags(player_flags::temp_ghost) && !target->alive()) {
+                        target->m_game->handle_player_death(nullptr, target, true);
                     }
-                    
-                    last_revived = target;
-                }
-            });
+                });
+            }
+        });
         origin->m_game->add_listener<event_type::count_cards_to_draw>({target_card, 1}, [](player *target, int &value) {
             if (target->check_player_flags(player_flags::temp_ghost)) {
                 ++value;
@@ -174,7 +171,7 @@ namespace banggame {
             }
             origin->m_game->queue_request<request_handcuffs>(target_card, origin);
         });
-        target->m_game->add_listener<event_type::on_turn_end>(target_card, [target_card](player *p) {
+        target->m_game->add_listener<event_type::on_turn_end>(target_card, [target_card](player *p, bool skipped) {
             p->m_game->remove_listeners(event_card_key{target_card, 1});
         });
     }

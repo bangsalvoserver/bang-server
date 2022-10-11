@@ -26,7 +26,7 @@ namespace banggame {
                 ++usages;
             }
         });
-        origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player *e_origin) {
+        origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player *e_origin, bool skipped) {
             if (e_origin == origin) {
                 origin->m_game->remove_listeners(key);
             }
@@ -133,7 +133,7 @@ namespace banggame {
                 ++value;
             }
         });
-        origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player *p) {
+        origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player *p, bool skipped) {
             if (origin == p) {
                 origin->m_game->remove_listeners(key);
             }
