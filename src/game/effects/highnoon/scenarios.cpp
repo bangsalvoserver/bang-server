@@ -154,6 +154,11 @@ namespace banggame {
                     last_revived = target;
                 }
             });
+        origin->m_game->add_listener<event_type::count_cards_to_draw>({target_card, 1}, [](player *target, int &value) {
+            if (target->check_player_flags(player_flags::temp_ghost)) {
+                ++value;
+            }
+        });
     }
 
     void effect_handcuffs::on_enable(card *target_card, player *target) {

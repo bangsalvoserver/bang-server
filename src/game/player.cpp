@@ -50,8 +50,7 @@ namespace banggame {
     }
 
     int player::get_cards_to_draw() {
-        return m_game->call_event<event_type::count_cards_to_draw>(this, 2)
-            + check_player_flags(player_flags::temp_ghost);
+        return m_game->call_event<event_type::count_cards_to_draw>(this, 2);
     }
 
     card *player::find_equipped_card(card *card) {
