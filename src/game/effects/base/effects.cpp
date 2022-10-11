@@ -326,7 +326,8 @@ namespace banggame {
         target->m_game->queue_action([=]{
             if (target->alive()) {
                 ++target->m_num_drawn_cards;
-                while (target->m_num_drawn_cards < target->m_num_cards_to_draw) {
+                int ncards = target->get_cards_to_draw();
+                while (target->m_num_drawn_cards < ncards) {
                     target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
                 }
             }

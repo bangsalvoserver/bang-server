@@ -26,6 +26,7 @@ namespace banggame {
         EVENT(count_usages,                     player *origin, card *origin_card, int &usages)
         EVENT(count_num_checks,                 player *origin, int &num_checks)
         EVENT(count_bangs_played,               player *origin, int &num_bangs_played)
+        EVENT(count_cards_to_draw,              player *origin, int &cards_to_draw)
 
         EVENT(verify_play_card, player *origin, card *origin_card, game_string &out_error)
 

@@ -43,7 +43,7 @@ namespace banggame {
 
     void effect_kit_carlson::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
-            if (target == origin && target->m_num_cards_to_draw < 3) {
+            if (target == origin && target->get_cards_to_draw() < 3) {
                 target->m_game->pop_request();
                 for (int i=0; i<3; ++i) {
                     target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
@@ -55,7 +55,7 @@ namespace banggame {
 
     void request_kit_carlson::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->add_to_hand_phase_one(target_card);
-        if (target->m_num_drawn_cards >= target->m_num_cards_to_draw) {
+        if (target->m_num_drawn_cards >= target->get_cards_to_draw()) {
             target->m_game->pop_request();
             while (!target->m_game->m_selection.empty()) {
                 target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, show_card_flags::hidden);

@@ -32,9 +32,10 @@ namespace banggame {
     void effect_dutch_will::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (origin == target) {
-                if (target->m_num_cards_to_draw > 1) {
+                int ncards = target->get_cards_to_draw();
+                if (ncards > 1) {
                     target->m_game->pop_request();
-                    for (int i=0; i<target->m_num_cards_to_draw; ++i) {
+                    for (int i=0; i<ncards; ++i) {
                         target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
                     }
                     target->m_game->queue_request<request_dutch_will>(target_card, target);

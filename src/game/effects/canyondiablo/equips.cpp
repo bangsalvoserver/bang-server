@@ -31,11 +31,15 @@ namespace banggame {
                     auto suit = target->get_card_sign(drawn_card).suit;
                     if (suit == card_suit::clubs || suit == card_suit::spades) {
                         target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
-                        --target->m_num_cards_to_draw;
+                        
                         event_card_key key{target_card, 1};
+                        target->m_game->add_listener<event_type::count_cards_to_draw>(key, [=](player *origin, int &value) {
+                            if (origin == target) {
+                                --value;
+                            }
+                        });
                         target->m_game->add_listener<event_type::post_draw_cards>(key, [=](player *origin) {
                             if (origin == target) {
-                                ++target->m_num_cards_to_draw;
                                 origin->m_game->remove_listeners(key);
                             }
                         });

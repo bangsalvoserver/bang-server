@@ -30,14 +30,12 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
-    struct effect_trainarrival {
+    struct effect_trainarrival : event_based_effect {
         void on_enable(card *target_card, player *target);
-        void on_disable(card *target_card, player *target);
     };
 
-    struct effect_thirst {
+    struct effect_thirst : event_based_effect {
         void on_enable(card *target_card, player *target);
-        void on_disable(card *target_card, player *target);
     };
 
     struct effect_highnoon : event_based_effect {

@@ -49,6 +49,11 @@ namespace banggame {
         return m_game->call_event<event_type::count_bangs_played>(this, 0);
     }
 
+    int player::get_cards_to_draw() {
+        return m_game->call_event<event_type::count_cards_to_draw>(this, 2)
+            + check_player_flags(player_flags::temp_ghost);
+    }
+
     card *player::find_equipped_card(card *card) {
         auto it = std::ranges::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {
@@ -386,16 +391,15 @@ namespace banggame {
     }
 
     void player::draw_from_deck() {
-        int save_numcards = m_num_cards_to_draw;
         m_game->call_event<event_type::on_draw_from_deck>(this);
         if (m_game->top_request_is<request_draw>()) {
             m_game->pop_request();
-            while (m_num_drawn_cards < m_num_cards_to_draw) {
+            int ncards = get_cards_to_draw();
+            while (m_num_drawn_cards < ncards) {
                 add_to_hand_phase_one(m_game->phase_one_drawn_card());
             }
             m_game->update_request();
         }
-        m_num_cards_to_draw = save_numcards;
         m_game->queue_action([this]{
             m_game->call_event<event_type::post_draw_cards>(this);
         });

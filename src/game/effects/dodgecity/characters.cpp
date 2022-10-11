@@ -9,9 +9,9 @@ namespace banggame {
     using namespace enums::flag_operators;
 
     void effect_bill_noface::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [target](player *origin) {
+        target->m_game->add_listener<event_type::count_cards_to_draw>({target_card, 2}, [target](player *origin, int &value) {
             if (target == origin) {
-                target->m_num_cards_to_draw = target->m_num_cards_to_draw - 1 + target->m_max_hp - target->m_hp;
+                value = 1 + target->m_max_hp - target->m_hp;
             }
         });
     }
@@ -28,7 +28,7 @@ namespace banggame {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (origin == target) {
                 target->m_game->pop_request();
-                int ncards = target->m_game->num_alive() + target->m_num_cards_to_draw - 1;
+                int ncards = target->m_game->num_alive() + target->get_cards_to_draw() - 1;
                 for (int i=0; i<ncards; ++i) {
                     target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
                 }
@@ -43,7 +43,7 @@ namespace banggame {
     }
 
     void request_claus_the_saint::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        if (target->m_num_drawn_cards < target->m_num_cards_to_draw) {
+        if (target->m_num_drawn_cards < target->get_cards_to_draw()) {
             target->add_to_hand_phase_one(target_card);
         } else {
             player *next_target = get_next_target();
@@ -64,12 +64,12 @@ namespace banggame {
 
     game_string request_claus_the_saint::status_text(player *owner) const {
         if (owner == target) {
-            if (target->m_num_drawn_cards < target->m_num_cards_to_draw) {
+            if (target->m_num_drawn_cards < target->get_cards_to_draw()) {
                 return {"STATUS_CLAUS_THE_SAINT_DRAW", origin_card};
             } else {
                 return {"STATUS_CLAUS_THE_SAINT_GIVE", origin_card, get_next_target()};
             }
-        } else if (target->m_num_drawn_cards < target->m_num_cards_to_draw) {
+        } else if (target->m_num_drawn_cards < target->get_cards_to_draw()) {
             return {"STATUS_CLAUS_THE_SAINT_DRAW_OTHER", target, origin_card};
         } else if (auto p = get_next_target(); p != owner) {
             return {"STATUS_CLAUS_THE_SAINT_GIVE_OTHER", target, origin_card, p};

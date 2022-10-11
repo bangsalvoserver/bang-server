@@ -59,27 +59,17 @@ namespace banggame {
     }
 
     void effect_trainarrival::on_enable(card *target_card, player *target) {
-        for (auto &p : target->m_game->m_players) {
-            ++p.m_num_cards_to_draw;
-        }
-    }
-
-    void effect_trainarrival::on_disable(card *target_card, player *target) {
-        for (auto &p : target->m_game->m_players) {
-            --p.m_num_cards_to_draw;
-        }
+        target->m_game->add_listener<event_type::count_cards_to_draw>({target_card, 1}, [](player *origin, int &value) {
+            ++value;
+        });
     }
 
     void effect_thirst::on_enable(card *target_card, player *target) {
-        for (auto &p : target->m_game->m_players) {
-            --p.m_num_cards_to_draw;
-        }
-    }
-
-    void effect_thirst::on_disable(card *target_card, player *target) {
-        for (auto &p : target->m_game->m_players) {
-            ++p.m_num_cards_to_draw;
-        }
+        target->m_game->add_listener<event_type::count_cards_to_draw>(target_card, [](player *origin, int &value) {
+            if (value > 1) {
+                value = 1;
+            }
+        });
     }
 
     void effect_highnoon::on_enable(card *target_card, player *target) {
@@ -147,7 +137,6 @@ namespace banggame {
             [=, last_revived = static_cast<player*>(nullptr)](player *target) mutable {
                 if (last_revived) {
                     last_revived->remove_player_flags(player_flags::temp_ghost);
-                    --last_revived->m_num_cards_to_draw;
                     if (!last_revived->alive()) {
                         origin->m_game->handle_player_death(nullptr, last_revived, true);
                     }
@@ -157,7 +146,6 @@ namespace banggame {
                     origin->m_game->add_log("LOG_REVIVE", target, target_card);
 
                     target->add_player_flags(player_flags::temp_ghost);
-                    ++target->m_num_cards_to_draw;
                     
                     for (auto *c : target->m_characters) {
                         c->on_enable(target);

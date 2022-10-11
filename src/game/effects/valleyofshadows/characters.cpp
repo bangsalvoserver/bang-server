@@ -10,9 +10,9 @@ namespace banggame {
     using namespace enums::flag_operators;
 
     void effect_tuco_franziskaner::on_enable(card *target_card, player *p) {
-        p->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [p](player *origin) {
+        p->m_game->add_listener<event_type::count_cards_to_draw>({target_card, 1}, [p](player *origin, int &value) {
             if (p == origin && std::ranges::find(p->m_table, card_color_type::blue, &card::color) == p->m_table.end()) {
-                p->m_num_cards_to_draw += 2;
+                value += 2;
             }
         });
     }
@@ -81,7 +81,7 @@ namespace banggame {
         effect_bang().on_play(origin_card, origin, target);
 
         origin->m_game->queue_action([=]{
-            if (origin->alive() && origin->m_num_drawn_cards < origin->m_num_cards_to_draw && origin->m_game->m_playing == origin) {
+            if (origin->alive() && origin->m_num_drawn_cards < origin->get_cards_to_draw() && origin->m_game->m_playing == origin) {
                 origin->request_drawing();
             }
         });
