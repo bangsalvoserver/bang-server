@@ -9,6 +9,8 @@
 
 namespace banggame {
 
+    using namespace enums::flag_operators;
+
     template<target_type E> struct tagged_value {};
 
     template<target_type E>
@@ -68,7 +70,7 @@ namespace banggame {
     struct timer_request : request_base, std::enable_shared_from_this<timer_request> {
         timer_request(card *origin_card, player *origin, player *target, effect_flags flags = {}
             , ticks duration = default_timer_duration)
-            : request_base(origin_card, origin, target, flags)
+            : request_base(origin_card, origin, target, flags | effect_flags::timer)
             , duration(duration) {}
 
         ticks duration;
