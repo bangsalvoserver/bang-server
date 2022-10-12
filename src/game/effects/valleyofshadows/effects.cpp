@@ -40,15 +40,17 @@ namespace banggame {
     }
     
     game_string effect_backfire::verify(card *origin_card, player *origin) {
-        if (!origin->m_game->pending_requests() || !origin->m_game->top_request().origin()) {
+        if (!origin->m_game->pending_requests()) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
         return {};
     }
 
     void effect_backfire::on_play(card *origin_card, player *origin) {
-        origin->m_game->queue_request<request_bang>(origin_card, origin, origin->m_game->top_request().origin(),
-            effect_flags::escapable | effect_flags::single_target);
+        if (origin->m_game->top_request().origin()) {
+            origin->m_game->queue_request<request_bang>(origin_card, origin, origin->m_game->top_request().origin(),
+                effect_flags::escapable | effect_flags::single_target);
+        }
     }
 
     void effect_bandidos::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
