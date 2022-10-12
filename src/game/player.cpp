@@ -421,15 +421,10 @@ namespace banggame {
         m_game->add_log("LOG_TURN_START", this);
         m_game->call_event<event_type::pre_turn_start>(this);
 
-        m_game->queue_action([this]{
-            next_predraw_check(nullptr);
-        });
+        m_game->queue_action([this]{ next_predraw_check(); });
     }
 
-    void player::next_predraw_check(card *target_card) {
-        if (auto it = m_predraw_checks.find(target_card); it != m_predraw_checks.end()) {
-            it->second.resolved = true;
-        }
+    void player::next_predraw_check() {
         if (alive() && m_game->m_playing == this && !m_game->check_flags(game_flags::game_over)) {
             if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
                 request_drawing();

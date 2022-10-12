@@ -141,7 +141,7 @@ namespace banggame {
 
         bool only_black_cards_equipped() const;
 
-        void next_predraw_check(card *target_card);
+        void next_predraw_check();
 
         void set_role(player_role role);
         void reset_max_hp();

@@ -68,8 +68,12 @@ namespace banggame {
     void request_predraw::on_pick(pocket_type pocket, player *target_player, card *target_card) {
         target->m_game->pop_request();
         target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
-        target->m_game->queue_action([target = target, target_card]{
-            target->next_predraw_check(target_card);
+        target->m_game->queue_action([target = target, target_card] {
+            auto it = target->m_predraw_checks.find(target_card);
+            if (it != target->m_predraw_checks.end()) {
+                it->second.resolved = true;
+            }
+            target->next_predraw_check();
         });
         target->m_game->update_request();
     }
