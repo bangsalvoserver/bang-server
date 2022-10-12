@@ -39,11 +39,8 @@ namespace banggame {
         });
     }
     
-    game_string effect_backfire::verify(card *origin_card, player *origin) {
-        if (!origin->m_game->pending_requests()) {
-            return {"ERROR_CANT_PLAY_CARD", origin_card};
-        }
-        return {};
+    bool effect_backfire::can_respond(card *origin_card, player *origin) {
+        return origin->m_game->pending_requests();
     }
 
     void effect_backfire::on_play(card *origin_card, player *origin) {
