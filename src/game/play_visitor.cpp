@@ -202,10 +202,8 @@ namespace banggame {
             } else {
                 return {};
             }
-        } else if (target->owner != verifier.origin || target->pocket != pocket_type::player_hand || target == verifier.origin_card) {
-            return "ERROR_TARGET_NOT_SELF";
         } else {
-            return effect.verify(verifier.origin_card, verifier.origin, target);
+            return play_visitor<target_type::card>{}.verify(verifier, effect, target);
         }
     }
 
