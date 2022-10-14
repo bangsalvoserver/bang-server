@@ -470,14 +470,16 @@ namespace banggame {
             add_log("LOG_PLAYER_DIED", target);
         }
         
-        add_update<game_update_type::player_show_role>(target, target->m_role);
-        target->add_player_flags(player_flags::role_revealed | player_flags::dead);
-        target->set_hp(0, true);
+        queue_action_front([this, killer, target]{
+            add_update<game_update_type::player_show_role>(target, target->m_role);
+            target->add_player_flags(player_flags::role_revealed | player_flags::dead);
+            target->set_hp(0, true);
 
-        call_event<event_type::on_player_death>(killer, target);
+            call_event<event_type::on_player_death>(killer, target);
         
-        queue_action([target]{
-            target->discard_all(true);
+            queue_action_front([=]{
+                target->discard_all(true);
+            });
         });
 
         if (no_handle_game_over) {
