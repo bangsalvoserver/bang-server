@@ -11,83 +11,6 @@
 namespace banggame {
     using namespace enums::flag_operators;
 
-    game_string check_player_filter(card *origin_card, player *origin, target_player_filter filter, player *target) {
-        if (bool(filter & target_player_filter::dead)) {
-            if (target->m_hp > 0) return "ERROR_TARGET_NOT_DEAD";
-        } else if (!target->check_player_flags(player_flags::targetable) && !target->alive()) {
-            return "ERROR_TARGET_DEAD";
-        }
-
-        if (bool(filter & target_player_filter::self) && target != origin)
-            return "ERROR_TARGET_NOT_SELF";
-
-        if (bool(filter & target_player_filter::notself) && target == origin)
-            return "ERROR_TARGET_SELF";
-
-        if (bool(filter & target_player_filter::notsheriff) && target->m_role == player_role::sheriff)
-            return "ERROR_TARGET_SHERIFF";
-
-        if (bool(filter & (target_player_filter::reachable | target_player_filter::range_1 | target_player_filter::range_2))) {
-            int distance = origin->m_range_mod;
-            if (bool(filter & target_player_filter::reachable)) {
-                distance += origin->m_weapon_range;
-            } else if (bool(filter & target_player_filter::range_1)) {
-                ++distance;
-            } else if (bool(filter & target_player_filter::range_2)) {
-                distance += 2;
-            }
-            if (origin->m_game->call_event<event_type::apply_distance_modifier>(origin, origin->m_game->calc_distance(origin, target)) > distance) {
-                return "ERROR_TARGET_NOT_IN_RANGE";
-            }
-        }
-
-        return {};
-    }
-
-    game_string check_card_filter(card *origin_card, player *origin, target_card_filter filter, card *target) {
-        if (!bool(filter & target_card_filter::can_target_self) && target == origin_card)
-            return "ERROR_TARGET_PLAYING_CARD";
-        
-        if (bool(filter & target_card_filter::cube_slot)) {
-            if (target != target->owner->m_characters.front() && target->color != card_color_type::orange)
-                return "ERROR_TARGET_NOT_CUBE_SLOT";
-        } else if (target->deck == card_deck_type::character) {
-            return "ERROR_TARGET_NOT_CARD";
-        }
-
-        if (bool(filter & target_card_filter::beer) && !target->has_tag(tag_type::beer))
-            return "ERROR_TARGET_NOT_BEER";
-
-        if (bool(filter & target_card_filter::bang) && !origin->is_bangcard(target))
-            return "ERROR_TARGET_NOT_BANG";
-
-        if (bool(filter & target_card_filter::bangcard) && !target->has_tag(tag_type::bangcard))
-            return "ERROR_TARGET_NOT_BANG";
-
-        if (bool(filter & target_card_filter::missed) && !target->has_tag(tag_type::missedcard))
-            return "ERROR_TARGET_NOT_MISSED";
-
-        if (bool(filter & target_card_filter::bronco) && !target->has_tag(tag_type::bronco))
-            return "ERROR_TARGET_NOT_BRONCO";
-
-        if (bool(filter & target_card_filter::blue) && target->color != card_color_type::blue)
-            return "ERROR_TARGET_NOT_BLUE_CARD";
-
-        if (bool(filter & target_card_filter::clubs) && origin->get_card_sign(target).suit != card_suit::clubs)
-            return "ERROR_TARGET_NOT_CLUBS";
-
-        if (bool(filter & target_card_filter::black) != (target->color == card_color_type::black))
-            return "ERROR_TARGET_BLACK_CARD";
-
-        if (bool(filter & target_card_filter::table) && target->pocket != pocket_type::player_table)
-            return "ERROR_TARGET_NOT_TABLE_CARD";
-
-        if (bool(filter & target_card_filter::hand) && target->pocket != pocket_type::player_hand)
-            return "ERROR_TARGET_NOT_HAND_CARD";
-
-        return {};
-    }
-
     game_string play_card_verify::verify_modifiers() const {
         for (card *mod_card : modifiers) {
             if (card *disabler = origin->m_game->get_disabler(mod_card)) {
@@ -202,7 +125,7 @@ namespace banggame {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
             target = targets.front().get<target_type::player>();
-            if (game_string error = check_player_filter(origin_card, origin, origin_card->equip_target, target)) {
+            if (game_string error = check_player_filter(origin, origin_card->equip_target, target)) {
                 return error;
             }
         }

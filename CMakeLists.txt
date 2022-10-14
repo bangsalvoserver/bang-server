@@ -27,6 +27,7 @@ set(bangserver_srcs
     src/game/effects/canyondiablo/effects.cpp
     src/game/effects/canyondiablo/equips.cpp
     src/game/card_serial.cpp
+    src/game/filters.cpp
     src/game/holders.cpp
     src/game/game.cpp
     src/game/game_table.cpp

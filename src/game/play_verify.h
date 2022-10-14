@@ -7,11 +7,9 @@
 
 #include "card_enums.h"
 #include "holders.h"
+#include "filters.h"
 
 namespace banggame {
-
-    game_string check_player_filter(card *origin_card, player *origin, target_player_filter filter, player *target);
-    game_string check_card_filter(card *origin_card, player *origin, target_card_filter filter, card *target);
 
     struct play_card_verify {
         player *origin;
