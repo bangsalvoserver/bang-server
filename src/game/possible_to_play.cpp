@@ -15,7 +15,7 @@ namespace banggame {
             }
         } else {
             for (player &p : m_game->m_players) {
-                if (check_player_filter(this, card->equip_target, &p).empty() && !p.find_equipped_card(card)) {
+                if (!check_player_filter(this, card->equip_target, &p) && !p.find_equipped_card(card)) {
                     ret.push_back(&p);
                 }
             }
@@ -26,7 +26,7 @@ namespace banggame {
     std::vector<player *> player::make_player_target_set(card *origin_card, const effect_holder &holder) {
         std::vector<player *> ret;
         for (player &target : m_game->m_players) {
-            if (check_player_filter(this, holder.player_filter, &target).empty()
+            if (!check_player_filter(this, holder.player_filter, &target)
                 && !holder.verify(origin_card, this, &target)) {
                 ret.push_back(&target);
             }
@@ -37,7 +37,7 @@ namespace banggame {
     std::vector<card *> player::make_card_target_set(card *origin_card, const effect_holder &holder) {
         std::vector<card *> ret;
         auto add_if_valid = [&](card *target_card) {
-            if (check_card_filter(origin_card, this, holder.card_filter, target_card).empty()
+            if (!check_card_filter(origin_card, this, holder.card_filter, target_card)
                 && !holder.verify(origin_card, this, target_card)) {
                 ret.push_back(target_card);
             }

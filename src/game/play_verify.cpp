@@ -125,7 +125,7 @@ namespace banggame {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
             target = targets.front().get<target_type::player>();
-            if (game_string error = check_player_filter(origin, origin_card->equip_target, target)) {
+            if (auto error = check_player_filter(origin, origin_card->equip_target, target)) {
                 return error;
             }
         }

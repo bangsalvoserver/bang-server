@@ -10,23 +10,26 @@ namespace banggame {
     namespace filter_impl {
         using namespace banggame;
 
-        int get_player_hp(serial::player origin);
-        bool check_player_flags(serial::player origin, player_flags flags);
-        bool is_player_alive(serial::player origin);
-        player_role get_player_role(serial::player origin);
-        int get_player_range_mod(serial::player origin);
-        int get_player_weapon_range(serial::player origin);
-        int get_distance(serial::player origin, serial::player target);
-        bool is_bangcard(serial::player origin, serial::card target);
-        card_sign get_card_sign(serial::player origin, serial::card target);
-        card_color_type get_card_color(serial::card target);
-        pocket_type get_card_pocket(serial::card target);
-        card_deck_type get_card_deck(serial::card target);
-        bool card_has_tag(serial::card target, tag_type type);
-        bool is_cube_slot(serial::card target);
+        using player_ptr = unwrap_not_null_t<serial::player>;
+        using card_ptr = unwrap_not_null_t<serial::card>;
+
+        int get_player_hp(player_ptr origin);
+        bool check_player_flags(player_ptr origin, player_flags flags);
+        bool is_player_alive(player_ptr origin);
+        player_role get_player_role(player_ptr origin);
+        int get_player_range_mod(player_ptr origin);
+        int get_player_weapon_range(player_ptr origin);
+        int get_distance(player_ptr origin, player_ptr target);
+        bool is_bangcard(player_ptr origin, card_ptr target);
+        card_sign get_card_sign(player_ptr origin, card_ptr target);
+        card_color_type get_card_color(card_ptr target);
+        pocket_type get_card_pocket(card_ptr target);
+        card_deck_type get_card_deck(card_ptr target);
+        bool card_has_tag(card_ptr target, tag_type type);
+        bool is_cube_slot(card_ptr target);
     }
 
-    inline std::string check_player_filter(serial::player origin, target_player_filter filter, serial::player target) {
+    inline const char *check_player_filter(filter_impl::player_ptr origin, target_player_filter filter, filter_impl::player_ptr target) {
         if (bool(filter & target_player_filter::dead)) {
             if (filter_impl::get_player_hp(target) > 0) return "ERROR_TARGET_NOT_DEAD";
         } else if (!filter_impl::check_player_flags(target, player_flags::targetable) && !filter_impl::is_player_alive(target)) {
@@ -56,10 +59,10 @@ namespace banggame {
             }
         }
 
-        return {};
+        return nullptr;
     }
 
-    inline std::string check_card_filter(serial::card origin_card, serial::player origin, target_card_filter filter, serial::card target) {
+    inline const char *check_card_filter(filter_impl::card_ptr origin_card, filter_impl::player_ptr origin, target_card_filter filter, filter_impl::card_ptr target) {
         if (!bool(filter & target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";
         
@@ -100,7 +103,7 @@ namespace banggame {
         if (bool(filter & target_card_filter::hand) && filter_impl::get_card_pocket(target) != pocket_type::player_hand)
             return "ERROR_TARGET_NOT_HAND_CARD";
 
-        return {};
+        return nullptr;
     }
 }
 

@@ -21,7 +21,7 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::player>::verify(const play_card_verify &verifier, const effect_holder &effect, player *target) {
-        if (game_string error = check_player_filter(verifier.origin, effect.player_filter, target)) {
+        if (auto error = check_player_filter(verifier.origin, effect.player_filter, target)) {
             return error;
         } else {
             return effect.verify(verifier.origin_card, verifier.origin, target);
@@ -158,9 +158,9 @@ namespace banggame {
     template<> game_string play_visitor<target_type::card>::verify(const play_card_verify &verifier, const effect_holder &effect, card *target) {
         if (!target->owner) {
             return "ERROR_CARD_HAS_NO_OWNER";
-        } else if (std::string error = check_player_filter(verifier.origin, effect.player_filter, target->owner); !error.empty()) {
+        } else if (auto error = check_player_filter(verifier.origin, effect.player_filter, target->owner)) {
             return error;
-        } else if (std::string error = check_card_filter(verifier.origin_card, verifier.origin, effect.card_filter, target); !error.empty()) {
+        } else if (auto error = check_card_filter(verifier.origin_card, verifier.origin, effect.card_filter, target)) {
             return error;
         } else {
             return effect.verify(verifier.origin_card, verifier.origin, target);
