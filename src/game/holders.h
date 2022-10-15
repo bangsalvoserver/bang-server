@@ -9,6 +9,8 @@
 
 namespace banggame {
 
+    void apply_expansion(game *game, card_expansion_type value);
+    
     struct effect_holder {
         REFLECTABLE(
             (target_type) target,

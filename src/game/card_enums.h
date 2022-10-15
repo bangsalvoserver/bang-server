@@ -41,22 +41,22 @@ namespace banggame {
             return suit != card_suit::none && rank != card_rank::none;
         }
     };
-
-    struct unofficial_expansion{};
     
-    DEFINE_ENUM_FLAGS_DATA(card_expansion_type,
-        (characterchoice)
+    DEFINE_ENUM_FLAGS_FWD_TYPES(card_expansion_type,
+        (characterchoice,       expansion_characterchoice)
         (dodgecity)
-        (goldrush)
-        (armedanddangerous)
-        (valleyofshadows)
-        (canyondiablo,      unofficial_expansion{})
+        (goldrush,              expansion_goldrush)
+        (armedanddangerous,     expansion_armedanddangerous)
+        (valleyofshadows,       expansion_valleyofshadows)
+        (canyondiablo,          expansion_canyondiablo)
         (highnoon)
         (fistfulofcards)
         (wildwestshow)
         (thebullet)
-        (ghostcards)
+        (ghostcards,            expansion_ghostcards)
     )
+
+    constexpr auto unofficial_expansions = card_expansion_type::canyondiablo;
 
     DEFINE_ENUM(card_color_type,
         (none)

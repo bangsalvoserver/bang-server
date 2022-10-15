@@ -132,6 +132,12 @@ namespace banggame {
     void game::start_game(const game_options &options) {
         m_options = options;
 
+        for (auto val : enums::enum_values_v<card_expansion_type>) {
+            if (bool(m_options.expansions & val)) {
+                apply_expansion(this, val);
+            }
+        }
+
         add_update<game_update_type::player_add>(static_cast<int>(m_players.size()));
 
         for (player &p : m_players) {
@@ -187,14 +193,11 @@ namespace banggame {
             add_update<game_update_type::add_cards>(make_id_vector(m_shop_deck), pocket_type::shop_deck);
         }
 
-        if (has_expansion(card_expansion_type::armedanddangerous)) {
-            num_cubes = 32;
-            add_update<game_update_type::add_cubes>(num_cubes);
-        }
-
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
             add_update<game_update_type::add_cards>(make_id_vector(m_hidden_deck), pocket_type::hidden_deck);
         }
+
+        call_event<event_type::on_game_setup>();
         
         player_role roles[] = {
             player_role::sheriff,
@@ -274,7 +277,7 @@ namespace banggame {
         }
 #endif
 
-        if (has_expansion(card_expansion_type::characterchoice)) {
+        if (bool(m_options.expansions & card_expansion_type::characterchoice)) {
             for (player &p : m_players) {
                 while (!p.m_characters.empty()) {
                     move_card(p.m_characters.front(), pocket_type::player_hand, &p, show_card_flags::instant | show_card_flags::shown);
@@ -519,7 +522,7 @@ namespace banggame {
                 add_update<game_update_type::move_scenario_deck>(m_first_player);
             }
 
-            if (winner_role == player_role::unknown && !has_expansion(card_expansion_type::ghostcards)) {
+            if (winner_role == player_role::unknown && !bool(m_options.expansions & card_expansion_type::ghostcards)) {
                 target->add_player_flags(player_flags::removed);
                 add_update<game_update_type::player_remove>(target);
             }

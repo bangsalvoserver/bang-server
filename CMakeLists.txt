@@ -13,18 +13,22 @@ set(bangserver_srcs
     src/game/effects/highnoon/scenarios.cpp
     src/game/effects/fistfulofcards/scenarios.cpp
     src/game/effects/goldrush/effects.cpp
+    src/game/effects/goldrush/expansions.cpp
     src/game/effects/goldrush/equips.cpp
     src/game/effects/goldrush/characters.cpp
     src/game/effects/valleyofshadows/effects.cpp
+    src/game/effects/valleyofshadows/expansions.cpp
     src/game/effects/valleyofshadows/equips.cpp
     src/game/effects/valleyofshadows/characters.cpp
     src/game/effects/valleyofshadows/requests.cpp
     src/game/effects/wildwestshow/characters.cpp
     src/game/effects/armedanddangerous/equips.cpp
     src/game/effects/armedanddangerous/effects.cpp
+    src/game/effects/armedanddangerous/expansions.cpp
     src/game/effects/armedanddangerous/characters.cpp
     src/game/effects/armedanddangerous/requests.cpp
     src/game/effects/canyondiablo/effects.cpp
+    src/game/effects/canyondiablo/expansions.cpp
     src/game/effects/canyondiablo/equips.cpp
     src/game/card_serial.cpp
     src/game/filters.cpp

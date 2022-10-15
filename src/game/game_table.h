@@ -85,11 +85,6 @@ namespace banggame {
             using namespace enums::flag_operators;
             return bool(m_game_flags & type);
         }
-
-        bool has_expansion(card_expansion_type type) const {
-            using namespace enums::flag_operators;
-            return bool(m_options.expansions & type);
-        }
     };
 
 }

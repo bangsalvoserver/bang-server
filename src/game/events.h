@@ -14,6 +14,10 @@ namespace banggame {
     #define EVENT(name, ...) (name, std::function<void(__VA_ARGS__)>)
     
     DEFINE_ENUM_TYPES(event_type,
+        EVENT(on_game_setup)
+
+        EVENT(check_damage_response, bool &value)
+
         EVENT(apply_sign_modifier,              player *origin, card_sign &value)
         EVENT(apply_beer_modifier,              player *origin, int &value)
         EVENT(apply_maxcards_modifier,          player *origin, int &value)
@@ -44,6 +48,8 @@ namespace banggame {
         
         // viene chiamato quando scarti una carta a fine turno
         EVENT(on_discard_pass, player *origin, card *target_card)
+
+        EVENT(post_discard_pass, player *origin, int ndiscarded)
 
         // viene chiamata quando un giocatore deve estrarre prima di pescare
         EVENT(on_predraw_check, player *origin, card *target_card)

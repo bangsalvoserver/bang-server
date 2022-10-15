@@ -164,9 +164,7 @@ namespace banggame {
         target->m_game->call_event<event_type::on_discard_pass>(target, target_card);
         if (target->m_hand.size() <= target->max_cards_end_of_turn()) {
             target->m_game->pop_request();
-            if (target->m_game->has_expansion(card_expansion_type::armedanddangerous)) {
-                target->queue_request_add_cube(nullptr, ndiscarded);
-            }
+            target->m_game->call_event<event_type::post_discard_pass>(target, ndiscarded);
             target->m_game->queue_action([target = target]{ target->pass_turn(); });
         }
         target->m_game->update_request();

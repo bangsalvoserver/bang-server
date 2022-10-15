@@ -96,17 +96,12 @@ namespace banggame {
     void player::damage(card *origin_card, player *origin, int value, bool is_bang, bool instant) {
         if (is_ghost()) return;
         
-        if (instant || !m_game->has_expansion(card_expansion_type::valleyofshadows | card_expansion_type::canyondiablo)) {
+        if (instant || !m_game->call_event<event_type::check_damage_response>(false)) {
             m_game->add_log(value == 1 ? "LOG_TAKEN_DAMAGE" : "LOG_TAKEN_DAMAGE_PLURAL", origin_card, this, value);
             set_hp(m_hp - value);
             m_game->call_event<event_type::before_hit>(origin_card, origin, this, value, is_bang);
             if (m_hp <= 0) {
                 m_game->queue_request<request_death>(origin_card, origin, this);
-            }
-            if (m_game->has_expansion(card_expansion_type::goldrush)) {
-                if (origin && origin->m_game->m_playing == origin && origin != this && origin->alive()) {
-                    origin->add_gold(value);
-                }
             }
             m_game->call_event<event_type::after_hit>(origin_card, origin, this, value, is_bang);
         } else {
@@ -169,9 +164,6 @@ namespace banggame {
     }
 
     bool player::can_escape(player *origin, card *origin_card, effect_flags flags) const {
-        if (bool(flags & effect_flags::escapable)
-            && m_game->has_expansion(card_expansion_type::valleyofshadows)) return true;
-        
         return m_game->call_event<event_type::apply_escapable_modifier>(origin_card, origin, this, flags, false);
     }
     

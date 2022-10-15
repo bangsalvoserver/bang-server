@@ -8,11 +8,21 @@
 #include "effects/equips.h"
 #include "effects/characters.h"
 #include "effects/scenarios.h"
+#include "effects/expansions.h"
 
 #include "game.h"
 #include "mth_unwrapper.h"
 
 namespace banggame {
+
+    void apply_expansion(game *game, card_expansion_type value) {
+        enums::visit_enum([&]<card_expansion_type E>(enums::enum_tag_t<E>) {
+            if constexpr (enums::value_with_type<E>) {
+                using type = enums::enum_type_t<E>;
+                type{}.on_apply(game);
+            }
+        }, value);
+    }
 
     template<typename Holder, typename Function>
     static auto visit_effect(Function &&fun, Holder &holder) {

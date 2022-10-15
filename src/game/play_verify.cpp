@@ -391,19 +391,9 @@ namespace banggame {
                         origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", origin_card, origin, target);
                     }
                     target->equip_card(origin_card);
-                    switch (origin_card->color) {
-                    case card_color_type::blue:
-                        if (origin->m_game->has_expansion(card_expansion_type::armedanddangerous)) {
-                            origin->queue_request_add_cube(origin_card);
-                        }
-                        break;
-                    case card_color_type::green:
+                    if (origin_card->color == card_color_type::green) {
                         origin_card->inactive = true;
                         origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
-                        break;
-                    case card_color_type::orange:
-                        origin->add_cubes(origin_card, 3);
-                        break;
                     }
                     origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card);
                     origin->set_last_played_card(nullptr);
