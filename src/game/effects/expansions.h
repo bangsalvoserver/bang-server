@@ -3,6 +3,5 @@
 
 #include "valleyofshadows/expansions.h"
 #include "canyondiablo/expansions.h"
-#include "goldrush/expansions.h"
 
 #endif

@@ -45,7 +45,7 @@ namespace banggame {
     DEFINE_ENUM_FLAGS_FWD_TYPES(card_expansion_type,
         (characterchoice,       expansion_characterchoice)
         (dodgecity)
-        (goldrush,              expansion_goldrush)
+        (goldrush,              ruleset_goldrush)
         (armedanddangerous,     ruleset_armedanddangerous)
         (valleyofshadows,       expansion_valleyofshadows)
         (canyondiablo,          expansion_canyondiablo)

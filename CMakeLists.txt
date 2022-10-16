@@ -11,7 +11,6 @@ set(bangserver_srcs
     src/game/effects/base/black_jack.cpp
     src/game/effects/base/boots.cpp
     src/game/effects/base/calamity_janet.cpp
-    src/game/effects/base/common.cpp
     src/game/effects/base/deathsave.cpp
     src/game/effects/base/draw.cpp
     src/game/effects/base/duel.cpp
@@ -27,9 +26,12 @@ set(bangserver_srcs
     src/game/effects/base/max_usages.cpp
     src/game/effects/base/missed.cpp
     src/game/effects/base/mustang.cpp
+    src/game/effects/base/pass_turn.cpp
+    src/game/effects/base/play_card_action.cpp
     src/game/effects/base/predraw_check.cpp
     src/game/effects/base/prompt_on_self_equip.cpp
     src/game/effects/base/requests.cpp
+    src/game/effects/base/resolve.cpp
     src/game/effects/base/scope.cpp
     src/game/effects/base/self_damage.cpp
     src/game/effects/base/slab_the_killer.cpp
@@ -42,10 +44,24 @@ set(bangserver_srcs
     src/game/effects/dodgecity/characters.cpp
     src/game/effects/highnoon/scenarios.cpp
     src/game/effects/fistfulofcards/scenarios.cpp
-    src/game/effects/goldrush/effects.cpp
-    src/game/effects/goldrush/expansions.cpp
-    src/game/effects/goldrush/equips.cpp
-    src/game/effects/goldrush/characters.cpp
+
+    src/game/effects/goldrush/add_gold.cpp
+    src/game/effects/goldrush/calumet.cpp
+    src/game/effects/goldrush/discard_black.cpp
+    src/game/effects/goldrush/don_bell.cpp
+    src/game/effects/goldrush/dutch_will.cpp
+    src/game/effects/goldrush/goldrush.cpp
+    src/game/effects/goldrush/gunbelt.cpp
+    src/game/effects/goldrush/josh_mccloud.cpp
+    src/game/effects/goldrush/luckycharm.cpp
+    src/game/effects/goldrush/madam_yto.cpp
+    src/game/effects/goldrush/pay_gold.cpp
+    src/game/effects/goldrush/pickaxe.cpp
+    src/game/effects/goldrush/ruleset.cpp
+    src/game/effects/goldrush/rum.cpp
+    src/game/effects/goldrush/sell_beer.cpp
+    src/game/effects/goldrush/wanted.cpp
+
     src/game/effects/valleyofshadows/effects.cpp
     src/game/effects/valleyofshadows/expansions.cpp
     src/game/effects/valleyofshadows/equips.cpp
