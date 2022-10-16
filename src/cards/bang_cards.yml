@@ -1294,7 +1294,7 @@ character:
   - name: BART_CASSIDY
     image: 01_bartcassidy
     equip:
-      - boots
+      - bart_cassidy
   - name: BLACK_JACK
     image: 01_blackjack
     equip:
@@ -1338,7 +1338,7 @@ character:
   - name: LUCKY_DUKE
     image: 01_luckyduke
     equip:
-      - horseshoe
+      - lucky_duke
   - name: PAUL_REGRET
     image: 01_paulregret
     equip:
@@ -1417,7 +1417,7 @@ character:
     image: 03_apache_kid
     expansion: dodgecity
     equip:
-      - calumet
+      - apache_kid
     tags:
       - max_hp(3)
   - name: BELLE_STAR
@@ -1490,7 +1490,7 @@ character:
     image: 03_pixie_pete
     expansion: dodgecity
     equip:
-      - pickaxe
+      - pixie_pete
     tags:
       - max_hp(3)
   - name: SEAN_MALLORY
@@ -1981,7 +1981,7 @@ goldrush:
     image: 04_calumet
     color: black
     equip:
-      - calumet
+      - apache_kid
     tags:
       - buy_cost(3)
   - name: GUN_BELT
@@ -2035,14 +2035,14 @@ goldrush:
     image: 04_ferro_di_cavallo
     color: black
     equip:
-      - horseshoe
+      - lucky_duke
     tags:
       - buy_cost(2)
   - name: PICKAXE
     image: 04_piccone
     color: black
     equip:
-      - pickaxe
+      - pixie_pete
     tags:
       - buy_cost(4)
   - count: 3
@@ -2077,7 +2077,7 @@ goldrush:
     image: 04_stivali
     color: black
     equip:
-      - boots
+      - bart_cassidy
     tags:
       - buy_cost(3)
   - name: LUCKY_CHARM

@@ -9,7 +9,7 @@ set(bangserver_srcs
     src/game/effects/base/barrel.cpp
     src/game/effects/base/beer.cpp
     src/game/effects/base/black_jack.cpp
-    src/game/effects/base/boots.cpp
+    src/game/effects/base/bart_cassidy.cpp
     src/game/effects/base/calamity_janet.cpp
     src/game/effects/base/deathsave.cpp
     src/game/effects/base/draw.cpp
@@ -18,7 +18,7 @@ set(bangserver_srcs
     src/game/effects/base/el_gringo.cpp
     src/game/effects/base/generalstore.cpp
     src/game/effects/base/heal.cpp
-    src/game/effects/base/horseshoe.cpp
+    src/game/effects/base/lucky_duke.cpp
     src/game/effects/base/indians.cpp
     src/game/effects/base/initialcards.cpp
     src/game/effects/base/jail.cpp
@@ -42,6 +42,7 @@ set(bangserver_srcs
     src/game/effects/base/vulture_sam.cpp
     src/game/effects/base/weapon.cpp
 
+    src/game/effects/dodgecity/apache_kid.cpp
     src/game/effects/dodgecity/bellestar.cpp
     src/game/effects/dodgecity/bill_noface.cpp
     src/game/effects/dodgecity/claus_the_saint.cpp
@@ -50,6 +51,7 @@ set(bangserver_srcs
     src/game/effects/dodgecity/herb_hunter.cpp
     src/game/effects/dodgecity/johnny_kisch.cpp
     src/game/effects/dodgecity/molly_stark.cpp
+    src/game/effects/dodgecity/pixie_pete.cpp
     src/game/effects/dodgecity/tequila_joe.cpp
     src/game/effects/dodgecity/vera_custer.cpp
     
@@ -84,7 +86,6 @@ set(bangserver_srcs
     src/game/effects/fistfulofcards/vendetta.cpp
 
     src/game/effects/goldrush/add_gold.cpp
-    src/game/effects/goldrush/calumet.cpp
     src/game/effects/goldrush/discard_black.cpp
     src/game/effects/goldrush/don_bell.cpp
     src/game/effects/goldrush/dutch_will.cpp
@@ -94,7 +95,6 @@ set(bangserver_srcs
     src/game/effects/goldrush/luckycharm.cpp
     src/game/effects/goldrush/madam_yto.cpp
     src/game/effects/goldrush/pay_gold.cpp
-    src/game/effects/goldrush/pickaxe.cpp
     src/game/effects/goldrush/ruleset.cpp
     src/game/effects/goldrush/rum.cpp
     src/game/effects/goldrush/sell_beer.cpp

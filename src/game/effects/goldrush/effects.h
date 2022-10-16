@@ -2,7 +2,6 @@
 #define __GOLDRUSH_EFFECTS_H__
 
 #include "add_gold.h"
-#include "calumet.h"
 #include "discard_black.h"
 #include "don_bell.h"
 #include "dutch_will.h"
@@ -12,7 +11,6 @@
 #include "luckycharm.h"
 #include "madam_yto.h"
 #include "pay_gold.h"
-#include "pickaxe.h"
 #include "ruleset.h"
 #include "rum.h"
 #include "sell_beer.h"
