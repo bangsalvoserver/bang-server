@@ -3,7 +3,6 @@
 
 #include "base/equips.h"
 #include "goldrush/equips.h"
-#include "armedanddangerous/equips.h"
 #include "valleyofshadows/equips.h"
 #include "canyondiablo/equips.h"
 

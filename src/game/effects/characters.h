@@ -4,7 +4,6 @@
 #include "base/characters.h"
 #include "dodgecity/characters.h"
 #include "goldrush/characters.h"
-#include "armedanddangerous/characters.h"
 #include "valleyofshadows/characters.h"
 #include "wildwestshow/characters.h"
 

@@ -1,0 +1,39 @@
+#include "al_preacher.h"
+
+#include "../../game.h"
+
+namespace banggame {
+
+    struct request_al_preacher : request_base {
+        request_al_preacher(card *origin_card, player *origin, player *target)
+            : request_base(origin_card, origin, target, effect_flags::auto_respond) {}
+
+        game_string status_text(player *owner) const override {
+            if (target == owner) {
+                return {"STATUS_CAN_PLAY_CARD", origin_card};
+            } else {
+                return {"STATUS_CAN_PLAY_CARD_OTHER", target, origin_card};
+            }
+        }
+    };
+
+    void effect_al_preacher::on_enable(card *target_card, player *p) {
+        p->m_game->add_listener<event_type::on_equip_card>(target_card, [=](player *origin, player *target, card *equipped_card) {
+            if (p != origin && (equipped_card->color == card_color_type::blue || equipped_card->color == card_color_type::orange)) {
+                if (p->count_cubes() >= 2) {
+                    p->m_game->queue_request<request_al_preacher>(target_card, origin, p);
+                }
+            }
+        });
+    }
+
+    bool effect_al_preacher::can_respond(card *origin_card, player *origin) {
+        return origin->m_game->top_request_is<request_al_preacher>(origin);
+    }
+
+    void effect_al_preacher::on_play(card *origin_card, player *origin) {
+        origin->m_game->pop_request();
+        origin->m_game->update_request();
+    }
+
+}

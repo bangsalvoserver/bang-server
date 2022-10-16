@@ -100,8 +100,6 @@ namespace banggame {
         void move_cubes(card *origin, card *target, int ncubes);
         void drop_all_cubes(card *target);
 
-        void queue_request_add_cube(card *origin_card, int ncubes = 1);
-
         bool can_escape(player *origin, card *origin_card, effect_flags flags) const;
         
         void add_to_hand(card *card);

@@ -7,7 +7,6 @@
 #include "game_update.h"
 
 #include "effects/base/requests.h"
-#include "effects/armedanddangerous/requests.h"
 #include "effects/valleyofshadows/requests.h"
 
 #include <cassert>
@@ -134,33 +133,6 @@ namespace banggame {
 
     bool player::immune_to(card *origin_card, player *origin, effect_flags flags) const {
         return m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, false);
-    }
-
-    void player::queue_request_add_cube(card *origin_card, int ncubes) {
-        int nslots = max_cubes - m_characters.front()->num_cubes;
-        int ncards = nslots > 0;
-        for (card *c : m_table) {
-            if (c->color == card_color_type::orange) {
-                ncards += c->num_cubes < max_cubes;
-                nslots += max_cubes - c->num_cubes;
-            }
-        }
-        ncubes = std::min<int>(ncubes, m_game->num_cubes);
-        if (nslots <= ncubes || ncards <= 1) {
-            auto do_add_cubes = [&](card *c) {
-                int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes);
-                ncubes -= cubes_to_add;
-                add_cubes(c, cubes_to_add);
-            };
-            do_add_cubes(m_characters.front());
-            for (card *c : m_table) {
-                if (c->color == card_color_type::orange) {
-                    do_add_cubes(c);
-                }
-            }
-        } else if (ncubes > 0) {
-            m_game->queue_request<request_add_cube>(origin_card, this, ncubes);
-        }
     }
 
     bool player::can_escape(player *origin, card *origin_card, effect_flags flags) const {

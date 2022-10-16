@@ -827,7 +827,7 @@ main_deck:
     expansion: armedanddangerous
     color: brown
     effects:
-      - reload
+      - add_cube(3)
   - name: RUST
     signs:
       - 9 spades

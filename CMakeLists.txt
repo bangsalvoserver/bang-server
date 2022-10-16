@@ -22,11 +22,27 @@ set(bangserver_srcs
     src/game/effects/valleyofshadows/characters.cpp
     src/game/effects/valleyofshadows/requests.cpp
     src/game/effects/wildwestshow/characters.cpp
-    src/game/effects/armedanddangerous/equips.cpp
-    src/game/effects/armedanddangerous/effects.cpp
-    src/game/effects/armedanddangerous/expansions.cpp
-    src/game/effects/armedanddangerous/characters.cpp
-    src/game/effects/armedanddangerous/requests.cpp
+    src/game/effects/armedanddangerous/add_cube.cpp
+    src/game/effects/armedanddangerous/al_preacher.cpp
+    src/game/effects/armedanddangerous/bandolier.cpp
+    src/game/effects/armedanddangerous/bigfifty.cpp
+    src/game/effects/armedanddangerous/bloody_mary.cpp
+    src/game/effects/armedanddangerous/bomb.cpp
+    src/game/effects/armedanddangerous/buntlinespecial.cpp
+    src/game/effects/armedanddangerous/doublebarrel.cpp
+    src/game/effects/armedanddangerous/draw_atend.cpp
+    src/game/effects/armedanddangerous/duck.cpp
+    src/game/effects/armedanddangerous/flintlock.cpp
+    src/game/effects/armedanddangerous/frankie_canton.cpp
+    src/game/effects/armedanddangerous/heal_multi.cpp
+    src/game/effects/armedanddangerous/julie_cutter.cpp
+    src/game/effects/armedanddangerous/ms_abigail.cpp
+    src/game/effects/armedanddangerous/red_ringo.cpp
+    src/game/effects/armedanddangerous/ruleset.cpp
+    src/game/effects/armedanddangerous/rust.cpp
+    src/game/effects/armedanddangerous/squaw.cpp
+    src/game/effects/armedanddangerous/thunderer.cpp
+    src/game/effects/armedanddangerous/tumbleweed.cpp
     src/game/effects/canyondiablo/effects.cpp
     src/game/effects/canyondiablo/expansions.cpp
     src/game/effects/canyondiablo/equips.cpp

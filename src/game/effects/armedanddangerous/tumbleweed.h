@@ -1,14 +1,9 @@
-#ifndef __ARMEDANDDANGEROUS_EQUIPS_H__
-#define __ARMEDANDDANGEROUS_EQUIPS_H__
+#ifndef __ARMEDANDDANGEROUS_TUMBLEWEED_H__
+#define __ARMEDANDDANGEROUS_TUMBLEWEED_H__
 
 #include "../card_effect.h"
 
 namespace banggame {
-    
-    struct effect_bomb {
-        void on_equip(card *target_card, player *target);
-        void on_unequip(card *target_card, player *target);
-    };
 
     struct effect_tumbleweed : event_based_effect {
         void on_enable(card *target_card, player *target);

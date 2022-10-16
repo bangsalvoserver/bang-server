@@ -3,7 +3,6 @@
 #include "holders.h"
 #include "game_update.h"
 
-#include "effects/armedanddangerous/requests.h"
 #include "effects/base/requests.h"
 #include "play_verify.h"
 
