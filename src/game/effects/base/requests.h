@@ -5,8 +5,6 @@
 
 namespace banggame {
 
-    using namespace enums::flag_operators;
-
     struct request_characterchoice : request_base {
         request_characterchoice(player *target)
             : request_base(nullptr, nullptr, target) {}

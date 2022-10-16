@@ -8,6 +8,8 @@
 
 namespace banggame {
 
+    using namespace enums::flag_operators;
+
     DEFINE_ENUM_DATA(card_suit,
         (none,      u8"")
         (hearts,    u8"\u2665")
@@ -43,17 +45,17 @@ namespace banggame {
     };
     
     DEFINE_ENUM_FLAGS_FWD_TYPES(card_expansion_type,
-        (characterchoice,       expansion_characterchoice)
+        (characterchoice)
         (dodgecity)
         (goldrush,              ruleset_goldrush)
         (armedanddangerous,     ruleset_armedanddangerous)
-        (valleyofshadows,       expansion_valleyofshadows)
+        (valleyofshadows,       ruleset_valleyofshadows)
         (canyondiablo,          expansion_canyondiablo)
         (highnoon)
         (fistfulofcards)
         (wildwestshow)
         (thebullet)
-        (ghostcards,            expansion_ghostcards)
+        (ghostcards)
     )
 
     constexpr auto unofficial_expansions = card_expansion_type::canyondiablo;

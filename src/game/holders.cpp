@@ -6,7 +6,6 @@
 
 #include "effects/effects.h"
 #include "effects/equips.h"
-#include "effects/characters.h"
 #include "effects/scenarios.h"
 #include "effects/expansions.h"
 

@@ -4,7 +4,7 @@
 #include "../card_effect.h"
 
 #include "../base/steal_destroy.h"
-#include "../valleyofshadows/requests.h"
+#include "../base/bang.h"
 
 namespace banggame {
 

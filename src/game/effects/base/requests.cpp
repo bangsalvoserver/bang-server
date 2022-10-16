@@ -1,7 +1,5 @@
 #include "requests.h"
 
-#include "../valleyofshadows/requests.h"
-
 #include "../../game.h"
 
 namespace banggame {

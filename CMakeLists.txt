@@ -72,11 +72,25 @@ set(bangserver_srcs
     src/game/effects/goldrush/sell_beer.cpp
     src/game/effects/goldrush/wanted.cpp
 
-    src/game/effects/valleyofshadows/effects.cpp
-    src/game/effects/valleyofshadows/expansions.cpp
-    src/game/effects/valleyofshadows/equips.cpp
-    src/game/effects/valleyofshadows/characters.cpp
-    src/game/effects/valleyofshadows/requests.cpp
+    src/game/effects/valleyofshadows/aim.cpp
+    src/game/effects/valleyofshadows/backfire.cpp
+    src/game/effects/valleyofshadows/bandidos.cpp
+    src/game/effects/valleyofshadows/bounty.cpp
+    src/game/effects/valleyofshadows/colorado_bill.cpp
+    src/game/effects/valleyofshadows/escape.cpp
+    src/game/effects/valleyofshadows/evelyn_shebang.cpp
+    src/game/effects/valleyofshadows/fanning.cpp
+    src/game/effects/valleyofshadows/ghost.cpp
+    src/game/effects/valleyofshadows/henry_block.cpp
+    src/game/effects/valleyofshadows/lemonade_jim.cpp
+    src/game/effects/valleyofshadows/play_as_gatling.cpp
+    src/game/effects/valleyofshadows/poker.cpp
+    src/game/effects/valleyofshadows/ruleset.cpp
+    src/game/effects/valleyofshadows/saved.cpp
+    src/game/effects/valleyofshadows/shotgun.cpp
+    src/game/effects/valleyofshadows/snake.cpp
+    src/game/effects/valleyofshadows/tornado.cpp
+    src/game/effects/valleyofshadows/tuco_franziskaner.cpp
 
     src/game/effects/wildwestshow/big_spencer.cpp
     src/game/effects/wildwestshow/gary_looter.cpp
