@@ -8,6 +8,8 @@
 
 namespace banggame {
 
+    using namespace enums::flag_operators;
+
     DEFINE_ENUM_DATA(card_suit,
         (none,      u8"")
         (hearts,    u8"\u2665")
@@ -43,17 +45,17 @@ namespace banggame {
     };
     
     DEFINE_ENUM_FLAGS_FWD_TYPES(card_expansion_type,
-        (characterchoice,       expansion_characterchoice)
+        (characterchoice)
         (dodgecity)
-        (goldrush,              expansion_goldrush)
-        (armedanddangerous,     expansion_armedanddangerous)
-        (valleyofshadows,       expansion_valleyofshadows)
-        (canyondiablo,          expansion_canyondiablo)
+        (goldrush,              ruleset_goldrush)
+        (armedanddangerous,     ruleset_armedanddangerous)
+        (valleyofshadows,       ruleset_valleyofshadows)
+        (canyondiablo,          ruleset_canyondiablo)
         (highnoon)
         (fistfulofcards)
         (wildwestshow)
         (thebullet)
-        (ghostcards,            expansion_ghostcards)
+        (ghostcards)
     )
 
     constexpr auto unofficial_expansions = card_expansion_type::canyondiablo;
@@ -179,7 +181,7 @@ namespace banggame {
         (resolve,               effect_resolve)
         (bang,                  effect_bang)
         (banglimit,             effect_banglimit)
-        (missedlike,            effect_missedlike)
+        (missed_base,           effect_missed_base)
         (missed,                effect_missed)
         (barrel,                effect_barrel)
         (discard,               effect_discard)
@@ -216,7 +218,6 @@ namespace banggame {
         (goldrush,              effect_goldrush)
         (pay_cube,              effect_pay_cube)
         (add_cube,              effect_add_cube)
-        (reload,                effect_reload)
         (rust,                  effect_rust)
         (doublebarrel,          effect_doublebarrel)
         (thunderer,             effect_thunderer)
@@ -252,15 +253,15 @@ namespace banggame {
         (horse,                 effect_horse)
         (weapon,                effect_weapon)
         (volcanic,              effect_volcanic)
-        (pickaxe,               effect_pickaxe)
-        (calumet,               effect_calumet)
-        (boots,                 effect_boots)
+        (pixie_pete,            effect_pixie_pete)
+        (apache_kid,            effect_apache_kid)
+        (bart_cassidy,          effect_bart_cassidy)
         (ghost,                 effect_ghost)
         (snake,                 effect_snake)
         (shotgun,               effect_shotgun)
         (bounty,                effect_bounty)
         (el_gringo,             effect_el_gringo)
-        (horseshoe,             effect_horseshoe)
+        (lucky_duke,            effect_lucky_duke)
         (luckycharm,            effect_luckycharm)
         (gunbelt,               effect_gunbelt)
         (initialcards,          effect_initialcards)
@@ -325,7 +326,7 @@ namespace banggame {
         (abandonedmine,         effect_abandonedmine)
         (deadman,               effect_deadman)
         (fistfulofcards,        effect_fistfulofcards)
-        (guitar,                effect_guitar)
+        (weapon_base,           effect_weapon_base)
         (packmule,              effect_packmule)
         (indianguide,           effect_indianguide)
         (taxman,                effect_taxman)
@@ -344,7 +345,7 @@ namespace banggame {
         (play_as_gatling,       handler_play_as_gatling)
         (doc_holyday,           handler_doc_holyday)
         (flint_westwood,        handler_flint_westwood)
-        (draw_atend,            handler_draw_atend)
+        (draw_multi,            handler_draw_multi)
         (heal_multi,            handler_heal_multi)
         (fanning,               handler_fanning)
         (flintlock,             handler_flintlock)

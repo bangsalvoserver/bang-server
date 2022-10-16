@@ -3,7 +3,6 @@
 #include "holders.h"
 #include "game_update.h"
 
-#include "effects/armedanddangerous/requests.h"
 #include "effects/base/requests.h"
 #include "play_verify.h"
 
@@ -134,7 +133,7 @@ namespace banggame {
 
         for (auto val : enums::enum_values_v<card_expansion_type>) {
             if (bool(m_options.expansions & val)) {
-                apply_expansion(this, val);
+                apply_ruleset(this, val);
             }
         }
 

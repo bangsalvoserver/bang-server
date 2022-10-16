@@ -1,9 +1,28 @@
 #include "draw_check_handler.h"
 
 #include "game.h"
-#include "effects/base/requests.h"
 
 namespace banggame {
+
+    struct request_check : selection_picker {
+        request_check(card *origin_card, player *target)
+            : selection_picker(origin_card, nullptr, target) {}
+
+        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+            target->m_game->flash_card(target_card);
+            target->m_game->pop_request();
+            target->m_game->m_current_check.select(target_card);
+            target->m_game->update_request();
+        }
+
+        game_string status_text(player *owner) const override {
+            if (target == owner) {
+                return {"STATUS_CHECK", origin_card};
+            } else {
+                return {"STATUS_CHECK_OTHER", target, origin_card};
+            }
+        }
+    };
 
     void draw_check_handler::set(player *origin, card *origin_card, draw_check_function &&function) {
         m_origin = origin;

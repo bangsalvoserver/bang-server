@@ -1,0 +1,38 @@
+#include "lemonade_jim.h"
+
+#include "../../game.h"
+
+namespace banggame {
+
+    struct request_lemonade_jim : request_base {
+        request_lemonade_jim(card *origin_card, player *origin, player *target)
+            : request_base(origin_card, origin, target, effect_flags::auto_respond) {}
+        
+        game_string status_text(player *owner) const override {
+            if (target == owner) {
+                return {"STATUS_CAN_PLAY_CARD", origin_card};
+            } else {
+                return {"STATUS_CAN_PLAY_CARD_OTHER", target, origin_card};
+            }
+        }
+    };
+    
+    void effect_lemonade_jim::on_enable(card *target_card, player *origin) {
+        origin->m_game->add_listener<event_type::on_play_beer>(target_card, [=](player *target) {
+            if (origin != target) {
+                if (!origin->m_hand.empty() && origin->m_hp < origin->m_max_hp) {
+                    target->m_game->queue_request<request_lemonade_jim>(target_card, target, origin);
+                }
+            }
+        });
+    }
+
+    bool effect_lemonade_jim::can_respond(card *origin_card, player *origin) {
+        return origin->m_game->top_request_is<request_lemonade_jim>(origin);
+    }
+
+    void effect_lemonade_jim::on_play(card *origin_card, player *origin) {
+        origin->m_game->pop_request();
+        origin->m_game->update_request();
+    }
+}

@@ -1,41 +1,19 @@
 #ifndef __GOLDRUSH_EFFECTS_H__
 #define __GOLDRUSH_EFFECTS_H__
 
-#include "../card_effect.h"
-
-namespace banggame {
-
-    struct effect_sell_beer {
-        void on_play(card *origin_card, player *origin, card *target);
-    };
-
-    struct effect_discard_black {
-        game_string verify(card *origin_card, player *origin, card *target);
-        void on_play(card *origin_card, player *origin, card *target);
-    };
-
-    struct effect_add_gold {
-        int amount;
-        effect_add_gold(int value) : amount(std::max(1, value)) {}
-
-        void on_play(card *origin_card, player *origin, player *target);
-    };
-
-    struct effect_pay_gold {
-        int amount;
-        effect_pay_gold(int value) : amount(value) {}
-
-        game_string verify(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
-    };
-
-    struct effect_rum {
-        void on_play(card *origin_card, player *origin);
-    };
-
-    struct effect_goldrush {
-        void on_play(card *origin_card, player *origin);
-    };
-}
+#include "add_gold.h"
+#include "discard_black.h"
+#include "don_bell.h"
+#include "dutch_will.h"
+#include "goldrush.h"
+#include "gunbelt.h"
+#include "josh_mccloud.h"
+#include "luckycharm.h"
+#include "madam_yto.h"
+#include "pay_gold.h"
+#include "ruleset.h"
+#include "rum.h"
+#include "sell_beer.h"
+#include "wanted.h"
 
 #endif

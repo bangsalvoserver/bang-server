@@ -1,46 +1,17 @@
 #ifndef __CANYONDIABLO_EFFECTS_H__
 #define __CANYONDIABLO_EFFECTS_H__
 
-#include "../card_effect.h"
-
-namespace banggame {
-
-    struct effect_graverobber {
-        void on_play(card *origin_card, player *origin);
-    };
-
-    struct effect_mirage {
-        game_string verify(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
-    };
-
-    struct effect_disarm {
-        game_string verify(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
-    };
-
-    struct handler_card_sharper {
-        game_string verify(card *origin_card, player *origin, card *chosen_card, card *target_card);
-        void on_play(card *origin_card, player *origin, card *chosen_card, card *target_card);
-        void on_resolve(card *origin_card, player *origin, card *chosen_card, card *target_card);
-    };
-
-    struct effect_sacrifice {
-        bool can_respond(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
-    };
-
-    struct effect_lastwill : event_based_effect {
-        void on_enable(card *origin_card, player *origin);
-        
-        bool can_respond(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin) {}
-    };
-
-    struct handler_lastwill {
-        void on_play(card *origin_card, player *origin, const target_list &targets);
-    };
-
-}
+#include "bronco.h"
+#include "brothel.h"
+#include "card_sharper.h"
+#include "disarm.h"
+#include "graverobber.h"
+#include "indianguide.h"
+#include "lastwill.h"
+#include "mirage.h"
+#include "packmule.h"
+#include "ruleset.h"
+#include "sacrifice.h"
+#include "taxman.h"
 
 #endif
