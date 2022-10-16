@@ -153,7 +153,7 @@ namespace banggame {
 
     void request_ricochet::on_resolve() {
         origin->m_game->pop_request();
-        effect_destroy::resolver{origin_card, origin, target_card}.resolve();
+        destroy_resolver{origin_card, origin, target_card}.resolve();
         origin->m_game->update_request();
     }
 

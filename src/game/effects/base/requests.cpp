@@ -32,98 +32,6 @@ namespace banggame {
         }
     }
 
-    bool request_draw::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return pocket == target->m_game->phase_one_drawn_card()->pocket;
-    }
-
-    void request_draw::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->draw_from_deck();
-    }
-
-    game_string request_draw::status_text(player *owner) const {
-        if (owner == target) {
-            return "STATUS_YOUR_TURN";
-        } else {
-            return {"STATUS_YOUR_TURN_OTHER", target};
-        }
-    }
-    
-    bool request_predraw::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        if (pocket == pocket_type::player_table && target == target_player) {
-            int top_priority = std::ranges::max(target->m_predraw_checks
-                | std::views::values
-                | std::views::filter(std::not_fn(&player::predraw_check::resolved))
-                | std::views::transform(&player::predraw_check::priority));
-            auto it = target->m_predraw_checks.find(target_card);
-            if (it != target->m_predraw_checks.end()
-                && !it->second.resolved
-                && it->second.priority == top_priority) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    void request_predraw::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request();
-        target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
-        target->m_game->queue_action([target = target, target_card] {
-            auto it = target->m_predraw_checks.find(target_card);
-            if (it != target->m_predraw_checks.end()) {
-                it->second.resolved = true;
-            }
-            target->next_predraw_check();
-        });
-        target->m_game->update_request();
-    }
-
-    game_string request_predraw::status_text(player *owner) const {
-        if (owner == target) {
-            return "STATUS_PREDRAW";
-        } else {
-            return {"STATUS_PREDRAW_OTHER", target};
-        }
-    }
-
-    void request_check::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->flash_card(target_card);
-        target->m_game->pop_request();
-        target->m_game->m_current_check.select(target_card);
-        target->m_game->update_request();
-    }
-
-    game_string request_check::status_text(player *owner) const {
-        if (target == owner) {
-            return {"STATUS_CHECK", origin_card};
-        } else {
-            return {"STATUS_CHECK_OTHER", target, origin_card};
-        }
-    }
-
-    void request_generalstore::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        player *next = std::next(player_iterator(target));
-        target->m_game->pop_request();
-        if (target->m_game->m_selection.size() == 2) {
-            target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
-            target->add_to_hand(target_card);
-            target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", next, target->m_game->m_selection.front(), origin_card);
-            next->add_to_hand(target->m_game->m_selection.front());
-            target->m_game->update_request();
-        } else {
-            target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
-            target->add_to_hand(target_card);
-            target->m_game->queue_request<request_generalstore>(origin_card, origin, next);
-        }
-    }
-
-    game_string request_generalstore::status_text(player *owner) const {
-        if (target == owner) {
-            return {"STATUS_GENERALSTORE", origin_card};
-        } else {
-            return {"STATUS_GENERALSTORE_OTHER", target, origin_card};
-        }
-    }
-
     bool request_discard::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
         return pocket == pocket_type::player_hand && target_player == target;
     }
@@ -181,147 +89,6 @@ namespace banggame {
             return "STATUS_DISCARD_PASS";
         } else {
             return {"STATUS_DISCARD_PASS_OTHER", target};
-        }
-    }
-
-    bool request_indians::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return pocket == pocket_type::player_hand && target_player == target && target->is_bangcard(target_card);
-    }
-
-    void request_indians::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request();
-        target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
-        target->discard_card(target_card);
-        target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
-        target->m_game->update_request();
-    }
-
-    void request_indians::on_resolve() {
-        target->m_game->pop_request();
-        target->damage(origin_card, origin, 1);
-        target->m_game->update_request();
-    }
-
-    game_string request_indians::status_text(player *owner) const {
-        if (target == owner) {
-            return {"STATUS_INDIANS", origin_card};
-        } else {
-            return {"STATUS_INDIANS_OTHER", target, origin_card};
-        }
-    }
-
-    bool request_duel::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return pocket == pocket_type::player_hand && target_player == target
-            && target->is_bangcard(target_card)
-            && !target->m_game->is_disabled(target_card);
-    }
-
-    void request_duel::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request();
-        target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
-        target->discard_card(target_card);
-        target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target);
-        target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
-    }
-
-    void request_duel::on_resolve() {
-        target->m_game->pop_request();
-        target->damage(origin_card, origin, 1);
-        target->m_game->update_request();
-    }
-
-    game_string request_duel::status_text(player *owner) const {
-        if (target == owner) {
-            return {"STATUS_DUEL", origin_card};
-        } else {
-            return {"STATUS_DUEL_OTHER", target, origin_card};
-        }
-    }
-
-    bool request_bang::can_miss(card *c) const {
-        return !unavoidable && missable_request::can_miss(c);
-    }
-
-    void request_bang::on_miss() {
-        auto target = this->target;
-        if (--bang_strength == 0) {
-            target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, is_bang_card);
-            target->m_game->pop_request();
-        }
-        target->m_game->update_request();
-    }
-
-    void request_bang::on_resolve() {
-        target->m_game->pop_request();
-        target->damage(origin_card, origin, bang_damage, is_bang_card);
-        if (auto *req = target->m_game->top_request_if<timer_damaging>(target)) {
-            static_cast<cleanup_request &>(*req) = std::move(*this);
-        } else {
-            target->m_game->update_request();
-        }
-    }
-     
-    void request_bang::set_unavoidable() {
-        unavoidable = true;
-        flags |= effect_flags::auto_respond;
-    }
-
-    game_string request_bang::status_text(player *owner) const {
-        if (target != owner) {
-            return {"STATUS_BANG_OTHER", target, origin_card};
-        } else if (bang_strength > 1) {
-            return {"STATUS_BANG_MULTIPLE_MISSED", origin_card, bang_strength};
-        } else {
-            return {"STATUS_BANG", origin_card};
-        }
-    }
-
-    game_string request_card_as_bang::status_text(player *owner) const {
-        if (target != owner) {
-            return {"STATUS_CARD_AS_BANG_OTHER", target, origin_card};
-        } else if (bang_strength > 1) {
-            return {"STATUS_CARD_AS_BANG_MULTIPLE_MISSED", origin_card, bang_strength};
-        } else {
-            return {"STATUS_CARD_AS_BANG", origin_card};
-        }
-    }
-
-    void request_death::on_resolve() {
-        // pushed backwards to the front of the queue
-        target->m_game->queue_action_front([origin=origin, target=target]{
-            if (target->m_hp <= 0) {
-                target->m_game->handle_player_death(origin, target);
-            }
-        });
-        target->m_game->queue_action_front([target=target, tried_save=tried_save]{
-            target->m_game->call_event<event_type::on_player_death_resolve>(target, tried_save);
-        });
-        // so that they are called in the correct order
-        target->m_game->pop_request();
-        target->m_game->update_request();
-    }
-
-    game_string request_death::status_text(player *owner) const {
-        card *saving_card = [this]() -> card * {
-            for (card *c : target->m_characters) {
-                if (can_respond(target, c)) return c;
-            }
-            for (card *c : target->m_table) {
-                if (can_respond(target, c)) return c;
-            }
-            for (card *c : target->m_hand) {
-                if (can_respond(target, c)) return c;
-            }
-            return nullptr;
-        }();
-        if (saving_card) {
-            if (target == owner) {
-                return {"STATUS_DEATH", saving_card};
-            } else {
-                return {"STATUS_DEATH_OTHER", target, saving_card};
-            }
-        } else {
-            return "STATUS_DEATH";
         }
     }
 
@@ -383,44 +150,15 @@ namespace banggame {
         }
     }
 
-    bool request_multi_vulture_sam::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return (pocket == pocket_type::player_hand || pocket == pocket_type::player_table)
-            && target_player == origin
-            && target_card->color != card_color_type::black;
+    std::vector<card *> timer_damaging::get_highlights() const {
+        return target->m_backup_character;
     }
 
-    void request_multi_vulture_sam::on_pick(pocket_type pocket, player *target_player, card *target_card) {
-        target->m_game->pop_request();
-
-        if (pocket == pocket_type::player_hand) {
-            target_card = origin->random_hand_card();
-            target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", target, origin, target_card);
-            target->m_game->add_log(update_target::excludes(origin, target), "LOG_STOLEN_CARD_FROM_HAND", target, origin);
-        } else {
-            target->m_game->add_log("LOG_STOLEN_CARD", target, origin, target_card);
-        }
-        target->steal_card(target_card);
-
-        auto is_valid_target = [&](player *p) {
-            return origin->m_game->call_event<event_type::verify_card_taker>(p, equip_type::vulture_sam, false);
-        };
-
-        if (origin->only_black_cards_equipped()) {
-            target->m_game->update_request();
-        } else {
-            player_iterator next_target(target);
-            do {
-                ++next_target;
-            } while (next_target == origin || !is_valid_target(next_target));
-            target->m_game->queue_request_front<request_multi_vulture_sam>(origin_card, origin, next_target);
-        }
+    void timer_damaging::on_finished() {
+        target->damage(origin_card, origin, damage, is_bang, true);
     }
 
-    game_string request_multi_vulture_sam::status_text(player *owner) const {
-        if (owner == target) {
-            return {"STATUS_MULTI_VULTURE_SAM", origin_card, origin};
-        } else {
-            return {"STATUS_MULT_VULTURE_SAM_OTHER", origin_card, target, origin};
-        }
+    game_string timer_damaging::status_text(player *owner) const {
+        return {damage > 1 ? "STATUS_DAMAGING_PLURAL" : "STATUS_DAMAGING", target, origin_card, damage};
     }
 }

@@ -1,7 +1,7 @@
 #include "flintlock.h"
 
 #include "../../game.h"
-#include "../base/requests.h"
+#include "../base/bang.h"
 
 namespace banggame {
 

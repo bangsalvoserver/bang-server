@@ -6,8 +6,10 @@
 #include "play_verify.h"
 #include "game_update.h"
 
+#include "effects/base/deathsave.h"
+#include "effects/base/draw.h"
+#include "effects/base/predraw_check.h"
 #include "effects/base/requests.h"
-#include "effects/valleyofshadows/requests.h"
 
 #include <cassert>
 #include <numeric>
@@ -393,7 +395,7 @@ namespace banggame {
             if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
                 request_drawing();
             } else {
-                m_game->queue_request<request_predraw>(this);
+                effect_predraw_check::queue(this);
             }
         }
     }

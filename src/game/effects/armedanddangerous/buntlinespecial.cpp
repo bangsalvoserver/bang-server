@@ -1,6 +1,7 @@
 #include "buntlinespecial.h"
 
 #include "../../game.h"
+#include "../base/bang.h"
 #include "../base/requests.h"
 
 namespace banggame {

@@ -3,7 +3,7 @@
 
 #include "../card_effect.h"
 
-#include "../base/requests.h"
+#include "../base/steal_destroy.h"
 #include "../valleyofshadows/requests.h"
 
 namespace banggame {

@@ -1,7 +1,7 @@
 #include "julie_cutter.h"
 
 #include "../../game.h"
-#include "../base/requests.h"
+#include "../base/bang.h"
 
 namespace banggame {
     

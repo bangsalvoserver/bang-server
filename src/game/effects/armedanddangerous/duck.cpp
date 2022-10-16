@@ -1,7 +1,7 @@
 #include "duck.h"
 
 #include "../../game.h"
-#include "../base/effects.h"
+#include "../base/missed.h"
 
 namespace banggame {
 

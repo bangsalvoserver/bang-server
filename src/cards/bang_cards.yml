@@ -732,7 +732,7 @@ main_deck:
     optional:
       - pay_cube select_cubes(2)
       - mth_add
-    mth_effect: draw_atend
+    mth_effect: draw_multi
     tags:
       - repeatable
   - name: CAT_BALOU
@@ -805,7 +805,7 @@ main_deck:
     expansion: armedanddangerous
     color: brown
     responses:
-      - missedlike
+      - missed_base
     optional:
       - pay_cube select_cubes(2)
       - mth_add
@@ -1260,7 +1260,7 @@ main_deck:
     color: blue
     equip_target: any
     equip:
-      - guitar
+      - weapon_base(0)
       - prompt_on_self_equip
     tags:
       - weapon
@@ -1895,7 +1895,7 @@ fistfulofcards:
       - mth_add
     tags:
       - repeatable
-    mth_response: draw_atend
+    mth_response: draw_multi
   - name: RICOCHET
     image: 05_rimbalzo
     effects:

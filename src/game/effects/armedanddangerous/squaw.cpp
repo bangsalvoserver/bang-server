@@ -1,7 +1,7 @@
 #include "squaw.h"
 
 #include "../../game.h"
-#include "../base/effects.h"
+#include "../base/steal_destroy.h"
 
 namespace banggame {
 

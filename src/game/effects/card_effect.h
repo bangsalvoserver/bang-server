@@ -32,10 +32,6 @@ namespace banggame {
         void on_disable(card *target_card, player *target);
     };
 
-    struct effect_prompt_on_self_equip {
-        game_string on_prompt(player *origin, card *target_card, player *target);
-    };
-
     struct request_base {
         request_base(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : origin_card(origin_card), origin(origin), target(target), flags(flags) {}

@@ -1,7 +1,7 @@
 #include "draw_check_handler.h"
 
 #include "game.h"
-#include "effects/base/requests.h"
+#include "effects/base/horseshoe.h"
 
 namespace banggame {
 
@@ -18,7 +18,7 @@ namespace banggame {
                 m_origin->m_game->add_log("LOG_REVEALED_CARD", m_origin, m_origin->m_game->m_deck.back());
                 m_origin->m_game->draw_card_to(pocket_type::selection, nullptr);
             }
-            m_origin->m_game->queue_request_front<request_check>(m_origin_card, m_origin);
+            effect_horseshoe::queue(m_origin_card, m_origin);
         } else {
             select(m_origin->m_game->draw_card_to(pocket_type::discard_pile));
         }

@@ -5,10 +5,40 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(bangserver_srcs
-    src/game/effects/base/effects.cpp
-    src/game/effects/base/equips.cpp
-    src/game/effects/base/characters.cpp
+    src/game/effects/base/bang.cpp
+    src/game/effects/base/barrel.cpp
+    src/game/effects/base/beer.cpp
+    src/game/effects/base/black_jack.cpp
+    src/game/effects/base/boots.cpp
+    src/game/effects/base/calamity_janet.cpp
+    src/game/effects/base/common.cpp
+    src/game/effects/base/deathsave.cpp
+    src/game/effects/base/draw.cpp
+    src/game/effects/base/duel.cpp
+    src/game/effects/base/dynamite.cpp
+    src/game/effects/base/el_gringo.cpp
+    src/game/effects/base/generalstore.cpp
+    src/game/effects/base/heal.cpp
+    src/game/effects/base/horseshoe.cpp
+    src/game/effects/base/indians.cpp
+    src/game/effects/base/initialcards.cpp
+    src/game/effects/base/jail.cpp
+    src/game/effects/base/kit_carlson.cpp
+    src/game/effects/base/max_usages.cpp
+    src/game/effects/base/missed.cpp
+    src/game/effects/base/mustang.cpp
+    src/game/effects/base/predraw_check.cpp
+    src/game/effects/base/prompt_on_self_equip.cpp
     src/game/effects/base/requests.cpp
+    src/game/effects/base/scope.cpp
+    src/game/effects/base/self_damage.cpp
+    src/game/effects/base/slab_the_killer.cpp
+    src/game/effects/base/steal_destroy.cpp
+    src/game/effects/base/suzy_lafayette.cpp
+    src/game/effects/base/volcanic.cpp
+    src/game/effects/base/vulture_sam.cpp
+    src/game/effects/base/weapon.cpp
+
     src/game/effects/dodgecity/characters.cpp
     src/game/effects/highnoon/scenarios.cpp
     src/game/effects/fistfulofcards/scenarios.cpp
@@ -22,6 +52,7 @@ set(bangserver_srcs
     src/game/effects/valleyofshadows/characters.cpp
     src/game/effects/valleyofshadows/requests.cpp
     src/game/effects/wildwestshow/characters.cpp
+
     src/game/effects/armedanddangerous/add_cube.cpp
     src/game/effects/armedanddangerous/al_preacher.cpp
     src/game/effects/armedanddangerous/bandolier.cpp
@@ -30,11 +61,9 @@ set(bangserver_srcs
     src/game/effects/armedanddangerous/bomb.cpp
     src/game/effects/armedanddangerous/buntlinespecial.cpp
     src/game/effects/armedanddangerous/doublebarrel.cpp
-    src/game/effects/armedanddangerous/draw_atend.cpp
     src/game/effects/armedanddangerous/duck.cpp
     src/game/effects/armedanddangerous/flintlock.cpp
     src/game/effects/armedanddangerous/frankie_canton.cpp
-    src/game/effects/armedanddangerous/heal_multi.cpp
     src/game/effects/armedanddangerous/julie_cutter.cpp
     src/game/effects/armedanddangerous/ms_abigail.cpp
     src/game/effects/armedanddangerous/red_ringo.cpp
@@ -43,6 +72,7 @@ set(bangserver_srcs
     src/game/effects/armedanddangerous/squaw.cpp
     src/game/effects/armedanddangerous/thunderer.cpp
     src/game/effects/armedanddangerous/tumbleweed.cpp
+
     src/game/effects/canyondiablo/effects.cpp
     src/game/effects/canyondiablo/expansions.cpp
     src/game/effects/canyondiablo/equips.cpp

@@ -3,33 +3,10 @@
 
 #include "../card_effect.h"
 
-#include "../base/requests.h"
+#include "../base/bang.h"
 
 namespace banggame {
 
-    struct request_targeting : request_base {
-        request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags)
-            , target_card(target_card) {}
-        
-        card *target_card;
-        virtual std::vector<card *> get_highlights() const override;
-    };
-
-    struct request_destroy : request_targeting, resolvable_request {
-        using request_targeting::request_targeting;
-
-        void on_resolve() override;
-        game_string status_text(player *owner) const override;
-    };
-
-    struct request_steal : request_targeting, resolvable_request {
-        using request_targeting::request_targeting;
-
-        void on_resolve() override;
-        game_string status_text(player *owner) const override;
-    };
-    
     struct request_card_as_gatling : request_bang {
         using request_bang::request_bang;
         game_string status_text(player *owner) const override;
@@ -69,20 +46,6 @@ namespace banggame {
         int num_cards = 2;
 
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
-        game_string status_text(player *owner) const override;
-    };
-
-    struct timer_damaging : timer_request, cleanup_request {
-        timer_damaging(card *origin_card, player *origin, player *target, int damage, bool is_bang)
-            : timer_request(origin_card, origin, target)
-            , damage(damage)
-            , is_bang(is_bang) {}
-        
-        int damage;
-        bool is_bang;
-
-        std::vector<card *> get_highlights() const override;
-        void on_finished() override;
         game_string status_text(player *owner) const override;
     };
 

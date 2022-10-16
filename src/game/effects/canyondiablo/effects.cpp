@@ -1,7 +1,8 @@
 #include "effects.h"
 
-#include "../valleyofshadows/requests.h"
 #include "../base/requests.h"
+#include "../base/generalstore.h"
+#include "../base/steal_destroy.h"
 
 #include "../../game.h"
 
