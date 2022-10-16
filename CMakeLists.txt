@@ -35,6 +35,7 @@ set(bangserver_srcs
     src/game/effects/base/scope.cpp
     src/game/effects/base/self_damage.cpp
     src/game/effects/base/slab_the_killer.cpp
+    src/game/effects/base/startofturn.cpp
     src/game/effects/base/steal_destroy.cpp
     src/game/effects/base/suzy_lafayette.cpp
     src/game/effects/base/volcanic.cpp
@@ -68,7 +69,19 @@ set(bangserver_srcs
     src/game/effects/highnoon/thirst.cpp
     src/game/effects/highnoon/trainarrival.cpp
 
-    src/game/effects/fistfulofcards/scenarios.cpp
+    src/game/effects/fistfulofcards/abandonedmine.cpp
+    src/game/effects/fistfulofcards/ambush.cpp
+    src/game/effects/fistfulofcards/deadman.cpp
+    src/game/effects/fistfulofcards/fistfulofcards.cpp
+    src/game/effects/fistfulofcards/judge.cpp
+    src/game/effects/fistfulofcards/lasso.cpp
+    src/game/effects/fistfulofcards/lawofthewest.cpp
+    src/game/effects/fistfulofcards/peyote.cpp
+    src/game/effects/fistfulofcards/ranch.cpp
+    src/game/effects/fistfulofcards/ricochet.cpp
+    src/game/effects/fistfulofcards/russianroulette.cpp
+    src/game/effects/fistfulofcards/sniper.cpp
+    src/game/effects/fistfulofcards/vendetta.cpp
 
     src/game/effects/goldrush/add_gold.cpp
     src/game/effects/goldrush/calumet.cpp
