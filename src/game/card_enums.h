@@ -50,7 +50,7 @@ namespace banggame {
         (goldrush,              ruleset_goldrush)
         (armedanddangerous,     ruleset_armedanddangerous)
         (valleyofshadows,       ruleset_valleyofshadows)
-        (canyondiablo,          expansion_canyondiablo)
+        (canyondiablo,          ruleset_canyondiablo)
         (highnoon)
         (fistfulofcards)
         (wildwestshow)

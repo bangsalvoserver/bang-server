@@ -5,16 +5,14 @@
 #include <stdexcept>
 
 #include "effects/effects.h"
-#include "effects/equips.h"
 #include "effects/scenarios.h"
-#include "effects/expansions.h"
 
 #include "game.h"
 #include "mth_unwrapper.h"
 
 namespace banggame {
 
-    void apply_expansion(game *game, card_expansion_type value) {
+    void apply_ruleset(game *game, card_expansion_type value) {
         enums::visit_enum([&]<card_expansion_type E>(enums::enum_tag_t<E>) {
             if constexpr (enums::value_with_type<E>) {
                 using type = enums::enum_type_t<E>;

@@ -121,9 +121,19 @@ set(bangserver_srcs
     src/game/effects/armedanddangerous/thunderer.cpp
     src/game/effects/armedanddangerous/tumbleweed.cpp
 
-    src/game/effects/canyondiablo/effects.cpp
-    src/game/effects/canyondiablo/expansions.cpp
-    src/game/effects/canyondiablo/equips.cpp
+    src/game/effects/canyondiablo/bronco.cpp
+    src/game/effects/canyondiablo/brothel.cpp
+    src/game/effects/canyondiablo/card_sharper.cpp
+    src/game/effects/canyondiablo/disarm.cpp
+    src/game/effects/canyondiablo/graverobber.cpp
+    src/game/effects/canyondiablo/indianguide.cpp
+    src/game/effects/canyondiablo/lastwill.cpp
+    src/game/effects/canyondiablo/mirage.cpp
+    src/game/effects/canyondiablo/packmule.cpp
+    src/game/effects/canyondiablo/ruleset.cpp
+    src/game/effects/canyondiablo/sacrifice.cpp
+    src/game/effects/canyondiablo/taxman.cpp
+
     src/game/card_serial.cpp
     src/game/filters.cpp
     src/game/holders.cpp
