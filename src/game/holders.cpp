@@ -5,7 +5,6 @@
 #include <stdexcept>
 
 #include "effects/effects.h"
-#include "effects/scenarios.h"
 
 #include "game.h"
 #include "mth_unwrapper.h"

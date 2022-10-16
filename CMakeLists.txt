@@ -52,7 +52,22 @@ set(bangserver_srcs
     src/game/effects/dodgecity/tequila_joe.cpp
     src/game/effects/dodgecity/vera_custer.cpp
     
-    src/game/effects/highnoon/scenarios.cpp
+    src/game/effects/highnoon/blessing.cpp
+    src/game/effects/highnoon/curse.cpp
+    src/game/effects/highnoon/ghosttown.cpp
+    src/game/effects/highnoon/handcuffs.cpp
+    src/game/effects/highnoon/hangover.cpp
+    src/game/effects/highnoon/highnoon.cpp
+    src/game/effects/highnoon/invert_rotation.cpp
+    src/game/effects/highnoon/newidentity.cpp
+    src/game/effects/highnoon/reverend.cpp
+    src/game/effects/highnoon/sermon.cpp
+    src/game/effects/highnoon/shootout.cpp
+    src/game/effects/highnoon/thedaltons.cpp
+    src/game/effects/highnoon/thedoctor.cpp
+    src/game/effects/highnoon/thirst.cpp
+    src/game/effects/highnoon/trainarrival.cpp
+
     src/game/effects/fistfulofcards/scenarios.cpp
 
     src/game/effects/goldrush/add_gold.cpp

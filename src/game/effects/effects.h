@@ -8,5 +8,7 @@
 #include "valleyofshadows/effects.h"
 #include "canyondiablo/effects.h"
 #include "wildwestshow/effects.h"
+#include "highnoon/effects.h"
+#include "fistfulofcards/effects.h"
 
 #endif
