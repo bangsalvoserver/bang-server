@@ -7,8 +7,6 @@ namespace banggame {
 
     struct effect_horseshoe : event_based_effect {
         void on_enable(card *target_card, player *target);
-
-        static void queue(card *target_card, player *target);
     };
 
 }
