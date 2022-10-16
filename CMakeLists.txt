@@ -41,7 +41,17 @@ set(bangserver_srcs
     src/game/effects/base/vulture_sam.cpp
     src/game/effects/base/weapon.cpp
 
-    src/game/effects/dodgecity/characters.cpp
+    src/game/effects/dodgecity/bellestar.cpp
+    src/game/effects/dodgecity/bill_noface.cpp
+    src/game/effects/dodgecity/claus_the_saint.cpp
+    src/game/effects/dodgecity/doc_holyday.cpp
+    src/game/effects/dodgecity/greg_digger.cpp
+    src/game/effects/dodgecity/herb_hunter.cpp
+    src/game/effects/dodgecity/johnny_kisch.cpp
+    src/game/effects/dodgecity/molly_stark.cpp
+    src/game/effects/dodgecity/tequila_joe.cpp
+    src/game/effects/dodgecity/vera_custer.cpp
+    
     src/game/effects/highnoon/scenarios.cpp
     src/game/effects/fistfulofcards/scenarios.cpp
 
