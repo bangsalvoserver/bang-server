@@ -7,5 +7,6 @@
 #include "armedanddangerous/effects.h"
 #include "valleyofshadows/effects.h"
 #include "canyondiablo/effects.h"
+#include "wildwestshow/effects.h"
 
 #endif

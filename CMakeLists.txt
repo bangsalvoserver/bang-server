@@ -77,7 +77,15 @@ set(bangserver_srcs
     src/game/effects/valleyofshadows/equips.cpp
     src/game/effects/valleyofshadows/characters.cpp
     src/game/effects/valleyofshadows/requests.cpp
-    src/game/effects/wildwestshow/characters.cpp
+
+    src/game/effects/wildwestshow/big_spencer.cpp
+    src/game/effects/wildwestshow/gary_looter.cpp
+    src/game/effects/wildwestshow/flint_westwood.cpp
+    src/game/effects/wildwestshow/gary_looter.cpp
+    src/game/effects/wildwestshow/greygory_deck.cpp
+    src/game/effects/wildwestshow/john_pain.cpp
+    src/game/effects/wildwestshow/teren_kill.cpp
+    src/game/effects/wildwestshow/youl_grinner.cpp
 
     src/game/effects/armedanddangerous/add_cube.cpp
     src/game/effects/armedanddangerous/al_preacher.cpp
