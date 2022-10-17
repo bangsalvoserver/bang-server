@@ -1557,6 +1557,8 @@ character:
   - name: MICK_DEFENDER
     image: 07_mickdefender
     expansion: valleyofshadows
+    equip:
+      - mick_defender
     responses:
       - discard card self | hand missed
       - escape

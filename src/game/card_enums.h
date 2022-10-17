@@ -298,6 +298,7 @@ namespace banggame {
         (greygory_deck,         effect_greygory_deck)
         (lemonade_jim,          effect_lemonade_jim)
         (evelyn_shebang,        effect_evelyn_shebang)
+        (mick_defender,         effect_mick_defender)
         (julie_cutter,          effect_julie_cutter)
         (bloody_mary,           effect_bloody_mary)
         (red_ringo,             effect_red_ringo)

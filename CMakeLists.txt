@@ -111,6 +111,7 @@ set(bangserver_srcs
     src/game/effects/valleyofshadows/ghost.cpp
     src/game/effects/valleyofshadows/henry_block.cpp
     src/game/effects/valleyofshadows/lemonade_jim.cpp
+    src/game/effects/valleyofshadows/mick_defender.cpp
     src/game/effects/valleyofshadows/play_as_gatling.cpp
     src/game/effects/valleyofshadows/poker.cpp
     src/game/effects/valleyofshadows/ruleset.cpp
