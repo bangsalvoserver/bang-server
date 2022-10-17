@@ -6,7 +6,7 @@
 #include "play_verify.h"
 #include "game_update.h"
 
-#include "effects/base/deathsave.h"
+#include "effects/base/damage.h"
 #include "effects/base/draw.h"
 #include "effects/base/predraw_check.h"
 #include "effects/base/requests.h"
@@ -94,20 +94,8 @@ namespace banggame {
         move_owned_card(target->owner, target, pocket_type::player_hand, this);
     }
 
-    void player::damage(card *origin_card, player *origin, int value, bool is_bang, bool instant) {
-        if (is_ghost()) return;
-        
-        if (instant || !m_game->call_event<event_type::check_damage_response>(false)) {
-            m_game->add_log(value == 1 ? "LOG_TAKEN_DAMAGE" : "LOG_TAKEN_DAMAGE_PLURAL", origin_card, this, value);
-            set_hp(m_hp - value);
-            m_game->call_event<event_type::before_hit>(origin_card, origin, this, value, is_bang);
-            if (m_hp <= 0) {
-                m_game->queue_request<request_death>(origin_card, origin, this);
-            }
-            m_game->call_event<event_type::after_hit>(origin_card, origin, this, value, is_bang);
-        } else {
-            m_game->queue_request_front<timer_damaging>(origin_card, origin, this, value, is_bang);
-        }
+    void player::damage(card *origin_card, player *origin, int value, effect_flags flags) {
+        effect_damage{value}.on_play(origin_card, origin, this, flags);
     }
 
     void player::heal(int value) {

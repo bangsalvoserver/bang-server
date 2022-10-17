@@ -1,7 +1,7 @@
 #include "bang.h"
 
 #include "../../game.h"
-#include "requests.h"
+#include "damage.h"
 
 namespace banggame {
     
@@ -11,7 +11,6 @@ namespace banggame {
     }
 
     static void queue_request_bang(std::shared_ptr<request_bang> &&req) {
-        req->is_bang_card = true;
         req->origin->m_game->call_event<event_type::apply_bang_modifier>(req->origin, req.get());
         req->origin->m_game->queue_action([req = std::move(req)]() mutable {
             if (!req->target->immune_to(req->origin_card, req->origin, req->flags)) {
@@ -22,7 +21,7 @@ namespace banggame {
 
     void handler_bangcard::on_play(card *origin_card, player *origin, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
-        queue_request_bang(std::make_shared<request_bang>(origin_card, origin, target, effect_flags::single_target));
+        queue_request_bang(std::make_shared<request_bang>(origin_card, origin, target, effect_flags::is_bang | effect_flags::single_target));
     }
     
     struct request_card_as_bang : request_bang {
@@ -41,7 +40,7 @@ namespace banggame {
     void handler_play_as_bang::on_play(card *origin_card, player *origin, card *chosen_card, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
         origin->discard_card(chosen_card);
-        queue_request_bang(std::make_shared<request_card_as_bang>(chosen_card, origin, target, effect_flags::single_target));
+        queue_request_bang(std::make_shared<request_card_as_bang>(chosen_card, origin, target, effect_flags::is_bang | effect_flags::single_target));
     }
     
     game_string effect_banglimit::verify(card *origin_card, player *origin) {
@@ -72,7 +71,7 @@ namespace banggame {
     void request_bang::on_miss() {
         auto target = this->target;
         if (--bang_strength == 0) {
-            target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, is_bang_card);
+            target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, flags);
             target->m_game->pop_request();
         }
         target->m_game->update_request();
@@ -80,7 +79,7 @@ namespace banggame {
 
     void request_bang::on_resolve() {
         target->m_game->pop_request();
-        target->damage(origin_card, origin, bang_damage, is_bang_card);
+        target->damage(origin_card, origin, bang_damage, flags);
         if (auto *req = target->m_game->top_request_if<timer_damaging>(target)) {
             static_cast<cleanup_request &>(*req) = std::move(*this);
         } else {

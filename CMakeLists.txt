@@ -11,6 +11,7 @@ set(bangserver_srcs
     src/game/effects/base/black_jack.cpp
     src/game/effects/base/bart_cassidy.cpp
     src/game/effects/base/calamity_janet.cpp
+    src/game/effects/base/damage.cpp
     src/game/effects/base/deathsave.cpp
     src/game/effects/base/draw.cpp
     src/game/effects/base/duel.cpp
@@ -33,7 +34,6 @@ set(bangserver_srcs
     src/game/effects/base/requests.cpp
     src/game/effects/base/resolve.cpp
     src/game/effects/base/scope.cpp
-    src/game/effects/base/self_damage.cpp
     src/game/effects/base/slab_the_killer.cpp
     src/game/effects/base/startofturn.cpp
     src/game/effects/base/steal_destroy.cpp

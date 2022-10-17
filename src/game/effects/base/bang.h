@@ -44,7 +44,6 @@ namespace banggame {
         int bang_strength = 1;
         int bang_damage = 1;
         bool unavoidable = false;
-        bool is_bang_card = false;
 
         bool can_miss(card *c) const override;
 

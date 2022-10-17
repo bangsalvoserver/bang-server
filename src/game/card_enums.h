@@ -164,6 +164,7 @@ namespace banggame {
     )
 
     DEFINE_ENUM_FLAGS(effect_flags,
+        (is_bang)
         (escapable)
         (single_target)
         (auto_pick)
@@ -207,6 +208,7 @@ namespace banggame {
         (aim,                   effect_aim)
         (poker,                 effect_poker)
         (tornado,               effect_tornado)
+        (damage,                effect_damage)
         (self_damage,           effect_self_damage)
         (saved,                 effect_saved)
         (escape,                effect_escape)

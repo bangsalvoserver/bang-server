@@ -126,7 +126,7 @@ namespace banggame {
             return !check_player_flags(player_flags::dead) || is_ghost();
         }
 
-        void damage(card *origin_card, player *source, int value, bool is_bang = false, bool instant = false);
+        void damage(card *origin_card, player *source, int value, effect_flags flags = {});
 
         void heal(int value);
         void set_hp(int value, bool instant = false);

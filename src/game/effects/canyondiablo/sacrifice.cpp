@@ -1,7 +1,7 @@
 #include "sacrifice.h"
 
 #include "../../game.h"
-#include "../base/requests.h"
+#include "../base/damage.h"
 
 namespace banggame {
 

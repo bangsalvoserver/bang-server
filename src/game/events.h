@@ -67,13 +67,13 @@ namespace banggame {
         EVENT(on_discard_orange_card, player *target, card *target_card)
 
         // viene chiamato prima che un giocatore viene colpito
-        EVENT(before_hit, card *origin_card, player *origin, player *target, int damage, bool is_bang)
+        EVENT(before_hit, card *origin_card, player *origin, player *target, int damage, effect_flags flags)
 
         // viene chiamato dopo che un giocatore viene colpito
-        EVENT(after_hit, card *origin_card, player *origin, player *target, int damage, bool is_bang)
+        EVENT(after_hit, card *origin_card, player *origin, player *target, int damage, effect_flags flags)
 
         // viene chiamato quando un giocatore gioca mancato
-        EVENT(on_missed, card *origin_card, player *origin, player *target, bool is_bang)
+        EVENT(on_missed, card *origin_card, player *origin, player *target, effect_flags flags)
 
         // viene chiamato quando un giocatore clicca su prendi danno quando muore
         EVENT(on_player_death_resolve, player *target, bool tried_save)

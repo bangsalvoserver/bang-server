@@ -64,20 +64,6 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
-    struct timer_damaging : timer_request, cleanup_request {
-        timer_damaging(card *origin_card, player *origin, player *target, int damage, bool is_bang)
-            : timer_request(origin_card, origin, target)
-            , damage(damage)
-            , is_bang(is_bang) {}
-        
-        int damage;
-        bool is_bang;
-
-        std::vector<card *> get_highlights() const override;
-        void on_finished() override;
-        game_string status_text(player *owner) const override;
-    };
-
 }
 
 #endif

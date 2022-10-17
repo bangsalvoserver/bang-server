@@ -147,16 +147,4 @@ namespace banggame {
             return {"STATUS_FORCE_PLAY_CARD_OTHER", target, target_card};
         }
     }
-
-    std::vector<card *> timer_damaging::get_highlights() const {
-        return target->m_backup_character;
-    }
-
-    void timer_damaging::on_finished() {
-        target->damage(origin_card, origin, damage, is_bang, true);
-    }
-
-    game_string timer_damaging::status_text(player *owner) const {
-        return {damage > 1 ? "STATUS_DAMAGING_PLURAL" : "STATUS_DAMAGING", target, origin_card, damage};
-    }
 }
