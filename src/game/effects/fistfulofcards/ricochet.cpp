@@ -11,7 +11,7 @@ namespace banggame {
 
         void on_resolve() override {
             origin->m_game->pop_request();
-            destroy_resolver{origin_card, origin, target_card}.resolve();
+            effect_destroy{}.on_resolve(origin_card, origin, target_card);
             origin->m_game->update_request();
         }
 

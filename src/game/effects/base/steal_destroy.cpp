@@ -19,17 +19,7 @@ namespace banggame {
         }
     }
 
-    void steal_resolver::resolve() const {
-        if (origin->m_game->num_queued_requests([&]{
-            origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
-        })) {
-            origin->m_game->queue_action_front([*this]{ finalize(); });
-        } else {
-            finalize();
-        }
-    }
-
-    void steal_resolver::finalize() const {
+    static void finalize_steal(card *origin_card, player *origin, card *target_card) {
         if (origin->alive() && target_card->owner) {
             auto priv_target = update_target::includes(origin, target_card->owner);
             auto inv_target = update_target::excludes(origin, target_card->owner);
@@ -52,12 +42,22 @@ namespace banggame {
         }
     }
 
+    void effect_steal::on_resolve(card *origin_card, player *origin, card *target_card) {
+        if (origin->m_game->num_queued_requests([&]{
+            origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
+        })) {
+            origin->m_game->queue_action_front([=]{ finalize_steal(origin_card, origin, target_card); });
+        } else {
+            finalize_steal(origin_card, origin, target_card);
+        }
+    }
+
     struct request_steal : request_targeting, resolvable_request {
         using request_targeting::request_targeting;
 
         void on_resolve() override {
             origin->m_game->pop_request();
-            steal_resolver{origin_card, origin, target_card}.resolve();
+            effect_steal{}.on_resolve(origin_card, origin, target_card);
             origin->m_game->update_request();
         }
 
@@ -82,21 +82,11 @@ namespace banggame {
         if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
             origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
         } else {
-            steal_resolver{origin_card, origin, target_card}.resolve();
+            on_resolve(origin_card, origin, target_card);
         }
     }
 
-    void destroy_resolver::resolve() const {
-        if (origin->m_game->num_queued_requests([&]{
-            origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
-        })) {
-            origin->m_game->queue_action_front([*this]{ finalize(); });
-        } else {
-            finalize();
-        }
-    }
-
-    void destroy_resolver::finalize() const {
+    static void finalize_discard(card *origin_card, player *origin, card *target_card) {
         if (origin->alive() && target_card->owner) {
             if (origin != target_card->owner) {
                 origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
@@ -106,13 +96,23 @@ namespace banggame {
             target_card->owner->discard_card(target_card);
         }
     }
+
+    void effect_discard::on_resolve(card *origin_card, player *origin, card *target_card) {
+        if (origin->m_game->num_queued_requests([&]{
+            origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
+        })) {
+            origin->m_game->queue_action_front([=]{ finalize_discard(origin_card, origin, target_card); });
+        } else {
+            finalize_discard(origin_card, origin, target_card);
+        }
+    }
     
     struct request_destroy : request_targeting, resolvable_request {
         using request_targeting::request_targeting;
 
         void on_resolve() override {
             origin->m_game->pop_request();
-            destroy_resolver{origin_card, origin, target_card}.resolve();
+            effect_destroy{}.on_resolve(origin_card, origin, target_card);
             origin->m_game->update_request();
         }
 
@@ -137,7 +137,7 @@ namespace banggame {
         if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
             origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
         } else {
-            destroy_resolver{origin_card, origin, target_card}.resolve();
+            on_resolve(origin_card, origin, target_card);
         }
     }
 }
