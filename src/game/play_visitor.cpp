@@ -2,8 +2,6 @@
 
 namespace banggame {
 
-    using namespace enums::flag_operators;
-
     template<> game_string play_visitor<target_type::none>::verify(const play_card_verify &verifier, const effect_holder &effect) {
         return effect.verify(verifier.origin_card, verifier.origin);
     }

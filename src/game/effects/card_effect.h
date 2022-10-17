@@ -9,8 +9,6 @@
 
 namespace banggame {
 
-    using namespace enums::flag_operators;
-
     template<target_type E> struct tagged_value {};
 
     template<target_type E>

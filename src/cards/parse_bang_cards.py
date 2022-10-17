@@ -160,7 +160,6 @@ def parse_file(data):
     return result
 
 INCLUDE_FILENAME = 'game/card_data.h'
-DECLARATIONS = 'using namespace enums::flag_operators;'
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':
@@ -174,5 +173,4 @@ if __name__ == '__main__':
     with open(sys.argv[2], 'w', encoding='utf8') as file:
         print_cpp_file(bang_cards, OBJECT_DECLARATION,
             include_filename=INCLUDE_FILENAME,
-            declarations=DECLARATIONS,
             file=file)

@@ -4,8 +4,6 @@
 
 namespace banggame {
 
-    using namespace enums::flag_operators;
-
     bool request_characterchoice::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
         return pocket == pocket_type::player_hand && target_player == target;
     }

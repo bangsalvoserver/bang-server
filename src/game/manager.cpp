@@ -11,7 +11,6 @@
 #include "net/git_version.h"
 
 using namespace banggame;
-using namespace enums::flag_operators;
 
 void game_manager::on_receive_message(client_handle client, const client_message &msg) {
     try {

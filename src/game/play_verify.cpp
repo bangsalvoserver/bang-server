@@ -9,8 +9,7 @@
 #include "utils/utils.h"
 
 namespace banggame {
-    using namespace enums::flag_operators;
-
+    
     game_string play_card_verify::verify_modifiers() const {
         for (card *mod_card : modifiers) {
             if (card *disabler = origin->m_game->get_disabler(mod_card)) {

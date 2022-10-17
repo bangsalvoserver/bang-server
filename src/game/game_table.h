@@ -82,7 +82,6 @@ namespace banggame {
         void set_game_flags(game_flags flags);
     
         bool check_flags(game_flags type) const {
-            using namespace enums::flag_operators;
             return bool(m_game_flags & type);
         }
     };

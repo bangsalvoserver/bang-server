@@ -15,7 +15,6 @@
 #include <numeric>
 
 namespace banggame {
-    using namespace enums::flag_operators;
 
     void player::equip_card(card *target) {
         m_game->move_card(target, pocket_type::player_table, this, show_card_flags::shown);

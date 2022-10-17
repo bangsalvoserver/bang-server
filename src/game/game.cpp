@@ -10,8 +10,6 @@
 
 namespace banggame {
 
-    using namespace enums::flag_operators;
-
     std::vector<Json::Value> game::get_spectator_updates() {
         std::vector<Json::Value> ret;
 

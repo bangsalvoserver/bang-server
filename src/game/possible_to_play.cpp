@@ -5,7 +5,6 @@
 #include "play_verify.h"
 
 namespace banggame {
-    using namespace enums::flag_operators;
 
     std::vector<player *> player::make_equip_set(card *card) {
         std::vector<player *> ret;

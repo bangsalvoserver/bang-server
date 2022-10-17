@@ -6,8 +6,6 @@
 
 namespace banggame {
 
-    using namespace enums::flag_operators;
-
     card *game_table::find_card(int card_id) const {
         if (auto it = m_cards.find(card_id); it != m_cards.end()) {
             return &*it;

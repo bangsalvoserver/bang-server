@@ -19,7 +19,6 @@ namespace banggame {
             if (--num_cards == 0 || target->m_hand.empty()) {
                 target->m_game->pop_request();
             } else {
-                using namespace enums::flag_operators;
                 flags &= ~effect_flags::escapable;
             }
             target->m_game->update_request();

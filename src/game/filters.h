@@ -5,8 +5,6 @@
 
 namespace banggame {
 
-    using namespace enums::flag_operators;
-
     namespace filter_impl {
         using namespace banggame;
 
