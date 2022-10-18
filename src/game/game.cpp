@@ -274,7 +274,7 @@ namespace banggame {
         }
 #endif
 
-        if (bool(m_options.expansions & card_expansion_type::characterchoice)) {
+        if (m_options.character_choice) {
             for (player &p : m_players) {
                 while (!p.m_characters.empty()) {
                     move_card(p.m_characters.front(), pocket_type::player_hand, &p, show_card_flags::instant | show_card_flags::shown);

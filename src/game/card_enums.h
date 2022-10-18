@@ -45,7 +45,6 @@ namespace banggame {
     };
     
     DEFINE_ENUM_FLAGS_FWD_TYPES(card_expansion_type,
-        (characterchoice)
         (dodgecity)
         (goldrush,              ruleset_goldrush)
         (armedanddangerous,     ruleset_armedanddangerous)
