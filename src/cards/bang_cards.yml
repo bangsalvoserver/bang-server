@@ -1032,7 +1032,7 @@ main_deck:
     expansion: canyondiablo
     color: brown
     effects:
-      - self_damage
+      - damage
       - heal_notfull player notself
   - name: SACRIFICE
     signs:
@@ -1280,7 +1280,7 @@ main_deck:
     color: brown
     effects:
       - draw(2)
-      - self_damage
+      - damage
   - name: DODGE
     signs:
       - 7 spades
@@ -1435,7 +1435,7 @@ character:
     expansion: dodgecity
     effects:
       - draw(2)
-      - self_damage
+      - damage
   - name: DOC_HOLYDAY
     image: 03_doc_holyday
     expansion: dodgecity
@@ -1849,7 +1849,7 @@ fistfulofcards:
       - while_drawing
       - startofturn
       - heal_notfull player notself
-      - self_damage
+      - damage
   - name: THE_JUDGE
     image: 05_ilgiudice
     equip:
