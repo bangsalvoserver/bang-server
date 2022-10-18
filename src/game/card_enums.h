@@ -361,6 +361,7 @@ namespace banggame {
 
     DEFINE_ENUM(tag_type,
         (none)
+        (temp_card)
         (confirm)
         (testing)
         (hidden)

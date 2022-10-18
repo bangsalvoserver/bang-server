@@ -5,7 +5,7 @@
 namespace banggame {
 
     static void copy_characters(player *origin, player *target) {
-        origin->remove_extra_characters(true);
+        origin->remove_extra_characters();
 
         std::ranges::for_each(
             target->m_characters
@@ -19,6 +19,7 @@ namespace banggame {
                 card_copy->id = static_cast<int>(origin->m_game->m_cards.first_available_id());
                 card_copy->pocket = pocket_type::player_character;
                 card_copy->owner = origin;
+                card_copy->tags.push_back(tag_holder{ .type = tag_type::temp_card });
 
                 card *new_card = origin->m_game->m_cards.insert(std::move(card_copy)).get();
                 
@@ -67,7 +68,7 @@ namespace banggame {
         });
         origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [=](player *target, bool skipped) {
             if (skipped && origin == target && origin->m_num_drawn_cards == 0) {
-                origin->remove_extra_characters(true);
+                origin->remove_extra_characters();
             }
         });
     }

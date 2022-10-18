@@ -434,14 +434,14 @@ namespace banggame {
         }
     }
 
-    void player::remove_extra_characters(bool erase_cards) {
+    void player::remove_extra_characters() {
         if (auto range = m_characters | std::views::drop(1)) {
             m_game->add_update<game_update_type::remove_cards>(to_vector_not_null(range));
 
             for (card *character : range) {
                 disable_equip(character);
                 
-                if (erase_cards) {
+                if (character->has_tag(tag_type::temp_card)) {
                     m_game->m_cards.erase(character->id);
                 } else {
                     character->pocket = pocket_type::none;
