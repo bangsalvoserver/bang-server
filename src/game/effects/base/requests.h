@@ -35,6 +35,7 @@ namespace banggame {
         void on_pick(pocket_type pocket, player *target, card *target_card) override;
         game_string status_text(player *owner) const override;
     };
+
     struct request_discard_all : request_base, resolvable_request {
         request_discard_all(player *target)
             : request_base(nullptr, nullptr, target) {}
@@ -42,6 +43,7 @@ namespace banggame {
         bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
 
+        static void auto_resolve(player *target);
         void on_resolve() override;
         game_string status_text(player *owner) const override;
     };

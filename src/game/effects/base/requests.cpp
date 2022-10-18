@@ -104,8 +104,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    void request_discard_all::on_resolve() {
-        target->m_game->pop_request();
+    void request_discard_all::auto_resolve(player *target) {
         std::vector<card *> target_cards;
         std::ranges::move(target->m_table | std::views::filter([](card *c) {
             return c->color != card_color_type::black;
@@ -115,6 +114,11 @@ namespace banggame {
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
             target->discard_card(c);
         }
+    }
+
+    void request_discard_all::on_resolve() {
+        target->m_game->pop_request();
+        auto_resolve(target);
         target->m_game->update_request();
     }
 
