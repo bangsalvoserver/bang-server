@@ -148,9 +148,12 @@ namespace banggame {
     struct game_options {REFLECTABLE(
         (card_expansion_type) expansions,
         (bool) keep_last_card_shuffling,
+        (bool) can_play_beer_in_duel,
         (int) scenario_deck_size
     )
-        game_options() : scenario_deck_size(12) {}
+        game_options()
+            : can_play_beer_in_duel(true)
+            , scenario_deck_size(12) {}
     };
 
     DEFINE_ENUM_TYPES(game_update_type,
