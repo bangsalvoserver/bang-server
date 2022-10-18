@@ -28,12 +28,6 @@ namespace banggame {
     }
     
     void effect_greygory_deck::on_play(card *target_card, player *target) {
-        for (int i=1; i<target->m_characters.size(); ++i) {
-            auto *c = target->m_characters[i];
-            target->disable_equip(c);
-            c->pocket = pocket_type::none;
-            c->owner = nullptr;
-        }
         target->remove_extra_characters();
         on_equip(target_card, target);
         target->m_game->update_request();

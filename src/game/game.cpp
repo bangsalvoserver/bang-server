@@ -456,11 +456,10 @@ namespace banggame {
     void game::handle_player_death(player *killer, player *target, bool no_handle_game_over) {
         if (killer != m_playing) killer = nullptr;
         
+        target->remove_extra_characters();
         for (card *c : target->m_characters) {
             target->disable_equip(c);
         }
-
-        target->remove_extra_characters();
 
         if (!m_first_dead) m_first_dead = target;
 

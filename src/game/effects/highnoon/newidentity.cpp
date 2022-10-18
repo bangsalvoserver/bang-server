@@ -16,10 +16,10 @@ namespace banggame {
         void on_pick(pocket_type pocket, player *, card *target_card) override {
             target->m_game->pop_request();
             if (pocket == pocket_type::selection) {
+                target->remove_extra_characters();
                 for (card *c : target->m_characters) {
                     target->disable_equip(c);
                 }
-                target->remove_extra_characters();
 
                 target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
 

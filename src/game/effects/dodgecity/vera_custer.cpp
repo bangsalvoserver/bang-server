@@ -4,20 +4,8 @@
 
 namespace banggame {
 
-    static void remove_characters(player *origin) {
-        if (origin->m_characters.size() > 1) {
-            origin->remove_extra_characters();
-            
-            while (origin->m_characters.size() > 1) {
-                origin->disable_equip(origin->m_characters.back());
-                origin->m_game->m_cards.erase(origin->m_characters.back()->id);
-                origin->m_characters.pop_back();
-            }
-        }
-    }
-
     static void copy_characters(player *origin, player *target) {
-        remove_characters(origin);
+        origin->remove_extra_characters(true);
 
         std::ranges::for_each(
             target->m_characters
@@ -79,7 +67,7 @@ namespace banggame {
         });
         origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [=](player *target, bool skipped) {
             if (skipped && origin == target && origin->m_num_drawn_cards == 0) {
-                remove_characters(origin);
+                origin->remove_extra_characters(true);
             }
         });
     }

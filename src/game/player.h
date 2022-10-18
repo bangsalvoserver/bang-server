@@ -172,7 +172,7 @@ namespace banggame {
         int count_cubes() const;
 
         void untap_inactive_cards();
-        void remove_extra_characters();
+        void remove_extra_characters(bool erase_cards = false);
 
         void play_card_action(card *origin_card);
         void log_played_card(card *origin_card, bool is_response);
