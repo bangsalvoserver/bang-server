@@ -7,6 +7,7 @@
 #include "draw_check_handler.h"
 #include "player_iterator.h"
 #include "utils/utils.h"
+#include "utils/generator.h"
 
 namespace banggame {
 
@@ -15,8 +16,8 @@ namespace banggame {
 
         player *m_playing = nullptr;
 
-        std::vector<Json::Value> get_spectator_updates();
-        std::vector<Json::Value> get_rejoin_updates(player *target);
+        util::generator<Json::Value> get_spectator_updates();
+        util::generator<Json::Value> get_rejoin_updates(player *target);
 
         void start_game(const game_options &options);
 

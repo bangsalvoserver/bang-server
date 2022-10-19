@@ -10,120 +10,112 @@
 
 namespace banggame {
 
-    std::vector<Json::Value> game::get_spectator_updates() {
-        std::vector<Json::Value> ret;
-
-        add_update<game_update_type::player_add>(ret, static_cast<int>(m_players.size()));
+    util::generator<Json::Value> game::get_spectator_updates() {
+        co_yield make_update<game_update_type::player_add>(static_cast<int>(m_players.size()));
 
         for (player &p : m_players) {
-            add_update<game_update_type::player_user>(ret, &p, p.user_id);
+            co_yield make_update<game_update_type::player_user>(&p, p.user_id);
             if (p.check_player_flags(player_flags::removed)) {
-                add_update<game_update_type::player_remove>(ret, &p, true);
+                co_yield make_update<game_update_type::player_remove>(&p, true);
             }
         }
         
-        add_update<game_update_type::add_cards>(ret, make_id_vector(m_cards | std::views::transform([](const card &c) { return &c; })), pocket_type::hidden_deck);
+        co_yield make_update<game_update_type::add_cards>(make_id_vector(m_cards | std::views::transform([](const card &c) { return &c; })), pocket_type::hidden_deck);
 
         const auto show_never = [](const card &c) { return false; };
         const auto show_always = [](const card &c) { return true; };
 
-        auto move_cards = [&](auto &&range, auto do_show_card) {
+        auto move_cards = [&](auto &&range, auto do_show_card) -> util::generator<Json::Value> {
             for (card *c : range) {
-                add_update<game_update_type::move_card>(ret, c, c->owner, c->pocket, show_card_flags::instant);
+                co_yield make_update<game_update_type::move_card>(c, c->owner, c->pocket, show_card_flags::instant);
 
                 if (do_show_card(*c)) {
-                    add_update<game_update_type::show_card>(ret, c, *c, show_card_flags::instant);
+                    co_yield make_update<game_update_type::show_card>(c, *c, show_card_flags::instant);
                     if (c->num_cubes > 0) {
-                        add_update<game_update_type::add_cubes>(ret, c->num_cubes, c);
+                        co_yield make_update<game_update_type::add_cubes>(c->num_cubes, c);
                     }
 
                     if (c->inactive) {
-                        add_update<game_update_type::tap_card>(ret, c, true, true);
+                        co_yield make_update<game_update_type::tap_card>(c, true, true);
                     }
                 }
             }
         };
 
-        add_update<game_update_type::game_options>(ret, m_options);
+        co_yield make_update<game_update_type::game_options>(m_options);
 
-        move_cards(m_button_row, show_always);
-        move_cards(m_deck, show_never);
-        move_cards(m_shop_deck, show_never);
+        co_await move_cards(m_button_row, show_always);
+        co_await move_cards(m_deck, show_never);
+        co_await move_cards(m_shop_deck, show_never);
 
-        move_cards(m_discards, show_always);
-        move_cards(m_selection, [&](const card &c){ return !c.owner; });
-        move_cards(m_shop_discards, show_always);
-        move_cards(m_shop_selection, show_always);
-        move_cards(m_hidden_deck, show_always);
+        co_await move_cards(m_discards, show_always);
+        co_await move_cards(m_selection, [&](const card &c){ return !c.owner; });
+        co_await move_cards(m_shop_discards, show_always);
+        co_await move_cards(m_shop_selection, show_always);
+        co_await move_cards(m_hidden_deck, show_always);
 
         if (!m_scenario_deck.empty()) {
-            add_update<game_update_type::move_scenario_deck>(ret, m_first_player);
+            co_yield make_update<game_update_type::move_scenario_deck>(m_first_player);
         }
 
-        move_cards(m_scenario_deck, [&](const card &c) { return &c == m_scenario_deck.back(); });
-        move_cards(m_scenario_cards, [&](const card &c) { return &c == m_scenario_cards.back(); });
+        co_await move_cards(m_scenario_deck, [&](const card &c) { return &c == m_scenario_deck.back(); });
+        co_await move_cards(m_scenario_cards, [&](const card &c) { return &c == m_scenario_cards.back(); });
         
         if (num_cubes > 0) {
-            add_update<game_update_type::add_cubes>(ret, num_cubes);
+            co_yield make_update<game_update_type::add_cubes>(num_cubes);
         }
 
         for (player &p : m_players) {
             if (p.check_player_flags(player_flags::role_revealed)) {
-                add_update<game_update_type::player_show_role>(ret, &p, p.m_role, true);
+                co_yield make_update<game_update_type::player_show_role>(&p, p.m_role, true);
             }
 
             if (!p.check_player_flags(player_flags::removed)) {
-                move_cards(p.m_characters, show_always);
-                move_cards(p.m_backup_character, show_never);
+                co_await move_cards(p.m_characters, show_always);
+                co_await move_cards(p.m_backup_character, show_never);
 
-                move_cards(p.m_table, show_always);
-                move_cards(p.m_hand, [&](const card &c){ return c.deck == card_deck_type::character; });
+                co_await move_cards(p.m_table, show_always);
+                co_await move_cards(p.m_hand, [&](const card &c){ return c.deck == card_deck_type::character; });
 
-                add_update<game_update_type::player_hp>(ret, &p, p.m_hp, true);
-                add_update<game_update_type::player_status>(ret, &p, p.m_player_flags, p.m_range_mod, p.m_weapon_range, p.m_distance_mod);
+                co_yield make_update<game_update_type::player_hp>(&p, p.m_hp, true);
+                co_yield make_update<game_update_type::player_status>(&p, p.m_player_flags, p.m_range_mod, p.m_weapon_range, p.m_distance_mod);
                 
                 if (p.m_gold != 0) {
-                    add_update<game_update_type::player_gold>(ret, &p, p.m_gold);
+                    co_yield make_update<game_update_type::player_gold>(&p, p.m_gold);
                 }
             }
         }
 
         if (m_playing) {
-            add_update<game_update_type::switch_turn>(ret, m_playing);
+            co_yield make_update<game_update_type::switch_turn>(m_playing);
         }
         if (pending_requests()) {
-            add_update<game_update_type::request_status>(ret, make_request_update(nullptr));
+            co_yield make_update<game_update_type::request_status>(make_request_update(nullptr));
         }
-
-        return ret;
     }
 
-    std::vector<Json::Value> game::get_rejoin_updates(player *target) {
-        std::vector<Json::Value> ret;
-
+    util::generator<Json::Value> game::get_rejoin_updates(player *target) {
         if (!target->check_player_flags(player_flags::role_revealed)) {
-            add_update<game_update_type::player_show_role>(ret, target, target->m_role, true);
+            co_yield make_update<game_update_type::player_show_role>(target, target->m_role, true);
         }
 
         for (card *c : target->m_hand) {
-            add_update<game_update_type::show_card>(ret, c, *c, show_card_flags::instant);
+            co_yield make_update<game_update_type::show_card>(c, *c, show_card_flags::instant);
         }
 
         for (card *c : m_selection) {
             if (c->owner == target) {
-                add_update<game_update_type::show_card>(ret, c, *c, show_card_flags::instant);
+                co_yield make_update<game_update_type::show_card>(c, *c, show_card_flags::instant);
             }
         }
 
         if (pending_requests()) {
-            add_update<game_update_type::request_status>(ret, make_request_update(target));
+            co_yield make_update<game_update_type::request_status>(make_request_update(target));
         }
 
         if (target->m_prompt) {
-            add_update<game_update_type::game_prompt>(ret, target->m_prompt->second);
+            co_yield make_update<game_update_type::game_prompt>(target->m_prompt->second);
         }
-
-        return ret;
     }
 
     void game::start_game(const game_options &options) {
