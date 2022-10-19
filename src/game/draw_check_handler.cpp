@@ -71,8 +71,7 @@ namespace banggame {
         } else {
             m_origin->m_game->call_event<event_type::on_draw_check>(m_origin, drawn_card);
         }
-        m_origin = nullptr;
         m_origin_card = nullptr;
-        std::invoke(std::exchange(m_function, nullptr), m_origin->get_card_sign(drawn_card));
+        std::invoke(std::exchange(m_function, nullptr), std::exchange(m_origin, nullptr)->get_card_sign(drawn_card));
     }
 }
