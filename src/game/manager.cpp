@@ -182,8 +182,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
 
     target->user_id = user->second.user_id;
 
-    broadcast_message_lobby<server_message_type::game_update>(lobby, json::serialize(game_update{
-            enums::enum_tag<game_update_type::player_user>, target, target->user_id}, lobby.game.context()));
+    broadcast_message_lobby<server_message_type::game_update>(lobby, lobby.game.make_update<game_update_type::player_user>(target, target->user_id));
     
     for (const auto &msg : lobby.game.get_rejoin_updates(target)) {
         send_message<server_message_type::game_update>(user->first, json::serialize(msg, lobby.game.context()));
@@ -214,8 +213,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
 
     if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
         it->user_id = 0;
-        broadcast_message_lobby<server_message_type::game_update>(lobby, json::serialize(game_update{
-            enums::enum_tag<game_update_type::player_user>, &*it, 0}, lobby.game.context()));
+        broadcast_message_lobby<server_message_type::game_update>(lobby, lobby.game.make_update<game_update_type::player_user>(&*it, 0));
     }
     
     broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user->second.user_id);
