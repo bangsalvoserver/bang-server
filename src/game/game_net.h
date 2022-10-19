@@ -76,13 +76,13 @@ namespace banggame {
         }
 
         template<game_update_type E>
-        void add_update(std::vector<Json::Value> &update_vector, auto && ... args) {
-            update_vector.emplace_back(json::serialize(game_update{enums::enum_tag<E>, FWD(args) ... }, context()));
+        Json::Value make_update(auto && ... args) {
+            return json::serialize(game_update{enums::enum_tag<E>, FWD(args) ... }, context());
         }
 
         template<game_update_type E>
         void add_update(update_target target, auto && ... args) {
-            m_updates.emplace_back(target, json::serialize(game_update{enums::enum_tag<E>, FWD(args) ... }, context()));
+            m_updates.emplace_back(target, make_update<E>(FWD(args) ... ));
         }
 
         template<game_update_type E>
