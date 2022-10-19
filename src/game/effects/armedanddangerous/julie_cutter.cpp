@@ -10,9 +10,8 @@ namespace banggame {
             if (origin && p == target && origin != target) {
                 origin->m_game->queue_action([=]{
                     if (origin->alive()) {
-                        target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
-                            card_suit suit = target->get_card_sign(drawn_card).suit;
-                            if (suit == card_suit::hearts || suit == card_suit::diamonds) {
+                        target->m_game->draw_check_then(target, target_card, [=](card_sign sign) {
+                            if (sign.suit == card_suit::hearts || sign.suit == card_suit::diamonds) {
                                 target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
                                 target->m_game->queue_request<request_bang>(target_card, target, origin);
                             }

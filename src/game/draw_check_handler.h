@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    using draw_check_function = std::function<void(card *drawn_card)>;
+    using draw_check_function = std::function<void(card_sign)>;
 
     class draw_check_handler {
     private:

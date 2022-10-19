@@ -73,6 +73,6 @@ namespace banggame {
         }
         m_origin = nullptr;
         m_origin_card = nullptr;
-        std::invoke(std::exchange(m_function, nullptr), drawn_card);
+        std::invoke(std::exchange(m_function, nullptr), m_origin->get_card_sign(drawn_card));
     }
 }

@@ -6,8 +6,7 @@ namespace banggame {
     void effect_dynamite::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *e_player, card *e_card) {
             if (e_player == target && e_card == target_card) {
-                target->m_game->draw_check_then(target, target_card, [=](card *drawn_card) {
-                    card_sign sign = target->get_card_sign(drawn_card);
+                target->m_game->draw_check_then(target, target_card, [=](card_sign sign) {
                     if (sign.suit == card_suit::spades
                         && enums::indexof(sign.rank) >= enums::indexof(card_rank::rank_2)
                         && enums::indexof(sign.rank) <= enums::indexof(card_rank::rank_9)) {
