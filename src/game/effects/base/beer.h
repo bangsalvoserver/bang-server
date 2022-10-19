@@ -6,15 +6,12 @@
 namespace banggame {
 
     struct effect_beer {
-        game_string on_prompt(card *origin_card, player *origin) {
-            return on_prompt(origin_card, origin, origin);
-        }
-        game_string on_prompt(card *origin_card, player *origin, player *target);
-        
-        void on_play(card *origin_card, player *origin) {
-            on_play(origin_card, origin, origin);
-        }
-        void on_play(card *origin_card, player *origin, player *target);
+        game_string on_prompt(card *origin_card, player *target);
+        void on_play(card *origin_card, player *target);
+    };
+
+    struct effect_beer_response : effect_beer {
+        bool can_respond(card *origin_card, player *target);
     };
 }
 

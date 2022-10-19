@@ -12,17 +12,21 @@ namespace banggame {
         }
     }
     
-    game_string effect_beer::on_prompt(card *origin_card, player *origin, player *target) {
+    game_string effect_beer::on_prompt(card *origin_card, player *target) {
         if (!can_use_beer(target->m_game) || (target->m_hp == target->m_max_hp)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
         return {};
     }
 
-    void effect_beer::on_play(card *origin_card, player *origin, player *target) {
+    void effect_beer::on_play(card *origin_card, player *target) {
         if (can_use_beer(target->m_game)) {
             target->heal(target->m_game->call_event<event_type::apply_beer_modifier>(target, 1));
         }
         target->m_game->call_event<event_type::on_play_beer>(target);
+    }
+
+    bool effect_beer_response::can_respond(card *origin_card, player *target) {
+        return can_use_beer(target->m_game);
     }
 }

@@ -193,6 +193,7 @@ namespace banggame {
         (steal,                 effect_steal)
         (duel,                  effect_duel)
         (beer,                  effect_beer)
+        (beer_response,         effect_beer_response)
         (heal,                  effect_heal)
         (heal_notfull,          effect_heal_notfull)
         (indians,               effect_indians)
