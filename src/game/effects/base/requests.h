@@ -16,7 +16,7 @@ namespace banggame {
     
     struct request_discard : request_base {
         request_discard(card *origin_card, player *origin, player *target)
-            : request_base(origin_card, origin, target) {}
+            : request_base(origin_card, origin, target, effect_flags::auto_pick) {}
 
         int ncards = 1;
         

@@ -383,14 +383,16 @@ namespace banggame {
 
     void game::send_request_update() {
         auto &req = top_request();
-        if (req.target() && bool(req.flags() & (effect_flags::auto_pick | effect_flags::auto_respond))) {
+        if (req.target() && bool(req.flags() & (effect_flags::auto_pick | effect_flags::auto_respond | effect_flags::auto_respond_empty_hand))) {
             auto target_request_update = make_request_update(req.target());
             if (bool(req.flags() & effect_flags::auto_pick) && target_request_update.pick_cards.size() == 1 && target_request_update.respond_cards.empty()) {
                 const auto &[pocket, player, card] = target_request_update.pick_cards.front();
                 req.on_pick(pocket, player, card);
                 return;
             }
-            if (bool(req.flags() & effect_flags::auto_respond) && target_request_update.pick_cards.empty() && target_request_update.respond_cards.size() == 1) {
+            if ((bool(req.flags() & effect_flags::auto_respond) || bool(req.flags() & effect_flags::auto_respond_empty_hand) && req.target()->m_hand.empty())
+                && target_request_update.pick_cards.empty() && target_request_update.respond_cards.size() == 1)
+            {
                 player *target = req.target();
                 card *origin_card = target_request_update.respond_cards.front();
                 bool is_response = !bool(req.flags() & effect_flags::force_play);

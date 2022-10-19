@@ -39,7 +39,8 @@ namespace banggame {
     };
 
     struct request_bang : request_base, missable_request, cleanup_request, resolvable_request {
-        using request_base::request_base;
+        request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {})
+            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand) {}
 
         int bang_strength = 1;
         int bang_damage = 1;

@@ -5,7 +5,8 @@
 namespace banggame {
 
     struct request_bandidos : request_base, resolvable_request {
-        using request_base::request_base;
+        request_bandidos(card *origin_card, player *origin, player *target, effect_flags flags = {})
+            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond) {}
 
         int num_cards = 2;
 

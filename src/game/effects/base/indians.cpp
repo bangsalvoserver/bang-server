@@ -5,7 +5,8 @@
 namespace banggame {
 
     struct request_indians : request_base, resolvable_request {
-        using request_base::request_base;
+        request_indians(card *origin_card, player *origin, player *target, effect_flags flags = {})
+            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand) {}
 
         bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override {
             return pocket == pocket_type::player_hand && target_player == target && target->is_bangcard(target_card);
