@@ -192,10 +192,6 @@ namespace banggame {
             return error;
         }
 
-        if (game_string error = verify_modifiers()) {
-            return error;
-        }
-
         std::vector<check_disabler> check_disablers;
         for (card *c : modifiers) {
             switch (c->modifier) {
@@ -217,6 +213,10 @@ namespace banggame {
                     });
                 break;
             }
+        }
+
+        if (game_string error = verify_modifiers()) {
+            return error;
         }
 
         size_t diff = targets.size() - effects.size();

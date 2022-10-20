@@ -4,10 +4,17 @@
 
 namespace banggame {
 
-    game_string effect_bandolier::verify(card *origin_card, player *origin) {
-        if (origin->get_bangs_played() <= 0) {
-            return {"ERROR_CANT_PLAY_CARD", origin_card};
-        }
-        return {};
+    void effect_bandolier::on_play(card *origin_card, player *origin) {
+        event_card_key key{origin_card, 4};
+        origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](player *p, int &value) {
+            if (origin == p) {
+                --value;
+            }
+        });
+        origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player *p, bool skipped) {
+            if (origin == p) {
+                origin->m_game->remove_listeners(key);
+            }
+        });
     }
 }
