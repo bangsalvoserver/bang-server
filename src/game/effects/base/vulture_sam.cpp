@@ -5,7 +5,8 @@
 namespace banggame {
 
     struct request_multi_vulture_sam : request_base {
-        using request_base::request_base;
+        request_multi_vulture_sam(card *origin_card, player *origin, player *target, effect_flags flags = {})
+            : request_base(origin_card, origin, target, flags | effect_flags::auto_pick) {}
 
         bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override {
             return (pocket == pocket_type::player_hand || pocket == pocket_type::player_table)

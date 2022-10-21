@@ -6,7 +6,7 @@ namespace banggame {
 
     struct request_claus_the_saint : selection_picker {
         request_claus_the_saint(card *origin_card, player *target)
-            : selection_picker(origin_card, nullptr, target) {}
+            : selection_picker(origin_card, nullptr, target, effect_flags::auto_pick) {}
 
         player *get_next_target() const {
             return std::next(player_iterator(target),
@@ -22,13 +22,8 @@ namespace banggame {
                 target->m_game->add_log(update_target::excludes(target, next_target), "LOG_GIFTED_A_CARD", target, next_target);
                 next_target->add_to_hand(target_card);
             }
-            if (target->m_game->m_selection.size() == 1) {
+            if (target->m_game->m_selection.empty()) {
                 target->m_game->pop_request();
-                player *next_target = get_next_target();
-                card *last_card = target->m_game->m_selection.front();
-                target->m_game->add_log(update_target::includes(target, next_target), "LOG_GIFTED_CARD", target, next_target, last_card);
-                target->m_game->add_log(update_target::excludes(target, next_target), "LOG_GIFTED_A_CARD", target, last_card);
-                next_target->add_to_hand(last_card);
             }
             target->m_game->update_request();
         }

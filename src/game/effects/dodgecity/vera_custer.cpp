@@ -34,7 +34,7 @@ namespace banggame {
 
     struct request_vera_custer : request_base {
         request_vera_custer(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target) {}
+            : request_base(origin_card, nullptr, target, effect_flags::auto_pick) {}
         
         bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override {
             return pocket == pocket_type::player_character
@@ -59,11 +59,7 @@ namespace banggame {
     void effect_vera_custer::on_enable(card *origin_card, player *origin) {
         origin->m_game->add_listener<event_type::on_turn_start>({origin_card, 1}, [=](player *target) {
             if (origin == target) {
-                if (origin->m_game->num_alive() == 2) {
-                    copy_characters(origin, std::next(player_iterator(origin)));
-                } else {
-                    origin->m_game->queue_request<request_vera_custer>(origin_card, target);
-                }
+                origin->m_game->queue_request<request_vera_custer>(origin_card, target);
             }
         });
         origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [=](player *target, bool skipped) {

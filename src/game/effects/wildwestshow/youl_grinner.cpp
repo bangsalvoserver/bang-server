@@ -6,7 +6,7 @@ namespace banggame {
 
     struct request_youl_grinner : request_base {
         request_youl_grinner(card *origin_card, player *origin, player *target)
-            : request_base(origin_card, origin, target) {}
+            : request_base(origin_card, origin, target, effect_flags::auto_pick) {}
 
         bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override {
             return pocket == pocket_type::player_hand && target_player == target;
