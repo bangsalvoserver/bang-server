@@ -17,7 +17,8 @@ namespace banggame {
     }
 
     struct request_rust : request_base, resolvable_request {
-        using request_base::request_base;
+        request_rust(card *origin_card, player *origin, player *target, effect_flags flags = {})
+            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand) {}
 
         void on_resolve() override {
             origin->m_game->pop_request();
