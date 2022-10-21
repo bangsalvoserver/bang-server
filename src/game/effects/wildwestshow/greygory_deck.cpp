@@ -12,13 +12,15 @@ namespace banggame {
                 || (c.pocket == pocket_type::player_character && c.owner == target)))
                 base_characters.push_back(&c);
         }
-        std::ranges::shuffle(base_characters, target->m_game->rng);
+        for (size_t i=0; i<2; ++i) {
+            size_t i2 = std::uniform_int_distribution<size_t>{0, base_characters.size() - 1}(target->m_game->rng);
+            std::swap(base_characters[i], base_characters[i2]);
+        }
+        base_characters.resize(2);
 
-        target->m_game->add_update<game_update_type::add_cards>(
-            make_id_vector(base_characters | std::views::take(2)),
-            pocket_type::player_character, target);
-        for (int i=0; i<2; ++i) {
-            auto *c = target->m_characters.emplace_back(base_characters[i]);
+        target->m_game->add_update<game_update_type::add_cards>(make_id_vector(base_characters), pocket_type::player_character, target);
+        for (card *c : base_characters) {
+            target->m_characters.push_back(c);
             target->m_game->add_log("LOG_CHARACTER_CHOICE", target, c);
             c->pocket = pocket_type::player_character;
             c->owner = target;
