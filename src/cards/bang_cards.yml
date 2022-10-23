@@ -1697,7 +1697,6 @@ character:
     image: 04_jacky_murieta
     expansion: goldrush
     effects:
-      - max_usages(1)
       - pay_gold(2)
       - bang player reachable notself
   - name: JOSH_MCCLOUD

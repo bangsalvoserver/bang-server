@@ -37,20 +37,17 @@ namespace banggame {
     };
 
     struct request_discard_all : request_base, resolvable_request {
-        request_discard_all(player *target)
-            : request_base(nullptr, nullptr, target) {}
+        bool death;
+
+        request_discard_all(player *target, bool death = true)
+            : request_base(nullptr, nullptr, target)
+            , death(death) {}
         
         bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
 
-        static void auto_resolve(player *target);
+        static void auto_resolve(player *target, bool death);
         void on_resolve() override;
-        game_string status_text(player *owner) const override;
-    };
-
-    struct request_sheriff_killed_deputy : request_discard_all {
-        using request_discard_all::request_discard_all;
-        
         game_string status_text(player *owner) const override;
     };
 

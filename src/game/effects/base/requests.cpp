@@ -104,7 +104,7 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    void request_discard_all::auto_resolve(player *target) {
+    void request_discard_all::auto_resolve(player *target, bool death) {
         std::vector<card *> target_cards;
         std::ranges::move(target->m_table | std::views::filter([](card *c) {
             return c->color != card_color_type::black;
@@ -118,23 +118,23 @@ namespace banggame {
 
     void request_discard_all::on_resolve() {
         target->m_game->pop_request();
-        auto_resolve(target);
+        auto_resolve(target, death);
         target->m_game->update_request();
     }
 
     game_string request_discard_all::status_text(player *owner) const {
-        if (target == owner) {
-            return "STATUS_DISCARD_ALL";
+        if (death) {
+            if (target == owner) {
+                return "STATUS_DISCARD_ALL";
+            } else {
+                return {"STATUS_DISCARD_ALL_OTHER", target};
+            }
         } else {
-            return {"STATUS_DISCARD_ALL_OTHER", target};
-        }
-    }
-
-    game_string request_sheriff_killed_deputy::status_text(player *owner) const {
-        if (target == owner) {
-            return "STATUS_SHERIFF_KILLED_DEPUTY";
-        } else {
-            return {"STATUS_SHERIFF_KILLED_DEPUTY_OTHER", target};
+            if (target == owner) {
+                return "STATUS_SHERIFF_KILLED_DEPUTY";
+            } else {
+                return {"STATUS_SHERIFF_KILLED_DEPUTY_OTHER", target};
+            }
         }
     }
 

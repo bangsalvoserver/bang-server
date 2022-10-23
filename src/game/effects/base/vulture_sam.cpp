@@ -4,6 +4,10 @@
 
 namespace banggame {
 
+    static bool is_vulture_sam(player *p) {
+        return p->m_game->call_event<event_type::verify_card_taker>(p, equip_type::vulture_sam, false);
+    }
+
     struct request_multi_vulture_sam : request_base {
         request_multi_vulture_sam(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags | effect_flags::auto_pick) {}
@@ -26,17 +30,13 @@ namespace banggame {
             }
             target->steal_card(target_card);
 
-            auto is_valid_target = [&](player *p) {
-                return origin->m_game->call_event<event_type::verify_card_taker>(p, equip_type::vulture_sam, false);
-            };
-
             if (origin->only_black_cards_equipped()) {
                 target->m_game->update_request();
             } else {
                 player_iterator next_target(target);
                 do {
                     ++next_target;
-                } while (next_target == origin || !is_valid_target(next_target));
+                } while (next_target == origin || !is_vulture_sam(next_target));
                 target->m_game->queue_request_front<request_multi_vulture_sam>(origin_card, origin, next_target);
             }
         }

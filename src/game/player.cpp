@@ -457,14 +457,12 @@ namespace banggame {
         if (!only_black_cards_equipped()) {
             untap_inactive_cards();
             if (m_game->m_options.auto_discard_all) {
-                request_discard_all::auto_resolve(this);
-            } else if (death) {
-                m_game->queue_request_front<request_discard_all>(this);
+                request_discard_all::auto_resolve(this, death);
             } else {
-                m_game->queue_request_front<request_sheriff_killed_deputy>(this);
+                m_game->queue_request_front<request_discard_all>(this, death);
             }
         }
-        m_game->queue_action_front([this]{
+        m_game->queue_action_front([this, death]{
             std::vector<card *> black_cards;
             for (card *c : m_table) {
                 if (c->color == card_color_type::black) {
@@ -475,7 +473,9 @@ namespace banggame {
                 m_game->add_log("LOG_DISCARDED_SELF_CARD", this, c);
                 discard_card(c);
             }
-            add_gold(-m_gold);
+            if (death) {
+                add_gold(-m_gold);
+            }
             drop_all_cubes(m_characters.front());
         });
     }
