@@ -182,6 +182,7 @@ main_deck:
     color: brown
     effects:
       - generalstore
+      - generalstore all_players
   - name: GATLING
     signs:
       - 10 hearts
@@ -352,6 +353,7 @@ main_deck:
     color: brown
     effects:
       - generalstore
+      - generalstore all_players
   - name: INDIANS
     signs:
       - 5 diamonds
@@ -1004,6 +1006,7 @@ main_deck:
     effects:
       - graverobber
       - play_card_action
+      - generalstore all_players
   - name: CARD_SHARPER
     signs:
       - 10 clubs
@@ -1403,6 +1406,7 @@ character:
       - max_usages(1)
       - discard card self | hand
       - generalstore
+      - generalstore all_players
   - name: ANNIE_VERSARY
     image: 02_annieversary
     expansion: thebullet
@@ -2005,6 +2009,7 @@ goldrush:
     color: brown
     effects:
       - generalstore
+      - generalstore all_players
     tags:
       - shopchoice(2)
       - hidden
