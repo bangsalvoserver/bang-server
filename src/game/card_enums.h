@@ -35,14 +35,14 @@ namespace banggame {
         (rank_K,    "K")
     )
 
-    struct card_sign {REFLECTABLE(
-        (card_suit) suit,
-        (card_rank) rank
-    )
+    DEFINE_STRUCT(card_sign,
+        (card_suit, suit)
+        (card_rank, rank),
+
         explicit operator bool () const {
             return suit != card_suit::none && rank != card_rank::none;
         }
-    };
+    )
     
     DEFINE_ENUM_FLAGS_FWD_TYPES(card_expansion_type,
         (dodgecity)

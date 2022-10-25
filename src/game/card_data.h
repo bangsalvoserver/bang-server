@@ -13,27 +13,26 @@ namespace banggame {
     using equip_list = std::vector<equip_holder>;
     using tag_list = std::vector<tag_holder>;
 
-    struct card_data {REFLECTABLE(
-        (std::string) name,
-        (std::string) image,
+    DEFINE_STRUCT(card_data,
+        (std::string, name)
+        (std::string, image)
 
-        (effect_list) effects,
-        (effect_list) responses,
-        (effect_list) optionals,
-        (equip_list) equips,
-        (tag_list) tags,
+        (effect_list, effects)
+        (effect_list, responses)
+        (effect_list, optionals)
+        (equip_list, equips)
+        (tag_list, tags)
 
-        (card_expansion_type) expansion,
-        (card_deck_type) deck,
+        (card_expansion_type, expansion)
+        (card_deck_type, deck)
 
-        (card_modifier_type) modifier,
-        (mth_holder) mth_effect,
-        (mth_holder) mth_response,
-        (target_player_filter) equip_target,
+        (card_modifier_type, modifier)
+        (mth_holder, mth_effect)
+        (mth_holder, mth_response)
+        (target_player_filter, equip_target)
         
-        (card_color_type) color,
-        (card_sign) sign
-    )
+        (card_color_type, color)
+        (card_sign, sign),
 
         bool has_tag(tag_type tag) const {
             return std::ranges::find(tags, tag, &tag_holder::type) != tags.end();
@@ -54,7 +53,7 @@ namespace banggame {
         short buy_cost() const {
             return get_tag_value(tag_type::buy_cost).value_or(0);
         }
-    };
+    )
 
     struct all_cards_t {
         std::vector<card_data> deck;

@@ -5,24 +5,24 @@
 
 namespace banggame {
 
-    struct game_over_update {REFLECTABLE(
-        (player_role) winner_role
-    )};
+    DEFINE_STRUCT(game_over_update,
+        (player_role, winner_role)
+    )
 
-    struct card_backface {REFLECTABLE(
-        (int) id,
-        (card_deck_type) deck
-    )};
+    DEFINE_STRUCT(card_backface,
+        (int, id)
+        (card_deck_type, deck)
+    )
 
-    struct add_cards_update {REFLECTABLE(
-        (std::vector<card_backface>) card_ids,
-        (pocket_type) pocket,
-        (serial::opt_player) player
-    )};
+    DEFINE_STRUCT(add_cards_update,
+        (std::vector<card_backface>, card_ids)
+        (pocket_type, pocket)
+        (serial::opt_player, player)
+    )
 
-    struct remove_cards_update {REFLECTABLE(
-        (std::vector<serial::card>) cards
-    )};
+    DEFINE_STRUCT(remove_cards_update,
+        (std::vector<serial::card>, cards)
+    )
 
     DEFINE_ENUM_FLAGS(show_card_flags,
         (pause_before_move)
@@ -32,71 +32,71 @@ namespace banggame {
         (hidden)
     )
 
-    struct move_card_update {REFLECTABLE(
-        (serial::card) card,
-        (serial::opt_player) player,
-        (pocket_type) pocket,
-        (show_card_flags) flags
-    )};
+    DEFINE_STRUCT(move_card_update,
+        (serial::card, card)
+        (serial::opt_player, player)
+        (pocket_type, pocket)
+        (show_card_flags, flags)
+    )
 
-    struct add_cubes_update {REFLECTABLE(
-        (int) num_cubes,
-        (serial::opt_card) target_card
-    )};
+    DEFINE_STRUCT(add_cubes_update,
+        (int, num_cubes)
+        (serial::opt_card, target_card)
+    )
 
-    struct move_cubes_update {REFLECTABLE(
-        (int) num_cubes,
-        (serial::opt_card) origin_card,
-        (serial::opt_card) target_card
-    )};
+    DEFINE_STRUCT(move_cubes_update,
+        (int, num_cubes)
+        (serial::opt_card, origin_card)
+        (serial::opt_card, target_card)
+    )
 
-    struct show_card_update {REFLECTABLE(
-        (serial::card) card,
-        (card_data) info,
-        (show_card_flags) flags
-    )};
+    DEFINE_STRUCT(show_card_update,
+        (serial::card, card)
+        (card_data, info)
+        (show_card_flags, flags)
+    )
 
-    struct hide_card_update {REFLECTABLE(
-        (serial::card) card,
-        (show_card_flags) flags
-    )};
+    DEFINE_STRUCT(hide_card_update,
+        (serial::card, card)
+        (show_card_flags, flags)
+    )
 
-    struct tap_card_update {REFLECTABLE(
-        (serial::card) card,
-        (bool) inactive,
-        (bool) instant
-    )};
+    DEFINE_STRUCT(tap_card_update,
+        (serial::card, card)
+        (bool, inactive)
+        (bool, instant)
+    )
 
-    struct player_add_update {REFLECTABLE(
-        (int) num_players
-    )};
+    DEFINE_STRUCT(player_add_update,
+        (int, num_players)
+    )
 
-    struct player_user_update {REFLECTABLE(
-        (serial::player) player,
-        (int) user_id
-    )};
+    DEFINE_STRUCT(player_user_update,
+        (serial::player, player)
+        (int, user_id)
+    )
 
-    struct player_remove_update {REFLECTABLE(
-        (serial::player) player,
-        (bool) instant
-    )};
+    DEFINE_STRUCT(player_remove_update,
+        (serial::player, player)
+        (bool, instant)
+    )
 
-    struct player_hp_update {REFLECTABLE(
-        (serial::player) player,
-        (int) hp,
-        (bool) instant
-    )};
+    DEFINE_STRUCT(player_hp_update,
+        (serial::player, player)
+        (int, hp)
+        (bool, instant)
+    )
 
-    struct player_gold_update {REFLECTABLE(
-        (serial::player) player,
-        (int) gold
-    )};
+    DEFINE_STRUCT(player_gold_update,
+        (serial::player, player)
+        (int, gold)
+    )
 
-    struct player_show_role_update {REFLECTABLE(
-        (serial::player) player,
-        (player_role) role,
-        (bool) instant
-    )};
+    DEFINE_STRUCT(player_show_role_update,
+        (serial::player, player)
+        (player_role, role)
+        (bool, instant)
+    )
 
     DEFINE_ENUM_FLAGS(game_flags,
         (game_over)
@@ -118,46 +118,41 @@ namespace banggame {
         (removed)
     )
 
-    struct player_status_update {REFLECTABLE(
-        (serial::player) player,
-        (player_flags) flags,
-        (int) range_mod,
-        (int) weapon_range,
-        (int) distance_mod
-    )};
-
-    struct picking_args {REFLECTABLE(
-        (pocket_type) pocket,
-        (serial::opt_player) player,
-        (serial::opt_card) card
+    DEFINE_STRUCT(player_status_update,
+        (serial::player, player)
+        (player_flags, flags)
+        (int, range_mod)
+        (int, weapon_range)
+        (int, distance_mod)
     )
+
+    DEFINE_STRUCT(picking_args,
+        (pocket_type, pocket)
+        (serial::opt_player, player)
+        (serial::opt_card, card),
+
         bool operator == (const picking_args &) const = default;
-    };
-
-    struct request_status_args {REFLECTABLE(
-        (serial::opt_card) origin_card,
-        (serial::opt_player) origin,
-        (serial::opt_player) target,
-        (game_string) status_text,
-        (effect_flags) flags,
-        (std::vector<serial::card>) respond_cards,
-        (std::vector<picking_args>) pick_cards,
-        (std::vector<serial::card>) highlight_cards
-    )};
-
-    struct game_options {REFLECTABLE(
-        (card_expansion_type) expansions,
-        (bool) character_choice,
-        (bool) keep_last_card_shuffling,
-        (bool) can_play_beer_in_duel,
-        (bool) auto_discard_all,
-        (int) scenario_deck_size
     )
-        game_options()
-            : character_choice(true)
-            , can_play_beer_in_duel(true)
-            , scenario_deck_size(12) {}
-    };
+
+    DEFINE_STRUCT(request_status_args,
+        (serial::opt_card, origin_card)
+        (serial::opt_player, origin)
+        (serial::opt_player, target)
+        (game_string, status_text)
+        (effect_flags, flags)
+        (std::vector<serial::card>, respond_cards)
+        (std::vector<picking_args>, pick_cards)
+        (std::vector<serial::card>, highlight_cards)
+    )
+
+    DEFINE_STRUCT(game_options,
+        (card_expansion_type, expansions)
+        (bool, character_choice, true)
+        (bool, keep_last_card_shuffling)
+        (bool, can_play_beer_in_duel, true)
+        (bool, auto_discard_all)
+        (int, scenario_deck_size, 12)
+    )
 
     DEFINE_ENUM_TYPES(game_update_type,
         (game_over, game_over_update)
@@ -194,11 +189,11 @@ namespace banggame {
     using game_update = enums::enum_variant<game_update_type>;
     #define UPD_TAG(name) enums::enum_tag_t<game_update_type::name>
 
-    struct play_card_args {REFLECTABLE(
-        (serial::card) card,
-        (std::vector<serial::card>) modifiers,
-        (target_list) targets
-    )};
+    DEFINE_STRUCT(play_card_args,
+        (serial::card, card)
+        (std::vector<serial::card>, modifiers)
+        (target_list, targets)
+    )
 
     DEFINE_ENUM_TYPES(game_action_type,
         (pick_card, picking_args)

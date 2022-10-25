@@ -11,15 +11,13 @@ namespace banggame {
 
     void apply_ruleset(game *game, card_expansion_type value);
     
-    struct effect_holder {
-        REFLECTABLE(
-            (target_type) target,
-            (target_player_filter) player_filter,
-            (target_card_filter) card_filter,
-            (int8_t) effect_value,
-            (int8_t) target_value,
-            (effect_type) type
-        )
+    DEFINE_STRUCT(effect_holder,
+        (target_type, target)
+        (target_player_filter, player_filter)
+        (target_card_filter, card_filter)
+        (int8_t, effect_value)
+        (int8_t, target_value)
+        (effect_type, type),
 
         game_string verify(card *origin_card, player *origin) const;
         game_string on_prompt(card *origin_card, player *origin) const;
@@ -32,33 +30,31 @@ namespace banggame {
         game_string verify(card *origin_card, player *origin, card *target) const;
         game_string on_prompt(card *origin_card, player *origin, card *target) const;
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags) const;
-    };
+    )
     
-    struct equip_holder {
-        REFLECTABLE(
-            (short) effect_value,
-            (equip_type) type
-        )
+    DEFINE_STRUCT(equip_holder,
+        (short, effect_value)
+        (equip_type, type),
 
         game_string on_prompt(player *origin, card *target_card, player *target) const;
         void on_equip(card *target_card, player *target) const;
         void on_enable(card *target_card, player *target) const;
         void on_disable(card *target_card, player *target) const;
         void on_unequip(card *target_card, player *target) const;
-    };
+    )
 
-    struct mth_holder {
-        REFLECTABLE((mth_type) type)
+    DEFINE_STRUCT(mth_holder,
+        (mth_type, type),
         
         game_string verify(card *origin_card, player *origin, const target_list &targets) const;
         game_string on_prompt(card *origin_card, player *origin, const target_list &targets) const;
         void on_play(card *origin_card, player *origin, const target_list &targets) const;
-    };
+    )
 
-    struct tag_holder {REFLECTABLE(
-        (short) tag_value,
-        (tag_type) type
-    )};
+    DEFINE_STRUCT(tag_holder,
+        (short, tag_value)
+        (tag_type, type)
+    )
 
     class request_holder {
     public:

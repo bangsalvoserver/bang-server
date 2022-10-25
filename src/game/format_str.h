@@ -8,18 +8,16 @@
 
 namespace banggame {
 
-    struct card_format_id {REFLECTABLE(
-        (std::string) name,
-        (card_sign) sign
-    )};
+    DEFINE_STRUCT(card_format_id,
+        (std::string, name)
+        (card_sign, sign)
+    )
 
     using game_format_arg = std::variant<int, std::string, card_format_id, serial::player>;
     
-    struct game_string {
-        REFLECTABLE(
-            (std::string) format_str,
-            (std::vector<game_format_arg>) format_args
-        )
+    DEFINE_STRUCT(game_string,
+        (std::string, format_str)
+        (std::vector<game_format_arg>, format_args),
 
         game_string() = default;
     
@@ -29,7 +27,7 @@ namespace banggame {
         explicit operator bool() const {
             return !format_str.empty();
         }
-    };
+    )
 }
 
 #endif

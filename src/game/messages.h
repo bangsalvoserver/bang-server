@@ -5,37 +5,37 @@
 #include "json/value.h"
 
 namespace sdl {
-    struct image_pixels {REFLECTABLE(
-        (int) width,
-        (int) height,
-        (std::vector<std::byte>) pixels
-    )};
+    DEFINE_STRUCT(image_pixels,
+        (int, width)
+        (int, height)
+        (std::vector<std::byte>, pixels)
+    )
 }
 
 namespace banggame {
 
-    struct connect_args {REFLECTABLE(
-        (std::string) user_name,
-        (sdl::image_pixels) profile_image,
-        (std::string) commit_hash
-    )};
+    DEFINE_STRUCT(connect_args,
+        (std::string, user_name)
+        (sdl::image_pixels, profile_image)
+        (std::string, commit_hash)
+    )
 
-    struct lobby_info {REFLECTABLE(
-        (std::string) name,
-        (game_options) options
-    )};
+    DEFINE_STRUCT(lobby_info,
+        (std::string, name)
+        (game_options, options)
+    )
 
-    struct lobby_id_args {REFLECTABLE(
-        (int) lobby_id
-    )};
+    DEFINE_STRUCT(lobby_id_args,
+        (int, lobby_id)
+    )
 
-    struct lobby_rejoin_args {REFLECTABLE(
-        (int) player_id
-    )};
+    DEFINE_STRUCT(lobby_rejoin_args,
+        (int, player_id)
+    )
 
-    struct lobby_chat_client_args {REFLECTABLE(
-        (std::string) message
-    )};
+    DEFINE_STRUCT(lobby_chat_client_args,
+        (std::string, message)
+    )
 
     DEFINE_ENUM_TYPES(client_message_type,
         (connect, connect_args)
@@ -60,31 +60,31 @@ namespace banggame {
         (finished)
     )
 
-    struct client_accepted_args {REFLECTABLE(
-        (int) user_id
-    )};
+    DEFINE_STRUCT(client_accepted_args,
+        (int, user_id)
+    )
 
-    struct lobby_data {REFLECTABLE(
-        (int) lobby_id,
-        (std::string) name,
-        (int) num_players,
-        (lobby_state) state
-    )};
+    DEFINE_STRUCT(lobby_data,
+        (int, lobby_id)
+        (std::string, name)
+        (int, num_players)
+        (lobby_state, state)
+    )
 
-    struct lobby_add_user_args {REFLECTABLE(
-        (int) user_id,
-        (std::string) name,
-        (sdl::image_pixels) profile_image
-    )};
+    DEFINE_STRUCT(lobby_add_user_args,
+        (int, user_id)
+        (std::string, name)
+        (sdl::image_pixels, profile_image)
+    )
 
-    struct user_id_args {REFLECTABLE(
-        (int) user_id
-    )};
+    DEFINE_STRUCT(user_id_args,
+        (int, user_id)
+    )
 
-    struct lobby_chat_args {REFLECTABLE(
-        (int) user_id,
-        (std::string) message
-    )};
+    DEFINE_STRUCT(lobby_chat_args,
+        (int, user_id)
+        (std::string, message)
+    )
 
     DEFINE_ENUM_TYPES(server_message_type,
         (client_accepted, client_accepted_args)
