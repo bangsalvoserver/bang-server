@@ -41,11 +41,22 @@ namespace banggame {
             }
         }
 
+        bool auto_resolve() override {
+            if (request_base::auto_resolve()) {
+                return true;
+            } else if (std::ranges::all_of(origin->m_table, [](card *c) { return c->color == card_color_type::black; })) {
+                on_pick(pocket_type::player_hand, origin, origin->m_hand.front());
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         game_string status_text(player *owner) const override {
             if (owner == target) {
                 return {"STATUS_MULTI_VULTURE_SAM", origin_card, origin};
             } else {
-                return {"STATUS_MULT_VULTURE_SAM_OTHER", origin_card, target, origin};
+                return {"STATUS_MULTI_VULTURE_SAM_OTHER", origin_card, target, origin};
             }
         }
     };
