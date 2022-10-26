@@ -8,7 +8,7 @@ namespace banggame {
         request_dutch_will(card *origin_card, player *target)
             : selection_picker(origin_card, nullptr, target) {}
 
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->add_to_hand_phase_one(target_card);
             if (target->m_game->m_selection.size() == 1) {
                 target->m_game->pop_request();

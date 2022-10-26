@@ -8,7 +8,7 @@ namespace banggame {
         request_generalstore(card *origin_card, player *origin, player *target)
             : selection_picker(origin_card, origin, target, effect_flags::auto_pick) {}
 
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->m_game->pop_request();
             target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
             target->add_to_hand(target_card);

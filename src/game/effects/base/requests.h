@@ -9,8 +9,8 @@ namespace banggame {
         request_characterchoice(player *target)
             : request_base(nullptr, nullptr, target) {}
         
-        bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
-        void on_pick(pocket_type pocket, player *target, card *target_card) override;
+        bool can_pick(card *target_card) const override;
+        void on_pick(card *target_card) override;
         game_string status_text(player *owner) const override;
     };
     
@@ -20,8 +20,8 @@ namespace banggame {
 
         int ncards = 1;
         
-        bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
-        void on_pick(pocket_type pocket, player *target, card *target_card) override;
+        bool can_pick(card *target_card) const override;
+        void on_pick(card *target_card) override;
         game_string status_text(player *owner) const override;
     };
 
@@ -31,8 +31,8 @@ namespace banggame {
 
         int ndiscarded = 0;
 
-        bool can_pick(pocket_type pocket, player *target, card *target_card) const override;
-        void on_pick(pocket_type pocket, player *target, card *target_card) override;
+        bool can_pick(card *target_card) const override;
+        void on_pick(card *target_card) override;
         game_string status_text(player *owner) const override;
     };
 
@@ -43,8 +43,8 @@ namespace banggame {
             : request_base(nullptr, nullptr, target)
             , death(death) {}
         
-        bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override;
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
+        bool can_pick(card *target_card) const override;
+        void on_pick(card *target_card) override;
 
         bool auto_resolve() override;
 

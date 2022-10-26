@@ -8,11 +8,11 @@ namespace banggame {
         request_indians(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand) {}
 
-        bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override {
-            return pocket == pocket_type::player_hand && target_player == target && target->is_bangcard(target_card);
+        bool can_pick(card *target_card) const override {
+            return target_card->pocket == pocket_type::player_hand && target_card->owner == target && target->is_bangcard(target_card);
         }
 
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->m_game->pop_request();
             target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
             target->discard_card(target_card);

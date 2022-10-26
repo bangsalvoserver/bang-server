@@ -8,7 +8,7 @@ namespace banggame {
         request_handcuffs(card *origin_card, player *target)
             : selection_picker(origin_card, nullptr, target) {}
 
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->m_game->flash_card(target_card);
             
             auto declared_suit = static_cast<card_suit>(*target_card->get_tag_value(tag_type::handcuffs));

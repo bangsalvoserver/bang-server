@@ -36,14 +36,14 @@ namespace banggame {
         request_vera_custer(card *origin_card, player *target)
             : request_base(origin_card, nullptr, target, effect_flags::auto_pick) {}
         
-        bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override {
-            return pocket == pocket_type::player_character
-                && target_player->alive() && target_player != target;
+        bool can_pick(card *target_card) const override {
+            return target_card->pocket == pocket_type::player_character
+                && target_card->owner->alive() && target_card->owner != target;
         }
 
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->m_game->pop_request();
-            copy_characters(target, target_player);
+            copy_characters(target, target_card->owner);
             target->m_game->update_request();
         }
 

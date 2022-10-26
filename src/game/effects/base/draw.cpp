@@ -45,11 +45,11 @@ namespace banggame {
         });
     }
     
-    bool request_draw::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
+    bool request_draw::can_pick(pocket_type pocket) const {
         return pocket == target->m_game->phase_one_drawn_card()->pocket;
     }
 
-    void request_draw::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+    void request_draw::on_pick(pocket_type pocket) {
         target->draw_from_deck();
     }
 

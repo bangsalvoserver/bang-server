@@ -8,7 +8,7 @@ namespace banggame {
         request_kit_carlson(card *origin_card, player *target)
             : selection_picker(origin_card, nullptr, target) {}
 
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->add_to_hand_phase_one(target_card);
             if (target->m_num_drawn_cards >= target->get_cards_to_draw()) {
                 target->m_game->pop_request();

@@ -8,13 +8,13 @@ namespace banggame {
         request_thedaltons(card *origin_card, player *target)
             : request_base(origin_card, nullptr, target, effect_flags::auto_pick) {}
 
-        bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override {
-            return pocket == pocket_type::player_table
-                && target == target_player
+        bool can_pick(card *target_card) const override {
+            return target_card->pocket == pocket_type::player_table
+                && target_card->owner == target
                 && target_card->color == card_color_type::blue;
         }
 
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->m_game->pop_request();
             target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->discard_card(target_card);

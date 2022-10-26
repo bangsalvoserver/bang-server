@@ -351,20 +351,25 @@ namespace banggame {
 
         if (req.target() != p) return ret;
 
-        auto maybe_add_pick_id = [&](pocket_type pocket, player *target_player, card *target_card) {
-            if (req.can_pick(pocket, target_player, target_card)) {
-                ret.pick_cards.emplace_back(pocket, target_player, target_card);
+        auto maybe_add_pick_id = [&](card *target_card) {
+            if (req.can_pick(target_card)) {
+                ret.pick_cards.emplace_back(target_card);
             }
         };
 
         for (player &target : m_players) {
-            std::ranges::for_each(target.m_hand, std::bind_front(maybe_add_pick_id, pocket_type::player_hand, &target));
-            std::ranges::for_each(target.m_table, std::bind_front(maybe_add_pick_id, pocket_type::player_table, &target));
-            std::ranges::for_each(target.m_characters, std::bind_front(maybe_add_pick_id, pocket_type::player_character, &target));
+            std::ranges::for_each(target.m_hand, maybe_add_pick_id);
+            std::ranges::for_each(target.m_table, maybe_add_pick_id);
+            std::ranges::for_each(target.m_characters, maybe_add_pick_id);
         }
-        maybe_add_pick_id(pocket_type::main_deck, nullptr, nullptr);
-        maybe_add_pick_id(pocket_type::discard_pile, nullptr, nullptr);
-        std::ranges::for_each(m_selection, std::bind_front(maybe_add_pick_id, pocket_type::selection, nullptr));
+        std::ranges::for_each(m_selection, maybe_add_pick_id);
+
+        if (req.can_pick(pocket_type::main_deck)) {
+            ret.pick_pockets.emplace_back(pocket_type::main_deck);
+        }
+        if (req.can_pick(pocket_type::discard_pile)) {
+            ret.pick_pockets.emplace_back(pocket_type::discard_pile);
+        }
 
         return ret;
     }

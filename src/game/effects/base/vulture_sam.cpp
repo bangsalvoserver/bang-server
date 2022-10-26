@@ -12,16 +12,16 @@ namespace banggame {
         request_multi_vulture_sam(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags | effect_flags::auto_pick) {}
 
-        bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override {
-            return (pocket == pocket_type::player_hand || pocket == pocket_type::player_table)
-                && target_player == origin
+        bool can_pick(card *target_card) const override {
+            return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
+                && target_card->owner == origin
                 && target_card->color != card_color_type::black;
         }
 
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->m_game->pop_request();
 
-            if (pocket == pocket_type::player_hand) {
+            if (target_card->pocket == pocket_type::player_hand) {
                 target_card = origin->random_hand_card();
                 target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", target, origin, target_card);
                 target->m_game->add_log(update_target::excludes(origin, target), "LOG_STOLEN_CARD_FROM_HAND", target, origin);
@@ -45,7 +45,7 @@ namespace banggame {
             if (request_base::auto_resolve()) {
                 return true;
             } else if (std::ranges::all_of(origin->m_table, [](card *c) { return c->color == card_color_type::black; })) {
-                on_pick(pocket_type::player_hand, origin, origin->m_hand.front());
+                on_pick(origin->m_hand.front());
                 return true;
             } else {
                 return false;

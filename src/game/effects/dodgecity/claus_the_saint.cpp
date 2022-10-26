@@ -13,7 +13,7 @@ namespace banggame {
                 target->m_game->num_alive() - static_cast<int>(target->m_game->m_selection.size()));
         }
 
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+        void on_pick(card *target_card) override {
             if (target->m_num_drawn_cards < target->get_cards_to_draw()) {
                 target->add_to_hand_phase_one(target_card);
             } else {

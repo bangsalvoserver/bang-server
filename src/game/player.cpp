@@ -228,7 +228,7 @@ namespace banggame {
             || origin_card->has_tag(tag_type::bangcard);
     };
 
-    game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, const picking_args &args) {
+    game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, card *target_card) {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         } else if (!m_game->pending_requests()) {
@@ -237,8 +237,26 @@ namespace banggame {
             return "ERROR_PLAYER_NOT_IN_TURN";
         } else {
             m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
-            if (req.can_pick(args.pocket, args.player, args.card)) {
-                req.on_pick(args.pocket, args.player, args.card);
+            if (req.can_pick(target_card)) {
+                req.on_pick(target_card);
+                return {};
+            } else {
+                return "ERROR_INVALID_PICK";
+            }
+        }
+    }
+
+    game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_pocket>, pocket_type pocket) {
+        if (m_prompt) {
+            return "ERROR_MUST_RESPOND_PROMPT";
+        } else if (!m_game->pending_requests()) {
+            return "ERROR_NO_PENDING_REQUEST";
+        } else if (auto &req = m_game->top_request(); req.target() != this) {
+            return "ERROR_PLAYER_NOT_IN_TURN";
+        } else {
+            m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
+            if (req.can_pick(pocket)) {
+                req.on_pick(pocket);
                 return {};
             } else {
                 return "ERROR_INVALID_PICK";

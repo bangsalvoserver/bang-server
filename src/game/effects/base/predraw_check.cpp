@@ -8,8 +8,8 @@ namespace banggame {
         request_predraw(player *target)
             : request_base(nullptr, nullptr, target, effect_flags::auto_pick) {}
         
-        bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override {
-            if (pocket == pocket_type::player_table && target == target_player) {
+        bool can_pick(card *target_card) const override {
+            if (target_card->pocket == pocket_type::player_table && target_card->owner == target) {
                 int top_priority = std::ranges::max(target->m_predraw_checks
                     | std::views::values
                     | std::views::filter(std::not_fn(&player::predraw_check::resolved))
@@ -24,7 +24,7 @@ namespace banggame {
             return false;
         }
 
-        void on_pick(pocket_type pocket, player *target, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->m_game->pop_request();
             target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
             target->m_game->queue_action([target = target, target_card] {

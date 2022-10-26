@@ -126,14 +126,6 @@ namespace banggame {
         (int, distance_mod)
     )
 
-    DEFINE_STRUCT(picking_args,
-        (pocket_type, pocket)
-        (serial::opt_player, player)
-        (serial::opt_card, card),
-
-        bool operator == (const picking_args &) const = default;
-    )
-
     DEFINE_STRUCT(request_status_args,
         (serial::opt_card, origin_card)
         (serial::opt_player, origin)
@@ -141,7 +133,8 @@ namespace banggame {
         (game_string, status_text)
         (effect_flags, flags)
         (std::vector<serial::card>, respond_cards)
-        (std::vector<picking_args>, pick_cards)
+        (std::vector<serial::card>, pick_cards)
+        (std::vector<pocket_type>, pick_pockets)
         (std::vector<serial::card>, highlight_cards)
     )
 
@@ -196,7 +189,8 @@ namespace banggame {
     )
 
     DEFINE_ENUM_TYPES(game_action_type,
-        (pick_card, picking_args)
+        (pick_card, serial::card)
+        (pick_pocket, pocket_type)
         (play_card, play_card_args)
         (respond_card, play_card_args)
         (prompt_respond, bool)

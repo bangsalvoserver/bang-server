@@ -8,7 +8,7 @@ namespace banggame {
         request_check(card *origin_card, player *target)
             : selection_picker(origin_card, nullptr, target) {}
 
-        void on_pick(pocket_type pocket, player *target_player, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->m_game->flash_card(target_card);
             target->m_game->pop_request();
             target->m_game->m_current_check.select(target_card);

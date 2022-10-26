@@ -8,14 +8,14 @@ namespace banggame {
         request_newidentity(card *origin_card, player *target)
             : request_base(origin_card, nullptr, target) {}
 
-        bool can_pick(pocket_type pocket, player *, card *target_card) const override {
-            return pocket == pocket_type::selection
-                || (pocket == pocket_type::player_character && target_card == target->m_characters.front());
+        bool can_pick(card *target_card) const override {
+            return target_card->pocket == pocket_type::selection
+                || (target_card->pocket == pocket_type::player_character && target_card == target->m_characters.front());
         }
 
-        void on_pick(pocket_type pocket, player *, card *target_card) override {
+        void on_pick(card *target_card) override {
             target->m_game->pop_request();
-            if (pocket == pocket_type::selection) {
+            if (target_card->pocket == pocket_type::selection) {
                 target->remove_extra_characters();
                 for (card *c : target->m_characters) {
                     target->disable_equip(c);

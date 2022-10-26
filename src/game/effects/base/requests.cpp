@@ -4,11 +4,11 @@
 
 namespace banggame {
 
-    bool request_characterchoice::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return pocket == pocket_type::player_hand && target_player == target;
+    bool request_characterchoice::can_pick(card *target_card) const {
+        return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
-    void request_characterchoice::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+    void request_characterchoice::on_pick(card *target_card) {
         target->m_game->pop_request();
         target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
         target->m_game->move_card(target_card, pocket_type::player_character, target, show_card_flags::shown);
@@ -28,11 +28,11 @@ namespace banggame {
         }
     }
 
-    bool request_discard::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return pocket == pocket_type::player_hand && target_player == target;
+    bool request_discard::can_pick(card *target_card) const {
+        return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
     
-    void request_discard::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+    void request_discard::on_pick(card *target_card) {
         if (--ncards == 0) {
             target->m_game->pop_request();
         }
@@ -52,11 +52,11 @@ namespace banggame {
         }
     }
 
-    bool request_discard_pass::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return pocket == pocket_type::player_hand && target_player == target;
+    bool request_discard_pass::can_pick(card *target_card) const {
+        return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
-    void request_discard_pass::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+    void request_discard_pass::on_pick(card *target_card) {
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
         if (target->m_game->check_flags(game_flags::phase_one_draw_discard)) {
             target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, show_card_flags::hidden);
@@ -88,13 +88,13 @@ namespace banggame {
         }
     }
 
-    bool request_discard_all::can_pick(pocket_type pocket, player *target_player, card *target_card) const {
-        return (pocket == pocket_type::player_hand || pocket == pocket_type::player_table)
-            && target_player == target
+    bool request_discard_all::can_pick(card *target_card) const {
+        return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
+            && target_card->owner == target
             && target_card->color != card_color_type::black;
     }
 
-    void request_discard_all::on_pick(pocket_type pocket, player *target_player, card *target_card) {
+    void request_discard_all::on_pick(card *target_card) {
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
         target->discard_card(target_card);
         
@@ -136,11 +136,11 @@ namespace banggame {
     bool request_discard_all::auto_resolve() {
         if (target->m_game->m_options.auto_discard_all) {
             if (card *c = get_first_discarded_card(target)) {
-                on_pick(c->pocket, target, c);
+                on_pick(c);
                 return true;
             }
         } else if (card *c = get_only_discarded_card(target)) {
-            on_pick(c->pocket, target, c);
+            on_pick(c);
             return true;
         }
         return false;
