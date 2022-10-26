@@ -375,44 +375,18 @@ namespace banggame {
 
     void game::send_request_update() {
         auto &req = top_request();
-        if (req.target() && bool(req.flags() & (effect_flags::auto_pick | effect_flags::auto_respond | effect_flags::auto_respond_empty_hand))) {
-            auto target_request_update = make_request_update(req.target());
-            if (bool(req.flags() & effect_flags::auto_pick) && target_request_update.pick_cards.size() == 1 && target_request_update.respond_cards.empty()) {
-                const auto &[pocket, player, card] = target_request_update.pick_cards.front();
-                req.on_pick(pocket, player, card);
-                return;
-            }
-            if ((bool(req.flags() & effect_flags::auto_respond) || bool(req.flags() & effect_flags::auto_respond_empty_hand) && req.target()->m_hand.empty())
-                && target_request_update.pick_cards.empty() && target_request_update.respond_cards.size() == 1)
-            {
-                player *target = req.target();
-                card *origin_card = target_request_update.respond_cards.front();
-                bool is_response = !bool(req.flags() & effect_flags::force_play);
-                auto &effects = is_response ? origin_card->responses : origin_card->effects;
-                if (origin_card->equips.empty()
-                    && origin_card->optionals.empty()
-                    && origin_card->modifier == card_modifier_type::none
-                    && std::ranges::all_of(effects, [](const effect_holder &holder) { return holder.target == target_type::none; })
-                ) {
-                    if (!is_response) {
-                        pop_request();
-                    }
-                    play_card_verify{target, origin_card, is_response,
-                        target_list{effects.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
-                    return;
+        
+        if (!req.auto_resolve()) {
+            auto spectator_target = update_target::excludes_public();
+            for (player &p : m_players) {
+                if (p.user_id && p.alive()) {
+                    req.add_pending_confirm(&p);
                 }
+                spectator_target.add(&p);
+                add_update<game_update_type::request_status>(update_target::includes_private(&p), make_request_update(&p));
             }
+            add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
         }
-
-        auto spectator_target = update_target::excludes_public();
-        for (player &p : m_players) {
-            if (p.user_id && p.alive()) {
-                req.add_pending_confirm(&p);
-            }
-            spectator_target.add(&p);
-            add_update<game_update_type::request_status>(update_target::includes_private(&p), make_request_update(&p));
-        }
-        add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
     }
     
     void game::draw_check_then(player *origin, card *origin_card, draw_check_function fun) {

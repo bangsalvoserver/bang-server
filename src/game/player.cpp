@@ -456,11 +456,7 @@ namespace banggame {
     void player::discard_all(bool death) {
         if (!only_black_cards_equipped()) {
             untap_inactive_cards();
-            if (m_game->m_options.auto_discard_all) {
-                request_discard_all::auto_resolve(this, death);
-            } else {
-                m_game->queue_request_front<request_discard_all>(this, death);
-            }
+            m_game->queue_request_front<request_discard_all>(this, death);
         }
         m_game->queue_action_front([this, death]{
             std::vector<card *> black_cards;

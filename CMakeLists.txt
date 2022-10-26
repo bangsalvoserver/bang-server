@@ -163,6 +163,8 @@ set(bangserver_srcs
     src/game/effects/canyondiablo/sacrifice.cpp
     src/game/effects/canyondiablo/taxman.cpp
 
+    src/game/effects/card_effect.cpp
+
     src/game/card_serial.cpp
     src/game/filters.cpp
     src/game/holders.cpp

@@ -46,7 +46,8 @@ namespace banggame {
         bool can_pick(pocket_type pocket, player *target_player, card *target_card) const override;
         void on_pick(pocket_type pocket, player *target_player, card *target_card) override;
 
-        static void auto_resolve(player *target, bool death);
+        bool auto_resolve() override;
+
         void on_resolve() override;
         game_string status_text(player *owner) const override;
     };

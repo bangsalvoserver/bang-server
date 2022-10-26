@@ -207,35 +207,4 @@ namespace banggame {
         }, type);
     }
 
-    bool request_base::can_respond(player *target, card *target_card) const {
-        const bool is_response = !bool(flags & effect_flags::force_play);
-        return !target->m_game->is_disabled(target_card) && target->is_possible_to_play(target_card, is_response);
-    }
-
-    void request_base::on_pick(pocket_type pocket, player *target, card *target_card) {
-        throw std::runtime_error("missing on_pick(pocket, target, target_card)");
-    }
-
-    void timer_request::tick() {
-        if (awaiting_confirms.empty() && duration != ticks{0} && --duration == ticks{0}) {
-            auto copy = shared_from_this();
-            target->m_game->pop_request();
-            on_finished();
-            target->m_game->update_request();
-        } else if (auto_confirm_timer != ticks{0} && --auto_confirm_timer == ticks{0}) {
-            awaiting_confirms.clear();
-        }
-    }
-
-    void timer_request::add_pending_confirm(player *p) {
-        awaiting_confirms.push_back(p);
-    }
-
-    void timer_request::confirm_player(player *p) {
-        auto it = std::ranges::find(awaiting_confirms, p);
-        if (it != awaiting_confirms.end()) {
-            awaiting_confirms.erase(it);
-        }
-    }
-
 }

@@ -96,6 +96,11 @@ namespace banggame {
             return m_value->can_respond(target, target_card);
         }
 
+        bool auto_resolve() {
+            auto copy = m_value;
+            return copy->auto_resolve();
+        }
+
         std::vector<card *> get_highlights() const {
             return m_value->get_highlights();
         }

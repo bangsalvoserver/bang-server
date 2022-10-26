@@ -56,6 +56,8 @@ namespace banggame {
 
         virtual bool can_respond(player *target, card *target_card) const;
 
+        virtual bool auto_resolve();
+
         virtual std::vector<card *> get_highlights() const {
             return {};
         }

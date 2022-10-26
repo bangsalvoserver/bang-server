@@ -104,21 +104,54 @@ namespace banggame {
         target->m_game->update_request();
     }
 
-    void request_discard_all::auto_resolve(player *target, bool death) {
-        std::vector<card *> target_cards;
-        std::ranges::move(target->m_table | std::views::filter([](card *c) {
-            return c->color != card_color_type::black;
-        }), std::back_inserter(target_cards));
-        std::ranges::move(target->m_hand, std::back_inserter(target_cards));
-        for (card *c : target_cards) {
-            target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
-            target->discard_card(c);
+    static bool is_non_black(card *c) {
+        return c->color != card_color_type::black;
+    }
+
+    static card *get_first_discarded_card(player *target) {
+        auto non_black_cards = target->m_table | std::views::filter(is_non_black);
+
+        if (!non_black_cards.empty()) {
+            return non_black_cards.front();
+        } else if (!target->m_hand.empty()) {
+            return target->m_hand.front();
+        } else {
+            return nullptr;
         }
+    }
+
+    static card *get_only_discarded_card(player *target) {
+        auto non_black_cards = target->m_table | std::views::filter(is_non_black);
+        if (std::ranges::distance(non_black_cards) + target->m_hand.size() == 1) {
+            if (target->m_hand.empty()) {
+                return non_black_cards.front();
+            } else {
+                return target->m_hand.front();
+            }
+        } else {
+            return nullptr;
+        }
+    }
+
+    bool request_discard_all::auto_resolve() {
+        if (target->m_game->m_options.auto_discard_all) {
+            if (card *c = get_first_discarded_card(target)) {
+                on_pick(c->pocket, target, c);
+                return true;
+            }
+        } else if (card *c = get_only_discarded_card(target)) {
+            on_pick(c->pocket, target, c);
+            return true;
+        }
+        return false;
     }
 
     void request_discard_all::on_resolve() {
         target->m_game->pop_request();
-        auto_resolve(target, death);
+        while (card *c = get_first_discarded_card(target)) {
+            target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
+            target->discard_card(c);
+        }
         target->m_game->update_request();
     }
 
