@@ -49,6 +49,13 @@ namespace banggame {
                     if (origin_card->color == card_color_type::black)
                         return "ERROR_INVALID_MODIFIER_CARD";
                 }
+                if (std::ranges::none_of(origin_card->effects, 
+                    [](target_player_filter filter) {
+                        return bool(filter & (target_player_filter::range_1 | target_player_filter::range_2 | target_player_filter::reachable));
+                    }, &effect_holder::player_filter))
+                {
+                    return "ERROR_INVALID_MODIFIER_CARD";
+                }
                 break;
             default:
                 return "ERROR_INVALID_MODIFIER_CARD";
