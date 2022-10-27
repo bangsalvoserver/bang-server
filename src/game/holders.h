@@ -83,15 +83,6 @@ namespace banggame {
             m_value->confirm_player(p);
         }
 
-        bool can_pick(pocket_type pocket) const {
-            return m_value->can_pick(pocket);
-        }
-
-        void on_pick(pocket_type pocket) {
-            auto copy = m_value;
-            copy->on_pick(pocket);
-        }
-
         bool can_pick(card *target_card) const {
             return m_value->can_pick(target_card);
         }

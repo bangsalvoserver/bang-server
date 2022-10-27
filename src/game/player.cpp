@@ -246,24 +246,6 @@ namespace banggame {
         }
     }
 
-    game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_pocket>, pocket_type pocket) {
-        if (m_prompt) {
-            return "ERROR_MUST_RESPOND_PROMPT";
-        } else if (!m_game->pending_requests()) {
-            return "ERROR_NO_PENDING_REQUEST";
-        } else if (auto &req = m_game->top_request(); req.target() != this) {
-            return "ERROR_PLAYER_NOT_IN_TURN";
-        } else {
-            m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
-            if (req.can_pick(pocket)) {
-                req.on_pick(pocket);
-                return {};
-            } else {
-                return "ERROR_INVALID_PICK";
-            }
-        }
-    }
-
     void player::play_card_action(card *origin_card) {
         switch (origin_card->pocket) {
         case pocket_type::player_hand:

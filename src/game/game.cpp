@@ -364,11 +364,11 @@ namespace banggame {
         }
         std::ranges::for_each(m_selection, maybe_add_pick_id);
 
-        if (req.can_pick(pocket_type::main_deck)) {
-            ret.pick_pockets.emplace_back(pocket_type::main_deck);
+        if (!m_deck.empty()) {
+            maybe_add_pick_id(m_deck.back());
         }
-        if (req.can_pick(pocket_type::discard_pile)) {
-            ret.pick_pockets.emplace_back(pocket_type::discard_pile);
+        if (!m_discards.empty()) {
+            maybe_add_pick_id(m_discards.back());
         }
 
         return ret;

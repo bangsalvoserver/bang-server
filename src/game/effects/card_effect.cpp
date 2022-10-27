@@ -5,10 +5,6 @@
 
 namespace banggame {
 
-    void request_base::on_pick(pocket_type pocket) {
-        throw std::runtime_error("missing on_pick(pocket)");
-    }
-
     void request_base::on_pick(card *target_card) {
         throw std::runtime_error("missing on_pick(card)");
     }
@@ -24,19 +20,13 @@ namespace banggame {
         }
 
         auto update = target->m_game->make_request_update(target);
-        if (bool(flags & effect_flags::auto_pick)) {
-            if (update.pick_cards.size() == 1 && update.pick_pockets.empty() && update.respond_cards.empty()) {
-                on_pick(update.pick_cards.front());
-                return true;
-            }
-            if (update.pick_pockets.size() == 1 && update.pick_cards.empty() && update.respond_cards.empty()) {
-                on_pick(update.pick_pockets.front());
-                return true;
-            }
+        if (bool(flags & effect_flags::auto_pick) && update.pick_cards.size() == 1 && update.respond_cards.empty()) {
+            on_pick(update.pick_cards.front());
+            return true;
         }
 
         if ((bool(flags & effect_flags::auto_respond) || bool(flags & effect_flags::auto_respond_empty_hand) && target->m_hand.empty())
-            && update.pick_cards.empty() && update.pick_pockets.empty() && update.respond_cards.size() == 1)
+            && update.pick_cards.empty() && update.respond_cards.size() == 1)
         {
             card *origin_card = update.respond_cards.front();
             bool is_response = !bool(flags & effect_flags::force_play);

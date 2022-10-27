@@ -48,10 +48,7 @@ namespace banggame {
 
         virtual game_string status_text(player *owner) const = 0;
 
-        virtual bool can_pick(pocket_type pocket) const { return false; }
         virtual bool can_pick(card *target_card) const { return false; }
-
-        virtual void on_pick(pocket_type pocket);
         virtual void on_pick(card *target_card);
 
         virtual bool can_respond(player *target, card *target_card) const;

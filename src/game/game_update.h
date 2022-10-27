@@ -134,7 +134,6 @@ namespace banggame {
         (effect_flags, flags)
         (std::vector<serial::card>, respond_cards)
         (std::vector<serial::card>, pick_cards)
-        (std::vector<pocket_type>, pick_pockets)
         (std::vector<serial::card>, highlight_cards)
     )
 
@@ -190,7 +189,6 @@ namespace banggame {
 
     DEFINE_ENUM_TYPES(game_action_type,
         (pick_card, serial::card)
-        (pick_pocket, pocket_type)
         (play_card, play_card_args)
         (respond_card, play_card_args)
         (prompt_respond, bool)
