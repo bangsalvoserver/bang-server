@@ -33,8 +33,9 @@ namespace banggame {
     };
 
     void effect_tumbleweed::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player *origin, card *origin_card, card *drawn_card) {
+        target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player *origin, card *origin_card, card *drawn_card, bool &auto_resolve) {
             target->m_game->queue_request_front<request_tumbleweed>(target_card, origin, target, drawn_card, origin_card);
+            auto_resolve = false;
         });
     }
 

@@ -78,13 +78,6 @@ namespace banggame {
             static_cast<Derived &>(*this).send_request_status_clear();
         }
 
-        template<std::invocable Function>
-        int num_queued_requests(Function &&fun) {
-            int nreqs = static_cast<int>(m_requests.size());
-            std::invoke(std::forward<Function>(fun));
-            return static_cast<int>(m_requests.size()) - nreqs;
-        }
-
         void tick() {
             if (pending_requests()) {
                 top_request().tick();

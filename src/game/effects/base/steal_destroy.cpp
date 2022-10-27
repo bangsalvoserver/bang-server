@@ -19,37 +19,30 @@ namespace banggame {
         }
     }
 
-    static void finalize_steal(card *origin_card, player *origin, card *target_card) {
-        if (origin->alive() && target_card->owner) {
-            auto priv_target = update_target::includes(origin, target_card->owner);
-            auto inv_target = update_target::excludes(origin, target_card->owner);
-            if (origin != target_card->owner) {
-                origin->m_game->add_log(priv_target, "LOG_STOLEN_CARD", origin, target_card->owner, target_card);
-                if (target_card->pocket == pocket_type::player_hand) {
-                    origin->m_game->add_log(inv_target, "LOG_STOLEN_CARD_FROM_HAND", origin, target_card->owner);
-                } else {
-                    origin->m_game->add_log(inv_target, "LOG_STOLEN_CARD", origin, target_card->owner, target_card);
-                }
-            } else {
-                origin->m_game->add_log(priv_target, "LOG_STOLEN_SELF_CARD", origin, target_card);
-                if (target_card->pocket == pocket_type::player_hand) {
-                    origin->m_game->add_log(inv_target, "LOG_STOLEN_SELF_CARD_FROM_HAND", origin);
-                } else {
-                    origin->m_game->add_log(inv_target, "LOG_STOLEN_SELF_CARD", origin, target_card);
-                }
-            }
-            origin->steal_card(target_card);
-        }
-    }
-
     void effect_steal::on_resolve(card *origin_card, player *origin, card *target_card) {
-        if (origin->m_game->num_queued_requests([&]{
-            origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
-        })) {
-            origin->m_game->queue_action_front([=]{ finalize_steal(origin_card, origin, target_card); });
-        } else {
-            finalize_steal(origin_card, origin, target_card);
-        }
+        origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
+        origin->m_game->queue_action_front([=]{
+            if (origin->alive() && target_card->owner) {
+                auto priv_target = update_target::includes(origin, target_card->owner);
+                auto inv_target = update_target::excludes(origin, target_card->owner);
+                if (origin != target_card->owner) {
+                    origin->m_game->add_log(priv_target, "LOG_STOLEN_CARD", origin, target_card->owner, target_card);
+                    if (target_card->pocket == pocket_type::player_hand) {
+                        origin->m_game->add_log(inv_target, "LOG_STOLEN_CARD_FROM_HAND", origin, target_card->owner);
+                    } else {
+                        origin->m_game->add_log(inv_target, "LOG_STOLEN_CARD", origin, target_card->owner, target_card);
+                    }
+                } else {
+                    origin->m_game->add_log(priv_target, "LOG_STOLEN_SELF_CARD", origin, target_card);
+                    if (target_card->pocket == pocket_type::player_hand) {
+                        origin->m_game->add_log(inv_target, "LOG_STOLEN_SELF_CARD_FROM_HAND", origin);
+                    } else {
+                        origin->m_game->add_log(inv_target, "LOG_STOLEN_SELF_CARD", origin, target_card);
+                    }
+                }
+                origin->steal_card(target_card);
+            }
+        });
     }
 
     struct request_steal : request_targeting, resolvable_request {
@@ -80,31 +73,26 @@ namespace banggame {
 
     void effect_steal::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
         if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
-            origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
+            origin->m_game->queue_action([=]{
+                origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
+            });
         } else {
             on_resolve(origin_card, origin, target_card);
         }
     }
 
-    static void finalize_discard(card *origin_card, player *origin, card *target_card) {
-        if (origin->alive() && target_card->owner) {
-            if (origin != target_card->owner) {
-                origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
-            } else {
-                origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
-            }
-            target_card->owner->discard_card(target_card);
-        }
-    }
-
     void effect_discard::on_resolve(card *origin_card, player *origin, card *target_card) {
-        if (origin->m_game->num_queued_requests([&]{
-            origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
-        })) {
-            origin->m_game->queue_action_front([=]{ finalize_discard(origin_card, origin, target_card); });
-        } else {
-            finalize_discard(origin_card, origin, target_card);
-        }
+        origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
+        origin->m_game->queue_action_front([=]{
+            if (origin->alive() && target_card->owner) {
+                if (origin != target_card->owner) {
+                    origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
+                } else {
+                    origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
+                }
+                target_card->owner->discard_card(target_card);
+            }
+        });
     }
     
     struct request_destroy : request_targeting, resolvable_request {
@@ -135,7 +123,9 @@ namespace banggame {
     
     void effect_discard::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
         if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
-            origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
+            origin->m_game->queue_action([=]{
+                origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
+            });
         } else {
             on_resolve(origin_card, origin, target_card);
         }

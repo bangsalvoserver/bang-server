@@ -45,9 +45,7 @@ namespace banggame {
 
     void draw_check_handler::select(card *drawn_card) {
         m_origin->m_game->add_log("LOG_CHECK_DREW_CARD", m_origin_card, m_origin, drawn_card);
-        if (!m_origin->m_game->num_queued_requests([&]{
-            m_origin->m_game->call_event<event_type::on_draw_check_select>(m_origin, m_origin_card, drawn_card);
-        })) {
+        if (m_origin->m_game->call_event<event_type::on_draw_check_select>(m_origin, m_origin_card, drawn_card, true)) {
             resolve(drawn_card);
         }
     }
@@ -63,13 +61,13 @@ namespace banggame {
         if (m_origin->get_num_checks() > 1) {
             while (!m_origin->m_game->m_selection.empty()) {
                 card *c = m_origin->m_game->m_selection.front();
-                m_origin->m_game->call_event<event_type::on_draw_check>(m_origin, c);
+                m_origin->m_game->call_event<event_type::on_draw_check_resolve>(m_origin, c);
                 if (c->pocket == pocket_type::selection) {
                     m_origin->m_game->move_card(c, pocket_type::discard_pile, nullptr);
                 }
             }
         } else {
-            m_origin->m_game->call_event<event_type::on_draw_check>(m_origin, drawn_card);
+            m_origin->m_game->call_event<event_type::on_draw_check_resolve>(m_origin, drawn_card);
         }
         m_origin_card = nullptr;
         std::invoke(std::exchange(m_function, nullptr), std::exchange(m_origin, nullptr)->get_card_sign(drawn_card));

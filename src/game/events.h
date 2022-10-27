@@ -55,10 +55,10 @@ namespace banggame {
         EVENT(on_predraw_check, player *origin, card *target_card)
 
         // viene chiamata quando estrai una carta nel momento che viene pescata
-        EVENT(on_draw_check, player *origin, card *target_card)
+        EVENT(on_draw_check_resolve, player *origin, card *target_card)
 
         // viene chiamato quando estrai una carta nel momento che viene scelta
-        EVENT(on_draw_check_select, player *origin, card *origin_card, card *drawn_card)
+        EVENT(on_draw_check_select, player *origin, card *origin_card, card *drawn_card, bool &auto_resolve)
 
         // viene chiamato quando si scarta VOLONTARIAMENTE una carta (si gioca cat balou o panico contro una carta)
         EVENT(on_discard_card, player *origin, player *target, card *target_card)
