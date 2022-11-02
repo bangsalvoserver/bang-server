@@ -58,8 +58,8 @@ namespace banggame {
 
                 event_card_key key{target_card, 1};
                 target->m_game->add_listener<event_type::on_effect_end>(key, [=](player *p, card *c) {
-                    target->damage(target_card, nullptr, 2);
                     target->m_game->remove_listeners(key);
+                    target->damage(target_card, nullptr, 2);
                 });
             }
         });
