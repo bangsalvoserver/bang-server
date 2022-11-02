@@ -1,7 +1,7 @@
 #ifndef __BASE_REQUESTS_H__
 #define __BASE_REQUESTS_H__
 
-#include "../card_effect.h"
+#include "discard_all.h"
 
 namespace banggame {
 
@@ -33,22 +33,6 @@ namespace banggame {
 
         bool can_pick(card *target_card) const override;
         void on_pick(card *target_card) override;
-        game_string status_text(player *owner) const override;
-    };
-
-    struct request_discard_all : request_base, resolvable_request {
-        bool death;
-
-        request_discard_all(player *target, bool death = true)
-            : request_base(nullptr, nullptr, target)
-            , death(death) {}
-        
-        bool can_pick(card *target_card) const override;
-        void on_pick(card *target_card) override;
-
-        bool auto_resolve() override;
-
-        void on_resolve() override;
         game_string status_text(player *owner) const override;
     };
 

@@ -12,6 +12,7 @@ set(bangserver_srcs
     src/game/effects/base/bart_cassidy.cpp
     src/game/effects/base/calamity_janet.cpp
     src/game/effects/base/damage.cpp
+    src/game/effects/base/discard_all.cpp
     src/game/effects/base/deathsave.cpp
     src/game/effects/base/draw.cpp
     src/game/effects/base/duel.cpp

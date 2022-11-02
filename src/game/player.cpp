@@ -454,26 +454,8 @@ namespace banggame {
     }
 
     void player::discard_all(bool death) {
-        if (!only_black_cards_equipped()) {
-            untap_inactive_cards();
-            m_game->queue_request_front<request_discard_all>(this, death);
-        }
-        m_game->queue_action_front([this, death]{
-            std::vector<card *> black_cards;
-            for (card *c : m_table) {
-                if (c->color == card_color_type::black) {
-                    black_cards.push_back(c);
-                }
-            }
-            for (card *c : black_cards) {
-                m_game->add_log("LOG_DISCARDED_SELF_CARD", this, c);
-                discard_card(c);
-            }
-            if (death) {
-                add_gold(-m_gold);
-            }
-            drop_all_cubes(m_characters.front());
-        });
+        untap_inactive_cards();
+        queue_request_discard_all(this, death);
     }
 
     bool player::only_black_cards_equipped() const {
