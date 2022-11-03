@@ -15,7 +15,7 @@ namespace banggame {
     }
 
     template<> void play_visitor<target_type::none>::play(const play_card_verify &verifier, const effect_holder &effect) {
-        effect.on_play(verifier.origin_card, verifier.origin, effect_flags{});
+        effect.on_play(verifier.origin_card, verifier.origin);
     }
 
     template<> game_string play_visitor<target_type::player>::verify(const play_card_verify &verifier, const effect_holder &effect, player *target) {
@@ -223,7 +223,7 @@ namespace banggame {
 
     template<> void play_visitor<target_type::extra_card>::play(const play_card_verify &verifier, const effect_holder &effect, card *target) {
         if (target) {
-            effect.on_play(verifier.origin_card, verifier.origin, target, effect_flags{});
+            effect.on_play(verifier.origin_card, verifier.origin, target);
         }
     }
 

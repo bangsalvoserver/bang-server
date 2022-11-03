@@ -105,7 +105,7 @@ namespace banggame {
             origin->play_card_action(mod_card);
             for (effect_holder &e : mod_card->effects) {
                 if (e.target == target_type::none) {
-                    e.on_play(mod_card, origin, effect_flags{});
+                    e.on_play(mod_card, origin);
                 } else if (e.target == target_type::self_cubes) {
                     origin->pay_cubes(mod_card, e.target_value);
                 } else {

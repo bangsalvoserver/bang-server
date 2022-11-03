@@ -36,99 +36,68 @@ namespace banggame {
         }, holder.type);
     }
 
-    game_string effect_holder::verify(card *origin_card, player *origin) const {
+    game_string effect_holder::verify(card *origin_card, player *origin, const target_variant &target) const {
         return visit_effect([=](auto &&value) -> game_string {
-            if constexpr (requires { value.verify(origin_card, origin); }) {
-                return value.verify(origin_card, origin);
-            } else if constexpr (requires { value.can_respond(origin_card, origin); }) {
-                if (!value.can_respond(origin_card, origin)) {
-                    return "ERROR_INVALID_RESPONSE";
+            if (std::holds_alternative<std::monostate>(target)) {
+                if constexpr (requires { value.verify(origin_card, origin); }) {
+                    return value.verify(origin_card, origin);
+                } else if constexpr (requires { value.can_respond(origin_card, origin); }) {
+                    if (!value.can_respond(origin_card, origin)) {
+                        return "ERROR_INVALID_RESPONSE";
+                    }
+                }
+            } else if (player * const *target_player = std::get_if<player *>(&target)) {
+                if constexpr (requires { value.verify(origin_card, origin, *target_player); }) {
+                    return value.verify(origin_card, origin, *target_player);
+                }
+            } else if (card * const *target_card = std::get_if<card *>(&target)) {
+                if constexpr (requires { value.verify(origin_card, origin, *target_card); }) {
+                    return value.verify(origin_card, origin, *target_card);
                 }
             }
             return {};
         }, *this);
     }
 
-    game_string effect_holder::verify(card *origin_card, player *origin, player *target) const {
+    game_string effect_holder::on_prompt(card *origin_card, player *origin, const target_variant &target) const {
         return visit_effect([=](auto &&value) -> game_string {
-            if constexpr (requires { value.verify(origin_card, origin, target); }) {
-                return value.verify(origin_card, origin, target);
+            if (std::holds_alternative<std::monostate>(target)) {
+                if constexpr (requires { value.on_prompt(origin_card, origin); }) {
+                    return value.on_prompt(origin_card, origin);
+                }
+            } else if (player * const *target_player = std::get_if<player *>(&target)) {
+                if constexpr (requires { value.on_prompt(origin_card, origin, *target_player); }) {
+                    return value.on_prompt(origin_card, origin, *target_player);
+                }
+            } else if (card * const *target_card = std::get_if<card *>(&target)) {
+                if constexpr (requires { value.on_prompt(origin_card, origin, *target_card); }) {
+                    return value.on_prompt(origin_card, origin, *target_card);
+                }
             }
             return {};
         }, *this);
     }
 
-    game_string effect_holder::verify(card *origin_card, player *origin, card *target) const {
-        return visit_effect([=](auto &&value) -> game_string {
-            if constexpr (requires { value.verify(origin_card, origin, target); }) {
-                return value.verify(origin_card, origin, target);
-            }
-            return {};
-        }, *this);
-    }
-
-    game_string effect_holder::on_prompt(card *origin_card, player *origin) const {
-        return visit_effect([=](auto &&value) -> game_string {
-            if constexpr (requires { value.on_prompt(origin_card, origin); }) {
-                return value.on_prompt(origin_card, origin);
-            } else {
-                return {};
-            }
-        }, *this);
-    }
-
-    game_string effect_holder::on_prompt(card *origin_card, player *origin, player *target) const {
-        return visit_effect([=](auto &&value) -> game_string {
-            if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
-                return value.on_prompt(origin_card, origin, target);
-            } else {
-                return {};
-            }
-        }, *this);
-    }
-
-    game_string effect_holder::on_prompt(card *origin_card, player *origin, card *target) const {
-        return visit_effect([=](auto &&value) -> game_string {
-            if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
-                return value.on_prompt(origin_card, origin, target);
-            } else {
-                return {};
-            }
-        }, *this);
-    }
-
-    void effect_holder::on_play(card *origin_card, player *origin, effect_flags flags) const {
+    void effect_holder::on_play(card *origin_card, player *origin, const target_variant &target, effect_flags flags) const {
         visit_effect([=](auto &&value) {
-            if constexpr (requires { value.on_play(origin_card, origin, flags); }) {
-                value.on_play(origin_card, origin, flags);
-            } else if constexpr (requires { value.on_play(origin_card, origin); }) {
-                value.on_play(origin_card, origin);
-            } else {
-                throw std::runtime_error("missing on_play(origin_card, origin)");
-            }
-        }, *this);
-    }
-
-    void effect_holder::on_play(card *origin_card, player *origin, player *target, effect_flags flags) const {
-        visit_effect([=](auto &&value) {
-            if constexpr (requires { value.on_play(origin_card, origin, target, flags); }) {
-                value.on_play(origin_card, origin, target, flags);
-            } else if constexpr (requires {value.on_play(origin_card, origin, target); }) {
-                value.on_play(origin_card, origin, target);
-            } else {
-                throw std::runtime_error("missing on_play(origin_card, origin, target)");
-            }
-        }, *this);
-    }
-
-    void effect_holder::on_play(card *origin_card, player *origin, card *target, effect_flags flags) const {
-        visit_effect([=](auto &&value) {
-            if constexpr (requires { value.on_play(origin_card, origin, target, flags); }) {
-                value.on_play(origin_card, origin, target, flags);
-            } else if constexpr (requires { value.on_play(origin_card, origin, target); }) {
-                value.on_play(origin_card, origin, target);
-            } else {
-                throw std::runtime_error("missing on_play(origin_card, origin, target_card)");
+            if (std::holds_alternative<std::monostate>(target)) {
+                if constexpr (requires { value.on_play(origin_card, origin, flags); }) {
+                    value.on_play(origin_card, origin, flags);
+                } else if constexpr (requires { value.on_play(origin_card, origin); }) {
+                    value.on_play(origin_card, origin);
+                }
+            } else if (player * const *target_player = std::get_if<player *>(&target)) {
+                if constexpr (requires { value.on_play(origin_card, origin, *target_player, flags); }) {
+                    value.on_play(origin_card, origin, *target_player, flags);
+                } else if constexpr (requires {value.on_play(origin_card, origin, *target_player); }) {
+                    value.on_play(origin_card, origin, *target_player);
+                }
+            } else if (card * const *target_card = std::get_if<card *>(&target)) {
+                if constexpr (requires { value.on_play(origin_card, origin, *target_card, flags); }) {
+                    value.on_play(origin_card, origin, *target_card, flags);
+                } else if constexpr (requires { value.on_play(origin_card, origin, *target_card); }) {
+                    value.on_play(origin_card, origin, *target_card);
+                }
             }
         }, *this);
     }
