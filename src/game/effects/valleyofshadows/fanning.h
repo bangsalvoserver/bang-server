@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct effect_fanning : effect_empty {
+    struct effect_fanning {
         game_string verify(card *origin_card, player *origin);
     };
 

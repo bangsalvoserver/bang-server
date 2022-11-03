@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_bandolier : effect_empty {
+    struct effect_bandolier {
         void on_play(card *origin_card, player *origin);
     };
 }

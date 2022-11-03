@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_move_bomb : effect_empty {
+    struct effect_move_bomb {
         bool can_respond(card *origin_card, player *origin);
     };
 

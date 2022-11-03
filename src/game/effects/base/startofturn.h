@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_startofturn : effect_empty {
+    struct effect_startofturn {
         game_string verify(card *origin_card, player *origin) const;
     };
 }
