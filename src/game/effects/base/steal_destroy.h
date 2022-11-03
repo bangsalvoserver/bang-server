@@ -15,11 +15,13 @@ namespace banggame {
     };
 
     struct effect_discard {
+        void on_play(card *origin_card, player *origin, card *target);
+    };
+
+    struct effect_destroy: prompt_target_self_hand {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };
-
-    struct effect_destroy : effect_discard, prompt_target_self_hand {};
 
     struct request_targeting : request_base {
         request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})

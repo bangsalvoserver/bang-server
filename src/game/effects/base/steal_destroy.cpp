@@ -20,7 +20,7 @@ namespace banggame {
     }
 
     void effect_steal::on_resolve(card *origin_card, player *origin, card *target_card) {
-        origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
+        origin->m_game->call_event<event_type::on_destroy_card>(origin, target_card->owner, target_card);
         origin->m_game->queue_action_front([=]{
             if (origin->alive() && target_card->owner) {
                 auto priv_target = update_target::includes(origin, target_card->owner);
@@ -81,17 +81,21 @@ namespace banggame {
         }
     }
 
-    void effect_discard::on_resolve(card *origin_card, player *origin, card *target_card) {
-        origin->m_game->call_event<event_type::on_discard_card>(origin, target_card->owner, target_card);
-        origin->m_game->queue_action_front([=]{
-            if (origin->alive() && target_card->owner) {
-                if (origin != target_card->owner) {
-                    origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
-                } else {
-                    origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
-                }
-                target_card->owner->discard_card(target_card);
+    void effect_discard::on_play(card *origin_card, player *origin, card *target_card) {
+        if (origin->alive() && target_card->owner) {
+            if (origin != target_card->owner) {
+                origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
+            } else {
+                origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
             }
+            target_card->owner->discard_card(target_card);
+        }
+    }
+
+    void effect_destroy::on_resolve(card *origin_card, player *origin, card *target_card) {
+        origin->m_game->call_event<event_type::on_destroy_card>(origin, target_card->owner, target_card);
+        origin->m_game->queue_action_front([=]{
+            effect_discard{}.on_play(origin_card, origin, target_card);
         });
     }
     
@@ -121,7 +125,7 @@ namespace banggame {
         }
     };
     
-    void effect_discard::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
+    void effect_destroy::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
         if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
             origin->m_game->queue_action([=]{
                 origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);

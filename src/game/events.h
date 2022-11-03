@@ -61,7 +61,7 @@ namespace banggame {
         EVENT(on_draw_check_select, player *origin, card *origin_card, card *drawn_card, bool &auto_resolve)
 
         // viene chiamato quando si scarta VOLONTARIAMENTE una carta (si gioca cat balou o panico contro una carta)
-        EVENT(on_discard_card, player *origin, player *target, card *target_card)
+        EVENT(on_destroy_card, player *origin, player *target, card *target_card)
 
         // viene chiamato quando una carta arancione viene scartata perche' sono finiti i cubetti
         EVENT(on_discard_orange_card, player *target, card *target_card)
