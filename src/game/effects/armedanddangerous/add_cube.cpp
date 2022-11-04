@@ -12,12 +12,14 @@ namespace banggame {
         int ncubes = 1;
         
         bool can_pick(card *target_card) const override {
-            if (target_card->pocket == pocket_type::player_character) {
-                target_card = target->m_characters.front();
-            } else if (target_card->pocket != pocket_type::player_table || target_card->color != card_color_type::orange) {
-                return false;
+            if (target_card->owner == target) {
+                if (target_card->pocket == pocket_type::player_table && target_card->color == card_color_type::orange) {
+                    return target_card->num_cubes < max_cubes;
+                } else if (target_card->pocket == pocket_type::player_character) {
+                    return target->m_characters.front()->num_cubes < max_cubes;
+                }
             }
-            return target_card->owner == target && target_card->num_cubes < max_cubes;
+            return false;
         }
 
         void on_pick(card *target_card) override {
