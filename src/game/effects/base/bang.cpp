@@ -10,7 +10,8 @@ namespace banggame {
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
-    static void queue_request_bang(std::shared_ptr<request_bang> &&req) {
+    static void queue_request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {}) {
+        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags | effect_flags::is_bang | effect_flags::single_target);
         req->origin->m_game->call_event<event_type::apply_bang_modifier>(req->origin, req.get());
         req->origin->m_game->queue_action([req = std::move(req)]() mutable {
             if (!req->target->immune_to(req->origin_card, req->origin, req->flags)) {
@@ -21,52 +22,13 @@ namespace banggame {
 
     void handler_bangcard::on_play(card *origin_card, player *origin, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
-        queue_request_bang(std::make_shared<request_bang>(origin_card, origin, target, effect_flags::is_bang | effect_flags::single_target));
+        queue_request_bang(origin_card, origin, target);
     }
-
-    game_string request_bang::status_text(player *owner) const {
-        if (target != owner) {
-            return {"STATUS_BANG_OTHER", target, origin_card};
-        } else if (bang_strength > 1) {
-            if (bang_damage > 1) {
-                return {"STATUS_BANG_DAMAGE_STRONG", origin_card, bang_strength, bang_damage};
-            } else {
-                return {"STATUS_BANG_STRONG", origin_card, bang_strength};
-            }
-        } else {
-            if (bang_damage > 1) {
-                return {"STATUS_BANG_DAMAGE", origin_card, bang_damage};
-            } else {
-                return {"STATUS_BANG", origin_card};
-            }
-        }
-    }
-    struct request_card_as_bang : request_bang {
-        using request_bang::request_bang;
-        game_string status_text(player *owner) const override {
-            if (target != owner) {
-                return {"STATUS_CARD_AS_BANG_OTHER", target, origin_card};
-            } else if (bang_strength > 1) {
-                if (bang_damage > 1) {
-                    return {"STATUS_CARD_AS_BANG_DAMAGE_STRONG", origin_card, bang_strength, bang_damage};
-                } else {
-                    return {"STATUS_CARD_AS_BANG_STRONG", origin_card, bang_strength};
-                }
-            } else {
-                if (bang_damage > 1) {
-                    return {"STATUS_CARD_AS_BANG_DAMAGE", origin_card, bang_damage};
-                } else {
-                    return {"STATUS_CARD_AS_BANG", origin_card};
-                }
-            }
-        }
-    };
 
     void handler_play_as_bang::on_play(card *origin_card, player *origin, card *chosen_card, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
         origin->discard_card(chosen_card);
-        queue_request_bang(std::make_shared<request_card_as_bang>(chosen_card, origin, target,
-            effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::single_target));
+        queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
     }
     
     game_string effect_banglimit::verify(card *origin_card, player *origin) {
@@ -116,6 +78,42 @@ namespace banggame {
     void request_bang::set_unavoidable() {
         unavoidable = true;
         flags |= effect_flags::auto_respond;
+    }
+
+    game_string request_bang::status_text(player *owner) const {
+        if (bool(flags & effect_flags::play_as_bang)) {
+            if (target != owner) {
+                return {"STATUS_CARD_AS_BANG_OTHER", target, origin_card};
+            } else if (bang_strength > 1) {
+                if (bang_damage > 1) {
+                    return {"STATUS_CARD_AS_BANG_DAMAGE_STRONG", origin_card, bang_strength, bang_damage};
+                } else {
+                    return {"STATUS_CARD_AS_BANG_STRONG", origin_card, bang_strength};
+                }
+            } else {
+                if (bang_damage > 1) {
+                    return {"STATUS_CARD_AS_BANG_DAMAGE", origin_card, bang_damage};
+                } else {
+                    return {"STATUS_CARD_AS_BANG", origin_card};
+                }
+            }
+        } else {
+            if (target != owner) {
+                return {"STATUS_BANG_OTHER", target, origin_card};
+            } else if (bang_strength > 1) {
+                if (bang_damage > 1) {
+                    return {"STATUS_BANG_DAMAGE_STRONG", origin_card, bang_strength, bang_damage};
+                } else {
+                    return {"STATUS_BANG_STRONG", origin_card, bang_strength};
+                }
+            } else {
+                if (bang_damage > 1) {
+                    return {"STATUS_BANG_DAMAGE", origin_card, bang_damage};
+                } else {
+                    return {"STATUS_BANG", origin_card};
+                }
+            }
+        }
     }
 
 }
