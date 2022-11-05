@@ -23,16 +23,41 @@ namespace banggame {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         queue_request_bang(std::make_shared<request_bang>(origin_card, origin, target, effect_flags::is_bang | effect_flags::single_target));
     }
-    
+
+    game_string request_bang::status_text(player *owner) const {
+        if (target != owner) {
+            return {"STATUS_BANG_OTHER", target, origin_card};
+        } else if (bang_strength > 1) {
+            if (bang_damage > 1) {
+                return {"STATUS_BANG_DAMAGE_STRONG", origin_card, bang_strength, bang_damage};
+            } else {
+                return {"STATUS_BANG_STRONG", origin_card, bang_strength};
+            }
+        } else {
+            if (bang_damage > 1) {
+                return {"STATUS_BANG_DAMAGE", origin_card, bang_damage};
+            } else {
+                return {"STATUS_BANG", origin_card};
+            }
+        }
+    }
     struct request_card_as_bang : request_bang {
         using request_bang::request_bang;
         game_string status_text(player *owner) const override {
             if (target != owner) {
                 return {"STATUS_CARD_AS_BANG_OTHER", target, origin_card};
             } else if (bang_strength > 1) {
-                return {"STATUS_CARD_AS_BANG_MULTIPLE_MISSED", origin_card, bang_strength};
+                if (bang_damage > 1) {
+                    return {"STATUS_CARD_AS_BANG_DAMAGE_STRONG", origin_card, bang_strength, bang_damage};
+                } else {
+                    return {"STATUS_CARD_AS_BANG_STRONG", origin_card, bang_strength};
+                }
             } else {
-                return {"STATUS_CARD_AS_BANG", origin_card};
+                if (bang_damage > 1) {
+                    return {"STATUS_CARD_AS_BANG_DAMAGE", origin_card, bang_damage};
+                } else {
+                    return {"STATUS_CARD_AS_BANG", origin_card};
+                }
             }
         }
     };
@@ -40,7 +65,8 @@ namespace banggame {
     void handler_play_as_bang::on_play(card *origin_card, player *origin, card *chosen_card, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
         origin->discard_card(chosen_card);
-        queue_request_bang(std::make_shared<request_card_as_bang>(chosen_card, origin, target, effect_flags::is_bang | effect_flags::single_target));
+        queue_request_bang(std::make_shared<request_card_as_bang>(chosen_card, origin, target,
+            effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::single_target));
     }
     
     game_string effect_banglimit::verify(card *origin_card, player *origin) {
@@ -90,16 +116,6 @@ namespace banggame {
     void request_bang::set_unavoidable() {
         unavoidable = true;
         flags |= effect_flags::auto_respond;
-    }
-
-    game_string request_bang::status_text(player *owner) const {
-        if (target != owner) {
-            return {"STATUS_BANG_OTHER", target, origin_card};
-        } else if (bang_strength > 1) {
-            return {"STATUS_BANG_MULTIPLE_MISSED", origin_card, bang_strength};
-        } else {
-            return {"STATUS_BANG", origin_card};
-        }
     }
 
 }

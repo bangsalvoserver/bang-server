@@ -164,6 +164,7 @@ namespace banggame {
 
     DEFINE_ENUM_FLAGS(effect_flags,
         (is_bang)
+        (play_as_bang)
         (escapable)
         (single_target)
         (auto_pick)

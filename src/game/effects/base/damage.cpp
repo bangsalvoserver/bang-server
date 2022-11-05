@@ -41,7 +41,19 @@ namespace banggame {
     }
 
     game_string timer_damaging::status_text(player *owner) const {
-        return {damage > 1 ? "STATUS_DAMAGING_PLURAL" : "STATUS_DAMAGING", target, origin_card, damage};
+        if (bool(flags & effect_flags::play_as_bang)) {
+            if (damage > 1) {
+                return {"STATUS_DAMAGING_AS_BANG_PLURAL", target, origin_card, damage};
+            } else {
+                return {"STATUS_DAMAGING_AS_BANG", target, origin_card};
+            }
+        } else {
+            if (damage > 1) {
+                return {"STATUS_DAMAGING_PLURAL", target, origin_card, damage};
+            } else {
+                return {"STATUS_DAMAGING", target, origin_card};
+            }
+        }
     }
 
 }
