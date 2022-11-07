@@ -14,11 +14,11 @@ namespace banggame{
             return std::move(value);
         }
 
-        game_format_arg operator()(player *value) const {
+        game_format_arg operator()(not_null<player *> value) const {
             return value;
         }
 
-        game_format_arg operator()(card *value) const {
+        game_format_arg operator()(not_null<card *> value) const {
             return card_format_id{value->name, value->sign};
         }
     };
