@@ -1,42 +1,10 @@
 #ifndef __MANAGER_H__
 #define __MANAGER_H__
 
-#include <json/json.h>
-
-#include "net_options.h"
-#include "messages.h"
-
-#include "game.h"
-#include "durations.h"
+#include "lobby.h"
+#include "chat_commands.h"
 
 namespace banggame {
-
-class game_manager;
-struct game_user;
-
-using client_handle = std::weak_ptr<void>;
-using user_map = std::map<client_handle, game_user, std::owner_less<client_handle>>;
-using user_ptr = user_map::iterator;
-
-struct lobby : lobby_info {
-    std::vector<user_ptr> users;
-    lobby_state state;
-    ticks lifetime = lobby_lifetime;
-
-    banggame::game game;
-    void start_game(game_manager &mgr);
-    void send_updates(game_manager &mgr);
-};
-
-using lobby_map = std::map<int, lobby>;
-using lobby_ptr = lobby_map::iterator;
-
-struct game_user {
-    int user_id;
-    std::string name;
-    sdl::image_pixels profile_image;
-    std::optional<lobby_ptr> in_lobby;
-};
 
 template<server_message_type E>
 server_message make_message(auto && ... args) {
@@ -106,6 +74,8 @@ private:
         }
     }
 
+    void kick_user_from_lobby(user_ptr user);
+
     std::string handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
     std::string handle_message(MSG_TAG(lobby_list),     user_ptr user);
     std::string handle_message(MSG_TAG(lobby_make),     user_ptr user, const lobby_info &value);
@@ -117,6 +87,12 @@ private:
     std::string handle_message(MSG_TAG(lobby_return),   user_ptr user);
     std::string handle_message(MSG_TAG(game_start),     user_ptr user);
     std::string handle_message(MSG_TAG(game_action),    user_ptr user, const Json::Value &value);
+
+    std::string handle_chat_command(user_ptr user, const std::string &command);
+
+    std::string command_print_help(user_ptr user);
+    std::string command_print_users(user_ptr user);
+    std::string command_kick_user(user_ptr user, std::string_view userid);
 
 private:
     user_map users;
@@ -130,6 +106,7 @@ private:
     kick_client_function m_kick_client;
 
     friend struct lobby;
+    friend class chat_command;
 };
 
 }

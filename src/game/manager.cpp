@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <sstream>
 #include <fstream>
 #include <iomanip>
 #include <ctime>
@@ -191,22 +192,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
     return {};
 }
 
-void game_manager::client_disconnected(client_handle client) {
-    if (auto it = users.find(client); it != users.end()) {
-        handle_message(MSG_TAG(lobby_leave){}, it);
-        users.erase(it);
-    }
-}
-
-bool game_manager::client_validated(client_handle client) const {
-    return users.find(client) != users.end();
-}
-
-std::string game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
-    if (!user->second.in_lobby) {
-        return "ERROR_PLAYER_NOT_IN_LOBBY";
-    }
-
+void game_manager::kick_user_from_lobby(user_ptr user) {
     auto lobby_it = *user->second.in_lobby;
     auto &lobby = lobby_it->second;
     user->second.in_lobby.reset();
@@ -232,6 +218,27 @@ std::string game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
     } else if (is_owner) {
         broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front()->second.user_id);
     }
+}
+
+void game_manager::client_disconnected(client_handle client) {
+    if (auto it = users.find(client); it != users.end()) {
+        if (it->second.in_lobby) {
+            kick_user_from_lobby(it);
+        }
+        users.erase(it);
+    }
+}
+
+bool game_manager::client_validated(client_handle client) const {
+    return users.find(client) != users.end();
+}
+
+std::string game_manager::handle_message(MSG_TAG(lobby_leave), user_ptr user) {
+    if (!user->second.in_lobby) {
+        return "ERROR_PLAYER_NOT_IN_LOBBY";
+    }
+
+    kick_user_from_lobby(user);
 
     return {};
 }
@@ -240,9 +247,45 @@ std::string game_manager::handle_message(MSG_TAG(lobby_chat), user_ptr user, con
     if (!user->second.in_lobby) {
         return "ERROR_PLAYER_NOT_IN_LOBBY";
     }
-    auto &lobby = (*user->second.in_lobby)->second;
-    broadcast_message_lobby<server_message_type::lobby_chat>(lobby, user->second.user_id, value.message);
+    if (!value.message.empty()) {
+        auto &lobby = (*user->second.in_lobby)->second;
+        broadcast_message_lobby<server_message_type::lobby_chat>(lobby, user->second.user_id, value.message);
+        if (value.message[0] == chat_command::start_char) {
+            return handle_chat_command(user, value.message.substr(1));
+        }
+    }
     return {};
+}
+
+std::string game_manager::handle_chat_command(user_ptr user, const std::string &message) {
+    size_t space_pos = message.find_first_of(" \t");
+    auto cmd_name = std::string_view(message).substr(0, space_pos);
+    auto cmd_it = chat_command::commands.find(cmd_name);
+    if (cmd_it == chat_command::commands.end()) {
+        return "INVALID_COMMAND_NAME";
+    }
+
+    auto &command = cmd_it->second;
+
+    if (bool(command.permissions() & command_permissions::lobby_owner)) {
+        auto &lobby = (*user->second.in_lobby)->second;
+        if (user != lobby.users.front()) {
+            return "ERROR_PLAYER_NOT_LOBBY_OWNER";
+        }
+    }
+
+    std::vector<std::string> args;
+
+    if (space_pos != std::string::npos) {
+        std::istringstream stream(message.substr(space_pos));
+        std::string token;
+
+        while (stream >> std::quoted(token)) {
+            args.push_back(token);
+        }
+    }
+
+    return command(this, user, args);
 }
 
 std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {

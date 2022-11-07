@@ -167,6 +167,7 @@ set(bangserver_srcs
     src/game/effects/card_effect.cpp
 
     src/game/card_serial.cpp
+    src/game/chat_commands.cpp
     src/game/filters.cpp
     src/game/holders.cpp
     src/game/game.cpp

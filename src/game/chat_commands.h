@@ -1,0 +1,80 @@
+#ifndef __CHAT_COMMANDS_H__
+#define __CHAT_COMMANDS_H__
+
+#include "lobby.h"
+
+namespace banggame {
+
+    DEFINE_ENUM_FLAGS(command_permissions,
+        (lobby_owner)
+    )
+
+    template<auto FnMemPtr> struct proxy_t {
+        static constexpr auto value = FnMemPtr;
+    };
+
+    template<auto FnMemPtr> static constexpr proxy_t<FnMemPtr> proxy;
+
+    template<typename FnMemPtr> struct argument_number;
+
+    template<typename ... Args>
+    struct argument_number<std::string (game_manager::* const)(user_ptr, Args...)> {
+        static constexpr size_t value = sizeof...(Args);
+    };
+
+    using manager_fn = std::string (*)(game_manager *, user_ptr, std::span<std::string>);
+
+    class chat_command {
+    public:
+        static constexpr char start_char = '/';
+        static const std::map<std::string, chat_command, std::less<>> commands;
+
+    private:
+        manager_fn m_fun;
+        std::string_view m_description;
+        command_permissions m_permissions;
+        int m_nargs;
+
+        template<typename Proxy, size_t ... Is>
+        static std::string call_manager_fun_impl(game_manager *mgr, user_ptr user, std::span<std::string> args, std::index_sequence<Is...>) {
+            if (args.size() == sizeof...(Is)) {
+                return (mgr->*Proxy::value)(user, args[Is]...);
+            } else {
+                return "INVALID_ARGUMENT_NUMBER";
+            }
+        }
+
+        template<typename Proxy>
+        static std::string call_manager_fun(game_manager *mgr, user_ptr user, std::span<std::string> args) {
+            return call_manager_fun_impl<Proxy>(mgr, user, args,
+                std::make_index_sequence<argument_number<decltype(Proxy::value)>::value>());
+        }
+
+    public:
+        template<typename Proxy>
+        chat_command(Proxy, std::string_view description, command_permissions permissions = {})
+            : m_fun(call_manager_fun<Proxy>)
+            , m_description(description)
+            , m_permissions(permissions)
+            , m_nargs(argument_number<decltype(Proxy::value)>::value) {}
+
+        std::string operator()(game_manager *mgr, user_ptr user, std::span<std::string> args) const {
+            return (*m_fun)(mgr, user, args);
+        }
+
+        std::string_view description() const {
+            return m_description;
+        }
+
+        command_permissions permissions() const {
+            return m_permissions;
+        }
+
+        int nargs() const {
+            return m_nargs;
+        }
+    };
+
+}
+
+#endif
