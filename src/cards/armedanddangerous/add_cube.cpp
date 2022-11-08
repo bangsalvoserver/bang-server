@@ -6,7 +6,7 @@ namespace banggame {
     
     struct request_add_cube : request_base {
         request_add_cube(card *origin_card, player *target, int ncubes = 1)
-            : request_base(origin_card, nullptr, target)
+            : request_base(origin_card, nullptr, target, effect_flags::auto_pick)
             , ncubes(ncubes) {}
 
         int ncubes = 1;
