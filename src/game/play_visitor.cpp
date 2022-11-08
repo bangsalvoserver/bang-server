@@ -2,23 +2,23 @@
 
 namespace banggame {
 
-    template<> game_string play_visitor<target_type::none>::verify(const play_card_verify &verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::none>::verify() {
         return effect.verify(verifier.origin_card, verifier.origin);
     }
 
-    template<> game_string play_visitor<target_type::none>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect) {
+    template<> duplicate_set play_visitor<target_type::none>::duplicates() {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::none>::prompt(const play_card_verify &verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::none>::prompt() {
         return effect.on_prompt(verifier.origin_card, verifier.origin);
     }
 
-    template<> void play_visitor<target_type::none>::play(const play_card_verify &verifier, const effect_holder &effect) {
+    template<> void play_visitor<target_type::none>::play() {
         effect.on_play(verifier.origin_card, verifier.origin);
     }
 
-    template<> game_string play_visitor<target_type::player>::verify(const play_card_verify &verifier, const effect_holder &effect, player *target) {
+    template<> game_string play_visitor<target_type::player>::verify(player *target) {
         if (auto error = check_player_filter(verifier.origin, effect.player_filter, target)) {
             return error;
         } else {
@@ -26,19 +26,15 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::player>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect, player *target) {
-        if (!selected.players.emplace(target).second) {
-            return {"ERROR_DUPLICATE_PLAYER", target};
-        } else {
-            return {};
-        }
+    template<> duplicate_set play_visitor<target_type::player>::duplicates(player *target) {
+        return player_set{target};
     }
 
-    template<> game_string play_visitor<target_type::player>::prompt(const play_card_verify &verifier, const effect_holder &effect, player *target) {
+    template<> game_string play_visitor<target_type::player>::prompt(player *target) {
         return effect.on_prompt(verifier.origin_card, verifier.origin, target);
     }
 
-    template<> void play_visitor<target_type::player>::play(const play_card_verify &verifier, const effect_holder &effect, player *target) {
+    template<> void play_visitor<target_type::player>::play(player *target) {
         auto flags = effect_flags::single_target;
         if (verifier.origin_card->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
@@ -48,9 +44,9 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::conditional_player>::verify(const play_card_verify &verifier, const effect_holder &effect, player *target) {
+    template<> game_string play_visitor<target_type::conditional_player>::verify(player *target) {
         if (target) {
-            return play_visitor<target_type::player>{}.verify(verifier, effect, target);
+            return play_visitor<target_type::player>{verifier, effect}.verify(target);
         } else if (!verifier.origin->make_player_target_set(verifier.origin_card, effect).empty()) {
             return "ERROR_TARGET_SET_NOT_EMPTY";
         } else {
@@ -58,29 +54,29 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::conditional_player>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect, player *target) {
-        if (target && !selected.players.emplace(target).second) {
-            return {"ERROR_DUPLICATE_PLAYER", target};
+    template<> duplicate_set play_visitor<target_type::conditional_player>::duplicates(player *target) {
+        if (target) {
+            return player_set{target};
         } else {
             return {};
         }
     }
 
-    template<> game_string play_visitor<target_type::conditional_player>::prompt(const play_card_verify &verifier, const effect_holder &effect, player *target) {
+    template<> game_string play_visitor<target_type::conditional_player>::prompt(player *target) {
         if (target) {
-            return play_visitor<target_type::player>{}.prompt(verifier, effect, target);
+            return play_visitor<target_type::player>{verifier, effect}.prompt(target);
         } else {
             return {};
         }
     }
 
-    template<> void play_visitor<target_type::conditional_player>::play(const play_card_verify &verifier, const effect_holder &effect, player *target) {
+    template<> void play_visitor<target_type::conditional_player>::play(player *target) {
         if (target) {
-            play_visitor<target_type::player>{}.play(verifier, effect, target);
+            play_visitor<target_type::player>{verifier, effect}.play(target);
         }
     }
 
-    template<> game_string play_visitor<target_type::other_players>::verify(const play_card_verify &verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::other_players>::verify() {
         for (player &p : range_other_players(verifier.origin)) {
             if (game_string error = effect.verify(verifier.origin_card, verifier.origin, &p)) {
                 return error;
@@ -89,11 +85,11 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::other_players>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect) {
+    template<> duplicate_set play_visitor<target_type::other_players>::duplicates() {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::other_players>::prompt(const play_card_verify &verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::other_players>::prompt() {
         game_string msg;
         for (player &p : range_other_players(verifier.origin)) {
             msg = effect.on_prompt(verifier.origin_card, verifier.origin, &p);
@@ -102,7 +98,7 @@ namespace banggame {
         return msg;
     }
 
-    template<> void play_visitor<target_type::other_players>::play(const play_card_verify &verifier, const effect_holder &effect) {
+    template<> void play_visitor<target_type::other_players>::play() {
         auto targets = range_other_players(verifier.origin);
         
         effect_flags flags{};
@@ -119,7 +115,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::all_players>::verify(const play_card_verify &verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::all_players>::verify() {
         for (player &p : range_all_players(verifier.origin)) {
             if (game_string error = effect.verify(verifier.origin_card, verifier.origin, &p)) {
                 return error;
@@ -128,11 +124,11 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::all_players>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect) {
+    template<> duplicate_set play_visitor<target_type::all_players>::duplicates() {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::all_players>::prompt(const play_card_verify &verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::all_players>::prompt() {
         game_string msg;
         for (player &p : range_all_players(verifier.origin)) {
             msg = effect.on_prompt(verifier.origin_card, verifier.origin, &p);
@@ -141,7 +137,7 @@ namespace banggame {
         return msg;
     }
 
-    template<> void play_visitor<target_type::all_players>::play(const play_card_verify &verifier, const effect_holder &effect) {
+    template<> void play_visitor<target_type::all_players>::play() {
         effect_flags flags{};
         if (verifier.origin_card->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
@@ -153,7 +149,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::card>::verify(const play_card_verify &verifier, const effect_holder &effect, card *target) {
+    template<> game_string play_visitor<target_type::card>::verify(card *target) {
         if (!target->owner) {
             return "ERROR_CARD_HAS_NO_OWNER";
         } else if (auto error = check_player_filter(verifier.origin, effect.player_filter, target->owner)) {
@@ -165,19 +161,19 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::card>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect, card *target) {
-        if (!bool(effect.card_filter & target_card_filter::can_repeat) && !selected.cards.emplace(target).second) {
-            return {"ERROR_DUPLICATE_CARD", target};
-        } else {
+    template<> duplicate_set play_visitor<target_type::card>::duplicates(card *target) {
+        if (bool(effect.card_filter & target_card_filter::can_repeat)) {
             return {};
+        } else {
+            return card_set{target};
         }
     }
 
-    template<> game_string play_visitor<target_type::card>::prompt(const play_card_verify &verifier, const effect_holder &effect, card *target) {
+    template<> game_string play_visitor<target_type::card>::prompt(card *target) {
         return effect.on_prompt(verifier.origin_card, verifier.origin, target);
     }
 
-    template<> void play_visitor<target_type::card>::play(const play_card_verify &verifier, const effect_holder &effect, card *target) {
+    template<> void play_visitor<target_type::card>::play(card *target) {
         auto flags = effect_flags::single_target;
         if (verifier.origin_card->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
@@ -193,7 +189,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::extra_card>::verify(const play_card_verify &verifier, const effect_holder &effect, card *target) {
+    template<> game_string play_visitor<target_type::extra_card>::verify(card *target) {
         if (!target) {
             if (verifier.origin_card != verifier.origin->m_last_played_card) {
                 return "ERROR_TARGET_SET_NOT_EMPTY";
@@ -201,19 +197,19 @@ namespace banggame {
                 return {};
             }
         } else {
-            return play_visitor<target_type::card>{}.verify(verifier, effect, target);
+            return play_visitor<target_type::card>{verifier, effect}.verify(target);
         }
     }
 
-    template<> game_string play_visitor<target_type::extra_card>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect, card *target) {
-        if (target && !bool(effect.card_filter & target_card_filter::can_repeat) && !selected.cards.emplace(target).second) {
-            return {"ERROR_DUPLICATE_CARD", target};
-        } else {
+    template<> duplicate_set play_visitor<target_type::extra_card>::duplicates(card *target) {
+        if (!target || bool(effect.card_filter & target_card_filter::can_repeat)) {
             return {};
+        } else {
+            return card_set{target};
         }
     }
 
-    template<> game_string play_visitor<target_type::extra_card>::prompt(const play_card_verify &verifier, const effect_holder &effect, card *target) {
+    template<> game_string play_visitor<target_type::extra_card>::prompt(card *target) {
         if (target) {
             return effect.on_prompt(verifier.origin_card, verifier.origin, target);
         } else {
@@ -221,49 +217,55 @@ namespace banggame {
         }
     }
 
-    template<> void play_visitor<target_type::extra_card>::play(const play_card_verify &verifier, const effect_holder &effect, card *target) {
+    template<> void play_visitor<target_type::extra_card>::play(card *target) {
         if (target) {
             effect.on_play(verifier.origin_card, verifier.origin, target);
         }
     }
 
-    template<> game_string play_visitor<target_type::cards>::verify(const play_card_verify &verifier, const effect_holder &effect, const std::vector<not_null<card *>> &targets) {
+    template<> game_string play_visitor<target_type::cards>::verify(const std::vector<not_null<card *>> &targets) {
         if (targets.size() != std::max<size_t>(1, effect.target_value)) {
             return "ERROR_INVALID_TARGETS";
         }
+        std::set<card *> duplicates;
         for (card *c : targets) {
-            if (game_string err = play_visitor<target_type::card>{}.verify(verifier, effect, c)) {
+            if (!bool(effect.card_filter & target_card_filter::can_repeat) && !duplicates.emplace(c).second) {
+                return {"ERROR_DUPLICATE_CARD", c};
+            } else if (game_string err = play_visitor<target_type::card>{verifier, effect}.verify(c)) {
                 return err;
             }
         }
         return {};
     }
 
-    template<> game_string play_visitor<target_type::cards>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect, const std::vector<not_null<card *>> &targets) {
-        for (card *target : targets) {
-            if (!bool(effect.card_filter & target_card_filter::can_repeat) && !selected.cards.emplace(target).second) {
-                return {"ERROR_DUPLICATE_CARD", target};
+    template<> duplicate_set play_visitor<target_type::cards>::duplicates(const std::vector<not_null<card *>> &targets) {
+        if (bool(effect.card_filter & target_card_filter::can_repeat)) {
+            card_set ret;
+            for (card *target : targets) {
+                ret.emplace(target);
             }
+            return ret;
+        } else {
+            return {};
         }
-        return {};
     }
 
-    template<> game_string play_visitor<target_type::cards>::prompt(const play_card_verify &verifier, const effect_holder &effect, const std::vector<not_null<card *>> &targets) {
+    template<> game_string play_visitor<target_type::cards>::prompt(const std::vector<not_null<card *>> &targets) {
         for (card *c : targets) {
-            if (game_string err = play_visitor<target_type::card>{}.prompt(verifier, effect, c)) {
+            if (game_string err = play_visitor<target_type::card>{verifier, effect}.prompt(c)) {
                 return err;
             }
         }
         return {};
     }
 
-    template<> void play_visitor<target_type::cards>::play(const play_card_verify &verifier, const effect_holder &effect, const std::vector<not_null<card *>> &targets) {
+    template<> void play_visitor<target_type::cards>::play(const std::vector<not_null<card *>> &targets) {
         for (card *c : targets) {
-            play_visitor<target_type::card>{}.play(verifier, effect, c);
+            play_visitor<target_type::card>{verifier, effect}.play(c);
         }
     }
 
-    template<> game_string play_visitor<target_type::cards_other_players>::verify(const play_card_verify &verifier, const effect_holder &effect, const std::vector<not_null<card *>> &target_cards) {
+    template<> game_string play_visitor<target_type::cards_other_players>::verify(const std::vector<not_null<card *>> &target_cards) {
         if (!std::ranges::all_of(verifier.origin->m_game->m_players | std::views::filter(&player::alive), [&](const player &p) {
             size_t found = std::ranges::count(target_cards, &p, &card::owner);
             if (p.m_hand.empty() && p.m_table.empty()) return found == 0;
@@ -281,11 +283,11 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::cards_other_players>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect, const std::vector<not_null<card *>> &target_cards) {
+    template<> duplicate_set play_visitor<target_type::cards_other_players>::duplicates(const std::vector<not_null<card *>> &target_cards) {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::cards_other_players>::prompt(const play_card_verify &verifier, const effect_holder &effect, const std::vector<not_null<card *>> &target_cards) {
+    template<> game_string play_visitor<target_type::cards_other_players>::prompt(const std::vector<not_null<card *>> &target_cards) {
         game_string msg;
         for (card *target_card : target_cards) {
             msg = effect.on_prompt(verifier.origin_card, verifier.origin, target_card);
@@ -294,7 +296,7 @@ namespace banggame {
         return msg;
     }
 
-    template<> void play_visitor<target_type::cards_other_players>::play(const play_card_verify &verifier, const effect_holder &effect, const std::vector<not_null<card *>> &target_cards) {
+    template<> void play_visitor<target_type::cards_other_players>::play(const std::vector<not_null<card *>> &target_cards) {
         effect_flags flags{};
         if (verifier.origin_card->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
@@ -311,7 +313,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::select_cubes>::verify(const play_card_verify &verifier, const effect_holder &effect, const std::vector<not_null<card *>> &target_cards) {
+    template<> game_string play_visitor<target_type::select_cubes>::verify(const std::vector<not_null<card *>> &target_cards) {
         if (effect.type != effect_type::pay_cube) {
             return "ERROR_INVALID_EFFECT_TYPE";
         }
@@ -323,38 +325,36 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::select_cubes>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect, const std::vector<not_null<card *>> &target_cards) {
+    template<> duplicate_set play_visitor<target_type::select_cubes>::duplicates(const std::vector<not_null<card *>> &target_cards) {
+        card_cube_count ret;
         for (card *target : target_cards) {
-            if (++selected.cubes[target] > target->num_cubes) {
-                return {"ERROR_NOT_ENOUGH_CUBES_ON", target};
-            }
+            ++ret[target];
         }
+        return ret;
+    }
+
+    template<> game_string play_visitor<target_type::select_cubes>::prompt(const std::vector<not_null<card *>> &target_cards) {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::select_cubes>::prompt(const play_card_verify &verifier, const effect_holder &effect, const std::vector<not_null<card *>> &target_cards) {
-        return {};
-    }
+    template<> void play_visitor<target_type::select_cubes>::play(const std::vector<not_null<card *>> &target_cards) {}
 
-    template<> void play_visitor<target_type::select_cubes>::play(const play_card_verify &verifier, const effect_holder &effect, const std::vector<not_null<card *>> &target_cards) {}
-
-    template<> game_string play_visitor<target_type::self_cubes>::verify(const play_card_verify &verifier, const effect_holder &effect) {
+    template<> game_string play_visitor<target_type::self_cubes>::verify() {
         if (effect.type != effect_type::pay_cube) {
             return "ERROR_INVALID_EFFECT_TYPE";
         }
         return {};
     }
 
-    template<> game_string play_visitor<target_type::self_cubes>::verify_duplicates(const play_card_verify &verifier, duplicate_sets &selected, const effect_holder &effect) {
-        if ((selected.cubes[verifier.origin_card] += effect.target_value) > verifier.origin_card->num_cubes) {
-            return {"ERROR_NOT_ENOUGH_CUBES_ON", verifier.origin_card};
-        }
+    template<> duplicate_set play_visitor<target_type::self_cubes>::duplicates() {
+        return card_cube_count{
+            {verifier.origin_card, effect.target_value}
+        };
+    }
+
+    template<> game_string play_visitor<target_type::self_cubes>::prompt() {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::self_cubes>::prompt(const play_card_verify &verifier, const effect_holder &effect) {
-        return {};
-    }
-
-    template<> void play_visitor<target_type::self_cubes>::play(const play_card_verify &verifier, const effect_holder &effect) {}
+    template<> void play_visitor<target_type::self_cubes>::play() {}
 }

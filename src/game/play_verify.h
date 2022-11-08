@@ -34,12 +34,6 @@ namespace banggame {
         game_string verify_and_play();
     };
 
-    struct duplicate_sets {
-        std::set<player *> players;
-        std::set<card *> cards;
-        std::map<card *, int> cubes;
-    };
-
 }
 
 #endif
