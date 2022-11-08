@@ -8,8 +8,7 @@
 #include <iomanip>
 #include <ctime>
 
-#include "utils/json_serial.h"
-#include "net/git_version.h"
+#include "git_version.h"
 
 using namespace banggame;
 

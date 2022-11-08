@@ -4,8 +4,8 @@
 #include "wsserver.h"
 #include "wsconnection.h"
 
-#include "game/manager.h"
-#include "game/net_options.h"
+#include "manager.h"
+#include "options.h"
 
 #include <iostream>
 #include <thread>

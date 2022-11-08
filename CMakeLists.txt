@@ -167,7 +167,6 @@ set(bangserver_srcs
     src/cards/card_effect.cpp
 
     src/game/card_serial.cpp
-    src/game/chat_commands.cpp
     src/game/filters.cpp
     src/game/holders.cpp
     src/game/game.cpp
@@ -178,8 +177,10 @@ set(bangserver_srcs
     src/game/play_verify.cpp
     src/game/play_visitor.cpp
     src/game/possible_to_play.cpp
-    src/game/manager.cpp
+
+    src/net/chat_commands.cpp
     src/net/main.cpp
+    src/net/manager.cpp
 )
 
 add_subdirectory(external/cpputils)

@@ -3,11 +3,11 @@
 
 #include <json/json.h>
 
-#include "net_options.h"
+#include "options.h"
 #include "messages.h"
 
-#include "game.h"
-#include "durations.h"
+#include "game/game.h"
+#include "game/durations.h"
 
 namespace banggame {
 

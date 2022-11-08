@@ -1,7 +1,7 @@
 #ifndef __DURATIONS_H__
 #define __DURATIONS_H__
 
-#include "net_options.h"
+#include "net/options.h"
 
 #include <chrono>
 

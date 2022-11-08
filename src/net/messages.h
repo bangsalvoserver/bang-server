@@ -1,8 +1,9 @@
 #ifndef __MESSAGES_H__
 #define __MESSAGES_H__
 
-#include "game_update.h"
-#include "json/value.h"
+#include "game/game_update.h"
+
+#include "utils/json_serial.h"
 
 namespace sdl {
     DEFINE_STRUCT(image_pixels,
