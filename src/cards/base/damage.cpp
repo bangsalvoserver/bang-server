@@ -47,6 +47,8 @@ namespace banggame {
             } else {
                 return {"STATUS_DAMAGING_AS_BANG", target, origin_card};
             }
+        } else if (bool(flags & effect_flags::play_as_gatling)) {
+            return {"STATUS_DAMAGING_AS_GATLING", target, origin_card};
         } else {
             if (damage > 1) {
                 return {"STATUS_DAMAGING_PLURAL", target, origin_card, damage};

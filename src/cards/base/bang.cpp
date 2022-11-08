@@ -97,6 +97,12 @@ namespace banggame {
                     return {"STATUS_CARD_AS_BANG", origin_card};
                 }
             }
+        } else if (bool(flags & effect_flags::play_as_gatling)) {
+            if (target != owner) {
+                return {"STATUS_CARD_AS_GATLING_OTHER", target, origin_card};
+            } else {
+                return {"STATUS_CARD_AS_GATLING", origin_card};
+            }
         } else {
             if (target != owner) {
                 return {"STATUS_BANG_OTHER", target, origin_card};
