@@ -220,7 +220,7 @@ namespace banggame {
 
         add_update<game_update_type::move_scenario_deck>(m_first_player);
 
-        if (add_cards(all_cards.highnoon, pocket_type::scenario_deck) || add_cards(all_cards.fistfulofcards, pocket_type::scenario_deck)) {
+        if (add_cards(all_cards.highnoon, pocket_type::scenario_deck) + add_cards(all_cards.fistfulofcards, pocket_type::scenario_deck)) {
             shuffle_cards_and_ids(m_scenario_deck);
             auto last_scenario_cards = std::ranges::partition(m_scenario_deck, [](card *c) {
                 return c->has_tag(tag_type::last_scenario_card);

@@ -8,7 +8,7 @@ namespace banggame {
         p->m_game->add_listener<event_type::after_hit>({target_card, 2}, [=](card *origin_card, player *origin, player *target, int damage, effect_flags flags) {
             if (origin && p == target) {
                 origin->m_game->queue_action([=]{
-                    if (origin->alive() && p->m_game->m_playing != p && !origin->m_hand.empty()) {
+                    if (target->alive() && p->m_game->m_playing != p && !origin->m_hand.empty()) {
                         target->m_game->flash_card(target_card);
                         for (int i=0; i<damage && !origin->m_hand.empty(); ++i) {
                             card *stolen_card = origin->random_hand_card();
