@@ -11,6 +11,9 @@
 namespace banggame {
     
     game_string play_card_verify::verify_modifiers() const {
+        if (is_response && !modifiers.empty()) {
+            return "ERROR_INVALID_RESPONSE_CARD";
+        }
         for (card *mod_card : modifiers) {
             if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return {"ERROR_CARD_DISABLED_BY", mod_card, disabler};
@@ -116,6 +119,9 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_equip_target() const {
+        if (is_response) {
+            return "ERROR_INVALID_RESPONSE_CARD";
+        }        
         if (card *disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
@@ -344,19 +350,21 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_and_play() {
-        if (origin->m_game->pending_requests()) {
-            const auto &req = origin->m_game->top_request();
-            if (bool(req.flags() & effect_flags::force_play)) {
-                if (!req.can_respond(origin, origin_card) && std::ranges::none_of(modifiers, [&](card *c) {
-                    return req.can_respond(origin, c);
-                })) {
-                    return "ERROR_FORCED_CARD";
+        if (!is_response) {
+            if (origin->m_game->pending_requests()) {
+                const auto &req = origin->m_game->top_request();
+                if (bool(req.flags() & effect_flags::force_play)) {
+                    if (!req.can_respond(origin, origin_card) && std::ranges::none_of(modifiers, [&](card *c) {
+                        return req.can_respond(origin, c);
+                    })) {
+                        return "ERROR_FORCED_CARD";
+                    }
+                } else {
+                    return "ERROR_MUST_RESPOND_TO_REQUEST";
                 }
-            } else {
-                return "ERROR_MUST_RESPOND_TO_REQUEST";
+            } else if (origin->m_game->m_playing != origin) {
+                return "ERROR_PLAYER_NOT_IN_TURN";
             }
-        } else if (origin->m_game->m_playing != origin) {
-            return "ERROR_PLAYER_NOT_IN_TURN";
         }
 
         switch(origin_card->pocket) {
@@ -426,6 +434,9 @@ namespace banggame {
             }
             [[fallthrough]];
         case pocket_type::shop_selection: {
+            if (is_response) {
+                return "ERROR_INVALID_RESPONSE_CARD";
+            }
             int cost = origin_card->buy_cost();
             for (card *c : modifiers) {
                 switch (c->modifier) {
@@ -491,24 +502,6 @@ namespace banggame {
         default:
             throw std::runtime_error("play_card: invalid card");
         }
-        return {};
-    }
-
-    game_string play_card_verify::verify_and_respond() {
-        if ((origin_card->pocket == pocket_type::player_hand && origin_card->color != card_color_type::brown)
-            || origin_card->pocket == pocket_type::shop_selection
-            || !modifiers.empty()
-        ) {
-            return "ERROR_INVALID_RESPONSE_CARD";
-        }
-        
-        if (game_string error = verify_card_targets()) {
-            return error;
-        }
-        origin->prompt_then(check_prompt(), [*this]{
-            do_play_card();
-            origin->set_last_played_card(nullptr);
-        });
         return {};
     }
 }

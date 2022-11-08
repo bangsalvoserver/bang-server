@@ -185,12 +185,12 @@ namespace banggame {
         (serial::card, card)
         (std::vector<serial::card>, modifiers)
         (target_list, targets)
+        (bool, is_response)
     )
 
     DEFINE_ENUM_TYPES(game_action_type,
         (pick_card, serial::card)
         (play_card, play_card_args)
-        (respond_card, play_card_args)
         (prompt_respond, bool)
         (request_confirm)
     )

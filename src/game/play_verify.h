@@ -32,7 +32,6 @@ namespace banggame {
         void do_play_card() const;
 
         game_string verify_and_play();
-        game_string verify_and_respond();
     };
 
     struct duplicate_sets {

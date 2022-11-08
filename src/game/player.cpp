@@ -293,14 +293,7 @@ namespace banggame {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         }
-        return play_card_verify{this, args.card, false, args.targets, unwrap_vector_not_null(args.modifiers)}.verify_and_play();
-    }
-    
-    game_string player::handle_action(enums::enum_tag_t<game_action_type::respond_card>, const play_card_args &args) {
-        if (m_prompt) {
-            return "ERROR_MUST_RESPOND_PROMPT";
-        }
-        return play_card_verify{this, args.card, true, args.targets, unwrap_vector_not_null(args.modifiers)}.verify_and_respond();
+        return play_card_verify{this, args.card, args.is_response, args.targets, unwrap_vector_not_null(args.modifiers)}.verify_and_play();
     }
 
     void player::prompt_then(game_string &&message, std::function<void()> &&fun) {
