@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "utils/reflector.h"
-#include "effects/card_effect.h"
+#include "cards/card_effect.h"
 
 namespace banggame {
 

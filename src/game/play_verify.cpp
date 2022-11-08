@@ -2,7 +2,7 @@
 
 #include "play_visitor.h"
 
-#include "effects/base/requests.h"
+#include "cards/base/requests.h"
 #include "effect_list_zip.h"
 
 #include "utils/raii_editor.h"

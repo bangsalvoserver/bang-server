@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-#include "effects/effects.h"
+#include "cards/effects.h"
 
 #include "game.h"
 #include "mth_unwrapper.h"

@@ -6,10 +6,10 @@
 #include "play_verify.h"
 #include "game_update.h"
 
-#include "effects/base/damage.h"
-#include "effects/base/draw.h"
-#include "effects/base/predraw_check.h"
-#include "effects/base/requests.h"
+#include "cards/base/damage.h"
+#include "cards/base/draw.h"
+#include "cards/base/predraw_check.h"
+#include "cards/base/requests.h"
 
 #include <cassert>
 #include <numeric>
