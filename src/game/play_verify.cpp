@@ -73,8 +73,8 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_duplicates() const {
-        card_set selected_cards;
-        player_set selected_players;
+        std::set<card *> selected_cards;
+        std::set<player *> selected_players;
         card_cube_count selected_cubes;
 
         for (card *mod_card : modifiers) {

@@ -227,11 +227,8 @@ namespace banggame {
         if (targets.size() != std::max<size_t>(1, effect.target_value)) {
             return "ERROR_INVALID_TARGETS";
         }
-        std::set<card *> duplicates;
         for (card *c : targets) {
-            if (!bool(effect.card_filter & target_card_filter::can_repeat) && !duplicates.emplace(c).second) {
-                return {"ERROR_DUPLICATE_CARD", c};
-            } else if (game_string err = play_visitor<target_type::card>{verifier, effect}.verify(c)) {
+            if (game_string err = play_visitor<target_type::card>{verifier, effect}.verify(c)) {
                 return err;
             }
         }
@@ -240,13 +237,13 @@ namespace banggame {
 
     template<> duplicate_set play_visitor<target_type::cards>::duplicates(const std::vector<not_null<card *>> &targets) {
         if (bool(effect.card_filter & target_card_filter::can_repeat)) {
+            return {};
+        } else {
             card_set ret;
             for (card *target : targets) {
                 ret.emplace(target);
             }
             return ret;
-        } else {
-            return {};
         }
     }
 
