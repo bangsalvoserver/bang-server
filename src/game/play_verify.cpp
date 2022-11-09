@@ -93,28 +93,22 @@ namespace banggame {
         auto &effects = is_response ? origin_card->responses : origin_card->effects;
         for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
             if (game_string error = enums::visit_indexed(
-                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return std::visit(overloaded {
-                        [](std::monostate) -> game_string { return {}; },
-                        [&](card_set &&cards) -> game_string {
-                            selected_cards.merge(cards);
-                            if (!cards.empty()) return {"ERROR_DUPLICATE_CARD", *cards.begin()};
-                            return {};
-                        },
-                        [&](player_set &&players) -> game_string {
-                            selected_players.merge(players);
-                            if (!players.empty()) return {"ERROR_DUPLICATE_PLAYER", *players.begin()};
-                            return {};
-                        },
-                        [&](card_cube_count &&cubes) -> game_string {
-                            for (auto &[card, ncubes] : cubes) {
-                                if (selected_cubes[card] += ncubes > max_cubes) {
-                                    return {"ERROR_NOT_ENOUGH_CUBES_ON", card};
-                                }
+                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
+                    duplicate_set duplicates = play_visitor<E>{*this, effect}.duplicates(FWD(args) ... );
+                    if (auto *cards = std::get_if<card_set>(&duplicates)) {
+                        selected_cards.merge(*cards);
+                        if (!cards->empty()) return {"ERROR_DUPLICATE_CARD", *cards->begin()};
+                    } else if (auto *players = std::get_if<player_set>(&duplicates)) {
+                        selected_players.merge(*players);
+                        if (!players->empty()) return {"ERROR_DUPLICATE_PLAYER", *players->begin()};
+                    } else if (auto *cubes = std::get_if<card_cube_count>(&duplicates)) {
+                        for (auto &[card, ncubes] : *cubes) {
+                            if (selected_cubes[card] += ncubes > card->num_cubes) {
+                                return {"ERROR_NOT_ENOUGH_CUBES_ON", card};
                             }
-                            return {};
                         }
-                    }, play_visitor<E>{*this, effect}.duplicates(FWD(args) ... ));
+                    }
+                    return {};
                 }, target))
             {
                 return error;
@@ -322,16 +316,6 @@ namespace banggame {
         return {};
     }
 
-    struct card_cube_ordering {
-        bool operator()(card *lhs, card *rhs) const {
-            if (lhs->pocket == pocket_type::player_table && rhs->pocket == pocket_type::player_table) {
-                return std::ranges::find(lhs->owner->m_table, lhs) < std::ranges::find(rhs->owner->m_table, rhs);
-            } else {
-                return lhs->pocket == pocket_type::player_table;
-            }
-        }
-    };
-
     void play_card_verify::do_play_card() const {
         auto &effects = is_response ? origin_card->responses : origin_card->effects;
         origin->log_played_card(origin_card, is_response);
@@ -340,7 +324,7 @@ namespace banggame {
         }
 
         std::vector<std::pair<const effect_holder &, const play_card_target &>> delay_effects;
-        std::map<card *, int, card_cube_ordering> selected_cubes;
+        card_cube_count selected_cubes;
 
         target_list mth_targets;
         for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
