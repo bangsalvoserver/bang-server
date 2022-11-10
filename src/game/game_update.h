@@ -144,6 +144,7 @@ namespace banggame {
         (bool, can_play_beer_in_duel, true)
         (bool, auto_discard_all)
         (int, scenario_deck_size, 12)
+        (int, damage_timer_ms, 1500)
     )
 
     DEFINE_ENUM_TYPES(game_update_type,

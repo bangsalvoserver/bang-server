@@ -55,8 +55,7 @@ namespace banggame {
     };
 
     struct timer_request : request_base, std::enable_shared_from_this<timer_request> {
-        timer_request(card *origin_card, player *origin, player *target, effect_flags flags = {}
-            , ticks duration = default_timer_duration)
+        timer_request(card *origin_card, player *origin, player *target, ticks duration, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags | effect_flags::timer)
             , duration(duration) {}
 

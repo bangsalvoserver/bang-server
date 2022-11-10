@@ -32,6 +32,14 @@ namespace banggame {
         target->m_game->call_event<event_type::after_hit>(origin_card, origin, target, damage, flags);
     }
 
+    static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::play_as_gatling;
+
+    timer_damaging::timer_damaging(card *origin_card, player *origin, player *target, int damage, effect_flags flags)
+        : timer_request(origin_card, origin, target,
+            std::clamp(std::chrono::duration_cast<ticks>(std::chrono::milliseconds{target->m_game->m_options.damage_timer_ms}), ticks{1}, ticks{10s}),
+            flags & damaging_allowed_flags)
+        , damage(damage) {}
+    
     std::vector<card *> timer_damaging::get_highlights() const {
         return target->m_backup_character;
     }

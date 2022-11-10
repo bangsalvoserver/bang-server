@@ -22,11 +22,7 @@ namespace banggame {
     };
 
     struct timer_damaging : timer_request, cleanup_request {
-        timer_damaging(card *origin_card, player *origin, player *target, int damage, effect_flags flags = {})
-            : timer_request(origin_card, origin, target, flags & allowed_flags)
-            , damage(damage) {}
-        
-        static constexpr auto allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::play_as_gatling;
+        timer_damaging(card *origin_card, player *origin, player *target, int damage, effect_flags flags = {});
 
         int damage;
 
