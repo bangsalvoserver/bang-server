@@ -5,12 +5,12 @@
 
 namespace banggame {
     
-    struct effect_horse {
+    struct equip_horse {
         game_string on_prompt(player *origin, card *target_card, player *target);
         void on_equip(card *target_card, player *target);
     };
 
-    struct effect_mustang {
+    struct equip_mustang {
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);
     };

@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_ghost {
+    struct equip_ghost {
         void on_equip(card *target_card, player *target);
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);

@@ -61,7 +61,7 @@ namespace banggame {
         }
     };
     
-    void effect_vulture_sam::on_enable(card *target_card, player *p) {
+    void equip_vulture_sam::on_enable(card *target_card, player *p) {
         p->m_game->add_listener<event_type::verify_card_taker>(target_card, [=](player *e_target, equip_type type, bool &value){
             if (type == equip_type::vulture_sam && e_target == p) {
                 value = true;

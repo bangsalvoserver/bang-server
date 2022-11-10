@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct effect_bill_noface : event_based_effect {
+    struct equip_bill_noface : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

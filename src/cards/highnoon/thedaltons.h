@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_thedaltons  {
+    struct equip_thedaltons  {
         void on_enable(card *target_card, player *target);
     };
 }

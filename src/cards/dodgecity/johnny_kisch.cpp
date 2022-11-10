@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    void effect_johnny_kisch::on_enable(card *target_card, player *p) {
+    void equip_johnny_kisch::on_enable(card *target_card, player *p) {
         p->m_game->add_listener<event_type::on_equip_card>(target_card, [=](player *origin, player *target, card *equipped_card) {
             if (p == origin) {
                 for (player &other : range_other_players(target)) {

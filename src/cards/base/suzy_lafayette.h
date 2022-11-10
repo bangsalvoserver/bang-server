@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_suzy_lafayette : event_based_effect {
+    struct equip_suzy_lafayette : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

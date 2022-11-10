@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_madam_yto : event_based_effect {
+    struct equip_madam_yto : event_equip {
         void on_enable(card *target_card, player *origin);
     };
 }

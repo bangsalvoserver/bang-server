@@ -5,9 +5,9 @@
 
 namespace banggame {
 
-    struct effect_gunbelt : event_based_effect {
+    struct equip_gunbelt : event_equip {
         int ncards;
-        effect_gunbelt(int value) : ncards(value) {}
+        equip_gunbelt(int value) : ncards(value) {}
         
         void on_enable(card *target_card, player *target);
     };

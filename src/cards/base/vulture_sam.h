@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct effect_vulture_sam : event_based_effect {
+    struct equip_vulture_sam : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_big_spencer {
+    struct equip_big_spencer {
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);
     };

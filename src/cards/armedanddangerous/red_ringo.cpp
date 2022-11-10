@@ -4,7 +4,7 @@
 
 namespace banggame {
     
-    void effect_red_ringo::on_equip(card *target_card, player *target) {
+    void equip_red_ringo::on_equip(card *target_card, player *target) {
         target->add_cubes(target->m_characters.front(), max_cubes);
     }
 

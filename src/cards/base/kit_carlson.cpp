@@ -28,7 +28,7 @@ namespace banggame {
         }
     };
 
-    void effect_kit_carlson::on_enable(card *target_card, player *target) {
+    void equip_kit_carlson::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (target == origin && target->get_cards_to_draw() < 3) {
                 target->m_game->pop_request();

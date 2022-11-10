@@ -50,7 +50,7 @@ namespace banggame {
         origin->m_game->update_request();
     }
 
-    void effect_bomb::on_equip(card *target_card, player *target) {
+    void equip_bomb::on_equip(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_discard_orange_card>(target_card, [=](player *e_target, card *e_card) {
             if (e_target == target && e_card == target_card
                 && !target->m_game->is_disabled(target_card) && !target->immune_to(target_card, nullptr, {})) {
@@ -78,7 +78,7 @@ namespace banggame {
         });
     }
 
-    void effect_bomb::on_unequip(card *target_card, player *target) {
+    void equip_bomb::on_unequip(card *target_card, player *target) {
         target->m_game->remove_listeners(event_card_key{target_card, 0});
     }
 

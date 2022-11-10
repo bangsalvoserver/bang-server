@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_abandonedmine {
+    struct equip_abandonedmine {
         void on_enable(card *target_card, player *target);
     };
 }

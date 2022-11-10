@@ -5,9 +5,9 @@
 
 namespace banggame {
 
-    struct effect_initialcards : event_based_effect {
+    struct equip_initialcards : event_equip {
         int value;
-        effect_initialcards(int value) : value(value) {}
+        equip_initialcards(int value) : value(value) {}
         
         void on_enable(card *target_card, player *target);
     };

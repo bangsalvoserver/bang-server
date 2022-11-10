@@ -17,7 +17,7 @@ namespace banggame {
         }
     };
     
-    void effect_lemonade_jim::on_enable(card *target_card, player *origin) {
+    void equip_lemonade_jim::on_enable(card *target_card, player *origin) {
         origin->m_game->add_listener<event_type::on_play_beer>(target_card, [=](player *target) {
             if (origin != target) {
                 if (!origin->m_hand.empty() && origin->m_hp < origin->m_max_hp) {

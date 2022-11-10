@@ -5,8 +5,11 @@
 
 namespace banggame {
 
-    struct effect_greygory_deck : event_based_effect {
+    struct equip_greygory_deck {
         void on_equip(card *target_card, player *target);
+    };
+
+    struct effect_greygory_deck {
         void on_play(card *origin_card, player *origin);
     };
 }

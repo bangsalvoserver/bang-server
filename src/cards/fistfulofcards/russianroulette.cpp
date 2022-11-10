@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    void effect_russianroulette::on_enable(card *target_card, player *target) {
+    void equip_russianroulette::on_enable(card *target_card, player *target) {
         auto queue_russianroulette_request = [=](player *target) {
             auto req = std::make_shared<request_bang>(target_card, nullptr, target);
             req->bang_damage = 2;

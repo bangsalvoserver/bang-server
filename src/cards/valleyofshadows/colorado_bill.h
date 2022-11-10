@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_colorado_bill : event_based_effect {
+    struct equip_colorado_bill : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

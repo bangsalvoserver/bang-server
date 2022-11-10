@@ -48,7 +48,7 @@ namespace banggame {
         }
     };
 
-    void effect_newidentity::on_enable(card *target_card, player *target) {
+    void equip_newidentity::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player *p) {
             target->m_game->move_card(p->m_backup_character.front(), pocket_type::selection);
             target->m_game->queue_request<request_newidentity>(target_card, p);

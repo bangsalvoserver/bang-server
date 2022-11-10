@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_packmule : event_based_effect {
+    struct equip_packmule : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

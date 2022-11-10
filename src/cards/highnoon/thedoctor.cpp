@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    void effect_thedoctor::on_enable(card *target_card, player *target) {
+    void equip_thedoctor::on_enable(card *target_card, player *target) {
         int min_hp = std::ranges::min(target->m_game->m_players
             | std::views::filter(&player::alive)
             | std::views::transform(&player::m_hp));

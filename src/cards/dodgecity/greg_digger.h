@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_greg_digger : event_based_effect {
+    struct equip_greg_digger : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

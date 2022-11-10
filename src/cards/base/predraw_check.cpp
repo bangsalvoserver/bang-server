@@ -46,15 +46,15 @@ namespace banggame {
         }
     };
 
-    void effect_predraw_check::on_enable(card *target_card, player *target) {
+    void equip_predraw_check::on_enable(card *target_card, player *target) {
         target->m_predraw_checks.try_emplace(target_card, priority, false);
     }
 
-    void effect_predraw_check::on_disable(card *target_card, player *target) {
+    void equip_predraw_check::on_disable(card *target_card, player *target) {
         target->m_predraw_checks.erase(target_card);
     }
 
-    void effect_predraw_check::queue(player *target) {
+    void equip_predraw_check::queue(player *target) {
         target->m_game->queue_request<request_predraw>(target);
     }
 }

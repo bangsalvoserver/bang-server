@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_herb_hunter : event_based_effect {
+    struct equip_herb_hunter : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

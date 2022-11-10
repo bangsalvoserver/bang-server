@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_tequila_joe : event_based_effect {
+    struct equip_tequila_joe : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

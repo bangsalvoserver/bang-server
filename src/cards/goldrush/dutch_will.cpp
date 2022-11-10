@@ -28,7 +28,7 @@ namespace banggame {
         }
     };
 
-    void effect_dutch_will::on_enable(card *target_card, player *target) {
+    void equip_dutch_will::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (origin == target) {
                 int ncards = target->get_cards_to_draw();

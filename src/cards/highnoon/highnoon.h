@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct effect_highnoon : event_based_effect {
+    struct equip_highnoon : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

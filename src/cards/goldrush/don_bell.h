@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_don_bell : event_based_effect {
+    struct equip_don_bell : event_equip {
         void on_enable(card *target_card, player *origin);
     };
 }

@@ -375,7 +375,7 @@ namespace banggame {
             if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
                 request_drawing();
             } else {
-                effect_predraw_check::queue(this);
+                equip_predraw_check::queue(this);
             }
         }
     }

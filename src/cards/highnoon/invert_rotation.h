@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_invert_rotation  {
+    struct equip_invert_rotation  {
         void on_enable(card *target_card, player *target);
     };
 }

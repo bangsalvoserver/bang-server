@@ -8,7 +8,7 @@ namespace banggame {
         return c->has_tag(tag_type::horse);
     }
 
-    game_string effect_horse::on_prompt(player *origin, card *target_card, player *target) {
+    game_string equip_horse::on_prompt(player *origin, card *target_card, player *target) {
         if (auto it = std::ranges::find_if(target->m_table, is_horse); it != target->m_table.end()) {
             return {"PROMPT_REPLACE", target_card, *it};
         } else {
@@ -16,18 +16,18 @@ namespace banggame {
         }
     }
 
-    void effect_horse::on_equip(card *target_card, player *target) {
+    void equip_horse::on_equip(card *target_card, player *target) {
         if (auto it = std::ranges::find_if(target->m_table, is_horse); it != target->m_table.end()) {
             target->discard_card(*it);
         }
     }
 
-    void effect_mustang::on_enable(card *target_card, player *target) {
+    void equip_mustang::on_enable(card *target_card, player *target) {
         ++target->m_distance_mod;
         target->send_player_status();
     }
 
-    void effect_mustang::on_disable(card *target_card, player *target) {
+    void equip_mustang::on_disable(card *target_card, player *target) {
         --target->m_distance_mod;
         target->send_player_status();
     }

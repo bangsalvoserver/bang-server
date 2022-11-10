@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_johnny_kisch : event_based_effect {
+    struct equip_johnny_kisch : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

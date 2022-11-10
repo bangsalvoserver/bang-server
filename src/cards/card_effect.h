@@ -20,7 +20,7 @@ namespace banggame {
     template<target_type E>
     using opt_tagged_value = std::optional<tagged_value<E>>;
 
-    struct event_based_effect {
+    struct event_equip {
         void on_disable(card *target_card, player *target);
     };
 

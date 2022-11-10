@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_apache_kid : event_based_effect {
+    struct equip_apache_kid : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

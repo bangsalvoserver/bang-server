@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_henry_block : event_based_effect {
+    struct equip_henry_block : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

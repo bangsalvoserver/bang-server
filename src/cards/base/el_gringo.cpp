@@ -4,7 +4,7 @@
 
 namespace banggame {
     
-    void effect_el_gringo::on_enable(card *target_card, player *p) {
+    void equip_el_gringo::on_enable(card *target_card, player *p) {
         p->m_game->add_listener<event_type::after_hit>({target_card, 2}, [=](card *origin_card, player *origin, player *target, int damage, effect_flags flags) {
             if (origin && p == target) {
                 origin->m_game->queue_action([=]{

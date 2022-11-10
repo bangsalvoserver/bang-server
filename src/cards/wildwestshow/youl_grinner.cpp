@@ -30,7 +30,7 @@ namespace banggame {
         }
     };
 
-    void effect_youl_grinner::on_enable(card *target_card, player *target) {
+    void equip_youl_grinner::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player *origin) {
             if (target == origin) {
                 for (player &p : range_other_players(target)) {

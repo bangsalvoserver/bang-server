@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_teren_kill : event_based_effect {
+    struct equip_teren_kill : event_equip {
         void on_enable(card *origin_card, player *origin);
     };
 }

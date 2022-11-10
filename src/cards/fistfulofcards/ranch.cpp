@@ -17,7 +17,7 @@ namespace banggame {
         }
     };
 
-    void effect_ranch::on_enable(card *target_card, player *target) {
+    void equip_ranch::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::post_draw_cards>(target_card, [=](player *origin) {
             origin->m_game->queue_request<request_ranch>(target_card, origin);
         });

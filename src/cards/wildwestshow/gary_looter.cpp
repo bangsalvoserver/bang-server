@@ -8,7 +8,7 @@ namespace banggame {
         return target.m_game->call_event<event_type::verify_card_taker>(&target, equip_type::gary_looter, false);
     }
 
-    void effect_gary_looter::on_enable(card *target_card, player *player_end) {
+    void equip_gary_looter::on_enable(card *target_card, player *player_end) {
         player_end->m_game->add_listener<event_type::verify_card_taker>(target_card, [=](player *e_target, equip_type type, bool &value) {
             if (type == equip_type::gary_looter && e_target == player_end) {
                 value = true;

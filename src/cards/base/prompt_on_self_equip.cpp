@@ -4,7 +4,7 @@
 
 namespace banggame {
     
-    game_string effect_prompt_on_self_equip::on_prompt(player *origin, card *target_card, player *target) {
+    game_string equip_prompt_on_self_equip::on_prompt(player *origin, card *target_card, player *target) {
         if (target == origin) {
             return {"PROMPT_EQUIP_ON_SELF", target_card};
         } else {

@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_claus_the_saint : event_based_effect {
+    struct equip_claus_the_saint : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

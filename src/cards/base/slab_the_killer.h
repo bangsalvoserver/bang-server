@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_slab_the_killer : event_based_effect {
+    struct equip_slab_the_killer : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

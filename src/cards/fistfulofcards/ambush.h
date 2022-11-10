@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_ambush {
+    struct equip_ambush {
         void on_enable(card *target_card, player *target);
     };
 }

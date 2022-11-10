@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct effect_blessing : event_based_effect {
+    struct equip_blessing : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

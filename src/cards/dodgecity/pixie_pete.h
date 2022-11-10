@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_pixie_pete : event_based_effect {
+    struct equip_pixie_pete : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

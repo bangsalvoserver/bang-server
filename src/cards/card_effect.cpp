@@ -72,4 +72,8 @@ namespace banggame {
     bool selection_picker::can_pick(card *target_card) const {
         return target_card->pocket == pocket_type::selection;
     }
+    
+    void event_equip::on_disable(card *target_card, player *target) {
+        target->m_game->remove_listeners(target_card);
+    }
 }

@@ -5,11 +5,12 @@
 
 namespace banggame {
 
-    struct effect_lastwill : event_based_effect {
+    struct equip_lastwill : event_equip {
         void on_enable(card *origin_card, player *origin);
-        
+    };
+
+    struct effect_lastwill {
         bool can_respond(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin) {}
     };
 
     struct handler_lastwill {

@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_mick_defender : event_based_effect {
+    struct equip_mick_defender : event_equip {
         void on_enable(card *origin_card, player *origin);
     };
 }

@@ -3,7 +3,7 @@
 #include "game/game.h"
 
 namespace banggame {
-    void effect_dynamite::on_enable(card *target_card, player *target) {
+    void equip_dynamite::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *e_player, card *e_card) {
             if (e_player == target && e_card == target_card) {
                 target->m_game->draw_check_then(target, target_card, [=](card_sign sign) {

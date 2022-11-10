@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_calamity_janet {
+    struct equip_calamity_janet {
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);
     };

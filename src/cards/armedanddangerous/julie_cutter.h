@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_julie_cutter : event_based_effect {
+    struct equip_julie_cutter : event_equip {
         void on_enable(card *target_card, player *target);
     };
 

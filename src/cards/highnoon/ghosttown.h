@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct effect_ghosttown : event_based_effect  {
+    struct equip_ghosttown : event_equip  {
         void on_enable(card *target_card, player *target);
     };
 }

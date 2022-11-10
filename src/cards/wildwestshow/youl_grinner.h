@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_youl_grinner : event_based_effect {
+    struct equip_youl_grinner : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

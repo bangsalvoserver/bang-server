@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct effect_kit_carlson : event_based_effect {
+    struct equip_kit_carlson : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

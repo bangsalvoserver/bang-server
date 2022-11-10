@@ -5,9 +5,11 @@
 
 namespace banggame {
 
-    struct effect_al_preacher : event_based_effect {
+    struct equip_al_preacher : event_equip {
         void on_enable(card *target_card, player *target);
+    };
 
+    struct effect_al_preacher {
         bool can_respond(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };

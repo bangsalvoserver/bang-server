@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    void effect_shotgun::on_enable(card *target_card, player *p) {
+    void equip_shotgun::on_enable(card *target_card, player *p) {
         p->m_game->add_listener<event_type::after_hit>({target_card, 3}, [=](card *origin_card, player *origin, player *target, int damage, effect_flags flags) {
             if (origin == p && target != p && bool(flags & effect_flags::is_bang)) {
                 target->m_game->queue_action([=]{

@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_john_pain : event_based_effect {
+    struct equip_john_pain : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

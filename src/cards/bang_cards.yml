@@ -1538,8 +1538,6 @@ character:
   - name: EVELYN_SHEBANG
     image: 07_evelynshebang
     expansion: valleyofshadows
-    equip:
-      - evelyn_shebang
     responses:
       - while_drawing
       - evelyn_shebang player notself reachable

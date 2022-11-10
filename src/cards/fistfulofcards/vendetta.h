@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_vendetta : event_based_effect {
+    struct equip_vendetta : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct effect_jail : event_based_effect {
+    struct equip_jail : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }

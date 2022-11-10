@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct effect_lasso {
+    struct equip_lasso {
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);
     };

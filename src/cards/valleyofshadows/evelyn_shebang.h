@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct effect_evelyn_shebang : event_based_effect {
+    struct effect_evelyn_shebang {
         game_string verify(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };

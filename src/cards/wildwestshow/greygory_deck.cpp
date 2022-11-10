@@ -4,7 +4,7 @@
 
 namespace banggame {
     
-    void effect_greygory_deck::on_equip(card *target_card, player *target) {
+    void equip_greygory_deck::on_equip(card *target_card, player *target) {
         std::vector<card *> base_characters;
         for (card &c : target->m_game->m_cards) {
             if (c.expansion == card_expansion_type{}
@@ -31,7 +31,7 @@ namespace banggame {
     
     void effect_greygory_deck::on_play(card *target_card, player *target) {
         target->remove_extra_characters();
-        on_equip(target_card, target);
+        equip_greygory_deck{}.on_equip(target_card, target);
         target->m_game->update_request();
     }
 }

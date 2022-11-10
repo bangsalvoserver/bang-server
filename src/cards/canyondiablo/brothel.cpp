@@ -6,7 +6,7 @@ namespace banggame {
 
     static uint8_t brothel_counter = 0;
 
-    void effect_brothel::on_enable(card *target_card, player *target) {
+    void equip_brothel::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
             if (p == target && e_card == target_card) {
                 target->m_game->draw_check_then(target, target_card, [=](card_sign sign) {
