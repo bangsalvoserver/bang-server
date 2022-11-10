@@ -37,7 +37,6 @@ public:
 
     void tick();
 
-private:
     lobby_data make_lobby_data(lobby_ptr it);
     void send_lobby_update(lobby_ptr it);
 
@@ -74,6 +73,7 @@ private:
         }
     }
 
+private:
     void kick_user_from_lobby(user_ptr user);
 
     std::string handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
@@ -93,6 +93,8 @@ private:
     std::string command_print_help(user_ptr user);
     std::string command_print_users(user_ptr user);
     std::string command_kick_user(user_ptr user, std::string_view userid);
+    std::string command_get_game_options(user_ptr user);
+    std::string command_set_game_option(user_ptr user, std::string_view name, std::string_view value);
 
 private:
     user_map users;

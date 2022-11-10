@@ -265,12 +265,14 @@ std::string game_manager::handle_chat_command(user_ptr user, const std::string &
     }
 
     auto &command = cmd_it->second;
+    auto &lobby = (*user->second.in_lobby)->second;
 
-    if (bool(command.permissions() & command_permissions::lobby_owner)) {
-        auto &lobby = (*user->second.in_lobby)->second;
-        if (user != lobby.users.front()) {
-            return "ERROR_PLAYER_NOT_LOBBY_OWNER";
-        }
+    if (bool(command.permissions() & command_permissions::lobby_owner) && user != lobby.users.front()) {
+        return "ERROR_PLAYER_NOT_LOBBY_OWNER";
+    }
+
+    if (bool(command.permissions() & command_permissions::lobby_waiting) && lobby.state != lobby_state::waiting) {
+        return "ERROR_LOBBY_NOT_WAITING";
     }
 
     std::vector<std::string> args;

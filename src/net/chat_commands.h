@@ -7,6 +7,7 @@ namespace banggame {
 
     DEFINE_ENUM_FLAGS(command_permissions,
         (lobby_owner)
+        (lobby_waiting)
     )
 
     template<auto FnMemPtr> struct proxy_t {
@@ -33,7 +34,6 @@ namespace banggame {
         manager_fn m_fun;
         std::string_view m_description;
         command_permissions m_permissions;
-        int m_nargs;
 
         template<typename Proxy, size_t ... Is>
         static std::string call_manager_fun_impl(game_manager *mgr, user_ptr user, std::span<std::string> args, std::index_sequence<Is...>) {
@@ -55,8 +55,7 @@ namespace banggame {
         chat_command(Proxy, std::string_view description, command_permissions permissions = {})
             : m_fun(call_manager_fun<Proxy>)
             , m_description(description)
-            , m_permissions(permissions)
-            , m_nargs(argument_number<decltype(Proxy::value)>::value) {}
+            , m_permissions(permissions) {}
 
         std::string operator()(game_manager *mgr, user_ptr user, std::span<std::string> args) const {
             return (*m_fun)(mgr, user, args);
@@ -68,10 +67,6 @@ namespace banggame {
 
         command_permissions permissions() const {
             return m_permissions;
-        }
-
-        int nargs() const {
-            return m_nargs;
         }
     };
 
