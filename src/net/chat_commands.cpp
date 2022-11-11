@@ -59,51 +59,20 @@ namespace banggame {
     }
 
     template<size_t I>
-    static void print_game_option_n(game_manager &self, user_ptr user, const game_options &options) {
+    static std::string get_field_string(const game_options &options) {
         const auto field_data = reflector::get_field_data<I>(options);
-        self.send_message<server_message_type::lobby_chat>(user->first, 0,
-            fmt::format("{} = {}", field_data.name(), field_data.get()));
+        return fmt::format("{} = {}", field_data.name(), field_data.get());
     }
 
     template<size_t ... Is>
     static void print_game_options(game_manager &self, user_ptr user, const game_options &options, std::index_sequence<Is ...>) {
-        (print_game_option_n<Is>(self, user, options), ...);
+        (self.send_message<server_message_type::lobby_chat>(user->first, 0, get_field_string<Is>(options)), ...);
     }
 
     std::string game_manager::command_get_game_options(user_ptr user) {
         print_game_options(*this, user, (*user->second.in_lobby)->second.options, std::make_index_sequence<reflector::num_fields<game_options>>());
         return {};
     }
-
-    template<typename T> struct value_parser;
-
-    template<std::integral T> struct value_parser<T> {
-        std::optional<T> operator()(std::string_view str) {
-            T value;
-            if (auto [end, ec] = std::from_chars(str.data(), str.data() + str.size(), value); ec != std::errc{}) {
-                return std::nullopt;
-            }
-            return value;
-        }
-    };
-
-    template<> struct value_parser<bool> {
-        std::optional<bool> operator()(std::string_view str) {
-            if (str == "true") {
-                return true;
-            } else if (str == "false") {
-                return false;
-            } else {
-                return std::nullopt;
-            }
-        }
-    };
-
-    template<enums::enum_with_names E> struct value_parser<E> {
-        std::optional<E> operator()(std::string_view str) {
-            return enums::from_string<E>(str);
-        }
-    };
 
     template<size_t ... Is>
     constexpr auto gen_set_option_map(std::index_sequence<Is ...>) {
@@ -113,7 +82,7 @@ namespace banggame {
             { reflector::get_field_name<Is, game_options>(), [](game_options &options, std::string_view value_str) {
                 auto field_data = reflector::get_field_data<Is>(options);
                 auto &field = field_data.get();
-                if (auto value = value_parser<std::remove_reference_t<decltype(field)>>{}(value_str)) {
+                if (auto value = parse_string<std::remove_reference_t<decltype(field)>>(value_str)) {
                     field = *value;
                     return true;
                 } else {
