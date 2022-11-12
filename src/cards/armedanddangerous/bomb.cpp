@@ -55,6 +55,7 @@ namespace banggame {
             if (e_target == target && e_card == target_card
                 && !target->m_game->is_disabled(target_card) && !target->immune_to(target_card, nullptr, {})) {
                 target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
+                target->m_game->play_sound(nullptr, "dynamite");
 
                 event_card_key key{target_card, 1};
                 target->m_game->add_listener<event_type::on_effect_end>(key, [=](player *p, card *c) {
