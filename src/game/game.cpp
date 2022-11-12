@@ -289,6 +289,7 @@ namespace banggame {
 
         queue_action([this] {
             add_log("LOG_GAME_START");
+            play_sound(nullptr, "gamestart");
 
             for (player &p : m_players) {
                 p.m_characters.front()->on_equip(&p);

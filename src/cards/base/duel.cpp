@@ -11,6 +11,11 @@ namespace banggame {
 
         player *respond_to = nullptr;
 
+        bool auto_resolve() override {
+            target->m_game->play_sound(target, "duel");
+            return request_base::auto_resolve();
+        }
+
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
                 && target->is_bangcard(target_card)

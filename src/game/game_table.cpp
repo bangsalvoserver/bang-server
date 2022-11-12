@@ -112,6 +112,7 @@ namespace banggame {
             }
             shuffle_cards_and_ids(m_deck);
             add_log("LOG_DECK_RESHUFFLED");
+            play_sound(nullptr, "shuffle");
             add_update<game_update_type::deck_shuffled>(pocket_type::main_deck);
         }
     }
@@ -177,6 +178,14 @@ namespace banggame {
 
     void game_table::flash_card(card *c) {
         add_update<game_update_type::flash_card>(c);
+    }
+
+    void game_table::play_sound(player *target, const std::string &file_id) {
+        if (target) {
+            add_update<game_update_type::play_sound>(update_target::includes_private(target), file_id);
+        } else {
+            add_update<game_update_type::play_sound>(file_id);
+        }
     }
 
     void game_table::add_disabler(event_card_key key, card_disabler_fun &&fun) {

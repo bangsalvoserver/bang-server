@@ -175,6 +175,7 @@ namespace banggame {
         (request_status, request_status_args)
         (game_flags, game_flags)
         (game_options, game_options)
+        (play_sound, std::string)
         (status_clear)
         (confirm_play)
     )

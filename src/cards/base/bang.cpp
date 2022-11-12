@@ -80,6 +80,15 @@ namespace banggame {
         flags |= effect_flags::auto_respond;
     }
 
+    bool request_bang::auto_resolve() {
+        if (bool(flags & effect_flags::single_target)) {
+            target->m_game->play_sound(target, "bang");
+        } else {
+            target->m_game->play_sound(target, "gatling");
+        }
+        return request_base::auto_resolve();
+    }
+
     game_string request_bang::status_text(player *owner) const {
         if (bool(flags & effect_flags::play_as_bang)) {
             if (target != owner) {
