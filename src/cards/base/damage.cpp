@@ -32,7 +32,7 @@ namespace banggame {
         target->m_game->call_event<event_type::after_hit>(origin_card, origin, target, damage, flags);
     }
 
-    static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::play_as_gatling;
+    static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::multi_target;
 
     timer_damaging::timer_damaging(card *origin_card, player *origin, player *target, int damage, effect_flags flags)
         : timer_request(origin_card, origin, target,
@@ -50,13 +50,13 @@ namespace banggame {
 
     game_string timer_damaging::status_text(player *owner) const {
         if (bool(flags & effect_flags::play_as_bang)) {
-            if (damage > 1) {
+            if (bool(flags & effect_flags::multi_target)) {
+                return {"STATUS_DAMAGING_AS_GATLING", target, origin_card};
+            } else if (damage > 1) {
                 return {"STATUS_DAMAGING_AS_BANG_PLURAL", target, origin_card, damage};
             } else {
                 return {"STATUS_DAMAGING_AS_BANG", target, origin_card};
             }
-        } else if (bool(flags & effect_flags::play_as_gatling)) {
-            return {"STATUS_DAMAGING_AS_GATLING", target, origin_card};
         } else {
             if (damage > 1) {
                 return {"STATUS_DAMAGING_PLURAL", target, origin_card, damage};

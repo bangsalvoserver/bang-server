@@ -10,7 +10,7 @@ namespace banggame {
         origin->discard_card(chosen_card);
 
         auto targets = range_other_players(origin);
-        auto flags = effect_flags::play_as_gatling;
+        auto flags = effect_flags::play_as_bang | effect_flags::multi_target;
         if (std::ranges::distance(targets) == 1) {
             flags |= effect_flags::single_target;
         }

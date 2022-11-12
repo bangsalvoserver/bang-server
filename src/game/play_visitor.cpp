@@ -101,7 +101,7 @@ namespace banggame {
     template<> void play_visitor<target_type::other_players>::play() {
         auto targets = range_other_players(verifier.origin);
         
-        effect_flags flags{};
+        auto flags = effect_flags::multi_target;
         if (verifier.origin_card->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
         }
@@ -138,7 +138,7 @@ namespace banggame {
     }
 
     template<> void play_visitor<target_type::all_players>::play() {
-        effect_flags flags{};
+        auto flags = effect_flags::multi_target;
         if (verifier.origin_card->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
         }
@@ -294,7 +294,7 @@ namespace banggame {
     }
 
     template<> void play_visitor<target_type::cards_other_players>::play(const std::vector<not_null<card *>> &target_cards) {
-        effect_flags flags{};
+        auto flags = effect_flags::multi_target;
         if (verifier.origin_card->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
         }

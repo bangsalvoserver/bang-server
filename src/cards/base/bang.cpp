@@ -81,17 +81,23 @@ namespace banggame {
     }
 
     bool request_bang::auto_resolve() {
-        if (bool(flags & effect_flags::single_target)) {
-            target->m_game->play_sound(target, "bang");
-        } else {
+        if (bool(flags & effect_flags::multi_target)) {
             target->m_game->play_sound(target, "gatling");
+        } else {
+            target->m_game->play_sound(target, "bang");
         }
         return request_base::auto_resolve();
     }
 
     game_string request_bang::status_text(player *owner) const {
         if (bool(flags & effect_flags::play_as_bang)) {
-            if (target != owner) {
+            if (bool(flags & effect_flags::multi_target)) {
+                if (target != owner) {
+                    return {"STATUS_CARD_AS_GATLING_OTHER", target, origin_card};
+                } else {
+                    return {"STATUS_CARD_AS_GATLING", origin_card};
+                }
+            } else if (target != owner) {
                 return {"STATUS_CARD_AS_BANG_OTHER", target, origin_card};
             } else if (bang_strength > 1) {
                 if (bang_damage > 1) {
@@ -105,12 +111,6 @@ namespace banggame {
                 } else {
                     return {"STATUS_CARD_AS_BANG", origin_card};
                 }
-            }
-        } else if (bool(flags & effect_flags::play_as_gatling)) {
-            if (target != owner) {
-                return {"STATUS_CARD_AS_GATLING_OTHER", target, origin_card};
-            } else {
-                return {"STATUS_CARD_AS_GATLING", origin_card};
             }
         } else {
             if (target != owner) {
