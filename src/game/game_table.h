@@ -5,7 +5,6 @@
 #include <random>
 
 #include "player.h"
-#include "formatter.h"
 #include "game_net.h"
 #include "events.h"
 

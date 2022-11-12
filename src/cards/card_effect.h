@@ -2,7 +2,7 @@
 #define __CARD_EFFECT_H__
 
 #include "game/card_enums.h"
-#include "game/format_str.h"
+#include "game/game_string.h"
 #include "game/durations.h"
 
 #include <memory>

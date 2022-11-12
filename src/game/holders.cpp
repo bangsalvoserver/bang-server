@@ -1,7 +1,5 @@
 #include "holders.h"
 
-#include "formatter.h"
-
 #include <stdexcept>
 
 #include "cards/effects.h"

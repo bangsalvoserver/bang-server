@@ -1,16 +1,17 @@
-#ifndef __FORMAT_STR_H__
-#define __FORMAT_STR_H__
+#ifndef __GAME_STRING_H__
+#define __GAME_STRING_H__
 
 #include "card_enums.h"
-
-#include <stdexcept>
-#include <optional>
 
 namespace banggame {
 
     DEFINE_STRUCT(card_format_id,
         (std::string, name)
-        (card_sign, sign)
+        (card_sign, sign),
+
+        card_format_id() = default;
+        card_format_id(not_null<card *> value);
+        card_format_id(card *value) : card_format_id(not_null{value}) {}
     )
 
     using game_format_arg = std::variant<int, std::string, card_format_id, serial::player>;
@@ -21,8 +22,11 @@ namespace banggame {
 
         game_string() = default;
     
-        template<std::convertible_to<std::string> T, typename ... Ts>
-        game_string(T &&message, Ts && ... args);
+        game_string(
+                std::convertible_to<std::string> auto &&message,
+                auto && ... args)
+            : format_str(FWD(message))
+            , format_args{game_format_arg(FWD(args)) ...} {}
 
         explicit operator bool() const {
             return !format_str.empty();

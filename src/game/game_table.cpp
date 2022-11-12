@@ -1,7 +1,5 @@
 #include "game_table.h"
 
-#include "formatter.h"
-
 #include "player_iterator.h"
 
 namespace banggame {

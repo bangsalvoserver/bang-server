@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "player.h"
-#include "format_str.h"
+#include "game_string.h"
 #include "game_update.h"
 
 namespace banggame {
