@@ -44,10 +44,11 @@ namespace banggame {
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
             target->discard_card(c);
         }
+        target->drop_all_cubes(target->m_characters.front());
         if (death) {
             target->add_gold(-target->m_gold);
+            target->m_game->play_sound(nullptr, "death");
         }
-        target->drop_all_cubes(target->m_characters.front());
     }
 
     struct request_discard_all : request_base, resolvable_request {
