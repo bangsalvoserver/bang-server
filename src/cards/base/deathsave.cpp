@@ -21,7 +21,7 @@ namespace banggame {
         // pushed backwards to the front of the queue
         target->m_game->queue_action_front([origin=origin, target=target]{
             if (target->m_hp <= 0) {
-                target->m_game->handle_player_death(origin, target);
+                target->m_game->handle_player_death(origin, target, discard_all_reason::death);
             }
         });
         target->m_game->queue_action_front([target=target, tried_save=tried_save]{

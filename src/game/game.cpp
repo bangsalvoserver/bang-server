@@ -427,7 +427,7 @@ namespace banggame {
         });
     }
 
-    void game::handle_player_death(player *killer, player *target, bool no_handle_game_over) {
+    void game::handle_player_death(player *killer, player *target, discard_all_reason reason) {
         if (killer != m_playing) killer = nullptr;
         
         target->remove_extra_characters();
@@ -443,7 +443,7 @@ namespace banggame {
             add_log("LOG_PLAYER_DIED", target);
         }
         
-        queue_action_front([this, killer, target]{
+        queue_action_front([this, killer, target, reason]{
             add_update<game_update_type::player_show_role>(target, target->m_role);
             target->add_player_flags(player_flags::role_revealed | player_flags::dead);
             target->set_hp(0, true);
@@ -451,11 +451,11 @@ namespace banggame {
             call_event<event_type::on_player_death>(killer, target);
         
             queue_action_front([=]{
-                target->discard_all(true);
+                target->discard_all(reason);
             });
         });
 
-        if (no_handle_game_over) {
+        if (reason == discard_all_reason::disable_temp_ghost) {
             return;
         }
 
@@ -518,7 +518,7 @@ namespace banggame {
                         if (killer->m_role == player_role::sheriff) {
                             queue_action([this, killer]{
                                 add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                                killer->discard_all(false);
+                                killer->discard_all(discard_all_reason::sheriff_killed_deputy);
                             });
                         }
                         break;

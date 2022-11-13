@@ -33,7 +33,7 @@ namespace banggame {
         }
     }
 
-    static void discard_rest(player *target, bool death) {
+    static void discard_rest(player *target, discard_all_reason reason) {
         std::vector<card *> black_cards;
         for (card *c : target->m_table) {
             if (c->color == card_color_type::black) {
@@ -45,18 +45,20 @@ namespace banggame {
             target->discard_card(c);
         }
         target->drop_all_cubes(target->m_characters.front());
-        if (death) {
+        if (reason != discard_all_reason::sheriff_killed_deputy) {
             target->add_gold(-target->m_gold);
+        }
+        if (reason == discard_all_reason::death) {
             target->m_game->play_sound(nullptr, "death");
         }
     }
 
     struct request_discard_all : request_base, resolvable_request {
-        bool death;
+        discard_all_reason reason;
 
-        request_discard_all(player *target, bool death = true)
+        request_discard_all(player *target, discard_all_reason reason = discard_all_reason::death)
             : request_base(nullptr, nullptr, target, effect_flags::auto_respond)
-            , death(death) {}
+            , reason(reason) {}
         
         bool can_pick(card *target_card) const override {
             return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
@@ -69,7 +71,7 @@ namespace banggame {
             target->discard_card(target_card);
             
             if (target->only_black_cards_equipped()) {
-                discard_rest(target, death);
+                discard_rest(target, reason);
                 target->m_game->pop_request();
             }
             target->m_game->update_request();
@@ -91,12 +93,12 @@ namespace banggame {
                 target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
                 target->discard_card(c);
             }
-            discard_rest(target, death);
+            discard_rest(target, reason);
             target->m_game->update_request();
         }
 
         game_string status_text(player *owner) const override {
-            if (death) {
+            if (reason != discard_all_reason::sheriff_killed_deputy) {
                 if (target == owner) {
                     return "STATUS_DISCARD_ALL";
                 } else {
@@ -112,8 +114,8 @@ namespace banggame {
         }
     };
 
-    void queue_request_discard_all(player *target, bool death) {
-        target->m_game->queue_request<request_discard_all>(target, death);
+    void queue_request_discard_all(player *target, discard_all_reason reason) {
+        target->m_game->queue_request<request_discard_all>(target, reason);
     }
 
 }

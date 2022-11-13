@@ -22,7 +22,7 @@ namespace banggame {
     void equip_ghost::on_unequip(card *target_card, player *target) {
         target->remove_player_flags(player_flags::targetable);
         target->m_game->queue_action_front([=]{
-            target->m_game->handle_player_death(nullptr, target);
+            target->m_game->handle_player_death(nullptr, target, discard_all_reason::discard_ghost);
         });
     }
 }

@@ -446,9 +446,9 @@ namespace banggame {
         }
     }
 
-    void player::discard_all(bool death) {
+    void player::discard_all(discard_all_reason reason) {
         untap_inactive_cards();
-        queue_request_discard_all(this, death);
+        queue_request_discard_all(this, reason);
     }
 
     bool player::only_black_cards_equipped() const {

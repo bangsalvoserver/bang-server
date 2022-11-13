@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "game_update.h"
+#include "cards/base/discard_all.h"
 
 namespace banggame {
 
@@ -135,7 +136,7 @@ namespace banggame {
 
         bool immune_to(card *origin_card, player *origin, effect_flags flags) const;
         
-        void discard_all(bool death);
+        void discard_all(discard_all_reason reason);
 
         bool only_black_cards_equipped() const;
 

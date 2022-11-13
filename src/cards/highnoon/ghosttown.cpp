@@ -18,7 +18,7 @@ namespace banggame {
             if (target->check_player_flags(player_flags::temp_ghost)) {
                 target->m_game->queue_action([=]{
                     if (target->m_extra_turns == 0 && target->remove_player_flags(player_flags::temp_ghost) && !target->alive()) {
-                        target->m_game->handle_player_death(nullptr, target, true);
+                        target->m_game->handle_player_death(nullptr, target, discard_all_reason::disable_temp_ghost);
                     }
                 });
             }
