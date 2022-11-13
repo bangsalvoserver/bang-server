@@ -81,10 +81,12 @@ namespace banggame {
     }
 
     bool request_bang::auto_resolve() {
-        if (bool(flags & effect_flags::multi_target)) {
-            target->m_game->play_sound(target, "gatling");
-        } else {
-            target->m_game->play_sound(target, "bang");
+        if (!num_cards_used()) {
+            if (bool(flags & effect_flags::multi_target)) {
+                target->m_game->play_sound(target, "gatling");
+            } else {
+                target->m_game->play_sound(target, "bang");
+            }
         }
         return request_base::auto_resolve();
     }

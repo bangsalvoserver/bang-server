@@ -24,6 +24,10 @@ namespace banggame {
 
     class missable_request {
     public:
+        size_t num_cards_used() const {
+            return m_cards_used.size();
+        }
+        
         void add_card(card *c) {
             m_cards_used.push_back(c);
         }
