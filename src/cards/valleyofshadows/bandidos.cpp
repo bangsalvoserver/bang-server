@@ -10,6 +10,13 @@ namespace banggame {
 
         int num_cards = 2;
 
+        bool auto_resolve() override {
+            if (num_cards == 2) {
+                target->m_game->play_sound(target, "bandidos");
+            }
+            return request_base::auto_resolve();
+        }
+
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
         }
