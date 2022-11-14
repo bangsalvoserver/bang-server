@@ -1,6 +1,7 @@
 ---
 main_deck:
-  - name: BARREL
+  - &barrel
+    name: BARREL
     signs:
       - Q spades
       - K spades
@@ -8,7 +9,8 @@ main_deck:
     color: blue
     responses:
       - barrel
-  - name: DYNAMITE
+  - &dynamite
+    name: DYNAMITE
     signs:
       - 2 hearts
     image: 01_dinamite
@@ -16,14 +18,16 @@ main_deck:
     equip:
       - predraw_check(2)
       - dynamite
-  - name: SCOPE
+  - &scope
+    name: SCOPE
     signs:
       - A spades
     image: 01_mirino
     color: blue
     equip:
       - scope
-  - name: MUSTANG
+  - &mustang
+    name: MUSTANG
     signs:
       - 8 hearts
       - 9 hearts
@@ -34,7 +38,8 @@ main_deck:
       - mustang
     tags:
       - horse
-  - name: JAIL
+  - &jail
+    name: JAIL
     signs:
       - J spades
       - 4 hearts
@@ -46,7 +51,8 @@ main_deck:
       - predraw_check(1)
       - jail
       - prompt_on_self_equip
-  - name: REMINGTON
+  - &remington
+    name: REMINGTON
     signs:
       - K clubs
     image: 01_remington
@@ -55,7 +61,8 @@ main_deck:
       - weapon(3)
     tags:
       - weapon
-  - name: REV_CARABINE
+  - &rev_carabine
+    name: REV_CARABINE
     signs:
       - A clubs
     image: 01_carabine
@@ -64,7 +71,8 @@ main_deck:
       - weapon(4)
     tags:
       - weapon
-  - name: SCHOFIELD
+  - &schofield
+    name: SCHOFIELD
     signs:
       - J clubs
       - Q clubs
@@ -75,7 +83,8 @@ main_deck:
       - weapon(2)
     tags:
       - weapon
-  - name: VOLCANIC
+  - &volcanic
+    name: VOLCANIC
     signs:
       - 10 spades
       - 10 clubs
@@ -86,7 +95,8 @@ main_deck:
       - volcanic
     tags:
       - weapon
-  - name: WINCHESTER
+  - &winchester
+    name: WINCHESTER
     signs:
       - 8 spades
     image: 01_winchester
@@ -95,7 +105,8 @@ main_deck:
       - weapon(5)
     tags:
       - weapon
-  - name: BANG
+  - &bang
+    name: BANG
     signs:
       - 2 clubs
       - 3 clubs
@@ -130,7 +141,8 @@ main_deck:
     mth_effect: bangcard
     tags:
       - bangcard
-  - name: BEER
+  - &beer
+    name: BEER
     signs:
       - 6 hearts
       - 7 hearts
@@ -147,7 +159,8 @@ main_deck:
       - deathsave
     tags:
       - beer
-  - name: CAT_BALOU
+  - &cat_balou
+    name: CAT_BALOU
     signs:
       - K hearts
       - 9 diamonds
@@ -157,7 +170,8 @@ main_deck:
     color: brown
     effects:
       - destroy card
-  - name: STAGECOACH
+  - &stagecoach
+    name: STAGECOACH
     signs:
       - 9 spades
       - 9 spades
@@ -165,7 +179,8 @@ main_deck:
     color: brown
     effects:
       - draw(2)
-  - name: DUEL
+  - &duel
+    name: DUEL
     signs:
       - Q diamonds
       - J spades
@@ -174,7 +189,8 @@ main_deck:
     color: brown
     effects:
       - duel player notself
-  - name: GENERAL_STORE
+  - &general_store
+    name: GENERAL_STORE
     signs:
       - 9 clubs
       - Q spades
@@ -183,14 +199,16 @@ main_deck:
     effects:
       - generalstore
       - generalstore all_players
-  - name: GATLING
+  - &gatling
+    name: GATLING
     signs:
       - 10 hearts
     image: 01_gatling
     color: brown
     effects:
       - bang other_players
-  - name: INDIANS
+  - &indians
+    name: INDIANS
     signs:
       - K diamonds
       - A diamonds
@@ -200,7 +218,8 @@ main_deck:
       - indians other_players
     tags:
       - indians
-  - name: MISSED
+  - &missed
+    name: MISSED
     signs:
       - 2 spades
       - 3 spades
@@ -220,7 +239,8 @@ main_deck:
       - missed
     tags:
       - missedcard
-  - name: PANIC
+  - &panic
+    name: PANIC
     signs:
       - J hearts
       - Q hearts
@@ -230,28 +250,27 @@ main_deck:
     color: brown
     effects:
       - steal card range_1
-  - name: SALOON
+  - &saloon
+    name: SALOON
     signs:
       - 5 hearts
     image: 01_saloon
     color: brown
     effects:
       - heal all_players
-  - name: WELLS_FARGO
+  - &wells_fargo
+    name: WELLS_FARGO
     signs:
       - 3 hearts
     image: 01_wellsfargo
     color: brown
     effects:
       - draw(3)
-  - name: BARREL
+  - <<: *barrel
     signs:
       - A clubs
     image: 03_barile
     expansion: dodgecity
-    color: blue
-    responses:
-      - barrel
   - name: BINOCULAR
     signs:
       - 10 diamonds
@@ -260,46 +279,26 @@ main_deck:
     color: blue
     equip:
       - scope
-  - name: DYNAMITE
+  - <<: *dynamite
     signs:
       - 10 clubs
     image: 03_dinamite
     expansion: dodgecity
-    color: blue
-    equip:
-      - predraw_check(2)
-      - dynamite
-  - name: MUSTANG
+  - <<: *mustang
     signs:
       - 5 hearts
     image: 03_mustang
     expansion: dodgecity
-    color: blue
-    equip:
-      - horse
-      - mustang
-    tags:
-      - horse
-  - name: REMINGTON
+  - <<: *remington
     signs:
       - 6 diamonds
     image: 03_remington
     expansion: dodgecity
-    color: blue
-    equip:
-      - weapon(3)
-    tags:
-      - weapon
-  - name: REV_CARABINE
+  - <<: *rev_carabine
     signs:
       - 5 spades
     image: 03_rev_carabine
     expansion: dodgecity
-    color: blue
-    equip:
-      - weapon(4)
-    tags:
-      - weapon
   - name: HIDEOUT
     signs:
       - K diamonds
@@ -308,7 +307,7 @@ main_deck:
     color: blue
     equip:
       - mustang
-  - name: BANG
+  - <<: *bang
     signs:
       - 8 spades
       - 5 clubs
@@ -316,72 +315,37 @@ main_deck:
       - K clubs
     image: 03_bang
     expansion: dodgecity
-    color: brown
-    effects:
-      - banglimit
-      - mth_add player reachable notself
-    mth_effect: bangcard
-    tags:
-      - bangcard
-  - name: BEER
+  - <<: *beer
     signs:
       - 6 hearts
       - 6 spades
     image: 03_birra
     expansion: dodgecity
-    color: brown
-    effects:
-      - beer
-    responses:
-      - beer_response
-      - deathsave
-    tags:
-      - beer
-  - name: CAT_BALOU
+  - <<: *cat_balou
     signs:
       - 8 clubs
     image: 03_cat_balou
     expansion: dodgecity
-    color: brown
-    effects:
-      - destroy card
-  - name: GENERAL_STORE
+  - <<: *general_store
     signs:
       - A spades
     image: 03_emporio
     expansion: dodgecity
-    color: brown
-    effects:
-      - generalstore
-      - generalstore all_players
-  - name: INDIANS
+  - <<: *indians
     signs:
       - 5 diamonds
     image: 03_indiani
     expansion: dodgecity
-    color: brown
-    effects:
-      - indians other_players
-    tags:
-      - indians
-  - name: MISSED
+  - <<: *missed
     signs:
       - 8 diamonds
     image: 03_mancato
     expansion: dodgecity
-    color: brown
-    responses:
-      - missed
-    tags:
-      - missedcard
-  - name: PANIC
+  - <<: *panic
     signs:
       - J hearts
     image: 03_panico
     expansion: dodgecity
-    color: brown
-    effects:
-      - steal card range_1
   - name: PUNCH
     signs:
       - 10 spades
@@ -410,7 +374,8 @@ main_deck:
       - discard extra_card self | hand
       - play_card_action
       - destroy cards_other_players
-  - name: DODGE
+  - &dodge
+    name: DODGE
     signs:
       - 7 diamonds
       - K hearts
@@ -707,7 +672,7 @@ main_deck:
     color: brown
     effects:
       - heal
-  - name: BANG
+  - <<: *bang
     signs:
       - 6 hearts
       - 2 clubs
@@ -715,13 +680,6 @@ main_deck:
       - 3 diamonds
     image: 17_bang
     expansion: armedanddangerous
-    color: brown
-    effects:
-      - banglimit
-      - mth_add player reachable notself
-    mth_effect: bangcard
-    tags:
-      - bangcard
   - name: CARAVAN
     signs:
       - 2 spades
@@ -737,14 +695,11 @@ main_deck:
     mth_effect: draw_multi
     tags:
       - repeatable
-  - name: CAT_BALOU
+  - <<: *cat_balou
     signs:
       - 3 hearts
     image: 17_catbalou
     expansion: armedanddangerous
-    color: brown
-    effects:
-      - destroy card
   - name: A_LITTLE_NIP
     signs:
       - 5 hearts
@@ -812,16 +767,11 @@ main_deck:
       - pay_cube select_cubes(2)
       - mth_add
     mth_response: duck
-  - name: MISSED
+  - <<: *missed
     signs:
       - K spades
     image: 17_mancato
     expansion: armedanddangerous
-    color: brown
-    responses:
-      - missed
-    tags:
-      - missedcard
   - name: RELOAD
     signs:
       - 4 diamonds
@@ -1064,18 +1014,13 @@ main_deck:
     color: brown
     effects:
       - bang player reachable notself
-  - name: MISSED
+  - <<: *missed
     signs:
       - J spades
       - 6 clubs
     image: 20_mancato
     expansion: canyondiablo
-    color: brown
-    responses:
-      - missed
-    tags:
-      - missedcard
-  - name: BANG
+  - <<: *bang
     signs:
       - 10 spades
       - Q clubs
@@ -1083,42 +1028,21 @@ main_deck:
       - 6 diamonds
     image: 20_bang
     expansion: canyondiablo
-    color: brown
-    effects:
-      - banglimit
-      - mth_add player reachable notself
-    mth_effect: bangcard
-    tags:
-      - bangcard
-  - name: PANIC
+  - <<: *panic
     signs:
       - 9 hearts
     image: 20_panico
     expansion: canyondiablo
-    color: brown
-    effects:
-      - steal card range_1
-  - name: BEER
+  - <<: *beer
     signs:
       - Q hearts
     image: 20_birra
     expansion: canyondiablo
-    color: brown
-    effects:
-      - beer
-    responses:
-      - beer_response
-      - deathsave
-    tags:
-      - beer
-  - name: CAT_BALOU
+  - <<: *cat_balou
     signs:
       - J clubs
     image: 20_catbalou
     expansion: canyondiablo
-    color: brown
-    effects:
-      - destroy card
   - name: BULLDOG
     signs:
       - 7 diamonds
@@ -1161,16 +1085,11 @@ main_deck:
     color: blue
     equip:
       - indianguide
-  - name: REMINGTON
+  - <<: *remington
     signs:
       - K spades
     image: 20_remington
     expansion: canyondiablo
-    color: blue
-    equip:
-      - weapon(3)
-    tags:
-      - weapon
   - name: TAXMAN
     signs:
       - K clubs
@@ -1284,15 +1203,11 @@ main_deck:
     effects:
       - draw(2)
       - damage
-  - name: DODGE
+  - <<: *dodge
     signs:
       - 7 spades
     image: 20_schivata
     expansion: canyondiablo
-    color: brown
-    responses:
-      - draw
-      - missed
 character:
   - name: BART_CASSIDY
     image: 01_bartcassidy
