@@ -285,6 +285,9 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::cards_other_players>::prompt(const std::vector<not_null<card *>> &target_cards) {
+        if (target_cards.empty()) {
+            return {"PROMPT_CARD_NO_EFFECT", verifier.origin_card};
+        }
         game_string msg;
         for (card *target_card : target_cards) {
             msg = effect.on_prompt(verifier.origin_card, verifier.origin, target_card);
