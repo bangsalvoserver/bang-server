@@ -275,6 +275,14 @@ std::string game_manager::handle_chat_command(user_ptr user, const std::string &
         return "ERROR_LOBBY_NOT_WAITING";
     }
 
+    if (bool(command.permissions() & command_permissions::game_cheat)) {
+        if (lobby.state != lobby_state::playing) {
+            return "ERROR_LOBBY_NOT_PLAYING";
+        } else if (!lobby.options.enable_cheats) {
+            return "ERROR_GAME_CHEATS_NOT_ENABLED";
+        }
+    }
+
     std::vector<std::string> args;
 
     if (space_pos != std::string::npos) {

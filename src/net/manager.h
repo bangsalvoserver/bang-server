@@ -95,6 +95,7 @@ private:
     std::string command_kick_user(user_ptr user, std::string_view userid);
     std::string command_get_game_options(user_ptr user);
     std::string command_set_game_option(user_ptr user, std::string_view name, std::string_view value);
+    std::string command_give_card(user_ptr user, std::string_view name);
 
 private:
     user_map users;

@@ -8,6 +8,7 @@ namespace banggame {
     DEFINE_ENUM_FLAGS(command_permissions,
         (lobby_owner)
         (lobby_waiting)
+        (game_cheat)
     )
 
     template<auto FnMemPtr> struct proxy_t {

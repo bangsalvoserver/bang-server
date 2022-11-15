@@ -14,13 +14,15 @@ namespace banggame {
     static constexpr std::string_view KICK_DESCRIPTION = "[userid] : kick an user in this lobby";
     static constexpr std::string_view GET_OPTIONS_DESCRIPTION = "print game options";
     static constexpr std::string_view SET_OPTION_DESCRIPTION = "[name] [value] : set a game option";
+    static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card (cheat)";
 
     const std::map<std::string, chat_command, std::less<>> chat_command::commands {
         { "help",           { proxy<&game_manager::command_print_help>,         HELP_DESCRIPTION }},
         { "users",          { proxy<&game_manager::command_print_users>,        USERS_DESCRIPTION }},
         { "kick",           { proxy<&game_manager::command_kick_user>,          KICK_DESCRIPTION, command_permissions::lobby_owner }},
         { "options",        { proxy<&game_manager::command_get_game_options>,   GET_OPTIONS_DESCRIPTION }},
-        { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, command_permissions::lobby_owner | command_permissions::lobby_waiting }}
+        { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, command_permissions::lobby_owner | command_permissions::lobby_waiting }},
+        { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }}
     };
 
     std::string game_manager::command_print_help(user_ptr user) {
@@ -105,6 +107,22 @@ namespace banggame {
             }
         } else {
             return "INVALID_OPTION_NAME";
+        }
+    }
+
+    std::string game_manager::command_give_card(user_ptr user, std::string_view name) {
+        auto &lobby = (*user->second.in_lobby)->second;
+        if (auto player_it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); player_it != lobby.game.m_players.end()) {
+            if (auto card_it = std::ranges::find_if(lobby.game.m_deck, [name](std::string_view card_name) {
+                return std::ranges::equal(name, card_name, {}, toupper, toupper);
+            }, &card::name); card_it != lobby.game.m_deck.end()) {
+                player_it->add_to_hand(*card_it);
+                return {};
+            } else {
+                return "ERROR_CANNOT_GIVE_CARD";
+            }
+        } else {
+            return "ERROR_USER_NOT_CONTROLLING_PLAYER";
         }
     }
 
