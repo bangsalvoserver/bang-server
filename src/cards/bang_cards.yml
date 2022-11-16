@@ -198,7 +198,7 @@ main_deck:
     color: brown
     effects:
       - generalstore
-      - generalstore all_players
+      - generalstore players
   - &gatling
     name: GATLING
     signs:
@@ -206,7 +206,7 @@ main_deck:
     image: 01_gatling
     color: brown
     effects:
-      - bang other_players
+      - bang players notself
   - &indians
     name: INDIANS
     signs:
@@ -215,7 +215,7 @@ main_deck:
     image: 01_indiani
     color: brown
     effects:
-      - indians other_players
+      - indians players notself
     tags:
       - indians
   - &missed
@@ -257,7 +257,7 @@ main_deck:
     image: 01_saloon
     color: brown
     effects:
-      - heal all_players
+      - heal players
   - &wells_fargo
     name: WELLS_FARGO
     signs:
@@ -480,7 +480,7 @@ main_deck:
     expansion: dodgecity
     color: green
     effects:
-      - bang other_players
+      - bang players notself
   - name: PEPPERBOX
     signs:
       - A hearts
@@ -589,7 +589,7 @@ main_deck:
     expansion: valleyofshadows
     color: brown
     effects:
-      - bandidos all_players
+      - bandidos players
   - name: ESCAPE
     signs:
       - 3 hearts
@@ -663,7 +663,7 @@ main_deck:
     expansion: valleyofshadows
     color: brown
     effects:
-      - tornado all_players
+      - tornado players
   - name: LAST_CALL
     signs:
       - 8 diamonds
@@ -787,7 +787,7 @@ main_deck:
     expansion: armedanddangerous
     color: brown
     effects:
-      - rust other_players
+      - rust players notself
   - name: SQUAW
     signs:
       - 3 diamonds
@@ -956,7 +956,7 @@ main_deck:
     effects:
       - graverobber
       - play_card_action
-      - generalstore all_players
+      - generalstore players
   - name: CARD_SHARPER
     signs:
       - 10 clubs
@@ -1143,7 +1143,7 @@ main_deck:
     expansion: canyondiablo
     color: green
     effects:
-      - indians other_players
+      - indians players notself
     tags:
       - indians
   - name: ARSON
@@ -1321,7 +1321,7 @@ character:
       - max_usages(1)
       - discard card self | hand
       - generalstore
-      - generalstore all_players
+      - generalstore players
   - name: ANNIE_VERSARY
     image: 02_annieversary
     expansion: thebullet
@@ -1922,7 +1922,7 @@ goldrush:
     color: brown
     effects:
       - generalstore
-      - generalstore all_players
+      - generalstore players
     tags:
       - shopchoice(2)
       - hidden

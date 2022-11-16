@@ -76,75 +76,51 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::other_players>::verify() {
-        for (player &p : range_other_players(verifier.origin)) {
-            if (game_string error = effect.verify(verifier.origin_card, verifier.origin, &p)) {
-                return error;
+    template<> game_string play_visitor<target_type::players>::verify() {
+        for (player &target : range_all_players(verifier.origin)) {
+            if (!check_player_filter(verifier.origin, effect.player_filter, &target)) {
+                if (game_string error = effect.verify(verifier.origin_card, verifier.origin, &target)) {
+                    return error;
+                }
             }
         }
         return {};
     }
 
-    template<> duplicate_set play_visitor<target_type::other_players>::duplicates() {
+    template<> duplicate_set play_visitor<target_type::players>::duplicates() {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::other_players>::prompt() {
+    template<> game_string play_visitor<target_type::players>::prompt() {
         game_string msg;
-        for (player &p : range_other_players(verifier.origin)) {
-            msg = effect.on_prompt(verifier.origin_card, verifier.origin, &p);
-            if (!msg) break;
+        for (player &target : range_all_players(verifier.origin)) {
+            if (!check_player_filter(verifier.origin, effect.player_filter, &target)) {
+                msg = effect.on_prompt(verifier.origin_card, verifier.origin, &target);
+                if (!msg) break;
+            }
         }
         return msg;
     }
 
-    template<> void play_visitor<target_type::other_players>::play() {
-        auto targets = range_other_players(verifier.origin);
-        
-        auto flags = effect_flags::multi_target;
-        if (verifier.origin_card->color == card_color_type::brown) {
-            flags |= effect_flags::escapable;
+    template<> void play_visitor<target_type::players>::play() {
+        std::vector<player *> targets;
+        for (player &target : range_all_players(verifier.origin)) {
+            if (!check_player_filter(verifier.origin, effect.player_filter, &target)) {
+                targets.push_back(&target);
+            }
         }
-        if (std::ranges::distance(targets) == 1) {
+
+        auto flags = effect_flags::multi_target;
+        if (targets.size() == 1) {
             flags |= effect_flags::single_target;
         }
-        for (player &p : targets) {
-            if (!p.immune_to(verifier.origin_card, verifier.origin, flags)) {
-                effect.on_play(verifier.origin_card, verifier.origin, &p, flags);
-            }
-        }
-    }
-
-    template<> game_string play_visitor<target_type::all_players>::verify() {
-        for (player &p : range_all_players(verifier.origin)) {
-            if (game_string error = effect.verify(verifier.origin_card, verifier.origin, &p)) {
-                return error;
-            }
-        }
-        return {};
-    }
-
-    template<> duplicate_set play_visitor<target_type::all_players>::duplicates() {
-        return {};
-    }
-
-    template<> game_string play_visitor<target_type::all_players>::prompt() {
-        game_string msg;
-        for (player &p : range_all_players(verifier.origin)) {
-            msg = effect.on_prompt(verifier.origin_card, verifier.origin, &p);
-            if (!msg) break;
-        }
-        return msg;
-    }
-
-    template<> void play_visitor<target_type::all_players>::play() {
-        auto flags = effect_flags::multi_target;
         if (verifier.origin_card->color == card_color_type::brown) {
             flags |= effect_flags::escapable;
         }
-        for (player &p : range_all_players(verifier.origin)) {
-            if (!p.immune_to(verifier.origin_card, verifier.origin, flags)) {
-                effect.on_play(verifier.origin_card, verifier.origin, &p, flags);
+
+        for (player *target : targets) {
+            if (!target->immune_to(verifier.origin_card, verifier.origin, flags)) {
+                effect.on_play(verifier.origin_card, verifier.origin, target, flags);
             }
         }
     }
