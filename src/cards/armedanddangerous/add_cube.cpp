@@ -60,6 +60,18 @@ namespace banggame {
         }
     };
 
+    game_string effect_add_cube::on_prompt(card *origin_card, player *origin) {
+        auto has_full_cubes = [](card *target) {
+            return target->pocket == pocket_type::player_table && target->color != card_color_type::orange
+                || target->num_cubes == max_cubes;
+        };
+        if (has_full_cubes(origin->m_characters.front()) && std::ranges::all_of(origin->m_table, has_full_cubes)) {
+            return {"PROMPT_CARD_NO_EFFECT", origin_card};
+        } else {
+            return {};
+        }
+    }
+
     void effect_add_cube::on_play(card *origin_card, player *origin) {
         int nslots = max_cubes - origin->m_characters.front()->num_cubes;
         int ncards = nslots > 0;
@@ -84,6 +96,14 @@ namespace banggame {
             }
         } else if (ncubes > 0) {
             origin->m_game->queue_request<request_add_cube>(origin_card, origin, ncubes);
+        }
+    }
+
+    game_string effect_add_cube::on_prompt(card *origin_card, player *origin, card *target) {
+        if (target->num_cubes == max_cubes) {
+            return {"PROMPT_CARD_NO_EFFECT", origin_card};
+        } else {
+            return {};
         }
     }
 
