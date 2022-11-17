@@ -6,10 +6,41 @@ namespace banggame {
     
     struct request_add_cube : request_base {
         request_add_cube(card *origin_card, player *target, int ncubes = 1)
-            : request_base(origin_card, nullptr, target, effect_flags::auto_pick)
-            , ncubes(ncubes) {}
+            : request_base(origin_card, nullptr, target)
+            , ncubes(std::min<int>(ncubes, target->m_game->num_cubes)) {}
 
         int ncubes = 1;
+
+        bool auto_resolve() override {
+            int nslots = max_cubes - target->m_characters.front()->num_cubes;
+            int ncards = nslots > 0;
+            for (card *c : target->m_table) {
+                if (c->color == card_color_type::orange) {
+                    ncards += c->num_cubes < max_cubes;
+                    nslots += max_cubes - c->num_cubes;
+                }
+            }
+
+            if (nslots <= ncubes || ncards <= 1) {
+                auto do_add_cubes = [&](card *c) {
+                    int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes);
+                    ncubes -= cubes_to_add;
+                    target->add_cubes(c, cubes_to_add);
+                };
+
+                target->m_game->pop_request();
+                do_add_cubes(target->m_characters.front());
+                for (card *c : target->m_table) {
+                    if (c->color == card_color_type::orange) {
+                        do_add_cubes(c);
+                    }
+                }
+                target->m_game->update_request();
+
+                return true;
+            }
+            return false;
+        }
         
         bool can_pick(card *target_card) const override {
             if (target_card->owner == target) {
@@ -73,30 +104,7 @@ namespace banggame {
     }
 
     void effect_add_cube::on_play(card *origin_card, player *origin) {
-        int nslots = max_cubes - origin->m_characters.front()->num_cubes;
-        int ncards = nslots > 0;
-        for (card *c : origin->m_table) {
-            if (c->color == card_color_type::orange) {
-                ncards += c->num_cubes < max_cubes;
-                nslots += max_cubes - c->num_cubes;
-            }
-        }
-        ncubes = std::min<int>(ncubes, origin->m_game->num_cubes);
-        if (nslots <= ncubes || ncards <= 1) {
-            auto do_add_cubes = [&](card *c) {
-                int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes);
-                ncubes -= cubes_to_add;
-                origin->add_cubes(c, cubes_to_add);
-            };
-            do_add_cubes(origin->m_characters.front());
-            for (card *c : origin->m_table) {
-                if (c->color == card_color_type::orange) {
-                    do_add_cubes(c);
-                }
-            }
-        } else if (ncubes > 0) {
-            origin->m_game->queue_request<request_add_cube>(origin_card, origin, ncubes);
-        }
+        origin->m_game->queue_request<request_add_cube>(origin_card, origin, ncubes);
     }
 
     game_string effect_add_cube::on_prompt(card *origin_card, player *origin, card *target) {
