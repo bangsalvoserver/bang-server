@@ -38,6 +38,13 @@ namespace banggame {
         }
     }
 
+    card *game_table::top_of_deck() {
+        if (m_deck.empty()) {
+            throw std::runtime_error("Deck is empty");
+        }
+        return m_deck.back();
+    }
+
     int game_table::calc_distance(player *from, player *to) {
         if (from == to) return 0;
         if (check_flags(game_flags::disable_player_distances)) return to->m_distance_mod;
@@ -96,7 +103,7 @@ namespace banggame {
             
             add_update<game_update_type::move_card>(c, owner, pocket, flags);
         }
-        if (prev_pocket == pocket_type::main_deck && m_deck.empty()) {
+        if (prev_pocket == pocket_type::main_deck && m_deck.empty() && !m_discards.empty()) {
             card *top_discards = m_discards.back();
             if (m_options.keep_last_card_shuffling) {
                 m_discards.pop_back();
@@ -118,14 +125,14 @@ namespace banggame {
     }
 
     card *game_table::draw_card_to(pocket_type pocket, player *owner, show_card_flags flags) {
-        card *drawn_card = m_deck.back();
+        card *drawn_card = top_of_deck();
         move_card(drawn_card, pocket, owner, flags);
         return drawn_card;
     }
 
     card *game_table::phase_one_drawn_card() {
         if (!check_flags(game_flags::phase_one_draw_discard) || m_discards.empty()) {
-            return m_deck.back();
+            return top_of_deck();
         } else {
             return m_discards.back();
         }
@@ -138,6 +145,9 @@ namespace banggame {
     }
 
     card *game_table::draw_shop_card() {
+        if (m_shop_deck.empty()) {
+            throw std::runtime_error("Shop deck is empty");
+        }
         card *drawn_card = m_shop_deck.back();
         add_log("LOG_DRAWN_SHOP_CARD", drawn_card);
         move_card(drawn_card, pocket_type::shop_selection);

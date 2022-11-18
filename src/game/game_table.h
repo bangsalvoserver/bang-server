@@ -52,6 +52,7 @@ namespace banggame {
         player *find_player(int player_id) const;
         
         std::vector<card *> &get_pocket(pocket_type pocket, player *owner = nullptr);
+        card *top_of_deck();
 
         int calc_distance(player *from, player *to);
 

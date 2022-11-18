@@ -207,13 +207,13 @@ namespace banggame {
             }
         }
         for (int i=0; i<ncards; ++i) {
-            card *drawn_card = m_game->m_deck.back();
+            card *drawn_card = m_game->top_of_deck();
             if (origin_card) {
                 m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD_FOR", this, drawn_card, origin_card);
             } else {
                 m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);
             }
-            m_game->draw_card_to(pocket_type::player_hand, this);
+            m_game->move_card(drawn_card, pocket_type::player_hand, this);
         }
     }
 
