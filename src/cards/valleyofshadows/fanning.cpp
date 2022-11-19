@@ -29,7 +29,7 @@ namespace banggame {
     }
 
     void handler_fanning::on_play(card *origin_card, player *origin, player *player1, player *player2) {
-        effect_bang{}.on_play(origin_card, origin, player1, effect_flags::multi_target | effect_flags::escapable);
-        effect_bang{}.on_play(origin_card, origin, player2, effect_flags::multi_target | effect_flags::escapable);
+        effect_bang{}.on_play(origin_card, origin, player1, effect_flags::escapable);
+        effect_bang{}.on_play(origin_card, origin, player2, effect_flags::escapable);
     }
 }

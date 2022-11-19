@@ -6,7 +6,9 @@
 namespace banggame {
     
     void effect_bang::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
-        target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
+        if (!bool(flags & effect_flags::multi_target)) {
+            target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
+        }
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
