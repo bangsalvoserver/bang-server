@@ -36,7 +36,8 @@ namespace banggame {
 
     game_string effect_holder::verify(card *origin_card, player *origin, const target_variant &target) const {
         return visit_effect([=](auto &&value) -> game_string {
-            if (std::holds_alternative<std::monostate>(target)) {
+            switch (target.index()) {
+            case 0:
                 if constexpr (requires { value.verify(origin_card, origin); }) {
                     return value.verify(origin_card, origin);
                 } else if constexpr (requires { value.can_respond(origin_card, origin); }) {
@@ -44,13 +45,15 @@ namespace banggame {
                         return "ERROR_INVALID_RESPONSE";
                     }
                 }
-            } else if (player * const *target_player = std::get_if<player *>(&target)) {
-                if constexpr (requires { value.verify(origin_card, origin, *target_player); }) {
-                    return value.verify(origin_card, origin, *target_player);
+                break;
+            case 1:
+                if constexpr (requires (player *target_player) { value.verify(origin_card, origin, target_player); }) {
+                    return value.verify(origin_card, origin, std::get<player *>(target));
                 }
-            } else if (card * const *target_card = std::get_if<card *>(&target)) {
-                if constexpr (requires { value.verify(origin_card, origin, *target_card); }) {
-                    return value.verify(origin_card, origin, *target_card);
+                break;
+            case 2:
+                if constexpr (requires (card *target_card) { value.verify(origin_card, origin, target_card); }) {
+                    return value.verify(origin_card, origin, std::get<card *>(target));
                 }
             }
             return {};
@@ -59,17 +62,20 @@ namespace banggame {
 
     game_string effect_holder::on_prompt(card *origin_card, player *origin, const target_variant &target) const {
         return visit_effect([=](auto &&value) -> game_string {
-            if (std::holds_alternative<std::monostate>(target)) {
+            switch (target.index()) {
+            case 0:
                 if constexpr (requires { value.on_prompt(origin_card, origin); }) {
                     return value.on_prompt(origin_card, origin);
                 }
-            } else if (player * const *target_player = std::get_if<player *>(&target)) {
-                if constexpr (requires { value.on_prompt(origin_card, origin, *target_player); }) {
-                    return value.on_prompt(origin_card, origin, *target_player);
+                break;
+            case 1:
+                if constexpr (requires (player *target_player) { value.on_prompt(origin_card, origin, target_player); }) {
+                    return value.on_prompt(origin_card, origin, std::get<player *>(target));
                 }
-            } else if (card * const *target_card = std::get_if<card *>(&target)) {
-                if constexpr (requires { value.on_prompt(origin_card, origin, *target_card); }) {
-                    return value.on_prompt(origin_card, origin, *target_card);
+                break;
+            case 2:
+                if constexpr (requires (card *target_card) { value.on_prompt(origin_card, origin, target_card); }) {
+                    return value.on_prompt(origin_card, origin, std::get<card *>(target));
                 }
             }
             return {};
@@ -78,23 +84,26 @@ namespace banggame {
 
     void effect_holder::on_play(card *origin_card, player *origin, const target_variant &target, effect_flags flags) const {
         visit_effect([=](auto &&value) {
-            if (std::holds_alternative<std::monostate>(target)) {
+            switch (target.index()) {
+            case 0:
                 if constexpr (requires { value.on_play(origin_card, origin, flags); }) {
                     value.on_play(origin_card, origin, flags);
                 } else if constexpr (requires { value.on_play(origin_card, origin); }) {
                     value.on_play(origin_card, origin);
                 }
-            } else if (player * const *target_player = std::get_if<player *>(&target)) {
-                if constexpr (requires { value.on_play(origin_card, origin, *target_player, flags); }) {
-                    value.on_play(origin_card, origin, *target_player, flags);
-                } else if constexpr (requires {value.on_play(origin_card, origin, *target_player); }) {
-                    value.on_play(origin_card, origin, *target_player);
+                break;
+            case 1:
+                if constexpr (requires (player *target_player) { value.on_play(origin_card, origin, target_player, flags); }) {
+                    value.on_play(origin_card, origin, std::get<player *>(target), flags);
+                } else if constexpr (requires (player *target_player) { value.on_play(origin_card, origin, target_player); }) {
+                    value.on_play(origin_card, origin, std::get<player *>(target));
                 }
-            } else if (card * const *target_card = std::get_if<card *>(&target)) {
-                if constexpr (requires { value.on_play(origin_card, origin, *target_card, flags); }) {
-                    value.on_play(origin_card, origin, *target_card, flags);
-                } else if constexpr (requires { value.on_play(origin_card, origin, *target_card); }) {
-                    value.on_play(origin_card, origin, *target_card);
+                break;
+            case 2:
+                if constexpr (requires (card *target_card) { value.on_play(origin_card, origin, target_card, flags); }) {
+                    value.on_play(origin_card, origin, std::get<card *>(target), flags);
+                } else if constexpr (requires (card *target_card) { value.on_play(origin_card, origin, target_card); }) {
+                    value.on_play(origin_card, origin, std::get<card *>(target));
                 }
             }
         }, *this);
