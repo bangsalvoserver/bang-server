@@ -95,18 +95,26 @@ namespace banggame {
             if (game_string error = enums::visit_indexed(
                 [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
                     duplicate_set duplicates = play_visitor<E>{*this, effect}.duplicates(FWD(args) ... );
-                    if (auto *cards = std::get_if<card_set>(&duplicates)) {
-                        selected_cards.merge(*cards);
-                        if (!cards->empty()) return {"ERROR_DUPLICATE_CARD", *cards->begin()};
-                    } else if (auto *players = std::get_if<player_set>(&duplicates)) {
-                        selected_players.merge(*players);
-                        if (!players->empty()) return {"ERROR_DUPLICATE_PLAYER", *players->begin()};
-                    } else if (auto *cubes = std::get_if<card_cube_count>(&duplicates)) {
-                        for (auto &[card, ncubes] : *cubes) {
+                    switch (duplicates.index()) {
+                    case 1: {
+                        auto &players = std::get<player_set>(duplicates);
+                        selected_players.merge(players);
+                        if (!players.empty()) return {"ERROR_DUPLICATE_PLAYER", *players.begin()};
+                        break;
+                    }
+                    case 2: {
+                        auto &cards = std::get<card_set>(duplicates);
+                        selected_cards.merge(cards);
+                        if (!cards.empty()) return {"ERROR_DUPLICATE_CARD", *cards.begin()};
+                        break;
+                    }
+                    case 3:
+                        for (auto &[card, ncubes] : std::get<card_cube_count>(duplicates)) {
                             if (selected_cubes[card] += ncubes > card->num_cubes) {
                                 return {"ERROR_NOT_ENOUGH_CUBES_ON", card};
                             }
                         }
+                        break;
                     }
                     return {};
                 }, target))

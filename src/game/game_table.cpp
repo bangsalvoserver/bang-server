@@ -101,20 +101,19 @@ namespace banggame {
     }
 
     void game_table::move_card(card *c, pocket_type pocket, player *owner, show_card_flags flags) {
-        pocket_type prev_pocket = c->pocket;
-        if (c->pocket != pocket || c->owner != owner) {
-            send_card_update(c, owner, flags);
+        if (c->pocket == pocket && c->owner == owner) return;
+        
+        send_card_update(c, owner, flags);
 
-            auto &prev_pile = get_pocket(c->pocket, c->owner);
-            prev_pile.erase(std::ranges::find(prev_pile, c));
+        auto &prev_pile = get_pocket(c->pocket, c->owner);
+        prev_pile.erase(std::ranges::find(prev_pile, c));
 
-            get_pocket(pocket, owner).emplace_back(c);
-            
-            c->pocket = pocket;
-            c->owner = owner;
-            
-            add_update<game_update_type::move_card>(c, owner, pocket, flags);
-        }
+        get_pocket(pocket, owner).emplace_back(c);
+        
+        c->pocket = pocket;
+        c->owner = owner;
+        
+        add_update<game_update_type::move_card>(c, owner, pocket, flags);
     }
 
     card *game_table::draw_card_to(pocket_type pocket, player *owner, show_card_flags flags) {
