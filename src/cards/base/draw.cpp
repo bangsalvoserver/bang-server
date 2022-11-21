@@ -51,7 +51,11 @@ namespace banggame {
     }
 
     bool request_draw::can_pick(card *target_card) const {
-        return target_card->pocket == target->m_game->phase_one_drawn_card()->pocket;
+        if (target->m_game->m_deck.empty() || target->m_game->check_flags(game_flags::phase_one_draw_discard) && !target->m_game->m_discards.empty()) {
+            return target_card->pocket == pocket_type::discard_pile;
+        } else {
+            return target_card->pocket == pocket_type::main_deck;
+        }
     }
 
     void request_draw::on_pick(card *target_card) {

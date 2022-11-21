@@ -141,7 +141,6 @@ namespace banggame {
         (card_expansion_type, expansions)
         (bool, enable_cheats)
         (bool, character_choice, true)
-        (bool, keep_last_card_shuffling)
         (bool, can_play_beer_in_duel, true)
         (bool, auto_discard_all)
         (int, scenario_deck_size, 12)

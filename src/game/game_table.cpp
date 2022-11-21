@@ -40,7 +40,19 @@ namespace banggame {
 
     card *game_table::top_of_deck() {
         if (m_deck.empty()) {
-            throw std::runtime_error("Deck is empty");
+            if (m_discards.empty()) {
+                throw std::runtime_error("Deck is empty. Cannot shuffle");
+            }
+            m_deck = std::move(m_discards);
+            m_discards.clear();
+            for (card *c : m_deck) {
+                c->pocket = pocket_type::main_deck;
+                c->owner = nullptr;
+            }
+            shuffle_cards_and_ids(m_deck);
+            add_log("LOG_DECK_RESHUFFLED");
+            play_sound(nullptr, "shuffle");
+            add_update<game_update_type::deck_shuffled>(pocket_type::main_deck);
         }
         return m_deck.back();
     }
@@ -102,25 +114,6 @@ namespace banggame {
             c->owner = owner;
             
             add_update<game_update_type::move_card>(c, owner, pocket, flags);
-        }
-        if (prev_pocket == pocket_type::main_deck && m_deck.empty() && !m_discards.empty()) {
-            card *top_discards = m_discards.back();
-            if (m_options.keep_last_card_shuffling) {
-                m_discards.pop_back();
-            }
-            m_deck = std::move(m_discards);
-            for (card *c : m_deck) {
-                c->pocket = pocket_type::main_deck;
-                c->owner = nullptr;
-            }
-            m_discards.clear();
-            if (m_options.keep_last_card_shuffling) {
-                m_discards.emplace_back(top_discards);
-            }
-            shuffle_cards_and_ids(m_deck);
-            add_log("LOG_DECK_RESHUFFLED");
-            play_sound(nullptr, "shuffle");
-            add_update<game_update_type::deck_shuffled>(pocket_type::main_deck);
         }
     }
 

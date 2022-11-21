@@ -13,13 +13,13 @@ namespace banggame {
         player *saved = nullptr;
 
         bool can_pick(card *target_card) const override {
-            return target_card->pocket == pocket_type::main_deck
+            return target_card->pocket == (target->m_game->m_deck.empty() ? pocket_type::discard_pile : pocket_type::main_deck)
                 || target_card->pocket == pocket_type::player_hand && target_card->owner == saved;
         }
 
         void on_pick(card *target_card) override {
             target->m_game->pop_request();
-            if (target_card->pocket == pocket_type::main_deck) {
+            if (target_card->pocket != pocket_type::player_hand) {
                 target->draw_card(2, origin_card);
             } else {
                 for (int i=0; i<2 && !saved->m_hand.empty(); ++i) {
