@@ -56,7 +56,7 @@ public:
     template<server_message_type E>
     void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
         auto msg = make_message<E>(FWD(args) ... );
-        for (user_ptr it : lobby.users) {
+        for (auto [team, it] : lobby.users) {
             m_send_message(it->first, msg);
         }
     }
@@ -96,6 +96,7 @@ private:
     std::string command_get_game_options(user_ptr user);
     std::string command_set_game_option(user_ptr user, std::string_view name, std::string_view value);
     std::string command_give_card(user_ptr user, std::string_view name);
+    std::string command_set_team(user_ptr user, std::string_view value);
 
 private:
     user_map users;

@@ -15,6 +15,7 @@ namespace banggame {
     static constexpr std::string_view GET_OPTIONS_DESCRIPTION = "print game options";
     static constexpr std::string_view SET_OPTION_DESCRIPTION = "[name] [value] : set a game option";
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card (cheat)";
+    static constexpr std::string_view SET_TEAM_DESCRIPTION = "[game_player / game_spectator] : set team";
 
     const std::map<std::string, chat_command, std::less<>> chat_command::commands {
         { "help",           { proxy<&game_manager::command_print_help>,         HELP_DESCRIPTION }},
@@ -22,7 +23,8 @@ namespace banggame {
         { "kick",           { proxy<&game_manager::command_kick_user>,          KICK_DESCRIPTION, command_permissions::lobby_owner }},
         { "options",        { proxy<&game_manager::command_get_game_options>,   GET_OPTIONS_DESCRIPTION }},
         { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, command_permissions::lobby_owner | command_permissions::lobby_waiting }},
-        { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }}
+        { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
+        { "set-team",       { proxy<&game_manager::command_set_team>,           SET_TEAM_DESCRIPTION, command_permissions::lobby_waiting }}
     };
 
     std::string game_manager::command_print_help(user_ptr user) {
@@ -35,9 +37,9 @@ namespace banggame {
 
     std::string game_manager::command_print_users(user_ptr user) {
         auto &lobby = (*user->second.in_lobby)->second;
-        for (user_ptr lobby_user : lobby.users) {
+        for (auto [team, lobby_user] : lobby.users) {
             send_message<server_message_type::lobby_chat>(user->first, 0,
-                fmt::format("{} : {}", lobby_user->second.user_id, lobby_user->second.name));
+                fmt::format("{} : {} ({})", lobby_user->second.user_id, lobby_user->second.name, enums::to_string(team)));
         }
         return {};
     }
@@ -49,13 +51,13 @@ namespace banggame {
         }
 
         auto &lobby = (*user->second.in_lobby)->second;
-        auto kicked = std::ranges::find(lobby.users, user_id, [](user_ptr lobby_user) {
-            return lobby_user->second.user_id;
+        auto kicked = std::ranges::find(lobby.users, user_id, [](const team_user_pair &pair) {
+            return pair.second->second.user_id;
         });
         if (kicked == lobby.users.end()) {
             return "CANNOT_FIND_USERID";
         }
-        kick_user_from_lobby(*kicked);
+        kick_user_from_lobby(kicked->second);
 
         return {};
     }
@@ -123,6 +125,16 @@ namespace banggame {
             }
         } else {
             return "ERROR_USER_NOT_CONTROLLING_PLAYER";
+        }
+    }
+
+    std::string game_manager::command_set_team(user_ptr user, std::string_view value) {
+        auto &lobby = (*user->second.in_lobby)->second;
+        if (auto team = enums::from_string<lobby_team>(value)) {
+            std::ranges::find(lobby.users, user, &team_user_pair::second)->first = *team;
+            return {};
+        } else {
+            return "ERROR_INVALID_TEAM";
         }
     }
 

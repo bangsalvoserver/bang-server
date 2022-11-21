@@ -18,8 +18,15 @@ using client_handle = std::weak_ptr<void>;
 using user_map = std::map<client_handle, game_user, std::owner_less<client_handle>>;
 using user_ptr = user_map::iterator;
 
+DEFINE_ENUM(lobby_team,
+    (game_player)
+    (game_spectator)
+)
+
+using team_user_pair = std::pair<lobby_team, user_ptr>;
+
 struct lobby : lobby_info {
-    std::vector<user_ptr> users;
+    std::vector<team_user_pair> users;
     lobby_state state;
     ticks lifetime = lobby_lifetime;
 

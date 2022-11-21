@@ -91,7 +91,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_make), user_ptr user, con
     auto lobby_it = m_lobbies.try_emplace(++m_lobby_counter).first;
     auto &new_lobby = lobby_it->second;
 
-    new_lobby.users.push_back(user);
+    new_lobby.users.emplace_back(lobby_team::game_player, user);
     user->second.in_lobby = lobby_it;
 
     static_cast<lobby_info &>(new_lobby) = value;
@@ -111,7 +111,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_edit), user_ptr user, con
     }
     auto &lobby = (*user->second.in_lobby)->second;
 
-    if (lobby.users.front() != user) {
+    if (lobby.users.front().second != user) {
         return "ERROR_PLAYER_NOT_LOBBY_OWNER";
     }
 
@@ -120,7 +120,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_edit), user_ptr user, con
     }
 
     static_cast<lobby_info &>(lobby) = args;
-    for (user_ptr p : lobby.users) {
+    for (auto &[team, p] : lobby.users) {
         if (p != user) {
             send_message<server_message_type::lobby_edited>(p->first, args);
         }
@@ -140,25 +140,26 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
     }
 
     auto &lobby = lobby_it->second;
-    if (lobby.users.size() < lobby_max_players) {
-        lobby.users.emplace_back(user);
-        user->second.in_lobby = lobby_it;
-        send_lobby_update(lobby_it);
+    auto &pair = lobby.users.emplace_back(lobby_team::game_player, user);
 
-        send_message<server_message_type::lobby_entered>(user->first, lobby);
-        for (user_ptr p : lobby.users) {
-            if (p != user) {
-                send_message<server_message_type::lobby_add_user>(p->first, user->second.user_id, user->second.name, user->second.profile_image);
-            }
-            send_message<server_message_type::lobby_add_user>(user->first, p->second.user_id, p->second.name, p->second.profile_image);
+    user->second.in_lobby = lobby_it;
+    send_lobby_update(lobby_it);
+
+    send_message<server_message_type::lobby_entered>(user->first, lobby);
+    for (auto &[team, p] : lobby.users) {
+        if (p != user) {
+            send_message<server_message_type::lobby_add_user>(p->first, user->second.user_id, user->second.name, user->second.profile_image);
         }
-        send_message<server_message_type::lobby_owner>(user->first, lobby.users.front()->second.user_id);
-        if (lobby.state != lobby_state::waiting) {
-            send_message<server_message_type::game_started>(user->first);
+        send_message<server_message_type::lobby_add_user>(user->first, p->second.user_id, p->second.name, p->second.profile_image);
+    }
+    send_message<server_message_type::lobby_owner>(user->first, lobby.users.front().second->second.user_id);
+    
+    if (lobby.state != lobby_state::waiting) {
+        pair.first = lobby_team::game_spectator;
+        send_message<server_message_type::game_started>(user->first);
 
-            for (const auto &msg : lobby.game.get_spectator_updates()) {
-                send_message<server_message_type::game_update>(user->first, msg);
-            }
+        for (const auto &msg : lobby.game.get_spectator_updates()) {
+            send_message<server_message_type::game_update>(user->first, msg);
         }
     }
 
@@ -179,6 +180,8 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
     if (!target || target->user_id != 0) {
         return "ERROR_INVALID_REJOIN_TARGET";
     }
+
+    std::ranges::find(lobby.users, user, &team_user_pair::second)->first = lobby_team::game_player;
 
     target->user_id = user->second.user_id;
 
@@ -203,7 +206,7 @@ void game_manager::kick_user_from_lobby(user_ptr user) {
     
     broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user->second.user_id);
 
-    auto it = std::ranges::find(lobby.users, user);
+    auto it = std::ranges::find(lobby.users, user, &team_user_pair::second);
     bool is_owner = it == lobby.users.begin();
     lobby.users.erase(it);
 
@@ -215,7 +218,7 @@ void game_manager::kick_user_from_lobby(user_ptr user) {
             m_lobbies.erase(lobby_it);
         }
     } else if (is_owner) {
-        broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front()->second.user_id);
+        broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front().second->second.user_id);
     }
 }
 
@@ -267,7 +270,7 @@ std::string game_manager::handle_chat_command(user_ptr user, const std::string &
     auto &command = cmd_it->second;
     auto &lobby = (*user->second.in_lobby)->second;
 
-    if (bool(command.permissions() & command_permissions::lobby_owner) && user != lobby.users.front()) {
+    if (bool(command.permissions() & command_permissions::lobby_owner) && user != lobby.users.front().second) {
         return "ERROR_PLAYER_NOT_LOBBY_OWNER";
     }
 
@@ -303,7 +306,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
     }
     auto &lobby = (*user->second.in_lobby)->second;
 
-    if (user != lobby.users.front()) {
+    if (user != lobby.users.front().second) {
         return "ERROR_PLAYER_NOT_LOBBY_OWNER";
     }
 
@@ -315,11 +318,15 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
     lobby.state = lobby_state::waiting;
     send_lobby_update(*(user->second.in_lobby));
 
+    for (auto &[team, p] : lobby.users) {
+        team = lobby_team::game_player;
+    }
+
     broadcast_message_lobby<server_message_type::lobby_entered>(lobby, lobby);
-    for (user_ptr p : lobby.users) {
+    for (auto &[team, p] : lobby.users) {
         broadcast_message_lobby<server_message_type::lobby_add_user>(lobby, p->second.user_id, p->second.name, p->second.profile_image);
     }
-    broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front()->second.user_id);
+    broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front().second->second.user_id);
     
     return {};
 }
@@ -330,7 +337,7 @@ std::string game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
     }
     auto &lobby = (*user->second.in_lobby)->second;
 
-    if (user != lobby.users.front()) {
+    if (user != lobby.users.front().second) {
         return "ERROR_PLAYER_NOT_LOBBY_OWNER";
     }
 
@@ -338,8 +345,12 @@ std::string game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
         return "ERROR_LOBBY_NOT_WAITING";
     }
 
-    if (lobby.users.size() <= 1) {
+    size_t num_players = std::ranges::count(lobby.users, lobby_team::game_player, &team_user_pair::first);
+
+    if (num_players <= 1) {
         return "ERROR_NOT_ENOUGH_PLAYERS";
+    } else if (num_players > lobby_max_players) {
+        return "ERROR_TOO_MANY_PLAYERS";
     }
 
     lobby.state = lobby_state::playing;
@@ -375,7 +386,7 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
 void lobby::send_updates(game_manager &mgr) {
     while (state == lobby_state::playing && !game.m_updates.empty()) {
         auto &[target, update] = game.m_updates.front();
-        for (auto it : users) {
+        for (auto &[team, it] : users) {
             if (target.matches(it->second.user_id)) {
                 mgr.send_message<server_message_type::game_update>(it->first, update);
             }
@@ -386,16 +397,20 @@ void lobby::send_updates(game_manager &mgr) {
 
 void lobby::start_game(game_manager &mgr) {
     mgr.broadcast_message_lobby<server_message_type::game_started>(*this);
+
+    auto user_players = users | std::views::filter([](const team_user_pair &pair) {
+        return pair.first == lobby_team::game_player;
+    });
     
     std::vector<player *> ids;
-    for (const auto &_ : users) {
+    for (const auto &_ : user_players) {
         ids.push_back(&game.m_players.emplace(&game, static_cast<int>(game.m_players.first_available_id())));
     }
     std::ranges::shuffle(ids, game.rng);
 
-    auto it = users.begin();
+    auto it = user_players.begin();
     for (player *p : ids) {
-        p->user_id = (*it)->second.user_id;
+        p->user_id = it->second->second.user_id;
         ++it;
     }
 
