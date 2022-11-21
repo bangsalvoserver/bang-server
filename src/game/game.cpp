@@ -42,8 +42,6 @@ namespace banggame {
             }
         };
 
-        co_yield make_update<game_update_type::game_options>(m_options);
-
         co_await move_cards(m_button_row, show_always);
         co_await move_cards(m_deck, show_never);
         co_await move_cards(m_shop_deck, show_never);
@@ -132,8 +130,6 @@ namespace banggame {
         for (player &p : m_players) {
             add_update<game_update_type::player_user>(&p, p.user_id);
         }
-    
-        add_update<game_update_type::game_options>(options);
         
         auto add_cards = [&](const std::vector<card_data> &cards, pocket_type pocket, std::vector<card *> *out_pocket = nullptr) {
             if (!out_pocket) out_pocket = &get_pocket(pocket);
