@@ -14,23 +14,26 @@ namespace banggame {
 
     void effect_damage::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
         if (!target->is_ghost()) {
-            target->m_game->queue_request_front<timer_damaging>(origin_card, origin, target, damage, flags);
+            target->m_game->queue_request_front<request_damage>(origin_card, origin, target, damage, flags);
         }
     }
 
     static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::multi_target;
 
-    timer_damaging::timer_damaging(card *origin_card, player *origin, player *target, int damage, effect_flags flags)
-        : timer_request(origin_card, origin, target,
-            std::clamp(std::chrono::duration_cast<ticks>(std::chrono::milliseconds{target->m_game->m_options.damage_timer_ms}), ticks{1}, ticks{10s}),
-            flags & damaging_allowed_flags)
+    timer_damage::timer_damage(request_damage *request)
+        : request_timer(request, std::clamp(std::chrono::duration_cast<ticks>(
+            std::chrono::milliseconds{request->target->m_game->m_options.damage_timer_ms}),
+            ticks{1}, ticks{10s})) {}
+
+    request_damage::request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags)
+        : request_base(origin_card, origin, target, (flags & damaging_allowed_flags) | effect_flags::timer)
         , damage(damage) {}
     
-    std::vector<card *> timer_damaging::get_highlights() const {
+    std::vector<card *> request_damage::get_highlights() const {
         return target->m_backup_character;
     }
 
-    bool timer_damaging::auto_resolve() {
+    bool request_damage::auto_resolve() {
         if (!target->m_game->call_event<event_type::check_damage_response>(false)) {
             target->m_game->pop_request();
             on_finished();
@@ -40,7 +43,7 @@ namespace banggame {
         return false;
     }
 
-    void timer_damaging::on_finished() {
+    void request_damage::on_finished() {
         if (bool(flags & effect_flags::play_as_bang)) {
             if (bool(flags & effect_flags::multi_target)) {
                 target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_GATLING", origin_card, target);
@@ -64,7 +67,7 @@ namespace banggame {
         target->m_game->call_event<event_type::after_hit>(origin_card, origin, target, damage, flags);
     }
 
-    game_string timer_damaging::status_text(player *owner) const {
+    game_string request_damage::status_text(player *owner) const {
         if (bool(flags & effect_flags::play_as_bang)) {
             if (bool(flags & effect_flags::multi_target)) {
                 return {"STATUS_DAMAGING_AS_GATLING", target, origin_card};

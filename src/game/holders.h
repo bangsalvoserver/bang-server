@@ -70,12 +70,6 @@ namespace banggame {
         game_string status_text(player *owner) const {
             return m_value->status_text(owner);
         }
-        void add_pending_confirm(player *p) {
-            m_value->add_pending_confirm(p);
-        }
-        void confirm_player(player *p) {
-            m_value->confirm_player(p);
-        }
 
         bool can_pick(card *target_card) const {
             return m_value->can_pick(target_card);
@@ -100,7 +94,20 @@ namespace banggame {
         }
 
         void tick() {
-            m_value->tick();
+            if (auto *t = m_value->timer()) {
+                auto copy = m_value;
+                t->tick();
+            }
+        }
+        void add_pending_confirm(player *p) {
+            if (auto *t = m_value->timer()) {
+                t->add_pending_confirm(p);
+            }
+        }
+        void confirm_player(player *p) {
+            if (auto *t = m_value->timer()) {
+                t->confirm_player(p);
+            }
         }
 
         template<typename T> auto &get() {

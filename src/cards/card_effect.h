@@ -24,6 +24,28 @@ namespace banggame {
         void on_disable(card *target_card, player *target);
     };
 
+    struct request_base;
+
+    struct request_timer {
+        request_timer(request_base *request, ticks duration)
+            : request(request)
+            , duration(duration) {}
+
+        request_base *request;
+
+        ticks duration;
+        
+        std::vector<player *> awaiting_confirms;
+        ticks auto_confirm_timer = auto_confirm_duration;
+
+        void add_pending_confirm(player *p);
+        void confirm_player(player *p);
+
+        void tick();
+
+        virtual void on_finished() {}
+    };
+
     struct request_base {
         request_base(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : origin_card(origin_card), origin(origin), target(target), flags(flags) {}
@@ -35,10 +57,7 @@ namespace banggame {
         player *target;
         effect_flags flags;
 
-        virtual void tick() {}
-
-        virtual void add_pending_confirm(player *p) {}
-        virtual void confirm_player(player *p) {}
+        virtual request_timer *timer() { return nullptr; }
 
         virtual game_string status_text(player *owner) const = 0;
 
@@ -52,23 +71,6 @@ namespace banggame {
         virtual std::vector<card *> get_highlights() const {
             return {};
         }
-    };
-
-    struct timer_request : request_base, std::enable_shared_from_this<timer_request> {
-        timer_request(card *origin_card, player *origin, player *target, ticks duration, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags | effect_flags::timer)
-            , duration(duration) {}
-
-        ticks duration;
-        
-        std::vector<player *> awaiting_confirms;
-        ticks auto_confirm_timer = auto_confirm_duration;
-
-        void add_pending_confirm(player *p) override final;
-        void confirm_player(player *p) override final;
-
-        void tick() override final;
-        virtual void on_finished() {}
     };
 
     class cleanup_request {

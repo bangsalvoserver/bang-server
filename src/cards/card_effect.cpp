@@ -47,22 +47,21 @@ namespace banggame {
         return false;
     }
 
-    void timer_request::tick() {
+    void request_timer::tick() {
         if (awaiting_confirms.empty() && duration != ticks{0} && --duration == ticks{0}) {
-            auto copy = shared_from_this();
-            target->m_game->pop_request();
+            request->target->m_game->pop_request();
             on_finished();
-            target->m_game->update_request();
+            request->target->m_game->update_request();
         } else if (auto_confirm_timer != ticks{0} && --auto_confirm_timer == ticks{0}) {
             awaiting_confirms.clear();
         }
     }
 
-    void timer_request::add_pending_confirm(player *p) {
+    void request_timer::add_pending_confirm(player *p) {
         awaiting_confirms.push_back(p);
     }
 
-    void timer_request::confirm_player(player *p) {
+    void request_timer::confirm_player(player *p) {
         auto it = std::ranges::find(awaiting_confirms, p);
         if (it != awaiting_confirms.end()) {
             awaiting_confirms.erase(it);
