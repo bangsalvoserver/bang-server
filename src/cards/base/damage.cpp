@@ -14,22 +14,8 @@ namespace banggame {
 
     void effect_damage::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
         if (!target->is_ghost()) {
-            if (target->m_game->call_event<event_type::check_damage_response>(false)) {
-                target->m_game->queue_request_front<timer_damaging>(origin_card, origin, target, damage, flags);
-            } else {
-                on_resolve(origin_card, origin, target, flags);
-            }
+            target->m_game->queue_request_front<timer_damaging>(origin_card, origin, target, damage, flags);
         }
-    }
-
-    void effect_damage::on_resolve(card *origin_card, player *origin, player *target, effect_flags flags) {
-        target->m_game->add_log(damage == 1 ? "LOG_TAKEN_DAMAGE" : "LOG_TAKEN_DAMAGE_PLURAL", origin_card, target, damage);
-        target->set_hp(target->m_hp - damage);
-        target->m_game->call_event<event_type::before_hit>(origin_card, origin, target, damage, flags);
-        if (target->m_hp <= 0) {
-            target->m_game->queue_request<request_death>(origin_card, origin, target);
-        }
-        target->m_game->call_event<event_type::after_hit>(origin_card, origin, target, damage, flags);
     }
 
     static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::multi_target;
@@ -44,8 +30,38 @@ namespace banggame {
         return target->m_backup_character;
     }
 
+    bool timer_damaging::auto_resolve() {
+        if (!target->m_game->call_event<event_type::check_damage_response>(false)) {
+            target->m_game->pop_request();
+            on_finished();
+            target->m_game->update_request();
+            return true;
+        }
+        return false;
+    }
+
     void timer_damaging::on_finished() {
-        effect_damage{damage}.on_resolve(origin_card, origin, target, flags);
+        if (bool(flags & effect_flags::play_as_bang)) {
+            if (bool(flags & effect_flags::multi_target)) {
+                target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_GATLING", origin_card, target);
+            } else if (damage > 1) {
+                target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_BANG_PLURAL", origin_card, target, damage);
+            } else {
+                target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_BANG", origin_card, target);
+            }
+        } else {
+            if (damage > 1) {
+                target->m_game->add_log("LOG_TAKEN_DAMAGE_PLURAL", origin_card, target, damage);
+            } else {
+                target->m_game->add_log("LOG_TAKEN_DAMAGE", origin_card, target);
+            }
+        }
+        target->set_hp(target->m_hp - damage);
+        target->m_game->call_event<event_type::before_hit>(origin_card, origin, target, damage, flags);
+        if (target->m_hp <= 0) {
+            target->m_game->queue_request<request_death>(origin_card, origin, target);
+        }
+        target->m_game->call_event<event_type::after_hit>(origin_card, origin, target, damage, flags);
     }
 
     game_string timer_damaging::status_text(player *owner) const {

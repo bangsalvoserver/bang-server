@@ -18,7 +18,6 @@ namespace banggame {
 
         game_string verify(card *origin_card, player *origin, player *target, effect_flags flags = {});
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
-        void on_resolve(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
 
     struct timer_damaging : timer_request, cleanup_request {
@@ -27,6 +26,7 @@ namespace banggame {
         int damage;
 
         std::vector<card *> get_highlights() const override;
+        bool auto_resolve() override;
         void on_finished() override;
         game_string status_text(player *owner) const override;
     };
