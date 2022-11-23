@@ -57,8 +57,12 @@ namespace banggame {
         }
     }
 
-    void request_timer::add_pending_confirm(player *p) {
-        awaiting_confirms.push_back(p);
+    void request_timer::add_pending_confirms() {
+        for (player &p : request->target->m_game->m_players) {
+            if (p.user_id && p.alive()) {
+                awaiting_confirms.push_back(&p);
+            }
+        }
     }
 
     void request_timer::confirm_player(player *p) {

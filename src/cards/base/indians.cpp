@@ -8,9 +8,8 @@ namespace banggame {
         request_indians(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand) {}
 
-        bool auto_resolve() override {
+        void on_update() override {
             target->m_game->play_sound(target, "indians");
-            return request_base::auto_resolve();
         }
 
         bool can_pick(card *target_card) const override {

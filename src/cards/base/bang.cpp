@@ -82,7 +82,7 @@ namespace banggame {
         flags |= effect_flags::auto_respond;
     }
 
-    bool request_bang::auto_resolve() {
+    void request_bang::on_update() {
         if (!num_cards_used()) {
             if (bool(flags & effect_flags::multi_target)) {
                 target->m_game->play_sound(target, "gatling");
@@ -90,7 +90,6 @@ namespace banggame {
                 target->m_game->play_sound(target, "bang");
             }
         }
-        return request_base::auto_resolve();
     }
 
     game_string request_bang::status_text(player *owner) const {

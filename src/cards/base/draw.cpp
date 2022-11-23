@@ -45,9 +45,8 @@ namespace banggame {
         });
     }
     
-    bool request_draw::auto_resolve() {
+    void request_draw::on_update() {
         target->m_game->play_sound(target, "draw");
-        return request_base::auto_resolve();
     }
 
     bool request_draw::can_pick(card *target_card) const {

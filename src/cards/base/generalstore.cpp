@@ -8,9 +8,8 @@ namespace banggame {
         request_generalstore(card *origin_card, player *origin, player *target)
             : selection_picker(origin_card, origin, target, effect_flags::auto_pick) {}
 
-        bool auto_resolve() override {
+        void on_update() override {
             target->m_game->play_sound(target, "generalstore");
-            return request_base::auto_resolve();
         }
 
         void on_pick(card *target_card) override {

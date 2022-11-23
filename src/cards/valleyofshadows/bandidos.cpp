@@ -9,9 +9,8 @@ namespace banggame {
         request_bandidos(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags | effect_flags::auto_respond) {}
 
-        bool auto_resolve() override {
+        void on_update() override {
             target->m_game->play_sound(target, "bandidos");
-            return request_base::auto_resolve();
         }
 
         void on_resolve() override {

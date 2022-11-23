@@ -38,7 +38,7 @@ namespace banggame {
         std::vector<player *> awaiting_confirms;
         ticks auto_confirm_timer = auto_confirm_duration;
 
-        void add_pending_confirm(player *p);
+        void add_pending_confirms();
         void confirm_player(player *p);
 
         void tick();
@@ -66,6 +66,7 @@ namespace banggame {
 
         virtual bool can_respond(player *target, card *target_card) const;
 
+        virtual void on_update() {}
         virtual bool auto_resolve();
 
         virtual std::vector<card *> get_highlights() const {

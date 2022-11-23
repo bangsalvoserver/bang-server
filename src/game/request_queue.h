@@ -41,7 +41,12 @@ namespace banggame {
         
         void update_request() {
             if (pending_requests()) {
-                static_cast<Derived &>(*this).send_request_update();
+                auto &req = top_request();
+                req.on_update();
+                if (!req.auto_resolve()) {
+                    req.add_pending_confirms();
+                    static_cast<Derived &>(*this).send_request_update();
+                }
             } else {
                 while (!pending_requests() && pending_actions()) {
                     auto fun = std::move(m_delayed_actions.front());

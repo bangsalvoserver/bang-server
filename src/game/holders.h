@@ -93,17 +93,23 @@ namespace banggame {
             return m_value->get_highlights();
         }
 
+        void on_update() {
+            m_value->on_update();
+        }
+
         void tick() {
             if (auto *t = m_value->timer()) {
                 auto copy = m_value;
                 t->tick();
             }
         }
-        void add_pending_confirm(player *p) {
+
+        void add_pending_confirms() {
             if (auto *t = m_value->timer()) {
-                t->add_pending_confirm(p);
+                t->add_pending_confirms();
             }
         }
+
         void confirm_player(player *p) {
             if (auto *t = m_value->timer()) {
                 t->confirm_player(p);

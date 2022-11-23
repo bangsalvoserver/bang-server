@@ -54,7 +54,7 @@ namespace banggame {
         request_draw(player *target)
             : request_base(nullptr, nullptr, target, effect_flags::auto_pick) {}
 
-        bool auto_resolve() override;
+        void on_update() override;
         bool can_pick(card *target_card) const override;
         void on_pick(card *target_card) override;
         game_string status_text(player *owner) const override;

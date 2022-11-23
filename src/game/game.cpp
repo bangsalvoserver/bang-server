@@ -376,19 +376,12 @@ namespace banggame {
     }
 
     void game::send_request_update() {
-        auto &req = top_request();
-        
-        if (!req.auto_resolve()) {
-            auto spectator_target = update_target::excludes_public();
-            for (player &p : m_players) {
-                if (p.user_id && p.alive()) {
-                    req.add_pending_confirm(&p);
-                }
-                spectator_target.add(&p);
-                add_update<game_update_type::request_status>(update_target::includes_private(&p), make_request_update(&p));
-            }
-            add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
+        auto spectator_target = update_target::excludes_public();
+        for (player &p : m_players) {
+            spectator_target.add(&p);
+            add_update<game_update_type::request_status>(update_target::includes_private(&p), make_request_update(&p));
         }
+        add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
     }
     
     void game::draw_check_then(player *origin, card *origin_card, draw_check_function fun) {
