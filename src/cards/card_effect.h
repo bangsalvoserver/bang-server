@@ -31,6 +31,8 @@ namespace banggame {
             : request(request)
             , duration(duration) {}
 
+        explicit request_timer(request_base *request);
+
         request_base *request;
 
         ticks duration;

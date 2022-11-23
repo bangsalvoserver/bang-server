@@ -23,10 +23,8 @@ namespace banggame {
         void on_resolve(card *origin_card, player *origin, card *target);
     };
 
-    struct request_targeting;
-
     struct resolve_timer : request_timer {
-        resolve_timer(request_targeting *request);
+        using request_timer::request_timer;
         void on_finished() override;
     };
 

@@ -47,6 +47,11 @@ namespace banggame {
         return false;
     }
 
+    request_timer::request_timer(request_base *request)
+        : request_timer(request, std::clamp(std::chrono::duration_cast<ticks>(
+            std::chrono::milliseconds{request->target->m_game->m_options.damage_timer_ms}),
+            ticks{1}, ticks{10s})) {}
+
     void request_timer::tick() {
         if (awaiting_confirms.empty() && duration != ticks{0} && --duration == ticks{0}) {
             request->target->m_game->pop_request();

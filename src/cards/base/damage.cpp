@@ -20,11 +20,6 @@ namespace banggame {
 
     static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::multi_target;
 
-    timer_damage::timer_damage(request_damage *request)
-        : request_timer(request, std::clamp(std::chrono::duration_cast<ticks>(
-            std::chrono::milliseconds{request->target->m_game->m_options.damage_timer_ms}),
-            ticks{1}, ticks{10s})) {}
-
     request_damage::request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags)
         : request_base(origin_card, origin, target, (flags & damaging_allowed_flags) | effect_flags::timer)
         , damage(damage) {}

@@ -20,11 +20,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
 
-    struct request_damage;
-
     struct timer_damage : request_timer {
-        timer_damage(request_damage *request);
-
+        using request_timer::request_timer;
         void on_finished() override;
     };
 

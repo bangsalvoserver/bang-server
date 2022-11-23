@@ -16,9 +16,20 @@ namespace banggame {
         target->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
     }
 
+    struct rust_timer : request_timer {
+        using request_timer::request_timer;
+        
+        void on_finished() override {
+            resolve_rust(request->origin_card, request->origin, request->target);
+        }
+    };
+
     struct request_rust : request_base, resolvable_request {
         request_rust(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand) {}
+            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand | effect_flags::timer) {}
+
+        rust_timer m_timer{this};
+        request_timer *timer() override { return &m_timer; }
 
         void on_resolve() override {
             origin->m_game->pop_request();

@@ -11,11 +11,6 @@ namespace banggame {
         return {};
     }
 
-    resolve_timer::resolve_timer(request_targeting *request)
-        : request_timer(request, std::clamp(std::chrono::duration_cast<ticks>(
-            std::chrono::milliseconds{request->target->m_game->m_options.damage_timer_ms}),
-            ticks{1}, ticks{10s})) {}
-
     void request_targeting::on_resolve() {
         target->m_game->pop_request();
         on_resolve_target();
