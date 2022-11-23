@@ -19,7 +19,7 @@ namespace banggame {
         target->equip_card(chosen_card);
     }
 
-    struct request_card_sharper : request_targeting, resolvable_request {
+    struct request_card_sharper : request_targeting {
         request_card_sharper(card *origin_card, player *origin, player *target, card *chosen_card, card *target_card)
             : request_targeting(origin_card, origin, target, target_card, effect_flags::escapable)
             , chosen_card(chosen_card) {}
@@ -30,10 +30,8 @@ namespace banggame {
             return {target_card, chosen_card};
         }
 
-        void on_resolve() override {
-            origin->m_game->pop_request();
+        void on_resolve_target() override {
             resolve_card_sharper(origin_card, origin, chosen_card, target_card);
-            origin->m_game->update_request();
         }
 
         game_string status_text(player *owner) const override {

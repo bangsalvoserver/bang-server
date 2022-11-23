@@ -10,6 +10,12 @@ namespace banggame {
         }
         return {};
     }
+
+    void request_targeting::on_resolve() {
+        target->m_game->pop_request();
+        on_resolve_target();
+        target->m_game->update_request();
+    }
     
     std::vector<card *> request_targeting::get_highlights() const {
         if (target_card->pocket == pocket_type::player_hand) {
@@ -45,13 +51,11 @@ namespace banggame {
         });
     }
 
-    struct request_steal : request_targeting, resolvable_request {
+    struct request_steal : request_targeting {
         using request_targeting::request_targeting;
 
-        void on_resolve() override {
-            origin->m_game->pop_request();
+        void on_resolve_target() override {
             effect_steal{}.on_resolve(origin_card, origin, target_card);
-            origin->m_game->update_request();
         }
 
         game_string status_text(player *owner) const override {
@@ -99,13 +103,11 @@ namespace banggame {
         });
     }
     
-    struct request_destroy : request_targeting, resolvable_request {
+    struct request_destroy : request_targeting {
         using request_targeting::request_targeting;
 
-        void on_resolve() override {
-            origin->m_game->pop_request();
+        void on_resolve_target() override {
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
-            origin->m_game->update_request();
         }
 
         game_string status_text(player *owner) const override {

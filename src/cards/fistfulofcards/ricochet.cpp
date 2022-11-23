@@ -6,13 +6,11 @@
 
 namespace banggame {
     
-    struct request_ricochet : request_targeting, resolvable_request, missable_request {
+    struct request_ricochet : request_targeting, missable_request {
         using request_targeting::request_targeting;
 
-        void on_resolve() override {
-            origin->m_game->pop_request();
+        void on_resolve_target() override {
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
-            origin->m_game->update_request();
         }
 
         void on_miss() override {
