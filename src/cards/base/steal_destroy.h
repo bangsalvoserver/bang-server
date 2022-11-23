@@ -23,18 +23,32 @@ namespace banggame {
         void on_resolve(card *origin_card, player *origin, card *target);
     };
 
+    struct request_targeting;
+
+    struct resolve_timer : request_timer {
+        resolve_timer(request_targeting *request);
+        void on_finished() override;
+    };
+
     struct request_targeting : request_base, resolvable_request {
         request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand)
+            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand | effect_flags::timer)
             , target_card(target_card) {}
         
         card *target_card;
+
+        resolve_timer m_timer{this};
+        request_timer *timer() override { return &m_timer; }
 
         void on_resolve() final;
         virtual void on_resolve_target() = 0;
 
         virtual std::vector<card *> get_highlights() const override;
     };
+
+    inline void resolve_timer::on_finished() {
+        static_cast<request_targeting *>(request)->on_resolve_target();
+    }
 }
 
 #endif
