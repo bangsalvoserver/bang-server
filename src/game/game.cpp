@@ -11,7 +11,7 @@
 namespace banggame {
 
     util::generator<Json::Value> game::get_spectator_updates() {
-        co_yield make_update<game_update_type::player_add>(static_cast<int>(m_players.size()));
+        co_yield make_update<game_update_type::player_add>(int(m_players.size()));
 
         for (player &p : m_players) {
             co_yield make_update<game_update_type::player_user>(&p, p.user_id);
@@ -125,7 +125,7 @@ namespace banggame {
             }
         }
 
-        add_update<game_update_type::player_add>(static_cast<int>(m_players.size()));
+        add_update<game_update_type::player_add>(int(m_players.size()));
 
         for (player &p : m_players) {
             add_update<game_update_type::player_user>(&p, p.user_id);
@@ -140,7 +140,7 @@ namespace banggame {
                 if ((c.expansion & m_options.expansions) != c.expansion) continue;
 
                 card copy(c);
-                copy.id = static_cast<int>(m_cards.first_available_id());
+                copy.id = int(m_cards.first_available_id());
                 copy.owner = nullptr;
                 copy.pocket = pocket;
                 auto *new_card = &m_cards.emplace(std::move(copy));

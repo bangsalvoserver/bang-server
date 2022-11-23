@@ -10,7 +10,7 @@ namespace banggame {
 
         player *get_next_target() const {
             return std::next(player_iterator(target),
-                target->m_game->num_alive() - static_cast<int>(target->m_game->m_selection.size()));
+                target->m_game->num_alive() - int(target->m_game->m_selection.size()));
         }
 
         void on_pick(card *target_card) override {

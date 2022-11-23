@@ -22,7 +22,7 @@ namespace banggame {
             }
         }
         std::sort(suits.begin(), suits.end());
-        origin->heal(static_cast<int>(std::unique(suits.begin(), suits.end()) - suits.begin()));
+        origin->heal(int(std::unique(suits.begin(), suits.end()) - suits.begin()));
     }
 
 }

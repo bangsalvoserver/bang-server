@@ -66,7 +66,7 @@ lobby_data game_manager::make_lobby_data(lobby_ptr it) {
     lobby_data obj;
     obj.lobby_id = it->first;
     obj.name = l.name;
-    obj.num_players = static_cast<int>(l.users.size());
+    obj.num_players = int(l.users.size());
     obj.state = l.state;
     return obj;
 }
@@ -404,7 +404,7 @@ void lobby::start_game(game_manager &mgr) {
     
     std::vector<player *> ids;
     for (const auto &_ : user_players) {
-        ids.push_back(&game.m_players.emplace(&game, static_cast<int>(game.m_players.first_available_id())));
+        ids.push_back(&game.m_players.emplace(&game, int(game.m_players.first_available_id())));
     }
     std::ranges::shuffle(ids, game.rng);
 

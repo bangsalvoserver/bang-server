@@ -16,7 +16,7 @@ namespace banggame {
                 origin->m_game->add_log("LOG_COPY_CHARACTER", origin, target_card);
                 
                 auto card_copy = std::make_unique<card>(static_cast<const card_data &>(*target_card));
-                card_copy->id = static_cast<int>(origin->m_game->m_cards.first_available_id());
+                card_copy->id = int(origin->m_game->m_cards.first_available_id());
                 card_copy->pocket = pocket_type::player_character;
                 card_copy->owner = origin;
                 card_copy->tags.push_back(tag_holder{ .type = tag_type::temp_card });

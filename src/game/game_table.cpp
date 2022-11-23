@@ -72,7 +72,7 @@ namespace banggame {
     }
 
     int game_table::num_alive() const {
-        return static_cast<int>(std::ranges::count_if(m_players, &player::alive));
+        return int(std::ranges::count_if(m_players, &player::alive));
     }
 
     void game_table::shuffle_cards_and_ids(std::span<card *> vec) {
