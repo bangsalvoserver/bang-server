@@ -54,9 +54,9 @@ namespace banggame {
 
     void request_timer::tick() {
         if (awaiting_confirms.empty() && duration != ticks{0} && --duration == ticks{0}) {
-            request->target->m_game->pop_request();
-            on_finished();
-            request->target->m_game->update_request();
+            request->target->m_game->pop_request_then([&]{
+                on_finished();
+            });
         } else if (auto_confirm_timer != ticks{0} && --auto_confirm_timer == ticks{0}) {
             awaiting_confirms.clear();
         }

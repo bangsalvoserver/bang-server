@@ -12,9 +12,9 @@ namespace banggame {
     }
 
     void request_targeting::on_resolve() {
-        target->m_game->pop_request();
-        on_resolve_target();
-        target->m_game->update_request();
+        target->m_game->pop_request_then([&]{
+            on_resolve_target();
+        });
     }
     
     std::vector<card *> request_targeting::get_highlights() const {

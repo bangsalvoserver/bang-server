@@ -28,14 +28,14 @@ namespace banggame {
                     target->add_cubes(c, cubes_to_add);
                 };
 
-                target->m_game->pop_request();
-                do_add_cubes(target->m_characters.front());
-                for (card *c : target->m_table) {
-                    if (c->color == card_color_type::orange) {
-                        do_add_cubes(c);
+                target->m_game->pop_request_then([&]{
+                    do_add_cubes(target->m_characters.front());
+                    for (card *c : target->m_table) {
+                        if (c->color == card_color_type::orange) {
+                            do_add_cubes(c);
+                        }
                     }
-                }
-                target->m_game->update_request();
+                });
 
                 return true;
             }

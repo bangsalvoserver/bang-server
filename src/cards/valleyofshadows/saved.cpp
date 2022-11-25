@@ -18,18 +18,18 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->pop_request();
-            if (target_card->pocket != pocket_type::player_hand) {
-                target->draw_card(2, origin_card);
-            } else {
-                for (int i=0; i<2 && !saved->m_hand.empty(); ++i) {
-                    card *stolen_card = saved->random_hand_card();
-                    target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
-                    target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
-                    target->steal_card(stolen_card);
+            target->m_game->pop_request_then([&]{
+                if (target_card->pocket != pocket_type::player_hand) {
+                    target->draw_card(2, origin_card);
+                } else {
+                    for (int i=0; i<2 && !saved->m_hand.empty(); ++i) {
+                        card *stolen_card = saved->random_hand_card();
+                        target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
+                        target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
+                        target->steal_card(stolen_card);
+                    }
                 }
-            }
-            target->m_game->update_request();
+            });
         }
 
         game_string status_text(player *owner) const override {

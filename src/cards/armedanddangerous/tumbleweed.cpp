@@ -18,9 +18,9 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            origin->m_game->pop_request();
-            origin->m_game->m_current_check.resolve(drawn_card);
-            origin->m_game->update_request();
+            origin->m_game->pop_request_then([&]{
+                origin->m_game->m_current_check.resolve(drawn_card);
+            });
         }
 
         game_string status_text(player *owner) const override {
@@ -44,9 +44,9 @@ namespace banggame {
     }
 
     void effect_tumbleweed::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request();
-        origin->m_game->m_current_check.restart();
-        origin->m_game->update_request();
+        origin->m_game->pop_request_then([&]{
+            origin->m_game->m_current_check.restart();
+        });
     }
 
 }

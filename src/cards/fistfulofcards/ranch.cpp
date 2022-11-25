@@ -28,7 +28,6 @@ namespace banggame {
     }
 
     void effect_ranch::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request();
-        origin->m_game->update_request();
+        origin->m_game->pop_update_request();
     }
 }

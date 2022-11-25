@@ -42,9 +42,9 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->pop_request();
-            copy_characters(target, target_card->owner);
-            target->m_game->update_request();
+            target->m_game->pop_request_then([&]{
+                copy_characters(target, target_card->owner);
+            });
         }
 
         game_string status_text(player *owner) const override {

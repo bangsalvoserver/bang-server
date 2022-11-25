@@ -13,6 +13,7 @@ namespace banggame {
     private:
         std::deque<request_holder> m_requests;
         std::deque<std::function<void()>> m_delayed_actions;
+        int m_lock_updates = 0;
 
     public:
         size_t pending_requests() const {
@@ -40,6 +41,8 @@ namespace banggame {
         }
         
         void update_request() {
+            if (m_lock_updates) return;
+
             if (pending_requests()) {
                 auto &req = top_request();
                 req.on_update();
@@ -81,6 +84,19 @@ namespace banggame {
         void pop_request() {
             m_requests.pop_front();
             static_cast<Derived &>(*this).send_request_status_clear();
+        }
+
+        void pop_request_then(std::invocable auto &&fun) {
+            ++m_lock_updates;
+            pop_request();
+            std::invoke(FWD(fun));
+            --m_lock_updates;
+            update_request();
+        }
+
+        void pop_update_request() {
+            pop_request();
+            update_request();
         }
 
         void tick() {

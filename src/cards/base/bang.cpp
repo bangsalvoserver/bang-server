@@ -68,13 +68,12 @@ namespace banggame {
     }
 
     void request_bang::on_resolve() {
-        target->m_game->pop_request();
-        target->damage(origin_card, origin, bang_damage, flags);
-        if (auto *req = target->m_game->top_request_if<request_damage>(target)) {
-            static_cast<cleanup_request &>(*req) = std::move(*this);
-        } else {
-            target->m_game->update_request();
-        }
+        target->m_game->pop_request_then([&]{
+            target->damage(origin_card, origin, bang_damage, flags);
+            if (auto *req = target->m_game->top_request_if<request_damage>(target)) {
+                static_cast<cleanup_request &>(*req) = std::move(*this);
+            }
+        });
     }
      
     void request_bang::set_unavoidable() {

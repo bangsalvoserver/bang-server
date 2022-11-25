@@ -88,13 +88,13 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
-            while (card *c = get_first_discarded_card(target)) {
-                target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
-                target->discard_card(c);
-            }
-            discard_rest(target, reason);
-            target->m_game->update_request();
+            target->m_game->pop_request_then([&]{
+                while (card *c = get_first_discarded_card(target)) {
+                    target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
+                    target->discard_card(c);
+                }
+                discard_rest(target, reason);
+            });
         }
 
         game_string status_text(player *owner) const override {

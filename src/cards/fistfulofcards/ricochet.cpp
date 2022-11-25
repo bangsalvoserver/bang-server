@@ -14,9 +14,7 @@ namespace banggame {
         }
 
         void on_miss() override {
-            auto target = this->target;
-            target->m_game->pop_request();
-            target->m_game->update_request();
+            target->m_game->pop_update_request();
         }
 
         game_string status_text(player *owner) const override {

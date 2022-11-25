@@ -10,9 +10,9 @@ namespace banggame {
 
         void on_pick(card *target_card) override {
             target->m_game->flash_card(target_card);
-            target->m_game->pop_request();
-            target->m_game->m_current_check.select(target_card);
-            target->m_game->update_request();
+            target->m_game->pop_request_then([&]{
+                target->m_game->m_current_check.select(target_card);
+            });
         }
 
         game_string status_text(player *owner) const override {

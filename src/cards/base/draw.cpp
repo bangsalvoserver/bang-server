@@ -75,16 +75,16 @@ namespace banggame {
 
     void effect_end_drawing::on_play(card *origin_card, player *origin) {
         if (origin->m_game->top_request_is<request_draw>()) {
-            origin->m_game->pop_request();
-            origin->m_game->add_listener<event_type::on_effect_end>(origin_card, [=](player *p, card *c) {
-                if (p == origin && c == origin_card) {
-                    origin->m_game->queue_action([=]{
-                        origin->m_game->call_event<event_type::post_draw_cards>(origin);
-                    });
-                    origin->m_game->remove_listeners(origin_card);
-                }
+            origin->m_game->pop_request_then([&]{
+                origin->m_game->add_listener<event_type::on_effect_end>(origin_card, [=](player *p, card *c) {
+                    if (p == origin && c == origin_card) {
+                        origin->m_game->queue_action([=]{
+                            origin->m_game->call_event<event_type::post_draw_cards>(origin);
+                        });
+                        origin->m_game->remove_listeners(origin_card);
+                    }
+                });
             });
-            origin->m_game->update_request();
         }
     }
 }

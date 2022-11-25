@@ -30,9 +30,9 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
-            target->damage(origin_card, origin, 1);
-            target->m_game->update_request();
+            target->m_game->pop_request_then([&]{
+                target->damage(origin_card, origin, 1);
+            });
         }
 
         game_string status_text(player *owner) const override {

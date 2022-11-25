@@ -338,12 +338,12 @@ namespace banggame {
     void player::draw_from_deck() {
         m_game->call_event<event_type::on_draw_from_deck>(this);
         if (m_game->top_request_is<request_draw>()) {
-            m_game->pop_request();
-            int ncards = get_cards_to_draw();
-            while (m_num_drawn_cards < ncards) {
-                add_to_hand_phase_one(m_game->phase_one_drawn_card());
-            }
-            m_game->update_request();
+            m_game->pop_request_then([&]{
+                int ncards = get_cards_to_draw();
+                while (m_num_drawn_cards < ncards) {
+                    add_to_hand_phase_one(m_game->phase_one_drawn_card());
+                }
+            });
         }
         m_game->queue_action([this]{
             m_game->call_event<event_type::post_draw_cards>(this);

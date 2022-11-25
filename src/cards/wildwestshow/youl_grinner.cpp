@@ -13,12 +13,12 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->pop_request();
-            target->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", target, origin, target_card);
-            target->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", target, origin);
-            origin->steal_card(target_card);
-            target->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
-            target->m_game->update_request();
+            target->m_game->pop_request_then([&]{
+                target->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", target, origin, target_card);
+                target->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", target, origin);
+                origin->steal_card(target_card);
+                target->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
+            });
         }
 
         game_string status_text(player *owner) const override {

@@ -28,15 +28,15 @@ namespace banggame {
             {
                 target->draw_card();
             } else {
-                target->m_game->pop_request();
-                target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, drawn_card);
-                target->m_game->move_card(drawn_card, pocket_type::discard_pile);
+                target->m_game->pop_request_then([&]{
+                    target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, drawn_card);
+                    target->m_game->move_card(drawn_card, pocket_type::discard_pile);
 
-                while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, show_card_flags::instant);
-                }
-                target->m_game->call_event<event_type::post_draw_cards>(target);
-                target->m_game->update_request();
+                    while (!target->m_game->m_selection.empty()) {
+                        target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, show_card_flags::instant);
+                    }
+                    target->m_game->call_event<event_type::post_draw_cards>(target);
+                });
             }
         }
 
