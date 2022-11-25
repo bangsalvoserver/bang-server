@@ -406,9 +406,7 @@ namespace banggame {
         player *next_player = &*it;
         
         if (next_player == m_first_player) {
-            queue_action_front([this]{
-                draw_scenario_card();
-            });
+            draw_scenario_card();
         }
 
         queue_action_front([next_player]{

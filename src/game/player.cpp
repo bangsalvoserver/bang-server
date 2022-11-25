@@ -355,6 +355,8 @@ namespace banggame {
     }
 
     void player::start_of_turn() {
+        if (m_game->check_flags(game_flags::game_over)) return;
+
         m_game->m_playing = this;
 
         m_num_drawn_cards = 0;
@@ -371,7 +373,7 @@ namespace banggame {
     }
 
     void player::next_predraw_check() {
-        if (alive() && m_game->m_playing == this && !m_game->check_flags(game_flags::game_over)) {
+        if (alive() && m_game->m_playing == this) {
             if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
                 request_drawing();
             } else {
