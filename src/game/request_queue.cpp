@@ -40,12 +40,18 @@ namespace banggame {
     }
     
     void request_queue::queue_action(delayed_action &&fun) {
-        m_delayed_actions.emplace_back(std::move(fun));
-        update_actions();
+        if (!pending_requests() && m_delayed_actions.empty() && !m_lock_updates) {
+            std::invoke(fun);
+        } else {
+            m_delayed_actions.emplace_back(std::move(fun));
+        }
     }
 
     void request_queue::queue_action_front(delayed_action &&fun) {
-        m_delayed_actions.emplace_front(std::move(fun));
-        update_actions();
+        if (!pending_requests() && m_delayed_actions.empty() && !m_lock_updates) {
+            std::invoke(fun);
+        } else {
+            m_delayed_actions.emplace_front(std::move(fun));
+        }
     }
 }
