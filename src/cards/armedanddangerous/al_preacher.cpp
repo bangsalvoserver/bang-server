@@ -32,7 +32,7 @@ namespace banggame {
     }
 
     void effect_al_preacher::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_update_request();
+        origin->m_game->pop_request();
     }
 
 }

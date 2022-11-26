@@ -11,11 +11,10 @@ namespace banggame {
         void on_pick(card *target_card) override {
             target->add_to_hand_phase_one(target_card);
             if (target->m_game->m_selection.size() == 1) {
-                target->m_game->pop_request_then([&]{
-                    target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_game->m_selection.front());
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
-                    target->add_gold(1);
-                });
+                auto lock = target->m_game->lock_updates(true);
+                target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_game->m_selection.front());
+                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+                target->add_gold(1);
             }
         }
 
@@ -33,7 +32,7 @@ namespace banggame {
             if (origin == target) {
                 int ncards = target->get_cards_to_draw();
                 if (ncards > 1) {
-                    target->m_game->pop_request();
+                    auto lock = target->m_game->lock_updates(true);
                     for (int i=0; i<ncards; ++i) {
                         target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
                     }

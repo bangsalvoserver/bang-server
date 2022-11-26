@@ -9,15 +9,14 @@ namespace banggame {
     }
 
     void request_characterchoice::on_pick(card *target_card) {
-        target->m_game->pop_request_then([&]{
-            target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
-            target->m_game->move_card(target_card, pocket_type::player_character, target, show_card_flags::shown);
-            target->reset_max_hp();
-            target->set_hp(target->m_max_hp, true);
-            target_card->on_enable(target);
+        auto lock = target->m_game->lock_updates(true);
+        target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
+        target->m_game->move_card(target_card, pocket_type::player_character, target, show_card_flags::shown);
+        target->reset_max_hp();
+        target->set_hp(target->m_max_hp, true);
+        target_card->on_enable(target);
 
-            target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, show_card_flags::hidden);
-        });
+        target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, show_card_flags::hidden);
     }
 
     game_string request_characterchoice::status_text(player *owner) const {
@@ -33,15 +32,10 @@ namespace banggame {
     }
     
     void request_discard::on_pick(card *target_card) {
-        if (--ncards == 0) {
-            target->m_game->pop_request();
-        }
-
+        auto lock = target->m_game->lock_updates(--ncards == 0);
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_card(target_card);
         target->m_game->call_event<event_type::on_effect_end>(target, origin_card);
-        
-        target->m_game->update_request();
     }
 
     game_string request_discard::status_text(player *owner) const {
@@ -57,6 +51,7 @@ namespace banggame {
     }
 
     void request_discard_pass::on_pick(card *target_card) {
+        auto lock = target->m_game->lock_updates();
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
         if (target->m_game->check_flags(game_flags::phase_one_draw_discard)) {
             target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, show_card_flags::hidden);
@@ -70,7 +65,6 @@ namespace banggame {
             target->m_game->call_event<event_type::post_discard_pass>(target, ndiscarded);
             target->m_game->queue_action([target = target]{ target->pass_turn(); });
         }
-        target->m_game->update_request();
     }
 
     game_string request_discard_pass::status_text(player *owner) const {

@@ -32,9 +32,8 @@ namespace banggame {
         request_timer *timer() override { return &m_timer; }
 
         void on_resolve() override {
-            origin->m_game->pop_request_then([&]{
-                resolve_rust(origin_card, origin, target);
-            });
+            auto lock = origin->m_game->lock_updates(true);
+            resolve_rust(origin_card, origin, target);
         }
 
         game_string status_text(player *owner) const override {

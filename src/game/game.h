@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-    struct game : game_table, listener_map, request_queue<game> {
+    struct game : game_table, listener_map, request_queue {
         draw_check_handler m_current_check;
 
         player *m_playing = nullptr;
@@ -23,8 +23,8 @@ namespace banggame {
 
         request_status_args make_request_update(player *p);
 
-        void send_request_status_clear();
-        void send_request_update();
+        void send_request_status_clear() override;
+        void send_request_update() override;
 
         void start_next_turn();
 

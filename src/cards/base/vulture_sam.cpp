@@ -19,8 +19,7 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->pop_request();
-
+            auto lock = target->m_game->lock_updates(true);
             if (target_card->pocket == pocket_type::player_hand) {
                 target_card = origin->random_hand_card();
                 target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", target, origin, target_card);
@@ -30,9 +29,7 @@ namespace banggame {
             }
             target->steal_card(target_card);
 
-            if (origin->only_black_cards_equipped()) {
-                target->m_game->update_request();
-            } else {
+            if (!origin->only_black_cards_equipped()) {
                 player_iterator next_target(target);
                 do {
                     ++next_target;

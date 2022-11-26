@@ -14,9 +14,8 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request_then([&]{
-                target->damage(origin_card, origin, 1);
-            });
+            auto lock = target->m_game->lock_updates(true);
+            target->damage(origin_card, origin, 1);
         }
         
         bool can_pick(card *target_card) const override {
@@ -24,12 +23,10 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
+            auto lock = target->m_game->lock_updates(true);
             target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->discard_card(target_card);
-            target->m_game->pop_request();
-            if (target->m_hand.empty()) {
-                target->m_game->update_request();
-            } else {
+            if (!target->m_hand.empty()) {
                 target->m_game->queue_request_front<request_discard>(origin_card, origin, target);
             }
         }

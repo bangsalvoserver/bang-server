@@ -28,14 +28,13 @@ namespace banggame {
                     target->add_cubes(c, cubes_to_add);
                 };
 
-                target->m_game->pop_request_then([&]{
-                    do_add_cubes(target->m_characters.front());
-                    for (card *c : target->m_table) {
-                        if (c->color == card_color_type::orange) {
-                            do_add_cubes(c);
-                        }
+                auto lock = target->m_game->lock_updates(true);
+                do_add_cubes(target->m_characters.front());
+                for (card *c : target->m_table) {
+                    if (c->color == card_color_type::orange) {
+                        do_add_cubes(c);
                     }
-                });
+                }
 
                 return true;
             }
@@ -54,14 +53,11 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            if (target_card->pocket == pocket_type::player_character) {
-                target_card = target->m_characters.front();
-            }
-            if (--ncubes == 0) {
-                target->m_game->pop_request();
-            }
-            target->add_cubes(target_card, 1);
-            target->m_game->update_request();
+            auto lock = target->m_game->lock_updates(--ncubes == 0);
+            
+            target->add_cubes(target_card->pocket == pocket_type::player_character
+                ? target->m_characters.front()
+                : target_card, 1);
         }
         
         game_string status_text(player *owner) const override {

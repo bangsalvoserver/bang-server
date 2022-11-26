@@ -30,9 +30,8 @@ namespace banggame {
 
     bool request_damage::auto_resolve() {
         if (!target->m_game->call_event<event_type::check_damage_response>(false)) {
-            target->m_game->pop_request_then([&]{
-                on_finished();
-            });
+            auto lock = target->m_game->lock_updates(true);
+            on_finished();
             return true;
         }
         return false;

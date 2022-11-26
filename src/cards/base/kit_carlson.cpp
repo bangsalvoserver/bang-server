@@ -9,6 +9,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
 
         void on_pick(card *target_card) override {
+            auto lock = target->m_game->lock_updates();
             target->add_to_hand_phase_one(target_card);
             if (target->m_num_drawn_cards >= target->get_cards_to_draw()) {
                 target->m_game->pop_request();
@@ -16,7 +17,6 @@ namespace banggame {
                     target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, show_card_flags::hidden);
                 }
             }
-            target->m_game->update_request();
         }
 
         game_string status_text(player *owner) const override {

@@ -22,7 +22,7 @@ namespace banggame {
             }
         });
 
-        origin->m_game->pop_request();
+        auto lock = origin->m_game->lock_updates(true);
         ++origin->m_num_drawn_cards;
 
         effect_bang().on_play(origin_card, origin, target);

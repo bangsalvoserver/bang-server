@@ -25,15 +25,14 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->pop_request_then([&]{
-                target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
-                target->m_game->queue_action([target = target, target_card] {
-                    auto it = target->m_predraw_checks.find(target_card);
-                    if (it != target->m_predraw_checks.end()) {
-                        it->second.resolved = true;
-                    }
-                    target->next_predraw_check();
-                });
+            auto lock = target->m_game->lock_updates(true);
+            target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
+            target->m_game->queue_action([target = target, target_card] {
+                auto it = target->m_predraw_checks.find(target_card);
+                if (it != target->m_predraw_checks.end()) {
+                    it->second.resolved = true;
+                }
+                target->next_predraw_check();
             });
         }
 

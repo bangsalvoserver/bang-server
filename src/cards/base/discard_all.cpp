@@ -67,6 +67,7 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
+            auto lock = target->m_game->lock_updates();
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
             target->discard_card(target_card);
             
@@ -74,7 +75,6 @@ namespace banggame {
                 discard_rest(target, reason);
                 target->m_game->pop_request();
             }
-            target->m_game->update_request();
         }
 
         bool auto_resolve() override {
@@ -88,13 +88,12 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request_then([&]{
-                while (card *c = get_first_discarded_card(target)) {
-                    target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
-                    target->discard_card(c);
-                }
-                discard_rest(target, reason);
-            });
+            auto lock = target->m_game->lock_updates(true);
+            while (card *c = get_first_discarded_card(target)) {
+                target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
+                target->discard_card(c);
+            }
+            discard_rest(target, reason);
         }
 
         game_string status_text(player *owner) const override {

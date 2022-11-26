@@ -18,18 +18,17 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->pop_request_then([&]{
-                if (target_card->pocket != pocket_type::player_hand) {
-                    target->draw_card(2, origin_card);
-                } else {
-                    for (int i=0; i<2 && !saved->m_hand.empty(); ++i) {
-                        card *stolen_card = saved->random_hand_card();
-                        target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
-                        target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
-                        target->steal_card(stolen_card);
-                    }
+            auto lock = target->m_game->lock_updates(true);
+            if (target_card->pocket != pocket_type::player_hand) {
+                target->draw_card(2, origin_card);
+            } else {
+                for (int i=0; i<2 && !saved->m_hand.empty(); ++i) {
+                    card *stolen_card = saved->random_hand_card();
+                    target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
+                    target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
+                    target->steal_card(stolen_card);
                 }
-            });
+            }
         }
 
         game_string status_text(player *owner) const override {
@@ -51,14 +50,13 @@ namespace banggame {
     void effect_saved::on_play(card *origin_card, player *origin) {
         auto &req = origin->m_game->top_request().get<request_damage>();
         player *saved = req.target;
+
+        auto lock = origin->m_game->lock_updates(--req.damage == 0);
+
         origin->m_game->queue_action_front([=]{
             if (saved->alive()) {
                 origin->m_game->queue_request<request_saved>(origin_card, origin, saved);
             }
         });
-        if (0 == --req.damage) {
-            origin->m_game->pop_request();
-        }
-        origin->m_game->update_request();
     }
 }

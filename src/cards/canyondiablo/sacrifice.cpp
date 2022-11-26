@@ -16,6 +16,8 @@ namespace banggame {
         auto &req = origin->m_game->top_request().get<request_damage>();
         player *saved = req.target;
         bool fatal = saved->m_hp <= req.damage;
+
+        auto lock = origin->m_game->lock_updates(--req.damage == 0);
         
         origin->m_game->queue_action_front([=]{
             origin->damage(origin_card, origin, 1);
@@ -25,9 +27,5 @@ namespace banggame {
                 }
             });
         });
-        if (0 == --req.damage) {
-            origin->m_game->pop_request();
-        }
-        origin->m_game->update_request();
     }
 }

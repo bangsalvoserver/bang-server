@@ -322,8 +322,6 @@ namespace banggame {
         m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
         if (response) {
             std::invoke(fun);
-        } else if (m_game->pending_requests()) {
-            m_game->update_request();
         }
         return {};
     }
@@ -338,12 +336,11 @@ namespace banggame {
     void player::draw_from_deck() {
         m_game->call_event<event_type::on_draw_from_deck>(this);
         if (m_game->top_request_is<request_draw>()) {
-            m_game->pop_request_then([&]{
-                int ncards = get_cards_to_draw();
-                while (m_num_drawn_cards < ncards) {
-                    add_to_hand_phase_one(m_game->phase_one_drawn_card());
-                }
-            });
+            auto lock = m_game->lock_updates(true);
+            int ncards = get_cards_to_draw();
+            while (m_num_drawn_cards < ncards) {
+                add_to_hand_phase_one(m_game->phase_one_drawn_card());
+            }
         }
         m_game->queue_action([this]{
             m_game->call_event<event_type::post_draw_cards>(this);

@@ -13,10 +13,9 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->pop_request_then([&]{
-                target->m_game->add_log("LOG_DISCARDED_A_CARD_FOR", origin_card, target);
-                target->m_game->move_card(target_card, pocket_type::selection, origin);
-            });
+            auto lock = target->m_game->lock_updates(true);
+            target->m_game->add_log("LOG_DISCARDED_A_CARD_FOR", origin_card, target);
+            target->m_game->move_card(target_card, pocket_type::selection, origin);
         }
 
         game_string status_text(player *owner) const override {
@@ -35,6 +34,7 @@ namespace banggame {
         int num_cards = 2;
 
         void on_pick(card *target_card) override {
+            auto lock = target->m_game->lock_updates();
             target->m_game->add_log("LOG_DRAWN_CARD", target, target_card);
             target->add_to_hand(target_card);
             if (--num_cards == 0 || target->m_game->m_selection.size() == 0) {
@@ -43,7 +43,6 @@ namespace banggame {
                     target->m_game->move_card(c, pocket_type::discard_pile);
                 }
             }
-            target->m_game->update_request();
         }
 
         game_string status_text(player *owner) const override {

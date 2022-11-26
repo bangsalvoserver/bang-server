@@ -34,11 +34,10 @@ namespace banggame {
                     }
                 });
 
-            target->m_game->pop_request_then([&]{
-                while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, show_card_flags::instant);
-                }
-            });
+            auto lock = target->m_game->lock_updates(true);
+            while (!target->m_game->m_selection.empty()) {
+                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, show_card_flags::instant);
+            }
         }
 
         game_string status_text(player *owner) const override {

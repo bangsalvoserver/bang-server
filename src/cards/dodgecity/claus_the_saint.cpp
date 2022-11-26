@@ -14,6 +14,7 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
+            auto lock = target->m_game->lock_updates();
             if (target->m_num_drawn_cards < target->get_cards_to_draw()) {
                 target->add_to_hand_phase_one(target_card);
             } else {
@@ -25,7 +26,6 @@ namespace banggame {
             if (target->m_game->m_selection.empty()) {
                 target->m_game->pop_request();
             }
-            target->m_game->update_request();
         }
 
         game_string status_text(player *owner) const override {
@@ -48,7 +48,7 @@ namespace banggame {
     void equip_claus_the_saint::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (origin == target) {
-                target->m_game->pop_request();
+                auto lock = target->m_game->lock_updates(true);
                 int ncards = target->m_game->num_alive() + target->get_cards_to_draw() - 1;
                 for (int i=0; i<ncards; ++i) {
                     target->m_game->draw_phase_one_card_to(pocket_type::selection, target);

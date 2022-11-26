@@ -30,8 +30,8 @@ namespace banggame {
     }
     
     void effect_greygory_deck::on_play(card *target_card, player *target) {
+        auto lock = target->m_game->lock_updates();
         target->remove_extra_characters();
         equip_greygory_deck{}.on_equip(target_card, target);
-        target->m_game->update_request();
     }
 }

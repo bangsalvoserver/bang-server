@@ -12,9 +12,8 @@ namespace banggame {
     }
 
     void request_targeting::on_resolve() {
-        target->m_game->pop_request_then([&]{
-            on_resolve_target();
-        });
+        auto lock = target->m_game->lock_updates(true);
+        on_resolve_target();
     }
     
     std::vector<card *> request_targeting::get_highlights() const {

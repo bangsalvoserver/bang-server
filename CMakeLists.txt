@@ -177,6 +177,7 @@ set(bangserver_srcs
     src/game/play_verify.cpp
     src/game/play_visitor.cpp
     src/game/possible_to_play.cpp
+    src/game/request_queue.cpp
 
     src/net/chat_commands.cpp
     src/net/main.cpp

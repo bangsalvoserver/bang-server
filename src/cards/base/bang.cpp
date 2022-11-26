@@ -59,21 +59,20 @@ namespace banggame {
     }
 
     void request_bang::on_miss() {
+        auto lock = target->m_game->lock_updates();
         auto target = this->target;
         if (--bang_strength == 0) {
             target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, flags);
             target->m_game->pop_request();
         }
-        target->m_game->update_request();
     }
 
     void request_bang::on_resolve() {
-        target->m_game->pop_request_then([&]{
-            target->damage(origin_card, origin, bang_damage, flags);
-            if (auto *req = target->m_game->top_request_if<request_damage>(target)) {
-                static_cast<cleanup_request &>(*req) = std::move(*this);
-            }
-        });
+        auto lock = target->m_game->lock_updates(true);
+        target->damage(origin_card, origin, bang_damage, flags);
+        if (auto *req = target->m_game->top_request_if<request_damage>(target)) {
+            static_cast<cleanup_request &>(*req) = std::move(*this);
+        }
     }
      
     void request_bang::set_unavoidable() {

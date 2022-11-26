@@ -14,29 +14,28 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->pop_request_then([&]{
-                if (target_card->pocket == pocket_type::selection) {
-                    target->remove_extra_characters();
-                    for (card *c : target->m_characters) {
-                        target->disable_equip(c);
-                    }
-
-                    target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
-
-                    card *old_character = target->m_characters.front();
-                    target->m_game->move_card(old_character, pocket_type::player_backup, target, show_card_flags::hidden);
-                    target->m_game->move_card(target_card, pocket_type::player_character, target, show_card_flags::shown);
-
-                    target->reset_max_hp();
-                    target->enable_equip(target_card);
-                    target->move_cubes(old_character, target_card, old_character->num_cubes);
-                    target_card->on_equip(target);
-                    
-                    target->set_hp(2);
-                } else {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::player_backup, target, show_card_flags::hidden);
+            auto lock = target->m_game->lock_updates(true);
+            if (target_card->pocket == pocket_type::selection) {
+                target->remove_extra_characters();
+                for (card *c : target->m_characters) {
+                    target->disable_equip(c);
                 }
-            });
+
+                target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
+
+                card *old_character = target->m_characters.front();
+                target->m_game->move_card(old_character, pocket_type::player_backup, target, show_card_flags::hidden);
+                target->m_game->move_card(target_card, pocket_type::player_character, target, show_card_flags::shown);
+
+                target->reset_max_hp();
+                target->enable_equip(target_card);
+                target->move_cubes(old_character, target_card, old_character->num_cubes);
+                target_card->on_equip(target);
+                
+                target->set_hp(2);
+            } else {
+                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::player_backup, target, show_card_flags::hidden);
+            }
         }
 
         game_string status_text(player *owner) const override {

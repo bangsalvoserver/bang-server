@@ -13,10 +13,9 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->pop_request_then([&]{
-                target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
-                target->add_to_hand(target_card);
-            });
+            auto lock = target->m_game->lock_updates(true);
+            target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
+            target->add_to_hand(target_card);
         }
 
         game_string status_text(player *owner) const override {
