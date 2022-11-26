@@ -26,20 +26,23 @@ namespace banggame {
 
     struct request_base;
 
-    struct request_timer {
-        request_timer(request_base *request, ticks duration)
-            : request(request)
-            , duration(duration) {}
-
-        explicit request_timer(request_base *request);
-
+    class request_timer {
+    protected:
         request_base *request;
 
+    private:
         ticks duration;
         
         std::vector<player *> awaiting_confirms;
         ticks auto_confirm_timer = auto_confirm_duration;
 
+    public:
+        request_timer(request_base *request, ticks duration)
+            : request(request), duration(std::clamp(duration, ticks{0}, max_timer_duration)) {}
+            
+        explicit request_timer(request_base *request);
+
+    public:
         void add_pending_confirms();
         void confirm_player(player *p);
 

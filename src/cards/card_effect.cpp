@@ -48,12 +48,11 @@ namespace banggame {
     }
 
     request_timer::request_timer(request_base *request)
-        : request_timer(request, std::clamp(std::chrono::duration_cast<ticks>(
-            std::chrono::milliseconds{request->target->m_game->m_options.damage_timer_ms}),
-            ticks{1}, ticks{10s})) {}
+        : request_timer(request, std::chrono::duration_cast<ticks>(
+            std::chrono::milliseconds{request->target->m_game->m_options.damage_timer_ms})) {}
 
     void request_timer::tick() {
-        if (awaiting_confirms.empty() && duration != ticks{0} && --duration == ticks{0}) {
+        if (awaiting_confirms.empty() && --duration <= ticks{0}) {
             auto lock = request->target->m_game->lock_updates(true);
             on_finished();
         } else if (auto_confirm_timer != ticks{0} && --auto_confirm_timer == ticks{0}) {
