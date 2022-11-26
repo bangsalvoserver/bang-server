@@ -52,20 +52,23 @@ namespace banggame {
             std::chrono::milliseconds{request->target->m_game->m_options.damage_timer_ms})) {}
 
     void request_timer::tick() {
-        if (awaiting_confirms.empty() && --duration <= ticks{0}) {
+        if (started && --(awaiting_confirms.empty() ? duration : auto_confirm_timer) <= ticks{0}) {
             auto lock = request->target->m_game->lock_updates(true);
             on_finished();
-        } else if (auto_confirm_timer != ticks{0} && --auto_confirm_timer == ticks{0}) {
-            awaiting_confirms.clear();
         }
     }
 
     void request_timer::add_pending_confirms() {
+        if (std::exchange(started, true)) return;
+
+        auto targets = update_target::includes_private();
         for (player &p : request->target->m_game->m_players) {
             if (p.user_id && p.alive()) {
                 awaiting_confirms.push_back(&p);
+                targets.add(&p);
             }
         }
+        request->target->m_game->add_update<game_update_type::timer_start>(std::move(targets));
     }
 
     void request_timer::confirm_player(player *p) {

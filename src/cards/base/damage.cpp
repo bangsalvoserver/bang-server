@@ -21,7 +21,7 @@ namespace banggame {
     static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::multi_target;
 
     request_damage::request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags)
-        : request_base(origin_card, origin, target, (flags & damaging_allowed_flags) | effect_flags::timer)
+        : request_base(origin_card, origin, target, flags & damaging_allowed_flags)
         , damage(damage) {}
     
     std::vector<card *> request_damage::get_highlights() const {

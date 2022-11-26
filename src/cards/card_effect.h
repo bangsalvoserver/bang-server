@@ -31,6 +31,7 @@ namespace banggame {
         request_base *request;
 
     private:
+        bool started = false;
         ticks duration;
         
         std::vector<player *> awaiting_confirms;

@@ -171,7 +171,6 @@ namespace banggame {
         (auto_respond)
         (auto_respond_empty_hand)
         (force_play)
-        (timer)
     )
     
     DEFINE_ENUM_FWD_TYPES(effect_type,
