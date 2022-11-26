@@ -325,6 +325,8 @@ namespace banggame {
     }
 
     void play_card_verify::do_play_card() const {
+        auto lock = origin->m_game->lock_updates();
+        
         auto &effects = is_response ? origin_card->responses : origin_card->effects;
         origin->log_played_card(origin_card, is_response);
         if (std::ranges::find(effects, effect_type::play_card_action, &effect_holder::type) == effects.end()) {
