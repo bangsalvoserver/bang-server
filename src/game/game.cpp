@@ -497,11 +497,6 @@ namespace banggame {
                 add_update<game_update_type::move_scenario_deck>(m_first_player);
             }
 
-            if (winner_role == player_role::unknown && !bool(m_options.expansions & card_expansion_type::ghostcards)) {
-                target->add_player_flags(player_flags::removed);
-                add_update<game_update_type::player_remove>(target);
-            }
-
             if (winner_role != player_role::unknown) {
                 for (player &p : m_players) {
                     if (!p.check_player_flags(player_flags::role_revealed)) {
@@ -511,10 +506,17 @@ namespace banggame {
                 add_log("LOG_GAME_OVER");
                 set_game_flags(game_flags::game_over);
                 add_update<game_update_type::game_over>(winner_role);
-            } else if (m_playing == target) {
-                start_next_turn();
-            } else if (killer && m_players.size() <= 3) {
-                killer->draw_card(3);
+            } else {
+                if (killer && killer != target && m_players.size() <= 3) {
+                    killer->draw_card(3);
+                }
+                if (!bool(m_options.expansions & card_expansion_type::ghostcards)) {
+                    target->add_player_flags(player_flags::removed);
+                    add_update<game_update_type::player_remove>(target);
+                }
+                if (m_playing == target) {
+                    start_next_turn();
+                }
             }
         }, -3);
     }
