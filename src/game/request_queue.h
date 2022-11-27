@@ -5,18 +5,26 @@
 #include <functional>
 
 #include "holders.h"
+#include "utils/stable_queue.h"
 
 namespace banggame {
 
     using delayed_action = std::function<void()>;
 
+    using action_priority_pair = std::pair<delayed_action, int>;
+
+    struct action_ordering {
+        bool operator()(const action_priority_pair &lhs, const action_priority_pair &rhs) const {
+            return lhs.second < rhs.second;
+        }
+    };
+
     class request_queue {
     private:
         std::deque<request_holder> m_requests;
-        std::deque<delayed_action> m_delayed_actions;
+        utils::stable_priority_queue<action_priority_pair, action_ordering> m_delayed_actions;
         int m_lock_updates = 0;
 
-        void update_actions();
         void update_request();
 
         struct update_lock_guard {
@@ -27,6 +35,10 @@ namespace banggame {
     protected:
         virtual void send_request_status_clear() = 0;
         virtual void send_request_update() = 0;
+
+    public:
+        [[nodiscard]] update_lock_guard lock_updates(bool pop = false);
+        void queue_action(delayed_action &&fun, int priority = 0);
 
     public:
         size_t pending_requests() const {
@@ -77,16 +89,11 @@ namespace banggame {
             update_request();
         }
 
-        [[nodiscard]] update_lock_guard lock_updates(bool pop = false);
-
         void tick() {
             if (pending_requests()) {
                 top_request().tick();
             }
         }
-
-        void queue_action(delayed_action &&fun);
-        void queue_action_front(delayed_action &&fun);
     };
 
 }

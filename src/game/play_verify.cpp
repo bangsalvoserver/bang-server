@@ -486,7 +486,7 @@ namespace banggame {
                         while (m_game->m_shop_selection.size() < 3) {
                             m_game->draw_shop_card();
                         }
-                    });
+                    }, -1);
                 });
             } else {
                 if (game_string error = verify_modifiers()) {
@@ -510,7 +510,7 @@ namespace banggame {
                         while (m_game->m_shop_selection.size() < 3) {
                             m_game->draw_shop_card();
                         }
-                    });
+                    }, -1);
                 });
             }
             break;

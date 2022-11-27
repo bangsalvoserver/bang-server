@@ -1,20 +1,6 @@
 #include "request_queue.h"
 
 namespace banggame {
-    request_queue::update_lock_guard::~update_lock_guard() noexcept(false) {
-        if (self) {
-            --self->m_lock_updates;
-            std::exchange(self, nullptr)->update_request();
-        }
-    }
-
-    void request_queue::update_actions() {
-        while (!pending_requests() && !m_delayed_actions.empty() && !m_lock_updates) {
-            auto fun = std::move(m_delayed_actions.front());
-            m_delayed_actions.pop_front();
-            std::invoke(fun);
-        }
-    }
     
     void request_queue::update_request() {
         if (m_lock_updates) return;
@@ -27,7 +13,18 @@ namespace banggame {
                 send_request_update();
             }
         } else {
-            update_actions();
+            while (!pending_requests() && !m_delayed_actions.empty() && !m_lock_updates) {
+                auto [fun, priority] = std::move(m_delayed_actions.top());
+                m_delayed_actions.pop();
+                std::invoke(fun);
+            }
+        }
+    }
+
+    request_queue::update_lock_guard::~update_lock_guard() noexcept(false) {
+        if (self) {
+            --self->m_lock_updates;
+            std::exchange(self, nullptr)->update_request();
         }
     }
 
@@ -39,19 +36,11 @@ namespace banggame {
         return update_lock_guard{this};
     }
     
-    void request_queue::queue_action(delayed_action &&fun) {
+    void request_queue::queue_action(delayed_action &&fun, int priority) {
         if (!pending_requests() && m_delayed_actions.empty() && !m_lock_updates) {
             std::invoke(fun);
         } else {
-            m_delayed_actions.emplace_back(std::move(fun));
-        }
-    }
-
-    void request_queue::queue_action_front(delayed_action &&fun) {
-        if (!pending_requests() && m_delayed_actions.empty() && !m_lock_updates) {
-            std::invoke(fun);
-        } else {
-            m_delayed_actions.emplace_front(std::move(fun));
+            m_delayed_actions.emplace(std::move(fun), priority);
         }
     }
 }

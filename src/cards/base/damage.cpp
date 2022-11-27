@@ -5,17 +5,15 @@
 
 namespace banggame {
     
-    game_string effect_damage::verify(card *origin_card, player *origin, player *target, effect_flags flags) {
-        if (origin == target && origin->m_hp <= damage) {
+    game_string effect_damage::verify(card *origin_card, player *origin, effect_flags flags) {
+        if (origin->m_hp <= damage) {
             return "ERROR_CANT_SELF_DAMAGE";
         }
         return {};
     }
 
     void effect_damage::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
-        if (!target->is_ghost()) {
-            target->m_game->queue_request_front<request_damage>(origin_card, origin, target, damage, flags);
-        }
+        target->m_game->queue_request<request_damage>(origin_card, origin, target, damage, flags);
     }
 
     static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::multi_target;
@@ -29,6 +27,10 @@ namespace banggame {
     }
 
     bool request_damage::auto_resolve() {
+        if (target->is_ghost()) {
+            target->m_game->pop_request();
+            return true;
+        }
         if (!target->m_game->call_event<event_type::check_damage_response>(false)) {
             auto lock = target->m_game->lock_updates(true);
             on_finished();

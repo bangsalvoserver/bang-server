@@ -19,13 +19,11 @@ namespace banggame {
 
         auto lock = origin->m_game->lock_updates(--req.damage == 0);
         
-        origin->m_game->queue_action_front([=]{
-            origin->damage(origin_card, origin, 1);
-            origin->m_game->queue_action_front([=]{
-                if (origin->alive()) {
-                    origin->draw_card(2 + fatal, origin_card);
-                }
-            });
-        });
+        origin->damage(origin_card, origin, 1);
+        origin->m_game->queue_action([=]{
+            if (origin->alive()) {
+                origin->draw_card(2 + fatal, origin_card);
+            }
+        }, 1);
     }
 }

@@ -409,9 +409,9 @@ namespace banggame {
             draw_scenario_card();
         }
 
-        queue_action_front([next_player]{
+        queue_action([next_player]{
             next_player->start_of_turn();
-        });
+        }, 1);
     }
 
     void game::handle_player_death(player *killer, player *target, discard_all_reason reason) {
@@ -430,17 +430,35 @@ namespace banggame {
             add_log("LOG_PLAYER_DIED", target);
         }
         
-        queue_action_front([this, killer, target, reason]{
+        queue_action([this, killer, target, reason]{
             add_update<game_update_type::player_show_role>(target, target->m_role);
             target->add_player_flags(player_flags::role_revealed | player_flags::dead);
             target->set_hp(0, true);
 
             call_event<event_type::on_player_death>(killer, target);
+        }, 2);
+
+        if (killer && m_players.size() > 3) {
+            queue_action([this, killer, target] {
+                switch (target->m_role) {
+                case player_role::outlaw:
+                    killer->draw_card(3);
+                    break;
+                case player_role::deputy:
+                    if (killer->m_role == player_role::sheriff) {
+                        queue_action([this, killer] {
+                            add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
+                            killer->discard_all(discard_all_reason::sheriff_killed_deputy);
+                        }, -2);
+                    }
+                    break;
+                }
+            }, 2);
+        }
         
-            queue_action_front([=]{
-                target->discard_all(reason);
-            });
-        });
+        queue_action([=]{
+            target->discard_all(reason);
+        }, 2);
 
         if (reason == discard_all_reason::disable_temp_ghost) {
             return;
@@ -495,26 +513,10 @@ namespace banggame {
                 add_update<game_update_type::game_over>(winner_role);
             } else if (m_playing == target) {
                 start_next_turn();
-            } else if (killer) {
-                if (m_players.size() > 3) {
-                    switch (target->m_role) {
-                    case player_role::outlaw:
-                        killer->draw_card(3);
-                        break;
-                    case player_role::deputy:
-                        if (killer->m_role == player_role::sheriff) {
-                            queue_action([this, killer]{
-                                add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                                killer->discard_all(discard_all_reason::sheriff_killed_deputy);
-                            });
-                        }
-                        break;
-                    }
-                } else {
-                    killer->draw_card(3);
-                }
+            } else if (killer && m_players.size() <= 3) {
+                killer->draw_card(3);
             }
-        });
+        }, -3);
     }
 
 }

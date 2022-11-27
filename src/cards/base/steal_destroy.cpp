@@ -26,7 +26,7 @@ namespace banggame {
 
     void effect_steal::on_resolve(card *origin_card, player *origin, card *target_card) {
         origin->m_game->call_event<event_type::on_destroy_card>(origin, target_card->owner, target_card);
-        origin->m_game->queue_action_front([=]{
+        origin->m_game->queue_action([=]{
             if (origin->alive() && target_card->owner) {
                 auto priv_target = update_target::includes(origin, target_card->owner);
                 auto inv_target = update_target::excludes(origin, target_card->owner);
@@ -47,7 +47,7 @@ namespace banggame {
                 }
                 origin->steal_card(target_card);
             }
-        });
+        }, 1);
     }
 
     struct request_steal : request_targeting {
@@ -97,9 +97,9 @@ namespace banggame {
 
     void effect_destroy::on_resolve(card *origin_card, player *origin, card *target_card) {
         origin->m_game->call_event<event_type::on_destroy_card>(origin, target_card->owner, target_card);
-        origin->m_game->queue_action_front([=]{
+        origin->m_game->queue_action([=]{
             effect_discard{}.on_play(origin_card, origin, target_card);
-        });
+        }, 1);
     }
     
     struct request_destroy : request_targeting {

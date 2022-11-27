@@ -53,10 +53,10 @@ namespace banggame {
 
         auto lock = origin->m_game->lock_updates(--req.damage == 0);
 
-        origin->m_game->queue_action_front([=]{
+        origin->m_game->queue_action([=]{
             if (saved->alive()) {
                 origin->m_game->queue_request<request_saved>(origin_card, origin, saved);
             }
-        });
+        }, 1);
     }
 }

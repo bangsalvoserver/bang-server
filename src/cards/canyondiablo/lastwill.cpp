@@ -24,11 +24,11 @@ namespace banggame {
     void equip_lastwill::on_enable(card *origin_card, player *origin) {
         origin->m_game->add_listener<event_type::on_player_death_resolve>({origin_card, -1}, [=](player *target, bool tried_save) {
             if (origin == target) {
-                target->m_game->queue_action_front([=]{
+                target->m_game->queue_action([=]{
                     if (target->m_hp <= 0) {
                         origin->m_game->queue_request<request_lastwill>(origin_card, origin);
                     }
-                });
+                }, 2);
             }
         });
     }
