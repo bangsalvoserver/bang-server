@@ -66,11 +66,11 @@ namespace banggame {
         });
         p->m_game->add_listener<event_type::on_player_death>(target_card, [=](player *origin, player *target) {
             std::vector<player *> range_targets;
-            int count = origin->m_game->num_alive();
+            int count = target->m_game->num_alive();
             player_iterator it{target};
             do {
                 ++it;
-                if (origin->m_game->call_event<event_type::verify_card_taker>(it, equip_type::vulture_sam, false)) {
+                if (target->m_game->call_event<event_type::verify_card_taker>(it, equip_type::vulture_sam, false)) {
                     range_targets.push_back(it);
                 }
             } while (--count != 0);
