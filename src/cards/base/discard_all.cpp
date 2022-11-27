@@ -4,60 +4,20 @@
 
 namespace banggame {
     
-    static bool is_non_black(card *c) {
-        return c->color != card_color_type::black;
-    }
-    
-    static card *get_first_discarded_card(player *target) {
-        auto non_black_cards = target->m_table | std::views::filter(is_non_black);
-
-        if (!non_black_cards.empty()) {
-            return non_black_cards.front();
-        } else if (!target->m_hand.empty()) {
-            return target->m_hand.front();
-        } else {
-            return nullptr;
-        }
+    static bool is_non_black(card *target_card) {
+        return target_card->color != card_color_type::black;
     }
 
-    static card *get_only_discarded_card(player *target) {
-        auto non_black_cards = target->m_table | std::views::filter(is_non_black);
-        if (std::ranges::distance(non_black_cards) + target->m_hand.size() == 1) {
-            if (target->m_hand.empty()) {
-                return non_black_cards.front();
-            } else {
-                return target->m_hand.front();
-            }
-        } else {
-            return nullptr;
-        }
-    }
-
-    static void discard_rest(player *target, discard_all_reason reason) {
-        std::vector<card *> black_cards;
-        for (card *c : target->m_table) {
-            if (c->color == card_color_type::black) {
-                black_cards.push_back(c);
-            }
-        }
-        for (card *c : black_cards) {
-            target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
-            target->discard_card(c);
-        }
-        target->drop_all_cubes(target->m_characters.front());
-        if (reason != discard_all_reason::sheriff_killed_deputy) {
-            target->add_gold(-target->m_gold);
-        }
-        if (reason == discard_all_reason::death) {
-            target->m_game->play_sound(nullptr, "death");
-        }
+    static void discard_card(player *target, card *target_card) {
+        target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
+        target->discard_card(target_card);
     }
 
     struct request_discard_all : request_base, resolvable_request {
         discard_all_reason reason;
 
         request_discard_all(player *target, discard_all_reason reason = discard_all_reason::death)
-            : request_base(nullptr, nullptr, target, effect_flags::auto_respond)
+            : request_base(nullptr, nullptr, target)
             , reason(reason) {}
         
         bool can_pick(card *target_card) const override {
@@ -68,20 +28,14 @@ namespace banggame {
 
         void on_pick(card *target_card) override {
             auto lock = target->m_game->lock_updates();
-            target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
-            target->discard_card(target_card);
-            
-            if (target->only_black_cards_equipped()) {
-                discard_rest(target, reason);
-                target->m_game->pop_request();
-            }
+            discard_card(target, target_card);
         }
 
         bool auto_resolve() override {
-            if (request_base::auto_resolve()) return true;
-
-            if (card *c = (target->m_game->m_options.auto_discard_all ? get_first_discarded_card : get_only_discarded_card)(target)) {
-                on_pick(c);
+            if (target->m_game->m_options.auto_discard_all
+                || (std::ranges::count_if(target->m_table, is_non_black) + target->m_hand.size()) <= 1)
+            {
+                on_resolve();
                 return true;
             }
             return false;
@@ -89,11 +43,22 @@ namespace banggame {
 
         void on_resolve() override {
             auto lock = target->m_game->lock_updates(true);
-            while (card *c = get_first_discarded_card(target)) {
-                target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, c);
-                target->discard_card(c);
+            while (auto non_black_cards = target->m_table | std::views::filter(is_non_black)) {
+                discard_card(target, non_black_cards.front());
             }
-            discard_rest(target, reason);
+            while (!target->m_hand.empty()) {
+                discard_card(target, target->m_hand.front());
+            }
+            while (!target->m_table.empty()) {
+                discard_card(target, target->m_table.front());
+            }
+            target->drop_all_cubes(target->m_characters.front());
+            if (reason != discard_all_reason::sheriff_killed_deputy) {
+                target->add_gold(-target->m_gold);
+            }
+            if (reason == discard_all_reason::death) {
+                target->m_game->play_sound(nullptr, "death");
+            }
         }
 
         game_string status_text(player *owner) const override {
