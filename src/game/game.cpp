@@ -430,7 +430,7 @@ namespace banggame {
             add_log("LOG_PLAYER_DIED", target);
         }
         
-        queue_action([this, killer, target, reason]{
+        queue_action([this, killer, target]{
             add_update<game_update_type::player_show_role>(target, target->m_role);
             target->add_player_flags(player_flags::role_revealed | player_flags::dead);
             target->set_hp(0, true);
@@ -440,18 +440,13 @@ namespace banggame {
 
         if (killer && m_players.size() > 3) {
             queue_action([this, killer, target] {
-                switch (target->m_role) {
-                case player_role::outlaw:
+                if (target->m_role == player_role::outlaw) {
                     killer->draw_card(3);
-                    break;
-                case player_role::deputy:
-                    if (killer->m_role == player_role::sheriff) {
-                        queue_action([this, killer] {
-                            add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                            killer->discard_all(discard_all_reason::sheriff_killed_deputy);
-                        }, -2);
-                    }
-                    break;
+                } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
+                    queue_action([this, killer] {
+                        add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
+                        killer->discard_all(discard_all_reason::sheriff_killed_deputy);
+                    }, -2);
                 }
             }, 2);
         }
@@ -491,11 +486,6 @@ namespace banggame {
                     winner_role = player_role::outlaw_3p;
                 }
             }
-            
-            if (target == m_first_player && num_alive > 1 && winner_role == player_role::unknown) {
-                m_first_player = std::next(player_iterator(m_first_player));
-                add_update<game_update_type::move_scenario_deck>(m_first_player);
-            }
 
             if (winner_role != player_role::unknown) {
                 for (player &p : m_players) {
@@ -509,6 +499,10 @@ namespace banggame {
             } else {
                 if (killer && killer != target && m_players.size() <= 3) {
                     killer->draw_card(3);
+                }
+                if (target == m_first_player && num_alive > 1) {
+                    m_first_player = std::next(player_iterator(m_first_player));
+                    add_update<game_update_type::move_scenario_deck>(m_first_player);
                 }
                 if (!bool(m_options.expansions & card_expansion_type::ghostcards)) {
                     target->add_player_flags(player_flags::removed);
