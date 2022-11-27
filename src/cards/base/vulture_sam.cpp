@@ -3,9 +3,23 @@
 #include "game/game.h"
 
 namespace banggame {
+    
+    inline bool is_non_black(card *target_card) {
+        return target_card->color != card_color_type::black;
+    }
 
-    static bool is_vulture_sam(player *p) {
-        return p->m_game->call_event<event_type::verify_card_taker>(p, equip_type::vulture_sam, false);
+    inline void steal_card(player *origin, player *target, card *target_card) {
+        if (target_card->pocket == pocket_type::player_hand) {
+            target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", origin, target, target_card);
+            target->m_game->add_log(update_target::excludes(origin, target), "LOG_STOLEN_CARD_FROM_HAND", origin, target);
+        } else {
+            target->m_game->add_log("LOG_STOLEN_CARD", origin, target, target_card);
+        }
+        origin->steal_card(target_card);
+    }
+
+    inline bool is_vulture_sam(player *target) {
+        return target->m_game->call_event<event_type::verify_card_taker>(target, equip_type::vulture_sam, false);
     }
 
     struct request_multi_vulture_sam : request_base {
@@ -22,12 +36,8 @@ namespace banggame {
             auto lock = target->m_game->lock_updates(true);
             if (target_card->pocket == pocket_type::player_hand) {
                 target_card = origin->random_hand_card();
-                target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", target, origin, target_card);
-                target->m_game->add_log(update_target::excludes(origin, target), "LOG_STOLEN_CARD_FROM_HAND", target, origin);
-            } else {
-                target->m_game->add_log("LOG_STOLEN_CARD", target, origin, target_card);
             }
-            target->steal_card(target_card);
+            steal_card(target, origin, target_card);
 
             if (!origin->only_black_cards_equipped()) {
                 player_iterator next_target(target);
@@ -58,13 +68,15 @@ namespace banggame {
         }
     };
     
-    void equip_vulture_sam::on_enable(card *target_card, player *p) {
-        p->m_game->add_listener<event_type::verify_card_taker>(target_card, [=](player *e_target, equip_type type, bool &value){
-            if (type == equip_type::vulture_sam && e_target == p) {
+    void equip_vulture_sam::on_enable(card *target_card, player *origin) {
+        origin->m_game->add_listener<event_type::verify_card_taker>(target_card, [=](player *e_target, equip_type type, bool &value){
+            if (type == equip_type::vulture_sam && e_target == origin) {
                 value = true;
             }
         });
-        p->m_game->add_listener<event_type::on_player_death>(target_card, [=](player *origin, player *target) {
+        origin->m_game->add_listener<event_type::on_player_death>(target_card, [=](player *killer, player *target) {
+            if (target->only_black_cards_equipped()) return;
+
             std::vector<player *> range_targets;
             int count = target->m_game->num_alive();
             player_iterator it{target};
@@ -75,27 +87,14 @@ namespace banggame {
                 }
             } while (--count != 0);
             if (range_targets.size() == 1) {
-                std::vector<card *> target_cards;
-                for (card *c : target->m_table) {
-                    if (c->color != card_color_type::black) {
-                        target_cards.push_back(c);
-                    }
+                while (auto non_black_cards = target->m_table | std::views::filter(is_non_black)) {
+                    steal_card(origin, target, non_black_cards.front());
                 }
-                for (card *c : target->m_hand) {
-                    target_cards.push_back(c);
+                while (!target->m_hand.empty()) {
+                    steal_card(origin, target, target->m_hand.front());
                 }
-
-                for (card *c : target_cards) {
-                    if (c->pocket == pocket_type::player_hand) {
-                        target->m_game->add_log(update_target::includes(target, p), "LOG_STOLEN_CARD", p, target, c);
-                        target->m_game->add_log(update_target::excludes(target, p), "LOG_STOLEN_CARD_FROM_HAND", p, target);
-                    } else {
-                        target->m_game->add_log("LOG_STOLEN_CARD", p, target, c);
-                    }
-                    p->steal_card(c);
-                }
-            } else if (!range_targets.empty() && range_targets.front() == p) {
-                p->m_game->queue_request_front<request_multi_vulture_sam>(target_card, target, p, effect_flags::auto_pick);
+            } else if (!range_targets.empty() && range_targets.front() == origin) {
+                origin->m_game->queue_request_front<request_multi_vulture_sam>(target_card, target, origin, effect_flags::auto_pick);
             }
         });
     }

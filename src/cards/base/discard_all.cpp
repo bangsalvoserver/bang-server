@@ -4,11 +4,11 @@
 
 namespace banggame {
     
-    static bool is_non_black(card *target_card) {
+    inline bool is_non_black(card *target_card) {
         return target_card->color != card_color_type::black;
     }
 
-    static void discard_card(player *target, card *target_card) {
+    inline void discard_card(player *target, card *target_card) {
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
         target->discard_card(target_card);
     }
