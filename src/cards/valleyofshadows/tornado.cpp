@@ -11,6 +11,16 @@ namespace banggame {
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
         }
+
+        bool auto_resolve() override {
+            if (target->m_hand.empty()) {
+                auto lock = target->m_game->lock_updates(true);
+                target->draw_card(2, origin_card);
+                return true;
+            } else {
+                return request_base::auto_resolve();
+            }
+        }
         
         void on_pick(card *target_card) override {
             auto lock = target->m_game->lock_updates(true);
@@ -29,13 +39,7 @@ namespace banggame {
     };
     
     void effect_tornado::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
-        target->m_game->queue_action([=]{
-            if (target->m_hand.empty()) {
-                target->draw_card(2, origin_card);
-            } else {
-                // ignore flags ... why would you ever play escape vs tornado?
-                target->m_game->queue_request<request_tornado>(origin_card, origin, target);
-            }
-        });
+        // ignore flags ... why would you ever play escape vs tornado?
+        target->m_game->queue_request<request_tornado>(origin_card, origin, target);
     }
 }

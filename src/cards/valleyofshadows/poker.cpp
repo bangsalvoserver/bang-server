@@ -33,6 +33,43 @@ namespace banggame {
 
         int num_cards = 2;
 
+        void on_update() override {
+            if (num_cards < 2) return;
+
+            for (auto it = target->m_game->m_selection.begin(); it != target->m_game->m_selection.end(); ++it) {
+                target->m_game->add_log("LOG_POKER_REVEAL", origin_card, *it);
+                auto flags = show_card_flags::shown;
+                if (std::next(it) == target->m_game->m_selection.end()) {
+                    flags |= show_card_flags::short_pause;
+                }
+                target->m_game->send_card_update(*it, nullptr, flags);
+            }
+        }
+
+        bool auto_resolve() override {
+            if (num_cards < 2) return false;
+            
+            if (std::ranges::any_of(target->m_game->m_selection, [this](card *c) {
+                return target->get_card_sign(c).rank == card_rank::rank_A;
+            })) {
+                auto lock = target->m_game->lock_updates(true);
+                target->m_game->add_log("LOG_POKER_ACE");
+                while (!target->m_game->m_selection.empty()) {
+                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+                }
+                return true;
+            } else if (target->m_game->m_selection.size() <= 2) {
+                auto lock = target->m_game->lock_updates(true);
+                while (!target->m_game->m_selection.empty()) {
+                    card *drawn_card = target->m_game->m_selection.front();
+                    target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
+                    target->add_to_hand(drawn_card);
+                }
+                return true;
+            }
+            return false;
+        }
+
         void on_pick(card *target_card) override {
             auto lock = target->m_game->lock_updates();
             target->m_game->add_log("LOG_DRAWN_CARD", target, target_card);
@@ -77,31 +114,6 @@ namespace banggame {
         for (player *p : targets) {
             origin->m_game->queue_request<request_poker>(origin_card, origin, p, flags);
         }
-        origin->m_game->queue_action([=]{
-            for (auto it = origin->m_game->m_selection.begin(); it != origin->m_game->m_selection.end(); ++it) {
-                origin->m_game->add_log("LOG_POKER_REVEAL", origin_card, *it);
-                auto flags = show_card_flags::shown;
-                if (std::next(it) == origin->m_game->m_selection.end()) {
-                    flags |= show_card_flags::short_pause;
-                }
-                origin->m_game->send_card_update(*it, nullptr, flags);
-            }
-            if (std::ranges::any_of(origin->m_game->m_selection, [origin](card *c) {
-                return origin->get_card_sign(c).rank == card_rank::rank_A;
-            })) {
-                origin->m_game->add_log("LOG_POKER_ACE");
-                while (!origin->m_game->m_selection.empty()) {
-                    origin->m_game->move_card(origin->m_game->m_selection.front(), pocket_type::discard_pile);
-                }
-            } else if (origin->m_game->m_selection.size() <= 2) {
-                while (!origin->m_game->m_selection.empty()) {
-                    card *drawn_card = origin->m_game->m_selection.front();
-                    origin->m_game->add_log("LOG_DRAWN_CARD", origin, drawn_card);
-                    origin->add_to_hand(drawn_card);
-                }
-            } else {
-                origin->m_game->queue_request<request_poker_draw>(origin_card, origin);
-            }
-        });
+        origin->m_game->queue_request<request_poker_draw>(origin_card, origin);
     }
 }
