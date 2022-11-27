@@ -73,6 +73,15 @@ namespace banggame {
         return origin->m_game->top_request_is<request_draw>(origin);
     }
 
+    void effect_reset_drawing::on_play(card *origin_card, player *origin) {
+        auto lock = origin->m_game->lock_updates(true);
+        origin->m_game->queue_action([=]{
+            if (origin->alive() && origin->m_num_drawn_cards < origin->get_cards_to_draw() && origin->m_game->m_playing == origin) {
+                origin->request_drawing();
+            }
+        });
+    }
+
     void effect_end_drawing::on_play(card *origin_card, player *origin) {
         if (origin->m_game->top_request_is<request_draw>()) {
             auto lock = origin->m_game->lock_updates(true);

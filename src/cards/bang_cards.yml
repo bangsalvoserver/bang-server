@@ -1454,8 +1454,8 @@ character:
     image: 07_evelynshebang
     expansion: valleyofshadows
     responses:
-      - while_drawing
       - evelyn_shebang player notself reachable
+      - reset_drawing
   - name: HENRY_BLOCK
     image: 07_henryblock
     expansion: valleyofshadows
@@ -1762,10 +1762,10 @@ fistfulofcards:
     image: 05_fratellidisangue
     responses:
       - max_usages(1)
-      - while_drawing
       - startofturn
       - heal_notfull player notself
       - damage
+      - reset_drawing
   - name: THE_JUDGE
     image: 05_ilgiudice
     equip:
