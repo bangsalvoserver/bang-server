@@ -12,7 +12,6 @@ set(bangserver_srcs
     src/cards/base/bart_cassidy.cpp
     src/cards/base/calamity_janet.cpp
     src/cards/base/damage.cpp
-    src/cards/base/discard_all.cpp
     src/cards/base/deathsave.cpp
     src/cards/base/draw.cpp
     src/cards/base/duel.cpp
@@ -167,6 +166,7 @@ set(bangserver_srcs
     src/cards/card_effect.cpp
 
     src/game/card_serial.cpp
+    src/game/discard_all.cpp
     src/game/filters.cpp
     src/game/holders.cpp
     src/game/game.cpp

@@ -1,7 +1,7 @@
 #ifndef __BASE_REQUESTS_H__
 #define __BASE_REQUESTS_H__
 
-#include "discard_all.h"
+#include "cards/card_effect.h"
 
 namespace banggame {
 

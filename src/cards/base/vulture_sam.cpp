@@ -76,6 +76,7 @@ namespace banggame {
         });
         origin->m_game->add_listener<event_type::on_player_death>(target_card, [=](player *killer, player *target) {
             if (target->only_black_cards_equipped()) return;
+            target->untap_inactive_cards();
 
             std::vector<player *> range_targets;
             int count = target->m_game->num_alive();

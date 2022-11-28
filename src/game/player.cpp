@@ -441,11 +441,6 @@ namespace banggame {
         }
     }
 
-    void player::discard_all(discard_all_reason reason) {
-        untap_inactive_cards();
-        queue_request_discard_all(this, reason);
-    }
-
     bool player::only_black_cards_equipped() const {
         return std::ranges::all_of(m_table, [](card *c) {
             return c->color == card_color_type::black;

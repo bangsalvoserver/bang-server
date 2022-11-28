@@ -1,6 +1,4 @@
-#include "discard_all.h"
-
-#include "game/game.h"
+#include "game.h"
 
 namespace banggame {
     
@@ -29,6 +27,10 @@ namespace banggame {
         void on_pick(card *target_card) override {
             auto lock = target->m_game->lock_updates();
             discard_card(target, target_card);
+        }
+
+        void on_update() override {
+            target->untap_inactive_cards();
         }
 
         bool auto_resolve() override {
@@ -78,8 +80,8 @@ namespace banggame {
         }
     };
 
-    void queue_request_discard_all(player *target, discard_all_reason reason) {
-        target->m_game->queue_request<request_discard_all>(target, reason);
+    void player::discard_all(discard_all_reason reason) {
+        m_game->queue_request<request_discard_all>(this, reason);
     }
 
 }

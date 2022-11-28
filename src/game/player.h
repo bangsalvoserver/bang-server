@@ -8,11 +8,17 @@
 #include <memory>
 
 #include "game_update.h"
-#include "cards/base/discard_all.h"
 
 namespace banggame {
 
     constexpr int max_cubes = 4;
+
+    enum class discard_all_reason {
+        death,
+        sheriff_killed_deputy,
+        disable_temp_ghost,
+        discard_ghost
+    };
     
     struct card : card_data {
         int id;
