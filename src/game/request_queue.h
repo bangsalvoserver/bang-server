@@ -39,6 +39,7 @@ namespace banggame {
     public:
         [[nodiscard]] update_lock_guard lock_updates(bool pop = false);
         void queue_action(delayed_action &&fun, int priority = 0);
+        void pop_request();
 
     public:
         size_t pending_requests() const {
@@ -81,12 +82,6 @@ namespace banggame {
         template<std::derived_from<request_base> T>
         void queue_request(auto && ... args) {
             queue_request(std::make_shared<T>(FWD(args) ... ));
-        }
-
-        void pop_request() {
-            m_requests.pop_front();
-            send_request_status_clear();
-            update_request();
         }
 
         void tick() {

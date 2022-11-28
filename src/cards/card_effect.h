@@ -63,6 +63,7 @@ namespace banggame {
         player *origin;
         player *target;
         effect_flags flags;
+        bool sent = false;
 
         virtual request_timer *timer() { return nullptr; }
 

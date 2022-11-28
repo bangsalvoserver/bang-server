@@ -43,4 +43,12 @@ namespace banggame {
             m_delayed_actions.emplace(std::move(fun), priority);
         }
     }
+
+    void request_queue::pop_request() {
+        if (top_request().is_sent()) {
+            send_request_status_clear();
+        }
+        m_requests.pop_front();
+        update_request();
+    }
 }

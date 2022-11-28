@@ -67,6 +67,9 @@ namespace banggame {
         effect_flags flags() const {
             return m_value->flags;
         }
+        bool is_sent() const {
+            return m_value->sent;
+        }
         game_string status_text(player *owner) const {
             return m_value->status_text(owner);
         }
@@ -105,6 +108,7 @@ namespace banggame {
         }
 
         void add_pending_confirms() {
+            m_value->sent = true;
             if (auto *t = m_value->timer()) {
                 t->add_pending_confirms();
             }
