@@ -80,12 +80,10 @@ namespace banggame {
     }
 
     void request_bang::on_update() {
-        if (!num_cards_used()) {
-            if (bool(flags & effect_flags::multi_target)) {
-                target->m_game->play_sound(target, "gatling");
-            } else {
-                target->m_game->play_sound(target, "bang");
-            }
+        if (bool(flags & effect_flags::multi_target)) {
+            target->m_game->play_sound(target, "gatling");
+        } else {
+            target->m_game->play_sound(target, "bang");
         }
     }
 

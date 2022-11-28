@@ -7,7 +7,9 @@ namespace banggame {
 
         if (pending_requests()) {
             auto &req = top_request();
-            req.on_update();
+            if (!req.is_sent()) {
+                req.on_update();
+            }
             if (!req.auto_resolve()) {
                 req.add_pending_confirms();
                 send_request_update();

@@ -38,8 +38,6 @@ namespace banggame {
         int num_cards = 2;
 
         void on_update() override {
-            if (num_cards < 2) return;
-
             for (auto it = target->m_game->m_selection.begin(); it != target->m_game->m_selection.end(); ++it) {
                 target->m_game->add_log("LOG_POKER_REVEAL", origin_card, *it);
                 auto flags = show_card_flags::shown;
@@ -51,7 +49,7 @@ namespace banggame {
         }
 
         bool auto_resolve() override {
-            if (num_cards < 2) return false;
+            if (sent) return false;
             
             if (std::ranges::any_of(target->m_game->m_selection, [this](card *c) {
                 return target->get_card_sign(c).rank == card_rank::rank_A;
@@ -78,7 +76,7 @@ namespace banggame {
             auto lock = target->m_game->lock_updates();
             target->m_game->add_log("LOG_DRAWN_CARD", target, target_card);
             target->add_to_hand(target_card);
-            if (--num_cards == 0 || target->m_game->m_selection.size() == 0) {
+            if (--num_cards == 0) {
                 target->m_game->pop_request();
                 for (auto *c : target->m_game->m_selection) {
                     target->m_game->move_card(c, pocket_type::discard_pile);
