@@ -11,9 +11,6 @@
 namespace banggame {
     
     game_string play_card_verify::verify_modifiers() const {
-        if (is_response && !modifiers.empty()) {
-            return "ERROR_INVALID_RESPONSE_CARD";
-        }
         for (card *mod_card : modifiers) {
             if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return {"ERROR_CARD_DISABLED_BY", mod_card, disabler};
@@ -366,16 +363,7 @@ namespace banggame {
     game_string play_card_verify::verify_and_play() {
         if (!is_response) {
             if (origin->m_game->pending_requests()) {
-                const auto &req = origin->m_game->top_request();
-                if (bool(req.flags() & effect_flags::force_play)) {
-                    if (!req.can_respond(origin, origin_card) && std::ranges::none_of(modifiers, [&](card *c) {
-                        return req.can_respond(origin, c);
-                    })) {
-                        return "ERROR_FORCED_CARD";
-                    }
-                } else {
-                    return "ERROR_MUST_RESPOND_TO_REQUEST";
-                }
+                return "ERROR_MUST_RESPOND_TO_REQUEST";
             } else if (origin->m_game->m_playing != origin) {
                 return "ERROR_PLAYER_NOT_IN_TURN";
             }
@@ -448,9 +436,6 @@ namespace banggame {
             }
             [[fallthrough]];
         case pocket_type::shop_selection: {
-            if (is_response) {
-                return "ERROR_INVALID_RESPONSE_CARD";
-            }
             int cost = origin_card->buy_cost();
             for (card *c : modifiers) {
                 switch (c->modifier) {
@@ -466,6 +451,7 @@ namespace banggame {
                 }
             }
             if (origin->m_game->m_shop_selection.size() > 3) {
+                // can only happen when playing Josh McCloud
                 cost = 0;
             }
             if (origin->m_gold < cost) {
@@ -487,12 +473,19 @@ namespace banggame {
                     }, -1);
                 });
             } else {
-                if (game_string error = verify_modifiers()) {
+                if (!cost) {
+                    is_response = false;
+                } else if (is_response) {
+                    return "ERROR_INVALID_RESPONSE_CARD";
+                } else if (game_string error = verify_modifiers()) {
                     return error;
                 } else if (game_string error = verify_equip_target()) {
                     return error;
                 }
                 origin->prompt_then(check_prompt_equip(), [*this, cost]{
+                    if (!cost) {
+                        origin->m_game->pop_request();
+                    }
                     player *target = get_equip_target();
                     origin_card->on_equip(target);
                     if (origin == target) {

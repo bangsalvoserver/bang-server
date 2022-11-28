@@ -37,18 +37,6 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
-    struct request_force_play_card : request_base {
-        request_force_play_card(card *origin_card, player *target, card *target_card)
-            : request_base(origin_card, nullptr, target, effect_flags::force_play | effect_flags::auto_respond)
-            , target_card(target_card) {}
-        
-        card *target_card;
-
-        bool can_respond(player *target, card *target_card) const override;
-
-        game_string status_text(player *owner) const override;
-    };
-
 }
 
 #endif

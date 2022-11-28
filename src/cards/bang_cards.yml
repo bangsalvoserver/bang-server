@@ -1916,6 +1916,9 @@ goldrush:
     color: brown
     effects:
       - heal player
+    responses:
+      - forced_play
+      - heal player
     tags:
       - buy_cost(1)
   - count: 3
@@ -1931,6 +1934,9 @@ goldrush:
     color: brown
     effects:
       - steal card range_1
+    responses:
+      - forced_play
+      - steal card range_1
     tags:
       - shopchoice(1)
       - hidden
@@ -1939,6 +1945,9 @@ goldrush:
     color: brown
     effects:
       - heal
+    responses:
+      - forced_play
+      - heal
     tags:
       - shopchoice(1)
       - hidden
@@ -1946,6 +1955,9 @@ goldrush:
     image: 04_bottiglia_bang
     color: brown
     effects:
+      - bang player reachable notself
+    responses:
+      - forced_play
       - bang player reachable notself
     tags:
       - shopchoice(1)
@@ -1978,6 +1990,10 @@ goldrush:
     effects:
       - generalstore
       - generalstore players
+    responses:
+      - forced_play
+      - generalstore
+      - generalstore players
     tags:
       - shopchoice(2)
       - hidden
@@ -1985,6 +2001,9 @@ goldrush:
     image: 04_complice_duello
     color: brown
     effects:
+      - duel player notself
+    responses:
+      - forced_play
       - duel player notself
     tags:
       - shopchoice(2)
@@ -1994,6 +2013,9 @@ goldrush:
     color: brown
     effects:
       - destroy card
+    responses:
+      - forced_play
+      - destroy card
     tags:
       - shopchoice(2)
       - hidden
@@ -2001,6 +2023,10 @@ goldrush:
     image: 04_corsa_all_oro
     color: brown
     effects:
+      - goldrush
+      - pass_turn
+    responses:
+      - forced_play
       - goldrush
       - pass_turn
     tags:
@@ -2036,6 +2062,9 @@ goldrush:
     color: brown
     effects:
       - rum
+    responses:
+      - forced_play
+      - rum
     tags:
       - buy_cost(3)
   - name: GOLD_PAN
@@ -2065,6 +2094,9 @@ goldrush:
     image: 04_union_pacific
     color: brown
     effects:
+      - draw(4)
+    responses:
+      - forced_play
       - draw(4)
     tags:
       - buy_cost(4)

@@ -168,7 +168,6 @@ namespace banggame {
         (single_target)
         (multi_target)
         (auto_respond)
-        (force_play)
     )
     
     DEFINE_ENUM_FWD_TYPES(effect_type,
@@ -217,6 +216,7 @@ namespace banggame {
         (pay_gold,              effect_pay_gold)
         (rum,                   effect_rum)
         (goldrush,              effect_goldrush)
+        (forced_play,           effect_forced_play)
         (pay_cube,              effect_pay_cube)
         (add_cube,              effect_add_cube)
         (rust,                  effect_rust)

@@ -341,10 +341,7 @@ namespace banggame {
         add_ids_for(p->m_characters);
         add_ids_for(m_scenario_cards | std::views::reverse | std::views::take(1));
         add_ids_for(m_button_row);
-        
-        if (bool(req.flags() & effect_flags::force_play)) {
-            add_ids_for(m_shop_selection);
-        }
+        add_ids_for(m_shop_selection);
 
         if (req.target() != p) return ret;
 

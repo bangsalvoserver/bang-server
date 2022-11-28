@@ -303,7 +303,7 @@ namespace banggame {
             m_prompt.emplace(std::move(fun), message);
             m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(message));
         } else {
-            auto lock = m_game->lock_updates(m_game->pending_requests() && bool(m_game->top_request().flags() & effect_flags::force_play));
+            auto lock = m_game->lock_updates();
             m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
             std::invoke(fun);
         }
@@ -318,8 +318,6 @@ namespace banggame {
 
         if (response) {
             prompt_then({}, std::move(fun));
-        } else {
-            m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
         }
         return {};
     }

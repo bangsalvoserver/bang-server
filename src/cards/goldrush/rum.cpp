@@ -4,6 +4,13 @@
 
 namespace banggame {
 
+    game_string effect_rum::on_prompt(card *origin_card, player *origin) {
+        if (origin->m_hp == origin->m_max_hp) {
+            return {"PROMPT_CARD_NO_EFFECT", origin_card};
+        }
+        return {};
+    }
+
     void effect_rum::on_play(card *origin_card, player *origin) {
         std::vector<card_suit> suits;
 

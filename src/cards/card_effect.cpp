@@ -10,8 +10,8 @@ namespace banggame {
     }
 
     bool request_base::can_respond(player *target, card *target_card) const {
-        const bool is_response = !bool(flags & effect_flags::force_play);
-        return !target->m_game->is_disabled(target_card) && target->is_possible_to_play(target_card, is_response);
+        return !target->m_game->is_disabled(target_card)
+            && target->is_possible_to_play(target_card, true);
     }
 
     bool request_base::auto_pick() {
@@ -27,16 +27,14 @@ namespace banggame {
         auto update = target->m_game->make_request_update(target);
         if (update.pick_cards.empty() && update.respond_cards.size() == 1) {
             card *origin_card = update.respond_cards.front();
-            bool is_response = !bool(flags & effect_flags::force_play);
-            auto &effects = is_response ? origin_card->responses : origin_card->effects;
             if (origin_card->equips.empty()
                 && origin_card->optionals.empty()
                 && origin_card->modifier == card_modifier_type::none
-                && std::ranges::all_of(effects, [](const effect_holder &holder) { return holder.target == target_type::none; })
+                && std::ranges::all_of(origin_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
             ) {
-                auto lock = target->m_game->lock_updates(!is_response);
-                play_card_verify{target, origin_card, is_response,
-                    target_list{effects.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
+                auto lock = target->m_game->lock_updates();
+                play_card_verify{target, origin_card, true,
+                    target_list{origin_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
                 return true;
             }
         }

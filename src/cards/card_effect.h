@@ -24,7 +24,7 @@ namespace banggame {
         void on_disable(card *target_card, player *target);
     };
 
-    struct request_base;
+    class request_base;
 
     class request_timer {
     protected:
