@@ -4,23 +4,6 @@
 
 namespace banggame {
 
-    static void log_played_card_on_card(card *origin_card, player *origin, card *target_card) {
-        if (origin != target_card->owner) {
-            if (target_card->pocket == pocket_type::player_hand) {
-                origin->m_game->add_log("LOG_PLAYED_CARD_ON_HAND", origin_card, origin, target_card->owner);
-            } else {
-                origin->m_game->add_log("LOG_PLAYED_CARD_ON_CARD", origin_card, origin, target_card->owner, target_card);
-            }
-        } else {
-            if (target_card->pocket == pocket_type::player_hand) {
-                origin->m_game->add_log(update_target::includes(origin), "LOG_PLAYED_CARD_ON_OWN_CARD", origin_card, origin, target_card);
-                origin->m_game->add_log(update_target::excludes(origin), "LOG_PLAYED_CARD_ON_OWN_HAND", origin_card, origin);
-            } else {
-                origin->m_game->add_log("LOG_PLAYED_CARD_ON_OWN_CARD", origin_card, origin, target_card);
-            }
-        }
-    }
-
     game_string prompt_target_self_hand::on_prompt(card *origin_card, player *origin, card *target_card) {
         if (origin == target_card->owner && target_card->pocket == pocket_type::player_hand) {
             return {"PROMPT_TARGET_OWN_HAND", origin_card};
@@ -79,7 +62,20 @@ namespace banggame {
 
     void effect_steal::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
         origin->m_game->queue_action([=]{
-            log_played_card_on_card(origin_card, origin, target_card);
+            if (origin != target_card->owner) {
+                if (target_card->pocket == pocket_type::player_hand) {
+                    origin->m_game->add_log("LOG_PLAYED_CARD_STEAL_HAND", origin_card, origin, target_card->owner);
+                } else {
+                    origin->m_game->add_log("LOG_PLAYED_CARD_STEAL", origin_card, origin, target_card->owner, target_card);
+                }
+            } else {
+                if (target_card->pocket == pocket_type::player_hand) {
+                    origin->m_game->add_log(update_target::includes(origin), "LOG_PLAYED_CARD_STEAL_OWN", origin_card, origin, target_card);
+                    origin->m_game->add_log(update_target::excludes(origin), "LOG_PLAYED_CARD_STEAL_OWN_HAND", origin_card, origin);
+                } else {
+                    origin->m_game->add_log("LOG_PLAYED_CARD_STEAL_OWN", origin_card, origin, target_card);
+                }
+            }
             if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
                 origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
             } else {
@@ -89,20 +85,23 @@ namespace banggame {
     }
 
     void effect_discard::on_play(card *origin_card, player *origin, card *target_card) {
-        if (origin->alive() && target_card->owner) {
-            if (origin != target_card->owner) {
-                origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
-            } else {
-                origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
-            }
-            target_card->owner->discard_card(target_card);
+        if (origin != target_card->owner) {
+            origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
+        } else {
+            origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_card->owner, target_card);
         }
+        target_card->owner->discard_card(target_card);
     }
 
     void effect_destroy::on_resolve(card *origin_card, player *origin, card *target_card) {
         origin->m_game->call_event<event_type::on_destroy_card>(origin, target_card->owner, target_card);
         origin->m_game->queue_action([=]{
-            target_card->owner->discard_card(target_card);
+            if (origin->alive() && target_card->owner) {
+                if (origin != target_card->owner && target_card->pocket == pocket_type::player_hand) {
+                    origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
+                }
+                target_card->owner->discard_card(target_card);
+            }
         }, 1);
     }
     
@@ -132,7 +131,15 @@ namespace banggame {
     
     void effect_destroy::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
         origin->m_game->queue_action([=]{
-            log_played_card_on_card(origin_card, origin, target_card);
+            if (origin != target_card->owner) {
+                if (target_card->pocket == pocket_type::player_hand) {
+                    origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_HAND", origin_card, origin, target_card->owner);
+                } else {
+                    origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY", origin_card, origin, target_card->owner, target_card);
+                }
+            } else {
+                origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_OWN", origin_card, origin, target_card);
+            }
             if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
                 origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
             } else {
