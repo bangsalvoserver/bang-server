@@ -478,6 +478,7 @@ namespace banggame {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this, cost]{
+                    auto lock = origin->m_game->lock_updates();
                     play_modifiers();
                     origin->add_gold(-cost);
                     do_play_card();
