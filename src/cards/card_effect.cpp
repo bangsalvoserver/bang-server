@@ -34,9 +34,7 @@ namespace banggame {
                 && origin_card->modifier == card_modifier_type::none
                 && std::ranges::all_of(effects, [](const effect_holder &holder) { return holder.target == target_type::none; })
             ) {
-                if (!is_response) {
-                    target->m_game->pop_request();
-                }
+                auto lock = target->m_game->lock_updates(!is_response);
                 play_card_verify{target, origin_card, is_response,
                     target_list{effects.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
                 return true;
