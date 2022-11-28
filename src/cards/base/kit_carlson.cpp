@@ -7,6 +7,12 @@ namespace banggame {
     struct request_kit_carlson : selection_picker {
         request_kit_carlson(card *origin_card, player *target)
             : selection_picker(origin_card, nullptr, target) {}
+        
+        void on_update() override {
+            for (int i=0; i<3; ++i) {
+                target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
+            }
+        }
 
         void on_pick(card *target_card) override {
             auto lock = target->m_game->lock_updates();
@@ -31,10 +37,7 @@ namespace banggame {
     void equip_kit_carlson::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (target == origin && target->get_cards_to_draw() < 3) {
-                target->m_game->pop_request();
-                for (int i=0; i<3; ++i) {
-                    target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
-                }
+                auto lock = target->m_game->lock_updates(true);
                 target->m_game->queue_request<request_kit_carlson>(target_card, target);
             }
         });

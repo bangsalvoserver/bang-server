@@ -370,7 +370,7 @@ namespace banggame {
             if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
                 request_drawing();
             } else {
-                equip_predraw_check::queue(this);
+                m_game->queue_request<request_predraw>(this);
             }
         }
     }
