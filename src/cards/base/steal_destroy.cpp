@@ -11,6 +11,10 @@ namespace banggame {
         return {};
     }
 
+    bool request_targeting::auto_resolve() {
+        return target->m_hand.empty() && auto_respond();
+    }
+
     void request_targeting::on_resolve() {
         auto lock = target->m_game->lock_updates(true);
         on_resolve_target();

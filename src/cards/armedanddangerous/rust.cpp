@@ -26,10 +26,14 @@ namespace banggame {
 
     struct request_rust : request_base, resolvable_request {
         request_rust(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand) {}
+            : request_base(origin_card, origin, target, flags) {}
 
         rust_timer m_timer{this};
         request_timer *timer() override { return &m_timer; }
+
+        bool auto_resolve() override {
+            return target->m_hand.empty() && auto_respond();
+        }
 
         void on_resolve() override {
             auto lock = origin->m_game->lock_updates(true);

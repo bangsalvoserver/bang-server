@@ -6,11 +6,15 @@ namespace banggame {
 
     struct request_claus_the_saint : selection_picker {
         request_claus_the_saint(card *origin_card, player *target)
-            : selection_picker(origin_card, nullptr, target, effect_flags::auto_pick) {}
+            : selection_picker(origin_card, nullptr, target) {}
 
         player *get_next_target() const {
             return std::next(player_iterator(target),
                 target->m_game->num_alive() - int(target->m_game->m_selection.size()));
+        }
+
+        bool auto_resolve() {
+            return auto_pick();
         }
 
         void on_pick(card *target_card) override {

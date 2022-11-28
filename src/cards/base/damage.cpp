@@ -15,12 +15,6 @@ namespace banggame {
     void effect_damage::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
         target->m_game->queue_request<request_damage>(origin_card, origin, target, damage, flags);
     }
-
-    static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::multi_target;
-
-    request_damage::request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags)
-        : request_base(origin_card, origin, target, flags & damaging_allowed_flags)
-        , damage(damage) {}
     
     std::vector<card *> request_damage::get_highlights() const {
         return target->m_backup_character;

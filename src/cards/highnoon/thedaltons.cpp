@@ -6,7 +6,11 @@ namespace banggame {
 
     struct request_thedaltons : request_base {
         request_thedaltons(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target, effect_flags::auto_pick) {}
+            : request_base(origin_card, nullptr, target) {}
+
+        bool auto_resolve() override {
+            return auto_pick();
+        }
 
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::player_table

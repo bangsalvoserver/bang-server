@@ -74,10 +74,9 @@ namespace banggame {
             static_cast<cleanup_request &>(*req) = std::move(*this);
         }
     }
-     
-    void request_bang::set_unavoidable() {
-        unavoidable = true;
-        flags |= effect_flags::auto_respond;
+
+    bool request_bang::auto_resolve() {
+        return (target->m_hand.empty() || unavoidable) && auto_respond();
     }
 
     void request_bang::on_update() {

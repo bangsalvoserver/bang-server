@@ -14,20 +14,18 @@ namespace banggame {
         return !target->m_game->is_disabled(target_card) && target->is_possible_to_play(target_card, is_response);
     }
 
-    bool request_base::auto_resolve() {
-        if (!target || !bool(flags & (effect_flags::auto_pick | effect_flags::auto_respond | effect_flags::auto_respond_empty_hand))) {
-            return false;
-        }
-
+    bool request_base::auto_pick() {
         auto update = target->m_game->make_request_update(target);
-        if (bool(flags & effect_flags::auto_pick) && update.pick_cards.size() == 1 && update.respond_cards.empty()) {
+        if (update.pick_cards.size() == 1 && update.respond_cards.empty()) {
             on_pick(update.pick_cards.front());
             return true;
         }
+        return false;
+    }
 
-        if ((bool(flags & effect_flags::auto_respond) || bool(flags & effect_flags::auto_respond_empty_hand) && target->m_hand.empty())
-            && update.pick_cards.empty() && update.respond_cards.size() == 1)
-        {
+    bool request_base::auto_respond() {
+        auto update = target->m_game->make_request_update(target);
+        if (update.pick_cards.empty() && update.respond_cards.size() == 1) {
             card *origin_card = update.respond_cards.front();
             bool is_response = !bool(flags & effect_flags::force_play);
             auto &effects = is_response ? origin_card->responses : origin_card->effects;

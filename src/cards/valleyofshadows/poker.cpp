@@ -6,7 +6,11 @@ namespace banggame {
 
     struct request_poker : request_base {
         request_poker(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags | effect_flags::auto_pick) {}
+            : request_base(origin_card, origin, target, flags) {}
+
+        bool auto_resolve() override {
+            return auto_pick();
+        }
 
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;

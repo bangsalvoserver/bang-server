@@ -12,10 +12,11 @@ namespace banggame {
     
     struct request_death : request_base, resolvable_request {
         request_death(card *origin_card, player *origin, player *target)
-            : request_base(origin_card, origin, target, effect_flags::auto_respond) {}
+            : request_base(origin_card, origin, target) {}
 
         bool tried_save = false;
-        
+
+        bool auto_resolve() override { return auto_respond(); }
         void on_resolve() override;
         game_string status_text(player *owner) const override;
     };

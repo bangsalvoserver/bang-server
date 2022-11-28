@@ -44,11 +44,13 @@ namespace banggame {
 
     struct request_bang : request_base, missable_request, cleanup_request, resolvable_request {
         request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand) {}
+            : request_base(origin_card, origin, target, flags) {}
 
         int bang_strength = 1;
         int bang_damage = 1;
         bool unavoidable = false;
+
+        bool auto_resolve() override;
 
         void on_update() override;
 
@@ -56,8 +58,6 @@ namespace banggame {
 
         void on_miss() override;
         void on_resolve() override;
-
-        void set_unavoidable();
 
         game_string status_text(player *owner) const override;
     };

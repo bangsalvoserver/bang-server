@@ -11,7 +11,7 @@ namespace banggame {
                 origin->m_game->draw_check_then(origin, target_card, [=](card_sign sign) {
                     if (sign.suit == card_suit::spades) {
                         p->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
-                        req->set_unavoidable();
+                        req->unavoidable = true;
                     }
                 });
             }

@@ -7,10 +7,14 @@ namespace banggame {
     
     struct request_saved : request_base {
         request_saved(card *origin_card, player *target, player *saved)
-            : request_base(origin_card, nullptr, target, effect_flags::auto_pick)
+            : request_base(origin_card, nullptr, target)
             , saved(saved) {}
 
         player *saved = nullptr;
+
+        bool auto_resolve() override {
+            return auto_pick();
+        }
 
         bool can_pick(card *target_card) const override {
             return target_card->pocket == (target->m_game->m_deck.empty() ? pocket_type::discard_pile : pocket_type::main_deck)

@@ -6,7 +6,11 @@ namespace banggame {
 
     struct request_predraw : request_base {
         request_predraw(player *target)
-            : request_base(nullptr, nullptr, target, effect_flags::auto_pick) {}
+            : request_base(nullptr, nullptr, target) {}
+
+        bool auto_resolve() override {
+            return auto_pick();
+        }
         
         bool can_pick(card *target_card) const override {
             if (target_card->pocket == pocket_type::player_table && target_card->owner == target) {

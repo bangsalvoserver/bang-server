@@ -6,10 +6,14 @@ namespace banggame {
 
     struct request_indians : request_base, resolvable_request {
         request_indians(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand) {}
+            : request_base(origin_card, origin, target, flags) {}
 
         void on_update() override {
             target->m_game->play_sound(target, "indians");
+        }
+
+        bool auto_resolve() override {
+            return target->m_hand.empty() && auto_respond();
         }
 
         bool can_pick(card *target_card) const override {

@@ -167,9 +167,7 @@ namespace banggame {
         (escapable)
         (single_target)
         (multi_target)
-        (auto_pick)
         (auto_respond)
-        (auto_respond_empty_hand)
         (force_play)
     )
     

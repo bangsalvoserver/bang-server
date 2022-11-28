@@ -52,7 +52,8 @@ namespace banggame {
         virtual void on_finished() {}
     };
 
-    struct request_base {
+    class request_base {
+    public:
         request_base(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : origin_card(origin_card), origin(origin), target(target), flags(flags) {}
         
@@ -73,11 +74,15 @@ namespace banggame {
         virtual bool can_respond(player *target, card *target_card) const;
 
         virtual void on_update() {}
-        virtual bool auto_resolve();
+        virtual bool auto_resolve() { return false; }
 
         virtual std::vector<card *> get_highlights() const {
             return {};
         }
+    
+    protected:
+        bool auto_pick();
+        bool auto_respond();
     };
 
     class cleanup_request {

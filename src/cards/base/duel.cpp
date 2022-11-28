@@ -6,13 +6,17 @@ namespace banggame {
 
     struct request_duel : request_base, resolvable_request {
         request_duel(card *origin_card, player *origin, player *target, player *respond_to, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond_empty_hand)
+            : request_base(origin_card, origin, target, flags)
             , respond_to(respond_to) {}
 
         player *respond_to = nullptr;
 
         void on_update() override {
             target->m_game->play_sound(target, "duel");
+        }
+
+        bool auto_resolve() override {
+            return target->m_hand.empty() && auto_respond();
         }
 
         bool can_pick(card *target_card) const override {

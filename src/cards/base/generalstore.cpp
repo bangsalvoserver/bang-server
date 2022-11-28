@@ -6,10 +6,14 @@ namespace banggame {
 
     struct request_generalstore : selection_picker {
         request_generalstore(card *origin_card, player *origin, player *target)
-            : selection_picker(origin_card, origin, target, effect_flags::auto_pick) {}
+            : selection_picker(origin_card, origin, target) {}
 
         void on_update() override {
             target->m_game->play_sound(target, "generalstore");
+        }
+
+        bool auto_resolve() override {
+            return auto_pick();
         }
 
         void on_pick(card *target_card) override {

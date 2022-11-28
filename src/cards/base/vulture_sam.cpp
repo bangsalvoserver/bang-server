@@ -24,7 +24,7 @@ namespace banggame {
 
     struct request_multi_vulture_sam : request_base {
         request_multi_vulture_sam(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags | effect_flags::auto_pick) {}
+            : request_base(origin_card, origin, target, flags) {}
 
         bool can_pick(card *target_card) const override {
             return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
@@ -49,7 +49,7 @@ namespace banggame {
         }
 
         bool auto_resolve() override {
-            if (request_base::auto_resolve()) {
+            if (auto_pick()) {
                 return true;
             } else if (std::ranges::all_of(origin->m_table, [](card *c) { return c->color == card_color_type::black; })) {
                 on_pick(origin->m_hand.front());
@@ -94,7 +94,7 @@ namespace banggame {
                     steal_card(origin, target, target->m_hand.front());
                 }
             } else if (!range_targets.empty() && range_targets.front() == origin) {
-                origin->m_game->queue_request_front<request_multi_vulture_sam>(target_card, target, origin, effect_flags::auto_pick);
+                origin->m_game->queue_request_front<request_multi_vulture_sam>(target_card, target, origin);
             }
         });
     }

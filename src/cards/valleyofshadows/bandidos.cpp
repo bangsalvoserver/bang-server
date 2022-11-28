@@ -7,7 +7,7 @@ namespace banggame {
 
     struct request_bandidos : request_base, resolvable_request {
         request_bandidos(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags | effect_flags::auto_respond) {}
+            : request_base(origin_card, origin, target, flags) {}
 
         void on_update() override {
             target->m_game->play_sound(target, "bandidos");
@@ -16,6 +16,10 @@ namespace banggame {
         void on_resolve() override {
             auto lock = target->m_game->lock_updates(true);
             target->damage(origin_card, origin, 1);
+        }
+
+        bool auto_resolve() override {
+            return auto_respond();
         }
         
         bool can_pick(card *target_card) const override {
