@@ -268,6 +268,8 @@ namespace banggame {
     }
 
     void player::log_played_card(card *origin_card, bool is_response) {
+        if (origin_card->has_tag(tag_type::skip_logs)) return;
+        
         switch (origin_card->pocket) {
         case pocket_type::player_hand:
         case pocket_type::scenario_card:

@@ -141,6 +141,7 @@ main_deck:
     mth_effect: bangcard
     tags:
       - bangcard
+      - skip_logs
   - &beer
     name: BEER
     signs:
@@ -170,6 +171,8 @@ main_deck:
     color: brown
     effects:
       - destroy card
+    tags:
+      - skip_logs
   - &stagecoach
     name: STAGECOACH
     signs:
@@ -189,6 +192,8 @@ main_deck:
     color: brown
     effects:
       - duel player notself
+    tags:
+      - skip_logs
   - &general_store
     name: GENERAL_STORE
     signs:
@@ -250,6 +255,8 @@ main_deck:
     color: brown
     effects:
       - steal card range_1
+    tags:
+      - skip_logs
   - &saloon
     name: SALOON
     signs:
@@ -354,6 +361,8 @@ main_deck:
     color: brown
     effects:
       - bang player notself range_1
+    tags:
+      - skip_logs
   - name: RAG_TIME
     signs:
       - 9 hearts
@@ -364,6 +373,8 @@ main_deck:
       - discard extra_card self | hand
       - play_card_action
       - steal card
+    tags:
+      - skip_logs
   - name: BRAWL
     signs:
       - J spades
@@ -374,6 +385,8 @@ main_deck:
       - discard extra_card self | hand
       - play_card_action
       - destroy cards_other_players
+    tags:
+      - skip_logs
   - &dodge
     name: DODGE
     signs:
@@ -395,6 +408,8 @@ main_deck:
       - discard extra_card self | hand
       - play_card_action
       - bang player notself
+    tags:
+      - skip_logs
   - name: TEQUILA
     signs:
       - 9 clubs
@@ -440,6 +455,8 @@ main_deck:
     color: green
     effects:
       - destroy card
+    tags:
+      - skip_logs
   - name: TEN_GALLON_HAT
     signs:
       - J diamonds
@@ -456,6 +473,8 @@ main_deck:
     color: green
     effects:
       - steal card
+    tags:
+      - skip_logs
   - name: DERRINGER
     signs:
       - 7 spades
@@ -465,6 +484,8 @@ main_deck:
     effects:
       - draw
       - bang player notself range_1
+    tags:
+      - skip_logs
   - name: BUFFALO_RIFLE
     signs:
       - 9 clubs
@@ -473,6 +494,8 @@ main_deck:
     color: green
     effects:
       - bang player notself
+    tags:
+      - skip_logs
   - name: HOWITZER
     signs:
       - 9 spades
@@ -489,6 +512,8 @@ main_deck:
     color: green
     effects:
       - bang player reachable notself
+    tags:
+      - skip_logs
   - name: IRON_PLATE
     signs:
       - A diamonds
@@ -514,6 +539,8 @@ main_deck:
     color: green
     effects:
       - bang player notself range_1
+    tags:
+      - skip_logs
   - name: SOMBRERO
     signs:
       - 7 clubs
@@ -550,6 +577,7 @@ main_deck:
     tags:
       - weapon
       - play_as_bang
+      - skip_logs
   - name: RATTLESNAKE
     signs:
       - 7 hearts
@@ -648,6 +676,7 @@ main_deck:
     mth_effect: fanning
     tags:
       - discard_if_two_players
+      - skip_logs
   - name: TOMAHAWK
     signs:
       - A diamonds
@@ -656,6 +685,8 @@ main_deck:
     color: brown
     effects:
       - bang player notself range_2
+    tags:
+      - skip_logs
   - name: TORNADO
     signs:
       - A clubs
@@ -728,6 +759,7 @@ main_deck:
     tags:
       - repeatable
       - auto_confirm
+      - skip_logs
   - name: FLINTLOCK
     signs:
       - A spades
@@ -740,6 +772,8 @@ main_deck:
       - pay_cube select_cubes(2)
       - mth_add
     mth_effect: flintlock
+    tags:
+      - skip_logs
   - name: ARROW
     signs:
       - 5 diamonds
@@ -755,6 +789,7 @@ main_deck:
       - repeatable
       - auto_confirm
       - indians
+      - skip_logs
   - name: DUCK
     signs:
       - 3 diamonds
@@ -800,6 +835,8 @@ main_deck:
       - pay_cube select_cubes(2)
       - mth_add
     mth_effect: squaw
+    tags:
+      - skip_logs
   - name: ACE_UP_THE_SLEEVE
     signs:
       - A hearts
@@ -915,6 +952,8 @@ main_deck:
     effects:
       - pay_cube self_cubes(3)
       - destroy card | table
+    tags:
+      - skip_logs
   - name: BEER_KEG
     signs:
       - 4 hearts
@@ -933,6 +972,8 @@ main_deck:
     effects:
       - pay_cube self_cubes(3)
       - steal card notself | hand
+    tags:
+      - skip_logs
   - name: THUNDERER
     signs:
       - 3 clubs
@@ -967,6 +1008,8 @@ main_deck:
       - mth_add card self | table blue
       - mth_add card notself | table blue
     mth_effect: card_sharper
+    tags:
+      - skip_logs
   - name: MIRAGE
     signs:
       - 8 hearts
@@ -1014,6 +1057,8 @@ main_deck:
     color: brown
     effects:
       - bang player reachable notself
+    tags:
+      - skip_logs
   - <<: *missed
     signs:
       - J spades
@@ -1154,6 +1199,8 @@ main_deck:
     color: green
     effects:
       - destroy cards_other_players
+    tags:
+      - skip_logs
   - name: FLYING_BULLET
     signs:
       - 10 diamonds
@@ -1194,6 +1241,8 @@ main_deck:
     color: green
     effects:
       - steal card range_1
+    tags:
+      - skip_logs
   - name: SHYLOCK
     signs:
       - 9 diamonds
@@ -1438,6 +1487,8 @@ character:
       - max_usages(1)
       - discard card self | hand clubs
       - bang player reachable notself
+    tags:
+      - skip_logs
   - name: COLORADO_BILL
     image: 07_coloradobill
     expansion: valleyofshadows
@@ -1579,6 +1630,8 @@ character:
       - max_usages(1)
       - pay_cube select_cubes(2)
       - bang player reachable notself
+    tags:
+      - skip_logs
   - name: MS_ABIGAIL
     image: 17_msabigail
     expansion: armedanddangerous
@@ -1616,6 +1669,8 @@ character:
     effects:
       - pay_gold(2)
       - bang player reachable notself
+    tags:
+      - skip_logs
   - name: JOSH_MCCLOUD
     image: 04_josh_mccloud
     expansion: goldrush
