@@ -10,7 +10,8 @@ namespace banggame {
     }
 
     bool request_base::can_respond(player *target, card *target_card) const {
-        return !target->m_game->is_disabled(target_card)
+        return target_card->pocket != pocket_type::shop_selection
+            && !target->m_game->is_disabled(target_card)
             && target->is_possible_to_play(target_card, true);
     }
 
