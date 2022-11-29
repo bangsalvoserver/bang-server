@@ -13,7 +13,7 @@ namespace banggame {
                     if (p->alive()) {
                         p->m_game->queue_request<request_bang>(target_card, nullptr, p);
                     }
-                });
+                }, -1);
             }
         });
     }

@@ -347,7 +347,7 @@ namespace banggame {
                         obj.resolved = false;
                     }
                     next_predraw_check();
-                });
+                }, -4);
             }
         }, -4);
     }
