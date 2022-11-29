@@ -417,9 +417,13 @@ namespace banggame {
                 });
             }
             break;
+        case pocket_type::scenario_card:
+            if (origin_card != origin->m_game->m_scenario_cards.back()) {
+                return "ERROR_INVALID_SCENARIO_CARD";
+            }
+            [[fallthrough]];
         case pocket_type::player_character:
         case pocket_type::player_table:
-        case pocket_type::scenario_card:
         case pocket_type::button_row:
             if (game_string error = verify_card_targets()) {
                 return error;
