@@ -334,21 +334,22 @@ namespace banggame {
     }
 
     void player::start_of_turn() {
-        if (m_game->check_flags(game_flags::game_over)) return;
-
         m_game->m_playing = this;
+        m_game->queue_action([this]{
+            if (!m_game->check_flags(game_flags::game_over)) {
+                m_game->add_update<game_update_type::switch_turn>(this);
+                m_game->add_log("LOG_TURN_START", this);
+                m_game->call_event<event_type::pre_turn_start>(this);
 
-        m_num_drawn_cards = 0;
-        
-        for (auto &[card_id, obj] : m_predraw_checks) {
-            obj.resolved = false;
-        }
-        
-        m_game->add_update<game_update_type::switch_turn>(this);
-        m_game->add_log("LOG_TURN_START", this);
-        m_game->call_event<event_type::pre_turn_start>(this);
-
-        m_game->queue_action([this]{ next_predraw_check(); });
+                m_game->queue_action([this]{            
+                    m_num_drawn_cards = 0;
+                    for (auto &[card_id, obj] : m_predraw_checks) {
+                        obj.resolved = false;
+                    }
+                    next_predraw_check();
+                });
+            }
+        }, -4);
     }
 
     void player::next_predraw_check() {
