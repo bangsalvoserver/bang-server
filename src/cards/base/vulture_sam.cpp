@@ -18,8 +18,8 @@ namespace banggame {
         origin->steal_card(target_card);
     }
 
-    inline bool is_vulture_sam(player *target) {
-        return target->m_game->call_event<event_type::verify_card_taker>(target, equip_type::vulture_sam, false);
+    static card *get_vulture_sam(player *target) {
+        return target->m_game->call_event<event_type::verify_card_taker>(target, equip_type::vulture_sam, nullptr);
     }
 
     struct request_multi_vulture_sam : request_base {
@@ -41,10 +41,12 @@ namespace banggame {
 
             if (!origin->only_black_cards_equipped()) {
                 player_iterator next_target(target);
+                card *next_origin_card = nullptr;
                 do {
                     ++next_target;
-                } while (next_target == origin || !is_vulture_sam(next_target));
-                target->m_game->queue_request_front<request_multi_vulture_sam>(origin_card, origin, next_target);
+                    next_origin_card = get_vulture_sam(next_target);
+                } while (next_target == origin || !next_origin_card);
+                target->m_game->queue_request_front<request_multi_vulture_sam>(next_origin_card, origin, next_target);
             }
         }
 
@@ -69,9 +71,9 @@ namespace banggame {
     };
     
     void equip_vulture_sam::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_listener<event_type::verify_card_taker>(target_card, [=](player *e_target, equip_type type, bool &value){
+        origin->m_game->add_listener<event_type::verify_card_taker>(target_card, [=](player *e_target, equip_type type, card* &value){
             if (type == equip_type::vulture_sam && e_target == origin) {
-                value = true;
+                value = target_card;
             }
         });
         origin->m_game->add_listener<event_type::on_player_death>(target_card, [=](player *killer, player *target) {
@@ -83,7 +85,7 @@ namespace banggame {
             player_iterator it{target};
             do {
                 ++it;
-                if (target->m_game->call_event<event_type::verify_card_taker>(it, equip_type::vulture_sam, false)) {
+                if (get_vulture_sam(it)) {
                     range_targets.push_back(it);
                 }
             } while (--count != 0);
