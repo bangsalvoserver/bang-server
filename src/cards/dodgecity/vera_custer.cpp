@@ -37,7 +37,12 @@ namespace banggame {
             : request_base(origin_card, nullptr, target) {}
 
         bool auto_resolve() override {
-            return auto_pick();
+            if (target->m_game->num_alive() == 2) {
+                on_pick(std::next(player_iterator(target))->m_characters.front());
+                return true;
+            } else {
+                return false;
+            }
         }
         
         bool can_pick(card *target_card) const override {
