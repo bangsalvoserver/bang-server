@@ -12,7 +12,8 @@ namespace banggame {
     }
 
     bool request_targeting::auto_resolve() {
-        return target->m_hand.empty() && auto_respond();
+        return (origin == target_card->owner || target->m_hand.empty() || !target->can_escape(origin, origin_card, flags))
+            && auto_respond();
     }
 
     void request_targeting::on_resolve() {
@@ -80,11 +81,7 @@ namespace banggame {
                     origin->m_game->add_log("LOG_PLAYED_CARD_STEAL_OWN", origin_card, origin, target_card);
                 }
             }
-            if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
-                origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
-            } else {
-                effect_steal{}.on_resolve(origin_card, origin, target_card);
-            }
+            origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
         });
     }
 
@@ -144,11 +141,7 @@ namespace banggame {
             } else {
                 origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_OWN", origin_card, origin, target_card);
             }
-            if (origin != target_card->owner && target_card->owner->can_escape(origin, origin_card, flags)) {
-                origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
-            } else {
-                effect_destroy{}.on_resolve(origin_card, origin, target_card);
-            }
+            origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
         });
     }
 }

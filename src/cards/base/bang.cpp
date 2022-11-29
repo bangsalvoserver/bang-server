@@ -60,7 +60,6 @@ namespace banggame {
 
     void request_bang::on_miss() {
         auto lock = target->m_game->lock_updates();
-        auto target = this->target;
         if (--bang_strength == 0) {
             target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, flags);
             target->m_game->pop_request();

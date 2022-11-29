@@ -54,10 +54,6 @@ namespace banggame {
     }
 
     void handler_card_sharper::on_play(card *origin_card, player *origin, card *chosen_card, card *target_card) {
-        if (target_card->owner->can_escape(origin, origin_card, effect_flags::escapable)) {
-            origin->m_game->queue_request<request_card_sharper>(origin_card, origin, target_card->owner, chosen_card, target_card);
-        } else {
-            resolve_card_sharper(origin_card, origin, chosen_card, target_card);
-        }
+        origin->m_game->queue_request<request_card_sharper>(origin_card, origin, target_card->owner, chosen_card, target_card);
     }
 }
