@@ -17,6 +17,13 @@ namespace banggame {
             return auto_pick();
         }
 
+        void on_update() override {
+            int ncards = target->m_game->num_alive() + target->get_cards_to_draw() - 1;
+            for (int i=0; i<ncards; ++i) {
+                target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
+            }
+        }
+
         void on_pick(card *target_card) override {
             auto lock = target->m_game->lock_updates();
             if (target->m_num_drawn_cards < target->get_cards_to_draw()) {
@@ -50,13 +57,10 @@ namespace banggame {
     };
     
     void equip_claus_the_saint::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
-            if (origin == target) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, bool &override_request) {
+            if (!override_request && origin == target) {
+                override_request = true;
                 auto lock = target->m_game->lock_updates(true);
-                int ncards = target->m_game->num_alive() + target->get_cards_to_draw() - 1;
-                for (int i=0; i<ncards; ++i) {
-                    target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
-                }
                 target->m_game->queue_request<request_claus_the_saint>(target_card, target);
             }
         });

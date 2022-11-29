@@ -35,8 +35,9 @@ namespace banggame {
     };
 
     void equip_kit_carlson::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
-            if (target == origin && target->get_cards_to_draw() < 3) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, bool &override_request) {
+            if (!override_request && target == origin && target->get_cards_to_draw() < 3) {
+                override_request = true;
                 auto lock = target->m_game->lock_updates(true);
                 target->m_game->queue_request<request_kit_carlson>(target_card, target);
             }

@@ -161,8 +161,6 @@ namespace banggame {
 
         bool is_bangcard(card *origin_card);
 
-        void draw_from_deck();
-
         void start_of_turn();
         void request_drawing();
         

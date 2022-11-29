@@ -58,7 +58,17 @@ namespace banggame {
     }
 
     void request_draw::on_pick(card *target_card) {
-        target->draw_from_deck();
+        auto lock = target->m_game->lock_updates();
+        if (!target->m_game->call_event<event_type::on_draw_from_deck>(target, false)) {
+            target->m_game->pop_request();
+            int ncards = target->get_cards_to_draw();
+            while (target->m_num_drawn_cards < ncards) {
+                target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
+            }
+        }
+        target->m_game->queue_action([target=target]{
+            target->m_game->call_event<event_type::post_draw_cards>(target);
+        });
     }
 
     game_string request_draw::status_text(player *owner) const {
