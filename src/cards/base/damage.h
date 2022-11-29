@@ -24,9 +24,7 @@ namespace banggame {
     };
 
     struct request_damage : request_base, cleanup_request {
-        request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags)
-            , damage(damage) {}
+        request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags = {});
 
         int damage;
 
