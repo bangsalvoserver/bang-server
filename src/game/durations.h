@@ -16,7 +16,7 @@ namespace banggame {
 
     static constexpr ticks max_timer_duration = 10s;
 
-    static constexpr ticks auto_confirm_duration = 5s;
+    static constexpr ticks auto_confirm_duration = 10s;
 
     static constexpr ticks lobby_lifetime = 10s;
 }

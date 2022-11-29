@@ -47,14 +47,14 @@ namespace banggame {
             std::chrono::milliseconds{request->target->m_game->m_options.damage_timer_ms})) {}
 
     void request_timer::tick() {
-        if (started && --(awaiting_confirms.empty() ? duration : auto_confirm_timer) <= ticks{0}) {
+        if (request->sent && --(awaiting_confirms.empty() ? duration : auto_confirm_timer) <= ticks{0}) {
             auto lock = request->target->m_game->lock_updates(true);
             on_finished();
         }
     }
 
     void request_timer::add_pending_confirms() {
-        if (std::exchange(started, true)) return;
+        if (request->sent) return;
 
         auto targets = update_target::includes_private();
         for (player &p : request->target->m_game->m_players) {

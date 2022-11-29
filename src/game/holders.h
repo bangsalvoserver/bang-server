@@ -108,10 +108,10 @@ namespace banggame {
         }
 
         void add_pending_confirms() {
-            m_value->sent = true;
             if (auto *t = m_value->timer()) {
                 t->add_pending_confirms();
             }
+            m_value->sent = true;
         }
 
         void confirm_player(player *p) {
