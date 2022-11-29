@@ -314,58 +314,57 @@ namespace banggame {
         });
     }
 
-    request_status_args game::make_request_update(player *p) {
+    request_status_args game::make_request_update(player *owner) {
         const auto &req = top_request();
-        request_status_args ret{
-            req.origin_card(),
-            req.origin(),
-            req.target(),
-            req.status_text(p),
-            req.flags()
-        };
+        return request_status_args {
+            .origin_card = req.origin_card(),
+            .origin = req.origin(),
+            .target = req.target(),
+            .status_text = req.status_text(owner),
+            .flags = req.flags(),
 
-        ret.highlight_cards = to_vector_not_null(req.get_highlights());
+            .respond_cards = [&]{
+                std::vector<serial::card> ret;
+                if (owner) {
+                    auto add_cards = [&](auto &&range){
+                        std::ranges::copy_if(range, std::back_inserter(ret), [&](card *target_card) {
+                            return req.can_respond(owner, target_card);
+                        });
+                    };
 
-        if (!p) return ret;
-
-        auto add_ids_for = [&](auto &&cards) {
-            for (card *c : cards) {
-                if (req.can_respond(p, c)) {
-                    ret.respond_cards.push_back(c);
+                    add_cards(owner->m_hand | std::views::filter([](card *c) { return c->color == card_color_type::brown; }));
+                    add_cards(owner->m_table | std::views::filter(std::not_fn(&card::inactive)));
+                    add_cards(owner->m_characters);
+                    add_cards(m_scenario_cards | std::views::reverse | std::views::take(1));
+                    add_cards(m_button_row);
+                    add_cards(m_shop_selection);
                 }
-            }
+                return ret;
+            }(),
+
+            .pick_cards = [&]{
+                std::vector<serial::card> ret;
+                if (owner && req.target() == owner) {
+                    auto add_cards = [&](auto &&range) {
+                        std::ranges::copy_if(range, std::back_inserter(ret), [&](card *target_card) {
+                            return req.can_pick(target_card);
+                        });
+                    };
+
+                    for (player &target : m_players) {
+                        add_cards(target.m_hand);
+                        add_cards(target.m_table);
+                        add_cards(target.m_characters);
+                    }
+                    add_cards(m_selection);
+                    add_cards(m_deck | std::views::take(1));
+                    add_cards(m_discards | std::views::take(1));
+                }
+                return ret;
+            }(),
+
+            .highlight_cards = to_vector_not_null(req.get_highlights())
         };
-
-        add_ids_for(p->m_hand | std::views::filter([](card *c) { return c->color == card_color_type::brown; }));
-        add_ids_for(p->m_table | std::views::filter(std::not_fn(&card::inactive)));
-        add_ids_for(p->m_characters);
-        add_ids_for(m_scenario_cards | std::views::reverse | std::views::take(1));
-        add_ids_for(m_button_row);
-        add_ids_for(m_shop_selection);
-
-        if (req.target() != p) return ret;
-
-        auto maybe_add_pick_id = [&](card *target_card) {
-            if (req.can_pick(target_card)) {
-                ret.pick_cards.emplace_back(target_card);
-            }
-        };
-
-        for (player &target : m_players) {
-            std::ranges::for_each(target.m_hand, maybe_add_pick_id);
-            std::ranges::for_each(target.m_table, maybe_add_pick_id);
-            std::ranges::for_each(target.m_characters, maybe_add_pick_id);
-        }
-        std::ranges::for_each(m_selection, maybe_add_pick_id);
-
-        if (!m_deck.empty()) {
-            maybe_add_pick_id(m_deck.back());
-        }
-        if (!m_discards.empty()) {
-            maybe_add_pick_id(m_discards.back());
-        }
-
-        return ret;
     }
 
     void game::send_request_status_clear() {
