@@ -5,10 +5,6 @@
 
 namespace banggame {
 
-    void request_base::on_pick(card *target_card) {
-        throw std::runtime_error("missing on_pick(card)");
-    }
-
     bool request_base::can_respond(player *target, card *target_card) const {
         return target_card->pocket != pocket_type::shop_selection
             && !target->m_game->is_disabled(target_card)

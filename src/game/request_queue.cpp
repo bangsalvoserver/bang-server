@@ -1,5 +1,7 @@
 #include "request_queue.h"
 
+#include "game.h"
+
 namespace banggame {
     
     void request_queue::update_request() {
@@ -11,8 +13,8 @@ namespace banggame {
                 req.on_update();
             }
             if (!req.auto_resolve()) {
-                req.add_pending_confirms();
-                send_request_update();
+                req.send();
+                req.target()->m_game->send_request_update();
             }
         } else {
             while (!pending_requests() && !m_delayed_actions.empty() && !m_lock_updates) {
@@ -47,8 +49,9 @@ namespace banggame {
     }
 
     void request_queue::pop_request() {
-        if (top_request().is_sent()) {
-            send_request_status_clear();
+        auto &req = top_request();
+        if (req.is_sent()) {
+            req.target()->m_game->send_request_status_clear();
         }
         m_requests.pop_front();
         update_request();

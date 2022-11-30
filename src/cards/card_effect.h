@@ -52,7 +52,7 @@ namespace banggame {
 
     class request_base {
     public:
-        request_base(card *origin_card, player *origin, player *target, effect_flags flags = {})
+        request_base(card *origin_card, player *origin, not_null<player *> target, effect_flags flags = {})
             : origin_card(origin_card), origin(origin), target(target), flags(flags) {}
         
         virtual ~request_base() {}
@@ -65,19 +65,17 @@ namespace banggame {
 
         virtual request_timer *timer() { return nullptr; }
 
-        virtual game_string status_text(player *owner) const = 0;
+        virtual game_string status_text(player *owner) const { return {}; };
 
         virtual bool can_pick(card *target_card) const { return false; }
-        virtual void on_pick(card *target_card);
+        virtual void on_pick(card *target_card) { throw std::runtime_error("missing on_pick(card)"); }
 
         virtual bool can_respond(player *target, card *target_card) const;
 
         virtual void on_update() {}
         virtual bool auto_resolve() { return false; }
 
-        virtual std::vector<card *> get_highlights() const {
-            return {};
-        }
+        virtual std::vector<card *> get_highlights() const { return {}; }
     
     protected:
         bool auto_pick();

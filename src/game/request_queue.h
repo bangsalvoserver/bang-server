@@ -31,10 +31,6 @@ namespace banggame {
             request_queue *self;
             ~update_lock_guard() noexcept(false);
         };
-    
-    protected:
-        virtual void send_request_status_clear() = 0;
-        virtual void send_request_update() = 0;
 
     public:
         [[nodiscard]] update_lock_guard lock_updates(bool pop = false);

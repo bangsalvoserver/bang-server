@@ -107,7 +107,7 @@ namespace banggame {
             }
         }
 
-        void add_pending_confirms() {
+        void send() {
             if (auto *t = m_value->timer()) {
                 t->add_pending_confirms();
             }
