@@ -26,9 +26,9 @@ namespace banggame {
 
         game_string status_text(player *owner) const override {
             if (target == owner) {
-                return {"STATUS_YOUL_GRINNER", origin_card};
+                return {"STATUS_YOUL_GRINNER", origin_card, origin};
             } else {
-                return {"STATUS_YOUL_GRINNER_OTHER", target, origin_card};
+                return {"STATUS_YOUL_GRINNER_OTHER", origin_card, origin, target};
             }
         }
     };
