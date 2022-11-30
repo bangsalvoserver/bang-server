@@ -1,6 +1,7 @@
 #include "josh_mccloud.h"
 
 #include "game/game.h"
+#include "game/filters.h"
 #include "cards/base/requests.h"
 
 namespace banggame {
@@ -14,10 +15,6 @@ namespace banggame {
 
         bool auto_resolve() override {
             return auto_respond();
-        }
-
-        bool can_respond(player *p, card *c) const override {
-            return p == target && c == target_card;
         }
 
         game_string status_text(player *owner) const override {
@@ -42,7 +39,65 @@ namespace banggame {
     }
 
     void effect_forced_play::on_play(card *origin_card, player *target) {
-        target->m_game->pop_request();
+        if (origin_card->modifier == card_modifier_type::none) {
+            target->m_game->pop_request();
+        }
+    }
+
+    struct request_force_equip_card : request_base {
+        request_force_equip_card(card *origin_card, player *target, card *target_card)
+            : request_base(origin_card, nullptr, target, effect_flags::auto_respond)
+            , target_card(target_card) {}
+        
+        card *target_card;
+
+        std::vector<card *> get_highlights() const override {
+            return {target_card};
+        }
+
+        game_string status_text(player *owner) const override {
+            if (owner == target) {
+                return {"STATUS_FORCE_EQUIP_CARD", target_card};
+            } else {
+                return {"STATUS_FORCE_EQUIP_CARD_OTHER", target, target_card};
+            }
+        }
+    };
+
+    game_string effect_forced_equip::verify(card *origin_card, player *origin, player *target) {
+        if (auto *req = target->m_game->top_request_if<request_force_equip_card>(origin)) {
+            card *target_card = req->target_card;
+            if (auto error = check_player_filter(origin, target_card->equip_target, target)) {
+                return error;
+            } else if (card *equipped = target->find_equipped_card(target_card)) {
+                return {"ERROR_DUPLICATED_CARD", equipped};
+            } else {
+                return {};
+            }
+        }
+        return "ERROR_INVALID_RESPONSE";
+    }
+
+    game_string effect_forced_equip::on_prompt(card *origin_card, player *origin, player *target) {
+        card *target_card = origin->m_game->top_request().get<request_force_equip_card>().target_card;
+        for (const auto &e : target_card->equips) {
+            if (auto prompt_message = e.on_prompt(origin, target_card, target)) {
+                return prompt_message;
+            }
+        }
+        return {};
+    }
+    
+    void effect_forced_equip::on_play(card *origin_card, player *origin, player *target) {
+        card *target_card = origin->m_game->top_request().get<request_force_equip_card>().target_card;
+        auto lock = origin->m_game->lock_updates(true);
+
+        if (origin == target) {
+            origin->m_game->add_log("LOG_BOUGHT_EQUIP", target_card, origin);
+        } else {
+            origin->m_game->add_log("LOG_BOUGHT_EQUIP_TO", target_card, origin, target);
+        }
+        target->equip_card(target_card);
     }
 
     void effect_josh_mccloud::on_play(card *origin_card, player *target) {
@@ -58,7 +113,7 @@ namespace banggame {
                 } else if (equip_set.size() == 1) {
                     equip_set.front()->equip_card(card);
                 } else {
-                    target->m_game->queue_request<request_force_play_card>(origin_card, target, card);
+                    target->m_game->queue_request<request_force_equip_card>(origin_card, target, card);
                 }
             } else {
                 discard_drawn_card();

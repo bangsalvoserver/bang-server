@@ -306,7 +306,7 @@ namespace banggame {
                 if (owner) {
                     auto add_cards = [&](auto &&range){
                         std::ranges::copy_if(range, std::back_inserter(ret), [&](card *target_card) {
-                            return req.can_respond(owner, target_card);
+                            return !is_disabled(target_card) && owner->is_possible_to_play(target_card, true);
                         });
                     };
 
@@ -315,7 +315,7 @@ namespace banggame {
                     add_cards(owner->m_characters);
                     add_cards(m_scenario_cards | std::views::reverse | std::views::take(1));
                     add_cards(m_button_row);
-                    add_cards(m_shop_selection);
+                    add_cards(m_shop_selection | std::views::filter([](card *c) { return c->color == card_color_type::brown; }));
                 }
                 return ret;
             }(),

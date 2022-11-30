@@ -217,6 +217,7 @@ namespace banggame {
         (rum,                   effect_rum)
         (goldrush,              effect_goldrush)
         (forced_play,           effect_forced_play)
+        (forced_equip,          effect_forced_equip)
         (pay_cube,              effect_pay_cube)
         (add_cube,              effect_add_cube)
         (rust,                  effect_rust)

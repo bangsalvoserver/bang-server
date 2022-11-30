@@ -70,8 +70,6 @@ namespace banggame {
         virtual bool can_pick(card *target_card) const { return false; }
         virtual void on_pick(card *target_card) { throw std::runtime_error("missing on_pick(card)"); }
 
-        virtual bool can_respond(player *target, card *target_card) const;
-
         virtual void on_update() {}
         virtual bool auto_resolve() { return false; }
 

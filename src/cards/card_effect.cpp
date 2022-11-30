@@ -5,12 +5,6 @@
 
 namespace banggame {
 
-    bool request_base::can_respond(player *target, card *target_card) const {
-        return target_card->pocket != pocket_type::shop_selection
-            && !target->m_game->is_disabled(target_card)
-            && target->is_possible_to_play(target_card, true);
-    }
-
     bool request_base::auto_pick() {
         auto update = target->m_game->make_request_update(target);
         if (update.pick_cards.size() == 1 && update.respond_cards.empty()) {

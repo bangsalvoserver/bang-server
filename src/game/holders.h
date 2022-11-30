@@ -83,10 +83,6 @@ namespace banggame {
             copy->on_pick(target_card);
         }
 
-        bool can_respond(player *target, card *target_card) const {
-            return m_value->can_respond(target, target_card);
-        }
-
         bool auto_resolve() {
             auto copy = m_value;
             return copy->auto_resolve();

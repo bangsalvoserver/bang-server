@@ -477,9 +477,7 @@ namespace banggame {
                     }, -1);
                 });
             } else {
-                if (!cost) {
-                    is_response = false;
-                } else if (is_response) {
+                if (is_response) {
                     return "ERROR_INVALID_RESPONSE_CARD";
                 } else if (game_string error = verify_modifiers()) {
                     return error;
@@ -487,9 +485,6 @@ namespace banggame {
                     return error;
                 }
                 origin->prompt_then(check_prompt_equip(), [*this, cost]{
-                    if (!cost) {
-                        origin->m_game->pop_request();
-                    }
                     player *target = get_equip_target();
                     origin_card->on_equip(target);
                     if (origin == target) {
