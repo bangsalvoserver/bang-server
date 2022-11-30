@@ -32,15 +32,14 @@ namespace banggame {
 
     private:
         ticks duration;
-        
+        ticks lifetime = auto_confirm_duration;
         std::vector<player *> awaiting_confirms;
-        ticks auto_confirm_timer = auto_confirm_duration;
 
     public:
-        request_timer(request_base *request, ticks duration)
-            : request(request), duration(std::clamp(duration, ticks{0}, max_timer_duration)) {}
-            
-        explicit request_timer(request_base *request);
+        template<typename Duration>
+        request_timer(request_base *request, Duration duration)
+            : request(request)
+            , duration(std::clamp(std::chrono::duration_cast<ticks>(duration), ticks{0}, max_timer_duration)) {}
 
     public:
         void add_pending_confirms();

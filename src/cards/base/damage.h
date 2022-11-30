@@ -18,15 +18,18 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
 
-    struct timer_damage : request_timer {
-        using request_timer::request_timer;
-        void on_finished() override;
-    };
-
     struct request_damage : request_base, cleanup_request {
         request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags = {});
 
         int damage;
+
+        struct timer_damage : request_timer {
+            explicit timer_damage(request_damage *request);
+            
+            void on_finished() override {
+                static_cast<request_damage *>(request)->on_finished();
+            }
+        };
 
         timer_damage m_timer{this};
         request_timer *timer() override { return &m_timer; }
@@ -36,10 +39,6 @@ namespace banggame {
         void on_finished();
         game_string status_text(player *owner) const override;
     };
-
-    inline void timer_damage::on_finished() {
-        static_cast<request_damage *>(request)->on_finished();
-    }
 }
 
 #endif

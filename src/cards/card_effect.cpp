@@ -42,12 +42,8 @@ namespace banggame {
         return false;
     }
 
-    request_timer::request_timer(request_base *request)
-        : request_timer(request, std::chrono::duration_cast<ticks>(
-            std::chrono::milliseconds{request->target->m_game->m_options.damage_timer_ms})) {}
-
     void request_timer::tick() {
-        if (request->sent && --(awaiting_confirms.empty() ? duration : auto_confirm_timer) <= ticks{0}) {
+        if (request->sent && --lifetime <= ticks{0}) {
             auto lock = request->target->m_game->lock_updates(true);
             on_finished();
         }
@@ -70,6 +66,9 @@ namespace banggame {
         auto it = std::ranges::find(awaiting_confirms, p);
         if (it != awaiting_confirms.end()) {
             awaiting_confirms.erase(it);
+            if (awaiting_confirms.empty()) {
+                lifetime = duration;
+            }
         }
     }
 

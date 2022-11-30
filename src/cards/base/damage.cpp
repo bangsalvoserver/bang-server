@@ -16,6 +16,9 @@ namespace banggame {
         target->m_game->queue_request<request_damage>(origin_card, origin, target, damage, flags);
     }
 
+    request_damage::timer_damage::timer_damage(request_damage *request)
+        : request_timer(request, request->target->m_game->m_options.damage_timer_ms) {}
+
     static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::multi_target;
 
     request_damage::request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags)

@@ -14,17 +14,18 @@ namespace banggame {
         }
     }
 
-    struct rust_timer : request_timer {
-        using request_timer::request_timer;
-        
-        void on_finished() override {
-            resolve_rust(request->origin_card, request->origin, request->target);
-        }
-    };
-
     struct request_rust : request_base, resolvable_request {
         request_rust(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags) {}
+
+        struct rust_timer : request_timer {
+            explicit rust_timer(request_rust *request)
+                : request_timer(request, request->target->m_game->m_options.escape_timer_ms) {}
+            
+            void on_finished() override {
+                resolve_rust(request->origin_card, request->origin, request->target);
+            }
+        };
 
         rust_timer m_timer{this};
         request_timer *timer() override { return &m_timer; }

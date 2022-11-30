@@ -13,13 +13,29 @@ namespace banggame {
         card *target_card;
         card *drawn_card;
 
+        struct timer_tumbleweed : request_timer {
+            explicit timer_tumbleweed(request_tumbleweed *request)
+                : request_timer(request, request->target->m_game->m_options.tumbleweed_timer_ms) {}
+        
+            void on_finished() override {
+                static_cast<request_tumbleweed *>(request)->on_finished();
+            }
+        };
+
+        timer_tumbleweed m_timer{this};
+        request_timer *timer() override { return &m_timer; }
+
         std::vector<card *> get_highlights() const override {
             return {target_card, drawn_card};
         }
 
+        void on_finished() {
+            origin->m_game->m_current_check.resolve(drawn_card);
+        }
+
         void on_resolve() override {
             auto lock = origin->m_game->lock_updates(true);
-            origin->m_game->m_current_check.resolve(drawn_card);
+            on_finished();
         }
 
         game_string status_text(player *owner) const override {
