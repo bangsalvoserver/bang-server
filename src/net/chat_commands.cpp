@@ -141,7 +141,11 @@ namespace banggame {
         
         switch (target_card->deck) {
         case card_deck_type::main_deck: {
-            target->add_to_hand(target_card);
+            if (target_card->owner) {
+                target->steal_card(target_card);
+            } else {
+                target->add_to_hand(target_card);
+            }
             break;
         }
         case card_deck_type::character: {
