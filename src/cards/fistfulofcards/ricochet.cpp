@@ -9,6 +9,10 @@ namespace banggame {
     struct request_ricochet : request_targeting, missable_request {
         using request_targeting::request_targeting;
 
+        bool auto_resolve() override {
+            return target->m_hand.empty() && auto_respond();
+        }
+
         void on_resolve_target() override {
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
         }
