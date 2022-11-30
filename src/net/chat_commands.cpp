@@ -127,7 +127,7 @@ namespace banggame {
                 case card_deck_type::character:
                     return target_card.pocket != pocket_type::player_character && target_card.pocket != pocket_type::player_backup;
                 case card_deck_type::goldrush:
-                    return target_card.pocket != pocket_type::shop_selection
+                    return target_card.pocket != pocket_type::shop_selection && target_card.pocket != pocket_type::hidden_deck
                         && (target_card.pocket != pocket_type::player_table || target_card.owner != target);
                 case card_deck_type::highnoon:
                 case card_deck_type::fistfulofcards:
