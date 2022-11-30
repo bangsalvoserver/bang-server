@@ -234,11 +234,4 @@ if (BUILD_GAME_RELEASE)
 
     target_link_libraries(bangcommon INTERFACE git_version)
 
-else()
-
-    option(TESTING_CARDS "Debug Option: Enable Testing Cards" ON)
-    if (TESTING_CARDS)
-        target_compile_definitions(bangserver PUBLIC TESTING_CARDS)
-    endif()
-
 endif()

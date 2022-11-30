@@ -1294,7 +1294,7 @@ character:
       - draw_one_less
     tags:
       - drawing
-  - name: JOURDONNAINS
+  - name: JOURDONNAIS
     image: 01_jourdonnais
     responses:
       - barrel

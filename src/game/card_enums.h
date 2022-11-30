@@ -363,7 +363,6 @@ namespace banggame {
         (temp_card)
         (confirm)
         (skip_logs)
-        (testing)
         (hidden)
         (discard_if_two_players)
         (bangcard)

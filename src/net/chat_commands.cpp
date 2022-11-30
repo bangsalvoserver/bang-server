@@ -15,6 +15,9 @@ namespace banggame {
     static constexpr std::string_view GET_OPTIONS_DESCRIPTION = "print game options";
     static constexpr std::string_view SET_OPTION_DESCRIPTION = "[name] [value] : set a game option";
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card (cheat)";
+    static constexpr std::string_view GIVE_CHARACTER_DESCRIPTION = "[name] : set your character (cheat)";
+    static constexpr std::string_view GIVE_SHOP_CARD_DESCRIPTION = "[name] : give yourself a shop card (cheat)";
+    static constexpr std::string_view GIVE_SCENARIO_CARD_DESCRIPTION = "[name] : move scenario card to top of deck (cheat)";
     static constexpr std::string_view SET_TEAM_DESCRIPTION = "[game_player / game_spectator] : set team";
 
     const std::map<std::string, chat_command, std::less<>> chat_command::commands {
@@ -24,6 +27,9 @@ namespace banggame {
         { "options",        { proxy<&game_manager::command_get_game_options>,   GET_OPTIONS_DESCRIPTION }},
         { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, command_permissions::lobby_owner | command_permissions::lobby_waiting }},
         { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
+        { "give-character", { proxy<&game_manager::command_give_character>,     GIVE_CHARACTER_DESCRIPTION, command_permissions::game_cheat }},
+        { "give-shop",      { proxy<&game_manager::command_give_shop_card>,     GIVE_SHOP_CARD_DESCRIPTION, command_permissions::game_cheat }},
+        { "give-scenario",  { proxy<&game_manager::command_give_scenario_card>, GIVE_SCENARIO_CARD_DESCRIPTION, command_permissions::game_cheat }},
         { "set-team",       { proxy<&game_manager::command_set_team>,           SET_TEAM_DESCRIPTION, command_permissions::lobby_waiting }}
     };
 
@@ -115,10 +121,122 @@ namespace banggame {
     std::string game_manager::command_give_card(user_ptr user, std::string_view name) {
         auto &lobby = (*user->second.in_lobby)->second;
         if (auto player_it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); player_it != lobby.game.m_players.end()) {
-            if (auto card_it = std::ranges::find_if(lobby.game.m_deck, [name](std::string_view card_name) {
-                return std::ranges::equal(name, card_name, {}, toupper, toupper);
-            }, &card::name); card_it != lobby.game.m_deck.end()) {
-                player_it->add_to_hand(*card_it);
+            if (auto card_it = std::ranges::find_if(lobby.game.m_cards, [&](const card &target_card) {
+                return std::ranges::equal(name, target_card.name, {}, toupper, toupper)
+                    && target_card.deck == card_deck_type::main_deck
+                    && (target_card.pocket != pocket_type::player_hand || target_card.owner != &*player_it);
+            }); card_it != lobby.game.m_cards.end()) {
+                player_it->add_to_hand(&*card_it);
+                return {};
+            } else {
+                return "ERROR_CANNOT_GIVE_CARD";
+            }
+        } else {
+            return "ERROR_USER_NOT_CONTROLLING_PLAYER";
+        }
+    }
+
+    std::string game_manager::command_give_character(user_ptr user, std::string_view name) {
+        auto &lobby = (*user->second.in_lobby)->second;
+        if (auto player_it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); player_it != lobby.game.m_players.end()) {
+            if (auto card_it = std::ranges::find_if(lobby.game.m_cards, [&](const card &target_card) {
+                return std::ranges::equal(name, target_card.name, {}, toupper, toupper)
+                    && target_card.deck == card_deck_type::character
+                    && target_card.pocket != pocket_type::player_character && target_card.pocket != pocket_type::player_backup;
+            }); card_it != lobby.game.m_cards.end()) {
+                player *target = &*player_it;
+                card *target_card = &*card_it;
+
+                target->remove_extra_characters();
+                for (card *c : target->m_characters) {
+                    target->disable_equip(c);
+                }
+
+                card *old_character = target->m_characters.front();
+                int ncubes = old_character->num_cubes;
+
+                target->pay_cubes(old_character, ncubes);
+                target->m_game->add_update<game_update_type::remove_cards>(to_vector_not_null(std::views::single(old_character)));
+
+                old_character->pocket = pocket_type::none;
+                old_character->owner = nullptr;
+
+                target->m_characters.clear();
+                target->m_characters.push_back(target_card);
+
+                target_card->pocket = pocket_type::player_character;
+                target_card->owner = target;
+
+                target->m_game->add_update<game_update_type::add_cards>(
+                    make_id_vector(std::views::single(target_card)), pocket_type::player_character, target);
+                target->m_game->send_card_update(target_card, target, show_card_flags::instant | show_card_flags::shown);
+
+                target->reset_max_hp();
+                target->enable_equip(target_card);
+                target_card->on_equip(target);
+                target->add_cubes(target_card, ncubes);
+
+                return {};
+            } else {
+                return "ERROR_CANNOT_GIVE_CARD";
+            }
+        } else {
+            return "ERROR_USER_NOT_CONTROLLING_PLAYER";
+        }
+    }
+
+    std::string game_manager::command_give_shop_card(user_ptr user, std::string_view name) {
+        auto &lobby = (*user->second.in_lobby)->second;
+        if (auto player_it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); player_it != lobby.game.m_players.end()) {
+            if (auto card_it = std::ranges::find_if(lobby.game.m_cards, [&](const card &target_card) {
+                return std::ranges::equal(name, target_card.name, {}, toupper, toupper)
+                    && target_card.deck == card_deck_type::goldrush
+                    && (target_card.pocket != pocket_type::player_table || target_card.owner != &*player_it);
+            }); card_it != lobby.game.m_cards.end()) {
+                player *target = &*player_it;
+                card *target_card = &*card_it;
+
+                if (target_card->pocket == pocket_type::shop_selection) {
+                    return "ERROR_CANNOT_GIVE_CARD";
+                } else {
+                    target->m_game->move_card(target->m_game->m_shop_selection.front(), pocket_type::shop_discard);
+                    target->m_game->move_card(target_card, pocket_type::shop_selection);
+                }
+
+                return {};
+            } else {
+                return "ERROR_CANNOT_GIVE_CARD";
+            }
+        } else {
+            return "ERROR_USER_NOT_CONTROLLING_PLAYER";
+        }
+    }
+
+    std::string game_manager::command_give_scenario_card(user_ptr user, std::string_view name) {
+        auto &lobby = (*user->second.in_lobby)->second;
+        if (auto player_it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); player_it != lobby.game.m_players.end()) {
+            if (auto card_it = std::ranges::find_if(lobby.game.m_cards, [&](const card &target_card) {
+                return std::ranges::equal(name, target_card.name, {}, toupper, toupper)
+                    && (target_card.deck == card_deck_type::highnoon || target_card.deck == card_deck_type::fistfulofcards);
+            }); card_it != lobby.game.m_cards.end()) {
+                player *target = &*player_it;
+                card *target_card = &*card_it;
+
+                if (target_card->pocket == pocket_type::scenario_deck) {
+                    if (auto it = std::ranges::find(target->m_game->m_scenario_deck, target_card); it != target->m_game->m_scenario_deck.end()) {
+                        target->m_game->m_scenario_deck.erase(it);
+                    } else {
+                        return "ERROR_CANNOT_GIVE_CARD";
+                    }
+                    target->m_game->m_scenario_deck.push_back(target_card);
+                    target->m_game->send_card_update(target_card, nullptr, show_card_flags::instant);
+                    target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::scenario_deck, show_card_flags::instant);
+                } else if (target_card != target->m_game->m_scenario_cards.back()) {
+                    target->m_game->move_card(target_card, pocket_type::scenario_deck);
+                } else {
+                    return "ERROR_CANNOT_GIVE_CARD";
+                }
+
                 return {};
             } else {
                 return "ERROR_CANNOT_GIVE_CARD";

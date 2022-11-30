@@ -151,14 +151,6 @@ namespace banggame {
             return count;
         };
 
-        auto move_testing_cards_back = [](auto &deck) {
-#ifdef TESTING_CARDS
-            std::ranges::partition(deck, [](card *c) {
-                return !c->has_tag(tag_type::testing);
-            });
-#endif
-        };
-
         if (add_cards(all_cards.button_row, pocket_type::button_row)) {
             add_update<game_update_type::add_cards>(make_id_vector(m_button_row), pocket_type::button_row);
             for (card *c : m_button_row) {
@@ -168,13 +160,11 @@ namespace banggame {
 
         if (add_cards(all_cards.deck, pocket_type::main_deck)) {
             shuffle_cards_and_ids(m_deck);
-            move_testing_cards_back(m_deck);
             add_update<game_update_type::add_cards>(make_id_vector(m_deck), pocket_type::main_deck);
         }
 
         if (add_cards(all_cards.goldrush, pocket_type::shop_deck)) {
             shuffle_cards_and_ids(m_shop_deck);
-            move_testing_cards_back(m_shop_deck);
             add_update<game_update_type::add_cards>(make_id_vector(m_shop_deck), pocket_type::shop_deck);
         }
 
@@ -224,8 +214,6 @@ namespace banggame {
             if (last_scenario_cards.begin() != m_scenario_deck.begin()) {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, last_scenario_cards.begin());
             }
-            
-            move_testing_cards_back(m_scenario_deck);
             if (m_scenario_deck.size() > m_options.scenario_deck_size) {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
             }
@@ -236,7 +224,6 @@ namespace banggame {
         std::vector<card *> character_ptrs;
         if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
             std::ranges::shuffle(character_ptrs, rng);
-            move_testing_cards_back(character_ptrs);
         }
 
         auto add_character_to = [&](card *c, player &p) {
@@ -248,19 +235,10 @@ namespace banggame {
 
         auto character_it = character_ptrs.rbegin();
 
-#ifdef TESTING_CARDS
-        for (player &p : m_players) {
-            add_character_to(*character_it++, p);
-        }
-        for (player &p : m_players) {
-            add_character_to(*character_it++, p);
-        }
-#else
         for (player &p : m_players) {
             add_character_to(*character_it++, p);
             add_character_to(*character_it++, p);
         }
-#endif
 
         if (m_options.character_choice) {
             for (player &p : m_players) {
