@@ -45,8 +45,8 @@ namespace banggame {
 
         void on_resolve() override {
             auto lock = target->m_game->lock_updates(true);
-            while (auto non_black_cards = target->m_table | std::views::filter(is_non_black)) {
-                discard_card(target, non_black_cards.front());
+            for (card *c : to_vector(target->m_table | std::views::filter(is_non_black))) {
+                discard_card(target, c);
             }
             while (!target->m_hand.empty()) {
                 discard_card(target, target->m_hand.front());
