@@ -23,6 +23,8 @@ namespace banggame {
 
         int damage;
 
+        player *savior = nullptr;
+
         struct timer_damage : request_timer {
             explicit timer_damage(request_damage *request);
             

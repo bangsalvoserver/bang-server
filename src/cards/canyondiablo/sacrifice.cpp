@@ -7,7 +7,7 @@ namespace banggame {
 
     bool effect_sacrifice::can_respond(card *origin_card, player *origin) {
         if (auto *req = origin->m_game->top_request_if<request_damage>()) {
-            return req->target != origin;
+            return req->target != origin && (!req->savior || req->savior == origin);
         }
         return false;
     }
@@ -15,6 +15,7 @@ namespace banggame {
     void effect_sacrifice::on_play(card *origin_card, player *origin) {
         auto &req = origin->m_game->top_request().get<request_damage>();
         player *saved = req.target;
+        req.savior = origin;
         bool fatal = saved->m_hp <= req.damage;
 
         auto lock = origin->m_game->lock_updates(--req.damage == 0);
