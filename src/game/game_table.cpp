@@ -92,20 +92,26 @@ namespace banggame {
 
     void game_table::send_card_update(card *c, player *owner, show_card_flags flags) {
         if (flags.visibility == card_visibility::hidden) {
-            if (c->visibility != card_visibility::hidden) {
+            if (c->visibility == card_visibility::show_owner) {
+                add_update<game_update_type::hide_card>(update_target::includes(c->owner), c, flags.instant);
+            } else if (c->visibility == card_visibility::shown) {
                 add_update<game_update_type::hide_card>(c, flags.instant);
             }
             c->visibility = card_visibility::hidden;
         } else if (!owner || flags.visibility == card_visibility::shown) {
             if (c->visibility == card_visibility::show_owner) {
                 add_update<game_update_type::show_card>(update_target::excludes(c->owner), c, *c, flags.instant);
-            } else {
+            } else if (c->visibility == card_visibility::hidden) {
                 add_update<game_update_type::show_card>(c, *c, flags.instant);
             }
             c->visibility = card_visibility::shown;
-        } else if (c->owner != owner) {
-            add_update<game_update_type::hide_card>(update_target::excludes(owner), c, flags.instant);
-            add_update<game_update_type::show_card>(update_target::includes(owner), c, *c, flags.instant);
+        } else if (c->owner != owner || c->visibility != card_visibility::show_owner) {
+            if (c->visibility != card_visibility::hidden) {
+                add_update<game_update_type::hide_card>(update_target::excludes(owner), c, flags.instant);
+            }
+            if (c->visibility != card_visibility::shown) {
+                add_update<game_update_type::show_card>(update_target::includes(owner), c, *c, flags.instant);
+            }
             c->visibility = card_visibility::show_owner;
         }
     }
