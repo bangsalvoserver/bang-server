@@ -25,7 +25,7 @@ namespace banggame {
             c->pocket = pocket_type::player_character;
             c->owner = target;
             c->on_enable(target);
-            target->m_game->send_card_update(c, target, show_card_flags::instant | show_card_flags::shown);
+            target->m_game->send_card_update(c, target, {card_visibility::shown, true});
         }
     }
     

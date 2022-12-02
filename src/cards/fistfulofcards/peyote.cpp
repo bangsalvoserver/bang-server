@@ -34,7 +34,7 @@ namespace banggame {
                 target->m_game->move_card(drawn_card, pocket_type::discard_pile);
 
                 while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, show_card_flags::instant);
+                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, {card_visibility::shown, true});
                 }
                 target->m_game->call_event<event_type::post_draw_cards>(target);
             }
@@ -58,7 +58,7 @@ namespace banggame {
                 }
             }
             for (card *c : target_cards) {
-                p->m_game->move_card(c, pocket_type::selection, nullptr, show_card_flags::instant);
+                p->m_game->move_card(c, pocket_type::selection, nullptr, {card_visibility::shown, true});
             }
             
             p->m_game->queue_request<request_peyote>(target_card, p);

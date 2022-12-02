@@ -88,7 +88,17 @@ namespace banggame {
 
         template<game_update_type E>
         void add_update(update_target target, auto && ... args) {
-            m_updates.emplace_back(target, make_update<E>(FWD(args) ... ), update_duration<E>);
+            game_update update{enums::enum_tag<E>, FWD(args) ... };
+            ticks duration = update_duration<E>;
+            if constexpr (game_update::has_type<E>) {
+                const auto &value = update.get<E>();
+                if constexpr (requires { { value.instant } -> std::convertible_to<bool>; }) {
+                    if (value.instant) {
+                        duration = ticks{0};
+                    }
+                }
+            }
+            m_updates.emplace_back(target, json::serialize(update, context()), duration);
         }
 
         template<game_update_type E>

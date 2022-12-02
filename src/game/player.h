@@ -13,21 +13,29 @@ namespace banggame {
 
     constexpr int max_cubes = 4;
 
-    enum class discard_all_reason {
+    enum class discard_all_reason : uint8_t {
         death,
         sheriff_killed_deputy,
         disable_temp_ghost,
         discard_ghost
+    };
+
+    enum class card_visibility : uint8_t {
+        hidden,
+        shown,
+        show_owner
     };
     
     struct card : card_data {
         int id;
         
         bool inactive = false;
+
         int8_t num_cubes = 0;
 
         pocket_type pocket = pocket_type::none;
         player *owner = nullptr;
+        card_visibility visibility = card_visibility::hidden;
 
         void on_equip(player *target) {
             for (auto &e : equips) {

@@ -22,42 +22,38 @@ namespace banggame {
         
         co_yield make_update<game_update_type::add_cards>(make_id_vector(m_cards | std::views::transform([](const card &c) { return &c; })), pocket_type::hidden_deck);
 
-        const auto show_never = [](const card &c) { return false; };
-        const auto show_always = [](const card &c) { return true; };
-
-        auto move_cards = [&](auto &&range, auto do_show_card) -> util::generator<Json::Value> {
+        auto move_cards = [&](auto &&range) -> util::generator<Json::Value> {
             for (card *c : range) {
                 co_yield make_update<game_update_type::move_card>(c, c->owner, c->pocket, true);
 
-                if (do_show_card(*c)) {
+                if (c->visibility == card_visibility::shown) {
                     co_yield make_update<game_update_type::show_card>(c, *c, true);
-                    if (c->num_cubes > 0) {
-                        co_yield make_update<game_update_type::add_cubes>(c->num_cubes, c);
-                    }
-
-                    if (c->inactive) {
-                        co_yield make_update<game_update_type::tap_card>(c, true, true);
-                    }
+                }
+                if (c->num_cubes > 0) {
+                    co_yield make_update<game_update_type::add_cubes>(c->num_cubes, c);
+                }
+                if (c->inactive) {
+                    co_yield make_update<game_update_type::tap_card>(c, true, true);
                 }
             }
         };
 
-        co_await move_cards(m_button_row, show_always);
-        co_await move_cards(m_deck, show_never);
-        co_await move_cards(m_shop_deck, show_never);
+        co_await move_cards(m_button_row);
+        co_await move_cards(m_deck);
+        co_await move_cards(m_shop_deck);
 
-        co_await move_cards(m_discards, show_always);
-        co_await move_cards(m_selection, [&](const card &c){ return !c.owner; });
-        co_await move_cards(m_shop_discards, show_always);
-        co_await move_cards(m_shop_selection, show_always);
-        co_await move_cards(m_hidden_deck, show_always);
+        co_await move_cards(m_discards);
+        co_await move_cards(m_selection);
+        co_await move_cards(m_shop_discards);
+        co_await move_cards(m_shop_selection);
+        co_await move_cards(m_hidden_deck);
 
         if (!m_scenario_deck.empty()) {
             co_yield make_update<game_update_type::move_scenario_deck>(m_first_player);
         }
 
-        co_await move_cards(m_scenario_deck, [&](const card &c) { return &c == m_scenario_deck.back(); });
-        co_await move_cards(m_scenario_cards, [&](const card &c) { return &c == m_scenario_cards.back(); });
+        co_await move_cards(m_scenario_deck);
+        co_await move_cards(m_scenario_cards);
         
         if (num_cubes > 0) {
             co_yield make_update<game_update_type::add_cubes>(num_cubes);
@@ -69,11 +65,11 @@ namespace banggame {
             }
 
             if (!p.check_player_flags(player_flags::removed)) {
-                co_await move_cards(p.m_characters, show_always);
-                co_await move_cards(p.m_backup_character, show_never);
+                co_await move_cards(p.m_characters);
+                co_await move_cards(p.m_backup_character);
 
-                co_await move_cards(p.m_table, show_always);
-                co_await move_cards(p.m_hand, [&](const card &c){ return c.deck == card_deck_type::character; });
+                co_await move_cards(p.m_table);
+                co_await move_cards(p.m_hand);
 
                 co_yield make_update<game_update_type::player_hp>(&p, p.m_hp, true);
                 co_yield make_update<game_update_type::player_status>(&p, p.m_player_flags, p.m_range_mod, p.m_weapon_range, p.m_distance_mod);
@@ -143,6 +139,7 @@ namespace banggame {
                 copy.id = int(m_cards.first_available_id());
                 copy.owner = nullptr;
                 copy.pocket = pocket;
+                copy.visibility = card_visibility::hidden;
                 auto *new_card = &m_cards.emplace(std::move(copy));
 
                 out_pocket->push_back(new_card);
@@ -154,7 +151,7 @@ namespace banggame {
         if (add_cards(all_cards.button_row, pocket_type::button_row)) {
             add_update<game_update_type::add_cards>(make_id_vector(m_button_row), pocket_type::button_row);
             for (card *c : m_button_row) {
-                send_card_update(c, nullptr, show_card_flags::instant);
+                send_card_update(c, nullptr, {card_visibility::shown, true});
             }
         }
 
@@ -243,7 +240,7 @@ namespace banggame {
         if (m_options.character_choice) {
             for (player &p : m_players) {
                 while (!p.m_characters.empty()) {
-                    move_card(p.m_characters.front(), pocket_type::player_hand, &p, show_card_flags::instant | show_card_flags::shown);
+                    move_card(p.m_characters.front(), pocket_type::player_hand, &p, {card_visibility::shown, true});
                 }
             }
             for (player &p : range_all_players(m_first_player)) {
@@ -252,12 +249,12 @@ namespace banggame {
         } else {
             for (player &p : m_players) {
                 add_log("LOG_CHARACTER_CHOICE", &p, p.m_characters.front());
-                send_card_update(p.m_characters.front(), &p, show_card_flags::instant | show_card_flags::shown);
+                send_card_update(p.m_characters.front(), &p, {card_visibility::shown, true});
                 p.reset_max_hp();
                 p.set_hp(p.m_max_hp, true);
                 p.m_characters.front()->on_enable(&p);
 
-                move_card(p.m_characters.back(), pocket_type::player_backup, &p, show_card_flags::instant | show_card_flags::hidden);
+                move_card(p.m_characters.back(), pocket_type::player_backup, &p, {card_visibility::hidden, true});
             }
         }
 
@@ -284,7 +281,7 @@ namespace banggame {
             }
 
             if (!m_scenario_deck.empty()) {
-                send_card_update(m_scenario_deck.back(), nullptr, show_card_flags::instant);
+                send_card_update(m_scenario_deck.back(), nullptr, {card_visibility::shown, true});
             }
 
             m_playing = m_first_player;

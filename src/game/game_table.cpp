@@ -48,6 +48,7 @@ namespace banggame {
             for (card *c : m_deck) {
                 c->pocket = pocket_type::main_deck;
                 c->owner = nullptr;
+                c->visibility = card_visibility::hidden;
             }
             shuffle_cards_and_ids(m_deck);
             add_log("LOG_DECK_RESHUFFLED");
@@ -90,14 +91,22 @@ namespace banggame {
     }
 
     void game_table::send_card_update(card *c, player *owner, show_card_flags flags) {
-        bool instant = bool(flags & show_card_flags::instant);
-        if (bool(flags & show_card_flags::hidden)) {
-            add_update<game_update_type::hide_card>(c, instant);
-        } else if (!owner || bool(flags & show_card_flags::shown)) {
-            add_update<game_update_type::show_card>(c, *c, instant);
-        } else {
-            add_update<game_update_type::hide_card>(update_target::excludes(owner), c, instant);
-            add_update<game_update_type::show_card>(update_target::includes(owner), c, *c, instant);
+        if (flags.visibility == card_visibility::hidden) {
+            if (c->visibility != card_visibility::hidden) {
+                add_update<game_update_type::hide_card>(c, flags.instant);
+            }
+            c->visibility = card_visibility::hidden;
+        } else if (!owner || flags.visibility == card_visibility::shown) {
+            if (c->visibility == card_visibility::show_owner) {
+                add_update<game_update_type::show_card>(update_target::excludes(c->owner), c, *c, flags.instant);
+            } else {
+                add_update<game_update_type::show_card>(c, *c, flags.instant);
+            }
+            c->visibility = card_visibility::shown;
+        } else if (c->owner != owner) {
+            add_update<game_update_type::hide_card>(update_target::excludes(owner), c, flags.instant);
+            add_update<game_update_type::show_card>(update_target::includes(owner), c, *c, flags.instant);
+            c->visibility = card_visibility::show_owner;
         }
     }
 
@@ -114,7 +123,7 @@ namespace banggame {
         c->pocket = pocket;
         c->owner = owner;
         
-        add_update<game_update_type::move_card>(c, owner, pocket, bool(flags & show_card_flags::instant));
+        add_update<game_update_type::move_card>(c, owner, pocket, flags.instant);
     }
 
     card *game_table::draw_card_to(pocket_type pocket, player *owner, show_card_flags flags) {
@@ -147,7 +156,7 @@ namespace banggame {
         if (drawn_card->modifier == card_modifier_type::shopchoice) {
             for (card *c : m_hidden_deck) {
                 if (c->get_tag_value(tag_type::shopchoice) == drawn_card->get_tag_value(tag_type::shopchoice)) {
-                    send_card_update(c, nullptr, show_card_flags::instant);
+                    send_card_update(c, nullptr, {card_visibility::shown, true});
                 }
             }
         }
@@ -156,6 +165,7 @@ namespace banggame {
             for (card *c : m_shop_deck) {
                 c->pocket = pocket_type::shop_deck;
                 c->owner = nullptr;
+                c->visibility = card_visibility::hidden;
             }
             m_shop_discards.clear();
             shuffle_cards_and_ids(m_shop_deck);
@@ -168,7 +178,7 @@ namespace banggame {
         if (m_scenario_deck.empty()) return;
 
         if (m_scenario_deck.size() > 1) {
-            send_card_update(*(m_scenario_deck.rbegin() + 1), nullptr, show_card_flags::instant);
+            send_card_update(*(m_scenario_deck.rbegin() + 1), nullptr, {card_visibility::shown, true});
         }
         if (!m_scenario_cards.empty()) {
             m_scenario_cards.back()->on_disable(m_first_player);

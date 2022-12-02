@@ -17,7 +17,7 @@
 namespace banggame {
 
     void player::equip_card(card *target) {
-        m_game->move_card(target, pocket_type::player_table, this, show_card_flags::shown);
+        m_game->move_card(target, pocket_type::player_table, this, card_visibility::shown);
         enable_equip(target);
     }
 
@@ -184,7 +184,7 @@ namespace banggame {
             m_game->add_log("LOG_DRAWN_FROM_DISCARD", this, drawn_card);
         } else if (reveal) {
             m_game->add_log("LOG_DRAWN_CARD", this, drawn_card);
-            m_game->send_card_update(drawn_card, this, show_card_flags::shown);
+            m_game->send_card_update(drawn_card, this, card_visibility::shown);
             m_game->add_short_pause(drawn_card);
         } else {
             m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);
@@ -415,6 +415,7 @@ namespace banggame {
                 } else {
                     character->pocket = pocket_type::none;
                     character->owner = nullptr;
+                    character->visibility = card_visibility::hidden;
                 }
             }
 

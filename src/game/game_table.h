@@ -12,11 +12,13 @@
 
 namespace banggame {
 
-    DEFINE_ENUM_FLAGS(show_card_flags,
-        (instant)
-        (shown)
-        (hidden)
-    )
+    struct show_card_flags {
+        card_visibility visibility;
+        bool instant;
+
+        show_card_flags(card_visibility visibility = card_visibility::show_owner, bool instant = false)
+            : visibility(visibility), instant(instant) {}
+    };
 
     using card_disabler_fun = std::function<bool(card *)>;
 

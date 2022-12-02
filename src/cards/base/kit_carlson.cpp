@@ -20,7 +20,7 @@ namespace banggame {
             if (target->m_num_drawn_cards >= target->get_cards_to_draw()) {
                 target->m_game->pop_request();
                 while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, show_card_flags::hidden);
+                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
                 }
             }
         }

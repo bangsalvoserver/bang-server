@@ -24,8 +24,8 @@ namespace banggame {
                 target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
 
                 card *old_character = target->m_characters.front();
-                target->m_game->move_card(old_character, pocket_type::player_backup, target, show_card_flags::hidden);
-                target->m_game->move_card(target_card, pocket_type::player_character, target, show_card_flags::shown);
+                target->m_game->move_card(old_character, pocket_type::player_backup, target, card_visibility::hidden);
+                target->m_game->move_card(target_card, pocket_type::player_character, target, card_visibility::shown);
 
                 target->reset_max_hp();
                 target->enable_equip(target_card);
@@ -34,7 +34,7 @@ namespace banggame {
                 
                 target->set_hp(2);
             } else {
-                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::player_backup, target, show_card_flags::hidden);
+                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::player_backup, target, card_visibility::hidden);
             }
         }
 

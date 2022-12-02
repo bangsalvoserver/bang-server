@@ -166,6 +166,7 @@ namespace banggame {
 
             old_character->pocket = pocket_type::none;
             old_character->owner = nullptr;
+            old_character->visibility = card_visibility::hidden;
 
             target->m_characters.clear();
             target->m_characters.push_back(target_card);
@@ -174,7 +175,7 @@ namespace banggame {
             target_card->owner = target;
 
             target->m_game->add_update<game_update_type::add_cards>(make_id_vector(std::views::single(target_card)), pocket_type::player_character, target);
-            target->m_game->send_card_update(target_card, target, show_card_flags::instant | show_card_flags::shown);
+            target->m_game->send_card_update(target_card, target, {card_visibility::shown, true});
 
             target->reset_max_hp();
             target->enable_equip(target_card);
@@ -196,7 +197,7 @@ namespace banggame {
                     target->m_game->add_update<game_update_type::add_cards>(make_id_vector(std::views::single(target_card)), pocket_type::scenario_deck);
                 }
                 target->m_game->m_scenario_deck.push_back(target_card);
-                target->m_game->send_card_update(target_card, nullptr, show_card_flags::instant);
+                target->m_game->send_card_update(target_card, nullptr, {card_visibility::shown, true});
                 target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::scenario_deck, true);
             } else {
                 target->m_game->move_card(target_card, pocket_type::scenario_deck);
