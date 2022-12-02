@@ -33,9 +33,7 @@ namespace banggame {
     }
 
     void request_timer::start() {
-        if (!request->sent) {
-            lifetime = duration + request->target->m_game->get_total_update_time();
-        }
+        lifetime = duration + request->target->m_game->get_total_update_time();
     }
 
     void request_timer::tick() {
