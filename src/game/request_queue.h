@@ -42,6 +42,10 @@ namespace banggame {
             return m_requests.size();
         }
 
+        bool locked() const {
+            return pending_requests() || !m_delayed_actions.empty() || m_lock_updates;
+        }
+
         request_holder &top_request() {
             return m_requests.front();
         }

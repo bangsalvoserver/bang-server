@@ -184,7 +184,8 @@ namespace banggame {
             m_game->add_log("LOG_DRAWN_FROM_DISCARD", this, drawn_card);
         } else if (reveal) {
             m_game->add_log("LOG_DRAWN_CARD", this, drawn_card);
-            m_game->send_card_update(drawn_card, this, show_card_flags::shown | show_card_flags::short_pause);
+            m_game->send_card_update(drawn_card, this, show_card_flags::shown);
+            m_game->add_short_pause(drawn_card);
         } else {
             m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);
             m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);

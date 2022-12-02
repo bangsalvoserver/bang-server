@@ -103,7 +103,8 @@ namespace banggame {
     void effect_josh_mccloud::on_play(card *origin_card, player *target) {
         auto *card = target->m_game->draw_shop_card();
         auto discard_drawn_card = [&]{
-            target->m_game->move_card(card, pocket_type::shop_discard, nullptr, show_card_flags::pause_before_move);
+            target->m_game->add_short_pause(card);
+            target->m_game->move_card(card, pocket_type::shop_discard, nullptr);
         };
         if (card->color == card_color_type::black) {
             if (!target->m_game->check_flags(game_flags::disable_equipping)) {

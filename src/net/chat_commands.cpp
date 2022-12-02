@@ -119,6 +119,10 @@ namespace banggame {
         if (player_it == lobby.game.m_players.end()) return "ERROR_USER_NOT_CONTROLLING_PLAYER";
         player *target = &*player_it;
 
+        if (lobby.game.locked()) {
+            return "ERROR_CANNOT_GIVE_CARD";
+        }
+
         auto card_it = std::ranges::find_if(lobby.game.m_cards, [&](const card &target_card) {
             if (std::ranges::equal(name, target_card.name, {}, toupper, toupper)) {
                 switch (target_card.deck) {
@@ -139,69 +143,67 @@ namespace banggame {
         if (card_it == lobby.game.m_cards.end()) return "ERROR_CANNOT_FIND_CARD";
         card *target_card = &*card_it;
         
-        target->m_game->queue_action([=]{
-            switch (target_card->deck) {
-            case card_deck_type::main_deck: {
-                if (target_card->owner) {
-                    target->steal_card(target_card);
+        switch (target_card->deck) {
+        case card_deck_type::main_deck: {
+            if (target_card->owner) {
+                target->steal_card(target_card);
+            } else {
+                target->add_to_hand(target_card);
+            }
+            break;
+        }
+        case card_deck_type::character: {
+            target->remove_extra_characters();
+            for (card *c : target->m_characters) {
+                target->disable_equip(c);
+            }
+
+            card *old_character = target->m_characters.front();
+            int ncubes = old_character->num_cubes;
+
+            target->pay_cubes(old_character, ncubes);
+            target->m_game->add_update<game_update_type::remove_cards>(to_vector_not_null(std::views::single(old_character)));
+
+            old_character->pocket = pocket_type::none;
+            old_character->owner = nullptr;
+
+            target->m_characters.clear();
+            target->m_characters.push_back(target_card);
+
+            target_card->pocket = pocket_type::player_character;
+            target_card->owner = target;
+
+            target->m_game->add_update<game_update_type::add_cards>(make_id_vector(std::views::single(target_card)), pocket_type::player_character, target);
+            target->m_game->send_card_update(target_card, target, show_card_flags::instant | show_card_flags::shown);
+
+            target->reset_max_hp();
+            target->enable_equip(target_card);
+            target_card->on_equip(target);
+            target->add_cubes(target_card, ncubes);
+            break;
+        }
+        case card_deck_type::goldrush: {
+            target->m_game->move_card(target->m_game->m_shop_selection.front(), pocket_type::shop_discard);
+            target->m_game->move_card(target_card, pocket_type::shop_selection);
+            break;
+        }
+        case card_deck_type::highnoon:
+        case card_deck_type::fistfulofcards: {
+            if (target_card->pocket == pocket_type::scenario_deck) {
+                if (auto it = std::ranges::find(target->m_game->m_scenario_deck, target_card); it != target->m_game->m_scenario_deck.end()) {
+                    target->m_game->m_scenario_deck.erase(it);
                 } else {
-                    target->add_to_hand(target_card);
+                    target->m_game->add_update<game_update_type::add_cards>(make_id_vector(std::views::single(target_card)), pocket_type::scenario_deck);
                 }
-                break;
+                target->m_game->m_scenario_deck.push_back(target_card);
+                target->m_game->send_card_update(target_card, nullptr, show_card_flags::instant);
+                target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::scenario_deck, show_card_flags::instant);
+            } else {
+                target->m_game->move_card(target_card, pocket_type::scenario_deck);
             }
-            case card_deck_type::character: {
-                target->remove_extra_characters();
-                for (card *c : target->m_characters) {
-                    target->disable_equip(c);
-                }
-
-                card *old_character = target->m_characters.front();
-                int ncubes = old_character->num_cubes;
-
-                target->pay_cubes(old_character, ncubes);
-                target->m_game->add_update<game_update_type::remove_cards>(to_vector_not_null(std::views::single(old_character)));
-
-                old_character->pocket = pocket_type::none;
-                old_character->owner = nullptr;
-
-                target->m_characters.clear();
-                target->m_characters.push_back(target_card);
-
-                target_card->pocket = pocket_type::player_character;
-                target_card->owner = target;
-
-                target->m_game->add_update<game_update_type::add_cards>(make_id_vector(std::views::single(target_card)), pocket_type::player_character, target);
-                target->m_game->send_card_update(target_card, target, show_card_flags::instant | show_card_flags::shown);
-
-                target->reset_max_hp();
-                target->enable_equip(target_card);
-                target_card->on_equip(target);
-                target->add_cubes(target_card, ncubes);
-                break;
-            }
-            case card_deck_type::goldrush: {
-                target->m_game->move_card(target->m_game->m_shop_selection.front(), pocket_type::shop_discard);
-                target->m_game->move_card(target_card, pocket_type::shop_selection);
-                break;
-            }
-            case card_deck_type::highnoon:
-            case card_deck_type::fistfulofcards: {
-                if (target_card->pocket == pocket_type::scenario_deck) {
-                    if (auto it = std::ranges::find(target->m_game->m_scenario_deck, target_card); it != target->m_game->m_scenario_deck.end()) {
-                        target->m_game->m_scenario_deck.erase(it);
-                    } else {
-                        target->m_game->add_update<game_update_type::add_cards>(make_id_vector(std::views::single(target_card)), pocket_type::scenario_deck);
-                    }
-                    target->m_game->m_scenario_deck.push_back(target_card);
-                    target->m_game->send_card_update(target_card, nullptr, show_card_flags::instant);
-                    target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::scenario_deck, show_card_flags::instant);
-                } else {
-                    target->m_game->move_card(target_card, pocket_type::scenario_deck);
-                }
-                break;
-            }
-            }
-        }, -99);
+            break;
+        }
+        }
 
         return {};
     }

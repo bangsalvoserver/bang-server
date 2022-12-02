@@ -72,6 +72,7 @@ namespace banggame {
         void draw_scenario_card();
 
         void flash_card(card *c);
+        void add_short_pause(card *c = nullptr);
         void play_sound(player *target, const std::string &sound_id);
 
         void add_disabler(event_card_key key, card_disabler_fun &&fun);

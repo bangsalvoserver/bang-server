@@ -41,7 +41,7 @@ namespace banggame {
     }
     
     void request_queue::queue_action(delayed_action &&fun, int priority) {
-        if (!pending_requests() && m_delayed_actions.empty() && !m_lock_updates) {
+        if (!locked()) {
             std::invoke(fun);
         } else {
             m_delayed_actions.emplace(std::move(fun), priority);

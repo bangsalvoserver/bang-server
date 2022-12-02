@@ -182,6 +182,10 @@ namespace banggame {
         add_update<game_update_type::flash_card>(c);
     }
 
+    void game_table::add_short_pause(card *c) {
+        add_update<game_update_type::short_pause>(c);
+    }
+
     void game_table::play_sound(player *target, const std::string &file_id) {
         if (target) {
             add_update<game_update_type::play_sound>(update_target::includes_private(target), file_id);

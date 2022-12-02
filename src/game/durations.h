@@ -17,6 +17,7 @@ namespace banggame {
     DURATION(hide_card, 167ms)
     DURATION(tap_card, 167ms)
     DURATION(flash_card, 167ms)
+    DURATION(short_pause, 333ms)
     DURATION(player_remove, 1000ms)
     DURATION(player_hp, 333ms)
     DURATION(player_show_role, 167ms)

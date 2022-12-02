@@ -12,7 +12,8 @@ namespace banggame {
             target->m_game->flash_card(target_card);
             
             auto *drawn_card = target->m_game->top_of_deck();
-            target->m_game->send_card_update(drawn_card, nullptr, show_card_flags::short_pause);
+            target->m_game->send_card_update(drawn_card);
+            target->m_game->add_short_pause(drawn_card);
 
             short choice = *target_card->get_tag_value(tag_type::peyote);
 

@@ -25,8 +25,6 @@ namespace banggame {
     )
 
     DEFINE_ENUM_FLAGS(show_card_flags,
-        (pause_before_move)
-        (short_pause)
         (instant)
         (shown)
         (hidden)
@@ -165,6 +163,7 @@ namespace banggame {
         (hide_card, hide_card_update)
         (tap_card, tap_card_update)
         (flash_card, serial::card)
+        (short_pause, serial::opt_card)
         (last_played_card, serial::opt_card)
         (player_add, player_add_update)
         (player_user, player_user_update)

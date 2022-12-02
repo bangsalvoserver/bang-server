@@ -38,14 +38,11 @@ namespace banggame {
         int num_cards = 2;
 
         void on_update() override {
-            for (auto it = target->m_game->m_selection.begin(); it != target->m_game->m_selection.end(); ++it) {
-                target->m_game->add_log("LOG_POKER_REVEAL", origin_card, *it);
-                auto flags = show_card_flags::shown;
-                if (std::next(it) == target->m_game->m_selection.end()) {
-                    flags |= show_card_flags::short_pause;
-                }
-                target->m_game->send_card_update(*it, nullptr, flags);
+            for (card *target_card : target->m_game->m_selection) {
+                target->m_game->add_log("LOG_POKER_REVEAL", origin_card, target_card);
+                target->m_game->send_card_update(target_card, nullptr, show_card_flags::shown);
             }
+            target->m_game->add_short_pause();
         }
 
         bool auto_resolve() override {
