@@ -177,7 +177,6 @@ namespace banggame {
         (request_status, request_status_args)
         (game_flags, game_flags)
         (play_sound, std::string)
-        (timer_start)
         (status_clear)
         (confirm_play)
     )
@@ -196,7 +195,6 @@ namespace banggame {
         (pick_card, serial::card)
         (play_card, play_card_args)
         (prompt_respond, bool)
-        (request_confirm)
     )
 
     using game_action = enums::enum_variant<game_action_type>;

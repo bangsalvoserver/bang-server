@@ -322,13 +322,6 @@ namespace banggame {
         return {};
     }
 
-    game_string player::handle_action(enums::enum_tag_t<game_action_type::request_confirm>) {
-        if (m_game->pending_requests()) {
-            m_game->top_request().confirm_player(this);
-        }
-        return {};
-    }
-
     card_sign player::get_card_sign(card *target_card) {
         return m_game->call_event<event_type::apply_sign_modifier>(this, target_card->sign);
     }

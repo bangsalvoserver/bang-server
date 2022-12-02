@@ -96,23 +96,17 @@ namespace banggame {
             m_value->on_update();
         }
 
-        void tick() {
+        void start() {
             if (auto *t = m_value->timer()) {
-                auto copy = m_value;
-                t->tick();
-            }
-        }
-
-        void send() {
-            if (auto *t = m_value->timer()) {
-                t->add_pending_confirms();
+                t->start();
             }
             m_value->sent = true;
         }
 
-        void confirm_player(player *p) {
+        void tick() {
             if (auto *t = m_value->timer()) {
-                t->confirm_player(p);
+                auto copy = m_value;
+                t->tick();
             }
         }
 

@@ -7,6 +7,7 @@
 #include "player.h"
 #include "game_string.h"
 #include "game_update.h"
+#include "durations.h"
 
 namespace banggame {
 
@@ -68,7 +69,7 @@ namespace banggame {
 
     template<typename Context>
     struct game_net_manager {
-        std::deque<std::pair<update_target, Json::Value>> m_updates;
+        std::deque<std::tuple<update_target, Json::Value, ticks>> m_updates;
         std::deque<std::pair<update_target, game_string>> m_saved_log;
 
         const Context &context() const {
@@ -80,9 +81,14 @@ namespace banggame {
             return json::serialize(game_update{enums::enum_tag<E>, FWD(args) ... }, context());
         }
 
+        ticks get_total_update_time() {
+            return std::transform_reduce(m_updates.begin(), m_updates.end(), ticks{0}, std::plus(),
+                [](const auto &tup) { return std::get<ticks>(tup); });
+        }
+
         template<game_update_type E>
         void add_update(update_target target, auto && ... args) {
-            m_updates.emplace_back(target, make_update<E>(FWD(args) ... ));
+            m_updates.emplace_back(target, make_update<E>(FWD(args) ... ), update_duration<E>);
         }
 
         template<game_update_type E>

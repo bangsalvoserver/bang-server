@@ -13,7 +13,7 @@ namespace banggame {
                 req.on_update();
             }
             if (!req.auto_resolve()) {
-                req.send();
+                req.start();
                 req.target()->m_game->send_request_update();
             }
         } else {

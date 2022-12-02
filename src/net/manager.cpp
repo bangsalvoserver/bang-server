@@ -188,7 +188,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
     broadcast_message_lobby<server_message_type::game_update>(lobby, lobby.game.make_update<game_update_type::player_user>(target, target->user_id));
     
     for (const auto &msg : lobby.game.get_rejoin_updates(target)) {
-        send_message<server_message_type::game_update>(user->first, json::serialize(msg, lobby.game.context()));
+        send_message<server_message_type::game_update>(user->first, msg);
     }
 
     return {};
@@ -385,7 +385,7 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
 
 void lobby::send_updates(game_manager &mgr) {
     while (state == lobby_state::playing && !game.m_updates.empty()) {
-        auto &[target, update] = game.m_updates.front();
+        auto &[target, update, update_time] = game.m_updates.front();
         for (auto &[team, it] : users) {
             if (target.matches(it->second.user_id)) {
                 mgr.send_message<server_message_type::game_update>(it->first, update);

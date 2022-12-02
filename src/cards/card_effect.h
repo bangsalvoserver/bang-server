@@ -3,11 +3,19 @@
 
 #include "game/card_enums.h"
 #include "game/game_string.h"
-#include "game/durations.h"
+
+#include "net/options.h"
 
 #include <memory>
 
 namespace banggame {
+
+    using namespace std::chrono_literals;
+
+    template<std::integral T>
+    using ticks_t = std::chrono::duration<T, std::ratio<1, server_tickrate>>;
+    
+    using ticks = ticks_t<int>;
 
     template<target_type E> struct tagged_value {};
 
@@ -26,14 +34,15 @@ namespace banggame {
 
     class request_base;
 
+    static constexpr ticks max_timer_duration = 10s;
+
     class request_timer {
     protected:
         request_base *request;
+        ticks duration;
 
     private:
-        ticks duration;
-        ticks lifetime = auto_confirm_duration;
-        std::vector<player *> awaiting_confirms;
+        ticks lifetime = max_timer_duration;
 
     public:
         template<typename Duration>
@@ -42,9 +51,7 @@ namespace banggame {
             , duration(std::clamp(std::chrono::duration_cast<ticks>(duration), ticks{0}, max_timer_duration)) {}
 
     public:
-        void add_pending_confirms();
-        void confirm_player(player *p);
-
+        void start();
         void tick();
 
         virtual void on_finished() {}

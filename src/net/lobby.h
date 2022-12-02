@@ -7,7 +7,6 @@
 #include "messages.h"
 
 #include "game/game.h"
-#include "game/durations.h"
 
 namespace banggame {
 
@@ -24,6 +23,8 @@ DEFINE_ENUM(lobby_team,
 )
 
 using team_user_pair = std::pair<lobby_team, user_ptr>;
+
+static constexpr ticks lobby_lifetime = 10s;
 
 struct lobby : lobby_info {
     std::vector<team_user_pair> users;
