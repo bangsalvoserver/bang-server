@@ -197,7 +197,7 @@ namespace banggame {
                 }
                 target->m_game->m_scenario_deck.push_back(target_card);
                 target->m_game->send_card_update(target_card, nullptr, show_card_flags::instant);
-                target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::scenario_deck, show_card_flags::instant);
+                target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::scenario_deck, true);
             } else {
                 target->m_game->move_card(target_card, pocket_type::scenario_deck);
             }

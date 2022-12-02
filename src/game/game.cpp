@@ -27,10 +27,10 @@ namespace banggame {
 
         auto move_cards = [&](auto &&range, auto do_show_card) -> util::generator<Json::Value> {
             for (card *c : range) {
-                co_yield make_update<game_update_type::move_card>(c, c->owner, c->pocket, show_card_flags::instant);
+                co_yield make_update<game_update_type::move_card>(c, c->owner, c->pocket, true);
 
                 if (do_show_card(*c)) {
-                    co_yield make_update<game_update_type::show_card>(c, *c, show_card_flags::instant);
+                    co_yield make_update<game_update_type::show_card>(c, *c, true);
                     if (c->num_cubes > 0) {
                         co_yield make_update<game_update_type::add_cubes>(c->num_cubes, c);
                     }
@@ -98,12 +98,12 @@ namespace banggame {
         }
 
         for (card *c : target->m_hand) {
-            co_yield make_update<game_update_type::show_card>(c, *c, show_card_flags::instant);
+            co_yield make_update<game_update_type::show_card>(c, *c, true);
         }
 
         for (card *c : m_selection) {
             if (c->owner == target) {
-                co_yield make_update<game_update_type::show_card>(c, *c, show_card_flags::instant);
+                co_yield make_update<game_update_type::show_card>(c, *c, true);
             }
         }
 

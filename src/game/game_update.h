@@ -24,17 +24,11 @@ namespace banggame {
         (std::vector<serial::card>, cards)
     )
 
-    DEFINE_ENUM_FLAGS(show_card_flags,
-        (instant)
-        (shown)
-        (hidden)
-    )
-
     DEFINE_STRUCT(move_card_update,
         (serial::card, card)
         (serial::opt_player, player)
         (pocket_type, pocket)
-        (show_card_flags, flags)
+        (bool, instant)
     )
 
     DEFINE_STRUCT(add_cubes_update,
@@ -51,12 +45,12 @@ namespace banggame {
     DEFINE_STRUCT(show_card_update,
         (serial::card, card)
         (card_data, info)
-        (show_card_flags, flags)
+        (bool, instant)
     )
 
     DEFINE_STRUCT(hide_card_update,
         (serial::card, card)
-        (show_card_flags, flags)
+        (bool, instant)
     )
 
     DEFINE_STRUCT(tap_card_update,

@@ -90,13 +90,14 @@ namespace banggame {
     }
 
     void game_table::send_card_update(card *c, player *owner, show_card_flags flags) {
+        bool instant = bool(flags & show_card_flags::instant);
         if (bool(flags & show_card_flags::hidden)) {
-            add_update<game_update_type::hide_card>(c, flags);
+            add_update<game_update_type::hide_card>(c, instant);
         } else if (!owner || bool(flags & show_card_flags::shown)) {
-            add_update<game_update_type::show_card>(c, *c, flags);
+            add_update<game_update_type::show_card>(c, *c, instant);
         } else {
-            add_update<game_update_type::hide_card>(update_target::excludes(owner), c, flags);
-            add_update<game_update_type::show_card>(update_target::includes(owner), c, *c, flags);
+            add_update<game_update_type::hide_card>(update_target::excludes(owner), c, instant);
+            add_update<game_update_type::show_card>(update_target::includes(owner), c, *c, instant);
         }
     }
 
@@ -113,7 +114,7 @@ namespace banggame {
         c->pocket = pocket;
         c->owner = owner;
         
-        add_update<game_update_type::move_card>(c, owner, pocket, flags);
+        add_update<game_update_type::move_card>(c, owner, pocket, bool(flags & show_card_flags::instant));
     }
 
     card *game_table::draw_card_to(pocket_type pocket, player *owner, show_card_flags flags) {

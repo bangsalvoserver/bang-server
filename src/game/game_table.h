@@ -12,6 +12,12 @@
 
 namespace banggame {
 
+    DEFINE_ENUM_FLAGS(show_card_flags,
+        (instant)
+        (shown)
+        (hidden)
+    )
+
     using card_disabler_fun = std::function<bool(card *)>;
 
     struct game_table : game_net_manager<game_table> {
