@@ -10,13 +10,6 @@
 
 namespace banggame {
 
-    using namespace std::chrono_literals;
-
-    template<std::integral T>
-    using ticks_t = std::chrono::duration<T, std::ratio<1, server_tickrate>>;
-    
-    using ticks = ticks_t<int>;
-
     template<target_type E> struct tagged_value {};
 
     template<target_type E>

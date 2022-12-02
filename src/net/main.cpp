@@ -27,11 +27,10 @@ int main(int argc, char **argv) {
             g_stop = true;
         });
 
-        using ticks = banggame::ticks_t<int64_t>;
-        auto next_tick = std::chrono::steady_clock::now() + ticks{0};
+        auto next_tick = std::chrono::steady_clock::now() + banggame::ticks64{0};
 
         while (!g_stop) {
-            next_tick += ticks{1};
+            next_tick += banggame::ticks64{1};
 
             ctx.poll();
             server.tick();
