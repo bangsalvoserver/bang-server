@@ -9,8 +9,12 @@ namespace banggame {
             value = value || bool(flags & effect_flags::escapable) && !ranges_contains(game->m_discards, "ESCAPE", &card::name);
         });
 
-        game->add_listener<event_type::check_damage_response>(nullptr, [=](bool &value) {
-            value = value || !ranges_contains(game->m_discards, "SAVED", &card::name);
+        game->add_listener<event_type::check_damage_response>(nullptr, [=](player *target, bool &value) {
+            if (!value && std::ranges::any_of(range_other_players(target), [](const player &p) { return !p.m_hand.empty(); })
+                && !ranges_contains(game->m_discards, "SAVED", &card::name))
+            {
+                value = true;
+            }
         });
     }
 }

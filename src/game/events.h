@@ -16,7 +16,7 @@ namespace banggame {
     DEFINE_ENUM_TYPES(event_type,
         EVENT(on_game_setup)
 
-        EVENT(check_damage_response, bool &value)
+        EVENT(check_damage_response, player *target, bool &value)
 
         EVENT(apply_sign_modifier,              player *origin, card_sign &value)
         EVENT(apply_beer_modifier,              player *origin, int &value)
