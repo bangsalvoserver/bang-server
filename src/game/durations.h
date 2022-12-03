@@ -14,6 +14,7 @@ namespace banggame {
     DURATION(move_scenario_deck, 333ms)
     DURATION(deck_shuffled, 1333ms)
     DURATION(show_card, 167ms)
+    DURATION(hide_card, 167ms)
     DURATION(tap_card, 167ms)
     DURATION(flash_card, 167ms)
     DURATION(short_pause, 333ms)
