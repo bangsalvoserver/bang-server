@@ -2,6 +2,7 @@
 #define __GAME_NET_H__
 
 #include <deque>
+#include <numeric>
 #include <iostream>
 
 #include "player.h"
