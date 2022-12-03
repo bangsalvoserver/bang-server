@@ -324,7 +324,7 @@ namespace banggame {
     void play_card_verify::do_play_card() const {
         auto &effects = is_response ? origin_card->responses : origin_card->effects;
         origin->log_played_card(origin_card, is_response);
-        if (std::ranges::find(effects, effect_type::play_card_action, &effect_holder::type) == effects.end()) {
+        if (!ranges_contains(effects, effect_type::play_card_action, &effect_holder::type)) {
             origin->play_card_action(origin_card);
         }
 
@@ -371,7 +371,7 @@ namespace banggame {
 
         switch(origin_card->pocket) {
         case pocket_type::player_hand:
-            if (!modifiers.empty() && modifiers.front()->modifier == card_modifier_type::leevankliff) {
+            if (ranges_contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
                 card *bang_card = std::exchange(origin_card, origin->m_last_played_card);
                 if (!origin->is_bangcard(bang_card)) {
                     return "ERROR_INVALID_MODIFIER_CARD";
@@ -380,8 +380,8 @@ namespace banggame {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this, bang_card]{
-                    origin->m_game->move_card(bang_card, pocket_type::discard_pile);
-                    origin->m_game->call_event<event_type::on_play_hand_card>(origin, bang_card);
+                    play_modifiers();
+                    origin->play_card_action(bang_card);
                     do_play_card();
                     origin->set_last_played_card(nullptr);
                 });
@@ -435,7 +435,7 @@ namespace banggame {
             });
             break;
         case pocket_type::hidden_deck:
-            if (std::ranges::find(modifiers, card_modifier_type::shopchoice, &card::modifier) == modifiers.end()) {
+            if (!ranges_contains(modifiers, card_modifier_type::shopchoice, &card::modifier)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             [[fallthrough]];
