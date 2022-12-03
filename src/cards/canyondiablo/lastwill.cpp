@@ -42,7 +42,7 @@ namespace banggame {
         player *target = targets[0].get<target_type::player>();
         for (auto c : targets | std::views::drop(1)) {
             card *chosen_card = c.get<target_type::card>();
-            if (chosen_card->pocket == pocket_type::player_hand) {
+            if (chosen_card->visibility != card_visibility::shown) {
                 origin->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, chosen_card);
                 origin->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", origin, target);
             } else {

@@ -12,8 +12,12 @@ namespace banggame {
                         target->m_game->flash_card(target_card);
                         for (int i=0; i<damage && !origin->m_hand.empty(); ++i) {
                             card *stolen_card = origin->random_hand_card();
-                            target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", target, origin, stolen_card);
-                            target->m_game->add_log(update_target::excludes(origin, target), "LOG_STOLEN_CARD_FROM_HAND", target, origin);
+                            if (stolen_card->visibility != card_visibility::shown) {
+                                target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", target, origin, stolen_card);
+                                target->m_game->add_log(update_target::excludes(origin, target), "LOG_STOLEN_CARD_FROM_HAND", target, origin);
+                            } else {
+                                target->m_game->add_log("LOG_STOLEN_CARD", target, origin, stolen_card);
+                            }
                             target->steal_card(stolen_card);
                             target->m_game->call_event<event_type::on_effect_end>(p, target_card);
                         }

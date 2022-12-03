@@ -18,8 +18,12 @@ namespace banggame {
 
         void on_pick(card *target_card) override {
             auto lock = target->m_game->lock_updates(true);
-            target->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", target, origin, target_card);
-            target->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", target, origin);
+            if (target_card->visibility != card_visibility::shown) {
+                target->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", target, origin, target_card);
+                target->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", target, origin);
+            } else {
+                target->m_game->add_log("LOG_GIFTED_CARD", target, origin, target_card);
+            }
             origin->steal_card(target_card);
             target->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
         }

@@ -9,7 +9,7 @@ namespace banggame {
     }
 
     inline void steal_card(player *origin, player *target, card *target_card) {
-        if (target_card->pocket == pocket_type::player_hand) {
+        if (target_card->visibility != card_visibility::shown) {
             target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", origin, target, target_card);
             target->m_game->add_log(update_target::excludes(origin, target), "LOG_STOLEN_CARD_FROM_HAND", origin, target);
         } else {

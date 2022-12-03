@@ -27,7 +27,8 @@ namespace banggame {
                 ? (drawn_card->sign.suit == card_suit::hearts || drawn_card->sign.suit == card_suit::diamonds)
                 : (drawn_card->sign.suit == card_suit::clubs || drawn_card->sign.suit == card_suit::spades))
             {
-                target->draw_card();
+                target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
+                target->m_game->move_card(drawn_card, pocket_type::player_hand, target);
             } else {
                 auto lock = target->m_game->lock_updates(true);
                 target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, drawn_card);

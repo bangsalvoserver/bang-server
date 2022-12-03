@@ -30,8 +30,12 @@ namespace banggame {
                 target->add_to_hand_phase_one(target_card);
             } else {
                 player *next_target = get_next_target();
-                target->m_game->add_log(update_target::includes(target, next_target), "LOG_GIFTED_CARD", target, next_target, target_card);
-                target->m_game->add_log(update_target::excludes(target, next_target), "LOG_GIFTED_A_CARD", target, next_target);
+                if (target_card->visibility != card_visibility::shown) {
+                    target->m_game->add_log(update_target::includes(target, next_target), "LOG_GIFTED_CARD", target, next_target, target_card);
+                    target->m_game->add_log(update_target::excludes(target, next_target), "LOG_GIFTED_A_CARD", target, next_target);
+                } else {
+                    target->m_game->add_log("LOG_GIFTED_CARD", target, next_target, target_card);
+                }
                 next_target->add_to_hand(target_card);
             }
             if (target->m_game->m_selection.empty()) {
