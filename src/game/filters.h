@@ -105,11 +105,13 @@ namespace banggame {
         return nullptr;
     }
 
-    constexpr auto modifier_bitset(std::same_as<card_modifier_type> auto ... values) {
-        return ((uint16_t(1) << enums::to_underlying(values)) | ... | 0);
+    using modifier_bitset_t = enums::sized_int_t<1 << (enums::num_members_v<card_modifier_type> - 1)>;
+
+    constexpr modifier_bitset_t modifier_bitset(std::same_as<card_modifier_type> auto ... values) {
+        return ((1 << enums::to_underlying(values)) | ... | 0);
     }
 
-    inline auto allowed_modifiers_after(card_modifier_type modifier) {
+    inline modifier_bitset_t allowed_modifiers_after(card_modifier_type modifier) {
         switch (modifier) {
         case card_modifier_type::bangmod:
         case card_modifier_type::bandolier:
@@ -118,9 +120,9 @@ namespace banggame {
             return modifier_bitset(card_modifier_type::shopchoice);
         case card_modifier_type::shopchoice:
         case card_modifier_type::leevankliff:
-            return 0;
+            return modifier_bitset();
         default:
-            return ~modifier_bitset();
+            return ~(-1 << enums::num_members_v<card_modifier_type>);
         }
     }
 

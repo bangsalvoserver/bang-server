@@ -11,7 +11,7 @@
 namespace banggame {
     
     game_string play_card_verify::verify_modifiers() const {
-        auto allowed_modifiers = ~modifier_bitset();
+        auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
         for (card *mod_card : modifiers) {
             if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return {"ERROR_CARD_DISABLED_BY", mod_card, disabler};

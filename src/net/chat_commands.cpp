@@ -186,6 +186,13 @@ namespace banggame {
         case card_deck_type::goldrush: {
             target->m_game->move_card(target->m_game->m_shop_selection.front(), pocket_type::shop_discard);
             target->m_game->move_card(target_card, pocket_type::shop_selection);
+            if (target_card->modifier == card_modifier_type::shopchoice) {
+                for (card *c : target->m_game->m_hidden_deck) {
+                    if (c->get_tag_value(tag_type::shopchoice) == target_card->get_tag_value(tag_type::shopchoice)) {
+                        target->m_game->send_card_update(c, nullptr, {card_visibility::shown, true});
+                    }
+                }
+            }
             break;
         }
         case card_deck_type::highnoon:
