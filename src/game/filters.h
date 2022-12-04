@@ -25,6 +25,7 @@ namespace banggame {
         card_deck_type get_card_deck(card_ptr target);
         bool card_has_tag(card_ptr target, tag_type type);
         bool is_cube_slot(card_ptr target);
+        bool allowed_with_leevankliff(player_ptr origin, card_ptr target);
     }
 
     inline const char *check_player_filter(filter_impl::player_ptr origin, target_player_filter filter, filter_impl::player_ptr target) {
@@ -102,6 +103,48 @@ namespace banggame {
             return "ERROR_TARGET_NOT_HAND_CARD";
 
         return nullptr;
+    }
+
+    constexpr auto modifier_bitset(std::same_as<card_modifier_type> auto ... values) {
+        return ((uint16_t(1) << enums::to_underlying(values)) | ... | 0);
+    }
+
+    inline auto allowed_modifiers_after(card_modifier_type modifier) {
+        switch (modifier) {
+        case card_modifier_type::bangmod:
+        case card_modifier_type::bandolier:
+            return modifier_bitset(card_modifier_type::bangmod, card_modifier_type::bandolier);
+        case card_modifier_type::discount:
+            return modifier_bitset(card_modifier_type::shopchoice);
+        case card_modifier_type::shopchoice:
+        case card_modifier_type::leevankliff:
+            return 0;
+        default:
+            return ~modifier_bitset();
+        }
+    }
+
+    inline bool allowed_card_with_modifier(card_modifier_type modifier, filter_impl::player_ptr origin, filter_impl::card_ptr target) {
+        switch (modifier) {
+        case card_modifier_type::bangmod:
+        case card_modifier_type::bandolier:
+            if (filter_impl::get_card_pocket(target) == pocket_type::player_hand) {
+                return filter_impl::is_bangcard(origin, target);
+            } else {
+                return filter_impl::card_has_tag(target, tag_type::play_as_bang);
+            }
+        case card_modifier_type::leevankliff:
+            return filter_impl::allowed_with_leevankliff(origin, target);
+        case card_modifier_type::discount:
+            return filter_impl::get_card_deck(target) == card_deck_type::goldrush;
+        case card_modifier_type::shopchoice:
+            return filter_impl::get_card_deck(target) == card_deck_type::goldrush
+                && filter_impl::get_card_pocket(target) == pocket_type::hidden_deck;
+        case card_modifier_type::belltower:
+            return filter_impl::get_card_pocket(target) != pocket_type::button_row;
+        default:
+            return true;
+        }
     }
 }
 

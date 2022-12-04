@@ -11,53 +11,15 @@
 namespace banggame {
     
     game_string play_card_verify::verify_modifiers() const {
+        auto allowed_modifiers = ~modifier_bitset();
         for (card *mod_card : modifiers) {
             if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return {"ERROR_CARD_DISABLED_BY", mod_card, disabler};
-            }
-            switch(mod_card->modifier) {
-            case card_modifier_type::bangmod:
-            case card_modifier_type::bandolier:
-                if (origin_card->pocket == pocket_type::player_hand) {
-                    if (!origin->is_bangcard(origin_card)) {
-                        return "ERROR_INVALID_MODIFIER_CARD";
-                    }
-                } else if (!origin_card->has_tag(tag_type::play_as_bang)) {
-                    return "ERROR_INVALID_MODIFIER_CARD";
-                }
-                break;
-            case card_modifier_type::leevankliff:
-                if (origin_card != origin->m_last_played_card)
-                    return "ERROR_INVALID_MODIFIER_CARD";
-                break;
-            case card_modifier_type::shopchoice:
-            case card_modifier_type::discount:
-                if (origin_card->expansion != card_expansion_type::goldrush)
-                    return "ERROR_INVALID_MODIFIER_CARD";
-                break;
-            case card_modifier_type::belltower:
-                switch (origin_card->pocket) {
-                case pocket_type::player_hand:
-                    if (origin_card->color != card_color_type::brown)
-                        return "ERROR_INVALID_MODIFIER_CARD";
-                    break;
-                case pocket_type::player_table:
-                    if (origin_card->effects.empty())
-                        return "ERROR_INVALID_MODIFIER_CARD";
-                    break;
-                default:
-                    if (origin_card->color == card_color_type::black)
-                        return "ERROR_INVALID_MODIFIER_CARD";
-                }
-                if (std::ranges::none_of(origin_card->effects, 
-                    [](target_player_filter filter) {
-                        return bool(filter & (target_player_filter::range_1 | target_player_filter::range_2 | target_player_filter::reachable));
-                    }, &effect_holder::player_filter))
-                {
-                    return "ERROR_INVALID_MODIFIER_CARD";
-                }
-                break;
-            default:
+            } else if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, mod_card, game_string{})) {
+                return error;
+            } else if (!bool(allowed_modifiers & modifier_bitset(mod_card->modifier))) {
+                return "ERROR_INVALID_MODIFIER_CARD";
+            } else if (!allowed_card_with_modifier(mod_card->modifier, origin, origin_card)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             for (const auto &effect : mod_card->effects) {
@@ -65,6 +27,7 @@ namespace banggame {
                     return e;
                 }
             }
+            allowed_modifiers &= allowed_modifiers_after(mod_card->modifier);
         }
         return {};
     }
@@ -372,10 +335,12 @@ namespace banggame {
         switch(origin_card->pocket) {
         case pocket_type::player_hand:
             if (ranges_contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
-                card *bang_card = std::exchange(origin_card, origin->m_last_played_card);
-                if (!origin->is_bangcard(bang_card)) {
+                if (!origin->m_last_played_card) {
+                    return "ERROR_INVALID_MODIFIER_CARD";
+                } else if (!origin_card->has_tag(tag_type::bangcard)) {
                     return "ERROR_INVALID_MODIFIER_CARD";
                 }
+                card *bang_card = std::exchange(origin_card, origin->m_last_played_card);
                 if (game_string error = verify_card_targets()) {
                     return error;
                 }
@@ -435,10 +400,6 @@ namespace banggame {
             });
             break;
         case pocket_type::hidden_deck:
-            if (!ranges_contains(modifiers, card_modifier_type::shopchoice, &card::modifier)) {
-                return "ERROR_INVALID_MODIFIER_CARD";
-            }
-            [[fallthrough]];
         case pocket_type::shop_selection: {
             int cost = origin_card->buy_cost();
             for (card *c : modifiers) {
