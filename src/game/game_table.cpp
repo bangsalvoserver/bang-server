@@ -60,7 +60,11 @@ namespace banggame {
 
     int game_table::calc_distance(player *from, player *to) {
         if (from == to) return 0;
-        if (check_flags(game_flags::disable_player_distances)) return to->m_distance_mod;
+
+        if (check_flags(game_flags::disable_player_distances)) {
+            return 1 + to->m_distance_mod;
+        }
+        
         if (to->alive()) {
             return std::min(
                 std::distance(player_iterator(from), player_iterator(to)),

@@ -32,7 +32,9 @@ namespace banggame {
                 target->move_cubes(old_character, target_card, old_character->num_cubes);
                 target_card->on_equip(target);
                 
-                target->set_hp(2);
+                if (!target->is_ghost()) {
+                    target->set_hp(2);
+                }
             } else {
                 target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::player_backup, target, card_visibility::hidden);
             }
