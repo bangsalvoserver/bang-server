@@ -402,7 +402,9 @@ namespace banggame {
         }
         
         queue_action([this, killer, target]{
-            add_update<game_update_type::player_show_role>(target, target->m_role);
+            if (!target->check_player_flags(player_flags::role_revealed)) {
+                add_update<game_update_type::player_show_role>(target, target->m_role);
+            }
             target->add_player_flags(player_flags::role_revealed | player_flags::dead);
             target->set_hp(0, true);
 
