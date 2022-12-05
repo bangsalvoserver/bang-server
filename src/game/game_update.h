@@ -79,7 +79,7 @@ namespace banggame {
     DEFINE_STRUCT(hide_card_update,
         (serial::card, card)
         (bool, instant),
-        bool skip_count;
+        bool skip_count = false;
 
         auto get_duration() const {
             return (instant || skip_count) ? 0ms : 167ms;
