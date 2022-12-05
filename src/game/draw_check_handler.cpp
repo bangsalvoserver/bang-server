@@ -39,7 +39,9 @@ namespace banggame {
             }
             m_origin->m_game->queue_request_front<request_check>(m_origin_card, m_origin);
         } else {
-            select(m_origin->m_game->draw_card_to(pocket_type::discard_pile));
+            card *drawn_card = m_origin->m_game->top_of_deck();
+            m_origin->m_game->move_card(drawn_card, pocket_type::discard_pile);
+            select(drawn_card);
         }
     }
 

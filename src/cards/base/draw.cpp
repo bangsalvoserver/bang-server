@@ -29,7 +29,7 @@ namespace banggame {
 
     void effect_draw_to_discard::on_play(card *origin_card, player *origin) {
         for (int i=0; i<ncards; ++i) {
-            origin->m_game->draw_card_to(pocket_type::discard_pile);
+            origin->m_game->move_card(origin->m_game->top_of_deck(), pocket_type::discard_pile);
         }
     }
 

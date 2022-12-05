@@ -38,26 +38,6 @@ namespace banggame {
         }
     }
 
-    card *game_table::top_of_deck() {
-        if (m_deck.empty()) {
-            if (m_discards.empty()) {
-                throw std::runtime_error("Deck is empty. Cannot shuffle");
-            }
-            m_deck = std::move(m_discards);
-            m_discards.clear();
-            for (card *c : m_deck) {
-                c->pocket = pocket_type::main_deck;
-                c->owner = nullptr;
-                c->visibility = card_visibility::hidden;
-            }
-            shuffle_cards_and_ids(m_deck);
-            add_log("LOG_DECK_RESHUFFLED");
-            play_sound(nullptr, "shuffle");
-            add_update<game_update_type::deck_shuffled>(pocket_type::main_deck);
-        }
-        return m_deck.back();
-    }
-
     int game_table::calc_distance(player *from, player *to) {
         if (from == to) return 0;
 
@@ -138,10 +118,24 @@ namespace banggame {
         add_update<game_update_type::move_card>(c, owner, pocket, instant);
     }
 
-    card *game_table::draw_card_to(pocket_type pocket, player *owner, card_visibility visibility, bool instant) {
-        card *drawn_card = top_of_deck();
-        move_card(drawn_card, pocket, owner, visibility, instant);
-        return drawn_card;
+    card *game_table::top_of_deck() {
+        if (m_deck.empty()) {
+            if (m_discards.empty()) {
+                throw std::runtime_error("Deck is empty. Cannot shuffle");
+            }
+            m_deck = std::move(m_discards);
+            m_discards.clear();
+            for (card *c : m_deck) {
+                c->pocket = pocket_type::main_deck;
+                c->owner = nullptr;
+                c->visibility = card_visibility::hidden;
+            }
+            shuffle_cards_and_ids(m_deck);
+            add_log("LOG_DECK_RESHUFFLED");
+            play_sound(nullptr, "shuffle");
+            add_update<game_update_type::deck_shuffled>(pocket_type::main_deck);
+        }
+        return m_deck.back();
     }
 
     card *game_table::phase_one_drawn_card() {
@@ -150,12 +144,6 @@ namespace banggame {
         } else {
             return m_discards.back();
         }
-    }
-
-    card *game_table::draw_phase_one_card_to(pocket_type pocket, player *owner, card_visibility visibility, bool instant) {
-        card *drawn_card = phase_one_drawn_card();
-        move_card(drawn_card, pocket, owner, visibility, instant);
-        return drawn_card;
     }
 
     card *game_table::draw_shop_card() {

@@ -10,7 +10,7 @@ namespace banggame {
         
         void on_update() override {
             for (int i=0; i<3; ++i) {
-                target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
+                target->m_game->move_card(target->m_game->phase_one_drawn_card(), pocket_type::selection, target);
             }
         }
 

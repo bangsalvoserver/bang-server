@@ -20,7 +20,7 @@ namespace banggame {
         void on_update() override {
             int ncards = target->m_game->num_alive() + target->get_cards_to_draw() - 1;
             for (int i=0; i<ncards; ++i) {
-                target->m_game->draw_phase_one_card_to(pocket_type::selection, target);
+                target->m_game->move_card(target->m_game->phase_one_drawn_card(), pocket_type::selection, target);
             }
         }
 

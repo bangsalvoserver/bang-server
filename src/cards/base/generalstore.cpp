@@ -33,7 +33,7 @@ namespace banggame {
 
     void effect_generalstore::on_play(card *origin_card, player *origin) {
         for (int i=0; i<origin->m_game->num_alive(); ++i) {
-            origin->m_game->draw_card_to(pocket_type::selection);
+            origin->m_game->move_card(origin->m_game->top_of_deck(), pocket_type::selection);
         }
     }
 
