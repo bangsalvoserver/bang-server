@@ -28,7 +28,11 @@ namespace banggame {
         (serial::card, card)
         (serial::opt_player, player)
         (pocket_type, pocket)
-        (bool, instant)
+        (bool, instant),
+
+        auto get_duration() const {
+            return instant ? 0ms : 333ms;
+        }
     )
 
     DEFINE_STRUCT(add_cubes_update,
@@ -39,24 +43,73 @@ namespace banggame {
     DEFINE_STRUCT(move_cubes_update,
         (int, num_cubes)
         (serial::opt_card, origin_card)
-        (serial::opt_card, target_card)
+        (serial::opt_card, target_card),
+        
+        auto get_duration() const {
+            return num_cubes == 1 ? 133ms : 250ms;
+        }
+    )
+
+    DEFINE_STRUCT(move_scenario_deck_update,
+        (serial::player, player),
+
+        auto get_duration() const {
+            return 333ms;
+        }
+    )
+
+    DEFINE_STRUCT(deck_shuffled_update,
+        (pocket_type, pocket),
+
+        auto get_duration() const {
+            return 1333ms;
+        }
     )
 
     DEFINE_STRUCT(show_card_update,
         (serial::card, card)
         (card_data, info)
-        (bool, instant)
+        (bool, instant),
+
+        auto get_duration() const {
+            return instant ? 0ms : 167ms;
+        }
     )
 
     DEFINE_STRUCT(hide_card_update,
         (serial::card, card)
-        (bool, instant)
+        (bool, instant),
+        bool skip_count;
+
+        auto get_duration() const {
+            return (instant || skip_count) ? 0ms : 167ms;
+        }
     )
 
     DEFINE_STRUCT(tap_card_update,
         (serial::card, card)
         (bool, inactive)
-        (bool, instant)
+        (bool, instant),
+
+        auto get_duration() const {
+            return instant ? 0ms : 167ms;
+        }
+    )
+
+    DEFINE_STRUCT(flash_card_update,
+        (serial::card, card),
+
+        auto get_duration() const {
+            return 167ms;
+        }
+    )
+
+    DEFINE_STRUCT(short_pause_update,
+        (serial::opt_card, card),
+
+        auto get_duration() const {
+            return 333ms;
+        }
     )
 
     DEFINE_STRUCT(player_add_update,
@@ -70,13 +123,21 @@ namespace banggame {
 
     DEFINE_STRUCT(player_remove_update,
         (serial::player, player)
-        (bool, instant)
+        (bool, instant),
+
+        auto get_duration() const {
+            return instant ? 0ms : 1000ms;
+        }
     )
 
     DEFINE_STRUCT(player_hp_update,
         (serial::player, player)
         (int, hp)
-        (bool, instant)
+        (bool, instant),
+
+        auto get_duration() const {
+            return instant ? 0ms : 333ms;
+        }
     )
 
     DEFINE_STRUCT(player_gold_update,
@@ -87,7 +148,11 @@ namespace banggame {
     DEFINE_STRUCT(player_show_role_update,
         (serial::player, player)
         (player_role, role)
-        (bool, instant)
+        (bool, instant),
+
+        auto get_duration() const {
+            return instant ? 0ms : 167ms;
+        }
     )
 
     DEFINE_ENUM_FLAGS(game_flags,
@@ -151,13 +216,13 @@ namespace banggame {
         (move_card, move_card_update)
         (add_cubes, add_cubes_update)
         (move_cubes, move_cubes_update)
-        (move_scenario_deck, serial::player)
-        (deck_shuffled, pocket_type)
+        (move_scenario_deck, move_scenario_deck_update)
+        (deck_shuffled, deck_shuffled_update)
         (show_card, show_card_update)
         (hide_card, hide_card_update)
         (tap_card, tap_card_update)
-        (flash_card, serial::card)
-        (short_pause, serial::opt_card)
+        (flash_card, flash_card_update)
+        (short_pause, short_pause_update)
         (last_played_card, serial::opt_card)
         (player_add, player_add_update)
         (player_user, player_user_update)

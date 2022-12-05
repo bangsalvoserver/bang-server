@@ -8,7 +8,6 @@
 #include "player.h"
 #include "game_string.h"
 #include "game_update.h"
-#include "durations.h"
 
 namespace banggame {
 
@@ -90,16 +89,15 @@ namespace banggame {
         template<game_update_type E>
         void add_update(update_target target, auto && ... args) {
             game_update update{enums::enum_tag<E>, FWD(args) ... };
-            ticks duration = update_duration<E>;
-            if constexpr (game_update::has_type<E>) {
-                const auto &value = update.get<E>();
-                if constexpr (requires { { value.instant } -> std::convertible_to<bool>; }) {
-                    if (value.instant) {
-                        duration = ticks{0};
+            m_updates.emplace_back(target, json::serialize(update, context()), [&]{
+                if constexpr (game_update::has_type<E>) {
+                    const auto &value = update.get<E>();
+                    if constexpr (requires { value.get_duration(); }) {
+                        return std::chrono::duration_cast<ticks>(value.get_duration());
                     }
                 }
-            }
-            m_updates.emplace_back(target, json::serialize(update, context()), duration);
+                return ticks{0};
+            }());
         }
 
         template<game_update_type E>
