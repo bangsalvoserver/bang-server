@@ -28,7 +28,7 @@ namespace banggame {
 
                 origin->m_game->add_update<game_update_type::add_cards>(
                     make_id_vector(std::views::single(new_card)), pocket_type::player_character, origin);
-                origin->m_game->send_card_update(new_card, origin, {card_visibility::shown, true});
+                origin->m_game->set_card_visibility(new_card, nullptr, card_visibility::shown, true);
             });
     }
 

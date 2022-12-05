@@ -12,7 +12,7 @@ namespace banggame {
             target->m_game->flash_card(target_card);
             
             auto *drawn_card = target->m_game->top_of_deck();
-            target->m_game->send_card_update(drawn_card);
+            target->m_game->set_card_visibility(drawn_card);
             target->m_game->add_short_pause(drawn_card);
 
             short choice = *target_card->get_tag_value(tag_type::peyote);
@@ -35,7 +35,7 @@ namespace banggame {
                 target->m_game->move_card(drawn_card, pocket_type::discard_pile);
 
                 while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, {card_visibility::shown, true});
+                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, card_visibility::shown, true);
                 }
                 target->m_game->call_event<event_type::post_draw_cards>(target);
             }
@@ -59,7 +59,7 @@ namespace banggame {
                 }
             }
             for (card *c : target_cards) {
-                p->m_game->move_card(c, pocket_type::selection, nullptr, {card_visibility::shown, true});
+                p->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
             }
             
             p->m_game->queue_request<request_peyote>(target_card, p);

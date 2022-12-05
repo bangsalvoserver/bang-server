@@ -40,7 +40,7 @@ namespace banggame {
         void on_update() override {
             for (card *target_card : target->m_game->m_selection) {
                 target->m_game->add_log("LOG_POKER_REVEAL", origin_card, target_card);
-                target->m_game->send_card_update(target_card, nullptr, card_visibility::shown);
+                target->m_game->set_card_visibility(target_card);
             }
             target->m_game->add_short_pause();
         }

@@ -151,7 +151,7 @@ namespace banggame {
         if (add_cards(all_cards.button_row, pocket_type::button_row)) {
             add_update<game_update_type::add_cards>(make_id_vector(m_button_row), pocket_type::button_row);
             for (card *c : m_button_row) {
-                send_card_update(c, nullptr, {card_visibility::shown, true});
+                set_card_visibility(c, nullptr, card_visibility::shown, true);
             }
         }
 
@@ -240,7 +240,7 @@ namespace banggame {
         if (m_options.character_choice) {
             for (player &p : m_players) {
                 while (!p.m_characters.empty()) {
-                    move_card(p.m_characters.front(), pocket_type::player_hand, &p, {card_visibility::shown, true});
+                    move_card(p.m_characters.front(), pocket_type::player_hand, &p, card_visibility::shown, true);
                 }
             }
             for (player &p : range_all_players(m_first_player)) {
@@ -249,12 +249,12 @@ namespace banggame {
         } else {
             for (player &p : m_players) {
                 add_log("LOG_CHARACTER_CHOICE", &p, p.m_characters.front());
-                send_card_update(p.m_characters.front(), &p, {card_visibility::shown, true});
+                set_card_visibility(p.m_characters.front(), nullptr, card_visibility::shown, true);
                 p.reset_max_hp();
                 p.set_hp(p.m_max_hp, true);
                 p.m_characters.front()->on_enable(&p);
 
-                move_card(p.m_characters.back(), pocket_type::player_backup, &p, {card_visibility::hidden, true});
+                move_card(p.m_characters.back(), pocket_type::player_backup, &p, card_visibility::hidden, true);
             }
         }
 
@@ -281,7 +281,7 @@ namespace banggame {
             }
 
             if (!m_scenario_deck.empty()) {
-                send_card_update(m_scenario_deck.back(), nullptr, {card_visibility::shown, true});
+                set_card_visibility(m_scenario_deck.back(), nullptr, card_visibility::shown, true);
             }
 
             m_playing = m_first_player;

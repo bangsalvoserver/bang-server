@@ -36,7 +36,7 @@ namespace banggame {
 
             auto lock = target->m_game->lock_updates(true);
             while (!target->m_game->m_selection.empty()) {
-                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, {card_visibility::shown, true});
+                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, card_visibility::shown, true);
             }
         }
 
@@ -58,7 +58,7 @@ namespace banggame {
                 }
             }
             for (card *c : target_cards) {
-                origin->m_game->move_card(c, pocket_type::selection, nullptr, {card_visibility::shown, true});
+                origin->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
             }
             origin->m_game->queue_request<request_handcuffs>(target_card, origin);
         });

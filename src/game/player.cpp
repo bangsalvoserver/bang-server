@@ -66,7 +66,7 @@ namespace banggame {
         return m_hand[std::uniform_int_distribution(0, int(m_hand.size() - 1))(m_game->rng)];
     }
 
-    static void move_owned_card(player *owner, card *target_card, pocket_type pocket, player *target = nullptr, show_card_flags flags = {}) {
+    static void move_owned_card(player *owner, card *target_card, pocket_type pocket, player *target = nullptr) {
         if (target_card->owner == owner) {
             if (target_card->pocket == pocket_type::player_table) {
                 if (target_card->inactive) {
@@ -75,10 +75,10 @@ namespace banggame {
                 }
                 owner->disable_equip(target_card);
                 owner->drop_all_cubes(target_card);
-                owner->m_game->move_card(target_card, pocket, target, flags);
+                owner->m_game->move_card(target_card, pocket, target);
                 target_card->on_unequip(owner);
             } else if (target_card->pocket == pocket_type::player_hand) {
-                owner->m_game->move_card(target_card, pocket, target, flags);
+                owner->m_game->move_card(target_card, pocket, target);
             }
         }
     }
@@ -184,7 +184,7 @@ namespace banggame {
             m_game->add_log("LOG_DRAWN_FROM_DISCARD", this, drawn_card);
         } else if (reveal) {
             m_game->add_log("LOG_DRAWN_CARD", this, drawn_card);
-            m_game->send_card_update(drawn_card, this, card_visibility::shown);
+            m_game->set_card_visibility(drawn_card);
             m_game->add_short_pause(drawn_card);
         } else {
             m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);

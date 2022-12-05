@@ -63,7 +63,7 @@ namespace banggame {
                 card *c = m_origin->m_game->m_selection.front();
                 m_origin->m_game->call_event<event_type::on_draw_check_resolve>(m_origin, c);
                 if (c->pocket == pocket_type::selection) {
-                    m_origin->m_game->move_card(c, pocket_type::discard_pile, nullptr);
+                    m_origin->m_game->move_card(c, pocket_type::discard_pile);
                 }
             }
         } else {

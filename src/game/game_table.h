@@ -12,14 +12,6 @@
 
 namespace banggame {
 
-    struct show_card_flags {
-        card_visibility visibility;
-        bool instant;
-
-        show_card_flags(card_visibility visibility = card_visibility::show_owner, bool instant = false)
-            : visibility(visibility), instant(instant) {}
-    };
-
     using card_disabler_fun = std::function<bool(card *)>;
 
     struct game_table : game_net_manager<game_table> {
@@ -68,11 +60,11 @@ namespace banggame {
 
         void shuffle_cards_and_ids(std::span<card *> vec);
 
-        void send_card_update(card *c, player *owner = nullptr, show_card_flags flags = {});
+        void set_card_visibility(card *c, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
 
-        void move_card(card *c, pocket_type pocket, player *owner = nullptr, show_card_flags flags = {});
-        card *draw_card_to(pocket_type pocket, player *owner = nullptr, show_card_flags flags = {});
-        card *draw_phase_one_card_to(pocket_type pocket, player *owner = nullptr, show_card_flags flags = {});
+        void move_card(card *c, pocket_type pocket, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
+        card *draw_card_to(pocket_type pocket, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
+        card *draw_phase_one_card_to(pocket_type pocket, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
         card *phase_one_drawn_card();
 
         card *draw_shop_card();
