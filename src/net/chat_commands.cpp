@@ -175,7 +175,7 @@ namespace banggame {
             target_card->owner = target;
 
             target->m_game->add_update<game_update_type::add_cards>(make_id_vector(std::views::single(target_card)), pocket_type::player_character, target);
-            target->m_game->set_card_visibility(target_card, nullptr, {}, true);
+            target->m_game->set_card_visibility(target_card, nullptr, card_visibility::shown, true);
 
             target->reset_max_hp();
             target->enable_equip(target_card);

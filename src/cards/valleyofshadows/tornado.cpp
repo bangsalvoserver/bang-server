@@ -39,7 +39,6 @@ namespace banggame {
     };
     
     void effect_tornado::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
-        // ignore flags ... why would you ever play escape vs tornado?
-        target->m_game->queue_request<request_tornado>(origin_card, origin, target);
+        target->m_game->queue_request<request_tornado>(origin_card, origin, target, flags);
     }
 }
