@@ -148,7 +148,20 @@ namespace banggame {
 
     card *game_table::draw_shop_card() {
         if (m_shop_deck.empty()) {
-            throw std::runtime_error("Shop deck is empty");
+            if (m_shop_discards.empty()) {
+                throw std::runtime_error("Shop deck is empty. Cannot reshuffle");
+            }
+            m_shop_deck = std::move(m_shop_discards);
+            m_shop_discards.clear();
+            for (card *c : m_shop_deck) {
+                c->pocket = pocket_type::shop_deck;
+                c->owner = nullptr;
+                c->visibility = card_visibility::hidden;
+            }
+            shuffle_cards_and_ids(m_shop_deck);
+            add_log("LOG_SHOP_RESHUFFLED");
+            play_sound(nullptr, "shuffle");
+            add_update<game_update_type::deck_shuffled>(pocket_type::shop_deck);
         }
         card *drawn_card = m_shop_deck.back();
         add_log("LOG_DRAWN_SHOP_CARD", drawn_card);
@@ -159,17 +172,6 @@ namespace banggame {
                     set_card_visibility(c, nullptr, card_visibility::shown, true);
                 }
             }
-        }
-        if (m_shop_deck.empty()) {
-            m_shop_deck = std::move(m_shop_discards);
-            for (card *c : m_shop_deck) {
-                c->pocket = pocket_type::shop_deck;
-                c->owner = nullptr;
-                c->visibility = card_visibility::hidden;
-            }
-            m_shop_discards.clear();
-            shuffle_cards_and_ids(m_shop_deck);
-            add_update<game_update_type::deck_shuffled>(pocket_type::shop_deck);
         }
         return drawn_card;
     }
