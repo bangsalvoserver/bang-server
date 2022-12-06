@@ -13,7 +13,9 @@ namespace banggame {
     game_string play_card_verify::verify_modifiers() const {
         auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
         for (card *mod_card : modifiers) {
-            if (card *disabler = origin->m_game->get_disabler(mod_card)) {
+            if (mod_card->modifier == card_modifier_type::none) {
+                return "ERROR_INVALID_MODIFIER_CARD";
+            } else if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return {"ERROR_CARD_DISABLED_BY", mod_card, disabler};
             } else if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, mod_card, game_string{})) {
                 return error;
@@ -176,6 +178,9 @@ namespace banggame {
     game_string play_card_verify::verify_card_targets() const {
         auto &effects = is_response ? origin_card->responses : origin_card->effects;
 
+        if (origin_card->modifier != card_modifier_type::none) {
+            return "ERROR_INVALID_MODIFIER_CARD";
+        }
         if (effects.empty()) {
             return "ERROR_EFFECT_LIST_EMPTY";
         }
