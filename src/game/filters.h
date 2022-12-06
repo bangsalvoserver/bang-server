@@ -143,7 +143,15 @@ namespace banggame {
             return filter_impl::get_card_deck(target) == card_deck_type::goldrush
                 && filter_impl::get_card_pocket(target) == pocket_type::hidden_deck;
         case card_modifier_type::belltower:
-            return filter_impl::get_card_pocket(target) != pocket_type::button_row;
+            switch (filter_impl::get_card_pocket(target)) {
+            case pocket_type::player_hand:
+            case pocket_type::shop_selection:
+                return filter_impl::get_card_color(target) == card_color_type::brown;
+            case pocket_type::button_row:
+                return false;
+            default:
+                return true;
+            }
         default:
             return true;
         }
