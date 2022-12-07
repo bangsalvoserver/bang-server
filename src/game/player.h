@@ -107,7 +107,7 @@ namespace banggame {
 
         void enable_equip(card *target_card);
         void disable_equip(card *target_card);
-
+        
         card *random_hand_card();
 
         void add_cubes(card *target, int ncubes);
@@ -152,7 +152,13 @@ namespace banggame {
         
         void discard_all(discard_all_reason reason);
 
-        bool only_black_cards_equipped() const;
+        bool only_black_cards_equipped() const {
+            return empty_hand() && std::ranges::all_of(m_table, &card::is_black);
+        }
+
+        bool empty_hand() const {
+            return m_hand.empty();
+        }
 
         void next_predraw_check();
 

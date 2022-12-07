@@ -53,6 +53,10 @@ namespace banggame {
         short buy_cost() const {
             return get_tag_value(tag_type::buy_cost).value_or(0);
         }
+
+        bool is_black() const {
+            return color == card_color_type::black;
+        }
     )
 
     struct all_cards_t {

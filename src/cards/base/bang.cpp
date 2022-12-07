@@ -75,7 +75,7 @@ namespace banggame {
     }
 
     bool request_bang::auto_resolve() {
-        return (target->m_hand.empty() || unavoidable) && auto_respond();
+        return (target->empty_hand() || unavoidable) && auto_respond();
     }
 
     void request_bang::on_update() {

@@ -106,7 +106,7 @@ namespace banggame {
             target->m_game->add_short_pause(card);
             target->m_game->move_card(card, pocket_type::shop_discard);
         };
-        if (card->color == card_color_type::black) {
+        if (card->is_black()) {
             if (!target->m_game->check_flags(game_flags::disable_equipping)) {
                 auto equip_set = target->make_equip_set(card);
                 if (equip_set.empty()) {

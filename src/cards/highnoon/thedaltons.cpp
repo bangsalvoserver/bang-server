@@ -34,9 +34,9 @@ namespace banggame {
     };
 
     void equip_thedaltons::on_enable(card *target_card, player *target) {
-        for (player &p : range_all_players(target)) {
-            if (std::ranges::find(p.m_table, card_color_type::blue, &card::color) != p.m_table.end()) {
-                p.m_game->queue_request<request_thedaltons>(target_card, &p);
+        for (player *p : range_all_players(target)) {
+            if (std::ranges::find(p->m_table, card_color_type::blue, &card::color) != p->m_table.end()) {
+                p->m_game->queue_request<request_thedaltons>(target_card, p);
             }
         }
     }

@@ -3,10 +3,6 @@
 #include "game/game.h"
 
 namespace banggame {
-    
-    inline bool is_non_black(card *target_card) {
-        return target_card->color != card_color_type::black;
-    }
 
     inline void steal_card(player *origin, player *target, card *target_card) {
         if (target_card->visibility != card_visibility::shown) {
@@ -29,7 +25,7 @@ namespace banggame {
         bool can_pick(card *target_card) const override {
             return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
                 && target_card->owner == origin
-                && target_card->color != card_color_type::black;
+                && !target_card->is_black();
         }
 
         void on_pick(card *target_card) override {
@@ -44,16 +40,16 @@ namespace banggame {
                 card *next_origin_card = nullptr;
                 do {
                     ++next_target;
-                    next_origin_card = get_vulture_sam(next_target);
-                } while (next_target == origin || !next_origin_card);
-                target->m_game->queue_request_front<request_multi_vulture_sam>(next_origin_card, origin, next_target);
+                    next_origin_card = get_vulture_sam(*next_target);
+                } while (*next_target == origin || !next_origin_card);
+                target->m_game->queue_request_front<request_multi_vulture_sam>(next_origin_card, origin, *next_target);
             }
         }
 
         bool auto_resolve() override {
             if (auto_pick()) {
                 return true;
-            } else if (std::ranges::all_of(origin->m_table, [](card *c) { return c->color == card_color_type::black; })) {
+            } else if (std::ranges::all_of(origin->m_table, &card::is_black)) {
                 on_pick(origin->m_hand.front());
                 return true;
             } else {
@@ -85,15 +81,15 @@ namespace banggame {
             player_iterator it{target};
             do {
                 ++it;
-                if (get_vulture_sam(it)) {
-                    range_targets.push_back(it);
+                if (get_vulture_sam(*it)) {
+                    range_targets.push_back(*it);
                 }
             } while (--count != 0);
             if (range_targets.size() == 1) {
-                while (auto non_black_cards = target->m_table | std::views::filter(is_non_black)) {
+                while (auto non_black_cards = target->m_table | std::views::filter(std::not_fn(&card::is_black))) {
                     steal_card(origin, target, non_black_cards.front());
                 }
-                while (!target->m_hand.empty()) {
+                while (!target->empty_hand()) {
                     steal_card(origin, target, target->m_hand.front());
                 }
             } else if (!range_targets.empty() && range_targets.front() == origin) {

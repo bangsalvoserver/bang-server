@@ -18,7 +18,9 @@ namespace banggame {
         std::default_random_engine rng;
 
         util::id_map<card> m_cards;
-        util::id_map<player> m_players;
+        util::id_map<player> m_player_map;
+
+        std::vector<player *> m_players;
         
         std::vector<card *> m_deck;
         std::vector<card *> m_discards;
@@ -50,6 +52,7 @@ namespace banggame {
         
         card *find_card(int card_id) const;
         player *find_player(int player_id) const;
+        player *find_player_by_userid(int user_id) const;
         
         std::vector<card *> &get_pocket(pocket_type pocket, player *owner = nullptr);
 

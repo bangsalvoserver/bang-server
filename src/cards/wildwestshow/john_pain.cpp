@@ -4,8 +4,8 @@
 
 namespace banggame {
 
-    static card *get_john_pain(player &target) {
-        return target.m_game->call_event<event_type::verify_card_taker>(&target, equip_type::john_pain, nullptr);
+    static card *get_john_pain(player *target) {
+        return target->m_game->call_event<event_type::verify_card_taker>(target, equip_type::john_pain, nullptr);
     }
     
     void equip_john_pain::on_enable(card *target_card, player *player_end) {
@@ -18,7 +18,7 @@ namespace banggame {
             player_end->m_game->queue_action([=]{
                 if (drawn_card->pocket != pocket_type::player_hand
                     && std::none_of(player_iterator(player_begin), player_iterator(player_end), get_john_pain)
-                    && get_john_pain(*player_end))
+                    && get_john_pain(player_end))
                 {
                     player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, drawn_card);
                     player_end->m_game->move_card(drawn_card, pocket_type::player_hand, player_end);

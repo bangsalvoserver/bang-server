@@ -172,7 +172,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
     }
     auto &lobby = (*user->second.in_lobby)->second;
 
-    if (ranges_contains(lobby.game.m_players, user->second.user_id, &player::user_id)) {
+    if (lobby.game.find_player_by_userid(user->second.user_id)) {
         return "ERROR_USER_CONTROLLING_PLAYER";
     }
 
@@ -199,9 +199,9 @@ void game_manager::kick_user_from_lobby(user_ptr user) {
     auto &lobby = lobby_it->second;
     user->second.in_lobby.reset();
 
-    if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
-        it->user_id = 0;
-        broadcast_message_lobby<server_message_type::game_update>(lobby, lobby.game.make_update<game_update_type::player_user>(&*it, 0));
+    if (player *p = lobby.game.find_player_by_userid(user->second.user_id)) {
+        p->user_id = 0;
+        broadcast_message_lobby<server_message_type::game_update>(lobby, lobby.game.make_update<game_update_type::player_user>(p, 0));
     }
     
     broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user->second.user_id);
@@ -371,11 +371,11 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
         return "ERROR_LOBBY_NOT_PLAYING";
     }
 
-    if (auto it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id); it != lobby.game.m_players.end()) {
+    if (player *p = lobby.game.find_player_by_userid(user->second.user_id)) {
         if (auto error = enums::visit_indexed([&]<game_action_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
-            return it->handle_action(tag, FWD(args) ...);
+            return p->handle_action(tag, FWD(args) ...);
         }, json::deserialize<banggame::game_action>(value, lobby.game.context()))) {
-            lobby.game.add_update<game_update_type::game_error>(update_target::includes_private(&*it), std::move(error));
+            lobby.game.add_update<game_update_type::game_error>(update_target::includes_private(p), std::move(error));
         }
     } else {
         return "ERROR_USER_NOT_CONTROLLING_PLAYER";
@@ -398,21 +398,13 @@ void lobby::send_updates(game_manager &mgr) {
 void lobby::start_game(game_manager &mgr) {
     mgr.broadcast_message_lobby<server_message_type::game_started>(*this);
 
-    auto user_players = users | std::views::filter([](const team_user_pair &pair) {
-        return pair.first == lobby_team::game_player;
-    });
-    
-    std::vector<player *> ids;
-    for (const auto &_ : user_players) {
-        ids.push_back(&game.m_players.emplace(&game, int(game.m_players.first_available_id())));
-    }
-    std::ranges::shuffle(ids, game.rng);
-
-    auto it = user_players.begin();
-    for (player *p : ids) {
-        p->user_id = it->second->second.user_id;
-        ++it;
+    std::vector<int> user_ids;
+    for (const team_user_pair &pair : users) {
+        if (pair.first == lobby_team::game_player) {
+            user_ids.push_back(pair.second->second.user_id);
+        }
     }
 
+    game.add_players(user_ids);
     game.start_game(options);
 }

@@ -12,10 +12,17 @@ namespace banggame {
     }
 
     player *game_table::find_player(int player_id) const {
-        if (auto it = m_players.find(player_id); it != m_players.end()) {
+        if (auto it = m_player_map.find(player_id); it != m_player_map.end()) {
             return &*it;
         }
         throw std::runtime_error(fmt::format("server.find_player: ID {} not found", player_id));
+    }
+
+    player *game_table::find_player_by_userid(int user_id) const {
+        if (auto it = std::ranges::find(m_players, user_id, &player::user_id); it != m_players.end()) {
+            return *it;
+        }
+        return nullptr;
     }
     
     std::vector<card *> &game_table::get_pocket(pocket_type pocket, player *owner) {
@@ -214,9 +221,9 @@ namespace banggame {
             }
         };
 
-        for (auto &p : m_players) {
-            std::ranges::for_each(p.m_table, disable_if_new);
-            std::ranges::for_each(p.m_characters, disable_if_new);
+        for (player *p : m_players) {
+            std::ranges::for_each(p->m_table, disable_if_new);
+            std::ranges::for_each(p->m_characters, disable_if_new);
         }
 
         m_disablers.emplace(std::make_pair(key, std::move(fun)));
@@ -235,9 +242,9 @@ namespace banggame {
             }
         };
 
-        for (auto &p : m_players) {
-            std::ranges::for_each(p.m_table, enable_if_old);
-            std::ranges::for_each(p.m_characters, enable_if_old);
+        for (player *p : m_players) {
+            std::ranges::for_each(p->m_table, enable_if_old);
+            std::ranges::for_each(p->m_characters, enable_if_old);
         }
 
         m_disablers.erase(key);

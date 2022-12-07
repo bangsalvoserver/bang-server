@@ -15,7 +15,7 @@ namespace banggame {
         : request_timer(request, request->target->m_game->m_options.escape_timer_ms) {}
 
     bool request_targeting::auto_resolve() {
-        return (origin == target_card->owner || target->m_hand.empty() || !target->can_escape(origin, origin_card, flags))
+        return (origin == target_card->owner || target->empty_hand() || !target->can_escape(origin, origin_card, flags))
             && auto_respond();
     }
 

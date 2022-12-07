@@ -10,7 +10,7 @@ namespace banggame {
         using request_targeting::request_targeting;
 
         bool auto_resolve() override {
-            return target->m_hand.empty() && auto_respond();
+            return target->empty_hand() && auto_respond();
         }
 
         void on_resolve_target() override {

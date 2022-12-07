@@ -4,8 +4,8 @@
 
 namespace banggame {
 
-    static card *get_gary_looter(player &target) {
-        return target.m_game->call_event<event_type::verify_card_taker>(&target, equip_type::gary_looter, nullptr);
+    static card *get_gary_looter(player *target) {
+        return target->m_game->call_event<event_type::verify_card_taker>(target, equip_type::gary_looter, nullptr);
     }
 
     void equip_gary_looter::on_enable(card *target_card, player *player_end) {

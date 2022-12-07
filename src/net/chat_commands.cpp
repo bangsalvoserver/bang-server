@@ -115,9 +115,8 @@ namespace banggame {
     std::string game_manager::command_give_card(user_ptr user, std::string_view name) {
         auto &lobby = (*user->second.in_lobby)->second;
 
-        auto player_it = std::ranges::find(lobby.game.m_players, user->second.user_id, &player::user_id);
-        if (player_it == lobby.game.m_players.end()) return "ERROR_USER_NOT_CONTROLLING_PLAYER";
-        player *target = &*player_it;
+        player *target = lobby.game.find_player_by_userid(user->second.user_id);
+        if (!target) return "ERROR_USER_NOT_CONTROLLING_PLAYER";
 
         if (lobby.game.locked()) {
             return "ERROR_CANNOT_GIVE_CARD";

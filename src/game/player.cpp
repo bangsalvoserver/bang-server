@@ -84,9 +84,7 @@ namespace banggame {
     }
 
     void player::discard_card(card *target) {
-        move_owned_card(this, target, target->color == card_color_type::black
-            ? pocket_type::shop_discard
-            : pocket_type::discard_pile);
+        move_owned_card(this, target, target->is_black() ? pocket_type::shop_discard : pocket_type::discard_pile);
     }
 
     void player::steal_card(card *target) {
@@ -421,12 +419,6 @@ namespace banggame {
 
             m_characters.resize(1);
         }
-    }
-
-    bool player::only_black_cards_equipped() const {
-        return std::ranges::all_of(m_table, [](card *c) {
-            return c->color == card_color_type::black;
-        }) && m_hand.empty();
     }
 
     void player::set_role(player_role role) {

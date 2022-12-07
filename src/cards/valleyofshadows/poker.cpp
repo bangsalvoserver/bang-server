@@ -91,9 +91,7 @@ namespace banggame {
     };
 
     game_string effect_poker::on_prompt(card *origin_card, player *origin) {
-        if (std::ranges::all_of(range_other_players(origin), [](const player &p) {
-            return p.m_hand.empty();
-        })) {
+        if (std::ranges::all_of(range_other_players(origin), &player::empty_hand)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
         return {};
@@ -101,9 +99,9 @@ namespace banggame {
 
     void effect_poker::on_play(card *origin_card, player *origin) {
         std::vector<player *> targets;
-        for (player &p : range_other_players(origin)) {
-            if (!p.m_hand.empty()) {
-                targets.push_back(&p);
+        for (player *p : range_other_players(origin)) {
+            if (!p->empty_hand()) {
+                targets.push_back(p);
             }
         }
 

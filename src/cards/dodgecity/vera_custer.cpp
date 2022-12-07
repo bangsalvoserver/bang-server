@@ -38,7 +38,7 @@ namespace banggame {
 
         bool auto_resolve() override {
             if (target->m_game->num_alive() == 2) {
-                on_pick(std::next(player_iterator(target))->m_characters.front());
+                on_pick((*std::next(player_iterator(target)))->m_characters.front());
                 return true;
             } else {
                 return false;

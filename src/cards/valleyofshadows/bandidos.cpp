@@ -30,7 +30,7 @@ namespace banggame {
             auto lock = target->m_game->lock_updates(true);
             target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->discard_card(target_card);
-            if (!target->m_hand.empty()) {
+            if (!target->empty_hand()) {
                 target->m_game->queue_request_front<request_discard>(origin_card, origin, target);
             }
         }

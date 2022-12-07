@@ -9,9 +9,9 @@ namespace banggame {
             | std::views::filter(&player::alive)
             | std::views::transform(&player::m_hp));
         
-        for (player &p : range_all_players(target)) {
-            if (p.m_hp == min_hp) {
-                p.heal(1);
+        for (player *p : range_all_players(target)) {
+            if (p->m_hp == min_hp) {
+                p->heal(1);
             }
         }
     }

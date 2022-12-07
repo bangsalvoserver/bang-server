@@ -9,7 +9,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
 
         player *get_next_target() const {
-            return std::next(player_iterator(target),
+            return *std::next(player_iterator(target),
                 target->m_game->num_alive() - int(target->m_game->m_selection.size()));
         }
 

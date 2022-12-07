@@ -40,9 +40,9 @@ namespace banggame {
     void equip_youl_grinner::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player *origin) {
             if (target == origin) {
-                for (player &p : range_other_players(target)) {
-                    if (p.m_hand.size() > target->m_hand.size()) {
-                        target->m_game->queue_request<request_youl_grinner>(target_card, target, &p);
+                for (player *p : range_other_players(target)) {
+                    if (p->m_hand.size() > target->m_hand.size()) {
+                        target->m_game->queue_request<request_youl_grinner>(target_card, target, p);
                     }
                 }
             }

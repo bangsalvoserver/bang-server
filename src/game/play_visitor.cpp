@@ -77,9 +77,9 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::players>::verify() {
-        for (player &target : range_all_players(verifier.origin)) {
-            if (!check_player_filter(verifier.origin, effect.player_filter, &target)) {
-                if (game_string error = effect.verify(verifier.origin_card, verifier.origin, &target)) {
+        for (player *target : range_all_players(verifier.origin)) {
+            if (!check_player_filter(verifier.origin, effect.player_filter, target)) {
+                if (game_string error = effect.verify(verifier.origin_card, verifier.origin, target)) {
                     return error;
                 }
             }
@@ -93,9 +93,9 @@ namespace banggame {
 
     template<> game_string play_visitor<target_type::players>::prompt() {
         game_string msg;
-        for (player &target : range_all_players(verifier.origin)) {
-            if (!check_player_filter(verifier.origin, effect.player_filter, &target)) {
-                msg = effect.on_prompt(verifier.origin_card, verifier.origin, &target);
+        for (player *target : range_all_players(verifier.origin)) {
+            if (!check_player_filter(verifier.origin, effect.player_filter, target)) {
+                msg = effect.on_prompt(verifier.origin_card, verifier.origin, target);
                 if (!msg) break;
             }
         }
@@ -104,9 +104,9 @@ namespace banggame {
 
     template<> void play_visitor<target_type::players>::play() {
         std::vector<player *> targets;
-        for (player &target : range_all_players(verifier.origin)) {
-            if (!check_player_filter(verifier.origin, effect.player_filter, &target)) {
-                targets.push_back(&target);
+        for (player *target : range_all_players(verifier.origin)) {
+            if (!check_player_filter(verifier.origin, effect.player_filter, target)) {
+                targets.push_back(target);
             }
         }
 
@@ -239,10 +239,10 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::cards_other_players>::verify(const std::vector<not_null<card *>> &target_cards) {
-        if (!std::ranges::all_of(verifier.origin->m_game->m_players | std::views::filter(&player::alive), [&](const player &p) {
-            size_t found = std::ranges::count(target_cards, &p, &card::owner);
-            if (p.m_hand.empty() && p.m_table.empty()) return found == 0;
-            if (&p == verifier.origin) return found == 0;
+        if (!std::ranges::all_of(verifier.origin->m_game->m_players | std::views::filter(&player::alive), [&](player *p) {
+            size_t found = std::ranges::count(target_cards, p, &card::owner);
+            if (p->only_black_cards_equipped()) return found == 0;
+            if (p == verifier.origin) return found == 0;
             else return found == 1;
         })) {
             return "ERROR_INVALID_TARGETS";

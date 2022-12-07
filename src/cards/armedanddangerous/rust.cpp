@@ -31,7 +31,7 @@ namespace banggame {
         request_timer *timer() override { return &m_timer; }
 
         bool auto_resolve() override {
-            return (target->m_hand.empty() || !target->can_escape(origin, origin_card, flags))
+            return (target->empty_hand() || !target->can_escape(origin, origin_card, flags))
                 && auto_respond();
         }
 

@@ -11,19 +11,17 @@ class player_iterator_base {
 public:
     using iterator_category = std::bidirectional_iterator_tag;
     using difference_type = int;
-    using value_type = player;
-    using pointer = player *;
-    using reference = player &;
+    using value_type = player *;
+    using pointer = player **;
+    using reference = player *;
 
     player_iterator_base() = default;
-    explicit player_iterator_base(pointer p);
+    explicit player_iterator_base(player *p);
 
     reference operator *() const { return *m_it; }
     pointer operator ->() { return &*m_it; }
 
-    operator pointer () const { return &*m_it; }
-
-    bool operator == (pointer p) const { return pointer(*this) == p; }
+    bool operator == (const player_iterator_base &other) const = default;
 
 protected:
     decltype(game_table::m_players)::iterator m_it;
@@ -55,7 +53,7 @@ class cycle_player_iterator : public player_iterator_base {
 public:
     cycle_player_iterator() = default;
 
-    explicit cycle_player_iterator(pointer p, int cycle = 0)
+    explicit cycle_player_iterator(player *p, int cycle = 0)
         : player_iterator_base(p), m_cycle(cycle) {}
 
     cycle_player_iterator &operator++();

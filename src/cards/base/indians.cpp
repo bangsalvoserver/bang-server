@@ -13,7 +13,7 @@ namespace banggame {
         }
 
         bool auto_resolve() override {
-            return target->m_hand.empty() && auto_respond();
+            return target->empty_hand() && auto_respond();
         }
 
         bool can_pick(card *target_card) const override {

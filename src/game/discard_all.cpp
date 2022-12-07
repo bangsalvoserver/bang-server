@@ -1,10 +1,6 @@
 #include "game.h"
 
 namespace banggame {
-    
-    inline bool is_non_black(card *target_card) {
-        return target_card->color != card_color_type::black;
-    }
 
     inline void discard_card(player *target, card *target_card) {
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
@@ -21,7 +17,7 @@ namespace banggame {
         bool can_pick(card *target_card) const override {
             return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
                 && target_card->owner == target
-                && target_card->color != card_color_type::black;
+                && !target_card->is_black();
         }
 
         void on_pick(card *target_card) override {
@@ -35,7 +31,7 @@ namespace banggame {
 
         bool auto_resolve() override {
             if (target->m_game->m_options.auto_discard_all
-                || (std::ranges::count_if(target->m_table, is_non_black) + target->m_hand.size()) <= 1)
+                || (std::ranges::count_if(target->m_table, std::not_fn(&card::is_black)) + target->m_hand.size()) <= 1)
             {
                 on_resolve();
                 return true;
@@ -45,10 +41,10 @@ namespace banggame {
 
         void on_resolve() override {
             auto lock = target->m_game->lock_updates(true);
-            for (card *c : to_vector(target->m_table | std::views::filter(is_non_black))) {
+            for (card *c : to_vector(target->m_table | std::views::filter(std::not_fn(&card::is_black)))) {
                 discard_card(target, c);
             }
-            while (!target->m_hand.empty()) {
+            while (!target->empty_hand()) {
                 discard_card(target, target->m_hand.front());
             }
             while (!target->m_table.empty()) {

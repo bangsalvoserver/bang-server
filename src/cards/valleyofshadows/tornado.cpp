@@ -13,7 +13,7 @@ namespace banggame {
         }
 
         bool auto_resolve() override {
-            if (target->m_hand.empty()) {
+            if (target->empty_hand()) {
                 auto lock = target->m_game->lock_updates(true);
                 target->draw_card(2, origin_card);
                 return true;

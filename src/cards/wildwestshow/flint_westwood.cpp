@@ -7,7 +7,7 @@ namespace banggame {
     void handler_flint_westwood::on_play(card *origin_card, player *origin, card *chosen_card, card *target_card) {
         auto target = target_card->owner;
 
-        for (int i=2; i && !target->m_hand.empty(); --i) {
+        for (int i=2; i && !target->empty_hand(); --i) {
             card *stolen_card = target->random_hand_card();
             if (stolen_card->visibility != card_visibility::shown) {
                 target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", origin, target, stolen_card);
