@@ -12,8 +12,8 @@ public:
     using iterator_category = std::bidirectional_iterator_tag;
     using difference_type = int;
     using value_type = player *;
-    using pointer = player **;
-    using reference = player *;
+    using pointer = value_type *;
+    using reference = value_type &;
 
     player_iterator_base() = default;
     explicit player_iterator_base(player *p);

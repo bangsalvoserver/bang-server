@@ -116,6 +116,15 @@ namespace banggame {
         (int, num_players)
     )
 
+    DEFINE_STRUCT(player_order_update,
+        (std::vector<serial::player>, players)
+        (bool, instant),
+
+        auto get_duration() const {
+            return instant ? 0ms : 1000ms;
+        }
+    )
+
     DEFINE_STRUCT(player_user_update,
         (serial::player, player)
         (int, user_id)
@@ -225,6 +234,7 @@ namespace banggame {
         (short_pause, short_pause_update)
         (last_played_card, serial::opt_card)
         (player_add, player_add_update)
+        (player_order, player_order_update)
         (player_user, player_user_update)
         (player_remove, player_remove_update)
         (player_hp, player_hp_update)

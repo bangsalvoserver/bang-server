@@ -12,6 +12,7 @@ namespace banggame {
 
     util::generator<Json::Value> game::get_spectator_updates() {
         co_yield make_update<game_update_type::player_add>(int(m_players.size()));
+        co_yield make_update<game_update_type::player_order>(to_vector_not_null(m_players), true);
 
         for (player *p : m_players) {
             co_yield make_update<game_update_type::player_user>(p, p->user_id);
