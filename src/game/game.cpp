@@ -115,8 +115,9 @@ namespace banggame {
     void game::add_players(std::span<int> user_ids) {
         std::ranges::shuffle(user_ids, rng);
 
+        int player_id = 0;
         for (int id : user_ids) {
-            m_players.emplace_back(&m_player_map.emplace(this, int(m_player_map.first_available_id())))->user_id = id;
+            m_players.emplace_back(&m_player_map.emplace(this, ++player_id))->user_id = id;
         }
     }
 
