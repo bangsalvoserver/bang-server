@@ -27,15 +27,16 @@ namespace banggame {
     };
     
     struct card : card_data {
+        card(int id, const card_data &data): card_data(data), id(id) {}
+        
         int id;
+
+        player *owner = nullptr;
+        pocket_type pocket = pocket_type::none;
+        card_visibility visibility = card_visibility::hidden;
         
         bool inactive = false;
-
         int8_t num_cubes = 0;
-
-        pocket_type pocket = pocket_type::none;
-        player *owner = nullptr;
-        card_visibility visibility = card_visibility::hidden;
 
         void on_equip(player *target) {
             for (auto &e : equips) {

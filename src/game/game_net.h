@@ -14,9 +14,11 @@
 namespace banggame {
 
     inline std::vector<card_backface> make_id_vector(std::ranges::range auto &&range) {
-        return to_vector(range | std::views::transform([](const card *c) {
-            return card_backface{c->id, c->deck};
-        }));
+        struct make_card_backface {
+            auto operator()(const card &c) const { return card_backface{c.id, c.deck}; }
+            auto operator()(const card *c) const { return (*this)(*c); }
+        };
+        return to_vector(std::ranges::transform_view(FWD(range), make_card_backface{}));
     }
 
     class update_target {

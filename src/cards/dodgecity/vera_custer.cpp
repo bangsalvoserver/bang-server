@@ -7,29 +7,22 @@ namespace banggame {
     static void copy_characters(player *origin, player *target) {
         origin->remove_extra_characters();
 
-        std::ranges::for_each(
-            target->m_characters
-                | std::views::reverse
-                | std::views::take(2)
-                | std::views::reverse,
-            [origin](card *target_card) {
-                origin->m_game->add_log("LOG_COPY_CHARACTER", origin, target_card);
-                
-                auto card_copy = std::make_unique<card>(static_cast<const card_data &>(*target_card));
-                card_copy->id = int(origin->m_game->m_context.cards.first_available_id());
-                card_copy->pocket = pocket_type::player_character;
-                card_copy->owner = origin;
-                card_copy->tags.push_back(tag_holder{ .type = tag_type::temp_card });
+        for (card *target_card : target->m_characters | std::views::reverse | std::views::take(2) | std::views::reverse) {
+            origin->m_game->add_log("LOG_COPY_CHARACTER", origin, target_card);
+            
+            card *new_card = &origin->m_game->m_context.cards.emplace(int(origin->m_game->m_context.cards.first_available_id()), *target_card);
+            new_card->pocket = pocket_type::player_character;
+            new_card->owner = origin;
+            
+            new_card->tags.push_back(tag_holder{ .type = tag_type::temp_card });
+            
+            origin->m_characters.emplace_back(new_card);
+            new_card->on_enable(origin);
 
-                card *new_card = origin->m_game->m_context.cards.insert(std::move(card_copy)).get();
-                
-                origin->m_characters.emplace_back(new_card);
-                new_card->on_enable(origin);
-
-                origin->m_game->add_update<game_update_type::add_cards>(
-                    make_id_vector(std::views::single(new_card)), pocket_type::player_character, origin);
-                origin->m_game->set_card_visibility(new_card, nullptr, card_visibility::shown, true);
-            });
+            origin->m_game->add_update<game_update_type::add_cards>(
+                make_id_vector(std::views::single(new_card)), pocket_type::player_character, origin);
+            origin->m_game->set_card_visibility(new_card, nullptr, card_visibility::shown, true);
+        }
     }
 
     struct request_vera_custer : request_base {
