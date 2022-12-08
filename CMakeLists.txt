@@ -167,6 +167,7 @@ set(bangserver_srcs
 
     src/game/card_serial.cpp
     src/game/discard_all.cpp
+    src/game/durations.cpp
     src/game/filters.cpp
     src/game/holders.cpp
     src/game/game.cpp

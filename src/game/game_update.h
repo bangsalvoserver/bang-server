@@ -2,6 +2,7 @@
 #define __GAME_UPDATE_H__
 
 #include "card_data.h"
+#include "durations.h"
 
 namespace banggame {
 
@@ -31,7 +32,7 @@ namespace banggame {
         (bool, instant),
 
         auto get_duration() const {
-            return instant ? 0ms : 333ms;
+            return instant ? 0ms : durations::move_card;
         }
     )
 
@@ -46,7 +47,7 @@ namespace banggame {
         (serial::opt_card, target_card),
         
         auto get_duration() const {
-            return num_cubes == 1 ? 133ms : 250ms;
+            return num_cubes == 1 ? durations::move_cube : durations::move_cubes;
         }
     )
 
@@ -54,7 +55,7 @@ namespace banggame {
         (serial::player, player),
 
         auto get_duration() const {
-            return 333ms;
+            return durations::move_card;
         }
     )
 
@@ -62,7 +63,7 @@ namespace banggame {
         (pocket_type, pocket),
 
         auto get_duration() const {
-            return 1333ms;
+            return durations::deck_shuffle;
         }
     )
 
@@ -72,7 +73,7 @@ namespace banggame {
         (bool, instant),
 
         auto get_duration() const {
-            return instant ? 0ms : 167ms;
+            return instant ? 0ms : durations::flip_card;
         }
     )
 
@@ -82,7 +83,7 @@ namespace banggame {
         bool skip_count = false;
 
         auto get_duration() const {
-            return (instant || skip_count) ? 0ms : 167ms;
+            return (instant || skip_count) ? 0ms : durations::flip_card;
         }
     )
 
@@ -92,7 +93,7 @@ namespace banggame {
         (bool, instant),
 
         auto get_duration() const {
-            return instant ? 0ms : 167ms;
+            return instant ? 0ms : durations::tap_card;
         }
     )
 
@@ -100,7 +101,7 @@ namespace banggame {
         (serial::card, card),
 
         auto get_duration() const {
-            return 167ms;
+            return durations::flash_card;
         }
     )
 
@@ -108,7 +109,7 @@ namespace banggame {
         (serial::opt_card, card),
 
         auto get_duration() const {
-            return 333ms;
+            return durations::short_pause;
         }
     )
 
@@ -121,7 +122,7 @@ namespace banggame {
         (bool, instant),
 
         auto get_duration() const {
-            return instant ? 0ms : 1000ms;
+            return instant ? 0ms : durations::move_player;
         }
     )
 
@@ -135,7 +136,7 @@ namespace banggame {
         (bool, instant),
 
         auto get_duration() const {
-            return instant ? 0ms : 1000ms;
+            return instant ? 0ms : durations::move_player;
         }
     )
 
@@ -145,7 +146,7 @@ namespace banggame {
         (bool, instant),
 
         auto get_duration() const {
-            return instant ? 0ms : 333ms;
+            return instant ? 0ms : durations::player_hp;
         }
     )
 
@@ -160,7 +161,7 @@ namespace banggame {
         (bool, instant),
 
         auto get_duration() const {
-            return instant ? 0ms : 167ms;
+            return instant ? 0ms : durations::flip_card;
         }
     )
 
