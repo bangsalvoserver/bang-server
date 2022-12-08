@@ -9,6 +9,8 @@
 #include "game_string.h"
 #include "game_update.h"
 
+#include "utils/id_map.h"
+
 namespace banggame {
 
     inline std::vector<card_backface> make_id_vector(std::ranges::range auto &&range) {
@@ -67,13 +69,33 @@ namespace banggame {
         }
     };
 
-    template<typename Context>
+    struct game_context {
+        util::id_map<card> cards;
+        util::id_map<player> players;
+
+        card *find_card(int card_id) const {
+            if (auto it = cards.find(card_id); it != cards.end()) {
+                return &*it;
+            }
+            throw std::runtime_error(fmt::format("server.find_card: ID {} not found", card_id));
+        }
+
+        player *find_player(int player_id) const {
+            if (auto it = players.find(player_id); it != players.end()) {
+                return &*it;
+            }
+            throw std::runtime_error(fmt::format("server.find_player: ID {} not found", player_id));
+        }
+    };
+
     struct game_net_manager {
         std::deque<std::tuple<update_target, Json::Value, ticks>> m_updates;
         std::deque<std::pair<update_target, game_string>> m_saved_log;
 
-        const Context &context() const {
-            return static_cast<const Context &>(*this);
+        game_context m_context;
+
+        const game_context &context() const {
+            return m_context;
         }
 
         template<game_update_type E>

@@ -122,7 +122,7 @@ namespace banggame {
             return "ERROR_CANNOT_GIVE_CARD";
         }
 
-        auto card_it = std::ranges::find_if(lobby.game.m_cards, [&](const card &target_card) {
+        auto card_it = std::ranges::find_if(lobby.game.m_context.cards, [&](const card &target_card) {
             if (std::ranges::equal(name, target_card.name, {}, toupper, toupper)) {
                 switch (target_card.deck) {
                 case card_deck_type::main_deck:
@@ -139,7 +139,7 @@ namespace banggame {
             }
             return false;
         });
-        if (card_it == lobby.game.m_cards.end()) return "ERROR_CANNOT_FIND_CARD";
+        if (card_it == lobby.game.m_context.cards.end()) return "ERROR_CANNOT_FIND_CARD";
         card *target_card = &*card_it;
         
         switch (target_card->deck) {

@@ -176,7 +176,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
         return "ERROR_USER_CONTROLLING_PLAYER";
     }
 
-    player *target = lobby.game.find_player(value.player_id);
+    player *target = lobby.game.context().find_player(value.player_id);
     if (!target || target->user_id != 0) {
         return "ERROR_INVALID_REJOIN_TARGET";
     }

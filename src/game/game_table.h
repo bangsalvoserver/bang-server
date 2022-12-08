@@ -8,17 +8,12 @@
 #include "game_net.h"
 #include "events.h"
 
-#include "utils/id_map.h"
-
 namespace banggame {
 
     using card_disabler_fun = std::function<bool(card *)>;
 
-    struct game_table : game_net_manager<game_table> {
+    struct game_table : game_net_manager {
         std::default_random_engine rng;
-
-        util::id_map<card> m_cards;
-        util::id_map<player> m_player_map;
 
         std::vector<player *> m_players;
         
@@ -50,8 +45,6 @@ namespace banggame {
             rng.seed(rd());
         }
         
-        card *find_card(int card_id) const;
-        player *find_player(int player_id) const;
         player *find_player_by_userid(int user_id) const;
         
         std::vector<card *> &get_pocket(pocket_type pocket, player *owner = nullptr);

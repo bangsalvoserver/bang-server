@@ -409,7 +409,7 @@ namespace banggame {
                 disable_equip(character);
                 
                 if (character->has_tag(tag_type::temp_card)) {
-                    m_game->m_cards.erase(character->id);
+                    m_game->m_context.cards.erase(character->id);
                 } else {
                     character->pocket = pocket_type::none;
                     character->owner = nullptr;

@@ -6,7 +6,7 @@ namespace banggame {
     
     void equip_greygory_deck::on_equip(card *target_card, player *target) {
         std::vector<card *> base_characters;
-        for (card &c : target->m_game->m_cards) {
+        for (card &c : target->m_game->m_context.cards) {
             if (c.expansion == card_expansion_type{}
                 && (c.pocket == pocket_type::none
                 || (c.pocket == pocket_type::player_character && c.owner == target)))

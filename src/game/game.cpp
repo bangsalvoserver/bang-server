@@ -21,7 +21,7 @@ namespace banggame {
             }
         }
         
-        co_yield make_update<game_update_type::add_cards>(make_id_vector(m_cards | std::views::transform([](const card &c) { return &c; })), pocket_type::hidden_deck);
+        co_yield make_update<game_update_type::add_cards>(make_id_vector(m_context.cards | std::views::transform([](const card &c) { return &c; })), pocket_type::hidden_deck);
 
         auto move_cards = [&](auto &&range) -> util::generator<Json::Value> {
             for (card *c : range) {
@@ -118,7 +118,9 @@ namespace banggame {
 
         int player_id = 0;
         for (int id : user_ids) {
-            m_players.emplace_back(&m_player_map.emplace(this, ++player_id))->user_id = id;
+            player &p = m_context.players.emplace(this, ++player_id);
+            p.user_id = id;
+            m_players.emplace_back(&p);
         }
     }
 
@@ -145,12 +147,14 @@ namespace banggame {
                 if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;;
                 if ((c.expansion & m_options.expansions) != c.expansion) continue;
 
-                card copy(c);
-                copy.id = int(m_cards.first_available_id());
-                copy.owner = nullptr;
-                copy.pocket = pocket;
-                copy.visibility = card_visibility::hidden;
-                auto *new_card = &m_cards.emplace(std::move(copy));
+                card *new_card = m_context.cards.insert([&]{
+                    auto copy = std::make_unique<card>(c);
+                    copy->id = int(m_context.cards.first_available_id());
+                    copy->owner = nullptr;
+                    copy->pocket = pocket;
+                    copy->visibility = card_visibility::hidden;
+                    return copy;
+                }()).get();
 
                 out_pocket->push_back(new_card);
                 ++count;
