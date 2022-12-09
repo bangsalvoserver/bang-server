@@ -2,6 +2,8 @@
 #include <iostream>
 #include <signal.h>
 
+#include <cxxopts.hpp>
+
 #include "wsbang.h"
 
 volatile bool g_stop = false;
@@ -11,13 +13,29 @@ int main(int argc, char **argv) {
 
     banggame::bang_server server(ctx);
 
+    cxxopts::Options options(argv[0], "Bang! Server");
+
     uint16_t port = banggame::default_server_port;
-    if (argc > 1) {
-        auto [ptr, ec] = std::from_chars(argv[1], argv[1] + strlen(argv[1]), port);
-        if (ec != std::errc{}) {
-            std::cerr << "Port must be a number" << std::endl;
-            return 1;
+
+    options.add_options()
+        ("port",        "",                 cxxopts::value(port))
+        ("cheats",      "Enable Cheats",    cxxopts::value(server.m_mgr.options().enable_cheats))
+        ("h,help",      "Print Help")
+    ;
+
+    options.positional_help("Port Number");
+    options.parse_positional({"port"});
+
+    try {
+        auto results = options.parse(argc, argv);
+
+        if (results.count("help")) {
+            std::cout << options.help() << std::endl;
+            return 0;
         }
+    } catch (const cxxopts::argument_incorrect_type &error) {
+        std::cout << "Invalid arguments: " << error.what() << "\n";
+        return 1;
     }
 
     if (server.start(port)) {

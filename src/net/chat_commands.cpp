@@ -14,7 +14,7 @@ namespace banggame {
     static constexpr std::string_view KICK_DESCRIPTION = "[userid] : kick an user in this lobby";
     static constexpr std::string_view GET_OPTIONS_DESCRIPTION = "print game options";
     static constexpr std::string_view SET_OPTION_DESCRIPTION = "[name] [value] : set a game option";
-    static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card (cheat)";
+    static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
     static constexpr std::string_view SET_TEAM_DESCRIPTION = "[game_player / game_spectator] : set team";
 
     const std::map<std::string, chat_command, std::less<>> chat_command::commands {
@@ -29,8 +29,10 @@ namespace banggame {
 
     std::string game_manager::command_print_help(user_ptr user) {
         for (const auto &[cmd_name, command] : chat_command::commands) {
-            send_message<server_message_type::lobby_chat>(user->first, 0,
-                fmt::format("{}{} : {}", chat_command::start_char, cmd_name, command.description()));
+            if (!bool(command.permissions() & command_permissions::game_cheat) || m_options.enable_cheats) {
+                send_message<server_message_type::lobby_chat>(user->first, 0,
+                    fmt::format("{}{} : {}", chat_command::start_char, cmd_name, command.description()));
+            }
         }
         return {};
     }

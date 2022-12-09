@@ -188,6 +188,7 @@ set(bangserver_srcs
 add_subdirectory(external/cpputils)
 
 find_package(Threads REQUIRED)
+find_package(cxxopts REQUIRED)
 
 add_library(networking INTERFACE)
 target_link_libraries(networking INTERFACE asio Threads::Threads)
@@ -216,7 +217,7 @@ target_include_directories(bangcommon INTERFACE src)
 target_link_libraries(bangcommon INTERFACE cpputils networking)
 
 add_executable(bangserver ${bangserver_srcs})
-target_link_libraries(bangserver PUBLIC bang_cards_obj bangcommon)
+target_link_libraries(bangserver PUBLIC bang_cards_obj bangcommon cxxopts::cxxopts)
 target_compile_definitions(bangserver PRIVATE BUILD_BANG_SERVER)
 
 option(BUILD_GAME_RELEASE "Build Game Release" OFF)

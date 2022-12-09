@@ -15,6 +15,10 @@ using send_message_function = std::function<void(client_handle, server_message)>
 using print_error_function = std::function<void(const std::string &message)>;
 using kick_client_function = std::function<void(client_handle, const std::string &message)>;
 
+struct server_options {
+    bool enable_cheats = false;
+};
+
 class game_manager {
 public:
     void set_send_message_function(send_message_function &&fun) {
@@ -73,6 +77,8 @@ public:
         }
     }
 
+    server_options &options() { return m_options; }
+
 private:
     void kick_user_from_lobby(user_ptr user);
 
@@ -101,6 +107,8 @@ private:
 private:
     user_map users;
     lobby_map m_lobbies;
+
+    server_options m_options;
 
     int m_lobby_counter = 0;
     int m_user_counter = 0;

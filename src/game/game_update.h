@@ -206,7 +206,6 @@ namespace banggame {
 
     DEFINE_STRUCT(game_options,
         (card_expansion_type, expansions)
-        (bool, enable_cheats)
         (bool, character_choice, true)
         (bool, can_play_beer_in_duel, true)
         (bool, auto_discard_all)
