@@ -2,15 +2,17 @@
 
 namespace banggame::durations {
 
-    const std::chrono::milliseconds move_cube{ 133 };
-    const std::chrono::milliseconds move_cubes{ 250 };
-    const std::chrono::milliseconds move_card{ 333 };
-    const std::chrono::milliseconds deck_shuffle{ 1333 };
-    const std::chrono::milliseconds flip_card{ 167 };
-    const std::chrono::milliseconds tap_card{ 167 };
-    const std::chrono::milliseconds flash_card{ 167 };
-    const std::chrono::milliseconds short_pause{ 333 };
-    const std::chrono::milliseconds move_player{ 1000 };
-    const std::chrono::milliseconds player_hp{ 333 };
+    using namespace std::chrono_literals;
+
+    duration_type move_cube =       133ms;
+    duration_type move_cubes =      250ms;
+    duration_type move_card =       333ms;
+    duration_type deck_shuffle =    1333ms;
+    duration_type flip_card =       167ms;
+    duration_type tap_card =        167ms;
+    duration_type flash_card =      167ms;
+    duration_type short_pause =     333ms;
+    duration_type move_player =     1000ms;
+    duration_type player_hp =       333ms;
 
 }

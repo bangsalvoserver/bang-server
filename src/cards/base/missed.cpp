@@ -14,7 +14,9 @@ namespace banggame {
 
     game_string effect_missed_base::on_prompt(card *origin_card, player *origin) {
         if (auto *req = origin->m_game->top_request_if<request_bang>(origin)) {
-            if (origin->m_game->make_request_update(origin).respond_cards.size() <= + req->bang_strength) {
+            if (req->bang_strength > std::ranges::count_if(origin->m_game->make_request_update(origin).respond_cards, [](card *c) {
+                return c->pocket != pocket_type::button_row;
+            })) {
                 return {"PROMPT_BANG_STRENGTH", req->bang_strength};
             }
         }

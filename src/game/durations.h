@@ -5,16 +5,18 @@
 
 namespace banggame::durations {
 
-    extern const std::chrono::milliseconds move_cube;
-    extern const std::chrono::milliseconds move_cubes;
-    extern const std::chrono::milliseconds move_card;
-    extern const std::chrono::milliseconds deck_shuffle;
-    extern const std::chrono::milliseconds flip_card;
-    extern const std::chrono::milliseconds tap_card;
-    extern const std::chrono::milliseconds flash_card;
-    extern const std::chrono::milliseconds short_pause;
-    extern const std::chrono::milliseconds move_player;
-    extern const std::chrono::milliseconds player_hp;
+    using duration_type = const std::chrono::milliseconds;
+
+    extern duration_type move_cube;
+    extern duration_type move_cubes;
+    extern duration_type move_card;
+    extern duration_type deck_shuffle;
+    extern duration_type flip_card;
+    extern duration_type tap_card;
+    extern duration_type flash_card;
+    extern duration_type short_pause;
+    extern duration_type move_player;
+    extern duration_type player_hp;
 
 }
 
