@@ -19,7 +19,7 @@ namespace banggame {
 
     void equip_al_preacher::on_enable(card *target_card, player *p) {
         p->m_game->add_listener<event_type::on_equip_card>(target_card, [=](player *origin, player *target, card *equipped_card) {
-            if (p != origin && (equipped_card->color == card_color_type::blue || equipped_card->color == card_color_type::orange)) {
+            if (p != origin && (equipped_card->is_blue() || equipped_card->is_orange())) {
                 if (p->count_cubes() >= 2) {
                     p->m_game->queue_request<request_al_preacher>(target_card, origin, p);
                 }

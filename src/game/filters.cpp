@@ -53,7 +53,7 @@ namespace banggame::filter_impl {
     }
 
     bool is_cube_slot(card *target) {
-        return target == target->owner->m_characters.front() || target->color == card_color_type::orange;
+        return target == target->owner->m_characters.front() || target->is_orange();
     }
 
     bool card_has_tag(card *target, tag_type type) {

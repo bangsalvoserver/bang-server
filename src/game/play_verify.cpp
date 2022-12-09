@@ -130,7 +130,7 @@ namespace banggame {
         if (card *equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};
         }
-        if (origin_card->color == card_color_type::orange && origin->m_game->num_cubes < 3) {
+        if (origin_card->is_orange() && origin->m_game->num_cubes < 3) {
             return "ERROR_NOT_ENOUGH_CUBES";
         }
         return {};
@@ -355,7 +355,7 @@ namespace banggame {
                     do_play_card();
                     origin->set_last_played_card(nullptr);
                 });
-            } else if (origin_card->color == card_color_type::brown) {
+            } else if (origin_card->is_brown()) {
                 if (game_string error = verify_card_targets()) {
                     return error;
                 }
@@ -377,7 +377,7 @@ namespace banggame {
                         origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", origin_card, origin, target);
                     }
                     target->equip_card(origin_card);
-                    if (origin_card->color == card_color_type::green) {
+                    if (origin_card->is_green()) {
                         origin_card->inactive = true;
                         origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
                     }
@@ -427,7 +427,7 @@ namespace banggame {
             if (origin->m_gold < cost) {
                 return "ERROR_NOT_ENOUGH_GOLD";
             }
-            if (origin_card->color == card_color_type::brown) {
+            if (origin_card->is_brown()) {
                 if (game_string error = verify_card_targets()) {
                     return error;
                 }

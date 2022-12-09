@@ -252,12 +252,12 @@ namespace banggame {
             m_game->call_event<event_type::on_play_hand_card>(this, origin_card);
             break;
         case pocket_type::player_table:
-            if (origin_card->color == card_color_type::green) {
+            if (origin_card->is_green()) {
                 m_game->move_card(origin_card, pocket_type::discard_pile);
             }
             break;
         case pocket_type::shop_selection:
-            if (origin_card->color == card_color_type::brown) {
+            if (origin_card->is_brown()) {
                 m_game->move_card(origin_card, pocket_type::shop_discard);
             }
             break;
@@ -469,5 +469,15 @@ namespace banggame {
                 m_table.end(),
                 0, std::plus(),
                 std::mem_fn(&card::num_cubes));
+    }
+
+    util::generator<card *> player::cube_slots() const {
+        for (card *c : m_table) {
+            if (c->is_orange()) {
+                co_yield c;
+            }
+        }
+        
+        co_yield m_characters.front();
     }
 }

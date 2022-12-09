@@ -54,9 +54,11 @@ namespace banggame {
             return get_tag_value(tag_type::buy_cost).value_or(0);
         }
 
-        bool is_black() const {
-            return color == card_color_type::black;
-        }
+        bool is_brown() const { return color == card_color_type::brown; }
+        bool is_blue() const { return color == card_color_type::blue; }
+        bool is_green() const { return color == card_color_type::green; }
+        bool is_black() const { return color == card_color_type::black; }
+        bool is_orange() const { return color == card_color_type::orange; }
     )
 
     struct all_cards_t {

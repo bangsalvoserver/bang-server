@@ -11,9 +11,9 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_equip_card>(nullptr, [](player *origin, player *target, card *origin_card) {
-            if (origin_card->color == card_color_type::blue) {
+            if (origin_card->is_blue()) {
                 effect_add_cube{1}.on_play(origin_card, origin);
-            } else if (origin_card->color == card_color_type::orange) {
+            } else if (origin_card->is_orange()) {
                 origin->add_cubes(origin_card, 3);
             }
         });

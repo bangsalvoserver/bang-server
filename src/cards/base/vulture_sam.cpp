@@ -86,8 +86,8 @@ namespace banggame {
                 }
             } while (--count != 0);
             if (range_targets.size() == 1) {
-                while (auto non_black_cards = target->m_table | std::views::filter(std::not_fn(&card::is_black))) {
-                    steal_card(origin, target, non_black_cards.front());
+                for (card *target_card : to_vector(target->m_table | std::views::filter(std::not_fn(&card::is_black)))) {
+                    steal_card(origin, target, target_card);
                 }
                 while (!target->empty_hand()) {
                     steal_card(origin, target, target->m_hand.front());

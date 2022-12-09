@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "game_update.h"
+#include "utils/generator.h"
 
 namespace banggame {
 
@@ -190,6 +191,8 @@ namespace banggame {
         bool check_player_flags(player_flags flags) const;
 
         int count_cubes() const;
+
+        util::generator<card *> cube_slots() const;
 
         void untap_inactive_cards();
         void remove_extra_characters();

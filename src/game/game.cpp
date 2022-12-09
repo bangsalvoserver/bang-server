@@ -297,6 +297,10 @@ namespace banggame {
         });
     }
 
+    void game::tick() {
+        request_queue::tick();
+    }
+
     request_status_args game::make_request_update(player *owner) {
         const auto &req = top_request();
         return request_status_args {
@@ -315,12 +319,12 @@ namespace banggame {
                         });
                     };
 
-                    add_cards(owner->m_hand | std::views::filter([](card *c) { return c->color == card_color_type::brown; }));
+                    add_cards(owner->m_hand | std::views::filter(&card::is_brown));
                     add_cards(owner->m_table | std::views::filter(std::not_fn(&card::inactive)));
                     add_cards(owner->m_characters);
                     add_cards(m_scenario_cards | std::views::reverse | std::views::take(1));
                     add_cards(m_button_row);
-                    add_cards(m_shop_selection | std::views::filter([](card *c) { return c->color == card_color_type::brown; }));
+                    add_cards(m_shop_selection | std::views::filter(&card::is_brown));
                 }
                 return ret;
             }(),

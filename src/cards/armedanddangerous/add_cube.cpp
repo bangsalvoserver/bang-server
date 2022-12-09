@@ -12,28 +12,19 @@ namespace banggame {
         int ncubes = 1;
 
         bool auto_resolve() override {
-            int nslots = max_cubes - target->m_characters.front()->num_cubes;
-            int ncards = nslots > 0;
-            for (card *c : target->m_table) {
-                if (c->color == card_color_type::orange) {
-                    ncards += c->num_cubes < max_cubes;
-                    nslots += max_cubes - c->num_cubes;
-                }
+            int nslots = 0;
+            int ncards = 0;
+            for (card *c : target->cube_slots()) {
+                ncards += c->num_cubes < max_cubes;
+                nslots += max_cubes - c->num_cubes;
             }
 
             if (nslots <= ncubes || ncards <= 1) {
-                auto do_add_cubes = [&](card *c) {
+                auto lock = target->m_game->lock_updates(true);
+                for (card *c : target->cube_slots()) {
                     int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes);
                     ncubes -= cubes_to_add;
                     target->add_cubes(c, cubes_to_add);
-                };
-
-                auto lock = target->m_game->lock_updates(true);
-                do_add_cubes(target->m_characters.front());
-                for (card *c : target->m_table) {
-                    if (c->color == card_color_type::orange) {
-                        do_add_cubes(c);
-                    }
                 }
 
                 return true;
@@ -43,7 +34,7 @@ namespace banggame {
         
         bool can_pick(card *target_card) const override {
             if (target_card->owner == target) {
-                if (target_card->pocket == pocket_type::player_table && target_card->color == card_color_type::orange) {
+                if (target_card->pocket == pocket_type::player_table && target_card->is_orange()) {
                     return target_card->num_cubes < max_cubes;
                 } else if (target_card->pocket == pocket_type::player_character) {
                     return target->m_characters.front()->num_cubes < max_cubes;
@@ -88,11 +79,9 @@ namespace banggame {
     };
 
     game_string effect_add_cube::on_prompt(card *origin_card, player *origin) {
-        auto has_full_cubes = [](card *target) {
-            return target->pocket == pocket_type::player_table && target->color != card_color_type::orange
-                || target->num_cubes == max_cubes;
-        };
-        if (has_full_cubes(origin->m_characters.front()) && std::ranges::all_of(origin->m_table, has_full_cubes)) {
+        if (std::ranges::all_of(origin->cube_slots(), [](card *target) {
+            return target->num_cubes == max_cubes;
+        })) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
             return {};

@@ -22,6 +22,8 @@ namespace banggame {
         void add_players(std::span<int> user_ids);
         void start_game(const game_options &options);
 
+        void tick();
+
         request_status_args make_request_update(player *p);
 
         void send_request_status_clear();

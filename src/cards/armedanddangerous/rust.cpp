@@ -5,11 +5,7 @@
 namespace banggame {
 
     static void resolve_rust(card *origin_card, player *origin, player *target) {
-        auto view = target->m_table | std::views::filter([](card *c){ return c->color == card_color_type::orange; });
-        std::vector<card *> orange_cards{view.begin(), view.end()};
-        
-        orange_cards.push_back(target->m_characters.front());
-        for (card *c : orange_cards) {
+        for (card *c : to_vector(target->cube_slots())) {
             target->move_cubes(c, origin->m_characters.front(), 1);
         }
     }

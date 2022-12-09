@@ -15,7 +15,7 @@ namespace banggame {
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::player_table
                 && target_card->owner == target
-                && target_card->color == card_color_type::blue;
+                && target_card->is_blue();
         }
 
         void on_pick(card *target_card) override {
@@ -35,7 +35,7 @@ namespace banggame {
 
     void equip_thedaltons::on_enable(card *target_card, player *target) {
         for (player *p : range_all_players(target)) {
-            if (std::ranges::find(p->m_table, card_color_type::blue, &card::color) != p->m_table.end()) {
+            if (std::ranges::any_of(p->m_table, &card::is_blue)) {
                 p->m_game->queue_request<request_thedaltons>(target_card, p);
             }
         }

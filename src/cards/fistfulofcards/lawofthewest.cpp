@@ -10,7 +10,7 @@ namespace banggame {
                 reveal = true;
                 event_card_key key{target_card, 1};
 
-                if (drawn_card->color != card_color_type::brown || !drawn_card->effects.empty()) {
+                if (!drawn_card->is_brown() || !drawn_card->effects.empty()) {
                     origin->m_game->add_listener<event_type::post_draw_cards>(key, [=](player *p) {
                         if (p == origin) {
                             origin->m_game->add_log("LOG_MANDATORY_CARD", origin, drawn_card);
@@ -18,7 +18,7 @@ namespace banggame {
                     });
                 }
                 
-                if (drawn_card->color == card_color_type::brown) {
+                if (drawn_card->is_brown()) {
                     origin->m_game->add_listener<event_type::verify_pass_turn>(key, [=](player *p, game_string &out_error) {
                         if (p == origin && drawn_card->owner == origin && origin->is_possible_to_play(drawn_card)) {
                             out_error = {"ERROR_MANDATORY_CARD", drawn_card};

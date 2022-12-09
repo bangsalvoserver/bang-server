@@ -36,7 +36,7 @@ namespace banggame {
 
     template<> void play_visitor<target_type::player>::play(player *target) {
         auto flags = effect_flags::single_target;
-        if (verifier.origin_card->color == card_color_type::brown) {
+        if (verifier.origin_card->is_brown()) {
             flags |= effect_flags::escapable;
         }
         if (!target->immune_to(verifier.origin_card, verifier.origin, flags)) {
@@ -114,7 +114,7 @@ namespace banggame {
         if (targets.size() == 1) {
             flags |= effect_flags::single_target;
         }
-        if (verifier.origin_card->color == card_color_type::brown) {
+        if (verifier.origin_card->is_brown()) {
             flags |= effect_flags::escapable;
         }
 
@@ -151,7 +151,7 @@ namespace banggame {
 
     template<> void play_visitor<target_type::card>::play(card *target) {
         auto flags = effect_flags::single_target;
-        if (verifier.origin_card->color == card_color_type::brown) {
+        if (verifier.origin_card->is_brown()) {
             flags |= effect_flags::escapable;
         }
         if (target->owner == verifier.origin) {
@@ -274,7 +274,7 @@ namespace banggame {
 
     template<> void play_visitor<target_type::cards_other_players>::play(const std::vector<not_null<card *>> &target_cards) {
         auto flags = effect_flags::multi_target;
-        if (verifier.origin_card->color == card_color_type::brown) {
+        if (verifier.origin_card->is_brown()) {
             flags |= effect_flags::escapable;
         }
         if (target_cards.size() == 1) {
