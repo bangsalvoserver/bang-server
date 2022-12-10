@@ -248,7 +248,7 @@ namespace banggame {
         if (m_options.character_choice) {
             for (player *p : m_players) {
                 while (!p->m_characters.empty()) {
-                    move_card(p->m_characters.front(), pocket_type::player_hand, p, card_visibility::shown, true);
+                    move_card(p->first_character(), pocket_type::player_hand, p, card_visibility::shown, true);
                 }
             }
             for (player *p : range_all_players(m_first_player)) {
@@ -256,11 +256,11 @@ namespace banggame {
             }
         } else {
             for (player *p : m_players) {
-                add_log("LOG_CHARACTER_CHOICE", p, p->m_characters.front());
-                set_card_visibility(p->m_characters.front(), nullptr, card_visibility::shown, true);
+                add_log("LOG_CHARACTER_CHOICE", p, p->first_character());
+                set_card_visibility(p->first_character(), nullptr, card_visibility::shown, true);
                 p->reset_max_hp();
                 p->set_hp(p->m_max_hp, true);
-                p->m_characters.front()->on_enable(p);
+                p->first_character()->on_enable(p);
 
                 move_card(p->m_characters.back(), pocket_type::player_backup, p, card_visibility::hidden, true);
             }
@@ -271,7 +271,7 @@ namespace banggame {
             play_sound(nullptr, "gamestart");
 
             for (player *p : m_players) {
-                p->m_characters.front()->on_equip(p);
+                p->first_character()->on_equip(p);
             }
 
             for (player *p : range_all_players(m_first_player,

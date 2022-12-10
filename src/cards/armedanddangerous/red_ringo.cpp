@@ -5,12 +5,12 @@
 namespace banggame {
     
     void equip_red_ringo::on_equip(card *target_card, player *target) {
-        target->add_cubes(target->m_characters.front(), max_cubes);
+        target->add_cubes(target->first_character(), max_cubes);
     }
 
     game_string handler_red_ringo::verify(card *origin_card, player *origin, const target_list &targets) {
-        if (origin->m_characters.front()->num_cubes < targets.size()) {
-            return {"ERROR_NOT_ENOUGH_CUBES_ON", origin->m_characters.front()};
+        if (origin->first_character()->num_cubes < targets.size()) {
+            return {"ERROR_NOT_ENOUGH_CUBES_ON", origin->first_character()};
         }
         for (const auto &target : targets) {
             card *target_card = target.get<target_type::card>();
@@ -23,7 +23,7 @@ namespace banggame {
 
     void handler_red_ringo::on_play(card *origin_card, player *origin, const target_list &targets) {
         for (const auto &target : targets) {
-            origin->move_cubes(origin->m_characters.front(), target.get<target_type::card>(), 1);
+            origin->move_cubes(origin->first_character(), target.get<target_type::card>(), 1);
         }
     }
 }

@@ -31,7 +31,8 @@ namespace banggame {
 
         bool auto_resolve() override {
             if (target->m_game->num_alive() == 2) {
-                on_pick((*std::next(player_iterator(target)))->m_characters.front());
+                auto lock = target->m_game->lock_updates(true);
+                copy_characters(target, *std::next(player_iterator(target)));
                 return true;
             } else {
                 return false;

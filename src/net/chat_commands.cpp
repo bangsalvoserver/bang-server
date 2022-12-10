@@ -159,7 +159,7 @@ namespace banggame {
                 target->disable_equip(c);
             }
 
-            card *old_character = target->m_characters.front();
+            card *old_character = target->first_character();
             int ncubes = old_character->num_cubes;
 
             target->pay_cubes(old_character, ncubes);

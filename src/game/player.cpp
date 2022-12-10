@@ -433,7 +433,7 @@ namespace banggame {
     }
 
     void player::reset_max_hp() {
-        m_max_hp = m_characters.front()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
+        m_max_hp = first_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
     }
 
     void player::send_player_status() {
@@ -463,21 +463,11 @@ namespace banggame {
     }
 
     int player::count_cubes() const {
-        return m_characters.front()->num_cubes
+        return first_character()->num_cubes
             + std::transform_reduce(
                 m_table.begin(),
                 m_table.end(),
                 0, std::plus(),
                 std::mem_fn(&card::num_cubes));
-    }
-
-    util::generator<card *> player::cube_slots() const {
-        for (card *c : m_table) {
-            if (c->is_orange()) {
-                co_yield c;
-            }
-        }
-        
-        co_yield m_characters.front();
     }
 }

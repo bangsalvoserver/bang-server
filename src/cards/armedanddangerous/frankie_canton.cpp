@@ -5,7 +5,7 @@
 namespace banggame {
 
     game_string effect_frankie_canton::verify(card *origin_card, player *origin, card *target_card) {
-        if (target_card == origin->m_characters.front()) {
+        if (target_card == origin->first_character()) {
             return "ERROR_TARGET_PLAYING_CARD";
         }
         if (target_card->num_cubes == 0) {
@@ -16,6 +16,6 @@ namespace banggame {
 
     void effect_frankie_canton::on_play(card *origin_card, player *origin, card *target_card) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target_card);
-        target_card->owner->move_cubes(target_card, origin->m_characters.front(), 1);
+        target_card->owner->move_cubes(target_card, origin->first_character(), 1);
     }
 }

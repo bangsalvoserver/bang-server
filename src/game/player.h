@@ -8,7 +8,7 @@
 #include <memory>
 
 #include "game_update.h"
-#include "utils/generator.h"
+#include "utils/concat_view.h"
 
 namespace banggame {
 
@@ -162,6 +162,10 @@ namespace banggame {
             return m_hand.empty();
         }
 
+        card *first_character() const {
+            return m_characters.front();
+        }
+
         void next_predraw_check();
 
         void set_role(player_role role);
@@ -192,7 +196,12 @@ namespace banggame {
 
         int count_cubes() const;
 
-        util::generator<card *> cube_slots() const;
+        auto cube_slots() const {
+            return util::concat_view(
+                std::ranges::filter_view(m_table, &card::is_orange),
+                std::ranges::single_view(first_character())
+            );
+        }
 
         void untap_inactive_cards();
         void remove_extra_characters();

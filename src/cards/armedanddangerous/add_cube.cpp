@@ -37,7 +37,7 @@ namespace banggame {
                 if (target_card->pocket == pocket_type::player_table && target_card->is_orange()) {
                     return target_card->num_cubes < max_cubes;
                 } else if (target_card->pocket == pocket_type::player_character) {
-                    return target->m_characters.front()->num_cubes < max_cubes;
+                    return target->first_character()->num_cubes < max_cubes;
                 }
             }
             return false;
@@ -47,7 +47,7 @@ namespace banggame {
             auto lock = target->m_game->lock_updates(--ncubes == 0);
             
             target->add_cubes(target_card->pocket == pocket_type::player_character
-                ? target->m_characters.front()
+                ? target->first_character()
                 : target_card, 1);
         }
         
