@@ -14,6 +14,9 @@ using namespace banggame;
 
 void game_manager::on_receive_message(client_handle client, const client_message &msg) {
     try {
+        if (m_options.verbose) {
+            std::cout << client.lock().get() << ": Received " << json::serialize(msg) << std::endl;
+        }
         auto error = enums::visit_indexed([&]<client_message_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
             if constexpr (requires { handle_message(tag, client, args ...); }) {
                 return handle_message(tag, client, FWD(args) ...);
@@ -28,7 +31,7 @@ void game_manager::on_receive_message(client_handle client, const client_message
             send_message<server_message_type::lobby_error>(client, std::move(error));
         }
     } catch (const std::exception &e) {
-        print_error(fmt::format("Error in game_manager: {}", e.what()));
+        std::cerr << fmt::format("Error in game_manager: {}", e.what()) << std::endl;
     }
 }
 

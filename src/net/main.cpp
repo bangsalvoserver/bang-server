@@ -20,6 +20,7 @@ int main(int argc, char **argv) {
     options.add_options()
         ("port",        "",                 cxxopts::value(port))
         ("cheats",      "Enable Cheats",    cxxopts::value(server.m_mgr.options().enable_cheats))
+        ("v,verbose",   "Verbose Logging",  cxxopts::value(server.m_mgr.options().verbose))
         ("h,help",      "Print Help")
     ;
 

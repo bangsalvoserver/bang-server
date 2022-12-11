@@ -24,10 +24,6 @@ namespace banggame {
                 this->push_message(con, std::move(msg));
             });
 
-            m_mgr.set_print_error_function([&](const std::string &msg) {
-                std::cerr << msg << '\n';
-            });
-
             m_mgr.set_kick_client_function([&](client_handle con, const std::string &msg) {
                 this->kick_client(con, msg);
             });

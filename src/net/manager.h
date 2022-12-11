@@ -12,21 +12,23 @@ server_message make_message(auto && ... args) {
 }
 
 using send_message_function = std::function<void(client_handle, server_message)>;
-using print_error_function = std::function<void(const std::string &message)>;
 using kick_client_function = std::function<void(client_handle, const std::string &message)>;
 
 struct server_options {
     bool enable_cheats = false;
+    bool verbose = false;
 };
 
 class game_manager {
 public:
-    void set_send_message_function(send_message_function &&fun) {
-        m_send_message = std::move(fun);
-    }
-
-    void set_print_error_function(print_error_function &&fun) {
-        m_print_error = std::move(fun);
+    template<std::invocable<client_handle, server_message> Function>
+    void set_send_message_function(Function &&fun) {
+        m_send_message = [this, fun=std::forward<Function>(fun)](client_handle hdl, server_message msg) {
+            if (m_options.verbose) {
+                std::cout << hdl.lock().get() << ": Sent " << json::serialize(msg) << std::endl;
+            }
+            std::invoke(fun, hdl, std::move(msg));
+        };
     }
 
     void set_kick_client_function(kick_client_function &&fun) {
@@ -62,12 +64,6 @@ public:
         auto msg = make_message<E>(FWD(args) ... );
         for (auto [team, it] : lobby.users) {
             m_send_message(it->first, msg);
-        }
-    }
-
-    void print_error(const std::string &message) {
-        if (m_print_error) {
-            m_print_error(message);
         }
     }
 
@@ -114,7 +110,6 @@ private:
     int m_user_counter = 0;
     
     send_message_function m_send_message;
-    print_error_function m_print_error;
     kick_client_function m_kick_client;
 
     friend struct lobby;
