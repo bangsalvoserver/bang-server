@@ -425,7 +425,7 @@ namespace banggame {
 
         if (killer && m_players.size() > 3) {
             queue_action([this, killer, target] {
-                if (target->m_role == player_role::outlaw) {
+                if (killer != target && target->m_role == player_role::outlaw) {
                     killer->draw_card(3);
                 } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
                     queue_action([this, killer] {
