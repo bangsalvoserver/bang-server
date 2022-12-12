@@ -165,7 +165,7 @@ set(bangserver_srcs
 
     src/cards/card_effect.cpp
 
-    src/game/bot_map.cpp
+    src/game/bot_ai.cpp
     src/game/card_serial.cpp
     src/game/discard_all.cpp
     src/game/durations.cpp

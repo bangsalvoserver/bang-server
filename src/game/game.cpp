@@ -121,9 +121,6 @@ namespace banggame {
             player &p = m_context.players.emplace(this, ++player_id);
             p.user_id = id;
             m_players.emplace_back(&p);
-            if (id == -1) {
-                m_bots.add(&p);
-            }
         }
     }
 
@@ -302,10 +299,8 @@ namespace banggame {
 
     void game::tick() {
         request_queue::tick();
-        if (!locked()) {
-            if (auto *bot = m_bots.find(m_playing)) {
-                bot->request_play();
-            }
+        if (m_playing && m_playing->user_id == -1) {
+            request_bot_play(m_playing, false);
         }
     }
 
@@ -375,8 +370,8 @@ namespace banggame {
         add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
 
         for (player *p : m_players) {
-            if (bot *b = m_bots.find(p)) {
-                b->request_play();
+            if (p->user_id == -1) {
+                request_bot_play(p, true);
             }
         }
     }

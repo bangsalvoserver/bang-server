@@ -1,39 +1,7 @@
-#include "bot_map.h"
-
 #include "game.h"
 #include "play_verify.h"
 
 namespace banggame {
-
-    struct bot_impl {
-        player *origin;
-
-        bot_impl(player *origin) : origin(origin) {}
-
-        void request_play();
-
-        void respond_to_request();
-
-        void play_in_turn();
-    };
-
-    bot::bot(player *origin) : m_pimpl(std::make_unique<bot_impl>(origin)) {}
-
-    bot::~bot() = default;
-
-    void bot::request_play() {
-        m_pimpl->request_play();
-    }
-
-    void bot_impl::request_play() {
-        if (!origin->m_game->check_flags(game_flags::game_over)) {
-            if (origin->m_game->pending_requests()) {
-                respond_to_request();
-            } else if (!origin->m_game->locked() && origin->m_game->m_playing == origin) {
-                play_in_turn();
-            }
-        }
-    }
 
     template<std::ranges::range Range, typename Rng>
     decltype(auto) random_element(Range &&range, Rng &rng) {
@@ -131,7 +99,7 @@ namespace banggame {
         return verifier;
     }
 
-    void bot_impl::respond_to_request() {
+    static void respond_to_request(player *origin) {
         auto update = origin->m_game->make_request_update(origin);
 
         if (!update.pick_cards.empty()) {
@@ -142,15 +110,8 @@ namespace banggame {
                     pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand),
                     true);
 
-                if (auto error = verifier.verify_and_play()) {
-                    std::cout << "bot error " << error.format_str << " on respond " 
-                        << verifier.origin_card->name << " "
-                        << json::serialize(verifier.targets, origin->m_game->context()) << "\n";
-                } else {
+                if (!verifier.verify_and_play()) {
                     if (auto &prompt = origin->m_prompt) {
-                        std::cout << "bot prompt " << prompt->second.format_str << " on respond " 
-                            << verifier.origin_card->name << " "
-                            << json::serialize(verifier.targets, origin->m_game->context()) << "\n";
                         auto lock = origin->m_game->lock_updates();
                         auto fun = std::move(prompt->first);
                         prompt.reset();
@@ -162,7 +123,7 @@ namespace banggame {
         } 
     }
 
-    void bot_impl::play_in_turn() {
+    static void play_in_turn(player *origin) {
         auto cards = to_vector(util::concat_view(
             std::views::all(origin->m_characters), std::views::all(origin->m_table), std::views::all(origin->m_hand))
             | std::views::filter([&](card *target_card){
@@ -178,21 +139,29 @@ namespace banggame {
         for (card *origin_card : cards) {
             auto verifier = generate_random_play(origin, origin_card, false);
 
-            if (auto error = verifier.verify_and_play()) {
-                std::cout << "bot error " << error.format_str << " on play "
-                    << verifier.origin_card->name << " "
-                    << json::serialize(verifier.targets, origin->m_game->context()) << "\n";
-            } else if (auto &prompt = origin->m_prompt) {
-                std::cout << "bot prompt " << prompt->second.format_str << " on play " 
-                    << verifier.origin_card->name << " "
-                    << json::serialize(verifier.targets, origin->m_game->context()) << "\n";
-                prompt.reset();
-            } else {
-                return;
+            if (!verifier.verify_and_play()) {
+                if (auto &prompt = origin->m_prompt) {
+                    prompt.reset();
+                } else {
+                    return;
+                }
             }
         }
 
         origin->pass_turn();
     }
 
+    void game::request_bot_play(player *origin, bool is_response) {
+        if (!origin->m_game->check_flags(game_flags::game_over)) {
+            if (is_response) {
+                if (origin->m_game->pending_requests()) {
+                    respond_to_request(origin);
+                }
+            } else {
+                if (!origin->m_game->locked() && origin->m_game->m_playing == origin) {
+                    play_in_turn(origin);
+                }
+            }
+        }
+    }
 }
