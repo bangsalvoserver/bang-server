@@ -298,7 +298,7 @@ namespace banggame {
     }
 
     void player::prompt_then(game_string &&message, std::function<void()> &&fun) {
-        if (user_id != -1 && message) {
+        if (message) {
             m_prompt.emplace(std::move(fun), message);
             m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(message));
         } else {
