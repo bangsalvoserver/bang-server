@@ -8,8 +8,8 @@ namespace banggame {
         request_youl_grinner(card *origin_card, player *origin, player *target)
             : request_base(origin_card, origin, target) {}
 
-        bool auto_resolve() override {
-            return auto_pick();
+        void on_update() override {
+            auto_pick();
         }
 
         bool can_pick(card *target_card) const override {

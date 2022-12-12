@@ -9,9 +9,11 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
         
         void on_update() override {
-            int ncards = target->get_cards_to_draw();
-            for (int i=0; i<ncards; ++i) {
-                target->m_game->move_card(target->m_game->phase_one_drawn_card(), pocket_type::selection, target);
+            if (!sent) {
+                int ncards = target->get_cards_to_draw();
+                for (int i=0; i<ncards; ++i) {
+                    target->m_game->move_card(target->m_game->phase_one_drawn_card(), pocket_type::selection, target);
+                }
             }
         }
 

@@ -8,8 +8,8 @@ namespace banggame {
         request_poker(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags) {}
 
-        bool auto_resolve() override {
-            return auto_pick();
+        void on_update() override {
+            auto_pick();
         }
 
         bool can_pick(card *target_card) const override {
@@ -38,35 +38,33 @@ namespace banggame {
         int num_cards = 2;
 
         void on_update() override {
+            if (sent) return;
+            
             for (card *target_card : target->m_game->m_selection) {
                 target->m_game->add_log("LOG_POKER_REVEAL", origin_card, target_card);
                 target->m_game->set_card_visibility(target_card);
             }
-            target->m_game->add_short_pause();
-        }
-
-        bool auto_resolve() override {
-            if (sent) return false;
             
             if (std::ranges::any_of(target->m_game->m_selection, [this](card *c) {
                 return target->get_card_sign(c).rank == card_rank::rank_A;
             })) {
                 auto lock = target->m_game->lock_updates(true);
+                target->m_game->add_short_pause();
                 target->m_game->add_log("LOG_POKER_ACE");
                 while (!target->m_game->m_selection.empty()) {
                     target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
                 }
-                return true;
             } else if (target->m_game->m_selection.size() <= 2) {
                 auto lock = target->m_game->lock_updates(true);
+                if (!target->m_game->m_selection.empty()) {
+                    target->m_game->add_short_pause();
+                }
                 while (!target->m_game->m_selection.empty()) {
                     card *drawn_card = target->m_game->m_selection.front();
                     target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
                     target->add_to_hand(drawn_card);
                 }
-                return true;
             }
-            return false;
         }
 
         void on_pick(card *target_card) override {

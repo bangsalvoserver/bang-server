@@ -74,15 +74,16 @@ namespace banggame {
         }
     }
 
-    bool request_bang::auto_resolve() {
-        return (target->empty_hand() || unavoidable) && auto_respond();
-    }
-
     void request_bang::on_update() {
-        if (bool(flags & effect_flags::multi_target)) {
-            target->m_game->play_sound(target, "gatling");
-        } else {
-            target->m_game->play_sound(target, "bang");
+        if (!sent) {
+            if (bool(flags & effect_flags::multi_target)) {
+                target->m_game->play_sound(target, "gatling");
+            } else {
+                target->m_game->play_sound(target, "bang");
+            }
+        }
+        if (target->empty_hand() || unavoidable) {
+            auto_respond();
         }
     }
 

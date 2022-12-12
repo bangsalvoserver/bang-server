@@ -369,10 +369,12 @@ namespace banggame {
         }
         add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
 
+        auto weak_ptr = top_request().weak_ptr();
         for (player *p : m_players) {
             if (p->user_id == -1) {
                 request_bot_play(p, true);
             }
+            if (weak_ptr.expired()) break;
         }
     }
     

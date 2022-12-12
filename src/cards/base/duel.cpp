@@ -12,11 +12,12 @@ namespace banggame {
         player *respond_to = nullptr;
 
         void on_update() override {
-            target->m_game->play_sound(target, "duel");
-        }
-
-        bool auto_resolve() override {
-            return target->empty_hand() && auto_respond();
+            if (!sent) {
+                target->m_game->play_sound(target, "duel");
+            }
+            if (target->empty_hand()) {
+                auto_respond();
+            }
         }
 
         bool can_pick(card *target_card) const override {

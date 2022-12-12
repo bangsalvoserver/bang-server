@@ -58,7 +58,6 @@ namespace banggame {
         request_draw(player *target)
             : request_base(nullptr, nullptr, target) {}
 
-        bool auto_resolve() override { return auto_pick(); }
         void on_update() override;
         bool can_pick(card *target_card) const override;
         void on_pick(card *target_card) override;

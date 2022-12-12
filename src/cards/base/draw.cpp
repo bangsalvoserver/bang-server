@@ -46,7 +46,10 @@ namespace banggame {
     }
     
     void request_draw::on_update() {
-        target->m_game->play_sound(target, "draw");
+        if (!sent) {
+            target->m_game->play_sound(target, "draw");
+        }
+        auto_pick();
     }
 
     bool request_draw::can_pick(card *target_card) const {

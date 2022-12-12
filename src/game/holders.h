@@ -83,16 +83,12 @@ namespace banggame {
             copy->on_pick(target_card);
         }
 
-        bool auto_resolve() {
-            auto copy = m_value;
-            return copy->auto_resolve();
-        }
-
         std::vector<card *> get_highlights() const {
             return m_value->get_highlights();
         }
 
         void on_update() {
+            auto copy = m_value;
             m_value->on_update();
         }
 
@@ -128,6 +124,10 @@ namespace banggame {
 
         template<typename T> bool is() const {
             return get_if<T>() != nullptr;
+        }
+
+        std::weak_ptr<request_base> weak_ptr() const {
+            return m_value;
         }
 
     private:

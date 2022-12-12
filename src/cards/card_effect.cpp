@@ -5,16 +5,14 @@
 
 namespace banggame {
 
-    bool request_base::auto_pick() {
+    void request_base::auto_pick() {
         auto update = target->m_game->make_request_update(target);
         if (update.pick_cards.size() == 1 && update.respond_cards.empty()) {
             on_pick(update.pick_cards.front());
-            return true;
         }
-        return false;
     }
 
-    bool request_base::auto_respond() {
+    void request_base::auto_respond() {
         auto update = target->m_game->make_request_update(target);
         if (update.pick_cards.empty() && update.respond_cards.size() == 1) {
             card *origin_card = update.respond_cards.front();
@@ -26,10 +24,8 @@ namespace banggame {
                 auto lock = target->m_game->lock_updates();
                 play_card_verify{target, origin_card, true,
                     target_list{origin_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
-                return true;
             }
         }
-        return false;
     }
 
     void request_timer::start() {

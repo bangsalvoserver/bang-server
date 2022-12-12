@@ -71,13 +71,12 @@ namespace banggame {
         virtual void on_pick(card *target_card) { throw std::runtime_error("missing on_pick(card)"); }
 
         virtual void on_update() {}
-        virtual bool auto_resolve() { return false; }
 
         virtual std::vector<card *> get_highlights() const { return {}; }
     
     protected:
-        bool auto_pick();
-        bool auto_respond();
+        void auto_pick();
+        void auto_respond();
     };
 
     class cleanup_request {

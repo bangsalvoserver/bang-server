@@ -26,17 +26,15 @@ namespace banggame {
         }
 
         void on_update() override {
-            target->untap_inactive_cards();
-        }
-
-        bool auto_resolve() override {
+            if (!sent) {
+                target->untap_inactive_cards();
+            }
+            
             if (target->m_game->m_options.auto_discard_all
                 || (std::ranges::count_if(target->m_table, std::not_fn(&card::is_black)) + target->m_hand.size()) <= 1)
             {
                 on_resolve();
-                return true;
             }
-            return false;
         }
 
         void on_resolve() override {

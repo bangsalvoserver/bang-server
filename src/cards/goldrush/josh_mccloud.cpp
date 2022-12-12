@@ -13,8 +13,8 @@ namespace banggame {
         
         card *target_card;
 
-        bool auto_resolve() override {
-            return auto_respond();
+        void on_update() override {
+            auto_respond();
         }
 
         game_string status_text(player *owner) const override {

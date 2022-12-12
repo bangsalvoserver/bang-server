@@ -26,9 +26,10 @@ namespace banggame {
         rust_timer m_timer{this};
         request_timer *timer() override { return &m_timer; }
 
-        bool auto_resolve() override {
-            return (target->empty_hand() || !target->can_escape(origin, origin_card, flags))
-                && auto_respond();
+        void on_update() override {
+            if (target->empty_hand() || !target->can_escape(origin, origin_card, flags)) {
+                auto_respond();
+            }
         }
 
         void on_resolve() override {

@@ -29,13 +29,10 @@ namespace banggame {
         request_vera_custer(card *origin_card, player *target)
             : request_base(origin_card, nullptr, target) {}
 
-        bool auto_resolve() override {
+        void on_update() override {
             if (target->m_game->num_alive() == 2) {
                 auto lock = target->m_game->lock_updates(true);
                 copy_characters(target, *std::next(player_iterator(target)));
-                return true;
-            } else {
-                return false;
             }
         }
         

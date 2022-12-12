@@ -9,10 +9,9 @@ namespace banggame {
 
         if (pending_requests()) {
             auto &req = top_request();
-            if (!req.is_sent()) {
-                req.on_update();
-            }
-            if (!req.auto_resolve()) {
+            auto weak_ptr = req.weak_ptr();
+            req.on_update();
+            if (!weak_ptr.expired()) {
                 req.start();
                 req.target()->m_game->send_request_update();
             }

@@ -37,7 +37,7 @@ namespace banggame {
         request_timer *timer() override { return &m_timer; }
 
         std::vector<card *> get_highlights() const override;
-        bool auto_resolve() override;
+        void on_update() override;
         void on_finished();
         game_string status_text(player *owner) const override;
     };
