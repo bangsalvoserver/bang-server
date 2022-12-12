@@ -121,6 +121,9 @@ namespace banggame {
             player &p = m_context.players.emplace(this, ++player_id);
             p.user_id = id;
             m_players.emplace_back(&p);
+            if (id == -1) {
+                m_bots.add(&p);
+            }
         }
     }
 
@@ -299,6 +302,11 @@ namespace banggame {
 
     void game::tick() {
         request_queue::tick();
+        if (!locked()) {
+            if (auto *bot = m_bots.find(m_playing)) {
+                bot->request_play();
+            }
+        }
     }
 
     request_status_args game::make_request_update(player *owner) {
@@ -365,6 +373,12 @@ namespace banggame {
             add_update<game_update_type::request_status>(update_target::includes_private(p), make_request_update(p));
         }
         add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
+
+        for (player *p : m_players) {
+            if (bot *b = m_bots.find(p)) {
+                b->request_play();
+            }
+        }
     }
     
     void game::draw_check_then(player *origin, card *origin_card, draw_check_function fun) {

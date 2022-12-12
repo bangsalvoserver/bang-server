@@ -210,6 +210,7 @@ namespace banggame {
         (bool, can_play_beer_in_duel, true)
         (bool, auto_discard_all)
         (int, scenario_deck_size, 12)
+        (int, num_bots, 0)
         (std::chrono::milliseconds, damage_timer_ms, 1500)
         (std::chrono::milliseconds, escape_timer_ms, 3000)
         (std::chrono::milliseconds, tumbleweed_timer_ms, 3000)

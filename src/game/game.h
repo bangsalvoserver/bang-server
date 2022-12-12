@@ -4,6 +4,7 @@
 #include "events.h"
 #include "game_table.h"
 #include "request_queue.h"
+#include "bot_map.h"
 #include "draw_check_handler.h"
 #include "player_iterator.h"
 #include "utils/utils.h"
@@ -15,6 +16,8 @@ namespace banggame {
         draw_check_handler m_current_check;
 
         player *m_playing = nullptr;
+
+        bot_map m_bots;
 
         util::generator<Json::Value> get_spectator_updates();
         util::generator<Json::Value> get_rejoin_updates(player *target);

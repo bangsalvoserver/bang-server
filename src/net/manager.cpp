@@ -348,7 +348,7 @@ std::string game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
         return "ERROR_LOBBY_NOT_WAITING";
     }
 
-    size_t num_players = std::ranges::count(lobby.users, lobby_team::game_player, &team_user_pair::first);
+    size_t num_players = std::ranges::count(lobby.users, lobby_team::game_player, &team_user_pair::first) + lobby.options.num_bots;
 
     if (num_players <= 1) {
         return "ERROR_NOT_ENOUGH_PLAYERS";
@@ -407,6 +407,7 @@ void lobby::start_game(game_manager &mgr) {
             user_ids.push_back(pair.second->second.user_id);
         }
     }
+    user_ids.resize(user_ids.size() + options.num_bots, -1);
 
     game.add_players(user_ids);
     game.start_game(options);
