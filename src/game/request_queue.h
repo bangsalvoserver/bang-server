@@ -94,7 +94,7 @@ namespace banggame {
 
         void tick() {
             if (pending_requests()) {
-                top_request().tick();
+                top_request().tick(this);
             }
         }
     };

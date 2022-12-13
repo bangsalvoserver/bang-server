@@ -25,6 +25,7 @@ namespace banggame {
         void on_disable(card *target_card, player *target);
     };
 
+    class request_queue;
     class request_base;
 
     static constexpr ticks max_timer_duration = 10s;
@@ -44,15 +45,15 @@ namespace banggame {
             , duration(std::clamp(std::chrono::duration_cast<ticks>(duration), ticks{0}, max_timer_duration)) {}
 
     public:
-        void start();
-        void tick();
+        void start(ticks total_update_time);
+        void tick(request_queue *queue);
 
         virtual void on_finished() {}
     };
 
     class request_base {
     public:
-        request_base(card *origin_card, player *origin, not_null<player *> target, effect_flags flags = {})
+        request_base(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : origin_card(origin_card), origin(origin), target(target), flags(flags) {}
         
         virtual ~request_base() {}

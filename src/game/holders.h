@@ -90,16 +90,16 @@ namespace banggame {
             m_value->on_update();
         }
 
-        void start() {
+        void start(ticks total_update_time) {
             if (auto *t = m_value->timer()) {
-                t->start();
+                t->start(total_update_time);
             }
             m_value->sent = true;
         }
 
-        void tick() {
+        void tick(request_queue *queue) {
             if (auto *t = m_value->timer()) {
-                t->tick();
+                t->tick(queue);
             }
         }
 

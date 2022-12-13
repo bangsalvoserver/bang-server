@@ -178,17 +178,23 @@ namespace banggame {
     }
     
     struct bot_delay_request : request_base {
-        bot_delay_request(player *target) : request_base(nullptr, nullptr, target) {}
-
+        bot_delay_request(player *origin)
+            : request_base(nullptr, nullptr, nullptr)
+            , m_timer(this, origin) {}
+        
         struct bot_delay_timer : request_timer {
-            using request_timer::request_timer;
+            bot_delay_timer(bot_delay_request *request, player *origin)
+                : request_timer(request, 0ms)
+                , origin(origin) {}
+            
+            player *origin;
 
             void on_finished() override {
-                play_in_turn(request->target);
+                play_in_turn(origin);
             }
         };
         
-        bot_delay_timer m_timer{this, 0ms};
+        bot_delay_timer m_timer;
         request_timer *timer() override { return &m_timer; }
     };
 

@@ -12,7 +12,7 @@ namespace banggame {
             auto weak_ptr = std::weak_ptr(req.ptr());
             req.on_update();
             if (!weak_ptr.expired()) {
-                req.start();
+                req.start(m_game->get_total_update_time());
                 m_game->send_request_update();
 
                 for (player *p : m_game->m_players) {
