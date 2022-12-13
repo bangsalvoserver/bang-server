@@ -75,8 +75,8 @@ namespace banggame {
             target->add_to_hand(target_card);
             if (--num_cards == 0) {
                 target->m_game->pop_request();
-                for (auto *c : target->m_game->m_selection) {
-                    target->m_game->move_card(c, pocket_type::discard_pile);
+                while (!target->m_game->m_selection.empty()) {
+                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
                 }
             }
         }
