@@ -113,11 +113,13 @@ namespace banggame {
         if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](card *c) { return c->pocket == pocket_type::button_row; })) {
             origin->m_game->top_request().on_pick(random_element(update.pick_cards, origin->m_game->rng));
         } else if (!update.respond_cards.empty()) {
-            while (true) {
+            std::set<card *> cards{update.respond_cards.begin(), update.respond_cards.end()};
+            while (!cards.empty()) {
                 card *origin_card = random_card_of_pocket(update.respond_cards, origin->m_game->rng,
                     pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand);
-                
                 if (!origin_card) break;
+
+                cards.erase(origin_card);
                 auto verifier = generate_random_play(origin, origin_card, true);
 
                 if (!verifier.verify_and_play()) {
@@ -127,9 +129,11 @@ namespace banggame {
                         prompt.reset();
                         std::invoke(fun);
                     }
-                    break;
+                    return;
                 }
             }
+            // softlock
+            std::cout << "BOT ERROR: could not find response card\n";
         } 
     }
 
@@ -170,16 +174,30 @@ namespace banggame {
             }
         }
 
-        auto lock = origin->m_game->lock_updates();
         origin->pass_turn();
     }
+    
+    struct bot_delay_request : request_base {
+        bot_delay_request(player *target) : request_base(nullptr, nullptr, target) {}
+
+        struct bot_delay_timer : request_timer {
+            using request_timer::request_timer;
+
+            void on_finished() override {
+                play_in_turn(request->target);
+            }
+        };
+        
+        bot_delay_timer m_timer{this, 0ms};
+        request_timer *timer() override { return &m_timer; }
+    };
 
     void game::request_bot_play(player *origin, bool is_response) {
         if (origin->is_bot() && !check_flags(game_flags::game_over)) {
             if (is_response) {
                 respond_to_request(origin);
             } else {
-                play_in_turn(origin);
+                queue_request_front<bot_delay_request>(origin);
             }
         }
     }
