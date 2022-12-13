@@ -136,13 +136,16 @@ namespace banggame {
     static void play_in_turn(player *origin) {
         auto cards_view = util::concat_view(
             std::views::all(origin->m_characters),
-            std::views::all(origin->m_table),
+            std::views::all(origin->m_table) | std::views::filter(std::not_fn(&card::inactive)),
             std::views::all(origin->m_hand),
+            std::views::all(origin->m_game->m_shop_selection) | std::views::filter([origin](card *target_card) {
+                return target_card->buy_cost() <= origin->m_gold;
+            }),
             std::views::all(origin->m_game->m_button_row))
             | std::views::filter([&](card *target_card){
-                if (target_card->pocket != pocket_type::player_hand || target_card->is_brown()) {
+                if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
                     return target_card->modifier == card_modifier_type::none
-                        && !target_card->inactive && origin->is_possible_to_play(target_card, false);
+                        && origin->is_possible_to_play(target_card, false);
                 } else {
                     return !origin->make_equip_set(target_card).empty();
                 }
