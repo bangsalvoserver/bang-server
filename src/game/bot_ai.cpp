@@ -14,13 +14,21 @@ namespace banggame {
         }
     }
 
-    decltype(auto) random_card_of_pocket(const auto &range, auto &rng, pocket_type pocket, std::same_as<pocket_type> auto ... rest) {
+    card *random_card_of_pocket(const auto &range, auto &rng, pocket_type pocket, std::same_as<pocket_type> auto ... rest) {
         if (auto filter = range | std::views::filter([&](card *c) { return c->pocket == pocket; })) {
             return random_element(filter, rng);
         } else if constexpr (sizeof...(rest) != 0) {
-            return random_card_of_pocket(range, rng, rest...);
+            if (card *c = random_card_of_pocket(range, rng, rest...)) {
+                return c;
+            } else if (auto filter = range | std::views::filter([&](card *c) {
+                return c->pocket != pocket && ((c->pocket != rest) && ... && true);
+            })) {
+                return random_element(filter, rng);
+            } else {
+                return nullptr;
+            }
         } else {
-            return random_element(range, rng);
+            return nullptr;
         }
     }
 
@@ -102,13 +110,15 @@ namespace banggame {
     static void respond_to_request(player *origin) {
         auto update = origin->m_game->make_request_update(origin);
 
-        if (!update.pick_cards.empty()) {
+        if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](card *c) { return c->pocket == pocket_type::button_row; })) {
             origin->m_game->top_request().on_pick(random_element(update.pick_cards, origin->m_game->rng));
         } else if (!update.respond_cards.empty()) {
             while (true) {
-                auto verifier = generate_random_play(origin, random_card_of_pocket(update.respond_cards, origin->m_game->rng,
-                    pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand),
-                    true);
+                card *origin_card = random_card_of_pocket(update.respond_cards, origin->m_game->rng,
+                    pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand);
+                
+                if (!origin_card) break;
+                auto verifier = generate_random_play(origin, origin_card, true);
 
                 if (!verifier.verify_and_play()) {
                     if (auto &prompt = origin->m_prompt) {
@@ -124,8 +134,11 @@ namespace banggame {
     }
 
     static void play_in_turn(player *origin) {
-        auto cards = to_vector(util::concat_view(
-            std::views::all(origin->m_characters), std::views::all(origin->m_table), std::views::all(origin->m_hand))
+        auto cards_view = util::concat_view(
+            std::views::all(origin->m_characters),
+            std::views::all(origin->m_table),
+            std::views::all(origin->m_hand),
+            std::views::all(origin->m_game->m_button_row))
             | std::views::filter([&](card *target_card){
                 if (target_card->pocket != pocket_type::player_hand || target_card->is_brown()) {
                     return target_card->modifier == card_modifier_type::none
@@ -133,10 +146,16 @@ namespace banggame {
                 } else {
                     return !origin->make_equip_set(target_card).empty();
                 }
-            }));
+            });
+
+        auto cards = std::set<card *>(std::ranges::begin(cards_view), std::ranges::end(cards_view));
         
-        std::ranges::shuffle(cards, origin->m_game->rng);
-        for (card *origin_card : cards) {
+        while (!cards.empty()) {
+            card *origin_card = random_card_of_pocket(cards, origin->m_game->rng,
+                pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand);
+            if (!origin_card) break;
+
+            cards.erase(origin_card);
             auto verifier = generate_random_play(origin, origin_card, false);
 
             if (!verifier.verify_and_play()) {
