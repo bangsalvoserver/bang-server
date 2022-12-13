@@ -25,6 +25,7 @@ namespace banggame {
     }
 
     request_queue::update_lock_guard::~update_lock_guard() noexcept(false) {
+        copy.reset();
         if (self) {
             --self->m_lock_updates;
             std::exchange(self, nullptr)->update_request();
@@ -33,10 +34,14 @@ namespace banggame {
 
     request_queue::update_lock_guard request_queue::lock_updates(bool pop) {
         ++m_lock_updates;
+        std::shared_ptr<request_base> copy;
+        if (pending_requests()) {
+            copy = top_request().copy();
+        }
         if (pop) {
             pop_request();
         }
-        return update_lock_guard{this};
+        return update_lock_guard{this, std::move(copy)};
     }
     
     void request_queue::queue_action(delayed_action &&fun, int priority) {

@@ -29,6 +29,8 @@ namespace banggame {
 
         struct update_lock_guard {
             request_queue *self;
+            std::shared_ptr<request_base> copy;
+            
             ~update_lock_guard() noexcept(false);
         };
 
