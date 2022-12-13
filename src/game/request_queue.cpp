@@ -21,10 +21,10 @@ namespace banggame {
                 }
             }
         } else if (!m_delayed_actions.empty()) {
+            auto lock = lock_updates();
             auto fun = std::move(m_delayed_actions.top().first);
             m_delayed_actions.pop();
             std::invoke(fun);
-            update_request();
         } else if (m_game->m_playing) {
             m_game->request_bot_play(m_game->m_playing, false);
         }

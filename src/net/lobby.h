@@ -31,7 +31,7 @@ struct lobby : lobby_info {
     lobby_state state;
     ticks lifetime = lobby_lifetime;
 
-    banggame::game game;
+    std::unique_ptr<banggame::game> m_game;
     void start_game(game_manager &mgr);
     void send_updates(game_manager &mgr);
 };
