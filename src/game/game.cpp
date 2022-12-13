@@ -297,13 +297,6 @@ namespace banggame {
         });
     }
 
-    void game::tick() {
-        request_queue::tick();
-        if (m_playing && m_playing->user_id == -1) {
-            request_bot_play(m_playing, false);
-        }
-    }
-
     request_status_args game::make_request_update(player *owner) {
         const auto &req = top_request();
         return request_status_args {
@@ -368,14 +361,6 @@ namespace banggame {
             add_update<game_update_type::request_status>(update_target::includes_private(p), make_request_update(p));
         }
         add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
-
-        auto weak_ptr = top_request().weak_ptr();
-        for (player *p : m_players) {
-            if (p->user_id == -1) {
-                request_bot_play(p, true);
-            }
-            if (weak_ptr.expired()) break;
-        }
     }
     
     void game::draw_check_then(player *origin, card *origin_card, draw_check_function fun) {
@@ -410,6 +395,8 @@ namespace banggame {
 
     void game::handle_player_death(player *killer, player *target, discard_all_reason reason) {
         if (killer != m_playing) killer = nullptr;
+
+        auto lock = lock_updates();
         
         target->remove_extra_characters();
         for (card *c : target->m_characters) {

@@ -170,19 +170,16 @@ namespace banggame {
             }
         }
 
+        auto lock = origin->m_game->lock_updates();
         origin->pass_turn();
     }
 
     void game::request_bot_play(player *origin, bool is_response) {
-        if (!origin->m_game->check_flags(game_flags::game_over)) {
+        if (origin->is_bot() && !check_flags(game_flags::game_over)) {
             if (is_response) {
-                if (origin->m_game->pending_requests()) {
-                    respond_to_request(origin);
-                }
+                respond_to_request(origin);
             } else {
-                if (!origin->m_game->locked() && origin->m_game->m_playing == origin) {
-                    play_in_turn(origin);
-                }
+                play_in_turn(origin);
             }
         }
     }

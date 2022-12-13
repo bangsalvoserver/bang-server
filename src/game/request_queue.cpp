@@ -9,18 +9,24 @@ namespace banggame {
 
         if (pending_requests()) {
             auto &req = top_request();
-            auto weak_ptr = req.weak_ptr();
+            auto weak_ptr = std::weak_ptr(req.ptr());
             req.on_update();
             if (!weak_ptr.expired()) {
                 req.start();
-                req.target()->m_game->send_request_update();
+                m_game->send_request_update();
+
+                for (player *p : m_game->m_players) {
+                    m_game->request_bot_play(p, true);
+                    if (weak_ptr.expired()) break;
+                }
             }
-        } else {
-            while (!pending_requests() && !m_delayed_actions.empty() && !m_lock_updates) {
-                auto [fun, priority] = std::move(m_delayed_actions.top());
-                m_delayed_actions.pop();
-                std::invoke(fun);
-            }
+        } else if (!m_delayed_actions.empty()) {
+            auto fun = std::move(m_delayed_actions.top().first);
+            m_delayed_actions.pop();
+            std::invoke(fun);
+            update_request();
+        } else if (m_game->m_playing) {
+            m_game->request_bot_play(m_game->m_playing, false);
         }
     }
 
@@ -36,7 +42,7 @@ namespace banggame {
         ++m_lock_updates;
         std::shared_ptr<request_base> copy;
         if (pending_requests()) {
-            copy = top_request().copy();
+            copy = top_request().ptr();
         }
         if (pop) {
             pop_request();
@@ -55,7 +61,7 @@ namespace banggame {
     void request_queue::pop_request() {
         auto &req = top_request();
         if (req.is_sent()) {
-            req.target()->m_game->send_request_status_clear();
+            m_game->send_request_status_clear();
         }
         m_requests.pop_front();
         update_request();

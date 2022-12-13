@@ -123,11 +123,7 @@ namespace banggame {
             return get_if<T>() != nullptr;
         }
 
-        std::shared_ptr<request_base> copy() const {
-            return m_value;
-        }
-
-        std::weak_ptr<request_base> weak_ptr() const {
+        std::shared_ptr<request_base> &ptr() {
             return m_value;
         }
 

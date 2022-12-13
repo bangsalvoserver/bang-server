@@ -15,7 +15,7 @@ namespace banggame {
         } else {
             for (player *p : m_game->m_players) {
                 if (!check_player_filter(this, card->equip_target, p) && !p->find_equipped_card(card)) {
-                    if (user_id != -1 || p != this) {
+                    if (!is_bot() || p != this) {
                         ret.push_back(p);
                     }
                 }
@@ -27,7 +27,7 @@ namespace banggame {
     std::vector<player *> player::make_player_target_set(card *origin_card, const effect_holder &holder) {
         std::vector<player *> ret;
         for (player *target : m_game->m_players) {
-            if (user_id != -1 || target != this || bool(holder.player_filter & target_player_filter::self)) {
+            if (!is_bot() || target != this || bool(holder.player_filter & target_player_filter::self)) {
                 if (!check_player_filter(this, holder.player_filter, target)
                     && !holder.verify(origin_card, this, target)) {
                     ret.push_back(target);

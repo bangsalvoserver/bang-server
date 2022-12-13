@@ -16,6 +16,8 @@ namespace banggame {
 
         player *m_playing = nullptr;
 
+        game() : request_queue(this) {}
+
         util::generator<Json::Value> get_spectator_updates();
         util::generator<Json::Value> get_rejoin_updates(player *target);
 
@@ -23,8 +25,6 @@ namespace banggame {
         void start_game(const game_options &options);
 
         void request_bot_play(player *origin, bool is_response);
-
-        void tick();
 
         request_status_args make_request_update(player *p);
 
