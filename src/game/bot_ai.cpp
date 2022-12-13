@@ -35,7 +35,7 @@ namespace banggame {
     static play_card_verify generate_random_play(player *origin, card *origin_card, bool is_response) {
         play_card_verify verifier{origin, origin_card, is_response};
 
-        if (!is_response && origin_card->pocket == pocket_type::player_hand && !origin_card->is_brown()) {
+        if (!is_response && (origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
             if (!origin_card->self_equippable()) {
                 verifier.targets.emplace_back(enums::enum_tag<target_type::player>,
                     random_element(origin->make_equip_set(origin_card), origin->m_game->rng));
