@@ -9,7 +9,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
 
         void on_pick(card *target_card) override {
-            auto lock = target->m_game->lock_updates(true);
+            auto lock = target->m_game->lock_updates();
             target->m_game->flash_card(target_card);
             
             auto *drawn_card = target->m_game->top_of_deck();
