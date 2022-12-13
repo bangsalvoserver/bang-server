@@ -9,6 +9,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
 
         void on_pick(card *target_card) override {
+            auto lock = target->m_game->lock_updates(true);
             target->m_game->flash_card(target_card);
             
             auto *drawn_card = target->m_game->top_of_deck();
@@ -30,7 +31,7 @@ namespace banggame {
                 target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
                 target->m_game->move_card(drawn_card, pocket_type::player_hand, target);
             } else {
-                auto lock = target->m_game->lock_updates(true);
+                target->m_game->pop_request();
                 target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, drawn_card);
                 target->m_game->move_card(drawn_card, pocket_type::discard_pile);
 
