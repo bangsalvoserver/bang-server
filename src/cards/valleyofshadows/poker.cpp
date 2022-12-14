@@ -96,12 +96,8 @@ namespace banggame {
     }
 
     void effect_poker::on_play(card *origin_card, player *origin) {
-        std::vector<player *> targets;
-        for (player *p : range_other_players(origin)) {
-            if (!p->empty_hand()) {
-                targets.push_back(p);
-            }
-        }
+        auto targets = to_vector(range_other_players(origin)
+            | std::views::filter(std::not_fn(&player::empty_hand)));
 
         effect_flags flags = effect_flags::escapable;
         if (targets.size() == 1) flags |= effect_flags::single_target;
