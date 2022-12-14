@@ -135,7 +135,7 @@ namespace banggame {
         int get_cards_to_draw();
 
         bool is_bot() const {
-            return user_id == -1;
+            return user_id < 0;
         }
 
         bool is_ghost() const {
