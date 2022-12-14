@@ -395,8 +395,6 @@ namespace banggame {
 
     void game::handle_player_death(player *killer, player *target, discard_all_reason reason) {
         if (killer != m_playing) killer = nullptr;
-
-        auto lock = lock_updates();
         
         target->remove_extra_characters();
         for (card *c : target->m_characters) {
