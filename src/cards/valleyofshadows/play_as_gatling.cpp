@@ -9,9 +9,9 @@ namespace banggame {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
         origin->discard_card(chosen_card);
 
-        auto targets = range_other_players(origin);
+        auto targets = to_vector(range_other_players(origin));
         auto flags = effect_flags::play_as_bang | effect_flags::multi_target;
-        if (std::ranges::distance(targets) == 1) {
+        if (targets.size() == 1) {
             flags |= effect_flags::single_target;
         }
         for (player *p : targets) {

@@ -10,9 +10,9 @@ namespace banggame {
         });
 
         game->add_listener<event_type::check_damage_response>(nullptr, [=](player *target, bool &value) {
-            if (!value && std::ranges::any_of(range_other_players(target), std::not_fn(&player::empty_hand))
-                && !ranges_contains(game->m_discards, "SAVED", &card::name))
-            {
+            if (!value && std::ranges::any_of(game->m_players, [target](player *p) {
+                return p != target && p->alive() && !p->empty_hand();
+            }) && !ranges_contains(game->m_discards, "SAVED", &card::name)) {
                 value = true;
             }
         });
