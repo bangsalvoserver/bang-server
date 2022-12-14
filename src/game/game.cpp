@@ -358,7 +358,9 @@ namespace banggame {
         auto spectator_target = update_target::excludes_public();
         for (player *p : m_players) {
             spectator_target.add(p);
-            add_update<game_update_type::request_status>(update_target::includes_private(p), make_request_update(p));
+            if (p->user_id > 0) {
+                add_update<game_update_type::request_status>(update_target::includes_private(p), make_request_update(p));
+            }
         }
         add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
     }
