@@ -10,8 +10,14 @@ namespace banggame {
         if (pending_requests()) {
             auto &req = top_request();
             auto weak_ptr = std::weak_ptr(req.ptr());
+
+            ++m_lock_updates;
             req.on_update();
-            if (!weak_ptr.expired()) {
+            --m_lock_updates;
+
+            if (weak_ptr.expired()) {
+                update_request();
+            } else {
                 req.start(m_game->get_total_update_time());
                 m_game->send_request_update();
             }
