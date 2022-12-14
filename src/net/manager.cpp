@@ -9,6 +9,7 @@
 #include <ctime>
 
 #include "git_version.h"
+#include "bot_names.h"
 
 using namespace banggame;
 
@@ -429,15 +430,11 @@ void lobby::start_game(game_manager &mgr) {
         }
     }
 
-    std::string_view bot_names[] = {
-        "BOT Salvo", "BOT Chris", "BOT Lorena", "BOT Riccardo", "BOT Davide",
-        "BOT Lela", "BOT Will", "Bot Sam", "BOT Michele", "BOT Jack"
-    };
-
-    std::ranges::shuffle(bot_names, m_game->rng);
+    std::vector<std::string_view> names;
+    std::ranges::sample(bot_names, std::back_inserter(names), options.num_bots, m_game->rng);
 
     for (int i=0; i<options.num_bots; ++i) {
-        auto &bot = bots.emplace_back(-1 - i, std::string(bot_names[i]));
+        auto &bot = bots.emplace_back(-1 - i, fmt::format("BOT {}", names[i]), bot_profile_picture);
         user_ids.push_back(bot.user_id);
 
         mgr.broadcast_message_lobby<server_message_type::lobby_add_user>(*this, bot);
