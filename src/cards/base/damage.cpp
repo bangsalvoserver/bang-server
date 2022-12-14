@@ -29,17 +29,13 @@ namespace banggame {
         return target->m_backup_character;
     }
 
-    bool request_damage::auto_resolve() {
+    void request_damage::on_update() {
         if (target->is_ghost()) {
             target->m_game->pop_request();
-            return true;
-        }
-        if (!target->m_game->call_event<event_type::check_damage_response>(target, false)) {
+        } else if (!target->m_game->call_event<event_type::check_damage_response>(target, false)) {
             auto lock = target->m_game->lock_updates(true);
             on_finished();
-            return true;
         }
-        return false;
     }
 
     void request_damage::on_finished() {

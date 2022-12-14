@@ -11,7 +11,7 @@ namespace banggame {
 
         int ncubes = 1;
 
-        bool auto_resolve() override {
+        void on_update() override {
             int nslots = 0;
             int ncards = 0;
             for (card *c : target->cube_slots()) {
@@ -26,10 +26,7 @@ namespace banggame {
                     ncubes -= cubes_to_add;
                     target->add_cubes(c, cubes_to_add);
                 }
-
-                return true;
             }
-            return false;
         }
         
         bool can_pick(card *target_card) const override {

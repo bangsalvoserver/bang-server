@@ -38,13 +38,13 @@ void game_manager::on_receive_message(client_handle client, const client_message
 void game_manager::tick() {
     for (auto it = m_lobbies.begin(); it != m_lobbies.end();) {
         auto &l = it->second;
-        if (l.state == lobby_state::playing) {
-            l.game.tick();
-        }
-        l.send_updates(*this);
-        if (l.game.check_flags(game_flags::game_over) && l.state != lobby_state::finished) {
-            l.state = lobby_state::finished;
-            send_lobby_update(it);
+        if (l.state == lobby_state::playing && l.m_game) {
+            l.m_game->tick();
+            l.send_updates(*this);
+            if (l.m_game->check_flags(game_flags::game_over)) {
+                l.state = lobby_state::finished;
+                send_lobby_update(it);
+            }
         }
         if (l.users.empty() && --l.lifetime == ticks{0}) {
             broadcast_message<server_message_type::lobby_removed>(it->first);
@@ -157,11 +157,11 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
     }
     send_message<server_message_type::lobby_owner>(user->first, lobby.users.front().second->second.user_id);
     
-    if (lobby.state != lobby_state::waiting) {
+    if (lobby.state != lobby_state::waiting && lobby.m_game) {
         pair.first = lobby_team::game_spectator;
         send_message<server_message_type::game_started>(user->first);
 
-        for (const auto &msg : lobby.game.get_spectator_updates()) {
+        for (const auto &msg : lobby.m_game->get_spectator_updates()) {
             send_message<server_message_type::game_update>(user->first, msg);
         }
     }
@@ -174,12 +174,15 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
         return "ERROR_PLAYER_NOT_IN_LOBBY";
     }
     auto &lobby = (*user->second.in_lobby)->second;
+    if (!lobby.m_game) {
+        return "ERROR_NO_GAME";
+    }
 
-    if (lobby.game.find_player_by_userid(user->second.user_id)) {
+    if (lobby.m_game->find_player_by_userid(user->second.user_id)) {
         return "ERROR_USER_CONTROLLING_PLAYER";
     }
 
-    player *target = lobby.game.context().find_player(value.player_id);
+    player *target = lobby.m_game->context().find_player(value.player_id);
     if (!target || target->user_id != 0) {
         return "ERROR_INVALID_REJOIN_TARGET";
     }
@@ -188,9 +191,9 @@ std::string game_manager::handle_message(MSG_TAG(lobby_rejoin), user_ptr user, c
 
     target->user_id = user->second.user_id;
 
-    broadcast_message_lobby<server_message_type::game_update>(lobby, lobby.game.make_update<game_update_type::player_user>(target, target->user_id));
+    broadcast_message_lobby<server_message_type::game_update>(lobby, lobby.m_game->make_update<game_update_type::player_user>(target, target->user_id));
     
-    for (const auto &msg : lobby.game.get_rejoin_updates(target)) {
+    for (const auto &msg : lobby.m_game->get_rejoin_updates(target)) {
         send_message<server_message_type::game_update>(user->first, msg);
     }
 
@@ -202,9 +205,11 @@ void game_manager::kick_user_from_lobby(user_ptr user) {
     auto &lobby = lobby_it->second;
     user->second.in_lobby.reset();
 
-    if (player *p = lobby.game.find_player_by_userid(user->second.user_id)) {
-        p->user_id = 0;
-        broadcast_message_lobby<server_message_type::game_update>(lobby, lobby.game.make_update<game_update_type::player_user>(p, 0));
+    if (lobby.m_game) {
+        if (player *p = lobby.m_game->find_player_by_userid(user->second.user_id)) {
+            p->user_id = 0;
+            broadcast_message_lobby<server_message_type::game_update>(lobby, lobby.m_game->make_update<game_update_type::player_user>(p, 0));
+        }
     }
     
     broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user->second.user_id);
@@ -317,7 +322,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
         return "ERROR_LOBBY_NOT_FINISHED";
     }
 
-    lobby.game = {};
+    lobby.m_game.reset();
     lobby.state = lobby_state::waiting;
     send_lobby_update(*(user->second.in_lobby));
 
@@ -370,15 +375,15 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
     }
     auto &lobby = (*user->second.in_lobby)->second;
 
-    if (lobby.state != lobby_state::playing) {
+    if (lobby.state != lobby_state::playing || !lobby.m_game) {
         return "ERROR_LOBBY_NOT_PLAYING";
     }
 
-    if (player *p = lobby.game.find_player_by_userid(user->second.user_id)) {
+    if (player *p = lobby.m_game->find_player_by_userid(user->second.user_id)) {
         if (auto error = enums::visit_indexed([&]<game_action_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
             return p->handle_action(tag, FWD(args) ...);
-        }, json::deserialize<banggame::game_action>(value, lobby.game.context()))) {
-            lobby.game.add_update<game_update_type::game_error>(update_target::includes_private(p), std::move(error));
+        }, json::deserialize<banggame::game_action>(value, lobby.m_game->context()))) {
+            lobby.m_game->add_update<game_update_type::game_error>(update_target::includes_private(p), std::move(error));
         }
     } else {
         return "ERROR_USER_NOT_CONTROLLING_PLAYER";
@@ -387,14 +392,14 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
 }
 
 void lobby::send_updates(game_manager &mgr) {
-    while (state == lobby_state::playing && !game.m_updates.empty()) {
-        auto &[target, update, update_time] = game.m_updates.front();
+    while (state == lobby_state::playing && m_game && !m_game->m_updates.empty()) {
+        auto &[target, update, update_time] = m_game->m_updates.front();
         for (auto &[team, it] : users) {
             if (target.matches(it->second.user_id)) {
                 mgr.send_message<server_message_type::game_update>(it->first, update);
             }
         }
-        game.m_updates.pop_front();
+        m_game->m_updates.pop_front();
     }
 }
 
@@ -408,6 +413,7 @@ void lobby::start_game(game_manager &mgr) {
         }
     }
 
-    game.add_players(user_ids);
-    game.start_game(options);
+    m_game = std::make_unique<banggame::game>();
+    m_game->add_players(user_ids);
+    m_game->start_game(options);
 }

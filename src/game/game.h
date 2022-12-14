@@ -16,13 +16,13 @@ namespace banggame {
 
         player *m_playing = nullptr;
 
+        game() : request_queue(this) {}
+
         util::generator<Json::Value> get_spectator_updates();
         util::generator<Json::Value> get_rejoin_updates(player *target);
 
         void add_players(std::span<int> user_ids);
         void start_game(const game_options &options);
-
-        void tick();
 
         request_status_args make_request_update(player *p);
 

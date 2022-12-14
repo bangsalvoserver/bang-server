@@ -297,10 +297,6 @@ namespace banggame {
         });
     }
 
-    void game::tick() {
-        request_queue::tick();
-    }
-
     request_status_args game::make_request_update(player *owner) {
         const auto &req = top_request();
         return request_status_args {

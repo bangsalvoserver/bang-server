@@ -79,13 +79,7 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) {
-            auto copy = m_value;
-            copy->on_pick(target_card);
-        }
-
-        bool auto_resolve() {
-            auto copy = m_value;
-            return copy->auto_resolve();
+            m_value->on_pick(target_card);
         }
 
         std::vector<card *> get_highlights() const {
@@ -96,17 +90,16 @@ namespace banggame {
             m_value->on_update();
         }
 
-        void start() {
+        void start(ticks total_update_time) {
             if (auto *t = m_value->timer()) {
-                t->start();
+                t->start(total_update_time);
             }
             m_value->sent = true;
         }
 
-        void tick() {
+        void tick(request_queue *queue) {
             if (auto *t = m_value->timer()) {
-                auto copy = m_value;
-                t->tick();
+                t->tick(queue);
             }
         }
 
@@ -128,6 +121,10 @@ namespace banggame {
 
         template<typename T> bool is() const {
             return get_if<T>() != nullptr;
+        }
+
+        std::shared_ptr<request_base> &ptr() {
+            return m_value;
         }
 
     private:

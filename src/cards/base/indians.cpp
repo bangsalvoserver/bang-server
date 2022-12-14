@@ -9,11 +9,12 @@ namespace banggame {
             : request_base(origin_card, origin, target, flags) {}
 
         void on_update() override {
-            target->m_game->play_sound(target, "indians");
-        }
-
-        bool auto_resolve() override {
-            return target->empty_hand() && auto_respond();
+            if (!sent) {
+                target->m_game->play_sound(target, "indians");
+            }
+            if (target->empty_hand()) {
+                auto_respond();
+            }
         }
 
         bool can_pick(card *target_card) const override {

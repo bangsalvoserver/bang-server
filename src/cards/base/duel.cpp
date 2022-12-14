@@ -12,11 +12,12 @@ namespace banggame {
         player *respond_to = nullptr;
 
         void on_update() override {
-            target->m_game->play_sound(target, "duel");
-        }
-
-        bool auto_resolve() override {
-            return target->empty_hand() && auto_respond();
+            if (!sent) {
+                target->m_game->play_sound(target, "duel");
+            }
+            if (target->empty_hand()) {
+                auto_respond();
+            }
         }
 
         bool can_pick(card *target_card) const override {
@@ -29,8 +30,8 @@ namespace banggame {
             auto lock = target->m_game->lock_updates(true);
             target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
             target->discard_card(target_card);
-            target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target);
             target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
+            target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target);
         }
 
         void on_resolve() override {

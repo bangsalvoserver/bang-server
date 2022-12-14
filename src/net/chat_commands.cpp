@@ -117,14 +117,14 @@ namespace banggame {
     std::string game_manager::command_give_card(user_ptr user, std::string_view name) {
         auto &lobby = (*user->second.in_lobby)->second;
 
-        player *target = lobby.game.find_player_by_userid(user->second.user_id);
+        player *target = lobby.m_game->find_player_by_userid(user->second.user_id);
         if (!target) return "ERROR_USER_NOT_CONTROLLING_PLAYER";
 
-        if (lobby.game.locked()) {
+        if (lobby.m_game->locked()) {
             return "ERROR_CANNOT_GIVE_CARD";
         }
 
-        auto card_it = std::ranges::find_if(lobby.game.m_context.cards, [&](const card &target_card) {
+        auto card_it = std::ranges::find_if(lobby.m_game->m_context.cards, [&](const card &target_card) {
             if (std::ranges::equal(name, target_card.name, {}, toupper, toupper)) {
                 switch (target_card.deck) {
                 case card_deck_type::main_deck:
@@ -141,7 +141,7 @@ namespace banggame {
             }
             return false;
         });
-        if (card_it == lobby.game.m_context.cards.end()) return "ERROR_CANNOT_FIND_CARD";
+        if (card_it == lobby.m_game->m_context.cards.end()) return "ERROR_CANNOT_FIND_CARD";
         card *target_card = &*card_it;
         
         switch (target_card->deck) {

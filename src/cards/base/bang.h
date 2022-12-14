@@ -50,8 +50,6 @@ namespace banggame {
         int bang_damage = 1;
         bool unavoidable = false;
 
-        bool auto_resolve() override;
-
         void on_update() override;
 
         bool can_miss(card *c) const override;

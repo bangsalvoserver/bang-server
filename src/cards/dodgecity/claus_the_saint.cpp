@@ -13,15 +13,14 @@ namespace banggame {
                 target->m_game->num_alive() - int(target->m_game->m_selection.size()));
         }
 
-        bool auto_resolve() {
-            return auto_pick();
-        }
-
         void on_update() override {
-            int ncards = target->m_game->num_alive() + target->get_cards_to_draw() - 1;
-            for (int i=0; i<ncards; ++i) {
-                target->m_game->move_card(target->m_game->phase_one_drawn_card(), pocket_type::selection, target);
+            if (!sent) {
+                int ncards = target->m_game->num_alive() + target->get_cards_to_draw() - 1;
+                for (int i=0; i<ncards; ++i) {
+                    target->m_game->move_card(target->m_game->phase_one_drawn_card(), pocket_type::selection, target);
+                }
             }
+            auto_pick();
         }
 
         void on_pick(card *target_card) override {

@@ -46,14 +46,13 @@ namespace banggame {
             }
         }
 
-        bool auto_resolve() override {
-            if (auto_pick()) {
-                return true;
-            } else if (std::ranges::all_of(origin->m_table, &card::is_black)) {
-                on_pick(origin->m_hand.front());
-                return true;
-            } else {
-                return false;
+        void on_update() override {
+            auto cards = util::concat_view(
+                origin->m_table | std::views::filter(std::not_fn(&card::is_black)),
+                origin->m_hand | std::views::take(1)
+            );
+            if (std::ranges::distance(cards) == 1) {
+                on_pick(cards.front());
             }
         }
 

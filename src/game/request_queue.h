@@ -19,6 +19,8 @@ namespace banggame {
         }
     };
 
+    struct game;
+
     class request_queue {
     private:
         std::deque<request_holder> m_requests;
@@ -29,10 +31,16 @@ namespace banggame {
 
         struct update_lock_guard {
             request_queue *self;
+            std::shared_ptr<request_base> copy;
+            
             ~update_lock_guard() noexcept(false);
         };
 
+        game *m_game;
+
     public:
+        request_queue(game *m_game) : m_game(m_game) {}
+        
         [[nodiscard]] update_lock_guard lock_updates(bool pop = false);
         void queue_action(delayed_action &&fun, int priority = 0);
         void pop_request();
@@ -86,7 +94,7 @@ namespace banggame {
 
         void tick() {
             if (pending_requests()) {
-                top_request().tick();
+                top_request().tick(this);
             }
         }
     };

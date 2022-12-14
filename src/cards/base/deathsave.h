@@ -16,7 +16,7 @@ namespace banggame {
 
         bool tried_save = false;
 
-        bool auto_resolve() override { return auto_respond(); }
+        void on_update() override { auto_respond(); }
         void on_resolve() override;
         game_string status_text(player *owner) const override;
     };

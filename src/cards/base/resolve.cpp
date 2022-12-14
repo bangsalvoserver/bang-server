@@ -9,7 +9,6 @@ namespace banggame {
     }
     
     void effect_resolve::on_play(card *origin_card, player *origin) {
-        auto copy = origin->m_game->top_request();
-        copy.get<resolvable_request>().on_resolve();
+        origin->m_game->top_request().get<resolvable_request>().on_resolve();
     }
 }

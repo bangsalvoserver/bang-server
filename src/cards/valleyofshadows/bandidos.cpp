@@ -10,16 +10,15 @@ namespace banggame {
             : request_base(origin_card, origin, target, flags) {}
 
         void on_update() override {
-            target->m_game->play_sound(target, "bandidos");
+            if (!sent) {
+                target->m_game->play_sound(target, "bandidos");
+            }
+            auto_respond();
         }
 
         void on_resolve() override {
             auto lock = target->m_game->lock_updates(true);
             target->damage(origin_card, origin, 1);
-        }
-
-        bool auto_resolve() override {
-            return auto_respond();
         }
         
         bool can_pick(card *target_card) const override {

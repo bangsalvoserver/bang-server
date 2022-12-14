@@ -9,11 +9,10 @@ namespace banggame {
             : selection_picker(origin_card, origin, target) {}
 
         void on_update() override {
-            target->m_game->play_sound(target, "generalstore");
-        }
-
-        bool auto_resolve() override {
-            return auto_pick();
+            if (!sent) {
+                target->m_game->play_sound(target, "generalstore");
+            }
+            auto_pick();
         }
 
         void on_pick(card *target_card) override {

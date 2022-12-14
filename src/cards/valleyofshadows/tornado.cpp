@@ -12,13 +12,12 @@ namespace banggame {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
         }
 
-        bool auto_resolve() override {
+        void on_update() override {
             if (target->empty_hand()) {
                 auto lock = target->m_game->lock_updates(true);
                 target->draw_card(2, origin_card);
-                return true;
             } else {
-                return auto_pick();
+                auto_pick();
             }
         }
         
