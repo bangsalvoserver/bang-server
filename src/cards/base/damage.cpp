@@ -62,6 +62,12 @@ namespace banggame {
         target->m_game->call_event<event_type::after_hit>(origin_card, origin, target, damage, flags);
     }
 
+    void request_damage::on_pop() {
+        if (cleanup_function) {
+            std::invoke(std::exchange(cleanup_function, nullptr));
+        }
+    }
+
     game_string request_damage::status_text(player *owner) const {
         if (bool(flags & effect_flags::play_as_bang)) {
             if (bool(flags & effect_flags::multi_target)) {

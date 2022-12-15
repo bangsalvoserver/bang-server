@@ -8,14 +8,13 @@ namespace banggame {
         if (m_lock_updates) return;
 
         if (pending_requests()) {
-            auto &req = top_request();
-            auto weak_ptr = std::weak_ptr(req.ptr());
+            auto req = top_request();
 
             ++m_lock_updates;
             req.on_update();
             --m_lock_updates;
 
-            if (weak_ptr.expired()) {
+            if (req.is_popped()) {
                 update_request();
             } else {
                 req.start(m_game->get_total_update_time());
@@ -23,7 +22,7 @@ namespace banggame {
 
                 for (player *p : m_game->m_players) {
                     m_game->request_bot_play(p, true);
-                    if (weak_ptr.expired()) break;
+                    if (req.is_popped()) break;
                 }
             }
         } else if (!m_delayed_actions.empty()) {
@@ -37,7 +36,6 @@ namespace banggame {
     }
 
     request_queue::update_lock_guard::~update_lock_guard() noexcept(false) {
-        copy.reset();
         if (self) {
             --self->m_lock_updates;
             std::exchange(self, nullptr)->update_request();
@@ -66,6 +64,7 @@ namespace banggame {
 
     void request_queue::pop_request() {
         auto &req = top_request();
+        req.on_pop();
         if (req.is_sent()) {
             m_game->send_request_status_clear();
         }

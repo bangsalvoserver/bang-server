@@ -42,7 +42,7 @@ namespace banggame {
         std::vector<card *> m_cards_used;
     };
 
-    struct request_bang : request_base, missable_request, cleanup_request, resolvable_request {
+    struct request_bang : request_base, missable_request, resolvable_request {
         request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags) {}
 
@@ -50,12 +50,19 @@ namespace banggame {
         int bang_damage = 1;
         bool unavoidable = false;
 
+        std::function<void()> cleanup_function;
+
+        void on_cleanup(std::function<void()> &&fun) {
+            cleanup_function = std::move(fun);
+        }
+
         void on_update() override;
 
         bool can_miss(card *c) const override;
 
         void on_miss() override;
         void on_resolve() override;
+        void on_pop() override;
 
         game_string status_text(player *owner) const override;
     };
