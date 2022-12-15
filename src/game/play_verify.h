@@ -18,6 +18,8 @@ namespace banggame {
         target_list targets;
         std::vector<card *> modifiers;
 
+        card *get_playing_card() const;
+
         game_string verify_modifiers() const;
         game_string verify_duplicates() const;
         game_string verify_equip_target() const;

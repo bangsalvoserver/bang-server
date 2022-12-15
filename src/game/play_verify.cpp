@@ -9,6 +9,14 @@
 #include "utils/utils.h"
 
 namespace banggame {
+
+    card *play_card_verify::get_playing_card() const {
+        if (ranges_contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
+            return origin->m_last_played_card;
+        } else {
+            return origin_card;
+        }
+    }
     
     game_string play_card_verify::verify_modifiers() const {
         auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
@@ -52,8 +60,9 @@ namespace banggame {
             }
         }
 
-        auto &effects = is_response ? origin_card->responses : origin_card->effects;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+        card *playing_card = get_playing_card();
+        auto &effects = is_response ? playing_card->responses : playing_card->effects;
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
             if (game_string error = enums::visit_indexed(
                 [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
                     duplicate_set duplicates = play_visitor<E>{*this, effect}.duplicates(FWD(args) ... );
@@ -176,21 +185,26 @@ namespace banggame {
     };
 
     game_string play_card_verify::verify_card_targets() const {
-        auto &effects = is_response ? origin_card->responses : origin_card->effects;
+        card *playing_card = get_playing_card();
+        if (!playing_card) {
+            return "ERROR_INVALID_CARD";
+        }
 
-        if (origin_card->modifier != card_modifier_type::none) {
+        auto &effects = is_response ? playing_card->responses : playing_card->effects;
+
+        if (playing_card->modifier != card_modifier_type::none) {
             return "ERROR_INVALID_MODIFIER_CARD";
         }
         if (effects.empty()) {
             return "ERROR_EFFECT_LIST_EMPTY";
         }
-        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
-            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
+        if (card *disabler = origin->m_game->get_disabler(playing_card)) {
+            return {"ERROR_CARD_DISABLED_BY", playing_card, disabler};
         }
-        if (origin_card->inactive) {
-            return {"ERROR_CARD_INACTIVE", origin_card};
+        if (playing_card->inactive) {
+            return {"ERROR_CARD_INACTIVE", playing_card};
         }
-        if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{})) {
+        if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, playing_card, game_string{})) {
             return error;
         }
 
@@ -198,7 +212,7 @@ namespace banggame {
         for (card *c : modifiers) {
             switch (c->modifier) {
             case card_modifier_type::belltower:
-                check_disablers.emplace_back(origin->m_game, event_card_key{origin_card, -1},
+                check_disablers.emplace_back(origin->m_game, event_card_key{playing_card, -1},
                     enums::enum_tag<event_type::apply_distance_modifier>, [origin=origin](player *p, int &value) {
                         if (p == origin) {
                             value = 1;
@@ -207,7 +221,7 @@ namespace banggame {
                 break;
             case card_modifier_type::bandolier:
             case card_modifier_type::leevankliff:
-                check_disablers.emplace_back(origin->m_game, event_card_key{origin_card, -1},
+                check_disablers.emplace_back(origin->m_game, event_card_key{playing_card, -1},
                     enums::enum_tag<event_type::count_bangs_played>, [origin=origin](player *p, int &value) {
                         if (p == origin) {
                             value = 0;
@@ -222,18 +236,18 @@ namespace banggame {
         }
 
         size_t diff = targets.size() - effects.size();
-        if (auto repeatable = origin_card->get_tag_value(tag_type::repeatable)) {
-            if (diff < 0 || diff % origin_card->optionals.size() != 0
-                || (*repeatable > 0 && diff > (origin_card->optionals.size() * *repeatable)))
+        if (auto repeatable = playing_card->get_tag_value(tag_type::repeatable)) {
+            if (diff < 0 || diff % playing_card->optionals.size() != 0
+                || (*repeatable > 0 && diff > (playing_card->optionals.size() * *repeatable)))
             {
                 return "ERROR_INVALID_TARGETS";
             }
-        } else if (diff != 0 && diff != origin_card->optionals.size()) {
+        } else if (diff != 0 && diff != playing_card->optionals.size()) {
             return "ERROR_INVALID_TARGETS";
         }
 
         target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
             if (!target.is(effect.target)) {
                 return "ERROR_INVALID_TARGET_TYPE";
             } else if (effect.type == effect_type::mth_add) {
@@ -249,7 +263,7 @@ namespace banggame {
             }
         }
 
-        if (game_string error = (is_response ? origin_card->mth_response : origin_card->mth_effect).verify(origin_card, origin, mth_targets)) {
+        if (game_string error = (is_response ? playing_card->mth_response : playing_card->mth_effect).verify(playing_card, origin, mth_targets)) {
             return error;
         }
 
@@ -261,10 +275,11 @@ namespace banggame {
     }
 
     game_string play_card_verify::check_prompt() const {
-        auto &effects = is_response ? origin_card->responses : origin_card->effects;
+        card *playing_card = get_playing_card();
+        auto &effects = is_response ? playing_card->responses : playing_card->effects;
 
         target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
             if (effect.type == effect_type::mth_add) {
                 mth_targets.push_back(target);
             } else if (auto prompt_message = enums::visit_indexed(
@@ -276,7 +291,7 @@ namespace banggame {
             }
         }
 
-        return (is_response ? origin_card->mth_response : origin_card->mth_effect).on_prompt(origin_card, origin, mth_targets);
+        return (is_response ? playing_card->mth_response : playing_card->mth_effect).on_prompt(playing_card, origin, mth_targets);
     }
 
     game_string play_card_verify::check_prompt_equip() const {
@@ -290,9 +305,11 @@ namespace banggame {
     }
 
     void play_card_verify::do_play_card() const {
-        auto &effects = is_response ? origin_card->responses : origin_card->effects;
-        origin->log_played_card(origin_card, is_response);
-        if (!ranges_contains(effects, effect_type::play_card_action, &effect_holder::type)) {
+        card *playing_card = get_playing_card();
+
+        auto &effects = is_response ? playing_card->responses : playing_card->effects;
+        origin->log_played_card(playing_card, is_response);
+        if (origin_card != playing_card || !ranges_contains(effects, effect_type::play_card_action, &effect_holder::type)) {
             origin->play_card_action(origin_card);
         }
 
@@ -300,7 +317,7 @@ namespace banggame {
         card_cube_count selected_cubes;
 
         target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
             if (effect.type == effect_type::mth_add) {
                 mth_targets.push_back(target);
             } else if (effect.type == effect_type::pay_cube) {
@@ -309,7 +326,7 @@ namespace banggame {
                         ++selected_cubes[c];
                     }
                 } else if (target.is(target_type::self_cubes)) {
-                    selected_cubes[origin_card] += effect.target_value;
+                    selected_cubes[playing_card] += effect.target_value;
                 }
             } else {
                 delay_effects.emplace_back(effect, target);
@@ -324,8 +341,8 @@ namespace banggame {
             }, t);
         }
 
-        (is_response ? origin_card->mth_response : origin_card->mth_effect).on_play(origin_card, origin, mth_targets);
-        origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
+        (is_response ? playing_card->mth_response : playing_card->mth_effect).on_play(playing_card, origin, mth_targets);
+        origin->m_game->call_event<event_type::on_effect_end>(origin, playing_card);
     }
 
     game_string play_card_verify::verify_and_play() {
@@ -339,30 +356,18 @@ namespace banggame {
 
         switch(origin_card->pocket) {
         case pocket_type::player_hand:
-            if (ranges_contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
-                if (!origin->m_last_played_card) {
-                    return "ERROR_INVALID_MODIFIER_CARD";
-                } else if (!origin_card->has_tag(tag_type::bangcard)) {
-                    return "ERROR_INVALID_MODIFIER_CARD";
-                }
-                card *bang_card = std::exchange(origin_card, origin->m_last_played_card);
-                if (game_string error = verify_card_targets()) {
-                    return error;
-                }
-                origin->prompt_then(check_prompt(), [*this, bang_card]{
-                    play_modifiers();
-                    origin->play_card_action(bang_card);
-                    do_play_card();
-                    origin->set_last_played_card(nullptr);
-                });
-            } else if (origin_card->is_brown()) {
+            if (origin_card->is_brown()) {
                 if (game_string error = verify_card_targets()) {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this]{
                     play_modifiers();
                     do_play_card();
-                    origin->set_last_played_card(origin_card);
+                    if (origin_card == get_playing_card()) {
+                        origin->set_last_played_card(origin_card);
+                    } else {
+                        origin->set_last_played_card(nullptr);
+                    }
                 });
             } else {
                 if (game_string error = verify_equip_target()) {
