@@ -63,6 +63,7 @@ namespace banggame {
         player *target;
         effect_flags flags;
         bool sent = false;
+        bool popped = false;
 
         virtual request_timer *timer() { return nullptr; }
 
@@ -72,44 +73,13 @@ namespace banggame {
         virtual void on_pick(card *target_card) { throw std::runtime_error("missing on_pick(card)"); }
 
         virtual void on_update() {}
+        virtual void on_pop() {}
 
         virtual std::vector<card *> get_highlights() const { return {}; }
     
     protected:
         void auto_pick();
         void auto_respond();
-    };
-
-    class cleanup_request {
-    public:
-        cleanup_request() = default;
-        ~cleanup_request() {
-            if (m_fun) {
-                m_fun();
-                m_fun = nullptr;
-            }
-        }
-
-        cleanup_request(const cleanup_request &) = delete;
-        cleanup_request(cleanup_request &&other) noexcept
-            : m_fun(std::move(other.m_fun))
-        {
-            other.m_fun = nullptr;
-        }
-
-        cleanup_request &operator = (const cleanup_request &) = delete;
-        cleanup_request &operator = (cleanup_request &&other) noexcept {
-            m_fun = std::move(other.m_fun);
-            other.m_fun = nullptr;
-            return *this;
-        }
-
-        void on_cleanup(std::function<void()> &&fun) {
-            m_fun = std::move(fun);
-        }
-
-    private:
-        std::function<void()> m_fun;
     };
 
     struct selection_picker : request_base {

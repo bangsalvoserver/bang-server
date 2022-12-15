@@ -70,7 +70,14 @@ namespace banggame {
         auto lock = target->m_game->lock_updates(true);
         target->damage(origin_card, origin, bang_damage, flags);
         if (auto *req = target->m_game->top_request_if<request_damage>(target)) {
-            static_cast<cleanup_request &>(*req) = std::move(*this);
+            req->cleanup_function = std::move(cleanup_function);
+            cleanup_function = nullptr;
+        }
+    }
+
+    void request_bang::on_pop() {
+        if (cleanup_function) {
+            std::invoke(std::exchange(cleanup_function, nullptr));
         }
     }
 
