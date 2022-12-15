@@ -215,6 +215,7 @@ namespace banggame {
         }
 
         origin->pass_turn();
+        origin->set_last_played_card(nullptr);
     }
     
     struct bot_delay_request : request_base {
