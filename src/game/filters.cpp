@@ -59,8 +59,4 @@ namespace banggame::filter_impl {
     bool card_has_tag(card *target, tag_type type) {
         return target->has_tag(type);
     }
-
-    bool allowed_with_leevankliff(player *origin, card *target) {
-        return target == origin->m_last_played_card;
-    }
 }
