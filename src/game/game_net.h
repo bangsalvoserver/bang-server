@@ -66,6 +66,11 @@ namespace banggame {
             return (std::ranges::find(targets, user_id, &player::user_id) != targets.end()) == m_inclusive;
         }
 
+        bool all_targets_bots() const {
+            return m_inclusive && std::ranges::all_of(
+                std::span{m_targets, m_targets + m_num_targets}, &player::is_bot);
+        }
+
         bool is_public() const {
             return m_invert_public != m_inclusive != (m_num_targets == 0);
         }
@@ -107,7 +112,13 @@ namespace banggame {
 
         ticks get_total_update_time() {
             return std::transform_reduce(m_updates.begin(), m_updates.end(), ticks{0}, std::plus(),
-                [](const auto &tup) { return std::get<ticks>(tup); });
+                [](const auto &tup) {
+                    if (std::get<update_target>(tup).all_targets_bots()) {
+                        return ticks{0};
+                    } else {
+                        return std::get<ticks>(tup);
+                    }
+                });
         }
 
         template<game_update_type E>

@@ -9,6 +9,7 @@
 #include <ctime>
 
 #include "git_version.h"
+#include "bot_names.h"
 
 using namespace banggame;
 
@@ -49,6 +50,9 @@ void game_manager::tick() {
         if (l.users.empty() && --l.lifetime == ticks{0}) {
             broadcast_message<server_message_type::lobby_removed>(it->first);
             it = m_lobbies.erase(it);
+            if (m_lobbies.empty()) {
+                m_lobby_counter = 0;
+            }
         } else {
             ++it;
         }
@@ -102,7 +106,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_make), user_ptr user, con
     send_lobby_update(lobby_it);
 
     send_message<server_message_type::lobby_entered>(user->first, value);
-    send_message<server_message_type::lobby_add_user>(user->first, user->second.user_id, user->second.name, user->second.profile_image);
+    send_message<server_message_type::lobby_add_user>(user->first, user->second);
     send_message<server_message_type::lobby_owner>(user->first, user->second.user_id);
 
     return {};
@@ -151,9 +155,12 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
     send_message<server_message_type::lobby_entered>(user->first, lobby);
     for (auto &[team, p] : lobby.users) {
         if (p != user) {
-            send_message<server_message_type::lobby_add_user>(p->first, user->second.user_id, user->second.name, user->second.profile_image);
+            send_message<server_message_type::lobby_add_user>(p->first, user->second);
         }
-        send_message<server_message_type::lobby_add_user>(user->first, p->second.user_id, p->second.name, p->second.profile_image);
+        send_message<server_message_type::lobby_add_user>(user->first, p->second);
+    }
+    for (auto &bot : lobby.bots) {
+        send_message<server_message_type::lobby_add_user>(user->first, bot);
     }
     send_message<server_message_type::lobby_owner>(user->first, lobby.users.front().second->second.user_id);
     
@@ -224,6 +231,9 @@ void game_manager::kick_user_from_lobby(user_ptr user) {
         if (lobby.state != lobby_state::playing) {
             broadcast_message<server_message_type::lobby_removed>(lobby_it->first);
             m_lobbies.erase(lobby_it);
+            if (m_lobbies.empty()) {
+                m_lobby_counter = 0;
+            }
         }
     } else if (is_owner) {
         broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front().second->second.user_id);
@@ -236,6 +246,9 @@ void game_manager::client_disconnected(client_handle client) {
             kick_user_from_lobby(it);
         }
         users.erase(it);
+        if (users.empty()) {
+            m_user_counter = 0;
+        }
     }
 }
 
@@ -322,7 +335,9 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
         return "ERROR_LOBBY_NOT_FINISHED";
     }
 
+    lobby.bots.clear();
     lobby.m_game.reset();
+    
     lobby.state = lobby_state::waiting;
     send_lobby_update(*(user->second.in_lobby));
 
@@ -332,7 +347,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
 
     broadcast_message_lobby<server_message_type::lobby_entered>(lobby, lobby);
     for (auto &[team, p] : lobby.users) {
-        broadcast_message_lobby<server_message_type::lobby_add_user>(lobby, p->second.user_id, p->second.name, p->second.profile_image);
+        broadcast_message_lobby<server_message_type::lobby_add_user>(lobby, p->second);
     }
     broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front().second->second.user_id);
     
@@ -353,7 +368,7 @@ std::string game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
         return "ERROR_LOBBY_NOT_WAITING";
     }
 
-    size_t num_players = std::ranges::count(lobby.users, lobby_team::game_player, &team_user_pair::first);
+    size_t num_players = std::ranges::count(lobby.users, lobby_team::game_player, &team_user_pair::first) + lobby.options.num_bots;
 
     if (num_players <= 1) {
         return "ERROR_NOT_ENOUGH_PLAYERS";
@@ -406,6 +421,8 @@ void lobby::send_updates(game_manager &mgr) {
 void lobby::start_game(game_manager &mgr) {
     mgr.broadcast_message_lobby<server_message_type::game_started>(*this);
 
+    m_game = std::make_unique<banggame::game>();
+
     std::vector<int> user_ids;
     for (const team_user_pair &pair : users) {
         if (pair.first == lobby_team::game_player) {
@@ -413,7 +430,16 @@ void lobby::start_game(game_manager &mgr) {
         }
     }
 
-    m_game = std::make_unique<banggame::game>();
+    std::vector<std::string_view> names;
+    std::ranges::sample(bot_names, std::back_inserter(names), options.num_bots, m_game->rng);
+
+    for (int i=0; i<options.num_bots; ++i) {
+        auto &bot = bots.emplace_back(-1 - i, fmt::format("BOT {}", names[i]), bot_profile_picture);
+        user_ids.push_back(bot.user_id);
+
+        mgr.broadcast_message_lobby<server_message_type::lobby_add_user>(*this, bot);
+    }
+
     m_game->add_players(user_ids);
     m_game->start_game(options);
 }

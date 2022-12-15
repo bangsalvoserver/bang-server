@@ -19,12 +19,19 @@ namespace banggame {
             } else {
                 req.start(m_game->get_total_update_time());
                 m_game->send_request_update();
+
+                for (player *p : m_game->m_players) {
+                    m_game->request_bot_play(p, true);
+                    if (req.is_popped()) break;
+                }
             }
         } else if (!m_delayed_actions.empty()) {
             auto lock = lock_updates();
             auto fun = std::move(m_delayed_actions.top().first);
             m_delayed_actions.pop();
             std::invoke(fun);
+        } else if (m_game->m_playing) {
+            m_game->request_bot_play(m_game->m_playing, false);
         }
     }
 

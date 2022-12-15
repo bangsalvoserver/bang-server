@@ -134,6 +134,10 @@ namespace banggame {
         int get_bangs_played();
         int get_cards_to_draw();
 
+        bool is_bot() const {
+            return user_id < 0;
+        }
+
         bool is_ghost() const {
             return check_player_flags(player_flags::ghost)
                 || check_player_flags(player_flags::temp_ghost);
