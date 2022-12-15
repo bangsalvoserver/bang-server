@@ -9,7 +9,7 @@ namespace banggame {
     }
 
     game_string equip_weapon::on_prompt(player *origin, card *target_card, player *target) {
-        if (target == origin) {
+        if (target == origin && origin->m_weapon_range != 0) {
             if (auto it = std::ranges::find_if(target->m_table, is_weapon); it != target->m_table.end()) {
                 return {"PROMPT_REPLACE", target_card, *it};
             }
