@@ -91,10 +91,13 @@ namespace banggame {
         origin->m_game->invoke_action([&]{
             origin->m_game->pop_request();
             origin->m_game->queue_action([=]{
-                if (origin->alive() && origin->m_num_drawn_cards < origin->get_cards_to_draw() && origin->m_game->m_playing == origin) {
+                if (!origin->m_game->check_flags(game_flags::game_over)
+                    && origin->alive() && origin->m_game->m_playing == origin
+                    && origin->m_num_drawn_cards < origin->get_cards_to_draw())
+                {
                     origin->request_drawing();
                 }
-            });
+            }, -4);
         });
     }
 
