@@ -29,21 +29,23 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            auto lock = target->m_game->lock_updates(true);
-            if (target_card->pocket == pocket_type::player_hand) {
-                target_card = origin->random_hand_card();
-            }
-            steal_card(target, origin, target_card);
+            target->m_game->invoke_action([&]{
+                target->m_game->pop_request();
+                if (target_card->pocket == pocket_type::player_hand) {
+                    target_card = origin->random_hand_card();
+                }
+                steal_card(target, origin, target_card);
 
-            if (!origin->only_black_cards_equipped()) {
-                player_iterator next_target(target);
-                card *next_origin_card = nullptr;
-                do {
-                    ++next_target;
-                    next_origin_card = get_vulture_sam(*next_target);
-                } while (*next_target == origin || !next_origin_card);
-                target->m_game->queue_request_front<request_multi_vulture_sam>(next_origin_card, origin, *next_target);
-            }
+                if (!origin->only_black_cards_equipped()) {
+                    player_iterator next_target(target);
+                    card *next_origin_card = nullptr;
+                    do {
+                        ++next_target;
+                        next_origin_card = get_vulture_sam(*next_target);
+                    } while (*next_target == origin || !next_origin_card);
+                    target->m_game->queue_request_front<request_multi_vulture_sam>(next_origin_card, origin, *next_target);
+                }
+            });
         }
 
         void on_update() override {

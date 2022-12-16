@@ -18,14 +18,15 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            auto lock = target->m_game->lock_updates();
-            target->add_to_hand_phase_one(target_card);
-            if (target->m_game->m_selection.size() == 1) {
-                target->m_game->pop_request();
-                target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_game->m_selection.front());
-                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
-                target->add_gold(1);
-            }
+            target->m_game->invoke_action([&]{
+                target->add_to_hand_phase_one(target_card);
+                if (target->m_game->m_selection.size() == 1) {
+                    target->m_game->pop_request();
+                    target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_game->m_selection.front());
+                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+                    target->add_gold(1);
+                }
+            });
         }
 
         game_string status_text(player *owner) const override {
@@ -41,8 +42,10 @@ namespace banggame {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, bool &override_request) {
             if (!override_request && origin == target && target->get_cards_to_draw() > 1) {
                 override_request = true;
-                auto lock = target->m_game->lock_updates(true);
-                target->m_game->queue_request<request_dutch_will>(target_card, target);
+                target->m_game->invoke_action([&]{
+                    target->m_game->pop_request();
+                    target->m_game->queue_request<request_dutch_will>(target_card, target);
+                });
             }
         });
     }

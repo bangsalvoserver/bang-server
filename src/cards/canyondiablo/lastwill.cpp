@@ -38,17 +38,19 @@ namespace banggame {
     }
 
     void handler_lastwill::on_play(card *origin_card, player *origin, const target_list &targets) {
-        auto lock = origin->m_game->lock_updates(true);
-        player *target = targets[0].get<target_type::player>();
-        for (auto c : targets | std::views::drop(1)) {
-            card *chosen_card = c.get<target_type::card>();
-            if (chosen_card->visibility != card_visibility::shown) {
-                origin->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, chosen_card);
-                origin->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", origin, target);
-            } else {
-                origin->m_game->add_log("LOG_GIFTED_CARD", origin, target, chosen_card);
+        origin->m_game->invoke_action([&]{
+            origin->m_game->pop_request();
+            player *target = targets[0].get<target_type::player>();
+            for (auto c : targets | std::views::drop(1)) {
+                card *chosen_card = c.get<target_type::card>();
+                if (chosen_card->visibility != card_visibility::shown) {
+                    origin->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, chosen_card);
+                    origin->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", origin, target);
+                } else {
+                    origin->m_game->add_log("LOG_GIFTED_CARD", origin, target, chosen_card);
+                }
+                target->add_to_hand(chosen_card);
             }
-            target->add_to_hand(chosen_card);
-        }
+        });
     }
 }

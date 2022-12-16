@@ -52,6 +52,8 @@ namespace banggame {
 
     class request_holder {
     public:
+        request_holder() = default;
+        
         request_holder(std::shared_ptr<request_base> &&value)
             : m_value(std::move(value)) {}
 
@@ -129,10 +131,6 @@ namespace banggame {
 
         template<typename T> bool is() const {
             return get_if<T>() != nullptr;
-        }
-
-        std::shared_ptr<request_base> &ptr() {
-            return m_value;
         }
 
     private:

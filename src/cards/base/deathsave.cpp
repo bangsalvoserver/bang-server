@@ -9,26 +9,29 @@ namespace banggame {
     }
 
     void effect_deathsave::on_play(card *origin_card, player *origin) {
-        auto lock = origin->m_game->lock_updates();
-        if (origin->m_hp > 0) {
-            origin->m_game->pop_request();
-        } else {
-            origin->m_game->top_request().get<request_death>().tried_save = true;
-        }
+        origin->m_game->invoke_action([&]{
+            if (origin->m_hp > 0) {
+                origin->m_game->pop_request();
+            } else {
+                origin->m_game->top_request().get<request_death>().tried_save = true;
+            }
+        });
     }
     
     void request_death::on_resolve() {
-        auto lock = target->m_game->lock_updates(true);
+        target->m_game->invoke_action([&]{
+            target->m_game->pop_request();
         
-        target->m_game->queue_action([target=target, tried_save=tried_save]{
-            target->m_game->call_event<event_type::on_player_death_resolve>(target, tried_save);
-        }, 2);
-        
-        target->m_game->queue_action([origin=origin, target=target]{
-            if (target->m_hp <= 0) {
-                target->m_game->handle_player_death(origin, target, discard_all_reason::death);
-            }
-        }, 2);
+            target->m_game->queue_action([target=target, tried_save=tried_save]{
+                target->m_game->call_event<event_type::on_player_death_resolve>(target, tried_save);
+            }, 2);
+            
+            target->m_game->queue_action([origin=origin, target=target]{
+                if (target->m_hp <= 0) {
+                    target->m_game->handle_player_death(origin, target, discard_all_reason::death);
+                }
+            }, 2);
+        });
     }
 
     game_string request_death::status_text(player *owner) const {

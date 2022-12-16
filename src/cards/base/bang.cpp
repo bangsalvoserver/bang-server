@@ -59,20 +59,23 @@ namespace banggame {
     }
 
     void request_bang::on_miss() {
-        auto lock = target->m_game->lock_updates();
-        if (--bang_strength == 0) {
-            target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, flags);
-            target->m_game->pop_request();
-        }
+        target->m_game->invoke_action([&]{
+            if (--bang_strength == 0) {
+                target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, flags);
+                target->m_game->pop_request();
+            }
+        });
     }
 
     void request_bang::on_resolve() {
-        auto lock = target->m_game->lock_updates(true);
-        target->damage(origin_card, origin, bang_damage, flags);
-        if (auto *req = target->m_game->top_request_if<request_damage>(target)) {
-            req->cleanup_function = std::move(cleanup_function);
-            cleanup_function = nullptr;
-        }
+        target->m_game->invoke_action([&]{
+            target->m_game->pop_request();
+            target->damage(origin_card, origin, bang_damage, flags);
+            if (auto *req = target->m_game->top_request_if<request_damage>(target)) {
+                req->cleanup_function = std::move(cleanup_function);
+                cleanup_function = nullptr;
+            }
+        });
     }
 
     void request_bang::on_pop() {

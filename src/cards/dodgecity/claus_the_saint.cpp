@@ -24,22 +24,23 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            auto lock = target->m_game->lock_updates();
-            if (target->m_num_drawn_cards < target->get_cards_to_draw()) {
-                target->add_to_hand_phase_one(target_card);
-            } else {
-                player *next_target = get_next_target();
-                if (target_card->visibility != card_visibility::shown) {
-                    target->m_game->add_log(update_target::includes(target, next_target), "LOG_GIFTED_CARD", target, next_target, target_card);
-                    target->m_game->add_log(update_target::excludes(target, next_target), "LOG_GIFTED_A_CARD", target, next_target);
+            target->m_game->invoke_action([&]{
+                if (target->m_num_drawn_cards < target->get_cards_to_draw()) {
+                    target->add_to_hand_phase_one(target_card);
                 } else {
-                    target->m_game->add_log("LOG_GIFTED_CARD", target, next_target, target_card);
+                    player *next_target = get_next_target();
+                    if (target_card->visibility != card_visibility::shown) {
+                        target->m_game->add_log(update_target::includes(target, next_target), "LOG_GIFTED_CARD", target, next_target, target_card);
+                        target->m_game->add_log(update_target::excludes(target, next_target), "LOG_GIFTED_A_CARD", target, next_target);
+                    } else {
+                        target->m_game->add_log("LOG_GIFTED_CARD", target, next_target, target_card);
+                    }
+                    next_target->add_to_hand(target_card);
                 }
-                next_target->add_to_hand(target_card);
-            }
-            if (target->m_game->m_selection.empty()) {
-                target->m_game->pop_request();
-            }
+                if (target->m_game->m_selection.empty()) {
+                    target->m_game->pop_request();
+                }
+            });
         }
 
         game_string status_text(player *owner) const override {
@@ -63,8 +64,10 @@ namespace banggame {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, bool &override_request) {
             if (!override_request && origin == target) {
                 override_request = true;
-                auto lock = target->m_game->lock_updates(true);
-                target->m_game->queue_request<request_claus_the_saint>(target_card, target);
+                target->m_game->invoke_action([&]{
+                    target->m_game->pop_request();
+                    target->m_game->queue_request<request_claus_the_saint>(target_card, target);
+                });
             }
         });
     }

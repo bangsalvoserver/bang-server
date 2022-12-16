@@ -17,13 +17,17 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            auto lock = target->m_game->lock_updates();
-            target->add_to_hand_phase_one(target_card);
-            if (target->m_num_drawn_cards >= target->get_cards_to_draw()) {
-                target->m_game->pop_request();
-                while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
+            target->m_game->invoke_action([&]{
+                target->add_to_hand_phase_one(target_card);
+                if (target->m_num_drawn_cards >= target->get_cards_to_draw()) {
+                    target->m_game->pop_request();
                 }
+            });
+        }
+
+        void on_pop() override {
+            while (!target->m_game->m_selection.empty()) {
+                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
             }
         }
 
@@ -40,8 +44,10 @@ namespace banggame {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, bool &override_request) {
             if (!override_request && target == origin && target->get_cards_to_draw() < 3) {
                 override_request = true;
-                auto lock = target->m_game->lock_updates(true);
-                target->m_game->queue_request<request_kit_carlson>(target_card, target);
+                target->m_game->invoke_action([&]{
+                    target->m_game->pop_request();
+                    target->m_game->queue_request<request_kit_carlson>(target_card, target);
+                });
             }
         });
     }

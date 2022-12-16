@@ -17,9 +17,11 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            auto lock = target->m_game->lock_updates(true);
-            target->m_game->add_log("LOG_DISCARDED_A_CARD_FOR", origin_card, target);
-            target->m_game->move_card(target_card, pocket_type::selection, origin);
+            target->m_game->invoke_action([&]{
+                target->m_game->pop_request();
+                target->m_game->add_log("LOG_DISCARDED_A_CARD_FOR", origin_card, target);
+                target->m_game->move_card(target_card, pocket_type::selection, origin);
+            });
         }
 
         game_string status_text(player *owner) const override {
@@ -48,35 +50,40 @@ namespace banggame {
             if (std::ranges::any_of(target->m_game->m_selection, [this](card *c) {
                 return target->get_card_sign(c).rank == card_rank::rank_A;
             })) {
-                auto lock = target->m_game->lock_updates(true);
-                target->m_game->add_short_pause();
-                target->m_game->add_log("LOG_POKER_ACE");
-                while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
-                }
-            } else if (target->m_game->m_selection.size() <= 2) {
-                auto lock = target->m_game->lock_updates(true);
-                if (!target->m_game->m_selection.empty()) {
+                target->m_game->invoke_action([&]{
+                    target->m_game->pop_request();
                     target->m_game->add_short_pause();
-                }
-                while (!target->m_game->m_selection.empty()) {
-                    card *drawn_card = target->m_game->m_selection.front();
-                    target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
-                    target->add_to_hand(drawn_card);
-                }
+                    target->m_game->add_log("LOG_POKER_ACE");
+                    while (!target->m_game->m_selection.empty()) {
+                        target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+                    }
+                });
+            } else if (target->m_game->m_selection.size() <= 2) {
+                target->m_game->invoke_action([&]{
+                    target->m_game->pop_request();
+                    if (!target->m_game->m_selection.empty()) {
+                        target->m_game->add_short_pause();
+                    }
+                    while (!target->m_game->m_selection.empty()) {
+                        card *drawn_card = target->m_game->m_selection.front();
+                        target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
+                        target->add_to_hand(drawn_card);
+                    }
+                });
             }
         }
 
         void on_pick(card *target_card) override {
-            auto lock = target->m_game->lock_updates();
-            target->m_game->add_log("LOG_DRAWN_CARD", target, target_card);
-            target->add_to_hand(target_card);
-            if (--num_cards == 0) {
-                target->m_game->pop_request();
-                while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+            target->m_game->invoke_action([&]{
+                target->m_game->add_log("LOG_DRAWN_CARD", target, target_card);
+                target->add_to_hand(target_card);
+                if (--num_cards == 0) {
+                    target->m_game->pop_request();
+                    while (!target->m_game->m_selection.empty()) {
+                        target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+                    }
                 }
-            }
+            });
         }
 
         game_string status_text(player *owner) const override {

@@ -17,8 +17,10 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            auto lock = target->m_game->lock_updates(true);
-            target->damage(origin_card, origin, 1);
+            target->m_game->invoke_action([&]{
+                target->m_game->pop_request();
+                target->damage(origin_card, origin, 1);
+            });
         }
         
         bool can_pick(card *target_card) const override {
@@ -26,12 +28,14 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            auto lock = target->m_game->lock_updates(true);
-            target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
-            target->discard_card(target_card);
-            if (!target->empty_hand()) {
-                target->m_game->queue_request_front<request_discard>(origin_card, origin, target);
-            }
+            target->m_game->invoke_action([&]{
+                target->m_game->pop_request();
+                target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
+                target->discard_card(target_card);
+                if (!target->empty_hand()) {
+                    target->m_game->queue_request_front<request_discard>(origin_card, origin, target);
+                }
+            });
         }
 
         game_string status_text(player *owner) const override {

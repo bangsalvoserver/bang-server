@@ -29,19 +29,12 @@ namespace banggame {
 
         void update_request();
 
-        struct update_lock_guard {
-            request_queue *self;
-            std::shared_ptr<request_base> copy;
-            
-            ~update_lock_guard() noexcept(false);
-        };
-
         game *m_game;
 
     public:
         request_queue(game *m_game) : m_game(m_game) {}
         
-        [[nodiscard]] update_lock_guard lock_updates(bool pop = false);
+        void invoke_action(delayed_action &&fun);
         void queue_action(delayed_action &&fun, int priority = 0);
         void pop_request();
 

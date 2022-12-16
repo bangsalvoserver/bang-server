@@ -26,32 +26,24 @@ namespace banggame {
                 }
             }
         } else if (!m_delayed_actions.empty()) {
-            auto lock = lock_updates();
+            ++m_lock_updates;
             auto fun = std::move(m_delayed_actions.top().first);
             m_delayed_actions.pop();
             std::invoke(fun);
+            --m_lock_updates;
+            update_request();
         } else if (m_game->m_playing) {
             m_game->request_bot_play(m_game->m_playing, false);
         }
     }
 
-    request_queue::update_lock_guard::~update_lock_guard() noexcept(false) {
-        if (self) {
-            --self->m_lock_updates;
-            std::exchange(self, nullptr)->update_request();
-        }
-    }
-
-    request_queue::update_lock_guard request_queue::lock_updates(bool pop) {
+    void request_queue::invoke_action(delayed_action &&fun) {
+        request_holder copy;
+        if (pending_requests()) copy = top_request();
         ++m_lock_updates;
-        std::shared_ptr<request_base> copy;
-        if (pending_requests()) {
-            copy = top_request().ptr();
-        }
-        if (pop) {
-            pop_request();
-        }
-        return update_lock_guard{this, std::move(copy)};
+        std::invoke(fun);
+        --m_lock_updates;
+        update_request();
     }
     
     void request_queue::queue_action(delayed_action &&fun, int priority) {

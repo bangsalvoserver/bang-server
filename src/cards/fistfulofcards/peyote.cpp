@@ -9,37 +9,38 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
 
         void on_pick(card *target_card) override {
-            auto lock = target->m_game->lock_updates();
-            target->m_game->flash_card(target_card);
-            
-            auto *drawn_card = target->m_game->top_of_deck();
-            target->m_game->set_card_visibility(drawn_card);
-            target->m_game->add_short_pause(drawn_card);
+            target->m_game->invoke_action([&]{
+                target->m_game->flash_card(target_card);
+                
+                auto *drawn_card = target->m_game->top_of_deck();
+                target->m_game->set_card_visibility(drawn_card);
+                target->m_game->add_short_pause(drawn_card);
 
-            short choice = *target_card->get_tag_value(tag_type::peyote);
+                short choice = *target_card->get_tag_value(tag_type::peyote);
 
-            if (choice == 1) {
-                target->m_game->add_log("LOG_DECLARED_RED", target, origin_card);
-            } else {
-                target->m_game->add_log("LOG_DECLARED_BLACK", target, origin_card);
-            }
-
-            if (choice == 1
-                ? (drawn_card->sign.suit == card_suit::hearts || drawn_card->sign.suit == card_suit::diamonds)
-                : (drawn_card->sign.suit == card_suit::clubs || drawn_card->sign.suit == card_suit::spades))
-            {
-                target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
-                target->m_game->move_card(drawn_card, pocket_type::player_hand, target);
-            } else {
-                target->m_game->pop_request();
-                target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, drawn_card);
-                target->m_game->move_card(drawn_card, pocket_type::discard_pile);
-
-                while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, card_visibility::shown, true);
+                if (choice == 1) {
+                    target->m_game->add_log("LOG_DECLARED_RED", target, origin_card);
+                } else {
+                    target->m_game->add_log("LOG_DECLARED_BLACK", target, origin_card);
                 }
-                target->m_game->call_event<event_type::post_draw_cards>(target);
-            }
+
+                if (choice == 1
+                    ? (drawn_card->sign.suit == card_suit::hearts || drawn_card->sign.suit == card_suit::diamonds)
+                    : (drawn_card->sign.suit == card_suit::clubs || drawn_card->sign.suit == card_suit::spades))
+                {
+                    target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
+                    target->m_game->move_card(drawn_card, pocket_type::player_hand, target);
+                } else {
+                    target->m_game->pop_request();
+                    target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, drawn_card);
+                    target->m_game->move_card(drawn_card, pocket_type::discard_pile);
+
+                    while (!target->m_game->m_selection.empty()) {
+                        target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, card_visibility::shown, true);
+                    }
+                    target->m_game->call_event<event_type::post_draw_cards>(target);
+                }
+            });
         }
 
         game_string status_text(player *owner) const override {

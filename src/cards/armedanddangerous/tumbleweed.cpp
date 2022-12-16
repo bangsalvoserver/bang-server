@@ -34,8 +34,10 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            auto lock = origin->m_game->lock_updates(true);
-            on_finished();
+            origin->m_game->invoke_action([&]{
+                origin->m_game->pop_request();
+                on_finished();
+            });
         }
 
         game_string status_text(player *owner) const override {
@@ -59,8 +61,10 @@ namespace banggame {
     }
 
     void effect_tumbleweed::on_play(card *origin_card, player *origin) {
-        auto lock = origin->m_game->lock_updates(true);
-        origin->m_game->m_current_check.restart();
+        origin->m_game->invoke_action([&]{
+            origin->m_game->pop_request();
+            origin->m_game->m_current_check.restart();
+        });
     }
 
 }

@@ -61,16 +61,17 @@ namespace banggame {
     }
 
     void request_draw::on_pick(card *target_card) {
-        auto lock = target->m_game->lock_updates();
-        if (!target->m_game->call_event<event_type::on_draw_from_deck>(target, false)) {
-            target->m_game->pop_request();
-            int ncards = target->get_cards_to_draw();
-            while (target->m_num_drawn_cards < ncards) {
-                target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
+        target->m_game->invoke_action([&]{
+            if (!target->m_game->call_event<event_type::on_draw_from_deck>(target, false)) {
+                target->m_game->pop_request();
+                int ncards = target->get_cards_to_draw();
+                while (target->m_num_drawn_cards < ncards) {
+                    target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
+                }
             }
-        }
-        target->m_game->queue_action([target=target]{
-            target->m_game->call_event<event_type::post_draw_cards>(target);
+            target->m_game->queue_action([target=target]{
+                target->m_game->call_event<event_type::post_draw_cards>(target);
+            });
         });
     }
 
@@ -87,24 +88,28 @@ namespace banggame {
     }
 
     void effect_reset_drawing::on_play(card *origin_card, player *origin) {
-        auto lock = origin->m_game->lock_updates(true);
-        origin->m_game->queue_action([=]{
-            if (origin->alive() && origin->m_num_drawn_cards < origin->get_cards_to_draw() && origin->m_game->m_playing == origin) {
-                origin->request_drawing();
-            }
+        origin->m_game->invoke_action([&]{
+            origin->m_game->pop_request();
+            origin->m_game->queue_action([=]{
+                if (origin->alive() && origin->m_num_drawn_cards < origin->get_cards_to_draw() && origin->m_game->m_playing == origin) {
+                    origin->request_drawing();
+                }
+            });
         });
     }
 
     void effect_end_drawing::on_play(card *origin_card, player *origin) {
         if (origin->m_game->top_request_is<request_draw>()) {
-            auto lock = origin->m_game->lock_updates(true);
-            origin->m_game->add_listener<event_type::on_effect_end>(origin_card, [=](player *p, card *c) {
-                if (p == origin && c == origin_card) {
-                    origin->m_game->queue_action([=]{
-                        origin->m_game->call_event<event_type::post_draw_cards>(origin);
-                    });
-                    origin->m_game->remove_listeners(origin_card);
-                }
+            origin->m_game->invoke_action([&]{
+                origin->m_game->pop_request();
+                origin->m_game->add_listener<event_type::on_effect_end>(origin_card, [=](player *p, card *c) {
+                    if (p == origin && c == origin_card) {
+                        origin->m_game->queue_action([=]{
+                            origin->m_game->call_event<event_type::post_draw_cards>(origin);
+                        });
+                        origin->m_game->remove_listeners(origin_card);
+                    }
+                });
             });
         }
     }

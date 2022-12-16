@@ -33,8 +33,10 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            auto lock = origin->m_game->lock_updates(true);
-            resolve_rust(origin_card, origin, target);
+            origin->m_game->invoke_action([&]{
+                origin->m_game->pop_request();
+                resolve_rust(origin_card, origin, target);
+            });
         }
 
         game_string status_text(player *owner) const override {

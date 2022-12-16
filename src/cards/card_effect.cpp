@@ -21,9 +21,10 @@ namespace banggame {
                 && origin_card->modifier == card_modifier_type::none
                 && std::ranges::all_of(origin_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
             ) {
-                auto lock = target->m_game->lock_updates();
-                play_card_verify{target, origin_card, true,
-                    target_list{origin_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
+                target->m_game->invoke_action([&]{
+                    play_card_verify{target, origin_card, true,
+                        target_list{origin_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
+                });
             }
         }
     }
@@ -34,8 +35,10 @@ namespace banggame {
 
     void request_timer::tick(request_queue *queue) {
         if (request->sent && --lifetime <= ticks{0}) {
-            auto lock = queue->lock_updates(true);
-            on_finished();
+            queue->invoke_action([&]{
+                queue->pop_request();
+                on_finished();
+            });
         }
     }
 

@@ -18,13 +18,17 @@ namespace banggame {
         req.savior = origin;
         bool fatal = saved->m_hp <= req.damage;
 
-        auto lock = origin->m_game->lock_updates(--req.damage == 0);
-        
-        origin->damage(origin_card, origin, 1);
-        origin->m_game->queue_action([=]{
-            if (origin->alive()) {
-                origin->draw_card(2 + fatal, origin_card);
+        origin->m_game->invoke_action([&]{
+            if (--req.damage == 0) {
+                origin->m_game->pop_request();
             }
-        }, 1);
+        
+            origin->damage(origin_card, origin, 1);
+            origin->m_game->queue_action([=]{
+                if (origin->alive()) {
+                    origin->draw_card(2 + fatal, origin_card);
+                }
+            }, 1);
+        });
     }
 }

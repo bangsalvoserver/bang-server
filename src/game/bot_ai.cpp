@@ -166,10 +166,11 @@ namespace banggame {
 
                 if (verifier.origin_card && !verifier.verify_and_play()) {
                     if (auto &prompt = origin->m_prompt) {
-                        auto lock = origin->m_game->lock_updates();
-                        auto fun = std::move(prompt->first);
-                        prompt.reset();
-                        std::invoke(fun);
+                        origin->m_game->invoke_action([&]{
+                            auto fun = std::move(prompt->first);
+                            prompt.reset();
+                            std::invoke(fun);
+                        });
                     }
                     return;
                 }

@@ -21,8 +21,9 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            auto lock = target->m_game->lock_updates();
-            discard_card(target, target_card);
+            target->m_game->invoke_action([&]{
+                discard_card(target, target_card);
+            });
         }
 
         void on_update() override {
@@ -38,23 +39,25 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            auto lock = target->m_game->lock_updates(true);
-            for (card *c : to_vector(target->m_table | std::views::filter(std::not_fn(&card::is_black)))) {
-                discard_card(target, c);
-            }
-            while (!target->empty_hand()) {
-                discard_card(target, target->m_hand.front());
-            }
-            while (!target->m_table.empty()) {
-                discard_card(target, target->m_table.front());
-            }
-            target->drop_all_cubes(target->first_character());
-            if (reason != discard_all_reason::sheriff_killed_deputy) {
-                target->add_gold(-target->m_gold);
-            }
-            if (reason == discard_all_reason::death) {
-                target->m_game->play_sound(nullptr, "death");
-            }
+            target->m_game->invoke_action([&]{
+                target->m_game->pop_request();
+                for (card *c : to_vector(target->m_table | std::views::filter(std::not_fn(&card::is_black)))) {
+                    discard_card(target, c);
+                }
+                while (!target->empty_hand()) {
+                    discard_card(target, target->m_hand.front());
+                }
+                while (!target->m_table.empty()) {
+                    discard_card(target, target->m_table.front());
+                }
+                target->drop_all_cubes(target->first_character());
+                if (reason != discard_all_reason::sheriff_killed_deputy) {
+                    target->add_gold(-target->m_gold);
+                }
+                if (reason == discard_all_reason::death) {
+                    target->m_game->play_sound(nullptr, "death");
+                }
+            });
         }
 
         game_string status_text(player *owner) const override {

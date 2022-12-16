@@ -39,14 +39,16 @@ namespace banggame {
     }
 
     void handler_move_bomb::on_play(card *origin_card, player *origin, player *target) {
-        auto lock = origin->m_game->lock_updates(true);
-        if (target != origin) {
-            origin->m_game->add_log("LOG_MOVE_BOMB_ON", origin_card, origin, target);
-            origin_card->on_disable(origin);
-            origin_card->on_unequip(origin);
-            origin_card->on_equip(target);
-            target->equip_card(origin_card);
-        }
+        origin->m_game->invoke_action([&]{
+            origin->m_game->pop_request();
+            if (target != origin) {
+                origin->m_game->add_log("LOG_MOVE_BOMB_ON", origin_card, origin, target);
+                origin_card->on_disable(origin);
+                origin_card->on_unequip(origin);
+                origin_card->on_equip(target);
+                target->equip_card(origin_card);
+            }
+        });
     }
 
     void equip_bomb::on_equip(card *target_card, player *target) {
