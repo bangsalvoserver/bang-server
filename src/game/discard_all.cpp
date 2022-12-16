@@ -2,11 +2,6 @@
 
 namespace banggame {
 
-    inline void discard_card(player *target, card *target_card) {
-        target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
-        target->discard_card(target_card);
-    }
-
     struct request_discard_all : request_base, resolvable_request {
         discard_all_reason reason;
 
@@ -22,7 +17,8 @@ namespace banggame {
 
         void on_pick(card *target_card) override {
             target->m_game->invoke_action([&]{
-                discard_card(target, target_card);
+                target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
+                target->discard_card(target_card);
             });
         }
 
@@ -40,24 +36,28 @@ namespace banggame {
 
         void on_resolve() override {
             target->m_game->invoke_action([&]{
+                for (card *target_card : to_vector(util::concat_view(
+                    std::views::filter(target->m_table, std::not_fn(&card::is_black)),
+                    std::views::all(target->m_hand)
+                ))) {
+                    on_pick(target_card);
+                }
                 target->m_game->pop_request();
-                for (card *c : to_vector(target->m_table | std::views::filter(std::not_fn(&card::is_black)))) {
-                    discard_card(target, c);
-                }
-                while (!target->empty_hand()) {
-                    discard_card(target, target->m_hand.front());
-                }
-                while (!target->m_table.empty()) {
-                    discard_card(target, target->m_table.front());
-                }
-                target->drop_all_cubes(target->first_character());
-                if (reason != discard_all_reason::sheriff_killed_deputy) {
-                    target->add_gold(-target->m_gold);
-                }
-                if (reason == discard_all_reason::death) {
-                    target->m_game->play_sound(nullptr, "death");
-                }
             });
+        }
+
+        void on_pop() override {
+            for (card *target_card : to_vector(std::views::filter(target->m_table, &card::is_black))) {
+                target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
+                target->discard_card(target_card);
+            }
+            target->drop_all_cubes(target->first_character());
+            if (reason != discard_all_reason::sheriff_killed_deputy) {
+                target->add_gold(-target->m_gold);
+            }
+            if (reason == discard_all_reason::death) {
+                target->m_game->play_sound(nullptr, "death");
+            }
         }
 
         game_string status_text(player *owner) const override {
