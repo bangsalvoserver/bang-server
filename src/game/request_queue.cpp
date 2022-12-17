@@ -22,9 +22,8 @@ namespace banggame {
                 m_game->send_request_update();
 
                 for (player *p : m_game->m_players) {
-                    if (p->is_bot()) {
-                        m_game->request_bot_play(p, true);
-                        if (req.is_popped()) break;
+                    if (p->is_bot() && m_game->request_bot_play(p, true)) {
+                        break;
                     }
                 }
             }

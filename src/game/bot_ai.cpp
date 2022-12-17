@@ -149,7 +149,7 @@ namespace banggame {
         }
     }
 
-    static void respond_to_request(player *origin) {
+    static bool respond_to_request(player *origin) {
         auto update = origin->m_game->make_request_update(origin);
 
         if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](card *c) { return c->pocket == pocket_type::button_row; })) {
@@ -172,12 +172,13 @@ namespace banggame {
                             std::invoke(fun);
                         });
                     }
-                    return;
+                    return true;
                 }
             }
             // softlock
             std::cout << "BOT ERROR: could not find response card\n";
-        } 
+        }
+        return false;
     }
 
     static void play_in_turn(player *origin) {
@@ -240,11 +241,12 @@ namespace banggame {
         request_timer *timer() override { return &m_timer; }
     };
 
-    void game::request_bot_play(player *origin, bool is_response) {
+    bool game::request_bot_play(player *origin, bool is_response) {
         if (is_response) {
-            respond_to_request(origin);
+            return respond_to_request(origin);
         } else {
             queue_request_front<bot_delay_request>(origin);
+            return true;
         }
     }
 }

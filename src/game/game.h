@@ -24,7 +24,7 @@ namespace banggame {
         void add_players(std::span<int> user_ids);
         void start_game(const game_options &options);
 
-        void request_bot_play(player *origin, bool is_response);
+        bool request_bot_play(player *origin, bool is_response);
 
         request_status_args make_request_update(player *p);
 
