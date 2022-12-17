@@ -59,7 +59,9 @@ namespace banggame {
         target->set_hp(target->m_hp - damage);
         target->m_game->call_event<event_type::before_hit>(origin_card, origin, target, damage, flags);
         if (target->m_hp <= 0) {
-            target->m_game->queue_request<request_death>(origin_card, origin, target);
+            target->m_game->queue_action([origin_card=origin_card, origin=origin, target=target]{
+                target->m_game->queue_request<request_death>(origin_card, origin, target);
+            });
         }
         target->m_game->call_event<event_type::after_hit>(origin_card, origin, target, damage, flags);
     }
