@@ -145,6 +145,9 @@ namespace banggame {
             for (const effect_holder &holder : is_response ? playing_card->responses : playing_card->effects) {
                 verifier.targets.push_back(generate_random_target(origin, playing_card, holder));
             }
+            for (const effect_holder &holder : playing_card->optionals) {
+                verifier.targets.push_back(generate_random_target(origin, playing_card, holder));
+            }
             return verifier;
         }
     }
@@ -154,6 +157,7 @@ namespace banggame {
 
         if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](card *c) { return c->pocket == pocket_type::button_row; })) {
             origin->m_game->top_request().on_pick(random_element(update.pick_cards, origin->m_game->rng));
+            return true;
         } else if (!update.respond_cards.empty()) {
             std::set<card *> cards{update.respond_cards.begin(), update.respond_cards.end()};
             while (!cards.empty()) {

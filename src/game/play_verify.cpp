@@ -410,6 +410,10 @@ namespace banggame {
             });
             break;
         case pocket_type::hidden_deck:
+            if (!ranges_contains(modifiers, card_modifier_type::shopchoice, &card::modifier)) {
+                return "ERROR_INVALID_MODIFIER_CARD";
+            }
+            [[fallthrough]];
         case pocket_type::shop_selection: {
             int cost = origin_card->buy_cost();
             for (card *c : modifiers) {

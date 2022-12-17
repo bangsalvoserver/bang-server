@@ -302,6 +302,9 @@ namespace banggame {
         if (effect.type != effect_type::pay_cube) {
             return "ERROR_INVALID_EFFECT_TYPE";
         }
+        if (target_cards.size() != effect.target_value) {
+            return "ERROR_INVALID_TARGETS";
+        }
         for (card *c : target_cards) {
             if (!c || c->owner != verifier.origin) {
                 return "ERROR_TARGET_NOT_SELF";
