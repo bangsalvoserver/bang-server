@@ -6,6 +6,7 @@ namespace banggame {
     
     void request_queue::update_request() {
         if (m_lock_updates) return;
+        if (m_game->check_flags(game_flags::game_over)) return;
 
         if (pending_requests()) {
             auto req = top_request();
@@ -21,8 +22,10 @@ namespace banggame {
                 m_game->send_request_update();
 
                 for (player *p : m_game->m_players) {
-                    m_game->request_bot_play(p, true);
-                    if (req.is_popped()) break;
+                    if (p->is_bot()) {
+                        m_game->request_bot_play(p, true);
+                        if (req.is_popped()) break;
+                    }
                 }
             }
         } else if (!m_delayed_actions.empty()) {
@@ -32,7 +35,7 @@ namespace banggame {
             std::invoke(fun);
             --m_lock_updates;
             update_request();
-        } else if (m_game->m_playing) {
+        } else if (m_game->m_playing && m_game->m_playing->is_bot()) {
             m_game->request_bot_play(m_game->m_playing, false);
         }
     }

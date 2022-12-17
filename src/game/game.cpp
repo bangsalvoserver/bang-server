@@ -443,8 +443,6 @@ namespace banggame {
         }
 
         queue_action([this, killer, target] {
-            if (check_flags(game_flags::game_over)) return;
-
             player_role winner_role = player_role::unknown;
 
             auto alive_players_view = m_players | std::views::filter(&player::alive);

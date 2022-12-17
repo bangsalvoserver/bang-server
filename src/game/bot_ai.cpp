@@ -241,12 +241,10 @@ namespace banggame {
     };
 
     void game::request_bot_play(player *origin, bool is_response) {
-        if (origin->is_bot() && !check_flags(game_flags::game_over)) {
-            if (is_response) {
-                respond_to_request(origin);
-            } else {
-                queue_request_front<bot_delay_request>(origin);
-            }
+        if (is_response) {
+            respond_to_request(origin);
+        } else {
+            queue_request_front<bot_delay_request>(origin);
         }
     }
 }
