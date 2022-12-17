@@ -71,7 +71,7 @@ namespace banggame {
                 if (saved->alive()) {
                     origin->m_game->queue_request<request_saved>(origin_card, origin, saved);
                 }
-            }, 1);
+            }, 4);
         });
     }
 }
