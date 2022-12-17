@@ -66,11 +66,8 @@ namespace banggame {
         // viene chiamato quando una carta arancione viene scartata perche' sono finiti i cubetti
         EVENT(on_discard_orange_card, player *target, card *target_card)
 
-        // viene chiamato prima che un giocatore viene colpito
-        EVENT(before_hit, card *origin_card, player *origin, player *target, int damage, effect_flags flags)
-
-        // viene chiamato dopo che un giocatore viene colpito
-        EVENT(after_hit, card *origin_card, player *origin, player *target, int damage, effect_flags flags)
+        // viene chiamato quando un giocatore viene colpito
+        EVENT(on_hit, card *origin_card, player *origin, player *target, int damage, effect_flags flags)
 
         // viene chiamato quando un giocatore gioca mancato
         EVENT(on_missed, card *origin_card, player *origin, player *target, effect_flags flags)
