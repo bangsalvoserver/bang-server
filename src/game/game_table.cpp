@@ -37,16 +37,18 @@ namespace banggame {
         if (check_flags(game_flags::disable_player_distances)) {
             return 1 + to->m_distance_mod;
         }
+
+        player_iterator from_it{from};
+        player_iterator to_it{to};
         
-        if (to->alive()) {
-            return std::min(
-                std::distance(player_iterator(from), player_iterator(to)),
-                std::distance(player_iterator(to), player_iterator(from))) + to->m_distance_mod;
-        } else {
-            return std::min(
-                std::distance(player_iterator(from), std::prev(player_iterator(to))),
-                std::distance(std::next(player_iterator(to)), player_iterator(from))) + 1 + to->m_distance_mod;
+        if (!to->alive()) {
+            --to_it;
         }
+
+        return std::min(
+            std::distance(from_it, to_it),
+            std::distance(std::reverse_iterator(from_it), std::reverse_iterator(to_it))
+        ) + to->m_distance_mod + (!to->alive());
     }
 
     int game_table::num_alive() const {
