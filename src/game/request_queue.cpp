@@ -57,7 +57,9 @@ namespace banggame {
 
     void request_queue::pop_request() {
         auto &req = top_request();
+        ++m_lock_updates;
         req.on_pop();
+        --m_lock_updates;
         if (req.is_sent()) {
             m_game->send_request_status_clear();
         }

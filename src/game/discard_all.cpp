@@ -47,9 +47,8 @@ namespace banggame {
         }
 
         void on_pop() override {
-            for (card *target_card : to_vector(std::views::filter(target->m_table, &card::is_black))) {
-                target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
-                target->discard_card(target_card);
+            while (!target->m_table.empty()) {
+                on_pick(target->m_table.front());
             }
             target->drop_all_cubes(target->first_character());
             if (reason != discard_all_reason::sheriff_killed_deputy) {
