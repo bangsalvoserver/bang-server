@@ -935,8 +935,8 @@ main_deck:
     equip:
       - tumbleweed
     responses:
-      - tumbleweed
       - pay_cube self_cubes(1)
+      - tumbleweed
   - name: DOUBLE_BARREL
     signs:
       - 6 clubs
