@@ -161,7 +161,7 @@ namespace banggame {
         } else if (!update.respond_cards.empty()) {
             std::set<card *> cards{update.respond_cards.begin(), update.respond_cards.end()};
             while (!cards.empty()) {
-                card *origin_card = random_card_of_pocket(update.respond_cards, origin->m_game->rng,
+                card *origin_card = random_card_of_pocket(cards, origin->m_game->rng,
                     pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand);
                 if (!origin_card) break;
 
