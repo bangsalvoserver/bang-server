@@ -179,7 +179,6 @@ namespace banggame {
         (resolve,               effect_resolve)
         (bang,                  effect_bang)
         (banglimit,             effect_banglimit)
-        (missed_base,           effect_missed_base)
         (missed,                effect_missed)
         (barrel,                effect_barrel)
         (discard,               effect_discard)

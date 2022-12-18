@@ -2,11 +2,11 @@
 #define __CANYONDIABLO_DISARM_H__
 
 #include "cards/card_effect.h"
+#include "cards/base/missed.h"
 
 namespace banggame {
 
-    struct effect_disarm {
-        bool can_respond(card *origin_card, player *origin);
+    struct effect_disarm : effect_missed {
         void on_play(card *origin_card, player *origin);
     };
 }

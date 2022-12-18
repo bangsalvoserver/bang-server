@@ -18,6 +18,5 @@ namespace banggame {
             origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
             origin->add_to_hand(origin_card);
         }
-        effect_missed().on_play(origin_card, origin);
     }
 }

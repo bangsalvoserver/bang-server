@@ -47,11 +47,12 @@ namespace banggame {
                 target->m_game->set_card_visibility(target_card);
             }
             
-            if (std::ranges::any_of(target->m_game->m_selection, [this](card *c) {
-                return target->get_card_sign(c).rank == card_rank::rank_A;
-            })) {
+            if (auto it = std::ranges::find(target->m_game->m_selection, card_rank::rank_A, [this](card *c) {
+                return target->get_card_sign(c).rank;
+            }); it != target->m_game->m_selection.end()) {
                 target->m_game->invoke_action([&]{
                     target->m_game->pop_request();
+                    target->m_game->flash_card(*it);
                     target->m_game->add_short_pause();
                     target->m_game->add_log("LOG_POKER_ACE");
                     while (!target->m_game->m_selection.empty()) {

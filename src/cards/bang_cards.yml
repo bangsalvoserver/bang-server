@@ -242,6 +242,7 @@ main_deck:
     color: brown
     responses:
       - missed
+      - play_card_action
     tags:
       - missedcard
   - &panic
@@ -396,8 +397,9 @@ main_deck:
     expansion: dodgecity
     color: brown
     responses:
-      - draw
       - missed
+      - play_card_action
+      - draw
   - name: SPRINGFIELD
     signs:
       - K spades
@@ -437,8 +439,9 @@ main_deck:
     expansion: dodgecity
     color: green
     responses:
-      - draw
       - missed
+      - play_card_action
+      - draw
   - name: CANTEEN
     signs:
       - 7 hearts
@@ -465,6 +468,7 @@ main_deck:
     color: green
     responses:
       - missed
+      - play_card_action
   - name: CONESTOGA
     signs:
       - 9 diamonds
@@ -523,6 +527,7 @@ main_deck:
     color: green
     responses:
       - missed
+      - play_card_action
   - name: PONY_EXPRESS
     signs:
       - Q diamonds
@@ -549,6 +554,7 @@ main_deck:
     color: green
     responses:
       - missed
+      - play_card_action
   - name: GHOST
     signs:
       - 9 spades
@@ -626,6 +632,7 @@ main_deck:
     color: brown
     responses:
       - escape
+      - play_card_action
   - name: AIM
     signs:
       - 6 clubs
@@ -651,7 +658,7 @@ main_deck:
     color: brown
     responses:
       - backfire
-      - missed
+      - play_card_action
     tags:
       - missedcard
   - name: SAVED
@@ -797,7 +804,8 @@ main_deck:
     expansion: armedanddangerous
     color: brown
     responses:
-      - missed_base
+      - missed
+      - play_card_action
     optional:
       - pay_cube select_cubes(2)
       - mth_add
@@ -916,8 +924,8 @@ main_deck:
     expansion: armedanddangerous
     color: orange
     responses:
-      - pay_cube self_cubes(2)
       - missed
+      - pay_cube self_cubes(2)
   - name: TUMBLEWEED
     signs:
       - 4 clubs
@@ -927,8 +935,8 @@ main_deck:
     equip:
       - tumbleweed
     responses:
-      - pay_cube self_cubes(1)
       - tumbleweed
+      - pay_cube self_cubes(1)
   - name: DOUBLE_BARREL
     signs:
       - 6 clubs
@@ -1018,7 +1026,7 @@ main_deck:
     color: brown
     responses:
       - mirage
-      - missed
+      - play_card_action
     tags:
       - missedcard
   - name: BLOOD_PACT
@@ -1046,7 +1054,7 @@ main_deck:
     color: brown
     responses:
       - disarm
-      - missed
+      - play_card_action
     tags:
       - missedcard
   - name: MOLOTOV
@@ -1209,6 +1217,7 @@ main_deck:
     color: brown
     responses:
       - missed
+      - play_card_action
       - bang conditional_player notself range_1
     tags:
       - missedcard
@@ -1276,8 +1285,9 @@ character:
       - mth_add player reachable notself
     mth_effect: play_as_bang
     responses:
-      - discard card self | hand bangcard
       - missed
+      - play_card_action
+      - discard card self | hand bangcard
     tags:
       - play_as_bang
   - name: EL_GRINGO
@@ -1416,8 +1426,9 @@ character:
     image: 03_elena_fuente
     expansion: dodgecity
     responses:
-      - discard card self | hand
       - missed
+      - play_card_action
+      - discard card self | hand
     tags:
       - max_hp(3)
   - name: GREG_DIGGER
@@ -1528,8 +1539,8 @@ character:
     equip:
       - mick_defender
     responses:
-      - discard card self | hand missed
       - escape
+      - discard card self | hand missed
   - name: TUCO_FRANZISKANER
     image: 07_tucofranziskaner
     expansion: valleyofshadows
@@ -1933,6 +1944,7 @@ goldrush:
       - buy_cost(2)
     responses:
       - forced_play
+      - play_card_action
   - name: BOTTLE_PANIC
     image: 04_bottiglia_panico
     color: brown
@@ -1990,6 +2002,7 @@ goldrush:
       - buy_cost(2)
     responses:
       - forced_play
+      - play_card_action
   - name: PARDNER_GENERAL_STORE
     image: 04_complice_emporio
     color: brown
@@ -2033,6 +2046,7 @@ goldrush:
       - pass_turn
     responses:
       - forced_play
+      - play_card_action
       - goldrush
       - pass_turn
     tags:
@@ -2070,6 +2084,7 @@ goldrush:
       - rum
     responses:
       - forced_play
+      - play_card_action
       - rum
     tags:
       - buy_cost(3)
@@ -2103,6 +2118,7 @@ goldrush:
       - draw(4)
     responses:
       - forced_play
+      - play_card_action
       - draw(4)
     tags:
       - buy_cost(4)

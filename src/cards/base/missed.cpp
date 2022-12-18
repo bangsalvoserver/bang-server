@@ -5,14 +5,14 @@
 
 namespace banggame {
     
-    bool effect_missed_base::can_respond(card *origin_card, player *origin) {
+    bool effect_missed::can_respond(card *origin_card, player *origin) {
         if (auto *req = origin->m_game->top_request_if<missable_request>(origin)) {
             return req->can_miss(origin_card);
         }
         return false;
     }
 
-    game_string effect_missed_base::on_prompt(card *origin_card, player *origin) {
+    game_string effect_missed::on_prompt(card *origin_card, player *origin) {
         if (auto *req = origin->m_game->top_request_if<request_bang>(origin)) {
             if (req->bang_strength > std::ranges::count_if(origin->m_game->make_request_update(origin).respond_cards, [](card *c) {
                 return c->pocket != pocket_type::button_row;

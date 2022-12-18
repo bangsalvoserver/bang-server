@@ -100,8 +100,11 @@ namespace banggame {
     void play_card_verify::play_modifiers() const {
         for (card *mod_card : modifiers) {
             origin->log_played_card(mod_card, false);
-            origin->play_card_action(mod_card);
-            for (effect_holder &e : mod_card->effects) {
+            auto &effects = is_response ? mod_card->responses : mod_card->effects;
+            if (!ranges_contains(effects, effect_type::play_card_action, &effect_holder::type)) {
+                origin->play_card_action(mod_card);
+            }
+            for (effect_holder &e : effects) {
                 if (e.target == target_type::none) {
                     e.on_play(mod_card, origin);
                 } else if (e.target == target_type::self_cubes) {
@@ -307,9 +310,14 @@ namespace banggame {
     void play_card_verify::do_play_card() const {
         card *playing_card = get_playing_card();
 
-        auto &effects = is_response ? playing_card->responses : playing_card->effects;
         origin->log_played_card(playing_card, is_response);
-        if (origin_card != playing_card || !ranges_contains(effects, effect_type::play_card_action, &effect_holder::type)) {
+        if (origin_card != playing_card || std::ranges::none_of(
+            util::concat_view(std::views::all(modifiers), std::views::single(playing_card)),
+            [&](card *target_card) {
+                return ranges_contains(is_response ? target_card->responses : target_card->effects,
+                    effect_type::play_card_action, &effect_holder::type);
+            }))
+        {
             origin->play_card_action(origin_card);
         }
 
@@ -317,7 +325,7 @@ namespace banggame {
         card_cube_count selected_cubes;
 
         target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
+        for (const auto &[target, effect] : zip_card_targets(targets, is_response ? playing_card->responses : playing_card->effects, playing_card->optionals)) {
             if (effect.type == effect_type::mth_add) {
                 mth_targets.push_back(target);
             } else if (effect.type == effect_type::pay_cube) {

@@ -39,7 +39,7 @@ namespace banggame {
     }
 
     void effect_forced_play::on_play(card *origin_card, player *target) {
-        if (origin_card->modifier == card_modifier_type::none) {
+        if (origin_card->pocket != pocket_type::hidden_deck) {
             target->m_game->pop_request();
         }
     }

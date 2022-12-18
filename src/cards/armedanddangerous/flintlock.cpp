@@ -11,8 +11,10 @@ namespace banggame {
         if (paid_cubes) {
             origin->m_game->add_listener<event_type::on_missed>(origin_card, [=](card *origin_card, player *p, player *target, effect_flags flags) {
                 if (origin == p) {
-                    origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
-                    origin->add_to_hand(origin_card);
+                    origin->m_game->queue_action([=]{
+                        origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
+                        origin->add_to_hand(origin_card);
+                    });
                 }
             });
             req->on_cleanup([=]{
