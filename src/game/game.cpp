@@ -422,16 +422,18 @@ namespace banggame {
         }, 2);
 
         if (killer && m_players.size() > 3) {
-            if (killer != target && target->m_role == player_role::outlaw) {
-                queue_action([killer] {
-                    killer->draw_card(3);
-                }, 2);
-            } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
-                queue_action([this, killer] {
-                    add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                    killer->discard_all(discard_all_reason::sheriff_killed_deputy);
-                }, -2);
-            }
+            queue_action([this, killer, target] {
+                if (killer->alive()) {
+                    if (target->m_role == player_role::outlaw) {
+                        killer->draw_card(3);
+                    } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
+                        queue_action([this, killer] {
+                            add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
+                            killer->discard_all(discard_all_reason::sheriff_killed_deputy);
+                        }, -2);
+                    }
+                }
+            }, 2);
         }
         
         queue_action([=]{
