@@ -16,9 +16,7 @@ namespace banggame {
 
         for (player *p : m_players) {
             co_yield make_update<game_update_type::player_user>(p, p->user_id);
-            if (p->check_player_flags(player_flags::removed)) {
-                co_yield make_update<game_update_type::player_remove>(p, true);
-            }
+            co_yield make_update<game_update_type::player_status>(p, p->m_player_flags, p->m_range_mod, p->m_weapon_range, p->m_distance_mod);
         }
         
         co_yield make_update<game_update_type::add_cards>(make_id_vector(m_context.cards), pocket_type::hidden_deck);
@@ -73,7 +71,6 @@ namespace banggame {
                 co_await move_cards(p->m_hand);
 
                 co_yield make_update<game_update_type::player_hp>(p, p->m_hp, true);
-                co_yield make_update<game_update_type::player_status>(p, p->m_player_flags, p->m_range_mod, p->m_weapon_range, p->m_distance_mod);
                 
                 if (p->m_gold != 0) {
                     co_yield make_update<game_update_type::player_gold>(p, p->m_gold);
@@ -497,14 +494,25 @@ namespace banggame {
             if (target == m_first_player && num_alive() > 1) {
                 add_update<game_update_type::move_scenario_deck>(m_first_player);
             }
-            if (!bool(m_options.expansions & card_expansion_type::ghostcards)) {
-                target->add_player_flags(player_flags::removed);
-                add_update<game_update_type::player_remove>(target);
-            }
+        }, -4);
+
+        if (!bool(m_options.expansions & card_expansion_type::ghostcards)) {
+            queue_action([this]{
+                if (auto range = std::views::filter(m_players, [](player *p) { return !p->alive() && !p->check_player_flags(player_flags::removed); })) {
+                    for (player *p : range) {
+                        p->add_player_flags(player_flags::removed);
+                    }
+                    
+                    add_update<game_update_type::player_order>(to_vector_not_null(std::views::filter(m_players, &player::alive)));
+                }
+            }, -5);
+        }
+
+        queue_action([this, target]{
             if (m_playing == target) {
                 start_next_turn();
             }
-        }, -4);
+        }, -6);
     }
 
 }

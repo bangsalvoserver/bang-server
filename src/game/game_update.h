@@ -127,15 +127,6 @@ namespace banggame {
         (int, user_id)
     )
 
-    DEFINE_STRUCT(player_remove_update,
-        (serial::player, player)
-        (bool, instant),
-
-        auto get_duration() const {
-            return instant ? 0ms : durations::move_player;
-        }
-    )
-
     DEFINE_STRUCT(player_hp_update,
         (serial::player, player)
         (int, hp)
@@ -233,7 +224,6 @@ namespace banggame {
         (player_add, player_add_update)
         (player_order, player_order_update)
         (player_user, player_user_update)
-        (player_remove, player_remove_update)
         (player_hp, player_hp_update)
         (player_gold, player_gold_update)
         (player_show_role, player_show_role_update)
