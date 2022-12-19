@@ -443,56 +443,66 @@ namespace banggame {
         }
 
         queue_action([this, killer, target] {
-            player_role winner_role = player_role::unknown;
-
-            auto alive_players_view = m_players | std::views::filter(&player::alive);
-            size_t num_alive = std::ranges::distance(alive_players_view);
-
-            if (num_alive == 0) {
-                winner_role = player_role::outlaw;
-            } else if (num_alive == 1 || std::ranges::all_of(alive_players_view, [](player_role role) {
-                return role == player_role::sheriff || role == player_role::deputy;
-            }, &player::m_role)) {
-                winner_role = (*alive_players_view.begin())->m_role;
-            } else if (m_players.size() > 3) {
-                if (target->m_role == player_role::sheriff) {
-                    winner_role = player_role::outlaw;
-                }
-            } else if (killer) {
-                if (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::renegade_3p) {
-                    winner_role = player_role::renegade_3p;
-                } else if (target->m_role == player_role::renegade_3p && killer->m_role == player_role::deputy_3p) {
-                    winner_role = player_role::deputy_3p;
-                } else if (target->m_role == player_role::deputy_3p && killer->m_role == player_role::outlaw_3p) {
-                    winner_role = player_role::outlaw_3p;
-                }
-            }
-
-            if (winner_role != player_role::unknown) {
+            auto declare_winners = [this](auto &&winners) {
                 for (player *p : m_players) {
                     if (p->add_player_flags(player_flags::role_revealed)) {
                         add_update<game_update_type::player_show_role>(p, p->m_role);
                     }
                 }
                 add_log("LOG_GAME_OVER");
+                for (player *p : winners) {
+                    p->add_player_flags(player_flags::winner);
+                }
                 set_game_flags(game_flags::game_over);
-                add_update<game_update_type::game_over>(winner_role);
+            };
+
+            auto alive_players = to_vector(std::views::filter(m_players, &player::alive));
+
+            if (m_players.size() > 3) {
+                auto is_outlaw = [](player *p) { return p->m_role == player_role::outlaw; };
+                auto is_sheriff_or_deputy = [](player *p) { return p->m_role == player_role::sheriff || p->m_role == player_role::deputy; };
+
+                if (alive_players.empty()) {
+                    declare_winners(std::views::filter(m_players, is_outlaw));
+                } else if (std::ranges::all_of(alive_players, is_sheriff_or_deputy)) {
+                    declare_winners(std::views::filter(m_players, is_sheriff_or_deputy));
+                } else if (alive_players.size() == 1) {
+                    if (std::ranges::all_of(alive_players, is_outlaw)) {
+                        declare_winners(std::views::filter(m_players, is_outlaw));
+                    } else {
+                        declare_winners(alive_players);
+                    }
+                } else if (target->m_role == player_role::sheriff) {
+                    declare_winners(std::views::filter(m_players, is_outlaw));
+                }
             } else {
-                if (killer && killer != target && m_players.size() <= 3) {
-                    killer->draw_card(3);
-                }
-                if (target == m_first_player && num_alive > 1) {
-                    add_update<game_update_type::move_scenario_deck>(m_first_player);
-                }
-                if (!bool(m_options.expansions & card_expansion_type::ghostcards)) {
-                    target->add_player_flags(player_flags::removed);
-                    add_update<game_update_type::player_remove>(target);
-                }
-                if (m_playing == target) {
-                    start_next_turn();
+                if (alive_players.size() <= 1) {
+                    declare_winners(alive_players);
+                } else if (killer && (
+                    (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::renegade_3p) ||
+                    (target->m_role == player_role::renegade_3p && killer->m_role == player_role::deputy_3p) ||
+                    (target->m_role == player_role::deputy_3p && killer->m_role == player_role::outlaw_3p)))
+                {
+                    declare_winners(std::views::single(killer));
                 }
             }
         }, -3);
+
+        queue_action([this, killer, target]{
+            if (killer && killer != target && m_players.size() <= 3) {
+                killer->draw_card(3);
+            }
+            if (target == m_first_player && num_alive() > 1) {
+                add_update<game_update_type::move_scenario_deck>(m_first_player);
+            }
+            if (!bool(m_options.expansions & card_expansion_type::ghostcards)) {
+                target->add_player_flags(player_flags::removed);
+                add_update<game_update_type::player_remove>(target);
+            }
+            if (m_playing == target) {
+                start_next_turn();
+            }
+        }, -4);
     }
 
 }

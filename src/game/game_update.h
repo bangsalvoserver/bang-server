@@ -6,10 +6,6 @@
 
 namespace banggame {
 
-    DEFINE_STRUCT(game_over_update,
-        (player_role, winner_role)
-    )
-
     DEFINE_STRUCT(card_backface,
         (int, id)
         (card_deck_type, deck)
@@ -183,6 +179,7 @@ namespace banggame {
         (treat_missed_as_bang)
         (role_revealed)
         (removed)
+        (winner)
     )
 
     DEFINE_STRUCT(player_status_update,
@@ -217,7 +214,6 @@ namespace banggame {
     )
 
     DEFINE_ENUM_TYPES(game_update_type,
-        (game_over, game_over_update)
         (game_error, game_string)
         (game_log, game_string)
         (game_prompt, game_string)

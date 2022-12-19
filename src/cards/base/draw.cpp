@@ -96,7 +96,7 @@ namespace banggame {
                 {
                     origin->request_drawing();
                 }
-            }, -4);
+            }, -5);
         });
     }
 
