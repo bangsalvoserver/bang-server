@@ -50,6 +50,9 @@ namespace banggame {
     struct request_steal : request_targeting {
         using request_targeting::request_targeting;
 
+        timer_targeting m_timer{this};
+        request_timer *timer() override { return &m_timer; }
+
         void on_resolve_target() override {
             effect_steal{}.on_resolve(origin_card, origin, target_card);
         }
@@ -114,6 +117,9 @@ namespace banggame {
     
     struct request_destroy : request_targeting {
         using request_targeting::request_targeting;
+
+        timer_targeting m_timer{this};
+        request_timer *timer() override { return &m_timer; }
 
         void on_resolve_target() override {
             effect_destroy{}.on_resolve(origin_card, origin, target_card);

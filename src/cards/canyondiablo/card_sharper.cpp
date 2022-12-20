@@ -26,6 +26,9 @@ namespace banggame {
 
         card *chosen_card;
 
+        timer_targeting m_timer{this};
+        request_timer *timer() override { return &m_timer; }
+
         std::vector<card *> get_highlights() const override {
             return {target_card, chosen_card};
         }
