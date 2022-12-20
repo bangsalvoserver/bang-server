@@ -1,0 +1,13 @@
+target_sources(bangserver
+PRIVATE
+    card.cpp
+    cards_other_players.cpp
+    cards.cpp
+    conditional_player.cpp
+    extra_card.cpp
+    none.cpp
+    player.cpp
+    players.cpp
+    select_cubes.cpp
+    self_cubes.cpp
+)

@@ -1,3 +1,5 @@
+add_subdirectory(target_types)
+
 target_sources(bangserver
 PRIVATE
     bot_ai.cpp
@@ -9,7 +11,6 @@ PRIVATE
     player.cpp
     player_iterator.cpp
     play_verify.cpp
-    play_visitor.cpp
     possible_to_play.cpp
     request_queue.cpp
 )

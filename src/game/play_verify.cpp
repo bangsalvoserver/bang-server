@@ -1,7 +1,5 @@
 #include "play_verify.h"
 
-#include "play_visitor.h"
-
 #include "cards/effect_list_zip.h"
 #include "cards/effect_context.h"
 #include "cards/effect_enums.h"
