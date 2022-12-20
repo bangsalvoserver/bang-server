@@ -50,6 +50,22 @@ namespace banggame {
                 random_element(origin->make_card_target_set(origin_card, holder), origin->m_game->rng)};
         case target_type::players:
             return enums::enum_tag<target_type::players>;
+        case target_type::fanning_targets:
+            return {enums::enum_tag<target_type::fanning_targets>, [&]{
+                std::vector<std::pair<player *, player *>> possible_targets;
+                for (player *target1 : origin->m_game->m_players) {
+                    if (origin != target1 && origin->m_game->calc_distance(origin, target1) <= origin->m_weapon_range + origin->m_range_mod) {
+                        if (player *target2 = *std::next(player_iterator(target1)); origin != target2 && target2->m_distance_mod == 0) {
+                            possible_targets.emplace_back(target1, target2);
+                        }
+                        if (player *target2 = *std::prev(player_iterator(target1)); origin != target2 && target2->m_distance_mod == 0) {
+                            possible_targets.emplace_back(target1, target2);
+                        }
+                    }
+                }
+                auto [target1, target2] = random_element(possible_targets, origin->m_game->rng);
+                return std::vector<not_null<player *>>{target1, target2};
+            }()};
         case target_type::cards:
             return {enums::enum_tag<target_type::cards>, [&]{
                 std::vector<not_null<card *>> ret;

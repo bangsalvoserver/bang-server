@@ -129,6 +129,45 @@ namespace banggame {
         }
     }
 
+    template<> game_string play_visitor<target_type::fanning_targets>::verify(const std::vector<not_null<player *>> &targets) {
+        if (targets.size() != 2) {
+            return "ERROR_INVALID_TARGETS";
+        }
+        card *playing_card = verifier.get_playing_card();
+        if (auto error = check_player_filter(verifier.origin, target_player_filter::notself | target_player_filter::reachable, targets.front())) {
+            return error;
+        } else if (verifier.origin->m_game->calc_distance(targets.front(), targets.back()) > 1) {
+            return "ERROR_TARGETS_NOT_ADJACENT";
+        }
+        return {};
+    }
+
+    template<> duplicate_set play_visitor<target_type::fanning_targets>::duplicates(const std::vector<not_null<player *>> &targets) {
+        return player_set{targets.front(), targets.back()};
+    }
+
+    template<> game_string play_visitor<target_type::fanning_targets>::prompt(const std::vector<not_null<player *>> &targets) {
+        for (player *target : targets) {
+            if (game_string err = play_visitor<target_type::player>{verifier, effect}.prompt(target)) {
+                return err;
+            }
+        }
+        return {};
+    }
+
+    template<> void play_visitor<target_type::fanning_targets>::play(const std::vector<not_null<player *>> &targets) {
+        card *playing_card = verifier.get_playing_card();
+        auto flags = effect_flags{};
+        if (playing_card->is_brown()) {
+            flags |= effect_flags::escapable;
+        }
+        for (player *target : targets) {
+            if (!target->immune_to(playing_card, verifier.origin, flags)) {
+                effect.on_play(playing_card, verifier.origin, target, flags);
+            }
+        }
+    }
+
     template<> game_string play_visitor<target_type::card>::verify(card *target) {
         card *playing_card = verifier.get_playing_card();
         if (!target->owner) {

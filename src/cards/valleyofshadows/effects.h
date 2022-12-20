@@ -8,7 +8,6 @@
 #include "colorado_bill.h"
 #include "escape.h"
 #include "evelyn_shebang.h"
-#include "fanning.h"
 #include "ghost.h"
 #include "henry_block.h"
 #include "lemonade_jim.h"

@@ -71,6 +71,14 @@ namespace banggame {
                 return count_cubes() >= holder.target_value;
             case target_type::self_cubes:
                 return target_card->num_cubes >= holder.target_value;
+            case target_type::fanning_targets:
+                return std::ranges::any_of(m_game->m_players, [&](player *target) {
+                    if (target != this && m_game->calc_distance(this, target) <= m_weapon_range + m_range_mod) {
+                        if (player *target2 = *std::next(player_iterator(target)); target2 != this && target2->m_distance_mod == 0) return true;
+                        if (player *target2 = *std::prev(player_iterator(target)); target2 != this && target2->m_distance_mod == 0) return true;
+                    }
+                    return false;
+                });
             default:
                 return true;
             }

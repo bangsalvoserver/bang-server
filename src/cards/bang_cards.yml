@@ -676,11 +676,8 @@ main_deck:
     expansion: valleyofshadows
     color: brown
     effects:
-      - mth_add player reachable notself
-      - mth_add player notself
       - banglimit
-      - fanning
-    mth_effect: fanning
+      - bang fanning_targets
     tags:
       - discard_if_two_players
       - skip_logs
