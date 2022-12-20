@@ -21,14 +21,11 @@ namespace banggame {
                 target->add_to_hand_phase_one(target_card);
                 if (target->m_num_drawn_cards >= target->get_cards_to_draw()) {
                     target->m_game->pop_request();
+                    while (!target->m_game->m_selection.empty()) {
+                        target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
+                    }
                 }
             });
-        }
-
-        void on_pop() override {
-            while (!target->m_game->m_selection.empty()) {
-                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
-            }
         }
 
         game_string status_text(player *owner) const override {

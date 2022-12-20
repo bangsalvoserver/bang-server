@@ -75,6 +75,9 @@ namespace banggame {
         bool is_popped() const {
             return m_value->popped;
         }
+        void set_popped() {
+            m_value->popped = true;
+        }
         game_string status_text(player *owner) const {
             return m_value->status_text(owner);
         }
@@ -93,11 +96,6 @@ namespace banggame {
 
         void on_update() {
             m_value->on_update();
-        }
-
-        void on_pop() {
-            m_value->on_pop();
-            m_value->popped = true;
         }
 
         void start(ticks total_update_time) {

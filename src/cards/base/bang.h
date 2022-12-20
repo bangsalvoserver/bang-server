@@ -46,6 +46,8 @@ namespace banggame {
         request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags) {}
 
+        ~request_bang();
+
         int bang_strength = 1;
         int bang_damage = 1;
         bool unavoidable = false;
@@ -62,7 +64,6 @@ namespace banggame {
 
         void on_miss() override;
         void on_resolve() override;
-        void on_pop() override;
 
         game_string status_text(player *owner) const override;
     };

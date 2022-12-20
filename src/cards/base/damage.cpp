@@ -63,9 +63,12 @@ namespace banggame {
             }, 3);
         }
         target->m_game->call_event<event_type::on_hit>(origin_card, origin, target, damage, flags);
+        if (cleanup_function) {
+            std::invoke(std::exchange(cleanup_function, nullptr));
+        }
     }
 
-    void request_damage::on_pop() {
+    request_damage::~request_damage() {
         if (cleanup_function) {
             std::invoke(std::exchange(cleanup_function, nullptr));
         }

@@ -42,21 +42,20 @@ namespace banggame {
                 ))) {
                     on_pick(target_card);
                 }
-                target->m_game->pop_request();
-            });
-        }
 
-        void on_pop() override {
-            while (!target->m_table.empty()) {
-                on_pick(target->m_table.front());
-            }
-            target->drop_all_cubes(target->first_character());
-            if (reason != discard_all_reason::sheriff_killed_deputy) {
-                target->add_gold(-target->m_gold);
-            }
-            if (reason == discard_all_reason::death) {
-                target->m_game->play_sound(nullptr, "death");
-            }
+                target->m_game->pop_request();
+                
+                while (!target->m_table.empty()) {
+                    on_pick(target->m_table.front());
+                }
+                target->drop_all_cubes(target->first_character());
+                if (reason != discard_all_reason::sheriff_killed_deputy) {
+                    target->add_gold(-target->m_gold);
+                }
+                if (reason == discard_all_reason::death) {
+                    target->m_game->play_sound(nullptr, "death");
+                }
+            });
         }
 
         game_string status_text(player *owner) const override {

@@ -73,7 +73,6 @@ namespace banggame {
         virtual void on_pick(card *target_card) { throw std::runtime_error("missing on_pick(card)"); }
 
         virtual void on_update() {}
-        virtual void on_pop() {}
 
         virtual std::vector<card *> get_highlights() const { return {}; }
     

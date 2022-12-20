@@ -21,6 +21,8 @@ namespace banggame {
     struct request_damage : request_base {
         request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags = {});
 
+        ~request_damage();
+
         int damage;
 
         player *savior = nullptr;
@@ -41,7 +43,6 @@ namespace banggame {
         std::vector<card *> get_highlights() const override;
         void on_update() override;
         void on_finished();
-        void on_pop() override;
         game_string status_text(player *owner) const override;
     };
 }

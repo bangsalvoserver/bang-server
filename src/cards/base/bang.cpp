@@ -78,7 +78,7 @@ namespace banggame {
         });
     }
 
-    void request_bang::on_pop() {
+    request_bang::~request_bang() {
         if (cleanup_function) {
             std::invoke(std::exchange(cleanup_function, nullptr));
         }
