@@ -91,16 +91,17 @@ namespace banggame {
     }
 
     static card *random_card_playable_with_modifiers(player *origin, bool is_response, const std::vector<card *> &modifiers) {
-        auto cards_view = util::concat_view(
+        std::vector<card *> cards;
+        std::ranges::copy_if(util::concat_view(
             std::views::all(origin->m_characters),
-            std::views::all(origin->m_table) | std::views::filter(std::not_fn(&card::inactive)),
+            std::views::filter(origin->m_table, std::not_fn(&card::inactive)),
             std::views::all(origin->m_hand),
             std::views::all(origin->m_game->m_shop_selection),
-            std::views::all(origin->m_game->m_hidden_deck)
-        );
-        
-        std::vector<card *> cards;
-        std::ranges::copy_if(cards_view, std::back_inserter(cards), [&](card *target_card) {
+            std::views::all(origin->m_game->m_hidden_deck),
+            std::views::take(std::views::reverse(origin->m_game->m_scenario_cards), 1)
+        ),
+        std::back_inserter(cards),
+        [&](card *target_card) {
             if (ranges_contains(modifiers, target_card)) return false;
             if (!origin->is_possible_to_play(target_card, is_response)) return false;
 
@@ -186,26 +187,28 @@ namespace banggame {
     }
 
     static void play_in_turn(player *origin) {
-        auto cards_view = util::concat_view(
+        std::set<card *> cards;
+        std::ranges::copy_if(util::concat_view(
             std::views::all(origin->m_characters),
-            std::views::all(origin->m_table) | std::views::filter(std::not_fn(&card::inactive)),
+            std::views::filter(origin->m_table, std::not_fn(&card::inactive)),
             std::views::all(origin->m_hand),
             std::views::all(origin->m_game->m_shop_selection),
-            std::views::all(origin->m_game->m_button_row))
-            | std::views::filter([&](card *target_card){
-                if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
-                    return target_card->modifier != card_modifier_type::none
-                        || origin->is_possible_to_play(target_card, false);
-                } else {
-                    return !origin->make_equip_set(target_card).empty();
-                }
-            });
-
-        auto cards = std::set<card *>(std::ranges::begin(cards_view), std::ranges::end(cards_view));
+            std::views::all(origin->m_game->m_button_row),
+            std::views::take(std::views::reverse(origin->m_game->m_scenario_cards), 1)
+        ),
+        std::inserter(cards, cards.begin()),
+        [&](card *target_card){
+            if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
+                return target_card->modifier != card_modifier_type::none
+                    || origin->is_possible_to_play(target_card, false);
+            } else {
+                return !origin->make_equip_set(target_card).empty();
+            }
+        });
         
         while (!cards.empty()) {
             card *origin_card = random_card_of_pocket(cards, origin->m_game->rng,
-                pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand);
+                pocket_type::scenario_card, pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand);
             if (!origin_card) break;
 
             cards.erase(origin_card);
