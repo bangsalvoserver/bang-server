@@ -441,6 +441,18 @@ namespace banggame {
             return;
         }
 
+        if (!bool(m_options.expansions & card_expansion_type::ghostcards)) {
+            queue_action([this]{
+                if (auto range = std::views::filter(m_players, [](player *p) { return !p->alive() && !p->check_player_flags(player_flags::removed); })) {
+                    for (player *p : range) {
+                        p->add_player_flags(player_flags::removed);
+                    }
+                    
+                    add_update<game_update_type::player_order>(to_vector_not_null(std::views::filter(m_players, &player::alive)));
+                }
+            }, -3);
+        }
+
         queue_action([this, killer, target] {
             auto declare_winners = [this](auto &&winners) {
                 for (player *p : m_players) {
@@ -485,7 +497,7 @@ namespace banggame {
                     declare_winners(std::views::single(killer));
                 }
             }
-        }, -3);
+        }, -4);
 
         queue_action([this, killer, target]{
             if (killer && killer != target && m_players.size() <= 3) {
@@ -494,25 +506,10 @@ namespace banggame {
             if (target == m_first_player && num_alive() > 1) {
                 add_update<game_update_type::move_scenario_deck>(m_first_player);
             }
-        }, -4);
-
-        if (!bool(m_options.expansions & card_expansion_type::ghostcards)) {
-            queue_action([this]{
-                if (auto range = std::views::filter(m_players, [](player *p) { return !p->alive() && !p->check_player_flags(player_flags::removed); })) {
-                    for (player *p : range) {
-                        p->add_player_flags(player_flags::removed);
-                    }
-                    
-                    add_update<game_update_type::player_order>(to_vector_not_null(std::views::filter(m_players, &player::alive)));
-                }
-            }, -5);
-        }
-
-        queue_action([this, target]{
             if (m_playing == target) {
                 start_next_turn();
             }
-        }, -6);
+        }, -5);
     }
 
 }
