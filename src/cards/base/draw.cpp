@@ -62,7 +62,8 @@ namespace banggame {
 
     void request_draw::on_pick(card *target_card) {
         target->m_game->invoke_action([&]{
-            if (!target->m_game->call_event<event_type::on_draw_from_deck>(target, false)) {
+            target->m_game->call_event<event_type::on_draw_from_deck>(target);
+            if (!popped) {
                 target->m_game->pop_request();
                 int ncards = target->get_cards_to_draw();
                 while (target->m_num_drawn_cards < ncards) {
@@ -101,7 +102,7 @@ namespace banggame {
         if (origin->m_game->top_request_is<request_draw>()) {
             origin->m_game->pop_request();
             origin->m_game->queue_action([=]{
-                origin->m_game->call_event<event_type::on_draw_from_deck>(origin, true);
+                origin->m_game->call_event<event_type::on_draw_from_deck>(origin);
             }, -1);
         }
     }

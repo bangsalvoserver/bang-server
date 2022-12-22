@@ -356,8 +356,7 @@ namespace banggame {
         m_game->call_event<event_type::on_turn_start>(this);
         m_game->queue_action([this]{
             if (m_game->check_flags(game_flags::phase_one_override)) {
-                m_game->call_event<event_type::phase_one_override>(this);
-                m_game->call_event<event_type::on_draw_from_deck>(this, true);
+                m_game->call_event<event_type::on_draw_from_deck>(this);
             } else {
                 m_game->queue_request<request_draw>(this);
             }

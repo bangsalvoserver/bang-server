@@ -1,5 +1,7 @@
 #include "handcuffs.h"
 
+#include "cards/base/draw.h"
+
 #include "game/game.h"
 
 namespace banggame {
@@ -61,7 +63,7 @@ namespace banggame {
     };
 
     void equip_handcuffs::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_from_deck>({target_card, -1}, [=](player *origin, bool &override_request) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>({target_card, -1}, [=](player *origin) {
             origin->m_game->queue_request<request_handcuffs>(target_card, origin);
         });
         target->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player *origin, bool skipped) {

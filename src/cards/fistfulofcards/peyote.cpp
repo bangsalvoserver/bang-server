@@ -52,7 +52,7 @@ namespace banggame {
     };
     
     void equip_peyote::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::phase_one_override>(target_card, [=](player *p) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>({target_card, 1}, [=](player *p) {
             std::vector<card *> target_cards;
             for (card *c : p->m_game->m_hidden_deck) {
                 if (c->has_tag(tag_type::peyote)) {

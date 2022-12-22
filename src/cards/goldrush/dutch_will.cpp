@@ -1,5 +1,7 @@
 #include "dutch_will.h"
 
+#include "cards/base/draw.h"
+
 #include "game/game.h"
 
 namespace banggame {
@@ -39,9 +41,8 @@ namespace banggame {
     };
 
     void equip_dutch_will::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, bool &override_request) {
-            if (!override_request && origin == target && target->get_cards_to_draw() > 1) {
-                override_request = true;
+        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
+            if (target->m_game->top_request_is<request_draw>(target) && origin == target && target->get_cards_to_draw() > 1) {
                 target->m_game->invoke_action([&]{
                     target->m_game->pop_request();
                     target->m_game->queue_request<request_dutch_will>(target_card, target);

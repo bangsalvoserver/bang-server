@@ -96,11 +96,8 @@ namespace banggame {
         // viene chiamato all'inizio del turno, prima di pescare
         EVENT(on_turn_start, player *origin)
 
-        // viene chiamato all'inizio del turno, prima di attivare fase di pesca
-        EVENT(phase_one_override, player *origin)
-
         // viene chiamato quando si clicca sul mazzo per pescare in fase di pesca
-        EVENT(on_draw_from_deck, player *origin, bool &override_request)
+        EVENT(on_draw_from_deck, player *origin)
 
         // viene chiamato quando si pesca una carta in fase di pesca
         EVENT(on_card_drawn, player *origin, card *target_card, bool &reveal)
