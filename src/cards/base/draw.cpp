@@ -69,9 +69,6 @@ namespace banggame {
                     target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
                 }
             }
-            target->m_game->queue_action([target=target]{
-                target->m_game->call_event<event_type::post_draw_cards>(target);
-            });
         });
     }
 
@@ -102,17 +99,10 @@ namespace banggame {
 
     void effect_end_drawing::on_play(card *origin_card, player *origin) {
         if (origin->m_game->top_request_is<request_draw>()) {
-            origin->m_game->invoke_action([&]{
-                origin->m_game->pop_request();
-                origin->m_game->add_listener<event_type::on_effect_end>(origin_card, [=](player *p, card *c) {
-                    if (p == origin && c == origin_card) {
-                        origin->m_game->queue_action([=]{
-                            origin->m_game->call_event<event_type::post_draw_cards>(origin);
-                        });
-                        origin->m_game->remove_listeners(origin_card);
-                    }
-                });
-            });
+            origin->m_game->pop_request();
+            origin->m_game->queue_action([=]{
+                origin->m_game->call_event<event_type::on_draw_from_deck>(origin, true);
+            }, -1);
         }
     }
 }

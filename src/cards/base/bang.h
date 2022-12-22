@@ -54,9 +54,7 @@ namespace banggame {
 
         std::function<void()> cleanup_function;
 
-        void on_cleanup(std::function<void()> &&fun) {
-            cleanup_function = std::move(fun);
-        }
+        void on_cleanup(std::function<void()> &&fun);
 
         void on_update() override;
 

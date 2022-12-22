@@ -17,9 +17,11 @@ namespace banggame {
                                 --value;
                             }
                         });
-                        target->m_game->add_listener<event_type::post_draw_cards>(key, [=](player *origin) {
+                        target->m_game->add_listener<event_type::on_draw_from_deck>(key, [=](player *origin, bool &override_request) {
                             if (origin == target) {
-                                origin->m_game->remove_listeners(key);
+                                origin->m_game->queue_action([=]{
+                                    origin->m_game->remove_listeners(key);
+                                }, -1);
                             }
                         });
                     }

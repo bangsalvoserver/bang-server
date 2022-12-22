@@ -77,7 +77,7 @@ namespace banggame {
     }
 
     void equip_bomb::on_unequip(card *target_card, player *target) {
-        target->m_game->remove_listeners(event_card_key{target_card, 0});
+        target->m_game->remove_listeners(target_card);
     }
 
 }

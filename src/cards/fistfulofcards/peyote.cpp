@@ -38,7 +38,6 @@ namespace banggame {
                     while (!target->m_game->m_selection.empty()) {
                         target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, card_visibility::shown, true);
                     }
-                    target->m_game->call_event<event_type::post_draw_cards>(target);
                 }
             });
         }

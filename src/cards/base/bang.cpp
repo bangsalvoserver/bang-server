@@ -84,6 +84,17 @@ namespace banggame {
         }
     }
 
+    void request_bang::on_cleanup(std::function<void()> &&fun) {
+        if (cleanup_function) {
+            cleanup_function = [fun1=std::move(cleanup_function), fun2=std::move(fun)]{
+                std::invoke(fun1);
+                std::invoke(fun2);
+            };
+        } else {
+            cleanup_function = std::move(fun);
+        }
+    }
+
     void request_bang::on_update() {
         if (!sent) {
             if (bool(flags & effect_flags::multi_target)) {

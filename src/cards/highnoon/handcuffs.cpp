@@ -52,7 +52,7 @@ namespace banggame {
     };
 
     void equip_handcuffs::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::post_draw_cards>(target_card, [=](player *origin) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>({target_card, -1}, [=](player *origin, bool &override_request) {
             std::vector<card *> target_cards;
             for (card *c : origin->m_game->m_hidden_deck) {
                 if (c->has_tag(tag_type::handcuffs)) {

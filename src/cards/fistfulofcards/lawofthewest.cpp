@@ -11,11 +11,9 @@ namespace banggame {
                 event_card_key key{target_card, 1};
 
                 if (!drawn_card->is_brown() || !drawn_card->effects.empty()) {
-                    origin->m_game->add_listener<event_type::post_draw_cards>(key, [=](player *p) {
-                        if (p == origin) {
-                            origin->m_game->add_log("LOG_MANDATORY_CARD", origin, drawn_card);
-                        }
-                    });
+                    origin->m_game->queue_action([=] {
+                        origin->m_game->add_log("LOG_MANDATORY_CARD", origin, drawn_card);
+                    }, 1);
                 }
                 
                 if (drawn_card->is_brown()) {
