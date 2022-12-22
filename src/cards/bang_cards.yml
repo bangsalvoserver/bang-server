@@ -669,6 +669,7 @@ main_deck:
     color: brown
     responses:
       - saved
+      - play_card_action
   - name: FANNING
     signs:
       - 2 spades
@@ -921,8 +922,8 @@ main_deck:
     expansion: armedanddangerous
     color: orange
     responses:
-      - missed
       - pay_cube self_cubes(2)
+      - missed
   - name: TUMBLEWEED
     signs:
       - 4 clubs
@@ -1043,6 +1044,7 @@ main_deck:
     color: brown
     responses:
       - sacrifice
+      - play_card_action
   - name: DISARM
     signs:
       - 7 hearts
@@ -1283,7 +1285,6 @@ character:
     mth_effect: play_as_bang
     responses:
       - missed
-      - play_card_action
       - discard card self | hand bangcard
     tags:
       - play_as_bang
@@ -1424,7 +1425,6 @@ character:
     expansion: dodgecity
     responses:
       - missed
-      - play_card_action
       - discard card self | hand
     tags:
       - max_hp(3)
