@@ -8,6 +8,15 @@ namespace banggame {
         request_handcuffs(card *origin_card, player *target)
             : selection_picker(origin_card, nullptr, target) {}
 
+        void on_update() override {
+            if (!sent) {
+                auto is_handcuffs_selection = [](card *c) { return c->has_tag(tag_type::handcuffs); };
+                for (card *c : to_vector(std::views::filter(target->m_game->m_hidden_deck, is_handcuffs_selection))) {
+                    target->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
+                }
+            }
+        }
+
         void on_pick(card *target_card) override {
             target->m_game->flash_card(target_card);
             
@@ -53,19 +62,10 @@ namespace banggame {
 
     void equip_handcuffs::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>({target_card, -1}, [=](player *origin, bool &override_request) {
-            std::vector<card *> target_cards;
-            for (card *c : origin->m_game->m_hidden_deck) {
-                if (c->has_tag(tag_type::handcuffs)) {
-                    target_cards.push_back(c);
-                }
-            }
-            for (card *c : target_cards) {
-                origin->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
-            }
             origin->m_game->queue_request<request_handcuffs>(target_card, origin);
         });
-        target->m_game->add_listener<event_type::on_turn_end>(target_card, [target_card](player *p, bool skipped) {
-            p->m_game->remove_listeners(event_card_key{target_card, 1});
+        target->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player *origin, bool skipped) {
+            origin->m_game->remove_listeners(event_card_key{target_card, 1});
         });
     }
 }
