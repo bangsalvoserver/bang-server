@@ -156,7 +156,7 @@ main_deck:
     effects:
       - beer
     responses:
-      - beer_response
+      - beer(1)
       - deathsave
     tags:
       - beer

@@ -6,11 +6,11 @@
 namespace banggame {
 
     struct effect_beer {
+        bool is_response;
+        effect_beer(int value) : is_response(value) {}
+        
         game_string on_prompt(card *origin_card, player *target);
         void on_play(card *origin_card, player *target);
-    };
-
-    struct effect_beer_response : effect_beer {
         bool can_respond(card *origin_card, player *target);
     };
 }
