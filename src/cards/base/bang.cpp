@@ -70,11 +70,11 @@ namespace banggame {
     void request_bang::on_resolve() {
         target->m_game->invoke_action([&]{
             target->m_game->pop_request();
-            target->damage(origin_card, origin, bang_damage, flags);
-            if (auto *req = target->m_game->top_request_if<request_damage>(target)) {
-                req->cleanup_function = std::move(cleanup_function);
-                cleanup_function = nullptr;
-            }
+            target->m_game->queue_request_front([&]{
+                auto req = std::make_shared<request_damage>(origin_card, origin, target, bang_damage, flags);
+                req->cleanup_function = std::exchange(cleanup_function, nullptr);
+                return req;
+            }());
         });
     }
 
