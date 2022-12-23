@@ -467,27 +467,25 @@ namespace banggame {
                 set_game_flags(game_flags::game_over);
             };
 
-            auto alive_players = to_vector(std::views::filter(m_players, &player::alive));
+            auto alive_players = std::views::filter(m_players, &player::alive);
 
             if (m_players.size() > 3) {
                 auto is_outlaw = [](player *p) { return p->m_role == player_role::outlaw; };
+                auto is_renegade = [](player *p) { return p->m_role == player_role::renegade; };
+                auto is_sheriff = [](player *p) { return p->m_role == player_role::sheriff; };
                 auto is_sheriff_or_deputy = [](player *p) { return p->m_role == player_role::sheriff || p->m_role == player_role::deputy; };
 
-                if (alive_players.empty()) {
-                    declare_winners(std::views::filter(m_players, is_outlaw));
+                if (std::ranges::none_of(alive_players, is_sheriff)) {
+                    if (std::ranges::distance(alive_players) == 1 && is_renegade(alive_players.front())) {
+                        declare_winners(alive_players);
+                    } else {
+                        declare_winners(std::views::filter(m_players, is_outlaw));
+                    }
                 } else if (std::ranges::all_of(alive_players, is_sheriff_or_deputy)) {
                     declare_winners(std::views::filter(m_players, is_sheriff_or_deputy));
-                } else if (alive_players.size() == 1) {
-                    if (std::ranges::all_of(alive_players, is_outlaw)) {
-                        declare_winners(std::views::filter(m_players, is_outlaw));
-                    } else {
-                        declare_winners(alive_players);
-                    }
-                } else if (target->m_role == player_role::sheriff) {
-                    declare_winners(std::views::filter(m_players, is_outlaw));
                 }
             } else {
-                if (alive_players.size() <= 1) {
+                if (std::ranges::distance(alive_players) <= 1) {
                     declare_winners(alive_players);
                 } else if (killer && (
                     (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::renegade_3p) ||
