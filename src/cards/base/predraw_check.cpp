@@ -7,9 +7,9 @@ namespace banggame {
     bool request_predraw::can_pick(card *target_card) const {
         if (target_card->pocket == pocket_type::player_table && target_card->owner == target) {
             int top_priority = std::ranges::max(target->m_predraw_checks
-                | std::views::values
-                | std::views::filter(std::not_fn(&player::predraw_check::resolved))
-                | std::views::transform(&player::predraw_check::priority));
+                | ranges::views::values
+                | ranges::views::remove_if(&player::predraw_check::resolved)
+                | ranges::views::transform(&player::predraw_check::priority));
             auto it = target->m_predraw_checks.find(target_card);
             if (it != target->m_predraw_checks.end()
                 && !it->second.resolved

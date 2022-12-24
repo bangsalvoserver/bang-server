@@ -49,9 +49,9 @@ namespace banggame {
         }
 
         void on_update() override {
-            auto cards = util::concat_view(
-                origin->m_table | std::views::filter(std::not_fn(&card::is_black)),
-                origin->m_hand | std::views::take(1)
+            auto cards = ranges::views::concat(
+                origin->m_table | ranges::views::remove_if(&card::is_black),
+                origin->m_hand | ranges::views::take(1)
             );
             if (std::ranges::distance(cards) == 1) {
                 on_pick(cards.front());
@@ -87,7 +87,10 @@ namespace banggame {
                 }
             } while (--count != 0);
             if (range_targets.size() == 1) {
-                for (card *target_card : to_vector(target->m_table | std::views::filter(std::not_fn(&card::is_black)))) {
+                for (card *target_card : target->m_table
+                    | ranges::views::remove_if(&card::is_black)
+                    | ranges::to<std::vector>
+                ) {
                     steal_card(origin, target, target_card);
                 }
                 while (!target->empty_hand()) {

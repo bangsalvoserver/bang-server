@@ -294,7 +294,7 @@ namespace banggame {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         }
-        return play_card_verify{this, args.card, args.is_response, args.targets, unwrap_vector_not_null(args.modifiers)}.verify_and_play();
+        return play_card_verify{this, args.card, args.is_response, args.targets, ranges::to<std::vector<card *>>(args.modifiers)}.verify_and_play();
     }
 
     void player::prompt_then(game_string &&message, std::function<void()> &&fun) {
@@ -401,7 +401,7 @@ namespace banggame {
 
     void player::remove_extra_characters() {
         if (auto range = m_characters | std::views::drop(1)) {
-            m_game->add_update<game_update_type::remove_cards>(to_vector_not_null(range));
+            m_game->add_update<game_update_type::remove_cards>(ranges::to<std::vector<not_null<card *>>>(range));
 
             for (card *character : range) {
                 disable_equip(character);
@@ -461,11 +461,7 @@ namespace banggame {
     }
 
     int player::count_cubes() const {
-        return first_character()->num_cubes
-            + std::transform_reduce(
-                m_table.begin(),
-                m_table.end(),
-                0, std::plus(),
-                std::mem_fn(&card::num_cubes));
+        return ranges::accumulate(cube_slots()
+            | ranges::views::transform(&card::num_cubes), 0);
     }
 }

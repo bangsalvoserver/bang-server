@@ -79,11 +79,11 @@ private:
 };
 
 inline auto range_all_players(player *begin, int cycles = 1) {
-    return std::ranges::subrange(cycle_player_iterator(begin), cycle_player_iterator(begin, cycles));
+    return ranges::subrange(cycle_player_iterator(begin), cycle_player_iterator(begin, cycles));
 }
 
 inline auto range_other_players(player *begin) {
-    return std::ranges::subrange(std::next(player_iterator(begin)), player_iterator(begin));
+    return ranges::subrange(std::next(player_iterator(begin)), player_iterator(begin));
 }
 
 }

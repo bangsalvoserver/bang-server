@@ -11,7 +11,7 @@
 namespace banggame {
 
     card *play_card_verify::get_playing_card() const {
-        if (ranges_contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
+        if (ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
             return origin->m_last_played_card;
         } else {
             return origin_card;
@@ -101,7 +101,7 @@ namespace banggame {
         for (card *mod_card : modifiers) {
             origin->log_played_card(mod_card, false);
             auto &effects = is_response ? mod_card->responses : mod_card->effects;
-            if (!ranges_contains(effects, effect_type::play_card_action, &effect_holder::type)) {
+            if (!ranges::contains(effects, effect_type::play_card_action, &effect_holder::type)) {
                 origin->play_card_action(mod_card);
             }
             for (effect_holder &e : effects) {
@@ -312,9 +312,9 @@ namespace banggame {
 
         origin->log_played_card(playing_card, is_response);
         if (origin_card != playing_card || std::ranges::none_of(
-            util::concat_view(std::views::all(modifiers), std::views::single(playing_card)),
+            ranges::views::concat(modifiers, ranges::views::single(playing_card)),
             [&](card *target_card) {
-                return ranges_contains(is_response ? target_card->responses : target_card->effects,
+                return ranges::contains(is_response ? target_card->responses : target_card->effects,
                     effect_type::play_card_action, &effect_holder::type);
             }))
         {
@@ -418,7 +418,7 @@ namespace banggame {
             });
             break;
         case pocket_type::hidden_deck:
-            if (!ranges_contains(modifiers, card_modifier_type::shopchoice, &card::modifier)) {
+            if (!ranges::contains(modifiers, card_modifier_type::shopchoice, &card::modifier)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             [[fallthrough]];

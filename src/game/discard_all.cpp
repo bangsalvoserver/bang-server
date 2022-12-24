@@ -36,9 +36,9 @@ namespace banggame {
 
         void on_resolve() override {
             target->m_game->invoke_action([&]{
-                for (card *target_card : to_vector(util::concat_view(
-                    std::views::filter(target->m_table, std::not_fn(&card::is_black)),
-                    std::views::all(target->m_hand)
+                for (card *target_card : ranges::to<std::vector>(ranges::views::concat(
+                    target->m_table | ranges::views::remove_if(&card::is_black),
+                    target->m_hand
                 ))) {
                     on_pick(target_card);
                 }

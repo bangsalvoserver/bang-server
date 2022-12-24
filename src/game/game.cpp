@@ -12,14 +12,19 @@ namespace banggame {
 
     util::generator<Json::Value> game::get_spectator_updates() {
         co_yield make_update<game_update_type::player_add>(int(m_players.size()));
-        co_yield make_update<game_update_type::player_order>(to_vector_not_null(m_players), true);
+        co_yield make_update<game_update_type::player_order>(ranges::to<std::vector<not_null<player *>>>(m_players), true);
 
         for (player *p : m_players) {
             co_yield make_update<game_update_type::player_user>(p, p->user_id);
             co_yield make_update<game_update_type::player_status>(p, p->m_player_flags, p->m_range_mod, p->m_weapon_range, p->m_distance_mod);
         }
         
-        co_yield make_update<game_update_type::add_cards>(make_id_vector(m_context.cards), pocket_type::hidden_deck);
+        co_yield make_update<game_update_type::add_cards>(
+            m_context.cards
+                | ranges::views::addressof
+                | ranges::to<std::vector<card_backface>>,
+            pocket_type::hidden_deck
+        );
 
         auto move_cards = [&](auto &&range) -> util::generator<Json::Value> {
             for (card *c : range) {
@@ -154,7 +159,7 @@ namespace banggame {
         };
 
         if (add_cards(all_cards.button_row, pocket_type::button_row)) {
-            add_update<game_update_type::add_cards>(make_id_vector(m_button_row), pocket_type::button_row);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_button_row), pocket_type::button_row);
             for (card *c : m_button_row) {
                 set_card_visibility(c, nullptr, card_visibility::shown, true);
             }
@@ -162,16 +167,16 @@ namespace banggame {
 
         if (add_cards(all_cards.deck, pocket_type::main_deck)) {
             shuffle_cards_and_ids(m_deck);
-            add_update<game_update_type::add_cards>(make_id_vector(m_deck), pocket_type::main_deck);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_deck), pocket_type::main_deck);
         }
 
         if (add_cards(all_cards.goldrush, pocket_type::shop_deck)) {
             shuffle_cards_and_ids(m_shop_deck);
-            add_update<game_update_type::add_cards>(make_id_vector(m_shop_deck), pocket_type::shop_deck);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_shop_deck), pocket_type::shop_deck);
         }
 
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
-            add_update<game_update_type::add_cards>(make_id_vector(m_hidden_deck), pocket_type::hidden_deck);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
         }
 
         call_event<event_type::on_game_setup>();
@@ -220,7 +225,7 @@ namespace banggame {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
             }
 
-            add_update<game_update_type::add_cards>(make_id_vector(m_scenario_deck), pocket_type::scenario_deck);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_scenario_deck), pocket_type::scenario_deck);
         }
 
         std::vector<card *> character_ptrs;
@@ -232,7 +237,7 @@ namespace banggame {
             p->m_characters.push_back(c);
             c->pocket = pocket_type::player_character;
             c->owner = p;
-            add_update<game_update_type::add_cards>(make_id_vector(std::views::single(c)), pocket_type::player_character, p);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(std::views::single(c)), pocket_type::player_character, p);
         };
 
         auto character_it = character_ptrs.rbegin();
@@ -303,47 +308,37 @@ namespace banggame {
             .status_text = req.status_text(owner),
             .flags = req.flags(),
 
-            .respond_cards = [&]{
-                std::vector<serial::card> ret;
-                if (owner) {
-                    auto add_cards = [&](auto &&range){
-                        std::ranges::copy_if(range, std::back_inserter(ret), [&](card *target_card) {
-                            return !is_disabled(target_card) && owner->is_possible_to_play(target_card, true);
-                        });
-                    };
+            .respond_cards = owner
+                ? ranges::views::concat(
+                    owner->m_hand | ranges::views::filter(&card::is_brown),
+                    owner->m_table | ranges::views::remove_if(&card::inactive),
+                    owner->m_characters,
+                    m_scenario_cards | ranges::views::take_last(1),
+                    m_button_row,
+                    m_shop_selection | ranges::views::filter(&card::is_brown)
+                )
+                | ranges::views::filter([&](card *target_card) {
+                    return !is_disabled(target_card) && owner->is_possible_to_play(target_card, true);
+                })
+                | ranges::to<std::vector<not_null<card *>>>
+                : std::vector<not_null<card *>>{},
 
-                    add_cards(owner->m_hand | std::views::filter(&card::is_brown));
-                    add_cards(owner->m_table | std::views::filter(std::not_fn(&card::inactive)));
-                    add_cards(owner->m_characters);
-                    add_cards(m_scenario_cards | std::views::reverse | std::views::take(1));
-                    add_cards(m_button_row);
-                    add_cards(m_shop_selection | std::views::filter(&card::is_brown));
-                }
-                return ret;
-            }(),
+            .pick_cards = owner && req.target() == owner
+                ? ranges::views::concat(
+                    m_players | ranges::views::transform([](player *p) {
+                        return ranges::views::concat(p->m_hand, p->m_table, p->m_characters);
+                    }) | ranges::views::join,
+                    m_selection,
+                    m_deck | ranges::views::take(1),
+                    m_discards | ranges::views::take(1)
+                )
+                | ranges::views::filter([&](card *target_card) {
+                    return req.can_pick(target_card);
+                })
+                | ranges::to<std::vector<not_null<card *>>>
+                : std::vector<not_null<card *>>{},
 
-            .pick_cards = [&]{
-                std::vector<serial::card> ret;
-                if (owner && req.target() == owner) {
-                    auto add_cards = [&](auto &&range) {
-                        std::ranges::copy_if(range, std::back_inserter(ret), [&](card *target_card) {
-                            return req.can_pick(target_card);
-                        });
-                    };
-
-                    for (player *target : m_players) {
-                        add_cards(target->m_hand);
-                        add_cards(target->m_table);
-                        add_cards(target->m_characters);
-                    }
-                    add_cards(m_selection);
-                    add_cards(m_deck | std::views::take(1));
-                    add_cards(m_discards | std::views::take(1));
-                }
-                return ret;
-            }(),
-
-            .highlight_cards = to_vector_not_null(req.get_highlights())
+            .highlight_cards = ranges::to<std::vector<not_null<card *>>>(req.get_highlights())
         };
     }
 
@@ -448,7 +443,9 @@ namespace banggame {
                         p->add_player_flags(player_flags::removed);
                     }
                     
-                    add_update<game_update_type::player_order>(to_vector_not_null(std::views::filter(m_players, &player::alive)));
+                    add_update<game_update_type::player_order>(m_players
+                        | ranges::views::filter(&player::alive)
+                        | ranges::to<std::vector<not_null<player *>>>);
                 }
             }, -3);
         }

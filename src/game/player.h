@@ -8,7 +8,6 @@
 #include <memory>
 
 #include "game_update.h"
-#include "utils/concat_view.h"
 
 namespace banggame {
 
@@ -63,6 +62,8 @@ namespace banggame {
             }
         }
     };
+
+    inline card_backface::card_backface(card *c): id(c->id), deck(c->deck) {}
 
     struct player {
         game *m_game;
@@ -201,9 +202,9 @@ namespace banggame {
         int count_cubes() const;
 
         auto cube_slots() const {
-            return util::concat_view(
-                std::ranges::filter_view(m_table, &card::is_orange),
-                std::ranges::single_view(first_character())
+            return ranges::views::concat(
+                m_table | ranges::views::filter(&card::is_orange),
+                ranges::views::single(first_character())
             );
         }
 

@@ -163,7 +163,7 @@ namespace banggame {
             int ncubes = old_character->num_cubes;
 
             target->pay_cubes(old_character, ncubes);
-            target->m_game->add_update<game_update_type::remove_cards>(to_vector_not_null(std::views::single(old_character)));
+            target->m_game->add_update<game_update_type::remove_cards>(std::vector{not_null{old_character}});
 
             old_character->pocket = pocket_type::none;
             old_character->owner = nullptr;
@@ -175,7 +175,7 @@ namespace banggame {
             target_card->pocket = pocket_type::player_character;
             target_card->owner = target;
 
-            target->m_game->add_update<game_update_type::add_cards>(make_id_vector(std::views::single(target_card)), pocket_type::player_character, target);
+            target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::player_character, target);
             target->m_game->set_card_visibility(target_card, nullptr, card_visibility::shown, true);
 
             target->reset_max_hp();
@@ -202,7 +202,7 @@ namespace banggame {
                 if (auto it = std::ranges::find(target->m_game->m_scenario_deck, target_card); it != target->m_game->m_scenario_deck.end()) {
                     target->m_game->m_scenario_deck.erase(it);
                 } else {
-                    target->m_game->add_update<game_update_type::add_cards>(make_id_vector(std::views::single(target_card)), pocket_type::scenario_deck);
+                    target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::scenario_deck);
                 }
                 target->m_game->m_scenario_deck.push_back(target_card);
                 target->m_game->set_card_visibility(target_card, nullptr, card_visibility::shown, true);

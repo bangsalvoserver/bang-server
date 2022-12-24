@@ -50,55 +50,55 @@ namespace banggame {
                 random_element(origin->make_card_target_set(origin_card, holder), origin->m_game->rng)};
         case target_type::players:
             return enums::enum_tag<target_type::players>;
-        case target_type::fanning_targets:
-            return {enums::enum_tag<target_type::fanning_targets>, [&]{
-                std::vector<std::pair<player *, player *>> possible_targets;
-                for (player *target1 : origin->m_game->m_players) {
-                    if (origin != target1 && origin->m_game->calc_distance(origin, target1) <= origin->m_weapon_range + origin->m_range_mod) {
-                        if (player *target2 = *std::next(player_iterator(target1)); origin != target2 && target2->m_distance_mod == 0) {
-                            possible_targets.emplace_back(target1, target2);
-                        }
-                        if (player *target2 = *std::prev(player_iterator(target1)); origin != target2 && target2->m_distance_mod == 0) {
-                            possible_targets.emplace_back(target1, target2);
-                        }
+        case target_type::fanning_targets: {
+            std::vector<std::pair<player *, player *>> possible_targets;
+            for (player *target1 : origin->m_game->m_players) {
+                if (origin != target1 && origin->m_game->calc_distance(origin, target1) <= origin->m_weapon_range + origin->m_range_mod) {
+                    if (player *target2 = *std::next(player_iterator(target1)); origin != target2 && target2->m_distance_mod == 0) {
+                        possible_targets.emplace_back(target1, target2);
+                    }
+                    if (player *target2 = *std::prev(player_iterator(target1)); origin != target2 && target2->m_distance_mod == 0) {
+                        possible_targets.emplace_back(target1, target2);
                     }
                 }
-                auto [target1, target2] = random_element(possible_targets, origin->m_game->rng);
-                return std::vector<not_null<player *>>{target1, target2};
-            }()};
-        case target_type::cards:
-            return {enums::enum_tag<target_type::cards>, [&]{
-                std::vector<not_null<card *>> ret;
-                std::ranges::sample(origin->make_card_target_set(origin_card, holder),
-                    std::back_inserter(ret), holder.target_value, origin->m_game->rng);
-                return ret;
-            }()};
+            }
+            auto [target1, target2] = random_element(possible_targets, origin->m_game->rng);
+            return {enums::enum_tag<target_type::fanning_targets>, std::vector<not_null<player *>>{target1, target2}};
+        }
+        case target_type::cards: {
+            auto targets = origin->make_card_target_set(origin_card, holder);
+            return {enums::enum_tag<target_type::cards>, targets
+                | ranges::views::sample(holder.target_value, origin->m_game->rng)
+                | ranges::to<std::vector<not_null<card *>>>
+            };
+        }
         case target_type::cards_other_players:
-            return {enums::enum_tag<target_type::cards_other_players>, [&]{
-                std::vector<not_null<card *>> ret;
-                for (player *target : range_other_players(origin)) {
-                    if (auto cards = util::concat_view(
-                        target->m_table | std::views::filter(std::not_fn(&card::is_black)),
-                        target->m_hand | std::views::take(1)
-                    )) {
-                        ret.emplace_back(random_element(cards, origin->m_game->rng));
-                    }
-                }
-                return ret;
-            }()};
-        case target_type::select_cubes:
-            return {enums::enum_tag<target_type::select_cubes>, [&]{
-                std::vector<card *> cubes;
-                for (card *slot : origin->cube_slots()) {
-                    for (int i=0; i<slot->num_cubes; ++i) {
-                        cubes.push_back(slot);
-                    }
-                }
-                
-                std::vector<not_null<card *>> ret;
-                std::ranges::sample(cubes, std::back_inserter(ret), holder.target_value, origin->m_game->rng);
-                return ret;
-            }()};
+            return {enums::enum_tag<target_type::cards_other_players>,
+                range_other_players(origin)
+                | ranges::views::transform([](player *target) {
+                    return ranges::views::concat(
+                        target->m_table | ranges::views::remove_if(&card::is_black),
+                        target->m_hand | ranges::views::take(1)
+                    );
+                })
+                | ranges::views::remove_if(ranges::empty)
+                | ranges::views::transform([&](auto &&range) {
+                    return random_element(range, origin->m_game->rng);
+                })
+                | ranges::to<std::vector<not_null<card *>>>
+            };
+        case target_type::select_cubes: {
+            auto cubes = origin->cube_slots()
+                | ranges::views::transform([](card *slot) {
+                    return ranges::views::repeat_n(slot, slot->num_cubes);
+                })
+                | ranges::views::join
+                | ranges::to<std::vector>;
+            return {enums::enum_tag<target_type::select_cubes>, cubes
+                | ranges::views::sample(holder.target_value, origin->m_game->rng)
+                | ranges::to<std::vector<not_null<card *>>>
+            };
+        }
         case target_type::self_cubes:
             return enums::enum_tag<target_type::self_cubes>;
         default:
@@ -107,18 +107,16 @@ namespace banggame {
     }
 
     static card *random_card_playable_with_modifiers(player *origin, bool is_response, const std::vector<card *> &modifiers) {
-        std::vector<card *> cards;
-        std::ranges::copy_if(util::concat_view(
-            std::views::all(origin->m_characters),
-            std::views::filter(origin->m_table, std::not_fn(&card::inactive)),
-            std::views::all(origin->m_hand),
-            std::views::all(origin->m_game->m_shop_selection),
-            std::views::all(origin->m_game->m_hidden_deck),
-            std::views::take(std::views::reverse(origin->m_game->m_scenario_cards), 1)
-        ),
-        std::back_inserter(cards),
-        [&](card *target_card) {
-            if (ranges_contains(modifiers, target_card)) return false;
+        auto cards = ranges::views::concat(
+            origin->m_characters,
+            origin->m_table | ranges::views::remove_if(&card::inactive),
+            origin->m_hand,
+            origin->m_game->m_shop_selection,
+            origin->m_game->m_hidden_deck,
+            origin->m_game->m_scenario_cards | ranges::views::take_last(1)
+        )
+        | ranges::views::filter([&](card *target_card) {
+            if (ranges::contains(modifiers, target_card)) return false;
             if (!origin->is_possible_to_play(target_card, is_response)) return false;
 
             return (target_card->modifier == card_modifier_type::none
@@ -129,7 +127,7 @@ namespace banggame {
                 && std::ranges::all_of(modifiers, [&](card *mod) {
                     return allowed_card_with_modifier(mod->modifier, origin, target_card);
                 });
-        });
+        }) | ranges::to<std::vector>;
 
         if (cards.empty()) {
             return nullptr;
@@ -176,7 +174,7 @@ namespace banggame {
             origin->m_game->top_request().on_pick(random_element(update.pick_cards, origin->m_game->rng));
             return true;
         } else if (!update.respond_cards.empty()) {
-            std::set<card *> cards{update.respond_cards.begin(), update.respond_cards.end()};
+            auto cards = ranges::to<std::set>(update.respond_cards);
             while (!cards.empty()) {
                 card *origin_card = random_card_of_pocket(cards, origin->m_game->rng,
                     pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand);
@@ -203,24 +201,23 @@ namespace banggame {
     }
 
     static void play_in_turn(player *origin) {
-        std::set<card *> cards;
-        std::ranges::copy_if(util::concat_view(
-            std::views::all(origin->m_characters),
-            std::views::filter(origin->m_table, std::not_fn(&card::inactive)),
-            std::views::all(origin->m_hand),
-            std::views::all(origin->m_game->m_shop_selection),
-            std::views::all(origin->m_game->m_button_row),
-            std::views::take(std::views::reverse(origin->m_game->m_scenario_cards), 1)
-        ),
-        std::inserter(cards, cards.begin()),
-        [&](card *target_card){
+        auto cards = ranges::views::concat(
+            origin->m_characters,
+            origin->m_table | ranges::views::remove_if(&card::inactive),
+            origin->m_hand,
+            origin->m_game->m_shop_selection,
+            origin->m_game->m_button_row,
+            origin->m_game->m_scenario_cards | ranges::views::take_last(1)
+        )
+        | ranges::views::filter([&](card *target_card){
             if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
                 return target_card->modifier != card_modifier_type::none
                     || origin->is_possible_to_play(target_card, false);
             } else {
                 return !origin->make_equip_set(target_card).empty();
             }
-        });
+        })
+        | ranges::to<std::set>;
         
         while (!cards.empty()) {
             card *origin_card = random_card_of_pocket(cards, origin->m_game->rng,

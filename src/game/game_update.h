@@ -8,7 +8,10 @@ namespace banggame {
 
     DEFINE_STRUCT(card_backface,
         (int, id)
-        (card_deck_type, deck)
+        (card_deck_type, deck),
+
+        card_backface() = default;
+        card_backface(card *c);
     )
 
     DEFINE_STRUCT(add_cards_update,

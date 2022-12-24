@@ -13,14 +13,6 @@
 
 namespace banggame {
 
-    inline std::vector<card_backface> make_id_vector(std::ranges::range auto &&range) {
-        struct make_card_backface {
-            auto operator()(const card &c) const { return card_backface{c.id, c.deck}; }
-            auto operator()(const card *c) const { return (*this)(*c); }
-        };
-        return to_vector(std::ranges::transform_view(FWD(range), make_card_backface{}));
-    }
-
     class update_target {
     private:
         player *m_targets[8];
@@ -111,14 +103,14 @@ namespace banggame {
         }
 
         ticks get_total_update_time() {
-            return std::transform_reduce(m_updates.begin(), m_updates.end(), ticks{0}, std::plus(),
-                [](const auto &tup) {
+            return ranges::accumulate(m_updates
+                | ranges::views::transform([](const auto &tup) {
                     if (std::get<update_target>(tup).all_targets_bots()) {
                         return ticks{0};
                     } else {
                         return std::get<ticks>(tup);
                     }
-                });
+                }), ticks{0});
         }
 
         template<game_update_type E>
