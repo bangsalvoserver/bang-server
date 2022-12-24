@@ -32,25 +32,37 @@ namespace banggame {
         }
     }
 
-    static play_card_target generate_random_target(player *origin, card *origin_card, const effect_holder &holder) {
-        switch (holder.target) {
-        case target_type::none:
-            return enums::enum_tag<target_type::none>;
-        case target_type::player:
-            return {enums::enum_tag<target_type::player>,
-                random_element(origin->make_player_target_set(origin_card, holder), origin->m_game->rng)};
-        case target_type::conditional_player:
-            return {enums::enum_tag<target_type::conditional_player>,
-                random_element(origin->make_player_target_set(origin_card, holder), origin->m_game->rng)};
-        case target_type::card:
-            return {enums::enum_tag<target_type::card>,
-                random_element(origin->make_card_target_set(origin_card, holder), origin->m_game->rng)};
-        case target_type::extra_card:
-            return {enums::enum_tag<target_type::extra_card>,
-                random_element(origin->make_card_target_set(origin_card, holder), origin->m_game->rng)};
-        case target_type::players:
-            return enums::enum_tag<target_type::players>;
-        case target_type::fanning_targets: {
+    struct random_target_visitor {
+        player *origin;
+        card *origin_card;
+        const effect_holder &holder;
+
+        player *operator()(enums::enum_tag_t<target_type::player>) const {
+            return random_element(origin->make_player_target_set(origin_card, holder), origin->m_game->rng);
+        }
+
+        player *operator()(enums::enum_tag_t<target_type::conditional_player>) const {
+            auto targets = origin->make_player_target_set(origin_card, holder);
+            if (targets.empty()) {
+                return nullptr;
+            } else {
+                return random_element(targets, origin->m_game->rng);
+            }
+        }
+
+        card *operator()(enums::enum_tag_t<target_type::card>) const {
+            return random_element(origin->make_card_target_set(origin_card, holder), origin->m_game->rng);
+        }
+
+        card *operator()(enums::enum_tag_t<target_type::extra_card> tag) const {
+            if (origin_card == origin->m_last_played_card) {
+                return nullptr;
+            } else {
+                return random_element(origin->make_card_target_set(origin_card, holder), origin->m_game->rng);
+            }
+        }
+
+        auto operator()(enums::enum_tag_t<target_type::fanning_targets>) const {
             std::vector<std::pair<player *, player *>> possible_targets;
             for (player *target1 : origin->m_game->m_players) {
                 if (origin != target1 && origin->m_game->calc_distance(origin, target1) <= origin->m_weapon_range + origin->m_range_mod) {
@@ -63,18 +75,21 @@ namespace banggame {
                 }
             }
             auto [target1, target2] = random_element(possible_targets, origin->m_game->rng);
-            return {enums::enum_tag<target_type::fanning_targets>, std::vector<not_null<player *>>{target1, target2}};
+            return std::vector<not_null<player *>>{target1, target2};
         }
-        case target_type::cards: {
+
+        auto operator()(enums::enum_tag_t<target_type::cards> tag) const {
             auto targets = origin->make_card_target_set(origin_card, holder);
-            return {enums::enum_tag<target_type::cards>, targets
+            return targets
                 | ranges::views::sample(holder.target_value, origin->m_game->rng)
-                | ranges::to<std::vector<not_null<card *>>>
-            };
+                | ranges::to<std::vector<not_null<card *>>>;
         }
-        case target_type::cards_other_players:
-            return {enums::enum_tag<target_type::cards_other_players>,
-                range_other_players(origin)
+
+        auto operator()(enums::enum_tag_t<target_type::cards_other_players>) const {
+            return origin->m_game->m_players
+                | ranges::views::filter([&](player *target) {
+                    return target != origin && target->alive();
+                })
                 | ranges::views::transform([](player *target) {
                     return ranges::views::concat(
                         target->m_table | ranges::views::remove_if(&card::is_black),
@@ -85,25 +100,30 @@ namespace banggame {
                 | ranges::views::transform([&](auto &&range) {
                     return random_element(range, origin->m_game->rng);
                 })
-                | ranges::to<std::vector<not_null<card *>>>
-            };
-        case target_type::select_cubes: {
+                | ranges::to<std::vector<not_null<card *>>>;
+        }
+
+        auto operator()(enums::enum_tag_t<target_type::select_cubes>) const {
             auto cubes = origin->cube_slots()
                 | ranges::views::transform([](card *slot) {
                     return ranges::views::repeat_n(slot, slot->num_cubes);
                 })
                 | ranges::views::join
                 | ranges::to<std::vector>;
-            return {enums::enum_tag<target_type::select_cubes>, cubes
+            return cubes
                 | ranges::views::sample(holder.target_value, origin->m_game->rng)
-                | ranges::to<std::vector<not_null<card *>>>
-            };
+                | ranges::to<std::vector<not_null<card *>>>;
         }
-        case target_type::self_cubes:
-            return enums::enum_tag<target_type::self_cubes>;
-        default:
-            throw std::runtime_error("Invalid target_type");
-        }
+    };
+
+    static play_card_target generate_random_target(player *origin, card *origin_card, const effect_holder &holder) {
+        return enums::visit_enum([&]<target_type E>(enums::enum_tag_t<E> tag) -> play_card_target {
+            if constexpr (play_card_target::has_type<E>) {
+                return {tag, random_target_visitor{origin, origin_card, holder}(tag)};
+            } else {
+                return tag;
+            }
+        }, holder.target);
     }
 
     static card *random_card_playable_with_modifiers(player *origin, bool is_response, const std::vector<card *> &modifiers) {
@@ -127,7 +147,7 @@ namespace banggame {
                 && std::ranges::all_of(modifiers, [&](card *mod) {
                     return allowed_card_with_modifier(mod->modifier, origin, target_card);
                 });
-        }) | ranges::to<std::vector>;
+        });
 
         if (cards.empty()) {
             return nullptr;
