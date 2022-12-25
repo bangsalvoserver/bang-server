@@ -140,7 +140,7 @@ namespace banggame {
         )
         | ranges::views::filter([&](card *target_card) {
             if (ranges::contains(modifiers, target_card)) return false;
-            if (!is_possible_to_play(origin, target_card, is_response)) return false;
+            if (!is_possible_to_play(origin, target_card, is_response ? target_card->responses : target_card->effects)) return false;
 
             return (target_card->modifier == card_modifier_type::none
                 || std::transform_reduce(
@@ -183,8 +183,10 @@ namespace banggame {
             for (const effect_holder &holder : is_response ? playing_card->responses : playing_card->effects) {
                 verifier.targets.push_back(generate_random_target(origin, playing_card, holder));
             }
-            for (const effect_holder &holder : playing_card->optionals) {
-                verifier.targets.push_back(generate_random_target(origin, playing_card, holder));
+            if (is_possible_to_play(origin, origin_card, origin_card->optionals)) {
+                for (const effect_holder &holder : playing_card->optionals) {
+                    verifier.targets.push_back(generate_random_target(origin, playing_card, holder));
+                }
             }
             return verifier;
         }
@@ -235,7 +237,7 @@ namespace banggame {
         | ranges::views::filter([&](card *target_card){
             if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
                 return target_card->modifier != card_modifier_type::none
-                    || is_possible_to_play(origin, target_card, false);
+                    || is_possible_to_play(origin, target_card, target_card->effects);
             } else {
                 return !make_equip_set(origin, target_card).empty();
             }

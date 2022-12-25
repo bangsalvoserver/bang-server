@@ -19,7 +19,7 @@ namespace banggame {
                 
                 if (drawn_card->is_brown()) {
                     origin->m_game->add_listener<event_type::verify_pass_turn>(key, [=](player *p, game_string &out_error) {
-                        if (p == origin && drawn_card->owner == origin && is_possible_to_play(origin, drawn_card)) {
+                        if (p == origin && drawn_card->owner == origin && is_possible_to_play(origin, drawn_card, drawn_card->effects)) {
                             out_error = {"ERROR_MANDATORY_CARD", drawn_card};
                         }
                     });

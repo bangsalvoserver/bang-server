@@ -42,7 +42,7 @@ namespace banggame {
             });
     }
 
-    bool is_possible_to_play(player *origin, card *target_card, bool is_response = false);
+    bool is_possible_to_play(player *origin, card *target_card, const effect_list &effects);
     
 }
 

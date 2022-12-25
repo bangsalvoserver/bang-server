@@ -7,11 +7,8 @@ namespace banggame {
         return ranges::distance(ranges::take_view(FWD(range), size)) == size;
     }
 
-    bool is_possible_to_play(player *origin, card *target_card, bool is_response) {
-        auto &effects = is_response ? target_card->responses : target_card->effects;
-        if (effects.empty()) return false;
-
-        return std::ranges::all_of(effects, [&](const effect_holder &holder) {
+    bool is_possible_to_play(player *origin, card *target_card, const effect_list &effects) {
+        return !effects.empty() && std::ranges::all_of(effects, [&](const effect_holder &holder) {
             switch (holder.target) {
             case target_type::none:
                 return !holder.verify(target_card, origin);

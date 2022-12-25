@@ -122,7 +122,7 @@ namespace banggame {
             } else {
                 discard_drawn_card();
             }
-        } else if (card->has_tag(tag_type::shopchoice) || is_possible_to_play(target, card)) {
+        } else if (card->has_tag(tag_type::shopchoice) || is_possible_to_play(target, card, card->effects)) {
             target->m_game->queue_request<request_force_play_card>(origin_card, target, card);
         } else {
             discard_drawn_card();
