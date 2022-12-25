@@ -5,6 +5,7 @@
 
 #include "cards/base/requests.h"
 #include "play_verify.h"
+#include "possible_to_play.h"
 
 #include <array>
 
@@ -318,7 +319,7 @@ namespace banggame {
                     m_shop_selection | ranges::views::filter(&card::is_brown)
                 )
                 | ranges::views::filter([&](card *target_card) {
-                    return !is_disabled(target_card) && owner->is_possible_to_play(target_card, true);
+                    return !is_disabled(target_card) && is_possible_to_play(owner, target_card, true);
                 })
                 | ranges::to<std::vector<not_null<card *>>>
                 : std::vector<not_null<card *>>{},

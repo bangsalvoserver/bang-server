@@ -1,5 +1,6 @@
 #include "game.h"
 #include "play_verify.h"
+#include "possible_to_play.h"
 
 namespace banggame {
 
@@ -38,11 +39,11 @@ namespace banggame {
         const effect_holder &holder;
 
         player *operator()(enums::enum_tag_t<target_type::player>) const {
-            return random_element(origin->make_player_target_set(origin_card, holder), origin->m_game->rng);
+            return random_element(make_player_target_set(origin, origin_card, holder), origin->m_game->rng);
         }
 
         player *operator()(enums::enum_tag_t<target_type::conditional_player>) const {
-            auto targets = origin->make_player_target_set(origin_card, holder);
+            auto targets = ranges::to<std::vector>(make_player_target_set(origin, origin_card, holder));
             if (targets.empty()) {
                 return nullptr;
             } else {
@@ -51,14 +52,16 @@ namespace banggame {
         }
 
         card *operator()(enums::enum_tag_t<target_type::card>) const {
-            return random_element(origin->make_card_target_set(origin_card, holder), origin->m_game->rng);
+            auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder));
+            return random_element(targets, origin->m_game->rng);
         }
 
         card *operator()(enums::enum_tag_t<target_type::extra_card> tag) const {
             if (origin_card == origin->m_last_played_card) {
                 return nullptr;
             } else {
-                return random_element(origin->make_card_target_set(origin_card, holder), origin->m_game->rng);
+                auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder));
+                return random_element(targets, origin->m_game->rng);
             }
         }
 
@@ -79,7 +82,7 @@ namespace banggame {
         }
 
         auto operator()(enums::enum_tag_t<target_type::cards> tag) const {
-            auto targets = origin->make_card_target_set(origin_card, holder);
+            auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder));
             return targets
                 | ranges::views::sample(holder.target_value, origin->m_game->rng)
                 | ranges::to<std::vector<not_null<card *>>>;
@@ -137,7 +140,7 @@ namespace banggame {
         )
         | ranges::views::filter([&](card *target_card) {
             if (ranges::contains(modifiers, target_card)) return false;
-            if (!origin->is_possible_to_play(target_card, is_response)) return false;
+            if (!is_possible_to_play(origin, target_card, is_response)) return false;
 
             return (target_card->modifier == card_modifier_type::none
                 || std::transform_reduce(
@@ -161,7 +164,7 @@ namespace banggame {
             play_card_verify verifier { origin, origin_card };
             if (!origin_card->self_equippable()) {
                 verifier.targets.emplace_back(enums::enum_tag<target_type::player>,
-                    random_element(origin->make_equip_set(origin_card), origin->m_game->rng));
+                    random_element(make_equip_set(origin, origin_card), origin->m_game->rng));
             }
             return verifier;
         } else if (origin_card->modifier != card_modifier_type::none) {
@@ -232,9 +235,9 @@ namespace banggame {
         | ranges::views::filter([&](card *target_card){
             if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
                 return target_card->modifier != card_modifier_type::none
-                    || origin->is_possible_to_play(target_card, false);
+                    || is_possible_to_play(origin, target_card, false);
             } else {
-                return !origin->make_equip_set(target_card).empty();
+                return !make_equip_set(origin, target_card).empty();
             }
         })
         | ranges::to<std::set>;

@@ -1,6 +1,7 @@
 #include "aim.h"
 
 #include "game/game.h"
+#include "game/possible_to_play.h"
 #include "cards/base/bang.h"
 
 namespace banggame {
@@ -21,7 +22,7 @@ namespace banggame {
          && std::ranges::none_of(origin->m_table, is_bangcard)
          && std::ranges::none_of(origin->m_characters, is_bangcard))
 
-         || origin->make_player_target_set(origin_card, bang_holder).empty())
+         || make_player_target_set(origin, origin_card, bang_holder).empty())
             return "ERROR_INVALID_MODIFIER_CARD";
         
         return {};

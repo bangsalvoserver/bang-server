@@ -1,4 +1,5 @@
 #include "play_visitor.h"
+#include "possible_to_play.h"
 
 namespace banggame {
 
@@ -48,7 +49,7 @@ namespace banggame {
     template<> game_string play_visitor<target_type::conditional_player>::verify(player *target) {
         if (target) {
             return play_visitor<target_type::player>{verifier, effect}.verify(target);
-        } else if (!verifier.origin->make_player_target_set(verifier.get_playing_card(), effect).empty()) {
+        } else if (!make_player_target_set(verifier.origin, verifier.get_playing_card(), effect).empty()) {
             return "ERROR_TARGET_SET_NOT_EMPTY";
         } else {
             return {};

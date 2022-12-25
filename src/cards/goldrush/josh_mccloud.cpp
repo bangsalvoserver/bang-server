@@ -3,6 +3,7 @@
 #include "game/game.h"
 #include "game/filters.h"
 #include "cards/base/requests.h"
+#include "game/possible_to_play.h"
 
 namespace banggame {
 
@@ -110,10 +111,10 @@ namespace banggame {
         };
         if (card->is_black()) {
             if (!target->m_game->check_flags(game_flags::disable_equipping)) {
-                auto equip_set = target->make_equip_set(card);
+                auto equip_set = make_equip_set(target, card);
                 if (equip_set.empty()) {
                     discard_drawn_card();
-                } else if (equip_set.size() == 1) {
+                } else if (ranges::empty(ranges::drop_view(equip_set, 1))) {
                     equip_set.front()->equip_card(card);
                 } else {
                     target->m_game->queue_request<request_force_equip_card>(origin_card, target, card);
@@ -121,7 +122,7 @@ namespace banggame {
             } else {
                 discard_drawn_card();
             }
-        } else if (card->has_tag(tag_type::shopchoice) || target->is_possible_to_play(card)) {
+        } else if (card->has_tag(tag_type::shopchoice) || is_possible_to_play(target, card)) {
             target->m_game->queue_request<request_force_play_card>(origin_card, target, card);
         } else {
             discard_drawn_card();

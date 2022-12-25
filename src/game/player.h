@@ -178,12 +178,6 @@ namespace banggame {
 
         void set_last_played_card(card *c);
 
-        std::vector<player *> make_equip_set(card *origin_card);
-        std::vector<player *> make_player_target_set(card *origin_card, const effect_holder &effect);
-        std::vector<card *> make_card_target_set(card *origin_card, const effect_holder &effect);
-
-        bool is_possible_to_play(card *c, bool is_response = false);
-
         bool is_bangcard(card *origin_card);
 
         void start_of_turn();
