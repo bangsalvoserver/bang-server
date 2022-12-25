@@ -6,8 +6,9 @@ namespace banggame {
     
     void equip_greygory_deck::on_equip(card *target_card, player *target) {
         std::array<card *, 2> base_characters;
-        std::ranges::sample(target->m_game->m_context.cards | ranges::views::addressof
-            | ranges::views::filter([&](card *c) {
+        std::ranges::sample(target->m_game->m_context.cards
+            | std::views::transform([](card &c) { return &c; })
+            | std::views::filter([&](card *c) {
                 return c != target_card && c->expansion == card_expansion_type{}
                     && (c->pocket == pocket_type::none
                     || (c->pocket == pocket_type::player_character && c->owner == target));

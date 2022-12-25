@@ -21,8 +21,8 @@ namespace banggame {
         
         co_yield make_update<game_update_type::add_cards>(
             m_context.cards
-                | ranges::views::addressof
-                | ranges::to<std::vector<card_backface>>,
+                | std::views::transform([](card &c) { return card_backface(&c); })
+                | ranges::to<std::vector>,
             pocket_type::hidden_deck
         );
 
