@@ -4,9 +4,9 @@
 
 namespace banggame {
 
-    game_string prompt_target_self_hand::on_prompt(card *origin_card, player *origin, card *target_card) {
-        if (origin == target_card->owner && target_card->pocket == pocket_type::player_hand) {
-            return {"PROMPT_TARGET_OWN_HAND", origin_card};
+    game_string prompt_target_self::on_prompt(card *origin_card, player *origin, card *target_card) {
+        if (origin == target_card->owner) {
+            return {"PROMPT_TARGET_SELF", origin_card};
         }
         return {};
     }

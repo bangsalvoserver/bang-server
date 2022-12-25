@@ -17,8 +17,7 @@ namespace banggame {
                     return origin == target;
                 } else {
                     return !check_player_filter(origin, origin_card->equip_target, target)
-                        && !target->find_equipped_card(origin_card)
-                        && (!origin->is_bot() || target != origin);
+                        && !target->find_equipped_card(origin_card);
                 }
             });
     }
@@ -26,8 +25,7 @@ namespace banggame {
     inline auto make_player_target_set(player *origin, card *origin_card, effect_holder holder) {
         return origin->m_game->m_players
             | ranges::views::filter([=](player *target) {
-                return (!origin->is_bot() || target != origin || bool(holder.player_filter & target_player_filter::self))
-                    && !check_player_filter(origin, holder.player_filter, target)
+                return !check_player_filter(origin, holder.player_filter, target)
                     && !holder.verify(origin_card, origin, target);
             });
     }

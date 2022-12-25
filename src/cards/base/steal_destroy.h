@@ -5,11 +5,11 @@
 
 namespace banggame {
     
-    struct prompt_target_self_hand {
+    struct prompt_target_self {
         game_string on_prompt(card *origin_card, player *origin, card *target);
     };
 
-    struct effect_steal : prompt_target_self_hand {
+    struct effect_steal : prompt_target_self {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };
@@ -18,7 +18,7 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, card *target);
     };
 
-    struct effect_destroy: prompt_target_self_hand {
+    struct effect_destroy: prompt_target_self {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };
