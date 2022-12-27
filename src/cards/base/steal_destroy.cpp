@@ -12,7 +12,7 @@ namespace banggame {
     }
 
     request_targeting::timer_targeting::timer_targeting(request_targeting *request)
-        : request_timer(request, request->target->m_game->m_options.escape_timer_ms) {}
+        : request_timer(request, request->target->m_game->m_options.escape_timer) {}
 
     void request_targeting::on_update() {
         if (origin == target_card->owner || target->empty_hand() || !target->can_escape(origin, origin_card, flags)) {

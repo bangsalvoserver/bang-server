@@ -16,7 +16,7 @@ namespace banggame {
 
         struct rust_timer : request_timer {
             explicit rust_timer(request_rust *request)
-                : request_timer(request, request->target->m_game->m_options.escape_timer_ms) {}
+                : request_timer(request, request->target->m_game->m_options.escape_timer) {}
             
             void on_finished() override {
                 resolve_rust(request->origin_card, request->origin, request->target);

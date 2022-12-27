@@ -6,7 +6,7 @@ namespace banggame {
 
     static bool can_use_beer(game *game) {
         if (game->m_players.size() <= 2) {
-            return game->m_options.can_play_beer_in_duel;
+            return game->m_options.allow_beer_in_duel;
         } else {
             return game->num_alive() > 2;
         }

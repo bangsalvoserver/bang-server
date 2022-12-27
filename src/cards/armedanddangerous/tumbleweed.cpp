@@ -15,7 +15,7 @@ namespace banggame {
 
         struct timer_tumbleweed : request_timer {
             explicit timer_tumbleweed(request_tumbleweed *request)
-                : request_timer(request, request->target->m_game->m_options.tumbleweed_timer_ms) {}
+                : request_timer(request, request->target->m_game->m_options.tumbleweed_timer) {}
         
             void on_finished() override {
                 static_cast<request_tumbleweed *>(request)->on_finished();

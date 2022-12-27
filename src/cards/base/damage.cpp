@@ -17,7 +17,7 @@ namespace banggame {
     }
 
     request_damage::timer_damage::timer_damage(request_damage *request)
-        : request_timer(request, request->target->m_game->m_options.damage_timer_ms) {}
+        : request_timer(request, request->target->m_game->m_options.damage_timer) {}
 
     static constexpr auto damaging_allowed_flags = effect_flags::is_bang | effect_flags::play_as_bang | effect_flags::multi_target;
 
