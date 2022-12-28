@@ -210,13 +210,15 @@ namespace banggame {
 
                 if (verifier.origin_card && !verifier.verify_and_play()) {
                     if (auto &prompt = origin->m_prompt) {
-                        origin->m_game->invoke_action([&]{
-                            auto fun = std::move(prompt->first);
-                            prompt.reset();
-                            std::invoke(fun);
-                        });
+                        auto fun = std::move(prompt->first);
+                        prompt.reset();
+                        if (cards.empty()) {
+                            origin->m_game->invoke_action(std::move(fun));
+                            return true;
+                        }
+                    } else {
+                        return true;
                     }
-                    return true;
                 }
             }
             // softlock

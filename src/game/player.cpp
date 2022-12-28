@@ -299,13 +299,11 @@ namespace banggame {
 
     void player::prompt_then(game_string &&message, std::function<void()> &&fun) {
         if (message) {
-            m_prompt.emplace(std::move(fun), message);
-            m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(message));
+            m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), message);
+            m_prompt.emplace(std::move(fun), std::move(message));
         } else {
-            m_game->invoke_action([&]{
-                m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
-                std::invoke(fun);
-            });
+            m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
+            m_game->invoke_action(std::move(fun));
         }
     }
 
