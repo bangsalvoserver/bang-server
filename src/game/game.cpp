@@ -358,9 +358,9 @@ namespace banggame {
         add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
     }
     
-    void game::draw_check_then(player *origin, card *origin_card, draw_check_function fun) {
+    void game::draw_check_then(player *origin, card *origin_card, draw_check_condition condition, draw_check_function fun) {
         flash_card(origin_card);
-        m_current_check.set(origin, origin_card, std::move(fun));
+        m_current_check.set(origin, origin_card, std::move(condition), std::move(fun));
         m_current_check.start();
     }
 

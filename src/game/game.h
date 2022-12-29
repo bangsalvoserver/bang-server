@@ -33,7 +33,7 @@ namespace banggame {
 
         void start_next_turn();
 
-        void draw_check_then(player *origin, card *origin_card, draw_check_function fun);
+        void draw_check_then(player *origin, card *origin_card, draw_check_condition condition, draw_check_function fun);
 
         void handle_player_death(player *killer, player *target, discard_all_reason reason = discard_all_reason::death);
     };

@@ -4,9 +4,26 @@
 
 namespace banggame {
 
-    struct request_check : selection_picker {
+    struct request_check : request_base {
         request_check(card *origin_card, player *target)
-            : selection_picker(origin_card, nullptr, target) {}
+            : request_base(origin_card, nullptr, target) {}
+
+        bool can_pick(card *target_card) const override {
+            if (target_card->pocket == pocket_type::selection) {
+                if (!target->is_bot()) return true;
+
+                auto is_lucky = [&m_current_check = target->m_game->m_current_check](card *drawn_card) {
+                    return m_current_check.check(drawn_card);
+                };
+
+                if (std::ranges::none_of(target->m_game->m_selection, is_lucky)) {
+                    return true;
+                } else {
+                    return is_lucky(target_card);
+                }
+            }
+            return false;
+        }
 
         void on_pick(card *target_card) override {
             target->m_game->invoke_action([&]{
@@ -25,9 +42,10 @@ namespace banggame {
         }
     };
 
-    void draw_check_handler::set(player *origin, card *origin_card, draw_check_function &&function) {
+    void draw_check_handler::set(player *origin, card *origin_card, draw_check_condition &&condition, draw_check_function &&function) {
         m_origin = origin;
         m_origin_card = origin_card;
+        m_condition = std::move(condition);
         m_function = std::move(function);
     }
 
@@ -61,6 +79,10 @@ namespace banggame {
         start();
     }
 
+    bool draw_check_handler::check(card *drawn_card) {
+        return std::invoke(m_condition, m_origin->get_card_sign(drawn_card));
+    }
+
     void draw_check_handler::resolve(card *drawn_card) {
         if (m_origin->get_num_checks() > 1) {
             while (!m_origin->m_game->m_selection.empty()) {
@@ -73,7 +95,10 @@ namespace banggame {
         } else {
             m_origin->m_game->call_event<event_type::on_draw_check_resolve>(m_origin, drawn_card);
         }
+        bool result = check(drawn_card);
+        m_origin = nullptr;
         m_origin_card = nullptr;
-        std::invoke(std::exchange(m_function, nullptr), std::exchange(m_origin, nullptr)->get_card_sign(drawn_card));
+        m_condition = nullptr;
+        std::invoke(std::exchange(m_function, nullptr), result);
     }
 }

@@ -57,7 +57,11 @@ namespace banggame {
     }
 
     bool effect_tumbleweed::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_is<request_tumbleweed>(origin);
+        if (auto *req = origin->m_game->top_request_if<request_tumbleweed>(origin)) {
+            return !origin->is_bot()
+                || ((req->origin == origin) != origin->m_game->m_current_check.check(req->drawn_card));
+        }
+        return false;
     }
 
     void effect_tumbleweed::on_play(card *origin_card, player *origin) {
