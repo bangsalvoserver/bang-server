@@ -147,7 +147,8 @@ namespace banggame {
 
             int count = 0;
             for (const card_data &c : cards) {
-                if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;;
+                if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;
+                if (c.has_tag(tag_type::ghost_card) && !m_options.enable_ghost_cards) continue;
                 if ((c.expansion & m_options.expansions) != c.expansion) continue;
 
                 card *new_card = &m_context.cards.emplace(int(m_context.cards.first_available_id()), c);
@@ -437,7 +438,7 @@ namespace banggame {
             return;
         }
 
-        if (!bool(m_options.expansions & card_expansion_type::ghostcards)) {
+        if (!m_options.enable_ghost_cards) {
             queue_action([this]{
                 if (auto range = std::views::filter(m_players, [](player *p) { return !p->alive() && !p->check_player_flags(player_flags::removed); })) {
                     for (player *p : range) {

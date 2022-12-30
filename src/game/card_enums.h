@@ -49,12 +49,11 @@ namespace banggame {
         (goldrush,              ruleset_goldrush)
         (armedanddangerous,     ruleset_armedanddangerous)
         (valleyofshadows,       ruleset_valleyofshadows)
-        (canyondiablo,          ruleset_canyondiablo)
         (highnoon)
         (fistfulofcards)
         (wildwestshow)
         (thebullet)
-        (ghostcards)
+        (canyondiablo,          ruleset_canyondiablo)
     )
 
     constexpr auto unofficial_expansions = card_expansion_type::canyondiablo;
@@ -359,6 +358,7 @@ namespace banggame {
     DEFINE_ENUM(tag_type,
         (none)
         (temp_card)
+        (ghost_card)
         (confirm)
         (skip_logs)
         (hidden)

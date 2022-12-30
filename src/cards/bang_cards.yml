@@ -560,13 +560,14 @@ main_deck:
       - 9 spades
       - 10 spades
     image: 07_fantasma
-    expansion: valleyofshadows ghostcards
+    expansion: valleyofshadows
     color: blue
     equip_target: dead
     equip:
       - ghost
     tags:
       - discard_if_two_players
+      - ghost_card
   - name: LEMAT
     signs:
       - 4 diamonds
@@ -1717,11 +1718,11 @@ highnoon:
       - blessing
   - name: GHOST_TOWN
     image: 05_cittafantasma
-    expansion: ghostcards
     equip:
       - ghosttown
     tags:
       - discard_if_two_players
+      - ghost_card
   - name: INVERT_ROTATION
     image: 05_corsaalloro
     equip:
@@ -1818,11 +1819,11 @@ fistfulofcards:
       - sniper player reachable notself
   - name: DEAD_MAN
     image: 05_deadman
-    expansion: ghostcards
     equip:
       - deadman
     tags:
       - discard_if_two_players
+      - ghost_card
   - name: BLOOD_BROTHERS
     image: 05_fratellidisangue
     responses:
