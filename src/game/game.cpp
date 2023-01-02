@@ -130,11 +130,7 @@ namespace banggame {
     void game::start_game(const game_options &options) {
         m_options = options;
 
-        for (auto val : enums::enum_values_v<card_expansion_type>) {
-            if (bool(m_options.expansions & val)) {
-                apply_ruleset(this, val);
-            }
-        }
+        apply_rulesets();
 
         add_update<game_update_type::player_add>(int(m_players.size()));
 

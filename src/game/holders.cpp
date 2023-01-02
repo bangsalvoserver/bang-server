@@ -9,13 +9,20 @@
 
 namespace banggame {
 
-    void apply_ruleset(game *game, card_expansion_type value) {
-        enums::visit_enum([&]<card_expansion_type E>(enums::enum_tag_t<E>) {
-            if constexpr (enums::value_with_type<E>) {
+    template<card_expansion_type E>
+    inline void do_apply_ruleset(game *game, enums::enum_tag_t<E>) {
+        if constexpr (enums::value_with_type<E>) {
+            if (bool(game->m_options.expansions & E)) {
                 using type = enums::enum_type_t<E>;
                 type{}.on_apply(game);
             }
-        }, value);
+        }
+    }
+
+    void game::apply_rulesets() {
+        [&]<card_expansion_type ... Es>(enums::enum_sequence<Es ...>) {
+            (do_apply_ruleset(this, enums::enum_tag<Es>), ...);
+        }(enums::make_enum_sequence<card_expansion_type>());
     }
 
     template<typename Holder, typename Function>

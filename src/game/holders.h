@@ -9,8 +9,6 @@
 
 namespace banggame {
 
-    void apply_ruleset(game *game, card_expansion_type value);
-
     using target_variant = std::variant<std::monostate, player *, card *>;
     
     DEFINE_STRUCT(effect_holder,
