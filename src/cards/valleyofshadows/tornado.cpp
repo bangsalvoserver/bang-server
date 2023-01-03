@@ -13,7 +13,9 @@ namespace banggame {
         }
 
         void on_update() override {
-            if (target->empty_hand()) {
+            if (target->immune_to(origin_card, origin, flags)) {
+                target->m_game->pop_request();
+            } else if (target->empty_hand()) {
                 target->m_game->invoke_action([&]{
                     target->m_game->pop_request();
                     target->draw_card(2, origin_card);

@@ -10,10 +10,14 @@ namespace banggame {
             : request_base(origin_card, origin, target, flags) {}
 
         void on_update() override {
-            if (!sent) {
-                target->m_game->play_sound(target, "bandidos");
+            if (target->immune_to(origin_card, origin, flags)) {
+                target->m_game->pop_request();
+            } else {
+                if (!sent) {
+                    target->m_game->play_sound(target, "bandidos");
+                }
+                auto_respond();
             }
-            auto_respond();
         }
 
         void on_resolve() override {

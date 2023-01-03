@@ -9,7 +9,7 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
 
-    struct handler_bangcard {
+    struct effect_bangcard {
         void on_play(card *origin_card, player *origin, player *target);
     };
 

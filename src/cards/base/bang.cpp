@@ -16,13 +16,11 @@ namespace banggame {
         auto req = std::make_shared<request_bang>(origin_card, origin, target, flags | effect_flags::is_bang | effect_flags::single_target);
         req->origin->m_game->call_event<event_type::apply_bang_modifier>(req->origin, req.get());
         req->origin->m_game->queue_action([req = std::move(req)]() mutable {
-            if (!req->target->immune_to(req->origin_card, req->origin, req->flags)) {
-                req->origin->m_game->queue_request(std::move(req));
-            }
+            req->origin->m_game->queue_request(std::move(req));
         });
     }
 
-    void handler_bangcard::on_play(card *origin_card, player *origin, player *target) {
+    void effect_bangcard::on_play(card *origin_card, player *origin, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         queue_request_bang(origin_card, origin, target);
     }
@@ -96,15 +94,19 @@ namespace banggame {
     }
 
     void request_bang::on_update() {
-        if (!sent) {
-            if (bool(flags & effect_flags::multi_target)) {
-                target->m_game->play_sound(target, "gatling");
-            } else {
-                target->m_game->play_sound(target, "bang");
+        if (target->immune_to(origin_card, origin, flags)) {
+            target->m_game->pop_request();
+        } else {
+            if (!sent) {
+                if (bool(flags & effect_flags::multi_target)) {
+                    target->m_game->play_sound(target, "gatling");
+                } else {
+                    target->m_game->play_sound(target, "bang");
+                }
             }
-        }
-        if (target->empty_hand() || unavoidable) {
-            auto_respond();
+            if (target->empty_hand() || unavoidable) {
+                auto_respond();
+            }
         }
     }
 

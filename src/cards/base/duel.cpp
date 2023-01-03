@@ -12,11 +12,15 @@ namespace banggame {
         player *respond_to = nullptr;
 
         void on_update() override {
-            if (!sent) {
-                target->m_game->play_sound(target, "duel");
-            }
-            if (target->empty_hand()) {
-                auto_respond();
+            if (target->immune_to(origin_card, origin, flags)) {
+                target->m_game->pop_request();
+            } else {
+                if (!sent) {
+                    target->m_game->play_sound(target, "duel");
+                }
+                if (target->empty_hand()) {
+                    auto_respond();
+                }
             }
         }
 

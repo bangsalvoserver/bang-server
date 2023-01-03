@@ -137,8 +137,7 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - mth_add player reachable notself
-    mth_effect: bangcard
+      - bangcard player reachable notself
     tags:
       - bangcard
       - skip_logs
@@ -890,9 +889,7 @@ main_deck:
       - bomb
       - prompt_on_self_equip
     responses:
-      - move_bomb
-      - mth_add player
-    mth_response: move_bomb
+      - move_bomb player
   - name: BUNTLINE_SPECIAL
     signs:
       - J spades

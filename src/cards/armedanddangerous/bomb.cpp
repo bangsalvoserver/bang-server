@@ -17,11 +17,7 @@ namespace banggame {
         }
     };
 
-    bool effect_move_bomb::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_is<request_move_bomb>(origin);
-    }
-
-    game_string handler_move_bomb::on_prompt(card *origin_card, player *origin, player *target) {
+    game_string effect_move_bomb::on_prompt(card *origin_card, player *origin, player *target) {
         if (origin == target) {
             return {"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
         } else {
@@ -29,7 +25,10 @@ namespace banggame {
         }
     }
 
-    game_string handler_move_bomb::verify(card *origin_card, player *origin, player *target) {
+    game_string effect_move_bomb::verify(card *origin_card, player *origin, player *target) {
+        if (!origin->m_game->top_request_is<request_move_bomb>(origin)) {
+            return "ERROR_INVALID_RESPONSE";
+        }
         if (target != origin) {
             if (auto c = target->find_equipped_card(origin_card)) {
                 return {"ERROR_DUPLICATED_CARD", c};
@@ -38,7 +37,7 @@ namespace banggame {
         return {};
     }
 
-    void handler_move_bomb::on_play(card *origin_card, player *origin, player *target) {
+    void effect_move_bomb::on_play(card *origin_card, player *origin, player *target) {
         origin->m_game->invoke_action([&]{
             origin->m_game->pop_request();
             if (target != origin) {

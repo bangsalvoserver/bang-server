@@ -57,6 +57,7 @@ namespace banggame {
     }
     
     void effect_rust::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
+        if (target->immune_to(origin_card, origin, flags)) return;
         if (target->count_cubes() == 0) return;
         origin->m_game->queue_action([=]{
             origin->m_game->queue_request<request_rust>(origin_card, origin, target, flags);

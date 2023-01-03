@@ -6,10 +6,6 @@
 namespace banggame {
 
     struct effect_move_bomb {
-        bool can_respond(card *origin_card, player *origin);
-    };
-
-    struct handler_move_bomb {
         game_string on_prompt(card *origin_card, player *origin, player *target);
         game_string verify(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);

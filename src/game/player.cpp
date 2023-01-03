@@ -119,7 +119,7 @@ namespace banggame {
     }
 
     bool player::immune_to(card *origin_card, player *origin, effect_flags flags) const {
-        return m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, false);
+        return origin_card && origin && m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, false);
     }
 
     bool player::can_escape(player *origin, card *origin_card, effect_flags flags) const {

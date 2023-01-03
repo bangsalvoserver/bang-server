@@ -41,9 +41,7 @@ namespace banggame {
         if (playing_card->is_brown()) {
             flags |= effect_flags::escapable;
         }
-        if (!target->immune_to(playing_card, verifier.origin, flags)) {
-            effect.on_play(playing_card, verifier.origin, target, flags);
-        }
+        effect.on_play(playing_card, verifier.origin, target, flags);
     }
 
     template<> game_string play_visitor<target_type::conditional_player>::verify(player *target) {
@@ -124,9 +122,7 @@ namespace banggame {
         }
 
         for (player *target : targets) {
-            if (!target->immune_to(playing_card, verifier.origin, flags)) {
-                effect.on_play(playing_card, verifier.origin, target, flags);
-            }
+            effect.on_play(playing_card, verifier.origin, target, flags);
         }
     }
 
@@ -163,9 +159,7 @@ namespace banggame {
             flags |= effect_flags::escapable;
         }
         for (player *target : targets) {
-            if (!target->immune_to(playing_card, verifier.origin, flags)) {
-                effect.on_play(playing_card, verifier.origin, target, flags);
-            }
+            effect.on_play(playing_card, verifier.origin, target, flags);
         }
     }
 
@@ -200,14 +194,10 @@ namespace banggame {
         if (playing_card->is_brown()) {
             flags |= effect_flags::escapable;
         }
-        if (target->owner == verifier.origin) {
+        if (target->owner != verifier.origin && target->pocket == pocket_type::player_hand) {
+            effect.on_play(playing_card, verifier.origin, target->owner->random_hand_card(), flags);
+        } else {
             effect.on_play(playing_card, verifier.origin, target, flags);
-        } else if (!target->owner->immune_to(playing_card, verifier.origin, flags)) {
-            if (target->pocket == pocket_type::player_hand) {
-                effect.on_play(playing_card, verifier.origin, target->owner->random_hand_card(), flags);
-            } else {
-                effect.on_play(playing_card, verifier.origin, target, flags);
-            }
         }
     }
 

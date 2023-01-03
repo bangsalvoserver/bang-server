@@ -90,6 +90,7 @@ namespace banggame {
                     origin->m_game->add_log("LOG_PLAYED_CARD_STEAL_OWN", origin_card, origin, target_card);
                 }
             }
+            if (target_card->owner->immune_to(origin_card, origin, flags)) return;
             origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
         });
     }
@@ -153,6 +154,7 @@ namespace banggame {
             } else {
                 origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_OWN", origin_card, origin, target_card);
             }
+            if (target_card->owner->immune_to(origin_card, origin, flags)) return;
             origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
         });
     }

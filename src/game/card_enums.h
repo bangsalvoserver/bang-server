@@ -178,6 +178,7 @@ namespace banggame {
         (pass_turn,             effect_pass_turn)
         (resolve,               effect_resolve)
         (bang,                  effect_bang)
+        (bangcard,              effect_bangcard)
         (banglimit,             effect_banglimit)
         (missed,                effect_missed)
         (barrel,                effect_barrel)
@@ -339,7 +340,6 @@ namespace banggame {
 
     DEFINE_ENUM_FWD_TYPES(mth_type,
         (none)
-        (bangcard,              handler_bangcard)
         (play_as_bang,          handler_play_as_bang)
         (play_as_gatling,       handler_play_as_gatling)
         (doc_holyday,           handler_doc_holyday)
@@ -348,7 +348,6 @@ namespace banggame {
         (heal_multi,            handler_heal_multi)
         (flintlock,             handler_flintlock)
         (duck,                  handler_duck)
-        (move_bomb,             handler_move_bomb)
         (squaw,                 handler_squaw)
         (red_ringo,             handler_red_ringo)
         (card_sharper,          handler_card_sharper)

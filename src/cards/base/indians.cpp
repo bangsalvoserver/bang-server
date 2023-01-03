@@ -9,11 +9,15 @@ namespace banggame {
             : request_base(origin_card, origin, target, flags) {}
 
         void on_update() override {
-            if (!sent) {
-                target->m_game->play_sound(target, "indians");
-            }
-            if (target->empty_hand()) {
-                auto_respond();
+            if (target->immune_to(origin_card, origin, flags)) {
+                target->m_game->pop_request();
+            } else {
+                if (!sent) {
+                    target->m_game->play_sound(target, "indians");
+                }
+                if (target->empty_hand()) {
+                    auto_respond();
+                }
             }
         }
 

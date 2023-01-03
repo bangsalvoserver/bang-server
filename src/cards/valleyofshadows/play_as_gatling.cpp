@@ -15,9 +15,7 @@ namespace banggame {
             flags |= effect_flags::single_target;
         }
         for (player *p : targets) {
-            if (!p->immune_to(chosen_card, origin, flags)) {
-                origin->m_game->queue_request<request_bang>(chosen_card, origin, p, flags);
-            }
+            origin->m_game->queue_request<request_bang>(chosen_card, origin, p, flags);
         }
     }
 }
