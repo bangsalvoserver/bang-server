@@ -202,7 +202,10 @@ namespace banggame {
             auto cards = ranges::to<std::set>(update.respond_cards);
             while (!cards.empty()) {
                 card *origin_card = random_card_of_pocket(cards, origin->m_game->rng,
-                    pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand);
+                    pocket_type::player_character,
+                    pocket_type::player_table,
+                    pocket_type::player_hand
+                );
                 if (!origin_card) break;
 
                 cards.erase(origin_card);
@@ -227,7 +230,7 @@ namespace banggame {
         return false;
     }
 
-    static void play_in_turn(player *origin) {
+    static bool play_in_turn(player *origin) {
         auto cards = ranges::views::concat(
             origin->m_characters,
             origin->m_table | ranges::views::remove_if(&card::inactive),
@@ -248,7 +251,12 @@ namespace banggame {
         
         while (!cards.empty()) {
             card *origin_card = random_card_of_pocket(cards, origin->m_game->rng,
-                pocket_type::scenario_card, pocket_type::player_character, pocket_type::player_table, pocket_type::player_hand);
+                pocket_type::scenario_card,
+                pocket_type::player_table,
+                pocket_type::player_hand,
+                pocket_type::player_character,
+                pocket_type::shop_selection
+            );
             if (!origin_card) break;
 
             cards.erase(origin_card);
@@ -256,15 +264,21 @@ namespace banggame {
 
             if (verifier.origin_card && !verifier.verify_and_play()) {
                 if (auto &prompt = origin->m_prompt) {
+                    auto fun = std::move(prompt->first);
                     prompt.reset();
+                    if (cards.empty()) {
+                        origin->m_game->invoke_action(std::move(fun));
+                        return true;
+                    }
                 } else {
-                    return;
+                    return true;
                 }
             }
         }
 
-        origin->pass_turn();
-        origin->set_last_played_card(nullptr);
+        // softlock
+        std::cout << "BOT ERROR: could not find play card\n";
+        return false;
     }
     
     struct bot_delay_request : request_base {
