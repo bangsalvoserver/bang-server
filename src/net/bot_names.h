@@ -6,6 +6,7 @@ namespace banggame {
         "Salvo",
         "Chris",
         "Lorena",
+        "Ismaele",
         "Riccardo",
         "Davide",
         "Lela",
