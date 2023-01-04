@@ -4,6 +4,14 @@
 
 namespace banggame {
 
+    game_string equip_wanted::on_prompt(player *origin, card *target_card, player *target) {
+        if (target->m_role == player_role::sheriff) {
+            return {"PROMPT_CARD_NO_EFFECT", target_card};
+        } else {
+            return {};
+        }
+    }
+
     void equip_wanted::on_enable(card *target_card, player *p) {
         p->m_game->add_listener<event_type::on_player_death>({target_card, 3}, [p, target_card](player *origin, player *target) {
             if (origin && p == target && origin != target) {

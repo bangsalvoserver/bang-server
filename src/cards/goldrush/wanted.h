@@ -6,6 +6,7 @@
 namespace banggame {
 
     struct equip_wanted : event_equip {
+        game_string on_prompt(player *origin, card *target_card, player *target);
         void on_enable(card *target_card, player *target);
     };
 }
