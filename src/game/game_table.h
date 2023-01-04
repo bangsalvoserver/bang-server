@@ -75,7 +75,8 @@ namespace banggame {
         card *get_disabler(card *target_card);
         bool is_disabled(card *target_card);
 
-        void set_game_flags(game_flags flags);
+        void add_game_flags(game_flags flags);
+        void remove_game_flags(game_flags flags);
     
         bool check_flags(game_flags type) const {
             return bool(m_game_flags & type);

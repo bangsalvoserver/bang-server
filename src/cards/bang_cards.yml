@@ -181,6 +181,8 @@ main_deck:
     color: brown
     effects:
       - draw(2)
+    tags:
+      - changewws
   - &duel
     name: DUEL
     signs:
@@ -273,6 +275,8 @@ main_deck:
     color: brown
     effects:
       - draw(3)
+    tags:
+      - changewws
   - <<: *barrel
     signs:
       - A clubs
@@ -535,6 +539,8 @@ main_deck:
     color: green
     effects:
       - draw(3)
+    tags:
+      - changewws
   - name: KNIFE
     signs:
       - 8 hearts
@@ -731,6 +737,7 @@ main_deck:
     mth_effect: draw_multi
     tags:
       - repeatable
+      - changewws
   - <<: *cat_balou
     signs:
       - 3 hearts
@@ -1897,26 +1904,54 @@ fistfulofcards:
     tags:
       - last_scenario_card
 wildwestshow:
-  - name: GAG
-    image: 06_bavaglio
+  # - name: GAG
+  #   image: 06_bavaglio
   - name: BONE_ORCHARD
     image: 06_camposanto
+    equip:
+      - bone_orchard
   - name: DARLING_VALENTINE
     image: 06_darlingvalentine
-  - name: DOROTHY_RAGE
-    image: 06_dorothyrage
+    equip:
+      - darling_valentine
+  # - name: DOROTHY_RAGE
+  #   image: 06_dorothyrage
   - name: HELENA_ZONTERO
     image: 06_helenazontero
+    equip:
+      - helena_zontero
   - name: LADY_ROSA_OF_TEXAS
     image: 06_ladyrosadeltexas
+    effects:
+      - ladyrosaoftexas
   - name: MISS_SUSANNA
     image: 06_misssusanna
+    equip:
+      - miss_susanna
   - name: SHOWDOWN
     image: 06_regolamentodiconti
+    equip:
+      - showdown
+    effects:
+      - banglimit
+      - mth_add card self | hand
+      - mth_add player reachable notself
+    mth_effect: play_as_bang
+    responses:
+      - missed
+      - discard card self | hand bangcard
+    tags:
+      - play_as_bang
   - name: SACAGAWAY
     image: 06_sacagaway
+    equip:
+      - sacagaway
   - name: WILD_WEST_SHOW
     image: 06_wildwestshow
+    equip:
+      - wildwestshow
+    tags:
+      - last_scenario_card
 goldrush:
   - count: 3
     name: SHOT

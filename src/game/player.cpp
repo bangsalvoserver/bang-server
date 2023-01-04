@@ -222,7 +222,8 @@ namespace banggame {
     }
 
     bool player::is_bangcard(card *origin_card) {
-        return (check_player_flags(player_flags::treat_missed_as_bang)
+        return m_game->check_flags(game_flags::treat_any_as_bang)
+            || (check_player_flags(player_flags::treat_missed_as_bang)
                 && origin_card->has_tag(tag_type::missedcard))
             || origin_card->has_tag(tag_type::bangcard);
     };

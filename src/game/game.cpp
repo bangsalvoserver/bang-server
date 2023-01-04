@@ -54,7 +54,7 @@ namespace banggame {
         co_await move_cards(m_hidden_deck);
 
         if (!m_scenario_deck.empty()) {
-            co_yield make_update<game_update_type::move_scenario_deck>(m_first_player);
+            co_yield make_update<game_update_type::move_scenario_deck>(m_first_player, pocket_type::scenario_deck);
         }
 
         co_await move_cards(m_scenario_deck);
@@ -209,7 +209,7 @@ namespace banggame {
             m_first_player = *std::ranges::find(m_players, player_role::deputy_3p, &player::m_role);
         }
 
-        add_update<game_update_type::move_scenario_deck>(m_first_player);
+        add_update<game_update_type::move_scenario_deck>(m_first_player, pocket_type::scenario_deck);
 
         if (add_cards(all_cards.highnoon, pocket_type::scenario_deck) + add_cards(all_cards.fistfulofcards, pocket_type::scenario_deck)) {
             shuffle_cards_and_ids(m_scenario_deck);
@@ -459,12 +459,16 @@ namespace banggame {
                 for (player *p : winners) {
                     p->add_player_flags(player_flags::winner);
                 }
-                set_game_flags(game_flags::game_over);
+                add_game_flags(game_flags::game_over);
             };
 
             auto alive_players = std::views::filter(m_players, &player::alive);
 
-            if (m_players.size() > 3) {
+            if (check_flags(game_flags::free_for_all)) {
+                if (std::ranges::distance(alive_players) <= 1) {
+                    declare_winners(alive_players);
+                }
+            } else if (m_players.size() > 3) {
                 auto is_outlaw = [](player *p) { return p->m_role == player_role::outlaw; };
                 auto is_renegade = [](player *p) { return p->m_role == player_role::renegade; };
                 auto is_sheriff = [](player *p) { return p->m_role == player_role::sheriff; };
@@ -497,7 +501,7 @@ namespace banggame {
                 killer->draw_card(3);
             }
             if (target == m_first_player && num_alive() > 1) {
-                add_update<game_update_type::move_scenario_deck>(m_first_player);
+                add_update<game_update_type::move_scenario_deck>(m_first_player, pocket_type::scenario_deck);
             }
             if (m_playing == target) {
                 start_next_turn();

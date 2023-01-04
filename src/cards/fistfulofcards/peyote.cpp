@@ -66,6 +66,11 @@ namespace banggame {
             p->m_game->queue_request<request_peyote>(target_card, p);
         });
 
-        target->m_game->set_game_flags(game_flags::phase_one_override);
+        target->m_game->add_game_flags(game_flags::phase_one_override);
+    }
+
+    void equip_peyote::on_disable(card *target_card, player *target) {
+        target->m_game->remove_listeners(target_card);
+        target->m_game->remove_game_flags(game_flags::phase_one_override);
     }
 }
