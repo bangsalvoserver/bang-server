@@ -192,81 +192,19 @@ namespace banggame {
         }
     }
 
-    static bool respond_to_request(player *origin) {
-        auto update = origin->m_game->make_request_update(origin);
+    static bool generate_random_play_impl(player *origin, bool is_response, std::ranges::range auto &&cards, std::same_as<pocket_type> auto ... pockets) {
+        auto card_set = ranges::to<std::set>(FWD(cards));
+        while (!card_set.empty()) {
+            card *origin_card = random_card_of_pocket(card_set, origin->m_game->rng, pockets ...);
 
-        if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](card *c) { return c->pocket == pocket_type::button_row; })) {
-            origin->m_game->top_request().on_pick(random_element(update.pick_cards, origin->m_game->rng));
-            return true;
-        } else if (!update.respond_cards.empty()) {
-            auto cards = ranges::to<std::set>(update.respond_cards);
-            while (!cards.empty()) {
-                card *origin_card = random_card_of_pocket(cards, origin->m_game->rng,
-                    pocket_type::player_character,
-                    pocket_type::player_table,
-                    pocket_type::player_hand
-                );
-                if (!origin_card) break;
-
-                cards.erase(origin_card);
-                auto verifier = generate_random_play(origin, origin_card, true);
-
-                if (verifier.origin_card && !verifier.verify_and_play()) {
-                    if (auto &prompt = origin->m_prompt) {
-                        auto fun = std::move(prompt->first);
-                        prompt.reset();
-                        if (cards.empty()) {
-                            origin->m_game->invoke_action(std::move(fun));
-                            return true;
-                        }
-                    } else {
-                        return true;
-                    }
-                }
-            }
-            // softlock
-            std::cout << "BOT ERROR: could not find response card\n";
-        }
-        return false;
-    }
-
-    static bool play_in_turn(player *origin) {
-        auto cards = ranges::views::concat(
-            origin->m_characters,
-            origin->m_table | ranges::views::remove_if(&card::inactive),
-            origin->m_hand,
-            origin->m_game->m_shop_selection,
-            origin->m_game->m_button_row,
-            origin->m_game->m_scenario_cards | ranges::views::take_last(1)
-        )
-        | ranges::views::filter([&](card *target_card){
-            if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
-                return target_card->modifier != card_modifier_type::none
-                    || is_possible_to_play(origin, target_card, target_card->effects);
-            } else {
-                return !make_equip_set(origin, target_card).empty();
-            }
-        })
-        | ranges::to<std::set>;
-        
-        while (!cards.empty()) {
-            card *origin_card = random_card_of_pocket(cards, origin->m_game->rng,
-                pocket_type::scenario_card,
-                pocket_type::player_table,
-                pocket_type::player_hand,
-                pocket_type::player_character,
-                pocket_type::shop_selection
-            );
-            if (!origin_card) break;
-
-            cards.erase(origin_card);
-            auto verifier = generate_random_play(origin, origin_card, false);
+            card_set.erase(origin_card);
+            auto verifier = generate_random_play(origin, origin_card, is_response);
 
             if (verifier.origin_card && !verifier.verify_and_play()) {
                 if (auto &prompt = origin->m_prompt) {
                     auto fun = std::move(prompt->first);
                     prompt.reset();
-                    if (cards.empty()) {
+                    if (card_set.empty()) {
                         origin->m_game->invoke_action(std::move(fun));
                         return true;
                     }
@@ -277,8 +215,51 @@ namespace banggame {
         }
 
         // softlock
-        std::cout << "BOT ERROR: could not find play card\n";
+        std::cout << "BOT ERROR: could not find card in generate_random_play_impl\n";
         return false;
+    }
+
+    static bool respond_to_request(player *origin) {
+        auto update = origin->m_game->make_request_update(origin);
+
+        if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](card *c) { return c->pocket == pocket_type::button_row; })) {
+            origin->m_game->top_request().on_pick(random_element(update.pick_cards, origin->m_game->rng));
+            return true;
+        } else if (!update.respond_cards.empty()) {
+            return generate_random_play_impl(origin, true,
+                update.respond_cards,
+                pocket_type::player_character,
+                pocket_type::player_table,
+                pocket_type::player_hand
+            );
+        }
+        return false;
+    }
+
+    static bool play_in_turn(player *origin) {
+        return generate_random_play_impl(origin, false,
+            ranges::views::concat(
+                origin->m_characters,
+                origin->m_table | ranges::views::remove_if(&card::inactive),
+                origin->m_hand,
+                origin->m_game->m_shop_selection,
+                origin->m_game->m_button_row,
+                origin->m_game->m_scenario_cards | ranges::views::take_last(1)
+            )
+            | ranges::views::filter([&](card *target_card){
+                if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
+                    return target_card->modifier != card_modifier_type::none
+                        || is_possible_to_play(origin, target_card, target_card->effects);
+                } else {
+                    return !make_equip_set(origin, target_card).empty();
+                }
+            }),
+            pocket_type::scenario_card,
+            pocket_type::player_table,
+            pocket_type::player_hand,
+            pocket_type::player_character,
+            pocket_type::shop_selection
+        );
     }
     
     struct bot_delay_request : request_base {
