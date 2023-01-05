@@ -29,13 +29,16 @@ namespace banggame {
 
         std::vector<card *> m_scenario_deck;
         std::vector<card *> m_scenario_cards;
+        std::vector<card *> m_wws_scenario_deck;
+        std::vector<card *> m_wws_scenario_cards;
         
         int8_t num_cubes = 0;
 
         game_flags m_game_flags{};
         game_options m_options;
 
-        player *m_first_player = nullptr;
+        player *m_scenario_holder = nullptr;
+        player *m_wws_scenario_holder = nullptr;
         player *m_first_dead = nullptr;
 
         std::multimap<event_card_key, card_disabler_fun, std::less<>> m_disablers;

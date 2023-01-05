@@ -364,7 +364,7 @@ namespace banggame {
 
         switch(origin_card->pocket) {
         case pocket_type::player_hand:
-            if (origin_card->is_brown()) {
+            if (origin_card->is_brown() || ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
                 if (game_string error = verify_card_targets()) {
                     return error;
                 }
@@ -401,7 +401,10 @@ namespace banggame {
             }
             break;
         case pocket_type::scenario_card:
-            if (origin_card != origin->m_game->m_scenario_cards.back()) {
+        case pocket_type::wws_scenario_card:
+            if (origin_card->pocket == pocket_type::scenario_card && origin_card != origin->m_game->m_scenario_cards.back()) {
+                return "ERROR_INVALID_SCENARIO_CARD";
+            } else if (origin_card->pocket == pocket_type::wws_scenario_card && origin_card != origin->m_game->m_wws_scenario_cards.back()) {
                 return "ERROR_INVALID_SCENARIO_CARD";
             }
             [[fallthrough]];

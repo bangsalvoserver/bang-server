@@ -53,8 +53,11 @@ namespace banggame {
         co_await move_cards(m_shop_selection);
         co_await move_cards(m_hidden_deck);
 
-        if (!m_scenario_deck.empty()) {
-            co_yield make_update<game_update_type::move_scenario_deck>(m_first_player, pocket_type::scenario_deck);
+        if (m_scenario_holder) {
+            co_yield make_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
+        }
+        if (m_wws_scenario_holder) {
+            co_yield make_update<game_update_type::move_scenario_deck>(m_wws_scenario_holder, pocket_type::wws_scenario_deck);
         }
 
         co_await move_cards(m_scenario_deck);
@@ -203,19 +206,16 @@ namespace banggame {
             p->set_role(*role_ptr++);
         }
 
-        if (m_players.size() > 3) {
-            m_first_player = *std::ranges::find(m_players, player_role::sheriff, &player::m_role);
-        } else {
-            m_first_player = *std::ranges::find(m_players, player_role::deputy_3p, &player::m_role);
-        }
+        player *first_player = *std::ranges::find(m_players,
+            m_players.size() > 3 ? player_role::sheriff : player_role::deputy_3p, &player::m_role);
 
-        add_update<game_update_type::move_scenario_deck>(m_first_player, pocket_type::scenario_deck);
+        auto is_last_scenario_card = [](card *c) {
+            return c->has_tag(tag_type::last_scenario_card);
+        };
 
         if (add_cards(all_cards.highnoon, pocket_type::scenario_deck) + add_cards(all_cards.fistfulofcards, pocket_type::scenario_deck)) {
             shuffle_cards_and_ids(m_scenario_deck);
-            auto last_scenario_cards = std::ranges::partition(m_scenario_deck, [](card *c) {
-                return c->has_tag(tag_type::last_scenario_card);
-            });
+            auto last_scenario_cards = std::ranges::partition(m_scenario_deck, is_last_scenario_card);
             if (last_scenario_cards.begin() != m_scenario_deck.begin()) {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, last_scenario_cards.begin());
             }
@@ -223,7 +223,17 @@ namespace banggame {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
             }
 
+            m_scenario_holder = first_player;
+            add_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_scenario_deck), pocket_type::scenario_deck);
+        }
+
+        if (add_cards(all_cards.wildwestshow, pocket_type::wws_scenario_deck)) {
+            shuffle_cards_and_ids(m_wws_scenario_deck);
+            std::ranges::partition(m_wws_scenario_deck, is_last_scenario_card);
+            m_wws_scenario_holder = first_player;
+            add_update<game_update_type::move_scenario_deck>(m_wws_scenario_holder, pocket_type::wws_scenario_deck);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_wws_scenario_deck), pocket_type::wws_scenario_deck);
         }
 
         std::vector<card *> character_ptrs;
@@ -251,7 +261,7 @@ namespace banggame {
                     move_card(p->first_character(), pocket_type::player_hand, p, card_visibility::shown, true);
                 }
             }
-            for (player *p : range_all_players(m_first_player)) {
+            for (player *p : range_all_players(first_player)) {
                 queue_request<request_characterchoice>(p);
             }
         } else {
@@ -266,7 +276,7 @@ namespace banggame {
             }
         }
 
-        queue_action([this] {
+        queue_action([this, first_player] {
             add_log("LOG_GAME_START");
             play_sound(nullptr, "gamestart");
 
@@ -274,7 +284,7 @@ namespace banggame {
                 p->first_character()->on_equip(p);
             }
 
-            for (player *p : range_all_players(m_first_player,
+            for (player *p : range_all_players(first_player,
                 std::ranges::max(m_players | std::views::transform(&player::get_initial_cards))))
             {
                 if (p->m_hand.size() < p->get_initial_cards()) {
@@ -291,9 +301,12 @@ namespace banggame {
             if (!m_scenario_deck.empty()) {
                 set_card_visibility(m_scenario_deck.back(), nullptr, card_visibility::shown, true);
             }
+            if (!m_wws_scenario_deck.empty()) {
+                set_card_visibility(m_wws_scenario_deck.back(), nullptr, card_visibility::shown, true);
+            }
 
-            m_playing = m_first_player;
-            m_first_player->start_of_turn();
+            m_playing = first_player;
+            first_player->start_of_turn();
         });
     }
 
@@ -376,7 +389,7 @@ namespace banggame {
 
         player *next_player = *it;
         
-        if (next_player == m_first_player) {
+        if (next_player == m_scenario_holder) {
             draw_scenario_card();
         }
 
@@ -500,8 +513,8 @@ namespace banggame {
             if (killer && killer != target && m_players.size() <= 3) {
                 killer->draw_card(3);
             }
-            if (target == m_first_player && num_alive() > 1) {
-                add_update<game_update_type::move_scenario_deck>(m_first_player, pocket_type::scenario_deck);
+            if (target == m_scenario_holder && num_alive() > 1) {
+                add_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
             }
             if (m_playing == target) {
                 start_next_turn();

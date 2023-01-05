@@ -1910,6 +1910,8 @@ wildwestshow:
     image: 06_camposanto
     equip:
       - bone_orchard
+    tags:
+      - ghost_card
   - name: DARLING_VALENTINE
     image: 06_darlingvalentine
     equip:

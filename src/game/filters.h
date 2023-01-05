@@ -135,7 +135,7 @@ namespace banggame {
                 return filter_impl::card_has_tag(target, tag_type::play_as_bang);
             }
         case card_modifier_type::leevankliff:
-            return filter_impl::card_has_tag(target, tag_type::bangcard);
+            return filter_impl::is_bangcard(origin, target);
         case card_modifier_type::discount:
             return filter_impl::get_card_deck(target) == card_deck_type::goldrush;
         case card_modifier_type::shopchoice:

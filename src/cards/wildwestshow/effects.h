@@ -11,6 +11,7 @@
 #include "john_pain.h"
 #include "ladyrosaoftexas.h"
 #include "miss_susanna.h"
+#include "ruleset.h"
 #include "sacagaway.h"
 #include "showdown.h"
 #include "teren_kill.h"
