@@ -438,7 +438,7 @@ namespace banggame {
     void player::set_role(player_role role, bool instant) {
         m_role = role;
 
-        if (role == player_role::sheriff || m_game->m_players.size() <= 3) {
+        if (role == player_role::sheriff || m_game->m_players.size() <= 3 || check_player_flags(player_flags::role_revealed)) {
             m_game->add_update<game_update_type::player_show_role>(this, m_role, instant);
             add_player_flags(player_flags::role_revealed);
         } else {

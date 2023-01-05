@@ -16,8 +16,8 @@ namespace banggame {
                     std::ranges::shuffle(roles, origin->m_game->rng);
                     
                     for (player *p : dead_players) {
-                        p->remove_player_flags(player_flags::role_revealed);
                         p->set_role(player_role::unknown, false);
+                        p->remove_player_flags(player_flags::role_revealed);
                     }
 
                     for (auto [p, role] : ranges::views::zip(dead_players, roles)) {
