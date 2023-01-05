@@ -6,12 +6,12 @@ namespace banggame {
 
     void effect_changewws::on_play(card *origin_card, player *origin) {
         if (origin->m_last_played_card == origin_card) return;
-
-        auto &scenario_deck = origin->m_game->m_wws_scenario_deck;
-        auto &scenario_cards = origin->m_game->m_wws_scenario_cards;
-        if (scenario_deck.empty()) return;
+        if (origin->m_game->m_wws_scenario_deck.empty()) return;
         
-        origin->m_game->queue_action([origin, &scenario_deck, &scenario_cards]{
+        origin->m_game->queue_action([origin]{
+            auto &scenario_deck = origin->m_game->m_wws_scenario_deck;
+            auto &scenario_cards = origin->m_game->m_wws_scenario_cards;
+            
             if (scenario_deck.size() > 1) {
                 origin->m_game->set_card_visibility(*(scenario_deck.rbegin() + 1), nullptr, card_visibility::shown, true);
             }
