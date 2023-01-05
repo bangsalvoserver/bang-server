@@ -514,7 +514,12 @@ namespace banggame {
                 killer->draw_card(3);
             }
             if (target == m_scenario_holder && num_alive() > 1) {
+                m_scenario_holder = *std::next(player_iterator(m_scenario_holder));
                 add_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
+            }
+            if (target == m_wws_scenario_holder && num_alive() > 1) {
+                m_wws_scenario_holder = *std::next(player_iterator(m_wws_scenario_holder));
+                add_update<game_update_type::move_scenario_deck>(m_wws_scenario_holder, pocket_type::wws_scenario_deck);
             }
             if (m_playing == target) {
                 start_next_turn();
