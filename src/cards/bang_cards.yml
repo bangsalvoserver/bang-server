@@ -181,7 +181,6 @@ main_deck:
     color: brown
     effects:
       - draw(2)
-    tags:
       - changewws
   - &duel
     name: DUEL
@@ -275,7 +274,6 @@ main_deck:
     color: brown
     effects:
       - draw(3)
-    tags:
       - changewws
   - <<: *barrel
     signs:
@@ -539,7 +537,6 @@ main_deck:
     color: green
     effects:
       - draw(3)
-    tags:
       - changewws
   - name: KNIFE
     signs:
@@ -731,13 +728,13 @@ main_deck:
     effects:
       - mth_add
       - mth_add
+      - changewws
     optional:
       - pay_cube select_cubes(2)
       - mth_add
     mth_effect: draw_multi
     tags:
       - repeatable
-      - changewws
   - <<: *cat_balou
     signs:
       - 3 hearts

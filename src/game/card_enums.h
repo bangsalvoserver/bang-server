@@ -51,7 +51,7 @@ namespace banggame {
         (valleyofshadows,       ruleset_valleyofshadows)
         (highnoon)
         (fistfulofcards)
-        (wildwestshow,          ruleset_wildwestshow)
+        (wildwestshow)
         (thebullet)
         (canyondiablo,          ruleset_canyondiablo)
     )
@@ -244,6 +244,7 @@ namespace banggame {
         (sacrifice,             effect_sacrifice)
         (lastwill,              effect_lastwill)
         (ladyrosaoftexas,       effect_ladyrosaoftexas)
+        (changewws,             effect_changewws)
     )
 
     DEFINE_ENUM_FWD_TYPES(equip_type,
@@ -390,7 +391,6 @@ namespace banggame {
         (buy_cost)
         (max_hp)
         (bronco)
-        (changewws)
     )
 
 }

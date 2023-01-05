@@ -122,6 +122,7 @@ set(bangserver_srcs
 
     src/cards/wildwestshow/big_spencer.cpp
     src/cards/wildwestshow/bone_orchard.cpp
+    src/cards/wildwestshow/changewws.cpp
     src/cards/wildwestshow/darling_valentine.cpp
     src/cards/wildwestshow/gary_looter.cpp
     src/cards/wildwestshow/flint_westwood.cpp
@@ -131,7 +132,6 @@ set(bangserver_srcs
     src/cards/wildwestshow/john_pain.cpp
     src/cards/wildwestshow/ladyrosaoftexas.cpp
     src/cards/wildwestshow/miss_susanna.cpp
-    src/cards/wildwestshow/ruleset.cpp
     src/cards/wildwestshow/sacagaway.cpp
     src/cards/wildwestshow/showdown.cpp
     src/cards/wildwestshow/teren_kill.cpp
