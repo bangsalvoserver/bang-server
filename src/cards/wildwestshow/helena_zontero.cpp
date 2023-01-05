@@ -13,18 +13,16 @@ namespace banggame {
                     | ranges::views::filter([](player *p) {
                         return p->alive() && p->m_role != player_role::sheriff;
                     });
-                for (player *p : alive_players) {
-                    if (origin->m_game->m_players.size() > 3) {
-                        origin->m_game->add_update<game_update_type::player_show_role>(update_target::includes(p), p, player_role::unknown);
-                    } else {
-                        origin->m_game->add_update<game_update_type::player_show_role>(p, player_role::unknown);
-                    }
-                }
-
+                
                 auto roles = alive_players | ranges::views::transform(&player::m_role) | ranges::to<std::vector>;
                 std::ranges::shuffle(roles, origin->m_game->rng);
+                
+                for (player *p : alive_players) {
+                    p->set_role(player_role::unknown, false);
+                }
+
                 for (auto [p, role] : ranges::views::zip(alive_players, roles)) {
-                    p->set_role(role);
+                    p->set_role(role, false);
                 }
             }
         });

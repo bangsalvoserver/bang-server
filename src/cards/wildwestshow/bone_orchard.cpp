@@ -12,16 +12,16 @@ namespace banggame {
 
                 auto dead_players = target->m_game->m_players | ranges::views::remove_if(&player::alive);
                 if (ranges::distance(dead_players) > 1) {
-                    for (player *p : dead_players) {
-                        if (p->remove_player_flags(player_flags::role_revealed)) {
-                            target->m_game->add_update<game_update_type::player_show_role>(p, player_role::unknown);
-                        }
-                    }
-
                     auto roles = dead_players | ranges::views::transform(&player::m_role) | ranges::to<std::vector>;
                     std::ranges::shuffle(roles, origin->m_game->rng);
+                    
+                    for (player *p : dead_players) {
+                        p->remove_player_flags(player_flags::role_revealed);
+                        p->set_role(player_role::unknown, false);
+                    }
+
                     for (auto [p, role] : ranges::views::zip(dead_players, roles)) {
-                        p->set_role(role);
+                        p->set_role(role, false);
                     }
                 }
 

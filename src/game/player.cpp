@@ -414,14 +414,14 @@ namespace banggame {
         }
     }
 
-    void player::set_role(player_role role) {
+    void player::set_role(player_role role, bool instant) {
         m_role = role;
 
         if (role == player_role::sheriff || m_game->m_players.size() <= 3) {
-            m_game->add_update<game_update_type::player_show_role>(this, m_role, true);
+            m_game->add_update<game_update_type::player_show_role>(this, m_role, instant);
             add_player_flags(player_flags::role_revealed);
         } else {
-            m_game->add_update<game_update_type::player_show_role>(update_target::includes(this), this, m_role, true);
+            m_game->add_update<game_update_type::player_show_role>(update_target::includes(this), this, m_role, instant);
         }
     }
 
