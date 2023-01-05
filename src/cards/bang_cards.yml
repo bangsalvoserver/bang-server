@@ -2146,10 +2146,12 @@ goldrush:
     color: brown
     effects:
       - draw(4)
+      - changewws
     responses:
       - forced_play
       - play_card_action
       - draw(4)
+      - changewws
     tags:
       - buy_cost(4)
   - name: RUCKSACK
