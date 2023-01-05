@@ -24,7 +24,9 @@ namespace banggame {
             std::ranges::find(origin->m_game->m_players, origin),
             std::ranges::find(origin->m_game->m_players, *next_player));
         origin->m_game->add_update<game_update_type::player_order>(origin->m_game->m_players
-            | ranges::views::filter(&player::alive)
+            | ranges::views::filter([](player *p) {
+                return p->m_game->m_options.enable_ghost_cards || p->alive();
+            })
             | ranges::to<std::vector<not_null<player *>>>);
     }
 }
