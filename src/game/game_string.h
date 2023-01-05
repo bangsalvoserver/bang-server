@@ -10,11 +10,10 @@ namespace banggame {
         (card_sign, sign),
 
         card_format_id() = default;
-        card_format_id(not_null<card *> value);
-        card_format_id(card *value) : card_format_id(not_null{value}) {}
+        card_format_id(card *value);
     )
 
-    using game_format_arg = std::variant<int, std::string, card_format_id, serial::player>;
+    using game_format_arg = std::variant<int, std::string, card_format_id, serial::opt_player>;
     
     DEFINE_STRUCT(game_string,
         (std::string, format_str)

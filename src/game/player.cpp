@@ -321,10 +321,6 @@ namespace banggame {
         return {};
     }
 
-    card_sign player::get_card_sign(card *target_card) {
-        return m_game->call_event<event_type::apply_sign_modifier>(this, target_card->sign);
-    }
-
     void player::start_of_turn() {
         m_game->m_playing = this;
         m_game->queue_action([this]{

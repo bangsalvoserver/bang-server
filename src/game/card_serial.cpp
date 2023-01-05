@@ -55,8 +55,11 @@ template<> not_null<banggame::player *> deserializer<not_null<banggame::player *
 
 namespace banggame {
 
-card_format_id::card_format_id(not_null<card *> value)
-    : name(value->name)
-    , sign(value->sign) {}
+card_format_id::card_format_id(card *value) {
+    if (value) {
+        name = value->name;
+        sign = value->sign;
+    }
+}
 
 }

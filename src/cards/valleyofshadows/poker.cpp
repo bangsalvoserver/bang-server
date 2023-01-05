@@ -48,7 +48,7 @@ namespace banggame {
             }
             
             if (auto it = std::ranges::find(target->m_game->m_selection, card_rank::rank_A, [this](card *c) {
-                return target->get_card_sign(c).rank;
+                return target->m_game->get_card_sign(c).rank;
             }); it != target->m_game->m_selection.end()) {
                 target->m_game->invoke_action([&]{
                     target->m_game->pop_request();

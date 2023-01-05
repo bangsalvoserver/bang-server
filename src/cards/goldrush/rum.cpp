@@ -17,7 +17,7 @@ namespace banggame {
         int num_cards = 3 + origin->get_num_checks();
         for (int i=0; i < num_cards; ++i) {
             card *drawn_card = origin->m_game->top_of_deck();
-            suits.push_back(origin->get_card_sign(drawn_card).suit);
+            suits.push_back(origin->m_game->get_card_sign(drawn_card).suit);
             origin->m_game->add_log("LOG_REVEALED_CARD", origin, drawn_card);
             origin->m_game->move_card(drawn_card, pocket_type::selection);
         }
