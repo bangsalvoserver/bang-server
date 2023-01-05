@@ -1909,6 +1909,7 @@ wildwestshow:
       - bone_orchard
     tags:
       - ghost_card
+      - discard_if_two_players
   - name: DARLING_VALENTINE
     image: 06_darlingvalentine
     equip:
@@ -1919,11 +1920,15 @@ wildwestshow:
     image: 06_helenazontero
     equip:
       - helena_zontero
+    tags:
+      - discard_if_two_players
   - name: LADY_ROSA_OF_TEXAS
     image: 06_ladyrosadeltexas
     effects:
       - max_usages(1)
       - ladyrosaoftexas
+    tags:
+      - discard_if_two_players
   - name: MISS_SUSANNA
     image: 06_misssusanna
     equip:
@@ -1952,6 +1957,7 @@ wildwestshow:
       - wildwestshow
     tags:
       - last_scenario_card
+      - discard_if_two_players
 goldrush:
   - count: 3
     name: SHOT
