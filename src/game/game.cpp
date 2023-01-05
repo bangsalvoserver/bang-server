@@ -389,7 +389,7 @@ namespace banggame {
                 if (it == m_players.end()) it = m_players.begin();
             }
             call_event<event_type::verify_revivers>(*it);
-        } while (!(*it)->alive());
+        } while (!(*it)->alive() || (*it)->remove_player_flags(player_flags::skip_turn));
 
         player *next_player = *it;
         

@@ -176,6 +176,7 @@ namespace banggame {
         (extra_turn)
         (treat_missed_as_bang)
         (role_revealed)
+        (skip_turn)
         (removed)
         (winner)
     )

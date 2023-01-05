@@ -1922,6 +1922,7 @@ wildwestshow:
   - name: LADY_ROSA_OF_TEXAS
     image: 06_ladyrosadeltexas
     effects:
+      - max_usages(1)
       - ladyrosaoftexas
   - name: MISS_SUSANNA
     image: 06_misssusanna
