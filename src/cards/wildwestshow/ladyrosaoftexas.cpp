@@ -5,7 +5,7 @@
 namespace banggame {
 
     game_string effect_ladyrosaoftexas::verify(card *origin_card, player *origin) {
-        if (origin->m_game->m_players.size() <= 2) {
+        if (origin->m_game->num_alive() <= 2) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         } else {
             return {};
