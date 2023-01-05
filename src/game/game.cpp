@@ -329,6 +329,7 @@ namespace banggame {
                     owner->m_table | ranges::views::remove_if(&card::inactive),
                     owner->m_characters,
                     m_scenario_cards | ranges::views::take_last(1),
+                    m_wws_scenario_cards | ranges::views::take_last(1),
                     m_button_row,
                     m_shop_selection | ranges::views::filter(&card::is_brown)
                 )
