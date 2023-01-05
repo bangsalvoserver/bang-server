@@ -66,7 +66,7 @@ namespace banggame {
         return m_hand[std::uniform_int_distribution(0, int(m_hand.size() - 1))(m_game->rng)];
     }
 
-    static void move_owned_card(player *owner, card *target_card, pocket_type pocket, player *target = nullptr) {
+    static void move_owned_card(player *owner, card *target_card, std::invocable auto &&fun) {
         if (target_card->owner == owner) {
             if (target_card->pocket == pocket_type::player_table) {
                 if (target_card->inactive) {
@@ -75,20 +75,28 @@ namespace banggame {
                 }
                 owner->disable_equip(target_card);
                 owner->drop_all_cubes(target_card);
-                owner->m_game->move_card(target_card, pocket, target);
+                std::invoke(FWD(fun));
                 target_card->on_unequip(owner);
             } else if (target_card->pocket == pocket_type::player_hand) {
-                owner->m_game->move_card(target_card, pocket, target);
+                std::invoke(FWD(fun));
             }
         }
     }
 
     void player::discard_card(card *target) {
-        move_owned_card(this, target, target->is_black() ? pocket_type::shop_discard : pocket_type::discard_pile);
+        move_owned_card(this, target, [&]{
+            if (target->is_black()) {
+                m_game->move_card(target, pocket_type::shop_discard);
+            } else {
+                m_game->move_card(target, pocket_type::discard_pile);
+            }
+        });
     }
 
     void player::steal_card(card *target) {
-        move_owned_card(target->owner, target, pocket_type::player_hand, this);
+        move_owned_card(target->owner, target, [&]{
+            add_to_hand(target);
+        });
     }
 
     void player::damage(card *origin_card, player *origin, int value, effect_flags flags) {
@@ -171,7 +179,8 @@ namespace banggame {
     }
 
     void player::add_to_hand(card *target) {
-        m_game->move_card(target, pocket_type::player_hand, this);
+        m_game->move_card(target, pocket_type::player_hand, this, m_game->check_flags(game_flags::hands_shown)
+            ? card_visibility::shown : card_visibility::show_owner);
     }
 
     void player::add_to_hand_phase_one(card *drawn_card) {
@@ -180,6 +189,8 @@ namespace banggame {
         bool reveal = m_game->call_event<event_type::on_card_drawn>(this, drawn_card, false);
         if (drawn_card->pocket == pocket_type::discard_pile) {
             m_game->add_log("LOG_DRAWN_FROM_DISCARD", this, drawn_card);
+        } else if (m_game->check_flags(game_flags::hands_shown)) {
+            m_game->add_log("LOG_DRAWN_CARD", this, drawn_card);
         } else if (reveal) {
             m_game->add_log("LOG_DRAWN_CARD", this, drawn_card);
             m_game->set_card_visibility(drawn_card);
@@ -188,31 +199,41 @@ namespace banggame {
             m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);
             m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);
         }
-        m_game->move_card(drawn_card, pocket_type::player_hand, this);
+        add_to_hand(drawn_card);
     }
 
     void player::draw_card(int ncards, card *origin_card) {
-        if (ncards == 1) {
-            if (origin_card) {
-                m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD_FOR", this, origin_card);
+        if (!m_game->check_flags(game_flags::hands_shown)) {
+            if (ncards == 1) {
+                if (origin_card) {
+                    m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD_FOR", this, origin_card);
+                } else {
+                    m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);
+                }
             } else {
-                m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);
-            }
-        } else {
-            if (origin_card) {
-                m_game->add_log(update_target::excludes(this), "LOG_DRAWN_N_CARDS_FOR", this, ncards, origin_card);
-            } else {
-                m_game->add_log(update_target::excludes(this), "LOG_DRAWN_N_CARDS", this, ncards);
+                if (origin_card) {
+                    m_game->add_log(update_target::excludes(this), "LOG_DRAWN_N_CARDS_FOR", this, ncards, origin_card);
+                } else {
+                    m_game->add_log(update_target::excludes(this), "LOG_DRAWN_N_CARDS", this, ncards);
+                }
             }
         }
         for (int i=0; i<ncards; ++i) {
             card *drawn_card = m_game->top_of_deck();
-            if (origin_card) {
-                m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD_FOR", this, drawn_card, origin_card);
+            if (m_game->check_flags(game_flags::hands_shown)) {
+                if (origin_card) {
+                    m_game->add_log("LOG_DRAWN_CARD_FOR", this, drawn_card, origin_card);
+                } else {
+                    m_game->add_log("LOG_DRAWN_CARD", this, drawn_card);
+                }
             } else {
-                m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);
+                if (origin_card) {
+                    m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD_FOR", this, drawn_card, origin_card);
+                } else {
+                    m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);
+                }
             }
-            m_game->move_card(drawn_card, pocket_type::player_hand, this);
+            add_to_hand(drawn_card);
         }
     }
 

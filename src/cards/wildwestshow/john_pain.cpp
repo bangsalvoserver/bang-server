@@ -23,7 +23,7 @@ namespace banggame {
                     && get_john_pain(player_end))
                 {
                     player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, drawn_card);
-                    player_end->m_game->move_card(drawn_card, pocket_type::player_hand, player_end);
+                    player_end->add_to_hand(drawn_card);
                 }
             });
         });

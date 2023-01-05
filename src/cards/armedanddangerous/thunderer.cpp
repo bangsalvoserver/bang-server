@@ -10,7 +10,7 @@ namespace banggame {
             if (p == origin) {
                 req->origin->m_game->add_log("LOG_STOLEN_SELF_CARD", req->origin, req->origin_card);
                 req->origin->m_game->add_short_pause(req->origin_card);
-                req->origin->m_game->move_card(req->origin_card, pocket_type::player_hand, req->origin);
+                req->origin->add_to_hand(req->origin_card);
                 origin->m_game->remove_listeners(origin_card);
             }
         });

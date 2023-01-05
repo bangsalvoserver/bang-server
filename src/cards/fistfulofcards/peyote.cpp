@@ -29,7 +29,7 @@ namespace banggame {
                     : (drawn_card->sign.suit == card_suit::clubs || drawn_card->sign.suit == card_suit::spades))
                 {
                     target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
-                    target->m_game->move_card(drawn_card, pocket_type::player_hand, target);
+                    target->add_to_hand(drawn_card);
                 } else {
                     target->m_game->pop_request();
                     target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, drawn_card);
