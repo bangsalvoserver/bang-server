@@ -357,7 +357,8 @@ namespace banggame {
             m_game->add_log("LOG_TURN_START", this);
             m_game->call_event<event_type::pre_turn_start>(this);
         }, -7);
-        m_game->queue_action([this]{            
+        m_game->queue_action([this]{
+            m_played_cards.clear();
             m_num_drawn_cards = 0;
             for (auto &[card_id, obj] : m_predraw_checks) {
                 obj.resolved = false;
@@ -394,7 +395,6 @@ namespace banggame {
             untap_inactive_cards();
 
             m_game->call_event<event_type::on_turn_end>(this, false);
-            m_played_cards.clear();
             m_game->queue_action([&]{
                 if (m_extra_turns == 0) {
                     remove_player_flags(player_flags::extra_turn);
@@ -412,7 +412,6 @@ namespace banggame {
         untap_inactive_cards();
         remove_player_flags(player_flags::extra_turn);
         m_game->call_event<event_type::on_turn_end>(this, true);
-        m_played_cards.clear();
         m_game->start_next_turn();
     }
 
