@@ -18,7 +18,7 @@ namespace banggame {
 
         EVENT(check_damage_response, player *target, bool &value)
 
-        EVENT(apply_sign_modifier,              player *origin, card_sign &value)
+        EVENT(apply_sign_modifier,              card_sign &value)
         EVENT(apply_beer_modifier,              player *origin, int &value)
         EVENT(apply_maxcards_modifier,          player *origin, int &value)
         EVENT(apply_distance_modifier,          player *origin, int &value)
@@ -31,6 +31,7 @@ namespace banggame {
         EVENT(count_num_checks,                 player *origin, int &num_checks)
         EVENT(count_bangs_played,               player *origin, int &num_bangs_played)
         EVENT(count_cards_to_draw,              player *origin, int &cards_to_draw)
+        EVENT(count_cards_played,               player *origin, int &cards_played)
 
         EVENT(verify_play_card, player *origin, card *origin_card, game_string &out_error)
 

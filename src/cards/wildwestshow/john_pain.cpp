@@ -15,13 +15,15 @@ namespace banggame {
             }
         });
         player_end->m_game->add_listener<event_type::on_draw_check_resolve>(target_card, [=](player *player_begin, card *drawn_card) {
+            if (!player_begin) return;
+            
             player_end->m_game->queue_action([=]{
                 if (drawn_card->pocket != pocket_type::player_hand
                     && std::none_of(player_iterator(player_begin), player_iterator(player_end), get_john_pain)
                     && get_john_pain(player_end))
                 {
                     player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, drawn_card);
-                    player_end->m_game->move_card(drawn_card, pocket_type::player_hand, player_end);
+                    player_end->add_to_hand(drawn_card);
                 }
             });
         });

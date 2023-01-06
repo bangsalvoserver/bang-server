@@ -31,7 +31,7 @@ namespace banggame {
                     target->add_to_hand_phase_one(target_card);
                 } else {
                     player *next_target = get_next_target();
-                    if (target_card->visibility != card_visibility::shown) {
+                    if (!target->m_game->check_flags(game_flags::hands_shown)) {
                         target->m_game->add_log(update_target::includes(target, next_target), "LOG_GIFTED_CARD", target, next_target, target_card);
                         target->m_game->add_log(update_target::excludes(target, next_target), "LOG_GIFTED_A_CARD", target, next_target);
                     } else {

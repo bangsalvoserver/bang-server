@@ -37,7 +37,7 @@ namespace banggame::filter_impl {
     }
 
     card_sign get_card_sign(player *origin, card *target) {
-        return origin->get_card_sign(target);
+        return origin->m_game->get_card_sign(target);
     }
 
     card_color_type get_card_color(card *target) {

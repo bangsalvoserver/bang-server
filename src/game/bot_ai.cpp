@@ -57,7 +57,7 @@ namespace banggame {
         }
 
         card *operator()(enums::enum_tag_t<target_type::extra_card> tag) const {
-            if (origin_card == origin->m_last_played_card) {
+            if (origin_card == origin->get_last_played_card().first) {
                 return nullptr;
             } else {
                 auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder));
@@ -136,7 +136,8 @@ namespace banggame {
             origin->m_hand,
             origin->m_game->m_shop_selection,
             origin->m_game->m_hidden_deck,
-            origin->m_game->m_scenario_cards | ranges::views::take_last(1)
+            origin->m_game->m_scenario_cards | ranges::views::take_last(1),
+            origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
         )
         | ranges::views::filter([&](card *target_card) {
             if (ranges::contains(modifiers, target_card)) return false;
@@ -244,7 +245,8 @@ namespace banggame {
                 origin->m_hand,
                 origin->m_game->m_shop_selection,
                 origin->m_game->m_button_row,
-                origin->m_game->m_scenario_cards | ranges::views::take_last(1)
+                origin->m_game->m_scenario_cards | ranges::views::take_last(1),
+                origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
             )
             | ranges::views::filter([&](card *target_card){
                 if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
@@ -255,6 +257,7 @@ namespace banggame {
                 }
             }),
             pocket_type::scenario_card,
+            pocket_type::wws_scenario_card,
             pocket_type::player_table,
             pocket_type::player_hand,
             pocket_type::player_character,

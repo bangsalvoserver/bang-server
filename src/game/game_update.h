@@ -51,7 +51,8 @@ namespace banggame {
     )
 
     DEFINE_STRUCT(move_scenario_deck_update,
-        (serial::player, player),
+        (serial::player, player)
+        (pocket_type, pocket),
 
         auto get_duration() const {
             return durations::move_card;
@@ -162,6 +163,9 @@ namespace banggame {
         (phase_one_draw_discard)
         (phase_one_override)
         (disable_player_distances)
+        (treat_any_as_bang)
+        (hands_shown)
+        (free_for_all)
     )
 
     DEFINE_ENUM_FLAGS(player_flags,
@@ -172,6 +176,7 @@ namespace banggame {
         (extra_turn)
         (treat_missed_as_bang)
         (role_revealed)
+        (skip_turn)
         (removed)
         (winner)
     )

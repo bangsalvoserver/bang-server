@@ -12,7 +12,7 @@ namespace banggame {
 
     card *play_card_verify::get_playing_card() const {
         if (ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
-            return origin->m_last_played_card;
+            return origin->get_last_played_card().first;
         } else {
             return origin_card;
         }
@@ -222,8 +222,12 @@ namespace banggame {
                         }
                     });
                 break;
-            case card_modifier_type::bandolier:
             case card_modifier_type::leevankliff:
+                if (!playing_card->is_brown() || !ranges::contains(origin->get_last_played_card().second, card_modifier_type::leevankliff, &card::modifier)) {
+                    return "ERROR_INVALID_MODIFIER_CARD";
+                }
+                [[fallthrough]];
+            case card_modifier_type::bandolier:
                 check_disablers.emplace_back(origin->m_game, event_card_key{playing_card, -1},
                     enums::enum_tag<event_type::count_bangs_played>, [origin=origin](player *p, int &value) {
                         if (p == origin) {
@@ -364,24 +368,21 @@ namespace banggame {
 
         switch(origin_card->pocket) {
         case pocket_type::player_hand:
-            if (origin_card->is_brown()) {
+            if (origin_card->is_brown() || ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
                 if (game_string error = verify_card_targets()) {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this]{
+                    origin->add_played_card(get_playing_card(), modifiers);
                     play_modifiers();
                     do_play_card();
-                    if (origin_card == get_playing_card()) {
-                        origin->set_last_played_card(origin_card);
-                    } else {
-                        origin->set_last_played_card(nullptr);
-                    }
                 });
             } else {
                 if (game_string error = verify_equip_target()) {
                     return error;
                 }
                 origin->prompt_then(check_prompt_equip(), [*this]{
+                    origin->add_played_card(origin_card, modifiers);
                     player *target = get_equip_target();
                     origin_card->on_equip(target);
                     if (origin == target) {
@@ -395,13 +396,15 @@ namespace banggame {
                         origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
                     }
                     origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card);
-                    origin->set_last_played_card(nullptr);
                     origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
                 });
             }
             break;
         case pocket_type::scenario_card:
-            if (origin_card != origin->m_game->m_scenario_cards.back()) {
+        case pocket_type::wws_scenario_card:
+            if (origin_card->pocket == pocket_type::scenario_card && origin_card != origin->m_game->m_scenario_cards.back()) {
+                return "ERROR_INVALID_SCENARIO_CARD";
+            } else if (origin_card->pocket == pocket_type::wws_scenario_card && origin_card != origin->m_game->m_wws_scenario_cards.back()) {
                 return "ERROR_INVALID_SCENARIO_CARD";
             }
             [[fallthrough]];
@@ -412,9 +415,9 @@ namespace banggame {
                 return error;
             }
             origin->prompt_then(check_prompt(), [*this]{
+                origin->add_played_card(origin_card, modifiers);
                 play_modifiers();
                 do_play_card();
-                origin->set_last_played_card(nullptr);
             });
             break;
         case pocket_type::hidden_deck:
@@ -449,10 +452,10 @@ namespace banggame {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this, cost]{
+                    origin->add_played_card(origin_card, modifiers);
                     play_modifiers();
                     origin->add_gold(-cost);
                     do_play_card();
-                    origin->set_last_played_card(origin_card);
                     origin->m_game->queue_action([m_game = origin->m_game]{
                         while (m_game->m_shop_selection.size() < 3) {
                             m_game->draw_shop_card();
@@ -468,6 +471,7 @@ namespace banggame {
                     return error;
                 }
                 origin->prompt_then(check_prompt_equip(), [*this, cost]{
+                    origin->add_played_card(origin_card, modifiers);
                     player *target = get_equip_target();
                     origin_card->on_equip(target);
                     if (origin == target) {
@@ -478,7 +482,6 @@ namespace banggame {
                     play_modifiers();
                     origin->add_gold(-cost);
                     target->equip_card(origin_card);
-                    origin->set_last_played_card(nullptr);
                     origin->m_game->queue_action([m_game = origin->m_game]{
                         while (m_game->m_shop_selection.size() < 3) {
                             m_game->draw_shop_card();

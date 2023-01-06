@@ -29,7 +29,7 @@ namespace banggame {
                     : (drawn_card->sign.suit == card_suit::clubs || drawn_card->sign.suit == card_suit::spades))
                 {
                     target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
-                    target->m_game->move_card(drawn_card, pocket_type::player_hand, target);
+                    target->add_to_hand(drawn_card);
                 } else {
                     target->m_game->pop_request();
                     target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, drawn_card);
@@ -66,6 +66,11 @@ namespace banggame {
             p->m_game->queue_request<request_peyote>(target_card, p);
         });
 
-        target->m_game->set_game_flags(game_flags::phase_one_override);
+        target->m_game->add_game_flags(game_flags::phase_one_override);
+    }
+
+    void equip_peyote::on_disable(card *target_card, player *target) {
+        target->m_game->remove_listeners(target_card);
+        target->m_game->remove_game_flags(game_flags::phase_one_override);
     }
 }

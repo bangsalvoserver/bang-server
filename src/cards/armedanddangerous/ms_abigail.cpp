@@ -8,7 +8,7 @@ namespace banggame {
         if (!origin) return false;
         if (!bool(flags & effect_flags::single_target)) return false;
         if (!origin_card->is_brown()) return false;
-        switch (origin->get_card_sign(origin_card).rank) {
+        switch (origin->m_game->get_card_sign(origin_card).rank) {
         case card_rank::rank_J:
         case card_rank::rank_Q:
         case card_rank::rank_K:

@@ -10,10 +10,14 @@ namespace banggame {
 
     class draw_check_handler {
     private:
+        game *m_game = nullptr;
         player *m_origin = nullptr;
         card *m_origin_card = nullptr;
         draw_check_condition m_condition;
         draw_check_function m_function;
+    
+    public:
+        draw_check_handler(game *m_game) : m_game(m_game) {}
 
     public:
         void set(player *origin, card *origin_card, draw_check_condition &&condition, draw_check_function &&function);

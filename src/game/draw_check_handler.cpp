@@ -50,50 +50,50 @@ namespace banggame {
     }
 
     void draw_check_handler::start() {
-        int num_checks = m_origin->get_num_checks();
+        int num_checks = m_origin ? m_origin->get_num_checks() : 1;
         if (num_checks > 1) {
             for (int i=0; i<num_checks; ++i) {
-                card *drawn_card = m_origin->m_game->top_of_deck();
-                m_origin->m_game->add_log("LOG_REVEALED_CARD", m_origin, drawn_card);
-                m_origin->m_game->move_card(drawn_card, pocket_type::selection);
+                card *drawn_card = m_game->top_of_deck();
+                m_game->add_log("LOG_REVEALED_CARD", m_origin, drawn_card);
+                m_game->move_card(drawn_card, pocket_type::selection);
             }
-            m_origin->m_game->queue_request_front<request_check>(m_origin_card, m_origin);
+            m_game->queue_request_front<request_check>(m_origin_card, m_origin);
         } else {
-            card *drawn_card = m_origin->m_game->top_of_deck();
-            m_origin->m_game->move_card(drawn_card, pocket_type::discard_pile);
+            card *drawn_card = m_game->top_of_deck();
+            m_game->move_card(drawn_card, pocket_type::discard_pile);
             select(drawn_card);
         }
     }
 
     void draw_check_handler::select(card *drawn_card) {
-        m_origin->m_game->add_log("LOG_CHECK_DREW_CARD", m_origin_card, m_origin, drawn_card);
-        if (m_origin->m_game->call_event<event_type::on_draw_check_select>(m_origin, m_origin_card, drawn_card, true)) {
+        m_game->add_log("LOG_CHECK_DREW_CARD", m_origin_card, m_origin, drawn_card);
+        if (m_game->call_event<event_type::on_draw_check_select>(m_origin, m_origin_card, drawn_card, true)) {
             resolve(drawn_card);
         }
     }
 
     void draw_check_handler::restart() {
-        while (!m_origin->m_game->m_selection.empty()) {
-            m_origin->m_game->move_card(m_origin->m_game->m_selection.front(), pocket_type::discard_pile);
+        while (!m_game->m_selection.empty()) {
+            m_game->move_card(m_game->m_selection.front(), pocket_type::discard_pile);
         }
         start();
     }
 
     bool draw_check_handler::check(card *drawn_card) {
-        return std::invoke(m_condition, m_origin->get_card_sign(drawn_card));
+        return std::invoke(m_condition, m_game->get_card_sign(drawn_card));
     }
 
     void draw_check_handler::resolve(card *drawn_card) {
-        if (m_origin->get_num_checks() > 1) {
-            while (!m_origin->m_game->m_selection.empty()) {
-                card *c = m_origin->m_game->m_selection.front();
-                m_origin->m_game->call_event<event_type::on_draw_check_resolve>(m_origin, c);
+        if (m_origin && m_origin->get_num_checks() > 1) {
+            while (!m_game->m_selection.empty()) {
+                card *c = m_game->m_selection.front();
+                m_game->call_event<event_type::on_draw_check_resolve>(m_origin, c);
                 if (c->pocket == pocket_type::selection) {
-                    m_origin->m_game->move_card(c, pocket_type::discard_pile);
+                    m_game->move_card(c, pocket_type::discard_pile);
                 }
             }
         } else {
-            m_origin->m_game->call_event<event_type::on_draw_check_resolve>(m_origin, drawn_card);
+            m_game->call_event<event_type::on_draw_check_resolve>(m_origin, drawn_card);
         }
         bool result = check(drawn_card);
         m_origin = nullptr;

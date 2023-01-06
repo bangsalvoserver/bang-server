@@ -121,12 +121,21 @@ set(bangserver_srcs
     src/cards/valleyofshadows/tuco_franziskaner.cpp
 
     src/cards/wildwestshow/big_spencer.cpp
+    src/cards/wildwestshow/bone_orchard.cpp
+    src/cards/wildwestshow/changewws.cpp
+    src/cards/wildwestshow/darling_valentine.cpp
     src/cards/wildwestshow/gary_looter.cpp
     src/cards/wildwestshow/flint_westwood.cpp
     src/cards/wildwestshow/gary_looter.cpp
     src/cards/wildwestshow/greygory_deck.cpp
+    src/cards/wildwestshow/helena_zontero.cpp
     src/cards/wildwestshow/john_pain.cpp
+    src/cards/wildwestshow/ladyrosaoftexas.cpp
+    src/cards/wildwestshow/miss_susanna.cpp
+    src/cards/wildwestshow/sacagaway.cpp
+    src/cards/wildwestshow/showdown.cpp
     src/cards/wildwestshow/teren_kill.cpp
+    src/cards/wildwestshow/wildwestshow.cpp
     src/cards/wildwestshow/youl_grinner.cpp
 
     src/cards/armedanddangerous/add_cube.cpp

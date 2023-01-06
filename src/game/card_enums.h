@@ -148,6 +148,8 @@ namespace banggame {
         (hidden_deck)
         (scenario_deck)
         (scenario_card)
+        (wws_scenario_deck)
+        (wws_scenario_card)
         (button_row)
     )
 
@@ -241,6 +243,8 @@ namespace banggame {
         (disarm,                effect_disarm)
         (sacrifice,             effect_sacrifice)
         (lastwill,              effect_lastwill)
+        (ladyrosaoftexas,       effect_ladyrosaoftexas)
+        (changewws,             effect_changewws)
     )
 
     DEFINE_ENUM_FWD_TYPES(equip_type,
@@ -336,6 +340,13 @@ namespace banggame {
         (newidentity,           equip_newidentity)
         (lawofthewest,          equip_lawofthewest)
         (vendetta,              equip_vendetta)
+        (bone_orchard,          equip_bone_orchard)
+        (darling_valentine,     equip_darling_valentine)
+        (helena_zontero,        equip_helena_zontero)
+        (miss_susanna,          equip_miss_susanna)
+        (showdown,              equip_showdown)
+        (sacagaway,             equip_sacagaway)
+        (wildwestshow,          equip_wildwestshow)
     )
 
     DEFINE_ENUM_FWD_TYPES(mth_type,

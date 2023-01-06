@@ -97,7 +97,7 @@ namespace banggame {
         
         int8_t m_extra_turns = 0;
 
-        card *m_last_played_card = nullptr;
+        std::vector<std::pair<card *, std::vector<card *>>> m_played_cards;
 
         player_flags m_player_flags{};
 
@@ -173,10 +173,11 @@ namespace banggame {
 
         void next_predraw_check();
 
-        void set_role(player_role role);
+        void set_role(player_role role, bool instant = true);
         void reset_max_hp();
 
-        void set_last_played_card(card *c);
+        void add_played_card(card *origin_card, std::vector<card *> modifiers);
+        std::pair<card *, std::vector<card *>> get_last_played_card() const;
 
         bool is_bangcard(card *origin_card);
 

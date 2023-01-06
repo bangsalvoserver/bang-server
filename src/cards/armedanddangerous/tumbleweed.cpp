@@ -30,12 +30,12 @@ namespace banggame {
         }
 
         void on_finished() {
-            origin->m_game->m_current_check.resolve(drawn_card);
+            target->m_game->m_current_check.resolve(drawn_card);
         }
 
         void on_resolve() override {
-            origin->m_game->invoke_action([&]{
-                origin->m_game->pop_request();
+            target->m_game->invoke_action([&]{
+                target->m_game->pop_request();
                 on_finished();
             });
         }

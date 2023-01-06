@@ -203,7 +203,7 @@ namespace banggame {
 
     template<> game_string play_visitor<target_type::extra_card>::verify(card *target) {
         if (!target) {
-            if (verifier.get_playing_card() != verifier.origin->m_last_played_card) {
+            if (verifier.get_playing_card() != verifier.origin->get_last_played_card().first) {
                 return "ERROR_TARGET_SET_NOT_EMPTY";
             } else {
                 return {};

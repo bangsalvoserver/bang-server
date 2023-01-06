@@ -26,6 +26,8 @@ namespace banggame {
         case pocket_type::hidden_deck:       return m_hidden_deck;
         case pocket_type::scenario_deck:     return m_scenario_deck;
         case pocket_type::scenario_card:     return m_scenario_cards;
+        case pocket_type::wws_scenario_deck: return m_wws_scenario_deck;
+        case pocket_type::wws_scenario_card: return m_wws_scenario_cards;
         case pocket_type::button_row:        return m_button_row;
         default: throw std::runtime_error("Invalid pocket");
         }
@@ -178,12 +180,11 @@ namespace banggame {
             set_card_visibility(*(m_scenario_deck.rbegin() + 1), nullptr, card_visibility::shown, true);
         }
         if (!m_scenario_cards.empty()) {
-            m_scenario_cards.back()->on_disable(m_first_player);
-            set_game_flags({});
+            m_scenario_cards.back()->on_disable(m_scenario_holder);
         }
         add_log("LOG_DRAWN_SCENARIO_CARD", m_scenario_deck.back());
         move_card(m_scenario_deck.back(), pocket_type::scenario_card);
-        m_scenario_cards.back()->on_enable(m_first_player);
+        m_scenario_cards.back()->on_enable(m_scenario_holder);
     }
 
     void game_table::flash_card(card *c) {
@@ -249,9 +250,14 @@ namespace banggame {
         return get_disabler(target_card) != nullptr;
     }
 
-    void game_table::set_game_flags(game_flags type) {
-        m_game_flags = type;
-        add_update<game_update_type::game_flags>(type);
+    void game_table::add_game_flags(game_flags flags) {
+        m_game_flags |= flags;
+        add_update<game_update_type::game_flags>(m_game_flags);
+    }
+
+    void game_table::remove_game_flags(game_flags flags) {
+        m_game_flags &= ~flags;
+        add_update<game_update_type::game_flags>(m_game_flags);
     }
 
 }
