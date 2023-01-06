@@ -62,6 +62,8 @@ namespace banggame {
 
         co_await move_cards(m_scenario_deck);
         co_await move_cards(m_scenario_cards);
+        co_await move_cards(m_wws_scenario_deck);
+        co_await move_cards(m_wws_scenario_cards);
         
         if (num_cubes > 0) {
             co_yield make_update<game_update_type::add_cubes>(num_cubes);
