@@ -223,8 +223,14 @@ namespace banggame {
                     });
                 break;
             case card_modifier_type::leevankliff:
-                if (!playing_card->is_brown() || !ranges::contains(origin->get_last_played_card().second, card_modifier_type::leevankliff, &card::modifier)) {
+                if (!playing_card->is_brown()) {
                     return "ERROR_INVALID_MODIFIER_CARD";
+                } else {
+                    auto last_played_modifiers = origin->get_last_played_card().second;
+                    auto it = std::ranges::find(last_played_modifiers, card_modifier_type::leevankliff, &card::modifier);
+                    if (it != last_played_modifiers.end()) {
+                        return {"ERROR_CANNOT_REPEAT_CARD", *it};
+                    }
                 }
                 [[fallthrough]];
             case card_modifier_type::bandolier:
