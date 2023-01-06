@@ -57,7 +57,7 @@ namespace banggame {
         }
 
         card *operator()(enums::enum_tag_t<target_type::extra_card> tag) const {
-            if (origin_card == origin->m_last_played_card) {
+            if (origin_card == origin->get_last_played_card().first) {
                 return nullptr;
             } else {
                 auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder));

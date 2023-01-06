@@ -237,9 +237,17 @@ namespace banggame {
         }
     }
 
-    void player::set_last_played_card(card *c) {
-        m_last_played_card = c;
-        m_game->add_update<game_update_type::last_played_card>(update_target::includes_private(this), c);
+    void player::add_played_card(card *origin_card, std::vector<card *> modifiers) {
+        m_played_cards.emplace_back(origin_card, modifiers);
+        m_game->add_update<game_update_type::last_played_card>(update_target::includes_private(this), origin_card);
+    }
+
+    std::pair<card *, std::vector<card *>> player::get_last_played_card() const {
+        if (m_played_cards.empty()) {
+            return {};
+        } else {
+            return m_played_cards.back();
+        }
     }
 
     bool player::is_bangcard(card *origin_card) {
@@ -386,6 +394,7 @@ namespace banggame {
             untap_inactive_cards();
 
             m_game->call_event<event_type::on_turn_end>(this, false);
+            m_played_cards.clear();
             m_game->queue_action([&]{
                 if (m_extra_turns == 0) {
                     remove_player_flags(player_flags::extra_turn);
@@ -403,6 +412,7 @@ namespace banggame {
         untap_inactive_cards();
         remove_player_flags(player_flags::extra_turn);
         m_game->call_event<event_type::on_turn_end>(this, true);
+        m_played_cards.clear();
         m_game->start_next_turn();
     }
 

@@ -8,7 +8,7 @@ namespace banggame {
 
     struct request_discard_hand : request_discard, resolvable_request {
         request_discard_hand(card *origin_card, player *target)
-            : request_discard(origin_card, nullptr, target, target->m_hand.size()) {}
+            : request_discard(origin_card, nullptr, target, int(target->m_hand.size())) {}
         
         void on_update() override {
             if (target->m_game->m_options.quick_discard_all || target->m_hand.size() <= 1) {
@@ -30,7 +30,7 @@ namespace banggame {
 
     void equip_darling_valentine::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_turn_start>({target_card, -1}, [=](player *origin) {
-            int ncards = origin->m_hand.size();
+            int ncards = int(origin->m_hand.size());
             origin->m_game->queue_request<request_discard_hand>(target_card, origin);
             origin->m_game->queue_action([=]{
                 origin->draw_card(ncards, target_card);
