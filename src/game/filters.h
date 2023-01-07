@@ -12,7 +12,6 @@ namespace banggame {
         using card_ptr = unwrap_not_null_t<serial::card>;
 
         int get_player_hp(player_ptr origin);
-        bool check_player_flags(player_ptr origin, player_flags flags);
         bool is_player_alive(player_ptr origin);
         player_role get_player_role(player_ptr origin);
         int get_player_range_mod(player_ptr origin);
@@ -32,7 +31,7 @@ namespace banggame {
     inline const char *check_player_filter(filter_impl::player_ptr origin, target_player_filter filter, filter_impl::player_ptr target) {
         if (bool(filter & target_player_filter::dead)) {
             if (filter_impl::get_player_hp(target) > 0) return "ERROR_TARGET_NOT_DEAD";
-        } else if (!filter_impl::check_player_flags(target, player_flags::targetable) && !filter_impl::is_player_alive(target)) {
+        } else if (!filter_impl::is_player_alive(target)) {
             return "ERROR_TARGET_DEAD";
         }
 

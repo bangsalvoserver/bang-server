@@ -8,10 +8,6 @@ namespace banggame::filter_impl {
         return origin->m_hp;
     }
 
-    bool check_player_flags(player *origin, player_flags flags) {
-        return origin->check_player_flags(flags);
-    }
-
     bool is_player_alive(player *origin) {
         return origin->alive();
     }

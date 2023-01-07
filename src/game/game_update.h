@@ -172,7 +172,6 @@ namespace banggame {
         (dead)
         (ghost)
         (temp_ghost)
-        (targetable)
         (extra_turn)
         (treat_missed_as_bang)
         (role_revealed)
