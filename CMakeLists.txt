@@ -85,6 +85,7 @@ set(bangserver_srcs
     src/cards/fistfulofcards/sniper.cpp
     src/cards/fistfulofcards/vendetta.cpp
 
+    src/cards/goldrush/add_cost.cpp
     src/cards/goldrush/add_gold.cpp
     src/cards/goldrush/discard_black.cpp
     src/cards/goldrush/don_bell.cpp
@@ -131,6 +132,7 @@ set(bangserver_srcs
     src/cards/wildwestshow/helena_zontero.cpp
     src/cards/wildwestshow/john_pain.cpp
     src/cards/wildwestshow/ladyrosaoftexas.cpp
+    src/cards/wildwestshow/leevankliff.cpp
     src/cards/wildwestshow/miss_susanna.cpp
     src/cards/wildwestshow/sacagaway.cpp
     src/cards/wildwestshow/showdown.cpp
@@ -141,6 +143,7 @@ set(bangserver_srcs
     src/cards/armedanddangerous/add_cube.cpp
     src/cards/armedanddangerous/al_preacher.cpp
     src/cards/armedanddangerous/bandolier.cpp
+    src/cards/armedanddangerous/belltower.cpp
     src/cards/armedanddangerous/bigfifty.cpp
     src/cards/armedanddangerous/bloody_mary.cpp
     src/cards/armedanddangerous/bomb.cpp

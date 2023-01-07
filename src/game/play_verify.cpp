@@ -18,7 +18,8 @@ namespace banggame {
         }
     }
     
-    game_string play_card_verify::verify_modifiers() const {
+    verify_result play_card_verify::verify_modifiers() const {
+        verify_result result;
         auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
         for (card *mod_card : modifiers) {
             if (mod_card->modifier == card_modifier_type::none) {
@@ -29,17 +30,15 @@ namespace banggame {
                 return error;
             } else if (!bool(allowed_modifiers & modifier_bitset(mod_card->modifier))) {
                 return "ERROR_INVALID_MODIFIER_CARD";
-            } else if (!allowed_card_with_modifier(mod_card->modifier, origin, origin_card)) {
+            } else if (!allowed_card_with_modifier(origin, mod_card, origin_card)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             for (const auto &effect : mod_card->effects) {
-                if (game_string e = effect.verify(mod_card, origin)) {
-                    return e;
-                }
+                result.add(effect.verify(mod_card, origin));
             }
             allowed_modifiers &= allowed_modifiers_after(mod_card->modifier);
         }
-        return {};
+        return result;
     }
 
     game_string play_card_verify::verify_duplicates() const {
@@ -156,38 +155,9 @@ namespace banggame {
         }
     }
 
-    struct check_disabler {
-        game *m_game = nullptr;
-        event_card_key key;
+    verify_result play_card_verify::verify_card_targets() const {
+        verify_result result;
 
-        template<event_type E, invocable_for_event<E> Function>
-        check_disabler(game *m_game, event_card_key key, enums::enum_tag_t<E>, Function &&fun)
-            : m_game(m_game), key(key)
-        {
-            m_game->add_listener<E>(key, std::move(fun));
-        }
-
-        check_disabler(const check_disabler &) = delete;
-        check_disabler(check_disabler &&other) noexcept
-            : m_game(std::exchange(other.m_game, nullptr))
-            , key(other.key) {}
-
-        check_disabler &operator = (const check_disabler &) = delete;
-        check_disabler &operator = (check_disabler &&other) noexcept {
-            m_game = std::exchange(other.m_game, nullptr);
-            key = other.key;
-            return *this;
-        }
-
-        ~check_disabler() {
-            if (m_game) {
-                m_game->remove_listeners(key);
-                m_game = nullptr;
-            }
-        }
-    };
-
-    game_string play_card_verify::verify_card_targets() const {
         card *playing_card = get_playing_card();
         if (!playing_card) {
             return "ERROR_INVALID_CARD";
@@ -211,42 +181,8 @@ namespace banggame {
             return error;
         }
 
-        std::vector<check_disabler> check_disablers;
-        for (card *c : modifiers) {
-            switch (c->modifier) {
-            case card_modifier_type::belltower:
-                check_disablers.emplace_back(origin->m_game, event_card_key{playing_card, -1},
-                    enums::enum_tag<event_type::apply_distance_modifier>, [origin=origin](player *p, int &value) {
-                        if (p == origin) {
-                            value = 1;
-                        }
-                    });
-                break;
-            case card_modifier_type::leevankliff:
-                if (!playing_card->is_brown()) {
-                    return "ERROR_INVALID_MODIFIER_CARD";
-                } else {
-                    auto last_played_modifiers = origin->get_last_played_card().second;
-                    auto it = std::ranges::find(last_played_modifiers, card_modifier_type::leevankliff, &card::modifier);
-                    if (it != last_played_modifiers.end()) {
-                        return {"ERROR_CANNOT_REPEAT_CARD", *it};
-                    }
-                }
-                [[fallthrough]];
-            case card_modifier_type::bandolier:
-                check_disablers.emplace_back(origin->m_game, event_card_key{playing_card, -1},
-                    enums::enum_tag<event_type::count_bangs_played>, [origin=origin](player *p, int &value) {
-                        if (p == origin) {
-                            value = 0;
-                        }
-                    });
-                break;
-            }
-        }
-
-        if (game_string error = verify_modifiers()) {
-            return error;
-        }
+        result.add(verify_modifiers());
+        if (result) return result;
 
         size_t diff = targets.size() - effects.size();
         if (auto repeatable = playing_card->get_tag_value(tag_type::repeatable)) {
@@ -267,24 +203,19 @@ namespace banggame {
                 mth_targets.push_back(target);
             }
             
-            if (game_string error = enums::visit_indexed(
+            result.add(enums::visit_indexed(
                 [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
                     return play_visitor<E>{*this, effect}.verify(FWD(args) ... );
-                }, target))
-            {
-                return error;
-            }
+                }, target));
+            if (result) return result;
         }
 
-        if (game_string error = (is_response ? playing_card->mth_response : playing_card->mth_effect).verify(playing_card, origin, mth_targets)) {
-            return error;
-        }
+        result.add((is_response ? playing_card->mth_response : playing_card->mth_effect).verify(playing_card, origin, mth_targets));
+        if (result) return result;
 
-        if (game_string error = verify_duplicates()) {
-            return error;
-        }
+        result.add_error(verify_duplicates());
 
-        return {};
+        return result;
     }
 
     game_string play_card_verify::check_prompt() const {
@@ -432,30 +363,12 @@ namespace banggame {
             }
             [[fallthrough]];
         case pocket_type::shop_selection: {
-            int cost = origin_card->buy_cost();
-            for (card *c : modifiers) {
-                switch (c->modifier) {
-                case card_modifier_type::discount:
-                    --cost;
-                    break;
-                case card_modifier_type::shopchoice:
-                    if (c->get_tag_value(tag_type::shopchoice) != origin_card->get_tag_value(tag_type::shopchoice)) {
-                        return "ERROR_INVALID_MODIFIER_CARD";
-                    }
-                    cost += c->buy_cost();
-                    break;
-                }
-            }
-            if (origin->m_game->m_shop_selection.size() > 3) {
-                // can only happen when playing Josh McCloud
-                cost = 0;
-            }
-            if (origin->m_gold < cost) {
-                return "ERROR_NOT_ENOUGH_GOLD";
-            }
             if (origin_card->is_brown()) {
-                if (game_string error = verify_card_targets()) {
-                    return error;
+                verify_result result = verify_card_targets();
+                if (result) return result;
+                int cost = origin->get_card_cost(origin_card);
+                if (origin->m_gold < cost) {
+                    return "ERROR_NOT_ENOUGH_GOLD";
                 }
                 origin->prompt_then(check_prompt(), [*this, cost]{
                     origin->add_played_card(origin_card, modifiers);
@@ -471,10 +384,14 @@ namespace banggame {
             } else {
                 if (is_response) {
                     return "ERROR_INVALID_RESPONSE_CARD";
-                } else if (game_string error = verify_modifiers()) {
-                    return error;
                 } else if (game_string error = verify_equip_target()) {
                     return error;
+                }
+                verify_result result = verify_modifiers();
+                if (result) return result;
+                int cost = origin->get_card_cost(origin_card);
+                if (origin->m_gold < cost) {
+                    return "ERROR_NOT_ENOUGH_GOLD";
                 }
                 origin->prompt_then(check_prompt_equip(), [*this, cost]{
                     origin->add_played_card(origin_card, modifiers);

@@ -26,7 +26,7 @@ namespace banggame {
         const play_card_verify &verifier;
         const effect_holder &effect;
 
-        game_string verify();
+        verify_result verify();
         duplicate_set duplicates();
         game_string prompt();
         void play();
@@ -39,7 +39,7 @@ namespace banggame {
         const play_card_verify &verifier;
         const effect_holder &effect;
 
-        game_string verify(arg_type arg);
+        verify_result verify(arg_type arg);
         duplicate_set duplicates(arg_type arg);
         game_string prompt(arg_type arg);
         void play(arg_type arg);

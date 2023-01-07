@@ -36,6 +36,14 @@ namespace banggame::filter_impl {
         return origin->is_bangcard(target);
     }
 
+    card *get_last_played_card(player *origin) {
+        return origin->get_last_played_card().first;
+    }
+
+    card_modifier_type get_card_modifier(card *target) {
+        return target->modifier;
+    }
+
     card_sign get_card_sign(player *origin, card *target) {
         return origin->m_game->get_card_sign(target);
     }
@@ -56,7 +64,7 @@ namespace banggame::filter_impl {
         return target == target->owner->first_character() || target->is_orange() && target->pocket == pocket_type::player_table;
     }
 
-    bool card_has_tag(card *target, tag_type type) {
-        return target->has_tag(type);
+    std::optional<short> get_card_tag(card *target, tag_type type) {
+        return target->get_tag_value(type);
     }
 }

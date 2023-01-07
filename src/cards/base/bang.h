@@ -22,6 +22,10 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
+    struct effect_banglimit_disabler {
+        verify_result verify(card *origin_card, player *origin);
+    };
+
     class missable_request {
     public:
         size_t num_cards_used() const {

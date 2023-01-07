@@ -862,11 +862,12 @@ main_deck:
     image: 17_bandoliera
     expansion: armedanddangerous
     color: orange
-    modifier: bandolier
+    modifier: bangmod
     effects:
       - max_usages(1)
       - pay_cube self_cubes(1)
       - bandolier
+      - banglimit_disabler
   - name: BIG_FIFTY
     signs:
       - Q spades
@@ -917,6 +918,7 @@ main_deck:
     modifier: belltower
     effects:
       - pay_cube self_cubes(1)
+      - belltower
   - name: CRATE
     signs:
       - 3 hearts
@@ -1588,6 +1590,9 @@ character:
     image: 06_leevankliff
     expansion: wildwestshow
     modifier: leevankliff
+    effects:
+      - banglimit_disabler
+      - leevankliff
   - name: TEREN_KILL
     image: 06_terenkill
     expansion: wildwestshow
@@ -1700,6 +1705,7 @@ character:
     modifier: discount
     effects:
       - max_usages(1)
+      - add_cost(-1)
   - name: RADDIE_SNAKE
     image: 04_raddie_snake
     expansion: goldrush
@@ -1991,6 +1997,7 @@ goldrush:
       - steal card range_1
     tags:
       - shopchoice(1)
+      - buy_cost(2)
       - hidden
   - name: BOTTLE_BEER
     image: 04_bottiglia_birra
@@ -2002,6 +2009,7 @@ goldrush:
       - heal
     tags:
       - shopchoice(1)
+      - buy_cost(2)
       - hidden
   - name: BOTTLE_BANG
     image: 04_bottiglia_bang
@@ -2013,6 +2021,7 @@ goldrush:
       - bang player reachable notself
     tags:
       - shopchoice(1)
+      - buy_cost(2)
       - hidden
   - name: CALUMET
     image: 04_calumet
@@ -2051,6 +2060,7 @@ goldrush:
       - generalstore players
     tags:
       - shopchoice(2)
+      - buy_cost(2)
       - hidden
   - name: PARDNER_DUEL
     image: 04_complice_duello
@@ -2062,6 +2072,7 @@ goldrush:
       - duel player notself
     tags:
       - shopchoice(2)
+      - buy_cost(2)
       - hidden
   - name: PARDNER_CAT_BALOU
     image: 04_complice_catbalou
@@ -2073,6 +2084,7 @@ goldrush:
       - destroy card
     tags:
       - shopchoice(2)
+      - buy_cost(2)
       - hidden
   - name: GOLD_RUSH
     image: 04_corsa_all_oro

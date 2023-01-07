@@ -11,6 +11,7 @@
 #include "helena_zontero.h"
 #include "john_pain.h"
 #include "ladyrosaoftexas.h"
+#include "leevankliff.h"
 #include "miss_susanna.h"
 #include "sacagaway.h"
 #include "showdown.h"

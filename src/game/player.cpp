@@ -53,6 +53,10 @@ namespace banggame {
         return m_game->call_event<event_type::count_cards_to_draw>(this, 2);
     }
 
+    int player::get_card_cost(card *origin_card) {
+        return m_game->call_event<event_type::apply_cost_modifier>(this, origin_card, origin_card->buy_cost());
+    }
+
     card *player::find_equipped_card(card *card) {
         auto it = std::ranges::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {
@@ -242,9 +246,10 @@ namespace banggame {
         m_game->add_update<game_update_type::last_played_card>(update_target::includes_private(this), origin_card);
     }
 
-    std::pair<card *, std::vector<card *>> player::get_last_played_card() const {
+    const playing_card_pair &player::get_last_played_card() const {
+        static const playing_card_pair empty_pair{};
         if (m_played_cards.empty()) {
-            return {};
+            return empty_pair;
         } else {
             return m_played_cards.back();
         }

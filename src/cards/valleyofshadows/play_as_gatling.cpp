@@ -6,7 +6,6 @@
 namespace banggame {
 
     void handler_play_as_gatling::on_play(card *origin_card, player *origin, card *chosen_card) {
-        origin->m_played_cards.back().first = chosen_card;
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
         origin->discard_card(chosen_card);
 

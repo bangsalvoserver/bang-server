@@ -65,6 +65,8 @@ namespace banggame {
 
     inline card_backface::card_backface(card *c): id(c->id), deck(c->deck) {}
 
+    using playing_card_pair = std::pair<card *, std::vector<card *>>;
+
     struct player {
         game *m_game;
         int id;
@@ -97,7 +99,7 @@ namespace banggame {
         
         int8_t m_extra_turns = 0;
 
-        std::vector<std::pair<card *, std::vector<card *>>> m_played_cards;
+        std::vector<playing_card_pair> m_played_cards;
 
         player_flags m_player_flags{};
 
@@ -134,6 +136,8 @@ namespace banggame {
         int get_num_checks();
         int get_bangs_played();
         int get_cards_to_draw();
+
+        int get_card_cost(card *origin_card);
 
         bool is_bot() const {
             return user_id < 0;
@@ -177,7 +181,7 @@ namespace banggame {
         void reset_max_hp();
 
         void add_played_card(card *origin_card, std::vector<card *> modifiers);
-        std::pair<card *, std::vector<card *>> get_last_played_card() const;
+        const playing_card_pair &get_last_played_card() const;
 
         bool is_bangcard(card *origin_card);
 
@@ -186,8 +190,6 @@ namespace banggame {
         
         void pass_turn();
         void skip_turn();
-
-        card_sign get_card_sign(card *target_card);
 
         void send_player_status();
         bool add_player_flags(player_flags flags);

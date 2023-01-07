@@ -3,6 +3,7 @@
 
 #include "game/card_enums.h"
 #include "game/game_string.h"
+#include "game/verify_result.h"
 
 #include "net/options.h"
 

@@ -12,7 +12,7 @@ namespace banggame {
                 })
                 | ranges::views::join,
                 [](card *c) {
-                    return c->pocket != pocket_type::button_row && c->sign;
+                    return c->color != card_color_type::none;
                 }
             );
             if ((!skipped || count) && count < 3) {

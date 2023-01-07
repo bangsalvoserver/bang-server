@@ -15,6 +15,13 @@ namespace banggame {
         card *target_card;
 
         void on_update() override {
+            if (!sent) {
+                target->m_game->add_listener<event_type::apply_cost_modifier>({origin_card, -2}, [target=target](player *p, card *c, int &value) {
+                    if (p == target) {
+                        value = 0;
+                    }
+                });
+            }
             auto_respond();
         }
 
@@ -41,6 +48,7 @@ namespace banggame {
 
     void effect_forced_play::on_play(card *origin_card, player *target) {
         if (origin_card->pocket != pocket_type::hidden_deck) {
+            target->m_game->remove_listeners(event_card_key{target->m_game->top_request().origin_card(), -2});
             target->m_game->pop_request();
         }
     }

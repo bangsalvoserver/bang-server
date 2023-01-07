@@ -20,10 +20,10 @@ namespace banggame {
 
         card *get_playing_card() const;
 
-        game_string verify_modifiers() const;
+        verify_result verify_modifiers() const;
         game_string verify_duplicates() const;
         game_string verify_equip_target() const;
-        game_string verify_card_targets() const;
+        verify_result verify_card_targets() const;
 
         game_string check_prompt() const;
         game_string check_prompt_equip() const;

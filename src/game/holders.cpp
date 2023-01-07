@@ -41,8 +41,8 @@ namespace banggame {
         }, holder.type);
     }
 
-    game_string effect_holder::verify(card *origin_card, player *origin, const target_variant &target) const {
-        return visit_effect([=](auto &&value) -> game_string {
+    verify_result effect_holder::verify(card *origin_card, player *origin, const target_variant &target) const {
+        return visit_effect([=](auto &&value) -> verify_result {
             switch (target.index()) {
             case 0:
                 if constexpr (requires { value.verify(origin_card, origin); }) {
@@ -157,7 +157,7 @@ namespace banggame {
         }, *this);
     }
 
-    game_string mth_holder::verify(card *origin_card, player *origin, const target_list &targets) const {
+    verify_result mth_holder::verify(card *origin_card, player *origin, const target_list &targets) const {
         return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;

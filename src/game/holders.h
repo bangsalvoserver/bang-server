@@ -19,7 +19,7 @@ namespace banggame {
         (int8_t, target_value)
         (effect_type, type),
 
-        game_string verify(card *origin_card, player *origin, const target_variant &target = {}) const;
+        verify_result verify(card *origin_card, player *origin, const target_variant &target = {}) const;
         game_string on_prompt(card *origin_card, player *origin, const target_variant &target = {}) const;
         void on_play(card *origin_card, player *origin, const target_variant &target = {}, effect_flags flags = {}) const;
     )
@@ -38,7 +38,7 @@ namespace banggame {
     DEFINE_STRUCT(mth_holder,
         (mth_type, type),
         
-        game_string verify(card *origin_card, player *origin, const target_list &targets) const;
+        verify_result verify(card *origin_card, player *origin, const target_list &targets) const;
         game_string on_prompt(card *origin_card, player *origin, const target_list &targets) const;
         void on_play(card *origin_card, player *origin, const target_list &targets) const;
     )

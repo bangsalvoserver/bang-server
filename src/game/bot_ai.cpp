@@ -149,7 +149,7 @@ namespace banggame {
                     [](card *mod) { return allowed_modifiers_after(mod->modifier); }
                 ))
                 && std::ranges::all_of(modifiers, [&](card *mod) {
-                    return allowed_card_with_modifier(mod->modifier, origin, target_card);
+                    return allowed_card_with_modifier(origin, mod, target_card);
                 });
         });
 

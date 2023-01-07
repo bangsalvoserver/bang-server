@@ -3,7 +3,7 @@
 
 namespace banggame {
 
-    template<> game_string play_visitor<target_type::none>::verify() {
+    template<> verify_result play_visitor<target_type::none>::verify() {
         return effect.verify(verifier.get_playing_card(), verifier.origin);
     }
 
@@ -19,7 +19,7 @@ namespace banggame {
         effect.on_play(verifier.get_playing_card(), verifier.origin);
     }
 
-    template<> game_string play_visitor<target_type::player>::verify(player *target) {
+    template<> verify_result play_visitor<target_type::player>::verify(player *target) {
         if (auto error = check_player_filter(verifier.origin, effect.player_filter, target)) {
             return error;
         } else {
@@ -44,7 +44,7 @@ namespace banggame {
         effect.on_play(playing_card, verifier.origin, target, flags);
     }
 
-    template<> game_string play_visitor<target_type::conditional_player>::verify(player *target) {
+    template<> verify_result play_visitor<target_type::conditional_player>::verify(player *target) {
         if (target) {
             return play_visitor<target_type::player>{verifier, effect}.verify(target);
         } else if (!make_player_target_set(verifier.origin, verifier.get_playing_card(), effect).empty()) {
@@ -76,16 +76,15 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::players>::verify() {
+    template<> verify_result play_visitor<target_type::players>::verify() {
+        verify_result ret;
         card *playing_card = verifier.get_playing_card();
         for (player *target : range_all_players(verifier.origin)) {
             if (!check_player_filter(verifier.origin, effect.player_filter, target)) {
-                if (game_string error = effect.verify(playing_card, verifier.origin, target)) {
-                    return error;
-                }
+                ret.add(effect.verify(playing_card, verifier.origin, target));
             }
         }
-        return {};
+        return ret;
     }
 
     template<> duplicate_set play_visitor<target_type::players>::duplicates() {
@@ -126,7 +125,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::fanning_targets>::verify(const std::vector<not_null<player *>> &targets) {
+    template<> verify_result play_visitor<target_type::fanning_targets>::verify(const std::vector<not_null<player *>> &targets) {
         if (targets.size() != 2) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -163,7 +162,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::card>::verify(card *target) {
+    template<> verify_result play_visitor<target_type::card>::verify(card *target) {
         card *playing_card = verifier.get_playing_card();
         if (!target->owner) {
             return "ERROR_CARD_HAS_NO_OWNER";
@@ -201,7 +200,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::extra_card>::verify(card *target) {
+    template<> verify_result play_visitor<target_type::extra_card>::verify(card *target) {
         if (!target) {
             if (verifier.get_playing_card() != verifier.origin->get_last_played_card().first) {
                 return "ERROR_TARGET_SET_NOT_EMPTY";
@@ -235,16 +234,15 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::cards>::verify(const std::vector<not_null<card *>> &targets) {
+    template<> verify_result play_visitor<target_type::cards>::verify(const std::vector<not_null<card *>> &targets) {
         if (targets.size() != std::max<size_t>(1, effect.target_value)) {
             return "ERROR_INVALID_TARGETS";
         }
+        verify_result ret;
         for (card *c : targets) {
-            if (game_string err = play_visitor<target_type::card>{verifier, effect}.verify(c)) {
-                return err;
-            }
+            ret.add(play_visitor<target_type::card>{verifier, effect}.verify(c));
         }
-        return {};
+        return ret;
     }
 
     template<> duplicate_set play_visitor<target_type::cards>::duplicates(const std::vector<not_null<card *>> &targets) {
@@ -274,7 +272,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::cards_other_players>::verify(const std::vector<not_null<card *>> &target_cards) {
+    template<> verify_result play_visitor<target_type::cards_other_players>::verify(const std::vector<not_null<card *>> &target_cards) {
         if (!std::ranges::all_of(verifier.origin->m_game->m_players | std::views::filter(&player::alive), [&](player *p) {
             size_t found = std::ranges::count(target_cards, p, &card::owner);
             if (p->only_black_cards_equipped()) return found == 0;
@@ -283,13 +281,12 @@ namespace banggame {
         })) {
             return "ERROR_INVALID_TARGETS";
         } else {
+            verify_result ret;
             card *playing_card = verifier.get_playing_card();
             for (card *c : target_cards) {
-                if (game_string error = effect.verify(playing_card, verifier.origin, c)) {
-                    return error;
-                }
+                ret.add(effect.verify(playing_card, verifier.origin, c));
             }
-            return {};
+            return ret;
         }
     }
 
@@ -328,7 +325,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::select_cubes>::verify(const std::vector<not_null<card *>> &target_cards) {
+    template<> verify_result play_visitor<target_type::select_cubes>::verify(const std::vector<not_null<card *>> &target_cards) {
         if (effect.type != effect_type::pay_cube) {
             return "ERROR_INVALID_EFFECT_TYPE";
         }
@@ -357,7 +354,7 @@ namespace banggame {
 
     template<> void play_visitor<target_type::select_cubes>::play(const std::vector<not_null<card *>> &target_cards) {}
 
-    template<> game_string play_visitor<target_type::self_cubes>::verify() {
+    template<> verify_result play_visitor<target_type::self_cubes>::verify() {
         if (effect.type != effect_type::pay_cube) {
             return "ERROR_INVALID_EFFECT_TYPE";
         }

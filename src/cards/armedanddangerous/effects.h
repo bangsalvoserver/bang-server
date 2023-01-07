@@ -4,6 +4,7 @@
 #include "add_cube.h"
 #include "al_preacher.h"
 #include "bandolier.h"
+#include "belltower.h"
 #include "bigfifty.h"
 #include "bloody_mary.h"
 #include "bomb.h"

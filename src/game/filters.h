@@ -19,11 +19,13 @@ namespace banggame {
         int get_player_weapon_range(player_ptr origin);
         int get_distance(player_ptr origin, player_ptr target);
         bool is_bangcard(player_ptr origin, card_ptr target);
+        card_ptr get_last_played_card(player_ptr origin);
+        card_modifier_type get_card_modifier(card_ptr target);
         card_sign get_card_sign(player_ptr origin, card_ptr target);
         card_color_type get_card_color(card_ptr target);
         pocket_type get_card_pocket(card_ptr target);
         card_deck_type get_card_deck(card_ptr target);
-        bool card_has_tag(card_ptr target, tag_type type);
+        std::optional<short> get_card_tag(card_ptr target, tag_type tag);
         bool is_cube_slot(card_ptr target);
     }
 
@@ -71,19 +73,19 @@ namespace banggame {
             return "ERROR_TARGET_NOT_CARD";
         }
 
-        if (bool(filter & target_card_filter::beer) && !filter_impl::card_has_tag(target, tag_type::beer))
+        if (bool(filter & target_card_filter::beer) && !filter_impl::get_card_tag(target, tag_type::beer))
             return "ERROR_TARGET_NOT_BEER";
 
         if (bool(filter & target_card_filter::bang) && !filter_impl::is_bangcard(origin, target))
             return "ERROR_TARGET_NOT_BANG";
 
-        if (bool(filter & target_card_filter::bangcard) && !filter_impl::card_has_tag(target, tag_type::bangcard))
+        if (bool(filter & target_card_filter::bangcard) && !filter_impl::get_card_tag(target, tag_type::bangcard))
             return "ERROR_TARGET_NOT_BANG";
 
-        if (bool(filter & target_card_filter::missed) && !filter_impl::card_has_tag(target, tag_type::missedcard))
+        if (bool(filter & target_card_filter::missed) && !filter_impl::get_card_tag(target, tag_type::missedcard))
             return "ERROR_TARGET_NOT_MISSED";
 
-        if (bool(filter & target_card_filter::bronco) && !filter_impl::card_has_tag(target, tag_type::bronco))
+        if (bool(filter & target_card_filter::bronco) && !filter_impl::get_card_tag(target, tag_type::bronco))
             return "ERROR_TARGET_NOT_BRONCO";
 
         if (bool(filter & target_card_filter::blue) && filter_impl::get_card_color(target) != card_color_type::blue)
@@ -113,8 +115,7 @@ namespace banggame {
     inline modifier_bitset_t allowed_modifiers_after(card_modifier_type modifier) {
         switch (modifier) {
         case card_modifier_type::bangmod:
-        case card_modifier_type::bandolier:
-            return modifier_bitset(card_modifier_type::bangmod, card_modifier_type::bandolier);
+            return modifier_bitset(card_modifier_type::bangmod);
         case card_modifier_type::discount:
             return modifier_bitset(card_modifier_type::shopchoice);
         case card_modifier_type::shopchoice:
@@ -125,22 +126,27 @@ namespace banggame {
         }
     }
 
-    inline bool allowed_card_with_modifier(card_modifier_type modifier, filter_impl::player_ptr origin, filter_impl::card_ptr target) {
-        switch (modifier) {
+    inline bool allowed_card_with_modifier(filter_impl::player_ptr origin, filter_impl::card_ptr mod_card, filter_impl::card_ptr target) {
+        switch (filter_impl::get_card_modifier(mod_card)) {
         case card_modifier_type::bangmod:
-        case card_modifier_type::bandolier:
             if (filter_impl::get_card_pocket(target) == pocket_type::player_hand) {
                 return filter_impl::is_bangcard(origin, target);
             } else {
-                return filter_impl::card_has_tag(target, tag_type::play_as_bang);
+                return filter_impl::get_card_tag(target, tag_type::play_as_bang).has_value();
             }
         case card_modifier_type::leevankliff:
+            if (auto last_played_card = filter_impl::get_last_played_card(origin)) {
+                if (filter_impl::get_card_color(last_played_card) != card_color_type::brown) return false;
+            } else {
+                return false;
+            }
             return filter_impl::is_bangcard(origin, target);
         case card_modifier_type::discount:
             return filter_impl::get_card_deck(target) == card_deck_type::goldrush;
         case card_modifier_type::shopchoice:
             return filter_impl::get_card_deck(target) == card_deck_type::goldrush
-                && filter_impl::get_card_pocket(target) == pocket_type::hidden_deck;
+                && filter_impl::get_card_pocket(target) == pocket_type::hidden_deck
+                && filter_impl::get_card_tag(mod_card, tag_type::shopchoice) == filter_impl::get_card_tag(target, tag_type::shopchoice);
         case card_modifier_type::belltower:
             switch (filter_impl::get_card_pocket(target)) {
             case pocket_type::player_hand:
