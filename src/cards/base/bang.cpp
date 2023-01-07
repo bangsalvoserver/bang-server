@@ -26,6 +26,7 @@ namespace banggame {
     }
 
     void handler_play_as_bang::on_play(card *origin_card, player *origin, card *chosen_card, player *target) {
+        origin->m_played_cards.back().first = chosen_card;
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
         origin->discard_card(chosen_card);
         queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
