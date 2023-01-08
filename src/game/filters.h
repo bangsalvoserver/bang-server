@@ -139,7 +139,7 @@ namespace banggame {
             } else {
                 return false;
             }
-            return filter_impl::is_bangcard(origin, target);
+            return filter_impl::get_card_pocket(target) == pocket_type::player_hand && filter_impl::is_bangcard(origin, target);
         case card_modifier_type::discount:
             return filter_impl::get_card_deck(target) == card_deck_type::goldrush;
         case card_modifier_type::shopchoice:
