@@ -58,7 +58,7 @@ namespace banggame {
                 : key(origin_card, -1)
                 , origin(origin)
             {
-                origin->m_game->add_listener<event_type::count_bangs_played>(key, [origin=origin](player *p, int &value) {
+                origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](player *p, int &value) {
                     if (p == origin) {
                         value = 0;
                     }

@@ -85,9 +85,9 @@ set(bangserver_srcs
     src/cards/fistfulofcards/sniper.cpp
     src/cards/fistfulofcards/vendetta.cpp
 
-    src/cards/goldrush/add_cost.cpp
     src/cards/goldrush/add_gold.cpp
     src/cards/goldrush/discard_black.cpp
+    src/cards/goldrush/discount.cpp
     src/cards/goldrush/don_bell.cpp
     src/cards/goldrush/dutch_will.cpp
     src/cards/goldrush/goldrush.cpp
@@ -99,6 +99,7 @@ set(bangserver_srcs
     src/cards/goldrush/ruleset.cpp
     src/cards/goldrush/rum.cpp
     src/cards/goldrush/sell_beer.cpp
+    src/cards/goldrush/shopchoice.cpp
     src/cards/goldrush/wanted.cpp
 
     src/cards/valleyofshadows/aim.cpp

@@ -143,10 +143,10 @@ namespace banggame {
             if (ranges::contains(modifiers, target_card)) return false;
             if (!is_possible_to_play(origin, target_card, is_response ? target_card->responses : target_card->effects)) return false;
 
-            return (target_card->modifier == card_modifier_type::none
+            return (target_card->modifier_type() == card_modifier_type::none
                 || std::transform_reduce(
-                    modifiers.begin(), modifiers.end(), modifier_bitset(target_card->modifier), std::bit_and(),
-                    [](card *mod) { return allowed_modifiers_after(mod->modifier); }
+                    modifiers.begin(), modifiers.end(), modifier_bitset(target_card->modifier_type()), std::bit_and(),
+                    [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
                 ))
                 && std::ranges::all_of(modifiers, [&](card *mod) {
                     return allowed_card_with_modifier(origin, mod, target_card);
@@ -168,7 +168,7 @@ namespace banggame {
                     random_element(make_equip_set(origin, origin_card), origin->m_game->rng));
             }
             return verifier;
-        } else if (origin_card->modifier != card_modifier_type::none) {
+        } else if (origin_card->modifier_type() != card_modifier_type::none) {
             modifiers.push_back(origin_card);
             origin_card = random_card_playable_with_modifiers(origin, is_response, modifiers);
             if (!origin_card) {
@@ -250,7 +250,7 @@ namespace banggame {
             )
             | ranges::views::filter([&](card *target_card){
                 if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
-                    return target_card->modifier != card_modifier_type::none
+                    return target_card->modifier_type() != card_modifier_type::none
                         || is_possible_to_play(origin, target_card, target_card->effects);
                 } else {
                     return !make_equip_set(origin, target_card).empty();

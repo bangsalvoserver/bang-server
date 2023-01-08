@@ -153,14 +153,13 @@ namespace banggame {
         (button_row)
     )
 
-    DEFINE_ENUM(card_modifier_type,
+    DEFINE_ENUM_FWD_TYPES(card_modifier_type,
         (none)
         (bangmod)
-        (discount)
-        (leevankliff)
-        (shopchoice)
-        (belltower)
-        (bandolier)
+        (discount, modifier_discount)
+        (leevankliff, modifier_leevankliff)
+        (shopchoice, modifier_shopchoice)
+        (belltower, modifier_belltower)
     )
 
     DEFINE_ENUM_FLAGS(effect_flags,
@@ -215,7 +214,6 @@ namespace banggame {
         (discard_black,         effect_discard_black)
         (add_gold,              effect_add_gold)
         (pay_gold,              effect_pay_gold)
-        (add_cost,              effect_add_cost)
         (rum,                   effect_rum)
         (goldrush,              effect_goldrush)
         (forced_play,           effect_forced_play)
@@ -228,7 +226,6 @@ namespace banggame {
         (buntlinespecial,       effect_buntlinespecial)
         (bigfifty,              effect_bigfifty)
         (bandolier,             effect_bandolier)
-        (belltower,             effect_belltower)
         (move_bomb,             effect_move_bomb)
         (tumbleweed,            effect_tumbleweed)
         (sniper,                effect_sniper)
@@ -246,7 +243,6 @@ namespace banggame {
         (disarm,                effect_disarm)
         (sacrifice,             effect_sacrifice)
         (lastwill,              effect_lastwill)
-        (leevankliff,           effect_leevankliff)
         (ladyrosaoftexas,       effect_ladyrosaoftexas)
         (changewws,             effect_changewws)
     )

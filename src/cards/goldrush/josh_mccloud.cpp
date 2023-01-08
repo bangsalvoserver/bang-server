@@ -15,13 +15,6 @@ namespace banggame {
         card *target_card;
 
         void on_update() override {
-            if (!sent) {
-                target->m_game->add_listener<event_type::apply_cost_modifier>({origin_card, -2}, [target=target](player *p, card *c, int &value) {
-                    if (p == target) {
-                        value = 0;
-                    }
-                });
-            }
             auto_respond();
         }
 
@@ -34,21 +27,41 @@ namespace banggame {
         }
     };
 
-    bool effect_forced_play::can_respond(card *origin_card, player *target) {
+    struct zero_cost_obj : verify_modifier {
+        zero_cost_obj(card *origin_card, player *origin)
+            : key(origin_card, -2)
+            , origin(origin)
+        {
+            origin->m_game->add_listener<event_type::apply_cost_modifier>(key, [=](player *p, card *c, int &cost) {
+                if (p == origin) {
+                    cost = 0;
+                }
+            });
+        }
+
+        ~zero_cost_obj() {
+            origin->m_game->remove_listeners(key);
+        }
+
+        event_card_key key;
+        player *origin;
+    };
+
+    verify_result effect_forced_play::verify(card *origin_card, player *target) {
         if (auto *req = target->m_game->top_request_if<request_force_play_card>(target)) {
-            if (origin_card == req->target_card) {
-                return true;
-            } else if (req->target_card->modifier == card_modifier_type::shopchoice) {
-                return origin_card->pocket == pocket_type::hidden_deck
-                    && origin_card->get_tag_value(tag_type::shopchoice) == req->target_card->get_tag_value(tag_type::shopchoice);
+            if (origin_card == req->target_card
+                || ((req->target_card->modifier_type() == card_modifier_type::shopchoice)
+                    && origin_card->pocket == pocket_type::hidden_deck
+                    && origin_card->get_tag_value(tag_type::shopchoice) == req->target_card->get_tag_value(tag_type::shopchoice)
+            )) {
+                return {std::in_place_type<zero_cost_obj>, origin_card, target};
             }
         }
-        return false;
+        return "ERROR_INVALID_RESPONSE";
     }
 
     void effect_forced_play::on_play(card *origin_card, player *target) {
         if (origin_card->pocket != pocket_type::hidden_deck) {
-            target->m_game->remove_listeners(event_card_key{target->m_game->top_request().origin_card(), -2});
             target->m_game->pop_request();
         }
     }

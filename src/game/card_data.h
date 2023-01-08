@@ -26,7 +26,7 @@ namespace banggame {
         (card_expansion_type, expansion)
         (card_deck_type, deck)
 
-        (card_modifier_type, modifier)
+        (modifier_holder, modifier)
         (mth_holder, mth_effect)
         (mth_holder, mth_response)
         (target_player_filter, equip_target)
@@ -36,6 +36,10 @@ namespace banggame {
 
         bool has_tag(tag_type tag) const {
             return std::ranges::find(tags, tag, &tag_holder::type) != tags.end();
+        }
+
+        card_modifier_type modifier_type() const {
+            return modifier.type;
         }
 
         std::optional<short> get_tag_value(tag_type tag) const {

@@ -11,7 +11,7 @@
 namespace banggame {
 
     card *play_card_verify::get_playing_card() const {
-        if (ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
+        if (ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier_type)) {
             return origin->get_last_played_card().first;
         } else {
             return origin_card;
@@ -20,23 +20,25 @@ namespace banggame {
     
     verify_result play_card_verify::verify_modifiers() const {
         verify_result result;
+        card *playing_card = get_playing_card();
         auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
         for (card *mod_card : modifiers) {
-            if (mod_card->modifier == card_modifier_type::none) {
+            if (mod_card->modifier_type() == card_modifier_type::none) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             } else if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return {"ERROR_CARD_DISABLED_BY", mod_card, disabler};
             } else if (auto error = origin->m_game->call_event<event_type::verify_play_card>(origin, mod_card, game_string{})) {
                 return error;
-            } else if (!bool(allowed_modifiers & modifier_bitset(mod_card->modifier))) {
+            } else if (!bool(allowed_modifiers & modifier_bitset(mod_card->modifier_type()))) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             } else if (!allowed_card_with_modifier(origin, mod_card, origin_card)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
+            result.add(mod_card->modifier.verify(mod_card, origin, playing_card));
             for (const auto &effect : mod_card->effects) {
                 result.add(effect.verify(mod_card, origin));
             }
-            allowed_modifiers &= allowed_modifiers_after(mod_card->modifier);
+            allowed_modifiers &= allowed_modifiers_after(mod_card->modifier_type());
         }
         return result;
     }
@@ -165,7 +167,7 @@ namespace banggame {
 
         auto &effects = is_response ? playing_card->responses : playing_card->effects;
 
-        if (playing_card->modifier != card_modifier_type::none) {
+        if (playing_card->modifier_type() != card_modifier_type::none) {
             return "ERROR_INVALID_MODIFIER_CARD";
         }
         if (effects.empty()) {
@@ -305,7 +307,7 @@ namespace banggame {
 
         switch(origin_card->pocket) {
         case pocket_type::player_hand:
-            if (origin_card->is_brown() || ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier)) {
+            if (origin_card->is_brown() || ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier_type)) {
                 if (game_string error = verify_card_targets()) {
                     return error;
                 }
@@ -358,7 +360,7 @@ namespace banggame {
             });
             break;
         case pocket_type::hidden_deck:
-            if (!ranges::contains(modifiers, card_modifier_type::shopchoice, &card::modifier)) {
+            if (!ranges::contains(modifiers, card_modifier_type::shopchoice, &card::modifier_type)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             [[fallthrough]];

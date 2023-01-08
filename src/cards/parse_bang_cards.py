@@ -94,7 +94,7 @@ def parse_all_effects(card):
             'tags':         parse_effect_simple(card['tags'], 'tag_value', 'tag_type') if 'tags' in card else None,
             'expansion':    CppEnum('card_expansion_type', card['expansion']) if 'expansion' in card else None,
             'deck':         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
-            'modifier':     CppEnum('card_modifier_type', card['modifier']) if 'modifier' in card else None,
+            'modifier':     {'type': CppEnum('card_modifier_type', card['modifier'])} if 'modifier' in card else None,
             'mth_effect':   {'type': CppEnum('mth_type', card['mth_effect'])} if 'mth_effect' in card else None,
             'mth_response': {'type': CppEnum('mth_type', card['mth_response'])} if 'mth_response' in card else None,
             'equip_target': CppEnum('target_player_filter', card['equip_target']) if 'equip_target' in card else None,

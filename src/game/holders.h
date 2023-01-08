@@ -35,6 +35,12 @@ namespace banggame {
         void on_unequip(card *target_card, player *target) const;
     )
 
+    DEFINE_STRUCT(modifier_holder,
+        (card_modifier_type, type),
+        
+        verify_result verify(card *origin_card, player *origin, card *playing_card) const;
+    )
+
     DEFINE_STRUCT(mth_holder,
         (mth_type, type),
         
