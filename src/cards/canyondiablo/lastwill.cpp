@@ -49,7 +49,7 @@ namespace banggame {
                 } else {
                     origin->m_game->add_log("LOG_GIFTED_CARD", origin, target, chosen_card);
                 }
-                target->add_to_hand(chosen_card);
+                target->steal_card(chosen_card);
             }
         });
     }
