@@ -65,8 +65,6 @@ namespace banggame {
 
     inline card_backface::card_backface(card *c): id(c->id), deck(c->deck) {}
 
-    using playing_card_pair = std::pair<card *, std::vector<card *>>;
-
     struct player {
         game *m_game;
         int id;
@@ -99,7 +97,7 @@ namespace banggame {
         
         int8_t m_extra_turns = 0;
 
-        std::vector<playing_card_pair> m_played_cards;
+        std::vector<std::tuple<card *, pocket_type, std::vector<card *>, std::vector<pocket_type>>> m_played_cards;
 
         player_flags m_player_flags{};
 
@@ -181,7 +179,8 @@ namespace banggame {
         void reset_max_hp();
 
         void add_played_card(card *origin_card, std::vector<card *> modifiers);
-        const playing_card_pair &get_last_played_card() const;
+        card *get_last_played_card() const;
+        const std::vector<card *> &get_last_played_modifiers() const;
 
         bool is_bangcard(card *origin_card);
 

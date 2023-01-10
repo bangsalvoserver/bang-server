@@ -12,7 +12,7 @@ namespace banggame {
 
     card *play_card_verify::get_playing_card() const {
         if (ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier_type)) {
-            return origin->get_last_played_card().first;
+            return origin->get_last_played_card();
         } else {
             return origin_card;
         }
@@ -312,7 +312,7 @@ namespace banggame {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this]{
-                    origin->add_played_card(get_playing_card(), modifiers);
+                    origin->add_played_card(origin_card, modifiers);
                     play_modifiers();
                     do_play_card();
                 });

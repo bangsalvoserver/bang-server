@@ -33,7 +33,7 @@ namespace banggame::filter_impl {
     }
 
     card *get_last_played_card(player *origin) {
-        return origin->get_last_played_card().first;
+        return origin->get_last_played_card();
     }
 
     card_modifier_type get_card_modifier(card *target) {
