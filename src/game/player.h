@@ -64,6 +64,13 @@ namespace banggame {
     };
 
     inline card_backface::card_backface(card *c): id(c->id), deck(c->deck) {}
+    
+    struct card_pocket_pair {
+        card *origin_card;
+        pocket_type pocket;
+
+        card_pocket_pair(card *c) : origin_card(c), pocket(c->pocket) {}
+    };
 
     struct player {
         game *m_game;
@@ -97,7 +104,7 @@ namespace banggame {
         
         int8_t m_extra_turns = 0;
 
-        std::vector<std::tuple<card *, pocket_type, std::vector<card *>, std::vector<pocket_type>>> m_played_cards;
+        std::vector<std::pair<card_pocket_pair, std::vector<card_pocket_pair>>> m_played_cards;
 
         player_flags m_player_flags{};
 
@@ -180,7 +187,12 @@ namespace banggame {
 
         void add_played_card(card *origin_card, std::vector<card *> modifiers);
         card *get_last_played_card() const;
-        const std::vector<card *> &get_last_played_modifiers() const;
+
+        auto get_last_played_modifiers() const {
+            static const std::vector<card_pocket_pair> empty_vector;
+            return (m_played_cards.empty() ? empty_vector : m_played_cards.back().second)
+                | ranges::views::transform(&card_pocket_pair::origin_card);
+        }
 
         bool is_bangcard(card *origin_card);
 

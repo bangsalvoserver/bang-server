@@ -242,9 +242,7 @@ namespace banggame {
     }
 
     void player::add_played_card(card *origin_card, std::vector<card *> modifiers) {
-        m_played_cards.emplace_back(origin_card, origin_card->pocket, modifiers,
-            modifiers | ranges::views::transform(&card::pocket) | ranges::to<std::vector>
-        );
+        m_played_cards.emplace_back(origin_card, modifiers | ranges::to<std::vector<card_pocket_pair>>);
         m_game->add_update<game_update_type::last_played_card>(update_target::includes_private(this), origin_card);
     }
 
@@ -252,16 +250,7 @@ namespace banggame {
         if (m_played_cards.empty()) {
             return nullptr;
         } else {
-            return std::get<card *>(m_played_cards.back());
-        }
-    }
-
-    const std::vector<card *> &player::get_last_played_modifiers() const {
-        static const std::vector<card *> empty_vector;
-        if (m_played_cards.empty()) {
-            return empty_vector;
-        } else {
-            return std::get<std::vector<card *>>(m_played_cards.back());
+            return m_played_cards.back().first.origin_card;
         }
     }
 
