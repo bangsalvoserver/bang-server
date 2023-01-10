@@ -59,13 +59,13 @@ namespace banggame {
 
         game_string status_text(player *owner) const override {
             if (target == owner) {
-                if (target_card->visibility != card_visibility::shown) {
+                if (target_card->pocket == pocket_type::player_hand) {
                     return {"STATUS_STEAL_FROM_HAND", origin_card};
                 } else {
                     return {"STATUS_STEAL", origin_card, target_card};
                 }
             } else {
-                if (target_card->visibility != card_visibility::shown) {
+                if (target_card->pocket == pocket_type::player_hand) {
                     return {"STATUS_STEAL_OTHER_FROM_HAND", target, origin_card};
                 } else {
                     return {"STATUS_STEAL_OTHER", target, origin_card, target_card};
@@ -77,7 +77,7 @@ namespace banggame {
     void effect_steal::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
         origin->m_game->queue_action([=]{
             if (origin != target_card->owner) {
-                if (target_card->visibility != card_visibility::shown) {
+                if (target_card->pocket == pocket_type::player_hand) {
                     origin->m_game->add_log("LOG_PLAYED_CARD_STEAL_HAND", origin_card, origin, target_card->owner);
                 } else {
                     origin->m_game->add_log("LOG_PLAYED_CARD_STEAL", origin_card, origin, target_card->owner, target_card);
@@ -128,13 +128,13 @@ namespace banggame {
 
         game_string status_text(player *owner) const override {
             if (target == owner) {
-                if (target_card->visibility != card_visibility::shown) {
+                if (target_card->pocket == pocket_type::player_hand) {
                     return {"STATUS_DESTROY_FROM_HAND", origin_card};
                 } else {
                     return {"STATUS_DESTROY", origin_card, target_card};
                 }
             } else {
-                if (target_card->visibility != card_visibility::shown) {
+                if (target_card->pocket == pocket_type::player_hand) {
                     return {"STATUS_DESTROY_OTHER_FROM_HAND", target, origin_card};
                 } else {
                     return {"STATUS_DESTROY_OTHER", target, origin_card, target_card};
@@ -146,7 +146,7 @@ namespace banggame {
     void effect_destroy::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
         origin->m_game->queue_action([=]{
             if (origin != target_card->owner) {
-                if (target_card->visibility != card_visibility::shown) {
+                if (target_card->pocket == pocket_type::player_hand) {
                     origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_HAND", origin_card, origin, target_card->owner);
                 } else {
                     origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY", origin_card, origin, target_card->owner, target_card);
