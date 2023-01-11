@@ -52,6 +52,33 @@ namespace banggame {
         }
     }
 
+    struct request_discard_hand_pass : request_discard_pass, resolvable_request {
+        using request_discard_pass::request_discard_pass;
+
+        void on_update() override {
+            if (target->m_game->m_options.quick_discard_all || target->m_hand.size() <= 1) {
+                on_resolve();
+            }
+        }
+
+        void on_resolve() override {
+            target->m_game->invoke_action([&]{
+                while (!target->empty_hand()) {
+                    on_pick(target->m_hand.front());
+                }
+            });
+        }
+    };
+
+    void request_discard_pass::on_update() {
+        if (target->max_cards_end_of_turn() == 0) {
+            target->m_game->invoke_action([&]{
+                target->m_game->pop_request();
+                target->m_game->queue_request_front<request_discard_hand_pass>(target);
+            });
+        }
+    }
+
     bool request_discard_pass::can_pick(card *target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
