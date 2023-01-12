@@ -435,6 +435,7 @@ namespace banggame {
             queue_action([this, killer, target] {
                 if (killer->alive()) {
                     if (target->m_role == player_role::outlaw) {
+                        add_log("LOG_KILLED_OUTLAW", killer);
                         killer->draw_card(3);
                     } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
                         queue_action([this, killer] {
@@ -453,6 +454,20 @@ namespace banggame {
         if (reason == discard_all_reason::disable_temp_ghost) {
             return;
         }
+
+        queue_action([this, target]{
+            if (num_alive() > 1) {
+                player *next_player = *std::next(player_iterator(target));
+                if (target == m_scenario_holder) {
+                    m_scenario_holder = next_player;
+                    add_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
+                }
+                if (target == m_wws_scenario_holder) {
+                    m_wws_scenario_holder = next_player;
+                    add_update<game_update_type::move_scenario_deck>(m_wws_scenario_holder, pocket_type::wws_scenario_deck);
+                }
+            }
+        }, -3);
 
         if (!m_options.enable_ghost_cards) {
             queue_action([this]{
@@ -519,14 +534,6 @@ namespace banggame {
         queue_action([this, killer, target]{
             if (killer && killer != target && m_players.size() <= 3) {
                 killer->draw_card(3);
-            }
-            if (target == m_scenario_holder && num_alive() > 1) {
-                m_scenario_holder = *std::next(player_iterator(m_scenario_holder));
-                add_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
-            }
-            if (target == m_wws_scenario_holder && num_alive() > 1) {
-                m_wws_scenario_holder = *std::next(player_iterator(m_wws_scenario_holder));
-                add_update<game_update_type::move_scenario_deck>(m_wws_scenario_holder, pocket_type::wws_scenario_deck);
             }
             if (m_playing == target) {
                 start_next_turn();
