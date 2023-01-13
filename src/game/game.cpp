@@ -383,7 +383,7 @@ namespace banggame {
 
     void game::start_next_turn() {
         auto it = std::ranges::find(m_players, m_playing);
-        do {
+        while (true) {
             if (check_flags(game_flags::invert_rotation)) {
                 if (it == m_players.begin()) it = m_players.end();
                 --it;
@@ -391,8 +391,11 @@ namespace banggame {
                 ++it;
                 if (it == m_players.end()) it = m_players.begin();
             }
-            call_event<event_type::verify_revivers>(*it);
-        } while (!(*it)->alive() || (*it)->remove_player_flags(player_flags::skip_turn));
+            if (!(*it)->remove_player_flags(player_flags::skip_turn)) {
+                call_event<event_type::verify_revivers>(*it);
+                if ((*it)->alive()) break;
+            }
+        }
 
         player *next_player = *it;
         
