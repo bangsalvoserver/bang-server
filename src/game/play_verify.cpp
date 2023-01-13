@@ -312,16 +312,15 @@ namespace banggame {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this]{
-                    origin->add_played_card(origin_card, modifiers);
                     play_modifiers();
                     do_play_card();
+                    origin->add_played_card(origin_card, modifiers);
                 });
             } else {
                 if (game_string error = verify_equip_target()) {
                     return error;
                 }
                 origin->prompt_then(check_prompt_equip(), [*this]{
-                    origin->add_played_card(origin_card, modifiers);
                     player *target = get_equip_target();
                     origin_card->on_equip(target);
                     if (origin == target) {
@@ -336,6 +335,7 @@ namespace banggame {
                     }
                     origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card);
                     origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
+                    origin->add_played_card(origin_card, modifiers);
                 });
             }
             break;
@@ -354,9 +354,9 @@ namespace banggame {
                 return error;
             }
             origin->prompt_then(check_prompt(), [*this]{
-                origin->add_played_card(origin_card, modifiers);
                 play_modifiers();
                 do_play_card();
+                origin->add_played_card(origin_card, modifiers);
             });
             break;
         case pocket_type::hidden_deck:
@@ -373,7 +373,6 @@ namespace banggame {
                     return "ERROR_NOT_ENOUGH_GOLD";
                 }
                 origin->prompt_then(check_prompt(), [*this, cost]{
-                    origin->add_played_card(origin_card, modifiers);
                     play_modifiers();
                     origin->add_gold(-cost);
                     do_play_card();
@@ -382,6 +381,7 @@ namespace banggame {
                             m_game->draw_shop_card();
                         }
                     }, -1);
+                    origin->add_played_card(origin_card, modifiers);
                 });
             } else {
                 if (is_response) {
@@ -396,7 +396,6 @@ namespace banggame {
                     return "ERROR_NOT_ENOUGH_GOLD";
                 }
                 origin->prompt_then(check_prompt_equip(), [*this, cost]{
-                    origin->add_played_card(origin_card, modifiers);
                     player *target = get_equip_target();
                     origin_card->on_equip(target);
                     if (origin == target) {
@@ -412,6 +411,7 @@ namespace banggame {
                             m_game->draw_shop_card();
                         }
                     }, -1);
+                    origin->add_played_card(origin_card, modifiers);
                 });
             }
             break;

@@ -202,10 +202,10 @@ namespace banggame {
 
     template<> verify_result play_visitor<target_type::extra_card>::verify(card *target) {
         if (!target) {
-            if (verifier.get_playing_card() != verifier.origin->get_last_played_card()) {
-                return "ERROR_TARGET_SET_NOT_EMPTY";
-            } else {
+            if (ranges::contains(verifier.modifiers, card_modifier_type::leevankliff, &card::modifier_type)) {
                 return {};
+            } else {
+                return "ERROR_TARGET_SET_NOT_EMPTY";
             }
         } else {
             return play_visitor<target_type::card>{verifier, effect}.verify(target);

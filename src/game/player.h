@@ -188,12 +188,6 @@ namespace banggame {
         void add_played_card(card *origin_card, std::vector<card *> modifiers);
         card *get_last_played_card() const;
 
-        auto get_last_played_modifiers() const {
-            static const std::vector<card_pocket_pair> empty_vector;
-            return (m_played_cards.empty() ? empty_vector : m_played_cards.back().second)
-                | ranges::views::transform(&card_pocket_pair::origin_card);
-        }
-
         bool is_bangcard(card *origin_card);
 
         void start_of_turn();
