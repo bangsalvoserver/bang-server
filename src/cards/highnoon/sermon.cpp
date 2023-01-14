@@ -7,10 +7,10 @@ namespace banggame {
     void equip_sermon::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player *p) {
             target->m_game->add_disabler(target_card, [=](card *c) {
-                if (c->owner != p) {
+                if (c->owner && c->owner != p) {
                     return false;
                 } else if (c->pocket == pocket_type::player_hand) {
-                    return p->is_bangcard(c);
+                    return c->has_tag(tag_type::bangcard);
                 } else {
                     return c->has_tag(tag_type::play_as_bang);
                 }

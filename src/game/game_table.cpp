@@ -203,23 +203,40 @@ namespace banggame {
         }
     }
 
-    void game_table::add_disabler(event_card_key key, card_disabler_fun &&fun) {
-        const auto disable_if_new = [&](card *c) {
-            if (!is_disabled(c) && fun(c)) {
-                c->on_disable(c->owner);
-            }
+    inline auto disablable_cards(game_table *table) {
+        struct to_player_card_pair {
+            player *p;
+            auto operator()(card *c) const { return std::pair{p, c}; }
         };
 
-        for (player *p : m_players) {
-            std::ranges::for_each(p->m_table, disable_if_new);
-            std::ranges::for_each(p->m_characters, disable_if_new);
+        return ranges::views::concat(
+            table->m_scenario_cards
+                | ranges::views::take_last(1)
+                | ranges::views::transform(to_player_card_pair{table->m_scenario_holder}),
+            table->m_wws_scenario_cards
+                | ranges::views::take_last(1)
+                | ranges::views::transform(to_player_card_pair{table->m_wws_scenario_holder}),
+            table->m_players
+                | ranges::views::transform([](player *p) {
+                    return ranges::views::concat(p->m_table, p->m_characters)
+                        | ranges::views::transform(to_player_card_pair{p});
+                })
+                | ranges::views::join
+        );
+    }
+
+    void game_table::add_disabler(event_card_key key, card_disabler_fun &&fun) {
+        for (auto [owner, c] : disablable_cards(this)) {
+            if (!is_disabled(c) && fun(c)) {
+                c->on_disable(owner);
+            }
         }
 
         m_disablers.emplace(std::make_pair(key, std::move(fun)));
     }
 
     void game_table::remove_disablers(event_card_key key) {
-        const auto enable_if_old = [&](card *c) {
+        for (auto [owner, c] : disablable_cards(this)) {
             bool a = false;
             bool b = false;
             for (const auto &[t, fun] : m_disablers) {
@@ -227,13 +244,8 @@ namespace banggame {
                 else b = b || fun(c);
             }
             if (!a && b) {
-                c->on_enable(c->owner);
+                c->on_enable(owner);
             }
-        };
-
-        for (player *p : m_players) {
-            std::ranges::for_each(p->m_table, enable_if_old);
-            std::ranges::for_each(p->m_characters, enable_if_old);
         }
 
         m_disablers.erase(key);
