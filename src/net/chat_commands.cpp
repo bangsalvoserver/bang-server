@@ -137,6 +137,8 @@ namespace banggame {
                 case card_deck_type::highnoon:
                 case card_deck_type::fistfulofcards:
                     return target->m_game->m_scenario_cards.empty() || &target_card != target->m_game->m_scenario_cards.back();
+                case card_deck_type::wildwestshow:
+                    return target->m_game->m_wws_scenario_cards.empty() || &target_card != target->m_game->m_wws_scenario_cards.back();
                 }
             }
             return false;
@@ -209,6 +211,21 @@ namespace banggame {
                 target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::scenario_deck, true);
             } else {
                 target->m_game->move_card(target_card, pocket_type::scenario_deck);
+            }
+            break;
+        }
+        case card_deck_type::wildwestshow: {
+            if (target_card->pocket == pocket_type::wws_scenario_deck) {
+                if (auto it = std::ranges::find(target->m_game->m_wws_scenario_deck, target_card); it != target->m_game->m_wws_scenario_deck.end()) {
+                    target->m_game->m_wws_scenario_deck.erase(it);
+                } else {
+                    target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::wws_scenario_deck);
+                }
+                target->m_game->m_wws_scenario_deck.push_back(target_card);
+                target->m_game->set_card_visibility(target_card, nullptr, card_visibility::shown, true);
+                target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::wws_scenario_deck, true);
+            } else {
+                target->m_game->move_card(target_card, pocket_type::wws_scenario_deck);
             }
             break;
         }
