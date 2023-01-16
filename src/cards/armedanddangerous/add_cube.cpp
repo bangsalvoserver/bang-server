@@ -7,7 +7,7 @@ namespace banggame {
     struct request_add_cube : request_base {
         request_add_cube(card *origin_card, player *target, int ncubes = 1)
             : request_base(origin_card, nullptr, target)
-            , ncubes(std::min<int>(ncubes, target->m_game->num_cubes)) {}
+            , ncubes(ncubes) {}
 
         int ncubes = 1;
 
@@ -92,7 +92,9 @@ namespace banggame {
     }
 
     void effect_add_cube::on_play(card *origin_card, player *origin) {
-        origin->m_game->queue_request<request_add_cube>(origin_card, origin, ncubes);
+        if (int num = std::min<int>(ncubes, origin->m_game->num_cubes)) {
+            origin->m_game->queue_request<request_add_cube>(origin_card, origin, num);
+        }
     }
 
     game_string effect_add_cube::on_prompt(card *origin_card, player *origin, card *target) {
