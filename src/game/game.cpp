@@ -276,7 +276,7 @@ namespace banggame {
                 set_card_visibility(p->first_character(), nullptr, card_visibility::shown, true);
                 p->reset_max_hp();
                 p->set_hp(p->m_max_hp, true);
-                p->first_character()->on_enable(p);
+                p->enable_equip(p->first_character());
 
                 move_card(p->m_characters.back(), pocket_type::player_backup, p, card_visibility::hidden, true);
             }

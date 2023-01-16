@@ -16,7 +16,7 @@ namespace banggame {
                 origin->m_game->set_card_visibility(*(scenario_deck.rbegin() + 1), nullptr, card_visibility::shown, true);
             }
             if (!scenario_cards.empty()) {
-                scenario_cards.back()->on_disable(origin->m_game->m_wws_scenario_holder);
+                origin->m_game->m_wws_scenario_holder->disable_equip(scenario_cards.back());
             }
 
             origin->m_game->add_log("LOG_DRAWN_SCENARIO_CARD", scenario_deck.back());
@@ -25,7 +25,7 @@ namespace banggame {
                 origin->m_game->add_update<game_update_type::move_scenario_deck>(origin->m_game->m_wws_scenario_holder, pocket_type::wws_scenario_deck);
             }
             origin->m_game->move_card(scenario_deck.back(), pocket_type::wws_scenario_card);
-            scenario_cards.back()->on_enable(origin->m_game->m_wws_scenario_holder);
+            origin->m_game->m_wws_scenario_holder->enable_equip(scenario_cards.back());
         }, 1);
     }
 }

@@ -10,10 +10,12 @@ namespace banggame {
         origin->m_game->add_log("LOG_SWAP_CARDS", origin, target, chosen_card, target_card);
 
         target->disable_equip(target_card);
+        target_card->on_unequip(target);
         target_card->on_equip(origin);
         origin->equip_card(target_card);
         if (chosen_card->owner == origin) {
             origin->disable_equip(chosen_card);
+            chosen_card->on_unequip(origin);
         }
         chosen_card->on_equip(target);
         target->equip_card(chosen_card);

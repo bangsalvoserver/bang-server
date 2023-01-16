@@ -21,7 +21,7 @@ namespace banggame {
             target->m_game->add_log("LOG_CHARACTER_CHOICE", target, c);
             c->pocket = pocket_type::player_character;
             c->owner = target;
-            c->on_enable(target);
+            target->enable_equip(c);
             target->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
         }
     }

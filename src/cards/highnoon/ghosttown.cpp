@@ -10,7 +10,7 @@ namespace banggame {
                 origin->m_game->add_log("LOG_REVIVE", target, target_card);
                 target->add_player_flags(player_flags::temp_ghost);
                 for (auto *c : target->m_characters) {
-                    c->on_enable(target);
+                    target->enable_equip(c);
                 }
             }
         });

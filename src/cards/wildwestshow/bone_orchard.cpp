@@ -29,7 +29,7 @@ namespace banggame {
                 target->set_hp(1);
 
                 for (auto *c : target->m_characters) {
-                    c->on_enable(target);
+                    target->enable_equip(c);
                 }
             }
         });

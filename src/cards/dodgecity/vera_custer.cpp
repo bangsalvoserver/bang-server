@@ -17,7 +17,7 @@ namespace banggame {
             new_card->tags.push_back(tag_holder{ .type = tag_type::temp_card });
             
             origin->m_characters.emplace_back(new_card);
-            new_card->on_enable(origin);
+            origin->enable_equip(new_card);
 
             origin->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{new_card}}, pocket_type::player_character, origin);
             origin->m_game->set_card_visibility(new_card, nullptr, card_visibility::shown, true);

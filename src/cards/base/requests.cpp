@@ -15,7 +15,7 @@ namespace banggame {
             target->m_game->move_card(target_card, pocket_type::player_character, target, card_visibility::shown);
             target->reset_max_hp();
             target->set_hp(target->m_max_hp, true);
-            target_card->on_enable(target);
+            target->enable_equip(target_card);
 
             target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, card_visibility::hidden);
         });
