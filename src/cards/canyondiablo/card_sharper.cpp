@@ -1,6 +1,7 @@
 #include "card_sharper.h"
 
 #include "game/game.h"
+#include "game/filters.h"
 #include "cards/base/steal_destroy.h"
 
 namespace banggame {
@@ -49,10 +50,17 @@ namespace banggame {
     };
 
     game_string handler_card_sharper::verify(card *origin_card, player *origin, card *chosen_card, card *target_card) {
+        player *target = target_card->owner;
+        if (auto error = check_player_filter(origin, target_card->equip_target, origin)) {
+            return error;
+        }
         if (auto *c = origin->find_equipped_card(target_card)) {
             return {"ERROR_DUPLICATED_CARD", c};
         }
-        if (auto *c = target_card->owner->find_equipped_card(chosen_card)) {
+        if (auto error = check_player_filter(target, chosen_card->equip_target, target)) {
+            return error;
+        }
+        if (auto *c = target->find_equipped_card(chosen_card)) {
             return {"ERROR_DUPLICATED_CARD", c};
         }
         return {};
