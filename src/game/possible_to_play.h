@@ -10,39 +10,24 @@
 
 namespace banggame {
 
-    inline auto make_equip_set(player *origin, card *origin_card) {
-        return origin->m_game->m_players
-            | ranges::views::filter([=](player *target) {
-                if (origin_card->self_equippable()) {
-                    return origin == target;
-                } else {
-                    return !check_player_filter(origin, origin_card->equip_target, target)
-                        && !target->find_equipped_card(origin_card);
-                }
-            });
+    template<typename Rng>
+    inline bool contains_at_least(Rng &&range, int size) {
+        return ranges::distance(ranges::take_view(FWD(range), size)) == size;
     }
 
-    inline auto make_player_target_set(player *origin, card *origin_card, effect_holder holder) {
-        return origin->m_game->m_players
-            | ranges::views::filter([=](player *target) {
-                return !check_player_filter(origin, holder.player_filter, target)
-                    && !holder.verify(origin_card, origin, target);
-            });
-    }
+    enum class effect_list_index {
+        effects,
+        responses,
+        optionals
+    };
 
-    inline auto make_card_target_set(player *origin, card *origin_card, effect_holder holder) {
-        return make_player_target_set(origin, origin_card, holder)
-            | ranges::views::transform([](player *target) {
-                return ranges::views::concat(target->m_hand, target->m_table);
-            })
-            | ranges::views::join
-            | ranges::views::filter([=](card *target_card) {
-                return !check_card_filter(origin_card, origin, holder.card_filter, target_card)
-                    && !holder.verify(origin_card, origin, target_card);
-            });
-    }
+    ranges::any_view<player *> make_equip_set(player *origin, card *origin_card);
 
-    bool is_possible_to_play(player *origin, card *target_card, const effect_list &effects);
+    ranges::any_view<player *> make_player_target_set(player *origin, card *origin_card, effect_holder holder);
+
+    ranges::any_view<card *> make_card_target_set(player *origin, card *origin_card, effect_holder holder);
+    
+    bool is_possible_to_play(player *origin, card *origin_card, effect_list_index index = effect_list_index::effects);
     
 }
 

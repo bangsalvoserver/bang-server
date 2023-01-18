@@ -129,7 +129,7 @@ namespace banggame {
         switch (filter_impl::get_card_modifier(mod_card)) {
         case card_modifier_type::bangmod:
             if (filter_impl::get_card_pocket(target) == pocket_type::player_hand) {
-                return filter_impl::is_bangcard(origin, target);
+                return filter_impl::get_card_tag(target, tag_type::bangcard).has_value();
             } else {
                 return filter_impl::get_card_tag(target, tag_type::play_as_bang).has_value();
             }

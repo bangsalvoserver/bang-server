@@ -46,7 +46,7 @@ namespace banggame {
     template<> verify_result play_visitor<target_type::conditional_player>::verify(player *target) {
         if (target) {
             return play_visitor<target_type::player>{verifier, effect}.verify(target);
-        } else if (!make_player_target_set(verifier.origin, verifier.playing_card, effect).empty()) {
+        } else if (contains_at_least(make_player_target_set(verifier.origin, verifier.playing_card, effect), 1)) {
             return "ERROR_TARGET_SET_NOT_EMPTY";
         } else {
             return {};
