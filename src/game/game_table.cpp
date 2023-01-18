@@ -217,11 +217,10 @@ namespace banggame {
                 | ranges::views::take_last(1)
                 | ranges::views::transform(to_player_card_pair{table->m_wws_scenario_holder}),
             table->m_players
-                | ranges::views::transform([](player *p) {
+                | ranges::views::for_each([](player *p) {
                     return ranges::views::concat(p->m_table, p->m_characters)
                         | ranges::views::transform(to_player_card_pair{p});
                 })
-                | ranges::views::join
         );
     }
 

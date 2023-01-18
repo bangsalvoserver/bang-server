@@ -343,9 +343,9 @@ namespace banggame {
 
             .pick_cards = owner && req.target() == owner
                 ? ranges::views::concat(
-                    m_players | ranges::views::transform([](player *p) {
+                    m_players | ranges::views::for_each([](player *p) {
                         return ranges::views::concat(p->m_hand, p->m_table, p->m_characters);
-                    }) | ranges::views::join,
+                    }),
                     m_selection,
                     m_deck | ranges::views::take(1),
                     m_discards | ranges::views::take(1)

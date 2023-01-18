@@ -35,10 +35,9 @@ namespace banggame {
 
     ranges::any_view<card *> make_card_target_set(player *origin, card *origin_card, effect_holder holder) {
         return make_player_target_set(origin, origin_card, holder)
-            | ranges::views::transform([](player *target) {
+            | ranges::views::for_each([](player *target) {
                 return ranges::views::concat(target->m_hand, target->m_table);
             })
-            | ranges::views::join
             | ranges::views::filter([=](card *target_card) {
                 return !check_card_filter(origin_card, origin, holder.card_filter, target_card)
                     && !holder.verify(origin_card, origin, target_card);

@@ -108,10 +108,9 @@ namespace banggame {
 
         auto operator()(enums::enum_tag_t<target_type::select_cubes>) const {
             auto cubes = origin->cube_slots()
-                | ranges::views::transform([](card *slot) {
+                | ranges::views::for_each([](card *slot) {
                     return ranges::views::repeat_n(slot, slot->num_cubes);
                 })
-                | ranges::views::join
                 | ranges::to<std::vector>;
             return cubes
                 | ranges::views::sample(holder.target_value, origin->m_game->rng)
