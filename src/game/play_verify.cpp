@@ -10,17 +10,16 @@
 
 namespace banggame {
 
-    card *play_card_verify::get_playing_card() const {
-        if (ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier_type)) {
-            return origin->get_last_played_card();
-        } else {
-            return origin_card;
-        }
-    }
+    play_card_verify::play_card_verify(player *origin, card *origin_card, bool is_response, target_list targets, std::vector<card *> modifiers)
+        : origin(origin)
+        , origin_card(origin_card)
+        , playing_card(ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier_type) ? origin->get_last_played_card() : origin_card)
+        , is_response(is_response)
+        , targets(std::move(targets))
+        , modifiers(std::move(modifiers)) {}
     
     verify_result play_card_verify::verify_modifiers() const {
         verify_result result;
-        card *playing_card = get_playing_card();
         auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
         for (card *mod_card : modifiers) {
             if (mod_card->modifier_type() == card_modifier_type::none) {
@@ -61,7 +60,6 @@ namespace banggame {
             }
         }
 
-        card *playing_card = get_playing_card();
         auto &effects = is_response ? playing_card->responses : playing_card->effects;
         for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
             if (game_string error = enums::visit_indexed(
@@ -160,7 +158,6 @@ namespace banggame {
     verify_result play_card_verify::verify_card_targets() const {
         verify_result result;
 
-        card *playing_card = get_playing_card();
         if (!playing_card) {
             return "ERROR_INVALID_CARD";
         }
@@ -221,7 +218,6 @@ namespace banggame {
     }
 
     game_string play_card_verify::check_prompt() const {
-        card *playing_card = get_playing_card();
         auto &effects = is_response ? playing_card->responses : playing_card->effects;
 
         target_list mth_targets;
@@ -251,8 +247,6 @@ namespace banggame {
     }
 
     void play_card_verify::do_play_card() const {
-        card *playing_card = get_playing_card();
-
         origin->log_played_card(playing_card, is_response);
         if (origin_card != playing_card || std::ranges::none_of(
             ranges::views::concat(modifiers, ranges::views::single(playing_card)),
@@ -312,15 +306,16 @@ namespace banggame {
                     return error;
                 }
                 origin->prompt_then(check_prompt(), [*this]{
+                    origin->add_played_card(origin_card, modifiers);
                     play_modifiers();
                     do_play_card();
-                    origin->add_played_card(origin_card, modifiers);
                 });
             } else {
                 if (game_string error = verify_equip_target()) {
                     return error;
                 }
                 origin->prompt_then(check_prompt_equip(), [*this]{
+                    origin->add_played_card(origin_card, modifiers);
                     player *target = get_equip_target();
                     origin_card->on_equip(target);
                     if (origin == target) {
@@ -335,7 +330,6 @@ namespace banggame {
                     }
                     origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card);
                     origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
-                    origin->add_played_card(origin_card, modifiers);
                 });
             }
             break;
@@ -354,9 +348,9 @@ namespace banggame {
                 return error;
             }
             origin->prompt_then(check_prompt(), [*this]{
+                origin->add_played_card(origin_card, modifiers);
                 play_modifiers();
                 do_play_card();
-                origin->add_played_card(origin_card, modifiers);
             });
             break;
         case pocket_type::hidden_deck:
@@ -373,6 +367,7 @@ namespace banggame {
                     return "ERROR_NOT_ENOUGH_GOLD";
                 }
                 origin->prompt_then(check_prompt(), [*this, cost]{
+                    origin->add_played_card(origin_card, modifiers);
                     play_modifiers();
                     origin->add_gold(-cost);
                     do_play_card();
@@ -381,7 +376,6 @@ namespace banggame {
                             m_game->draw_shop_card();
                         }
                     }, -1);
-                    origin->add_played_card(origin_card, modifiers);
                 });
             } else {
                 if (is_response) {
@@ -396,6 +390,7 @@ namespace banggame {
                     return "ERROR_NOT_ENOUGH_GOLD";
                 }
                 origin->prompt_then(check_prompt_equip(), [*this, cost]{
+                    origin->add_played_card(origin_card, modifiers);
                     player *target = get_equip_target();
                     origin_card->on_equip(target);
                     if (origin == target) {
@@ -411,7 +406,6 @@ namespace banggame {
                             m_game->draw_shop_card();
                         }
                     }, -1);
-                    origin->add_played_card(origin_card, modifiers);
                 });
             }
             break;

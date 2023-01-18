@@ -177,16 +177,15 @@ namespace banggame {
             return generate_random_play(origin, origin_card, is_response, std::move(modifiers));
         } else {
             play_card_verify verifier { origin, origin_card, is_response, {}, std::move(modifiers) };
-            card *playing_card = verifier.get_playing_card();
-            if (!playing_card) {
+            if (!verifier.playing_card) {
                 return play_card_verify{};
             }
-            for (const effect_holder &holder : is_response ? playing_card->responses : playing_card->effects) {
-                verifier.targets.push_back(generate_random_target(origin, playing_card, holder));
+            for (const effect_holder &holder : is_response ? verifier.playing_card->responses : verifier.playing_card->effects) {
+                verifier.targets.push_back(generate_random_target(origin, verifier.playing_card, holder));
             }
             if (is_possible_to_play(origin, origin_card, origin_card->optionals)) {
-                for (const effect_holder &holder : playing_card->optionals) {
-                    verifier.targets.push_back(generate_random_target(origin, playing_card, holder));
+                for (const effect_holder &holder : verifier.playing_card->optionals) {
+                    verifier.targets.push_back(generate_random_target(origin, verifier.playing_card, holder));
                 }
             }
             return verifier;
