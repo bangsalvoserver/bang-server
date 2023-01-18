@@ -133,7 +133,7 @@ namespace banggame {
         if (card->is_black()) {
             if (!target->m_game->check_flags(game_flags::disable_equipping)) {
                 auto equip_set = make_equip_set(target, card) | ranges::to<std::vector>;
-                if (!equip_set.empty()) {
+                if (equip_set.empty()) {
                     discard_drawn_card();
                 } else if (equip_set.size() == 1) {
                     equip_set.front()->equip_card(card);
