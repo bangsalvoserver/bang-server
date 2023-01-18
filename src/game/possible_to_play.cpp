@@ -75,7 +75,7 @@ namespace banggame {
     }
 
     static bool any_card_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, effect_list_index index) {
-        return std::ranges::any_of(ranges::views::concat(
+        return ranges::any_of(ranges::views::concat(
             origin->m_characters,
             origin->m_table | ranges::views::remove_if(&card::inactive),
             origin->m_hand | ranges::views::filter(&card::is_brown),
@@ -85,24 +85,23 @@ namespace banggame {
             origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
         ),
         [&](card *target_card) {
-            if (ranges::contains(modifiers, target_card)
-                || !std::transform_reduce(
-                    modifiers.begin(), modifiers.end(), modifier_bitset(target_card->modifier_type()), std::bit_and(),
-                    [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
-                )
-                || !std::ranges::all_of(modifiers, [&](card *mod) {
-                    return allowed_card_with_modifier(origin, mod, target_card);
-                })
-                || !is_possible_to_play_impl(origin, target_card, index))
-            {
-                return false;
-            }
+            if (ranges::contains(modifiers, target_card)) return false;
+
+            if (!std::ranges::all_of(modifiers, [&](card *mod) {
+                return allowed_card_with_modifier(origin, mod, target_card);
+            })) return false;
+
+            if (!is_possible_to_play_impl(origin, target_card, index)) return false;
+
             if (target_card->modifier_type() == card_modifier_type::none) {
                 return !get_effect_list(target_card, index).empty();
             } else {
                 auto modifiers_new = modifiers;
                 modifiers_new.push_back(target_card);
-                return any_card_playable_with_modifiers(origin, modifiers_new, index);
+                return std::transform_reduce(
+                    modifiers_new.begin(), modifiers_new.end(), modifier_bitset(card_modifier_type::none), std::bit_and(),
+                    [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
+                ) && any_card_playable_with_modifiers(origin, modifiers_new, index);
             }
         });
     }
