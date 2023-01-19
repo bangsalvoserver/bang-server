@@ -4,6 +4,14 @@
 
 namespace banggame {
 
+    game_string effect_bandolier::on_prompt(card *origin_card, player *origin) {
+        if (origin->get_bangs_played() == 0) {
+            return {"PROMPT_NO_BANGS_PLAYED", origin_card};
+        } else {
+            return {};
+        }
+    }
+
     void effect_bandolier::on_play(card *origin_card, player *origin) {
         event_card_key key{origin_card, 4};
         origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](player *p, int &value) {

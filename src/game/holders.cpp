@@ -157,6 +157,18 @@ namespace banggame {
         }, *this);
     }
 
+    game_string modifier_holder::on_prompt(card *origin_card, player *origin, card *playing_card) const {
+        return enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) -> game_string {
+            if constexpr (enums::value_with_type<E>) {
+                enums::enum_type_t<E> handler;
+                if constexpr (requires { handler.on_prompt(origin_card, origin, playing_card); }) {
+                    return handler.on_prompt(origin_card, origin, playing_card);
+                }
+            }
+            return {};
+        }, type);
+    }
+
     verify_result modifier_holder::verify(card *origin_card, player *origin, card *playing_card) const {
         return enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) -> verify_result {
             if constexpr (enums::value_with_type<E>) {

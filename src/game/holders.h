@@ -38,6 +38,7 @@ namespace banggame {
     DEFINE_STRUCT(modifier_holder,
         (card_modifier_type, type),
         
+        game_string on_prompt(card *origin_card, player *origin, card *playing_card) const;
         verify_result verify(card *origin_card, player *origin, card *playing_card) const;
     )
 

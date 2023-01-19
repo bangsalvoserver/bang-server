@@ -103,7 +103,7 @@ namespace banggame {
             if (!ranges::contains(effects, effect_type::play_card_action, &effect_holder::type)) {
                 origin->play_card_action(mod_card);
             }
-            for (effect_holder &e : effects) {
+            for (const effect_holder &e : effects) {
                 if (e.target == target_type::none) {
                     e.on_play(mod_card, origin);
                 } else if (e.target == target_type::self_cubes) {
@@ -219,6 +219,17 @@ namespace banggame {
 
     game_string play_card_verify::check_prompt() const {
         auto &effects = is_response ? playing_card->responses : playing_card->effects;
+
+        for (card *mod_card : modifiers) {
+            if (auto msg = mod_card->modifier.on_prompt(mod_card, origin, playing_card)) {
+                return msg;
+            }
+            for (const effect_holder &e : is_response ? mod_card->responses : mod_card->effects) {
+                if (auto msg = e.on_prompt(mod_card, origin)) {
+                    return msg;
+                }
+            }
+        }
 
         target_list mth_targets;
         for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
