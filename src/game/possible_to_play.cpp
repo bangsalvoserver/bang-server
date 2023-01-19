@@ -96,12 +96,15 @@ namespace banggame {
             if (target_card->modifier_type() == card_modifier_type::none) {
                 return !get_effect_list(target_card, index).empty();
             } else {
+                if (!std::transform_reduce(
+                    modifiers.begin(), modifiers.end(), modifier_bitset(target_card->modifier_type()), std::bit_and(),
+                    [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
+                )) {
+                    return false;
+                }
                 auto modifiers_new = modifiers;
                 modifiers_new.push_back(target_card);
-                return std::transform_reduce(
-                    modifiers_new.begin(), modifiers_new.end(), modifier_bitset(card_modifier_type::none), std::bit_and(),
-                    [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
-                ) && any_card_playable_with_modifiers(origin, modifiers_new, index);
+                return any_card_playable_with_modifiers(origin, modifiers_new, index);
             }
         });
     }
