@@ -364,6 +364,33 @@ namespace banggame {
         add_update<game_update_type::status_clear>();
     }
 
+    void game::send_request_status_ready() {
+        if (!m_playing) return;
+        if (m_playing->is_bot()) {
+            request_bot_play(m_playing, false);
+        } else if (m_playing->empty_hand()
+        && std::ranges::none_of(
+            ranges::views::concat(
+                m_playing->m_characters,
+                m_playing->m_table | ranges::views::remove_if(&card::inactive),
+                m_button_row | ranges::views::remove_if([](card *c) { return c->has_tag(tag_type::confirm); }),
+                m_scenario_cards | ranges::views::take_last(1),
+                m_wws_scenario_cards | ranges::views::take_last(1)
+            ),
+            [&](card *origin_card) {
+                return is_possible_to_play(m_playing, origin_card);
+            }
+        )
+        && std::ranges::none_of(
+            m_shop_selection,
+            [&](card *origin_card) {
+                return m_playing->m_gold >= origin_card->buy_cost();
+            }
+        )) {
+            m_playing->pass_turn();
+        }
+    }
+
     void game::send_request_update() {
         auto spectator_target = update_target::excludes_public();
         for (player *p : m_players) {

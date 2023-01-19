@@ -33,6 +33,7 @@ namespace banggame {
         request_status_args make_request_update(player *p);
 
         void send_request_status_clear();
+        void send_request_status_ready();
         void send_request_update();
 
         void start_next_turn();

@@ -34,8 +34,8 @@ namespace banggame {
             std::invoke(fun);
             --m_lock_updates;
             update_request();
-        } else if (m_game->m_playing && m_game->m_playing->is_bot()) {
-            m_game->request_bot_play(m_game->m_playing, false);
+        } else {
+            m_game->send_request_status_ready();
         }
     }
 
