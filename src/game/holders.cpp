@@ -71,16 +71,31 @@ namespace banggame {
         return visit_effect([=](auto &&value) -> game_string {
             switch (target.index()) {
             case 0:
+                if constexpr (requires { value.on_check_target(origin_card, origin); }) {
+                    if (origin->is_bot() && !value.on_check_target(origin_card, origin)) {
+                        return "BOT_BAD_PLAY";
+                    }
+                }
                 if constexpr (requires { value.on_prompt(origin_card, origin); }) {
                     return value.on_prompt(origin_card, origin);
                 }
                 break;
             case 1:
+                if constexpr (requires (player *target_player) { value.on_check_target(origin_card, origin, target_player); }) {
+                    if (origin->is_bot() && !value.on_check_target(origin_card, origin, std::get<player *>(target))) {
+                        return "BOT_BAD_PLAY";
+                    }
+                }
                 if constexpr (requires (player *target_player) { value.on_prompt(origin_card, origin, target_player); }) {
                     return value.on_prompt(origin_card, origin, std::get<player *>(target));
                 }
                 break;
             case 2:
+                if constexpr (requires (card *target_card) { value.on_check_target(origin_card, origin, target_card); }) {
+                    if (origin->is_bot() && !value.on_check_target(origin_card, origin, std::get<card *>(target))) {
+                        return "BOT_BAD_PLAY";
+                    }
+                }
                 if constexpr (requires (card *target_card) { value.on_prompt(origin_card, origin, target_card); }) {
                     return value.on_prompt(origin_card, origin, std::get<card *>(target));
                 }
@@ -118,6 +133,11 @@ namespace banggame {
 
     game_string equip_holder::on_prompt(player *origin, card *target_card, player *target) const {
         return visit_effect([=](auto &&value) -> game_string {
+            if constexpr (requires { value.on_check_target(target_card, origin, target); }) {
+                if (origin->is_bot() && !value.on_check_target(target_card, origin, target)) {
+                    return "BOT_BAD_PLAY";
+                }
+            }
             if constexpr (requires { value.on_prompt(origin, target_card, target); }) {
                 return value.on_prompt(origin, target_card, target);
             }
@@ -197,6 +217,11 @@ namespace banggame {
         return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
+                if constexpr (requires { mth_unwrapper{&handler_type::on_check_target}; }) {
+                    if (origin->is_bot() && !mth_unwrapper{&handler_type::on_check_target}(origin_card, origin, targets)) {
+                        return "BOT_BAD_PLAY";
+                    }
+                }
                 if constexpr (requires { mth_unwrapper{&handler_type::on_prompt}; }) {
                     return mth_unwrapper{&handler_type::on_prompt}(origin_card, origin, targets);
                 }

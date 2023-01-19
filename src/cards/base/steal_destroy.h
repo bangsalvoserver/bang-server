@@ -2,6 +2,7 @@
 #define __BASE_STEAL_DESTROY_H__
 
 #include "cards/card_effect.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
     
@@ -9,7 +10,7 @@ namespace banggame {
         game_string on_prompt(card *origin_card, player *origin, card *target);
     };
 
-    struct effect_steal : prompt_target_self {
+    struct effect_steal : prompt_target_self, bot_suggestion::target_enemy {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };
@@ -18,7 +19,7 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, card *target);
     };
 
-    struct effect_destroy: prompt_target_self {
+    struct effect_destroy: prompt_target_self, bot_suggestion::target_enemy {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };

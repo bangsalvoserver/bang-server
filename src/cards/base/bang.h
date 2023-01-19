@@ -2,18 +2,22 @@
 #define __BASE_BANG_H__
 
 #include "cards/card_effect.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
     
-    struct effect_bang {
+    struct effect_bang : bot_suggestion::target_enemy {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
 
-    struct effect_bangcard {
+    struct effect_bangcard : bot_suggestion::target_enemy {
         void on_play(card *origin_card, player *origin, player *target);
     };
 
     struct handler_play_as_bang {
+        bool on_check_target(card *origin_card, player *origin, card *chosen_card, player *target) {
+            return bot_suggestion::target_enemy{}.on_check_target(origin_card, origin, target);
+        }
         void on_play(card *origin_card, player *origin, card *chosen_card, player *target);
     };
 

@@ -2,6 +2,7 @@
 #define __ARMEDANDDANGEROUS_BOMB_H__
 
 #include "cards/card_effect.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -11,7 +12,7 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target);
     };
     
-    struct equip_bomb {
+    struct equip_bomb : bot_suggestion::target_enemy {
         void on_equip(card *target_card, player *target);
         void on_unequip(card *target_card, player *target);
     };
