@@ -20,7 +20,7 @@ namespace banggame::bot_suggestion {
                     || role == player_role::deputy;
             }, &player::m_role);
             if (num_outlaws == 0 && num_sheriff_or_deputy == 0) {
-                if (std::ranges::distance(alive_players) == 1) {
+                if (std::ranges::distance(alive_players) <= 2) {
                     return target->m_role == player_role::sheriff;
                 } else {
                     return target->m_role == player_role::renegade;
@@ -34,11 +34,11 @@ namespace banggame::bot_suggestion {
             }
         }
         case player_role::outlaw_3p:
-            return target->m_role == player_role::deputy_3p;
+            return origin->m_game->num_alive() <= 2 || target->m_role == player_role::deputy_3p;
         case player_role::deputy_3p:
-            return target->m_role == player_role::renegade_3p;
+            return origin->m_game->num_alive() <= 2 || target->m_role == player_role::renegade_3p;
         case player_role::renegade_3p:
-            return target->m_role == player_role::outlaw_3p;
+            return origin->m_game->num_alive() <= 2 || target->m_role == player_role::outlaw_3p;
         default:
             return true;
         }
