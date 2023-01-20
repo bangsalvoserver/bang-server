@@ -1,6 +1,7 @@
 #include "tumbleweed.h"
 
 #include "game/game.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -56,12 +57,14 @@ namespace banggame {
         });
     }
 
+    bool effect_tumbleweed::on_check_target(card *origin_card, player *origin) {
+        auto &req = origin->m_game->top_request().get<request_tumbleweed>();
+        return bot_suggestion::target_friend{}.on_check_target(origin_card, origin, req.origin)
+            != origin->m_game->m_current_check.check(req.drawn_card);
+    }
+
     bool effect_tumbleweed::can_respond(card *origin_card, player *origin) {
-        if (auto *req = origin->m_game->top_request_if<request_tumbleweed>(origin)) {
-            return !origin->is_bot()
-                || ((req->origin == origin) != origin->m_game->m_current_check.check(req->drawn_card));
-        }
-        return false;
+        return origin->m_game->top_request_is<request_tumbleweed>(origin);
     }
 
     void effect_tumbleweed::on_play(card *origin_card, player *origin) {
