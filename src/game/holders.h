@@ -8,8 +8,6 @@
 #include "cards/card_effect.h"
 
 namespace banggame {
-
-    using target_variant = std::variant<std::monostate, player *, card *>;
     
     DEFINE_STRUCT(effect_holder,
         (target_type, target)
@@ -19,9 +17,17 @@ namespace banggame {
         (int8_t, target_value)
         (effect_type, type),
 
-        verify_result verify(card *origin_card, player *origin, const target_variant &target = {}) const;
-        game_string on_prompt(card *origin_card, player *origin, const target_variant &target = {}) const;
-        void on_play(card *origin_card, player *origin, const target_variant &target = {}, effect_flags flags = {}) const;
+        verify_result verify(card *origin_card, player *origin) const;
+        game_string on_prompt(card *origin_card, player *origin) const;
+        void on_play(card *origin_card, player *origin, effect_flags flags = {}) const;
+
+        verify_result verify(card *origin_card, player *origin, player *target) const;
+        game_string on_prompt(card *origin_card, player *origin, player *target) const;
+        void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {}) const;
+        
+        verify_result verify(card *origin_card, player *origin, card *target) const;
+        game_string on_prompt(card *origin_card, player *origin, card *target) const;
+        void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {}) const;
     )
     
     DEFINE_STRUCT(equip_holder,
