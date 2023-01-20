@@ -13,22 +13,27 @@ namespace banggame::bot_suggestion {
             return target->m_role == player_role::outlaw
                 || target->m_role == player_role::renegade;
         case player_role::renegade: {
-            auto alive_players = origin->m_game->m_players | std::views::filter(&player::alive);
-            auto num_outlaws = std::ranges::count(alive_players, player_role::outlaw, &player::m_role);
-            auto num_sheriff_or_deputy = std::ranges::count_if(alive_players, [](player_role role) {
+            auto targets = std::ranges::filter_view(origin->m_game->m_players, [origin](player *p) {
+                return p != origin && p->alive();
+            });
+            auto num_outlaws = std::ranges::count_if(targets, [](player_role role) {
+                return role == player_role::outlaw
+                    || role == player_role::renegade;
+            }, &player::m_role);
+            auto num_sheriff_or_deputy = std::ranges::count_if(targets, [](player_role role) {
                 return role == player_role::sheriff
                     || role == player_role::deputy;
             }, &player::m_role);
-            if (num_outlaws == 0 && num_sheriff_or_deputy == 0) {
-                if (std::ranges::distance(alive_players) <= 2) {
+            if (num_outlaws > num_sheriff_or_deputy) {
+                return target->m_role == player_role::outlaw
+                    || target->m_role == player_role::renegade
+                    && origin != target;
+            } else if (num_outlaws < num_sheriff_or_deputy) {
+                if (num_outlaws == 0) {
                     return target->m_role == player_role::sheriff;
                 } else {
-                    return target->m_role == player_role::renegade;
+                    return target->m_role == player_role::deputy;
                 }
-            } else if (num_outlaws > num_sheriff_or_deputy) {
-                return target->m_role == player_role::outlaw;
-            } else if (num_outlaws < num_sheriff_or_deputy) {
-                return target->m_role == player_role::deputy;
             } else {
                 return true;
             }
