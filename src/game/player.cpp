@@ -243,7 +243,6 @@ namespace banggame {
 
     void player::add_played_card(card *origin_card, std::vector<card *> modifiers) {
         m_played_cards.emplace_back(origin_card, modifiers | ranges::to<std::vector<card_pocket_pair>>);
-        m_game->add_update<game_update_type::last_played_card>(update_target::includes_private(this), origin_card);
     }
 
     card *player::get_last_played_card() const {

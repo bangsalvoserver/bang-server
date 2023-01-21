@@ -228,7 +228,6 @@ namespace banggame {
         (tap_card, tap_card_update)
         (flash_card, flash_card_update)
         (short_pause, short_pause_update)
-        (last_played_card, serial::opt_card)
         (player_add, player_add_update)
         (player_order, player_order_update)
         (player_user, player_user_update)
