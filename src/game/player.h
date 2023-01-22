@@ -125,7 +125,7 @@ namespace banggame {
         void move_cubes(card *origin, card *target, int ncubes);
         void drop_all_cubes(card *target);
 
-        bool can_escape(player *origin, card *origin_card, effect_flags flags) const;
+        int can_escape(player *origin, card *origin_card, effect_flags flags) const;
         
         void add_to_hand(card *card);
         void add_to_hand_phase_one(card *card);

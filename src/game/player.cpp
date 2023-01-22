@@ -134,8 +134,8 @@ namespace banggame {
         return m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, false);
     }
 
-    bool player::can_escape(player *origin, card *origin_card, effect_flags flags) const {
-        return m_game->call_event<event_type::apply_escapable_modifier>(origin_card, origin, this, flags, false);
+    int player::can_escape(player *origin, card *origin_card, effect_flags flags) const {
+        return m_game->call_event<event_type::apply_escapable_modifier>(origin_card, origin, this, flags, 0);
     }
     
     void player::add_cubes(card *target, int ncubes) {

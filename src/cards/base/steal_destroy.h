@@ -39,6 +39,9 @@ namespace banggame {
             }
         };
 
+        timer_targeting m_timer{this};
+        request_timer *timer() override { return &m_timer; }
+
         void on_update() override;
 
         void on_resolve() final;

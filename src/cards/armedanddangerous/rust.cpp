@@ -27,8 +27,12 @@ namespace banggame {
         request_timer *timer() override { return &m_timer; }
 
         void on_update() override {
-            if (target->empty_hand() || !target->can_escape(origin, origin_card, flags)) {
+            switch (target->can_escape(origin, origin_card, flags)) {
+            case 0:
                 auto_respond();
+                break;
+            case 2:
+                m_timer.disable();
             }
         }
 

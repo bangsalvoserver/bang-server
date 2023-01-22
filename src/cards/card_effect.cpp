@@ -34,7 +34,7 @@ namespace banggame {
     }
 
     void request_timer::tick(request_queue *queue) {
-        if (request->sent && --lifetime <= ticks{0}) {
+        if (enabled() && request->sent && --lifetime <= ticks{0}) {
             queue->invoke_action([&]{
                 queue->pop_request();
                 on_finished();

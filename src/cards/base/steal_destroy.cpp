@@ -15,8 +15,17 @@ namespace banggame {
         : request_timer(request, request->target->m_game->m_options.escape_timer) {}
 
     void request_targeting::on_update() {
-        if (origin == target_card->owner || target->empty_hand() || !target->can_escape(origin, origin_card, flags)) {
+        switch (target->can_escape(origin, origin_card, flags)) {
+        case 1:
+            if (origin != target_card->owner) {
+                break;
+            }
+            [[fallthrough]];
+        case 0:
             auto_respond();
+            break;
+        case 2:
+            m_timer.disable();
         }
     }
 
@@ -49,9 +58,6 @@ namespace banggame {
 
     struct request_steal : request_targeting {
         using request_targeting::request_targeting;
-
-        timer_targeting m_timer{this};
-        request_timer *timer() override { return &m_timer; }
 
         void on_resolve_target() override {
             effect_steal{}.on_resolve(origin_card, origin, target_card);
@@ -118,9 +124,6 @@ namespace banggame {
     
     struct request_destroy : request_targeting {
         using request_targeting::request_targeting;
-
-        timer_targeting m_timer{this};
-        request_timer *timer() override { return &m_timer; }
 
         void on_resolve_target() override {
             effect_destroy{}.on_resolve(origin_card, origin, target_card);

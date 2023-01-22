@@ -9,6 +9,8 @@ namespace banggame {
     struct request_ricochet : request_targeting, missable_request {
         using request_targeting::request_targeting;
 
+        request_timer *timer() override { return nullptr; }
+
         void on_update() override {
             if (target->empty_hand()) {
                 auto_respond();

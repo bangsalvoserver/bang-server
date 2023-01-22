@@ -49,6 +49,9 @@ namespace banggame {
         void start(ticks total_update_time);
         void tick(request_queue *queue);
 
+        void disable() { request = nullptr; }
+        bool enabled() const { return request != nullptr; }
+
         virtual void on_finished() {}
     };
 
