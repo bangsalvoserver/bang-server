@@ -89,10 +89,7 @@ namespace banggame {
         }
 
         auto operator()(enums::enum_tag_t<target_type::cards_other_players>) const {
-            return origin->m_game->m_players
-                | ranges::views::filter([&](player *target) {
-                    return target != origin && target->alive();
-                })
+            return range_other_players(origin)
                 | ranges::views::transform([](player *target) {
                     return ranges::views::concat(
                         target->m_table | ranges::views::remove_if(&card::is_black),

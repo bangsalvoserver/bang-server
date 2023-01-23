@@ -78,12 +78,20 @@ private:
     int m_cycle = 0;
 };
 
+auto alive_player_iterator (auto it) {
+    if ((*it)->alive()) {
+        return it;
+    } else {
+        return std::prev(std::next(it));
+    }
+}
+
 inline auto range_all_players(player *begin, int cycles = 1) {
-    return ranges::subrange(cycle_player_iterator(begin), cycle_player_iterator(begin, cycles));
+    return ranges::subrange(cycle_player_iterator(begin), alive_player_iterator(cycle_player_iterator(begin, cycles)));
 }
 
 inline auto range_other_players(player *begin) {
-    return ranges::subrange(std::next(player_iterator(begin)), player_iterator(begin));
+    return ranges::subrange(std::next(player_iterator(begin)), alive_player_iterator(player_iterator(begin)));
 }
 
 }

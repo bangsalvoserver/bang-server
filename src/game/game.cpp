@@ -515,7 +515,7 @@ namespace banggame {
 
         queue_action([this, killer, target] {
             auto declare_winners = [this](auto &&winners) {
-                for (player *p : m_players) {
+                for (player *p : range_all_players(m_playing)) {
                     if (p->add_player_flags(player_flags::role_revealed)) {
                         add_update<game_update_type::player_show_role>(p, p->m_role);
                     }
