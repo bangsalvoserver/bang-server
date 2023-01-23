@@ -93,7 +93,7 @@ namespace banggame {
 
             if (!is_possible_to_play_impl(origin, target_card, index)) return false;
 
-            if (target_card->modifier_type() == card_modifier_type::none) {
+            if (!target_card->is_modifier()) {
                 return !get_effect_list(target_card, index).empty();
             } else {
                 if (!std::transform_reduce(
@@ -110,7 +110,7 @@ namespace banggame {
     }
 
     bool is_possible_to_play(player *origin, card *origin_card, effect_list_index index) {
-        if (origin_card->modifier_type() == card_modifier_type::none) {
+        if (!origin_card->is_modifier()) {
             if (get_effect_list(origin_card, index).empty()) return false;
         } else {
             if (!any_card_playable_with_modifiers(origin, std::vector{origin_card}, index)) {

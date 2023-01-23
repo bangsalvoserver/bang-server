@@ -18,7 +18,7 @@ namespace banggame {
             card *origin_card = update.respond_cards.front();
             if (origin_card->equips.empty()
                 && origin_card->optionals.empty()
-                && origin_card->modifier_type() == card_modifier_type::none
+                && !origin_card->is_modifier()
                 && std::ranges::all_of(origin_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
             ) {
                 target->m_game->invoke_action([&]{

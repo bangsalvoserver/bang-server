@@ -22,7 +22,7 @@ namespace banggame {
         verify_result result;
         auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
         for (card *mod_card : modifiers) {
-            if (mod_card->modifier_type() == card_modifier_type::none) {
+            if (!mod_card->is_modifier()) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             } else if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return {"ERROR_CARD_DISABLED_BY", mod_card, disabler};
@@ -164,7 +164,7 @@ namespace banggame {
 
         auto &effects = is_response ? playing_card->responses : playing_card->effects;
 
-        if (playing_card->modifier_type() != card_modifier_type::none) {
+        if (playing_card->is_modifier()) {
             return "ERROR_INVALID_MODIFIER_CARD";
         }
         if (effects.empty()) {

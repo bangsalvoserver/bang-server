@@ -42,6 +42,10 @@ namespace banggame {
             return modifier.type;
         }
 
+        bool is_modifier() const {
+            return modifier.type != card_modifier_type::none;
+        }
+
         std::optional<short> get_tag_value(tag_type tag) const {
             if (auto it = std::ranges::find(tags, tag, &tag_holder::type); it != tags.end()) {
                 return it->tag_value;

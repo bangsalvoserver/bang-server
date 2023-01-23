@@ -139,7 +139,7 @@ namespace banggame {
             origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
         )
         | ranges::views::filter([&](card *target_card) {
-            return target_card->modifier_type() == card_modifier_type::none
+            return !target_card->is_modifier()
                 && !ranges::contains(modifiers, target_card)
                 && std::transform_reduce(
                     modifiers.begin(), modifiers.end(), modifier_bitset(target_card->modifier_type()), std::bit_and(),
@@ -166,7 +166,7 @@ namespace banggame {
                     random_element(make_equip_set(origin, origin_card), origin->m_game->rng));
             }
             return verifier;
-        } else if (origin_card->modifier_type() != card_modifier_type::none) {
+        } else if (origin_card->is_modifier()) {
             modifiers.push_back(origin_card);
             origin_card = random_card_playable_with_modifiers(origin, is_response, modifiers);
             if (!origin_card) {
