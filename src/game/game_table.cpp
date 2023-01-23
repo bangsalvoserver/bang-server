@@ -203,7 +203,7 @@ namespace banggame {
         }
     }
 
-    inline auto disablable_cards(game_table *table) {
+    inline auto disableable_cards(game_table *table) {
         struct to_player_card_pair {
             player *p;
             auto operator()(card *c) const { return std::pair{p, c}; }
@@ -217,6 +217,7 @@ namespace banggame {
                 | ranges::views::take_last(1)
                 | ranges::views::transform(to_player_card_pair{table->m_wws_scenario_holder}),
             table->m_players
+                | ranges::views::filter(&player::alive)
                 | ranges::views::for_each([](player *p) {
                     return ranges::views::concat(p->m_table, p->m_characters)
                         | ranges::views::transform(to_player_card_pair{p});
@@ -225,7 +226,7 @@ namespace banggame {
     }
 
     void game_table::add_disabler(event_card_key key, card_disabler_fun &&fun) {
-        for (auto [owner, c] : disablable_cards(this)) {
+        for (auto [owner, c] : disableable_cards(this)) {
             if (!is_disabled(c) && fun(c)) {
                 c->on_disable(owner);
             }
@@ -235,7 +236,7 @@ namespace banggame {
     }
 
     void game_table::remove_disablers(event_card_key key) {
-        for (auto [owner, c] : disablable_cards(this)) {
+        for (auto [owner, c] : disableable_cards(this)) {
             bool a = false;
             bool b = false;
             for (const auto &[t, fun] : m_disablers) {
