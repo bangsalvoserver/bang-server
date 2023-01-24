@@ -15,24 +15,6 @@ namespace banggame {
         }
     }
 
-    card *random_card_of_pocket(const auto &range, auto &rng, pocket_type pocket, std::same_as<pocket_type> auto ... rest) {
-        if (auto filter = range | std::views::filter([&](card *c) { return c->pocket == pocket; })) {
-            return random_element(filter, rng);
-        } else if constexpr (sizeof...(rest) != 0) {
-            if (card *c = random_card_of_pocket(range, rng, rest...)) {
-                return c;
-            } else if (auto filter = range | std::views::filter([&](card *c) {
-                return c->pocket != pocket && ((c->pocket != rest) && ... && true);
-            })) {
-                return random_element(filter, rng);
-            } else {
-                return nullptr;
-            }
-        } else {
-            return nullptr;
-        }
-    }
-
     struct random_target_visitor {
         player *origin;
         card *origin_card;
@@ -187,24 +169,33 @@ namespace banggame {
         }
     }
 
-    static bool generate_random_play_impl(player *origin, bool is_response, std::ranges::range auto &&cards, std::same_as<pocket_type> auto ... pockets) {
-        auto card_set = ranges::to<std::set>(FWD(cards));
-        while (!card_set.empty()) {
-            card *origin_card = random_card_of_pocket(card_set, origin->m_game->rng, pockets ...);
+    static bool generate_random_play_impl(player *origin, bool is_response, std::set<card *> const& cards, std::initializer_list<pocket_type> pockets) {
+        for (int i=0; i<10; ++i) {
+            std::set<card *> card_set = cards;
+            while (!card_set.empty()) {
+                card *origin_card = [&]{
+                    for (pocket_type pocket : pockets) {
+                        if (auto filter = card_set | std::views::filter([&](card *c) { return c->pocket == pocket; })) {
+                            return random_element(filter, origin->m_game->rng);
+                        }
+                    }
+                    return random_element(card_set, origin->m_game->rng);
+                }();
 
-            card_set.erase(origin_card);
-            auto verifier = generate_random_play(origin, origin_card, is_response);
+                card_set.erase(origin_card);
+                auto verifier = generate_random_play(origin, origin_card, is_response);
 
-            if (verifier.origin_card && !verifier.verify_and_play()) {
-                if (auto &prompt = origin->m_prompt) {
-                    auto fun = std::move(prompt->first);
-                    prompt.reset();
-                    if (card_set.empty()) {
-                        origin->m_game->invoke_action(std::move(fun));
+                if (verifier.origin_card && !verifier.verify_and_play()) {
+                    if (auto &prompt = origin->m_prompt) {
+                        auto fun = std::move(prompt->first);
+                        prompt.reset();
+                        if (card_set.empty() && i>=5) {
+                            origin->m_game->invoke_action(std::move(fun));
+                            return true;
+                        }
+                    } else {
                         return true;
                     }
-                } else {
-                    return true;
                 }
             }
         }
@@ -222,10 +213,12 @@ namespace banggame {
             return true;
         } else if (!update.respond_cards.empty()) {
             return generate_random_play_impl(origin, true,
-                update.respond_cards,
-                pocket_type::player_character,
-                pocket_type::player_table,
-                pocket_type::player_hand
+                ranges::to<std::set<card *>>(update.respond_cards),
+                {
+                    pocket_type::player_character,
+                    pocket_type::player_table,
+                    pocket_type::player_hand
+                }
             );
         }
         return false;
@@ -248,13 +241,16 @@ namespace banggame {
                 } else {
                     return contains_at_least(make_equip_set(origin, target_card), 1);
                 }
-            }),
-            pocket_type::scenario_card,
-            pocket_type::wws_scenario_card,
-            pocket_type::player_table,
-            pocket_type::player_hand,
-            pocket_type::player_character,
-            pocket_type::shop_selection
+            })
+            | ranges::to<std::set>,
+            {
+                pocket_type::scenario_card,
+                pocket_type::wws_scenario_card,
+                pocket_type::player_table,
+                pocket_type::player_hand,
+                pocket_type::player_character,
+                pocket_type::shop_selection
+            }
         );
     }
 
