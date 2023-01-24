@@ -28,7 +28,7 @@ namespace banggame {
                 if (origin->alive()) {
                     origin->draw_card(2 + fatal, origin_card);
                 }
-            }, 4);
+            });
         });
     }
 }

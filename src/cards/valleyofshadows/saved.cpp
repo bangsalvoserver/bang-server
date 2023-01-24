@@ -68,10 +68,10 @@ namespace banggame {
             }
 
             origin->m_game->queue_action([=]{
-                if (saved->alive()) {
+                if (origin->alive() && saved->alive()) {
                     origin->m_game->queue_request<request_saved>(origin_card, origin, saved);
                 }
-            }, 4);
+            });
         });
     }
 }
