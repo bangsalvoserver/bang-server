@@ -78,20 +78,22 @@ private:
     int m_cycle = 0;
 };
 
-auto alive_player_iterator (auto it) {
-    if ((*it)->alive()) {
-        return it;
+inline player *first_alive_player(player *p) {
+    if (p->alive()) {
+        return p;
     } else {
-        return std::prev(std::next(it));
+        return *std::next(player_iterator(p));
     }
 }
 
-inline auto range_all_players(player *begin, int cycles = 1) {
-    return ranges::subrange(cycle_player_iterator(begin), alive_player_iterator(cycle_player_iterator(begin, cycles)));
+inline auto range_all_players(player *p, int cycles = 1) {
+    player *begin = first_alive_player(p);
+    return ranges::subrange(cycle_player_iterator(begin), cycle_player_iterator(begin, cycles));
 }
 
-inline auto range_other_players(player *begin) {
-    return ranges::subrange(std::next(player_iterator(begin)), alive_player_iterator(player_iterator(begin)));
+inline auto range_other_players(player *p) {
+    player *begin = first_alive_player(p);
+    return ranges::subrange(std::next(player_iterator(begin)), player_iterator(begin));
 }
 
 }
