@@ -349,11 +349,16 @@ namespace banggame {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             [[fallthrough]];
-        case pocket_type::shop_selection:
+        case pocket_type::shop_selection: {
+            int cost = ranges::accumulate(modifiers | ranges::views::transform(&card::buy_cost), origin_card->buy_cost());
             if (origin_card->is_brown()) {
                 effect_context ctx;
                 MAYBE_RETURN(verify_card_targets(ctx));
-                int cost = is_response ? 0 : origin_card->buy_cost() + ctx.cost_difference;
+                if (is_response) {
+                    cost = 0;
+                } else if (ctx.discount) {
+                    --cost;
+                }
                 if (origin->m_gold < cost) {
                     return "ERROR_NOT_ENOUGH_GOLD";
                 }
@@ -372,7 +377,7 @@ namespace banggame {
                 effect_context ctx;
                 MAYBE_RETURN(verify_equip_target());
                 MAYBE_RETURN(verify_modifiers(ctx));
-                int cost = origin_card->buy_cost() + ctx.cost_difference;
+                if (ctx.discount) --cost;
                 if (origin->m_gold < cost) {
                     return "ERROR_NOT_ENOUGH_GOLD";
                 }
@@ -396,6 +401,7 @@ namespace banggame {
                 });
             }
             break;
+        }
         default:
             throw std::runtime_error("play_card: invalid card");
         }

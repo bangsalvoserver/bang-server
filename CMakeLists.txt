@@ -99,7 +99,6 @@ set(bangserver_srcs
     src/cards/goldrush/ruleset.cpp
     src/cards/goldrush/rum.cpp
     src/cards/goldrush/sell_beer.cpp
-    src/cards/goldrush/shopchoice.cpp
     src/cards/goldrush/wanted.cpp
 
     src/cards/valleyofshadows/aim.cpp

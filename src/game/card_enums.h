@@ -156,9 +156,9 @@ namespace banggame {
     DEFINE_ENUM_FWD_TYPES(card_modifier_type,
         (none)
         (bangmod)
+        (shopchoice)
         (discount, modifier_discount)
         (leevankliff, modifier_leevankliff)
-        (shopchoice, modifier_shopchoice)
         (belltower, modifier_belltower)
     )
 
@@ -396,7 +396,7 @@ namespace banggame {
     struct effect_context {
         bool ignore_distances = false;
         bool disable_banglimit = false;
-        int cost_difference = 0;
+        bool discount = false;
     };
 
 }
