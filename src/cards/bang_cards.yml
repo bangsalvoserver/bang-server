@@ -867,7 +867,6 @@ main_deck:
       - max_usages(1)
       - pay_cube self_cubes(1)
       - bandolier
-      - banglimit_disabler
   - name: BIG_FIFTY
     signs:
       - Q spades
@@ -1589,8 +1588,6 @@ character:
     image: 06_leevankliff
     expansion: wildwestshow
     modifier: leevankliff
-    effects:
-      - banglimit_disabler
   - name: TEREN_KILL
     image: 06_terenkill
     expansion: wildwestshow

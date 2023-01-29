@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    game_string modifier_leevankliff::verify(card *origin_card, player *origin, card *playing_card) {
+    game_string modifier_leevankliff::verify(card *origin_card, player *origin, card *playing_card, effect_context &ctx) {
         if (origin->m_played_cards.empty()) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
@@ -15,6 +15,8 @@ namespace banggame {
         if (it != modifiers.end()) {
             return {"ERROR_CANNOT_REPEAT_CARD", *it};
         }
+
+        ctx.disable_banglimit = true;
         return {};
     }
 }

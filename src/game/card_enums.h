@@ -181,7 +181,6 @@ namespace banggame {
         (bang,                  effect_bang)
         (bangcard,              effect_bangcard)
         (banglimit,             effect_banglimit)
-        (banglimit_disabler,    effect_banglimit_disabler)
         (missed,                effect_missed)
         (barrel,                effect_barrel)
         (discard,               effect_discard)

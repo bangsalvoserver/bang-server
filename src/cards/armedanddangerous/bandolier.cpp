@@ -4,6 +4,11 @@
 
 namespace banggame {
 
+    game_string effect_bandolier::verify(card *origin_card, player *origin, effect_context &ctx) {
+        ctx.disable_banglimit = true;
+        return {};
+    }
+
     game_string effect_bandolier::on_prompt(card *origin_card, player *origin) {
         if (origin->get_bangs_played() == 0) {
             return {"PROMPT_NO_BANGS_PLAYED", origin_card};

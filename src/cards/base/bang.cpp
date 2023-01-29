@@ -51,11 +51,6 @@ namespace banggame {
             }
         });
     }
-
-    game_string effect_banglimit_disabler::verify(card *origin_card, player *origin, effect_context &ctx) {
-        ctx.disable_banglimit = true;
-        return {};
-    }
     
     bool request_bang::can_miss(card *c) const {
         return !unavoidable && missable_request::can_miss(c);
