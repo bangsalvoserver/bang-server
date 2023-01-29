@@ -393,6 +393,12 @@ namespace banggame {
         (bronco)
     )
 
+    struct effect_context {
+        bool ignore_distances = false;
+        bool disable_banglimit = false;
+        int cost_difference = 0;
+    };
+
 }
 
 #endif

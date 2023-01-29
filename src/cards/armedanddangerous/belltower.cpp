@@ -3,26 +3,6 @@
 #include "game/game.h"
 
 namespace banggame {
-    
-    struct belltower_obj : verify_modifier {
-        belltower_obj(card *origin_card, player *origin)
-            : key(origin_card, -1)
-            , origin(origin)
-        {
-            origin->m_game->add_listener<event_type::apply_distance_modifier>(key, [=](player *p, int &value) {
-                if (p == origin) {
-                    value = 1;
-                }
-            });
-        }
-
-        ~belltower_obj() {
-            origin->m_game->remove_listeners(key);
-        }
-
-        event_card_key key;
-        player *origin;
-    };
 
     game_string modifier_belltower::on_prompt(card *origin_card, player *origin, card *playing_card) {
         if (playing_card->effects.empty() || std::ranges::none_of(playing_card->effects, [](const effect_holder &holder) {
@@ -34,7 +14,8 @@ namespace banggame {
         }
     }
 
-    verify_result modifier_belltower::verify(card *origin_card, player *origin, card *playing_card) {
-        return {std::in_place_type<belltower_obj>, origin_card, origin};
+    game_string modifier_belltower::verify(card *origin_card, player *origin, card *playing_card, effect_context &ctx) {
+        ctx.ignore_distances = true;
+        return {};
     }
 }

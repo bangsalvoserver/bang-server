@@ -25,7 +25,7 @@ namespace banggame::filter_impl {
     }
 
     int get_distance(player *origin, player *target) {
-        return origin->m_game->call_event<event_type::apply_distance_modifier>(origin, origin->m_game->calc_distance(origin, target));
+        return origin->m_game->calc_distance(origin, target);
     }
 
     bool is_bangcard(player *origin, card *target) {

@@ -28,7 +28,7 @@ namespace banggame {
         bool is_cube_slot(card_ptr target);
     }
 
-    inline const char *check_player_filter(filter_impl::player_ptr origin, target_player_filter filter, filter_impl::player_ptr target) {
+    inline const char *check_player_filter(filter_impl::player_ptr origin, target_player_filter filter, filter_impl::player_ptr target, const effect_context &ctx = {}) {
         if (bool(filter & target_player_filter::dead)) {
             if (filter_impl::get_player_hp(target) > 0) return "ERROR_TARGET_NOT_DEAD";
         } else if (!filter_impl::is_player_alive(target)) {
@@ -44,7 +44,7 @@ namespace banggame {
         if (bool(filter & target_player_filter::notsheriff) && filter_impl::get_player_role(target) == player_role::sheriff)
             return "ERROR_TARGET_SHERIFF";
 
-        if (bool(filter & (target_player_filter::reachable | target_player_filter::range_1 | target_player_filter::range_2))) {
+        if (!ctx.ignore_distances && bool(filter & (target_player_filter::reachable | target_player_filter::range_1 | target_player_filter::range_2))) {
             int range = filter_impl::get_player_range_mod(origin);
             if (bool(filter & target_player_filter::reachable)) {
                 range += filter_impl::get_player_weapon_range(origin);
@@ -61,7 +61,7 @@ namespace banggame {
         return nullptr;
     }
 
-    inline const char *check_card_filter(filter_impl::card_ptr origin_card, filter_impl::player_ptr origin, target_card_filter filter, filter_impl::card_ptr target) {
+    inline const char *check_card_filter(filter_impl::card_ptr origin_card, filter_impl::player_ptr origin, target_card_filter filter, filter_impl::card_ptr target, const effect_context &ctx = {}) {
         if (!bool(filter & target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";
         

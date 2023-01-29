@@ -22,12 +22,12 @@ namespace banggame {
     };
 
     struct effect_banglimit {
-        game_string verify(card *origin_card, player *origin);
+        game_string verify(card *origin_card, player *origin, const effect_context &ctx);
         void on_play(card *origin_card, player *origin);
     };
 
     struct effect_banglimit_disabler {
-        verify_result verify(card *origin_card, player *origin);
+        game_string verify(card *origin_card, player *origin, effect_context &ctx);
     };
 
     class missable_request {

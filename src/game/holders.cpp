@@ -41,9 +41,11 @@ namespace banggame {
         }, holder.type);
     }
 
-    verify_result effect_holder::verify(card *origin_card, player *origin) const {
-        return visit_effect([=](auto &&value) -> verify_result {
-            if constexpr (requires { value.verify(origin_card, origin); }) {
+    game_string effect_holder::verify(card *origin_card, player *origin, effect_context &ctx) const {
+        return visit_effect([&](auto &&value) -> game_string {
+            if constexpr (requires { value.verify(origin_card, origin, ctx); }) {
+                return value.verify(origin_card, origin, ctx);
+            } else if constexpr (requires { value.verify(origin_card, origin); }) {
                 return value.verify(origin_card, origin);
             } else if constexpr (requires { value.can_respond(origin_card, origin); }) {
                 if (!value.can_respond(origin_card, origin)) {
@@ -55,7 +57,7 @@ namespace banggame {
     }
 
     game_string effect_holder::on_prompt(card *origin_card, player *origin) const {
-        return visit_effect([=](auto &&value) -> game_string {
+        return visit_effect([&](auto &&value) -> game_string {
             if constexpr (requires { value.on_check_target(origin_card, origin); }) {
                 if (origin->is_bot() && !value.on_check_target(origin_card, origin)) {
                     return "BOT_BAD_PLAY";
@@ -69,7 +71,7 @@ namespace banggame {
     }
 
     void effect_holder::on_play(card *origin_card, player *origin, effect_flags flags) const {
-        visit_effect([=](auto &&value) {
+        visit_effect([&](auto &&value) {
             if constexpr (requires { value.on_play(origin_card, origin, flags); }) {
                 value.on_play(origin_card, origin, flags);
             } else if constexpr (requires { value.on_play(origin_card, origin); }) {
@@ -78,9 +80,11 @@ namespace banggame {
         }, *this);
     }
 
-    verify_result effect_holder::verify(card *origin_card, player *origin, player *target) const {
-        return visit_effect([=](auto &&value) -> verify_result {
-            if constexpr (requires { value.verify(origin_card, origin, target); }) {
+    game_string effect_holder::verify(card *origin_card, player *origin, player *target, effect_context &ctx) const {
+        return visit_effect([&](auto &&value) -> game_string {
+            if constexpr (requires { value.verify(origin_card, origin, target, ctx); }) {
+                return value.verify(origin_card, origin, target, ctx);
+            } else if constexpr (requires { value.verify(origin_card, origin, target); }) {
                 return value.verify(origin_card, origin, target);
             }
             return {};
@@ -88,7 +92,7 @@ namespace banggame {
     }
 
     game_string effect_holder::on_prompt(card *origin_card, player *origin, player *target) const {
-        return visit_effect([=](auto &&value) -> game_string {
+        return visit_effect([&](auto &&value) -> game_string {
             if constexpr (requires { value.on_check_target(origin_card, origin, target); }) {
                 if (origin->is_bot() && !value.on_check_target(origin_card, origin, target)) {
                     return "BOT_BAD_PLAY";
@@ -102,7 +106,7 @@ namespace banggame {
     }
 
     void effect_holder::on_play(card *origin_card, player *origin, player *target, effect_flags flags) const {
-        visit_effect([=](auto &&value) {
+        visit_effect([&](auto &&value) {
             if constexpr (requires { value.on_play(origin_card, origin, target, flags); }) {
                 value.on_play(origin_card, origin, target, flags);
             } else if constexpr (requires { value.on_play(origin_card, origin, target); }) {
@@ -111,9 +115,11 @@ namespace banggame {
         }, *this);
     }
 
-    verify_result effect_holder::verify(card *origin_card, player *origin, card *target) const {
-        return visit_effect([=](auto &&value) -> verify_result {
-            if constexpr (requires { value.verify(origin_card, origin, target); }) {
+    game_string effect_holder::verify(card *origin_card, player *origin, card *target, effect_context &ctx) const {
+        return visit_effect([&](auto &&value) -> game_string {
+            if constexpr (requires { value.verify(origin_card, origin, target, ctx); }) {
+                return value.verify(origin_card, origin, target, ctx);
+            } else if constexpr (requires { value.verify(origin_card, origin, target); }) {
                 return value.verify(origin_card, origin, target);
             }
             return {};
@@ -121,7 +127,7 @@ namespace banggame {
     }
 
     game_string effect_holder::on_prompt(card *origin_card, player *origin, card *target) const {
-        return visit_effect([=](auto &&value) -> game_string {
+        return visit_effect([&](auto &&value) -> game_string {
             if constexpr (requires { value.on_check_target(origin_card, origin, target); }) {
                 if (origin->is_bot() && !value.on_check_target(origin_card, origin, target)) {
                     return "BOT_BAD_PLAY";
@@ -135,7 +141,7 @@ namespace banggame {
     }
 
     void effect_holder::on_play(card *origin_card, player *origin, card *target, effect_flags flags) const {
-        visit_effect([=](auto &&value) {
+        visit_effect([&](auto &&value) {
             if constexpr (requires { value.on_play(origin_card, origin, target, flags); }) {
                 value.on_play(origin_card, origin, target, flags);
             } else if constexpr (requires { value.on_play(origin_card, origin, target); }) {
@@ -145,7 +151,7 @@ namespace banggame {
     }
 
     game_string equip_holder::on_prompt(player *origin, card *target_card, player *target) const {
-        return visit_effect([=](auto &&value) -> game_string {
+        return visit_effect([&](auto &&value) -> game_string {
             if constexpr (requires { value.on_check_target(target_card, origin, target); }) {
                 if (origin->is_bot() && !value.on_check_target(target_card, origin, target)) {
                     return "BOT_BAD_PLAY";
@@ -159,7 +165,7 @@ namespace banggame {
     }
 
     void equip_holder::on_equip(card *target_card, player *target) const {
-        visit_effect([=](auto &&value) {
+        visit_effect([&](auto &&value) {
             if constexpr (requires { value.on_equip(target_card, target); }) {
                 value.on_equip(target_card, target);
             }
@@ -167,7 +173,7 @@ namespace banggame {
     }
 
     void equip_holder::on_enable(card *target_card, player *target) const {
-        visit_effect([=](auto &&value) {
+        visit_effect([&](auto &&value) {
             if constexpr (requires { value.on_enable(target_card, target); }) {
                 value.on_enable(target_card, target);
             }
@@ -175,7 +181,7 @@ namespace banggame {
     }
 
     void equip_holder::on_disable(card *target_card, player *target) const {
-        visit_effect([=](auto &&value) {
+        visit_effect([&](auto &&value) {
             if constexpr (requires { value.on_disable(target_card, target); }) {
                 value.on_disable(target_card, target);
             }
@@ -183,7 +189,7 @@ namespace banggame {
     }
 
     void equip_holder::on_unequip(card *target_card, player *target) const {
-        visit_effect([=](auto &&value) {
+        visit_effect([&](auto &&value) {
             if constexpr (requires { value.on_unequip(target_card, target); }) {
                 value.on_unequip(target_card, target);
             }
@@ -202,11 +208,13 @@ namespace banggame {
         }, type);
     }
 
-    verify_result modifier_holder::verify(card *origin_card, player *origin, card *playing_card) const {
-        return enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) -> verify_result {
+    game_string modifier_holder::verify(card *origin_card, player *origin, card *playing_card, effect_context &ctx) const {
+        return enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;
-                if constexpr (requires { handler.verify(origin_card, origin, playing_card); }) {
+                if constexpr (requires { handler.verify(origin_card, origin, playing_card, ctx); }) {
+                    return handler.verify(origin_card, origin, playing_card, ctx);
+                } else if constexpr (requires { handler.verify(origin_card, origin, playing_card); }) {
                     return handler.verify(origin_card, origin, playing_card);
                 }
             }
@@ -214,8 +222,8 @@ namespace banggame {
         }, type);
     }
 
-    verify_result mth_holder::verify(card *origin_card, player *origin, const target_list &targets) const {
-        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> verify_result {
+    game_string mth_holder::verify(card *origin_card, player *origin, const target_list &targets) const {
+        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
                 if constexpr (requires { mth_unwrapper{&handler_type::verify}; }) {

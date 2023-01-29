@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_forced_play {
-        verify_result verify(card *origin_card, player *origin);
+        game_string verify(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 

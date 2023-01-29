@@ -17,15 +17,15 @@ namespace banggame {
         (int8_t, target_value)
         (effect_type, type),
 
-        verify_result verify(card *origin_card, player *origin) const;
+        game_string verify(card *origin_card, player *origin, effect_context &ctx) const;
         game_string on_prompt(card *origin_card, player *origin) const;
         void on_play(card *origin_card, player *origin, effect_flags flags = {}) const;
 
-        verify_result verify(card *origin_card, player *origin, player *target) const;
+        game_string verify(card *origin_card, player *origin, player *target, effect_context &ctx) const;
         game_string on_prompt(card *origin_card, player *origin, player *target) const;
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {}) const;
         
-        verify_result verify(card *origin_card, player *origin, card *target) const;
+        game_string verify(card *origin_card, player *origin, card *target, effect_context &ctx) const;
         game_string on_prompt(card *origin_card, player *origin, card *target) const;
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {}) const;
     )
@@ -45,13 +45,13 @@ namespace banggame {
         (card_modifier_type, type),
         
         game_string on_prompt(card *origin_card, player *origin, card *playing_card) const;
-        verify_result verify(card *origin_card, player *origin, card *playing_card) const;
+        game_string verify(card *origin_card, player *origin, card *playing_card, effect_context &ctx) const;
     )
 
     DEFINE_STRUCT(mth_holder,
         (mth_type, type),
         
-        verify_result verify(card *origin_card, player *origin, const target_list &targets) const;
+        game_string verify(card *origin_card, player *origin, const target_list &targets) const;
         game_string on_prompt(card *origin_card, player *origin, const target_list &targets) const;
         void on_play(card *origin_card, player *origin, const target_list &targets) const;
     )

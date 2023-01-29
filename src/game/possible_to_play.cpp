@@ -28,8 +28,9 @@ namespace banggame {
     ranges::any_view<player *> make_player_target_set(player *origin, card *origin_card, effect_holder holder) {
         return origin->m_game->m_players
             | ranges::views::filter([=](player *target) {
-                return !check_player_filter(origin, holder.player_filter, target)
-                    && !holder.verify(origin_card, origin, target);
+                effect_context ctx;
+                return !check_player_filter(origin, holder.player_filter, target, ctx)
+                    && !holder.verify(origin_card, origin, target, ctx);
             });
     }
 
@@ -39,16 +40,18 @@ namespace banggame {
                 return ranges::views::concat(target->m_hand, target->m_table);
             })
             | ranges::views::filter([=](card *target_card) {
-                return !check_card_filter(origin_card, origin, holder.card_filter, target_card)
-                    && !holder.verify(origin_card, origin, target_card);
+                effect_context ctx;
+                return !check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
+                    && !holder.verify(origin_card, origin, target_card, ctx);
             });
     }
 
     static bool is_possible_to_play_impl(player *origin, card *origin_card, effect_list_index index) {
         return std::ranges::all_of(get_effect_list(origin_card, index), [&](const effect_holder &holder) {
+            effect_context ctx;
             switch (holder.target) {
             case target_type::none:
-                return !holder.verify(origin_card, origin);
+                return !holder.verify(origin_card, origin, ctx);
             case target_type::player:
                 return contains_at_least(make_player_target_set(origin, origin_card, holder), 1);
             case target_type::card:

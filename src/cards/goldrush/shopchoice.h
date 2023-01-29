@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct modifier_shopchoice {
-        verify_result verify(card *origin_card, player *origin, card *playing_card);
+        game_string verify(card *origin_card, player *origin, card *playing_card, effect_context &ctx);
     };
 }
 

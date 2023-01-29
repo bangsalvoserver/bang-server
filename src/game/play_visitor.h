@@ -26,10 +26,10 @@ namespace banggame {
         const play_card_verify &verifier;
         const effect_holder &effect;
 
-        verify_result verify();
+        game_string verify(effect_context &ctx);
         duplicate_set duplicates();
-        game_string prompt();
-        void play();
+        game_string prompt(const effect_context &ctx);
+        void play(const effect_context &ctx);
     };
 
     template<target_type E> requires (play_card_target::has_type<E>)
@@ -39,10 +39,10 @@ namespace banggame {
         const play_card_verify &verifier;
         const effect_holder &effect;
 
-        verify_result verify(arg_type arg);
+        game_string verify(effect_context &ctx, arg_type arg);
         duplicate_set duplicates(arg_type arg);
-        game_string prompt(arg_type arg);
-        void play(arg_type arg);
+        game_string prompt(const effect_context &ctx, arg_type arg);
+        void play(const effect_context &ctx, arg_type arg);
     };
 
 }

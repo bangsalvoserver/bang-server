@@ -31,8 +31,8 @@ namespace banggame {
         queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
     }
     
-    game_string effect_banglimit::verify(card *origin_card, player *origin) {
-        if (origin->get_bangs_played() >= 1) {
+    game_string effect_banglimit::verify(card *origin_card, player *origin, const effect_context &ctx) {
+        if (!ctx.disable_banglimit && origin->get_bangs_played() >= 1) {
             return "ERROR_ONE_BANG_PER_TURN";
         }
         return {};
@@ -52,28 +52,9 @@ namespace banggame {
         });
     }
 
-    verify_result effect_banglimit_disabler::verify(card *origin_card, player *origin) {
-        struct banglimit_disabler : verify_modifier {
-            banglimit_disabler(card *origin_card, player *origin)
-                : key(origin_card, -1)
-                , origin(origin)
-            {
-                origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](player *p, int &value) {
-                    if (p == origin) {
-                        value = 0;
-                    }
-                });
-            }
-
-            ~banglimit_disabler() {
-                origin->m_game->remove_listeners(key);
-            }
-
-            event_card_key key;
-            player *origin;
-        };
-
-        return {std::in_place_type<banglimit_disabler>, origin_card, origin};
+    game_string effect_banglimit_disabler::verify(card *origin_card, player *origin, effect_context &ctx) {
+        ctx.disable_banglimit = true;
+        return {};
     }
     
     bool request_bang::can_miss(card *c) const {

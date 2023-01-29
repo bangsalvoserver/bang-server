@@ -22,18 +22,18 @@ namespace banggame {
         play_card_verify() = default;
         play_card_verify(player *origin, card *origin_card, bool is_response = false, target_list targets = {}, std::vector<card *> modifiers = {});
 
-        verify_result verify_modifiers() const;
+        game_string verify_modifiers(effect_context &ctx) const;
         game_string verify_duplicates() const;
         game_string verify_equip_target() const;
-        verify_result verify_card_targets() const;
+        game_string verify_card_targets(effect_context &ctx) const;
 
-        game_string check_prompt() const;
+        game_string check_prompt(const effect_context &ctx) const;
         game_string check_prompt_equip() const;
 
         player *get_equip_target() const;
         
         void play_modifiers() const;
-        void do_play_card() const;
+        void do_play_card(const effect_context &ctx) const;
 
         game_string verify_and_play();
     };

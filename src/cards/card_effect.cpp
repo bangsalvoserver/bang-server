@@ -23,7 +23,7 @@ namespace banggame {
             ) {
                 target->m_game->invoke_action([&]{
                     play_card_verify{target, origin_card, true,
-                        target_list{origin_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
+                        target_list{origin_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card({});
                 });
             }
         }

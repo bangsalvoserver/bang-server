@@ -31,6 +31,8 @@ namespace banggame {
             return !format_str.empty();
         }
     )
+    
+    #define MAYBE_RETURN(...) if (auto value_ = __VA_ARGS__) return value_
 }
 
 #endif

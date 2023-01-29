@@ -53,10 +53,6 @@ namespace banggame {
         return m_game->call_event<event_type::count_cards_to_draw>(this, 2);
     }
 
-    int player::get_card_cost(card *origin_card) {
-        return m_game->call_event<event_type::apply_cost_modifier>(this, origin_card, origin_card->buy_cost());
-    }
-
     card *player::find_equipped_card(card *card) {
         auto it = std::ranges::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {
