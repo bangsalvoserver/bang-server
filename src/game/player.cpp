@@ -323,7 +323,7 @@ namespace banggame {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         }
-        return play_card_verify{this, args.card, args.is_response, args.targets, ranges::to<std::vector<card *>>(args.modifiers)}.verify_and_play();
+        return play_card_verify{this, args.card, args.is_response, args.targets, args.modifiers}.verify_and_play();
     }
 
     void player::prompt_then(game_string &&message, std::function<void()> &&fun) {

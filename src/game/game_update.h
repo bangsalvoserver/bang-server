@@ -246,9 +246,14 @@ namespace banggame {
     using game_update = enums::enum_variant<game_update_type>;
     #define UPD_TAG(name) enums::enum_tag_t<game_update_type::name>
 
+    DEFINE_STRUCT(modifier_pair,
+        (serial::card, card)
+        (target_list, targets)
+    )
+
     DEFINE_STRUCT(play_card_args,
         (serial::card, card)
-        (std::vector<serial::card>, modifiers)
+        (std::vector<modifier_pair>, modifiers)
         (target_list, targets)
         (bool, is_response)
     )

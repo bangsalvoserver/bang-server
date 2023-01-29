@@ -17,10 +17,12 @@ namespace banggame {
         card *playing_card;
         bool is_response;
         target_list targets;
-        std::vector<card *> modifiers;
+        std::vector<modifier_pair> modifiers;
 
         play_card_verify() = default;
-        play_card_verify(player *origin, card *origin_card, bool is_response = false, target_list targets = {}, std::vector<card *> modifiers = {});
+        play_card_verify(player *origin, card *origin_card, bool is_response = false, target_list targets = {}, std::vector<modifier_pair> modifiers = {});
+
+        std::vector<card *> modifier_cards() const;
 
         game_string verify_modifiers(effect_context &ctx) const;
         game_string verify_duplicates() const;
@@ -32,7 +34,7 @@ namespace banggame {
 
         player *get_equip_target() const;
         
-        void play_modifiers() const;
+        void play_modifiers(const effect_context &ctx) const;
         void do_play_card(const effect_context &ctx) const;
 
         game_string verify_and_play();

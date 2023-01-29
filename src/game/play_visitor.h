@@ -23,7 +23,8 @@ namespace banggame {
     using duplicate_set = std::variant<std::monostate, player_set, card_set, card_cube_count>;
 
     template<target_type E> struct play_visitor {
-        const play_card_verify &verifier;
+        player *origin;
+        card *origin_card;
         const effect_holder &effect;
 
         game_string verify(effect_context &ctx);
@@ -36,7 +37,8 @@ namespace banggame {
     struct play_visitor<E> {
         using arg_type = same_if_trivial_t<unwrap_not_null_t<typename play_card_target::value_type<E>>>;
 
-        const play_card_verify &verifier;
+        player *origin;
+        card *origin_card;
         const effect_holder &effect;
 
         game_string verify(effect_context &ctx, arg_type arg);

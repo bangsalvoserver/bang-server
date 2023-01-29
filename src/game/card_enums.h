@@ -396,6 +396,7 @@ namespace banggame {
         bool ignore_distances = false;
         bool disable_banglimit = false;
         bool discount = false;
+        bool repeating = false;
     };
 
 }

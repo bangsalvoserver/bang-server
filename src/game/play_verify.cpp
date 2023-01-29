@@ -10,21 +10,97 @@
 
 namespace banggame {
 
-    play_card_verify::play_card_verify(player *origin, card *origin_card, bool is_response, target_list targets, std::vector<card *> modifiers)
+    play_card_verify::play_card_verify(player *origin, card *origin_card, bool is_response, target_list targets, std::vector<modifier_pair> modifiers)
         : origin(origin)
         , origin_card(origin_card)
-        , playing_card(ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier_type) ? origin->get_last_played_card() : origin_card)
+        , playing_card(std::ranges::any_of(modifiers,
+            [](const modifier_pair &pair) {
+                return pair.card->modifier_type() == card_modifier_type::leevankliff;
+            }) ? origin->get_last_played_card() : origin_card)
         , is_response(is_response)
         , targets(std::move(targets))
         , modifiers(std::move(modifiers)) {}
+
+    std::vector<card *> play_card_verify::modifier_cards() const {
+        return modifiers
+            | ranges::views::transform(&modifier_pair::card)
+            | ranges::to<std::vector<card *>>;
+    }
+
+    static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
+        auto &effects = is_response ? origin_card->responses : origin_card->effects;
+
+        if (effects.empty()) {
+            return "ERROR_EFFECT_LIST_EMPTY";
+        }
+        
+        size_t diff = targets.size() - effects.size();
+        if (auto repeatable = origin_card->get_tag_value(tag_type::repeatable)) {
+            if (diff < 0 || diff % origin_card->optionals.size() != 0
+                || (*repeatable > 0 && diff > (origin_card->optionals.size() * *repeatable)))
+            {
+                return "ERROR_INVALID_TARGETS";
+            }
+        } else if (diff != 0 && diff != origin_card->optionals.size()) {
+            return "ERROR_INVALID_TARGETS";
+        }
+
+        target_list mth_targets;
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+            if (!target.is(effect.target)) {
+                return "ERROR_INVALID_TARGET_TYPE";
+            } else if (effect.type == effect_type::mth_add) {
+                mth_targets.push_back(target);
+            }
+            
+            MAYBE_RETURN(enums::visit_indexed(
+                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                    return play_visitor<E>{origin, origin_card, effect}.verify(ctx, FWD(args) ... );
+                }, target));
+        }
+
+        return (is_response ? origin_card->mth_response : origin_card->mth_effect).verify(origin_card, origin, mth_targets);
+    }
+
+    static void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+        std::vector<std::pair<const effect_holder &, const play_card_target &>> delay_effects;
+        card_cube_count selected_cubes;
+
+        target_list mth_targets;
+        for (const auto &[target, effect] : zip_card_targets(targets, is_response ? origin_card->responses : origin_card->effects, origin_card->optionals)) {
+            if (effect.type == effect_type::mth_add) {
+                mth_targets.push_back(target);
+            } else if (effect.type == effect_type::pay_cube) {
+                if (auto *cs = target.get_if<target_type::select_cubes>()) {
+                    for (card *c : *cs) {
+                        ++selected_cubes[c];
+                    }
+                } else if (target.is(target_type::self_cubes)) {
+                    selected_cubes[origin_card] += effect.target_value;
+                }
+            } else {
+                delay_effects.emplace_back(effect, target);
+            }
+        }
+        for (const auto &[c, ncubes] : selected_cubes) {
+            origin->pay_cubes(c, ncubes);
+        }
+        for (const auto &[effect, target] : delay_effects) {
+            enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                play_visitor<E>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
+            }, target);
+        }
+
+        (is_response ? origin_card->mth_response : origin_card->mth_effect).on_play(origin_card, origin, mth_targets);
+    }
     
     game_string play_card_verify::verify_modifiers(effect_context &ctx) const {
         auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
-        for (card *mod_card : modifiers) {
+        for (const auto &[mod_card, targets] : modifiers) {
             if (!mod_card->is_modifier()) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             } else if (card *disabler = origin->m_game->get_disabler(mod_card)) {
-                return {"ERROR_CARD_DISABLED_BY", mod_card, disabler};
+                return {"ERROR_CARD_DISABLED_BY", mod_card.get(), disabler};
             }
             MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, mod_card, game_string{}));
             if (!bool(allowed_modifiers & modifier_bitset(mod_card->modifier_type()))) {
@@ -33,8 +109,8 @@ namespace banggame {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             MAYBE_RETURN(mod_card->modifier.verify(mod_card, origin, playing_card, ctx));
-            for (const auto &effect : mod_card->effects) {
-                MAYBE_RETURN(effect.verify(mod_card, origin, ctx));
+            if (!(is_response ? mod_card->responses : mod_card->effects).empty()) {
+                MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
             }
             allowed_modifiers &= allowed_modifiers_after(mod_card->modifier_type());
         }
@@ -42,28 +118,14 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_duplicates() const {
-        std::set<card *> selected_cards;
-        std::set<player *> selected_players;
-        card_cube_count selected_cubes;
+        struct {
+            std::set<card *> selected_cards;
+            std::set<player *> selected_players;
+            card_cube_count selected_cubes;
 
-        for (card *mod_card : modifiers) {
-            if (!selected_cards.emplace(mod_card).second) {
-                return {"ERROR_DUPLICATE_CARD", mod_card};
-            }
-            for (const auto &effect : mod_card->effects) {
-                if (effect.target == target_type::self_cubes) {
-                    if (selected_cubes[mod_card] += effect.target_value > mod_card->num_cubes) {
-                        return  {"ERROR_NOT_ENOUGH_CUBES_ON", mod_card};
-                    }
-                }
-            }
-        }
-
-        auto &effects = is_response ? playing_card->responses : playing_card->effects;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
-            MAYBE_RETURN(enums::visit_indexed(
-                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
-                    duplicate_set duplicates = play_visitor<E>{*this, effect}.duplicates(FWD(args) ... );
+            game_string operator()(player *origin, card *origin_card, const effect_holder &effect, const play_card_target &target) {
+                return enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
+                    duplicate_set duplicates = play_visitor<E>{origin, origin_card, effect}.duplicates(FWD(args) ... );
                     switch (duplicates.index()) {
                     case 1: {
                         auto &players = std::get<player_set>(duplicates);
@@ -86,29 +148,26 @@ namespace banggame {
                         break;
                     }
                     return {};
-                }, target));
+                }, target);
+            }
+        } check;
+
+        for (const auto &[mod_card, mod_targets] : modifiers) {
+            if (!check.selected_cards.emplace(mod_card).second) {
+                return {"ERROR_DUPLICATE_CARD", mod_card.get()};
+            }
+            auto &mod_effects = is_response ? mod_card->responses : mod_card->effects;
+            for (const auto &[target, effect] : zip_card_targets(mod_targets, mod_effects, mod_card->optionals)) {
+                MAYBE_RETURN(check(origin, mod_card, effect, target));
+            }
+        }
+
+        auto &effects = is_response ? playing_card->responses : playing_card->effects;
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
+            MAYBE_RETURN(check(origin, playing_card, effect, target));
         }
 
         return {};
-    }
-
-    void play_card_verify::play_modifiers() const {
-        for (card *mod_card : modifiers) {
-            origin->log_played_card(mod_card, false);
-            auto &effects = is_response ? mod_card->responses : mod_card->effects;
-            if (!ranges::contains(effects, effect_type::play_card_action, &effect_holder::type)) {
-                origin->play_card_action(mod_card);
-            }
-            for (const effect_holder &e : effects) {
-                if (e.target == target_type::none) {
-                    e.on_play(mod_card, origin);
-                } else if (e.target == target_type::self_cubes) {
-                    origin->pay_cubes(mod_card, e.target_value);
-                } else {
-                    throw std::runtime_error("Invalid target_type in modifier card");
-                }
-            }
-        }
     }
 
     game_string play_card_verify::verify_equip_target() const {
@@ -152,13 +211,8 @@ namespace banggame {
             return "ERROR_INVALID_CARD";
         }
 
-        auto &effects = is_response ? playing_card->responses : playing_card->effects;
-
         if (playing_card->is_modifier()) {
             return "ERROR_INVALID_MODIFIER_CARD";
-        }
-        if (effects.empty()) {
-            return "ERROR_EFFECT_LIST_EMPTY";
         }
         if (card *disabler = origin->m_game->get_disabler(playing_card)) {
             return {"ERROR_CARD_DISABLED_BY", playing_card, disabler};
@@ -168,66 +222,36 @@ namespace banggame {
         }
         MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, playing_card, game_string{}));
         MAYBE_RETURN(verify_modifiers(ctx));
-
-        size_t diff = targets.size() - effects.size();
-        if (auto repeatable = playing_card->get_tag_value(tag_type::repeatable)) {
-            if (diff < 0 || diff % playing_card->optionals.size() != 0
-                || (*repeatable > 0 && diff > (playing_card->optionals.size() * *repeatable)))
-            {
-                return "ERROR_INVALID_TARGETS";
-            }
-        } else if (diff != 0 && diff != playing_card->optionals.size()) {
-            return "ERROR_INVALID_TARGETS";
-        }
-
-        target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
-            if (!target.is(effect.target)) {
-                return "ERROR_INVALID_TARGET_TYPE";
-            } else if (effect.type == effect_type::mth_add) {
-                mth_targets.push_back(target);
-            }
-            
-            MAYBE_RETURN(enums::visit_indexed(
-                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return play_visitor<E>{*this, effect}.verify(ctx, FWD(args) ... );
-                }, target));
-        }
-
-        MAYBE_RETURN((is_response ? playing_card->mth_response : playing_card->mth_effect).verify(playing_card, origin, mth_targets));
+        MAYBE_RETURN(verify_target_list(origin, playing_card, is_response, targets, ctx));
         MAYBE_RETURN(verify_duplicates());
 
         return {};
     }
 
     game_string play_card_verify::check_prompt(const effect_context &ctx) const {
-        auto &effects = is_response ? playing_card->responses : playing_card->effects;
+        auto check = [&](card *c, const target_list &ts) {
+            auto &effects = is_response ? c->responses : c->effects;
 
-        for (card *mod_card : modifiers) {
-            if (auto msg = mod_card->modifier.on_prompt(mod_card, origin, playing_card)) {
-                return msg;
-            }
-            for (const effect_holder &e : is_response ? mod_card->responses : mod_card->effects) {
-                if (auto msg = e.on_prompt(mod_card, origin)) {
-                    return msg;
+            target_list mth_targets;
+            for (const auto &[target, effect] : zip_card_targets(ts, effects, c->optionals)) {
+                if (effect.type == effect_type::mth_add) {
+                    mth_targets.push_back(target);
                 }
+                MAYBE_RETURN(enums::visit_indexed(
+                    [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                        return play_visitor<E>{origin, c, effect}.prompt(ctx, FWD(args) ... );
+                    }, target));
             }
+
+            return (is_response ? c->mth_response : c->mth_effect).on_prompt(c, origin, mth_targets);
+        };
+
+        for (const auto &[mod_card, mod_targets] : modifiers) {
+            MAYBE_RETURN(mod_card->modifier.on_prompt(mod_card, origin, playing_card));
+            MAYBE_RETURN(check(mod_card, mod_targets));
         }
 
-        target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
-            if (effect.type == effect_type::mth_add) {
-                mth_targets.push_back(target);
-            } else if (auto prompt_message = enums::visit_indexed(
-                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return play_visitor<E>{*this, effect}.prompt(ctx, FWD(args) ... );
-                }, target))
-            {
-                return prompt_message;
-            }
-        }
-
-        return (is_response ? playing_card->mth_response : playing_card->mth_effect).on_prompt(playing_card, origin, mth_targets);
+        return check(playing_card, targets);
     }
 
     game_string play_card_verify::check_prompt_equip() const {
@@ -240,10 +264,21 @@ namespace banggame {
         return {};
     }
 
+    void play_card_verify::play_modifiers(const effect_context &ctx) const {
+        for (const auto &[mod_card, mod_targets] : modifiers) {
+            origin->log_played_card(mod_card, is_response);
+            auto &effects = is_response ? mod_card->responses : mod_card->effects;
+            if (!ranges::contains(effects, effect_type::play_card_action, &effect_holder::type)) {
+                origin->play_card_action(mod_card);
+            }
+            apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
+        }
+    }
+
     void play_card_verify::do_play_card(const effect_context &ctx) const {
         origin->log_played_card(playing_card, is_response);
         if (origin_card != playing_card || std::ranges::none_of(
-            ranges::views::concat(modifiers, ranges::views::single(playing_card)),
+            ranges::views::concat(modifiers | ranges::views::transform(&modifier_pair::card), ranges::views::single(not_null(playing_card))),
             [&](card *target_card) {
                 return ranges::contains(is_response ? target_card->responses : target_card->effects,
                     effect_type::play_card_action, &effect_holder::type);
@@ -252,35 +287,7 @@ namespace banggame {
             origin->play_card_action(origin_card);
         }
 
-        std::vector<std::pair<const effect_holder &, const play_card_target &>> delay_effects;
-        card_cube_count selected_cubes;
-
-        target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, is_response ? playing_card->responses : playing_card->effects, playing_card->optionals)) {
-            if (effect.type == effect_type::mth_add) {
-                mth_targets.push_back(target);
-            } else if (effect.type == effect_type::pay_cube) {
-                if (auto *cs = target.get_if<target_type::select_cubes>()) {
-                    for (card *c : *cs) {
-                        ++selected_cubes[c];
-                    }
-                } else if (target.is(target_type::self_cubes)) {
-                    selected_cubes[playing_card] += effect.target_value;
-                }
-            } else {
-                delay_effects.emplace_back(effect, target);
-            }
-        }
-        for (const auto &[c, ncubes] : selected_cubes) {
-            origin->pay_cubes(c, ncubes);
-        }
-        for (const auto &[e, t] : delay_effects) {
-            enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                play_visitor<E>{*this, e}.play(ctx, FWD(args) ... );
-            }, t);
-        }
-
-        (is_response ? playing_card->mth_response : playing_card->mth_effect).on_play(playing_card, origin, mth_targets);
+        apply_target_list(origin, playing_card, is_response, targets, ctx);
         origin->m_game->call_event<event_type::on_effect_end>(origin, playing_card);
     }
 
@@ -295,18 +302,18 @@ namespace banggame {
 
         switch(origin_card->pocket) {
         case pocket_type::player_hand:
-            if (origin_card->is_brown() || ranges::contains(modifiers, card_modifier_type::leevankliff, &card::modifier_type)) {
+            if (origin_card->is_brown() || origin_card != playing_card) {
                 effect_context ctx;
                 MAYBE_RETURN(verify_card_targets(ctx));
                 origin->prompt_then(check_prompt(ctx), [*this, ctx]{
-                    origin->add_played_card(origin_card, modifiers);
-                    play_modifiers();
+                    origin->add_played_card(origin_card, modifier_cards());
+                    play_modifiers(ctx);
                     do_play_card(ctx);
                 });
             } else {
                 MAYBE_RETURN(verify_equip_target());
                 origin->prompt_then(check_prompt_equip(), [*this]{
-                    origin->add_played_card(origin_card, modifiers);
+                    origin->add_played_card(origin_card, modifier_cards());
                     player *target = get_equip_target();
                     origin_card->on_equip(target);
                     if (origin == target) {
@@ -338,19 +345,19 @@ namespace banggame {
             effect_context ctx;
             MAYBE_RETURN(verify_card_targets(ctx));
             origin->prompt_then(check_prompt(ctx), [*this, ctx]{
-                origin->add_played_card(origin_card, modifiers);
-                play_modifiers();
+                origin->add_played_card(origin_card, modifier_cards());
+                play_modifiers(ctx);
                 do_play_card(ctx);
             });
             break;
         }
         case pocket_type::hidden_deck:
-            if (!ranges::contains(modifiers, card_modifier_type::shopchoice, &card::modifier_type)) {
+            if (std::ranges::none_of(modifiers, [](const modifier_pair &pair) { return pair.card->modifier_type() == card_modifier_type::shopchoice; })) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             [[fallthrough]];
         case pocket_type::shop_selection: {
-            int cost = ranges::accumulate(modifiers | ranges::views::transform(&card::buy_cost), origin_card->buy_cost());
+            int cost = ranges::accumulate(modifiers | ranges::views::transform([](const modifier_pair &pair) { return pair.card->buy_cost(); }), origin_card->buy_cost());
             if (origin_card->is_brown()) {
                 effect_context ctx;
                 MAYBE_RETURN(verify_card_targets(ctx));
@@ -363,9 +370,9 @@ namespace banggame {
                     return "ERROR_NOT_ENOUGH_GOLD";
                 }
                 origin->prompt_then(check_prompt(ctx), [*this, cost, ctx]{
-                    origin->add_played_card(origin_card, modifiers);
-                    play_modifiers();
+                    origin->add_played_card(origin_card, modifier_cards());
                     origin->add_gold(-cost);
+                    play_modifiers(ctx);
                     do_play_card(ctx);
                     origin->m_game->queue_action([m_game = origin->m_game]{
                         while (m_game->m_shop_selection.size() < 3) {
@@ -381,8 +388,8 @@ namespace banggame {
                 if (origin->m_gold < cost) {
                     return "ERROR_NOT_ENOUGH_GOLD";
                 }
-                origin->prompt_then(check_prompt_equip(), [*this, cost]{
-                    origin->add_played_card(origin_card, modifiers);
+                origin->prompt_then(check_prompt_equip(), [*this, cost, ctx]{
+                    origin->add_played_card(origin_card, modifier_cards());
                     player *target = get_equip_target();
                     origin_card->on_equip(target);
                     if (origin == target) {
@@ -390,8 +397,8 @@ namespace banggame {
                     } else {
                         origin->m_game->add_log("LOG_BOUGHT_EQUIP_TO", origin_card, origin, target);
                     }
-                    play_modifiers();
                     origin->add_gold(-cost);
+                    play_modifiers(ctx);
                     target->equip_card(origin_card);
                     origin->m_game->queue_action([m_game = origin->m_game]{
                         while (m_game->m_shop_selection.size() < 3) {

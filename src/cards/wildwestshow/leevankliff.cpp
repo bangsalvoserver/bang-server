@@ -17,6 +17,7 @@ namespace banggame {
         }
 
         ctx.disable_banglimit = true;
+        ctx.repeating = true;
         return {};
     }
 }

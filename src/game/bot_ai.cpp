@@ -153,7 +153,14 @@ namespace banggame {
             }
             return generate_random_play(origin, origin_card, is_response, std::move(modifiers));
         } else {
-            play_card_verify verifier { origin, origin_card, is_response, {}, std::move(modifiers) };
+            play_card_verify verifier { origin, origin_card, is_response, {},
+                modifiers | ranges::views::transform([&](card *mod_card) {
+                    return modifier_pair{mod_card, (is_response ? mod_card->responses : mod_card->effects)
+                        | ranges::views::transform([&](const effect_holder &holder) {
+                            return generate_random_target(origin, mod_card, holder);
+                        })
+                        | ranges::to<target_list>};
+                }) | ranges::to<std::vector> };
             if (!verifier.playing_card) {
                 return play_card_verify{};
             }
