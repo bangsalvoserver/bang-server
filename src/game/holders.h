@@ -55,9 +55,10 @@ namespace banggame {
     DEFINE_STRUCT(mth_holder,
         (mth_type, type),
         
-        game_string verify(card *origin_card, player *origin, const target_list &targets) const;
-        game_string on_prompt(card *origin_card, player *origin, const target_list &targets) const;
-        void on_play(card *origin_card, player *origin, const target_list &targets) const;
+        void add_context(card *origin_card, player *origin, const target_list &targets, effect_context &ctx) const;
+        game_string verify(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx = {}) const;
+        game_string on_prompt(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx = {}) const;
+        void on_play(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx = {}) const;
     )
 
     DEFINE_STRUCT(tag_holder,

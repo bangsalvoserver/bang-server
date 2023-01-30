@@ -62,7 +62,10 @@ namespace banggame {
                 }, target));
         }
 
-        return (is_response ? origin_card->mth_response : origin_card->mth_effect).verify(origin_card, origin, mth_targets);
+        auto &mth = is_response ? origin_card->mth_response : origin_card->mth_effect;
+        MAYBE_RETURN(mth.verify(origin_card, origin, mth_targets, ctx));
+        mth.add_context(origin_card, origin, mth_targets, ctx);
+        return {};
     }
 
     static void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
@@ -94,7 +97,7 @@ namespace banggame {
             }, target);
         }
 
-        (is_response ? origin_card->mth_response : origin_card->mth_effect).on_play(origin_card, origin, mth_targets);
+        (is_response ? origin_card->mth_response : origin_card->mth_effect).on_play(origin_card, origin, mth_targets, ctx);
     }
     
     game_string play_card_verify::verify_modifiers(effect_context &ctx) const {
@@ -247,7 +250,7 @@ namespace banggame {
                     }, target));
             }
 
-            return (is_response ? c->mth_response : c->mth_effect).on_prompt(c, origin, mth_targets);
+            return (is_response ? c->mth_response : c->mth_effect).on_prompt(c, origin, mth_targets, ctx);
         };
 
         for (const auto &[mod_card, mod_targets] : modifiers) {

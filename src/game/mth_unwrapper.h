@@ -53,15 +53,30 @@ template<typename T> struct target_getter<std::optional<T>> {
 template<typename RetType, typename HandlerType, typename ... Args>
 using fun_mem_ptr_t = RetType (HandlerType::*)(card *origin_card, player *origin, Args...);
 
+template<typename RetType, typename HandlerType, typename CtxType, typename ... Args>
+requires std::same_as<std::remove_cvref_t<CtxType>, effect_context>
+using ctx_fun_mem_ptr_t = RetType (HandlerType::*)(card *origin_card, player *origin, Args..., CtxType ctx);
+
 template<typename T> struct mth_unwrapper;
 
 template<typename RetType, typename HandlerType, typename ... Args>
 struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>> {
     fun_mem_ptr_t<RetType, HandlerType, Args...> m_value;
 
-    RetType operator()(card *origin_card, player *origin, const target_list &targets) {
+    RetType operator()(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) {
         return [&]<size_t ... Is>(std::index_sequence<Is...>) {
             return (HandlerType{}.*m_value)(origin_card, origin, target_getter<Args>{}(targets, Is) ...);
+        }(std::index_sequence_for<Args...>());
+    }
+};
+
+template<typename RetType, typename HandlerType, typename CtxType, typename ... Args>
+struct mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>> {
+    ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...> m_value;
+
+    RetType operator()(card *origin_card, player *origin, const target_list &targets, CtxType ctx) {
+        return [&]<size_t ... Is>(std::index_sequence<Is...>) {
+            return (HandlerType{}.*m_value)(origin_card, origin, target_getter<Args>{}(targets, Is) ..., ctx);
         }(std::index_sequence_for<Args...>());
     }
 };
@@ -70,8 +85,17 @@ template<typename RetType, typename HandlerType>
 struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, const target_list &>> {
     fun_mem_ptr_t<RetType, HandlerType, const target_list &> m_value;
 
-    RetType operator()(card *origin_card, player *origin, const target_list &targets) {
+    RetType operator()(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) {
         return (HandlerType{}.*m_value)(origin_card, origin, targets);
+    }
+};
+
+template<typename RetType, typename HandlerType, typename CtxType>
+struct mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, const target_list &>> {
+    ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, const target_list &> m_value;
+
+    RetType operator()(card *origin_card, player *origin, const target_list &targets, CtxType ctx) {
+        return (HandlerType{}.*m_value)(origin_card, origin, targets, ctx);
     }
 };
 
@@ -79,13 +103,25 @@ template<typename RetType, typename HandlerType, std::integral SizeType>
 struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, SizeType>> {
     fun_mem_ptr_t<RetType, HandlerType, SizeType> m_value;
 
-    RetType operator()(card *origin_card, player *origin, const target_list &targets) {
+    RetType operator()(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) {
         return (HandlerType{}.*m_value)(origin_card, origin, static_cast<SizeType>(targets.size()));
+    }
+};
+
+template<typename RetType, typename HandlerType, typename CtxType, std::integral SizeType>
+struct mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, SizeType>> {
+    ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, SizeType> m_value;
+
+    RetType operator()(card *origin_card, player *origin, const target_list &targets, CtxType ctx) {
+        return (HandlerType{}.*m_value)(origin_card, origin, static_cast<SizeType>(targets.size()), ctx);
     }
 };
 
 template<typename RetType, typename HandlerType, typename ... Args>
 mth_unwrapper(fun_mem_ptr_t<RetType, HandlerType, Args...>) -> mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>>;
+
+template<typename RetType, typename HandlerType, typename CtxType, typename ... Args>
+mth_unwrapper(ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>) -> mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>>;
 
 }
 
