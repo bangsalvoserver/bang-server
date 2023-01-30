@@ -10,7 +10,7 @@ namespace banggame {
         game_string on_prompt(card *origin_card, player *origin, card *target);
     };
 
-    struct effect_steal : prompt_target_self, bot_suggestion::target_enemy {
+    struct effect_steal : prompt_target_self, bot_suggestion::target_enemy_card {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };
@@ -19,7 +19,7 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, card *target);
     };
 
-    struct effect_destroy: prompt_target_self, bot_suggestion::target_enemy {
+    struct effect_destroy: prompt_target_self, bot_suggestion::target_enemy_card {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };

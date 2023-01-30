@@ -14,6 +14,10 @@ namespace banggame::bot_suggestion {
         bool on_check_target(card *origin_card, player *origin, player *target);
         bool on_check_target(card *origin_card, player *origin, card *target);
     };
+
+    struct target_enemy_card {
+        bool on_check_target(card *origin_card, player *origin, card *target);
+    };
     
 }
 
