@@ -118,15 +118,18 @@ namespace banggame {
             origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
         )
         | ranges::views::filter([&](card *target_card) {
-            return !target_card->is_modifier()
-                && !ranges::contains(modifiers, target_card)
-                && std::transform_reduce(
+            if (target_card->is_modifier()) {
+                if (ranges::contains(modifiers, target_card)) {
+                    return false;
+                }
+                if (!std::transform_reduce(
                     modifiers.begin(), modifiers.end(), modifier_bitset(target_card->modifier_type()), std::bit_and(),
                     [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
-                )
-                && std::ranges::all_of(modifiers, [&](card *mod) {
-                    return allowed_card_with_modifier(origin, mod, target_card);
-                })
+                )) {
+                    return false;
+                }
+            }
+            return std::ranges::all_of(modifiers, [&](card *mod) { return allowed_card_with_modifier(origin, mod, target_card); })
                 && is_possible_to_play(origin, target_card, is_response ? effect_list_index::responses : effect_list_index::effects);
         });
 
