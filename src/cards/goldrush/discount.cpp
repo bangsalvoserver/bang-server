@@ -4,8 +4,7 @@
 
 namespace banggame {
 
-    game_string modifier_discount::verify(card *origin_card, player *origin, card *playing_card, effect_context &ctx) {
+    void modifier_discount::add_context(card *origin_card, player *origin, card *playing_card, effect_context &ctx) {
         ctx.discount = true;
-        return {};
     }
 }

@@ -3,7 +3,11 @@
 
 namespace banggame {
 
-    template<> game_string play_visitor<target_type::none>::verify(effect_context &ctx) {
+    template<> void play_visitor<target_type::none>::add_context(effect_context &ctx) {
+        effect.add_context(origin_card, origin, ctx);
+    }
+
+    template<> game_string play_visitor<target_type::none>::verify(const effect_context &ctx) {
         return effect.verify(origin_card, origin, ctx);
     }
 
@@ -19,7 +23,11 @@ namespace banggame {
         effect.on_play(origin_card, origin);
     }
 
-    template<> game_string play_visitor<target_type::player>::verify(effect_context &ctx, player *target) {
+    template<> void play_visitor<target_type::player>::add_context(effect_context &ctx, player *target) {
+        effect.add_context(origin_card, origin, target, ctx);
+    }
+
+    template<> game_string play_visitor<target_type::player>::verify(const effect_context &ctx, player *target) {
         MAYBE_RETURN(check_player_filter(origin, effect.player_filter, target, ctx));
         return effect.verify(origin_card, origin, target, ctx);
     }
@@ -40,7 +48,13 @@ namespace banggame {
         effect.on_play(origin_card, origin, target, flags);
     }
 
-    template<> game_string play_visitor<target_type::conditional_player>::verify(effect_context &ctx, player *target) {
+    template<> void play_visitor<target_type::conditional_player>::add_context(effect_context &ctx, player *target) {
+        if (target) {
+            play_visitor<target_type::player>{origin, origin_card, effect}.add_context(ctx, target);
+        }
+    }
+
+    template<> game_string play_visitor<target_type::conditional_player>::verify(const effect_context &ctx, player *target) {
         if (target) {
             return play_visitor<target_type::player>{origin, origin_card, effect}.verify(ctx, target);
         } else if (contains_at_least(make_player_target_set(origin, origin_card, effect), 1)) {
@@ -72,7 +86,9 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::players>::verify(effect_context &ctx) {
+    template<> void play_visitor<target_type::players>::add_context(effect_context &ctx) {}
+
+    template<> game_string play_visitor<target_type::players>::verify(const effect_context &ctx) {
         for (player *target : range_all_players(origin)) {
             if (!check_player_filter(origin, effect.player_filter, target, ctx)) {
                 MAYBE_RETURN(effect.verify(origin_card, origin, target, ctx));
@@ -117,7 +133,9 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::fanning_targets>::verify(effect_context &ctx, const std::vector<not_null<player *>> &targets) {
+    template<> void play_visitor<target_type::fanning_targets>::add_context(effect_context &ctx, const std::vector<not_null<player *>> &targets) { }
+
+    template<> game_string play_visitor<target_type::fanning_targets>::verify(const effect_context &ctx, const std::vector<not_null<player *>> &targets) {
         if (targets.size() != 2) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -149,7 +167,11 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::card>::verify(effect_context &ctx, card *target) {
+    template<> void play_visitor<target_type::card>::add_context(effect_context &ctx, card *target) {
+        effect.add_context(origin_card, origin, target, ctx);
+    }
+
+    template<> game_string play_visitor<target_type::card>::verify(const effect_context &ctx, card *target) {
         if (!target->owner) return "ERROR_CARD_HAS_NO_OWNER";
         MAYBE_RETURN(check_player_filter(origin, effect.player_filter, target->owner, ctx));
         MAYBE_RETURN(check_card_filter(origin_card, origin, effect.card_filter, target, ctx));
@@ -180,7 +202,13 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::extra_card>::verify(effect_context &ctx, card *target) {
+    template<> void play_visitor<target_type::extra_card>::add_context(effect_context &ctx, card *target) {
+        if (target) {
+            play_visitor<target_type::card>{origin, origin_card, effect}.add_context(ctx, target);
+        }
+    }
+
+    template<> game_string play_visitor<target_type::extra_card>::verify(const effect_context &ctx, card *target) {
         if (!target) {
             if (ctx.repeating) {
                 return {};
@@ -214,7 +242,13 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::cards>::verify(effect_context &ctx, const std::vector<not_null<card *>> &targets) {
+    template<> void play_visitor<target_type::cards>::add_context(effect_context &ctx, const std::vector<not_null<card *>> &targets) {
+        for (card *c : targets) {
+            play_visitor<target_type::card>{origin, origin_card, effect}.add_context(ctx, c);
+        }
+    }
+
+    template<> game_string play_visitor<target_type::cards>::verify(const effect_context &ctx, const std::vector<not_null<card *>> &targets) {
         if (targets.size() != std::max<size_t>(1, effect.target_value)) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -249,7 +283,9 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::cards_other_players>::verify(effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {
+    template<> void play_visitor<target_type::cards_other_players>::add_context(effect_context &ctx, const std::vector<not_null<card *>> &target_cards) { }
+
+    template<> game_string play_visitor<target_type::cards_other_players>::verify(const effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {
         if (!std::ranges::all_of(origin->m_game->m_players | std::views::filter(&player::alive), [&](player *p) {
             size_t found = std::ranges::count(target_cards, p, &card::owner);
             if (p->only_black_cards_equipped()) return found == 0;
@@ -298,7 +334,9 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::select_cubes>::verify(effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {
+    template<> void play_visitor<target_type::select_cubes>::add_context(effect_context &ctx, const std::vector<not_null<card *>> &target_cards) { }
+
+    template<> game_string play_visitor<target_type::select_cubes>::verify(const effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {
         if (effect.type != effect_type::pay_cube) {
             return "ERROR_INVALID_EFFECT_TYPE";
         }
@@ -327,7 +365,9 @@ namespace banggame {
 
     template<> void play_visitor<target_type::select_cubes>::play(const effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {}
 
-    template<> game_string play_visitor<target_type::self_cubes>::verify(effect_context &ctx) {
+    template<> void play_visitor<target_type::self_cubes>::add_context(effect_context &ctx) { }
+
+    template<> game_string play_visitor<target_type::self_cubes>::verify(const effect_context &ctx) {
         if (effect.type != effect_type::pay_cube) {
             return "ERROR_INVALID_EFFECT_TYPE";
         }

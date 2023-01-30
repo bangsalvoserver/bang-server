@@ -17,15 +17,18 @@ namespace banggame {
         (int8_t, target_value)
         (effect_type, type),
 
-        game_string verify(card *origin_card, player *origin, effect_context &ctx) const;
+        void add_context(card *origin_card, player *origin, effect_context &ctx) const;
+        game_string verify(card *origin_card, player *origin, const effect_context &ctx = {}) const;
         game_string on_prompt(card *origin_card, player *origin) const;
         void on_play(card *origin_card, player *origin, effect_flags flags = {}) const;
 
-        game_string verify(card *origin_card, player *origin, player *target, effect_context &ctx) const;
+        void add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const;
+        game_string verify(card *origin_card, player *origin, player *target, const effect_context &ctx = {}) const;
         game_string on_prompt(card *origin_card, player *origin, player *target) const;
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {}) const;
         
-        game_string verify(card *origin_card, player *origin, card *target, effect_context &ctx) const;
+        void add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const;
+        game_string verify(card *origin_card, player *origin, card *target, const effect_context &ctx = {}) const;
         game_string on_prompt(card *origin_card, player *origin, card *target) const;
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {}) const;
     )
@@ -44,8 +47,9 @@ namespace banggame {
     DEFINE_STRUCT(modifier_holder,
         (card_modifier_type, type),
         
+        void add_context(card *origin_card, player *origin, card *playing_card, effect_context &ctx) const;
+        game_string verify(card *origin_card, player *origin, card *playing_card, const effect_context &ctx = {}) const;
         game_string on_prompt(card *origin_card, player *origin, card *playing_card) const;
-        game_string verify(card *origin_card, player *origin, card *playing_card, effect_context &ctx) const;
     )
 
     DEFINE_STRUCT(mth_holder,

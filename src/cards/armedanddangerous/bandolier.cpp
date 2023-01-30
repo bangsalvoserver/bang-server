@@ -4,9 +4,8 @@
 
 namespace banggame {
 
-    game_string effect_bandolier::verify(card *origin_card, player *origin, effect_context &ctx) {
+    void effect_bandolier::add_context(card *origin_card, player *origin, effect_context &ctx) {
         ctx.disable_banglimit = true;
-        return {};
     }
 
     game_string effect_bandolier::on_prompt(card *origin_card, player *origin) {

@@ -41,7 +41,15 @@ namespace banggame {
         }, holder.type);
     }
 
-    game_string effect_holder::verify(card *origin_card, player *origin, effect_context &ctx) const {
+    void effect_holder::add_context(card *origin_card, player *origin, effect_context &ctx) const {
+        visit_effect([&](auto &&value) {
+            if constexpr (requires { value.add_context(origin_card, origin, ctx); }) {
+                value.add_context(origin_card, origin, ctx);
+            }
+        }, *this);
+    }
+
+    game_string effect_holder::verify(card *origin_card, player *origin, const effect_context &ctx) const {
         return visit_effect([&](auto &&value) -> game_string {
             if constexpr (requires { value.verify(origin_card, origin, ctx); }) {
                 return value.verify(origin_card, origin, ctx);
@@ -80,7 +88,15 @@ namespace banggame {
         }, *this);
     }
 
-    game_string effect_holder::verify(card *origin_card, player *origin, player *target, effect_context &ctx) const {
+    void effect_holder::add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const {
+        visit_effect([&](auto &&value) {
+            if constexpr (requires { value.add_context(origin_card, origin, target, ctx); }) {
+                value.add_context(origin_card, origin, target, ctx);
+            }
+        }, *this);
+    }
+
+    game_string effect_holder::verify(card *origin_card, player *origin, player *target, const effect_context &ctx) const {
         return visit_effect([&](auto &&value) -> game_string {
             if constexpr (requires { value.verify(origin_card, origin, target, ctx); }) {
                 return value.verify(origin_card, origin, target, ctx);
@@ -115,7 +131,15 @@ namespace banggame {
         }, *this);
     }
 
-    game_string effect_holder::verify(card *origin_card, player *origin, card *target, effect_context &ctx) const {
+    void effect_holder::add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const {
+        visit_effect([&](auto &&value) {
+            if constexpr (requires { value.add_context(origin_card, origin, target, ctx); }) {
+                value.add_context(origin_card, origin, target, ctx);
+            }
+        }, *this);
+    }
+
+    game_string effect_holder::verify(card *origin_card, player *origin, card *target, const effect_context &ctx) const {
         return visit_effect([&](auto &&value) -> game_string {
             if constexpr (requires { value.verify(origin_card, origin, target, ctx); }) {
                 return value.verify(origin_card, origin, target, ctx);
@@ -208,7 +232,18 @@ namespace banggame {
         }, type);
     }
 
-    game_string modifier_holder::verify(card *origin_card, player *origin, card *playing_card, effect_context &ctx) const {
+    void modifier_holder::add_context(card *origin_card, player *origin, card *playing_card, effect_context &ctx) const {
+        enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) {
+            if constexpr (enums::value_with_type<E>) {
+                enums::enum_type_t<E> handler;
+                if constexpr (requires { handler.add_context(origin_card, origin, playing_card, ctx); }) {
+                    handler.add_context(origin_card, origin, playing_card, ctx);
+                }
+            }
+        }, type);
+    }
+
+    game_string modifier_holder::verify(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) const {
         return enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;

@@ -54,8 +54,11 @@ namespace banggame {
             }
             
             MAYBE_RETURN(enums::visit_indexed(
-                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                    return play_visitor<E>{origin, origin_card, effect}.verify(ctx, FWD(args) ... );
+                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
+                    play_visitor<E> visitor{origin, origin_card, effect};
+                    MAYBE_RETURN(visitor.verify(ctx, args ... ));
+                    visitor.add_context(ctx, args ... );
+                    return {};
                 }, target));
         }
 
@@ -109,6 +112,7 @@ namespace banggame {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             MAYBE_RETURN(mod_card->modifier.verify(mod_card, origin, playing_card, ctx));
+            mod_card->modifier.add_context(mod_card, origin, playing_card, ctx);
             if (!(is_response ? mod_card->responses : mod_card->effects).empty()) {
                 MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
             }

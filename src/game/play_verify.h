@@ -29,13 +29,13 @@ namespace banggame {
         game_string verify_equip_target() const;
         game_string verify_card_targets(effect_context &ctx) const;
 
-        game_string check_prompt(const effect_context &ctx) const;
+        game_string check_prompt(const effect_context &ctx = {}) const;
         game_string check_prompt_equip() const;
 
         player *get_equip_target() const;
         
-        void play_modifiers(const effect_context &ctx) const;
-        void do_play_card(const effect_context &ctx) const;
+        void play_modifiers(const effect_context &ctx = {}) const;
+        void do_play_card(const effect_context &ctx = {}) const;
 
         game_string verify_and_play();
     };

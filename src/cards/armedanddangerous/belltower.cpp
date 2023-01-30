@@ -14,8 +14,7 @@ namespace banggame {
         }
     }
 
-    game_string modifier_belltower::verify(card *origin_card, player *origin, card *playing_card, effect_context &ctx) {
+    void modifier_belltower::add_context(card *origin_card, player *origin, card *playing_card, effect_context &ctx) {
         ctx.ignore_distances = true;
-        return {};
     }
 }
