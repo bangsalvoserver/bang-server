@@ -40,11 +40,13 @@ namespace banggame {
     }
 
     void request_queue::invoke_action(delayed_action &&fun) {
-        request_holder copy;
-        if (pending_requests()) copy = top_request();
-        ++m_lock_updates;
-        std::invoke(fun);
-        --m_lock_updates;
+        {
+            request_holder copy;
+            if (pending_requests()) copy = top_request();
+            ++m_lock_updates;
+            std::invoke(fun);
+            --m_lock_updates;
+        }
         update_request();
     }
     
