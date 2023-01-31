@@ -4,6 +4,9 @@
 namespace banggame::bot_suggestion {
 
     bool target_enemy::on_check_target(card *origin_card, player *origin, player *target) {
+        if (origin->m_game->check_flags(game_flags::free_for_all)) {
+            return origin != target;
+        }
         switch (origin->m_role) {
         case player_role::outlaw:
             return target->m_role == player_role::sheriff
@@ -54,6 +57,9 @@ namespace banggame::bot_suggestion {
     }
 
     bool target_friend::on_check_target(card *origin_card, player *origin, player *target) {
+        if (origin->m_game->check_flags(game_flags::free_for_all)) {
+            return origin == target;
+        }
         switch (origin->m_role) {
         case player_role::outlaw:
             return target->m_role == player_role::outlaw;
@@ -72,7 +78,7 @@ namespace banggame::bot_suggestion {
     }
 
     bool target_enemy_card::on_check_target(card *origin_card, player *origin, card *target) {
-        if (target->pocket == pocket_type::player_hand && !target->self_equippable() && !target->has_tag(tag_type::ghost_card)) {
+        if (target->pocket == pocket_type::player_table && !target->self_equippable() && !target->has_tag(tag_type::ghost_card)) {
             return target_friend{}.on_check_target(origin_card, origin, target);
         } else {
             return target_enemy{}.on_check_target(origin_card, origin, target);
