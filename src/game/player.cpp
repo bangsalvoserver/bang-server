@@ -115,8 +115,10 @@ namespace banggame {
     }
 
     void player::set_hp(int value, bool instant) {
-        m_hp = value;
-        m_game->add_update<game_update_type::player_hp>(this, value, instant);
+        if (value != m_hp) {
+            m_hp = value;
+            m_game->add_update<game_update_type::player_hp>(this, value, instant);
+        }
     }
 
     void player::add_gold(int amount) {
