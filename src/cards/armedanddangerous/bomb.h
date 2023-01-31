@@ -3,6 +3,7 @@
 
 #include "cards/card_effect.h"
 #include "game/bot_suggestion.h"
+#include "cards/base/prompts.h"
 
 namespace banggame {
 
@@ -12,7 +13,7 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target);
     };
     
-    struct equip_bomb : bot_suggestion::target_enemy {
+    struct equip_bomb : prompt_target_self, bot_suggestion::target_enemy {
         void on_equip(card *target_card, player *target);
         void on_unequip(card *target_card, player *target);
     };

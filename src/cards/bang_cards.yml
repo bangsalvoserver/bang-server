@@ -50,7 +50,6 @@ main_deck:
     equip:
       - predraw_check(1)
       - jail
-      - prompt_on_self_equip
   - &remington
     name: REMINGTON
     signs:
@@ -597,7 +596,6 @@ main_deck:
     equip:
       - predraw_check(0)
       - snake
-      - prompt_on_self_equip
   - name: SHOTGUN
     signs:
       - K spades
@@ -618,7 +616,6 @@ main_deck:
     equip_target: any
     equip:
       - bounty
-      - prompt_on_self_equip
   - name: BANDIDOS
     signs:
       - Q diamonds
@@ -891,7 +888,6 @@ main_deck:
     equip:
       - predraw_check(0)
       - bomb
-      - prompt_on_self_equip
     responses:
       - move_bomb player
   - name: BUNTLINE_SPECIAL
@@ -1154,7 +1150,6 @@ main_deck:
     equip:
       - predraw_check(-1)
       - taxman
-      - prompt_on_self_equip
   - name: BROTHEL
     signs:
       - 7 clubs
@@ -1165,7 +1160,6 @@ main_deck:
     equip:
       - predraw_check(-2)
       - brothel
-      - prompt_on_self_equip
   - name: BRONCO
     signs:
       - Q diamonds
@@ -1239,8 +1233,7 @@ main_deck:
     color: blue
     equip_target: any
     equip:
-      - weapon_base(0)
-      - prompt_on_self_equip
+      - weapon(0)
     tags:
       - weapon
   - name: SCRAPPER
@@ -2108,7 +2101,6 @@ goldrush:
     equip_target: any
     equip:
       - wanted
-      - prompt_on_self_equip
     tags:
       - buy_cost(2)
       - discard_if_two_players

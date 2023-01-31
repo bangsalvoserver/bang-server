@@ -37,7 +37,7 @@ namespace banggame {
         (short, effect_value)
         (equip_type, type),
 
-        game_string on_prompt(player *origin, card *target_card, player *target) const;
+        game_string on_prompt(card *origin_card, player *origin, player *target) const;
         void on_equip(card *target_card, player *target) const;
         void on_enable(card *target_card, player *target) const;
         void on_disable(card *target_card, player *target) const;

@@ -5,18 +5,14 @@
 
 namespace banggame {
 
-    struct equip_weapon_base {
+    struct equip_weapon {
         int range;
-        equip_weapon_base(int value) : range(value) {}
+        equip_weapon(int range): range(range) {}
 
+        game_string on_prompt(card *origin_card, player *origin, player *target);
         void on_equip(card *target_card, player *target);
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);
-    };
-
-    struct equip_weapon : equip_weapon_base {
-        equip_weapon(int value) : equip_weapon_base(value) {}
-        game_string on_prompt(player *origin, card *target_card, player *target);
     };
 }
 

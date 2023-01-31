@@ -4,13 +4,6 @@
 
 namespace banggame {
 
-    game_string prompt_target_self::on_prompt(card *origin_card, player *origin, card *target_card) {
-        if (origin == target_card->owner) {
-            return {"PROMPT_TARGET_SELF", origin_card};
-        }
-        return {};
-    }
-
     request_targeting::timer_targeting::timer_targeting(request_targeting *request)
         : request_timer(request, request->target->m_game->m_options.escape_timer) {}
 

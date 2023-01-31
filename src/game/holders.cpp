@@ -174,15 +174,15 @@ namespace banggame {
         }, *this);
     }
 
-    game_string equip_holder::on_prompt(player *origin, card *target_card, player *target) const {
+    game_string equip_holder::on_prompt(card *origin_card, player *origin, player *target) const {
         return visit_effect([&](auto &&value) -> game_string {
-            if constexpr (requires { value.on_check_target(target_card, origin, target); }) {
-                if (origin->is_bot() && !value.on_check_target(target_card, origin, target)) {
+            if constexpr (requires { value.on_check_target(origin_card, origin, target); }) {
+                if (origin->is_bot() && !value.on_check_target(origin_card, origin, target)) {
                     return "BOT_BAD_PLAY";
                 }
             }
-            if constexpr (requires { value.on_prompt(origin, target_card, target); }) {
-                return value.on_prompt(origin, target_card, target);
+            if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
+                return value.on_prompt(origin_card, origin, target);
             }
             return {};
         }, *this);

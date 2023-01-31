@@ -6,7 +6,7 @@
 namespace banggame {
     
     struct equip_horse {
-        game_string on_prompt(player *origin, card *target_card, player *target);
+        game_string on_prompt(card *origin_card, player *origin, player *target);
         void on_equip(card *target_card, player *target);
     };
 

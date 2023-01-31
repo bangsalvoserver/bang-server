@@ -3,20 +3,24 @@
 
 #include "cards/card_effect.h"
 #include "game/bot_suggestion.h"
+#include "prompts.h"
 
 namespace banggame {
     
-    struct effect_bang : bot_suggestion::target_enemy {
+    struct effect_bang : prompt_target_ghost, bot_suggestion::target_enemy {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
 
-    struct effect_bangcard : bot_suggestion::target_enemy {
+    struct effect_bangcard : prompt_target_ghost, bot_suggestion::target_enemy {
         void on_play(card *origin_card, player *origin, player *target);
     };
 
     struct handler_play_as_bang {
         bool on_check_target(card *origin_card, player *origin, card *chosen_card, player *target) {
             return bot_suggestion::target_enemy{}.on_check_target(origin_card, origin, target);
+        }
+        game_string on_prompt(card *origin_card, player *origin, card *chosen_card, player *target) {
+            return prompt_target_ghost{}.on_prompt(origin_card, origin, target);
         }
         void on_play(card *origin_card, player *origin, card *chosen_card, player *target);
     };

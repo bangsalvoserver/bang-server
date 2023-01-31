@@ -3,12 +3,9 @@
 
 #include "cards/card_effect.h"
 #include "game/bot_suggestion.h"
+#include "prompts.h"
 
 namespace banggame {
-    
-    struct prompt_target_self {
-        game_string on_prompt(card *origin_card, player *origin, card *target);
-    };
 
     struct effect_steal : prompt_target_self, bot_suggestion::target_enemy_card {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});

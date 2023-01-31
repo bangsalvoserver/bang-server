@@ -30,7 +30,7 @@ set(bangserver_srcs
     src/cards/base/pass_turn.cpp
     src/cards/base/play_card_action.cpp
     src/cards/base/predraw_check.cpp
-    src/cards/base/prompt_on_self_equip.cpp
+    src/cards/base/prompts.cpp
     src/cards/base/requests.cpp
     src/cards/base/resolve.cpp
     src/cards/base/scope.cpp

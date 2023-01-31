@@ -26,7 +26,6 @@
 #include "pass_turn.h"
 #include "play_card_action.h"
 #include "predraw_check.h"
-#include "prompt_on_self_equip.h"
 #include "requests.h"
 #include "resolve.h"
 #include "scope.h"
