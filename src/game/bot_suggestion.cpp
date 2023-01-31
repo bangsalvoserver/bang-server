@@ -72,7 +72,7 @@ namespace banggame::bot_suggestion {
     }
 
     bool target_enemy_card::on_check_target(card *origin_card, player *origin, card *target) {
-        if (target->pocket == pocket_type::player_hand && !target->self_equippable()) {
+        if (target->pocket == pocket_type::player_hand && !target->self_equippable() && !target->has_tag(tag_type::ghost_card)) {
             return target_friend{}.on_check_target(origin_card, origin, target);
         } else {
             return target_enemy{}.on_check_target(origin_card, origin, target);
