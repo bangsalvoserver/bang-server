@@ -95,6 +95,8 @@ namespace banggame {
         if (pending_requests()) {
             co_yield make_update<game_update_type::request_status>(make_request_update(nullptr));
         }
+
+        co_yield make_update<game_update_type::game_flags>(m_game_flags);
     }
 
     util::generator<Json::Value> game::get_rejoin_updates(player *target) {
