@@ -34,7 +34,7 @@ namespace banggame {
     }
 
     bool effect_lastwill::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_is<request_lastwill>(origin);
+        return origin->m_game->top_request<request_lastwill>(origin) != nullptr;
     }
 
     void handler_lastwill::on_play(card *origin_card, player *origin, const target_list &targets) {

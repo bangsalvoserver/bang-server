@@ -28,7 +28,7 @@ namespace banggame {
     }
 
     bool effect_lemonade_jim::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_is<request_lemonade_jim>(origin);
+        return origin->m_game->top_request<request_lemonade_jim>(origin) != nullptr;
     }
 
     void effect_lemonade_jim::on_play(card *origin_card, player *origin) {

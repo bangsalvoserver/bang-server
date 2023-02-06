@@ -319,13 +319,13 @@ namespace banggame {
     }
 
     request_status_args game::make_request_update(player *owner) {
-        const auto &req = top_request();
+        auto req = top_request();
         return request_status_args {
-            .origin_card = req.origin_card(),
-            .origin = req.origin(),
-            .target = req.target(),
-            .status_text = req.status_text(owner),
-            .flags = req.flags(),
+            .origin_card = req->origin_card,
+            .origin = req->origin,
+            .target = req->target,
+            .status_text = req->status_text(owner),
+            .flags = req->flags,
 
             .respond_cards = owner
                 ? ranges::views::concat(
@@ -343,7 +343,7 @@ namespace banggame {
                 | ranges::to<std::vector<not_null<card *>>>
                 : std::vector<not_null<card *>>{},
 
-            .pick_cards = owner && req.target() == owner
+            .pick_cards = owner && req->target == owner
                 ? ranges::views::concat(
                     m_players | ranges::views::for_each([](player *p) {
                         return ranges::views::concat(p->m_hand, p->m_table, p->m_characters);
@@ -353,12 +353,12 @@ namespace banggame {
                     m_discards | ranges::views::take(1)
                 )
                 | ranges::views::filter([&](card *target_card) {
-                    return req.can_pick(target_card);
+                    return req->can_pick(target_card);
                 })
                 | ranges::to<std::vector<not_null<card *>>>
                 : std::vector<not_null<card *>>{},
 
-            .highlight_cards = ranges::to<std::vector<not_null<card *>>>(req.get_highlights())
+            .highlight_cards = ranges::to<std::vector<not_null<card *>>>(req->get_highlights())
         };
     }
 

@@ -82,7 +82,7 @@ namespace banggame {
     }
     
     bool effect_while_drawing::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_is<request_draw>(origin);
+        return origin->m_game->top_request<request_draw>(origin) != nullptr;
     }
 
     void effect_reset_drawing::on_play(card *origin_card, player *origin) {
@@ -99,7 +99,7 @@ namespace banggame {
     }
 
     void effect_end_drawing::on_play(card *origin_card, player *origin) {
-        if (origin->m_game->top_request_is<request_draw>()) {
+        if (origin->m_game->top_request<request_draw>()) {
             origin->m_game->pop_request();
             origin->m_game->queue_action([=]{
                 origin->m_game->call_event<event_type::on_draw_from_deck>(origin);

@@ -28,7 +28,7 @@ namespace banggame {
     };
 
     game_string effect_forced_play::verify(card *origin_card, player *target) {
-        if (auto *req = target->m_game->top_request_if<request_force_play_card>(target)) {
+        if (auto req = target->m_game->top_request<request_force_play_card>(target)) {
             if (origin_card == req->target_card
                 || ((req->target_card->modifier_type() == card_modifier_type::shopchoice)
                     && origin_card->pocket == pocket_type::hidden_deck
@@ -67,7 +67,7 @@ namespace banggame {
     };
 
     game_string effect_forced_equip::verify(card *origin_card, player *origin, player *target) {
-        if (auto *req = target->m_game->top_request_if<request_force_equip_card>(origin)) {
+        if (auto req = target->m_game->top_request<request_force_equip_card>(origin)) {
             card *target_card = req->target_card;
             MAYBE_RETURN(check_player_filter(origin, target_card->equip_target, target));
             if (card *equipped = target->find_equipped_card(target_card)) {
@@ -80,7 +80,7 @@ namespace banggame {
     }
 
     game_string effect_forced_equip::on_prompt(card *origin_card, player *origin, player *target) {
-        card *target_card = origin->m_game->top_request().get<request_force_equip_card>().target_card;
+        card *target_card = origin->m_game->top_request<request_force_equip_card>()->target_card;
         for (const auto &e : target_card->equips) {
             if (auto prompt_message = e.on_prompt(target_card, origin, target)) {
                 return prompt_message;
@@ -90,7 +90,7 @@ namespace banggame {
     }
     
     void effect_forced_equip::on_play(card *origin_card, player *origin, player *target) {
-        card *target_card = origin->m_game->top_request().get<request_force_equip_card>().target_card;
+        card *target_card = origin->m_game->top_request<request_force_equip_card>()->target_card;
         origin->m_game->invoke_action([&]{
             origin->m_game->pop_request();
 

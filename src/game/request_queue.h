@@ -2,6 +2,7 @@
 #define __REQUEST_QUEUE_H__
 
 #include <deque>
+#include <memory>
 #include <functional>
 
 #include "holders.h"
@@ -23,7 +24,7 @@ namespace banggame {
 
     class request_queue {
     private:
-        std::deque<request_holder> m_requests;
+        std::deque<std::shared_ptr<request_base>> m_requests;
         utils::stable_priority_queue<action_priority_pair, action_ordering> m_delayed_actions;
         int m_lock_updates = 0;
 
@@ -34,6 +35,8 @@ namespace banggame {
     public:
         request_queue(game *m_game) : m_game(m_game) {}
         
+        void tick();
+
         void invoke_action(delayed_action &&fun);
         void queue_action(delayed_action &&fun, int priority = 0);
         void pop_request();
@@ -47,20 +50,15 @@ namespace banggame {
             return pending_requests() || !m_delayed_actions.empty() || m_lock_updates;
         }
 
-        request_holder &top_request() {
-            return m_requests.front();
-        }
-
         template<typename T = request_base>
-        T *top_request_if(player *target = nullptr) {
-            if (!pending_requests()) return nullptr;
-            request_holder &req = top_request();
-            return !target || req.target() == target ? req.get_if<T>() : nullptr;
-        }
-
-        template<typename T>
-        bool top_request_is(player *target = nullptr) {
-            return top_request_if<T>(target) != nullptr;
+        std::shared_ptr<T> top_request(player *target = nullptr) {
+            if (!m_requests.empty()) {
+                auto req = m_requests.front();
+                if (!target || req->target == target) {
+                    return std::dynamic_pointer_cast<T>(req);
+                }
+            }
+            return nullptr;
         }
 
         void queue_request_front(std::shared_ptr<request_base> &&value) {
@@ -83,12 +81,6 @@ namespace banggame {
         template<std::derived_from<request_base> T>
         void queue_request(auto && ... args) {
             queue_request(std::make_shared<T>(FWD(args) ... ));
-        }
-
-        void tick() {
-            if (pending_requests()) {
-                top_request().tick(this);
-            }
         }
     };
 

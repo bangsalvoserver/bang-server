@@ -41,7 +41,7 @@ namespace banggame {
 
     void equip_kit_carlson::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
-            if (target->m_game->top_request_is<request_draw>(target) && target == origin && target->get_cards_to_draw() < 3) {
+            if (target->m_game->top_request<request_draw>(target) && target == origin && target->get_cards_to_draw() < 3) {
                 target->m_game->invoke_action([&]{
                     target->m_game->pop_request();
                     target->m_game->queue_request<request_kit_carlson>(target_card, target);

@@ -261,18 +261,16 @@ namespace banggame {
     game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, card *target_card) {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
-        } else if (!m_game->pending_requests()) {
-            return "ERROR_NO_PENDING_REQUEST";
-        } else if (auto &req = m_game->top_request(); req.target() != this) {
-            return "ERROR_PLAYER_NOT_IN_TURN";
-        } else {
+        } else if (auto req = m_game->top_request(this)) {
             m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
-            if (req.can_pick(target_card)) {
-                req.on_pick(target_card);
+            if (req->can_pick(target_card)) {
+                req->on_pick(target_card);
                 return {};
             } else {
                 return "ERROR_INVALID_PICK";
             }
+        } else {
+            return "ERROR_NO_PENDING_REQUEST";
         }
     }
 

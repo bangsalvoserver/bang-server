@@ -5,7 +5,7 @@
 namespace banggame {
 
     void effect_disarm::on_play(card *origin_card, player *origin) {
-        player *shooter = origin->m_game->top_request().origin();
+        player *shooter = origin->m_game->top_request()->origin;
         effect_missed::on_play(origin_card, origin);
         if (shooter) {
             origin->m_game->queue_action([=]{

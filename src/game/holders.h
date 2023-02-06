@@ -2,7 +2,6 @@
 #define __HOLDERS_H__
 
 #include <concepts>
-#include <memory>
 
 #include "utils/reflector.h"
 #include "cards/card_effect.h"
@@ -65,91 +64,6 @@ namespace banggame {
         (short, tag_value)
         (tag_type, type)
     )
-
-    class request_holder {
-    public:
-        request_holder() = default;
-        
-        request_holder(std::shared_ptr<request_base> &&value)
-            : m_value(std::move(value)) {}
-
-        card *origin_card() const {
-            return m_value->origin_card;
-        }
-        player *origin() const {
-            return m_value->origin;
-        }
-        player *target() const {
-            return m_value->target;
-        }
-        effect_flags flags() const {
-            return m_value->flags;
-        }
-        bool is_sent() const {
-            return m_value->sent;
-        }
-        bool is_popped() const {
-            return m_value->popped;
-        }
-        void set_popped() {
-            m_value->popped = true;
-        }
-        game_string status_text(player *owner) const {
-            return m_value->status_text(owner);
-        }
-
-        bool can_pick(card *target_card) const {
-            return m_value->can_pick(target_card);
-        }
-
-        void on_pick(card *target_card) {
-            m_value->on_pick(target_card);
-        }
-
-        std::vector<card *> get_highlights() const {
-            return m_value->get_highlights();
-        }
-
-        void on_update() {
-            m_value->on_update();
-        }
-
-        void start(ticks total_update_time) {
-            if (auto *t = m_value->timer()) {
-                t->start(total_update_time);
-            }
-            m_value->sent = true;
-        }
-
-        void tick(request_queue *queue) {
-            if (auto *t = m_value->timer()) {
-                t->tick(queue);
-            }
-        }
-
-        template<typename T> auto &get() {
-            return dynamic_cast<T &>(*m_value);
-        }
-
-        template<typename T> const auto &get() const {
-            return dynamic_cast<const T &>(*m_value);
-        }
-
-        template<typename T> auto *get_if() {
-            return dynamic_cast<T *>(m_value.get());
-        }
-
-        template<typename T> const auto *get_if() const {
-            return dynamic_cast<const T *>(m_value.get());
-        }
-
-        template<typename T> bool is() const {
-            return get_if<T>() != nullptr;
-        }
-
-    private:
-        std::shared_ptr<request_base> m_value;
-    };
 }
 
 #endif

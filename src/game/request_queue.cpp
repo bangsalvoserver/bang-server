@@ -4,22 +4,33 @@
 
 namespace banggame {
     
+    void request_queue::tick() {
+        if (auto req = top_request()) {
+            if (auto *timer = req->timer()) {
+                timer->tick(this);
+            }
+        }
+    }
+    
     void request_queue::update_request() {
         if (m_lock_updates) return;
         if (m_game->check_flags(game_flags::game_over)) return;
 
-        if (pending_requests()) {
-            auto req = top_request();
-
+        if (auto req = top_request()) {
             ++m_lock_updates;
-            req.on_update();
+            req->on_update();
             --m_lock_updates;
 
-            if (req.is_popped()) {
+            if (req->popped) {
+                req.reset();
                 update_request();
             } else {
-                req.start(m_game->get_total_update_time());
+                req->sent = true;
+                if (auto *timer = req->timer()) {
+                    timer->start(m_game->get_total_update_time());
+                }
                 m_game->send_request_update();
+                req.reset();
 
                 for (player *p : m_game->m_players) {
                     if (p->is_bot() && m_game->request_bot_play(p, true)) {
@@ -40,13 +51,9 @@ namespace banggame {
     }
 
     void request_queue::invoke_action(delayed_action &&fun) {
-        {
-            request_holder copy;
-            if (pending_requests()) copy = top_request();
-            ++m_lock_updates;
-            std::invoke(fun);
-            --m_lock_updates;
-        }
+        ++m_lock_updates;
+        std::invoke(fun);
+        --m_lock_updates;
         update_request();
     }
     
@@ -58,12 +65,13 @@ namespace banggame {
     }
 
     void request_queue::pop_request() {
-        auto &req = top_request();
-        req.set_popped();
-        if (req.is_sent()) {
+        auto req = top_request();
+        req->popped = true;
+        if (req->sent) {
             m_game->send_request_status_clear();
         }
         m_requests.pop_front();
+        req.reset();
         update_request();
     }
 }

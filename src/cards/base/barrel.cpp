@@ -7,7 +7,8 @@ namespace banggame {
     
     void effect_barrel::on_play(card *origin_card, player *target) {
         target->m_game->invoke_action([&]{
-            target->m_game->top_request().get<missable_request>().add_card(origin_card);
+            auto req = target->m_game->top_request<missable_request>();
+            req->add_card(origin_card);
             target->m_game->draw_check_then(target, origin_card, [](card_sign sign) {
                 return sign.suit == card_suit::hearts;
             }, [=](bool result) {

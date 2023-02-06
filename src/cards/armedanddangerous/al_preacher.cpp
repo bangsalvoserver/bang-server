@@ -28,7 +28,7 @@ namespace banggame {
     }
 
     bool effect_al_preacher::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_is<request_al_preacher>(origin);
+        return origin->m_game->top_request<request_al_preacher>(origin) != nullptr;
     }
 
     void effect_al_preacher::on_play(card *origin_card, player *origin) {

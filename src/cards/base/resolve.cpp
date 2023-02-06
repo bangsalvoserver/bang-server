@@ -5,10 +5,11 @@
 namespace banggame {
 
     bool effect_resolve::can_respond(card *origin_card, player *origin) {
-        return origin->m_game->top_request_is<resolvable_request>(origin);
+        return origin->m_game->top_request<resolvable_request>(origin) != nullptr;
     }
     
     void effect_resolve::on_play(card *origin_card, player *origin) {
-        origin->m_game->top_request().get<resolvable_request>().on_resolve();
+        auto req = origin->m_game->top_request<resolvable_request>();
+        req->on_resolve();
     }
 }
