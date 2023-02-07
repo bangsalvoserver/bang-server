@@ -53,8 +53,8 @@ class cycle_player_iterator : public player_iterator_base {
 public:
     cycle_player_iterator() = default;
 
-    explicit cycle_player_iterator(player *p, int cycle = 0)
-        : player_iterator_base(p), m_cycle(cycle) {}
+    explicit cycle_player_iterator(player *p, int cycle = 0, bool no_skip_dead = false)
+        : player_iterator_base(p), m_cycle(cycle), m_no_skip_dead(no_skip_dead) {}
 
     cycle_player_iterator &operator++();
 
@@ -76,6 +76,7 @@ public:
 
 private:
     int m_cycle = 0;
+    bool m_no_skip_dead = false;
 };
 
 inline player *first_alive_player(player *p) {
@@ -86,9 +87,9 @@ inline player *first_alive_player(player *p) {
     }
 }
 
-inline auto range_all_players(player *p, int cycles = 1) {
+inline auto range_all_players(player *p, int cycles = 1, bool no_skip_dead = false) {
     player *begin = first_alive_player(p);
-    return ranges::subrange(cycle_player_iterator(begin), cycle_player_iterator(begin, cycles));
+    return ranges::subrange(cycle_player_iterator(begin, 0, no_skip_dead), cycle_player_iterator(begin, cycles, no_skip_dead));
 }
 
 inline auto range_other_players(player *p) {

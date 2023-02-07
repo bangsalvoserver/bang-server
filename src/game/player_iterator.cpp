@@ -37,7 +37,7 @@ namespace banggame {
                 m_it = list.begin();
                 ++m_cycle;
             }
-        } while(!(*m_it)->alive());
+        } while(!m_no_skip_dead && !(*m_it)->alive());
         return *this;
     }
 
@@ -49,7 +49,7 @@ namespace banggame {
                 --m_cycle;
             }
             --m_it;
-        } while(!(*m_it)->alive());
+        } while(!m_no_skip_dead && !(*m_it)->alive());
         return *this;
     }
 }
