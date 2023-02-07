@@ -1,9 +1,6 @@
 #ifndef __HOLDERS_H__
 #define __HOLDERS_H__
 
-#include <concepts>
-
-#include "utils/reflector.h"
 #include "cards/card_effect.h"
 
 namespace banggame {
