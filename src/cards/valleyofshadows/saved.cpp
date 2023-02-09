@@ -2,6 +2,7 @@
 
 #include "game/game.h"
 #include "cards/base/damage.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
     
@@ -17,8 +18,13 @@ namespace banggame {
         }
 
         bool can_pick(card *target_card) const override {
-            return target_card->pocket == (target->m_game->m_deck.empty() ? pocket_type::discard_pile : pocket_type::main_deck)
-                || target_card->pocket == pocket_type::player_hand && target_card->owner == saved;
+            bool is_deck = target_card->pocket == (target->m_game->m_deck.empty() ? pocket_type::discard_pile : pocket_type::main_deck);
+            bool is_hand = target_card->pocket == pocket_type::player_hand && target_card->owner == saved;
+            if (!saved->empty_hand() && target->is_bot()) {
+                return bot_suggestion::target_enemy{}.on_check_target(origin_card, target, saved) ? is_hand : is_deck;
+            } else {
+                return is_deck || is_hand;
+            }
         }
 
         void on_pick(card *target_card) override {
