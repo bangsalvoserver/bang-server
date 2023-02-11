@@ -219,8 +219,10 @@ namespace banggame {
         auto update = origin->m_game->make_request_update(origin);
 
         if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](card *c) { return c->pocket == pocket_type::button_row; })) {
-            auto req = origin->m_game->top_request();
-            req->on_pick(random_element(update.pick_cards, origin->m_game->rng));
+            origin->m_game->invoke_action([&]{
+                auto req = origin->m_game->top_request();
+                req->on_pick(random_element(update.pick_cards, origin->m_game->rng));
+            });
             return true;
         } else if (!update.respond_cards.empty()) {
             return generate_random_play_impl(origin, true,

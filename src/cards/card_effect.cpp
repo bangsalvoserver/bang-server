@@ -33,12 +33,9 @@ namespace banggame {
         lifetime = duration + total_update_time;
     }
 
-    void request_timer::tick(request_queue *queue) {
-        if (enabled() && request->sent && --lifetime <= ticks{0}) {
-            queue->invoke_action([&]{
-                queue->pop_request();
-                on_finished();
-            });
+    void request_timer::tick() {
+        if (request && request->sent) {
+            --lifetime;
         }
     }
 

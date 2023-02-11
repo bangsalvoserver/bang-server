@@ -64,11 +64,11 @@ namespace banggame {
     }
 
     void effect_saved::on_play(card *origin_card, player *origin) {
-        auto req = origin->m_game->top_request<request_damage>();
-        player *saved = req->target;
-        req->savior = origin;
-
         origin->m_game->invoke_action([&]{
+            auto req = origin->m_game->top_request<request_damage>();
+            player *saved = req->target;
+            req->savior = origin;
+
             if (--req->damage == 0) {
                 origin->m_game->pop_request();
             }

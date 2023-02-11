@@ -46,12 +46,12 @@ namespace banggame {
 
     public:
         void start(ticks total_update_time);
-        void tick(request_queue *queue);
+        void tick();
+        bool finished() const { return lifetime <= ticks{0}; }
+        virtual void on_finished() {}
 
         void disable() { request = nullptr; }
         bool enabled() const { return request != nullptr; }
-
-        virtual void on_finished() {}
     };
 
     class request_base {

@@ -264,7 +264,10 @@ namespace banggame {
         } else if (auto req = m_game->top_request(this)) {
             m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
             if (req->can_pick(target_card)) {
-                req->on_pick(target_card);
+                m_game->invoke_action([&]{
+                    req->on_pick(target_card);
+                    req.reset();
+                });
                 return {};
             } else {
                 return "ERROR_INVALID_PICK";

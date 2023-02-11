@@ -7,7 +7,14 @@ namespace banggame {
     void request_queue::tick() {
         if (auto req = top_request()) {
             if (auto *timer = req->timer()) {
-                timer->tick(this);
+                timer->tick();
+                if (timer->finished()) {
+                    invoke_action([&]{
+                        pop_request();
+                        timer->on_finished();
+                        req.reset();
+                    });
+                }
             }
         }
     }
