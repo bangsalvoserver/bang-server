@@ -27,7 +27,6 @@ namespace banggame {
         card *origin_card;
         const effect_holder &effect;
 
-        void add_context(effect_context &ctx);
         game_string verify(const effect_context &ctx);
         duplicate_set duplicates();
         game_string prompt(const effect_context &ctx);
@@ -42,7 +41,6 @@ namespace banggame {
         card *origin_card;
         const effect_holder &effect;
 
-        void add_context(effect_context &ctx, arg_type arg);
         game_string verify(const effect_context &ctx, arg_type arg);
         duplicate_set duplicates(arg_type arg);
         game_string prompt(const effect_context &ctx, arg_type arg);

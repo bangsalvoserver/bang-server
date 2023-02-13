@@ -156,10 +156,11 @@ namespace banggame {
     DEFINE_ENUM_FWD_TYPES(card_modifier_type,
         (none)
         (bangmod)
+        (bandolier, modifier_bandolier)
+        (belltower, modifier_belltower)
         (shopchoice)
         (discount, modifier_discount)
         (leevankliff, modifier_leevankliff)
-        (belltower, modifier_belltower)
     )
 
     DEFINE_ENUM_FLAGS(effect_flags,
@@ -174,6 +175,7 @@ namespace banggame {
     DEFINE_ENUM_FWD_TYPES(effect_type,
         (none)
         (mth_add)
+        (ctx_add)
         (play_card_action,      effect_play_card_action)
         (max_usages,            effect_max_usages)
         (pass_turn,             effect_pass_turn)

@@ -24,10 +24,10 @@ namespace banggame {
 
         std::vector<card *> modifier_cards() const;
 
-        game_string verify_modifiers(effect_context &ctx) const;
+        game_string verify_modifiers_add_context(effect_context &ctx) const;
         game_string verify_duplicates() const;
         game_string verify_equip_target() const;
-        game_string verify_card_targets(effect_context &ctx) const;
+        game_string verify_card_targets_add_context(effect_context &ctx) const;
 
         game_string check_prompt(const effect_context &ctx = {}) const;
         game_string check_prompt_equip() const;

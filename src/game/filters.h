@@ -114,7 +114,8 @@ namespace banggame {
     inline modifier_bitset_t allowed_modifiers_after(card_modifier_type modifier) {
         switch (modifier) {
         case card_modifier_type::bangmod:
-            return modifier_bitset(card_modifier_type::bangmod);
+        case card_modifier_type::bandolier:
+            return modifier_bitset(card_modifier_type::bangmod, card_modifier_type::bandolier);
         case card_modifier_type::discount:
             return modifier_bitset(card_modifier_type::shopchoice);
         case card_modifier_type::shopchoice:
@@ -128,6 +129,7 @@ namespace banggame {
     inline bool allowed_card_with_modifier(filter_impl::player_ptr origin, filter_impl::card_ptr mod_card, filter_impl::card_ptr target) {
         switch (filter_impl::get_card_modifier(mod_card)) {
         case card_modifier_type::bangmod:
+        case card_modifier_type::bandolier:
             if (filter_impl::get_card_pocket(target) == pocket_type::player_hand) {
                 return filter_impl::get_card_tag(target, tag_type::bangcard).has_value();
             } else {

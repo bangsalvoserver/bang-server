@@ -51,21 +51,24 @@ namespace banggame {
                 return "ERROR_INVALID_TARGET_TYPE";
             } else if (effect.type == effect_type::mth_add) {
                 mth_targets.push_back(target);
+            } else if (effect.type == effect_type::ctx_add) {
+                if (target.is(target_type::card)) {
+                    origin_card->modifier.add_context(origin_card, origin, target.get<target_type::card>(), ctx);
+                } else if (target.is(target_type::player)) {
+                    origin_card->modifier.add_context(origin_card, origin, target.get<target_type::player>(), ctx);
+                } else {
+                    return "ERROR_INVALID_TARGET_TYPE";
+                }
             }
             
             MAYBE_RETURN(enums::visit_indexed(
                 [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
-                    play_visitor<E> visitor{origin, origin_card, effect};
-                    MAYBE_RETURN(visitor.verify(ctx, args ... ));
-                    visitor.add_context(ctx, args ... );
-                    return {};
+                    return play_visitor<E>{origin, origin_card, effect}.verify(ctx, FWD(args) ...);
                 }, target));
         }
 
         auto &mth = is_response ? origin_card->mth_response : origin_card->mth_effect;
-        MAYBE_RETURN(mth.verify(origin_card, origin, mth_targets, ctx));
-        mth.add_context(origin_card, origin, mth_targets, ctx);
-        return {};
+        return mth.verify(origin_card, origin, mth_targets, ctx);
     }
 
     static void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
@@ -100,7 +103,7 @@ namespace banggame {
         (is_response ? origin_card->mth_response : origin_card->mth_effect).on_play(origin_card, origin, mth_targets, ctx);
     }
     
-    game_string play_card_verify::verify_modifiers(effect_context &ctx) const {
+    game_string play_card_verify::verify_modifiers_add_context(effect_context &ctx) const {
         auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
         for (const auto &[mod_card, targets] : modifiers) {
             if (!mod_card->is_modifier()) {
@@ -114,8 +117,8 @@ namespace banggame {
             } else if (!allowed_card_with_modifier(origin, mod_card, origin_card)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
+            mod_card->modifier.add_context(mod_card, origin, ctx);
             MAYBE_RETURN(mod_card->modifier.verify(mod_card, origin, playing_card, ctx));
-            mod_card->modifier.add_context(mod_card, origin, playing_card, ctx);
             if (!(is_response ? mod_card->responses : mod_card->effects).empty()) {
                 MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
             }
@@ -213,7 +216,7 @@ namespace banggame {
         }
     }
 
-    game_string play_card_verify::verify_card_targets(effect_context &ctx) const {
+    game_string play_card_verify::verify_card_targets_add_context(effect_context &ctx) const {
         if (!playing_card) {
             return "ERROR_INVALID_CARD";
         }
@@ -228,7 +231,7 @@ namespace banggame {
             return {"ERROR_CARD_INACTIVE", playing_card};
         }
         MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, playing_card, game_string{}));
-        MAYBE_RETURN(verify_modifiers(ctx));
+        MAYBE_RETURN(verify_modifiers_add_context(ctx));
         MAYBE_RETURN(verify_target_list(origin, playing_card, is_response, targets, ctx));
         MAYBE_RETURN(verify_duplicates());
 
@@ -311,7 +314,7 @@ namespace banggame {
         case pocket_type::player_hand:
             if (origin_card->is_brown() || origin_card != playing_card) {
                 effect_context ctx;
-                MAYBE_RETURN(verify_card_targets(ctx));
+                MAYBE_RETURN(verify_card_targets_add_context(ctx));
                 origin->prompt_then(check_prompt(ctx), [*this, ctx]{
                     origin->add_played_card(origin_card, modifier_cards());
                     play_modifiers(ctx);
@@ -350,7 +353,7 @@ namespace banggame {
         case pocket_type::player_table:
         case pocket_type::button_row: {
             effect_context ctx;
-            MAYBE_RETURN(verify_card_targets(ctx));
+            MAYBE_RETURN(verify_card_targets_add_context(ctx));
             origin->prompt_then(check_prompt(ctx), [*this, ctx]{
                 origin->add_played_card(origin_card, modifier_cards());
                 play_modifiers(ctx);
@@ -367,7 +370,7 @@ namespace banggame {
             int cost = ranges::accumulate(modifiers | ranges::views::transform([](const modifier_pair &pair) { return pair.card->buy_cost(); }), origin_card->buy_cost());
             if (origin_card->is_brown()) {
                 effect_context ctx;
-                MAYBE_RETURN(verify_card_targets(ctx));
+                MAYBE_RETURN(verify_card_targets_add_context(ctx));
                 if (is_response) {
                     cost = 0;
                 } else if (ctx.discount) {
@@ -390,7 +393,7 @@ namespace banggame {
             } else {
                 effect_context ctx;
                 MAYBE_RETURN(verify_equip_target());
-                MAYBE_RETURN(verify_modifiers(ctx));
+                MAYBE_RETURN(verify_modifiers_add_context(ctx));
                 if (ctx.discount) --cost;
                 if (origin->m_gold < cost) {
                     return "ERROR_NOT_ENOUGH_GOLD";

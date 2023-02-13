@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    void effect_bandolier::add_context(card *origin_card, player *origin, effect_context &ctx) {
+    void modifier_bandolier::add_context(card *origin_card, player *origin, effect_context &ctx) {
         ctx.disable_banglimit = true;
     }
 

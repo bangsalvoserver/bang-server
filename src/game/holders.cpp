@@ -41,14 +41,6 @@ namespace banggame {
         }, holder.type);
     }
 
-    void effect_holder::add_context(card *origin_card, player *origin, effect_context &ctx) const {
-        visit_effect([&](auto &&value) {
-            if constexpr (requires { value.add_context(origin_card, origin, ctx); }) {
-                value.add_context(origin_card, origin, ctx);
-            }
-        }, *this);
-    }
-
     game_string effect_holder::verify(card *origin_card, player *origin, const effect_context &ctx) const {
         return visit_effect([&](auto &&value) -> game_string {
             if constexpr (requires { value.verify(origin_card, origin, ctx); }) {
@@ -88,14 +80,6 @@ namespace banggame {
         }, *this);
     }
 
-    void effect_holder::add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const {
-        visit_effect([&](auto &&value) {
-            if constexpr (requires { value.add_context(origin_card, origin, target, ctx); }) {
-                value.add_context(origin_card, origin, target, ctx);
-            }
-        }, *this);
-    }
-
     game_string effect_holder::verify(card *origin_card, player *origin, player *target, const effect_context &ctx) const {
         return visit_effect([&](auto &&value) -> game_string {
             if constexpr (requires { value.verify(origin_card, origin, target, ctx); }) {
@@ -127,14 +111,6 @@ namespace banggame {
                 value.on_play(origin_card, origin, target, flags);
             } else if constexpr (requires { value.on_play(origin_card, origin, target); }) {
                 value.on_play(origin_card, origin, target);
-            }
-        }, *this);
-    }
-
-    void effect_holder::add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const {
-        visit_effect([&](auto &&value) {
-            if constexpr (requires { value.add_context(origin_card, origin, target, ctx); }) {
-                value.add_context(origin_card, origin, target, ctx);
             }
         }, *this);
     }
@@ -232,12 +208,34 @@ namespace banggame {
         }, type);
     }
 
-    void modifier_holder::add_context(card *origin_card, player *origin, card *playing_card, effect_context &ctx) const {
+    void modifier_holder::add_context(card *origin_card, player *origin, effect_context &ctx) const {
         enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;
-                if constexpr (requires { handler.add_context(origin_card, origin, playing_card, ctx); }) {
-                    handler.add_context(origin_card, origin, playing_card, ctx);
+                if constexpr (requires { handler.add_context(origin_card, origin, ctx); }) {
+                    handler.add_context(origin_card, origin, ctx);
+                }
+            }
+        }, type);
+    }
+
+    void modifier_holder::add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const {
+        enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) {
+            if constexpr (enums::value_with_type<E>) {
+                enums::enum_type_t<E> handler;
+                if constexpr (requires { handler.add_context(origin_card, origin, target, ctx); }) {
+                    handler.add_context(origin_card, origin, target, ctx);
+                }
+            }
+        }, type);
+    }
+
+    void modifier_holder::add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const {
+        enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) {
+            if constexpr (enums::value_with_type<E>) {
+                enums::enum_type_t<E> handler;
+                if constexpr (requires { handler.add_context(origin_card, origin, target, ctx); }) {
+                    handler.add_context(origin_card, origin, target, ctx);
                 }
             }
         }, type);
@@ -254,17 +252,6 @@ namespace banggame {
                 }
             }
             return {};
-        }, type);
-    }
-
-    void mth_holder::add_context(card *origin_card, player *origin, const target_list &targets, effect_context &ctx) const {
-        enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) {
-            if constexpr (enums::value_with_type<E>) {
-                using handler_type = enums::enum_type_t<E>;
-                if constexpr (requires { mth_unwrapper{&handler_type::add_context}; }) {
-                    mth_unwrapper{&handler_type::add_context}(origin_card, origin, targets, ctx);
-                }
-            }
         }, type);
     }
 

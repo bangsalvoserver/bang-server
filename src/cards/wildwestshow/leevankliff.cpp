@@ -19,7 +19,7 @@ namespace banggame {
         return {};
     }
 
-    void modifier_leevankliff::add_context(card *origin_card, player *origin, card *playing_card, effect_context &ctx) {
+    void modifier_leevankliff::add_context(card *origin_card, player *origin, effect_context &ctx) {
         ctx.disable_banglimit = true;
         ctx.repeating = true;
     }

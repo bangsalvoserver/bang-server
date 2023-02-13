@@ -97,11 +97,15 @@ namespace banggame {
                 return allowed_card_with_modifier(origin, mod, target_card);
             })) return false;
 
-            if (!is_possible_to_play_impl(origin, target_card, index, ctx)) return false;
-
             if (!target_card->is_modifier()) {
-                return !get_effect_list(target_card, index).empty();
+                if (get_effect_list(target_card, index).empty()) return false;
+                effect_context ctx_copy = ctx;
+                for (card *mod_card : modifiers) {
+                    mod_card->modifier.add_context(mod_card, origin, ctx_copy);
+                }
+                return is_possible_to_play_impl(origin, target_card, index, ctx_copy);
             } else {
+                if (!is_possible_to_play_impl(origin, target_card, index, ctx)) return false;
                 if (!std::transform_reduce(
                     modifiers.begin(), modifiers.end(), modifier_bitset(target_card->modifier_type()), std::bit_and(),
                     [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }

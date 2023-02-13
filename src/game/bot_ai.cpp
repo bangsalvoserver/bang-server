@@ -19,13 +19,14 @@ namespace banggame {
         player *origin;
         card *origin_card;
         const effect_holder &holder;
+        const effect_context &ctx;
 
         player *operator()(enums::enum_tag_t<target_type::player>) const {
-            return random_element(make_player_target_set(origin, origin_card, holder), origin->m_game->rng);
+            return random_element(make_player_target_set(origin, origin_card, holder, ctx), origin->m_game->rng);
         }
 
         player *operator()(enums::enum_tag_t<target_type::conditional_player>) const {
-            auto targets = ranges::to<std::vector>(make_player_target_set(origin, origin_card, holder));
+            auto targets = ranges::to<std::vector>(make_player_target_set(origin, origin_card, holder, ctx));
             if (targets.empty()) {
                 return nullptr;
             } else {
@@ -34,7 +35,7 @@ namespace banggame {
         }
 
         card *operator()(enums::enum_tag_t<target_type::card>) const {
-            auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder));
+            auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
             return random_element(targets, origin->m_game->rng);
         }
 
@@ -42,7 +43,7 @@ namespace banggame {
             if (origin_card == origin->get_last_played_card()) {
                 return nullptr;
             } else {
-                auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder));
+                auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
                 return random_element(targets, origin->m_game->rng);
             }
         }
@@ -64,7 +65,7 @@ namespace banggame {
         }
 
         auto operator()(enums::enum_tag_t<target_type::cards> tag) const {
-            auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder));
+            auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
             return targets
                 | ranges::views::sample(holder.target_value, origin->m_game->rng)
                 | ranges::to<std::vector<not_null<card *>>>;
@@ -97,17 +98,17 @@ namespace banggame {
         }
     };
 
-    static play_card_target generate_random_target(player *origin, card *origin_card, const effect_holder &holder) {
+    static play_card_target generate_random_target(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
         return enums::visit_enum([&]<target_type E>(enums::enum_tag_t<E> tag) -> play_card_target {
             if constexpr (play_card_target::has_type<E>) {
-                return {tag, random_target_visitor{origin, origin_card, holder}(tag)};
+                return {tag, random_target_visitor{origin, origin_card, holder, ctx}(tag)};
             } else {
                 return tag;
             }
         }, holder.target);
     }
 
-    static card *random_card_playable_with_modifiers(player *origin, bool is_response, const std::vector<card *> &modifiers) {
+    static card *random_card_playable_with_modifiers(player *origin, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
         auto cards = ranges::views::concat(
             origin->m_characters,
             origin->m_table | ranges::views::remove_if(&card::inactive),
@@ -130,7 +131,7 @@ namespace banggame {
                 }
             }
             return std::ranges::all_of(modifiers, [&](card *mod) { return allowed_card_with_modifier(origin, mod, target_card); })
-                && is_possible_to_play(origin, target_card, is_response ? effect_list_index::responses : effect_list_index::effects);
+                && is_possible_to_play(origin, target_card, is_response ? effect_list_index::responses : effect_list_index::effects, ctx);
         });
 
         if (cards.empty()) {
@@ -140,7 +141,7 @@ namespace banggame {
         return random_element(cards, origin->m_game->rng);
     }
 
-    static play_card_verify generate_random_play(player *origin, card *origin_card, bool is_response, std::vector<card *> modifiers = {}) {
+    static play_card_verify generate_random_play(player *origin, card *origin_card, bool is_response, std::vector<card *> modifiers = {}, effect_context ctx = {}) {
         if (!is_response && (origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
             play_card_verify verifier { origin, origin_card };
             if (!origin_card->self_equippable()) {
@@ -150,17 +151,26 @@ namespace banggame {
             return verifier;
         } else if (origin_card->is_modifier()) {
             modifiers.push_back(origin_card);
-            origin_card = random_card_playable_with_modifiers(origin, is_response, modifiers);
+            origin_card->modifier.add_context(origin_card, origin, ctx);
+            origin_card = random_card_playable_with_modifiers(origin, is_response, modifiers, ctx);
             if (!origin_card) {
                 return play_card_verify{};
             }
-            return generate_random_play(origin, origin_card, is_response, std::move(modifiers));
+            return generate_random_play(origin, origin_card, is_response, std::move(modifiers), ctx);
         } else {
             play_card_verify verifier { origin, origin_card, is_response, {},
                 modifiers | ranges::views::transform([&](card *mod_card) {
                     return modifier_pair{mod_card, (is_response ? mod_card->responses : mod_card->effects)
                         | ranges::views::transform([&](const effect_holder &holder) {
-                            return generate_random_target(origin, mod_card, holder);
+                            auto target = generate_random_target(origin, mod_card, holder, ctx);
+                            if (holder.type == effect_type::ctx_add) {
+                                if (target.is(target_type::card)) {
+                                    mod_card->modifier.add_context(mod_card, origin, target.get<target_type::card>(), ctx);
+                                } else if (target.is(target_type::player)) {
+                                    mod_card->modifier.add_context(mod_card, origin, target.get<target_type::player>(), ctx);
+                                }
+                            }
+                            return target;
                         })
                         | ranges::to<target_list>};
                 }) | ranges::to<std::vector> };
@@ -168,18 +178,18 @@ namespace banggame {
                 return play_card_verify{};
             }
             for (const effect_holder &holder : is_response ? verifier.playing_card->responses : verifier.playing_card->effects) {
-                verifier.targets.push_back(generate_random_target(origin, verifier.playing_card, holder));
+                verifier.targets.push_back(generate_random_target(origin, verifier.playing_card, holder, ctx));
             }
-            if (is_possible_to_play(origin, origin_card, effect_list_index::optionals)) {
+            if (is_possible_to_play(origin, origin_card, effect_list_index::optionals, ctx)) {
                 for (const effect_holder &holder : verifier.playing_card->optionals) {
-                    verifier.targets.push_back(generate_random_target(origin, verifier.playing_card, holder));
+                    verifier.targets.push_back(generate_random_target(origin, verifier.playing_card, holder, ctx));
                 }
             }
             return verifier;
         }
     }
 
-    static bool generate_random_play_impl(player *origin, bool is_response, std::set<card *> const& cards, std::initializer_list<pocket_type> pockets) {
+    static bool execute_random_play(player *origin, bool is_response, std::set<card *> const& cards, std::initializer_list<pocket_type> pockets) {
         for (int i=0; i<10; ++i) {
             std::set<card *> card_set = cards;
             while (!card_set.empty()) {
@@ -211,7 +221,7 @@ namespace banggame {
         }
 
         // softlock
-        std::cout << "BOT ERROR: could not find card in generate_random_play_impl\n";
+        std::cout << "BOT ERROR: could not find card in execute_random_play\n";
         return false;
     }
 
@@ -225,7 +235,7 @@ namespace banggame {
             });
             return true;
         } else if (!update.respond_cards.empty()) {
-            return generate_random_play_impl(origin, true,
+            return execute_random_play(origin, true,
                 ranges::to<std::set<card *>>(update.respond_cards),
                 {
                     pocket_type::player_character,
@@ -238,7 +248,7 @@ namespace banggame {
     }
 
     static bool play_in_turn(player *origin) {
-        return generate_random_play_impl(origin, false,
+        return execute_random_play(origin, false,
             ranges::views::concat(
                 origin->m_characters,
                 origin->m_table | ranges::views::remove_if(&card::inactive),

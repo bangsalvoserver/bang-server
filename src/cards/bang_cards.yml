@@ -859,7 +859,7 @@ main_deck:
     image: 17_bandoliera
     expansion: armedanddangerous
     color: orange
-    modifier: bangmod
+    modifier: bandolier
     effects:
       - max_usages(1)
       - pay_cube self_cubes(1)

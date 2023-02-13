@@ -5,8 +5,11 @@
 
 namespace banggame {
 
-    struct effect_bandolier {
+    struct modifier_bandolier {
         void add_context(card *origin_card, player *origin, effect_context &ctx);
+    };
+
+    struct effect_bandolier {
         game_string on_prompt(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
