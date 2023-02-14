@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
             std::cout << options.help() << std::endl;
             return 0;
         }
-    } catch (const cxxopts::argument_incorrect_type &error) {
+    } catch (const std::exception &error) {
         std::cout << "Invalid arguments: " << error.what() << "\n";
         return 1;
     }
