@@ -276,12 +276,34 @@ namespace banggame {
             }
         );
     }
+    
+    struct bot_delay_request : request_base {
+        bot_delay_request(player *origin)
+            : request_base(nullptr, nullptr, nullptr)
+            , m_timer(this, origin) {}
+        
+        struct bot_delay_timer : request_timer {
+            bot_delay_timer(bot_delay_request *request, player *origin)
+                : request_timer(request, 0ms)
+                , origin(origin) {}
+            
+            player *origin;
+
+            void on_finished() override {
+                play_in_turn(origin);
+            }
+        };
+        
+        bot_delay_timer m_timer;
+        request_timer *timer() override { return &m_timer; }
+    };
 
     bool game::request_bot_play(player *origin, bool is_response) {
         if (is_response) {
             return respond_to_request(origin);
         } else {
-            return play_in_turn(origin);
+            queue_request_front<bot_delay_request>(origin);
+            return true;
         }
     }
 }
