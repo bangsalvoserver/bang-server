@@ -14,13 +14,9 @@ namespace banggame {
     struct play_card_verify {
         player *origin;
         card *origin_card;
-        card *playing_card;
         bool is_response;
         target_list targets;
         std::vector<modifier_pair> modifiers;
-
-        play_card_verify() = default;
-        play_card_verify(player *origin, card *origin_card, bool is_response = false, target_list targets = {}, std::vector<modifier_pair> modifiers = {});
 
         std::vector<card *> modifier_cards() const;
 

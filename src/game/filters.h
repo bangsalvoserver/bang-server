@@ -136,12 +136,8 @@ namespace banggame {
                 return filter_impl::get_card_tag(target, tag_type::play_as_bang).has_value();
             }
         case card_modifier_type::leevankliff:
-            if (auto last_played_card = filter_impl::get_last_played_card(origin)) {
-                if (filter_impl::get_card_color(last_played_card) != card_color_type::brown) return false;
-            } else {
-                return false;
-            }
-            return filter_impl::get_card_pocket(target) == pocket_type::player_hand && filter_impl::is_bangcard(origin, target);
+            return filter_impl::get_last_played_card(origin) == target
+                && filter_impl::get_card_color(target) == card_color_type::brown;
         case card_modifier_type::discount:
             return filter_impl::get_card_deck(target) == card_deck_type::goldrush;
         case card_modifier_type::shopchoice:

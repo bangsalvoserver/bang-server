@@ -158,9 +158,10 @@ namespace banggame {
             }
             return generate_random_play(origin, origin_card, is_response, std::move(modifiers), ctx);
         } else {
-            play_card_verify verifier { origin, origin_card, is_response, {},
-                modifiers | ranges::views::transform([&](card *mod_card) {
-                    return modifier_pair{mod_card, (is_response ? mod_card->responses : mod_card->effects)
+            play_card_verify verifier { origin, origin_card, is_response };
+            for (card *mod_card : modifiers) {
+                verifier.modifiers.emplace_back(mod_card,
+                    (is_response ? mod_card->responses : mod_card->effects)
                         | ranges::views::transform([&](const effect_holder &holder) {
                             auto target = generate_random_target(origin, mod_card, holder, ctx);
                             if (holder.type == effect_type::ctx_add) {
@@ -172,17 +173,15 @@ namespace banggame {
                             }
                             return target;
                         })
-                        | ranges::to<target_list>};
-                }) | ranges::to<std::vector> };
-            if (!verifier.playing_card) {
-                return play_card_verify{};
+                        | ranges::to<target_list>
+                );
             }
-            for (const effect_holder &holder : is_response ? verifier.playing_card->responses : verifier.playing_card->effects) {
-                verifier.targets.push_back(generate_random_target(origin, verifier.playing_card, holder, ctx));
+            for (const effect_holder &holder : is_response ? verifier.origin_card->responses : verifier.origin_card->effects) {
+                verifier.targets.push_back(generate_random_target(origin, verifier.origin_card, holder, ctx));
             }
             if (is_possible_to_play(origin, origin_card, effect_list_index::optionals, ctx)) {
-                for (const effect_holder &holder : verifier.playing_card->optionals) {
-                    verifier.targets.push_back(generate_random_target(origin, verifier.playing_card, holder, ctx));
+                for (const effect_holder &holder : verifier.origin_card->optionals) {
+                    verifier.targets.push_back(generate_random_target(origin, verifier.origin_card, holder, ctx));
                 }
             }
             return verifier;

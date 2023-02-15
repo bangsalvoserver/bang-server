@@ -10,17 +10,6 @@
 
 namespace banggame {
 
-    play_card_verify::play_card_verify(player *origin, card *origin_card, bool is_response, target_list targets, std::vector<modifier_pair> modifiers)
-        : origin(origin)
-        , origin_card(origin_card)
-        , playing_card(std::ranges::any_of(modifiers,
-            [](const modifier_pair &pair) {
-                return pair.card->modifier_type() == card_modifier_type::leevankliff;
-            }) ? origin->get_last_played_card() : origin_card)
-        , is_response(is_response)
-        , targets(std::move(targets))
-        , modifiers(std::move(modifiers)) {}
-
     std::vector<card *> play_card_verify::modifier_cards() const {
         return modifiers
             | ranges::views::transform(&modifier_pair::card)
@@ -118,7 +107,7 @@ namespace banggame {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             mod_card->modifier.add_context(mod_card, origin, ctx);
-            MAYBE_RETURN(mod_card->modifier.verify(mod_card, origin, playing_card, ctx));
+            MAYBE_RETURN(mod_card->modifier.verify(mod_card, origin, origin_card, ctx));
             if (!(is_response ? mod_card->responses : mod_card->effects).empty()) {
                 MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
             }
@@ -172,9 +161,9 @@ namespace banggame {
             }
         }
 
-        auto &effects = is_response ? playing_card->responses : playing_card->effects;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, playing_card->optionals)) {
-            MAYBE_RETURN(check(origin, playing_card, effect, target));
+        auto &effects = is_response ? origin_card->responses : origin_card->effects;
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+            MAYBE_RETURN(check(origin, origin_card, effect, target));
         }
 
         return {};
@@ -217,22 +206,22 @@ namespace banggame {
     }
 
     game_string play_card_verify::verify_card_targets_add_context(effect_context &ctx) const {
-        if (!playing_card) {
+        if (!origin_card) {
             return "ERROR_INVALID_CARD";
         }
 
-        if (playing_card->is_modifier()) {
+        if (origin_card->is_modifier()) {
             return "ERROR_INVALID_MODIFIER_CARD";
         }
-        if (card *disabler = origin->m_game->get_disabler(playing_card)) {
-            return {"ERROR_CARD_DISABLED_BY", playing_card, disabler};
+        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
+            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
-        if (playing_card->inactive) {
-            return {"ERROR_CARD_INACTIVE", playing_card};
+        if (origin_card->inactive) {
+            return {"ERROR_CARD_INACTIVE", origin_card};
         }
-        MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, playing_card, game_string{}));
+        MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{}));
         MAYBE_RETURN(verify_modifiers_add_context(ctx));
-        MAYBE_RETURN(verify_target_list(origin, playing_card, is_response, targets, ctx));
+        MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
         MAYBE_RETURN(verify_duplicates());
 
         return {};
@@ -257,11 +246,11 @@ namespace banggame {
         };
 
         for (const auto &[mod_card, mod_targets] : modifiers) {
-            MAYBE_RETURN(mod_card->modifier.on_prompt(mod_card, origin, playing_card));
+            MAYBE_RETURN(mod_card->modifier.on_prompt(mod_card, origin, origin_card));
             MAYBE_RETURN(check(mod_card, mod_targets));
         }
 
-        return check(playing_card, targets);
+        return check(origin_card, targets);
     }
 
     game_string play_card_verify::check_prompt_equip() const {
@@ -286,9 +275,9 @@ namespace banggame {
     }
 
     void play_card_verify::do_play_card(const effect_context &ctx) const {
-        origin->log_played_card(playing_card, is_response);
-        if (origin_card != playing_card || std::ranges::none_of(
-            ranges::views::concat(modifiers | ranges::views::transform(&modifier_pair::card), ranges::views::single(not_null(playing_card))),
+        origin->log_played_card(origin_card, is_response);
+        if (!ctx.repeating || std::ranges::none_of(
+            ranges::views::concat(modifiers | ranges::views::transform(&modifier_pair::card), ranges::views::single(not_null(origin_card))),
             [&](card *target_card) {
                 return ranges::contains(is_response ? target_card->responses : target_card->effects,
                     effect_type::play_card_action, &effect_holder::type);
@@ -297,8 +286,8 @@ namespace banggame {
             origin->play_card_action(origin_card);
         }
 
-        apply_target_list(origin, playing_card, is_response, targets, ctx);
-        origin->m_game->call_event<event_type::on_effect_end>(origin, playing_card);
+        apply_target_list(origin, origin_card, is_response, targets, ctx);
+        origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
     }
 
     game_string play_card_verify::verify_and_play() {
@@ -311,8 +300,14 @@ namespace banggame {
         }
 
         switch(origin_card->pocket) {
+        case pocket_type::main_deck:
+        case pocket_type::discard_pile:
+            if (std::ranges::none_of(modifiers, [](const modifier_pair &pair) { return pair.card->modifier_type() == card_modifier_type::leevankliff; })) {
+                return "ERROR_INVALID_MODIFIER_CARD";
+            }
+            [[fallthrough]];
         case pocket_type::player_hand:
-            if (origin_card->is_brown() || origin_card != playing_card) {
+            if (origin_card->is_brown()) {
                 effect_context ctx;
                 MAYBE_RETURN(verify_card_targets_add_context(ctx));
                 origin->prompt_then(check_prompt(ctx), [*this, ctx]{
