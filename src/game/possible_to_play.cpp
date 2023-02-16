@@ -88,7 +88,8 @@ namespace banggame {
                     return false;
                 }),
             origin->m_game->m_scenario_cards | ranges::views::take_last(1),
-            origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
+            origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1),
+            ranges::views::single(origin->get_last_played_card()) | ranges::views::filter([](card *c) { return c != nullptr; })
         ),
         [&](card *target_card) {
             if (ranges::contains(modifiers, target_card)) return false;
