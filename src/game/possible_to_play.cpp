@@ -1,5 +1,7 @@
 #include "possible_to_play.h"
 
+#include "filters.h"
+
 namespace banggame {
 
     static const effect_list &get_effect_list(card *origin_card, effect_list_index index) {
@@ -80,13 +82,7 @@ namespace banggame {
             origin->m_table | ranges::views::remove_if(&card::inactive),
             origin->m_hand | ranges::views::filter(&card::is_brown),
             origin->m_game->m_shop_selection,
-            origin->m_game->m_hidden_deck
-                | ranges::views::filter([&](card *c){
-                    if (auto it = std::ranges::find(modifiers, card_modifier_type::shopchoice, &card::modifier_type); it != modifiers.end()) {
-                        return c->get_tag_value(tag_type::shopchoice) == (*it)->get_tag_value(tag_type::shopchoice);
-                    }
-                    return false;
-                }),
+            origin->m_game->m_hidden_deck,
             origin->m_game->m_scenario_cards | ranges::views::take_last(1),
             origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1),
             ranges::views::single(origin->get_last_played_card()) | ranges::views::filter([](card *c) { return c != nullptr; })

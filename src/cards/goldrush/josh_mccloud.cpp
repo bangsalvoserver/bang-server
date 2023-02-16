@@ -27,23 +27,15 @@ namespace banggame {
         }
     };
 
-    game_string effect_forced_play::verify(card *origin_card, player *target) {
+    bool effect_forced_play::can_respond(card *origin_card, player *target) {
         if (auto req = target->m_game->top_request<request_force_play_card>(target)) {
-            if (origin_card == req->target_card
-                || ((req->target_card->modifier_type() == card_modifier_type::shopchoice)
-                    && origin_card->pocket == pocket_type::hidden_deck
-                    && origin_card->get_tag_value(tag_type::shopchoice) == req->target_card->get_tag_value(tag_type::shopchoice)
-            )) {
-                return {};
-            }
+            return origin_card == req->target_card;
         }
-        return "ERROR_INVALID_RESPONSE";
+        return false;
     }
 
     void effect_forced_play::on_play(card *origin_card, player *target) {
-        if (origin_card->pocket != pocket_type::hidden_deck) {
-            target->m_game->pop_request();
-        }
+        target->m_game->pop_request();
     }
 
     struct request_force_equip_card : request_base {
@@ -122,7 +114,7 @@ namespace banggame {
             } else {
                 discard_drawn_card();
             }
-        } else if (card->has_tag(tag_type::shopchoice) || is_possible_to_play(target, card)) {
+        } else if (is_possible_to_play(target, card)) {
             target->m_game->queue_request<request_force_play_card>(origin_card, target, card);
         } else {
             discard_drawn_card();

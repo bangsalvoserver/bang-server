@@ -1,6 +1,7 @@
 #include "game.h"
 #include "play_verify.h"
 #include "possible_to_play.h"
+#include "filters.h"
 
 namespace banggame {
 
@@ -142,26 +143,25 @@ namespace banggame {
         return random_element(cards, origin->m_game->rng);
     }
 
-    static play_card_verify generate_random_play(player *origin, card *origin_card, bool is_response, std::vector<card *> modifiers = {}, effect_context ctx = {}) {
+    static std::pair<target_list, modifier_list> generate_random_play(player *origin, card *origin_card, bool is_response, std::vector<card *> modifier_cards = {}, effect_context ctx = {}) {
         if (!is_response && (origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
-            play_card_verify verifier { origin, origin_card };
-            if (!origin_card->self_equippable()) {
-                verifier.targets.emplace_back(enums::enum_tag<target_type::player>,
-                    random_element(make_equip_set(origin, origin_card), origin->m_game->rng));
+            if (origin_card->self_equippable()) {
+                return {};
+            } else {
+                return {target_list{play_card_target{enums::enum_tag<target_type::player>,
+                    random_element(make_equip_set(origin, origin_card), origin->m_game->rng)}},
+                    modifier_list{}};
             }
-            return verifier;
         } else if (origin_card->is_modifier()) {
-            modifiers.push_back(origin_card);
+            modifier_cards.push_back(origin_card);
             origin_card->modifier.add_context(origin_card, origin, ctx);
-            origin_card = random_card_playable_with_modifiers(origin, is_response, modifiers, ctx);
-            if (!origin_card) {
-                return play_card_verify{};
-            }
-            return generate_random_play(origin, origin_card, is_response, std::move(modifiers), ctx);
+            origin_card = random_card_playable_with_modifiers(origin, is_response, modifier_cards, ctx);
+            return generate_random_play(origin, origin_card, is_response, std::move(modifier_cards), ctx);
         } else {
-            play_card_verify verifier { origin, origin_card, is_response };
-            for (card *mod_card : modifiers) {
-                verifier.modifiers.emplace_back(mod_card,
+            target_list targets;
+            modifier_list modifiers;
+            for (card *mod_card : modifier_cards) {
+                modifiers.emplace_back(mod_card,
                     (is_response ? mod_card->responses : mod_card->effects)
                         | ranges::views::transform([&](const effect_holder &holder) {
                             auto target = generate_random_target(origin, mod_card, holder, ctx);
@@ -177,15 +177,15 @@ namespace banggame {
                         | ranges::to<target_list>
                 );
             }
-            for (const effect_holder &holder : is_response ? verifier.origin_card->responses : verifier.origin_card->effects) {
-                verifier.targets.push_back(generate_random_target(origin, verifier.origin_card, holder, ctx));
+            for (const effect_holder &holder : is_response ? origin_card->responses : origin_card->effects) {
+                targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
             }
             if (is_possible_to_play(origin, origin_card, effect_list_index::optionals, ctx)) {
-                for (const effect_holder &holder : verifier.origin_card->optionals) {
-                    verifier.targets.push_back(generate_random_target(origin, verifier.origin_card, holder, ctx));
+                for (const effect_holder &holder : origin_card->optionals) {
+                    targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
                 }
             }
-            return verifier;
+            return {std::move(targets), std::move(modifiers)};
         }
     }
 
@@ -203,9 +203,9 @@ namespace banggame {
                 }();
 
                 card_set.erase(origin_card);
-                auto verifier = generate_random_play(origin, origin_card, is_response);
+                auto [targets, modifiers] = generate_random_play(origin, origin_card, is_response);
 
-                if (verifier.origin_card && !verifier.verify_and_play()) {
+                if (!verify_and_play(origin, origin_card, is_response, targets, modifiers)) {
                     if (auto &prompt = origin->m_prompt) {
                         auto fun = std::move(prompt->first);
                         prompt.reset();

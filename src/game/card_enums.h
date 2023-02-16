@@ -158,7 +158,7 @@ namespace banggame {
         (bangmod)
         (bandolier, modifier_bandolier)
         (belltower, modifier_belltower)
-        (shopchoice)
+        (shopchoice, modifier_shopchoice)
         (discount, modifier_discount)
         (leevankliff, modifier_leevankliff)
     )
@@ -219,6 +219,7 @@ namespace banggame {
         (goldrush,              effect_goldrush)
         (forced_play,           effect_forced_play)
         (forced_equip,          effect_forced_equip)
+        (shopchoice,            effect_shopchoice)
         (pay_cube,              effect_pay_cube)
         (add_cube,              effect_add_cube)
         (rust,                  effect_rust)
@@ -397,6 +398,7 @@ namespace banggame {
         bool disable_banglimit = false;
         bool discount = false;
         bool repeating = false;
+        int shopchoice = 0;
     };
 
 }

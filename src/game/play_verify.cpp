@@ -10,18 +10,8 @@
 
 namespace banggame {
 
-    std::vector<card *> play_card_verify::modifier_cards() const {
-        return modifiers
-            | ranges::views::transform(&modifier_pair::card)
-            | ranges::to<std::vector<card *>>;
-    }
-
     static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
         auto &effects = is_response ? origin_card->responses : origin_card->effects;
-
-        if (effects.empty()) {
-            return "ERROR_EFFECT_LIST_EMPTY";
-        }
         
         size_t diff = targets.size() - effects.size();
         if (auto repeatable = origin_card->get_tag_value(tag_type::repeatable)) {
@@ -59,40 +49,8 @@ namespace banggame {
         auto &mth = is_response ? origin_card->mth_response : origin_card->mth_effect;
         return mth.verify(origin_card, origin, mth_targets, ctx);
     }
-
-    static void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
-        std::vector<std::pair<const effect_holder &, const play_card_target &>> delay_effects;
-        card_cube_count selected_cubes;
-
-        target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, is_response ? origin_card->responses : origin_card->effects, origin_card->optionals)) {
-            if (effect.type == effect_type::mth_add) {
-                mth_targets.push_back(target);
-            } else if (effect.type == effect_type::pay_cube) {
-                if (auto *cs = target.get_if<target_type::select_cubes>()) {
-                    for (card *c : *cs) {
-                        ++selected_cubes[c];
-                    }
-                } else if (target.is(target_type::self_cubes)) {
-                    selected_cubes[origin_card] += effect.target_value;
-                }
-            } else {
-                delay_effects.emplace_back(effect, target);
-            }
-        }
-        for (const auto &[c, ncubes] : selected_cubes) {
-            origin->pay_cubes(c, ncubes);
-        }
-        for (const auto &[effect, target] : delay_effects) {
-            enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                play_visitor<E>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
-            }, target);
-        }
-
-        (is_response ? origin_card->mth_response : origin_card->mth_effect).on_play(origin_card, origin, mth_targets, ctx);
-    }
     
-    game_string play_card_verify::verify_modifiers_add_context(effect_context &ctx) const {
+    static game_string verify_modifiers_add_context(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
         auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
         for (const auto &[mod_card, targets] : modifiers) {
             if (!mod_card->is_modifier()) {
@@ -108,15 +66,13 @@ namespace banggame {
             }
             mod_card->modifier.add_context(mod_card, origin, ctx);
             MAYBE_RETURN(mod_card->modifier.verify(mod_card, origin, origin_card, ctx));
-            if (!(is_response ? mod_card->responses : mod_card->effects).empty()) {
-                MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
-            }
+            MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
             allowed_modifiers &= allowed_modifiers_after(mod_card->modifier_type());
         }
         return {};
     }
 
-    game_string play_card_verify::verify_duplicates() const {
+    static game_string verify_duplicates(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers) {
         struct {
             std::set<card *> selected_cards;
             std::set<player *> selected_players;
@@ -169,10 +125,7 @@ namespace banggame {
         return {};
     }
 
-    game_string play_card_verify::verify_equip_target() const {
-        if (is_response) {
-            return "ERROR_INVALID_RESPONSE_CARD";
-        }        
+    static game_string verify_equip_target(player *origin, card *origin_card, const target_list &targets) {
         if (card *disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
@@ -197,21 +150,32 @@ namespace banggame {
         return {};
     }
 
-    player *play_card_verify::get_equip_target() const {
-        if (origin_card->self_equippable()) {
-            return origin;
-        } else {
-            return targets.front().get<target_type::player>();
-        }
-    }
-
-    game_string play_card_verify::verify_card_targets_add_context(effect_context &ctx) const {
-        if (!origin_card) {
-            return "ERROR_INVALID_CARD";
+    static game_string verify_card_targets_add_context(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
+        switch (origin_card->pocket) {
+        case pocket_type::scenario_card:
+            if (origin_card != origin->m_game->m_scenario_cards.back()) {
+                return "ERROR_INVALID_SCENARIO_CARD";
+            }
+            break;
+        case pocket_type::wws_scenario_card:
+            if (origin_card != origin->m_game->m_wws_scenario_cards.back()) {
+                return "ERROR_INVALID_SCENARIO_CARD";
+            }
+            break;
+        case pocket_type::main_deck:
+        case pocket_type::discard_pile:
+        case pocket_type::shop_discard:
+            if (!ctx.repeating) {
+                return "ERROR_INVALID_MODIFIER_CARD";
+            }
+            break;
         }
 
         if (origin_card->is_modifier()) {
             return "ERROR_INVALID_MODIFIER_CARD";
+        }
+        if ((is_response ? origin_card->responses : origin_card->effects).empty()) {
+            return "ERROR_EFFECT_LIST_EMPTY";
         }
         if (card *disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
@@ -220,14 +184,14 @@ namespace banggame {
             return {"ERROR_CARD_INACTIVE", origin_card};
         }
         MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{}));
-        MAYBE_RETURN(verify_modifiers_add_context(ctx));
+        MAYBE_RETURN(verify_modifiers_add_context(origin, origin_card, is_response, modifiers, ctx));
         MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
-        MAYBE_RETURN(verify_duplicates());
+        MAYBE_RETURN(verify_duplicates(origin, origin_card, is_response, targets, modifiers));
 
         return {};
     }
 
-    game_string play_card_verify::check_prompt(const effect_context &ctx) const {
+    static game_string check_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         auto check = [&](card *c, const target_list &ts) {
             auto &effects = is_response ? c->responses : c->effects;
 
@@ -253,8 +217,7 @@ namespace banggame {
         return check(origin_card, targets);
     }
 
-    game_string play_card_verify::check_prompt_equip() const {
-        player *target = get_equip_target();
+    static game_string check_prompt_equip(card *origin_card, player *origin, player *target) {
         for (const auto &e : origin_card->equips) {
             if (auto prompt_message = e.on_prompt(origin_card, origin, target)) {
                 return prompt_message;
@@ -263,34 +226,102 @@ namespace banggame {
         return {};
     }
 
-    void play_card_verify::play_modifiers(const effect_context &ctx) const {
-        for (const auto &[mod_card, mod_targets] : modifiers) {
-            origin->log_played_card(mod_card, is_response);
-            auto &effects = is_response ? mod_card->responses : mod_card->effects;
-            if (!ranges::contains(effects, effect_type::play_card_action, &effect_holder::type)) {
-                origin->play_card_action(mod_card);
-            }
-            apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
+    inline int get_card_cost(card *origin_card, bool is_response, const modifier_list &modifiers, const effect_context &ctx) {
+        if (!is_response && !ctx.repeating && origin_card->pocket != pocket_type::player_table) {
+            return ranges::accumulate(modifiers | ranges::views::transform([](const modifier_pair &pair) {
+                return pair.card->buy_cost();
+            }), origin_card->buy_cost()) - ctx.discount;
+        } else {
+            return 0;
         }
     }
 
-    void play_card_verify::do_play_card(const effect_context &ctx) const {
-        origin->log_played_card(origin_card, is_response);
-        if (!ctx.repeating || std::ranges::none_of(
-            ranges::views::concat(modifiers | ranges::views::transform(&modifier_pair::card), ranges::views::single(not_null(origin_card))),
-            [&](card *target_card) {
-                return ranges::contains(is_response ? target_card->responses : target_card->effects,
-                    effect_type::play_card_action, &effect_holder::type);
-            }))
-        {
+    inline std::vector<card *> get_modifier_cards(const modifier_list &modifiers) {
+        return modifiers
+            | ranges::views::transform(&modifier_pair::card)
+            | ranges::to<std::vector<card *>>;
+    }
+
+    static void log_played_card(card *origin_card, player *origin, bool is_response) {
+        if (origin_card->has_tag(tag_type::skip_logs)) return;
+        
+        switch (origin_card->pocket) {
+        case pocket_type::player_hand:
+        case pocket_type::scenario_card:
+            origin->m_game->add_log(is_response ? "LOG_RESPONDED_WITH_CARD" : "LOG_PLAYED_CARD", origin_card, origin);
+            break;
+        case pocket_type::player_table:
+            origin->m_game->add_log(is_response ? "LOG_RESPONDED_WITH_CARD" : "LOG_PLAYED_TABLE_CARD", origin_card, origin);
+            break;
+        case pocket_type::player_character:
+            origin->m_game->add_log(is_response ?
+                origin_card->has_tag(tag_type::drawing)
+                    ? "LOG_DRAWN_WITH_CHARACTER"
+                    : "LOG_RESPONDED_WITH_CHARACTER"
+                : "LOG_PLAYED_CHARACTER", origin_card, origin);
+            break;
+        case pocket_type::shop_selection:
+            origin->m_game->add_log("LOG_BOUGHT_CARD", origin_card, origin);
+            break;
+        }
+    }
+
+    static void log_equipped_card(card *origin_card, player *origin, player *target) {
+        if (origin_card->pocket == pocket_type::shop_selection) {
+            if (origin == target) {
+                origin->m_game->add_log("LOG_BOUGHT_EQUIP", origin_card, origin);
+            } else {
+                origin->m_game->add_log("LOG_BOUGHT_EQUIP_TO", origin_card, origin, target);
+            }
+        } else {
+            if (origin == target) {
+                origin->m_game->add_log("LOG_EQUIPPED_CARD", origin_card, origin);
+            } else {
+                origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", origin_card, origin, target);
+            }
+        }
+    }
+
+    void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+        log_played_card(origin_card, origin, is_response);
+
+        auto &effects = is_response ? origin_card->responses : origin_card->effects;
+        if (!ctx.repeating && !ranges::contains(effects, effect_type::play_card_action, &effect_holder::type)) {
             origin->play_card_action(origin_card);
         }
 
-        apply_target_list(origin, origin_card, is_response, targets, ctx);
-        origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
+        std::vector<std::pair<const effect_holder &, const play_card_target &>> delay_effects;
+        card_cube_count selected_cubes;
+
+        target_list mth_targets;
+        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+            if (effect.type == effect_type::mth_add) {
+                mth_targets.push_back(target);
+            } else if (effect.type == effect_type::pay_cube) {
+                if (auto *cs = target.get_if<target_type::select_cubes>()) {
+                    for (card *c : *cs) {
+                        ++selected_cubes[c];
+                    }
+                } else if (target.is(target_type::self_cubes)) {
+                    selected_cubes[origin_card] += effect.target_value;
+                }
+            } else {
+                delay_effects.emplace_back(effect, target);
+            }
+        }
+        for (const auto &[c, ncubes] : selected_cubes) {
+            origin->pay_cubes(c, ncubes);
+        }
+        for (const auto &[effect, target] : delay_effects) {
+            enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                play_visitor<E>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
+            }, target);
+        }
+
+        (is_response ? origin_card->mth_response : origin_card->mth_effect).on_play(origin_card, origin, mth_targets, ctx);
     }
 
-    game_string play_card_verify::verify_and_play() {
+    game_string verify_and_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers) {
         if (!is_response) {
             if (origin->m_game->pending_requests()) {
                 return "ERROR_MUST_RESPOND_TO_REQUEST";
@@ -299,124 +330,66 @@ namespace banggame {
             }
         }
 
-        switch(origin_card->pocket) {
-        case pocket_type::main_deck:
-        case pocket_type::discard_pile:
-        case pocket_type::shop_discard:
-            if (!contains_modifier(modifiers, card_modifier_type::leevankliff)) {
-                return "ERROR_INVALID_MODIFIER_CARD";
+        effect_context ctx;
+
+        if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
+            if (is_response) {
+                return "ERROR_INVALID_RESPONSE_CARD";
             }
-            [[fallthrough]];
-        case pocket_type::player_hand:
-            if (origin_card->is_brown()) {
-                effect_context ctx;
-                MAYBE_RETURN(verify_card_targets_add_context(ctx));
-                origin->prompt_then(check_prompt(ctx), [*this, ctx]{
-                    origin->add_played_card(origin_card, modifier_cards());
-                    play_modifiers(ctx);
-                    do_play_card(ctx);
-                });
-            } else {
-                MAYBE_RETURN(verify_equip_target());
-                origin->prompt_then(check_prompt_equip(), [*this]{
-                    origin->add_played_card(origin_card, modifier_cards());
-                    player *target = get_equip_target();
-                    origin_card->on_equip(target);
-                    if (origin == target) {
-                        origin->m_game->add_log("LOG_EQUIPPED_CARD", origin_card, origin);
-                    } else {
-                        origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", origin_card, origin, target);
-                    }
-                    target->equip_card(origin_card);
-                    if (origin_card->is_green()) {
-                        origin_card->inactive = true;
-                        origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
-                    }
-                    origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card);
-                    origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
-                });
+
+            MAYBE_RETURN(verify_equip_target(origin, origin_card, targets));
+            MAYBE_RETURN(verify_modifiers_add_context(origin, origin_card, is_response, modifiers, ctx));
+
+            int cost = get_card_cost(origin_card, is_response, modifiers, ctx);
+            if (origin->m_gold < cost) {
+                return "ERROR_NOT_ENOUGH_GOLD";
             }
-            break;
-        case pocket_type::scenario_card:
-        case pocket_type::wws_scenario_card:
-            if (origin_card->pocket == pocket_type::scenario_card && origin_card != origin->m_game->m_scenario_cards.back()) {
-                return "ERROR_INVALID_SCENARIO_CARD";
-            } else if (origin_card->pocket == pocket_type::wws_scenario_card && origin_card != origin->m_game->m_wws_scenario_cards.back()) {
-                return "ERROR_INVALID_SCENARIO_CARD";
+
+            player *target = origin;
+            if (!origin_card->self_equippable()) {
+                target = targets.front().get<target_type::player>();
             }
-            [[fallthrough]];
-        case pocket_type::player_character:
-        case pocket_type::player_table:
-        case pocket_type::button_row: {
-            effect_context ctx;
-            MAYBE_RETURN(verify_card_targets_add_context(ctx));
-            origin->prompt_then(check_prompt(ctx), [*this, ctx]{
-                origin->add_played_card(origin_card, modifier_cards());
-                play_modifiers(ctx);
-                do_play_card(ctx);
+
+            origin->prompt_then(check_prompt_equip(origin_card, origin, target), [=]{
+                origin->add_played_card(origin_card, get_modifier_cards(modifiers));
+
+                origin->add_gold(-cost);
+                origin_card->on_equip(target);
+                log_equipped_card(origin_card, origin, target);
+                for (const auto &[mod_card, mod_targets] : modifiers) {
+                    apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
+                }
+                target->equip_card(origin_card);
+
+                if (origin_card->is_green()) {
+                    origin_card->inactive = true;
+                    origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
+                } else if (origin_card->is_black()) {
+                    origin->m_game->draw_shop_card();
+                }
+
+                origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card);
+                origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
             });
-            break;
-        }
-        case pocket_type::hidden_deck:
-            if (!contains_modifier(modifiers, card_modifier_type::shopchoice, card_modifier_type::leevankliff)) {
-                return "ERROR_INVALID_MODIFIER_CARD";
+        } else {
+            MAYBE_RETURN(verify_card_targets_add_context(origin, origin_card, is_response, targets, modifiers, ctx));
+
+            int cost = get_card_cost(origin_card, is_response, modifiers, ctx);
+            if (origin->m_gold < cost) {
+                return "ERROR_NOT_ENOUGH_GOLD";
             }
-            [[fallthrough]];
-        case pocket_type::shop_selection: {
-            int cost = ranges::accumulate(modifiers | ranges::views::transform([](const modifier_pair &pair) { return pair.card->buy_cost(); }), origin_card->buy_cost());
-            if (origin_card->is_brown()) {
-                effect_context ctx;
-                MAYBE_RETURN(verify_card_targets_add_context(ctx));
-                if (is_response || ctx.repeating) {
-                    cost = 0;
-                } else if (ctx.discount) {
-                    --cost;
+
+            origin->prompt_then(check_prompt(origin, origin_card, is_response, targets, modifiers, ctx), [=]{
+                origin->add_played_card(origin_card, get_modifier_cards(modifiers));
+
+                origin->add_gold(-cost);
+                for (const auto &[mod_card, mod_targets] : modifiers) {
+                    apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
                 }
-                if (origin->m_gold < cost) {
-                    return "ERROR_NOT_ENOUGH_GOLD";
-                }
-                origin->prompt_then(check_prompt(ctx), [*this, cost, ctx]{
-                    origin->add_played_card(origin_card, modifier_cards());
-                    origin->add_gold(-cost);
-                    play_modifiers(ctx);
-                    do_play_card(ctx);
-                    origin->m_game->queue_action([m_game = origin->m_game]{
-                        while (m_game->m_shop_selection.size() < 3) {
-                            m_game->draw_shop_card();
-                        }
-                    }, -1);
-                });
-            } else {
-                effect_context ctx;
-                MAYBE_RETURN(verify_equip_target());
-                MAYBE_RETURN(verify_modifiers_add_context(ctx));
-                if (ctx.discount) --cost;
-                if (origin->m_gold < cost) {
-                    return "ERROR_NOT_ENOUGH_GOLD";
-                }
-                origin->prompt_then(check_prompt_equip(), [*this, cost, ctx]{
-                    origin->add_played_card(origin_card, modifier_cards());
-                    player *target = get_equip_target();
-                    origin_card->on_equip(target);
-                    if (origin == target) {
-                        origin->m_game->add_log("LOG_BOUGHT_EQUIP", origin_card, origin);
-                    } else {
-                        origin->m_game->add_log("LOG_BOUGHT_EQUIP_TO", origin_card, origin, target);
-                    }
-                    origin->add_gold(-cost);
-                    play_modifiers(ctx);
-                    target->equip_card(origin_card);
-                    origin->m_game->queue_action([m_game = origin->m_game]{
-                        while (m_game->m_shop_selection.size() < 3) {
-                            m_game->draw_shop_card();
-                        }
-                    }, -1);
-                });
-            }
-            break;
-        }
-        default:
-            return "ERROR_INVALID_CARD_POCKET";
+                apply_target_list(origin, origin_card, is_response, targets, ctx);
+
+                origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
+            });
         }
         return {};
     }

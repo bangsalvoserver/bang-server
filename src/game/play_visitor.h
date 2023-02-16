@@ -1,7 +1,7 @@
 #ifndef __PLAY_VISITOR_H__
 #define __PLAY_VISITOR_H__
 
-#include "play_verify.h"
+#include "filters.h"
 #include "player.h"
 #include "game.h"
 

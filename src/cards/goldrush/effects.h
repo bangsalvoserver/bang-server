@@ -15,6 +15,7 @@
 #include "ruleset.h"
 #include "rum.h"
 #include "sell_beer.h"
+#include "shopchoice.h"
 #include "wanted.h"
 
 #endif

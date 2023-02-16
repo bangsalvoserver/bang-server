@@ -1980,9 +1980,10 @@ goldrush:
     image: 04_bottiglia_panico
     color: brown
     effects:
+      - shopchoice
       - steal card range_1
     responses:
-      - forced_play
+      - shopchoice
       - steal card range_1
     tags:
       - shopchoice(1)
@@ -1991,9 +1992,10 @@ goldrush:
     image: 04_bottiglia_birra
     color: brown
     effects:
+      - shopchoice
       - heal
     responses:
-      - forced_play
+      - shopchoice
       - heal
     tags:
       - shopchoice(1)
@@ -2002,9 +2004,10 @@ goldrush:
     image: 04_bottiglia_bang
     color: brown
     effects:
+      - shopchoice
       - bang player reachable notself
     responses:
-      - forced_play
+      - shopchoice
       - bang player reachable notself
     tags:
       - shopchoice(1)
@@ -2038,10 +2041,11 @@ goldrush:
     image: 04_complice_emporio
     color: brown
     effects:
+      - shopchoice
       - generalstore
       - generalstore players
     responses:
-      - forced_play
+      - shopchoice
       - generalstore
       - generalstore players
     tags:
@@ -2051,9 +2055,10 @@ goldrush:
     image: 04_complice_duello
     color: brown
     effects:
+      - shopchoice
       - duel player notself
     responses:
-      - forced_play
+      - shopchoice
       - duel player notself
     tags:
       - shopchoice(2)
@@ -2062,9 +2067,10 @@ goldrush:
     image: 04_complice_catbalou
     color: brown
     effects:
+      - shopchoice
       - destroy card
     responses:
-      - forced_play
+      - shopchoice
       - destroy card
     tags:
       - shopchoice(2)

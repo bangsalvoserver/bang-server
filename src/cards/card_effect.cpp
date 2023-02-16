@@ -22,8 +22,9 @@ namespace banggame {
                 && std::ranges::all_of(origin_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
             ) {
                 target->m_game->invoke_action([&]{
-                    play_card_verify{target, origin_card, true,
-                        target_list{origin_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}}.do_play_card();
+                    apply_target_list(target, origin_card, true,
+                        target_list{origin_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}});
+                    target->m_game->call_event<event_type::on_effect_end>(target, origin_card);
                 });
             }
         }

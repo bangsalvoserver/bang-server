@@ -292,32 +292,13 @@ namespace banggame {
             if (origin_card->is_brown()) {
                 m_game->move_card(origin_card, pocket_type::shop_discard);
             }
+            m_game->queue_action([m_game=m_game]{
+                while (m_game->m_shop_selection.size() < 3) {
+                    m_game->draw_shop_card();
+                }
+            }, -1);
             break;
         default:
-            break;
-        }
-    }
-
-    void player::log_played_card(card *origin_card, bool is_response) {
-        if (origin_card->has_tag(tag_type::skip_logs)) return;
-        
-        switch (origin_card->pocket) {
-        case pocket_type::player_hand:
-        case pocket_type::scenario_card:
-            m_game->add_log(is_response ? "LOG_RESPONDED_WITH_CARD" : "LOG_PLAYED_CARD", origin_card, this);
-            break;
-        case pocket_type::player_table:
-            m_game->add_log(is_response ? "LOG_RESPONDED_WITH_CARD" : "LOG_PLAYED_TABLE_CARD", origin_card, this);
-            break;
-        case pocket_type::player_character:
-            m_game->add_log(is_response ?
-                origin_card->has_tag(tag_type::drawing)
-                    ? "LOG_DRAWN_WITH_CHARACTER"
-                    : "LOG_RESPONDED_WITH_CHARACTER"
-                : "LOG_PLAYED_CHARACTER", origin_card, this);
-            break;
-        case pocket_type::shop_selection:
-            m_game->add_log("LOG_BOUGHT_CARD", origin_card, this);
             break;
         }
     }
@@ -326,7 +307,7 @@ namespace banggame {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         }
-        return play_card_verify{this, args.card, args.is_response, args.targets, args.modifiers}.verify_and_play();
+        return verify_and_play(this, args.card, args.is_response, args.targets, args.modifiers);
     }
 
     void player::prompt_then(game_string &&message, std::function<void()> &&fun) {

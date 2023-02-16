@@ -212,7 +212,6 @@ namespace banggame {
         void remove_extra_characters();
 
         void play_card_action(card *origin_card);
-        void log_played_card(card *origin_card, bool is_response);
 
         void prompt_then(game_string &&message, std::function<void()> &&args);
 
