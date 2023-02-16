@@ -159,6 +159,9 @@ namespace banggame {
             case pocket_type::shop_selection:
                 return filter_impl::get_card_color(target) == card_color_type::brown;
             case pocket_type::button_row:
+            case pocket_type::main_deck:
+            case pocket_type::discard_pile:
+            case pocket_type::shop_discard:
                 return false;
             default:
                 return true;
