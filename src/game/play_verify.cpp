@@ -50,11 +50,11 @@ namespace banggame {
         return mth.verify(origin_card, origin, mth_targets, ctx);
     }
     
-    static game_string verify_modifiers_add_context(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
+    static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
         auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
         for (const auto &[mod_card, targets] : modifiers) {
             if (!mod_card->is_modifier()) {
-                return "ERROR_INVALID_MODIFIER_CARD";
+                return "ERROR_CARD_IS_NOT_MODIFIER";
             } else if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return {"ERROR_CARD_DISABLED_BY", mod_card.get(), disabler};
             }
@@ -62,7 +62,7 @@ namespace banggame {
             if (!bool(allowed_modifiers & modifier_bitset(mod_card->modifier_type()))) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             } else if (!allowed_card_with_modifier(origin, mod_card, origin_card)) {
-                return "ERROR_INVALID_MODIFIER_CARD";
+                return "ERROR_INVALID_CARD_WITH_MODIFIER";
             }
             mod_card->modifier.add_context(mod_card, origin, ctx);
             MAYBE_RETURN(mod_card->modifier.verify(mod_card, origin, origin_card, ctx));
@@ -150,7 +150,24 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_card_targets_add_context(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
+    static game_string verify_card_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
+        if (origin_card->is_modifier()) {
+            return "ERROR_CARD_IS_MODIFIER";
+        }
+        if ((is_response ? origin_card->responses : origin_card->effects).empty()) {
+            return "ERROR_EFFECT_LIST_EMPTY";
+        }
+        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
+            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
+        }
+        if (origin_card->inactive) {
+            return {"ERROR_CARD_INACTIVE", origin_card};
+        }
+        MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{}));
+        MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
+        MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
+        MAYBE_RETURN(verify_duplicates(origin, origin_card, is_response, targets, modifiers));
+
         switch (origin_card->pocket) {
         case pocket_type::scenario_card:
             if (origin_card != origin->m_game->m_scenario_cards.back()) {
@@ -166,27 +183,10 @@ namespace banggame {
         case pocket_type::discard_pile:
         case pocket_type::shop_discard:
             if (!ctx.repeating) {
-                return "ERROR_INVALID_MODIFIER_CARD";
+                return "ERROR_INVALID_CARD_POCKET";
             }
             break;
         }
-
-        if (origin_card->is_modifier()) {
-            return "ERROR_INVALID_MODIFIER_CARD";
-        }
-        if ((is_response ? origin_card->responses : origin_card->effects).empty()) {
-            return "ERROR_EFFECT_LIST_EMPTY";
-        }
-        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
-            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
-        }
-        if (origin_card->inactive) {
-            return {"ERROR_CARD_INACTIVE", origin_card};
-        }
-        MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{}));
-        MAYBE_RETURN(verify_modifiers_add_context(origin, origin_card, is_response, modifiers, ctx));
-        MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
-        MAYBE_RETURN(verify_duplicates(origin, origin_card, is_response, targets, modifiers));
 
         return {};
     }
@@ -338,7 +338,7 @@ namespace banggame {
             }
 
             MAYBE_RETURN(verify_equip_target(origin, origin_card, targets));
-            MAYBE_RETURN(verify_modifiers_add_context(origin, origin_card, is_response, modifiers, ctx));
+            MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
 
             int cost = get_card_cost(origin_card, is_response, modifiers, ctx);
             if (origin->m_gold < cost) {
@@ -372,7 +372,7 @@ namespace banggame {
                 origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
             });
         } else {
-            MAYBE_RETURN(verify_card_targets_add_context(origin, origin_card, is_response, targets, modifiers, ctx));
+            MAYBE_RETURN(verify_card_targets(origin, origin_card, is_response, targets, modifiers, ctx));
 
             int cost = get_card_cost(origin_card, is_response, modifiers, ctx);
             if (origin->m_gold < cost) {
