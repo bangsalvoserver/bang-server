@@ -302,6 +302,7 @@ namespace banggame {
         switch(origin_card->pocket) {
         case pocket_type::main_deck:
         case pocket_type::discard_pile:
+        case pocket_type::shop_discard:
             if (!contains_modifier(modifiers, card_modifier_type::leevankliff)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
@@ -357,7 +358,7 @@ namespace banggame {
             break;
         }
         case pocket_type::hidden_deck:
-            if (!contains_modifier(modifiers, card_modifier_type::shopchoice)) {
+            if (!contains_modifier(modifiers, card_modifier_type::shopchoice, card_modifier_type::leevankliff)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             [[fallthrough]];
@@ -366,7 +367,7 @@ namespace banggame {
             if (origin_card->is_brown()) {
                 effect_context ctx;
                 MAYBE_RETURN(verify_card_targets_add_context(ctx));
-                if (is_response) {
+                if (is_response || ctx.repeating) {
                     cost = 0;
                 } else if (ctx.discount) {
                     --cost;
@@ -415,7 +416,7 @@ namespace banggame {
             break;
         }
         default:
-            throw std::runtime_error("play_card: invalid card");
+            return "ERROR_INVALID_CARD_POCKET";
         }
         return {};
     }
