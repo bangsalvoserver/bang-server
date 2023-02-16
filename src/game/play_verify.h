@@ -16,7 +16,7 @@ namespace banggame {
         card *origin_card;
         bool is_response;
         target_list targets;
-        std::vector<modifier_pair> modifiers;
+        modifier_list modifiers;
 
         std::vector<card *> modifier_cards() const;
 

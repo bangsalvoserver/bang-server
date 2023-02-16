@@ -251,9 +251,11 @@ namespace banggame {
         (target_list, targets)
     )
 
+    using modifier_list = std::vector<modifier_pair>;
+
     DEFINE_STRUCT(play_card_args,
         (serial::card, card)
-        (std::vector<modifier_pair>, modifiers)
+        (modifier_list, modifiers)
         (target_list, targets)
         (bool, is_response)
     )

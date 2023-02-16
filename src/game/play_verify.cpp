@@ -302,7 +302,7 @@ namespace banggame {
         switch(origin_card->pocket) {
         case pocket_type::main_deck:
         case pocket_type::discard_pile:
-            if (std::ranges::none_of(modifiers, [](const modifier_pair &pair) { return pair.card->modifier_type() == card_modifier_type::leevankliff; })) {
+            if (!contains_modifier(modifiers, card_modifier_type::leevankliff)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             [[fallthrough]];
@@ -357,7 +357,7 @@ namespace banggame {
             break;
         }
         case pocket_type::hidden_deck:
-            if (std::ranges::none_of(modifiers, [](const modifier_pair &pair) { return pair.card->modifier_type() == card_modifier_type::shopchoice; })) {
+            if (!contains_modifier(modifiers, card_modifier_type::shopchoice)) {
                 return "ERROR_INVALID_MODIFIER_CARD";
             }
             [[fallthrough]];
