@@ -15,4 +15,12 @@ namespace banggame {
             }
         });
     }
+
+    game_string modifier_doublebarrel::on_prompt(card *origin_card, player *origin, card *playing_card) {
+        if (origin->m_game->get_card_sign(playing_card).suit != card_suit::diamonds) {
+            return {"PROMPT_CARD_NO_EFFECT", origin_card};
+        } else {
+            return {};
+        }
+    }
 }

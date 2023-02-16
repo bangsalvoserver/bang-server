@@ -939,7 +939,7 @@ main_deck:
     image: 17_doppiacanna
     expansion: armedanddangerous
     color: orange
-    modifier: bangmod
+    modifier: doublebarrel
     equip:
       - weapon(1)
     effects:
