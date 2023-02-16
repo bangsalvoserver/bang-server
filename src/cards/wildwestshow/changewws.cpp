@@ -4,11 +4,9 @@
 
 namespace banggame {
 
-    void effect_changewws::on_play(card *origin_card, player *origin) {
-        if (ranges::contains(origin->m_played_cards.back().second, card_modifier_type::leevankliff, [](const card_pocket_pair &pair) {
-            return pair.origin_card->modifier_type();
-        })) return;
+    void effect_changewws::on_play(card *origin_card, player *origin, const effect_context &ctx) {
         if (origin->m_game->m_wws_scenario_deck.empty()) return;
+        if (ctx.repeating) return;
         
         origin->m_game->queue_action([origin]{
             auto &scenario_deck = origin->m_game->m_wws_scenario_deck;

@@ -12,11 +12,11 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::none>::prompt(const effect_context &ctx) {
-        return effect.on_prompt(origin_card, origin);
+        return effect.on_prompt(origin_card, origin, ctx);
     }
 
     template<> void play_visitor<target_type::none>::play(const effect_context &ctx) {
-        effect.on_play(origin_card, origin);
+        effect.on_play(origin_card, origin, {}, ctx);
     }
 
     template<> game_string play_visitor<target_type::player>::verify(const effect_context &ctx, player *target) {
@@ -29,7 +29,7 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::player>::prompt(const effect_context &ctx, player *target) {
-        return effect.on_prompt(origin_card, origin, target);
+        return effect.on_prompt(origin_card, origin, target, ctx);
     }
 
     template<> void play_visitor<target_type::player>::play(const effect_context &ctx, player *target) {
@@ -37,7 +37,7 @@ namespace banggame {
         if (origin_card->is_brown()) {
             flags |= effect_flags::escapable;
         }
-        effect.on_play(origin_card, origin, target, flags);
+        effect.on_play(origin_card, origin, target, flags, ctx);
     }
 
     template<> game_string play_visitor<target_type::conditional_player>::verify(const effect_context &ctx, player *target) {
@@ -89,7 +89,7 @@ namespace banggame {
         game_string msg;
         for (player *target : range_all_players(origin)) {
             if (!check_player_filter(origin, effect.player_filter, target, ctx)) {
-                msg = effect.on_prompt(origin_card, origin, target);
+                msg = effect.on_prompt(origin_card, origin, target, ctx);
                 if (!msg) break;
             }
         }
@@ -113,7 +113,7 @@ namespace banggame {
         }
 
         for (player *target : targets) {
-            effect.on_play(origin_card, origin, target, flags);
+            effect.on_play(origin_card, origin, target, flags, ctx);
         }
     }
 
@@ -145,7 +145,7 @@ namespace banggame {
             flags |= effect_flags::escapable;
         }
         for (player *target : targets) {
-            effect.on_play(origin_card, origin, target, flags);
+            effect.on_play(origin_card, origin, target, flags, ctx);
         }
     }
 
@@ -165,7 +165,7 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::card>::prompt(const effect_context &ctx, card *target) {
-        return effect.on_prompt(origin_card, origin, target);
+        return effect.on_prompt(origin_card, origin, target, ctx);
     }
 
     template<> void play_visitor<target_type::card>::play(const effect_context &ctx, card *target) {
@@ -174,9 +174,9 @@ namespace banggame {
             flags |= effect_flags::escapable;
         }
         if (target->owner != origin && target->pocket == pocket_type::player_hand) {
-            effect.on_play(origin_card, origin, target->owner->random_hand_card(), flags);
+            effect.on_play(origin_card, origin, target->owner->random_hand_card(), flags, ctx);
         } else {
-            effect.on_play(origin_card, origin, target, flags);
+            effect.on_play(origin_card, origin, target, flags, ctx);
         }
     }
 
@@ -202,7 +202,7 @@ namespace banggame {
 
     template<> game_string play_visitor<target_type::extra_card>::prompt(const effect_context &ctx, card *target) {
         if (target) {
-            return effect.on_prompt(origin_card, origin, target);
+            return effect.on_prompt(origin_card, origin, target, ctx);
         } else {
             return {};
         }
@@ -210,7 +210,7 @@ namespace banggame {
 
     template<> void play_visitor<target_type::extra_card>::play(const effect_context &ctx, card *target) {
         if (target) {
-            effect.on_play(origin_card, origin, target);
+            effect.on_play(origin_card, origin, target, {}, ctx);
         }
     }
 
@@ -275,7 +275,7 @@ namespace banggame {
         }
         game_string msg;
         for (card *target_card : target_cards) {
-            msg = effect.on_prompt(origin_card, origin, target_card);
+            msg = effect.on_prompt(origin_card, origin, target_card, ctx);
             if (!msg) break;
         }
         return msg;
@@ -291,9 +291,9 @@ namespace banggame {
         }
         for (card *target_card : target_cards) {
             if (target_card->pocket == pocket_type::player_hand) {
-                effect.on_play(origin_card, origin, target_card->owner->random_hand_card(), flags);
+                effect.on_play(origin_card, origin, target_card->owner->random_hand_card(), flags, ctx);
             } else {
-                effect.on_play(origin_card, origin, target_card, flags);
+                effect.on_play(origin_card, origin, target_card, flags, ctx);
             }
         }
     }

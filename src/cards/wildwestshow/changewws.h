@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_changewws {
-        void on_play(card *origin_card, player *origin);
+        void on_play(card *origin_card, player *origin, const effect_context &ctx);
     };
 }
 
