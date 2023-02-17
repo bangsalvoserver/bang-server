@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_shopchoice {
-        game_string get_error(card *origin_card, player *origin, const effect_context &ctx);
+        bool can_play(card *origin_card, player *origin, const effect_context &ctx);
     };
 
     struct modifier_shopchoice {

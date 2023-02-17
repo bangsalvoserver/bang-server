@@ -5,6 +5,6 @@
 namespace banggame {
 
     void modifier_discount::add_context(card *origin_card, player *origin, effect_context &ctx) {
-        ctx.discount = true;
+        ctx.discount = 1;
     }
 }

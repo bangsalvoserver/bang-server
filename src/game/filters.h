@@ -105,13 +105,6 @@ namespace banggame {
         return nullptr;
     }
 
-    inline bool contains_modifier(const modifier_list &list, std::same_as<card_modifier_type> auto ... types) {
-        return std::ranges::any_of(list, [types...](const modifier_pair &pair) {
-            card_modifier_type type = filter_impl::get_card_modifier(pair.card);
-            return ((type == types) || ...);
-        });
-    }
-
     using modifier_bitset_t = enums::sized_int_t<1 << (enums::num_members_v<card_modifier_type> - 1)>;
 
     constexpr modifier_bitset_t modifier_bitset(std::same_as<card_modifier_type> auto ... values) {

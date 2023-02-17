@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    int get_card_cost(card *origin_card, bool is_response, const std::vector<card *> &modifiers = {}, const effect_context &ctx = {});
+    int get_card_cost(card *origin_card, bool is_response, const effect_context &ctx = {});
 
     void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx = {});
 

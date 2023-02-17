@@ -97,10 +97,10 @@ namespace banggame {
                 for (card *mod_card : modifiers) {
                     mod_card->modifier.add_context(mod_card, origin, ctx_copy);
                 }
-                return origin->m_gold >= get_card_cost(origin_card, is_response, modifiers, ctx_copy)
+                return origin->m_gold >= get_card_cost(origin_card, is_response, ctx_copy)
                     && is_possible_to_play_effects(origin, origin_card, effects, ctx_copy);
             } else {
-                if (origin->m_gold < get_card_cost(origin_card, is_response, modifiers, ctx)) return false;
+                if (origin->m_gold < get_card_cost(origin_card, is_response, ctx)) return false;
                 if (!is_possible_to_play_effects(origin, origin_card, effects, ctx)) return false;
                 if (!std::transform_reduce(
                     modifiers.begin(), modifiers.end(), modifier_bitset(origin_card->modifier_type()), std::bit_and(),
@@ -118,14 +118,14 @@ namespace banggame {
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
         if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
             return !is_response && contains_at_least(make_equip_set(origin, origin_card), 1)
-                 && origin->m_gold >= get_card_cost(origin_card, is_response, {}, ctx);
+                 && origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
         } else {
             auto &effects = origin_card->get_effect_list(is_response);
             if (is_possible_to_play_effects(origin, origin_card, effects, ctx)) {
                 if (origin_card->is_modifier()) {
                     return any_card_playable_with_modifiers(origin, std::vector{origin_card}, is_response, ctx);
                 } else {
-                    return !effects.empty() && origin->m_gold >= get_card_cost(origin_card, is_response, {}, ctx);
+                    return !effects.empty() && origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
                 }
             } else {
                 return false;

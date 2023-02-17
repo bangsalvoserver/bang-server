@@ -396,11 +396,11 @@ namespace banggame {
     )
 
     struct effect_context {
+        card *shopchoice = nullptr;
+        int8_t discount = 0;
         bool ignore_distances = false;
         bool disable_banglimit = false;
-        bool discount = false;
         bool repeating = false;
-        int shopchoice = 0;
     };
 
 }

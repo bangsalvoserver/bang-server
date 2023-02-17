@@ -296,13 +296,12 @@ namespace banggame {
         origin_card->get_mth(is_response).on_play(origin_card, origin, mth_targets, ctx);
     }
 
-    int get_card_cost(card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
+    int get_card_cost(card *origin_card, bool is_response, const effect_context &ctx) {
         if (!is_response && !ctx.repeating && origin_card->pocket != pocket_type::player_table) {
-            int cost = origin_card->buy_cost() - ctx.discount;
-            for (card *mod_card : modifiers) {
-                cost += mod_card->buy_cost();
+            if (ctx.shopchoice) {
+                origin_card = ctx.shopchoice;
             }
-            return cost;
+            return origin_card->buy_cost() - ctx.discount;
         } else {
             return 0;
         }
@@ -328,7 +327,7 @@ namespace banggame {
             MAYBE_RETURN(verify_equip_target(origin, origin_card, targets));
             MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
 
-            int cost = get_card_cost(origin_card, is_response, get_modifier_cards(modifiers), ctx);
+            int cost = get_card_cost(origin_card, is_response, ctx);
             if (origin->m_gold < cost) {
                 return "ERROR_NOT_ENOUGH_GOLD";
             }
@@ -362,7 +361,7 @@ namespace banggame {
         } else {
             MAYBE_RETURN(verify_card_targets(origin, origin_card, is_response, targets, modifiers, ctx));
 
-            int cost = get_card_cost(origin_card, is_response, get_modifier_cards(modifiers), ctx);
+            int cost = get_card_cost(origin_card, is_response, ctx);
             if (origin->m_gold < cost) {
                 return "ERROR_NOT_ENOUGH_GOLD";
             }
