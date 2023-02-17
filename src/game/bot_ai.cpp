@@ -136,10 +136,6 @@ namespace banggame {
                 && is_possible_to_play(origin, target_card, is_response, ctx);
         });
 
-        if (cards.empty()) {
-            return nullptr;
-        }
-
         return random_element(cards, origin->m_game->rng);
     }
 
