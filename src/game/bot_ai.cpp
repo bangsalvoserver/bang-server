@@ -7,13 +7,11 @@ namespace banggame {
 
     template<std::ranges::range Range, typename Rng>
     decltype(auto) random_element(Range &&range, Rng &rng) {
-        if constexpr (std::ranges::contiguous_range<Range>) {
-            std::uniform_int_distribution dist{size_t(0), std::ranges::size(range) - 1};
-            return range[dist(rng)];
-        } else {
-            std::uniform_int_distribution dist{size_t(0), size_t(std::ranges::distance(range)) - 1};
-            return *std::next(std::ranges::begin(range), dist(rng));
+        std::ranges::range_value_t<Range> ret;
+        if (std::ranges::sample(std::forward<Range>(range), &ret, 1, rng) == &ret) {
+            throw std::runtime_error("empty range in random_element");
         }
+        return ret;
     }
 
     struct random_target_visitor {
