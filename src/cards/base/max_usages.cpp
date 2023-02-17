@@ -3,7 +3,7 @@
 #include "game/game.h"
 
 namespace banggame {
-    game_string effect_max_usages::verify(card *origin_card, player *origin) {
+    game_string effect_max_usages::get_error(card *origin_card, player *origin) {
         if (origin->m_game->call_event<event_type::count_usages>(origin, origin_card, 0) >= max_usages) {
             return {"ERROR_MAX_USAGES", origin_card, max_usages};
         }

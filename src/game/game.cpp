@@ -421,7 +421,7 @@ namespace banggame {
                 if (it == m_players.end()) it = m_players.begin();
             }
             if (!(*it)->remove_player_flags(player_flags::skip_turn)) {
-                call_event<event_type::verify_revivers>(*it);
+                call_event<event_type::check_revivers>(*it);
                 if ((*it)->alive()) break;
             }
         }

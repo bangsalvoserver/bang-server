@@ -58,7 +58,7 @@ namespace banggame {
         }
     };
 
-    game_string effect_forced_equip::verify(card *origin_card, player *origin, player *target) {
+    game_string effect_forced_equip::get_error(card *origin_card, player *origin, player *target) {
         if (auto req = target->m_game->top_request<request_force_equip_card>(origin)) {
             card *target_card = req->target_card;
             MAYBE_RETURN(check_player_filter(origin, target_card->equip_target, target));

@@ -11,7 +11,7 @@ namespace banggame {
     };
 
     struct effect_forced_equip {
-        game_string verify(card *origin_card, player *origin, player *target);
+        game_string get_error(card *origin_card, player *origin, player *target);
         game_string on_prompt(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };

@@ -22,10 +22,10 @@ namespace banggame {
     };
 
     struct effect_heal_notfull : effect_heal {
-        game_string verify(card *origin_card, player *origin) {
-            return verify(origin_card, origin, origin);
+        game_string get_error(card *origin_card, player *origin) {
+            return get_error(origin_card, origin, origin);
         }
-        game_string verify(card *origin_card, player *origin, player *target);
+        game_string get_error(card *origin_card, player *origin, player *target);
     };
     
     struct handler_heal_multi {

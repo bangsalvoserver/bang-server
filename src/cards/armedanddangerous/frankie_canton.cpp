@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    game_string effect_frankie_canton::verify(card *origin_card, player *origin, card *target_card) {
+    game_string effect_frankie_canton::get_error(card *origin_card, player *origin, card *target_card) {
         if (target_card == origin->first_character()) {
             return "ERROR_TARGET_PLAYING_CARD";
         }

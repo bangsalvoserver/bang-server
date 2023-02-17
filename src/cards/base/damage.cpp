@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    game_string effect_damage::verify(card *origin_card, player *origin, effect_flags flags) {
+    game_string effect_damage::get_error(card *origin_card, player *origin, effect_flags flags) {
         if (origin->m_hp <= damage) {
             return "ERROR_CANT_SELF_DAMAGE";
         }

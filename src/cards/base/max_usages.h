@@ -8,7 +8,7 @@ namespace banggame {
     struct effect_max_usages {
         int max_usages;
         
-        game_string verify(card *origin_card, player *origin);
+        game_string get_error(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 }

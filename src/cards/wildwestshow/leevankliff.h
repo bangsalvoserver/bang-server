@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_leevankliff {
-        game_string verify(card *origin_card, player *origin);
+        game_string get_error(card *origin_card, player *origin);
     };
 
     struct modifier_leevankliff {

@@ -19,7 +19,7 @@ namespace banggame {
         return origin->m_game->m_players
             | ranges::views::filter([=](player *target) {
                 return !check_player_filter(origin, holder.player_filter, target, ctx)
-                    && !holder.verify(origin_card, origin, target, ctx);
+                    && !holder.get_error(origin_card, origin, target, ctx);
             });
     }
 
@@ -30,7 +30,7 @@ namespace banggame {
             })
             | ranges::views::filter([=](card *target_card) {
                 return !check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
-                    && !holder.verify(origin_card, origin, target_card, ctx);
+                    && !holder.get_error(origin_card, origin, target_card, ctx);
             });
     }
 
@@ -38,7 +38,7 @@ namespace banggame {
         return std::ranges::all_of(effects, [&](const effect_holder &holder) {
             switch (holder.target) {
             case target_type::none:
-                return !holder.verify(origin_card, origin, ctx);
+                return !holder.get_error(origin_card, origin, ctx);
             case target_type::player:
                 return contains_at_least(make_player_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::card:

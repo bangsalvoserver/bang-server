@@ -9,7 +9,7 @@ namespace banggame {
         int damage;
         effect_damage(int damage) : damage(std::max(1, damage)) {}
 
-        game_string verify(card *origin_card, player *origin, effect_flags flags = {});
+        game_string get_error(card *origin_card, player *origin, effect_flags flags = {});
         
         void on_play(card *origin_card, player *origin, effect_flags flags = {}) {
             on_play(origin_card, origin, origin, flags);

@@ -18,13 +18,13 @@ namespace banggame {
                 }
                 
                 if (drawn_card->is_brown()) {
-                    origin->m_game->add_listener<event_type::verify_pass_turn>(key, [=](player *p, game_string &out_error) {
+                    origin->m_game->add_listener<event_type::check_pass_turn>(key, [=](player *p, game_string &out_error) {
                         if (p == origin && drawn_card->owner == origin && is_possible_to_play(origin, drawn_card)) {
                             out_error = {"ERROR_MANDATORY_CARD", drawn_card};
                         }
                     });
                 } else {
-                    origin->m_game->add_listener<event_type::verify_pass_turn>(key, [=](player *p, game_string &out_error) {
+                    origin->m_game->add_listener<event_type::check_pass_turn>(key, [=](player *p, game_string &out_error) {
                         if (p == origin && drawn_card->owner == origin && contains_at_least(make_equip_set(origin, drawn_card), 1)) {
                             out_error = {"ERROR_MANDATORY_CARD", drawn_card};
                         }

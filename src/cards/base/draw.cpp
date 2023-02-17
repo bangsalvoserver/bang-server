@@ -14,7 +14,7 @@ namespace banggame {
         }
     }
 
-    game_string effect_draw_discard::verify(card *origin_card, player *origin, player *target) {
+    game_string effect_draw_discard::get_error(card *origin_card, player *origin, player *target) {
         if (target->m_game->m_discards.empty()) {
             return "ERROR_DISCARD_PILE_EMPTY";
         }

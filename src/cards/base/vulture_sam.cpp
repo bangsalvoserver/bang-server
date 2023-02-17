@@ -15,7 +15,7 @@ namespace banggame {
     }
 
     static card *get_vulture_sam(player *target) {
-        return target->m_game->call_event<event_type::verify_card_taker>(target, equip_type::vulture_sam, nullptr);
+        return target->m_game->call_event<event_type::check_card_taker>(target, equip_type::vulture_sam, nullptr);
     }
 
     struct request_multi_vulture_sam : request_base {
@@ -68,7 +68,7 @@ namespace banggame {
     };
     
     void equip_vulture_sam::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_listener<event_type::verify_card_taker>(target_card, [=](player *e_target, equip_type type, card* &value){
+        origin->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player *e_target, equip_type type, card* &value){
             if (type == equip_type::vulture_sam && e_target == origin) {
                 value = target_card;
             }

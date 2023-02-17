@@ -17,7 +17,7 @@ namespace banggame {
         target->heal(amount);
     }
 
-    game_string effect_heal_notfull::verify(card *origin_card, player *origin, player *target) {
+    game_string effect_heal_notfull::get_error(card *origin_card, player *origin, player *target) {
         if (target->m_hp == target->m_max_hp) {
             return "ERROR_CANT_HEAL_PAST_FULL_HP";
         }

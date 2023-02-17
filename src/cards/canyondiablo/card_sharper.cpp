@@ -46,7 +46,7 @@ namespace banggame {
         }
     };
 
-    game_string handler_card_sharper::verify(card *origin_card, player *origin, card *chosen_card, card *target_card) {
+    game_string handler_card_sharper::get_error(card *origin_card, player *origin, card *chosen_card, card *target_card) {
         player *target = target_card->owner;
         MAYBE_RETURN(check_player_filter(origin, target_card->equip_target, origin));
         if (auto *c = origin->find_equipped_card(target_card)) {

@@ -25,7 +25,7 @@ namespace banggame {
         }
     }
 
-    game_string effect_move_bomb::verify(card *origin_card, player *origin, player *target) {
+    game_string effect_move_bomb::get_error(card *origin_card, player *origin, player *target) {
         if (!origin->m_game->top_request<request_move_bomb>(origin)) {
             return "ERROR_INVALID_RESPONSE";
         }

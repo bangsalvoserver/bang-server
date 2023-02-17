@@ -19,7 +19,7 @@ namespace banggame {
         return bot_suggestion::target_enemy{}.on_check_target(origin_card, origin, get_next_player(origin));
     }
 
-    game_string effect_ladyrosaoftexas::verify(card *origin_card, player *origin) {
+    game_string effect_ladyrosaoftexas::get_error(card *origin_card, player *origin) {
         if (origin->m_game->num_alive() <= 2) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         } else {

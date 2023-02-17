@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    game_string effect_discard_black::verify(card *origin_card, player *origin, card *target_card) {
+    game_string effect_discard_black::get_error(card *origin_card, player *origin, card *target_card) {
         if (origin->m_gold < target_card->buy_cost() + 1) {
             return "ERROR_NOT_ENOUGH_GOLD";
         }

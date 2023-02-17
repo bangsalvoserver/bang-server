@@ -10,7 +10,7 @@ namespace banggame {
     };
 
     struct handler_red_ringo {
-        game_string verify(card *origin_card, player *origin, const target_list &targets);
+        game_string get_error(card *origin_card, player *origin, const target_list &targets);
         void on_play(card *origin_card, player *origin, const target_list &targets);
     };
 }

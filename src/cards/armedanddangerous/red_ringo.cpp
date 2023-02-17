@@ -8,7 +8,7 @@ namespace banggame {
         target->add_cubes(target->first_character(), max_cubes);
     }
 
-    game_string handler_red_ringo::verify(card *origin_card, player *origin, const target_list &targets) {
+    game_string handler_red_ringo::get_error(card *origin_card, player *origin, const target_list &targets) {
         if (origin->first_character()->num_cubes < targets.size()) {
             return {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
         }

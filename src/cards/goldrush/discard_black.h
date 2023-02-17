@@ -8,7 +8,7 @@
 namespace banggame {
 
     struct effect_discard_black : prompt_target_self, bot_suggestion::target_enemy_card {
-        game_string verify(card *origin_card, player *origin, card *target);
+        game_string get_error(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target);
     };
 }

@@ -32,19 +32,19 @@ namespace banggame {
         EVENT(count_cards_to_draw,              player *origin, int &cards_to_draw)
         EVENT(count_cards_played,               player *origin, int &cards_played)
 
-        EVENT(verify_play_card, player *origin, card *origin_card, game_string &out_error)
+        EVENT(check_play_card, player *origin, card *origin_card, game_string &out_error)
 
         // verifica per gli effetti che rubano carte in alcune condizioni
-        EVENT(verify_card_taker, player *target, equip_type type, card* &value)
+        EVENT(check_card_taker, player *target, equip_type type, card* &value)
 
         // verifica l'effetto ha un bersaglio unico
-        EVENT(verify_target_unique, card *origin_card, player *origin, player *target, game_string &out_error)
+        EVENT(check_target_unique, card *origin_card, player *origin, player *target, game_string &out_error)
 
         // verifica prima di passare il turno
-        EVENT(verify_pass_turn, player *origin, game_string &out_error)
+        EVENT(check_pass_turn, player *origin, game_string &out_error)
 
         // viene chiamato quando si sta cercando il prossimo giocatore di turno
-        EVENT(verify_revivers, player *origin)
+        EVENT(check_revivers, player *origin)
         
         // viene chiamato quando scarti una carta a fine turno
         EVENT(on_discard_pass, player *origin, card *target_card)

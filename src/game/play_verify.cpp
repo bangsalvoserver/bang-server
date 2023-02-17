@@ -11,7 +11,7 @@
 namespace banggame {
 
     static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
-        MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{}));
+        MAYBE_RETURN(origin->m_game->call_event<event_type::check_play_card>(origin, origin_card, game_string{}));
         
         size_t diff = targets.size() - origin_card->get_effect_list(is_response).size();
         if (auto repeatable = origin_card->get_tag_value(tag_type::repeatable)) {
@@ -42,11 +42,11 @@ namespace banggame {
             
             MAYBE_RETURN(enums::visit_indexed(
                 [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
-                    return play_visitor<E>{origin, origin_card, effect}.verify(ctx, FWD(args) ...);
+                    return play_visitor<E>{origin, origin_card, effect}.get_error(ctx, FWD(args) ...);
                 }, target));
         }
 
-        return origin_card->get_mth(is_response).verify(origin_card, origin, mth_targets, ctx);
+        return origin_card->get_mth(is_response).get_error(origin_card, origin, mth_targets, ctx);
     }
     
     static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
@@ -121,7 +121,7 @@ namespace banggame {
         if (origin->m_game->check_flags(game_flags::disable_equipping)) {
             return "ERROR_CANT_EQUIP_CARDS";
         }
-        MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{}));
+        MAYBE_RETURN(origin->m_game->call_event<event_type::check_play_card>(origin, origin_card, game_string{}));
         player *target = origin;
         if (!origin_card->self_equippable()) {
             if (targets.size() != 1 || !targets.front().is(target_type::player)) {

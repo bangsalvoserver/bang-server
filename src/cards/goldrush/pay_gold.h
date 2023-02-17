@@ -9,7 +9,7 @@ namespace banggame {
         int amount;
         effect_pay_gold(int value) : amount(value) {}
 
-        game_string verify(card *origin_card, player *origin);
+        game_string get_error(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 }

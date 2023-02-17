@@ -5,7 +5,7 @@
 namespace banggame {
 
     void equip_ghosttown::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_listener<event_type::verify_revivers>(target_card, [=](player *target) {
+        origin->m_game->add_listener<event_type::check_revivers>(target_card, [=](player *target) {
             if (!target->alive()) {
                 origin->m_game->add_log("LOG_REVIVE", target, target_card);
                 target->add_player_flags(player_flags::temp_ghost);

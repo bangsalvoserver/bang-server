@@ -31,7 +31,7 @@ namespace banggame {
         queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
     }
     
-    game_string effect_banglimit::verify(card *origin_card, player *origin, const effect_context &ctx) {
+    game_string effect_banglimit::get_error(card *origin_card, player *origin, const effect_context &ctx) {
         if (!ctx.disable_banglimit && origin->get_bangs_played() >= 1) {
             return "ERROR_ONE_BANG_PER_TURN";
         }

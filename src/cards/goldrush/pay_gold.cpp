@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    game_string effect_pay_gold::verify(card *origin_card, player *origin) {
+    game_string effect_pay_gold::get_error(card *origin_card, player *origin) {
         if (origin->m_gold < amount) {
             return "ERROR_NOT_ENOUGH_GOLD";
         }

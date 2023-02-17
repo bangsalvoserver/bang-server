@@ -41,12 +41,12 @@ namespace banggame {
         }, holder.type);
     }
 
-    game_string effect_holder::verify(card *origin_card, player *origin, const effect_context &ctx) const {
+    game_string effect_holder::get_error(card *origin_card, player *origin, const effect_context &ctx) const {
         return visit_effect([&](auto &&value) -> game_string {
-            if constexpr (requires { value.verify(origin_card, origin, ctx); }) {
-                return value.verify(origin_card, origin, ctx);
-            } else if constexpr (requires { value.verify(origin_card, origin); }) {
-                return value.verify(origin_card, origin);
+            if constexpr (requires { value.get_error(origin_card, origin, ctx); }) {
+                return value.get_error(origin_card, origin, ctx);
+            } else if constexpr (requires { value.get_error(origin_card, origin); }) {
+                return value.get_error(origin_card, origin);
             } else if constexpr (requires { value.can_respond(origin_card, origin); }) {
                 if (!value.can_respond(origin_card, origin)) {
                     return "ERROR_INVALID_RESPONSE";
@@ -86,12 +86,12 @@ namespace banggame {
         }, *this);
     }
 
-    game_string effect_holder::verify(card *origin_card, player *origin, player *target, const effect_context &ctx) const {
+    game_string effect_holder::get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) const {
         return visit_effect([&](auto &&value) -> game_string {
-            if constexpr (requires { value.verify(origin_card, origin, target, ctx); }) {
-                return value.verify(origin_card, origin, target, ctx);
-            } else if constexpr (requires { value.verify(origin_card, origin, target); }) {
-                return value.verify(origin_card, origin, target);
+            if constexpr (requires { value.get_error(origin_card, origin, target, ctx); }) {
+                return value.get_error(origin_card, origin, target, ctx);
+            } else if constexpr (requires { value.get_error(origin_card, origin, target); }) {
+                return value.get_error(origin_card, origin, target);
             }
             return {};
         }, *this);
@@ -127,12 +127,12 @@ namespace banggame {
         }, *this);
     }
 
-    game_string effect_holder::verify(card *origin_card, player *origin, card *target, const effect_context &ctx) const {
+    game_string effect_holder::get_error(card *origin_card, player *origin, card *target, const effect_context &ctx) const {
         return visit_effect([&](auto &&value) -> game_string {
-            if constexpr (requires { value.verify(origin_card, origin, target, ctx); }) {
-                return value.verify(origin_card, origin, target, ctx);
-            } else if constexpr (requires { value.verify(origin_card, origin, target); }) {
-                return value.verify(origin_card, origin, target);
+            if constexpr (requires { value.get_error(origin_card, origin, target, ctx); }) {
+                return value.get_error(origin_card, origin, target, ctx);
+            } else if constexpr (requires { value.get_error(origin_card, origin, target); }) {
+                return value.get_error(origin_card, origin, target);
             }
             return {};
         }, *this);
@@ -259,12 +259,12 @@ namespace banggame {
         }, type);
     }
 
-    game_string mth_holder::verify(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
+    game_string mth_holder::get_error(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
         return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
-                if constexpr (requires { mth_unwrapper{&handler_type::verify}; }) {
-                    return mth_unwrapper{&handler_type::verify}(origin_card, origin, targets, ctx);
+                if constexpr (requires { mth_unwrapper{&handler_type::get_error}; }) {
+                    return mth_unwrapper{&handler_type::get_error}(origin_card, origin, targets, ctx);
                 }
             }
             return {};
