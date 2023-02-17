@@ -252,11 +252,7 @@ namespace banggame {
                 origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
             )
             | ranges::views::filter([&](card *target_card){
-                if (target_card->pocket != pocket_type::player_hand && target_card->pocket != pocket_type::shop_selection || target_card->is_brown()) {
-                    return is_possible_to_play(origin, target_card);
-                } else {
-                    return contains_at_least(make_equip_set(origin, target_card), 1);
-                }
+                return is_possible_to_play(origin, target_card);
             })
             | ranges::to<std::set>,
             {

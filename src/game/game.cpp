@@ -375,18 +375,13 @@ namespace banggame {
             ranges::views::concat(
                 m_playing->m_characters,
                 m_playing->m_table | ranges::views::remove_if(&card::inactive),
+                m_shop_selection,
                 m_button_row | ranges::views::remove_if([](card *c) { return c->has_tag(tag_type::confirm); }),
                 m_scenario_cards | ranges::views::take_last(1),
                 m_wws_scenario_cards | ranges::views::take_last(1)
             ),
             [&](card *origin_card) {
                 return is_possible_to_play(m_playing, origin_card);
-            }
-        )
-        && std::ranges::none_of(
-            m_shop_selection,
-            [&](card *origin_card) {
-                return m_playing->m_gold >= origin_card->buy_cost();
             }
         )) {
             m_playing->pass_turn();
