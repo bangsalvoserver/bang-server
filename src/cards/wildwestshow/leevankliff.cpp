@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    game_string modifier_leevankliff::verify(card *origin_card, player *origin, card *playing_card) {
+    game_string effect_leevankliff::verify(card *origin_card, player *origin) {
         if (origin->m_played_cards.empty()) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }

@@ -4,18 +4,6 @@
 
 namespace banggame {
 
-    static const effect_list &get_effect_list(card *origin_card, effect_list_index index) {
-        switch (index) {
-        case effect_list_index::effects:
-        default:
-            return origin_card->effects;
-        case effect_list_index::responses:
-            return origin_card->responses;
-        case effect_list_index::optionals:
-            return origin_card->optionals;
-        }
-    }
-
     ranges::any_view<player *> make_equip_set(player *origin, card *origin_card) {
         if (origin_card->self_equippable()) {
             return ranges::views::single(origin);
@@ -46,8 +34,8 @@ namespace banggame {
             });
     }
 
-    static bool is_possible_to_play_impl(player *origin, card *origin_card, effect_list_index index, const effect_context &ctx) {
-        return std::ranges::all_of(get_effect_list(origin_card, index), [&](const effect_holder &holder) {
+    bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx) {
+        return std::ranges::all_of(effects, [&](const effect_holder &holder) {
             switch (holder.target) {
             case target_type::none:
                 return !holder.verify(origin_card, origin, ctx);
@@ -76,7 +64,7 @@ namespace banggame {
         });
     }
 
-    static bool any_card_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, effect_list_index index, const effect_context &ctx) {
+    static bool any_card_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
         return ranges::any_of(ranges::views::concat(
             origin->m_characters,
             origin->m_table | ranges::views::remove_if(&card::inactive),
@@ -94,15 +82,17 @@ namespace banggame {
                 return allowed_card_with_modifier(origin, mod, target_card);
             })) return false;
 
+            auto &effects = target_card->get_effect_list(is_response);
+
             if (!target_card->is_modifier()) {
-                if (get_effect_list(target_card, index).empty()) return false;
+                if (effects.empty()) return false;
                 effect_context ctx_copy = ctx;
                 for (card *mod_card : modifiers) {
                     mod_card->modifier.add_context(mod_card, origin, ctx_copy);
                 }
-                return is_possible_to_play_impl(origin, target_card, index, ctx_copy);
+                return is_possible_to_play_effects(origin, target_card, effects, ctx_copy);
             } else {
-                if (!is_possible_to_play_impl(origin, target_card, index, ctx)) return false;
+                if (!is_possible_to_play_effects(origin, target_card, effects, ctx)) return false;
                 if (!std::transform_reduce(
                     modifiers.begin(), modifiers.end(), modifier_bitset(target_card->modifier_type()), std::bit_and(),
                     [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
@@ -111,19 +101,21 @@ namespace banggame {
                 }
                 auto modifiers_new = modifiers;
                 modifiers_new.push_back(target_card);
-                return any_card_playable_with_modifiers(origin, modifiers_new, index, ctx);
+                return any_card_playable_with_modifiers(origin, modifiers_new, is_response, ctx);
             }
         });
     }
 
-    bool is_possible_to_play(player *origin, card *origin_card, effect_list_index index, const effect_context &ctx) {
-        if (!origin_card->is_modifier()) {
-            if (get_effect_list(origin_card, index).empty()) return false;
-        } else {
-            if (!any_card_playable_with_modifiers(origin, std::vector{origin_card}, index, ctx)) {
-                return false;
+    bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
+        auto &effects = origin_card->get_effect_list(is_response);
+        if (is_possible_to_play_effects(origin, origin_card, effects, ctx)) {
+            if (origin_card->is_modifier()) {
+                return any_card_playable_with_modifiers(origin, std::vector{origin_card}, is_response, ctx);
+            } else {
+                return !effects.empty();
             }
+        } else {
+            return false;
         }
-        return is_possible_to_play_impl(origin, origin_card, index, ctx);
     }
 }

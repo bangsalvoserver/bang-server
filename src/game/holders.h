@@ -44,7 +44,6 @@ namespace banggame {
         void add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const;
         void add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const;
 
-        game_string verify(card *origin_card, player *origin, card *playing_card, const effect_context &ctx = {}) const;
         game_string on_prompt(card *origin_card, player *origin, card *playing_card) const;
     )
 

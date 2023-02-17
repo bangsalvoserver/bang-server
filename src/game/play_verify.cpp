@@ -11,9 +11,9 @@
 namespace banggame {
 
     static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
-        auto &effects = is_response ? origin_card->responses : origin_card->effects;
+        MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{}));
         
-        size_t diff = targets.size() - effects.size();
+        size_t diff = targets.size() - origin_card->get_effect_list(is_response).size();
         if (auto repeatable = origin_card->get_tag_value(tag_type::repeatable)) {
             if (diff < 0 || diff % origin_card->optionals.size() != 0
                 || (*repeatable > 0 && diff > (origin_card->optionals.size() * *repeatable)))
@@ -25,7 +25,7 @@ namespace banggame {
         }
 
         target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+        for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
             if (!target.is(effect.target)) {
                 return "ERROR_INVALID_TARGET_TYPE";
             } else if (effect.type == effect_type::mth_add) {
@@ -46,8 +46,7 @@ namespace banggame {
                 }, target));
         }
 
-        auto &mth = is_response ? origin_card->mth_response : origin_card->mth_effect;
-        return mth.verify(origin_card, origin, mth_targets, ctx);
+        return origin_card->get_mth(is_response).verify(origin_card, origin, mth_targets, ctx);
     }
     
     static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
@@ -55,17 +54,17 @@ namespace banggame {
         for (const auto &[mod_card, targets] : modifiers) {
             if (!mod_card->is_modifier()) {
                 return "ERROR_CARD_IS_NOT_MODIFIER";
-            } else if (card *disabler = origin->m_game->get_disabler(mod_card)) {
+            }
+            if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return {"ERROR_CARD_DISABLED_BY", mod_card.get(), disabler};
             }
-            MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, mod_card, game_string{}));
             if (!bool(allowed_modifiers & modifier_bitset(mod_card->modifier_type()))) {
                 return "ERROR_INVALID_MODIFIER_CARD";
-            } else if (!allowed_card_with_modifier(origin, mod_card, origin_card)) {
+            }
+            if (!allowed_card_with_modifier(origin, mod_card, origin_card)) {
                 return "ERROR_INVALID_CARD_WITH_MODIFIER";
             }
             mod_card->modifier.add_context(mod_card, origin, ctx);
-            MAYBE_RETURN(mod_card->modifier.verify(mod_card, origin, origin_card, ctx));
             MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
             allowed_modifiers &= allowed_modifiers_after(mod_card->modifier_type());
         }
@@ -111,14 +110,12 @@ namespace banggame {
             if (!check.selected_cards.emplace(mod_card).second) {
                 return {"ERROR_DUPLICATE_CARD", mod_card.get()};
             }
-            auto &mod_effects = is_response ? mod_card->responses : mod_card->effects;
-            for (const auto &[target, effect] : zip_card_targets(mod_targets, mod_effects, mod_card->optionals)) {
+            for (const auto &[target, effect] : zip_card_targets(mod_targets, mod_card, is_response)) {
                 MAYBE_RETURN(check(origin, mod_card, effect, target));
             }
         }
 
-        auto &effects = is_response ? origin_card->responses : origin_card->effects;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+        for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
             MAYBE_RETURN(check(origin, origin_card, effect, target));
         }
 
@@ -154,7 +151,7 @@ namespace banggame {
         if (origin_card->is_modifier()) {
             return "ERROR_CARD_IS_MODIFIER";
         }
-        if ((is_response ? origin_card->responses : origin_card->effects).empty()) {
+        if (origin_card->get_effect_list(is_response).empty()) {
             return "ERROR_EFFECT_LIST_EMPTY";
         }
         if (card *disabler = origin->m_game->get_disabler(origin_card)) {
@@ -163,7 +160,6 @@ namespace banggame {
         if (origin_card->inactive) {
             return {"ERROR_CARD_INACTIVE", origin_card};
         }
-        MAYBE_RETURN(origin->m_game->call_event<event_type::verify_play_card>(origin, origin_card, game_string{}));
         MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
         MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
         MAYBE_RETURN(verify_duplicates(origin, origin_card, is_response, targets, modifiers));
@@ -193,10 +189,8 @@ namespace banggame {
 
     static game_string check_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         auto check = [&](card *c, const target_list &ts) {
-            auto &effects = is_response ? c->responses : c->effects;
-
             target_list mth_targets;
-            for (const auto &[target, effect] : zip_card_targets(ts, effects, c->optionals)) {
+            for (const auto &[target, effect] : zip_card_targets(ts, c, is_response)) {
                 if (effect.type == effect_type::mth_add) {
                     mth_targets.push_back(target);
                 }
@@ -206,7 +200,7 @@ namespace banggame {
                     }, target));
             }
 
-            return (is_response ? c->mth_response : c->mth_effect).on_prompt(c, origin, mth_targets, ctx);
+            return c->get_mth(is_response).on_prompt(c, origin, mth_targets, ctx);
         };
 
         for (const auto &[mod_card, mod_targets] : modifiers) {
@@ -285,8 +279,7 @@ namespace banggame {
     void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, is_response);
 
-        auto &effects = is_response ? origin_card->responses : origin_card->effects;
-        if (!ctx.repeating && !ranges::contains(effects, effect_type::play_card_action, &effect_holder::type)) {
+        if (!ctx.repeating && !ranges::contains(origin_card->get_effect_list(is_response), effect_type::play_card_action, &effect_holder::type)) {
             origin->play_card_action(origin_card);
         }
 
@@ -294,7 +287,7 @@ namespace banggame {
         card_cube_count selected_cubes;
 
         target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, effects, origin_card->optionals)) {
+        for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
             if (effect.type == effect_type::mth_add) {
                 mth_targets.push_back(target);
             } else if (effect.type == effect_type::pay_cube) {
@@ -318,14 +311,15 @@ namespace banggame {
             }, target);
         }
 
-        (is_response ? origin_card->mth_response : origin_card->mth_effect).on_play(origin_card, origin, mth_targets, ctx);
+        origin_card->get_mth(is_response).on_play(origin_card, origin, mth_targets, ctx);
     }
 
     game_string verify_and_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers) {
         if (!is_response) {
             if (origin->m_game->pending_requests()) {
                 return "ERROR_MUST_RESPOND_TO_REQUEST";
-            } else if (origin->m_game->m_playing != origin) {
+            }
+            if (origin->m_game->m_playing != origin) {
                 return "ERROR_PLAYER_NOT_IN_TURN";
             }
         }

@@ -338,7 +338,7 @@ namespace banggame {
                     m_shop_selection | ranges::views::filter(&card::is_brown)
                 )
                 | ranges::views::filter([&](card *target_card) {
-                    return !is_disabled(target_card) && !target_card->responses.empty() && is_possible_to_play(owner, target_card, effect_list_index::responses);
+                    return !is_disabled(target_card) && !target_card->responses.empty() && is_possible_to_play(owner, target_card, true);
                 })
                 | ranges::to<std::vector<not_null<card *>>>
                 : std::vector<not_null<card *>>{},

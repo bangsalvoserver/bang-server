@@ -70,6 +70,10 @@ namespace banggame {
         );
     }
 
+    inline auto zip_card_targets(const target_list &targets, card_data *origin_card, bool is_response) {
+        return zip_card_targets(targets, origin_card->get_effect_list(is_response), origin_card->optionals);
+    }
+
 }
 
 #endif

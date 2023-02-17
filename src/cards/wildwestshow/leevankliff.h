@@ -5,8 +5,11 @@
 
 namespace banggame {
 
+    struct effect_leevankliff {
+        game_string verify(card *origin_card, player *origin);
+    };
+
     struct modifier_leevankliff {
-        game_string verify(card *origin_card, player *origin, card *playing_card);
         void add_context(card *origin_card, player *origin, effect_context &ctx);
     };
 }

@@ -34,6 +34,14 @@ namespace banggame {
         (card_color_type, color)
         (card_sign, sign),
 
+        const effect_list &get_effect_list(bool is_response) const {
+            return is_response ? responses : effects;
+        }
+
+        const mth_holder &get_mth(bool is_response) const {
+            return is_response ? mth_response : mth_effect;
+        }
+
         bool has_tag(tag_type tag) const {
             return std::ranges::find(tags, tag, &tag_holder::type) != tags.end();
         }

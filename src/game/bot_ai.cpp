@@ -133,7 +133,7 @@ namespace banggame {
                 }
             }
             return std::ranges::all_of(modifiers, [&](card *mod) { return allowed_card_with_modifier(origin, mod, target_card); })
-                && is_possible_to_play(origin, target_card, is_response ? effect_list_index::responses : effect_list_index::effects, ctx);
+                && is_possible_to_play(origin, target_card, is_response, ctx);
         });
 
         if (cards.empty()) {
@@ -161,26 +161,25 @@ namespace banggame {
             target_list targets;
             modifier_list modifiers;
             for (card *mod_card : modifier_cards) {
-                modifiers.emplace_back(mod_card,
-                    (is_response ? mod_card->responses : mod_card->effects)
-                        | ranges::views::transform([&](const effect_holder &holder) {
-                            auto target = generate_random_target(origin, mod_card, holder, ctx);
-                            if (holder.type == effect_type::ctx_add) {
-                                if (target.is(target_type::card)) {
-                                    mod_card->modifier.add_context(mod_card, origin, target.get<target_type::card>(), ctx);
-                                } else if (target.is(target_type::player)) {
-                                    mod_card->modifier.add_context(mod_card, origin, target.get<target_type::player>(), ctx);
-                                }
+                modifiers.emplace_back(mod_card, mod_card->get_effect_list(is_response)
+                    | ranges::views::transform([&](const effect_holder &holder) {
+                        auto target = generate_random_target(origin, mod_card, holder, ctx);
+                        if (holder.type == effect_type::ctx_add) {
+                            if (target.is(target_type::card)) {
+                                mod_card->modifier.add_context(mod_card, origin, target.get<target_type::card>(), ctx);
+                            } else if (target.is(target_type::player)) {
+                                mod_card->modifier.add_context(mod_card, origin, target.get<target_type::player>(), ctx);
                             }
-                            return target;
-                        })
-                        | ranges::to<target_list>
+                        }
+                        return target;
+                    })
+                    | ranges::to<target_list>
                 );
             }
-            for (const effect_holder &holder : is_response ? origin_card->responses : origin_card->effects) {
+            for (const effect_holder &holder : origin_card->get_effect_list(is_response)) {
                 targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
             }
-            if (is_possible_to_play(origin, origin_card, effect_list_index::optionals, ctx)) {
+            if (is_possible_to_play_effects(origin, origin_card, origin_card->optionals, ctx)) {
                 for (const effect_holder &holder : origin_card->optionals) {
                     targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
                 }

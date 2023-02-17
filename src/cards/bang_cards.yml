@@ -1583,6 +1583,7 @@ character:
     modifier: leevankliff
     effects:
       - discard card self | hand bang
+      - leevankliff
   - name: TEREN_KILL
     image: 06_terenkill
     expansion: wildwestshow
