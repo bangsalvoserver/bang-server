@@ -63,7 +63,7 @@ namespace banggame {
             != origin->m_game->m_current_check.check(req->drawn_card);
     }
 
-    bool effect_tumbleweed::can_respond(card *origin_card, player *origin) {
+    bool effect_tumbleweed::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_tumbleweed>(origin) != nullptr;
     }
 

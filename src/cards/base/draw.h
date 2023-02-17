@@ -39,7 +39,7 @@ namespace banggame {
     };
 
     struct effect_while_drawing {
-        bool can_respond(card *origin_card, player *origin);
+        bool can_play(card *origin_card, player *origin);
     };
 
     struct effect_reset_drawing : effect_while_drawing {

@@ -47,8 +47,8 @@ namespace banggame {
                 return value.get_error(origin_card, origin, ctx);
             } else if constexpr (requires { value.get_error(origin_card, origin); }) {
                 return value.get_error(origin_card, origin);
-            } else if constexpr (requires { value.can_respond(origin_card, origin); }) {
-                if (!value.can_respond(origin_card, origin)) {
+            } else if constexpr (requires { value.can_play(origin_card, origin); }) {
+                if (!value.can_play(origin_card, origin)) {
                     return "ERROR_INVALID_RESPONSE";
                 }
             }

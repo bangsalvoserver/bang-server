@@ -11,7 +11,7 @@ namespace banggame {
     };
 
     struct effect_lastwill {
-        bool can_respond(card *origin_card, player *origin);
+        bool can_play(card *origin_card, player *origin);
     };
 
     struct handler_lastwill {

@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_sacrifice {
-        bool can_respond(card *origin_card, player *origin);
+        bool can_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 }

@@ -81,7 +81,7 @@ namespace banggame {
         }
     }
     
-    bool effect_while_drawing::can_respond(card *origin_card, player *origin) {
+    bool effect_while_drawing::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_draw>(origin) != nullptr;
     }
 

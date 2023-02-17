@@ -23,7 +23,7 @@ namespace banggame {
         });
     }
 
-    bool effect_ranch::can_respond(card *origin_card, player *origin) {
+    bool effect_ranch::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_ranch>(origin) != nullptr;
     }
 

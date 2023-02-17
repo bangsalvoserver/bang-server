@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    bool effect_missed::can_respond(card *origin_card, player *origin) {
+    bool effect_missed::can_play(card *origin_card, player *origin) {
         if (auto req = origin->m_game->top_request<missable_request>(origin)) {
             return req->can_miss(origin_card);
         }

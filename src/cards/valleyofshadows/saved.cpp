@@ -56,7 +56,7 @@ namespace banggame {
         }
     };
 
-    bool effect_saved::can_respond(card *origin_card, player *origin) {
+    bool effect_saved::can_play(card *origin_card, player *origin) {
         if (auto req = origin->m_game->top_request<request_damage>()) {
             return req->target != origin && (!req->savior || req->savior == origin);
         }

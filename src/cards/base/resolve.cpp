@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    bool effect_resolve::can_respond(card *origin_card, player *origin) {
+    bool effect_resolve::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<resolvable_request>(origin) != nullptr;
     }
     

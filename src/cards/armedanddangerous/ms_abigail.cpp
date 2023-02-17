@@ -28,7 +28,7 @@ namespace banggame {
             });
     }
 
-    bool effect_ms_abigail::can_respond(card *origin_card, player *origin) {
+    bool effect_ms_abigail::can_play(card *origin_card, player *origin) {
         if (auto req = origin->m_game->top_request(origin)) {
             return ms_abigail_can_escape(req->origin, req->origin_card, req->flags);
         }

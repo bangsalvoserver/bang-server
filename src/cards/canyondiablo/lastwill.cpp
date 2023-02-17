@@ -33,7 +33,7 @@ namespace banggame {
         });
     }
 
-    bool effect_lastwill::can_respond(card *origin_card, player *origin) {
+    bool effect_lastwill::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_lastwill>(origin) != nullptr;
     }
 

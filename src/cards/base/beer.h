@@ -11,7 +11,7 @@ namespace banggame {
         
         game_string on_prompt(card *origin_card, player *target);
         void on_play(card *origin_card, player *target);
-        bool can_respond(card *origin_card, player *target);
+        bool can_play(card *origin_card, player *target);
     };
 }
 
