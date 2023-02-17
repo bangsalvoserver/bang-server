@@ -79,27 +79,19 @@ namespace banggame {
 
             game_string operator()(player *origin, card *origin_card, const effect_holder &effect, const play_card_target &target) {
                 return enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
-                    duplicate_set duplicates = play_visitor<E>{origin, origin_card, effect}.duplicates(FWD(args) ... );
-                    switch (duplicates.index()) {
-                    case 1: {
-                        auto &players = std::get<player_set>(duplicates);
-                        selected_players.merge(players);
-                        if (!players.empty()) return {"ERROR_DUPLICATE_PLAYER", *players.begin()};
-                        break;
+                    auto [players, cards, cubes] = play_visitor<E>{origin, origin_card, effect}.duplicates(FWD(args) ... );
+                    selected_players.merge(players);
+                    if (!players.empty()) {
+                        return {"ERROR_DUPLICATE_PLAYER", *players.begin()};
                     }
-                    case 2: {
-                        auto &cards = std::get<card_set>(duplicates);
-                        selected_cards.merge(cards);
-                        if (!cards.empty()) return {"ERROR_DUPLICATE_CARD", *cards.begin()};
-                        break;
+                    selected_cards.merge(cards);
+                    if (!cards.empty()) {
+                        return {"ERROR_DUPLICATE_CARD", *cards.begin()};
                     }
-                    case 3:
-                        for (auto &[card, ncubes] : std::get<card_cube_count>(duplicates)) {
-                            if (selected_cubes[card] += ncubes > card->num_cubes) {
-                                return {"ERROR_NOT_ENOUGH_CUBES_ON", card};
-                            }
+                    for (auto &[card, ncubes] : cubes) {
+                        if (selected_cubes[card] += ncubes > card->num_cubes) {
+                            return {"ERROR_NOT_ENOUGH_CUBES_ON", card};
                         }
-                        break;
                     }
                     return {};
                 }, target);

@@ -25,7 +25,7 @@ namespace banggame {
     }
 
     template<> duplicate_set play_visitor<target_type::player>::duplicates(player *target) {
-        return player_set{target};
+        return {.players{target}};
     }
 
     template<> game_string play_visitor<target_type::player>::prompt(const effect_context &ctx, player *target) {
@@ -52,7 +52,7 @@ namespace banggame {
 
     template<> duplicate_set play_visitor<target_type::conditional_player>::duplicates(player *target) {
         if (target) {
-            return player_set{target};
+            return {.players{target}};
         } else {
             return {};
         }
@@ -129,7 +129,7 @@ namespace banggame {
     }
 
     template<> duplicate_set play_visitor<target_type::fanning_targets>::duplicates(const std::vector<not_null<player *>> &targets) {
-        return player_set{targets.front(), targets.back()};
+        return {.players{targets.front(), targets.back()}};
     }
 
     template<> game_string play_visitor<target_type::fanning_targets>::prompt(const effect_context &ctx, const std::vector<not_null<player *>> &targets) {
@@ -160,7 +160,7 @@ namespace banggame {
         if (bool(effect.card_filter & target_card_filter::can_repeat)) {
             return {};
         } else {
-            return card_set{target};
+            return {.cards{target}};
         }
     }
 
@@ -196,7 +196,7 @@ namespace banggame {
         if (!target || bool(effect.card_filter & target_card_filter::can_repeat)) {
             return {};
         } else {
-            return card_set{target};
+            return {.cards{target}};
         }
     }
 
@@ -225,15 +225,13 @@ namespace banggame {
     }
 
     template<> duplicate_set play_visitor<target_type::cards>::duplicates(const std::vector<not_null<card *>> &targets) {
-        if (bool(effect.card_filter & target_card_filter::can_repeat)) {
-            return {};
-        } else {
-            card_set ret;
+        duplicate_set ret;
+        if (!bool(effect.card_filter & target_card_filter::can_repeat)) {
             for (card *target : targets) {
-                ret.emplace(target);
+                ret.cards.emplace(target);
             }
-            return ret;
         }
+        return ret;
     }
 
     template<> game_string play_visitor<target_type::cards>::prompt(const effect_context &ctx, const std::vector<not_null<card *>> &targets) {
@@ -314,9 +312,9 @@ namespace banggame {
     }
 
     template<> duplicate_set play_visitor<target_type::select_cubes>::duplicates(const std::vector<not_null<card *>> &target_cards) {
-        card_cube_count ret;
+        duplicate_set ret;
         for (card *target : target_cards) {
-            ++ret[target];
+            ++ret.cubes[target];
         }
         return ret;
     }
@@ -335,9 +333,9 @@ namespace banggame {
     }
 
     template<> duplicate_set play_visitor<target_type::self_cubes>::duplicates() {
-        return card_cube_count{
+        return {.cubes{
             {origin_card, effect.target_value}
-        };
+        }};
     }
 
     template<> game_string play_visitor<target_type::self_cubes>::prompt(const effect_context &ctx) {

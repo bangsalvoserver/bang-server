@@ -17,10 +17,13 @@ namespace banggame {
         }
     };
 
-    using player_set = std::multiset<player *>;
-    using card_set = std::multiset<card *>;
     using card_cube_count = std::map<card *, int, card_cube_ordering>;
-    using duplicate_set = std::variant<std::monostate, player_set, card_set, card_cube_count>;
+
+    struct duplicate_set {
+        std::multiset<player *> players;
+        std::multiset<card *> cards;
+        card_cube_count cubes;
+    };
 
     template<target_type E> struct play_visitor {
         player *origin;
