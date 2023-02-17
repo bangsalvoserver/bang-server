@@ -202,7 +202,6 @@ main_deck:
     color: brown
     effects:
       - generalstore
-      - generalstore players
   - &gatling
     name: GATLING
     signs:
@@ -999,9 +998,9 @@ main_deck:
     expansion: canyondiablo
     color: brown
     effects:
-      - graverobber
+      - graverobber(1)
       - play_card_action
-      - generalstore players
+      - graverobber(2)
   - name: CARD_SHARPER
     signs:
       - 10 clubs
@@ -1373,7 +1372,6 @@ character:
       - max_usages(1)
       - discard card self | hand
       - generalstore
-      - generalstore players
   - name: ANNIE_VERSARY
     image: 02_annieversary
     expansion: thebullet
@@ -2044,11 +2042,9 @@ goldrush:
     effects:
       - shopchoice
       - generalstore
-      - generalstore players
     responses:
       - shopchoice
       - generalstore
-      - generalstore players
     tags:
       - shopchoice(2)
       - hidden
