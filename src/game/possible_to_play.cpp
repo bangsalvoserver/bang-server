@@ -4,6 +4,23 @@
 
 namespace banggame {
 
+    ranges::any_view<card *> get_all_active_cards(player *origin, bool include_last) {
+        return ranges::views::concat(
+            origin->m_hand,
+            origin->m_table | ranges::views::remove_if(&card::inactive),
+            origin->m_characters,
+            origin->m_game->m_button_row,
+            origin->m_game->m_hidden_deck,
+            origin->m_game->m_shop_selection,
+            origin->m_game->m_scenario_cards | ranges::views::take_last(1),
+            origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1),
+            ranges::views::single(origin->get_last_played_card())
+                | ranges::views::filter([=](card *last_played_card) {
+                    return include_last && last_played_card != nullptr;
+                })
+        );
+    }
+
     ranges::any_view<player *> make_equip_set(player *origin, card *origin_card) {
         if (origin_card->self_equippable()) {
             return ranges::views::single(origin);
@@ -65,17 +82,7 @@ namespace banggame {
     }
 
     static bool any_card_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
-        return ranges::any_of(ranges::views::concat(
-            origin->m_characters,
-            origin->m_table | ranges::views::remove_if(&card::inactive),
-            origin->m_hand | ranges::views::filter(&card::is_brown),
-            origin->m_game->m_shop_selection,
-            origin->m_game->m_hidden_deck,
-            origin->m_game->m_scenario_cards | ranges::views::take_last(1),
-            origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1),
-            ranges::views::single(origin->get_last_played_card()) | ranges::views::filter([](card *c) { return c != nullptr; })
-        ),
-        [&](card *origin_card) {
+        return ranges::any_of(get_all_active_cards(origin, true), [&](card *origin_card) {
             if (ranges::contains(modifiers, origin_card)) return false;
 
             if (!std::ranges::all_of(modifiers, [&](card *mod) {

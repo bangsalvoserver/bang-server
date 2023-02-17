@@ -328,15 +328,7 @@ namespace banggame {
             .flags = req->flags,
 
             .respond_cards = owner
-                ? ranges::views::concat(
-                    owner->m_hand | ranges::views::filter(&card::is_brown),
-                    owner->m_table | ranges::views::remove_if(&card::inactive),
-                    owner->m_characters,
-                    m_scenario_cards | ranges::views::take_last(1),
-                    m_wws_scenario_cards | ranges::views::take_last(1),
-                    m_button_row,
-                    m_shop_selection | ranges::views::filter(&card::is_brown)
-                )
+                ? get_all_active_cards(owner)
                 | ranges::views::filter([&](card *target_card) {
                     return !is_disabled(target_card) && !target_card->responses.empty() && is_possible_to_play(owner, target_card, true);
                 })
@@ -371,19 +363,10 @@ namespace banggame {
         if (m_playing->is_bot()) {
             request_bot_play(m_playing, false);
         } else if (m_playing->empty_hand()
-        && std::ranges::none_of(
-            ranges::views::concat(
-                m_playing->m_characters,
-                m_playing->m_table | ranges::views::remove_if(&card::inactive),
-                m_shop_selection,
-                m_button_row | ranges::views::remove_if([](card *c) { return c->has_tag(tag_type::confirm); }),
-                m_scenario_cards | ranges::views::take_last(1),
-                m_wws_scenario_cards | ranges::views::take_last(1)
-            ),
-            [&](card *origin_card) {
-                return is_possible_to_play(m_playing, origin_card);
-            }
-        )) {
+            && std::ranges::none_of(get_all_active_cards(m_playing), [&](card *origin_card) {
+                return !origin_card->has_tag(tag_type::confirm) && is_possible_to_play(m_playing, origin_card);
+            })
+        ) {
             m_playing->pass_turn();
         }
     }

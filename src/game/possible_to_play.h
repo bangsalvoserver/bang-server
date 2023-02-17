@@ -15,6 +15,8 @@ namespace banggame {
         return ranges::distance(ranges::take_view(FWD(range), size)) == size;
     }
 
+    ranges::any_view<card *> get_all_active_cards(player *origin, bool include_last = false);
+
     ranges::any_view<player *> make_equip_set(player *origin, card *origin_card);
 
     ranges::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {});

@@ -110,16 +110,7 @@ namespace banggame {
     }
 
     static card *random_card_playable_with_modifiers(player *origin, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
-        auto cards = ranges::views::concat(
-            origin->m_characters,
-            origin->m_table | ranges::views::remove_if(&card::inactive),
-            origin->m_hand,
-            origin->m_game->m_shop_selection,
-            origin->m_game->m_hidden_deck,
-            origin->m_game->m_scenario_cards | ranges::views::take_last(1),
-            origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1),
-            ranges::views::single(origin->get_last_played_card()) | ranges::views::filter([](card *c) { return c != nullptr; })
-        )
+        auto cards = get_all_active_cards(origin, true)
         | ranges::views::filter([&](card *target_card) {
             if (target_card->is_modifier()) {
                 if (ranges::contains(modifiers, target_card)) {
@@ -242,15 +233,7 @@ namespace banggame {
 
     static bool play_in_turn(player *origin) {
         return execute_random_play(origin, false,
-            ranges::views::concat(
-                origin->m_characters,
-                origin->m_table | ranges::views::remove_if(&card::inactive),
-                origin->m_hand,
-                origin->m_game->m_shop_selection,
-                origin->m_game->m_button_row,
-                origin->m_game->m_scenario_cards | ranges::views::take_last(1),
-                origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
-            )
+            get_all_active_cards(origin)
             | ranges::views::filter([&](card *target_card){
                 return is_possible_to_play(origin, target_card);
             })
