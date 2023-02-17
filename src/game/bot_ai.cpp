@@ -143,25 +143,23 @@ namespace banggame {
         return random_element(cards, origin->m_game->rng);
     }
 
-    static std::pair<target_list, modifier_list> generate_random_play(player *origin, card *origin_card, bool is_response, std::vector<card *> modifier_cards = {}, effect_context ctx = {}) {
+    static play_card_args generate_random_play(player *origin, card *origin_card, bool is_response, std::vector<card *> modifier_cards = {}, effect_context ctx = {}) {
         if (!is_response && (origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
-            if (origin_card->self_equippable()) {
-                return {};
-            } else {
-                return {target_list{play_card_target{enums::enum_tag<target_type::player>,
-                    random_element(make_equip_set(origin, origin_card), origin->m_game->rng)}},
-                    modifier_list{}};
+            play_card_args ret { .card = origin_card };
+            if (!origin_card->self_equippable()) {
+                ret.targets.emplace_back(enums::enum_tag<target_type::player>,
+                    random_element(make_equip_set(origin, origin_card), origin->m_game->rng));
             }
+            return ret;
         } else if (origin_card->is_modifier()) {
             modifier_cards.push_back(origin_card);
             origin_card->modifier.add_context(origin_card, origin, ctx);
             origin_card = random_card_playable_with_modifiers(origin, is_response, modifier_cards, ctx);
             return generate_random_play(origin, origin_card, is_response, std::move(modifier_cards), ctx);
         } else {
-            target_list targets;
-            modifier_list modifiers;
+            play_card_args ret { .card = origin_card, .is_response = is_response };
             for (card *mod_card : modifier_cards) {
-                modifiers.emplace_back(mod_card, mod_card->get_effect_list(is_response)
+                ret.modifiers.emplace_back(mod_card, mod_card->get_effect_list(is_response)
                     | ranges::views::transform([&](const effect_holder &holder) {
                         auto target = generate_random_target(origin, mod_card, holder, ctx);
                         if (holder.type == effect_type::ctx_add) {
@@ -177,14 +175,14 @@ namespace banggame {
                 );
             }
             for (const effect_holder &holder : origin_card->get_effect_list(is_response)) {
-                targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
+                ret.targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
             }
             if (is_possible_to_play_effects(origin, origin_card, origin_card->optionals, ctx)) {
                 for (const effect_holder &holder : origin_card->optionals) {
-                    targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
+                    ret.targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
                 }
             }
-            return {std::move(targets), std::move(modifiers)};
+            return ret;
         }
     }
 
@@ -192,7 +190,7 @@ namespace banggame {
         for (int i=0; i<10; ++i) {
             std::set<card *> card_set = cards;
             while (!card_set.empty()) {
-                card *origin_card = [&]{
+                card *selected_card = [&]{
                     for (pocket_type pocket : pockets) {
                         if (auto filter = card_set | std::views::filter([&](card *c) { return c->pocket == pocket; })) {
                             return random_element(filter, origin->m_game->rng);
@@ -201,10 +199,10 @@ namespace banggame {
                     return random_element(card_set, origin->m_game->rng);
                 }();
 
-                card_set.erase(origin_card);
-                auto [targets, modifiers] = generate_random_play(origin, origin_card, is_response);
+                card_set.erase(selected_card);
+                play_card_args args = generate_random_play(origin, selected_card, is_response);
 
-                if (!verify_and_play(origin, origin_card, is_response, targets, modifiers)) {
+                if (!verify_and_play(origin, args.card, args.is_response, args.targets, args.modifiers)) {
                     if (auto &prompt = origin->m_prompt) {
                         auto fun = std::move(prompt->first);
                         prompt.reset();
