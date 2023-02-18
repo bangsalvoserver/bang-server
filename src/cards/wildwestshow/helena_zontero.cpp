@@ -5,9 +5,7 @@
 namespace banggame {
 
     void equip_helena_zontero::on_enable(card *target_card, player *origin) {
-        origin->m_game->draw_check_then(nullptr, target_card, [](card_sign sign) {
-            return sign.suit == card_suit::hearts || sign.suit == card_suit::diamonds;
-        }, [=](bool condition) {
+        origin->m_game->draw_check_then(nullptr, target_card, &card_sign::is_red, [=](bool condition) {
             if (condition) {
                 auto alive_players = origin->m_game->m_players
                     | ranges::views::filter([](player *p) {

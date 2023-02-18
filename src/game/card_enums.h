@@ -39,6 +39,13 @@ namespace banggame {
         (card_suit, suit)
         (card_rank, rank),
 
+        bool is_hearts() const      { return suit == card_suit::hearts; }
+        bool is_diamonds() const    { return suit == card_suit::diamonds; }
+        bool is_red() const         { return is_hearts() || is_diamonds(); }
+        bool is_clubs() const       { return suit == card_suit::clubs; }
+        bool is_spades() const      { return suit == card_suit::spades; }
+        bool is_black() const       { return is_clubs() || is_spades(); }
+
         explicit operator bool () const {
             return suit != card_suit::none && rank != card_rank::none;
         }

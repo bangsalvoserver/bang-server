@@ -90,7 +90,7 @@ namespace banggame {
         if (bool(filter & target_card_filter::blue) && filter_impl::get_card_color(target) != card_color_type::blue)
             return "ERROR_TARGET_NOT_BLUE_CARD";
 
-        if (bool(filter & target_card_filter::clubs) && filter_impl::get_card_sign(origin, target).suit != card_suit::clubs)
+        if (bool(filter & target_card_filter::clubs) && !filter_impl::get_card_sign(origin, target).is_clubs())
             return "ERROR_TARGET_NOT_CLUBS";
 
         if (bool(filter & target_card_filter::black) != (filter_impl::get_card_color(target) == card_color_type::black))

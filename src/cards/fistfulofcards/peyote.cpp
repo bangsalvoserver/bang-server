@@ -24,10 +24,7 @@ namespace banggame {
                     target->m_game->add_log("LOG_DECLARED_BLACK", target, origin_card);
                 }
 
-                if (choice == 1
-                    ? (drawn_card->sign.suit == card_suit::hearts || drawn_card->sign.suit == card_suit::diamonds)
-                    : (drawn_card->sign.suit == card_suit::clubs || drawn_card->sign.suit == card_suit::spades))
-                {
+                if ((choice == 1) == drawn_card->sign.is_red()) {
                     target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
                     target->add_to_hand(drawn_card);
                 } else {

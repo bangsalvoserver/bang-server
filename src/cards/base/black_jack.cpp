@@ -9,8 +9,7 @@ namespace banggame {
             if (origin == target && origin->m_num_drawn_cards == 2) {
                 reveal = true;
 
-                card_suit suit = target->m_game->get_card_sign(drawn_card).suit;
-                if (suit == card_suit::hearts || suit == card_suit::diamonds) {
+                if (target->m_game->get_card_sign(drawn_card).is_red()) {
                     origin->m_game->queue_action([=]{
                         origin->add_to_hand_phase_one(origin->m_game->phase_one_drawn_card());
                     }, 2);
