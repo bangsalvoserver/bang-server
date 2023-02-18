@@ -15,13 +15,15 @@ namespace banggame {
         return ranges::distance(ranges::take_view(FWD(range), size)) == size;
     }
 
-    ranges::any_view<card *> get_all_active_cards(player *origin, bool include_last = false);
+    ranges::any_view<card *> get_all_playable_cards(player *origin, bool is_response = false);
 
     ranges::any_view<player *> make_equip_set(player *origin, card *origin_card);
 
     ranges::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {});
 
     ranges::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {});
+
+    ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response = false, const effect_context &ctx = {});
 
     bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx = {});
     

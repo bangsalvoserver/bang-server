@@ -107,27 +107,6 @@ namespace banggame {
         }, holder.target);
     }
 
-    static card *random_card_playable_with_modifiers(player *origin, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
-        auto cards = get_all_active_cards(origin, true)
-        | ranges::views::filter([&](card *target_card) {
-            if (target_card->is_modifier()) {
-                if (ranges::contains(modifiers, target_card)) {
-                    return false;
-                }
-                if (!std::transform_reduce(
-                    modifiers.begin(), modifiers.end(), modifier_bitset(target_card->modifier_type()), std::bit_and(),
-                    [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
-                )) {
-                    return false;
-                }
-            }
-            return std::ranges::all_of(modifiers, [&](card *mod) { return allowed_card_with_modifier(origin, mod, target_card); })
-                && is_possible_to_play(origin, target_card, is_response, ctx);
-        });
-
-        return random_element(cards, origin->m_game->rng);
-    }
-
     static play_card_args generate_random_play(player *origin, card *origin_card, bool is_response, std::vector<card *> modifier_cards = {}, effect_context ctx = {}) {
         if (!is_response && (origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
             play_card_args ret { .card = origin_card };
@@ -139,25 +118,22 @@ namespace banggame {
         } else if (origin_card->is_modifier()) {
             modifier_cards.push_back(origin_card);
             origin_card->modifier.add_context(origin_card, origin, ctx);
-            origin_card = random_card_playable_with_modifiers(origin, is_response, modifier_cards, ctx);
-            return generate_random_play(origin, origin_card, is_response, std::move(modifier_cards), ctx);
+            auto cards = cards_playable_with_modifiers(origin, modifier_cards, is_response, ctx);
+            return generate_random_play(origin, random_element(cards, origin->m_game->rng), is_response, std::move(modifier_cards), ctx);
         } else {
             play_card_args ret { .card = origin_card, .is_response = is_response };
             for (card *mod_card : modifier_cards) {
-                ret.modifiers.emplace_back(mod_card, mod_card->get_effect_list(is_response)
-                    | ranges::views::transform([&](const effect_holder &holder) {
-                        auto target = generate_random_target(origin, mod_card, holder, ctx);
-                        if (holder.type == effect_type::ctx_add) {
-                            if (target.is(target_type::card)) {
-                                mod_card->modifier.add_context(mod_card, origin, target.get<target_type::card>(), ctx);
-                            } else if (target.is(target_type::player)) {
-                                mod_card->modifier.add_context(mod_card, origin, target.get<target_type::player>(), ctx);
-                            }
+                auto &[_, targets] = ret.modifiers.emplace_back(mod_card);
+                for (const effect_holder &holder : mod_card->get_effect_list(is_response)) {
+                    const auto &target = targets.emplace_back(generate_random_target(origin, mod_card, holder, ctx));
+                    if (holder.type == effect_type::ctx_add) {
+                        if (target.is(target_type::card)) {
+                            mod_card->modifier.add_context(mod_card, origin, target.get<target_type::card>(), ctx);
+                        } else if (target.is(target_type::player)) {
+                            mod_card->modifier.add_context(mod_card, origin, target.get<target_type::player>(), ctx);
                         }
-                        return target;
-                    })
-                    | ranges::to<target_list>
-                );
+                    }
+                }
             }
             for (const effect_holder &holder : origin_card->get_effect_list(is_response)) {
                 ret.targets.push_back(generate_random_target(origin, origin_card, holder, ctx));

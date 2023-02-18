@@ -330,11 +330,7 @@ namespace banggame {
             .flags = req->flags,
 
             .respond_cards = owner
-                ? get_all_active_cards(owner)
-                | ranges::views::filter([&](card *target_card) {
-                    return is_possible_to_play(owner, target_card, true);
-                })
-                | ranges::to<std::vector<not_null<card *>>>
+                ? ranges::to<std::vector<not_null<card *>>>(get_all_playable_cards(owner, true))
                 : std::vector<not_null<card *>>{},
 
             .pick_cards = owner && req->target == owner
@@ -358,11 +354,7 @@ namespace banggame {
 
     status_ready_args game::make_status_ready_update(player *owner) {
         return {
-            .play_cards = get_all_active_cards(owner)
-                | ranges::views::filter([&](card *origin_card) {
-                    return is_possible_to_play(owner, origin_card);
-                })
-                | ranges::to<std::vector<not_null<card *>>>
+            .play_cards = ranges::to<std::vector<not_null<card *>>>(get_all_playable_cards(owner))
         };
     }
 

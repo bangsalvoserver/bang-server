@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    ranges::any_view<card *> get_all_active_cards(player *origin, bool include_last) {
+    static auto get_all_active_cards(player *origin, bool include_last) {
         return ranges::views::concat(
             origin->m_hand,
             origin->m_table | ranges::views::remove_if(&card::inactive),
@@ -19,6 +19,13 @@ namespace banggame {
                     return last_played_card && include_last;
                 })
         );
+    }
+
+    ranges::any_view<card *> get_all_playable_cards(player *origin, bool is_response) {
+        return get_all_active_cards(origin, false)
+            | ranges::views::filter([=](card *origin_card) {
+                return is_possible_to_play(origin, origin_card, is_response);
+            });
     }
 
     ranges::any_view<player *> make_equip_set(player *origin, card *origin_card) {
@@ -89,8 +96,8 @@ namespace banggame {
         });
     }
 
-    static bool any_card_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
-        return ranges::any_of(get_all_active_cards(origin, true), [&](card *origin_card) {
+    ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
+        return get_all_active_cards(origin, true) | ranges::views::filter([=](card *origin_card) {
             if (std::ranges::any_of(modifiers, [&](card *mod_card) {
                 return origin_card == mod_card || !allowed_card_with_modifier(origin, mod_card, origin_card);
             })) {
@@ -115,7 +122,7 @@ namespace banggame {
             if (origin_card->is_modifier()) {
                 std::vector modifiers_copy = modifiers;
                 modifiers_copy.push_back(origin_card);
-                return any_card_playable_with_modifiers(origin, std::move(modifiers_copy), is_response, ctx_copy);
+                return contains_at_least(cards_playable_with_modifiers(origin, std::move(modifiers_copy), is_response, ctx_copy), 1);
             }
             return true;
         });
@@ -131,7 +138,7 @@ namespace banggame {
             if (origin_card->is_modifier()) {
                 auto ctx_copy = ctx;
                 origin_card->modifier.add_context(origin_card, origin, ctx_copy);
-                return any_card_playable_with_modifiers(origin, std::vector{origin_card}, is_response, ctx_copy);
+                return contains_at_least(cards_playable_with_modifiers(origin, std::vector{origin_card}, is_response, ctx_copy), 1);
             } else {
                 return origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
             }
