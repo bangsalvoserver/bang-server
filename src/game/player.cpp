@@ -53,6 +53,10 @@ namespace banggame {
         return m_game->call_event<event_type::count_cards_to_draw>(this, 2);
     }
 
+    game_string player::get_play_card_error(card *origin_card) {
+        return m_game->call_event<event_type::check_play_card>(this, origin_card, game_string{});
+    }
+
     card *player::find_equipped_card(card *card) {
         auto it = std::ranges::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {

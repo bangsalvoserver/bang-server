@@ -116,6 +116,7 @@ namespace banggame {
                 origin_card->modifier.add_context(origin_card, origin, ctx_copy);
             }
 
+            if (origin->get_play_card_error(origin_card) || origin->m_game->is_disabled(origin_card)) return false;
             if (origin->m_gold < get_card_cost(origin_card, is_response, ctx_copy)) return false;
             if (!is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx_copy)) return false;
 
@@ -129,7 +130,7 @@ namespace banggame {
     }
 
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
-        if (origin->m_game->is_disabled(origin_card)) {
+        if (origin->get_play_card_error(origin_card) || origin->m_game->is_disabled(origin_card)) {
             return false;
         } else if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
             return !is_response && contains_at_least(make_equip_set(origin, origin_card), 1)

@@ -142,6 +142,8 @@ namespace banggame {
         int get_bangs_played();
         int get_cards_to_draw();
 
+        game_string get_play_card_error(card *card);
+
         bool is_bot() const {
             return user_id < 0;
         }
