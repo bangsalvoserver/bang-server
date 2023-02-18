@@ -16,7 +16,7 @@ namespace banggame {
             origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1),
             ranges::views::single(origin->get_last_played_card())
                 | ranges::views::filter([=](card *last_played_card) {
-                    return include_last && last_played_card != nullptr;
+                    return last_played_card && include_last;
                 })
         );
     }
@@ -59,8 +59,9 @@ namespace banggame {
             case target_type::player:
                 return contains_at_least(make_player_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::card:
-            case target_type::extra_card:
                 return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
+            case target_type::extra_card:
+                return ctx.repeating || contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::cards:
                 return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), std::max<int>(1, holder.target_value));
             case target_type::select_cubes:
