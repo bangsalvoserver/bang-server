@@ -29,17 +29,18 @@ namespace banggame {
     }
 
     ranges::any_view<player *> make_equip_set(player *origin, card *origin_card) {
-        if (origin->m_game->check_flags(game_flags::disable_equipping)) {
-            return ranges::views::empty<player *>;
-        }
-        if (origin_card->self_equippable()) {
-            return ranges::views::single(origin);
-        }
-        return origin->m_game->m_players
-            | ranges::views::filter([=](player *target) {
-                return !check_player_filter(origin, origin_card->equip_target, target)
-                    && !target->find_equipped_card(origin_card);
-            });
+        return ranges::views::filter(origin->m_game->m_players, [=](player *target) {
+            if (origin->m_game->check_flags(game_flags::disable_equipping)) {
+                return false;
+            } else if (origin_card->is_orange() && origin->m_game->num_cubes < 3) {
+                return false;
+            } else if (origin_card->self_equippable()) {
+                if (origin != target) return false;
+            } else if (check_player_filter(origin, origin_card->equip_target, target)) {
+                return false;
+            }
+            return !target->find_equipped_card(origin_card);
+        });
     }
 
     ranges::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
