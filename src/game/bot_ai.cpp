@@ -230,12 +230,10 @@ namespace banggame {
     }
 
     static bool play_in_turn(player *origin) {
+        auto update = origin->m_game->make_status_ready_update(origin);
+
         return execute_random_play(origin, false,
-            get_all_active_cards(origin)
-            | ranges::views::filter([&](card *target_card){
-                return is_possible_to_play(origin, target_card);
-            })
-            | ranges::to<std::set>,
+            ranges::to<std::set<card *>>(update.play_cards),
             {
                 pocket_type::scenario_card,
                 pocket_type::wws_scenario_card,

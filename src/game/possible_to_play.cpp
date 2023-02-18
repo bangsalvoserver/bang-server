@@ -22,6 +22,9 @@ namespace banggame {
     }
 
     ranges::any_view<player *> make_equip_set(player *origin, card *origin_card) {
+        if (origin->m_game->check_flags(game_flags::disable_equipping)) {
+            return ranges::views::empty<player *>;
+        }
         if (origin_card->self_equippable()) {
             return ranges::views::single(origin);
         }
@@ -115,7 +118,9 @@ namespace banggame {
     }
 
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
-        if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
+        if (origin->m_game->is_disabled(origin_card)) {
+            return false;
+        } else if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
             return !is_response && contains_at_least(make_equip_set(origin, origin_card), 1)
                  && origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
         } else if (is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx)) {

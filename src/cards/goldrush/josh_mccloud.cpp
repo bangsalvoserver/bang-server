@@ -99,7 +99,7 @@ namespace banggame {
         card *target_card = target->m_game->draw_shop_card();
         if (target_card->is_black()) {
             auto equip_set = make_equip_set(target, target_card) | ranges::to<std::vector>;
-            if (target->m_game->check_flags(game_flags::disable_equipping) || equip_set.empty()) {
+            if (equip_set.empty()) {
                 target->m_game->add_short_pause(target_card);
                 target->m_game->move_card(target_card, pocket_type::shop_discard);
             } else if (equip_set.size() == 1) {

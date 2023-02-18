@@ -330,7 +330,7 @@ namespace banggame {
             .respond_cards = owner
                 ? get_all_active_cards(owner)
                 | ranges::views::filter([&](card *target_card) {
-                    return !is_disabled(target_card) && is_possible_to_play(owner, target_card, true);
+                    return is_possible_to_play(owner, target_card, true);
                 })
                 | ranges::to<std::vector<not_null<card *>>>
                 : std::vector<not_null<card *>>{},
@@ -354,6 +354,16 @@ namespace banggame {
         };
     }
 
+    status_ready_args game::make_status_ready_update(player *owner) {
+        return {
+            .play_cards = get_all_active_cards(owner)
+                | ranges::views::filter([&](card *origin_card) {
+                    return is_possible_to_play(owner, origin_card);
+                })
+                | ranges::to<std::vector<not_null<card *>>>
+        };
+    }
+
     void game::send_request_status_clear() {
         add_update<game_update_type::status_clear>();
     }
@@ -362,12 +372,15 @@ namespace banggame {
         if (!m_playing) return;
         if (m_playing->is_bot()) {
             request_bot_play(m_playing, false);
-        } else if (m_playing->empty_hand()
-            && std::ranges::none_of(get_all_active_cards(m_playing), [&](card *origin_card) {
-                return !origin_card->has_tag(tag_type::confirm) && is_possible_to_play(m_playing, origin_card);
-            })
-        ) {
-            m_playing->pass_turn();
+        } else {
+            auto update = make_status_ready_update(m_playing);
+            if (m_playing->empty_hand() && std::ranges::all_of(update.play_cards, [](card *origin_card) {
+                return origin_card->has_tag(tag_type::confirm);
+            })) {
+                m_playing->pass_turn();
+            } else {
+                add_update<game_update_type::status_ready>(update_target::includes_private(m_playing), std::move(update));
+            }
         }
     }
 

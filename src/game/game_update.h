@@ -199,6 +199,10 @@ namespace banggame {
         (std::vector<serial::card>, highlight_cards)
     )
 
+    DEFINE_STRUCT(status_ready_args,
+        (std::vector<serial::card>, play_cards)
+    )
+
     DEFINE_STRUCT(game_options,
         (card_expansion_type, expansions)
         (bool, enable_ghost_cards, false)
@@ -237,6 +241,7 @@ namespace banggame {
         (player_status, player_status_update)
         (switch_turn, serial::player)
         (request_status, request_status_args)
+        (status_ready, status_ready_args)
         (game_flags, game_flags)
         (play_sound, std::string)
         (status_clear)
