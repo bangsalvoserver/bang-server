@@ -12,8 +12,13 @@ namespace banggame {
 
     static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
         MAYBE_RETURN(origin->m_game->call_event<event_type::check_play_card>(origin, origin_card, game_string{}));
+        auto &effects = origin_card->get_effect_list(is_response);
+
+        if (effects.empty()) {
+            return "ERROR_EFFECT_LIST_EMPTY";
+        }
         
-        size_t diff = targets.size() - origin_card->get_effect_list(is_response).size();
+        size_t diff = targets.size() - effects.size();
         if (auto repeatable = origin_card->get_tag_value(tag_type::repeatable)) {
             if (diff < 0 || diff % origin_card->optionals.size() != 0
                 || (*repeatable > 0 && diff > (origin_card->optionals.size() * *repeatable)))
@@ -142,9 +147,6 @@ namespace banggame {
     static game_string verify_card_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
         if (origin_card->is_modifier()) {
             return "ERROR_CARD_IS_MODIFIER";
-        }
-        if (origin_card->get_effect_list(is_response).empty()) {
-            return "ERROR_EFFECT_LIST_EMPTY";
         }
         if (card *disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};

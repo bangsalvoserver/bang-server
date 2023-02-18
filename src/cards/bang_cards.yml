@@ -1969,12 +1969,14 @@ goldrush:
     image: 04_bottiglia
     color: brown
     modifier: shopchoice
-    tags:
-      - shopchoice(1)
-      - buy_cost(2)
+    effects:
+      - none
     responses:
       - forced_play
       - play_card_action
+    tags:
+      - shopchoice(1)
+      - buy_cost(2)
   - name: BOTTLE_PANIC
     image: 04_bottiglia_panico
     color: brown
@@ -2030,12 +2032,14 @@ goldrush:
     image: 04_complice
     color: brown
     modifier: shopchoice
-    tags:
-      - shopchoice(2)
-      - buy_cost(2)
+    effects:
+      - none
     responses:
       - forced_play
       - play_card_action
+    tags:
+      - shopchoice(2)
+      - buy_cost(2)
   - name: PARDNER_GENERAL_STORE
     image: 04_complice_emporio
     color: brown

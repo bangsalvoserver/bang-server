@@ -330,7 +330,7 @@ namespace banggame {
             .respond_cards = owner
                 ? get_all_active_cards(owner)
                 | ranges::views::filter([&](card *target_card) {
-                    return !is_disabled(target_card) && !target_card->responses.empty() && is_possible_to_play(owner, target_card, true);
+                    return !is_disabled(target_card) && is_possible_to_play(owner, target_card, true);
                 })
                 | ranges::to<std::vector<not_null<card *>>>
                 : std::vector<not_null<card *>>{},
