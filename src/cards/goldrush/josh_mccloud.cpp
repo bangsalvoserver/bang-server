@@ -87,37 +87,28 @@ namespace banggame {
             origin->m_game->pop_request();
 
             if (origin == target) {
-                origin->m_game->add_log("LOG_BOUGHT_EQUIP", target_card, origin);
+                origin->m_game->add_log("LOG_EQUIPPED_CARD", target_card, origin);
             } else {
-                origin->m_game->add_log("LOG_BOUGHT_EQUIP_TO", target_card, origin, target);
+                origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, origin, target);
             }
             target->equip_card(target_card);
         });
     }
 
     void effect_josh_mccloud::on_play(card *origin_card, player *target) {
-        auto *card = target->m_game->draw_shop_card();
-        auto discard_drawn_card = [&]{
-            target->m_game->add_short_pause(card);
-            target->m_game->move_card(card, pocket_type::shop_discard);
-        };
-        if (card->is_black()) {
-            if (!target->m_game->check_flags(game_flags::disable_equipping)) {
-                auto equip_set = make_equip_set(target, card) | ranges::to<std::vector>;
-                if (equip_set.empty()) {
-                    discard_drawn_card();
-                } else if (equip_set.size() == 1) {
-                    equip_set.front()->equip_card(card);
-                } else {
-                    target->m_game->queue_request<request_force_equip_card>(origin_card, target, card);
-                }
+        card *target_card = target->m_game->draw_shop_card();
+        if (target_card->is_black()) {
+            auto equip_set = make_equip_set(target, target_card) | ranges::to<std::vector>;
+            if (target->m_game->check_flags(game_flags::disable_equipping) || equip_set.empty()) {
+                target->m_game->add_short_pause(target_card);
+                target->m_game->move_card(target_card, pocket_type::shop_discard);
+            } else if (equip_set.size() == 1) {
+                equip_set.front()->equip_card(target_card);
             } else {
-                discard_drawn_card();
+                target->m_game->queue_request<request_force_equip_card>(origin_card, target, target_card);
             }
-        } else if (is_possible_to_play(target, card)) {
-            target->m_game->queue_request<request_force_play_card>(origin_card, target, card);
         } else {
-            discard_drawn_card();
+            target->m_game->queue_request<request_force_play_card>(origin_card, target, target_card);
         }
     }
 }
