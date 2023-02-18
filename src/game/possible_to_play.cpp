@@ -82,28 +82,33 @@ namespace banggame {
         });
     }
 
-    static bool any_card_playable_with_modifiers(player *origin, std::vector<card *> &&modifiers, bool is_response, effect_context ctx) {
+    static bool any_card_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
         return ranges::any_of(get_all_active_cards(origin, true), [&](card *origin_card) {
             if (std::ranges::any_of(modifiers, [&](card *mod_card) {
                 return origin_card == mod_card || !allowed_card_with_modifier(origin, mod_card, origin_card);
             })) {
                 return false;
-            } else if (origin_card->is_modifier()) {
+            }
+
+            auto ctx_copy = ctx;
+            
+            if (origin_card->is_modifier()) {
                 if (!std::transform_reduce(
                     modifiers.begin(), modifiers.end(), modifier_bitset(origin_card->modifier_type()), std::bit_and(),
                     [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
                 )) {
                     return false;
                 }
-                origin_card->modifier.add_context(origin_card, origin, ctx);
-                modifiers.push_back(origin_card);
+                origin_card->modifier.add_context(origin_card, origin, ctx_copy);
             }
 
-            if (origin->m_gold < get_card_cost(origin_card, is_response, ctx)) return false;
-            if (!is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx)) return false;
+            if (origin->m_gold < get_card_cost(origin_card, is_response, ctx_copy)) return false;
+            if (!is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx_copy)) return false;
 
             if (origin_card->is_modifier()) {
-                return any_card_playable_with_modifiers(origin, std::move(modifiers), is_response, ctx);
+                std::vector modifiers_copy = modifiers;
+                modifiers_copy.push_back(origin_card);
+                return any_card_playable_with_modifiers(origin, std::move(modifiers_copy), is_response, ctx_copy);
             }
             return true;
         });
