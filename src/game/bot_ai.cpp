@@ -107,9 +107,27 @@ namespace banggame {
         }, holder.target);
     }
 
+    static play_card_args make_play_card_args(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifier_cards, effect_context &ctx) {
+        play_card_args args { .card = origin_card, .is_response = is_response };
+        for (card *mod_card : modifier_cards) {
+            auto &targets = args.modifiers.emplace_back(mod_card).targets;
+            for (const effect_holder &holder : mod_card->get_effect_list(is_response)) {
+                const auto &target = targets.emplace_back(generate_random_target(origin, mod_card, holder, ctx));
+                if (holder.type == effect_type::ctx_add) {
+                    if (target.is(target_type::card)) {
+                        mod_card->modifier.add_context(mod_card, origin, target.get<target_type::card>(), ctx);
+                    } else if (target.is(target_type::player)) {
+                        mod_card->modifier.add_context(mod_card, origin, target.get<target_type::player>(), ctx);
+                    }
+                }
+            }
+        }
+        return args;
+    }
+
     static play_card_args generate_random_play(player *origin, card *origin_card, bool is_response, std::vector<card *> modifier_cards = {}, effect_context ctx = {}) {
         if (!is_response && (origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
-            play_card_args ret { .card = origin_card };
+            auto ret = make_play_card_args(origin, origin_card, is_response, modifier_cards, ctx);
             if (!origin_card->self_equippable()) {
                 ret.targets.emplace_back(enums::enum_tag<target_type::player>,
                     random_element(make_equip_set(origin, origin_card), origin->m_game->rng));
@@ -121,20 +139,7 @@ namespace banggame {
             auto cards = cards_playable_with_modifiers(origin, modifier_cards, is_response, ctx);
             return generate_random_play(origin, random_element(cards, origin->m_game->rng), is_response, std::move(modifier_cards), ctx);
         } else {
-            play_card_args ret { .card = origin_card, .is_response = is_response };
-            for (card *mod_card : modifier_cards) {
-                auto &[_, targets] = ret.modifiers.emplace_back(mod_card);
-                for (const effect_holder &holder : mod_card->get_effect_list(is_response)) {
-                    const auto &target = targets.emplace_back(generate_random_target(origin, mod_card, holder, ctx));
-                    if (holder.type == effect_type::ctx_add) {
-                        if (target.is(target_type::card)) {
-                            mod_card->modifier.add_context(mod_card, origin, target.get<target_type::card>(), ctx);
-                        } else if (target.is(target_type::player)) {
-                            mod_card->modifier.add_context(mod_card, origin, target.get<target_type::player>(), ctx);
-                        }
-                    }
-                }
-            }
+            auto ret = make_play_card_args(origin, origin_card, is_response, modifier_cards, ctx);
             for (const effect_holder &holder : origin_card->get_effect_list(is_response)) {
                 ret.targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
             }
