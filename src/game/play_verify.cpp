@@ -332,13 +332,12 @@ namespace banggame {
     }
 
     game_string verify_and_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers) {
-        if (!is_response) {
-            if (origin->m_game->pending_requests()) {
+        if (origin->m_game->pending_requests()) {
+            if (!is_response) {
                 return "ERROR_MUST_RESPOND_TO_REQUEST";
             }
-            if (origin->m_game->m_playing != origin) {
-                return "ERROR_PLAYER_NOT_IN_TURN";
-            }
+        } else if (is_response || origin->m_game->m_playing != origin) {
+            return "ERROR_PLAYER_NOT_IN_TURN";
         }
 
         effect_context ctx;

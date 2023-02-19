@@ -27,6 +27,6 @@ namespace banggame {
     }
 
     bool effect_beer::can_play(card *origin_card, player *target) {
-        return !is_response || can_use_beer(target->m_game);
+        return !target->m_game->pending_requests() || can_use_beer(target->m_game);
     }
 }
