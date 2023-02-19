@@ -29,18 +29,10 @@ namespace banggame {
     }
 
     ranges::any_view<player *> make_equip_set(player *origin, card *origin_card) {
-        return ranges::views::filter(origin->m_game->m_players, [=](player *target) {
-            if (origin->m_game->check_flags(game_flags::disable_equipping)) {
-                return false;
-            } else if (origin_card->is_orange() && origin->m_game->num_cubes < 3) {
-                return false;
-            } else if (origin_card->self_equippable()) {
-                if (origin != target) return false;
-            } else if (check_player_filter(origin, origin_card->equip_target, target)) {
-                return false;
-            }
-            return !target->find_equipped_card(origin_card);
-        });
+        return origin->m_game->m_players
+            | ranges::views::filter([=](player *target) {
+                return !get_equip_error(origin, origin_card, target);
+            });
     }
 
     ranges::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
@@ -99,53 +91,39 @@ namespace banggame {
 
     ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
         return get_all_active_cards(origin, true) | ranges::views::filter([=](card *origin_card) {
-            if (std::ranges::any_of(modifiers, [&](card *mod_card) {
-                return origin_card == mod_card || !allowed_card_with_modifier(origin, mod_card, origin_card);
-            })) {
+            return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
+        });
+    }
+
+    bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
+        if (std::ranges::any_of(modifiers, [&](card *mod_card) {
+            return origin_card == mod_card || !allowed_card_with_modifier(origin, mod_card, origin_card);
+        })) {
+            return false;
+        } else if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
+            return !is_response
+                && contains_at_least(make_equip_set(origin, origin_card), 1)
+                && origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
+        } else if (origin->get_play_card_error(origin_card) || origin->m_game->is_disabled(origin_card)) {
+            return false;
+        } else if (!is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx)) {
+            return false;
+        } else if (origin_card->is_modifier()) {
+            if (!std::transform_reduce(
+                modifiers.begin(), modifiers.end(), modifier_bitset(origin_card->modifier_type()), std::bit_and(),
+                [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
+            )) {
                 return false;
             }
 
             auto ctx_copy = ctx;
+            origin_card->modifier.add_context(origin_card, origin, ctx_copy);
             
-            if (origin_card->is_modifier()) {
-                if (!std::transform_reduce(
-                    modifiers.begin(), modifiers.end(), modifier_bitset(origin_card->modifier_type()), std::bit_and(),
-                    [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
-                )) {
-                    return false;
-                }
-                origin_card->modifier.add_context(origin_card, origin, ctx_copy);
-            }
-
-            if (origin->get_play_card_error(origin_card) || origin->m_game->is_disabled(origin_card)) return false;
-            if (origin->m_gold < get_card_cost(origin_card, is_response, ctx_copy)) return false;
-            if (!is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx_copy)) return false;
-
-            if (origin_card->is_modifier()) {
-                std::vector modifiers_copy = modifiers;
-                modifiers_copy.push_back(origin_card);
-                return contains_at_least(cards_playable_with_modifiers(origin, std::move(modifiers_copy), is_response, ctx_copy), 1);
-            }
-            return true;
-        });
-    }
-
-    bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
-        if (origin->get_play_card_error(origin_card) || origin->m_game->is_disabled(origin_card)) {
-            return false;
-        } else if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
-            return !is_response && contains_at_least(make_equip_set(origin, origin_card), 1)
-                 && origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
-        } else if (is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx)) {
-            if (origin_card->is_modifier()) {
-                auto ctx_copy = ctx;
-                origin_card->modifier.add_context(origin_card, origin, ctx_copy);
-                return contains_at_least(cards_playable_with_modifiers(origin, std::vector{origin_card}, is_response, ctx_copy), 1);
-            } else {
-                return origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
-            }
+            auto modifiers_copy = modifiers;
+            modifiers_copy.push_back(origin_card);
+            return contains_at_least(cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy), 1);
         } else {
-            return false;
+            return origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
         }
     }
 }

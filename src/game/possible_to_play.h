@@ -27,7 +27,7 @@ namespace banggame {
 
     bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx = {});
     
-    bool is_possible_to_play(player *origin, card *origin_card, bool is_response = false, const effect_context &ctx = {});
+    bool is_possible_to_play(player *origin, card *origin_card, bool is_response = false, const std::vector<card *> &modifiers = {}, const effect_context &ctx = {});
     
 }
 

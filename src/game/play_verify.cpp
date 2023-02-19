@@ -121,7 +121,7 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_equip_target(player *origin, card *origin_card, const target_list &targets) {
+    game_string get_equip_error(player *origin, card *origin_card, player *target) {
         if (card *disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
@@ -129,12 +129,11 @@ namespace banggame {
             return "ERROR_CANT_EQUIP_CARDS";
         }
         MAYBE_RETURN(origin->get_play_card_error(origin_card));
-        player *target = origin;
-        if (!origin_card->self_equippable()) {
-            if (targets.size() != 1 || !targets.front().is(target_type::player)) {
+        if (origin_card->self_equippable()) {
+            if (origin != target) {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
-            target = targets.front().get<target_type::player>();
+        } else {
             MAYBE_RETURN(check_player_filter(origin, origin_card->equip_target, target));
         }
         if (card *equipped = target->find_equipped_card(origin_card)) {
@@ -144,6 +143,21 @@ namespace banggame {
             return "ERROR_NOT_ENOUGH_CUBES";
         }
         return {};
+    }
+
+    static game_string verify_equip_target(player *origin, card *origin_card, const target_list &targets) {
+        player *target = origin;
+        if (origin_card->self_equippable()) {
+            if (!targets.empty()) {
+                return "ERROR_INVALID_EQUIP_TARGET";
+            }
+        } else {
+            if (targets.size() != 1 || !targets.front().is(target_type::player)) {
+                return "ERROR_INVALID_EQUIP_TARGET";
+            }
+            target = targets.front().get<target_type::player>();
+        }
+        return get_equip_error(origin, origin_card, target);
     }
 
     static game_string verify_card_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
