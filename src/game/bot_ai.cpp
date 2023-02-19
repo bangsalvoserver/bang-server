@@ -60,14 +60,14 @@ namespace banggame {
                 }
             }
             auto [target1, target2] = random_element(possible_targets, origin->m_game->rng);
-            return std::vector<not_null<player *>>{target1, target2};
+            return serial::player_list{target1, target2};
         }
 
         auto operator()(enums::enum_tag_t<target_type::cards> tag) const {
             auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
             return targets
                 | ranges::views::sample(holder.target_value, origin->m_game->rng)
-                | ranges::to<std::vector<not_null<card *>>>;
+                | ranges::to<serial::card_list>;
         }
 
         auto operator()(enums::enum_tag_t<target_type::cards_other_players>) const {
@@ -82,7 +82,7 @@ namespace banggame {
                 | ranges::views::transform([&](auto &&range) {
                     return random_element(range, origin->m_game->rng);
                 })
-                | ranges::to<std::vector<not_null<card *>>>;
+                | ranges::to<serial::card_list>;
         }
 
         auto operator()(enums::enum_tag_t<target_type::select_cubes>) const {
@@ -93,7 +93,7 @@ namespace banggame {
                 | ranges::to<std::vector>;
             return cubes
                 | ranges::views::sample(holder.target_value, origin->m_game->rng)
-                | ranges::to<std::vector<not_null<card *>>>;
+                | ranges::to<serial::card_list>;
         }
     };
 
@@ -155,7 +155,7 @@ namespace banggame {
         return ret;
     }
 
-    static bool execute_random_play(player *origin, bool is_response, const std::vector<not_null<card *>> &cards, std::initializer_list<pocket_type> pockets) {
+    static bool execute_random_play(player *origin, bool is_response, const serial::card_list &cards, std::initializer_list<pocket_type> pockets) {
         for (int i=0; i<10; ++i) {
             auto card_set = cards | ranges::to<std::set<card *>>;
             while (!card_set.empty()) {

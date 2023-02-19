@@ -117,7 +117,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::fanning_targets>::get_error(const effect_context &ctx, const std::vector<not_null<player *>> &targets) {
+    template<> game_string play_visitor<target_type::fanning_targets>::get_error(const effect_context &ctx, const serial::player_list &targets) {
         if (targets.size() != 2) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -128,18 +128,18 @@ namespace banggame {
         return {};
     }
 
-    template<> duplicate_set play_visitor<target_type::fanning_targets>::duplicates(const std::vector<not_null<player *>> &targets) {
+    template<> duplicate_set play_visitor<target_type::fanning_targets>::duplicates(const serial::player_list &targets) {
         return {.players{targets.front(), targets.back()}};
     }
 
-    template<> game_string play_visitor<target_type::fanning_targets>::prompt(const effect_context &ctx, const std::vector<not_null<player *>> &targets) {
+    template<> game_string play_visitor<target_type::fanning_targets>::prompt(const effect_context &ctx, const serial::player_list &targets) {
         for (player *target : targets) {
             MAYBE_RETURN(play_visitor<target_type::player>{origin, origin_card, effect}.prompt(ctx, target));
         }
         return {};
     }
 
-    template<> void play_visitor<target_type::fanning_targets>::play(const effect_context &ctx, const std::vector<not_null<player *>> &targets) {
+    template<> void play_visitor<target_type::fanning_targets>::play(const effect_context &ctx, const serial::player_list &targets) {
         auto flags = effect_flags{};
         if (origin_card->is_brown()) {
             flags |= effect_flags::escapable;
@@ -214,7 +214,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::cards>::get_error(const effect_context &ctx, const std::vector<not_null<card *>> &targets) {
+    template<> game_string play_visitor<target_type::cards>::get_error(const effect_context &ctx, const serial::card_list &targets) {
         if (targets.size() != std::max<size_t>(1, effect.target_value)) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -224,7 +224,7 @@ namespace banggame {
         return {};
     }
 
-    template<> duplicate_set play_visitor<target_type::cards>::duplicates(const std::vector<not_null<card *>> &targets) {
+    template<> duplicate_set play_visitor<target_type::cards>::duplicates(const serial::card_list &targets) {
         duplicate_set ret;
         if (!bool(effect.card_filter & target_card_filter::can_repeat)) {
             for (card *target : targets) {
@@ -234,20 +234,20 @@ namespace banggame {
         return ret;
     }
 
-    template<> game_string play_visitor<target_type::cards>::prompt(const effect_context &ctx, const std::vector<not_null<card *>> &targets) {
+    template<> game_string play_visitor<target_type::cards>::prompt(const effect_context &ctx, const serial::card_list &targets) {
         for (card *c : targets) {
             MAYBE_RETURN(play_visitor<target_type::card>{origin, origin_card, effect}.prompt(ctx, c));
         }
         return {};
     }
 
-    template<> void play_visitor<target_type::cards>::play(const effect_context &ctx, const std::vector<not_null<card *>> &targets) {
+    template<> void play_visitor<target_type::cards>::play(const effect_context &ctx, const serial::card_list &targets) {
         for (card *c : targets) {
             play_visitor<target_type::card>{origin, origin_card, effect}.play(ctx, c);
         }
     }
 
-    template<> game_string play_visitor<target_type::cards_other_players>::get_error(const effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {
+    template<> game_string play_visitor<target_type::cards_other_players>::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
         if (!std::ranges::all_of(origin->m_game->m_players | std::views::filter(&player::alive), [&](player *p) {
             size_t found = std::ranges::count(target_cards, p, &card::owner);
             if (p->only_black_cards_equipped()) return found == 0;
@@ -263,11 +263,11 @@ namespace banggame {
         }
     }
 
-    template<> duplicate_set play_visitor<target_type::cards_other_players>::duplicates(const std::vector<not_null<card *>> &target_cards) {
+    template<> duplicate_set play_visitor<target_type::cards_other_players>::duplicates(const serial::card_list &target_cards) {
         return {};
     }
 
-    template<> game_string play_visitor<target_type::cards_other_players>::prompt(const effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {
+    template<> game_string play_visitor<target_type::cards_other_players>::prompt(const effect_context &ctx, const serial::card_list &target_cards) {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
@@ -279,7 +279,7 @@ namespace banggame {
         return msg;
     }
 
-    template<> void play_visitor<target_type::cards_other_players>::play(const effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {
+    template<> void play_visitor<target_type::cards_other_players>::play(const effect_context &ctx, const serial::card_list &target_cards) {
         auto flags = effect_flags::multi_target;
         if (origin_card->is_brown()) {
             flags |= effect_flags::escapable;
@@ -296,7 +296,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::select_cubes>::get_error(const effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {
+    template<> game_string play_visitor<target_type::select_cubes>::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
         if (effect.type != effect_type::pay_cube) {
             return "ERROR_INVALID_EFFECT_TYPE";
         }
@@ -311,7 +311,7 @@ namespace banggame {
         return {};
     }
 
-    template<> duplicate_set play_visitor<target_type::select_cubes>::duplicates(const std::vector<not_null<card *>> &target_cards) {
+    template<> duplicate_set play_visitor<target_type::select_cubes>::duplicates(const serial::card_list &target_cards) {
         duplicate_set ret;
         for (card *target : target_cards) {
             ++ret.cubes[target];
@@ -319,11 +319,11 @@ namespace banggame {
         return ret;
     }
 
-    template<> game_string play_visitor<target_type::select_cubes>::prompt(const effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {
+    template<> game_string play_visitor<target_type::select_cubes>::prompt(const effect_context &ctx, const serial::card_list &target_cards) {
         return {};
     }
 
-    template<> void play_visitor<target_type::select_cubes>::play(const effect_context &ctx, const std::vector<not_null<card *>> &target_cards) {}
+    template<> void play_visitor<target_type::select_cubes>::play(const effect_context &ctx, const serial::card_list &target_cards) {}
 
     template<> game_string play_visitor<target_type::self_cubes>::get_error(const effect_context &ctx) {
         if (effect.type != effect_type::pay_cube) {

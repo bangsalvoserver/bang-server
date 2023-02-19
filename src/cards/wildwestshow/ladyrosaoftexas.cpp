@@ -37,6 +37,6 @@ namespace banggame {
             | ranges::views::filter([](player *p) {
                 return p->m_game->m_options.enable_ghost_cards || p->alive();
             })
-            | ranges::to<std::vector<not_null<player *>>>);
+            | ranges::to<serial::player_list>);
     }
 }

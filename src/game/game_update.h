@@ -21,7 +21,7 @@ namespace banggame {
     )
 
     DEFINE_STRUCT(remove_cards_update,
-        (std::vector<serial::card>, cards)
+        (serial::card_list, cards)
     )
 
     DEFINE_STRUCT(move_card_update,
@@ -118,7 +118,7 @@ namespace banggame {
     )
 
     DEFINE_STRUCT(player_order_update,
-        (std::vector<serial::player>, players)
+        (serial::player_list, players)
         (bool, instant),
 
         auto get_duration() const {
@@ -194,13 +194,13 @@ namespace banggame {
         (serial::opt_player, target)
         (game_string, status_text)
         (effect_flags, flags)
-        (std::vector<serial::card>, respond_cards)
-        (std::vector<serial::card>, pick_cards)
-        (std::vector<serial::card>, highlight_cards)
+        (serial::card_list, respond_cards)
+        (serial::card_list, pick_cards)
+        (serial::card_list, highlight_cards)
     )
 
     DEFINE_STRUCT(status_ready_args,
-        (std::vector<serial::card>, play_cards)
+        (serial::card_list, play_cards)
     )
 
     DEFINE_STRUCT(game_options,

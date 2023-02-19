@@ -53,6 +53,11 @@ namespace banggame::serial {
 
 #endif
 
+namespace banggame::serial {
+    using player_list = std::vector<player>;
+    using card_list = std::vector<card>;
+}
+
 #ifndef NO_DEFINE_SERIALIZERS
 
 namespace json {

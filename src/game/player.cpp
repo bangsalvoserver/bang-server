@@ -413,7 +413,7 @@ namespace banggame {
 
     void player::remove_extra_characters() {
         if (auto range = m_characters | std::views::drop(1)) {
-            m_game->add_update<game_update_type::remove_cards>(ranges::to<std::vector<not_null<card *>>>(range));
+            m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(range));
 
             for (card *character : range) {
                 disable_equip(character);

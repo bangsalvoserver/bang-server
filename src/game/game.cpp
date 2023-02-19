@@ -13,7 +13,7 @@ namespace banggame {
 
     util::generator<Json::Value> game::get_spectator_updates() {
         co_yield make_update<game_update_type::player_add>(int(m_players.size()));
-        co_yield make_update<game_update_type::player_order>(ranges::to<std::vector<not_null<player *>>>(m_players), true);
+        co_yield make_update<game_update_type::player_order>(ranges::to<serial::player_list>(m_players), true);
 
         for (player *p : m_players) {
             co_yield make_update<game_update_type::player_user>(p, p->user_id);
@@ -330,8 +330,8 @@ namespace banggame {
             .flags = req->flags,
 
             .respond_cards = owner
-                ? ranges::to<std::vector<not_null<card *>>>(get_all_playable_cards(owner, true))
-                : std::vector<not_null<card *>>{},
+                ? ranges::to<serial::card_list>(get_all_playable_cards(owner, true))
+                : serial::card_list{},
 
             .pick_cards = owner && req->target == owner
                 ? ranges::views::concat(
@@ -345,16 +345,16 @@ namespace banggame {
                 | ranges::views::filter([&](card *target_card) {
                     return req->can_pick(target_card);
                 })
-                | ranges::to<std::vector<not_null<card *>>>
-                : std::vector<not_null<card *>>{},
+                | ranges::to<serial::card_list>
+                : serial::card_list{},
 
-            .highlight_cards = ranges::to<std::vector<not_null<card *>>>(req->get_highlights())
+            .highlight_cards = ranges::to<serial::card_list>(req->get_highlights())
         };
     }
 
     status_ready_args game::make_status_ready_update(player *owner) {
         return {
-            .play_cards = ranges::to<std::vector<not_null<card *>>>(get_all_playable_cards(owner))
+            .play_cards = ranges::to<serial::card_list>(get_all_playable_cards(owner))
         };
     }
 
@@ -495,7 +495,7 @@ namespace banggame {
                     
                     add_update<game_update_type::player_order>(m_players
                         | ranges::views::filter(&player::alive)
-                        | ranges::to<std::vector<not_null<player *>>>);
+                        | ranges::to<serial::player_list>);
                 }
             }, -3);
         }
