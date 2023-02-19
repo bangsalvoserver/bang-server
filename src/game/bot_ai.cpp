@@ -155,9 +155,9 @@ namespace banggame {
         return ret;
     }
 
-    static bool execute_random_play(player *origin, bool is_response, std::set<card *> const& cards, std::initializer_list<pocket_type> pockets) {
+    static bool execute_random_play(player *origin, bool is_response, const std::vector<not_null<card *>> &cards, std::initializer_list<pocket_type> pockets) {
         for (int i=0; i<10; ++i) {
-            std::set<card *> card_set = cards;
+            auto card_set = cards | ranges::to<std::set<card *>>;
             while (!card_set.empty()) {
                 card *selected_card = [&]{
                     for (pocket_type pocket : pockets) {
@@ -201,14 +201,11 @@ namespace banggame {
             });
             return true;
         } else if (!update.respond_cards.empty()) {
-            return execute_random_play(origin, true,
-                ranges::to<std::set<card *>>(update.respond_cards),
-                {
-                    pocket_type::player_character,
-                    pocket_type::player_table,
-                    pocket_type::player_hand
-                }
-            );
+            return execute_random_play(origin, true, update.respond_cards, {
+                pocket_type::player_character,
+                pocket_type::player_table,
+                pocket_type::player_hand
+            });
         }
         return false;
     }
@@ -216,17 +213,12 @@ namespace banggame {
     static bool play_in_turn(player *origin) {
         auto update = origin->m_game->make_status_ready_update(origin);
 
-        return execute_random_play(origin, false,
-            ranges::to<std::set<card *>>(update.play_cards),
-            {
-                pocket_type::scenario_card,
-                pocket_type::wws_scenario_card,
-                pocket_type::player_table,
-                pocket_type::player_hand,
-                pocket_type::player_character,
-                pocket_type::shop_selection
-            }
-        );
+        return execute_random_play(origin, false, update.play_cards, {
+            pocket_type::player_character,
+            pocket_type::player_table,
+            pocket_type::player_hand,
+            pocket_type::shop_selection
+        });
     }
     
     struct bot_delay_request : request_base {
