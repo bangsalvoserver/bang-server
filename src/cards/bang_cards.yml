@@ -240,7 +240,6 @@ main_deck:
     color: brown
     responses:
       - missed
-      - play_card_action
     tags:
       - missedcard
   - &panic
@@ -397,7 +396,6 @@ main_deck:
     color: brown
     responses:
       - missed
-      - play_card_action
       - draw
   - name: SPRINGFIELD
     signs:
@@ -439,7 +437,6 @@ main_deck:
     color: green
     responses:
       - missed
-      - play_card_action
       - draw
   - name: CANTEEN
     signs:
@@ -467,7 +464,6 @@ main_deck:
     color: green
     responses:
       - missed
-      - play_card_action
   - name: CONESTOGA
     signs:
       - 9 diamonds
@@ -526,7 +522,6 @@ main_deck:
     color: green
     responses:
       - missed
-      - play_card_action
   - name: PONY_EXPRESS
     signs:
       - Q diamonds
@@ -554,7 +549,6 @@ main_deck:
     color: green
     responses:
       - missed
-      - play_card_action
   - name: GHOST
     signs:
       - 9 spades
@@ -631,7 +625,6 @@ main_deck:
     color: brown
     responses:
       - escape
-      - play_card_action
   - name: AIM
     signs:
       - 6 clubs
@@ -657,7 +650,6 @@ main_deck:
     color: brown
     responses:
       - backfire
-      - play_card_action
     tags:
       - missedcard
   - name: SAVED
@@ -668,7 +660,6 @@ main_deck:
     color: brown
     responses:
       - saved
-      - play_card_action
   - name: FANNING
     signs:
       - 2 spades
@@ -803,7 +794,6 @@ main_deck:
     color: brown
     responses:
       - missed
-      - play_card_action
     optional:
       - pay_cube select_cubes(2)
       - mth_add
@@ -1021,7 +1011,6 @@ main_deck:
     color: brown
     responses:
       - mirage
-      - play_card_action
     tags:
       - missedcard
   - name: BLOOD_PACT
@@ -1041,7 +1030,6 @@ main_deck:
     color: brown
     responses:
       - sacrifice
-      - play_card_action
   - name: DISARM
     signs:
       - 7 hearts
@@ -1050,7 +1038,6 @@ main_deck:
     color: brown
     responses:
       - disarm
-      - play_card_action
     tags:
       - missedcard
   - name: MOLOTOV
@@ -1211,7 +1198,6 @@ main_deck:
     color: brown
     responses:
       - missed
-      - play_card_action
       - bang conditional_player notself range_1
     tags:
       - missedcard
@@ -1973,7 +1959,6 @@ goldrush:
       - none
     responses:
       - forced_play
-      - play_card_action
     tags:
       - shopchoice(1)
       - buy_cost(2)
@@ -2036,7 +2021,6 @@ goldrush:
       - none
     responses:
       - forced_play
-      - play_card_action
     tags:
       - shopchoice(2)
       - buy_cost(2)
@@ -2084,7 +2068,6 @@ goldrush:
       - pass_turn
     responses:
       - forced_play
-      - play_card_action
       - goldrush
       - pass_turn
     tags:
@@ -2121,7 +2104,6 @@ goldrush:
       - rum
     responses:
       - forced_play
-      - play_card_action
       - rum
     tags:
       - buy_cost(3)
@@ -2156,7 +2138,6 @@ goldrush:
       - changewws
     responses:
       - forced_play
-      - play_card_action
       - draw(4)
       - changewws
     tags:
