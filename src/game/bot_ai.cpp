@@ -169,16 +169,15 @@ namespace banggame {
                 }();
 
                 card_set.erase(selected_card);
-                play_card_args args = generate_random_play(origin, selected_card, is_response);
 
-                if (!verify_and_play(origin, args.card, args.is_response, args.targets, args.modifiers)) {
-                    if (auto &prompt = origin->m_prompt) {
-                        auto fun = std::move(prompt->first);
-                        prompt.reset();
-                        if (card_set.empty() && i>=5) {
-                            origin->m_game->invoke_action(std::move(fun));
-                            return true;
-                        }
+                if (!origin->handle_action(enums::enum_tag<game_action_type::play_card>,
+                    generate_random_play(origin, selected_card, is_response)))
+                {
+                    if (origin->m_prompt) {
+                        // maybe add random variation to fix softlock?
+                        bool response = card_set.empty() && i>=5;
+                        origin->handle_action(enums::enum_tag<game_action_type::prompt_respond>, response);
+                        if (response) return true;
                     } else {
                         return true;
                     }
@@ -195,10 +194,8 @@ namespace banggame {
         auto update = origin->m_game->make_request_update(origin);
 
         if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](card *c) { return c->pocket == pocket_type::button_row; })) {
-            origin->m_game->invoke_action([&]{
-                auto req = origin->m_game->top_request();
-                req->on_pick(random_element(update.pick_cards, origin->m_game->rng));
-            });
+            origin->handle_action(enums::enum_tag<game_action_type::pick_card>,
+                random_element(update.pick_cards, origin->m_game->rng));
             return true;
         } else if (!update.respond_cards.empty()) {
             return execute_random_play(origin, true, update.respond_cards, {

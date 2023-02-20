@@ -354,7 +354,8 @@ namespace banggame {
 
     status_ready_args game::make_status_ready_update(player *owner) {
         return {
-            .play_cards = ranges::to<serial::card_list>(get_all_playable_cards(owner))
+            .play_cards = ranges::to<serial::card_list>(get_all_playable_cards(owner)),
+            .last_played_card = owner->get_last_played_card()
         };
     }
 

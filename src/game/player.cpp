@@ -266,7 +266,7 @@ namespace banggame {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         } else if (auto req = m_game->top_request(this)) {
-            m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
+            m_game->send_request_status_clear();
             if (req->can_pick(target_card)) {
                 m_game->invoke_action([&]{
                     req->on_pick(target_card);
@@ -319,7 +319,7 @@ namespace banggame {
             m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), message);
             m_prompt.emplace(std::move(fun), std::move(message));
         } else {
-            m_game->add_update<game_update_type::confirm_play>(update_target::includes_private(this));
+            m_game->send_request_status_clear();
             m_game->invoke_action(std::move(fun));
         }
     }

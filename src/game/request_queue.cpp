@@ -9,6 +9,7 @@ namespace banggame {
             if (auto *timer = req->timer()) {
                 timer->tick();
                 if (timer->finished()) {
+                    m_game->send_request_status_clear();
                     invoke_action([&]{
                         pop_request();
                         timer->on_finished();
@@ -72,13 +73,8 @@ namespace banggame {
     }
 
     void request_queue::pop_request() {
-        auto req = top_request();
-        req->popped = true;
-        if (req->sent) {
-            m_game->send_request_status_clear();
-        }
+        top_request()->popped = true;
         m_requests.pop_front();
-        req.reset();
         update_request();
     }
 }

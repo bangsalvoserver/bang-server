@@ -201,6 +201,7 @@ namespace banggame {
 
     DEFINE_STRUCT(status_ready_args,
         (serial::card_list, play_cards)
+        (serial::opt_card, last_played_card)
     )
 
     DEFINE_STRUCT(game_options,
@@ -245,7 +246,6 @@ namespace banggame {
         (game_flags, game_flags)
         (play_sound, std::string)
         (status_clear)
-        (confirm_play)
     )
 
     using game_update = enums::enum_variant<game_update_type>;
