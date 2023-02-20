@@ -3,52 +3,52 @@
 
 namespace json {
 
-template<> Json::Value serializer<banggame::card *, banggame::game_context>::operator()(banggame::card *card) const {
+template<> json serializer<banggame::card *, banggame::game_context>::operator()(banggame::card *card) const {
     if (card) {
         return card->id;
     } else {
-        return Json::nullValue;
+        return {};
     }
 }
 
-template<> Json::Value serializer<not_null<banggame::card *>, banggame::game_context>::operator()(not_null<banggame::card *> card) const {
+template<> json serializer<not_null<banggame::card *>, banggame::game_context>::operator()(not_null<banggame::card *> card) const {
     return card->id;
 }
 
-template<> Json::Value serializer<banggame::player *, banggame::game_context>::operator()(banggame::player *player) const {
+template<> json serializer<banggame::player *, banggame::game_context>::operator()(banggame::player *player) const {
     if (player) {
         return player->id;
     } else {
-        return Json::nullValue;
+        return {};
     }
 }
 
-template<> Json::Value serializer<not_null<banggame::player *>, banggame::game_context>::operator()(not_null<banggame::player *> player) const {
+template<> json serializer<not_null<banggame::player *>, banggame::game_context>::operator()(not_null<banggame::player *> player) const {
     return player->id;
 }
 
-template<> banggame::card *deserializer<banggame::card *, banggame::game_context>::operator()(const Json::Value &value) const {
-    if (value.isInt()) {
-        return context.find_card(value.asInt());
+template<> banggame::card *deserializer<banggame::card *, banggame::game_context>::operator()(const json &value) const {
+    if (value.is_number_integer()) {
+        return context.find_card(value.get<int>());
     } else {
         return nullptr;
     }
 }
 
-template<> not_null<banggame::card *> deserializer<not_null<banggame::card *>, banggame::game_context>::operator()(const Json::Value &value) const {
-    return context.find_card(value.asInt());
+template<> not_null<banggame::card *> deserializer<not_null<banggame::card *>, banggame::game_context>::operator()(const json &value) const {
+    return context.find_card(value.get<int>());
 }
 
-template<> banggame::player *deserializer<banggame::player *, banggame::game_context>::operator()(const Json::Value &value) const {
-    if (value.isInt()) {
-        return context.find_player(value.asInt());
+template<> banggame::player *deserializer<banggame::player *, banggame::game_context>::operator()(const json &value) const {
+    if (value.is_number_integer()) {
+        return context.find_player(value.get<int>());
     } else {
         return nullptr;
     }
 }
 
-template<> not_null<banggame::player *> deserializer<not_null<banggame::player *>, banggame::game_context>::operator()(const Json::Value &value) const {
-    return context.find_player(value.asInt());
+template<> not_null<banggame::player *> deserializer<not_null<banggame::player *>, banggame::game_context>::operator()(const json &value) const {
+    return context.find_player(value.get<int>());
 }
 
 }

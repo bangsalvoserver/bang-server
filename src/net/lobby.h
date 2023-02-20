@@ -1,8 +1,6 @@
 #ifndef __LOBBY_H__
 #define __LOBBY_H__
 
-#include <json/json.h>
-
 #include "options.h"
 #include "messages.h"
 

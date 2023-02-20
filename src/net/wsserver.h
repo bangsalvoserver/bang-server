@@ -71,10 +71,8 @@ public:
 
         m_server.set_message_handler([this](client_handle con, server_type::message_ptr msg) {
             try {
-                std::stringstream ss(msg->get_payload());
-                Json::Value json_value;
-                ss >> json_value;
-                static_cast<Derived &>(*this).on_message(con, json::deserialize<InputMessage>(json_value));
+                static_cast<Derived &>(*this).on_message(con, json::deserialize<InputMessage>(
+                    json::json::parse(msg->get_payload())));
             } catch (const std::exception &) {
                 m_server.close(con, 0, "");
             }
@@ -87,10 +85,8 @@ public:
     }
 
     void push_message(client_handle con, const OutputMessage &msg) {
-        Json::StreamWriterBuilder builder;
-        builder["indentation"] = "";
         std::error_code ec;
-        m_server.send(con, Json::writeString(builder, json::serialize(msg)),
+        m_server.send(con, json::serialize(msg).dump(),
             websocketpp::frame::opcode::text, ec);
     }
 

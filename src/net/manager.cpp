@@ -384,7 +384,7 @@ std::string game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
     return {};
 }
 
-std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, const Json::Value &value) {
+std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, const json::json &value) {
     if (!user->second.in_lobby) {
         return "ERROR_PLAYER_NOT_IN_LOBBY";
     }

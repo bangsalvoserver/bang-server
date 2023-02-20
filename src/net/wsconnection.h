@@ -56,10 +56,8 @@ namespace net {
             m_client.set_message_handler([this](client_handle hdl, client_type::message_ptr msg) {
                 if (check_client_handle(hdl)) {
                     try {
-                        std::stringstream ss(msg->get_payload());
-                        Json::Value json_value;
-                        ss >> json_value;
-                        static_cast<Derived &>(*this).on_message(json::deserialize<InputMessage>(json_value));
+                        static_cast<Derived &>(*this).on_message(json::deserialize<InputMessage>(
+                            json::json::parse(msg->get_payload())));
                     } catch (const std::exception &) {
                         disconnect();
                     }
@@ -93,10 +91,8 @@ namespace net {
         }
 
         void push_message(auto && ... args) {
-            Json::StreamWriterBuilder builder;
-            builder["indentation"] = "";
             std::error_code ec;
-            m_client.send(m_con, Json::writeString(builder, json::serialize(OutputMessage{FWD(args) ... })),
+            m_client.send(m_con, json::serialize(OutputMessage{FWD(args) ... }).dump(),
                 websocketpp::frame::opcode::text, ec);
         }
     };

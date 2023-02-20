@@ -88,7 +88,7 @@ namespace banggame {
     };
 
     struct game_net_manager {
-        std::deque<std::tuple<update_target, Json::Value, ticks>> m_updates;
+        std::deque<std::tuple<update_target, json::json, ticks>> m_updates;
         std::deque<std::pair<update_target, game_string>> m_saved_log;
 
         game_context m_context;
@@ -98,7 +98,7 @@ namespace banggame {
         }
 
         template<game_update_type E>
-        Json::Value make_update(auto && ... args) {
+        json::json make_update(auto && ... args) {
             return json::serialize(game_update{enums::enum_tag<E>, FWD(args) ... }, context());
         }
 

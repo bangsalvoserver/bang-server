@@ -49,7 +49,7 @@ namespace banggame {
         (lobby_chat, lobby_chat_client_args)
         (lobby_return)
         (game_start)
-        (game_action, Json::Value)
+        (game_action, json::json)
     )
 
     using client_message = enums::enum_variant<client_message_type>;
@@ -98,7 +98,7 @@ namespace banggame {
         (lobby_add_user, lobby_add_user_args)
         (lobby_remove_user, user_id_args)
         (lobby_chat, lobby_chat_args)
-        (game_update, Json::Value)
+        (game_update, json::json)
         (game_started)
     )
 

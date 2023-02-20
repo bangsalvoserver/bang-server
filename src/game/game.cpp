@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-    util::generator<Json::Value> game::get_spectator_updates() {
+    util::generator<json::json> game::get_spectator_updates() {
         co_yield make_update<game_update_type::player_add>(int(m_players.size()));
         co_yield make_update<game_update_type::player_order>(ranges::to<serial::player_list>(m_players), true);
 
@@ -27,7 +27,7 @@ namespace banggame {
             pocket_type::hidden_deck
         );
 
-        auto move_cards = [&](auto &&range) -> util::generator<Json::Value> {
+        auto move_cards = [&](auto &&range) -> util::generator<json::json> {
             for (card *c : range) {
                 co_yield make_update<game_update_type::move_card>(c, c->owner, c->pocket, true);
 
@@ -99,7 +99,7 @@ namespace banggame {
         co_yield make_update<game_update_type::game_flags>(m_game_flags);
     }
 
-    util::generator<Json::Value> game::get_rejoin_updates(player *target) {
+    util::generator<json::json> game::get_rejoin_updates(player *target) {
         if (!target->check_player_flags(player_flags::role_revealed)) {
             co_yield make_update<game_update_type::player_show_role>(target, target->m_role, true);
         }

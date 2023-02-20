@@ -63,12 +63,12 @@ namespace banggame::serial {
 namespace json {
     template<banggame::serial::serializable T> struct serializer<T, banggame::serial::context> {
         const banggame::serial::context &context;
-        Json::Value operator()(same_if_trivial_t<T> value) const;
+        json operator()(same_if_trivial_t<T> value) const;
     };
 
     template<banggame::serial::serializable T> struct deserializer<T, banggame::serial::context> {
         const banggame::serial::context &context;
-        T operator()(const Json::Value &value) const;
+        T operator()(const json &value) const;
     };
 
 }
