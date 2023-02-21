@@ -58,6 +58,45 @@ namespace banggame {
             });
     }
 
+    template<typename T, typename ... Ts>
+    inline std::vector<T> vector_concat(const std::vector<T> &vec, Ts && ... args) {
+        auto copy = vec;
+        copy.emplace_back(FWD(args) ... );
+        return copy;
+    }
+
+    static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, effect_list::const_iterator effect_it, const effect_context &ctx, const target_list &targets) {
+        effect_it = std::ranges::find(effect_it, effects.end(), effect_type::mth_add, &effect_holder::type);
+        if (effect_it == effects.end()) {
+            return !mth.get_error(origin_card, origin, targets, ctx);
+        } else {
+            switch (effect_it->target) {
+            case target_type::none:
+                return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
+                    vector_concat(targets, enums::enum_tag<target_type::none>));
+            case target_type::player:
+                return std::ranges::any_of(make_player_target_set(origin, origin_card, *effect_it), [&](player *target) {
+                    return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
+                        vector_concat(targets, enums::enum_tag<target_type::player>, target));
+                });
+            case target_type::card:
+                return std::ranges::any_of(make_card_target_set(origin, origin_card, *effect_it), [&](card *target) {
+                    return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
+                        vector_concat(targets, enums::enum_tag<target_type::card>, target));
+                });
+            default:
+                // ignore other target types
+                return true;
+            }
+        }
+    }
+
+    static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
+        const auto &effects = origin_card->get_effect_list(is_response);
+        const auto &mth = origin_card->get_mth(is_response);
+        return is_possible_mth_impl(origin, origin_card, mth, effects, effects.begin(), ctx, {});
+    }
+
     bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx) {
         return !effects.empty() && std::ranges::all_of(effects, [&](const effect_holder &holder) {
             switch (holder.target) {
@@ -75,14 +114,6 @@ namespace banggame {
                 return origin->count_cubes() >= holder.target_value;
             case target_type::self_cubes:
                 return origin_card->num_cubes >= holder.target_value;
-            case target_type::fanning_targets:
-                return std::ranges::any_of(origin->m_game->m_players, [&](player *target) {
-                    if (target != origin && (ctx.ignore_distances || origin->m_game->calc_distance(origin, target) <= origin->m_weapon_range + origin->m_range_mod)) {
-                        if (player *target2 = *std::next(player_iterator(target)); target2 != origin && target2->m_distance_mod == 0) return true;
-                        if (player *target2 = *std::prev(player_iterator(target)); target2 != origin && target2->m_distance_mod == 0) return true;
-                    }
-                    return false;
-                });
             default:
                 return true;
             }
@@ -108,6 +139,8 @@ namespace banggame {
             return false;
         } else if (!is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx)) {
             return false;
+        } else if (!is_possible_mth(origin, origin_card, is_response, ctx)) {
+            return false;
         } else if (origin_card->is_modifier()) {
             if (!std::transform_reduce(
                 modifiers.begin(), modifiers.end(), modifier_bitset(origin_card->modifier_type()), std::bit_and(),
@@ -119,9 +152,7 @@ namespace banggame {
             auto ctx_copy = ctx;
             origin_card->modifier.add_context(origin_card, origin, ctx_copy);
             
-            auto modifiers_copy = modifiers;
-            modifiers_copy.push_back(origin_card);
-            return contains_at_least(cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy), 1);
+            return contains_at_least(cards_playable_with_modifiers(origin, vector_concat(modifiers, origin_card), is_response, ctx_copy), 1);
         } else {
             return origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
         }

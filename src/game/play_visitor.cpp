@@ -117,38 +117,6 @@ namespace banggame {
         }
     }
 
-    template<> game_string play_visitor<target_type::fanning_targets>::get_error(const effect_context &ctx, const serial::player_list &targets) {
-        if (targets.size() != 2) {
-            return "ERROR_INVALID_TARGETS";
-        }
-        MAYBE_RETURN(check_player_filter(origin, target_player_filter::notself | target_player_filter::reachable, targets.front(), ctx));
-        if (origin->m_game->calc_distance(targets.front(), targets.back()) > 1) {
-            return "ERROR_TARGETS_NOT_ADJACENT";
-        }
-        return {};
-    }
-
-    template<> duplicate_set play_visitor<target_type::fanning_targets>::duplicates(const serial::player_list &targets) {
-        return {.players{targets.front(), targets.back()}};
-    }
-
-    template<> game_string play_visitor<target_type::fanning_targets>::prompt(const effect_context &ctx, const serial::player_list &targets) {
-        for (player *target : targets) {
-            MAYBE_RETURN(play_visitor<target_type::player>{origin, origin_card, effect}.prompt(ctx, target));
-        }
-        return {};
-    }
-
-    template<> void play_visitor<target_type::fanning_targets>::play(const effect_context &ctx, const serial::player_list &targets) {
-        auto flags = effect_flags{};
-        if (origin_card->is_brown()) {
-            flags |= effect_flags::escapable;
-        }
-        for (player *target : targets) {
-            effect.on_play(origin_card, origin, target, flags, ctx);
-        }
-    }
-
     template<> game_string play_visitor<target_type::card>::get_error(const effect_context &ctx, card *target) {
         if (!target->owner) return "ERROR_CARD_HAS_NO_OWNER";
         MAYBE_RETURN(check_player_filter(origin, effect.player_filter, target->owner, ctx));

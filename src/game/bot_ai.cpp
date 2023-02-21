@@ -47,22 +47,6 @@ namespace banggame {
             }
         }
 
-        auto operator()(enums::enum_tag_t<target_type::fanning_targets>) const {
-            std::vector<std::pair<player *, player *>> possible_targets;
-            for (player *target1 : origin->m_game->m_players) {
-                if (origin != target1 && origin->m_game->calc_distance(origin, target1) <= origin->m_weapon_range + origin->m_range_mod) {
-                    if (player *target2 = *std::next(player_iterator(target1)); origin != target2 && target2->m_distance_mod == 0) {
-                        possible_targets.emplace_back(target1, target2);
-                    }
-                    if (player *target2 = *std::prev(player_iterator(target1)); origin != target2 && target2->m_distance_mod == 0) {
-                        possible_targets.emplace_back(target1, target2);
-                    }
-                }
-            }
-            auto [target1, target2] = random_element(possible_targets, origin->m_game->rng);
-            return serial::player_list{target1, target2};
-        }
-
         auto operator()(enums::enum_tag_t<target_type::cards> tag) const {
             auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
             return targets

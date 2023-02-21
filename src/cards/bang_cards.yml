@@ -668,7 +668,9 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - bang fanning_targets
+      - mth_add player reachable notself
+      - mth_add player notself
+    mth_effect: fanning
     tags:
       - discard_if_two_players
       - skip_logs

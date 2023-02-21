@@ -109,6 +109,7 @@ set(bangserver_srcs
     src/cards/valleyofshadows/colorado_bill.cpp
     src/cards/valleyofshadows/escape.cpp
     src/cards/valleyofshadows/evelyn_shebang.cpp
+    src/cards/valleyofshadows/fanning.cpp
     src/cards/valleyofshadows/ghost.cpp
     src/cards/valleyofshadows/henry_block.cpp
     src/cards/valleyofshadows/lemonade_jim.cpp
