@@ -75,12 +75,12 @@ namespace banggame {
                 return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
                     vector_concat(targets, enums::enum_tag<target_type::none>));
             case target_type::player:
-                return std::ranges::any_of(make_player_target_set(origin, origin_card, *effect_it), [&](player *target) {
+                return std::ranges::any_of(make_player_target_set(origin, origin_card, *effect_it, ctx), [&](player *target) {
                     return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
                         vector_concat(targets, enums::enum_tag<target_type::player>, target));
                 });
             case target_type::card:
-                return std::ranges::any_of(make_card_target_set(origin, origin_card, *effect_it), [&](card *target) {
+                return std::ranges::any_of(make_card_target_set(origin, origin_card, *effect_it, ctx), [&](card *target) {
                     return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
                         vector_concat(targets, enums::enum_tag<target_type::card>, target));
                 });
