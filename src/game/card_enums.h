@@ -161,7 +161,7 @@ namespace banggame {
 
     DEFINE_ENUM_FWD_TYPES(card_modifier_type,
         (none)
-        (bangmod)
+        (bangmod,       modifier_bangmod)
         (doublebarrel,  modifier_doublebarrel)
         (bandolier,     modifier_bandolier)
         (belltower,     modifier_belltower)

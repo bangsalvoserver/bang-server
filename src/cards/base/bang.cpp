@@ -51,6 +51,25 @@ namespace banggame {
             }
         });
     }
+
+    bool modifier_bangmod::valid_with_modifier(card *origin_card, player *origin, card *target_card) {
+        switch (target_card->modifier_type()) {
+        case card_modifier_type::bangmod:
+        case card_modifier_type::doublebarrel:
+        case card_modifier_type::bandolier:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool modifier_bangmod::valid_with_card(card *origin_card, player *origin, card *target_card) {
+        if (target_card->pocket == pocket_type::player_hand) {
+            return target_card->has_tag(tag_type::bangcard);
+        } else {
+            return target_card->has_tag(tag_type::play_as_bang);
+        }
+    }
     
     bool request_bang::can_miss(card *c) const {
         return !unavoidable && missable_request::can_miss(c);

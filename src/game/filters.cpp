@@ -32,14 +32,6 @@ namespace banggame::filter_impl {
         return origin->is_bangcard(target);
     }
 
-    card *get_last_played_card(player *origin) {
-        return origin->get_last_played_card();
-    }
-
-    card_modifier_type get_card_modifier(card *target) {
-        return target->modifier_type();
-    }
-
     card_sign get_card_sign(player *origin, card *target) {
         return origin->m_game->get_card_sign(target);
     }

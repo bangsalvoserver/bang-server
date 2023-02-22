@@ -19,6 +19,10 @@ namespace banggame {
         return {};
     }
 
+    bool modifier_leevankliff::valid_with_card(card *origin_card, player *origin, card *target_card) {
+        return target_card->is_brown() && target_card == origin->get_last_played_card();
+    }
+
     void modifier_leevankliff::add_context(card *origin_card, player *origin, effect_context &ctx) {
         ctx.disable_banglimit = true;
         ctx.repeating = true;

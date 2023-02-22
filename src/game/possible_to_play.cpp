@@ -127,28 +127,26 @@ namespace banggame {
     }
 
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
-        if (std::ranges::any_of(modifiers, [&](card *mod_card) {
-            return origin_card == mod_card || !allowed_card_with_modifier(origin, mod_card, origin_card);
-        })) {
-            return false;
-        } else if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
+        for (card *mod_card : modifiers) {
+            if (mod_card == origin_card) return false;
+            if (mod_card->modifier.get_error(mod_card, origin, origin_card)) return false;
+        }
+
+        if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
             return !is_response
                 && contains_at_least(make_equip_set(origin, origin_card), 1)
                 && origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
-        } else if (origin->get_play_card_error(origin_card) || origin->m_game->is_disabled(origin_card)) {
+        }
+        
+        if (origin->get_play_card_error(origin_card)
+            || origin->m_game->is_disabled(origin_card)
+            || !is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx)
+            || !is_possible_mth(origin, origin_card, is_response, ctx))
+        {
             return false;
-        } else if (!is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx)) {
-            return false;
-        } else if (!is_possible_mth(origin, origin_card, is_response, ctx)) {
-            return false;
-        } else if (origin_card->is_modifier()) {
-            if (!std::transform_reduce(
-                modifiers.begin(), modifiers.end(), modifier_bitset(origin_card->modifier_type()), std::bit_and(),
-                [](card *mod) { return allowed_modifiers_after(mod->modifier_type()); }
-            )) {
-                return false;
-            }
-
+        }
+        
+        if (origin_card->is_modifier()) {
             auto ctx_copy = ctx;
             origin_card->modifier.add_context(origin_card, origin, ctx_copy);
             

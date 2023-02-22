@@ -54,16 +54,10 @@ namespace banggame {
     }
     
     static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
-        auto allowed_modifiers = allowed_modifiers_after(card_modifier_type::none);
-        for (const auto &[mod_card, targets] : modifiers) {
+        for (size_t i=0; i<modifiers.size(); ++i) {
+            const auto &[mod_card, targets] = modifiers[i];
             if (!mod_card->is_modifier()) {
                 return "ERROR_CARD_IS_NOT_MODIFIER";
-            }
-            if (!bool(allowed_modifiers & modifier_bitset(mod_card->modifier_type()))) {
-                return "ERROR_INVALID_MODIFIER_CARD";
-            }
-            if (!allowed_card_with_modifier(origin, mod_card, origin_card)) {
-                return "ERROR_INVALID_CARD_WITH_MODIFIER";
             }
 
             if (card *disabler = origin->m_game->get_disabler(mod_card)) {
@@ -71,9 +65,14 @@ namespace banggame {
             }
             MAYBE_RETURN(origin->get_play_card_error(mod_card));
 
+            MAYBE_RETURN(mod_card->modifier.get_error(mod_card, origin, origin_card));
+            for (size_t j=0; j<i; ++j) {
+                card *mod_card_before = modifiers[j].card;
+                MAYBE_RETURN(mod_card_before->modifier.get_error(mod_card_before, origin, mod_card));
+            }
+
             mod_card->modifier.add_context(mod_card, origin, ctx);
             MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
-            allowed_modifiers &= allowed_modifiers_after(mod_card->modifier_type());
         }
         return {};
     }

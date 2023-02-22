@@ -18,8 +18,6 @@ namespace banggame {
         int get_player_weapon_range(player_ptr origin);
         int get_distance(player_ptr origin, player_ptr target);
         bool is_bangcard(player_ptr origin, card_ptr target);
-        card_ptr get_last_played_card(player_ptr origin);
-        card_modifier_type get_card_modifier(card_ptr target);
         card_sign get_card_sign(player_ptr origin, card_ptr target);
         card_color_type get_card_color(card_ptr target);
         pocket_type get_card_pocket(card_ptr target);
@@ -103,65 +101,6 @@ namespace banggame {
             return "ERROR_TARGET_NOT_HAND_CARD";
 
         return nullptr;
-    }
-
-    using modifier_bitset_t = enums::sized_int_t<1 << (enums::num_members_v<card_modifier_type> - 1)>;
-
-    constexpr modifier_bitset_t modifier_bitset(std::same_as<card_modifier_type> auto ... values) {
-        return ((1 << enums::to_underlying(values)) | ... | 0);
-    }
-
-    inline modifier_bitset_t allowed_modifiers_after(card_modifier_type modifier) {
-        switch (modifier) {
-        case card_modifier_type::bangmod:
-        case card_modifier_type::doublebarrel:
-        case card_modifier_type::bandolier:
-            return modifier_bitset(card_modifier_type::bangmod, card_modifier_type::doublebarrel, card_modifier_type::bandolier);
-        case card_modifier_type::discount:
-            return modifier_bitset(card_modifier_type::shopchoice);
-        case card_modifier_type::shopchoice:
-        case card_modifier_type::leevankliff:
-            return modifier_bitset();
-        default:
-            return ~(-1 << enums::num_members_v<card_modifier_type>);
-        }
-    }
-
-    inline bool allowed_card_with_modifier(filter_impl::player_ptr origin, filter_impl::card_ptr mod_card, filter_impl::card_ptr target) {
-        switch (filter_impl::get_card_modifier(mod_card)) {
-        case card_modifier_type::bangmod:
-        case card_modifier_type::doublebarrel:
-        case card_modifier_type::bandolier:
-            if (filter_impl::get_card_pocket(target) == pocket_type::player_hand) {
-                return filter_impl::get_card_tag(target, tag_type::bangcard).has_value();
-            } else {
-                return filter_impl::get_card_tag(target, tag_type::play_as_bang).has_value();
-            }
-        case card_modifier_type::leevankliff:
-            return filter_impl::get_last_played_card(origin) == target
-                && filter_impl::get_card_color(target) == card_color_type::brown;
-        case card_modifier_type::discount:
-            return filter_impl::get_card_deck(target) == card_deck_type::goldrush;
-        case card_modifier_type::shopchoice:
-            return filter_impl::get_card_deck(target) == card_deck_type::goldrush
-                && filter_impl::get_card_pocket(target) == pocket_type::hidden_deck
-                && filter_impl::get_card_tag(mod_card, tag_type::shopchoice) == filter_impl::get_card_tag(target, tag_type::shopchoice);
-        case card_modifier_type::belltower:
-            switch (filter_impl::get_card_pocket(target)) {
-            case pocket_type::player_hand:
-            case pocket_type::shop_selection:
-                return filter_impl::get_card_color(target) == card_color_type::brown;
-            case pocket_type::button_row:
-            case pocket_type::main_deck:
-            case pocket_type::discard_pile:
-            case pocket_type::shop_discard:
-                return false;
-            default:
-                return true;
-            }
-        default:
-            return true;
-        }
     }
 }
 

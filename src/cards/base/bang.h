@@ -30,6 +30,11 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
+    struct modifier_bangmod {
+        bool valid_with_modifier(card *origin_card, player *origin, card *target_card);
+        bool valid_with_card(card *origin_card, player *origin, card *target_card);
+    };
+
     class missable_request {
     public:
         size_t num_cards_used() const {
