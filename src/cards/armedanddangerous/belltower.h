@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct modifier_belltower {
-        bool valid_with_card(card *origin_card, player *origin, card *playing_card);
+        game_string get_error(card *origin_card, player *origin, card *playing_card);
         void add_context(card *origin_card, player *origin, effect_context &ctx);
     };
 }
