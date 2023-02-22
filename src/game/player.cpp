@@ -331,7 +331,8 @@ namespace banggame {
         m_prompt.reset();
 
         if (response) {
-            prompt_then({}, std::move(fun));
+            m_game->send_request_status_clear();
+            m_game->invoke_action(std::move(fun));
         }
         return {};
     }
