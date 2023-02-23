@@ -293,9 +293,8 @@ namespace banggame {
             }
             break;
         case pocket_type::shop_selection:
-            m_game->flash_card(origin_card);
-            m_game->queue_action([origin_card, m_game=m_game] {
-                m_game->move_card(origin_card, pocket_type::shop_discard);
+            m_game->move_card(origin_card, pocket_type::shop_discard);
+            m_game->queue_action([m_game=m_game]{
                 if (m_game->m_shop_selection.size() < 3) {
                     m_game->draw_shop_card();
                 }
