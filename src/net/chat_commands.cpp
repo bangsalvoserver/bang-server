@@ -120,8 +120,8 @@ namespace banggame {
         player *target = lobby.m_game->find_player_by_userid(user->second.user_id);
         if (!target) return "ERROR_USER_NOT_CONTROLLING_PLAYER";
 
-        if (lobby.m_game->locked()) {
-            return "ERROR_CANNOT_GIVE_CARD";
+        if (lobby.m_game->pending_requests() || lobby.m_game->m_playing != target) {
+            return "ERROR_PLAYER_NOT_IN_TURN";
         }
 
         auto card_it = std::ranges::find_if(lobby.m_game->m_context.cards, [&](const card &target_card) {
@@ -230,6 +230,9 @@ namespace banggame {
             break;
         }
         }
+
+        lobby.m_game->send_request_status_clear();
+        lobby.m_game->send_request_status_ready();
 
         return {};
     }

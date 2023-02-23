@@ -47,10 +47,6 @@ namespace banggame {
             return m_requests.size();
         }
 
-        bool locked() const {
-            return pending_requests() || !m_delayed_actions.empty() || m_lock_updates;
-        }
-
         template<typename T = request_base>
         std::shared_ptr<T> top_request(player *target = nullptr) {
             if (!m_requests.empty()) {
