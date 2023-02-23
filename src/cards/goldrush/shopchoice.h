@@ -10,7 +10,7 @@ namespace banggame {
     };
 
     struct modifier_shopchoice {
-        bool valid_with_modifier(card *origin_card, player *origin, player *target_card) {
+        bool valid_with_modifier(card *origin_card, player *origin, card *target_card) {
             return false;
         }
 
