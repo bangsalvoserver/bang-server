@@ -255,13 +255,6 @@ namespace banggame {
         }
     }
 
-    bool player::is_bangcard(card *origin_card) {
-        return m_game->check_flags(game_flags::treat_any_as_bang)
-            || (check_player_flags(player_flags::treat_missed_as_bang)
-                && origin_card->has_tag(tag_type::missedcard))
-            || origin_card->has_tag(tag_type::bangcard);
-    };
-
     game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, card *target_card) {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";

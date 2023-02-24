@@ -3,6 +3,14 @@
 #include "game.h"
 
 namespace banggame::filter_impl {
+
+    bool check_player_flags(player *origin, player_flags flags) {
+        return origin->check_player_flags(flags);
+    }
+
+    bool check_game_flags(player *origin, game_flags flags) {
+        return origin->m_game->check_flags(flags);
+    }
     
     int get_player_hp(player *origin) {
         return origin->m_hp;
@@ -26,10 +34,6 @@ namespace banggame::filter_impl {
 
     int get_distance(player *origin, player *target) {
         return origin->m_game->calc_distance(origin, target);
-    }
-
-    bool is_bangcard(player *origin, card *target) {
-        return origin->is_bangcard(target);
     }
 
     card_sign get_card_sign(player *origin, card *target) {

@@ -11,13 +11,14 @@ namespace banggame {
         using player_ptr = unwrap_not_null_t<serial::player>;
         using card_ptr = unwrap_not_null_t<serial::card>;
 
+        bool check_player_flags(player_ptr origin, player_flags flags);
+        bool check_game_flags(player_ptr origin, game_flags flags);
         int get_player_hp(player_ptr origin);
         bool is_player_alive(player_ptr origin);
         player_role get_player_role(player_ptr origin);
         int get_player_range_mod(player_ptr origin);
         int get_player_weapon_range(player_ptr origin);
         int get_distance(player_ptr origin, player_ptr target);
-        bool is_bangcard(player_ptr origin, card_ptr target);
         card_sign get_card_sign(player_ptr origin, card_ptr target);
         card_color_type get_card_color(card_ptr target);
         pocket_type get_card_pocket(card_ptr target);
@@ -59,6 +60,13 @@ namespace banggame {
         return nullptr;
     }
 
+    inline bool is_bangcard(filter_impl::player_ptr origin, filter_impl::card_ptr target) {
+        return filter_impl::check_game_flags(origin, game_flags::treat_any_as_bang)
+            || filter_impl::get_card_tag(target, tag_type::bangcard).has_value()
+            || filter_impl::check_player_flags(origin, player_flags::treat_missed_as_bang)
+            && filter_impl::get_card_tag(target, tag_type::missedcard).has_value();
+    }
+
     inline const char *check_card_filter(filter_impl::card_ptr origin_card, filter_impl::player_ptr origin, target_card_filter filter, filter_impl::card_ptr target, const effect_context &ctx = {}) {
         if (!bool(filter & target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";
@@ -73,7 +81,7 @@ namespace banggame {
         if (bool(filter & target_card_filter::beer) && !filter_impl::get_card_tag(target, tag_type::beer))
             return "ERROR_TARGET_NOT_BEER";
 
-        if (bool(filter & target_card_filter::bang) && !filter_impl::is_bangcard(origin, target))
+        if (bool(filter & target_card_filter::bang) && !is_bangcard(origin, target))
             return "ERROR_TARGET_NOT_BANG";
 
         if (bool(filter & target_card_filter::bangcard) && !filter_impl::get_card_tag(target, tag_type::bangcard))

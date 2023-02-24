@@ -188,8 +188,6 @@ namespace banggame {
         void add_played_card(card *origin_card, std::vector<card *> modifiers);
         card *get_last_played_card() const;
 
-        bool is_bangcard(card *origin_card);
-
         void start_of_turn();
         void request_drawing();
         

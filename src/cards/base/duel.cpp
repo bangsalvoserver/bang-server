@@ -1,6 +1,7 @@
 #include "duel.h"
 
 #include "game/game.h"
+#include "game/filters.h"
 
 namespace banggame {
 
@@ -26,7 +27,7 @@ namespace banggame {
 
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
-                && target->is_bangcard(target_card)
+                && is_bangcard(target, target_card)
                 && !target->m_game->is_disabled(target_card);
         }
 
