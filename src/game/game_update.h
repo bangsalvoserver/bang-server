@@ -205,7 +205,7 @@ namespace banggame {
     )
 
     DEFINE_STRUCT(game_options,
-        (card_expansion_type, expansions)
+        (expansion_type, expansions)
         (bool, enable_ghost_cards, false)
         (bool, character_choice, true)
         (bool, allow_beer_in_duel, true)

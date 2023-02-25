@@ -4,6 +4,8 @@
 
 namespace banggame {
 
+    static constexpr int equip_type_vulture_sam = 1;
+
     inline void steal_card(player *origin, player *target, card *target_card) {
         if (target_card->visibility != card_visibility::shown) {
             target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", origin, target, target_card);
@@ -15,7 +17,7 @@ namespace banggame {
     }
 
     static card *get_vulture_sam(player *target) {
-        return target->m_game->call_event<event_type::check_card_taker>(target, equip_type::vulture_sam, nullptr);
+        return target->m_game->call_event<event_type::check_card_taker>(target, equip_type_vulture_sam, nullptr);
     }
 
     struct request_multi_vulture_sam : request_base {
@@ -68,8 +70,8 @@ namespace banggame {
     };
     
     void equip_vulture_sam::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player *e_target, equip_type type, card* &value){
-            if (type == equip_type::vulture_sam && e_target == origin) {
+        origin->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player *e_target, int type, card* &value){
+            if (type == equip_type_vulture_sam && e_target == origin) {
                 value = target_card;
             }
         });

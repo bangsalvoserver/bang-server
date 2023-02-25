@@ -3,13 +3,19 @@
 #include "holders.h"
 #include "game_update.h"
 
+#include "cards/effect_enums.h"
 #include "cards/base/requests.h"
+
 #include "play_verify.h"
 #include "possible_to_play.h"
 
 #include <array>
 
 namespace banggame {
+
+    json::json game_net_manager::serialize_update(const game_update &update) const {
+        return json::serialize(update, context());
+    }
 
     util::generator<json::json> game::get_spectator_updates() {
         co_yield make_update<game_update_type::player_add>(int(m_players.size()));

@@ -1,5 +1,7 @@
 #include "bang.h"
 
+#include "cards/effects.h"
+#include "cards/effect_enums.h"
 #include "game/game.h"
 #include "damage.h"
 
@@ -52,15 +54,16 @@ namespace banggame {
         });
     }
 
+    template<modifier_type E>
+    static constexpr bool is_bangmod = false;
+
+    template<modifier_type E> requires enums::value_with_type<E>
+    static constexpr bool is_bangmod<E> = std::is_base_of_v<modifier_bangmod, enums::enum_type_t<E>>;
+
     bool modifier_bangmod::valid_with_modifier(card *origin_card, player *origin, card *target_card) {
-        switch (target_card->modifier_type()) {
-        case card_modifier_type::bangmod:
-        case card_modifier_type::doublebarrel:
-        case card_modifier_type::bandolier:
-            return true;
-        default:
-            return false;
-        }
+        return []<modifier_type ... Es>(enums::enum_sequence<Es...>, modifier_type type) {
+            return ((is_bangmod<Es> && Es == type) || ...);
+        }(enums::make_enum_sequence<modifier_type>(), target_card->modifier.type);
     }
 
     bool modifier_bangmod::valid_with_card(card *origin_card, player *origin, card *target_card) {

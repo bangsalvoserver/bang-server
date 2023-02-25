@@ -3,13 +3,14 @@
 #include <stdexcept>
 
 #include "cards/effects.h"
+#include "cards/effect_enums.h"
 
 #include "game.h"
 #include "mth_unwrapper.h"
 
 namespace banggame {
 
-    template<card_expansion_type E>
+    template<expansion_type E>
     inline void do_apply_ruleset(game *game, enums::enum_tag_t<E>) {
         if constexpr (enums::value_with_type<E>) {
             if (bool(game->m_options.expansions & E)) {
@@ -20,9 +21,9 @@ namespace banggame {
     }
 
     void game::apply_rulesets() {
-        [&]<card_expansion_type ... Es>(enums::enum_sequence<Es ...>) {
+        [&]<expansion_type ... Es>(enums::enum_sequence<Es ...>) {
             (do_apply_ruleset(this, enums::enum_tag<Es>), ...);
-        }(enums::make_enum_sequence<card_expansion_type>());
+        }(enums::make_enum_sequence<expansion_type>());
     }
 
     template<typename Holder, typename Function>
@@ -219,7 +220,7 @@ namespace banggame {
     }
 
     void modifier_holder::add_context(card *origin_card, player *origin, effect_context &ctx) const {
-        enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) {
+        enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;
                 if constexpr (requires { handler.add_context(origin_card, origin, ctx); }) {
@@ -230,7 +231,7 @@ namespace banggame {
     }
 
     void modifier_holder::add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const {
-        enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) {
+        enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;
                 if constexpr (requires { handler.add_context(origin_card, origin, target, ctx); }) {
@@ -241,7 +242,7 @@ namespace banggame {
     }
 
     void modifier_holder::add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const {
-        enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) {
+        enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;
                 if constexpr (requires { handler.add_context(origin_card, origin, target, ctx); }) {
@@ -252,7 +253,7 @@ namespace banggame {
     }
 
     game_string modifier_holder::get_error(card *origin_card, player *origin, card *target_card) const {
-        return enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) -> game_string {
+        return enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;
                 if constexpr (requires { handler.valid_with_modifier(origin_card, origin, target_card); }) {
@@ -274,7 +275,7 @@ namespace banggame {
     }
 
     game_string modifier_holder::on_prompt(card *origin_card, player *origin, card *playing_card) const {
-        return enums::visit_enum([&]<card_modifier_type E>(enums::enum_tag_t<E>) -> game_string {
+        return enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;
                 if constexpr (requires { handler.on_prompt(origin_card, origin, playing_card); }) {

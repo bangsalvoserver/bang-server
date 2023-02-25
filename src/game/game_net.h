@@ -97,9 +97,11 @@ namespace banggame {
             return m_context;
         }
 
+        json::json serialize_update(const game_update &update) const;
+
         template<game_update_type E>
         json::json make_update(auto && ... args) {
-            return json::serialize(game_update{enums::enum_tag<E>, FWD(args) ... }, context());
+            return serialize_update(game_update{enums::enum_tag<E>, FWD(args) ... });
         }
 
         ticks get_total_update_time() {
@@ -116,7 +118,7 @@ namespace banggame {
         template<game_update_type E>
         void add_update(update_target target, auto && ... args) {
             game_update update{enums::enum_tag<E>, FWD(args) ... };
-            m_updates.emplace_back(target, json::serialize(update, context()), [&]{
+            m_updates.emplace_back(target, serialize_update(update), [&]{
                 if constexpr (game_update::has_type<E>) {
                     const auto &value = update.get<E>();
                     if constexpr (requires { value.get_duration(); }) {

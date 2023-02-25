@@ -2,6 +2,7 @@
 
 #include "play_visitor.h"
 
+#include "cards/effect_enums.h"
 #include "cards/base/requests.h"
 #include "effect_list_zip.h"
 

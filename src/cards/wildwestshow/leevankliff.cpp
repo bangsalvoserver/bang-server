@@ -9,11 +9,8 @@ namespace banggame {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
 
-        auto modifiers = origin->m_played_cards.back().second
-            | std::views::transform(&card_pocket_pair::origin_card);
-        auto it = std::ranges::find(modifiers, card_modifier_type::leevankliff, &card::modifier_type);
-        if (it != modifiers.end()) {
-            return {"ERROR_CANNOT_REPEAT_CARD", *it};
+        if (ranges::contains(origin->m_played_cards.back().second, origin_card, &card_pocket_pair::origin_card)) {
+            return {"ERROR_CANNOT_REPEAT_CARD", origin_card};
         }
 
         return {};

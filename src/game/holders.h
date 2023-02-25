@@ -38,7 +38,7 @@ namespace banggame {
     )
 
     DEFINE_STRUCT(modifier_holder,
-        (card_modifier_type, type),
+        (modifier_type, type),
         
         void add_context(card *origin_card, player *origin, effect_context &ctx) const;
         void add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const;

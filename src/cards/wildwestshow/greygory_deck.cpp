@@ -9,7 +9,7 @@ namespace banggame {
         std::ranges::sample(target->m_game->m_context.cards
             | std::views::transform([](card &c) { return &c; })
             | std::views::filter([&](card *c) {
-                return c != target_card && c->expansion == card_expansion_type{}
+                return c != target_card && c->expansion == expansion_type{}
                     && (c->pocket == pocket_type::none
                     || (c->pocket == pocket_type::player_character && c->owner == target));
             }),

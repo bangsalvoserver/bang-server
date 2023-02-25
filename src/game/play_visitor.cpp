@@ -1,5 +1,6 @@
 #include "play_visitor.h"
 #include "possible_to_play.h"
+#include "cards/effect_enums.h"
 
 namespace banggame {
 

@@ -92,9 +92,9 @@ def parse_all_effects(card):
             'optionals':    parse_effects(card['optional']) if 'optional' in card else None,
             'equips':       parse_effect_simple(card['equip'], 'effect_value', 'equip_type') if 'equip' in card else None,
             'tags':         parse_effect_simple(card['tags'], 'tag_value', 'tag_type') if 'tags' in card else None,
-            'expansion':    CppEnum('card_expansion_type', card['expansion']) if 'expansion' in card else None,
+            'expansion':    CppEnum('expansion_type', card['expansion']) if 'expansion' in card else None,
             'deck':         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
-            'modifier':     {'type': CppEnum('card_modifier_type', card['modifier'])} if 'modifier' in card else None,
+            'modifier':     {'type': CppEnum('modifier_type', card['modifier'])} if 'modifier' in card else None,
             'mth_effect':   {'type': CppEnum('mth_type', card['mth_effect'])} if 'mth_effect' in card else None,
             'mth_response': {'type': CppEnum('mth_type', card['mth_response'])} if 'mth_response' in card else None,
             'equip_target': CppEnum('target_player_filter', card['equip_target']) if 'equip_target' in card else None,
@@ -159,7 +159,7 @@ def parse_file(data):
 
     return result
 
-INCLUDE_FILENAME = 'game/card_data.h'
+INCLUDE_FILENAMES = ['game/card_data.h', 'cards/effect_enums.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':
@@ -172,5 +172,5 @@ if __name__ == '__main__':
     
     with open(sys.argv[2], 'w', encoding='utf8') as file:
         print_cpp_file(bang_cards, OBJECT_DECLARATION,
-            include_filename=INCLUDE_FILENAME,
+            include_filenames=INCLUDE_FILENAMES,
             file=file)

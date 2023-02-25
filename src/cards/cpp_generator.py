@@ -23,7 +23,7 @@ def object_to_string(object_value, indent = 0):
     else:
         return f'{{{object_value}}}'
 
-def print_cpp_file(object_value, object_declaration, include_filename = None, declarations=None, file=sys.stdout):
+def print_cpp_file(object_value, object_declaration, include_filenames = None, declarations=None, file=sys.stdout):
     match = re.match(r'^(\w+) (?:(\w+)::)?(\w+)$', object_declaration)
 
     object_type = match.group(1)
@@ -31,8 +31,11 @@ def print_cpp_file(object_value, object_declaration, include_filename = None, de
     object_name = match.group(3)
 
     print("// AUTO GENERATED FILE\n", file=file)
-    if include_filename:
-        print(f"#include \"{include_filename}\"\n", file=file)
+    if isinstance(include_filenames, list):
+        for filename in include_filenames:
+            print(f"#include \"{filename}\"\n", file=file)
+    elif isinstance(include_filenames, string):
+        print(f"#include \"{include_filenames}\"\n", file=file)
     indent = 0
     if namespace_name:
         print(f"namespace {namespace_name} {{\n", file=file)
