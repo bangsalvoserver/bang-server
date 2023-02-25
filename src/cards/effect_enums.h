@@ -66,7 +66,6 @@ namespace banggame {
         (sniper,                effect_sniper)
         (ricochet,              effect_ricochet)
         (ranch,                 effect_ranch)
-        (leevankliff,           effect_leevankliff)
         (greygory_deck,         effect_greygory_deck)
         (lemonade_jim,          effect_lemonade_jim)
         (josh_mccloud,          effect_josh_mccloud)

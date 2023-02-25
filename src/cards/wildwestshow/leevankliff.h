@@ -5,16 +5,8 @@
 
 namespace banggame {
 
-    struct effect_leevankliff {
-        game_string get_error(card *origin_card, player *origin);
-    };
-
     struct modifier_leevankliff {
-        bool valid_with_modifier(card *origin_card, player *origin, card *target_card) {
-            return false;
-        }
-        
-        bool valid_with_card(card *origin_card, player *origin, card *target_card);
+        game_string get_error(card *origin_card, player *origin, card *target_card);
         void add_context(card *origin_card, player *origin, effect_context &ctx);
     };
 }

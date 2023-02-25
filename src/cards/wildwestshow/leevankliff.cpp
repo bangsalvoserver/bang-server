@@ -4,20 +4,26 @@
 
 namespace banggame {
 
-    game_string effect_leevankliff::get_error(card *origin_card, player *origin) {
+    game_string modifier_leevankliff::get_error(card *origin_card, player *origin, card *playing_card) {
+        if (playing_card->is_modifier()) {
+            return "ERROR_NOT_ALLOWED_WITH_MODIFIER";
+        }
+
         if (origin->m_played_cards.empty()) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
 
-        if (ranges::contains(origin->m_played_cards.back().second, origin_card, &card_pocket_pair::origin_card)) {
+        const auto &[target_card, modifiers] = origin->m_played_cards.back();
+
+        if (target_card.origin_card != playing_card || !playing_card->is_brown()) {
+            return "INVALID_MODIFIER_CARD";
+        }
+
+        if (ranges::contains(modifiers, origin_card, &card_pocket_pair::origin_card)) {
             return {"ERROR_CANNOT_REPEAT_CARD", origin_card};
         }
 
         return {};
-    }
-
-    bool modifier_leevankliff::valid_with_card(card *origin_card, player *origin, card *target_card) {
-        return target_card->is_brown() && target_card == origin->get_last_played_card();
     }
 
     void modifier_leevankliff::add_context(card *origin_card, player *origin, effect_context &ctx) {
