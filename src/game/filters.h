@@ -3,6 +3,8 @@
 
 #include "game_update.h"
 
+#include "cards/filter_enums.h"
+
 namespace banggame {
 
     namespace filter_impl {

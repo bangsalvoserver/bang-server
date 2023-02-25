@@ -4,6 +4,7 @@
 #include "game_update.h"
 
 #include "cards/effect_enums.h"
+#include "cards/filter_enums.h"
 #include "cards/base/requests.h"
 
 #include "play_verify.h"

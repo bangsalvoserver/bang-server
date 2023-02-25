@@ -85,32 +85,9 @@ namespace banggame {
         (renegade_3p)
     )
 
-    DEFINE_ENUM_FLAGS(target_player_filter,
-        (any)
-        (dead)
-        (self)
-        (notself)
-        (notsheriff)
-        (range_1)
-        (range_2)
-        (reachable)
-    )
+    enum class target_player_filter : uint8_t;
 
-    DEFINE_ENUM_FLAGS(target_card_filter,
-        (table)
-        (hand)
-        (blue)
-        (black)
-        (clubs)
-        (bang)
-        (bangcard)
-        (missed)
-        (beer)
-        (bronco)
-        (cube_slot)
-        (can_repeat)
-        (can_target_self)
-    )
+    enum class target_card_filter : uint16_t;
 
     DEFINE_ENUM_TYPES(target_type,
         (none)

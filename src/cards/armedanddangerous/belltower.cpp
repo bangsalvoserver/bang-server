@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/filter_enums.h"
+
 namespace banggame {
 
     game_string modifier_belltower::get_error(card *origin_card, player *origin, card *playing_card) {

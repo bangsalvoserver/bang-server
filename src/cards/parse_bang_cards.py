@@ -159,7 +159,7 @@ def parse_file(data):
 
     return result
 
-INCLUDE_FILENAMES = ['game/card_data.h', 'cards/effect_enums.h']
+INCLUDE_FILENAMES = ['game/card_data.h', 'cards/effect_enums.h', 'cards/filter_enums.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':
