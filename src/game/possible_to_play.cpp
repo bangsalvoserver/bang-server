@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    static auto get_all_active_cards(player *origin, bool include_last) {
+    static auto get_all_active_cards(player *origin) {
         return ranges::views::concat(
             origin->m_hand,
             origin->m_table | ranges::views::remove_if(&card::inactive),
@@ -14,16 +14,12 @@ namespace banggame {
             origin->m_game->m_hidden_deck,
             origin->m_game->m_shop_selection,
             origin->m_game->m_scenario_cards | ranges::views::take_last(1),
-            origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1),
-            ranges::views::single(origin->get_last_played_card())
-                | ranges::views::filter([=](card *last_played_card) {
-                    return last_played_card && include_last;
-                })
+            origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
         );
     }
 
     ranges::any_view<card *> get_all_playable_cards(player *origin, bool is_response) {
-        return get_all_active_cards(origin, false)
+        return get_all_active_cards(origin)
             | ranges::views::filter([=](card *origin_card) {
                 return is_possible_to_play(origin, origin_card, is_response);
             });
@@ -122,9 +118,15 @@ namespace banggame {
     }
 
     ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
-        return get_all_active_cards(origin, true) | ranges::views::filter([=](card *origin_card) {
-            return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
-        });
+        if (ctx.repeating) {
+            return ranges::views::single(origin->get_last_played_card()) | ranges::views::filter([=](card *origin_card) {
+                return origin_card && is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
+            });
+        } else {
+            return get_all_active_cards(origin) | ranges::views::filter([=](card *origin_card) {
+                return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
+            });
+        }
     }
 
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {

@@ -7,19 +7,9 @@
 namespace banggame {
 
     game_string modifier_belltower::get_error(card *origin_card, player *origin, card *playing_card) {
-        switch (playing_card->pocket) {
-        case pocket_type::player_hand:
-        case pocket_type::shop_selection:
-            if (!playing_card->is_brown()) {
-                return {"ERROR_CANNOT_PLAY_WHILE_EQUIPPING", origin_card};
-            }
-            break;
-        case pocket_type::main_deck:
-        case pocket_type::discard_pile:
-        case pocket_type::shop_discard:
-            return "ERROR_INVALID_MODIFIER";
-        }
-        if (!playing_card->is_modifier() && std::ranges::none_of(playing_card->get_effect_list(origin->m_game->pending_requests()),
+        if ((playing_card->pocket == pocket_type::player_hand || playing_card->pocket == pocket_type::shop_selection) && !playing_card->is_brown()) {
+            return {"ERROR_CANNOT_PLAY_WHILE_EQUIPPING", origin_card};
+        } else if (!playing_card->is_modifier() && std::ranges::none_of(playing_card->get_effect_list(origin->m_game->pending_requests()),
             [](const effect_holder &holder) {
                 return bool(holder.player_filter & (target_player_filter::reachable | target_player_filter::range_1 | target_player_filter::range_2));
             })
