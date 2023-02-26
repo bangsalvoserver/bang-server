@@ -11,6 +11,8 @@
 #include "cards/base/predraw_check.h"
 #include "cards/base/requests.h"
 
+#include "cards/filter_enums.h"
+
 #include <cassert>
 #include <numeric>
 
@@ -271,30 +273,6 @@ namespace banggame {
             }
         } else {
             return "ERROR_NO_PENDING_REQUEST";
-        }
-    }
-
-    void player::play_card_action(card *origin_card) {
-        switch (origin_card->pocket) {
-        case pocket_type::player_hand:
-            m_game->move_card(origin_card, pocket_type::discard_pile);
-            m_game->call_event<event_type::on_play_hand_card>(this, origin_card);
-            break;
-        case pocket_type::player_table:
-            if (origin_card->is_green()) {
-                m_game->move_card(origin_card, pocket_type::discard_pile);
-            }
-            break;
-        case pocket_type::shop_selection:
-            m_game->move_card(origin_card, pocket_type::shop_discard);
-            m_game->queue_action([m_game=m_game]{
-                if (m_game->m_shop_selection.size() < 3) {
-                    m_game->draw_shop_card();
-                }
-            }, -1);
-            break;
-        default:
-            break;
         }
     }
 

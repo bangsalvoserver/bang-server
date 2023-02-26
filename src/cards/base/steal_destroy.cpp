@@ -45,6 +45,7 @@ namespace banggame {
                     origin->m_game->add_log(update_target::includes(origin, target_card->owner), "LOG_STOLEN_CARD", origin, target_card->owner, target_card);
                 }
                 origin->steal_card(target_card);
+                origin->m_game->call_event<event_type::on_use_hand_card>(target_card->owner, target_card, true);
             }
         }, 1);
     }
@@ -94,6 +95,10 @@ namespace banggame {
         });
     }
 
+    void effect_discard::on_play(card *origin_card, player *origin) {
+        origin->discard_card(origin_card);
+    }
+
     void effect_discard::on_play(card *origin_card, player *origin, card *target_card) {
         if (origin != target_card->owner) {
             origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
@@ -111,6 +116,7 @@ namespace banggame {
                     origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
                 }
                 target_card->owner->discard_card(target_card);
+                origin->m_game->call_event<event_type::on_use_hand_card>(target_card->owner, target_card, true);
             }
         }, 1);
     }

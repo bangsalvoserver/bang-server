@@ -1,6 +1,7 @@
 #include "handcuffs.h"
 
 #include "cards/base/draw.h"
+#include "cards/filter_enums.h"
 
 #include "game/game.h"
 

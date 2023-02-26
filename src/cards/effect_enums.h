@@ -3,13 +3,14 @@
 
 #include "utils/enums.h"
 
+#include "filter_enums.h"
+
 namespace banggame {
 
     DEFINE_ENUM_FWD_TYPES(effect_type,
         (none)
         (mth_add)
         (ctx_add)
-        (play_card_action,      effect_play_card_action)
         (max_usages,            effect_max_usages)
         (pass_turn,             effect_pass_turn)
         (resolve,               effect_resolve)
@@ -80,6 +81,20 @@ namespace banggame {
         (lastwill,              effect_lastwill)
         (ladyrosaoftexas,       effect_ladyrosaoftexas)
         (changewws,             effect_changewws)
+        (cactus)
+        (evaded)
+        (full_steam)
+        (knife_revolver)
+        (most_wanted)
+        (next_stop)
+        (train_robbery)
+        (shade_oconnor)
+        (trainchoice)
+        (lounge_car)
+        (cattle_truck)
+        (circus_wagon)
+        (express_car)
+        (mail_car)
     )
 
     DEFINE_ENUM_FWD_TYPES(equip_type,
@@ -180,6 +195,23 @@ namespace banggame {
         (showdown,              equip_showdown)
         (sacagaway,             equip_sacagaway)
         (wildwestshow,          equip_wildwestshow)
+        (dragoon)
+        (map)
+        (refund)
+        (strongbox)
+        (water_tower)
+        (benny_brawler)
+        (jimmy_texas)
+        (manuelita)
+        (shade_oconnor)
+        (ironhorse)
+        (leland)
+        (lumber_flatcar)
+        (mail_car)
+        (prisoner_car)
+        (private_car)
+        (dining_car)
+        (ghost_car)
     )
 
     DEFINE_ENUM_FWD_TYPES(mth_type,
@@ -195,8 +227,9 @@ namespace banggame {
         (duck,                  handler_duck)
         (squaw,                 handler_squaw)
         (red_ringo,             handler_red_ringo)
-        (card_sharper,          handler_card_sharper)
         (lastwill,              handler_lastwill)
+        (switch_cards,          handler_switch_cards)
+        (evan_babbit)
     )
 
     DEFINE_ENUM_FWD_TYPES(modifier_type,
@@ -208,6 +241,11 @@ namespace banggame {
         (shopchoice,            modifier_shopchoice)
         (discount,              modifier_discount)
         (leevankliff,           modifier_leevankliff)
+        (moneybag)
+        (skip_player)
+        (trainchoice)
+        (traincost)
+        (locomotive)
     )
 
 }

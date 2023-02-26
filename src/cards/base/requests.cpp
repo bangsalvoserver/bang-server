@@ -40,7 +40,7 @@ namespace banggame {
             }
             target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->discard_card(target_card);
-            target->m_game->call_event<event_type::on_effect_end>(target, origin_card);
+            target->m_game->call_event<event_type::on_use_hand_card>(target, origin_card, false);
         });
     }
 

@@ -26,7 +26,7 @@ namespace banggame {
                     target->m_game->add_log("LOG_GIFTED_CARD", target, origin, target_card);
                 }
                 origin->steal_card(target_card);
-                target->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
+                target->m_game->call_event<event_type::on_use_hand_card>(target, target_card, false);
             });
         }
 

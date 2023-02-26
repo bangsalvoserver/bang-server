@@ -3,6 +3,7 @@
 #include "play_visitor.h"
 
 #include "cards/effect_enums.h"
+
 #include "cards/base/requests.h"
 #include "effect_list_zip.h"
 
@@ -285,8 +286,28 @@ namespace banggame {
     void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, is_response);
 
-        if (!ctx.repeating && !ranges::contains(origin_card->get_effect_list(is_response), effect_type::play_card_action, &effect_holder::type)) {
-            origin->play_card_action(origin_card);
+        if (origin_card->pocket == pocket_type::player_hand) {
+            origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, false);
+        }
+
+        if (!ctx.repeating && !origin_card->has_tag(tag_type::no_auto_discard)) {
+            switch (origin_card->pocket) {
+            case pocket_type::player_hand:
+                origin->discard_card(origin_card);
+                break;
+            case pocket_type::player_table:
+                if (origin_card->is_green()) {
+                    origin->discard_card(origin_card);
+                }
+                break;
+            case pocket_type::shop_selection:
+                origin->m_game->move_card(origin_card, pocket_type::shop_discard);
+                origin->m_game->queue_action([m_game=origin->m_game]{
+                    if (m_game->m_shop_selection.size() < 3) {
+                        m_game->draw_shop_card();
+                    }
+                }, -1);
+            }
         }
 
         std::vector<std::pair<const effect_holder &, const play_card_target &>> delay_effects;
@@ -325,7 +346,7 @@ namespace banggame {
             if (ctx.shopchoice) {
                 origin_card = ctx.shopchoice;
             }
-            return origin_card->buy_cost() - ctx.discount;
+            return origin_card->get_tag_value(tag_type::buy_cost).value_or(0) - ctx.discount;
         } else {
             return 0;
         }
@@ -365,10 +386,16 @@ namespace banggame {
 
                 origin->add_gold(-cost);
                 origin_card->on_equip(target);
-                log_equipped_card(origin_card, origin, target);
                 for (const auto &[mod_card, mod_targets] : modifiers) {
                     apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
                 }
+                
+                log_equipped_card(origin_card, origin, target);
+                
+                if (origin_card->pocket == pocket_type::player_hand) {
+                    origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, false);
+                }
+
                 target->equip_card(origin_card);
 
                 if (origin_card->is_green()) {
@@ -379,7 +406,6 @@ namespace banggame {
                 }
 
                 origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card);
-                origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
             });
         } else {
             MAYBE_RETURN(verify_card_targets(origin, origin_card, is_response, targets, modifiers, ctx));
@@ -397,8 +423,6 @@ namespace banggame {
                     apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
                 }
                 apply_target_list(origin, origin_card, is_response, targets, ctx);
-
-                origin->m_game->call_event<event_type::on_effect_end>(origin, origin_card);
             });
         }
         return {};

@@ -20,7 +20,6 @@ namespace banggame {
 
     DEFINE_ENUM_DATA(card_rank,
         (none,      "")
-        (rank_A,    "A")
         (rank_2,    "2")
         (rank_3,    "3")
         (rank_4,    "4")
@@ -33,6 +32,7 @@ namespace banggame {
         (rank_J,    "J")
         (rank_Q,    "Q")
         (rank_K,    "K")
+        (rank_A,    "A")
     )
 
     DEFINE_STRUCT(card_sign,
@@ -46,6 +46,16 @@ namespace banggame {
         bool is_spades() const      { return suit == card_suit::spades; }
         bool is_black() const       { return is_clubs() || is_spades(); }
 
+        bool is_two_to_nine() const {
+            return enums::indexof(rank) >= enums::indexof(card_rank::rank_2)
+                && enums::indexof(rank) <= enums::indexof(card_rank::rank_9);
+        }
+
+        bool is_ten_to_ace() const {
+            return enums::indexof(rank) >= enums::indexof(card_rank::rank_10)
+                && enums::indexof(rank) <= enums::indexof(card_rank::rank_A);
+        }
+
         explicit operator bool () const {
             return suit != card_suit::none && rank != card_rank::none;
         }
@@ -55,6 +65,7 @@ namespace banggame {
         (dodgecity)
         (goldrush,              ruleset_goldrush)
         (armedanddangerous,     ruleset_armedanddangerous)
+        (greattrainrobbery,     ruleset_greattrainrobbery)
         (valleyofshadows,       ruleset_valleyofshadows)
         (highnoon)
         (fistfulofcards)
@@ -72,6 +83,7 @@ namespace banggame {
         (green)
         (black)
         (orange)
+        (train)
     )
 
     DEFINE_ENUM(player_role,
@@ -84,10 +96,6 @@ namespace banggame {
         (outlaw_3p)
         (renegade_3p)
     )
-
-    enum class target_player_filter : uint8_t;
-
-    enum class target_card_filter : uint16_t;
 
     DEFINE_ENUM_TYPES(target_type,
         (none)
@@ -114,6 +122,8 @@ namespace banggame {
         (highnoon)
         (fistfulofcards)
         (wildwestshow)
+        (station)
+        (train)
     )
 
     DEFINE_ENUM(pocket_type,
@@ -145,41 +155,14 @@ namespace banggame {
         (auto_respond)
     )
 
-    DEFINE_ENUM(tag_type,
-        (none)
-        (temp_card)
-        (ghost_card)
-        (confirm)
-        (skip_logs)
-        (hidden)
-        (discard_if_two_players)
-        (bangcard)
-        (missedcard)
-        (play_as_bang)
-        (beer)
-        (indians)
-        (drawing)
-        (weapon)
-        (horse)
-        (repeatable)
-        (auto_confirm)
-        (auto_confirm_red_ringo)
-        (shopchoice)
-        (last_scenario_card)
-        (peyote)
-        (handcuffs)
-        (buy_cost)
-        (max_hp)
-        (bronco)
-    )
+    enum class effect_type;
+    enum class equip_type;
+    enum class mth_type;
+    enum class modifier_type;
 
-    enum class effect_type : uint8_t;
-
-    enum class equip_type : uint8_t;
-
-    enum class mth_type : uint8_t;
-
-    enum class modifier_type : uint8_t;
+    enum class target_player_filter;
+    enum class target_card_filter;
+    enum class tag_type;
 
     struct effect_context {
         card *shopchoice = nullptr;

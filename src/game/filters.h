@@ -66,7 +66,7 @@ namespace banggame {
         return filter_impl::check_game_flags(origin, game_flags::treat_any_as_bang)
             || filter_impl::get_card_tag(target, tag_type::bangcard).has_value()
             || filter_impl::check_player_flags(origin, player_flags::treat_missed_as_bang)
-            && filter_impl::get_card_tag(target, tag_type::missedcard).has_value();
+            && filter_impl::get_card_tag(target, tag_type::missed).has_value();
     }
 
     inline const char *check_card_filter(filter_impl::card_ptr origin_card, filter_impl::player_ptr origin, target_card_filter filter, filter_impl::card_ptr target, const effect_context &ctx = {}) {
@@ -89,20 +89,53 @@ namespace banggame {
         if (bool(filter & target_card_filter::bangcard) && !filter_impl::get_card_tag(target, tag_type::bangcard))
             return "ERROR_TARGET_NOT_BANG";
 
-        if (bool(filter & target_card_filter::missed) && !filter_impl::get_card_tag(target, tag_type::missedcard))
+        if (bool(filter & target_card_filter::missed) && !filter_impl::get_card_tag(target, tag_type::missed))
             return "ERROR_TARGET_NOT_MISSED";
+
+        if (bool(filter & target_card_filter::missedcard) && !filter_impl::get_card_tag(target, tag_type::missedcard))
+            return "ERROR_TARGET_NOT_MISSEDCARD";
 
         if (bool(filter & target_card_filter::bronco) && !filter_impl::get_card_tag(target, tag_type::bronco))
             return "ERROR_TARGET_NOT_BRONCO";
 
-        if (bool(filter & target_card_filter::blue) && filter_impl::get_card_color(target) != card_color_type::blue)
+        if (bool(filter & target_card_filter::catbalou_panic)
+            && !filter_impl::get_card_tag(target, tag_type::cat_balou)
+            && !filter_impl::get_card_tag(target, tag_type::panic))
+            return "ERROR_TARGET_NOT_CATBALOU_OR_PANIC";
+
+        card_color_type color = filter_impl::get_card_color(target);
+
+        if (bool(filter & target_card_filter::blue) && color != card_color_type::blue)
             return "ERROR_TARGET_NOT_BLUE_CARD";
 
-        if (bool(filter & target_card_filter::clubs) && !filter_impl::get_card_sign(origin, target).is_clubs())
-            return "ERROR_TARGET_NOT_CLUBS";
+        if (bool(filter & target_card_filter::train) && color != card_color_type::train)
+            return "ERROR_TARGET_NOT_TRAIN";
 
-        if (bool(filter & target_card_filter::black) != (filter_impl::get_card_color(target) == card_color_type::black))
+        if (bool(filter & target_card_filter::blue_or_train) && color != card_color_type::blue && color != card_color_type::train)
+            return "ERROR_TARGET_NOT_BLUE_OR_TRAIN";
+
+        if (bool(filter & target_card_filter::black) != (color == card_color_type::black))
             return "ERROR_TARGET_BLACK_CARD";
+
+        card_sign sign = filter_impl::get_card_sign(origin, target);
+
+        if (bool(filter & target_card_filter::hearts) && !sign.is_hearts())
+            return "ERROR_TARGET_NOT_HEARTS";
+
+        if (bool(filter & target_card_filter::diamonds) && !sign.is_diamonds())
+            return "ERROR_TARGET_NOT_DIAMONDS";
+
+        if (bool(filter & target_card_filter::clubs) && !sign.is_clubs())
+            return "ERROR_TARGET_NOT_CLUBS";
+        
+        if (bool(filter & target_card_filter::spades) && !sign.is_spades())
+            return "ERROR_TARGET_NOT_SPADES";
+        
+        if (bool(filter & target_card_filter::two_to_nine) && !sign.is_two_to_nine())
+            return "ERROR_TARGET_NOT_TWO_TO_NINE";
+        
+        if (bool(filter & target_card_filter::ten_to_ace) && !sign.is_ten_to_ace())
+            return "ERROR_TARGET_NOT_TEN_TO_ACE";
 
         if (bool(filter & target_card_filter::table) && filter_impl::get_card_pocket(target) != pocket_type::player_table)
             return "ERROR_TARGET_NOT_TABLE_CARD";

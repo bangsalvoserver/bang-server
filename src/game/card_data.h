@@ -61,16 +61,13 @@ namespace banggame {
         bool self_equippable() const {
             return equip_target == target_player_filter{};
         }
-    
-        short buy_cost() const {
-            return get_tag_value(tag_type::buy_cost).value_or(0);
-        }
 
         bool is_brown() const { return color == card_color_type::brown; }
         bool is_blue() const { return color == card_color_type::blue; }
         bool is_green() const { return color == card_color_type::green; }
         bool is_black() const { return color == card_color_type::black; }
         bool is_orange() const { return color == card_color_type::orange; }
+        bool is_train() const { return color == card_color_type::train; }
     )
 
     struct all_cards_t {
@@ -81,6 +78,8 @@ namespace banggame {
         std::vector<card_data> fistfulofcards;
         std::vector<card_data> wildwestshow;
         std::vector<card_data> button_row;
+        std::vector<card_data> stations;
+        std::vector<card_data> train;
         std::vector<card_data> hidden;
     };
 

@@ -24,7 +24,6 @@
 #include "missed.h"
 #include "mustang.h"
 #include "pass_turn.h"
-#include "play_card_action.h"
 #include "predraw_check.h"
 #include "requests.h"
 #include "resolve.h"

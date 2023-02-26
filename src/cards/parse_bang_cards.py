@@ -119,6 +119,8 @@ def parse_file(data):
         'fistfulofcards': [],
         'wildwestshow': [],
         'button_row': [],
+        'stations': [],
+        'train': [],
         'hidden': []
     }
 
@@ -151,6 +153,16 @@ def parse_file(data):
             else:
                 result[name].append(parse_all_effects(card))
 
+    for card in data['station']:
+        card['deck'] = 'station'
+        add_expansion(card, 'greattrainrobbery')
+        result['stations'].append(parse_all_effects(card))
+
+    for card in data['train']:
+        card['deck'] = 'train'
+        add_expansion(card, 'greattrainrobbery')
+        result['train'].append(parse_all_effects(card))
+
     for card in data['button_row']:
         if is_hidden(card):
             result['hidden'].append(parse_all_effects(card))
@@ -159,7 +171,7 @@ def parse_file(data):
 
     return result
 
-INCLUDE_FILENAMES = ['game/card_data.h', 'cards/effect_enums.h', 'cards/filter_enums.h']
+INCLUDE_FILENAMES = ['game/card_data.h', 'cards/effect_enums.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':

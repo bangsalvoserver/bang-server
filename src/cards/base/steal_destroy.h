@@ -13,6 +13,7 @@ namespace banggame {
     };
 
     struct effect_discard {
+        void on_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin, card *target);
     };
 

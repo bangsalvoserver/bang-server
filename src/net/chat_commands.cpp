@@ -5,6 +5,8 @@
 #include "utils/enum_format.h"
 #include "utils/static_map.h"
 
+#include "cards/filter_enums.h"
+
 #include <charconv>
 
 namespace banggame {

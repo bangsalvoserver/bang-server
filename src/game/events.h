@@ -81,11 +81,8 @@ namespace banggame {
         // viene chiamato quando un giocatore equipaggia una carta
         EVENT(on_equip_card, player *origin, player *target, card *target_card)
 
-        // viene chiamato quando un giocatore gioca una carta dalla mano
-        EVENT(on_play_hand_card, player *origin, card *target_card)
-
-        // viene chiamato dopo la fine di un effetto
-        EVENT(on_effect_end, player *origin, card *target_card)
+        // viene chiamato quando un giocatore gioca o scarta una carta dalla mano
+        EVENT(on_use_hand_card, player *origin, card *target_card, bool automatic)
 
         // viene chiamato quando un giocatore gioca birra
         EVENT(on_play_beer, player *origin)

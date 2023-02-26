@@ -211,8 +211,6 @@ namespace banggame {
         void untap_inactive_cards();
         void remove_extra_characters();
 
-        void play_card_action(card *origin_card);
-
         void prompt_then(game_string &&message, std::function<void()> &&args);
 
         game_string handle_action(enums::enum_tag_t<game_action_type::pick_card>, card *target_card);

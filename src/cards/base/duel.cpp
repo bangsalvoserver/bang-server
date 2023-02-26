@@ -36,7 +36,7 @@ namespace banggame {
                 target->m_game->pop_request();
                 target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
                 target->discard_card(target_card);
-                target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
+                target->m_game->call_event<event_type::on_use_hand_card>(target, target_card, false);
                 target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target);
             });
         }

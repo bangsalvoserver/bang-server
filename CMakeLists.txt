@@ -28,7 +28,6 @@ set(bangserver_srcs
     src/cards/base/missed.cpp
     src/cards/base/mustang.cpp
     src/cards/base/pass_turn.cpp
-    src/cards/base/play_card_action.cpp
     src/cards/base/predraw_check.cpp
     src/cards/base/prompts.cpp
     src/cards/base/requests.cpp
@@ -163,9 +162,10 @@ set(bangserver_srcs
     src/cards/armedanddangerous/thunderer.cpp
     src/cards/armedanddangerous/tumbleweed.cpp
 
+    src/cards/greattrainrobbery/switch_cards.cpp
+
     src/cards/canyondiablo/bronco.cpp
     src/cards/canyondiablo/brothel.cpp
-    src/cards/canyondiablo/card_sharper.cpp
     src/cards/canyondiablo/disarm.cpp
     src/cards/canyondiablo/graverobber.cpp
     src/cards/canyondiablo/indianguide.cpp

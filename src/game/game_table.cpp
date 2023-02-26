@@ -1,6 +1,7 @@
 #include "game_table.h"
 
 #include "player_iterator.h"
+#include "cards/filter_enums.h"
 
 namespace banggame {
 

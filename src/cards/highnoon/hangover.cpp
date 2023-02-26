@@ -12,6 +12,5 @@ namespace banggame {
 
     void equip_hangover::on_disable(card *target_card, player *target) {
         target->m_game->remove_disablers(target_card);
-        target->m_game->call_event<event_type::on_effect_end>(target, target_card);
     }
 }

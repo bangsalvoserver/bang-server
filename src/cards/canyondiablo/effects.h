@@ -3,7 +3,6 @@
 
 #include "bronco.h"
 #include "brothel.h"
-#include "card_sharper.h"
 #include "disarm.h"
 #include "graverobber.h"
 #include "indianguide.h"
