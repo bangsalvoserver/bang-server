@@ -162,6 +162,15 @@ set(bangserver_srcs
     src/cards/armedanddangerous/thunderer.cpp
     src/cards/armedanddangerous/tumbleweed.cpp
 
+    src/cards/greattrainrobbery/cactus.cpp
+    src/cards/greattrainrobbery/dragoon.cpp
+    src/cards/greattrainrobbery/evaded.cpp
+    src/cards/greattrainrobbery/knife_revolver.cpp
+    src/cards/greattrainrobbery/map.cpp
+    src/cards/greattrainrobbery/most_wanted.cpp
+    src/cards/greattrainrobbery/moneybag.cpp
+    src/cards/greattrainrobbery/refund.cpp
+    src/cards/greattrainrobbery/strongbox.cpp
     src/cards/greattrainrobbery/switch_cards.cpp
 
     src/cards/canyondiablo/bronco.cpp

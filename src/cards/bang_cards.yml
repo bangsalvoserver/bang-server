@@ -1037,14 +1037,13 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - bang player reachable notself
-      - knife_revolver
+      - knife_revolver player reachable notself
   - name: MAP
     signs:
       - 3 diamonds
     image: 27_map
     expansion: greattrainrobbery
-    color: brown
+    color: blue
     equip:
       - map
   - name: MONEY_BAG
@@ -1054,7 +1053,7 @@ main_deck:
     expansion: greattrainrobbery
     color: brown
     effects:
-      - none
+      - discard
     modifier: moneybag
   - name: MOST_WANTED
     signs:
@@ -1846,7 +1845,7 @@ character:
     image: 27_jimmy_texas
     expansion: greattrainrobbery
     equip:
-      - jimmy_texas
+      - strongbox
   - name: MANUELITA
     image: 27_manuelita
     expansion: greattrainrobbery

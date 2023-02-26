@@ -47,7 +47,7 @@ namespace banggame {
                 origin->steal_card(target_card);
                 origin->m_game->call_event<event_type::on_use_hand_card>(target_card->owner, target_card, true);
             }
-        }, 1);
+        }, 2);
     }
 
     struct request_steal : request_targeting {
@@ -118,7 +118,7 @@ namespace banggame {
                 target_card->owner->discard_card(target_card);
                 origin->m_game->call_event<event_type::on_use_hand_card>(target_card->owner, target_card, true);
             }
-        }, 1);
+        }, 2);
     }
     
     struct request_destroy : request_targeting {

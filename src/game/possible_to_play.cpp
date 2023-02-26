@@ -119,8 +119,14 @@ namespace banggame {
 
     ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
         if (ctx.repeating) {
-            return ranges::views::single(origin->get_last_played_card()) | ranges::views::filter([=](card *origin_card) {
-                return origin_card && is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
+            return ranges::views::concat(
+                ranges::views::single(origin->get_last_played_card())
+                    | ranges::views::filter([](card *origin_card) { return origin_card != nullptr; }),
+                origin->m_game->m_discards
+                    | ranges::views::take_last(1)
+            )
+            | ranges::views::filter([=](card *origin_card) {
+                return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
             });
         } else {
             return get_all_active_cards(origin) | ranges::views::filter([=](card *origin_card) {
