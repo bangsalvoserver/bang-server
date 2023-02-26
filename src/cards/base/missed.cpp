@@ -3,6 +3,8 @@
 #include "game/game.h"
 #include "bang.h"
 
+#include "game/possible_to_play.h"
+
 namespace banggame {
     
     bool effect_missed::can_play(card *origin_card, player *origin) {
@@ -14,9 +16,10 @@ namespace banggame {
 
     game_string effect_missed::on_prompt(card *origin_card, player *origin) {
         if (auto req = origin->m_game->top_request<request_bang>(origin)) {
-            if (req->bang_strength > std::ranges::count_if(origin->m_game->make_request_update(origin).respond_cards, [](card *c) {
-                return c->pocket != pocket_type::button_row;
-            })) {
+            if (req->bang_strength > 1 && !contains_at_least(get_all_playable_cards(origin, true)
+                | ranges::views::filter([](card *c) { return c->pocket != pocket_type::button_row; }),
+                req->bang_strength))
+            {
                 return {"PROMPT_BANG_STRENGTH", req->bang_strength};
             }
         }
