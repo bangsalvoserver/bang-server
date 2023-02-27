@@ -62,6 +62,16 @@ namespace banggame {
         return nullptr;
     }
 
+    inline bool is_equip_card(filter_impl::card_ptr target) {
+        switch (filter_impl::get_card_pocket(target)) {
+        case pocket_type::player_hand:
+        case pocket_type::shop_selection:
+            return filter_impl::get_card_color(target) != card_color_type::brown;
+        default:
+            return false;
+        }
+    }
+
     inline bool is_bangcard(filter_impl::player_ptr origin, filter_impl::card_ptr target) {
         return filter_impl::check_game_flags(origin, game_flags::treat_any_as_bang)
             || filter_impl::get_card_tag(target, tag_type::bangcard).has_value()

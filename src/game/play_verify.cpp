@@ -364,7 +364,7 @@ namespace banggame {
 
         effect_context ctx;
 
-        if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
+        if (is_equip_card(origin_card)) {
             if (is_response) {
                 return "ERROR_INVALID_RESPONSE_CARD";
             }

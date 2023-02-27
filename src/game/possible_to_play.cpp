@@ -141,7 +141,7 @@ namespace banggame {
             if (mod_card->modifier.get_error(mod_card, origin, origin_card, ctx)) return false;
         }
 
-        if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
+        if (is_equip_card(origin_card)) {
             return !is_response
                 && contains_at_least(make_equip_set(origin, origin_card), 1)
                 && origin->m_gold >= get_card_cost(origin_card, is_response, ctx);

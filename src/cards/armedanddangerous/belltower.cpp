@@ -1,13 +1,12 @@
 #include "belltower.h"
 
 #include "game/game.h"
-
-#include "cards/filter_enums.h"
+#include "game/filters.h"
 
 namespace banggame {
 
     game_string modifier_belltower::get_error(card *origin_card, player *origin, card *playing_card) {
-        if ((playing_card->pocket == pocket_type::player_hand || playing_card->pocket == pocket_type::shop_selection) && !playing_card->is_brown()) {
+        if (is_equip_card(playing_card)) {
             return {"ERROR_CANNOT_PLAY_WHILE_EQUIPPING", origin_card};
         } else if (!playing_card->is_modifier() && std::ranges::none_of(playing_card->get_effect_list(origin->m_game->pending_requests()),
             [](const effect_holder &holder) {

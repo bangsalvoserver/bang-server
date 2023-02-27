@@ -99,7 +99,7 @@ namespace banggame {
 
         card *playing_card = nullptr;
         while (!playing_card) {
-            if (!is_response && (origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
+            if (!is_response && is_equip_card(origin_card)) {
                 playing_card = origin_card;
                 if (!origin_card->self_equippable()) {
                     ret.targets.emplace_back(enums::enum_tag<target_type::player>,
