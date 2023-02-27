@@ -166,6 +166,7 @@ namespace banggame {
 
     struct effect_context {
         card *shopchoice = nullptr;
+        player *skipped_player = nullptr;
         int8_t discount = 0;
         bool ignore_distances = false;
         bool disable_banglimit = false;

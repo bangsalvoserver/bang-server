@@ -67,14 +67,15 @@ namespace banggame {
             }
             MAYBE_RETURN(origin->get_play_card_error(mod_card));
 
-            MAYBE_RETURN(mod_card->modifier.get_error(mod_card, origin, origin_card));
+            mod_card->modifier.add_context(mod_card, origin, ctx);
+            
+            MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
+
+            MAYBE_RETURN(mod_card->modifier.get_error(mod_card, origin, origin_card, ctx));
             for (size_t j=0; j<i; ++j) {
                 card *mod_card_before = modifiers[j].card;
-                MAYBE_RETURN(mod_card_before->modifier.get_error(mod_card_before, origin, mod_card));
+                MAYBE_RETURN(mod_card_before->modifier.get_error(mod_card_before, origin, mod_card, ctx));
             }
-
-            mod_card->modifier.add_context(mod_card, origin, ctx);
-            MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
         }
         return {};
     }
@@ -221,7 +222,7 @@ namespace banggame {
         };
 
         for (const auto &[mod_card, mod_targets] : modifiers) {
-            MAYBE_RETURN(mod_card->modifier.on_prompt(mod_card, origin, origin_card));
+            MAYBE_RETURN(mod_card->modifier.on_prompt(mod_card, origin, origin_card, ctx));
             MAYBE_RETURN(check(mod_card, mod_targets));
         }
 

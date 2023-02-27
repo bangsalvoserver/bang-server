@@ -11,6 +11,7 @@
 #include "most_wanted.h"
 #include "refund.h"
 #include "shade_oconnor.h"
+#include "skip_player.h"
 #include "strongbox.h"
 #include "switch_cards.h"
 

@@ -138,7 +138,7 @@ namespace banggame {
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
         for (card *mod_card : modifiers) {
             if (mod_card == origin_card) return false;
-            if (mod_card->modifier.get_error(mod_card, origin, origin_card)) return false;
+            if (mod_card->modifier.get_error(mod_card, origin, origin_card, ctx)) return false;
         }
 
         if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {

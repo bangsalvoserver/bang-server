@@ -241,7 +241,7 @@ namespace banggame {
         (discount,              modifier_discount)
         (leevankliff,           modifier_leevankliff)
         (moneybag,              modifier_moneybag)
-        (skip_player)
+        (skip_player,           modifier_skip_player)
         (trainchoice)
         (traincost)
         (locomotive)

@@ -252,7 +252,7 @@ namespace banggame {
         }, type);
     }
 
-    game_string modifier_holder::get_error(card *origin_card, player *origin, card *target_card) const {
+    game_string modifier_holder::get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx) const {
         return enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;
@@ -266,7 +266,9 @@ namespace banggame {
                         return "ERROR_NOT_ALLOWED_WITH_CARD";
                     }
                 }
-                if constexpr (requires { handler.get_error(origin_card, origin, target_card); }) {
+                if constexpr (requires { handler.get_error(origin_card, origin, target_card, ctx); }) {
+                    return handler.get_error(origin_card, origin, target_card, ctx);
+                } else if constexpr (requires { handler.get_error(origin_card, origin, target_card); }) {
                     return handler.get_error(origin_card, origin, target_card);
                 }
             }
@@ -274,11 +276,13 @@ namespace banggame {
         }, type);
     }
 
-    game_string modifier_holder::on_prompt(card *origin_card, player *origin, card *playing_card) const {
+    game_string modifier_holder::on_prompt(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) const {
         return enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;
-                if constexpr (requires { handler.on_prompt(origin_card, origin, playing_card); }) {
+                if constexpr (requires { handler.on_prompt(origin_card, origin, playing_card, ctx); }) {
+                    return handler.on_prompt(origin_card, origin, playing_card);
+                } else if constexpr (requires { handler.on_prompt(origin_card, origin, playing_card); }) {
                     return handler.on_prompt(origin_card, origin, playing_card);
                 }
             }
