@@ -4,6 +4,7 @@
 #include "cactus.h"
 #include "dragoon.h"
 #include "evaded.h"
+#include "evan_babbit.h"
 #include "knife_revolver.h"
 #include "map.h"
 #include "moneybag.h"

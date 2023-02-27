@@ -228,7 +228,7 @@ namespace banggame {
         (red_ringo,             handler_red_ringo)
         (lastwill,              handler_lastwill)
         (switch_cards,          handler_switch_cards)
-        (evan_babbit)
+        (evan_babbit,           handler_evan_babbit)
     )
 
     DEFINE_ENUM_FWD_TYPES(modifier_type,

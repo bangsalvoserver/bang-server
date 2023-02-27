@@ -165,6 +165,7 @@ set(bangserver_srcs
     src/cards/greattrainrobbery/cactus.cpp
     src/cards/greattrainrobbery/dragoon.cpp
     src/cards/greattrainrobbery/evaded.cpp
+    src/cards/greattrainrobbery/evan_babbit.cpp
     src/cards/greattrainrobbery/knife_revolver.cpp
     src/cards/greattrainrobbery/map.cpp
     src/cards/greattrainrobbery/most_wanted.cpp
