@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_most_wanted {
-        void on_play(card *origin_card, player *origin, player *target);
+        void on_play(card *origin_card, player *origin, player *target, effect_flags flags);
     };
 }
 
