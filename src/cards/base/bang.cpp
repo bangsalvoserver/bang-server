@@ -40,7 +40,10 @@ namespace banggame {
         return {};
     }
 
-    void effect_banglimit::on_play(card *origin_card, player *origin) {
+    void effect_banglimit::on_play(card *origin_card, player *origin, const effect_context &ctx) {
+        if (ctx.disable_banglimit) {
+            return;
+        }
         event_card_key key{origin_card, 4};
         origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](player *p, int &value) {
             if (origin == p) {

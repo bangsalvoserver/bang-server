@@ -27,7 +27,7 @@ namespace banggame {
 
     struct effect_banglimit {
         game_string get_error(card *origin_card, player *origin, const effect_context &ctx);
-        void on_play(card *origin_card, player *origin);
+        void on_play(card *origin_card, player *origin, const effect_context &ctx);
     };
 
     struct modifier_bangmod {

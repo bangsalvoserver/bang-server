@@ -864,7 +864,6 @@ main_deck:
     effects:
       - max_usages(1)
       - pay_cube self_cubes(1)
-      - bandolier
   - name: BIG_FIFTY
     signs:
       - Q spades

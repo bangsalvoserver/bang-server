@@ -61,7 +61,6 @@ namespace banggame {
         (thunderer,             effect_thunderer)
         (buntlinespecial,       effect_buntlinespecial)
         (bigfifty,              effect_bigfifty)
-        (bandolier,             effect_bandolier)
         (move_bomb,             effect_move_bomb)
         (tumbleweed,            effect_tumbleweed)
         (sniper,                effect_sniper)
