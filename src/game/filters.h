@@ -20,6 +20,8 @@ namespace banggame {
         player_role get_player_role(player_ptr origin);
         int get_player_range_mod(player_ptr origin);
         int get_player_weapon_range(player_ptr origin);
+        int count_player_hand_cards(player_ptr origin);
+        int count_player_cubes(player_ptr origin);
         int get_distance(player_ptr origin, player_ptr target);
         card_sign get_card_sign(player_ptr origin, card_ptr target);
         card_color_type get_card_color(card_ptr target);
@@ -44,6 +46,12 @@ namespace banggame {
 
         if (bool(filter & target_player_filter::notsheriff) && filter_impl::get_player_role(target) == player_role::sheriff)
             return "ERROR_TARGET_SHERIFF";
+
+        if (bool(filter & target_player_filter::not_empty_hand) && filter_impl::count_player_hand_cards(target) == 0)
+            return "ERROR_TARGET_EMPTY_HAND";
+
+        if (bool(filter & target_player_filter::not_empty_cubes) && filter_impl::count_player_cubes(target) == 0)
+            return "ERROR_TARGET_EMPTY_CUBES";
 
         if (!ctx.ignore_distances && bool(filter & (target_player_filter::reachable | target_player_filter::range_1 | target_player_filter::range_2))) {
             int range = filter_impl::get_player_range_mod(origin);

@@ -113,7 +113,6 @@ set(bangserver_srcs
     src/cards/valleyofshadows/henry_block.cpp
     src/cards/valleyofshadows/lemonade_jim.cpp
     src/cards/valleyofshadows/mick_defender.cpp
-    src/cards/valleyofshadows/play_as_gatling.cpp
     src/cards/valleyofshadows/poker.cpp
     src/cards/valleyofshadows/ruleset.cpp
     src/cards/valleyofshadows/saved.cpp

@@ -198,7 +198,6 @@ namespace banggame {
         (map,                   equip_map)
         (refund,                equip_refund)
         (strongbox,             equip_strongbox)
-        (water_tower)
         (benny_brawler)
         (manuelita)
         (shade_oconnor,         equip_shade_oconnor)
@@ -215,7 +214,6 @@ namespace banggame {
     DEFINE_ENUM_FWD_TYPES(mth_type,
         (none)
         (play_as_bang,          handler_play_as_bang)
-        (play_as_gatling,       handler_play_as_gatling)
         (fanning,               handler_fanning)
         (doc_holyday,           handler_doc_holyday)
         (flint_westwood,        handler_flint_westwood)

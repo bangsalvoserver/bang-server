@@ -17,7 +17,10 @@ namespace banggame {
     };
 
     struct effect_generalstore {
-        void on_play(card *origin_card, player *origin);
+        int step;
+        effect_generalstore(int step) : step(step) {}
+        
+        void on_play(card *origin_card, player *origin, player *target);
     };
 }
 

@@ -87,12 +87,19 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::players>::prompt(const effect_context &ctx) {
-        game_string msg;
+        std::vector<player *> targets;
         for (player *target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !check_player_filter(origin, effect.player_filter, target, ctx)) {
-                msg = effect.on_prompt(origin_card, origin, target, ctx);
-                if (!msg) break;
+                targets.push_back(target);
             }
+        }
+        if (targets.empty()) {
+            return {"PROMPT_CARD_NO_EFFECT", origin_card};
+        }
+        game_string msg;
+        for (player *target : targets) {
+            msg = effect.on_prompt(origin_card, origin, target, ctx);
+            if (!msg) break;
         }
         return msg;
     }

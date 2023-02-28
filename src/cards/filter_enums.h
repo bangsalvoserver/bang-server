@@ -14,6 +14,8 @@ namespace banggame {
         (range_1)
         (range_2)
         (reachable)
+        (not_empty_hand)
+        (not_empty_cubes)
     )
 
     DEFINE_ENUM_FLAGS(target_card_filter,
