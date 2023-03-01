@@ -26,6 +26,8 @@ namespace banggame {
 
     void modifier_moneybag::add_context(card *origin_card, player *origin, effect_context &ctx) {
         ctx.disable_banglimit = true;
-        ctx.repeating = true;
+        if (!origin->m_game->m_discards.empty()) {
+            ctx.repeat_card = origin->m_game->m_discards.back();
+        }
     }
 }

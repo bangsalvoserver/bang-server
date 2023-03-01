@@ -161,7 +161,7 @@ namespace banggame {
 
     template<> game_string play_visitor<target_type::extra_card>::get_error(const effect_context &ctx, card *target) {
         if (!target) {
-            if (ctx.repeating) {
+            if (ctx.repeat_card) {
                 return {};
             } else {
                 return "ERROR_TARGET_SET_NOT_EMPTY";

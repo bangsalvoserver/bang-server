@@ -1054,7 +1054,7 @@ main_deck:
     expansion: greattrainrobbery
     color: brown
     effects:
-      - discard
+      - none
     modifier: moneybag
   - name: MOST_WANTED
     signs:

@@ -41,7 +41,7 @@ namespace banggame {
         }
 
         card *operator()(enums::enum_tag_t<target_type::extra_card> tag) const {
-            if (ctx.repeating) {
+            if (ctx.repeat_card) {
                 return nullptr;
             } else {
                 auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));

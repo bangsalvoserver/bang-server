@@ -30,6 +30,6 @@ namespace banggame {
 
     void modifier_leevankliff::add_context(card *origin_card, player *origin, effect_context &ctx) {
         ctx.disable_banglimit = true;
-        ctx.repeating = true;
+        ctx.repeat_card = origin->get_last_played_card();
     }
 }

@@ -104,7 +104,7 @@ namespace banggame {
             case target_type::card:
                 return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::extra_card:
-                return ctx.repeating || contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
+                return ctx.repeat_card || contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::cards:
                 return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), std::max<int>(1, holder.target_value));
             case target_type::select_cubes:
@@ -118,20 +118,13 @@ namespace banggame {
     }
 
     ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
-        if (ctx.repeating) {
-            return ranges::views::concat(
-                ranges::views::single(origin->get_last_played_card())
-                    | ranges::views::filter([](card *origin_card) { return origin_card != nullptr; }),
-                origin->m_game->m_discards
-                    | ranges::views::take_last(1)
-            )
-            | ranges::views::filter([=](card *origin_card) {
-                return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
-            });
+        auto filter = ranges::views::filter([=](card *origin_card) {
+            return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
+        });
+        if (ctx.repeat_card) {
+            return ranges::views::single(ctx.repeat_card) | filter;
         } else {
-            return get_all_active_cards(origin) | ranges::views::filter([=](card *origin_card) {
-                return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
-            });
+            return get_all_active_cards(origin) | filter;
         }
     }
 

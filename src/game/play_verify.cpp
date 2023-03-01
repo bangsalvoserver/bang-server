@@ -180,29 +180,28 @@ namespace banggame {
         MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
         MAYBE_RETURN(verify_duplicates(origin, origin_card, is_response, targets, modifiers));
 
-        switch (origin_card->pocket) {
-        case pocket_type::player_hand:
-        case pocket_type::player_table:
-        case pocket_type::player_character:
-        case pocket_type::button_row:
-        case pocket_type::shop_selection:
-        case pocket_type::hidden_deck:
-            break;
-        case pocket_type::scenario_card:
-            if (origin_card != origin->m_game->m_scenario_cards.back()) {
-                return "ERROR_INVALID_SCENARIO_CARD";
-            }
-            break;
-        case pocket_type::wws_scenario_card:
-            if (origin_card != origin->m_game->m_wws_scenario_cards.back()) {
-                return "ERROR_INVALID_SCENARIO_CARD";
-            }
-            break;
-        default:
-            if (!ctx.repeating) {
+        if (ctx.repeat_card != origin_card) {
+            switch (origin_card->pocket) {
+            case pocket_type::player_hand:
+            case pocket_type::player_table:
+            case pocket_type::player_character:
+            case pocket_type::button_row:
+            case pocket_type::shop_selection:
+            case pocket_type::hidden_deck:
+                break;
+            case pocket_type::scenario_card:
+                if (origin_card != origin->m_game->m_scenario_cards.back()) {
+                    return "ERROR_INVALID_SCENARIO_CARD";
+                }
+                break;
+            case pocket_type::wws_scenario_card:
+                if (origin_card != origin->m_game->m_wws_scenario_cards.back()) {
+                    return "ERROR_INVALID_SCENARIO_CARD";
+                }
+                break;
+            default:
                 return "ERROR_INVALID_CARD_POCKET";
             }
-            break;
         }
 
         return {};
@@ -294,7 +293,7 @@ namespace banggame {
             origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, false);
         }
 
-        if (!ctx.repeating && !origin_card->has_tag(tag_type::no_auto_discard)) {
+        if (origin_card != ctx.repeat_card && !origin_card->has_tag(tag_type::no_auto_discard)) {
             switch (origin_card->pocket) {
             case pocket_type::player_hand:
                 origin->discard_card(origin_card);
