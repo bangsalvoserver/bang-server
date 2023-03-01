@@ -88,6 +88,17 @@ namespace banggame {
             && filter_impl::get_card_tag(target, tag_type::missed).has_value();
     }
 
+    inline int get_card_cost(filter_impl::card_ptr target, bool is_response, const effect_context &ctx) {
+        if (!is_response && !ctx.repeating && filter_impl::get_card_pocket(target) != pocket_type::player_table) {
+            if (ctx.shopchoice) {
+                target = ctx.shopchoice;
+            }
+            return filter_impl::get_card_tag(target, tag_type::buy_cost).value_or(0) - ctx.discount;
+        } else {
+            return 0;
+        }
+    }
+
     inline const char *check_card_filter(filter_impl::card_ptr origin_card, filter_impl::player_ptr origin, target_card_filter filter, filter_impl::card_ptr target, const effect_context &ctx = {}) {
         if (!bool(filter & target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";

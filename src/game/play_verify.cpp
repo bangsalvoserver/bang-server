@@ -345,17 +345,6 @@ namespace banggame {
         origin_card->get_mth(is_response).on_play(origin_card, origin, mth_targets, ctx);
     }
 
-    int get_card_cost(card *origin_card, bool is_response, const effect_context &ctx) {
-        if (!is_response && !ctx.repeating && origin_card->pocket != pocket_type::player_table) {
-            if (ctx.shopchoice) {
-                origin_card = ctx.shopchoice;
-            }
-            return origin_card->get_tag_value(tag_type::buy_cost).value_or(0) - ctx.discount;
-        } else {
-            return 0;
-        }
-    }
-
     game_string verify_and_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers) {
         if (origin->m_game->pending_requests()) {
             if (!is_response) {
