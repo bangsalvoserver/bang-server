@@ -1,8 +1,11 @@
 #include "switch_cards.h"
 
-#include "game/game.h"
-#include "game/filters.h"
 #include "cards/base/steal_destroy.h"
+
+#include "cards/game_enums.h"
+#include "cards/filters.h"
+
+#include "game/game.h"
 
 namespace banggame {
 

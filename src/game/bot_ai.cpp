@@ -1,8 +1,9 @@
 #include "game.h"
 #include "play_verify.h"
 #include "possible_to_play.h"
-#include "filters.h"
+
 #include "cards/effect_enums.h"
+#include "cards/filters.h"
 
 namespace banggame {
 

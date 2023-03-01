@@ -146,14 +146,9 @@ namespace banggame {
         (button_row)
     )
 
-    DEFINE_ENUM_FLAGS(effect_flags,
-        (is_bang)
-        (play_as_bang)
-        (escapable)
-        (single_target)
-        (multi_target)
-        (auto_respond)
-    )
+    enum class effect_flags;
+    enum class game_flags;
+    enum class player_flags;
 
     enum class effect_type;
     enum class equip_type;
@@ -163,15 +158,6 @@ namespace banggame {
     enum class target_player_filter;
     enum class target_card_filter;
     enum class tag_type;
-
-    struct effect_context {
-        card *shopchoice = nullptr;
-        player *skipped_player = nullptr;
-        int8_t discount = 0;
-        bool ignore_distances = false;
-        bool disable_banglimit = false;
-        bool repeating = false;
-    };
 
 }
 

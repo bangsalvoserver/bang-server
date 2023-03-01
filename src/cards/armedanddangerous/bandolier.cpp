@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/effect_context.h"
+
 namespace banggame {
 
     game_string modifier_bandolier::on_prompt(card *origin_card, player *origin, card *playing_card) {

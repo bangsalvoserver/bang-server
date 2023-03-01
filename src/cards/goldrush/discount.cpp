@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/effect_context.h"
+
 namespace banggame {
 
     bool modifier_discount::valid_with_card(card *origin_card, player *origin, card *target_card) {

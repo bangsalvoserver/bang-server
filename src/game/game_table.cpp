@@ -1,7 +1,9 @@
 #include "game_table.h"
 
-#include "player_iterator.h"
 #include "cards/filter_enums.h"
+#include "cards/game_enums.h"
+
+#include "player_iterator.h"
 
 namespace banggame {
 
@@ -271,6 +273,14 @@ namespace banggame {
     void game_table::remove_game_flags(game_flags flags) {
         m_game_flags &= ~flags;
         add_update<game_update_type::game_flags>(m_game_flags);
+    }
+
+    bool game_table::check_flags(game_flags flags) const {
+        return bool(m_game_flags & flags);
+    }
+
+    bool game_table::is_game_over() const {
+        return check_flags(game_flags::game_over);
     }
 
 }

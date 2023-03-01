@@ -1,7 +1,9 @@
 #include "peyote.h"
 
-#include "game/game.h"
 #include "cards/filter_enums.h"
+#include "cards/game_enums.h"
+
+#include "game/game.h"
 
 namespace banggame {
 

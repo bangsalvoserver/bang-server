@@ -1,9 +1,10 @@
 #include "game.h"
 
-#include "holders.h"
 #include "game_update.h"
 
+#include "cards/holders.h"
 #include "cards/effect_enums.h"
+#include "cards/game_enums.h"
 
 #include "cards/base/requests.h"
 

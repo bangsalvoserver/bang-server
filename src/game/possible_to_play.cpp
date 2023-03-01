@@ -1,7 +1,7 @@
 #include "possible_to_play.h"
 
 #include "cards/effect_enums.h"
-#include "filters.h"
+#include "cards/filters.h"
 
 namespace banggame {
 

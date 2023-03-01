@@ -1,5 +1,6 @@
 #include "card_serial.h"
-#include "game.h"
+
+#include "game/game.h"
 
 namespace json {
 

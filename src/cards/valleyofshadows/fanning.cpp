@@ -1,9 +1,12 @@
 #include "fanning.h"
 
+#include "cards/base/bang.h"
+
+#include "cards/game_enums.h"
+
 #include "game/game.h"
 #include "game/bot_suggestion.h"
 
-#include "cards/base/bang.h"
 
 namespace banggame {
 

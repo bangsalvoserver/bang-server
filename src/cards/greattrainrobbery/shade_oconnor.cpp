@@ -1,5 +1,7 @@
 #include "shade_oconnor.h"
 
+#include "cards/game_enums.h"
+
 #include "game/game.h"
 
 namespace banggame {

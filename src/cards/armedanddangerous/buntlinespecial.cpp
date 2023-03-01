@@ -1,8 +1,11 @@
 #include "buntlinespecial.h"
 
-#include "game/game.h"
 #include "cards/base/bang.h"
 #include "cards/base/requests.h"
+
+#include "cards/game_enums.h"
+
+#include "game/game.h"
 
 namespace banggame {
 

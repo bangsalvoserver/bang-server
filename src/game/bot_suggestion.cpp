@@ -2,6 +2,7 @@
 #include "game.h"
 
 #include "cards/filter_enums.h"
+#include "cards/game_enums.h"
 
 namespace banggame::bot_suggestion {
 

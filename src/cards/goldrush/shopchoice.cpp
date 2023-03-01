@@ -1,7 +1,9 @@
 #include "shopchoice.h"
 
-#include "game/game.h"
 #include "cards/filter_enums.h"
+#include "cards/effect_context.h"
+
+#include "game/game.h"
 
 namespace banggame {
 

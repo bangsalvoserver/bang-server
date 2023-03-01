@@ -2,11 +2,11 @@
 
 #include <stdexcept>
 
-#include "cards/effects.h"
-#include "cards/effect_enums.h"
-
-#include "game.h"
+#include "effects.h"
+#include "effect_enums.h"
 #include "mth_unwrapper.h"
+
+#include "game/game.h"
 
 namespace banggame {
 

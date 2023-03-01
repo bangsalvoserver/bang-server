@@ -2,6 +2,8 @@
 
 #include "cards/base/draw.h"
 
+#include "cards/game_enums.h"
+
 #include "game/game.h"
 
 namespace banggame {

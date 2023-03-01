@@ -1,9 +1,10 @@
 #ifndef __FILTERS_H__
 #define __FILTERS_H__
 
-#include "game_update.h"
-
-#include "cards/filter_enums.h"
+#include "card_data.h"
+#include "effect_context.h"
+#include "filter_enums.h"
+#include "game_enums.h"
 
 namespace banggame {
 

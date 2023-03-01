@@ -1,7 +1,8 @@
 #ifndef __CARD_EFFECT_H__
 #define __CARD_EFFECT_H__
 
-#include "game/card_enums.h"
+#include "card_enums.h"
+
 #include "game/game_string.h"
 
 #include "net/options.h"
@@ -93,6 +94,8 @@ namespace banggame {
     struct resolvable_request {
         virtual void on_resolve() = 0;
     };
+
+    struct effect_context;
 
 }
 

@@ -144,18 +144,9 @@ namespace banggame {
 
         game_string get_play_card_error(card *card);
 
-        bool is_bot() const {
-            return user_id < 0;
-        }
-
-        bool is_ghost() const {
-            return check_player_flags(player_flags::ghost)
-                || check_player_flags(player_flags::temp_ghost);
-        }
-
-        bool alive() const {
-            return !check_player_flags(player_flags::dead) || is_ghost();
-        }
+        bool is_bot() const;
+        bool is_ghost() const;
+        bool alive() const;
 
         void damage(card *origin_card, player *source, int value, effect_flags flags = {});
 

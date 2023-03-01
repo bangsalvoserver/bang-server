@@ -1,7 +1,8 @@
 #include "duel.h"
 
+#include "cards/filters.h"
+
 #include "game/game.h"
-#include "game/filters.h"
 
 namespace banggame {
 

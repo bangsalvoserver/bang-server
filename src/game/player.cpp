@@ -2,9 +2,11 @@
 
 #include "game.h"
 
-#include "holders.h"
 #include "play_verify.h"
 #include "game_update.h"
+
+#include "cards/holders.h"
+#include "cards/game_enums.h"
 
 #include "cards/base/damage.h"
 #include "cards/base/draw.h"
@@ -17,6 +19,19 @@
 #include <numeric>
 
 namespace banggame {
+
+    bool player::is_bot() const {
+        return user_id < 0;
+    }
+
+    bool player::is_ghost() const {
+        return check_player_flags(player_flags::ghost)
+            || check_player_flags(player_flags::temp_ghost);
+    }
+
+    bool player::alive() const {
+        return !check_player_flags(player_flags::dead) || is_ghost();
+    }
 
     void player::equip_card(card *target) {
         m_game->move_card(target, pocket_type::player_table, this, card_visibility::shown);

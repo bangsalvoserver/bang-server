@@ -1,6 +1,6 @@
 #include "filters.h"
 
-#include "game.h"
+#include "game/game.h"
 
 namespace banggame::filter_impl {
 

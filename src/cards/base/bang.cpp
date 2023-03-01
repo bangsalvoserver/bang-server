@@ -2,6 +2,9 @@
 
 #include "cards/effects.h"
 #include "cards/effect_enums.h"
+#include "cards/effect_context.h"
+#include "cards/game_enums.h"
+
 #include "game/game.h"
 #include "damage.h"
 

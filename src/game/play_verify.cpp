@@ -2,10 +2,13 @@
 
 #include "play_visitor.h"
 
+#include "cards/effect_list_zip.h"
+#include "cards/effect_context.h"
 #include "cards/effect_enums.h"
+#include "cards/game_enums.h"
+#include "cards/filters.h"
 
 #include "cards/base/requests.h"
-#include "effect_list_zip.h"
 
 #include "utils/raii_editor.h"
 #include "utils/utils.h"

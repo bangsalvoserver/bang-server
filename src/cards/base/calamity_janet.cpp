@@ -1,5 +1,7 @@
 #include "calamity_janet.h"
 
+#include "cards/game_enums.h"
+
 #include "game/game.h"
 
 namespace banggame {

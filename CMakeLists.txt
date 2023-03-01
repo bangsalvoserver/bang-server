@@ -188,14 +188,14 @@ set(bangserver_srcs
     src/cards/canyondiablo/taxman.cpp
 
     src/cards/card_effect.cpp
+    src/cards/card_serial.cpp
+    src/cards/filters.cpp
+    src/cards/holders.cpp
 
     src/game/bot_ai.cpp
     src/game/bot_suggestion.cpp
-    src/game/card_serial.cpp
     src/game/discard_all.cpp
     src/game/durations.cpp
-    src/game/filters.cpp
-    src/game/holders.cpp
     src/game/game.cpp
     src/game/game_table.cpp
     src/game/draw_check_handler.cpp

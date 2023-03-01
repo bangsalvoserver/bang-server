@@ -1,5 +1,7 @@
 #include "changewws.h"
 
+#include "cards/effect_context.h"
+
 #include "game/game.h"
 
 namespace banggame {

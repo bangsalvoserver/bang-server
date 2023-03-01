@@ -1,5 +1,6 @@
 #include "damage.h"
 
+#include "cards/game_enums.h"
 #include "game/game.h"
 #include "deathsave.h"
 

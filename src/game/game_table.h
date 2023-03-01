@@ -81,9 +81,9 @@ namespace banggame {
         void add_game_flags(game_flags flags);
         void remove_game_flags(game_flags flags);
     
-        bool check_flags(game_flags type) const {
-            return bool(m_game_flags & type);
-        }
+        bool check_flags(game_flags type) const;
+
+        bool is_game_over() const;
     };
 
 }
