@@ -35,7 +35,7 @@ namespace banggame {
     ranges::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
         return origin->m_game->m_players
             | ranges::views::filter([=](player *target) {
-                return !check_player_filter(origin, holder.player_filter, target, ctx)
+                return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
                     && !holder.get_error(origin_card, origin, target, ctx);
             });
     }
@@ -50,7 +50,7 @@ namespace banggame {
                 );
             })
             | ranges::views::filter([=](card *target_card) {
-                return !check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
+                return !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
                     && !holder.get_error(origin_card, origin, target_card, ctx);
             });
     }
@@ -141,10 +141,10 @@ namespace banggame {
             if (mod_card->modifier.get_error(mod_card, origin, origin_card, ctx)) return false;
         }
 
-        if (is_equip_card(origin_card)) {
+        if (filters::is_equip_card(origin_card)) {
             return !is_response
                 && contains_at_least(make_equip_set(origin, origin_card), 1)
-                && origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
+                && origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
         }
         
         if (origin->get_play_card_error(origin_card)
@@ -161,7 +161,7 @@ namespace banggame {
             
             return contains_at_least(cards_playable_with_modifiers(origin, vector_concat(modifiers, origin_card), is_response, ctx_copy), 1);
         } else {
-            return origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
+            return origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
         }
     }
 }

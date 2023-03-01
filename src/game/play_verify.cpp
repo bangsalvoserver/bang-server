@@ -139,7 +139,7 @@ namespace banggame {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
         } else {
-            MAYBE_RETURN(check_player_filter(origin, origin_card->equip_target, target));
+            MAYBE_RETURN(filters::check_player_filter(origin, origin_card->equip_target, target));
         }
         if (card *equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};
@@ -356,7 +356,7 @@ namespace banggame {
 
         effect_context ctx;
 
-        if (is_equip_card(origin_card)) {
+        if (filters::is_equip_card(origin_card)) {
             if (is_response) {
                 return "ERROR_INVALID_RESPONSE_CARD";
             }
@@ -364,7 +364,7 @@ namespace banggame {
             MAYBE_RETURN(verify_equip_target(origin, origin_card, targets));
             MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
 
-            int cost = get_card_cost(origin_card, is_response, ctx);
+            int cost = filters::get_card_cost(origin_card, is_response, ctx);
             if (origin->m_gold < cost) {
                 return "ERROR_NOT_ENOUGH_GOLD";
             }
@@ -403,7 +403,7 @@ namespace banggame {
         } else {
             MAYBE_RETURN(verify_card_targets(origin, origin_card, is_response, targets, modifiers, ctx));
 
-            int cost = get_card_cost(origin_card, is_response, ctx);
+            int cost = filters::get_card_cost(origin_card, is_response, ctx);
             if (origin->m_gold < cost) {
                 return "ERROR_NOT_ENOUGH_GOLD";
             }

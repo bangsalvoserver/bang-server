@@ -24,7 +24,7 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::player>::get_error(const effect_context &ctx, player *target) {
-        MAYBE_RETURN(check_player_filter(origin, effect.player_filter, target, ctx));
+        MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target, ctx));
         return effect.get_error(origin_card, origin, target, ctx);
     }
 
@@ -78,7 +78,7 @@ namespace banggame {
 
     template<> game_string play_visitor<target_type::players>::get_error(const effect_context &ctx) {
         for (player *target : range_all_players(origin)) {
-            if (target != ctx.skipped_player && !check_player_filter(origin, effect.player_filter, target, ctx)) {
+            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
             }
         }
@@ -92,7 +92,7 @@ namespace banggame {
     template<> game_string play_visitor<target_type::players>::prompt(const effect_context &ctx) {
         std::vector<player *> targets;
         for (player *target : range_all_players(origin)) {
-            if (target != ctx.skipped_player && !check_player_filter(origin, effect.player_filter, target, ctx)) {
+            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 targets.push_back(target);
             }
         }
@@ -110,7 +110,7 @@ namespace banggame {
     template<> void play_visitor<target_type::players>::play(const effect_context &ctx) {
         std::vector<player *> targets;
         for (player *target : range_all_players(origin)) {
-            if (target != ctx.skipped_player && !check_player_filter(origin, effect.player_filter, target, ctx)) {
+            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 targets.push_back(target);
             }
         }
@@ -130,8 +130,8 @@ namespace banggame {
 
     template<> game_string play_visitor<target_type::card>::get_error(const effect_context &ctx, card *target) {
         if (!target->owner) return "ERROR_CARD_HAS_NO_OWNER";
-        MAYBE_RETURN(check_player_filter(origin, effect.player_filter, target->owner, ctx));
-        MAYBE_RETURN(check_card_filter(origin_card, origin, effect.card_filter, target, ctx));
+        MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target->owner, ctx));
+        MAYBE_RETURN(filters::check_card_filter(origin_card, origin, effect.card_filter, target, ctx));
         return effect.get_error(origin_card, origin, target, ctx);
     }
 

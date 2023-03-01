@@ -51,11 +51,11 @@ namespace banggame {
 
     game_string handler_switch_cards::get_error(card *origin_card, player *origin, card *chosen_card, card *target_card) {
         player *target = target_card->owner;
-        MAYBE_RETURN(check_player_filter(origin, target_card->equip_target, origin));
+        MAYBE_RETURN(filters::check_player_filter(origin, target_card->equip_target, origin));
         if (auto *c = origin->find_equipped_card(target_card)) {
             return {"ERROR_DUPLICATED_CARD", c};
         }
-        MAYBE_RETURN(check_player_filter(target, chosen_card->equip_target, target));
+        MAYBE_RETURN(filters::check_player_filter(target, chosen_card->equip_target, target));
         if (auto *c = target->find_equipped_card(chosen_card)) {
             return {"ERROR_DUPLICATED_CARD", c};
         }
