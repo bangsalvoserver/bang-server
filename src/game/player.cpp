@@ -106,7 +106,9 @@ namespace banggame {
 
     void player::discard_card(card *target) {
         move_owned_card(this, target, [&]{
-            if (target->is_black()) {
+            if (target->is_train()) {
+                m_game->discard_train_card(target);
+            } else if (target->is_black()) {
                 m_game->move_card(target, pocket_type::shop_discard);
             } else {
                 m_game->move_card(target, pocket_type::discard_pile);
@@ -202,8 +204,12 @@ namespace banggame {
     }
 
     void player::add_to_hand(card *target) {
-        m_game->move_card(target, pocket_type::player_hand, this, m_game->check_flags(game_flags::hands_shown)
-            ? card_visibility::shown : card_visibility::show_owner);
+        if (target->deck == card_deck_type::train) {
+            equip_card(target);
+        } else {
+            m_game->move_card(target, pocket_type::player_hand, this, m_game->check_flags(game_flags::hands_shown)
+                ? card_visibility::shown : card_visibility::show_owner);
+        }
     }
 
     void player::add_to_hand_phase_one(card *drawn_card) {

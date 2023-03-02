@@ -59,6 +59,15 @@ namespace banggame {
         }
     )
 
+    DEFINE_STRUCT(move_train_update,
+        (int, position)
+        (bool, instant),
+        
+        auto get_duration() const {
+            return instant ? 0ms : durations::move_train;
+        }
+    )
+
     DEFINE_STRUCT(deck_shuffled_update,
         (pocket_type, pocket),
 
@@ -203,6 +212,7 @@ namespace banggame {
         (add_cubes, add_cubes_update)
         (move_cubes, move_cubes_update)
         (move_scenario_deck, move_scenario_deck_update)
+        (move_train, move_train_update)
         (deck_shuffled, deck_shuffled_update)
         (show_card, show_card_update)
         (hide_card, hide_card_update)

@@ -188,6 +188,8 @@ namespace banggame {
             case pocket_type::button_row:
             case pocket_type::shop_selection:
             case pocket_type::hidden_deck:
+            case pocket_type::stations:
+            case pocket_type::train:
                 break;
             case pocket_type::scenario_card:
                 if (origin_card != origin->m_game->m_scenario_cards.back()) {

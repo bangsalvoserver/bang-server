@@ -13,6 +13,8 @@ namespace banggame {
             origin->m_game->m_button_row,
             origin->m_game->m_hidden_deck,
             origin->m_game->m_shop_selection,
+            origin->m_game->m_stations,
+            origin->m_game->m_train,
             origin->m_game->m_scenario_cards | ranges::views::take_last(1),
             origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
         );

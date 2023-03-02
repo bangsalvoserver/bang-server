@@ -17,6 +17,7 @@ namespace banggame::durations {
     extern duration_type short_pause;
     extern duration_type move_player;
     extern duration_type player_hp;
+    extern duration_type move_train;
 
 }
 

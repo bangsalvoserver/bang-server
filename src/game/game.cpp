@@ -61,6 +61,14 @@ namespace banggame {
         co_await move_cards(m_shop_selection);
         co_await move_cards(m_hidden_deck);
 
+        co_await move_cards(m_stations);
+        co_await move_cards(m_train_deck);
+        co_await move_cards(m_train);
+
+        if (train_position != 0) {
+            co_yield make_update<game_update_type::move_train>(train_position, true);
+        }
+
         if (m_scenario_holder) {
             co_yield make_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
         }

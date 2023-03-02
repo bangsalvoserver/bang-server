@@ -76,6 +76,8 @@ namespace banggame::filters {
         case pocket_type::player_hand:
         case pocket_type::shop_selection:
             return detail::get_card_color(target) != card_color_type::brown;
+        case pocket_type::train:
+            return !detail::get_card_tag(target, tag_type::locomotive).has_value();
         default:
             return false;
         }

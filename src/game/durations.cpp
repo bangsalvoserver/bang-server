@@ -14,5 +14,6 @@ namespace banggame::durations {
     duration_type short_pause =     333ms;
     duration_type move_player =     1000ms;
     duration_type player_hp =       333ms;
+    duration_type move_train =      500ms;
 
 }

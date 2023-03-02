@@ -32,6 +32,9 @@ namespace banggame {
         case pocket_type::wws_scenario_deck: return m_wws_scenario_deck;
         case pocket_type::wws_scenario_card: return m_wws_scenario_cards;
         case pocket_type::button_row:        return m_button_row;
+        case pocket_type::stations:          return m_stations;
+        case pocket_type::train:             return m_train;
+        case pocket_type::train_deck:        return m_train_deck;
         default: throw std::runtime_error("Invalid pocket");
         }
     }
@@ -116,6 +119,14 @@ namespace banggame {
         c->owner = owner;
         
         add_update<game_update_type::move_card>(c, owner, pocket, instant);
+    }
+
+    void game_table::discard_train_card(card *c) {
+        if (m_train.size() < 4) {
+            move_card(c, pocket_type::train);
+        } else {
+            move_card(c, pocket_type::train_deck, nullptr, card_visibility::hidden);
+        }
     }
 
     card *game_table::top_of_deck() {

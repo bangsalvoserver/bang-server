@@ -144,6 +144,9 @@ namespace banggame {
         (wws_scenario_deck)
         (wws_scenario_card)
         (button_row)
+        (stations)
+        (train_deck)
+        (train)
     )
 
     enum class effect_flags;
