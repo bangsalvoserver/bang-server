@@ -14,7 +14,9 @@ namespace banggame {
     }
 
     void equip_suzy_lafayette::on_enable(card *origin_card, player *origin) {
-        check_empty_hand(origin_card, origin);
+        if (origin->m_game->m_playing) {
+            check_empty_hand(origin_card, origin);
+        }
 
         origin->m_game->add_listener<event_type::on_use_hand_card>(origin_card, [=](player *target, card *target_card, bool automatic) {
             if (origin == target) {
