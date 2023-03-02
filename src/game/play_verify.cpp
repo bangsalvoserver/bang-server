@@ -144,9 +144,6 @@ namespace banggame {
         if (card *equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};
         }
-        if (origin_card->is_orange() && origin->m_game->num_cubes < 3) {
-            return "ERROR_NOT_ENOUGH_CUBES";
-        }
         return {};
     }
 
