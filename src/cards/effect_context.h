@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_context {
-        serial::opt_card shopchoice = nullptr;
+        serial::opt_card card_choice = nullptr;
         serial::opt_player skipped_player = nullptr;
         serial::opt_card repeat_card = nullptr;
         serial::opt_card traincost = nullptr;

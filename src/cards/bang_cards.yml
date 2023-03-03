@@ -2153,49 +2153,49 @@ goldrush:
     name: BOTTLE
     image: 04_bottiglia
     color: brown
-    modifier: shopchoice
+    modifier: card_choice
     effects:
       - none
     responses:
       - forced_play
     tags:
-      - shopchoice(1)
+      - card_choice(1)
       - buy_cost(2)
   - name: BOTTLE_PANIC
     image: 04_bottiglia_panico
     color: brown
     effects:
-      - shopchoice
+      - card_choice
       - steal card range_1
     responses:
-      - shopchoice
+      - card_choice
       - steal card range_1
     tags:
-      - shopchoice(1)
+      - card_choice(1)
       - hidden
   - name: BOTTLE_BEER
     image: 04_bottiglia_birra
     color: brown
     effects:
-      - shopchoice
+      - card_choice
       - heal
     responses:
-      - shopchoice
+      - card_choice
       - heal
     tags:
-      - shopchoice(1)
+      - card_choice(1)
       - hidden
   - name: BOTTLE_BANG
     image: 04_bottiglia_bang
     color: brown
     effects:
-      - shopchoice
+      - card_choice
       - bang player reachable notself
     responses:
-      - shopchoice
+      - card_choice
       - bang player reachable notself
     tags:
-      - shopchoice(1)
+      - card_choice(1)
       - hidden
   - name: CALUMET
     image: 04_calumet
@@ -2215,51 +2215,51 @@ goldrush:
     name: PARDNER
     image: 04_complice
     color: brown
-    modifier: shopchoice
+    modifier: card_choice
     effects:
       - none
     responses:
       - forced_play
     tags:
-      - shopchoice(2)
+      - card_choice(2)
       - buy_cost(2)
   - name: PARDNER_GENERAL_STORE
     image: 04_complice_emporio
     color: brown
     effects:
-      - shopchoice
+      - card_choice
       - generalstore(1) players
       - generalstore(2) players
     responses:
-      - shopchoice
+      - card_choice
       - generalstore(1) players
       - generalstore(2) players
     tags:
-      - shopchoice(2)
+      - card_choice(2)
       - hidden
   - name: PARDNER_DUEL
     image: 04_complice_duello
     color: brown
     effects:
-      - shopchoice
+      - card_choice
       - duel player notself
     responses:
-      - shopchoice
+      - card_choice
       - duel player notself
     tags:
-      - shopchoice(2)
+      - card_choice(2)
       - hidden
   - name: PARDNER_CAT_BALOU
     image: 04_complice_catbalou
     color: brown
     effects:
-      - shopchoice
+      - card_choice
       - destroy card
     responses:
-      - shopchoice
+      - card_choice
       - destroy card
     tags:
-      - shopchoice(2)
+      - card_choice(2)
       - hidden
   - name: GOLD_RUSH
     image: 04_corsa_all_oro
@@ -2429,40 +2429,40 @@ train:
       - discard
     responses:
       - discard
-    modifier: trainchoice
+    modifier: card_choice
     tags:
-      - trainchoice(1)
+      - card_choice(3)
   - name: BAGGAGE_CAR_MISSED
     image: 27_baggage_car_missed
     responses:
-      - trainchoice
+      - card_choice
       - missed
     tags:
-      - trainchoice(1)
+      - card_choice(3)
       - hidden
   - name: BAGGAGE_CAR_PANIC
     image: 27_baggage_car_panic
     effects:
-      - trainchoice
+      - card_choice
       - steal card range_1
     tags:
-      - trainchoice(1)
+      - card_choice(3)
       - hidden
   - name: BAGGAGE_CAR_CAT_BALOU
     image: 27_baggage_car_cat_balou
     effects:
-      - trainchoice
+      - card_choice
       - destroy card
     tags:
-      - trainchoice(1)
+      - card_choice(3)
       - hidden
   - name: BAGGAGE_CAR_BANG
     image: 27_baggage_car_bang
     effects:
-      - trainchoice
+      - card_choice
       - bang player reachable notself
     tags:
-      - trainchoice(1)
+      - card_choice(1)
       - hidden
   - name: CABOOSE
     image: 27_caboose

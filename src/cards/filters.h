@@ -92,8 +92,8 @@ namespace banggame::filters {
 
     inline int get_card_cost(detail::card_ptr target, bool is_response, const effect_context &ctx) {
         if (!is_response && !ctx.repeat_card && detail::get_card_pocket(target) != pocket_type::player_table) {
-            if (ctx.shopchoice) {
-                target = ctx.shopchoice;
+            if (ctx.card_choice) {
+                target = ctx.card_choice;
             }
             return detail::get_card_tag(target, tag_type::buy_cost).value_or(0) - ctx.discount;
         } else {

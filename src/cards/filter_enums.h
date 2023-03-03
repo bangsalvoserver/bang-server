@@ -66,7 +66,7 @@ namespace banggame {
         (repeatable)
         (auto_confirm)
         (auto_confirm_red_ringo)
-        (shopchoice)
+        (card_choice)
         (last_scenario_card)
         (peyote)
         (handcuffs)

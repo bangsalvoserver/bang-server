@@ -178,9 +178,9 @@ namespace banggame {
         card *drawn_card = m_shop_deck.back();
         add_log("LOG_DRAWN_SHOP_CARD", drawn_card);
         move_card(drawn_card, pocket_type::shop_selection);
-        if (drawn_card->has_tag(tag_type::shopchoice)) {
+        if (drawn_card->has_tag(tag_type::card_choice)) {
             for (card *c : m_hidden_deck) {
-                if (c->get_tag_value(tag_type::shopchoice) == drawn_card->get_tag_value(tag_type::shopchoice)) {
+                if (c->get_tag_value(tag_type::card_choice) == drawn_card->get_tag_value(tag_type::card_choice)) {
                     set_card_visibility(c, nullptr, card_visibility::shown, true);
                 }
             }

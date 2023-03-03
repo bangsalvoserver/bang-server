@@ -5,11 +5,11 @@
 
 namespace banggame {
 
-    struct effect_shopchoice {
+    struct effect_card_choice {
         bool can_play(card *origin_card, player *origin, const effect_context &ctx);
     };
 
-    struct modifier_shopchoice {
+    struct modifier_card_choice {
         bool valid_with_modifier(card *origin_card, player *origin, card *target_card) {
             return false;
         }

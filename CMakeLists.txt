@@ -11,6 +11,7 @@ set(bangserver_srcs
     src/cards/base/black_jack.cpp
     src/cards/base/bart_cassidy.cpp
     src/cards/base/calamity_janet.cpp
+    src/cards/base/card_choice.cpp
     src/cards/base/damage.cpp
     src/cards/base/deathsave.cpp
     src/cards/base/draw.cpp
@@ -98,7 +99,6 @@ set(bangserver_srcs
     src/cards/goldrush/ruleset.cpp
     src/cards/goldrush/rum.cpp
     src/cards/goldrush/sell_beer.cpp
-    src/cards/goldrush/shopchoice.cpp
     src/cards/goldrush/wanted.cpp
 
     src/cards/valleyofshadows/aim.cpp

@@ -7,6 +7,7 @@
 #include "black_jack.h"
 #include "bart_cassidy.h"
 #include "calamity_janet.h"
+#include "card_choice.h"
 #include "damage.h"
 #include "deathsave.h"
 #include "draw.h"
