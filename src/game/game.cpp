@@ -210,8 +210,6 @@ namespace banggame {
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_train_deck), pocket_type::train_deck);
         }
 
-        add_cards(all_cards.stations, pocket_type::none);
-
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
         }
@@ -268,6 +266,10 @@ namespace banggame {
             m_wws_scenario_holder = first_player;
             add_update<game_update_type::move_scenario_deck>(m_wws_scenario_holder, pocket_type::wws_scenario_deck);
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_wws_scenario_deck), pocket_type::wws_scenario_deck);
+        }
+
+        if (add_cards(all_cards.stations, pocket_type::none)) {
+            m_scenario_holder = first_player;
         }
 
         std::vector<card *> character_ptrs;
@@ -431,7 +433,9 @@ namespace banggame {
         player *next_player = *it;
         
         if (next_player == m_scenario_holder) {
-            effect_next_stop{}.on_play(nullptr, next_player);
+            if (!m_stations.empty()) {
+                effect_next_stop{}.on_play(nullptr, next_player);
+            }
             draw_scenario_card();
         }
 

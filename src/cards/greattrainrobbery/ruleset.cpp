@@ -19,6 +19,7 @@ namespace banggame {
             std::ranges::sample(stations, std::back_inserter(game->m_stations), std::max<int>(game->m_players.size(), 3), game->rng);
             game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(game->m_stations), pocket_type::stations);
             for (card *c : game->m_stations) {
+                c->pocket = pocket_type::stations;
                 game->set_card_visibility(c, nullptr, card_visibility::shown, true);
             }
             for (int i=0; i<4; ++i) {
