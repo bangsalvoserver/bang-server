@@ -203,10 +203,9 @@ namespace banggame {
         (shade_oconnor,         equip_shade_oconnor)
         (ironhorse,             equip_ironhorse)
         (leland,                equip_leland)
-        (mail_car)
-        (prisoner_car)
-        (private_car)
-        (dining_car)
+        (prisoner_car,          equip_prisoner_car)
+        (private_car,           equip_private_car)
+        (dining_car,            equip_dining_car)
         (ghost_car)
     )
 

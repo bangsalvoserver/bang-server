@@ -3,6 +3,7 @@
 
 #include "benny_brawler.h"
 #include "cactus.h"
+#include "dining_car.h"
 #include "dragoon.h"
 #include "evaded.h"
 #include "evan_babbit.h"
@@ -15,6 +16,8 @@
 #include "moneybag.h"
 #include "most_wanted.h"
 #include "next_stop.h"
+#include "prisoner_car.h"
+#include "private_car.h"
 #include "refund.h"
 #include "ruleset.h"
 #include "shade_oconnor.h"
