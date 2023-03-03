@@ -161,14 +161,18 @@ set(bangserver_srcs
     src/cards/armedanddangerous/thunderer.cpp
     src/cards/armedanddangerous/tumbleweed.cpp
 
+    src/cards/greattrainrobbery/benny_brawler.cpp
     src/cards/greattrainrobbery/cactus.cpp
     src/cards/greattrainrobbery/dragoon.cpp
     src/cards/greattrainrobbery/evaded.cpp
     src/cards/greattrainrobbery/evan_babbit.cpp
+    src/cards/greattrainrobbery/full_steam.cpp
     src/cards/greattrainrobbery/knife_revolver.cpp
     src/cards/greattrainrobbery/map.cpp
+    src/cards/greattrainrobbery/manuelita.cpp
     src/cards/greattrainrobbery/most_wanted.cpp
     src/cards/greattrainrobbery/moneybag.cpp
+    src/cards/greattrainrobbery/next_stop.cpp
     src/cards/greattrainrobbery/refund.cpp
     src/cards/greattrainrobbery/ruleset.cpp
     src/cards/greattrainrobbery/shade_oconnor.cpp

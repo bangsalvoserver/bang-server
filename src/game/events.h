@@ -66,6 +66,9 @@ namespace banggame {
         // viene chiamato quando una carta arancione viene scartata perche' sono finiti i cubetti
         EVENT(on_discard_orange_card, player *target, card *target_card)
 
+        // viene chiamato quando il treno avanza
+        EVENT(on_train_advance, player *origin)
+
         // viene chiamato quando un giocatore viene colpito
         EVENT(on_hit, card *origin_card, player *origin, player *target, int damage, effect_flags flags)
 

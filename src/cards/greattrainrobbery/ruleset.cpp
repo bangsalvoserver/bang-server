@@ -2,6 +2,8 @@
 
 #include "cards/filters.h"
 
+#include "next_stop.h"
+
 #include "game/game.h"
 
 namespace banggame {
@@ -39,14 +41,18 @@ namespace banggame {
                     origin->m_game->move_card(origin->m_game->m_train_deck.front(), pocket_type::train);
                 }
                 if (ctx.train_advance) {
-                    // TODO effect_next_stop{}.on_play(nullptr, origin);
-                    // advance train
-                    // call event on_train_advance
+                    effect_next_stop{}.on_play(nullptr, origin);
                 }
             }
         });
 
-        // TODO add_listener on_train_advance : if end of line : queue_action : shuffle and recreate stations and train
+        game->add_listener<event_type::on_train_advance>(nullptr, [](player *origin) {
+            if (origin->m_game->train_position == origin->m_game->m_stations.size()) {
+                origin->m_game->queue_action([=]{
+                    // TODO shuffle and recreate stations and train
+                });
+            }
+        });
     }
 
 }

@@ -7,8 +7,8 @@
 namespace banggame {
     
     struct request_shade_oconnor : request_base {
-        request_shade_oconnor(card *origin_card, player *origin, player *target)
-            : request_base(origin_card, origin, target, effect_flags::auto_respond) {}
+        request_shade_oconnor(card *origin_card, player *target)
+            : request_base(origin_card, nullptr, target, effect_flags::auto_respond) {}
         
         game_string status_text(player *owner) const override {
             if (target == owner) {
@@ -20,8 +20,11 @@ namespace banggame {
     };
     
     void equip_shade_oconnor::on_enable(card *target_card, player *origin) {
-        // TODO add_listener on_train_advance
-        // if out of turn : queue_request request_shade_oconnor
+        origin->m_game->add_listener<event_type::on_train_advance>({target_card, 2}, [=](player *target) {
+            if (origin != target) {
+                origin->m_game->queue_request_front<request_shade_oconnor>(target_card, origin);
+            }
+        });
     }
 
     bool effect_shade_oconnor::can_play(card *origin_card, player *origin) {
