@@ -167,6 +167,8 @@ set(bangserver_srcs
     src/cards/greattrainrobbery/evaded.cpp
     src/cards/greattrainrobbery/evan_babbit.cpp
     src/cards/greattrainrobbery/full_steam.cpp
+    src/cards/greattrainrobbery/ironhorse.cpp
+    src/cards/greattrainrobbery/leland.cpp
     src/cards/greattrainrobbery/knife_revolver.cpp
     src/cards/greattrainrobbery/map.cpp
     src/cards/greattrainrobbery/manuelita.cpp

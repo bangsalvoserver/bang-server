@@ -7,6 +7,8 @@
 #include "evaded.h"
 #include "evan_babbit.h"
 #include "full_steam.h"
+#include "ironhorse.h"
+#include "leland.h"
 #include "knife_revolver.h"
 #include "manuelita.h"
 #include "map.h"
