@@ -25,7 +25,7 @@ main_deck:
     image: 01_mirino
     color: blue
     equip:
-      - scope
+      - scope(1)
   - &mustang
     name: MUSTANG
     signs:
@@ -288,7 +288,7 @@ main_deck:
     expansion: dodgecity
     color: blue
     equip:
-      - scope
+      - scope(1)
   - <<: *dynamite
     signs:
       - 10 clubs
@@ -1453,7 +1453,7 @@ character:
   - name: ROSE_DOOLAN
     image: 01_rosedoolan
     equip:
-      - scope
+      - scope(1)
   - name: SID_KETCHUM
     image: 01_sidketchum
     effects:
@@ -2539,7 +2539,7 @@ train:
     color: train
     equip_target: any
     equip:
-      - lumber_flatcar
+      - scope(-1)
   - name: MAIL_CAR
     image: 27_mail_car
     color: train
@@ -2550,7 +2550,7 @@ train:
     image: 27_observation_car
     color: train
     equip:
-      - scope
+      - scope(1)
       - mustang
   - name: PASSENGER_CAR
     image: 27_passenger_car

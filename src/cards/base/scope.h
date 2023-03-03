@@ -6,6 +6,9 @@
 namespace banggame {
 
     struct equip_scope {
+        int diff;
+        equip_scope(int diff) : diff(diff) {}
+        
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);
     };
