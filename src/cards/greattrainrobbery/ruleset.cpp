@@ -10,19 +10,31 @@ namespace banggame {
 
     void ruleset_greattrainrobbery::on_apply(game *game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 1}, [=]{
-            std::vector<card *> stations = game->m_context.cards
+            game->m_stations = game->m_context.cards
                 | ranges::views::transform([](card &c) { return &c; })
-                | ranges::views::filter([](card *c) {
-                    return c->deck == card_deck_type::station;
-                })
+                | ranges::views::filter([](card *c) { return c->deck == card_deck_type::station; })
+                | ranges::views::sample(std::max(int(game->m_players.size()), 3), game->rng)
                 | ranges::to<std::vector>;
-            std::ranges::sample(stations, std::back_inserter(game->m_stations), std::max<int>(game->m_players.size(), 3), game->rng);
+                
             game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(game->m_stations), pocket_type::stations);
             for (card *c : game->m_stations) {
                 c->pocket = pocket_type::stations;
                 game->set_card_visibility(c, nullptr, card_visibility::shown, true);
             }
-            for (int i=0; i<4; ++i) {
+
+            game->m_train = game->m_context.cards
+                | ranges::views::transform([](card &c) { return &c; })
+                | ranges::views::filter([](card *c) { return c->deck == card_deck_type::locomotive; })
+                | ranges::views::sample(1, game->rng)
+                | ranges::to<std::vector>;
+
+            game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(game->m_train), pocket_type::train);
+            for (card *c : game->m_train) {
+                c->pocket = pocket_type::train;
+                game->set_card_visibility(c, nullptr, card_visibility::shown, true);
+            }
+            
+            for (int i=0; i<3; ++i) {
                 game->move_card(game->m_train_deck.front(), pocket_type::train);
             }
         });

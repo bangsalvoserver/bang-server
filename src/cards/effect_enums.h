@@ -88,7 +88,6 @@ namespace banggame {
         (next_stop,             effect_next_stop)
         (train_robbery)
         (shade_oconnor,         effect_shade_oconnor)
-        (trainchoice)
         (lounge_car)
         (cattle_truck)
         (circus_wagon)

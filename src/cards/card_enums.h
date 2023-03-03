@@ -123,6 +123,7 @@ namespace banggame {
         (fistfulofcards)
         (wildwestshow)
         (station)
+        (locomotive)
         (train)
     )
 

@@ -80,6 +80,7 @@ namespace banggame {
         std::vector<card_data> button_row;
         std::vector<card_data> stations;
         std::vector<card_data> train;
+        std::vector<card_data> locomotive;
         std::vector<card_data> hidden;
     };
 

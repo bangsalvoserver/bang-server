@@ -121,6 +121,7 @@ def parse_file(data):
         'button_row': [],
         'stations': [],
         'train': [],
+        'locomotive': [],
         'hidden': []
     }
 
@@ -165,6 +166,11 @@ def parse_file(data):
             result['hidden'].append(parse_all_effects(card))
         else:
             result['train'].append(parse_all_effects(card))
+    
+    for card in data['locomotive']:
+        card['deck'] = 'locomotive'
+        add_expansion(card, 'greattrainrobbery')
+        result['locomotive'] .append(parse_all_effects(card))
 
     for card in data['button_row']:
         if is_hidden(card):

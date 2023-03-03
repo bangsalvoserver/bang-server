@@ -268,7 +268,7 @@ namespace banggame {
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_wws_scenario_deck), pocket_type::wws_scenario_deck);
         }
 
-        if (add_cards(all_cards.stations, pocket_type::none)) {
+        if (add_cards(all_cards.stations, pocket_type::none) && add_cards(all_cards.locomotive, pocket_type::none)) {
             m_scenario_holder = first_player;
         }
 

@@ -2508,26 +2508,6 @@ train:
       - ghost_car
     tags:
       - ghost_card
-  - name: IRONHORSE
-    image: 27_ironhorse
-    color: train
-    equip:
-      - ironhorse
-    effects:
-      - next_stop
-    modifier: locomotive
-    tags:
-      - locomotive
-  - name: LELAND
-    image: 27_leland
-    color: train
-    equip:
-      - leland
-    effects:
-      - next_stop
-    modifier: locomotive
-    tags:
-      - locomotive
   - name: LOUNGE_CAR
     image: 27_lounge_car
     color: train
@@ -2575,6 +2555,23 @@ train:
       - max_usages(1)
       - discard card self | blue_or_train
       - bang player reachable notself
+locomotive:
+  - name: IRONHORSE
+    image: 27_ironhorse
+    color: train
+    equip:
+      - ironhorse
+    effects:
+      - next_stop
+    modifier: locomotive
+  - name: LELAND
+    image: 27_leland
+    color: train
+    equip:
+      - leland
+    effects:
+      - next_stop
+    modifier: locomotive
 button_row:
   - name: GAME_PASS_CONFIRM
     effects:

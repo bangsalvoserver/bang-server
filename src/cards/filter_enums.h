@@ -73,8 +73,6 @@ namespace banggame {
         (buy_cost)
         (max_hp)
         (bronco)
-        (trainchoice)
-        (locomotive)
     )
 }
 
