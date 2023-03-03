@@ -32,7 +32,6 @@ namespace banggame {
         std::vector<card *> m_wws_scenario_deck;
         std::vector<card *> m_wws_scenario_cards;
 
-        std::vector<card *> m_stations_deck;
         std::vector<card *> m_stations;
         std::vector<card *> m_train_deck;
         std::vector<card *> m_train;

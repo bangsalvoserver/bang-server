@@ -161,7 +161,10 @@ def parse_file(data):
     for card in data['train']:
         card['deck'] = 'train'
         add_expansion(card, 'greattrainrobbery')
-        result['train'].append(parse_all_effects(card))
+        if is_hidden(card):
+            result['hidden'].append(parse_all_effects(card))
+        else:
+            result['train'].append(parse_all_effects(card))
 
     for card in data['button_row']:
         if is_hidden(card):

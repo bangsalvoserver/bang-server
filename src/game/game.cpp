@@ -7,6 +7,7 @@
 #include "cards/game_enums.h"
 
 #include "cards/base/requests.h"
+#include "cards/greattrainrobbery/next_stop.h"
 
 #include "play_verify.h"
 #include "possible_to_play.h"
@@ -61,13 +62,13 @@ namespace banggame {
         co_await move_cards(m_shop_selection);
         co_await move_cards(m_hidden_deck);
 
-        co_await move_cards(m_stations);
-        co_await move_cards(m_train_deck);
-        co_await move_cards(m_train);
-
         if (train_position != 0) {
             co_yield make_update<game_update_type::move_train>(train_position, true);
         }
+
+        co_await move_cards(m_stations);
+        co_await move_cards(m_train_deck);
+        co_await move_cards(m_train);
 
         if (m_scenario_holder) {
             co_yield make_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
@@ -168,7 +169,7 @@ namespace banggame {
         }
         
         auto add_cards = [&](const std::vector<card_data> &cards, pocket_type pocket, std::vector<card *> *out_pocket = nullptr) {
-            if (!out_pocket) out_pocket = &get_pocket(pocket);
+            if (!out_pocket && pocket != pocket_type::none) out_pocket = &get_pocket(pocket);
 
             int count = 0;
             for (const card_data &c : cards) {
@@ -179,7 +180,9 @@ namespace banggame {
                 card *new_card = &m_context.cards.emplace(int(m_context.cards.first_available_id()), c);
                 new_card->pocket = pocket;
                 
-                out_pocket->push_back(new_card);
+                if (out_pocket) {
+                    out_pocket->push_back(new_card);
+                }
                 ++count;
             }
             return count;
@@ -207,10 +210,7 @@ namespace banggame {
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_train_deck), pocket_type::train_deck);
         }
 
-        if (add_cards(all_cards.stations, pocket_type::stations_deck)) {
-            shuffle_cards_and_ids(m_stations_deck);
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_stations_deck), pocket_type::stations_deck);
-        }
+        add_cards(all_cards.stations, pocket_type::none);
 
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
@@ -431,6 +431,7 @@ namespace banggame {
         player *next_player = *it;
         
         if (next_player == m_scenario_holder) {
+            effect_next_stop{}.on_play(nullptr, next_player);
             draw_scenario_card();
         }
 
