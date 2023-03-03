@@ -359,8 +359,8 @@ namespace banggame {
                 return "ERROR_INVALID_RESPONSE_CARD";
             }
 
-            MAYBE_RETURN(verify_equip_target(origin, origin_card, targets, ctx));
             MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
+            MAYBE_RETURN(verify_equip_target(origin, origin_card, targets, ctx));
 
             int cost = filters::get_card_cost(origin_card, is_response, ctx);
             if (origin->m_gold < cost) {

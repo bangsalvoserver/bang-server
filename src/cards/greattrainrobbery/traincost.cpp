@@ -16,11 +16,14 @@ namespace banggame {
             return "ERROR_NOT_ALLOWED_WITH_CARD";
         }
 
+        size_t train_index = std::distance(origin->m_game->m_train.begin(), std::ranges::find(origin->m_game->m_train, target_card)) - ctx.train_advance;
+        if (train_index > origin->m_game->train_position) {
+            return "ERROR_TRAIN_NOT_IN_ANY_STATION";
+        }
         if (origin_card->pocket == pocket_type::stations) {
             size_t station_index = std::distance(origin->m_game->m_stations.begin(), std::ranges::find(origin->m_game->m_stations, origin_card));
-            size_t train_index = std::distance(origin->m_game->m_train.begin(), std::ranges::find(origin->m_game->m_train, target_card));
 
-            if (station_index != ctx.train_advance + origin->m_game->train_position - train_index) {
+            if (train_index != origin->m_game->train_position - station_index) {
                 return "ERROR_TRAIN_NOT_IN_THIS_STATION";
             }
         }
