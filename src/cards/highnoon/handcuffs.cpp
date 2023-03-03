@@ -42,7 +42,7 @@ namespace banggame {
             }
 
             target->m_game->add_listener<event_type::check_play_card>({origin_card, 1},
-                [origin_card=origin_card, target=target, declared_suit](player *origin, card *c, game_string &out_error) {
+                [origin_card=origin_card, target=target, declared_suit](player *origin, card *c, const effect_context &ctx, game_string &out_error) {
                     if (c->pocket == pocket_type::player_hand && c->owner == target && c->sign.suit != declared_suit) {
                         out_error = {"ERROR_INVALID_SUIT", origin_card, c};
                     }

@@ -202,11 +202,19 @@ namespace banggame {
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_shop_deck), pocket_type::shop_deck);
         }
 
+        if (add_cards(all_cards.train, pocket_type::train_deck)) {
+            shuffle_cards_and_ids(m_train_deck);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_train_deck), pocket_type::train_deck);
+        }
+
+        if (add_cards(all_cards.stations, pocket_type::stations_deck)) {
+            shuffle_cards_and_ids(m_stations_deck);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_stations_deck), pocket_type::stations_deck);
+        }
+
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
         }
-
-        call_event<event_type::on_game_setup>();
         
         player_role roles[] = {
             player_role::sheriff,
@@ -306,10 +314,6 @@ namespace banggame {
             add_log("LOG_GAME_START");
             play_sound(nullptr, "gamestart");
 
-            for (player *p : m_players) {
-                p->first_character()->on_equip(p);
-            }
-
             for (player *p : range_all_players(first_player,
                 std::ranges::max(m_players | std::views::transform(&player::get_initial_cards))))
             {
@@ -317,11 +321,11 @@ namespace banggame {
                     p->draw_card();
                 }
             }
+            
+            call_event<event_type::on_game_setup>();
 
-            if (!m_shop_deck.empty()) {
-                for (int i=0; i<3; ++i) {
-                    draw_shop_card();
-                }
+            for (player *p : m_players) {
+                p->first_character()->on_equip(p);
             }
 
             if (!m_scenario_deck.empty()) {

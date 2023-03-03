@@ -240,8 +240,8 @@ namespace banggame {
         (moneybag,              modifier_moneybag)
         (skip_player,           modifier_skip_player)
         (trainchoice)
-        (traincost)
-        (locomotive)
+        (traincost,             modifier_traincost)
+        (locomotive,            modifier_locomotive)
     )
 
 }

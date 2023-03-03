@@ -104,7 +104,7 @@ namespace banggame {
                 playing_card = origin_card;
                 if (!origin_card->self_equippable()) {
                     ret.targets.emplace_back(enums::enum_tag<target_type::player>,
-                        random_element(make_equip_set(origin, origin_card), origin->m_game->rng));
+                        random_element(make_equip_set(origin, origin_card, ctx), origin->m_game->rng));
                 }
             } else if (origin_card->is_modifier()) {
                 auto &targets = ret.modifiers.emplace_back(origin_card).targets;

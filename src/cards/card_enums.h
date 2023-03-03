@@ -144,6 +144,7 @@ namespace banggame {
         (wws_scenario_deck)
         (wws_scenario_card)
         (button_row)
+        (stations_deck)
         (stations)
         (train_deck)
         (train)

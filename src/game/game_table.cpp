@@ -32,6 +32,7 @@ namespace banggame {
         case pocket_type::wws_scenario_deck: return m_wws_scenario_deck;
         case pocket_type::wws_scenario_card: return m_wws_scenario_cards;
         case pocket_type::button_row:        return m_button_row;
+        case pocket_type::stations_deck:     return m_stations_deck;
         case pocket_type::stations:          return m_stations;
         case pocket_type::train:             return m_train;
         case pocket_type::train_deck:        return m_train_deck;

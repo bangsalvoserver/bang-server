@@ -9,6 +9,8 @@ namespace banggame {
         serial::opt_card shopchoice = nullptr;
         serial::opt_player skipped_player = nullptr;
         serial::opt_card repeat_card = nullptr;
+        serial::opt_card traincost = nullptr;
+        int8_t train_advance = 0;
         int8_t discount = 0;
         bool ignore_distances = false;
         bool disable_banglimit = false;

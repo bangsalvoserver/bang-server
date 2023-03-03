@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    game_string get_equip_error(player *origin, card *origin_card, player *target);
+    game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx);
 
     void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx);
 

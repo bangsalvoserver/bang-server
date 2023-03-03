@@ -19,7 +19,7 @@ namespace banggame {
 
     ranges::any_view<card *> get_all_playable_cards(player *origin, bool is_response = false);
 
-    ranges::any_view<player *> make_equip_set(player *origin, card *origin_card);
+    ranges::any_view<player *> make_equip_set(player *origin, card *origin_card, const effect_context &ctx = {});
 
     ranges::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {});
 

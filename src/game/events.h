@@ -30,9 +30,9 @@ namespace banggame {
         EVENT(count_num_checks,                 player *origin, int &num_checks)
         EVENT(count_bangs_played,               player *origin, int &num_bangs_played)
         EVENT(count_cards_to_draw,              player *origin, int &cards_to_draw)
-        EVENT(count_cards_played,               player *origin, int &cards_played)
+        EVENT(count_train_equips,               player *origin, int &num_cards)
 
-        EVENT(check_play_card, player *origin, card *origin_card, game_string &out_error)
+        EVENT(check_play_card, player *origin, card *origin_card, const effect_context &ctx, game_string &out_error)
 
         // verifica per gli effetti che rubano carte in alcune condizioni
         EVENT(check_card_taker, player *target, int type, card* &value)
@@ -79,7 +79,7 @@ namespace banggame {
         EVENT(on_player_death, player *origin, player *target)
 
         // viene chiamato quando un giocatore equipaggia una carta
-        EVENT(on_equip_card, player *origin, player *target, card *target_card)
+        EVENT(on_equip_card, player *origin, player *target, card *target_card, const effect_context &ctx)
 
         // viene chiamato quando un giocatore gioca o scarta una carta dalla mano
         EVENT(on_use_hand_card, player *origin, card *target_card, bool automatic)
@@ -279,7 +279,7 @@ namespace banggame {
     struct find_reference_params_impl<std::tuple<First, Ts...>, std::index_sequence<IFirst, Is...>, std::index_sequence<Os...>>
         : find_reference_params_impl<std::tuple<Ts...>, std::index_sequence<Is...>, std::index_sequence<Os...>> {};
 
-    template<typename First, typename ... Ts, size_t IFirst, size_t ... Is, size_t ... Os>
+    template<typename First, typename ... Ts, size_t IFirst, size_t ... Is, size_t ... Os> requires (!std::is_const_v<First>)
     struct find_reference_params_impl<std::tuple<First&, Ts...>, std::index_sequence<IFirst, Is...>, std::index_sequence<Os...>>
         : find_reference_params_impl<std::tuple<Ts...>, std::index_sequence<Is...>, std::index_sequence<Os..., IFirst>> {};
 

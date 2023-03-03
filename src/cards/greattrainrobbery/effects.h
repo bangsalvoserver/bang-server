@@ -10,6 +10,7 @@
 #include "moneybag.h"
 #include "most_wanted.h"
 #include "refund.h"
+#include "ruleset.h"
 #include "shade_oconnor.h"
 #include "skip_player.h"
 #include "strongbox.h"

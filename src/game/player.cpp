@@ -14,6 +14,7 @@
 #include "cards/base/requests.h"
 
 #include "cards/filter_enums.h"
+#include "cards/effect_context.h"
 
 #include <cassert>
 #include <numeric>
@@ -70,8 +71,8 @@ namespace banggame {
         return m_game->call_event<event_type::count_cards_to_draw>(this, 2);
     }
 
-    game_string player::get_play_card_error(card *origin_card) {
-        return m_game->call_event<event_type::check_play_card>(this, origin_card, game_string{});
+    game_string player::get_play_card_error(card *origin_card, const effect_context &ctx) {
+        return m_game->call_event<event_type::check_play_card>(this, origin_card, ctx, game_string{});
     }
 
     card *player::find_equipped_card(card *card) {

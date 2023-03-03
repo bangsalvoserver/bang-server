@@ -68,7 +68,7 @@ namespace banggame {
             if (card *disabler = origin->m_game->get_disabler(mod_card)) {
                 return {"ERROR_CARD_DISABLED_BY", mod_card.get(), disabler};
             }
-            MAYBE_RETURN(origin->get_play_card_error(mod_card));
+            MAYBE_RETURN(origin->get_play_card_error(mod_card, ctx));
 
             mod_card->modifier.add_context(mod_card, origin, ctx);
             
@@ -126,14 +126,14 @@ namespace banggame {
         return {};
     }
 
-    game_string get_equip_error(player *origin, card *origin_card, player *target) {
+    game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx) {
         if (card *disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
         if (origin->m_game->check_flags(game_flags::disable_equipping)) {
             return "ERROR_CANT_EQUIP_CARDS";
         }
-        MAYBE_RETURN(origin->get_play_card_error(origin_card));
+        MAYBE_RETURN(origin->get_play_card_error(origin_card, ctx));
         if (origin_card->self_equippable()) {
             if (origin != target) {
                 return "ERROR_INVALID_EQUIP_TARGET";
@@ -147,7 +147,7 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_equip_target(player *origin, card *origin_card, const target_list &targets) {
+    static game_string verify_equip_target(player *origin, card *origin_card, const target_list &targets, const effect_context &ctx) {
         player *target = origin;
         if (origin_card->self_equippable()) {
             if (!targets.empty()) {
@@ -159,7 +159,7 @@ namespace banggame {
             }
             target = targets.front().get<target_type::player>();
         }
-        return get_equip_error(origin, origin_card, target);
+        return get_equip_error(origin, origin_card, target, ctx);
     }
 
     static game_string verify_card_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
@@ -172,10 +172,10 @@ namespace banggame {
         if (origin_card->inactive) {
             return {"ERROR_CARD_INACTIVE", origin_card};
         }
-        MAYBE_RETURN(origin->get_play_card_error(origin_card));
         MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
         MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
         MAYBE_RETURN(verify_duplicates(origin, origin_card, is_response, targets, modifiers));
+        MAYBE_RETURN(origin->get_play_card_error(origin_card, ctx));
 
         if (ctx.repeat_card != origin_card) {
             switch (origin_card->pocket) {
@@ -359,7 +359,7 @@ namespace banggame {
                 return "ERROR_INVALID_RESPONSE_CARD";
             }
 
-            MAYBE_RETURN(verify_equip_target(origin, origin_card, targets));
+            MAYBE_RETURN(verify_equip_target(origin, origin_card, targets, ctx));
             MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
 
             int cost = filters::get_card_cost(origin_card, is_response, ctx);
@@ -396,7 +396,7 @@ namespace banggame {
                     origin->m_game->draw_shop_card();
                 }
 
-                origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card);
+                origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card, ctx);
             });
         } else {
             MAYBE_RETURN(verify_card_targets(origin, origin_card, is_response, targets, modifiers, ctx));

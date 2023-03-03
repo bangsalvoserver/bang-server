@@ -142,7 +142,7 @@ namespace banggame {
         int get_bangs_played();
         int get_cards_to_draw();
 
-        game_string get_play_card_error(card *card);
+        game_string get_play_card_error(card *card, const effect_context &ctx);
 
         bool is_bot() const;
         bool is_ghost() const;

@@ -170,10 +170,12 @@ set(bangserver_srcs
     src/cards/greattrainrobbery/most_wanted.cpp
     src/cards/greattrainrobbery/moneybag.cpp
     src/cards/greattrainrobbery/refund.cpp
+    src/cards/greattrainrobbery/ruleset.cpp
     src/cards/greattrainrobbery/shade_oconnor.cpp
     src/cards/greattrainrobbery/skip_player.cpp
     src/cards/greattrainrobbery/strongbox.cpp
     src/cards/greattrainrobbery/switch_cards.cpp
+    src/cards/greattrainrobbery/traincost.cpp
 
     src/cards/canyondiablo/bronco.cpp
     src/cards/canyondiablo/brothel.cpp

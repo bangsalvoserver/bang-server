@@ -13,8 +13,8 @@ namespace banggame {
             origin->m_game->m_button_row,
             origin->m_game->m_hidden_deck,
             origin->m_game->m_shop_selection,
-            origin->m_game->m_stations,
-            origin->m_game->m_train,
+            // origin->m_game->m_stations,
+            // origin->m_game->m_train,
             origin->m_game->m_scenario_cards | ranges::views::take_last(1),
             origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
         );
@@ -27,10 +27,10 @@ namespace banggame {
             });
     }
 
-    ranges::any_view<player *> make_equip_set(player *origin, card *origin_card) {
+    ranges::any_view<player *> make_equip_set(player *origin, card *origin_card, const effect_context &ctx) {
         return origin->m_game->m_players
             | ranges::views::filter([=](player *target) {
-                return !get_equip_error(origin, origin_card, target);
+                return !get_equip_error(origin, origin_card, target, ctx);
             });
     }
 
@@ -138,11 +138,11 @@ namespace banggame {
 
         if (filters::is_equip_card(origin_card)) {
             return !is_response
-                && contains_at_least(make_equip_set(origin, origin_card), 1)
+                && contains_at_least(make_equip_set(origin, origin_card, ctx), 1)
                 && origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
         }
         
-        if (origin->get_play_card_error(origin_card)
+        if (origin->get_play_card_error(origin_card, ctx)
             || origin->m_game->is_disabled(origin_card)
             || !is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx)
             || !is_possible_mth(origin, origin_card, is_response, ctx))
