@@ -27,6 +27,9 @@ namespace banggame {
     };
 
     struct modifier_bangmod {
+        bool valid_with_equip(card *origin_card, player *origin, card *target_card) {
+            return false;
+        }
         bool valid_with_modifier(card *origin_card, player *origin, card *target_card);
         bool valid_with_card(card *origin_card, player *origin, card *target_card);
     };

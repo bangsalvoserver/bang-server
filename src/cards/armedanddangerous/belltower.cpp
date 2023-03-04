@@ -8,9 +8,7 @@
 namespace banggame {
 
     game_string modifier_belltower::get_error(card *origin_card, player *origin, card *playing_card) {
-        if (filters::is_equip_card(playing_card)) {
-            return {"ERROR_CANNOT_PLAY_WHILE_EQUIPPING", origin_card};
-        } else if (!playing_card->is_modifier() && std::ranges::none_of(playing_card->get_effect_list(origin->m_game->pending_requests()),
+        if (std::ranges::none_of(playing_card->get_effect_list(origin->m_game->pending_requests()),
             [](const effect_holder &holder) {
                 return bool(holder.player_filter & (target_player_filter::reachable | target_player_filter::range_1 | target_player_filter::range_2));
             })
