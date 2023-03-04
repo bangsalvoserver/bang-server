@@ -42,25 +42,26 @@ namespace banggame {
     }
 
     static void shuffle_stations_and_trains(player *origin) {
-        origin->m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(origin->m_game->m_stations));
-        for (card *c : origin->m_game->m_stations) {
-            c->visibility = card_visibility::hidden;
-        }
-
         while (origin->m_game->m_train.size() != 1) {
             origin->m_game->move_card(origin->m_game->m_train.back(), pocket_type::train_deck, nullptr, card_visibility::hidden);
         }
+        
+        origin->m_game->train_position = 0;
+        origin->m_game->add_update<game_update_type::move_train>(0);
 
         origin->m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(origin->m_game->m_train));
         for (card *c : origin->m_game->m_train) {
             c->visibility = card_visibility::hidden;
             origin->disable_equip(c);
         }
-        
-        origin->m_game->train_position = 0;
-        origin->m_game->add_update<game_update_type::move_train>(0);
 
         origin->m_game->shuffle_cards_and_ids(origin->m_game->m_train_deck);
+        
+        origin->m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(origin->m_game->m_stations));
+        for (card *c : origin->m_game->m_stations) {
+            c->visibility = card_visibility::hidden;
+        }
+        
         init_stations_and_train(origin);
     }
 
