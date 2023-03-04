@@ -2562,7 +2562,7 @@ locomotive:
     equip:
       - ironhorse
     effects:
-      - none
+      - next_stop
     modifier: locomotive
   - name: LELAND
     image: 27_leland
@@ -2570,7 +2570,7 @@ locomotive:
     equip:
       - leland
     effects:
-      - none
+      - next_stop
     modifier: locomotive
 button_row:
   - name: GAME_PASS_CONFIRM

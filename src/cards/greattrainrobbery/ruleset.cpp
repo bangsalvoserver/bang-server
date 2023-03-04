@@ -8,36 +8,64 @@
 
 namespace banggame {
 
-    void ruleset_greattrainrobbery::on_apply(game *game) {
-        game->add_listener<event_type::on_game_setup>({nullptr, 1}, [](player *origin){
-            origin->m_game->m_stations = origin->m_game->m_context.cards
-                | ranges::views::transform([](card &c) { return &c; })
-                | ranges::views::filter([](card *c) { return c->deck == card_deck_type::station; })
-                | ranges::views::sample(std::max(int(origin->m_game->m_players.size()), 3), origin->m_game->rng)
-                | ranges::to<std::vector>;
-                
-            origin->m_game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(origin->m_game->m_stations), pocket_type::stations);
-            for (card *c : origin->m_game->m_stations) {
-                c->pocket = pocket_type::stations;
-                origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
-            }
-
-            origin->m_game->m_train = origin->m_game->m_context.cards
-                | ranges::views::transform([](card &c) { return &c; })
-                | ranges::views::filter([](card *c) { return c->deck == card_deck_type::locomotive; })
-                | ranges::views::sample(1, origin->m_game->rng)
-                | ranges::to<std::vector>;
-
-            origin->m_game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(origin->m_game->m_train), pocket_type::train);
-            for (card *c : origin->m_game->m_train) {
-                c->pocket = pocket_type::train;
-                origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
-            }
+    static void init_stations_and_train(player *origin) {
+        origin->m_game->m_stations = origin->m_game->m_context.cards
+            | ranges::views::transform([](card &c) { return &c; })
+            | ranges::views::filter([](card *c) { return c->deck == card_deck_type::station; })
+            | ranges::views::sample(std::max(int(origin->m_game->m_players.size()), 4), origin->m_game->rng)
+            | ranges::to<std::vector>;
             
-            for (int i=0; i<3; ++i) {
-                origin->m_game->move_card(origin->m_game->m_train_deck.front(), pocket_type::train);
-            }
-        });
+        origin->m_game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(origin->m_game->m_stations), pocket_type::stations);
+        for (card *c : origin->m_game->m_stations) {
+            c->pocket = pocket_type::stations;
+            origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
+        }
+
+        origin->m_game->m_train = origin->m_game->m_context.cards
+            | ranges::views::transform([](card &c) { return &c; })
+            | ranges::views::filter([&](card *c) {
+                return c->deck == card_deck_type::locomotive && !ranges::contains(origin->m_game->m_train, c);
+            })
+            | ranges::views::sample(1, origin->m_game->rng)
+            | ranges::to<std::vector>;
+
+        origin->m_game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(origin->m_game->m_train), pocket_type::train);
+        for (card *c : origin->m_game->m_train) {
+            c->pocket = pocket_type::train;
+            origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
+            origin->enable_equip(c);
+        }
+        
+        for (int i=0; i<3; ++i) {
+            origin->m_game->move_card(origin->m_game->m_train_deck.front(), pocket_type::train);
+        }
+    }
+
+    static void shuffle_stations_and_trains(player *origin) {
+        origin->m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(origin->m_game->m_stations));
+        for (card *c : origin->m_game->m_stations) {
+            c->visibility = card_visibility::hidden;
+        }
+
+        while (origin->m_game->m_train.size() != 1) {
+            origin->m_game->move_card(origin->m_game->m_train.back(), pocket_type::train_deck, nullptr, card_visibility::hidden);
+        }
+
+        origin->m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(origin->m_game->m_train));
+        for (card *c : origin->m_game->m_train) {
+            c->visibility = card_visibility::hidden;
+            origin->disable_equip(c);
+        }
+        
+        origin->m_game->train_position = 0;
+        origin->m_game->add_update<game_update_type::move_train>(0);
+
+        origin->m_game->shuffle_cards_and_ids(origin->m_game->m_train_deck);
+        init_stations_and_train(origin);
+    }
+
+    void ruleset_greattrainrobbery::on_apply(game *game) {
+        game->add_listener<event_type::on_game_setup>({nullptr, 1}, init_stations_and_train);
 
         game->add_listener<event_type::check_play_card>(nullptr, [](player *origin, card *origin_card, const effect_context &ctx, game_string &out_error) {
             if (filters::is_equip_card(origin_card) && origin_card->is_train()) {
@@ -68,17 +96,14 @@ namespace banggame {
                 if (!origin->m_game->m_train_deck.empty()) {
                     origin->m_game->move_card(origin->m_game->m_train_deck.front(), pocket_type::train);
                 }
-                if (ctx.train_advance) {
-                    effect_next_stop{}.on_play(nullptr, origin);
-                }
             }
         });
 
         game->add_listener<event_type::on_train_advance>(nullptr, [](player *origin) {
             if (origin->m_game->train_position == origin->m_game->m_stations.size()) {
                 origin->m_game->queue_action([=]{
-                    // TODO shuffle and recreate stations and train
-                });
+                    shuffle_stations_and_trains(origin);
+                }, -1);
             }
         });
     }

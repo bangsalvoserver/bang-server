@@ -14,7 +14,7 @@ namespace banggame {
                     origin->m_game->move_card(origin->m_game->top_of_deck(), pocket_type::selection);
                 }
                 for (player *p : targets) {
-                    origin->m_game->queue_request<request_generalstore>(origin_card, nullptr, target);
+                    origin->m_game->queue_request<request_generalstore>(origin_card, nullptr, p);
                 }
             }
         });
