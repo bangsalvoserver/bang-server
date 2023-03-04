@@ -103,6 +103,13 @@ namespace banggame {
             }
             c->visibility = card_visibility::show_owner;
         }
+        if (c->pocket != pocket_type::hidden_deck && c->visibility != card_visibility::hidden && c->has_tag(tag_type::card_choice)) {
+            for (card *choice : m_hidden_deck) {
+                if (choice->get_tag_value(tag_type::card_choice) == c->get_tag_value(tag_type::card_choice)) {
+                    set_card_visibility(choice, nullptr, card_visibility::shown, true);
+                }
+            }
+        }
     }
 
     void game_table::move_card(card *c, pocket_type pocket, player *owner, card_visibility visibility, bool instant) {
@@ -177,13 +184,6 @@ namespace banggame {
         card *drawn_card = m_shop_deck.back();
         add_log("LOG_DRAWN_SHOP_CARD", drawn_card);
         move_card(drawn_card, pocket_type::shop_selection);
-        if (drawn_card->has_tag(tag_type::card_choice)) {
-            for (card *c : m_hidden_deck) {
-                if (c->get_tag_value(tag_type::card_choice) == drawn_card->get_tag_value(tag_type::card_choice)) {
-                    set_card_visibility(c, nullptr, card_visibility::shown, true);
-                }
-            }
-        }
         return drawn_card;
     }
 

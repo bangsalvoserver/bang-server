@@ -37,7 +37,8 @@ namespace banggame {
         }
         
         for (int i=0; i<3; ++i) {
-            origin->m_game->move_card(origin->m_game->m_train_deck.front(), pocket_type::train);
+            card *drawn_card = origin->m_game->m_train_deck.front();
+            origin->m_game->move_card(drawn_card, pocket_type::train);
         }
     }
 

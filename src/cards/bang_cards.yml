@@ -2462,7 +2462,7 @@ train:
       - card_choice
       - bang player reachable notself
     tags:
-      - card_choice(1)
+      - card_choice(3)
       - hidden
   - name: CABOOSE
     image: 27_caboose
