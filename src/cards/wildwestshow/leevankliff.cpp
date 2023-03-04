@@ -5,10 +5,6 @@
 namespace banggame {
 
     game_string modifier_leevankliff::get_error(card *origin_card, player *origin, card *playing_card) {
-        if (playing_card->is_modifier()) {
-            return "ERROR_NOT_ALLOWED_WITH_MODIFIER";
-        }
-
         if (origin->m_played_cards.empty()) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }

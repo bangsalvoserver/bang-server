@@ -256,14 +256,26 @@ namespace banggame {
         return enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 enums::enum_type_t<E> handler;
-                if constexpr (requires { handler.valid_with_modifier(origin_card, origin, target_card); }) {
-                    if (target_card->is_modifier() && !handler.valid_with_modifier(origin_card, origin, target_card)) {
-                        return "ERROR_NOT_ALLOWED_WITH_MODIFIER";
+                if ((target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::shop_selection) && !target_card->is_brown()) {
+                    if constexpr (requires { handler.valid_with_equip(origin_card, origin, target_card); }) {
+                        if (handler.valid_with_equip(origin_card, origin, target_card)) {
+                            return {};
+                        } else {
+                            return {"ERROR_CANNOT_PLAY_WHILE_EQUIPPING", origin_card, target_card};
+                        }
+                    }
+                } else if (target_card->is_modifier()) {
+                    if constexpr (requires { handler.valid_with_modifier(origin_card, origin, target_card); }) {
+                        if (handler.valid_with_modifier(origin_card, origin, target_card)) {
+                            return {};
+                        } else {
+                            return {"ERROR_NOT_ALLOWED_WITH_MODIFIER", origin_card, target_card};
+                        }
                     }
                 }
                 if constexpr (requires { handler.valid_with_card(origin_card, origin, target_card); }) {
-                    if (!target_card->is_modifier() && !handler.valid_with_card(origin_card, origin, target_card)) {
-                        return "ERROR_NOT_ALLOWED_WITH_CARD";
+                    if (!handler.valid_with_card(origin_card, origin, target_card)) {
+                        return {"ERROR_NOT_ALLOWED_WITH_CARD", origin_card, target_card};
                     }
                 }
                 if constexpr (requires { handler.get_error(origin_card, origin, target_card); }) {
