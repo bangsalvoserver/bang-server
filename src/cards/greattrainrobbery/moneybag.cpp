@@ -7,10 +7,6 @@
 namespace banggame {
 
     game_string modifier_moneybag::get_error(card *origin_card, player *origin, card *playing_card) {
-        if (playing_card->is_modifier()) {
-            return "ERROR_NOT_ALLOWED_WITH_MODIFIER";
-        }
-
         if (origin->m_game->m_discards.empty()) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }

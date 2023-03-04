@@ -8,10 +8,6 @@
 namespace banggame {
 
     game_string modifier_traincost::get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx) {
-        if (target_card->is_modifier()) {
-            return "ERROR_NOT_ALLOWED_WITH_MODIFIER";
-        }
-
         if (target_card->pocket != pocket_type::train) {
             return "ERROR_NOT_ALLOWED_WITH_CARD";
         }

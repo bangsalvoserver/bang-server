@@ -6,6 +6,12 @@
 namespace banggame {
 
     struct modifier_skip_player {
+        bool valid_with_equip(card *origin_card, player *origin, card *playing_card) {
+            return false;
+        }
+        bool valid_with_modifier(card *origin_card, player *origin, card *playing_card) {
+            return true;
+        }
         game_string get_error(card *origin_card, player *origin, card *playing_card, const effect_context &ctx);
         void add_context(card *origin_card, player *origin, player *target, effect_context &ctx);
     };
