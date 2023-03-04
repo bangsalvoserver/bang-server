@@ -24,13 +24,13 @@ namespace banggame {
         
             target->m_game->queue_action([target=target, tried_save=tried_save]{
                 target->m_game->call_event<event_type::on_player_death_resolve>(target, tried_save);
-            }, 2);
+            }, 3);
             
             target->m_game->queue_action([origin=origin, target=target]{
                 if (target->m_hp <= 0) {
                     target->m_game->handle_player_death(origin, target, discard_all_reason::death);
                 }
-            }, 2);
+            }, 3);
         });
     }
 

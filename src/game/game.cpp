@@ -468,7 +468,7 @@ namespace banggame {
             target->set_hp(0, true);
 
             call_event<event_type::on_player_death>(killer, target);
-        }, 2);
+        }, 3);
 
         if (killer && m_players.size() > 3) {
             queue_action([this, killer, target] {
@@ -483,12 +483,12 @@ namespace banggame {
                         }, -2);
                     }
                 }
-            }, 2);
+            }, 3);
         }
         
         queue_action([=]{
             target->discard_all(reason);
-        }, 2);
+        }, 3);
 
         if (reason == discard_all_reason::disable_temp_ghost) {
             return;
