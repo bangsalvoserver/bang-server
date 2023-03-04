@@ -4,9 +4,9 @@
 
 namespace banggame {
     void ruleset_goldrush::on_apply(game *game) {
-        game->add_listener<event_type::on_game_setup>({nullptr, 2}, [=]{
+        game->add_listener<event_type::on_game_setup>({nullptr, 2}, [](player *origin){
             for (int i=0; i<3; ++i) {
-                game->draw_shop_card();
+                origin->m_game->draw_shop_card();
             }
         });
         

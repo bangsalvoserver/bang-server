@@ -14,7 +14,7 @@ namespace banggame {
     #define EVENT(name, ...) (name, std::function<void(__VA_ARGS__)>)
     
     DEFINE_ENUM_TYPES(event_type,
-        EVENT(on_game_setup)
+        EVENT(on_game_setup,                    player *first_player)
 
         EVENT(check_damage_response, player *target, bool &value)
 

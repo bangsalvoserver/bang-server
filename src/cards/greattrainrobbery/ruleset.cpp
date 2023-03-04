@@ -9,33 +9,33 @@
 namespace banggame {
 
     void ruleset_greattrainrobbery::on_apply(game *game) {
-        game->add_listener<event_type::on_game_setup>({nullptr, 1}, [=]{
-            game->m_stations = game->m_context.cards
+        game->add_listener<event_type::on_game_setup>({nullptr, 1}, [](player *origin){
+            origin->m_game->m_stations = origin->m_game->m_context.cards
                 | ranges::views::transform([](card &c) { return &c; })
                 | ranges::views::filter([](card *c) { return c->deck == card_deck_type::station; })
-                | ranges::views::sample(std::max(int(game->m_players.size()), 3), game->rng)
+                | ranges::views::sample(std::max(int(origin->m_game->m_players.size()), 3), origin->m_game->rng)
                 | ranges::to<std::vector>;
                 
-            game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(game->m_stations), pocket_type::stations);
-            for (card *c : game->m_stations) {
+            origin->m_game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(origin->m_game->m_stations), pocket_type::stations);
+            for (card *c : origin->m_game->m_stations) {
                 c->pocket = pocket_type::stations;
-                game->set_card_visibility(c, nullptr, card_visibility::shown, true);
+                origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
             }
 
-            game->m_train = game->m_context.cards
+            origin->m_game->m_train = origin->m_game->m_context.cards
                 | ranges::views::transform([](card &c) { return &c; })
                 | ranges::views::filter([](card *c) { return c->deck == card_deck_type::locomotive; })
-                | ranges::views::sample(1, game->rng)
+                | ranges::views::sample(1, origin->m_game->rng)
                 | ranges::to<std::vector>;
 
-            game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(game->m_train), pocket_type::train);
-            for (card *c : game->m_train) {
+            origin->m_game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(origin->m_game->m_train), pocket_type::train);
+            for (card *c : origin->m_game->m_train) {
                 c->pocket = pocket_type::train;
-                game->set_card_visibility(c, nullptr, card_visibility::shown, true);
+                origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
             }
             
             for (int i=0; i<3; ++i) {
-                game->move_card(game->m_train_deck.front(), pocket_type::train);
+                origin->m_game->move_card(origin->m_game->m_train_deck.front(), pocket_type::train);
             }
         });
 

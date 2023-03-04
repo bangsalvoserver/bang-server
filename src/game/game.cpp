@@ -324,7 +324,7 @@ namespace banggame {
                 }
             }
             
-            call_event<event_type::on_game_setup>();
+            call_event<event_type::on_game_setup>(first_player);
 
             for (player *p : m_players) {
                 p->first_character()->on_equip(p);
