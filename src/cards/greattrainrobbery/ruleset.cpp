@@ -111,7 +111,7 @@ namespace banggame {
             if (origin->m_game->train_position == origin->m_game->m_stations.size()) {
                 origin->m_game->queue_action([=]{
                     shuffle_stations_and_trains(origin);
-                }, -1);
+                }, -2);
             }
         });
     }

@@ -14,7 +14,7 @@ namespace banggame {
                         for (player *p : range_all_players(target)) {
                             origin->m_game->queue_request<request_bang>(origin_card, nullptr, p);
                         }
-                    });
+                    }, -1);
                 }
             }
         });
