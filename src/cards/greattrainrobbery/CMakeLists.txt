@@ -8,6 +8,7 @@ target_sources(bangserver PRIVATE
     full_steam.cpp
     ironhorse.cpp
     leland.cpp
+    lumber_flatcar.cpp
     knife_revolver.cpp
     map.cpp
     manuelita.cpp

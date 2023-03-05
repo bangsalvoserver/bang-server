@@ -205,6 +205,7 @@ namespace banggame {
         (prisoner_car,          equip_prisoner_car)
         (private_car,           equip_private_car)
         (dining_car,            equip_dining_car)
+        (lumber_flatcar,        equip_lumber_flatcar)
         (ghost_car)
     )
 
