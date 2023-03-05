@@ -1,0 +1,26 @@
+target_sources(bangserver PRIVATE
+    benny_brawler.cpp
+    cactus.cpp
+    dining_car.cpp
+    dragoon.cpp
+    evaded.cpp
+    evan_babbit.cpp
+    full_steam.cpp
+    ironhorse.cpp
+    leland.cpp
+    knife_revolver.cpp
+    map.cpp
+    manuelita.cpp
+    most_wanted.cpp
+    moneybag.cpp
+    next_stop.cpp
+    prisoner_car.cpp
+    private_car.cpp
+    refund.cpp
+    ruleset.cpp
+    shade_oconnor.cpp
+    skip_player.cpp
+    strongbox.cpp
+    switch_cards.cpp
+    traincost.cpp
+)

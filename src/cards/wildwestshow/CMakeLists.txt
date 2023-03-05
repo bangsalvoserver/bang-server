@@ -1,0 +1,20 @@
+target_sources(bangserver PRIVATE
+    big_spencer.cpp
+    bone_orchard.cpp
+    changewws.cpp
+    darling_valentine.cpp
+    gary_looter.cpp
+    flint_westwood.cpp
+    gary_looter.cpp
+    greygory_deck.cpp
+    helena_zontero.cpp
+    john_pain.cpp
+    ladyrosaoftexas.cpp
+    leevankliff.cpp
+    miss_susanna.cpp
+    sacagaway.cpp
+    showdown.cpp
+    teren_kill.cpp
+    wildwestshow.cpp
+    youl_grinner.cpp
+)
