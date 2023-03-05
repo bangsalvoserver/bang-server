@@ -127,9 +127,12 @@ def parse_file(data):
 
     for card in data['main_deck']:
         card['deck'] = 'main_deck'
-        for sign in card['signs']:
-            card['sign'] = sign
-            result['deck'].append(parse_all_effects(card))
+        if is_hidden(card):
+            result['hidden'].append(parse_all_effects(card))
+        else:
+            for sign in card['signs']:
+                card['sign'] = sign
+                result['deck'].append(parse_all_effects(card))
     
     for card in data['character']:
         card['deck'] = 'character'

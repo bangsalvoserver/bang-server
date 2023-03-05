@@ -143,6 +143,9 @@ namespace banggame::filters {
         if (bool(filter & target_card_filter::train) && color != card_color_type::train)
             return "ERROR_TARGET_NOT_TRAIN";
 
+        if (bool(filter & target_card_filter::nottrain) && color == card_color_type::train)
+            return "ERROR_TARGET_TRAIN";
+
         if (bool(filter & target_card_filter::blue_or_train) && color != card_color_type::blue && color != card_color_type::train)
             return "ERROR_TARGET_NOT_BLUE_OR_TRAIN";
 

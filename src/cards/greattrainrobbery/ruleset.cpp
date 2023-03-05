@@ -73,8 +73,13 @@ namespace banggame {
             if (filters::is_equip_card(origin_card) && origin_card->is_train()) {
                 if (!ctx.traincost) {
                     out_error = "ERROR_MUST_PAY_TRAIN_COST";
-                } else if (ctx.traincost->deck != card_deck_type::main_deck && origin->m_game->call_event<event_type::count_train_equips>(origin, 0) >= 1) {
-                    out_error = "ERROR_ONE_TRAIN_EQUIP_PER_TURN";
+                } else if (ctx.traincost->deck != card_deck_type::main_deck) {
+                    auto [train_equips, num_advance] = origin->m_game->call_event<event_type::count_train_equips>(origin, 0, 0);
+                    if (train_equips >= 1) {
+                        out_error = "ERROR_ONE_TRAIN_EQUIP_PER_TURN";
+                    } else if (ctx.train_advance >= 1 && num_advance >= 1) {
+                        out_error = "ERROR_ONE_TRAIN_ADVANCE_PER_TURN";
+                    }
                 }
             }
         });
@@ -83,9 +88,10 @@ namespace banggame {
             if (origin_card->is_train()) {
                 if (ctx.traincost->deck != card_deck_type::main_deck) {
                     event_card_key key{origin_card, 5};
-                    origin->m_game->add_listener<event_type::count_train_equips>(key, [=](player *p, int &value) {
+                    origin->m_game->add_listener<event_type::count_train_equips>(key, [=](player *p, int &train_equips, int &num_advance) {
                         if (origin == p) {
-                            ++value;
+                            ++train_equips;
+                            num_advance += ctx.train_advance;
                         }
                     });
                     origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player *p, bool skipped) {
@@ -101,7 +107,7 @@ namespace banggame {
             }
         });
 
-        game->add_listener<event_type::on_train_advance>(nullptr, [](player *origin) {
+        game->add_listener<event_type::on_train_advance>(nullptr, [](player *origin, int locomotive_count) {
             if (origin->m_game->train_position == origin->m_game->m_stations.size()) {
                 origin->m_game->queue_action([=]{
                     shuffle_stations_and_trains(origin);

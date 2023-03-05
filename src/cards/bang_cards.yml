@@ -1029,7 +1029,30 @@ main_deck:
     expansion: greattrainrobbery
     color: brown
     effects:
-      - full_steam
+      - none
+    modifier: card_choice
+    tags:
+      - card_choice(4)
+  - name: FULL_STEAM_NO_EFFECT
+    image: 27_full_steam_no_effect
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - card_choice
+      - full_steam(0)
+    tags:
+      - card_choice(4)
+      - hidden
+  - name: FULL_STEAM_DOUBLE_EFFECT
+    image: 27_full_steam_double_effect
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - card_choice
+      - full_steam(2)
+    tags:
+      - card_choice(4)
+      - hidden
   - name: KNIFE_REVOLVER
     signs:
       - 5 diamonds
@@ -1098,8 +1121,8 @@ main_deck:
     expansion: greattrainrobbery
     color: brown
     effects:
-      - mth_add card self | table
-      - mth_add card notself | table
+      - mth_add card self | table nottrain
+      - mth_add card notself | table nottrain
     mth_effect: switch_cards
   - name: TRAIN_ROBBERY
     signs:
@@ -2162,7 +2185,7 @@ goldrush:
       - card_choice(1)
       - buy_cost(2)
   - name: BOTTLE_PANIC
-    image: 04_bottiglia_panico
+    image: main_deck/01_panico
     color: brown
     effects:
       - card_choice
@@ -2174,7 +2197,7 @@ goldrush:
       - card_choice(1)
       - hidden
   - name: BOTTLE_BEER
-    image: 04_bottiglia_birra
+    image: main_deck/01_birra
     color: brown
     effects:
       - card_choice
@@ -2186,7 +2209,7 @@ goldrush:
       - card_choice(1)
       - hidden
   - name: BOTTLE_BANG
-    image: 04_bottiglia_bang
+    image: main_deck/01_bang
     color: brown
     effects:
       - card_choice
@@ -2224,7 +2247,7 @@ goldrush:
       - card_choice(2)
       - buy_cost(2)
   - name: PARDNER_GENERAL_STORE
-    image: 04_complice_emporio
+    image: main_deck/01_emporio
     color: brown
     effects:
       - card_choice
@@ -2238,7 +2261,7 @@ goldrush:
       - card_choice(2)
       - hidden
   - name: PARDNER_DUEL
-    image: 04_complice_duello
+    image: main_deck/01_duello
     color: brown
     effects:
       - card_choice
@@ -2250,7 +2273,7 @@ goldrush:
       - card_choice(2)
       - hidden
   - name: PARDNER_CAT_BALOU
-    image: 04_complice_catbalou
+    image: main_deck/01_catbalou
     color: brown
     effects:
       - card_choice
@@ -2433,7 +2456,7 @@ train:
     tags:
       - card_choice(3)
   - name: BAGGAGE_CAR_MISSED
-    image: 27_baggage_car_missed
+    image: main_deck/01_mancato
     responses:
       - card_choice
       - missed
@@ -2441,7 +2464,7 @@ train:
       - card_choice(3)
       - hidden
   - name: BAGGAGE_CAR_PANIC
-    image: 27_baggage_car_panic
+    image: main_deck/01_panico
     effects:
       - card_choice
       - steal card range_1
@@ -2449,7 +2472,7 @@ train:
       - card_choice(3)
       - hidden
   - name: BAGGAGE_CAR_CAT_BALOU
-    image: 27_baggage_car_cat_balou
+    image: main_deck/01_catbalou
     effects:
       - card_choice
       - destroy card
@@ -2457,7 +2480,7 @@ train:
       - card_choice(3)
       - hidden
   - name: BAGGAGE_CAR_BANG
-    image: 27_baggage_car_bang
+    image: main_deck/01_bang
     effects:
       - card_choice
       - bang player reachable notself

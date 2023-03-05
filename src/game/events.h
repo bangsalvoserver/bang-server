@@ -30,7 +30,7 @@ namespace banggame {
         EVENT(count_num_checks,                 player *origin, int &num_checks)
         EVENT(count_bangs_played,               player *origin, int &num_bangs_played)
         EVENT(count_cards_to_draw,              player *origin, int &cards_to_draw)
-        EVENT(count_train_equips,               player *origin, int &num_cards)
+        EVENT(count_train_equips,               player *origin, int &num_cards, int &num_advance)
 
         EVENT(check_play_card, player *origin, card *origin_card, const effect_context &ctx, game_string &out_error)
 
@@ -67,7 +67,7 @@ namespace banggame {
         EVENT(on_discard_orange_card, player *target, card *target_card)
 
         // viene chiamato quando il treno avanza
-        EVENT(on_train_advance, player *origin)
+        EVENT(on_train_advance, player *origin, int locomotive_count)
 
         // viene chiamato quando un giocatore viene colpito
         EVENT(on_hit, card *origin_card, player *origin, player *target, int damage, effect_flags flags)

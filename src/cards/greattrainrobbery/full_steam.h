@@ -6,6 +6,9 @@
 namespace banggame {
 
     struct effect_full_steam {
+        int value;
+        effect_full_steam(int value) : value(value) {}
+        
         void on_play(card *origin_card, player *origin);
     };
 }
