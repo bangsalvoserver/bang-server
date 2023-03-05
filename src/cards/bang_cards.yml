@@ -2504,7 +2504,7 @@ train:
     color: train
     effects:
       - discard
-      - circus_wagon players
+      - circus_wagon players notself not_empty_table
   - name: COAL_HOPPER
     image: 27_coal_hopper
     color: train

@@ -15,6 +15,7 @@ namespace banggame {
         (range_2)
         (reachable)
         (not_empty_hand)
+        (not_empty_table)
         (not_empty_cubes)
     )
 

@@ -3,6 +3,8 @@
 
 #include "benny_brawler.h"
 #include "cactus.h"
+#include "cattle_truck.h"
+#include "circus_wagon.h"
 #include "dining_car.h"
 #include "dragoon.h"
 #include "evaded.h"

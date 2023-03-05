@@ -36,6 +36,10 @@ namespace banggame::filters::detail {
         return int(origin->m_hand.size());
     }
 
+    int count_player_table_cards(player *origin) {
+        return int(std::ranges::count_if(origin->m_table, std::not_fn(&card::is_black)));
+    }
+
     int count_player_cubes(player *origin) {
         return origin->count_cubes();
     }

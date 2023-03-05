@@ -1,6 +1,8 @@
 target_sources(bangserver PRIVATE
     benny_brawler.cpp
     cactus.cpp
+    cattle_truck.cpp
+    circus_wagon.cpp
     dining_car.cpp
     dragoon.cpp
     evaded.cpp

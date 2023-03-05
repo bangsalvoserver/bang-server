@@ -98,6 +98,9 @@ namespace banggame {
     }
 
     void effect_discard::on_play(card *origin_card, player *origin) {
+        if (origin_card->pocket == pocket_type::player_hand) {
+            origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, true);
+        }
         origin->discard_card(origin_card);
     }
 

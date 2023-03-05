@@ -22,6 +22,7 @@ namespace banggame::filters {
         int get_player_range_mod(player_ptr origin);
         int get_player_weapon_range(player_ptr origin);
         int count_player_hand_cards(player_ptr origin);
+        int count_player_table_cards(player_ptr origin);
         int count_player_cubes(player_ptr origin);
         int get_distance(player_ptr origin, player_ptr target);
         card_sign get_card_sign(player_ptr origin, card_ptr target);
@@ -50,6 +51,9 @@ namespace banggame::filters {
 
         if (bool(filter & target_player_filter::not_empty_hand) && detail::count_player_hand_cards(target) == 0)
             return "ERROR_TARGET_EMPTY_HAND";
+        
+        if (bool(filter & target_player_filter::not_empty_table) && detail::count_player_table_cards(target) == 0)
+            return "ERROR_TARGET_EMPTY_TABLE";
 
         if (bool(filter & target_player_filter::not_empty_cubes) && detail::count_player_cubes(target) == 0)
             return "ERROR_TARGET_EMPTY_CUBES";
