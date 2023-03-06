@@ -13,13 +13,6 @@ namespace banggame {
 
     constexpr int max_cubes = 4;
 
-    enum class discard_all_reason : uint8_t {
-        death,
-        sheriff_killed_deputy,
-        disable_temp_ghost,
-        discard_ghost
-    };
-
     enum class card_visibility : uint8_t {
         hidden,
         shown,
@@ -156,8 +149,6 @@ namespace banggame {
         void add_gold(int amount);
 
         bool immune_to(card *origin_card, player *origin, effect_flags flags) const;
-        
-        void discard_all(discard_all_reason reason);
 
         bool only_black_cards_equipped() const {
             return empty_hand() && std::ranges::all_of(m_table, &card::is_black);

@@ -153,6 +153,7 @@ namespace banggame {
     enum class effect_flags;
     enum class game_flags;
     enum class player_flags;
+    enum class discard_all_reason;
 
     enum class effect_type;
     enum class equip_type;

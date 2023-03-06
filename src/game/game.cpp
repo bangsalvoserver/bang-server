@@ -482,15 +482,15 @@ namespace banggame {
                     } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
                         queue_action([this, killer] {
                             add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                            killer->discard_all(discard_all_reason::sheriff_killed_deputy);
+                            queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy);
                         }, -2);
                     }
                 }
             }, 3);
         }
         
-        queue_action([=]{
-            target->discard_all(reason);
+        queue_action([this, target, reason]{
+            queue_request<request_discard_all>(target, reason);
         }, 3);
 
         if (reason == discard_all_reason::disable_temp_ghost) {

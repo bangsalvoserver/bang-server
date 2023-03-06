@@ -9,6 +9,7 @@
 #include "dragoon.h"
 #include "evaded.h"
 #include "evan_babbit.h"
+#include "express_car.h"
 #include "full_steam.h"
 #include "ironhorse.h"
 #include "leland.h"

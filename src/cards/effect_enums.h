@@ -91,7 +91,7 @@ namespace banggame {
         (lounge_car,            effect_lounge_car)
         (cattle_truck,          effect_cattle_truck)
         (circus_wagon,          effect_circus_wagon)
-        (express_car)
+        (express_car,           effect_express_car)
         (mail_car,              effect_mail_car)
     )
 

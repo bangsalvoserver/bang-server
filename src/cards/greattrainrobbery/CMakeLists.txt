@@ -7,6 +7,7 @@ target_sources(bangserver PRIVATE
     dragoon.cpp
     evaded.cpp
     evan_babbit.cpp
+    express_car.cpp
     full_steam.cpp
     ironhorse.cpp
     leland.cpp

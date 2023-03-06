@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/game_enums.h"
+
 namespace banggame {
 
     bool effect_deathsave::can_play(card *origin_card, player *origin) {

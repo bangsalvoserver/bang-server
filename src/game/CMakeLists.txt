@@ -2,7 +2,6 @@ target_sources(bangserver
 PRIVATE
     bot_ai.cpp
     bot_suggestion.cpp
-    discard_all.cpp
     game.cpp
     game_table.cpp
     draw_check_handler.cpp
