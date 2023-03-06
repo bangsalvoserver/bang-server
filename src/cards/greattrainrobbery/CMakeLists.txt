@@ -12,6 +12,7 @@ target_sources(bangserver PRIVATE
     leland.cpp
     lumber_flatcar.cpp
     knife_revolver.cpp
+    mail_car.cpp
     map.cpp
     manuelita.cpp
     most_wanted.cpp

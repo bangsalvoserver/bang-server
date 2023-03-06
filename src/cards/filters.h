@@ -176,6 +176,9 @@ namespace banggame::filters {
         if (bool(filter & target_card_filter::ten_to_ace) && !sign.is_ten_to_ace())
             return "ERROR_TARGET_NOT_TEN_TO_ACE";
 
+        if (bool(filter & target_card_filter::selection) && detail::get_card_pocket(target) != pocket_type::selection)
+            return "ERROR_TARGET_NOT_SELECTION_CARD";
+
         if (bool(filter & target_card_filter::table) && detail::get_card_pocket(target) != pocket_type::player_table)
             return "ERROR_TARGET_NOT_TABLE_CARD";
 

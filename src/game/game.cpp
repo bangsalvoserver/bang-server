@@ -212,6 +212,9 @@ namespace banggame {
 
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
+            for (card *c : m_hidden_deck) {
+                set_card_visibility(c, nullptr, card_visibility::shown, true);
+            }
         }
         
         player_role roles[] = {

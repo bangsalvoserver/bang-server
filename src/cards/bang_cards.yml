@@ -2549,6 +2549,12 @@ train:
     effects:
       - discard
       - mail_car
+  - responses:
+      - mth_add card | selection
+      - mth_add player notself
+    mth_response: mail_car
+    tags:
+      - hidden
   - name: OBSERVATION_CAR
     image: 27_observation_car
     color: train

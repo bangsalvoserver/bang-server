@@ -85,7 +85,7 @@ def parse_effect_simple(effect_list, value_name, type_name):
 def parse_all_effects(card):
     try:
         return {
-            'name':         card['name'],
+            'name':         card['name'] if 'name' in card else None,
             'image':        card['image'] if 'image' in card else None,
             'effects':      parse_effects(card['effects']) if 'effects' in card else None,
             'responses':    parse_effects(card['responses']) if 'responses' in card else None,

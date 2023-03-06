@@ -15,6 +15,7 @@
 #include "lumber_flatcar.h"
 #include "knife_revolver.h"
 #include "manuelita.h"
+#include "mail_car.h"
 #include "map.h"
 #include "moneybag.h"
 #include "most_wanted.h"

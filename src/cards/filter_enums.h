@@ -20,6 +20,7 @@ namespace banggame {
     )
 
     DEFINE_ENUM_FLAGS(target_card_filter,
+        (selection)
         (table)
         (hand)
         (blue)

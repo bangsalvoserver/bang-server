@@ -92,7 +92,7 @@ namespace banggame {
         (cattle_truck,          effect_cattle_truck)
         (circus_wagon,          effect_circus_wagon)
         (express_car)
-        (mail_car)
+        (mail_car,              effect_mail_car)
     )
 
     DEFINE_ENUM_FWD_TYPES(equip_type,
@@ -224,6 +224,7 @@ namespace banggame {
         (lastwill,              handler_lastwill)
         (switch_cards,          handler_switch_cards)
         (evan_babbit,           handler_evan_babbit)
+        (mail_car,              handler_mail_car)
     )
 
     DEFINE_ENUM_FWD_TYPES(modifier_type,
