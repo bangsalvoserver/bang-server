@@ -31,5 +31,6 @@
 #include "strongbox.h"
 #include "switch_cards.h"
 #include "traincost.h"
+#include "train_robbery.h"
 
 #endif

@@ -86,7 +86,7 @@ namespace banggame {
         (knife_revolver,        effect_knife_revolver)
         (most_wanted,           effect_most_wanted)
         (next_stop,             effect_next_stop)
-        (train_robbery)
+        (train_robbery,         effect_train_robbery)
         (shade_oconnor,         effect_shade_oconnor)
         (lounge_car,            effect_lounge_car)
         (cattle_truck,          effect_cattle_truck)

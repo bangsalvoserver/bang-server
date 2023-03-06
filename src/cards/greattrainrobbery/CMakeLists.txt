@@ -29,4 +29,5 @@ target_sources(bangserver PRIVATE
     strongbox.cpp
     switch_cards.cpp
     traincost.cpp
+    train_robbery.cpp
 )
