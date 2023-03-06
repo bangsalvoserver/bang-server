@@ -11,7 +11,7 @@ namespace banggame {
         void on_update() override {
             if (!sent) {
                 for (int i=0; i<3 && !target->m_game->m_discards.empty(); ++i) {
-                    target->m_game->move_card(target->m_game->m_discards.back(), pocket_type::selection, target);
+                    target->m_game->move_card(target->m_game->m_discards.back(), pocket_type::selection, target, card_visibility::shown);
                 }
                 if (target->m_game->m_selection.empty()) {
                     target->m_game->pop_request();
