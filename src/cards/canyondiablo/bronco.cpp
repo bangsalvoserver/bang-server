@@ -12,14 +12,14 @@ namespace banggame {
     void equip_bronco::on_equip(card *origin_card, player *target) {
         auto it = std::ranges::find_if(target->m_game->m_hidden_deck, is_discard_bronco);
         if (it != target->m_game->m_hidden_deck.end()) {
-            target->m_game->move_card(*it, pocket_type::button_row);
+            target->m_game->move_card(*it, pocket_type::button_row, nullptr, card_visibility::shown, true);
         }
     }
 
     void equip_bronco::on_unequip(card *origin_card, player *target) {
         auto it = std::ranges::find_if(target->m_game->m_button_row, is_discard_bronco);
         if (it != target->m_game->m_button_row.end()) {
-            target->m_game->move_card(*it, pocket_type::hidden_deck);
+            target->m_game->move_card(*it, pocket_type::hidden_deck, nullptr, card_visibility::shown, true);
         }
     }
 }
