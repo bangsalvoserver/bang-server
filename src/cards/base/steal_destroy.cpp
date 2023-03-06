@@ -110,7 +110,7 @@ namespace banggame {
         } else {
             origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_player, target_card);
         }
-        if (origin_card->pocket == pocket_type::player_hand) {
+        if (target_card->pocket == pocket_type::player_hand) {
             origin->m_game->call_event<event_type::on_use_hand_card>(target_player, target_card, true);
         }
         target_player->discard_card(target_card);
