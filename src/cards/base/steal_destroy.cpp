@@ -45,8 +45,10 @@ namespace banggame {
                 if (origin != target_player && target_card->visibility != card_visibility::shown) {
                     origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_STOLEN_CARD", origin, target_player, target_card);
                 }
+                if (target_card->pocket == pocket_type::player_hand) {
+                    origin->m_game->call_event<event_type::on_use_hand_card>(target_player, target_card, true);
+                }
                 origin->steal_card(target_card);
-                origin->m_game->call_event<event_type::on_use_hand_card>(target_player, target_card, true);
             }
         }, 2);
     }
@@ -98,9 +100,6 @@ namespace banggame {
     }
 
     void effect_discard::on_play(card *origin_card, player *origin) {
-        if (origin_card->pocket == pocket_type::player_hand) {
-            origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, true);
-        }
         origin->discard_card(origin_card);
     }
 
@@ -110,6 +109,9 @@ namespace banggame {
             origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
         } else {
             origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_player, target_card);
+        }
+        if (origin_card->pocket == pocket_type::player_hand) {
+            origin->m_game->call_event<event_type::on_use_hand_card>(target_player, target_card, true);
         }
         target_player->discard_card(target_card);
     }
@@ -122,8 +124,10 @@ namespace banggame {
                 if (origin != target_player && target_card->visibility != card_visibility::shown) {
                     origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
                 }
+                if (target_card->pocket == pocket_type::player_hand) {
+                    origin->m_game->call_event<event_type::on_use_hand_card>(target_player, target_card, true);
+                }
                 target_player->discard_card(target_card);
-                origin->m_game->call_event<event_type::on_use_hand_card>(target_player, target_card, true);
             }
         }, 2);
     }
