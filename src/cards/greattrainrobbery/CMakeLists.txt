@@ -10,6 +10,7 @@ target_sources(bangserver PRIVATE
     full_steam.cpp
     ironhorse.cpp
     leland.cpp
+    lounge_car.cpp
     lumber_flatcar.cpp
     knife_revolver.cpp
     mail_car.cpp

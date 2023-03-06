@@ -2537,6 +2537,12 @@ train:
     effects:
       - discard
       - lounge_car
+  - responses:
+      - mth_add card | selection
+      - mth_add player notself
+    mth_response: lounge_car
+    tags:
+      - hidden
   - name: LUMBER_FLATCAR
     image: 27_lumber_flatcar
     color: train

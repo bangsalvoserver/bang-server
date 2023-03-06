@@ -12,6 +12,7 @@
 #include "full_steam.h"
 #include "ironhorse.h"
 #include "leland.h"
+#include "lounge_car.h"
 #include "lumber_flatcar.h"
 #include "knife_revolver.h"
 #include "manuelita.h"

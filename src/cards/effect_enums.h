@@ -88,7 +88,7 @@ namespace banggame {
         (next_stop,             effect_next_stop)
         (train_robbery)
         (shade_oconnor,         effect_shade_oconnor)
-        (lounge_car)
+        (lounge_car,            effect_lounge_car)
         (cattle_truck,          effect_cattle_truck)
         (circus_wagon,          effect_circus_wagon)
         (express_car)
@@ -224,6 +224,7 @@ namespace banggame {
         (lastwill,              handler_lastwill)
         (switch_cards,          handler_switch_cards)
         (evan_babbit,           handler_evan_babbit)
+        (lounge_car,            handler_lounge_car)
         (mail_car,              handler_mail_car)
     )
 
