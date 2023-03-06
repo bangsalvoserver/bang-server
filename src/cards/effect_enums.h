@@ -213,6 +213,7 @@ namespace banggame {
         (none)
         (play_as_bang,          handler_play_as_bang)
         (fanning,               handler_fanning)
+        (claus_the_saint,       handler_claus_the_saint)
         (doc_holyday,           handler_doc_holyday)
         (flint_westwood,        handler_flint_westwood)
         (draw_multi,            handler_draw_multi)

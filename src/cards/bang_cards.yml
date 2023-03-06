@@ -1509,6 +1509,10 @@ character:
     expansion: thebullet
     equip:
       - claus_the_saint
+    responses:
+      - mth_add card | selection
+      - mth_add player notself
+    mth_response: claus_the_saint
     tags:
       - max_hp(3)
   - name: JOHNNY_KISCH

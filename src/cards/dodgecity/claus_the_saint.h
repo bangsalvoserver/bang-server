@@ -8,6 +8,11 @@ namespace banggame {
     struct equip_claus_the_saint : event_equip {
         void on_enable(card *target_card, player *target);
     };
+
+    struct handler_claus_the_saint {
+        game_string get_error(card *origin_card, player *origin, card *target_card, player *target_player);
+        void on_play(card *origin_card, player *origin, card *target_card, player *target_player);
+    };
 }
 
 #endif
