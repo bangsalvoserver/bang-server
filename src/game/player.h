@@ -167,7 +167,6 @@ namespace banggame {
         void set_role(player_role role, bool instant = true);
         void reset_max_hp();
 
-        void add_played_card(card *origin_card, std::vector<card *> modifiers);
         card *get_last_played_card() const;
 
         void start_of_turn();

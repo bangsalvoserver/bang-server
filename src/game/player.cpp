@@ -267,12 +267,6 @@ namespace banggame {
         }
     }
 
-    void player::add_played_card(card *origin_card, std::vector<card *> modifiers) {
-        if (origin_card->pocket != pocket_type::button_row) {
-            m_played_cards.emplace_back(origin_card, modifiers | ranges::to<std::vector<card_pocket_pair>>);
-        }
-    }
-
     card *player::get_last_played_card() const {
         if (m_played_cards.empty()) {
             return nullptr;

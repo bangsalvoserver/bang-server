@@ -242,10 +242,13 @@ namespace banggame {
         return {};
     }
 
-    inline std::vector<card *> get_modifier_cards(const modifier_list &modifiers) {
-        return modifiers
-            | ranges::views::transform(&modifier_pair::card)
-            | ranges::to<std::vector<card *>>;
+    inline void add_played_card(player *origin, card *origin_card, const modifier_list &modifiers) {
+        if (origin_card->pocket != pocket_type::button_row) {
+            origin->m_played_cards.emplace_back(origin_card, modifiers
+                | ranges::views::transform([](const modifier_pair &pair) -> card * { return pair.card; })
+                | ranges::to<std::vector<card_pocket_pair>>
+            );
+        }
     }
 
     static void log_played_card(card *origin_card, player *origin, bool is_response) {
@@ -376,7 +379,7 @@ namespace banggame {
             }
 
             origin->prompt_then(check_prompt_equip(origin_card, origin, target), [=]{
-                origin->add_played_card(origin_card, get_modifier_cards(modifiers));
+                add_played_card(origin, origin_card, modifiers);
 
                 origin->add_gold(-cost);
                 origin_card->on_equip(target);
@@ -410,7 +413,7 @@ namespace banggame {
             }
 
             origin->prompt_then(check_prompt(origin, origin_card, is_response, targets, modifiers, ctx), [=]{
-                origin->add_played_card(origin_card, get_modifier_cards(modifiers));
+                add_played_card(origin, origin_card, modifiers);
 
                 origin->add_gold(-cost);
                 for (const auto &[mod_card, mod_targets] : modifiers) {
