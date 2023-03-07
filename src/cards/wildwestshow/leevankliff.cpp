@@ -8,7 +8,7 @@
 namespace banggame {
 
     bool modifier_leevankliff::valid_with_modifier(card *origin_card, player *origin, card *playing_card) {
-        return playing_card->has_tag(tag_type::card_choice);
+        return playing_card->has_tag(tag_type::card_choice) && playing_card->is_brown();
     }
 
     game_string modifier_leevankliff::get_error(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) {
