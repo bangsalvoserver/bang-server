@@ -12,6 +12,8 @@ namespace banggame {
         request_claus_the_saint(card *origin_card, player *target)
             : request_base(origin_card, nullptr, target, effect_flags::auto_respond) {}
 
+        std::vector<player *> targets;
+
         void on_update() override {
             if (!sent) {
                 int ncards = target->m_game->num_alive() + target->get_cards_to_draw() - 1;
@@ -42,14 +44,20 @@ namespace banggame {
     }
 
     game_string handler_claus_the_saint::get_error(card *origin_card, player *origin, card *target_card, player *target_player) {
-        if (origin->m_game->top_request<request_claus_the_saint>(origin) == nullptr) {
-            return "ERROR_INVALID_RESPONSE";
+        if (auto req = origin->m_game->top_request<request_claus_the_saint>(origin)) {
+            if (ranges::contains(req->targets, target_player)) {
+                return "ERROR_TARGET_NOT_UNIQUE";
+            } else {
+                return {};
+            }
         } else {
-            return {};
+            return "ERROR_INVALID_RESPONSE";
         }
     }
 
     void handler_claus_the_saint::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {
+        origin->m_game->top_request<request_claus_the_saint>(origin)->targets.push_back(target_player);
+        
         if (!origin->m_game->check_flags(game_flags::hands_shown)) {
             origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_GIFTED_CARD", origin, target_player, target_card);
             origin->m_game->add_log(update_target::excludes(origin, target_player), "LOG_GIFTED_A_CARD", origin, target_player);
