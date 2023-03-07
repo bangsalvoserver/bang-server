@@ -4,6 +4,8 @@
 
 #include "cards/base/bang.h"
 
+#include "cards/game_enums.h"
+
 namespace banggame {
 
     void equip_ironhorse::on_enable(card *origin_card, player *origin) {
@@ -13,7 +15,7 @@ namespace banggame {
                     origin->m_game->queue_action([=]{
                         origin->m_game->add_log("LOG_END_OF_LINE");
                         for (player *p : range_all_players(target)) {
-                            origin->m_game->queue_request<request_bang>(origin_card, nullptr, p);
+                            origin->m_game->queue_request<request_bang>(origin_card, nullptr, p, effect_flags::multi_target);
                         }
                     }, -1);
                 }
