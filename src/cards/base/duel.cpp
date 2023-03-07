@@ -1,7 +1,8 @@
 #include "duel.h"
 
+#include "cards/filters.h"
+
 #include "game/game.h"
-#include "game/filters.h"
 
 namespace banggame {
 
@@ -27,7 +28,7 @@ namespace banggame {
 
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
-                && is_bangcard(target, target_card)
+                && filters::is_bang_card(target, target_card)
                 && !target->m_game->is_disabled(target_card);
         }
 
@@ -36,7 +37,7 @@ namespace banggame {
                 target->m_game->pop_request();
                 target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
                 target->discard_card(target_card);
-                target->m_game->call_event<event_type::on_play_hand_card>(target, target_card);
+                target->m_game->call_event<event_type::on_use_hand_card>(target, target_card, false);
                 target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target);
             });
         }

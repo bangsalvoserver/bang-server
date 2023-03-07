@@ -13,7 +13,6 @@
 #include "henry_block.h"
 #include "lemonade_jim.h"
 #include "mick_defender.h"
-#include "play_as_gatling.h"
 #include "poker.h"
 #include "ruleset.h"
 #include "saved.h"

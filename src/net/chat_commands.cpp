@@ -5,6 +5,8 @@
 #include "utils/enum_format.h"
 #include "utils/static_map.h"
 
+#include "cards/filter_enums.h"
+
 #include <charconv>
 
 namespace banggame {
@@ -189,13 +191,6 @@ namespace banggame {
         case card_deck_type::goldrush: {
             target->m_game->move_card(target->m_game->m_shop_selection.front(), pocket_type::shop_discard);
             target->m_game->move_card(target_card, pocket_type::shop_selection);
-            if (target_card->has_tag(tag_type::shopchoice)) {
-                for (card *c : target->m_game->m_hidden_deck) {
-                    if (c->get_tag_value(tag_type::shopchoice) == target_card->get_tag_value(tag_type::shopchoice)) {
-                        target->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
-                    }
-                }
-            }
             break;
         }
         case card_deck_type::highnoon:

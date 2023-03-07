@@ -1,12 +1,14 @@
 #include "changewws.h"
 
+#include "cards/effect_context.h"
+
 #include "game/game.h"
 
 namespace banggame {
 
     void effect_changewws::on_play(card *origin_card, player *origin, const effect_context &ctx) {
         if (origin->m_game->m_wws_scenario_deck.empty()) return;
-        if (ctx.repeating) return;
+        if (ctx.repeat_card) return;
         
         origin->m_game->queue_action([origin]{
             auto &scenario_deck = origin->m_game->m_wws_scenario_deck;

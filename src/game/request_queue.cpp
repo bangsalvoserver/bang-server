@@ -22,7 +22,7 @@ namespace banggame {
     
     void request_queue::update_request() {
         if (m_lock_updates) return;
-        if (m_game->check_flags(game_flags::game_over)) return;
+        if (m_game->is_game_over()) return;
 
         if (auto req = top_request()) {
             ++m_lock_updates;

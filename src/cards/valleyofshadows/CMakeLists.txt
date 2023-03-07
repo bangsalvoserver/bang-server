@@ -1,0 +1,21 @@
+target_sources(bangserver PRIVATE
+    aim.cpp
+    backfire.cpp
+    bandidos.cpp
+    bounty.cpp
+    colorado_bill.cpp
+    escape.cpp
+    evelyn_shebang.cpp
+    fanning.cpp
+    ghost.cpp
+    henry_block.cpp
+    lemonade_jim.cpp
+    mick_defender.cpp
+    poker.cpp
+    ruleset.cpp
+    saved.cpp
+    shotgun.cpp
+    snake.cpp
+    tornado.cpp
+    tuco_franziskaner.cpp
+)

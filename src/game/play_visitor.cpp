@@ -1,6 +1,9 @@
 #include "play_visitor.h"
 #include "possible_to_play.h"
+
 #include "cards/effect_enums.h"
+#include "cards/game_enums.h"
+#include "cards/filters.h"
 
 namespace banggame {
 
@@ -21,7 +24,7 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::player>::get_error(const effect_context &ctx, player *target) {
-        MAYBE_RETURN(check_player_filter(origin, effect.player_filter, target, ctx));
+        MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target, ctx));
         return effect.get_error(origin_card, origin, target, ctx);
     }
 
@@ -75,7 +78,7 @@ namespace banggame {
 
     template<> game_string play_visitor<target_type::players>::get_error(const effect_context &ctx) {
         for (player *target : range_all_players(origin)) {
-            if (!check_player_filter(origin, effect.player_filter, target, ctx)) {
+            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
             }
         }
@@ -87,12 +90,19 @@ namespace banggame {
     }
 
     template<> game_string play_visitor<target_type::players>::prompt(const effect_context &ctx) {
-        game_string msg;
+        std::vector<player *> targets;
         for (player *target : range_all_players(origin)) {
-            if (!check_player_filter(origin, effect.player_filter, target, ctx)) {
-                msg = effect.on_prompt(origin_card, origin, target, ctx);
-                if (!msg) break;
+            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
+                targets.push_back(target);
             }
+        }
+        if (targets.empty()) {
+            return {"PROMPT_CARD_NO_EFFECT", origin_card};
+        }
+        game_string msg;
+        for (player *target : targets) {
+            msg = effect.on_prompt(origin_card, origin, target, ctx);
+            if (!msg) break;
         }
         return msg;
     }
@@ -100,7 +110,7 @@ namespace banggame {
     template<> void play_visitor<target_type::players>::play(const effect_context &ctx) {
         std::vector<player *> targets;
         for (player *target : range_all_players(origin)) {
-            if (!check_player_filter(origin, effect.player_filter, target, ctx)) {
+            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 targets.push_back(target);
             }
         }
@@ -120,8 +130,8 @@ namespace banggame {
 
     template<> game_string play_visitor<target_type::card>::get_error(const effect_context &ctx, card *target) {
         if (!target->owner) return "ERROR_CARD_HAS_NO_OWNER";
-        MAYBE_RETURN(check_player_filter(origin, effect.player_filter, target->owner, ctx));
-        MAYBE_RETURN(check_card_filter(origin_card, origin, effect.card_filter, target, ctx));
+        MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target->owner, ctx));
+        MAYBE_RETURN(filters::check_card_filter(origin_card, origin, effect.card_filter, target, ctx));
         return effect.get_error(origin_card, origin, target, ctx);
     }
 
@@ -151,7 +161,7 @@ namespace banggame {
 
     template<> game_string play_visitor<target_type::extra_card>::get_error(const effect_context &ctx, card *target) {
         if (!target) {
-            if (ctx.repeating) {
+            if (ctx.repeat_card) {
                 return {};
             } else {
                 return "ERROR_TARGET_SET_NOT_EMPTY";
@@ -220,7 +230,7 @@ namespace banggame {
         if (!std::ranges::all_of(origin->m_game->m_players | std::views::filter(&player::alive), [&](player *p) {
             size_t found = std::ranges::count(target_cards, p, &card::owner);
             if (p->only_black_cards_equipped()) return found == 0;
-            if (p == origin) return found == 0;
+            if (p == origin || p == ctx.skipped_player) return found == 0;
             else return found == 1;
         })) {
             return "ERROR_INVALID_TARGETS";

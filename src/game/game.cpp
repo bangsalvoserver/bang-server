@@ -1,11 +1,13 @@
 #include "game.h"
 
-#include "holders.h"
 #include "game_update.h"
 
+#include "cards/holders.h"
 #include "cards/effect_enums.h"
-#include "cards/filter_enums.h"
+#include "cards/game_enums.h"
+
 #include "cards/base/requests.h"
+#include "cards/greattrainrobbery/next_stop.h"
 
 #include "play_verify.h"
 #include "possible_to_play.h"
@@ -59,6 +61,14 @@ namespace banggame {
         co_await move_cards(m_shop_discards);
         co_await move_cards(m_shop_selection);
         co_await move_cards(m_hidden_deck);
+
+        if (train_position != 0) {
+            co_yield make_update<game_update_type::move_train>(train_position, true);
+        }
+
+        co_await move_cards(m_stations);
+        co_await move_cards(m_train_deck);
+        co_await move_cards(m_train);
 
         if (m_scenario_holder) {
             co_yield make_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
@@ -159,7 +169,7 @@ namespace banggame {
         }
         
         auto add_cards = [&](const std::vector<card_data> &cards, pocket_type pocket, std::vector<card *> *out_pocket = nullptr) {
-            if (!out_pocket) out_pocket = &get_pocket(pocket);
+            if (!out_pocket && pocket != pocket_type::none) out_pocket = &get_pocket(pocket);
 
             int count = 0;
             for (const card_data &c : cards) {
@@ -170,7 +180,9 @@ namespace banggame {
                 card *new_card = &m_context.cards.emplace(int(m_context.cards.first_available_id()), c);
                 new_card->pocket = pocket;
                 
-                out_pocket->push_back(new_card);
+                if (out_pocket) {
+                    out_pocket->push_back(new_card);
+                }
                 ++count;
             }
             return count;
@@ -193,11 +205,17 @@ namespace banggame {
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_shop_deck), pocket_type::shop_deck);
         }
 
-        if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
+        if (add_cards(all_cards.train, pocket_type::train_deck)) {
+            shuffle_cards_and_ids(m_train_deck);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_train_deck), pocket_type::train_deck);
         }
 
-        call_event<event_type::on_game_setup>();
+        if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
+            for (card *c : m_hidden_deck) {
+                set_card_visibility(c, nullptr, card_visibility::shown, true);
+            }
+        }
         
         player_role roles[] = {
             player_role::sheriff,
@@ -253,6 +271,10 @@ namespace banggame {
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_wws_scenario_deck), pocket_type::wws_scenario_deck);
         }
 
+        if (add_cards(all_cards.stations, pocket_type::none) && add_cards(all_cards.locomotive, pocket_type::none)) {
+            m_scenario_holder = first_player;
+        }
+
         std::vector<card *> character_ptrs;
         if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
             std::ranges::shuffle(character_ptrs, rng);
@@ -297,10 +319,6 @@ namespace banggame {
             add_log("LOG_GAME_START");
             play_sound(nullptr, "gamestart");
 
-            for (player *p : m_players) {
-                p->first_character()->on_equip(p);
-            }
-
             for (player *p : range_all_players(first_player,
                 std::ranges::max(m_players | std::views::transform(&player::get_initial_cards))))
             {
@@ -308,11 +326,11 @@ namespace banggame {
                     p->draw_card();
                 }
             }
+            
+            call_event<event_type::on_game_setup>(first_player);
 
-            if (!m_shop_deck.empty()) {
-                for (int i=0; i<3; ++i) {
-                    draw_shop_card();
-                }
+            for (player *p : m_players) {
+                p->first_character()->on_equip(p);
             }
 
             if (!m_scenario_deck.empty()) {
@@ -418,6 +436,9 @@ namespace banggame {
         player *next_player = *it;
         
         if (next_player == m_scenario_holder) {
+            if (!m_stations.empty()) {
+                effect_next_stop{}.on_play(nullptr, next_player);
+            }
             draw_scenario_card();
         }
 
@@ -450,7 +471,7 @@ namespace banggame {
             target->set_hp(0, true);
 
             call_event<event_type::on_player_death>(killer, target);
-        }, 2);
+        }, 3);
 
         if (killer && m_players.size() > 3) {
             queue_action([this, killer, target] {
@@ -461,16 +482,16 @@ namespace banggame {
                     } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
                         queue_action([this, killer] {
                             add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                            killer->discard_all(discard_all_reason::sheriff_killed_deputy);
+                            queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy);
                         }, -2);
                     }
                 }
-            }, 2);
+            }, 3);
         }
         
-        queue_action([=]{
-            target->discard_all(reason);
-        }, 2);
+        queue_action([this, target, reason]{
+            queue_request<request_discard_all>(target, reason);
+        }, 3);
 
         if (reason == discard_all_reason::disable_temp_ghost) {
             return;

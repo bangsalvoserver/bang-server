@@ -85,7 +85,7 @@ def parse_effect_simple(effect_list, value_name, type_name):
 def parse_all_effects(card):
     try:
         return {
-            'name':         card['name'],
+            'name':         card['name'] if 'name' in card else None,
             'image':        card['image'] if 'image' in card else None,
             'effects':      parse_effects(card['effects']) if 'effects' in card else None,
             'responses':    parse_effects(card['responses']) if 'responses' in card else None,
@@ -119,14 +119,20 @@ def parse_file(data):
         'fistfulofcards': [],
         'wildwestshow': [],
         'button_row': [],
+        'stations': [],
+        'train': [],
+        'locomotive': [],
         'hidden': []
     }
 
     for card in data['main_deck']:
         card['deck'] = 'main_deck'
-        for sign in card['signs']:
-            card['sign'] = sign
-            result['deck'].append(parse_all_effects(card))
+        if is_hidden(card):
+            result['hidden'].append(parse_all_effects(card))
+        else:
+            for sign in card['signs']:
+                card['sign'] = sign
+                result['deck'].append(parse_all_effects(card))
     
     for card in data['character']:
         card['deck'] = 'character'
@@ -151,6 +157,24 @@ def parse_file(data):
             else:
                 result[name].append(parse_all_effects(card))
 
+    for card in data['station']:
+        card['deck'] = 'station'
+        add_expansion(card, 'greattrainrobbery')
+        result['stations'].append(parse_all_effects(card))
+
+    for card in data['train']:
+        card['deck'] = 'train'
+        add_expansion(card, 'greattrainrobbery')
+        if is_hidden(card):
+            result['hidden'].append(parse_all_effects(card))
+        else:
+            result['train'].append(parse_all_effects(card))
+    
+    for card in data['locomotive']:
+        card['deck'] = 'locomotive'
+        add_expansion(card, 'greattrainrobbery')
+        result['locomotive'] .append(parse_all_effects(card))
+
     for card in data['button_row']:
         if is_hidden(card):
             result['hidden'].append(parse_all_effects(card))
@@ -159,7 +183,7 @@ def parse_file(data):
 
     return result
 
-INCLUDE_FILENAMES = ['game/card_data.h', 'cards/effect_enums.h', 'cards/filter_enums.h']
+INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/effect_enums.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':

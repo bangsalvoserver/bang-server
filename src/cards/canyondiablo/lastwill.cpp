@@ -28,7 +28,7 @@ namespace banggame {
                     if (target->m_hp <= 0) {
                         origin->m_game->queue_request<request_lastwill>(origin_card, origin);
                     }
-                }, 2);
+                }, 3);
             }
         });
     }

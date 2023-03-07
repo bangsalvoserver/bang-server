@@ -40,6 +40,31 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
+    struct request_discard_all : request_base, resolvable_request {
+        discard_all_reason reason;
+
+        request_discard_all(player *target, discard_all_reason reason)
+            : request_base(nullptr, nullptr, target)
+            , reason(reason) {}
+        
+        bool can_pick(card *target_card) const override;
+        void on_pick(card *target_card) override;
+        void on_update() override;
+        void on_resolve() override;
+        game_string status_text(player *owner) const override;
+    };
+    
+    struct request_discard_hand : request_base, resolvable_request {
+        request_discard_hand(card *origin_card, player *target)
+            : request_base(origin_card, nullptr, target) {}
+        
+        bool can_pick(card *target_card) const override;
+        void on_pick(card *target_card) override;
+        void on_update() override;
+        void on_resolve() override;
+        game_string status_text(player *owner) const override;
+    };
+
 }
 
 #endif

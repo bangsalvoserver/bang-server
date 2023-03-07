@@ -1,7 +1,7 @@
 #ifndef __GAME_STRING_H__
 #define __GAME_STRING_H__
 
-#include "card_enums.h"
+#include "cards/card_enums.h"
 
 namespace banggame {
 

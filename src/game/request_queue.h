@@ -6,7 +6,8 @@
 #include <concepts>
 #include <functional>
 
-#include "holders.h"
+#include "cards/card_effect.h"
+
 #include "utils/stable_queue.h"
 
 namespace banggame {

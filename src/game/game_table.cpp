@@ -1,5 +1,8 @@
 #include "game_table.h"
 
+#include "cards/filter_enums.h"
+#include "cards/game_enums.h"
+
 #include "player_iterator.h"
 
 namespace banggame {
@@ -29,6 +32,9 @@ namespace banggame {
         case pocket_type::wws_scenario_deck: return m_wws_scenario_deck;
         case pocket_type::wws_scenario_card: return m_wws_scenario_cards;
         case pocket_type::button_row:        return m_button_row;
+        case pocket_type::stations:          return m_stations;
+        case pocket_type::train:             return m_train;
+        case pocket_type::train_deck:        return m_train_deck;
         default: throw std::runtime_error("Invalid pocket");
         }
     }
@@ -115,6 +121,14 @@ namespace banggame {
         add_update<game_update_type::move_card>(c, owner, pocket, instant);
     }
 
+    void game_table::discard_train_card(card *c) {
+        if (m_train.size() < 4) {
+            move_card(c, pocket_type::train);
+        } else {
+            move_card(c, pocket_type::train_deck, nullptr, card_visibility::hidden);
+        }
+    }
+
     card *game_table::top_of_deck() {
         if (m_deck.empty()) {
             if (m_discards.empty()) {
@@ -163,13 +177,6 @@ namespace banggame {
         card *drawn_card = m_shop_deck.back();
         add_log("LOG_DRAWN_SHOP_CARD", drawn_card);
         move_card(drawn_card, pocket_type::shop_selection);
-        if (drawn_card->has_tag(tag_type::shopchoice)) {
-            for (card *c : m_hidden_deck) {
-                if (c->get_tag_value(tag_type::shopchoice) == drawn_card->get_tag_value(tag_type::shopchoice)) {
-                    set_card_visibility(c, nullptr, card_visibility::shown, true);
-                }
-            }
-        }
         return drawn_card;
     }
 
@@ -270,6 +277,14 @@ namespace banggame {
     void game_table::remove_game_flags(game_flags flags) {
         m_game_flags &= ~flags;
         add_update<game_update_type::game_flags>(m_game_flags);
+    }
+
+    bool game_table::check_flags(game_flags flags) const {
+        return bool(m_game_flags & flags);
+    }
+
+    bool game_table::is_game_over() const {
+        return check_flags(game_flags::game_over);
     }
 
 }

@@ -2,19 +2,37 @@
 
 #include "game.h"
 
-#include "holders.h"
 #include "play_verify.h"
 #include "game_update.h"
+
+#include "cards/holders.h"
+#include "cards/game_enums.h"
 
 #include "cards/base/damage.h"
 #include "cards/base/draw.h"
 #include "cards/base/predraw_check.h"
 #include "cards/base/requests.h"
 
+#include "cards/filter_enums.h"
+#include "cards/effect_context.h"
+
 #include <cassert>
 #include <numeric>
 
 namespace banggame {
+
+    bool player::is_bot() const {
+        return user_id < 0;
+    }
+
+    bool player::is_ghost() const {
+        return check_player_flags(player_flags::ghost)
+            || check_player_flags(player_flags::temp_ghost);
+    }
+
+    bool player::alive() const {
+        return !check_player_flags(player_flags::dead) || is_ghost();
+    }
 
     void player::equip_card(card *target) {
         m_game->move_card(target, pocket_type::player_table, this, card_visibility::shown);
@@ -53,8 +71,8 @@ namespace banggame {
         return m_game->call_event<event_type::count_cards_to_draw>(this, 2);
     }
 
-    game_string player::get_play_card_error(card *origin_card) {
-        return m_game->call_event<event_type::check_play_card>(this, origin_card, game_string{});
+    game_string player::get_play_card_error(card *origin_card, const effect_context &ctx) {
+        return m_game->call_event<event_type::check_play_card>(this, origin_card, ctx, game_string{});
     }
 
     card *player::find_equipped_card(card *card) {
@@ -89,7 +107,9 @@ namespace banggame {
 
     void player::discard_card(card *target) {
         move_owned_card(this, target, [&]{
-            if (target->is_black()) {
+            if (target->is_train()) {
+                m_game->discard_train_card(target);
+            } else if (target->is_black()) {
                 m_game->move_card(target, pocket_type::shop_discard);
             } else {
                 m_game->move_card(target, pocket_type::discard_pile);
@@ -185,8 +205,12 @@ namespace banggame {
     }
 
     void player::add_to_hand(card *target) {
-        m_game->move_card(target, pocket_type::player_hand, this, m_game->check_flags(game_flags::hands_shown)
-            ? card_visibility::shown : card_visibility::show_owner);
+        if (target->deck == card_deck_type::train) {
+            equip_card(target);
+        } else {
+            m_game->move_card(target, pocket_type::player_hand, this, m_game->check_flags(game_flags::hands_shown)
+                ? card_visibility::shown : card_visibility::show_owner);
+        }
     }
 
     void player::add_to_hand_phase_one(card *drawn_card) {
@@ -243,15 +267,17 @@ namespace banggame {
         }
     }
 
-    void player::add_played_card(card *origin_card, std::vector<card *> modifiers) {
-        m_played_cards.emplace_back(origin_card, modifiers | ranges::to<std::vector<card_pocket_pair>>);
-    }
-
     card *player::get_last_played_card() const {
         if (m_played_cards.empty()) {
             return nullptr;
         } else {
-            return m_played_cards.back().first.origin_card;
+            auto &last_card_pair = m_played_cards.back();
+            if (auto it = std::ranges::find_if(last_card_pair.second, [](const card_pocket_pair &pair) {
+                return pair.origin_card->has_tag(tag_type::card_choice);
+            }); it != last_card_pair.second.end()) {
+                return it->origin_card;
+            }
+            return last_card_pair.first.origin_card;
         }
     }
 
@@ -271,30 +297,6 @@ namespace banggame {
             }
         } else {
             return "ERROR_NO_PENDING_REQUEST";
-        }
-    }
-
-    void player::play_card_action(card *origin_card) {
-        switch (origin_card->pocket) {
-        case pocket_type::player_hand:
-            m_game->move_card(origin_card, pocket_type::discard_pile);
-            m_game->call_event<event_type::on_play_hand_card>(this, origin_card);
-            break;
-        case pocket_type::player_table:
-            if (origin_card->is_green()) {
-                m_game->move_card(origin_card, pocket_type::discard_pile);
-            }
-            break;
-        case pocket_type::shop_selection:
-            m_game->move_card(origin_card, pocket_type::shop_discard);
-            m_game->queue_action([m_game=m_game]{
-                if (m_game->m_shop_selection.size() < 3) {
-                    m_game->draw_shop_card();
-                }
-            }, -1);
-            break;
-        default:
-            break;
         }
     }
 

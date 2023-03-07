@@ -1,6 +1,9 @@
 #include "bot_suggestion.h"
 #include "game.h"
 
+#include "cards/filter_enums.h"
+#include "cards/game_enums.h"
+
 namespace banggame::bot_suggestion {
 
     bool target_enemy::on_check_target(card *origin_card, player *origin, player *target) {

@@ -13,6 +13,7 @@ namespace banggame {
                     card *hand_card = shooter->random_hand_card();
                     origin->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, shooter, hand_card);
                     shooter->discard_card(hand_card);
+                    origin->m_game->call_event<event_type::on_use_hand_card>(shooter, hand_card, true);
                 }
             });
         }

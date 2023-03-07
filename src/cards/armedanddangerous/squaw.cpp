@@ -1,7 +1,10 @@
 #include "squaw.h"
 
-#include "game/game.h"
 #include "cards/base/steal_destroy.h"
+
+#include "cards/game_enums.h"
+
+#include "game/game.h"
 
 namespace banggame {
 

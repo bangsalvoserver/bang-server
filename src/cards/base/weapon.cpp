@@ -2,6 +2,7 @@
 
 #include "game/game.h"
 #include "prompts.h"
+#include "cards/filter_enums.h"
 
 namespace banggame {
 

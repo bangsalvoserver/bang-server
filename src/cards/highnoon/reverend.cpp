@@ -1,6 +1,7 @@
 #include "reverend.h"
 
 #include "game/game.h"
+#include "cards/filter_enums.h"
 
 namespace banggame {
 

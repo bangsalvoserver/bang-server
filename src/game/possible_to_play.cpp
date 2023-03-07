@@ -1,7 +1,7 @@
 #include "possible_to_play.h"
 
 #include "cards/effect_enums.h"
-#include "filters.h"
+#include "cards/filters.h"
 
 namespace banggame {
 
@@ -13,6 +13,8 @@ namespace banggame {
             origin->m_game->m_button_row,
             origin->m_game->m_hidden_deck,
             origin->m_game->m_shop_selection,
+            origin->m_game->m_stations,
+            origin->m_game->m_train,
             origin->m_game->m_scenario_cards | ranges::views::take_last(1),
             origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
         );
@@ -25,32 +27,34 @@ namespace banggame {
             });
     }
 
-    ranges::any_view<player *> make_equip_set(player *origin, card *origin_card) {
+    ranges::any_view<player *> make_equip_set(player *origin, card *origin_card, const effect_context &ctx) {
         return origin->m_game->m_players
             | ranges::views::filter([=](player *target) {
-                return !get_equip_error(origin, origin_card, target);
+                return !get_equip_error(origin, origin_card, target, ctx);
             });
     }
 
     ranges::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
         return origin->m_game->m_players
             | ranges::views::filter([=](player *target) {
-                return !check_player_filter(origin, holder.player_filter, target, ctx)
+                return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
                     && !holder.get_error(origin_card, origin, target, ctx);
             });
     }
 
     ranges::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
-        return make_player_target_set(origin, origin_card, holder)
+        return ranges::views::concat(
+            make_player_target_set(origin, origin_card, holder)
             | ranges::views::for_each([](player *target) {
                 return ranges::views::concat(
                     target->m_hand,
                     target->m_table,
                     target->m_characters | ranges::views::take(1)
                 );
-            })
+            }),
+            origin->m_game->m_selection)
             | ranges::views::filter([=](card *target_card) {
-                return !check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
+                return !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
                     && !holder.get_error(origin_card, origin, target_card, ctx);
             });
     }
@@ -104,7 +108,7 @@ namespace banggame {
             case target_type::card:
                 return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::extra_card:
-                return ctx.repeating || contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
+                return ctx.repeat_card || contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::cards:
                 return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), std::max<int>(1, holder.target_value));
             case target_type::select_cubes:
@@ -118,30 +122,31 @@ namespace banggame {
     }
 
     ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
-        if (ctx.repeating) {
-            return ranges::views::single(origin->get_last_played_card()) | ranges::views::filter([=](card *origin_card) {
-                return origin_card && is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
-            });
+        auto filter = ranges::views::filter([=](card *origin_card) {
+            return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
+        });
+        if (ctx.card_choice) {
+            return origin->m_game->m_hidden_deck | filter;
+        } else if (ctx.repeat_card) {
+            return ranges::views::single(ctx.repeat_card) | filter;
         } else {
-            return get_all_active_cards(origin) | ranges::views::filter([=](card *origin_card) {
-                return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
-            });
+            return get_all_active_cards(origin) | filter;
         }
     }
 
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
         for (card *mod_card : modifiers) {
             if (mod_card == origin_card) return false;
-            if (mod_card->modifier.get_error(mod_card, origin, origin_card)) return false;
+            if (mod_card->modifier.get_error(mod_card, origin, origin_card, ctx)) return false;
         }
 
-        if ((origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
+        if (filters::is_equip_card(origin_card)) {
             return !is_response
-                && contains_at_least(make_equip_set(origin, origin_card), 1)
-                && origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
+                && contains_at_least(make_equip_set(origin, origin_card, ctx), 1)
+                && origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
         }
         
-        if (origin->get_play_card_error(origin_card)
+        if (origin->get_play_card_error(origin_card, ctx)
             || origin->m_game->is_disabled(origin_card)
             || !is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx)
             || !is_possible_mth(origin, origin_card, is_response, ctx))
@@ -155,7 +160,7 @@ namespace banggame {
             
             return contains_at_least(cards_playable_with_modifiers(origin, vector_concat(modifiers, origin_card), is_response, ctx_copy), 1);
         } else {
-            return origin->m_gold >= get_card_cost(origin_card, is_response, ctx);
+            return origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
         }
     }
 }

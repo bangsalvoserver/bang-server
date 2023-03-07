@@ -1,5 +1,7 @@
 #include "ladyrosaoftexas.h"
 
+#include "cards/game_enums.h"
+
 #include "game/game.h"
 #include "game/bot_suggestion.h"
 

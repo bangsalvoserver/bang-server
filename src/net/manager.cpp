@@ -42,7 +42,7 @@ void game_manager::tick() {
         if (l.state == lobby_state::playing && l.m_game) {
             l.m_game->tick();
             l.send_updates(*this);
-            if (l.m_game->check_flags(game_flags::game_over)) {
+            if (l.m_game->is_game_over()) {
                 l.state = lobby_state::finished;
                 send_lobby_update(it);
             }

@@ -6,10 +6,7 @@
 namespace banggame {
 
     struct effect_graverobber {
-        int state;
-        effect_graverobber(int state) : state(state) {}
-        
-        void on_play(card *origin_card, player *origin);
+        void on_play(card *origin_card, player *origin, player *target);
     };
 }
 

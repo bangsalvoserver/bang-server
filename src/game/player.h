@@ -13,13 +13,6 @@ namespace banggame {
 
     constexpr int max_cubes = 4;
 
-    enum class discard_all_reason : uint8_t {
-        death,
-        sheriff_killed_deputy,
-        disable_temp_ghost,
-        discard_ghost
-    };
-
     enum class card_visibility : uint8_t {
         hidden,
         shown,
@@ -142,20 +135,11 @@ namespace banggame {
         int get_bangs_played();
         int get_cards_to_draw();
 
-        game_string get_play_card_error(card *card);
+        game_string get_play_card_error(card *card, const effect_context &ctx);
 
-        bool is_bot() const {
-            return user_id < 0;
-        }
-
-        bool is_ghost() const {
-            return check_player_flags(player_flags::ghost)
-                || check_player_flags(player_flags::temp_ghost);
-        }
-
-        bool alive() const {
-            return !check_player_flags(player_flags::dead) || is_ghost();
-        }
+        bool is_bot() const;
+        bool is_ghost() const;
+        bool alive() const;
 
         void damage(card *origin_card, player *source, int value, effect_flags flags = {});
 
@@ -165,8 +149,6 @@ namespace banggame {
         void add_gold(int amount);
 
         bool immune_to(card *origin_card, player *origin, effect_flags flags) const;
-        
-        void discard_all(discard_all_reason reason);
 
         bool only_black_cards_equipped() const {
             return empty_hand() && std::ranges::all_of(m_table, &card::is_black);
@@ -185,7 +167,6 @@ namespace banggame {
         void set_role(player_role role, bool instant = true);
         void reset_max_hp();
 
-        void add_played_card(card *origin_card, std::vector<card *> modifiers);
         card *get_last_played_card() const;
 
         void start_of_turn();
@@ -210,8 +191,6 @@ namespace banggame {
 
         void untap_inactive_cards();
         void remove_extra_characters();
-
-        void play_card_action(card *origin_card);
 
         void prompt_then(game_string &&message, std::function<void()> &&args);
 

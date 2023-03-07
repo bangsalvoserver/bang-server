@@ -96,24 +96,11 @@ namespace banggame {
         }
     };
 
-    game_string effect_poker::on_prompt(card *origin_card, player *origin) {
-        if (std::ranges::all_of(range_other_players(origin), &player::empty_hand)) {
-            return {"PROMPT_CARD_NO_EFFECT", origin_card};
-        }
-        return {};
+    void effect_poker::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
+        origin->m_game->queue_request<request_poker>(origin_card, origin, target, flags);
     }
 
     void effect_poker::on_play(card *origin_card, player *origin) {
-        auto targets = range_other_players(origin)
-            | ranges::views::remove_if(&player::empty_hand)
-            | ranges::to<std::vector>;
-
-        effect_flags flags = effect_flags::escapable;
-        if (targets.size() == 1) flags |= effect_flags::single_target;
-        
-        for (player *p : targets) {
-            origin->m_game->queue_request<request_poker>(origin_card, origin, p, flags);
-        }
         origin->m_game->queue_request<request_poker_draw>(origin_card, origin);
     }
 }

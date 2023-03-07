@@ -1,8 +1,11 @@
 #include "josh_mccloud.h"
 
-#include "game/game.h"
-#include "game/filters.h"
 #include "cards/base/requests.h"
+
+#include "cards/game_enums.h"
+#include "cards/filters.h"
+
+#include "game/game.h"
 #include "game/possible_to_play.h"
 
 namespace banggame {
@@ -61,7 +64,7 @@ namespace banggame {
     game_string effect_forced_equip::get_error(card *origin_card, player *origin, player *target) {
         if (auto req = target->m_game->top_request<request_force_equip_card>(origin)) {
             card *target_card = req->target_card;
-            MAYBE_RETURN(check_player_filter(origin, target_card->equip_target, target));
+            MAYBE_RETURN(filters::check_player_filter(origin, target_card->equip_target, target));
             if (card *equipped = target->find_equipped_card(target_card)) {
                 return {"ERROR_DUPLICATED_CARD", equipped};
             } else {

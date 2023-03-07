@@ -51,21 +51,13 @@ namespace banggame {
             }
         }
     };
-
-    game_string effect_rust::on_prompt(card *origin_card, player *origin, player *target) {
-        if (target->count_cubes() == 0) {
-            return {"PROMPT_CARD_NO_EFFECT", origin_card};
-        } else {
-            return {};
-        }
-    }
     
     void effect_rust::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
-        if (target->immune_to(origin_card, origin, flags)) return;
-        if (target->count_cubes() == 0) return;
-        origin->m_game->queue_action([=]{
-            origin->m_game->queue_request<request_rust>(origin_card, origin, target, flags);
-        });
+        if (!target->immune_to(origin_card, origin, flags)) {
+            origin->m_game->queue_action([=]{
+                origin->m_game->queue_request<request_rust>(origin_card, origin, target, flags);
+            });
+        }
     }
 
 }

@@ -1,8 +1,9 @@
 #include "belltower.h"
 
-#include "game/game.h"
+#include "cards/effect_context.h"
+#include "cards/filters.h"
 
-#include "cards/filter_enums.h"
+#include "game/game.h"
 
 namespace banggame {
 

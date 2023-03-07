@@ -3,13 +3,14 @@
 
 #include "utils/enums.h"
 
+#include "filter_enums.h"
+
 namespace banggame {
 
     DEFINE_ENUM_FWD_TYPES(effect_type,
         (none)
         (mth_add)
         (ctx_add)
-        (play_card_action,      effect_play_card_action)
         (max_usages,            effect_max_usages)
         (pass_turn,             effect_pass_turn)
         (resolve,               effect_resolve)
@@ -52,7 +53,7 @@ namespace banggame {
         (goldrush,              effect_goldrush)
         (forced_play,           effect_forced_play)
         (forced_equip,          effect_forced_equip)
-        (shopchoice,            effect_shopchoice)
+        (card_choice,           effect_card_choice)
         (pay_cube,              effect_pay_cube)
         (add_cube,              effect_add_cube)
         (rust,                  effect_rust)
@@ -60,7 +61,6 @@ namespace banggame {
         (thunderer,             effect_thunderer)
         (buntlinespecial,       effect_buntlinespecial)
         (bigfifty,              effect_bigfifty)
-        (bandolier,             effect_bandolier)
         (move_bomb,             effect_move_bomb)
         (tumbleweed,            effect_tumbleweed)
         (sniper,                effect_sniper)
@@ -80,6 +80,19 @@ namespace banggame {
         (lastwill,              effect_lastwill)
         (ladyrosaoftexas,       effect_ladyrosaoftexas)
         (changewws,             effect_changewws)
+        (cactus,                effect_cactus)
+        (evaded,                effect_evaded)
+        (full_steam,            effect_full_steam)
+        (knife_revolver,        effect_knife_revolver)
+        (most_wanted,           effect_most_wanted)
+        (next_stop,             effect_next_stop)
+        (train_robbery,         effect_train_robbery)
+        (shade_oconnor,         effect_shade_oconnor)
+        (lounge_car,            effect_lounge_car)
+        (cattle_truck,          effect_cattle_truck)
+        (circus_wagon,          effect_circus_wagon)
+        (express_car,           effect_express_car)
+        (mail_car,              effect_mail_car)
     )
 
     DEFINE_ENUM_FWD_TYPES(equip_type,
@@ -180,13 +193,27 @@ namespace banggame {
         (showdown,              equip_showdown)
         (sacagaway,             equip_sacagaway)
         (wildwestshow,          equip_wildwestshow)
+        (dragoon,               equip_dragoon)
+        (map,                   equip_map)
+        (refund,                equip_refund)
+        (strongbox,             equip_strongbox)
+        (benny_brawler,         equip_benny_brawler)
+        (manuelita,             equip_manuelita)
+        (shade_oconnor,         equip_shade_oconnor)
+        (ironhorse,             equip_ironhorse)
+        (leland,                equip_leland)
+        (prisoner_car,          equip_prisoner_car)
+        (private_car,           equip_private_car)
+        (dining_car,            equip_dining_car)
+        (lumber_flatcar,        equip_lumber_flatcar)
+        (ghost_car)
     )
 
     DEFINE_ENUM_FWD_TYPES(mth_type,
         (none)
         (play_as_bang,          handler_play_as_bang)
-        (play_as_gatling,       handler_play_as_gatling)
         (fanning,               handler_fanning)
+        (claus_the_saint,       handler_claus_the_saint)
         (doc_holyday,           handler_doc_holyday)
         (flint_westwood,        handler_flint_westwood)
         (draw_multi,            handler_draw_multi)
@@ -195,8 +222,11 @@ namespace banggame {
         (duck,                  handler_duck)
         (squaw,                 handler_squaw)
         (red_ringo,             handler_red_ringo)
-        (card_sharper,          handler_card_sharper)
         (lastwill,              handler_lastwill)
+        (switch_cards,          handler_switch_cards)
+        (evan_babbit,           handler_evan_babbit)
+        (lounge_car,            handler_lounge_car)
+        (mail_car,              handler_mail_car)
     )
 
     DEFINE_ENUM_FWD_TYPES(modifier_type,
@@ -205,9 +235,13 @@ namespace banggame {
         (doublebarrel,          modifier_doublebarrel)
         (bandolier,             modifier_bandolier)
         (belltower,             modifier_belltower)
-        (shopchoice,            modifier_shopchoice)
+        (card_choice,           modifier_card_choice)
         (discount,              modifier_discount)
         (leevankliff,           modifier_leevankliff)
+        (moneybag,              modifier_moneybag)
+        (skip_player,           modifier_skip_player)
+        (traincost,             modifier_traincost)
+        (locomotive,            modifier_locomotive)
     )
 
 }

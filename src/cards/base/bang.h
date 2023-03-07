@@ -16,18 +16,14 @@ namespace banggame {
     };
 
     struct handler_play_as_bang {
-        bool on_check_target(card *origin_card, player *origin, card *chosen_card, player *target) {
-            return bot_suggestion::target_enemy{}.on_check_target(origin_card, origin, target);
-        }
-        game_string on_prompt(card *origin_card, player *origin, card *chosen_card, player *target) {
-            return prompt_target_ghost{}.on_prompt(origin_card, origin, target);
-        }
-        void on_play(card *origin_card, player *origin, card *chosen_card, player *target);
+        bool on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target);
+        game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target);
+        void on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target);
     };
 
     struct effect_banglimit {
         game_string get_error(card *origin_card, player *origin, const effect_context &ctx);
-        void on_play(card *origin_card, player *origin);
+        void on_play(card *origin_card, player *origin, const effect_context &ctx);
     };
 
     struct modifier_bangmod {

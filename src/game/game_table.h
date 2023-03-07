@@ -31,8 +31,13 @@ namespace banggame {
         std::vector<card *> m_scenario_cards;
         std::vector<card *> m_wws_scenario_deck;
         std::vector<card *> m_wws_scenario_cards;
+
+        std::vector<card *> m_stations;
+        std::vector<card *> m_train_deck;
+        std::vector<card *> m_train;
         
         int8_t num_cubes = 0;
+        int8_t train_position = 0;
 
         game_flags m_game_flags{};
         game_options m_options;
@@ -60,6 +65,7 @@ namespace banggame {
 
         void set_card_visibility(card *c, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
         void move_card(card *c, pocket_type pocket, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
+        void discard_train_card(card *c);
         
         card *top_of_deck();
         card *phase_one_drawn_card();
@@ -81,9 +87,9 @@ namespace banggame {
         void add_game_flags(game_flags flags);
         void remove_game_flags(game_flags flags);
     
-        bool check_flags(game_flags type) const {
-            return bool(m_game_flags & type);
-        }
+        bool check_flags(game_flags type) const;
+
+        bool is_game_over() const;
     };
 
 }

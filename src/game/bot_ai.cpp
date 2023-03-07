@@ -1,8 +1,9 @@
 #include "game.h"
 #include "play_verify.h"
 #include "possible_to_play.h"
-#include "filters.h"
+
 #include "cards/effect_enums.h"
+#include "cards/filters.h"
 
 namespace banggame {
 
@@ -40,7 +41,7 @@ namespace banggame {
         }
 
         card *operator()(enums::enum_tag_t<target_type::extra_card> tag) const {
-            if (ctx.repeating) {
+            if (ctx.repeat_card) {
                 return nullptr;
             } else {
                 auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
@@ -99,11 +100,11 @@ namespace banggame {
 
         card *playing_card = nullptr;
         while (!playing_card) {
-            if (!is_response && (origin_card->pocket == pocket_type::player_hand || origin_card->pocket == pocket_type::shop_selection) && !origin_card->is_brown()) {
+            if (!is_response && filters::is_equip_card(origin_card)) {
                 playing_card = origin_card;
                 if (!origin_card->self_equippable()) {
                     ret.targets.emplace_back(enums::enum_tag<target_type::player>,
-                        random_element(make_equip_set(origin, origin_card), origin->m_game->rng));
+                        random_element(make_equip_set(origin, origin_card, ctx), origin->m_game->rng));
                 }
             } else if (origin_card->is_modifier()) {
                 auto &targets = ret.modifiers.emplace_back(origin_card).targets;

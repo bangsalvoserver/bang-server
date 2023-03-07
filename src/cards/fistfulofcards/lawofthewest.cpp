@@ -22,8 +22,8 @@ namespace banggame {
                         out_error = {"ERROR_MANDATORY_CARD", drawn_card};
                     }
                 });
-                origin->m_game->add_listener<event_type::on_effect_end>(key, [=](player *p, card *played_card) {
-                    if (p == origin && played_card == drawn_card) {
+                origin->m_game->add_listener<event_type::on_use_hand_card>(key, [=](player *p, card *target_card, bool automatic) {
+                    if (p == origin && target_card == drawn_card) {
                         origin->m_game->remove_listeners(key);
                     }
                 });

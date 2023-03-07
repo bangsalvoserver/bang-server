@@ -1,0 +1,22 @@
+target_sources(bangserver PRIVATE
+    add_cube.cpp
+    al_preacher.cpp
+    bandolier.cpp
+    belltower.cpp
+    bigfifty.cpp
+    bloody_mary.cpp
+    bomb.cpp
+    buntlinespecial.cpp
+    doublebarrel.cpp
+    duck.cpp
+    flintlock.cpp
+    frankie_canton.cpp
+    julie_cutter.cpp
+    ms_abigail.cpp
+    red_ringo.cpp
+    ruleset.cpp
+    rust.cpp
+    squaw.cpp
+    thunderer.cpp
+    tumbleweed.cpp
+)

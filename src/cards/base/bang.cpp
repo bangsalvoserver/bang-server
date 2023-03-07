@@ -2,6 +2,9 @@
 
 #include "cards/effects.h"
 #include "cards/effect_enums.h"
+#include "cards/effect_context.h"
+#include "cards/game_enums.h"
+
 #include "game/game.h"
 #include "damage.h"
 
@@ -27,10 +30,49 @@ namespace banggame {
         queue_request_bang(origin_card, origin, target);
     }
 
-    void handler_play_as_bang::on_play(card *origin_card, player *origin, card *chosen_card, player *target) {
-        origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
-        origin->discard_card(chosen_card);
-        queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
+    bool handler_play_as_bang::on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target) {
+        if (target.is(target_type::player)) {
+            player *target_player = target.get<target_type::player>();
+            return bot_suggestion::target_enemy{}.on_check_target(chosen_card, origin, target_player);
+        } else {
+            return true;
+        }
+    }
+
+    game_string handler_play_as_bang::on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target) {
+        if (target.is(target_type::player)) {
+            player *target_player = target.get<target_type::player>();
+            return prompt_target_ghost{}.on_prompt(chosen_card, origin, target_player);
+        } else {
+            return {};
+        }
+    }
+
+    void handler_play_as_bang::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target_variant) {
+        if (target_variant.is(target_type::player)) {
+            player *target = target_variant.get<target_type::player>();
+            origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
+            origin->discard_card(chosen_card);
+            queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
+
+        } else if (target_variant.is(target_type::players)) {
+            origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
+            origin->discard_card(chosen_card);
+
+            std::vector<player *> targets;
+            for (player *target : range_other_players(origin)) {
+                if (target != ctx.skipped_player) {
+                    targets.push_back(target);
+                }
+            }
+            auto flags = effect_flags::play_as_bang | effect_flags::multi_target;
+            if (targets.size() == 1) {
+                flags |= effect_flags::single_target;
+            }
+            for (player *p : targets) {
+                origin->m_game->queue_request<request_bang>(chosen_card, origin, p, flags);
+            }
+        }
     }
     
     game_string effect_banglimit::get_error(card *origin_card, player *origin, const effect_context &ctx) {
@@ -40,7 +82,10 @@ namespace banggame {
         return {};
     }
 
-    void effect_banglimit::on_play(card *origin_card, player *origin) {
+    void effect_banglimit::on_play(card *origin_card, player *origin, const effect_context &ctx) {
+        if (ctx.disable_banglimit) {
+            return;
+        }
         event_card_key key{origin_card, 4};
         origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](player *p, int &value) {
             if (origin == p) {
