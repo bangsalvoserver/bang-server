@@ -5,6 +5,7 @@
 namespace banggame {
 
     void effect_next_stop::on_play(card *origin_card, player *origin) {
+        origin->m_game->add_log("LOG_TRAIN_ADVANCE");
         ++origin->m_game->train_position;
         origin->m_game->add_update<game_update_type::move_train>(origin->m_game->train_position);
         origin->m_game->queue_action([=]{

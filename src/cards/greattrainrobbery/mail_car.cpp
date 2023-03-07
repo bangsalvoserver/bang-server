@@ -51,7 +51,14 @@ namespace banggame {
             target_player->add_to_hand(target_card);
 
             while (!origin->m_game->m_selection.empty()) {
-                origin->add_to_hand(origin->m_game->m_selection.front());
+                card *c = origin->m_game->m_selection.front();
+                if (!origin->m_game->check_flags(game_flags::hands_shown)) {
+                    origin->m_game->add_log(update_target::includes(origin), "LOG_DRAWN_CARD", origin, c);
+                    origin->m_game->add_log(update_target::excludes(origin), "LOG_DRAWN_A_CARD", origin);
+                } else {
+                    origin->m_game->add_log("LOG_DRAWN_CARD", origin, c);
+                }
+                origin->add_to_hand(c);
             }
         });
     }

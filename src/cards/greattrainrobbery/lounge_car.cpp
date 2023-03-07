@@ -56,10 +56,13 @@ namespace banggame {
         origin->m_game->invoke_action([&]{
             origin->m_game->pop_request();
 
+            origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, origin, target_player);
             target_player->equip_card(target_card);
 
             while (!origin->m_game->m_selection.empty()) {
-                origin->equip_card(origin->m_game->m_selection.front());
+                card *c = origin->m_game->m_selection.front();
+                origin->m_game->add_log("LOG_EQUIPPED_CARD", c, origin);
+                origin->equip_card(c);
             }
         });
     }

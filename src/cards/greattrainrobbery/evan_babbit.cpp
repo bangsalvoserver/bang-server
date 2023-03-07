@@ -33,7 +33,10 @@ namespace banggame {
     }
 
     void handler_evan_babbit::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {
+        origin->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, origin, target_card);
         origin->discard_card(target_card);
-        origin->m_game->top_request()->target = target_player;
+        auto req = origin->m_game->top_request();
+        origin->m_game->add_log("LOG_DEFLECTED_BANG_TO", origin_card, origin, req->origin_card, target_player);
+        req->target = target_player;
     }
 }
