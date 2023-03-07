@@ -59,8 +59,7 @@ namespace banggame {
     }
     
     static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
-        for (size_t i=0; i<modifiers.size(); ++i) {
-            const auto &[mod_card, targets] = modifiers[i];
+        for (const auto &[mod_card, targets] : modifiers) {
             if (!mod_card->is_modifier()) {
                 return "ERROR_CARD_IS_NOT_MODIFIER";
             }
@@ -73,6 +72,10 @@ namespace banggame {
             mod_card->modifier.add_context(mod_card, origin, ctx);
             
             MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
+        }
+
+        for (size_t i=0; i<modifiers.size(); ++i) {
+            const auto &[mod_card, targets] = modifiers[i];
 
             MAYBE_RETURN(mod_card->modifier.get_error(mod_card, origin, origin_card, ctx));
             for (size_t j=0; j<i; ++j) {

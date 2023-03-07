@@ -275,7 +275,13 @@ namespace banggame {
         if (m_played_cards.empty()) {
             return nullptr;
         } else {
-            return m_played_cards.back().first.origin_card;
+            auto &last_card_pair = m_played_cards.back();
+            if (auto it = std::ranges::find_if(last_card_pair.second, [](const card_pocket_pair &pair) {
+                return pair.origin_card->has_tag(tag_type::card_choice);
+            }); it != last_card_pair.second.end()) {
+                return it->origin_card;
+            }
+            return last_card_pair.first.origin_card;
         }
     }
 

@@ -125,7 +125,9 @@ namespace banggame {
         auto filter = ranges::views::filter([=](card *origin_card) {
             return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
         });
-        if (ctx.repeat_card) {
+        if (ctx.card_choice) {
+            return origin->m_game->m_hidden_deck | filter;
+        } else if (ctx.repeat_card) {
             return ranges::views::single(ctx.repeat_card) | filter;
         } else {
             return get_all_active_cards(origin) | filter;

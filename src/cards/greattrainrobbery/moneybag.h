@@ -9,10 +9,8 @@ namespace banggame {
         bool valid_with_equip(card *origin_card, player *origin, card *target_card) {
             return false;
         }
-        bool valid_with_modifier(card *origin_card, player *origin, card *target_card) {
-            return false;
-        }
-        game_string get_error(card *origin_card, player *origin, card *target_card);
+        bool valid_with_modifier(card *origin_card, player *origin, card *target_card);
+        game_string get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx);
         void add_context(card *origin_card, player *origin, effect_context &ctx);
     };
 }
