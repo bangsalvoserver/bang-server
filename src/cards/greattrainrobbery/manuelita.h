@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct equip_manuelita {
+    struct equip_manuelita : event_equip {
         void on_enable(card *target_card, player *target);
     };
 }
