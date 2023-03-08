@@ -127,6 +127,8 @@ namespace banggame {
         });
         if (ctx.card_choice) {
             return origin->m_game->m_hidden_deck | filter;
+        } else if (ctx.traincost) {
+            return origin->m_game->m_train | filter;
         } else if (ctx.repeat_card) {
             return ranges::views::single(ctx.repeat_card) | filter;
         } else {

@@ -242,12 +242,9 @@ namespace banggame {
         return {};
     }
 
-    inline void add_played_card(player *origin, card *origin_card, const modifier_list &modifiers) {
+    inline void add_played_card(player *origin, card *origin_card, const modifier_list &modifiers, const effect_context &ctx) {
         if (origin_card->pocket != pocket_type::button_row) {
-            origin->m_played_cards.emplace_back(origin_card, modifiers
-                | ranges::views::transform([](const modifier_pair &pair) -> card * { return pair.card; })
-                | ranges::to<std::vector<card_pocket_pair>>
-            );
+            origin->m_played_cards.emplace_back(origin_card, modifiers, ctx);
         }
     }
 
@@ -385,7 +382,7 @@ namespace banggame {
             }
 
             origin->prompt_then(check_prompt_equip(origin_card, origin, target), [=]{
-                add_played_card(origin, origin_card, modifiers);
+                add_played_card(origin, origin_card, modifiers, ctx);
 
                 origin->add_gold(-cost);
                 origin_card->on_equip(target);
@@ -419,7 +416,7 @@ namespace banggame {
             }
 
             origin->prompt_then(check_prompt(origin, origin_card, is_response, targets, modifiers, ctx), [=]{
-                add_played_card(origin, origin_card, modifiers);
+                add_played_card(origin, origin_card, modifiers, ctx);
 
                 origin->add_gold(-cost);
                 for (const auto &[mod_card, mod_targets] : modifiers) {

@@ -61,8 +61,16 @@ namespace banggame {
     struct card_pocket_pair {
         card *origin_card;
         pocket_type pocket;
+    };
 
-        card_pocket_pair(card *c) : origin_card(c), pocket(c->pocket) {}
+    struct played_card_history {
+        card_pocket_pair origin_card;
+        std::vector<card_pocket_pair> modifiers;
+        std::unique_ptr<effect_context> context;
+
+        played_card_history(card *origin_card, const modifier_list &modifiers, const effect_context &context);
+        played_card_history(played_card_history &&) noexcept = default;
+        ~played_card_history();
     };
 
     struct player {
@@ -97,7 +105,7 @@ namespace banggame {
         
         int8_t m_extra_turns = 0;
 
-        std::vector<std::pair<card_pocket_pair, std::vector<card_pocket_pair>>> m_played_cards;
+        std::vector<played_card_history> m_played_cards;
 
         player_flags m_player_flags{};
 

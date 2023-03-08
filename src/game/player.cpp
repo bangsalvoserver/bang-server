@@ -20,6 +20,20 @@
 
 namespace banggame {
 
+    inline card_pocket_pair to_card_pocket_pair(card *c) {
+        return {c, c->pocket};
+    }
+
+    played_card_history::played_card_history(card *origin_card, const modifier_list &modifiers, const effect_context &context)
+        : origin_card{to_card_pocket_pair(origin_card)}
+        , modifiers{modifiers
+            | ranges::views::transform(&modifier_pair::card)
+            | ranges::views::transform(to_card_pocket_pair)
+            | ranges::to<std::vector>}
+        , context{std::make_unique<effect_context>(context)} {}
+
+    played_card_history::~played_card_history() = default;
+
     bool player::is_bot() const {
         return user_id < 0;
     }
@@ -269,16 +283,15 @@ namespace banggame {
     }
 
     card *player::get_last_played_card() const {
-        if (m_played_cards.empty()) {
-            return nullptr;
+        if (m_played_cards.empty()) return nullptr;
+        const auto &[origin_card, modifiers, ctx] = m_played_cards.back();
+
+        if (ctx->card_choice) {
+            return ctx->card_choice;
+        } else if (ctx->traincost) {
+            return ctx->traincost;
         } else {
-            auto &last_card_pair = m_played_cards.back();
-            if (auto it = std::ranges::find_if(last_card_pair.second, [](const card_pocket_pair &pair) {
-                return pair.origin_card->has_tag(tag_type::card_choice);
-            }); it != last_card_pair.second.end()) {
-                return it->origin_card;
-            }
-            return last_card_pair.first.origin_card;
+            return origin_card.origin_card;
         }
     }
 

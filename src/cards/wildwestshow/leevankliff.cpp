@@ -7,27 +7,27 @@
 
 namespace banggame {
 
-    bool modifier_leevankliff::valid_with_modifier(card *origin_card, player *origin, card *playing_card) {
-        return playing_card->has_tag(tag_type::card_choice) && playing_card->is_brown();
-    }
-
     game_string modifier_leevankliff::get_error(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) {
-        if (origin->m_played_cards.empty()) {
+        if (!ctx.repeat_card) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
 
-        if (ctx.card_choice && playing_card->get_tag_value(tag_type::card_choice) == ctx.card_choice->get_tag_value(tag_type::card_choice)) {
-            return {};
+        if (ranges::contains(origin->m_played_cards.back().modifiers, origin_card, &card_pocket_pair::origin_card)) {
+            return {"ERROR_CANNOT_REPEAT_CARD", origin_card};
         }
 
-        const auto &[target_card, modifiers] = origin->m_played_cards.back();
-
-        if (target_card.origin_card != playing_card || !playing_card->is_brown()) {
+        if (ctx.card_choice) {
+            playing_card = ctx.card_choice;
+        } else if (ctx.traincost) {
+            playing_card = ctx.traincost;
+        }
+        
+        if (ctx.repeat_card != playing_card) {
             return "INVALID_MODIFIER_CARD";
         }
 
-        if (ranges::contains(modifiers, origin_card, &card_pocket_pair::origin_card)) {
-            return {"ERROR_CANNOT_REPEAT_CARD", origin_card};
+        if (!playing_card->is_brown()) {
+            return "ERROR_CARD_IS_NOT_BROWN";
         }
 
         return {};
