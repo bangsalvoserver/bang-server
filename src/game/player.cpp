@@ -117,9 +117,11 @@ namespace banggame {
     }
 
     void player::steal_card(card *target) {
-        move_owned_card(target->owner, target, [&]{
-            add_to_hand(target);
-        });
+        if (target->owner != this || target->pocket != pocket_type::player_table || !target->is_train()) {
+            move_owned_card(target->owner, target, [&]{
+                add_to_hand(target);
+            });
+        }
     }
 
     void player::damage(card *origin_card, player *origin, int value, effect_flags flags) {
