@@ -8,6 +8,7 @@
 namespace banggame {
 
     struct effect_steal : prompt_target_self, bot_suggestion::target_enemy_card {
+        game_string get_error(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };

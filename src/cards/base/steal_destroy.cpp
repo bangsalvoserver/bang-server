@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/filters.h"
+
 namespace banggame {
 
     request_targeting::timer_targeting::timer_targeting(request_targeting *request)
@@ -35,6 +37,13 @@ namespace banggame {
         } else {
             return {target_card};
         }
+    }
+
+    game_string effect_steal::get_error(card *origin_card, player *origin, card *target_card) {
+        if (target_card->pocket == pocket_type::player_table && target_card->is_train()) {
+            MAYBE_RETURN(filters::check_player_filter(origin, target_card->equip_target, origin));
+        }
+        return {};
     }
 
     void effect_steal::on_resolve(card *origin_card, player *origin, card *target_card) {
