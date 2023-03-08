@@ -463,17 +463,21 @@ namespace banggame {
             add_log("LOG_PLAYER_DIED", target);
         }
         
-        queue_action([this, killer, target]{
-            if (!target->check_player_flags(player_flags::role_revealed)) {
-                add_update<game_update_type::player_show_role>(target, target->m_role);
-            }
-            target->add_player_flags(player_flags::role_revealed | player_flags::dead);
+        queue_action([this, killer, target, reason]{
+            target->add_player_flags(player_flags::dead);
             target->set_hp(0, true);
 
-            call_event<event_type::on_player_death>(killer, target);
+            if (!target->alive() && !target->check_player_flags(player_flags::role_revealed)) {
+                add_update<game_update_type::player_show_role>(target, target->m_role);
+                target->add_player_flags(player_flags::role_revealed);
+            }
+
+            if (reason != discard_all_reason::discard_ghost) {
+                call_event<event_type::on_player_death>(killer, target);
+            }
         }, 3);
 
-        if (killer && m_players.size() > 3) {
+        if (killer && m_players.size() > 3 && reason != discard_all_reason::discard_ghost) {
             queue_action([this, killer, target] {
                 if (killer->alive()) {
                     if (target->m_role == player_role::outlaw) {
@@ -490,10 +494,12 @@ namespace banggame {
         }
         
         queue_action([this, target, reason]{
-            queue_request<request_discard_all>(target, reason);
+            if (!target->alive()) {
+                queue_request<request_discard_all>(target, reason);
+            }
         }, 3);
 
-        if (reason == discard_all_reason::disable_temp_ghost) {
+        if (reason == discard_all_reason::disable_ghost_town) {
             return;
         }
 
@@ -563,7 +569,7 @@ namespace banggame {
             } else {
                 if (std::ranges::distance(alive_players) <= 1) {
                     declare_winners(alive_players);
-                } else if (killer && (
+                } else if (killer && !target->alive() && (
                     (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::renegade_3p) ||
                     (target->m_role == player_role::renegade_3p && killer->m_role == player_role::deputy_3p) ||
                     (target->m_role == player_role::deputy_3p && killer->m_role == player_role::outlaw_3p)))

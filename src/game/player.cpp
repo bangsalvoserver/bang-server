@@ -6,15 +6,14 @@
 #include "game_update.h"
 
 #include "cards/holders.h"
+#include "cards/filters.h"
 #include "cards/game_enums.h"
+#include "cards/effect_context.h"
 
 #include "cards/base/damage.h"
 #include "cards/base/draw.h"
 #include "cards/base/predraw_check.h"
 #include "cards/base/requests.h"
-
-#include "cards/filter_enums.h"
-#include "cards/effect_context.h"
 
 #include <cassert>
 #include <numeric>
@@ -26,12 +25,12 @@ namespace banggame {
     }
 
     bool player::is_ghost() const {
-        return check_player_flags(player_flags::ghost)
-            || check_player_flags(player_flags::temp_ghost);
+        return check_player_flags(player_flags::dead)
+            && filters::is_player_ghost(this);
     }
 
     bool player::alive() const {
-        return !check_player_flags(player_flags::dead) || is_ghost();
+        return filters::is_player_alive(this);
     }
 
     void player::equip_card(card *target) {

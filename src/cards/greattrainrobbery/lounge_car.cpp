@@ -2,7 +2,7 @@
 
 #include "game/game.h"
 
-#include "cards/game_enums.h"
+#include "cards/filters.h"
 
 namespace banggame {
 
@@ -15,11 +15,15 @@ namespace banggame {
                 for (int i=0; i<2 && !origin->m_game->m_train_deck.empty(); ++i) {
                     origin->m_game->move_card(origin->m_game->m_train_deck.front(), pocket_type::selection, origin);
                 }
-                if (origin->m_game->m_selection.size() <= 1) {
-                    origin->m_game->pop_request();
-                    while (!origin->m_game->m_selection.empty()) {
-                        origin->equip_card(origin->m_game->m_selection.front());
-                    }
+            }
+            if (origin->m_game->m_selection.size() <= 1 && std::ranges::all_of(origin->m_game->m_selection, [&](card *target_card) {
+                return !filters::check_player_filter(target, target_card->equip_target, target);
+            })) {
+                origin->m_game->pop_request();
+                while (!origin->m_game->m_selection.empty()) {
+                    card *c = origin->m_game->m_selection.front();
+                    origin->m_game->add_log("LOG_EQUIPPED_CARD", c, origin);
+                    origin->equip_card(c);
                 }
             }
         }
@@ -49,21 +53,14 @@ namespace banggame {
         if (origin->m_game->top_request<request_lounge_car>(origin) == nullptr) {
             return "ERROR_INVALID_RESPONSE";
         }
+        MAYBE_RETURN(filters::check_player_filter(origin, target_card->equip_target, target_player));
         return {};
     }
 
     void handler_lounge_car::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {
         origin->m_game->invoke_action([&]{
-            origin->m_game->pop_request();
-
             origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, origin, target_player);
             target_player->equip_card(target_card);
-
-            while (!origin->m_game->m_selection.empty()) {
-                card *c = origin->m_game->m_selection.front();
-                origin->m_game->add_log("LOG_EQUIPPED_CARD", c, origin);
-                origin->equip_card(c);
-            }
         });
     }
 }

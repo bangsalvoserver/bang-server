@@ -36,7 +36,7 @@ namespace banggame {
             origin->enable_equip(c);
         }
         
-        for (int i=0; i<3; ++i) {
+        for (int i=0; i<3 && !origin->m_game->m_train_deck.empty(); ++i) {
             card *drawn_card = origin->m_game->m_train_deck.front();
             origin->m_game->move_card(drawn_card, pocket_type::train);
         }

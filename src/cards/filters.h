@@ -11,13 +11,19 @@ namespace banggame::filters {
     namespace detail {
         using namespace banggame;
 
+        template<typename T> struct const_ptr;
+        template<typename T> struct const_ptr<T *> { using type = const T *; };
+        template<typename T> using const_ptr_t = typename const_ptr<T>::type;
+
         using player_ptr = unwrap_not_null_t<serial::player>;
         using card_ptr = unwrap_not_null_t<serial::card>;
 
-        bool check_player_flags(player_ptr origin, player_flags flags);
-        bool check_game_flags(player_ptr origin, game_flags flags);
+        using const_player_ptr = const_ptr_t<player_ptr>;
+        using const_card_ptr = const_ptr_t<card_ptr>;
+
+        bool check_player_flags(const_player_ptr origin, player_flags flags);
+        bool check_game_flags(const_player_ptr origin, game_flags flags);
         int get_player_hp(player_ptr origin);
-        bool is_player_alive(player_ptr origin);
         player_role get_player_role(player_ptr origin);
         int get_player_range_mod(player_ptr origin);
         int get_player_weapon_range(player_ptr origin);
@@ -33,10 +39,21 @@ namespace banggame::filters {
         bool is_cube_slot(card_ptr target);
     }
 
+    inline bool is_player_ghost(detail::const_player_ptr origin) {
+        return detail::check_player_flags(origin, player_flags::ghost)
+            || detail::check_player_flags(origin, player_flags::ghost_town)
+            || detail::check_player_flags(origin, player_flags::ghost_car);
+    }
+
+    inline bool is_player_alive(detail::const_player_ptr origin) {
+        return !detail::check_player_flags(origin, player_flags::dead)
+            || is_player_ghost(origin);
+    }
+
     inline const char *check_player_filter(detail::player_ptr origin, target_player_filter filter, detail::player_ptr target, const effect_context &ctx = {}) {
         if (bool(filter & target_player_filter::dead)) {
             if (detail::get_player_hp(target) > 0) return "ERROR_TARGET_NOT_DEAD";
-        } else if (!detail::is_player_alive(target)) {
+        } else if (!is_player_alive(target)) {
             return "ERROR_TARGET_DEAD";
         }
 

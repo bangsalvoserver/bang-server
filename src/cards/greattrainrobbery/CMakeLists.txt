@@ -9,6 +9,7 @@ target_sources(bangserver PRIVATE
     evan_babbit.cpp
     express_car.cpp
     full_steam.cpp
+    ghost_car.cpp
     ironhorse.cpp
     leland.cpp
     lounge_car.cpp

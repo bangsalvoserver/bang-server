@@ -2534,6 +2534,7 @@ train:
     equip:
       - ghost_car
     tags:
+      - discard_if_two_players
       - ghost_card
   - name: LOUNGE_CAR
     image: 27_lounge_car
