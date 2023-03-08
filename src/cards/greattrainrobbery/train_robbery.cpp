@@ -4,6 +4,8 @@
 
 #include "cards/base/bang.h"
 
+#include "cards/game_enums.h"
+
 namespace banggame {
 
     struct request_train_robbery_choose : request_bang {
@@ -60,6 +62,7 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
+            flags &= ~effect_flags::escapable;
             selected_cards.push_back(target_card);
             origin->m_game->queue_request_front<request_train_robbery_choose>(origin_card, origin, target, target_card);
         }
