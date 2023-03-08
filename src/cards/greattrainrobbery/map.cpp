@@ -26,7 +26,7 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, origin, target_card);
+            target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->m_game->move_card(target_card, pocket_type::discard_pile);
             on_resolve();
         }
