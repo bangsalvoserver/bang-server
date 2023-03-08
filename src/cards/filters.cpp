@@ -11,10 +11,6 @@ namespace banggame::filters::detail {
     bool check_game_flags(const player *origin, game_flags flags) {
         return origin->m_game->check_flags(flags);
     }
-    
-    int get_player_hp(player *origin) {
-        return origin->m_hp;
-    }
 
     player_role get_player_role(player *origin) {
         return origin->m_role;

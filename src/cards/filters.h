@@ -23,7 +23,6 @@ namespace banggame::filters {
 
         bool check_player_flags(const_player_ptr origin, player_flags flags);
         bool check_game_flags(const_player_ptr origin, game_flags flags);
-        int get_player_hp(player_ptr origin);
         player_role get_player_role(player_ptr origin);
         int get_player_range_mod(player_ptr origin);
         int get_player_weapon_range(player_ptr origin);
@@ -40,9 +39,9 @@ namespace banggame::filters {
     }
 
     inline bool is_player_ghost(detail::const_player_ptr origin) {
-        return detail::check_player_flags(origin, player_flags::ghost)
-            || detail::check_player_flags(origin, player_flags::ghost_town)
-            || detail::check_player_flags(origin, player_flags::ghost_car);
+        return detail::check_player_flags(origin, player_flags::ghost_1)
+            || detail::check_player_flags(origin, player_flags::ghost_2)
+            || detail::check_player_flags(origin, player_flags::temp_ghost);
     }
 
     inline bool is_player_alive(detail::const_player_ptr origin) {
@@ -52,7 +51,9 @@ namespace banggame::filters {
 
     inline const char *check_player_filter(detail::player_ptr origin, target_player_filter filter, detail::player_ptr target, const effect_context &ctx = {}) {
         if (bool(filter & target_player_filter::dead)) {
-            if (detail::get_player_hp(target) > 0) return "ERROR_TARGET_NOT_DEAD";
+            if (!bool(filter & target_player_filter::alive) && !detail::check_player_flags(target, player_flags::dead)) {
+                return "ERROR_TARGET_NOT_DEAD";
+            }
         } else if (!is_player_alive(target)) {
             return "ERROR_TARGET_DEAD";
         }

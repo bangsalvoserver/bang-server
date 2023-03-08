@@ -569,7 +569,7 @@ main_deck:
     color: blue
     equip_target: dead
     equip:
-      - ghost
+      - ghost(1)
     tags:
       - discard_if_two_players
       - ghost_card
@@ -2530,9 +2530,9 @@ train:
   - name: GHOST_CAR
     image: 27_ghost_car
     color: train
-    equip_target: notsheriff
+    equip_target: notsheriff dead alive
     equip:
-      - ghost_car
+      - ghost(2)
     tags:
       - discard_if_two_players
       - ghost_card

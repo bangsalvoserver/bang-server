@@ -11,7 +11,6 @@
 #include "evan_babbit.h"
 #include "express_car.h"
 #include "full_steam.h"
-#include "ghost_car.h"
 #include "ironhorse.h"
 #include "leland.h"
 #include "lounge_car.h"

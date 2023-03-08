@@ -467,19 +467,20 @@ namespace banggame {
             target->add_player_flags(player_flags::dead);
             target->set_hp(0, true);
 
-            if (!target->alive() && !target->check_player_flags(player_flags::role_revealed)) {
-                add_update<game_update_type::player_show_role>(target, target->m_role);
-                target->add_player_flags(player_flags::role_revealed);
-            }
+            if (!target->alive()) {
+                if (target->add_player_flags(player_flags::role_revealed)) {
+                    add_update<game_update_type::player_show_role>(target, target->m_role);
+                }
 
-            if (reason != discard_all_reason::discard_ghost) {
-                call_event<event_type::on_player_death>(killer, target);
+                if (reason != discard_all_reason::discard_ghost) {
+                    call_event<event_type::on_player_death>(killer, target);
+                }
             }
         }, 3);
 
         if (killer && m_players.size() > 3 && reason != discard_all_reason::discard_ghost) {
             queue_action([this, killer, target] {
-                if (killer->alive()) {
+                if (killer->alive() && !target->alive()) {
                     if (target->m_role == player_role::outlaw) {
                         add_log("LOG_KILLED_OUTLAW", killer);
                         killer->draw_card(3);
@@ -499,7 +500,7 @@ namespace banggame {
             }
         }, 3);
 
-        if (reason == discard_all_reason::disable_ghost_town) {
+        if (reason == discard_all_reason::disable_temp_ghost) {
             return;
         }
 

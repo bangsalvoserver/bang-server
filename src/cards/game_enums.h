@@ -28,9 +28,9 @@ namespace banggame {
 
     DEFINE_ENUM_FLAGS(player_flags,
         (dead)
-        (ghost)
-        (ghost_town)
-        (ghost_car)
+        (ghost_1)
+        (ghost_2)
+        (temp_ghost)
         (extra_turn)
         (treat_missed_as_bang)
         (role_revealed)
@@ -42,7 +42,7 @@ namespace banggame {
     DEFINE_ENUM(discard_all_reason,
         (death)
         (sheriff_killed_deputy)
-        (disable_ghost_town)
+        (disable_temp_ghost)
         (discard_ghost)
     )
 }
