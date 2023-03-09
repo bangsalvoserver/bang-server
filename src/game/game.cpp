@@ -28,18 +28,13 @@ namespace banggame {
             co_yield make_update<game_update_type::player_user>(p, p->user_id);
             co_yield make_update<game_update_type::player_status>(p, p->m_player_flags, p->m_range_mod, p->m_weapon_range, p->m_distance_mod);
         }
-        
-        co_yield make_update<game_update_type::add_cards>(
-            m_context.cards
-                | std::views::transform([](card &c) { return card_backface(&c); })
-                | ranges::to<std::vector>,
-            pocket_type::hidden_deck
-        );
 
-        auto move_cards = [&](auto &&range) -> util::generator<json::json> {
+        auto add_cards = [&](pocket_type pocket, player *owner = nullptr) -> util::generator<json::json> {
+            auto &range = get_pocket(pocket, owner);
+            if (!range.empty()) {
+                co_yield make_update<game_update_type::add_cards>(range | ranges::to<std::vector<card_backface>>, pocket, owner);
+            }
             for (card *c : range) {
-                co_yield make_update<game_update_type::move_card>(c, c->owner, c->pocket, true);
-
                 if (c->visibility == card_visibility::shown) {
                     co_yield make_update<game_update_type::show_card>(c, *c, true);
                 }
@@ -52,23 +47,23 @@ namespace banggame {
             }
         };
 
-        co_await move_cards(m_button_row);
-        co_await move_cards(m_deck);
-        co_await move_cards(m_shop_deck);
+        co_await add_cards(pocket_type::button_row);
+        co_await add_cards(pocket_type::main_deck);
+        co_await add_cards(pocket_type::shop_deck);
 
-        co_await move_cards(m_discards);
-        co_await move_cards(m_selection);
-        co_await move_cards(m_shop_discards);
-        co_await move_cards(m_shop_selection);
-        co_await move_cards(m_hidden_deck);
+        co_await add_cards(pocket_type::discard_pile);
+        co_await add_cards(pocket_type::selection);
+        co_await add_cards(pocket_type::shop_discard);
+        co_await add_cards(pocket_type::shop_selection);
+        co_await add_cards(pocket_type::hidden_deck);
 
         if (train_position != 0) {
             co_yield make_update<game_update_type::move_train>(train_position, true);
         }
 
-        co_await move_cards(m_stations);
-        co_await move_cards(m_train_deck);
-        co_await move_cards(m_train);
+        co_await add_cards(pocket_type::stations);
+        co_await add_cards(pocket_type::train_deck);
+        co_await add_cards(pocket_type::train);
 
         if (m_scenario_holder) {
             co_yield make_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
@@ -77,10 +72,10 @@ namespace banggame {
             co_yield make_update<game_update_type::move_scenario_deck>(m_wws_scenario_holder, pocket_type::wws_scenario_deck);
         }
 
-        co_await move_cards(m_scenario_deck);
-        co_await move_cards(m_scenario_cards);
-        co_await move_cards(m_wws_scenario_deck);
-        co_await move_cards(m_wws_scenario_cards);
+        co_await add_cards(pocket_type::scenario_deck);
+        co_await add_cards(pocket_type::scenario_card);
+        co_await add_cards(pocket_type::wws_scenario_deck);
+        co_await add_cards(pocket_type::wws_scenario_card);
         
         if (num_cubes > 0) {
             co_yield make_update<game_update_type::add_cubes>(num_cubes);
@@ -92,11 +87,11 @@ namespace banggame {
             }
 
             if (!p->check_player_flags(player_flags::removed)) {
-                co_await move_cards(p->m_characters);
-                co_await move_cards(p->m_backup_character);
+                co_await add_cards(pocket_type::player_character, p);
+                co_await add_cards(pocket_type::player_backup, p);
 
-                co_await move_cards(p->m_table);
-                co_await move_cards(p->m_hand);
+                co_await add_cards(pocket_type::player_table, p);
+                co_await add_cards(pocket_type::player_hand, p);
 
                 co_yield make_update<game_update_type::player_hp>(p, p->m_hp, true);
                 
