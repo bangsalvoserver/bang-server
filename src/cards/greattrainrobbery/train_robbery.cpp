@@ -47,10 +47,10 @@ namespace banggame {
         std::vector<card *> selected_cards;
 
         void on_update() override {
-            if (origin->immune_to(origin_card, origin, flags)
+            if (!target->alive() || target->immune_to(origin_card, origin, flags)
                 || std::ranges::none_of(target->m_table, [&](card *target_card) { return can_pick(target_card); }))
             {
-                origin->m_game->pop_request();
+                target->m_game->pop_request();
             } else {
                 auto_pick();
             }
@@ -64,7 +64,7 @@ namespace banggame {
         void on_pick(card *target_card) override {
             flags &= ~effect_flags::escapable;
             selected_cards.push_back(target_card);
-            origin->m_game->queue_request_front<request_train_robbery_choose>(origin_card, origin, target, target_card);
+            target->m_game->queue_request_front<request_train_robbery_choose>(origin_card, origin, target, target_card);
         }
 
         game_string status_text(player *owner) const override {
