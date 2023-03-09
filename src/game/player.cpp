@@ -358,29 +358,25 @@ namespace banggame {
             for (auto &[card_id, obj] : m_predraw_checks) {
                 obj.resolved = false;
             }
-            next_predraw_check();
+            request_drawing();
         }, -7);
     }
 
-    void player::next_predraw_check() {
+    void player::request_drawing() {
         if (alive() && m_game->m_playing == this) {
             if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
-                request_drawing();
+                m_game->call_event<event_type::on_turn_start>(this);
+                m_game->queue_action([this]{
+                    if (m_game->check_flags(game_flags::phase_one_override)) {
+                        m_game->call_event<event_type::on_draw_from_deck>(this);
+                    } else {
+                        m_game->queue_request<request_draw>(this);
+                    }
+                });
             } else {
                 m_game->queue_request<request_predraw>(this);
             }
         }
-    }
-
-    void player::request_drawing() {
-        m_game->call_event<event_type::on_turn_start>(this);
-        m_game->queue_action([this]{
-            if (m_game->check_flags(game_flags::phase_one_override)) {
-                m_game->call_event<event_type::on_draw_from_deck>(this);
-            } else {
-                m_game->queue_request<request_draw>(this);
-            }
-        });
     }
 
     void player::pass_turn() {

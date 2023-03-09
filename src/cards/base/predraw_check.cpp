@@ -29,7 +29,7 @@ namespace banggame {
                 if (it != target->m_predraw_checks.end()) {
                     it->second.resolved = true;
                 }
-                target->next_predraw_check();
+                target->request_drawing();
             });
         });
     }

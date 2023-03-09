@@ -94,7 +94,7 @@ namespace banggame {
                 if (origin->alive() && origin->m_game->m_playing == origin
                     && origin->m_num_drawn_cards < origin->get_cards_to_draw())
                 {
-                    origin->request_drawing();
+                    origin->m_game->queue_request<request_draw>(origin);
                 }
             }, -7);
         });
