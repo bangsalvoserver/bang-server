@@ -49,6 +49,9 @@ namespace banggame {
     }
 
     void handler_play_as_bang::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target_variant) {
+        if (chosen_card->pocket == pocket_type::player_hand) {
+            origin->m_game->call_event<event_type::on_use_hand_card>(origin, chosen_card, false);
+        }
         if (target_variant.is(target_type::player)) {
             player *target = target_variant.get<target_type::player>();
             origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
