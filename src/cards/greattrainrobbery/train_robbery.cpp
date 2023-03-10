@@ -28,15 +28,20 @@ namespace banggame {
         void on_pick(card *) override {
             origin->m_game->invoke_action([&]{
                 origin->m_game->pop_request();
+                target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
                 target->discard_card(target_card);
             });
         }
 
         game_string status_text(player *owner) const override {
-            if (owner == target) {
-                return {"STATUS_TRAIN_ROBBERY_CHOOSE", origin_card, target_card};
+            if (num_cards_used() == 0) {
+                if (owner == target) {
+                    return {"STATUS_TRAIN_ROBBERY_CHOOSE", origin_card, target_card};
+                } else {
+                    return {"STATUS_TRAIN_ROBBERY_CHOOSE_OTHER", target, origin_card, target_card};
+                }
             } else {
-                return {"STATUS_TRAIN_ROBBERY_CHOOSE_OTHER", target, origin_card, target_card};
+                return request_bang::status_text(owner);
             }
         }
     };
