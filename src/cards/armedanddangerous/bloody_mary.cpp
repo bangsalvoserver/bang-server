@@ -10,8 +10,10 @@ namespace banggame {
         p->m_game->add_listener<event_type::on_missed>(target_card, [=](card *origin_card, player *origin, player *target, effect_flags flags) {
             if (origin == p && bool(flags & effect_flags::is_bang)) {
                 p->m_game->queue_action([=]{
-                    p->m_game->flash_card(target_card);
-                    p->draw_card(1, target_card);
+                    if (p->alive()) {
+                        p->m_game->flash_card(target_card);
+                        p->draw_card(1, target_card);
+                    }
                 });
             }
         });
