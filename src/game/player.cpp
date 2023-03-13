@@ -301,10 +301,9 @@ namespace banggame {
         } else if (auto req = m_game->top_request(this)) {
             m_game->send_request_status_clear();
             if (req->can_pick(target_card)) {
-                m_game->invoke_action([&]{
-                    req->on_pick(target_card);
-                    req.reset();
-                });
+                req->on_pick(target_card);
+                req.reset();
+                m_game->update();
                 return {};
             } else {
                 return "ERROR_INVALID_PICK";
@@ -327,7 +326,8 @@ namespace banggame {
             m_prompt.emplace(std::move(fun), std::move(message));
         } else {
             m_game->send_request_status_clear();
-            m_game->invoke_action(std::move(fun));
+            fun();
+            m_game->update();
         }
     }
 
@@ -340,7 +340,8 @@ namespace banggame {
 
         if (response) {
             m_game->send_request_status_clear();
-            m_game->invoke_action(std::move(fun));
+            fun();
+            m_game->update();
         }
         return {};
     }

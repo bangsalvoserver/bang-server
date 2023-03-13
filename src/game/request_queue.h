@@ -28,9 +28,6 @@ namespace banggame {
     private:
         std::deque<std::shared_ptr<request_base>> m_requests;
         utils::stable_priority_queue<action_priority_pair, action_ordering> m_delayed_actions;
-        int m_lock_updates = 0;
-
-        void update_request();
 
         game *m_game;
 
@@ -38,6 +35,7 @@ namespace banggame {
         request_queue(game *m_game) : m_game(m_game) {}
         
         void tick();
+        void update();
 
     public:
         bool pending_requests() const {
@@ -53,13 +51,6 @@ namespace banggame {
                 }
             }
             return nullptr;
-        }
-
-        void invoke_action(std::invocable auto &&fun) {
-            ++m_lock_updates;
-            std::invoke(fun);
-            --m_lock_updates;
-            update_request();
         }
 
         void queue_action(delayed_action &&fun, int priority = 0) {

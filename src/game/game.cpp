@@ -384,14 +384,15 @@ namespace banggame {
     }
 
     void game::send_request_status_ready() {
-        auto update = make_status_ready_update(m_playing);
+        auto args = make_status_ready_update(m_playing);
         
-        if (m_playing->empty_hand() && std::ranges::all_of(update.play_cards, [](card *origin_card) {
+        if (m_playing->empty_hand() && std::ranges::all_of(args.play_cards, [](card *origin_card) {
             return origin_card->has_tag(tag_type::confirm);
         })) {
-            invoke_action([&]{ m_playing->pass_turn(); });
+            m_playing->pass_turn();
+            update();
         } else {
-            add_update<game_update_type::status_ready>(update_target::includes_private(m_playing), std::move(update));
+            add_update<game_update_type::status_ready>(update_target::includes_private(m_playing), std::move(args));
         }
     }
 
