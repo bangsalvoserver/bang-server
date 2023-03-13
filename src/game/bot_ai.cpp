@@ -156,23 +156,27 @@ namespace banggame {
 
                 card_set.erase(selected_card);
 
-                if (!origin->handle_action(enums::enum_tag<game_action_type::play_card>,
-                    generate_random_play(origin, selected_card, is_response)))
-                {
-                    if (origin->m_prompt) {
-                        // maybe add random variation to fix softlock?
-                        bool response = card_set.empty() && i>=5;
-                        origin->handle_action(enums::enum_tag<game_action_type::prompt_respond>, response);
-                        if (response) return true;
-                    } else {
-                        return true;
+                try {
+                    if (!origin->handle_action(enums::enum_tag<game_action_type::play_card>,
+                        generate_random_play(origin, selected_card, is_response)))
+                    {
+                        if (origin->m_prompt) {
+                            // maybe add random variation to fix softlock?
+                            bool response = card_set.empty() && i>=5;
+                            origin->handle_action(enums::enum_tag<game_action_type::prompt_respond>, response);
+                            if (response) return true;
+                        } else {
+                            return true;
+                        }
                     }
+                } catch (const std::exception &e) {
+                    std::cout << "BOT ERROR: " << e.what() << std::endl;
                 }
             }
         }
 
         // softlock
-        std::cout << "BOT ERROR: could not find card in execute_random_play\n";
+        std::cout << "BOT ERROR: could not find card in execute_random_play" << std::endl;
         return false;
     }
 
