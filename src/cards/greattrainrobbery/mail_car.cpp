@@ -39,27 +39,25 @@ namespace banggame {
     }
 
     void handler_mail_car::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {
-        origin->m_game->invoke_action([&]{
-            origin->m_game->pop_request();
+        origin->m_game->pop_request();
 
+        if (!origin->m_game->check_flags(game_flags::hands_shown)) {
+            origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_GIFTED_CARD", origin, target_player, target_card);
+            origin->m_game->add_log(update_target::excludes(origin, target_player), "LOG_GIFTED_A_CARD", origin, target_player);
+        } else {
+            origin->m_game->add_log("LOG_GIFTED_CARD", origin, target_player, target_card);
+        }
+        target_player->add_to_hand(target_card);
+
+        while (!origin->m_game->m_selection.empty()) {
+            card *c = origin->m_game->m_selection.front();
             if (!origin->m_game->check_flags(game_flags::hands_shown)) {
-                origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_GIFTED_CARD", origin, target_player, target_card);
-                origin->m_game->add_log(update_target::excludes(origin, target_player), "LOG_GIFTED_A_CARD", origin, target_player);
+                origin->m_game->add_log(update_target::includes(origin), "LOG_DRAWN_CARD", origin, c);
+                origin->m_game->add_log(update_target::excludes(origin), "LOG_DRAWN_A_CARD", origin);
             } else {
-                origin->m_game->add_log("LOG_GIFTED_CARD", origin, target_player, target_card);
+                origin->m_game->add_log("LOG_DRAWN_CARD", origin, c);
             }
-            target_player->add_to_hand(target_card);
-
-            while (!origin->m_game->m_selection.empty()) {
-                card *c = origin->m_game->m_selection.front();
-                if (!origin->m_game->check_flags(game_flags::hands_shown)) {
-                    origin->m_game->add_log(update_target::includes(origin), "LOG_DRAWN_CARD", origin, c);
-                    origin->m_game->add_log(update_target::excludes(origin), "LOG_DRAWN_A_CARD", origin);
-                } else {
-                    origin->m_game->add_log("LOG_DRAWN_CARD", origin, c);
-                }
-                origin->add_to_hand(c);
-            }
-        });
+            origin->add_to_hand(c);
+        }
     }
 }

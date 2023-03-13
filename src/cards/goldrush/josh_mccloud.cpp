@@ -86,16 +86,14 @@ namespace banggame {
     
     void effect_forced_equip::on_play(card *origin_card, player *origin, player *target) {
         card *target_card = origin->m_game->top_request<request_force_equip_card>()->target_card;
-        origin->m_game->invoke_action([&]{
-            origin->m_game->pop_request();
+        origin->m_game->pop_request();
 
-            if (origin == target) {
-                origin->m_game->add_log("LOG_EQUIPPED_CARD", target_card, origin);
-            } else {
-                origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, origin, target);
-            }
-            target->equip_card(target_card);
-        });
+        if (origin == target) {
+            origin->m_game->add_log("LOG_EQUIPPED_CARD", target_card, origin);
+        } else {
+            origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, origin, target);
+        }
+        target->equip_card(target_card);
     }
 
     void effect_josh_mccloud::on_play(card *origin_card, player *target) {

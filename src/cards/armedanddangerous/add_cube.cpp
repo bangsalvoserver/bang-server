@@ -20,14 +20,12 @@ namespace banggame {
             }
 
             if (nslots <= ncubes || ncards <= 1) {
-                target->m_game->invoke_action([&]{
-                    target->m_game->pop_request();
-                    for (card *c : target->cube_slots()) {
-                        int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes);
-                        ncubes -= cubes_to_add;
-                        target->add_cubes(c, cubes_to_add);
-                    }
-                });
+                target->m_game->pop_request();
+                for (card *c : target->cube_slots()) {
+                    int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes);
+                    ncubes -= cubes_to_add;
+                    target->add_cubes(c, cubes_to_add);
+                }
             }
         }
         
@@ -43,15 +41,13 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->invoke_action([&]{
-                if (--ncubes == 0) {
-                    target->m_game->pop_request();
-                }
-            
-                target->add_cubes(target_card->pocket == pocket_type::player_character
-                    ? target->first_character()
-                    : target_card, 1);
-            });
+            if (--ncubes == 0) {
+                target->m_game->pop_request();
+            }
+        
+            target->add_cubes(target_card->pocket == pocket_type::player_character
+                ? target->first_character()
+                : target_card, 1);
         }
         
         game_string status_text(player *owner) const override {

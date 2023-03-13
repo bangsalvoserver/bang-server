@@ -63,16 +63,14 @@ namespace banggame {
     }
 
     void request_draw::on_pick(card *target_card) {
-        target->m_game->invoke_action([&]{
-            target->m_game->call_event<event_type::on_draw_from_deck>(target);
-            if (state != request_state::dead) {
-                target->m_game->pop_request();
-                int ncards = target->get_cards_to_draw();
-                while (target->m_num_drawn_cards < ncards) {
-                    target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
-                }
+        target->m_game->call_event<event_type::on_draw_from_deck>(target);
+        if (state != request_state::dead) {
+            target->m_game->pop_request();
+            int ncards = target->get_cards_to_draw();
+            while (target->m_num_drawn_cards < ncards) {
+                target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
             }
-        });
+        }
     }
 
     game_string request_draw::status_text(player *owner) const {
@@ -88,16 +86,14 @@ namespace banggame {
     }
 
     void effect_reset_drawing::on_play(card *origin_card, player *origin) {
-        origin->m_game->invoke_action([&]{
-            origin->m_game->pop_request();
-            origin->m_game->queue_action([=]{
-                if (origin->alive() && origin->m_game->m_playing == origin
-                    && origin->m_num_drawn_cards < origin->get_cards_to_draw())
-                {
-                    origin->m_game->queue_request<request_draw>(origin);
-                }
-            }, -7);
-        });
+        origin->m_game->pop_request();
+        origin->m_game->queue_action([=]{
+            if (origin->alive() && origin->m_game->m_playing == origin
+                && origin->m_num_drawn_cards < origin->get_cards_to_draw())
+            {
+                origin->m_game->queue_request<request_draw>(origin);
+            }
+        }, -7);
     }
 
     void effect_end_drawing::on_play(card *origin_card, player *origin) {

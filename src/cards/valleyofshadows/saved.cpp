@@ -28,24 +28,22 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->invoke_action([&]{
-                target->m_game->pop_request();
-                if (target_card->pocket != pocket_type::player_hand) {
-                    target->draw_card(2, origin_card);
-                } else {
-                    for (int i=0; i<2 && !saved->empty_hand(); ++i) {
-                        card *stolen_card = saved->random_hand_card();
-                        if (stolen_card->visibility != card_visibility::shown) {
-                            target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
-                            target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
-                        } else {
-                            target->m_game->add_log("LOG_STOLEN_CARD", target, saved, stolen_card);
-                        }
-                        target->steal_card(stolen_card);
-                        target->m_game->call_event<event_type::on_use_hand_card>(target, stolen_card, true);
+            target->m_game->pop_request();
+            if (target_card->pocket != pocket_type::player_hand) {
+                target->draw_card(2, origin_card);
+            } else {
+                for (int i=0; i<2 && !saved->empty_hand(); ++i) {
+                    card *stolen_card = saved->random_hand_card();
+                    if (stolen_card->visibility != card_visibility::shown) {
+                        target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
+                        target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
+                    } else {
+                        target->m_game->add_log("LOG_STOLEN_CARD", target, saved, stolen_card);
                     }
+                    target->steal_card(stolen_card);
+                    target->m_game->call_event<event_type::on_use_hand_card>(target, stolen_card, true);
                 }
-            });
+            }
         }
 
         game_string status_text(player *owner) const override {
@@ -65,20 +63,18 @@ namespace banggame {
     }
 
     void effect_saved::on_play(card *origin_card, player *origin) {
-        origin->m_game->invoke_action([&]{
-            auto req = origin->m_game->top_request<request_damage>();
-            player *saved = req->target;
-            req->savior = origin;
+        auto req = origin->m_game->top_request<request_damage>();
+        player *saved = req->target;
+        req->savior = origin;
 
-            if (--req->damage == 0) {
-                origin->m_game->pop_request();
+        if (--req->damage == 0) {
+            origin->m_game->pop_request();
+        }
+
+        origin->m_game->queue_action([=]{
+            if (origin->alive() && saved->alive()) {
+                origin->m_game->queue_request<request_saved>(origin_card, origin, saved);
             }
-
-            origin->m_game->queue_action([=]{
-                if (origin->alive() && saved->alive()) {
-                    origin->m_game->queue_request<request_saved>(origin_card, origin, saved);
-                }
-            });
         });
     }
 }

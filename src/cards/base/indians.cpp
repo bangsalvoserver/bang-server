@@ -29,19 +29,15 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->invoke_action([&]{
-                target->m_game->pop_request();
-                target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
-                target->discard_card(target_card);
-                target->m_game->call_event<event_type::on_use_hand_card>(target, target_card, false);
-            });
+            target->m_game->pop_request();
+            target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
+            target->discard_card(target_card);
+            target->m_game->call_event<event_type::on_use_hand_card>(target, target_card, false);
         }
 
         void on_resolve() override {
-            target->m_game->invoke_action([&]{
-                target->m_game->pop_request();
-                target->damage(origin_card, origin, 1);
-            });
+            target->m_game->pop_request();
+            target->damage(origin_card, origin, 1);
         }
 
         game_string status_text(player *owner) const override {

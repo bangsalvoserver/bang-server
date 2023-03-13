@@ -22,14 +22,12 @@ namespace banggame {
         }
         
         void on_pick(card *target_card) {
-            target->m_game->invoke_action([&]{
-                target->m_game->pop_request();
-                target->add_to_hand(target_card);
+            target->m_game->pop_request();
+            target->add_to_hand(target_card);
 
-                while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
-                }
-            });
+            while (!target->m_game->m_selection.empty()) {
+                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+            }
         }
 
         game_string status_text(player *owner) const override {

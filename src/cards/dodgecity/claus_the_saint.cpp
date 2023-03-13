@@ -35,10 +35,8 @@ namespace banggame {
     void equip_claus_the_saint::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
             if (target->m_game->top_request<request_draw>(target) && origin == target) {
-                target->m_game->invoke_action([&]{
-                    target->m_game->pop_request();
-                    target->m_game->queue_request<request_claus_the_saint>(target_card, target);
-                });
+                target->m_game->pop_request();
+                target->m_game->queue_request<request_claus_the_saint>(target_card, target);
             }
         });
     }

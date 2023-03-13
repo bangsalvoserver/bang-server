@@ -13,22 +13,20 @@ namespace banggame {
     }
 
     void effect_sacrifice::on_play(card *origin_card, player *origin) {
-        origin->m_game->invoke_action([&]{
-            auto req = origin->m_game->top_request<request_damage>();
-            player *saved = req->target;
-            req->savior = origin;
-            bool fatal = saved->m_hp <= req->damage;
+        auto req = origin->m_game->top_request<request_damage>();
+        player *saved = req->target;
+        req->savior = origin;
+        bool fatal = saved->m_hp <= req->damage;
 
-            if (--req->damage == 0) {
-                origin->m_game->pop_request();
+        if (--req->damage == 0) {
+            origin->m_game->pop_request();
+        }
+    
+        origin->damage(origin_card, origin, 1);
+        origin->m_game->queue_action([=]{
+            if (origin->alive()) {
+                origin->draw_card(2 + fatal, origin_card);
             }
-        
-            origin->damage(origin_card, origin, 1);
-            origin->m_game->queue_action([=]{
-                if (origin->alive()) {
-                    origin->draw_card(2 + fatal, origin_card);
-                }
-            });
         });
     }
 }

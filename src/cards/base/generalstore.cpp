@@ -12,11 +12,9 @@ namespace banggame {
     }
 
     void request_generalstore::on_pick(card *target_card) {
-        target->m_game->invoke_action([&]{
-            target->m_game->pop_request();
-            target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
-            target->add_to_hand(target_card);
-        });
+        target->m_game->pop_request();
+        target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
+        target->add_to_hand(target_card);
     }
 
     game_string request_generalstore::status_text(player *owner) const {

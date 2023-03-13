@@ -58,9 +58,7 @@ namespace banggame {
     }
 
     void handler_lounge_car::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {
-        origin->m_game->invoke_action([&]{
-            origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, origin, target_player);
-            target_player->equip_card(target_card);
-        });
+        origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, origin, target_player);
+        target_player->equip_card(target_card);
     }
 }

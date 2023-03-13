@@ -17,17 +17,15 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->invoke_action([&]{
-                target->m_game->pop_request();
-                if (target_card->visibility != card_visibility::shown) {
-                    target->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", target, origin, target_card);
-                    target->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", target, origin);
-                } else {
-                    target->m_game->add_log("LOG_GIFTED_CARD", target, origin, target_card);
-                }
-                origin->steal_card(target_card);
-                target->m_game->call_event<event_type::on_use_hand_card>(target, target_card, false);
-            });
+            target->m_game->pop_request();
+            if (target_card->visibility != card_visibility::shown) {
+                target->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", target, origin, target_card);
+                target->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", target, origin);
+            } else {
+                target->m_game->add_log("LOG_GIFTED_CARD", target, origin, target_card);
+            }
+            origin->steal_card(target_card);
+            target->m_game->call_event<event_type::on_use_hand_card>(target, target_card, false);
         }
 
         game_string status_text(player *owner) const override {

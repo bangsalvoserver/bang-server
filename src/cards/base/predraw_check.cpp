@@ -21,16 +21,14 @@ namespace banggame {
     }
 
     void request_predraw::on_pick(card *target_card) {
-        target->m_game->invoke_action([&]{
-            target->m_game->pop_request();
-            target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
-            target->m_game->queue_action([target = target, target_card] {
-                auto it = target->m_predraw_checks.find(target_card);
-                if (it != target->m_predraw_checks.end()) {
-                    it->second.resolved = true;
-                }
-                target->request_drawing();
-            });
+        target->m_game->pop_request();
+        target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
+        target->m_game->queue_action([target = target, target_card] {
+            auto it = target->m_predraw_checks.find(target_card);
+            if (it != target->m_predraw_checks.end()) {
+                it->second.resolved = true;
+            }
+            target->request_drawing();
         });
     }
 

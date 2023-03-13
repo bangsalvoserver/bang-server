@@ -79,6 +79,5 @@ namespace banggame {
     void request_queue::pop_request() {
         top_request()->state = request_state::dead;
         m_requests.pop_front();
-        update_request();
     }
 }

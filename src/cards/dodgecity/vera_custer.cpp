@@ -31,10 +31,8 @@ namespace banggame {
 
         void on_update() override {
             if (target->m_game->num_alive() == 2) {
-                target->m_game->invoke_action([&]{
-                    target->m_game->pop_request();
-                    copy_characters(target, *std::next(player_iterator(target)));
-                });
+                target->m_game->pop_request();
+                copy_characters(target, *std::next(player_iterator(target)));
             }
         }
         
@@ -44,10 +42,8 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->invoke_action([&]{
-                target->m_game->pop_request();
-                copy_characters(target, target_card->owner);
-            });
+            target->m_game->pop_request();
+            copy_characters(target, target_card->owner);
         }
 
         game_string status_text(player *owner) const override {

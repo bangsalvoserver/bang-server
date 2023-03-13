@@ -17,12 +17,10 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->invoke_action([&]{
-                target->m_game->pop_request();
-                while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
-                }
-            });
+            target->m_game->pop_request();
+            while (!target->m_game->m_selection.empty()) {
+                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
+            }
         }
 
         void on_pick(card *target_card) override {
