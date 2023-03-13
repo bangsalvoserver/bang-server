@@ -326,7 +326,7 @@ namespace banggame {
             m_prompt.emplace(std::move(fun), std::move(message));
         } else {
             m_game->send_request_status_clear();
-            fun();
+            std::invoke(std::move(fun));
             m_game->update();
         }
     }
@@ -340,7 +340,7 @@ namespace banggame {
 
         if (response) {
             m_game->send_request_status_clear();
-            fun();
+            std::invoke(std::move(fun));
             m_game->update();
         }
         return {};

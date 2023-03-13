@@ -45,7 +45,7 @@ namespace banggame {
         } else if (!m_delayed_actions.empty()) {
             auto fun = std::move(m_delayed_actions.top().first);
             m_delayed_actions.pop();
-            fun();
+            std::invoke(std::move(fun));
             update();
         } else if (m_game->m_playing) {
             if (m_game->m_playing->is_bot()) {
