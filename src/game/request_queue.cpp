@@ -47,12 +47,9 @@ namespace banggame {
                 }
             }
         } else if (!m_delayed_actions.empty()) {
-            ++m_lock_updates;
             auto fun = std::move(m_delayed_actions.top().first);
             m_delayed_actions.pop();
-            std::invoke(fun);
-            --m_lock_updates;
-            update_request();
+            invoke_action(std::move(fun));
         } else if (m_game->m_playing) {
             if (m_game->m_playing->is_bot()) {
                 m_game->request_bot_play(m_game->m_playing, false);
@@ -60,24 +57,5 @@ namespace banggame {
                 m_game->send_request_status_ready();
             }
         }
-    }
-
-    void request_queue::invoke_action(delayed_action &&fun) {
-        ++m_lock_updates;
-        std::invoke(fun);
-        --m_lock_updates;
-        update_request();
-    }
-    
-    void request_queue::queue_action(delayed_action &&fun, int priority) {
-        m_delayed_actions.emplace(std::move(fun), priority);
-        if (!pending_requests()) {
-            update_request();
-        }
-    }
-
-    void request_queue::pop_request() {
-        top_request()->state = request_state::dead;
-        m_requests.pop_front();
     }
 }

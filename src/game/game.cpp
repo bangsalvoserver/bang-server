@@ -389,7 +389,7 @@ namespace banggame {
         if (m_playing->empty_hand() && std::ranges::all_of(update.play_cards, [](card *origin_card) {
             return origin_card->has_tag(tag_type::confirm);
         })) {
-            invoke_action([p=m_playing]{ p->pass_turn(); });
+            invoke_action([&]{ m_playing->pass_turn(); });
         } else {
             add_update<game_update_type::status_ready>(update_target::includes_private(m_playing), std::move(update));
         }

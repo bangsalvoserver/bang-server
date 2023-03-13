@@ -441,5 +441,7 @@ void lobby::start_game(game_manager &mgr) {
     }
 
     m_game->add_players(user_ids);
-    m_game->start_game(options);
+    m_game->invoke_action([&]{
+        m_game->start_game(options);
+    });
 }

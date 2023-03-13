@@ -39,13 +39,9 @@ namespace banggame {
         
         void tick();
 
-        void invoke_action(delayed_action &&fun);
-        void queue_action(delayed_action &&fun, int priority = 0);
-        void pop_request();
-
     public:
-        size_t pending_requests() const {
-            return m_requests.size();
+        bool pending_requests() const {
+            return !m_requests.empty();
         }
 
         template<typename T = request_base>
@@ -59,26 +55,38 @@ namespace banggame {
             return nullptr;
         }
 
-        void queue_request_front(std::shared_ptr<request_base> &&value) {
-            m_requests.emplace_front(std::move(value));
+        void invoke_action(std::invocable auto &&fun) {
+            ++m_lock_updates;
+            std::invoke(fun);
+            --m_lock_updates;
             update_request();
+        }
+
+        void queue_action(delayed_action &&fun, int priority = 0) {
+            m_delayed_actions.emplace(std::move(fun), priority);
         }
 
         void queue_request(std::shared_ptr<request_base> &&value) {
             m_requests.emplace_back(std::move(value));
-            if (m_requests.size() == 1) {
-                update_request();
-            }
+        }
+
+        template<std::derived_from<request_base> T>
+        void queue_request(auto && ... args) {
+            queue_request(std::make_shared<T>(FWD(args) ... ));
+        }
+
+        void queue_request_front(std::shared_ptr<request_base> &&value) {
+            m_requests.emplace_front(std::move(value));
         }
 
         template<std::derived_from<request_base> T>
         void queue_request_front(auto && ... args) {
             queue_request_front(std::make_shared<T>(FWD(args) ... ));
         }
-        
-        template<std::derived_from<request_base> T>
-        void queue_request(auto && ... args) {
-            queue_request(std::make_shared<T>(FWD(args) ... ));
+
+        void pop_request() {
+            top_request()->state = request_state::dead;
+            m_requests.pop_front();
         }
     };
 
