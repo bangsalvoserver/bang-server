@@ -11,7 +11,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
         
         void on_update() override {
-            if (!sent) {
+            if (state == request_state::pending) {
                 for (int i=0; i<3; ++i) {
                     target->m_game->move_card(target->m_game->phase_one_drawn_card(), pocket_type::selection, target);
                 }

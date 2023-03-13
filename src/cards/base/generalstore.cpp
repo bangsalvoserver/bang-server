@@ -5,7 +5,7 @@
 namespace banggame {
 
     void request_generalstore::on_update() {
-        if (!sent) {
+        if (state == request_state::pending) {
             target->m_game->play_sound(target, "generalstore");
         }
         auto_pick();

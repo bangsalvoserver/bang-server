@@ -135,7 +135,7 @@ namespace banggame {
     }
 
     void request_discard_all::on_update() {
-        if (!sent) {
+        if (state == request_state::pending) {
             target->untap_inactive_cards();
         }
         

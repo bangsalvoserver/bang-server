@@ -29,11 +29,11 @@ namespace banggame {
             req->on_update();
             --m_lock_updates;
 
-            if (req->popped) {
+            if (req->state == request_state::dead) {
                 req.reset();
                 update_request();
             } else {
-                req->sent = true;
+                req->state = request_state::live;
                 if (auto *timer = req->timer()) {
                     timer->start(m_game->get_total_update_time());
                 }
@@ -77,7 +77,7 @@ namespace banggame {
     }
 
     void request_queue::pop_request() {
-        top_request()->popped = true;
+        top_request()->state = request_state::dead;
         m_requests.pop_front();
         update_request();
     }

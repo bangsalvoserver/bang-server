@@ -11,7 +11,7 @@ namespace banggame {
             : request_base(origin_card, origin, origin, effect_flags::auto_respond) {}
         
         void on_update() override {
-            if (!sent) {
+            if (state == request_state::pending) {
                 for (int i=0; i<3; ++i) {
                     origin->m_game->move_card(origin->m_game->top_of_deck(), pocket_type::selection, origin);
                 }

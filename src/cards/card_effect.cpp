@@ -36,7 +36,7 @@ namespace banggame {
     }
 
     void request_timer::tick() {
-        if (request && request->sent) {
+        if (request && request->state == request_state::live) {
             --lifetime;
         }
     }

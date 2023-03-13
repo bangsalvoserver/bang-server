@@ -167,7 +167,7 @@ namespace banggame {
         if (target->immune_to(origin_card, origin, flags)) {
             target->m_game->pop_request();
         } else {
-            if (!sent) {
+            if (state == request_state::pending) {
                 if (bool(flags & effect_flags::multi_target)) {
                     target->m_game->play_sound(target, "gatling");
                 } else {

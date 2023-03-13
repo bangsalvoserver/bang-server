@@ -55,6 +55,12 @@ namespace banggame {
         bool enabled() const { return request != nullptr; }
     };
 
+    enum class request_state : uint8_t {
+        pending,
+        live,
+        dead
+    };
+
     class request_base {
     public:
         request_base(card *origin_card, player *origin, player *target, effect_flags flags = {})
@@ -66,8 +72,8 @@ namespace banggame {
         player *origin;
         player *target;
         effect_flags flags;
-        bool sent = false;
-        bool popped = false;
+
+        request_state state = request_state::pending;
 
         virtual request_timer *timer() { return nullptr; }
 

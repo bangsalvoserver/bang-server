@@ -15,7 +15,7 @@ namespace banggame {
         std::vector<player *> targets;
 
         void on_update() override {
-            if (!sent) {
+            if (state == request_state::pending) {
                 int ncards = target->m_game->num_alive() + target->get_cards_to_draw() - 1;
                 for (int i=0; i<ncards; ++i) {
                     target->m_game->move_card(target->m_game->phase_one_drawn_card(), pocket_type::selection, target);

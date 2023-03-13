@@ -48,7 +48,7 @@ namespace banggame {
     }
     
     void request_draw::on_update() {
-        if (!sent) {
+        if (state == request_state::pending) {
             target->m_game->play_sound(target, "draw");
         }
         auto_pick();
@@ -65,7 +65,7 @@ namespace banggame {
     void request_draw::on_pick(card *target_card) {
         target->m_game->invoke_action([&]{
             target->m_game->call_event<event_type::on_draw_from_deck>(target);
-            if (!popped) {
+            if (state != request_state::dead) {
                 target->m_game->pop_request();
                 int ncards = target->get_cards_to_draw();
                 while (target->m_num_drawn_cards < ncards) {
