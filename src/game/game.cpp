@@ -2,6 +2,7 @@
 
 #include "game_update.h"
 
+#include "cards/filters.h"
 #include "cards/holders.h"
 #include "cards/effect_enums.h"
 #include "cards/game_enums.h"
@@ -349,9 +350,7 @@ namespace banggame {
             .status_text = req->status_text(owner),
             .flags = req->flags,
 
-            .respond_cards = owner
-                ? ranges::to<serial::card_list>(get_all_playable_cards(owner, true))
-                : serial::card_list{},
+            .respond_cards = owner ? generate_card_modifier_tree(owner, true) : card_modifier_tree{},
 
             .pick_cards = owner && req->target == owner
                 ? ranges::views::concat(
@@ -374,8 +373,7 @@ namespace banggame {
 
     status_ready_args game::make_status_ready_update(player *owner) {
         return {
-            .play_cards = ranges::to<serial::card_list>(get_all_playable_cards(owner)),
-            .last_played_card = owner->get_last_played_card()
+            .play_cards = generate_card_modifier_tree(owner)
         };
     }
 
@@ -386,8 +384,8 @@ namespace banggame {
     void game::send_request_status_ready() {
         auto args = make_status_ready_update(m_playing);
         
-        if (m_playing->empty_hand() && std::ranges::all_of(args.play_cards, [](card *origin_card) {
-            return origin_card->has_tag(tag_type::confirm);
+        if (m_playing->empty_hand() && std::ranges::all_of(args.play_cards, [](const card_modifier_node &node) {
+            return node.card->has_tag(tag_type::confirm);
         })) {
             m_playing->pass_turn();
             update();

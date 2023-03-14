@@ -93,20 +93,32 @@ namespace banggame {
         }, holder.target);
     }
 
-    static play_card_args generate_random_play(player *origin, card *origin_card, bool is_response) {
+    static play_card_args generate_random_play(player *origin, const card_modifier_node &node, bool is_response) {
         play_card_args ret;
-        std::vector<card *> modifiers;
         effect_context ctx;
 
+        const card_modifier_node *cur_node = &node;
         card *playing_card = nullptr;
         while (!playing_card) {
-            if (!is_response && filters::is_equip_card(origin_card)) {
-                playing_card = origin_card;
-                if (!origin_card->self_equippable()) {
-                    ret.targets.emplace_back(enums::enum_tag<target_type::player>,
-                        random_element(make_equip_set(origin, origin_card, ctx), origin->m_game->rng));
+            if (cur_node->branches.empty()) {
+                playing_card = cur_node->card;
+                if (filters::is_equip_card(playing_card)) {
+                    if (!playing_card->self_equippable()) {
+                        ret.targets.emplace_back(enums::enum_tag<target_type::player>,
+                            random_element(make_equip_set(origin, playing_card, ctx), origin->m_game->rng));
+                    }
+                } else {
+                    for (const effect_holder &holder : playing_card->get_effect_list(is_response)) {
+                        ret.targets.push_back(generate_random_target(origin, playing_card, holder, ctx));
+                    }
+                    if (is_possible_to_play_effects(origin, playing_card, playing_card->optionals, ctx)) {
+                        for (const effect_holder &holder : playing_card->optionals) {
+                            ret.targets.push_back(generate_random_target(origin, playing_card, holder, ctx));
+                        }
+                    }
                 }
-            } else if (origin_card->is_modifier()) {
+            } else {
+                card *origin_card = cur_node->card;
                 auto &targets = ret.modifiers.emplace_back(origin_card).targets;
 
                 origin_card->modifier.add_context(origin_card, origin, ctx);
@@ -121,19 +133,9 @@ namespace banggame {
                     }
                 }
 
-                modifiers.push_back(origin_card);
-                auto cards = cards_playable_with_modifiers(origin, modifiers, is_response, ctx);
-                origin_card = random_element(cards, origin->m_game->rng);
-            } else {
-                playing_card = origin_card;
-                for (const effect_holder &holder : origin_card->get_effect_list(is_response)) {
-                    ret.targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
-                }
-                if (is_possible_to_play_effects(origin, origin_card, origin_card->optionals, ctx)) {
-                    for (const effect_holder &holder : origin_card->optionals) {
-                        ret.targets.push_back(generate_random_target(origin, origin_card, holder, ctx));
-                    }
-                }
+                cur_node = random_element(cur_node->branches
+                    | ranges::views::transform([](const card_modifier_node &node) { return &node; }),
+                    origin->m_game->rng);
             }
         }
         ret.card = playing_card;
@@ -141,28 +143,33 @@ namespace banggame {
         return ret;
     }
 
-    static bool execute_random_play(player *origin, bool is_response, const serial::card_list &cards, std::initializer_list<pocket_type> pockets) {
+    static bool execute_random_play(player *origin, bool is_response, const card_modifier_tree &cards, std::initializer_list<pocket_type> pockets) {
         for (int i=0; i<10; ++i) {
-            auto card_set = cards | ranges::to<std::set<card *>>;
-            while (!card_set.empty()) {
-                card *selected_card = [&]{
+            auto node_set = cards
+                | ranges::views::transform([](const card_modifier_node &node) { return &node; })
+                | ranges::to<std::set>;
+            
+            while (!node_set.empty()) {
+                const card_modifier_node *selected_node = [&]{
                     for (pocket_type pocket : pockets) {
-                        if (auto filter = card_set | std::views::filter([&](card *c) { return c->pocket == pocket; })) {
+                        if (auto filter = node_set
+                            | std::views::filter([&](const card_modifier_node *node) { return node->card->pocket == pocket; }))
+                        {
                             return random_element(filter, origin->m_game->rng);
                         }
                     }
-                    return random_element(card_set, origin->m_game->rng);
+                    return random_element(node_set, origin->m_game->rng);
                 }();
 
-                card_set.erase(selected_card);
+                node_set.erase(selected_node);
 
                 try {
                     if (!origin->handle_action(enums::enum_tag<game_action_type::play_card>,
-                        generate_random_play(origin, selected_card, is_response)))
+                        generate_random_play(origin, *selected_node, is_response)))
                     {
                         if (origin->m_prompt) {
                             // maybe add random variation to fix softlock?
-                            bool response = card_set.empty() && i>=5;
+                            bool response = node_set.empty() && i>=5;
                             origin->handle_action(enums::enum_tag<game_action_type::prompt_respond>, response);
                             if (response) return true;
                         } else {
@@ -183,7 +190,9 @@ namespace banggame {
     static bool respond_to_request(player *origin) {
         auto update = origin->m_game->make_request_update(origin);
 
-        if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](card *c) { return c->pocket == pocket_type::button_row; })) {
+        if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](const card_modifier_node &node) {
+            return node.card->has_tag(tag_type::confirm);
+        })) {
             origin->handle_action(enums::enum_tag<game_action_type::pick_card>,
                 random_element(update.pick_cards, origin->m_game->rng));
             return true;

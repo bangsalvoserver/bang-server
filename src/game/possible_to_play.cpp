@@ -121,7 +121,7 @@ namespace banggame {
         });
     }
 
-    ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
+    static ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
         auto filter = ranges::views::filter([=](card *origin_card) {
             return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
         });
@@ -164,5 +164,27 @@ namespace banggame {
         } else {
             return origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
         }
+    }
+
+    static card_modifier_node generate_card_modifier_node(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
+        card_modifier_node node { .card = origin_card };
+        if (!filters::is_equip_card(origin_card) && origin_card->is_modifier()) {
+            std::vector<card *> modifiers_copy = vector_concat(modifiers, origin_card);
+            effect_context ctx_copy = ctx;
+            origin_card->modifier.add_context(origin_card, origin, ctx_copy);
+
+            for (card *target_card : cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy)) {
+                node.branches.push_back(generate_card_modifier_node(origin, target_card, is_response, modifiers_copy, ctx_copy));
+            }
+        }
+        return node;
+    }
+
+    card_modifier_tree generate_card_modifier_tree(player *origin, bool is_response) {
+        card_modifier_tree tree;
+        for (card *origin_card : get_all_playable_cards(origin, is_response)) {
+            tree.push_back(generate_card_modifier_node(origin, origin_card, is_response, {}, {}));
+        }
+        return tree;
     }
 }

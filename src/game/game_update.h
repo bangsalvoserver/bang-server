@@ -173,20 +173,26 @@ namespace banggame {
         (int, distance_mod)
     )
 
+    DEFINE_STRUCT(card_modifier_node,
+        (serial::card, card)
+        (std::vector<card_modifier_node>, branches)
+    )
+
+    using card_modifier_tree = std::vector<card_modifier_node>;
+
     DEFINE_STRUCT(request_status_args,
         (serial::opt_card, origin_card)
         (serial::opt_player, origin)
         (serial::opt_player, target)
         (game_string, status_text)
         (effect_flags, flags)
-        (serial::card_list, respond_cards)
+        (card_modifier_tree, respond_cards)
         (serial::card_list, pick_cards)
         (serial::card_list, highlight_cards)
     )
 
     DEFINE_STRUCT(status_ready_args,
-        (serial::card_list, play_cards)
-        (serial::opt_card, last_played_card)
+        (card_modifier_tree, play_cards)
     )
 
     DEFINE_STRUCT(game_options,

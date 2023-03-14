@@ -17,7 +17,7 @@ namespace banggame {
     void request_base::auto_respond() {
         auto update = target->m_game->make_request_update(target);
         if (update.pick_cards.empty() && update.respond_cards.size() == 1) {
-            card *origin_card = update.respond_cards.front();
+            card *origin_card = update.respond_cards.front().card;
             if (origin_card->equips.empty()
                 && origin_card->optionals.empty()
                 && !origin_card->is_modifier()

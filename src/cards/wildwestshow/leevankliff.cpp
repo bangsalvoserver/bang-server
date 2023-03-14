@@ -35,6 +35,17 @@ namespace banggame {
 
     void modifier_leevankliff::add_context(card *origin_card, player *origin, effect_context &ctx) {
         ctx.disable_banglimit = true;
-        ctx.repeat_card = origin->get_last_played_card();
+
+        if (!origin->m_played_cards.empty()) {
+            const auto &[last_played_card, modifiers, last_ctx] = origin->m_played_cards.back();
+
+            if (last_ctx->card_choice) {
+                ctx.repeat_card = last_ctx->card_choice;
+            } else if (last_ctx->traincost) {
+                ctx.repeat_card = last_ctx->traincost;
+            } else {
+                ctx.repeat_card = last_played_card.origin_card;
+            }
+        }
     }
 }

@@ -25,11 +25,11 @@ namespace banggame {
 
     ranges::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {});
 
-    ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response = false, const effect_context &ctx = {});
-
     bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx = {});
     
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response = false, const std::vector<card *> &modifiers = {}, const effect_context &ctx = {});
+
+    card_modifier_tree generate_card_modifier_tree(player *origin, bool is_response = false);
     
 }
 

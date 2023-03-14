@@ -173,8 +173,6 @@ namespace banggame {
         void set_role(player_role role, bool instant = true);
         void reset_max_hp();
 
-        card *get_last_played_card() const;
-
         void start_of_turn();
         void request_drawing();
         

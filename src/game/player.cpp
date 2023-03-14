@@ -282,19 +282,6 @@ namespace banggame {
         }
     }
 
-    card *player::get_last_played_card() const {
-        if (m_played_cards.empty()) return nullptr;
-        const auto &[origin_card, modifiers, ctx] = m_played_cards.back();
-
-        if (ctx->card_choice) {
-            return ctx->card_choice;
-        } else if (ctx->traincost) {
-            return ctx->traincost;
-        } else {
-            return origin_card.origin_card;
-        }
-    }
-
     game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, card *target_card) {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
