@@ -59,7 +59,7 @@ namespace banggame {
         }
         target->set_hp(target->m_hp - damage);
         target->m_game->queue_action([origin_card=origin_card, origin=origin, target=target] {
-            if (target->m_hp <= 0 && target->alive()) {
+            if (target->m_hp <= 0 && !target->check_player_flags(player_flags::dead)) {
                 target->m_game->queue_request<request_death>(origin_card, origin, target);
             }
         }, 3);
