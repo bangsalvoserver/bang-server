@@ -22,10 +22,21 @@ namespace banggame {
     };
 
     struct effect_heal_notfull : effect_heal {
+        using effect_heal::effect_heal;
+
         game_string get_error(card *origin_card, player *origin) {
             return get_error(origin_card, origin, origin);
         }
         game_string get_error(card *origin_card, player *origin, player *target);
+    };
+
+    struct effect_queue_heal_notfull : effect_heal_notfull {
+        using effect_heal_notfull::effect_heal_notfull;
+        
+        void on_play(card *origin_card, player *origin) {
+            on_play(origin_card, origin, origin);
+        }
+        void on_play(card *origin_card, player *origin, player *target);
     };
     
     struct handler_heal_multi {

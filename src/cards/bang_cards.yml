@@ -1185,7 +1185,7 @@ main_deck:
     color: brown
     effects:
       - damage
-      - heal_notfull player notself
+      - queue_heal_notfull player notself
   - name: SACRIFICE
     signs:
       - 10 hearts
@@ -1403,8 +1403,8 @@ main_deck:
     expansion: canyondiablo
     color: brown
     effects:
-      - draw(2)
       - damage
+      - queue_draw(2)
   - <<: *dodge
     signs:
       - 7 spades
@@ -1559,8 +1559,8 @@ character:
     image: 03_chuck_wengam
     expansion: dodgecity
     effects:
-      - draw(2)
       - damage
+      - queue_draw(2)
   - name: DOC_HOLYDAY
     image: 03_doc_holyday
     expansion: dodgecity
@@ -2036,8 +2036,8 @@ fistfulofcards:
     responses:
       - max_usages(1)
       - startofturn
-      - heal_notfull player notself
       - damage
+      - queue_heal_notfull player notself
       - reset_drawing
   - name: THE_JUDGE
     image: 05_ilgiudice

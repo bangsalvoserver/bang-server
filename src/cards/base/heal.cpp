@@ -24,6 +24,12 @@ namespace banggame {
         return {};
     }
 
+    void effect_queue_heal_notfull::on_play(card *origin_card, player *origin, player *target) {
+        origin->m_game->queue_action([target, amount=amount]{
+            target->heal(amount);
+        });
+    }
+
     game_string handler_heal_multi::on_prompt(card *origin_card, player *origin, int amount) {
         return effect_heal(amount).on_prompt(origin_card, origin);
     }
