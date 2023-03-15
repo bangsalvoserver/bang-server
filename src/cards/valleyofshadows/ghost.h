@@ -7,8 +7,8 @@
 namespace banggame {
 
     struct equip_ghost : bot_suggestion::target_friend {
-        int value;
-        equip_ghost(int value) : value(value) {}
+        player_flags flag;
+        equip_ghost(int value);
         
         void on_equip(card *target_card, player *target);
         void on_unequip(card *target_card, player *target);
