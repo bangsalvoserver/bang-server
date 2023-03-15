@@ -390,22 +390,24 @@ namespace banggame {
                     apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
                 }
                 
-                log_equipped_card(origin_card, origin, target);
-                
-                if (origin_card->pocket == pocket_type::player_hand) {
-                    origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, false);
-                }
+                origin->m_game->queue_action([=]{
+                    log_equipped_card(origin_card, origin, target);
+                    
+                    if (origin_card->pocket == pocket_type::player_hand) {
+                        origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, false);
+                    }
 
-                target->equip_card(origin_card);
+                    target->equip_card(origin_card);
 
-                if (origin_card->is_green()) {
-                    origin_card->inactive = true;
-                    origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
-                } else if (origin_card->is_black()) {
-                    origin->m_game->draw_shop_card();
-                }
+                    if (origin_card->is_green()) {
+                        origin_card->inactive = true;
+                        origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
+                    } else if (origin_card->is_black()) {
+                        origin->m_game->draw_shop_card();
+                    }
 
-                origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card, ctx);
+                    origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card, ctx);
+                });
             });
         } else {
             MAYBE_RETURN(verify_card_targets(origin, origin_card, is_response, targets, modifiers, ctx));
