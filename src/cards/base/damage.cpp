@@ -58,11 +58,11 @@ namespace banggame {
             }
         }
         target->set_hp(target->m_hp - damage);
-        if (target->m_hp <= 0) {
-            target->m_game->queue_action([origin_card=origin_card, origin=origin, target=target]{
+        target->m_game->queue_action([origin_card=origin_card, origin=origin, target=target] {
+            if (target->m_hp <= 0 && target->alive()) {
                 target->m_game->queue_request<request_death>(origin_card, origin, target);
-            }, 3);
-        }
+            }
+        }, 3);
         target->m_game->call_event<event_type::on_hit>(origin_card, origin, target, damage, flags);
         if (cleanup_function) {
             std::invoke(std::exchange(cleanup_function, nullptr));
