@@ -30,6 +30,7 @@ namespace banggame {
         utils::stable_priority_queue<action_priority_pair, action_ordering> m_delayed_actions;
 
         game *m_game;
+        std::optional<ticks> m_update_timer;
 
     public:
         request_queue(game *m_game) : m_game(m_game) {}

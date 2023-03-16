@@ -289,7 +289,6 @@ namespace banggame {
             m_game->send_request_status_clear();
             if (req->can_pick(target_card)) {
                 req->on_pick(target_card);
-                req.reset();
                 m_game->update();
                 return {};
             } else {
