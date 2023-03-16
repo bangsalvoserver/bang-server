@@ -1871,9 +1871,8 @@ character:
     image: 27_evan_babbit
     expansion: greattrainrobbery
     responses:
-      - mth_add card self | hand
-      - mth_add player notself range_1
-    mth_response: evan_babbit
+      - discard card self | hand origin_card_suit
+      - evan_babbit player notself notorigin range_1
   - name: JIMMY_TEXAS
     image: 27_jimmy_texas
     expansion: greattrainrobbery

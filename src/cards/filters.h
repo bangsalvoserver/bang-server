@@ -36,6 +36,8 @@ namespace banggame::filters {
         card_deck_type get_card_deck(card_ptr target);
         std::optional<short> get_card_tag(card_ptr target, tag_type tag);
         bool is_cube_slot(card_ptr target);
+        card_ptr get_request_origin_card(player_ptr origin);
+        player_ptr get_request_origin(player_ptr origin);
     }
 
     inline bool is_player_ghost(detail::const_player_ptr origin) {
@@ -63,6 +65,13 @@ namespace banggame::filters {
 
         if (bool(filter & target_player_filter::notself) && target == origin)
             return "ERROR_TARGET_SELF";
+        
+        if (bool(filter & target_player_filter::notorigin)) {
+            auto req_origin = detail::get_request_origin(origin);
+            if (!req_origin || req_origin == target) {
+                return "ERROR_TARGET_ORIGIN";
+            }
+        }
 
         if (bool(filter & target_player_filter::notsheriff) && detail::get_player_role(target) == player_role::sheriff)
             return "ERROR_TARGET_SHERIFF";
@@ -147,7 +156,7 @@ namespace banggame::filters {
             return "ERROR_TARGET_NOT_MISSED";
 
         if (bool(filter & target_card_filter::missedcard) && !detail::get_card_tag(target, tag_type::missedcard))
-            return "ERROR_TARGET_NOT_MISSEDCARD";
+            return "ERROR_TARGET_NOT_MISSED";
 
         if (bool(filter & target_card_filter::bronco) && !detail::get_card_tag(target, tag_type::bronco))
             return "ERROR_TARGET_NOT_BRONCO";
@@ -187,6 +196,18 @@ namespace banggame::filters {
         
         if (bool(filter & target_card_filter::spades) && !sign.is_spades())
             return "ERROR_TARGET_NOT_SPADES";
+        
+        if (bool(filter & target_card_filter::origin_card_suit)) {
+            detail::card_ptr req_origin_card = detail::get_request_origin_card(origin);
+            if (!req_origin_card) return "ERROR_NO_ORIGIN_CARD_SUIT";
+            switch (detail::get_card_sign(origin, req_origin_card).suit) {
+                case card_suit::hearts: if (!sign.is_hearts()) { return "ERROR_TARGET_NOT_HEARTS"; } break;
+                case card_suit::diamonds: if (!sign.is_diamonds()) { return "ERROR_TARGET_NOT_DIAMONDS"; } break;
+                case card_suit::clubs: if (!sign.is_clubs()) { return "ERROR_TARGET_NOT_CLUBS"; } break;
+                case card_suit::spades: if (!sign.is_spades()) { return "ERROR_TARGET_NOT_SPADES"; } break;
+                default: return "ERROR_NO_ORIGIN_CARD_SUIT";
+            }
+        }
         
         if (bool(filter & target_card_filter::two_to_nine) && !sign.is_two_to_nine())
             return "ERROR_TARGET_NOT_TWO_TO_NINE";

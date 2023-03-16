@@ -63,4 +63,18 @@ namespace banggame::filters::detail {
     std::optional<short> get_card_tag(card *target, tag_type type) {
         return target->get_tag_value(type);
     }
+
+    card *get_request_origin_card(player *origin) {
+        if (auto req = origin->m_game->top_request()) {
+            return req->origin_card;
+        }
+        return nullptr;
+    }
+
+    player *get_request_origin(player *origin) {
+        if (auto req = origin->m_game->top_request()) {
+            return req->origin;
+        }
+        return nullptr;
+    }
 }
