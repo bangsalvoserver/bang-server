@@ -122,7 +122,7 @@ namespace banggame {
         player *target = lobby.m_game->find_player_by_userid(user->second.user_id);
         if (!target) return "ERROR_USER_NOT_CONTROLLING_PLAYER";
 
-        if (lobby.m_game->pending_requests() || lobby.m_game->m_playing != target) {
+        if (lobby.m_game->pending_requests() || lobby.m_game->pending_updates() || lobby.m_game->m_playing != target) {
             return "ERROR_PLAYER_NOT_IN_TURN";
         }
 

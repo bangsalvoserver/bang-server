@@ -357,7 +357,7 @@ namespace banggame {
             if (!is_response) {
                 return "ERROR_MUST_RESPOND_TO_REQUEST";
             }
-        } else if (is_response || origin->m_game->m_playing != origin) {
+        } else if (is_response || origin->m_game->m_playing != origin || origin->m_game->pending_updates()) {
             return "ERROR_PLAYER_NOT_IN_TURN";
         }
 

@@ -43,6 +43,10 @@ namespace banggame {
             return !m_requests.empty();
         }
 
+        bool pending_updates() const {
+            return m_update_timer.has_value();
+        }
+
         template<typename T = request_base>
         std::shared_ptr<T> top_request(player *target = nullptr) {
             if (!m_requests.empty()) {
