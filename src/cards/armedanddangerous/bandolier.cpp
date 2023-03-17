@@ -3,8 +3,14 @@
 #include "game/game.h"
 
 #include "cards/effect_context.h"
+#include "cards/effect_enums.h"
 
 namespace banggame {
+
+    bool modifier_bandolier::valid_with_card(card *origin_card, player *origin, card *playing_card) {
+        return ranges::contains(playing_card->get_effect_list(origin->m_game->pending_requests()),
+                effect_type::banglimit, &effect_holder::type);
+    }
 
     game_string modifier_bandolier::on_prompt(card *origin_card, player *origin, card *playing_card) {
         if (origin->get_bangs_played() <= 0) {
