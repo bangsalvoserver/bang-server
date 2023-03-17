@@ -76,7 +76,7 @@ namespace banggame {
                 if (req->target->alive() && req->is_valid()) {
                     req->target->m_game->queue_request_front(std::move(req));
                 }
-            });
+            }, 1);
             target->m_game->pop_request();
             target->m_game->queue_request_front<request_train_robbery_choose>(origin_card, origin, target, target_card);
         }
