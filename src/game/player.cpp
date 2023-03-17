@@ -286,8 +286,8 @@ namespace banggame {
         if (m_prompt) {
             return "ERROR_MUST_RESPOND_PROMPT";
         } else if (auto req = m_game->top_request(this)) {
-            m_game->send_request_status_clear();
             if (req->can_pick(target_card)) {
+                m_game->send_request_status_clear();
                 req->on_pick(target_card);
                 m_game->update();
                 return {};
