@@ -69,11 +69,12 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            flags &= ~effect_flags::escapable;
             selected_cards.push_back(target_card);
             
             target->m_game->queue_action([req=target->m_game->top_request<request_train_robbery>()] () mutable {
                 if (req->target->alive() && req->is_valid()) {
+                    req->flags &= ~effect_flags::escapable;
+                    req->state = request_state::pending;
                     req->target->m_game->queue_request_front(std::move(req));
                 }
             }, 1);
