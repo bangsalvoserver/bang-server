@@ -37,6 +37,8 @@ namespace banggame {
         void send_request_status_ready();
         void send_request_update();
 
+        ticks get_total_update_time() const;
+
         void start_next_turn();
 
         void draw_check_then(player *origin, card *origin_card, draw_check_condition condition, draw_check_function fun);

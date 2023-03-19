@@ -87,8 +87,14 @@ namespace banggame {
         }
     };
 
+    struct game_update_tuple {
+        update_target target;
+        json::json content;
+        ticks duration;
+    };
+
     struct game_net_manager {
-        std::deque<std::tuple<update_target, json::json, ticks>> m_updates;
+        std::deque<game_update_tuple> m_updates;
         std::deque<std::pair<update_target, game_string>> m_saved_log;
 
         game_context m_context;
@@ -102,17 +108,6 @@ namespace banggame {
         template<game_update_type E>
         json::json make_update(auto && ... args) {
             return serialize_update(game_update{enums::enum_tag<E>, FWD(args) ... });
-        }
-
-        ticks get_total_update_time() {
-            return ranges::accumulate(m_updates
-                | ranges::views::transform([](const auto &tup) {
-                    if (std::get<update_target>(tup).all_targets_bots()) {
-                        return ticks{0};
-                    } else {
-                        return std::get<ticks>(tup);
-                    }
-                }), ticks{0});
         }
 
         template<game_update_type E>

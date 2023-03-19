@@ -14,11 +14,14 @@ namespace banggame {
                         target->m_game->play_sound(nullptr, "dynamite");
                         target->discard_card(target_card);
                         target->damage(target_card, nullptr, 3);
-                    } else if (auto dest = ranges::find_if(range_other_players(target), [target_card](player *p) {
-                        return !p->find_equipped_card(target_card);
-                    }); *dest != target) {
-                        target_card->on_disable(target);
-                        (*dest)->equip_card(target_card);
+                    } else {
+                        for (player *dest : range_other_players(target)) {
+                            if (!dest->find_equipped_card(target_card)) {
+                                target_card->on_disable(target);
+                                dest->equip_card(target_card);
+                                break;
+                            }
+                        }
                     }
                 });
             }

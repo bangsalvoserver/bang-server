@@ -57,18 +57,16 @@ namespace banggame {
         }
 
         auto operator()(enums::enum_tag_t<target_type::cards_other_players>) const {
-            return range_other_players(origin)
-                | ranges::views::transform([](player *target) {
-                    return ranges::views::concat(
-                        target->m_table | ranges::views::remove_if(&card::is_black),
-                        target->m_hand | ranges::views::take(1)
-                    );
-                })
-                | ranges::views::remove_if(ranges::empty)
-                | ranges::views::transform([&](auto &&range) {
-                    return random_element(range, origin->m_game->rng);
-                })
-                | ranges::to<serial::card_list>;
+            serial::card_list ret;
+            for (player *target : range_other_players(origin)) {
+                if (auto targets = ranges::views::concat(
+                    target->m_table | ranges::views::remove_if(&card::is_black),
+                    target->m_hand | ranges::views::take(1)
+                )) {
+                    ret.push_back(random_element(targets, origin->m_game->rng));
+                }
+            }
+            return ret;
         }
 
         auto operator()(enums::enum_tag_t<target_type::select_cubes>) const {

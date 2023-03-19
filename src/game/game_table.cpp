@@ -97,7 +97,7 @@ namespace banggame {
                 add_update<game_update_type::hide_card>(update_target::excludes(owner), c, instant);
             } else {
                 if (c->visibility == card_visibility::show_owner) {
-                    add_update<game_update_type::hide_card>(update_target::includes(c->owner), c, instant, true);
+                    add_update<game_update_type::hide_card>(update_target::includes(c->owner), c, instant);
                 }
                 add_update<game_update_type::show_card>(update_target::includes(owner), c, *c, instant);
             }

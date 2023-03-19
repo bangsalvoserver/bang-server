@@ -38,13 +38,14 @@ namespace banggame {
             steal_card(target, origin, target_card);
 
             if (!origin->only_black_cards_equipped()) {
-                player_iterator next_target(target);
-                card *next_origin_card = nullptr;
-                do {
-                    ++next_target;
-                    next_origin_card = get_vulture_sam(*next_target);
-                } while (*next_target == origin || !next_origin_card);
-                target->m_game->queue_request_front<request_multi_vulture_sam>(next_origin_card, origin, *next_target);
+                for (player *next_target : range_other_players(target)) {
+                    if (next_target == origin) continue;
+
+                    if (card *next_origin_card = get_vulture_sam(next_target)) {
+                        target->m_game->queue_request_front<request_multi_vulture_sam>(next_origin_card, origin, next_target);
+                        break;
+                    }
+                }
             }
         }
 
@@ -78,14 +79,11 @@ namespace banggame {
             target->untap_inactive_cards();
 
             std::vector<player *> range_targets;
-            int count = target->m_game->num_alive();
-            player_iterator it{target};
-            do {
-                ++it;
-                if (get_vulture_sam(*it)) {
-                    range_targets.push_back(*it);
+            for (player *p : range_other_players(target)) {
+                if (get_vulture_sam(p)) {
+                    range_targets.push_back(p);
                 }
-            } while (--count != 0);
+            }
             if (range_targets.size() == 1) {
                 for (card *target_card : target->m_table
                     | ranges::views::remove_if(&card::is_black)

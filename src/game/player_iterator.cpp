@@ -4,52 +4,80 @@
 #include "player.h"
 
 namespace banggame {
-    player_iterator_base::player_iterator_base(player *p)
+    player_iterator::player_iterator(player *p)
         : m_it(std::ranges::find(p->m_game->m_players, p)) {}
 
     player_iterator &player_iterator::operator++() {
         auto &list = (*m_it)->m_game->m_players;
-        do {
+        while (true) {
             ++m_it;
             if (m_it == list.end()) {
                 m_it = list.begin();
             }
-        } while(!(*m_it)->alive());
+            if ((*m_it)->alive()) {
+                break;
+            }
+        }
         return *this;
     }
 
     player_iterator &player_iterator::operator--() {
         auto &list = (*m_it)->m_game->m_players;
-        do {
+        while (true) {
             if (m_it == list.begin()) {
                 m_it = list.end();
             }
             --m_it;
-        } while(!(*m_it)->alive());
+            if ((*m_it)->alive()) {
+                break;
+            }
+        }
         return *this;
     }
 
-    cycle_player_iterator &cycle_player_iterator::operator++() {
-        auto &list = (*m_it)->m_game->m_players;
-        do {
-            ++m_it;
-            if (m_it == list.end()) {
-                m_it = list.begin();
-                ++m_cycle;
+    util::generator<player *> range_all_players(player *begin) {
+        auto &list = begin->m_game->m_players;
+        auto it = std::ranges::find(list, begin);
+        while (true) {
+            if ((*it)->alive()) {
+                co_yield *it;
             }
-        } while(!m_no_skip_dead && !(*m_it)->alive());
-        return *this;
+            if (++it == list.end()) {
+                it = list.begin();
+            }
+            if (*it == begin) {
+                break;
+            }
+        }
     }
 
-    cycle_player_iterator &cycle_player_iterator::operator--() {
-        auto &list = (*m_it)->m_game->m_players;
-        do {
-            if (m_it == list.begin()) {
-                m_it = list.end();
-                --m_cycle;
+    util::generator<player *> range_all_players_and_dead(player *begin) {
+        auto &list = begin->m_game->m_players;
+        auto it = std::ranges::find(list, begin);
+        while (true) {
+            co_yield *it;
+            if (++it == list.end()) {
+                it = list.begin();
             }
-            --m_it;
-        } while(!m_no_skip_dead && !(*m_it)->alive());
-        return *this;
+            if (*it == begin) {
+                break;
+            }
+        }
+    }
+
+    util::generator<player *> range_other_players(player *begin) {
+        auto &list = begin->m_game->m_players;
+        auto it = std::ranges::find(list, begin);
+        while (true) {
+            if (++it == list.end()) {
+                it = list.begin();
+            }
+            if (*it == begin) {
+                break;
+            }
+            if ((*it)->alive()) {
+                co_yield *it;
+            }
+        }
     }
 }

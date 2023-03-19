@@ -315,11 +315,12 @@ namespace banggame {
             add_log("LOG_GAME_START");
             play_sound(nullptr, "gamestart");
 
-            for (player *p : range_all_players(first_player,
-                std::ranges::max(m_players | std::views::transform(&player::get_initial_cards))))
-            {
-                if (p->m_hand.size() < p->get_initial_cards()) {
-                    p->draw_card();
+            int cycles = std::ranges::max(m_players | std::views::transform(&player::get_initial_cards));
+            for (int i=0; i<cycles; ++i) {
+                for (player *p : range_all_players(first_player)) {
+                    if (p->m_hand.size() < p->get_initial_cards()) {
+                        p->draw_card();
+                    }
                 }
             }
             
@@ -403,6 +404,17 @@ namespace banggame {
             }
         }
         add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
+    }
+
+    ticks game::get_total_update_time() const {
+        return ranges::accumulate(m_players | ranges::views::transform([&](player *p) {
+            return ranges::accumulate(m_updates | ranges::views::transform([&](const game_update_tuple &tup) {
+                if (tup.duration >= ticks{0} && tup.target.matches(p->user_id)) {
+                    return tup.duration;
+                }
+                return ticks{0};
+            }), ticks{0});
+        }), ticks{0}) / m_players.size();
     }
     
     void game::draw_check_then(player *origin, card *origin_card, draw_check_condition condition, draw_check_function fun) {
@@ -528,7 +540,7 @@ namespace banggame {
 
         queue_action([this, killer, target] {
             auto declare_winners = [this](auto &&winners) {
-                for (player *p : range_all_players(m_playing, 1, true)) {
+                for (player *p : range_all_players_and_dead(m_playing)) {
                     if (p->add_player_flags(player_flags::role_revealed)) {
                         add_update<game_update_type::player_show_role>(p, p->m_role);
                     }
