@@ -44,6 +44,7 @@ namespace banggame {
 
         player *m_scenario_holder = nullptr;
         player *m_wws_scenario_holder = nullptr;
+        player *m_train_holder = nullptr;
         player *m_first_dead = nullptr;
 
         std::multimap<event_card_key, card_disabler_fun, std::less<>> m_disablers;

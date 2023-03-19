@@ -52,10 +52,11 @@ namespace banggame {
 
     DEFINE_STRUCT(move_scenario_deck_update,
         (serial::player, player)
-        (pocket_type, pocket),
+        (pocket_type, pocket)
+        (bool, instant),
 
         auto get_duration() const {
-            return durations::move_card;
+            return instant ? 0ms : durations::move_card;
         }
     )
 
