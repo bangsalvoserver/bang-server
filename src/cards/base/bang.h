@@ -16,9 +16,9 @@ namespace banggame {
     };
 
     struct handler_play_as_bang {
-        bool on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target);
-        game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target);
-        void on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target);
+        bool on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
+        game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
+        void on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
     };
 
     struct effect_banglimit {

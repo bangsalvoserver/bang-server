@@ -11,6 +11,15 @@
 
 namespace banggame {
 
+    struct effect_holder;
+
+    struct effect_target_pair {
+        const effect_holder &effect;
+        play_card_target target;
+    };
+    
+    using effect_target_list = std::vector<effect_target_pair>;
+
     template<target_type E> struct tagged_value {};
 
     template<target_type E>

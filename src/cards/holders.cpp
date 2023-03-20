@@ -303,7 +303,7 @@ namespace banggame {
         }, type);
     }
 
-    game_string mth_holder::get_error(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
+    game_string mth_holder::get_error(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx) const {
         return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
@@ -315,7 +315,7 @@ namespace banggame {
         }, type);
     }
 
-    game_string mth_holder::on_prompt(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
+    game_string mth_holder::on_prompt(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx) const {
         return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> game_string {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;
@@ -332,7 +332,7 @@ namespace banggame {
         }, type);
     }
     
-    void mth_holder::on_play(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
+    void mth_holder::on_play(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx) const {
         enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) {
             if constexpr (enums::value_with_type<E>) {
                 using handler_type = enums::enum_type_t<E>;

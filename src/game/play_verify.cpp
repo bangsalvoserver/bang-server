@@ -33,12 +33,12 @@ namespace banggame {
             return "ERROR_INVALID_TARGETS";
         }
 
-        target_list mth_targets;
+        effect_target_list mth_targets;
         for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
             if (!target.is(effect.target)) {
                 return "ERROR_INVALID_TARGET_TYPE";
             } else if (effect.type == effect_type::mth_add) {
-                mth_targets.push_back(target);
+                mth_targets.emplace_back(effect, target);
             } else if (effect.type == effect_type::ctx_add) {
                 if (target.is(target_type::card)) {
                     origin_card->modifier.add_context(origin_card, origin, target.get<target_type::card>(), ctx);
@@ -210,10 +210,10 @@ namespace banggame {
     }
 
     static game_string check_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
-        target_list mth_targets;
+        effect_target_list mth_targets;
         for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
             if (effect.type == effect_type::mth_add) {
-                mth_targets.push_back(target);
+                mth_targets.emplace_back(effect, target);
             }
             MAYBE_RETURN(enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
                 return play_visitor<E>{origin, origin_card, effect}.prompt(ctx, FWD(args) ... );
@@ -323,29 +323,26 @@ namespace banggame {
             }
         }
 
-        std::vector<std::pair<const effect_holder &, const play_card_target &>> delay_effects;
+        effect_target_list mth_targets;
         card_cube_count selected_cubes;
 
-        target_list mth_targets;
         for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
             if (effect.type == effect_type::mth_add) {
-                mth_targets.push_back(target);
+                mth_targets.emplace_back(effect, target);
             } else if (effect.type == effect_type::pay_cube) {
-                if (auto *cs = target.get_if<target_type::select_cubes>()) {
-                    for (card *c : *cs) {
+                if (target.is(target_type::select_cubes)) {
+                    for (card *c : target.get<target_type::select_cubes>()) {
                         ++selected_cubes[c];
                     }
                 } else if (target.is(target_type::self_cubes)) {
                     selected_cubes[origin_card] += effect.target_value;
                 }
-            } else {
-                delay_effects.emplace_back(effect, target);
             }
         }
         for (const auto &[c, ncubes] : selected_cubes) {
             origin->pay_cubes(c, ncubes);
         }
-        for (const auto &[effect, target] : delay_effects) {
+        for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
             enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
                 play_visitor<E>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
             }, target);

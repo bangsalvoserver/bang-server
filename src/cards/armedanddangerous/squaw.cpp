@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    game_string handler_squaw::on_prompt(card *origin_card, player *origin, card *target_card, opt_tagged_value<target_type::none> paid_cubes) {
+    game_string handler_squaw::on_prompt(card *origin_card, player *origin, card *target_card, bool paid_cubes) {
         if (target_card->owner == origin) {
             return {"PROMPT_TARGET_SELF", origin_card};
         } else {
@@ -16,7 +16,7 @@ namespace banggame {
         }
     }
 
-    void handler_squaw::on_play(card *origin_card, player *origin, card *target_card, opt_tagged_value<target_type::none> paid_cubes) {
+    void handler_squaw::on_play(card *origin_card, player *origin, card *target_card, bool paid_cubes) {
         const auto flags = effect_flags::escapable | effect_flags::single_target;
         if (target_card->owner) {
             if (paid_cubes) {

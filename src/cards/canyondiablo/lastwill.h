@@ -15,10 +15,10 @@ namespace banggame {
     };
 
     struct handler_lastwill {
-        bool on_check_target(card *origin_card, player *origin, const target_list &targets) {
-            return bot_suggestion::target_friend{}.on_check_target(origin_card, origin, targets[0].get<target_type::player>());
+        bool on_check_target(card *origin_card, player *origin, const effect_target_list &targets) {
+            return bot_suggestion::target_friend{}.on_check_target(origin_card, origin, targets[0].target.get<target_type::player>());
         }
-        void on_play(card *origin_card, player *origin, const target_list &targets);
+        void on_play(card *origin_card, player *origin, const effect_target_list &targets);
     };
 }
 

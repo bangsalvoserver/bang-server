@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    void handler_flintlock::on_play(card *origin_card, player *origin, player *target, opt_tagged_value<target_type::none> paid_cubes) {
+    void handler_flintlock::on_play(card *origin_card, player *origin, player *target, bool paid_cubes) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         auto req = std::make_shared<request_bang>(origin_card, origin, target, effect_flags::escapable | effect_flags::single_target);
         if (paid_cubes) {

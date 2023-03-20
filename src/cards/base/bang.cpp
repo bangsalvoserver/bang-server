@@ -4,6 +4,7 @@
 #include "cards/effect_enums.h"
 #include "cards/effect_context.h"
 #include "cards/game_enums.h"
+#include "cards/filters.h"
 
 #include "game/game.h"
 #include "damage.h"
@@ -30,41 +31,41 @@ namespace banggame {
         queue_request_bang(origin_card, origin, target);
     }
 
-    bool handler_play_as_bang::on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target) {
-        if (target.is(target_type::player)) {
-            player *target_player = target.get<target_type::player>();
+    bool handler_play_as_bang::on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
+        if (target.target.is(target_type::player)) {
+            player *target_player = target.target.get<target_type::player>();
             return bot_suggestion::target_enemy{}.on_check_target(chosen_card, origin, target_player);
         } else {
             return true;
         }
     }
 
-    game_string handler_play_as_bang::on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target) {
-        if (target.is(target_type::player)) {
-            player *target_player = target.get<target_type::player>();
+    game_string handler_play_as_bang::on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
+        if (target.target.is(target_type::player)) {
+            player *target_player = target.target.get<target_type::player>();
             return prompt_target_ghost{}.on_prompt(chosen_card, origin, target_player);
         } else {
             return {};
         }
     }
 
-    void handler_play_as_bang::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const play_card_target &target_variant) {
+    void handler_play_as_bang::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target_variant) {
         if (chosen_card->pocket == pocket_type::player_hand) {
             origin->m_game->call_event<event_type::on_use_hand_card>(origin, chosen_card, false);
         }
-        if (target_variant.is(target_type::player)) {
-            player *target = target_variant.get<target_type::player>();
+        if (target_variant.target.is(target_type::player)) {
+            player *target = target_variant.target.get<target_type::player>();
             origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
             origin->discard_card(chosen_card);
             queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
 
-        } else if (target_variant.is(target_type::players)) {
+        } else if (target_variant.target.is(target_type::players)) {
             origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
             origin->discard_card(chosen_card);
 
             std::vector<player *> targets;
-            for (player *target : range_other_players(origin)) {
-                if (target != ctx.skipped_player) {
+            for (player *target : range_all_players(origin)) {
+                if (target != ctx.skipped_player && !filters::check_player_filter(origin, target_variant.effect.player_filter, target, ctx)) {
                     targets.push_back(target);
                 }
             }

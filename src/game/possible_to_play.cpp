@@ -66,7 +66,7 @@ namespace banggame {
         return copy;
     }
 
-    static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, effect_list::const_iterator effect_it, const effect_context &ctx, const target_list &targets) {
+    static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, effect_list::const_iterator effect_it, const effect_context &ctx, const effect_target_list &targets) {
         effect_it = std::ranges::find(effect_it, effects.end(), effect_type::mth_add, &effect_holder::type);
         if (effect_it == effects.end()) {
             return !mth.get_error(origin_card, origin, targets, ctx);
@@ -74,16 +74,16 @@ namespace banggame {
             switch (effect_it->target) {
             case target_type::none:
                 return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
-                    vector_concat(targets, enums::enum_tag<target_type::none>));
+                    vector_concat(targets, *effect_it, play_card_target{enums::enum_tag<target_type::none>}));
             case target_type::player:
                 return std::ranges::any_of(make_player_target_set(origin, origin_card, *effect_it, ctx), [&](player *target) {
                     return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
-                        vector_concat(targets, enums::enum_tag<target_type::player>, target));
+                        vector_concat(targets, *effect_it, play_card_target{enums::enum_tag<target_type::player>, target}));
                 });
             case target_type::card:
                 return std::ranges::any_of(make_card_target_set(origin, origin_card, *effect_it, ctx), [&](card *target) {
                     return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
-                        vector_concat(targets, enums::enum_tag<target_type::card>, target));
+                        vector_concat(targets, *effect_it, play_card_target{enums::enum_tag<target_type::card>, target}));
                 });
             default:
                 // ignore other target types

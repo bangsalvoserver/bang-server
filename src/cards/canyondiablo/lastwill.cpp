@@ -37,11 +37,11 @@ namespace banggame {
         return origin->m_game->top_request<request_lastwill>(origin) != nullptr;
     }
 
-    void handler_lastwill::on_play(card *origin_card, player *origin, const target_list &targets) {
+    void handler_lastwill::on_play(card *origin_card, player *origin, const effect_target_list &targets) {
         origin->m_game->pop_request();
-        player *target = targets[0].get<target_type::player>();
+        player *target = targets[0].target.get<target_type::player>();
         for (auto c : targets | std::views::drop(1)) {
-            card *chosen_card = c.get<target_type::card>();
+            card *chosen_card = c.target.get<target_type::card>();
             if (chosen_card->visibility != card_visibility::shown) {
                 origin->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, chosen_card);
                 origin->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", origin, target);
