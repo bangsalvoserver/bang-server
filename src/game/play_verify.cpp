@@ -209,35 +209,37 @@ namespace banggame {
         return {};
     }
 
-    static game_string check_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
-        auto check = [&](card *c, const target_list &ts) {
-            target_list mth_targets;
-            for (const auto &[target, effect] : zip_card_targets(ts, c, is_response)) {
-                if (effect.type == effect_type::mth_add) {
-                    mth_targets.push_back(target);
-                }
-                MAYBE_RETURN(enums::visit_indexed(
-                    [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                        return play_visitor<E>{origin, c, effect}.prompt(ctx, FWD(args) ... );
-                    }, target));
+    static game_string check_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+        target_list mth_targets;
+        for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
+            if (effect.type == effect_type::mth_add) {
+                mth_targets.push_back(target);
             }
-
-            return c->get_mth(is_response).on_prompt(c, origin, mth_targets, ctx);
-        };
-
-        for (const auto &[mod_card, mod_targets] : modifiers) {
-            MAYBE_RETURN(mod_card->modifier.on_prompt(mod_card, origin, origin_card, ctx));
-            MAYBE_RETURN(check(mod_card, mod_targets));
+            MAYBE_RETURN(enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                return play_visitor<E>{origin, origin_card, effect}.prompt(ctx, FWD(args) ... );
+            }, target));
         }
 
-        return check(origin_card, targets);
+        return origin_card->get_mth(is_response).on_prompt(origin_card, origin, mth_targets, ctx);
     }
 
-    static game_string check_prompt_equip(card *origin_card, player *origin, player *target) {
+    static game_string check_prompt_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, const effect_context &ctx) {
+        for (const auto &[mod_card, mod_targets] : modifiers) {
+            MAYBE_RETURN(mod_card->modifier.on_prompt(mod_card, origin, origin_card, ctx));
+            MAYBE_RETURN(check_prompt(origin, mod_card, is_response, mod_targets, ctx));
+        }
+        return {};
+    }
+
+    static game_string check_prompt_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
+        MAYBE_RETURN(check_prompt_modifiers(origin, origin_card, is_response, modifiers, ctx));
+        return check_prompt(origin, origin_card, is_response, targets, ctx);
+    }
+
+    static game_string check_prompt_equip(card *origin_card, player *origin, player *target, const modifier_list &modifiers, const effect_context &ctx) {
+        MAYBE_RETURN(check_prompt_modifiers(origin, origin_card, false, modifiers, ctx));
         for (const auto &e : origin_card->equips) {
-            if (auto prompt_message = e.on_prompt(origin_card, origin, target)) {
-                return prompt_message;
-            }
+            MAYBE_RETURN(e.on_prompt(origin_card, origin, target));
         }
         return {};
     }
@@ -381,7 +383,7 @@ namespace banggame {
                 target = targets.front().get<target_type::player>();
             }
 
-            origin->prompt_then(check_prompt_equip(origin_card, origin, target), [=]{
+            origin->prompt_then(check_prompt_equip(origin_card, origin, target, modifiers, ctx), [=]{
                 add_played_card(origin, origin_card, modifiers, ctx);
 
                 origin->add_gold(-cost);
@@ -391,22 +393,24 @@ namespace banggame {
                 }
                 
                 origin->m_game->queue_action([=]{
-                    log_equipped_card(origin_card, origin, target);
-                    
-                    if (origin_card->pocket == pocket_type::player_hand) {
-                        origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, false);
+                    if (origin->alive()) {
+                        log_equipped_card(origin_card, origin, target);
+                        
+                        if (origin_card->pocket == pocket_type::player_hand) {
+                            origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, false);
+                        }
+
+                        target->equip_card(origin_card);
+
+                        if (origin_card->is_green()) {
+                            origin_card->inactive = true;
+                            origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
+                        } else if (origin_card->is_black()) {
+                            origin->m_game->draw_shop_card();
+                        }
+
+                        origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card, ctx);
                     }
-
-                    target->equip_card(origin_card);
-
-                    if (origin_card->is_green()) {
-                        origin_card->inactive = true;
-                        origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
-                    } else if (origin_card->is_black()) {
-                        origin->m_game->draw_shop_card();
-                    }
-
-                    origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card, ctx);
                 });
             });
         } else {
@@ -417,7 +421,7 @@ namespace banggame {
                 return "ERROR_NOT_ENOUGH_GOLD";
             }
 
-            origin->prompt_then(check_prompt(origin, origin_card, is_response, targets, modifiers, ctx), [=]{
+            origin->prompt_then(check_prompt_play(origin, origin_card, is_response, targets, modifiers, ctx), [=]{
                 add_played_card(origin, origin_card, modifiers, ctx);
 
                 origin->add_gold(-cost);
