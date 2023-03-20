@@ -12,6 +12,7 @@
 
 #include "play_verify.h"
 #include "possible_to_play.h"
+#include "draw_check_handler.h"
 
 #include <array>
 
@@ -419,8 +420,7 @@ namespace banggame {
     
     void game::draw_check_then(player *origin, card *origin_card, draw_check_condition condition, draw_check_function fun) {
         flash_card(origin_card);
-        m_current_check.set(origin, origin_card, std::move(condition), std::move(fun));
-        m_current_check.start();
+        queue_request_front<request_check>(this, origin_card, origin, std::move(condition), std::move(fun));
     }
 
     void game::start_next_turn() {

@@ -4,27 +4,30 @@
 #include "player.h"
 
 namespace banggame {
+    
+    struct request_check : request_base {
+        request_check(game *m_game, card *origin_card, player *target, draw_check_condition &&condition, draw_check_function &&function)
+            : request_base(origin_card, nullptr, target)
+            , m_game(m_game)
+            , m_condition(std::move(condition))
+            , m_function(std::move(function)) {}
 
-    using draw_check_condition = std::function<bool(card_sign)>;
-    using draw_check_function = std::function<void(bool)>;
-
-    class draw_check_handler {
-    private:
-        game *m_game = nullptr;
-        player *m_origin = nullptr;
-        card *m_origin_card = nullptr;
+        game *m_game;
         draw_check_condition m_condition;
         draw_check_function m_function;
-    
-    public:
-        draw_check_handler(game *m_game) : m_game(m_game) {}
 
-    public:
-        void set(player *origin, card *origin_card, draw_check_condition &&condition, draw_check_function &&function);
+        void on_update() override;
+
+        bool can_pick(card *target_card) const override;
+
+        void on_pick(card *target_card) override;
+
+        game_string status_text(player *owner) const override;
+
         void start();
         void select(card *drawn_card);
         void restart();
-        bool check(card *drawn_card);
+        bool check(card *drawn_card) const;
         void resolve(card *drawn_card);
     };
 

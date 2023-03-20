@@ -57,6 +57,9 @@ namespace banggame {
     };
 
     inline card_backface::card_backface(card *c): id(c->id), deck(c->deck) {}
+
+    using draw_check_condition = std::function<bool(card_sign)>;
+    using draw_check_function = std::function<void(bool)>;
     
     struct card_pocket_pair {
         card *origin_card;

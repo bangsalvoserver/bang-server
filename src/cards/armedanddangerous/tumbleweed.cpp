@@ -2,17 +2,21 @@
 
 #include "game/game.h"
 #include "game/bot_suggestion.h"
+#include "game/draw_check_handler.h"
 
 namespace banggame {
 
     struct request_tumbleweed : request_base, resolvable_request {
-        request_tumbleweed(card *origin_card, player *origin, player *target, card *drawn_card, card *drawing_card)
+        request_tumbleweed(card *origin_card, player *origin, player *target, card *drawn_card, card *drawing_card, request_check *req_check)
             : request_base(origin_card, origin, target)
             , target_card(drawing_card)
-            , drawn_card(drawn_card) {}
+            , drawn_card(drawn_card)
+            , req_check(req_check) {}
         
         card *target_card;
         card *drawn_card;
+
+        request_check *req_check;
 
         struct timer_tumbleweed : request_timer {
             explicit timer_tumbleweed(request_tumbleweed *request)
@@ -31,7 +35,7 @@ namespace banggame {
         }
 
         void on_finished() {
-            target->m_game->m_current_check.resolve(drawn_card);
+            req_check->resolve(drawn_card);
         }
 
         void on_resolve() override {
@@ -50,7 +54,8 @@ namespace banggame {
 
     void equip_tumbleweed::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player *origin, card *origin_card, card *drawn_card, bool &auto_resolve) {
-            target->m_game->queue_request_front<request_tumbleweed>(target_card, origin, target, drawn_card, origin_card);
+            target->m_game->queue_request_front<request_tumbleweed>(target_card, origin, target, drawn_card, origin_card,
+                target->m_game->top_request<request_check>().get());
             auto_resolve = false;
         });
     }
@@ -58,7 +63,7 @@ namespace banggame {
     bool effect_tumbleweed::on_check_target(card *origin_card, player *origin) {
         auto req = origin->m_game->top_request<request_tumbleweed>();
         return (req->origin && bot_suggestion::target_friend{}.on_check_target(origin_card, origin, req->origin))
-            != origin->m_game->m_current_check.check(req->drawn_card);
+            != req->req_check->check(req->drawn_card);
     }
 
     bool effect_tumbleweed::can_play(card *origin_card, player *origin) {
@@ -66,8 +71,9 @@ namespace banggame {
     }
 
     void effect_tumbleweed::on_play(card *origin_card, player *origin) {
+        request_check *req_check = origin->m_game->top_request<request_tumbleweed>()->req_check;
         origin->m_game->pop_request();
-        origin->m_game->m_current_check.restart();
+        req_check->restart();
     }
 
 }

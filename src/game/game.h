@@ -4,7 +4,6 @@
 #include "events.h"
 #include "game_table.h"
 #include "request_queue.h"
-#include "draw_check_handler.h"
 #include "player_iterator.h"
 #include "utils/utils.h"
 #include "utils/generator.h"
@@ -12,11 +11,9 @@
 namespace banggame {
 
     struct game : game_table, listener_map, request_queue {
-        draw_check_handler m_current_check;
-
         player *m_playing = nullptr;
 
-        game() : request_queue(this), m_current_check(this) {}
+        game() : request_queue(this) {}
 
         util::generator<json::json> get_spectator_updates();
         util::generator<json::json> get_rejoin_updates(player *target);
