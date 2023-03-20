@@ -9,6 +9,7 @@ namespace banggame {
 
     player_iterator &player_iterator::operator++() {
         auto &list = (*m_it)->m_game->m_players;
+        auto start = m_it;
         while (true) {
             ++m_it;
             if (m_it == list.end()) {
@@ -17,12 +18,16 @@ namespace banggame {
             if ((*m_it)->alive()) {
                 break;
             }
+            if (m_it == start) {
+                throw std::runtime_error("Infinite loop in player_iterator");
+            }
         }
         return *this;
     }
 
     player_iterator &player_iterator::operator--() {
         auto &list = (*m_it)->m_game->m_players;
+        auto start = m_it;
         while (true) {
             if (m_it == list.begin()) {
                 m_it = list.end();
@@ -30,6 +35,9 @@ namespace banggame {
             --m_it;
             if ((*m_it)->alive()) {
                 break;
+            }
+            if (m_it == start) {
+                throw std::runtime_error("Infinite loop in player_iterator");
             }
         }
         return *this;
