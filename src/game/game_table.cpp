@@ -48,15 +48,18 @@ namespace banggame {
 
         player_iterator from_it{from};
         player_iterator to_it{to};
-        
-        if (!to->alive()) {
-            --to_it;
-        }
 
-        return std::min(
-            std::distance(from_it, to_it),
-            std::distance(std::reverse_iterator(from_it), std::reverse_iterator(to_it))
-        ) + to->m_distance_mod + (!to->alive());
+        if (to->alive()) {
+            return std::min(
+                std::distance(from_it, to_it),
+                std::distance(std::reverse_iterator(from_it), std::reverse_iterator(to_it))
+            ) + to->m_distance_mod;
+        } else {
+            return std::min(
+                std::distance(from_it, std::prev(to_it)),
+                std::distance(std::reverse_iterator(from_it), std::reverse_iterator(std::next(to_it)))
+            ) + 1 + to->m_distance_mod;
+        }
     }
 
     int game_table::num_alive() const {
