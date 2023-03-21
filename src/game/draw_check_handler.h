@@ -4,8 +4,14 @@
 #include "player.h"
 
 namespace banggame {
+
+    struct draw_check_handler {
+        virtual void restart() = 0;
+        virtual bool check(card *drawn_card) const = 0;
+        virtual void resolve(card *drawn_card) = 0;
+    };
     
-    struct request_check : request_base {
+    struct request_check : request_base, draw_check_handler {
         request_check(game *m_game, card *origin_card, player *target, draw_check_condition &&condition, draw_check_function &&function)
             : request_base(origin_card, nullptr, target)
             , m_game(m_game)
@@ -26,9 +32,10 @@ namespace banggame {
 
         void start();
         void select(card *drawn_card);
-        void restart();
-        bool check(card *drawn_card) const;
-        void resolve(card *drawn_card);
+
+        void restart() override;
+        bool check(card *drawn_card) const override;
+        void resolve(card *drawn_card) override;
     };
 
 }
