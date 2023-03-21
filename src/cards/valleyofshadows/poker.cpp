@@ -20,6 +20,7 @@ namespace banggame {
             target->m_game->pop_request();
             target->m_game->add_log("LOG_DISCARDED_A_CARD_FOR", origin_card, target);
             target->m_game->move_card(target_card, pocket_type::selection, origin);
+            target->m_game->call_event<event_type::on_discard_hand_card>(target, target_card, true);
         }
 
         game_string status_text(player *owner) const override {

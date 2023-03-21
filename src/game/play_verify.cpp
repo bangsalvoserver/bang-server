@@ -299,14 +299,10 @@ namespace banggame {
     void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, is_response);
 
-        if (origin_card->pocket == pocket_type::player_hand) {
-            origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, false);
-        }
-
         if (origin_card != ctx.repeat_card && !origin_card->has_tag(tag_type::no_auto_discard)) {
             switch (origin_card->pocket) {
             case pocket_type::player_hand:
-                origin->discard_card(origin_card);
+                origin->discard_used_card(origin_card);
                 break;
             case pocket_type::player_table:
                 if (origin_card->is_green()) {
@@ -394,7 +390,7 @@ namespace banggame {
                         log_equipped_card(origin_card, origin, target);
                         
                         if (origin_card->pocket == pocket_type::player_hand) {
-                            origin->m_game->call_event<event_type::on_use_hand_card>(origin, origin_card, false);
+                            origin->m_game->call_event<event_type::on_discard_hand_card>(origin, origin_card, true);
                         }
 
                         target->equip_card(origin_card);

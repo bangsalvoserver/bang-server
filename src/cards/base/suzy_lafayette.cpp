@@ -18,7 +18,7 @@ namespace banggame {
             check_empty_hand(origin_card, origin);
         }
 
-        origin->m_game->add_listener<event_type::on_use_hand_card>(origin_card, [=](player *target, card *target_card, bool automatic) {
+        origin->m_game->add_listener<event_type::on_discard_hand_card>(origin_card, [=](player *target, card *target_card, bool used) {
             if (origin == target) {
                 check_empty_hand(origin_card, origin);
             }

@@ -136,6 +136,7 @@ namespace banggame {
         void draw_card(int ncards = 1, card *origin_card = nullptr);
 
         void discard_card(card *target);
+        void discard_used_card(card *target);
         void steal_card(card *target);
 
         int get_initial_cards();

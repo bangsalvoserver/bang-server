@@ -41,7 +41,6 @@ namespace banggame {
                         target->m_game->add_log("LOG_STOLEN_CARD", target, saved, stolen_card);
                     }
                     target->steal_card(stolen_card);
-                    target->m_game->call_event<event_type::on_use_hand_card>(target, stolen_card, true);
                 }
             }
         }

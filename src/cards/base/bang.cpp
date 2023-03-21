@@ -50,18 +50,15 @@ namespace banggame {
     }
 
     void handler_play_as_bang::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target_variant) {
-        if (chosen_card->pocket == pocket_type::player_hand) {
-            origin->m_game->call_event<event_type::on_use_hand_card>(origin, chosen_card, false);
-        }
         if (target_variant.target.is(target_type::player)) {
             player *target = target_variant.target.get<target_type::player>();
             origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
-            origin->discard_card(chosen_card);
+            origin->discard_used_card(chosen_card);
             queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
 
         } else if (target_variant.target.is(target_type::players)) {
             origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
-            origin->discard_card(chosen_card);
+            origin->discard_used_card(chosen_card);
 
             std::vector<player *> targets;
             for (player *target : range_all_players(origin)) {

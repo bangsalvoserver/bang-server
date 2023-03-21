@@ -31,8 +31,7 @@ namespace banggame {
         void on_pick(card *target_card) override {
             target->m_game->pop_request();
             target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
-            target->discard_card(target_card);
-            target->m_game->call_event<event_type::on_use_hand_card>(target, target_card, false);
+            target->discard_used_card(target_card);
         }
 
         void on_resolve() override {

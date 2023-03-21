@@ -101,7 +101,7 @@ namespace banggame {
         return m_hand[std::uniform_int_distribution(0, int(m_hand.size() - 1))(m_game->rng)];
     }
 
-    static void move_owned_card(player *owner, card *target_card, std::invocable auto &&fun) {
+    static void move_owned_card(player *owner, card *target_card, bool used, std::invocable auto &&fun) {
         if (target_card->owner == owner) {
             if (target_card->pocket == pocket_type::player_table) {
                 if (target_card->inactive) {
@@ -113,13 +113,14 @@ namespace banggame {
                 std::invoke(FWD(fun));
                 target_card->on_unequip(owner);
             } else if (target_card->pocket == pocket_type::player_hand) {
+                owner->m_game->call_event<event_type::on_discard_hand_card>(owner, target_card, used);
                 std::invoke(FWD(fun));
             }
         }
     }
 
     void player::discard_card(card *target) {
-        move_owned_card(this, target, [&]{
+        move_owned_card(this, target, false, [&]{
             if (target->is_train()) {
                 m_game->discard_train_card(target);
             } else if (target->is_black()) {
@@ -130,9 +131,15 @@ namespace banggame {
         });
     }
 
+    void player::discard_used_card(card *target) {
+        move_owned_card(this, target, true, [&]{
+            m_game->move_card(target, pocket_type::discard_pile);
+        });
+    }
+
     void player::steal_card(card *target) {
         if (target->owner != this || target->pocket != pocket_type::player_table || !target->is_train()) {
-            move_owned_card(target->owner, target, [&]{
+            move_owned_card(target->owner, target, false, [&]{
                 add_to_hand(target);
             });
         }

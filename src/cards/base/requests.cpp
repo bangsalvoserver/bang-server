@@ -38,8 +38,7 @@ namespace banggame {
             target->m_game->pop_request();
         }
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
-        target->discard_card(target_card);
-        target->m_game->call_event<event_type::on_use_hand_card>(target, origin_card, false);
+        target->discard_used_card(target_card);
     }
 
     game_string request_discard::status_text(player *owner) const {
@@ -115,9 +114,6 @@ namespace banggame {
     }
 
     void request_discard_all::on_pick(card *target_card) {
-        if (target_card->pocket == pocket_type::player_hand) {
-            target->m_game->call_event<event_type::on_use_hand_card>(target, target_card, true);
-        }
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
         target->discard_card(target_card);
     }
