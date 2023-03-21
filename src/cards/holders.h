@@ -4,6 +4,8 @@
 #include "cards/card_effect.h"
 
 namespace banggame {
+
+    void apply_rulesets(game *game);
     
     DEFINE_STRUCT(effect_holder,
         (target_type, target)

@@ -1,3 +1,4 @@
+#include "bot_ai.h"
 #include "game.h"
 #include "play_verify.h"
 #include "possible_to_play.h"
@@ -5,7 +6,7 @@
 #include "cards/effect_enums.h"
 #include "cards/filters.h"
 
-namespace banggame {
+namespace banggame::bot_ai {
 
     template<std::ranges::range Range, typename Rng>
     decltype(auto) random_element(Range &&range, Rng &rng) {
@@ -185,7 +186,7 @@ namespace banggame {
         return false;
     }
 
-    static bool respond_to_request(player *origin) {
+    bool respond_to_request(player *origin) {
         auto update = origin->m_game->make_request_update(origin);
 
         if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](const card_modifier_node &node) {
@@ -204,7 +205,7 @@ namespace banggame {
         return false;
     }
 
-    static bool play_in_turn(player *origin) {
+    bool play_in_turn(player *origin) {
         auto update = origin->m_game->make_status_ready_update(origin);
 
         return execute_random_play(origin, false, update.play_cards, {
@@ -213,13 +214,5 @@ namespace banggame {
             pocket_type::player_hand,
             pocket_type::shop_selection
         });
-    }
-
-    bool game::request_bot_play(player *origin, bool is_response) {
-        if (is_response) {
-            return respond_to_request(origin);
-        } else {
-            return play_in_turn(origin);
-        }
     }
 }

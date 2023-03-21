@@ -23,18 +23,12 @@ namespace banggame {
         void add_players(std::span<int> user_ids);
         void start_game(const game_options &options);
 
-        void apply_rulesets();
-
-        bool request_bot_play(player *origin, bool is_response);
-
         request_status_args make_request_update(player *p);
         status_ready_args make_status_ready_update(player *p);
 
         void send_request_status_clear();
         void send_request_status_ready();
         void send_request_update();
-
-        ticks get_total_update_time() const;
 
         void start_next_turn();
 

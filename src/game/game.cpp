@@ -157,7 +157,7 @@ namespace banggame {
     void game::start_game(const game_options &options) {
         m_options = options;
 
-        apply_rulesets();
+        apply_rulesets(this);
 
         add_update<game_update_type::player_add>(int(m_players.size()));
 
@@ -405,17 +405,6 @@ namespace banggame {
             }
         }
         add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
-    }
-
-    ticks game::get_total_update_time() const {
-        return ranges::accumulate(m_players | ranges::views::transform([&](player *p) {
-            return ranges::accumulate(m_updates | ranges::views::transform([&](const game_update_tuple &tup) {
-                if (tup.duration >= ticks{0} && tup.target.matches(p->user_id)) {
-                    return tup.duration;
-                }
-                return ticks{0};
-            }), ticks{0});
-        }), ticks{0}) / m_players.size();
     }
     
     void game::draw_check_then(player *origin, card *origin_card, draw_check_condition condition, draw_check_function fun) {

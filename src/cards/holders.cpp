@@ -21,9 +21,9 @@ namespace banggame {
         }
     }
 
-    void game::apply_rulesets() {
+    void apply_rulesets(game *game) {
         [&]<expansion_type ... Es>(enums::enum_sequence<Es ...>) {
-            (do_apply_ruleset(this, enums::enum_tag<Es>), ...);
+            (do_apply_ruleset(game, enums::enum_tag<Es>), ...);
         }(enums::make_enum_sequence<expansion_type>());
     }
 
