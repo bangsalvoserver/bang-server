@@ -2514,7 +2514,7 @@ train:
     effects:
       - discard
       - draw
-      - discard card | train
+      - destroy card | train
   - name: DINING_CAR
     image: 27_dining_car
     color: train
