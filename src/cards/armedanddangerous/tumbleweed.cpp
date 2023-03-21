@@ -31,7 +31,11 @@ namespace banggame {
         request_timer *timer() override { return &m_timer; }
 
         std::vector<card *> get_highlights() const override {
-            return {target_card, drawn_card};
+            if (drawn_card) {
+                return {target_card, drawn_card};
+            } else {
+                return {target_card};
+            }
         }
 
         void on_finished() {
