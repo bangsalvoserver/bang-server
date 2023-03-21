@@ -40,10 +40,11 @@ namespace banggame {
             if (auto req = top_request()) {
                 req->on_update();
 
-                if (req->state == request_state::dead) {
-                    update();
-                } else {
+                if (req->state == request_state::pending) {
                     req->state = request_state::live;
+                }
+
+                if (top_request() == req) {
                     if (auto *timer = req->timer()) {
                         timer->start(get_total_update_time(m_game));
                     }
@@ -54,6 +55,8 @@ namespace banggame {
                             break;
                         }
                     }
+                } else {
+                    update();
                 }
             } else if (!m_delayed_actions.empty()) {
                 auto fun = std::move(m_delayed_actions.top().first);
