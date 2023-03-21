@@ -7,14 +7,9 @@
 namespace banggame {
 
     struct request_tumbleweed : request_base, resolvable_request {
-        request_tumbleweed(card *origin_card, player *origin, player *target, card *drawn_card, card *drawing_card, std::shared_ptr<draw_check_handler> &&handler)
+        request_tumbleweed(card *origin_card, player *origin, player *target, std::shared_ptr<draw_check_handler> &&handler)
             : request_base(origin_card, origin, target)
-            , target_card(drawing_card)
-            , drawn_card(drawn_card)
             , handler(std::move(handler)) {}
-        
-        card *target_card;
-        card *drawn_card;
 
         std::shared_ptr<draw_check_handler> handler;
 
@@ -31,15 +26,13 @@ namespace banggame {
         request_timer *timer() override { return &m_timer; }
 
         std::vector<card *> get_highlights() const override {
-            if (drawn_card) {
-                return {target_card, drawn_card};
-            } else {
-                return {target_card};
-            }
+            auto vec = handler->get_drawn_cards();
+            vec.push_back(handler->get_drawing_card());
+            return vec;
         }
 
         void on_finished() {
-            handler->resolve(drawn_card);
+            handler->resolve();
         }
 
         void on_resolve() override {
@@ -48,26 +41,35 @@ namespace banggame {
         }
 
         game_string status_text(player *owner) const override {
-            if (target == owner) {
-                return {"STATUS_CAN_PLAY_TUMBLEWEED", origin, origin_card, target_card, drawn_card};
+            auto cards = handler->get_drawn_cards();
+            card *drawing_card = handler->get_drawing_card();
+            if (cards.size() == 1) {
+                card *drawn_card = cards.front();
+                if (target == owner) {
+                    return {"STATUS_CAN_PLAY_TUMBLEWEED", origin, origin_card, drawing_card, drawn_card};
+                } else {
+                    return {"STATUS_CAN_PLAY_TUMBLEWEED_OTHER", origin, origin_card, drawing_card, drawn_card, target};
+                }
             } else {
-                return {"STATUS_CAN_PLAY_TUMBLEWEED_OTHER", origin, origin_card, target_card, drawn_card, target};
+                if (target == owner) {
+                    return {"STATUS_CAN_PLAY_TUMBLEWEED_FOR", origin, origin_card, drawing_card};
+                } else {
+                    return {"STATUS_CAN_PLAY_TUMBLEWEED_FOR_OTHER", origin, origin_card, drawing_card, target};
+                }
             }
         }
     };
 
     void equip_tumbleweed::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player *origin, card *origin_card, card *drawn_card, bool &auto_resolve) {
-            target->m_game->queue_request_front<request_tumbleweed>(target_card, origin, target, drawn_card, origin_card,
-                target->m_game->top_request<draw_check_handler>());
+        target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player *origin, bool &auto_resolve) {
+            target->m_game->queue_request_front<request_tumbleweed>(target_card, origin, target, target->m_game->top_request<draw_check_handler>());
             auto_resolve = false;
         });
     }
 
     bool effect_tumbleweed::on_check_target(card *origin_card, player *origin) {
         auto req = origin->m_game->top_request<request_tumbleweed>();
-        return (req->origin && bot_suggestion::target_friend{}.on_check_target(origin_card, origin, req->origin))
-            != req->handler->check(req->drawn_card);
+        return (req->origin && bot_suggestion::target_friend{}.on_check_target(origin_card, origin, req->origin)) != req->handler->check();
     }
 
     bool effect_tumbleweed::can_play(card *origin_card, player *origin) {

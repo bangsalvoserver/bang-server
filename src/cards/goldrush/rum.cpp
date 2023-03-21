@@ -23,9 +23,17 @@ namespace banggame {
                 target->m_game->move_card(drawn_card, pocket_type::selection);
             }
 
-            if (target->m_game->call_event<event_type::on_draw_check_select>(target, origin_card, nullptr, true)) {
-                resolve(nullptr);
+            if (target->m_game->call_event<event_type::on_draw_check_select>(target, true)) {
+                resolve();
             }
+        }
+
+        std::vector<card *> get_drawn_cards() const override {
+            return target->m_game->m_selection;
+        }
+
+        card *get_drawing_card() const override {
+            return origin_card;
         }
 
         void restart() override {
@@ -35,24 +43,31 @@ namespace banggame {
             start();
         }
 
-        bool check(card *) const override {
-            return false;
+        int count_suits() const {
+            std::vector<card_suit> suits;
+            for (card *c : target->m_game->m_selection) {
+                suits.push_back(target->m_game->get_card_sign(c).suit);
+            }
+            std::sort(suits.begin(), suits.end());
+            return int(std::unique(suits.begin(), suits.end()) - suits.begin());
         }
 
-        void resolve(card *) override {
+        bool check() const override {
+            return count_suits() > 2;
+        }
+
+        void resolve() override {
             target->m_game->pop_request();
-            std::vector<card_suit> suits;
+            int heal = count_suits();
 
             while (!target->m_game->m_selection.empty()) {
                 card *drawn_card = target->m_game->m_selection.front();
-                suits.push_back(target->m_game->get_card_sign(drawn_card).suit);
                 target->m_game->call_event<event_type::on_draw_check_resolve>(target, drawn_card);
                 if (drawn_card->pocket == pocket_type::selection) {
                     target->m_game->move_card(drawn_card, pocket_type::discard_pile);
                 }
             }
-            std::sort(suits.begin(), suits.end());
-            target->heal(int(std::unique(suits.begin(), suits.end()) - suits.begin()));
+            target->heal(heal);
         }
     };
 

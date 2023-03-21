@@ -14,10 +14,10 @@ namespace banggame {
         if (target_card->pocket == pocket_type::selection) {
             if (!target->is_bot()) return true;
 
-            if (std::ranges::none_of(m_game->m_selection, [&](card *drawn_card) { return check(drawn_card); })) {
+            if (std::ranges::none_of(m_game->m_selection, [&](card *c) { return check_for(c); })) {
                 return true;
             } else {
-                return check(target_card);
+                return check_for(target_card);
             }
         }
         return false;
@@ -40,21 +40,23 @@ namespace banggame {
         int num_checks = target ? target->get_num_checks() : 1;
         if (num_checks > 1) {
             for (int i=0; i<num_checks; ++i) {
-                card *drawn_card = m_game->top_of_deck();
-                m_game->add_log("LOG_REVEALED_CARD", target, drawn_card);
-                m_game->move_card(drawn_card, pocket_type::selection);
+                card *target_card = m_game->top_of_deck();
+                m_game->add_log("LOG_REVEALED_CARD", target, target_card);
+                m_game->move_card(target_card, pocket_type::selection);
             }
         } else {
-            card *drawn_card = m_game->top_of_deck();
-            m_game->move_card(drawn_card, pocket_type::discard_pile);
-            select(drawn_card);
+            card *target_card = m_game->top_of_deck();
+            m_game->move_card(target_card, pocket_type::discard_pile);
+            select(target_card);
         }
     }
 
-    void request_check::select(card *drawn_card) {
-        m_game->add_log("LOG_CHECK_DREW_CARD", origin_card, target, drawn_card);
-        if (m_game->call_event<event_type::on_draw_check_select>(target, origin_card, drawn_card, true)) {
-            resolve(drawn_card);
+    void request_check::select(card *target_card) {
+        drawn_card = target_card;
+
+        m_game->add_log("LOG_CHECK_DREW_CARD", origin_card, target, target_card);
+        if (m_game->call_event<event_type::on_draw_check_select>(target, true)) {
+            resolve();
         }
     }
 
@@ -65,11 +67,15 @@ namespace banggame {
         start();
     }
 
-    bool request_check::check(card *drawn_card) const {
-        return std::invoke(m_condition, m_game->get_card_sign(drawn_card));
+    bool request_check::check_for(card *target_card) const {
+        return std::invoke(m_condition, m_game->get_card_sign(target_card));
     }
 
-    void request_check::resolve(card *drawn_card) {
+    bool request_check::check() const {
+        return check_for(drawn_card);
+    }
+
+    void request_check::resolve() {
         m_game->pop_request();
         if (!m_game->m_selection.empty()) {
             while (!m_game->m_selection.empty()) {
@@ -82,6 +88,6 @@ namespace banggame {
         } else {
             m_game->call_event<event_type::on_draw_check_resolve>(target, drawn_card);
         }
-        std::invoke(m_function, check(drawn_card));
+        std::invoke(m_function, check());
     }
 }

@@ -6,9 +6,12 @@
 namespace banggame {
 
     struct draw_check_handler {
+        virtual std::vector<card *> get_drawn_cards() const = 0;
+        virtual card *get_drawing_card() const = 0;
+
+        virtual bool check() const = 0;
+        virtual void resolve() = 0;
         virtual void restart() = 0;
-        virtual bool check(card *drawn_card) const = 0;
-        virtual void resolve(card *drawn_card) = 0;
     };
     
     struct request_check : request_base, draw_check_handler {
@@ -22,6 +25,8 @@ namespace banggame {
         draw_check_condition m_condition;
         draw_check_function m_function;
 
+        card *drawn_card = nullptr;
+
         void on_update() override;
 
         bool can_pick(card *target_card) const override;
@@ -31,11 +36,21 @@ namespace banggame {
         game_string status_text(player *owner) const override;
 
         void start();
-        void select(card *drawn_card);
+        void select(card *target_card);
 
+        std::vector<card *> get_drawn_cards() const override {
+            return {drawn_card};
+        }
+
+        card *get_drawing_card() const override {
+            return origin_card;
+        }
+
+        bool check_for(card *target_card) const;
+
+        bool check() const override;
+        void resolve() override;
         void restart() override;
-        bool check(card *drawn_card) const override;
-        void resolve(card *drawn_card) override;
     };
 
 }
