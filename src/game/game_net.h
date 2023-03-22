@@ -15,7 +15,7 @@ namespace banggame {
 
     class update_target {
     private:
-        player *m_targets[8];
+        player *m_targets[lobby_max_players];
 
         struct {
             bool m_inclusive:1;
@@ -27,10 +27,17 @@ namespace banggame {
             : m_targets{targets ...}
             , m_inclusive{inclusive}
             , m_invert_public{invert_public}
-            , m_num_targets{sizeof...(targets)} {}
+            , m_num_targets{sizeof...(targets)}
+        {
+            static_assert(sizeof...(targets) <= lobby_max_players);
+        }
 
         update_target(bool inclusive, std::same_as<player *> auto ... targets)
             : update_target(inclusive, false, targets...) {}
+
+        auto targets() const {
+            return std::span{m_targets, m_targets + m_num_targets};
+        }
 
     public:
         static update_target includes(std::same_as<player *> auto ... targets) {
@@ -53,14 +60,12 @@ namespace banggame {
             m_targets[m_num_targets++] = target;
         }
 
-        bool matches(int user_id) const {
-            std::span targets{m_targets, m_targets + m_num_targets};
-            return (std::ranges::find(targets, user_id, &player::user_id) != targets.end()) == m_inclusive;
+        bool matches(player *target) const {
+            return ranges::contains(targets(), target) == m_inclusive;
         }
 
-        bool all_targets_bots() const {
-            return m_inclusive && std::ranges::all_of(
-                std::span{m_targets, m_targets + m_num_targets}, &player::is_bot);
+        bool matches(int user_id) const {
+            return ranges::contains(targets(), user_id, &player::user_id) == m_inclusive;
         }
 
         bool is_public() const {
