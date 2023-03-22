@@ -10,9 +10,9 @@
 
 namespace banggame {
 
-    struct request_force_play_card : request_base {
+    struct request_force_play_card : request_auto_select {
         request_force_play_card(card *origin_card, player *target, card *target_card)
-            : request_base(origin_card, nullptr, target, effect_flags::auto_respond)
+            : request_auto_select(origin_card, nullptr, target)
             , target_card(target_card) {}
         
         card *target_card;
@@ -41,9 +41,9 @@ namespace banggame {
         target->m_game->pop_request();
     }
 
-    struct request_force_equip_card : request_base {
+    struct request_force_equip_card : request_auto_select {
         request_force_equip_card(card *origin_card, player *target, card *target_card)
-            : request_base(origin_card, nullptr, target, effect_flags::auto_respond)
+            : request_auto_select(origin_card, nullptr, target)
             , target_card(target_card) {}
         
         card *target_card;

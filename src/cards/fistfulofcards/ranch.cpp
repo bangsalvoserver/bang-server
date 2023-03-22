@@ -6,9 +6,9 @@
 
 namespace banggame {
 
-    struct request_ranch : request_base {
+    struct request_ranch : request_auto_select {
         request_ranch(card *target_card, player *target)
-            : request_base(target_card, nullptr, target, effect_flags::auto_respond) {}
+            : request_auto_select(target_card, nullptr, target) {}
 
         game_string status_text(player *owner) const override {
             if (owner == target) {

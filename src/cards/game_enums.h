@@ -11,7 +11,6 @@ namespace banggame {
         (escapable)
         (single_target)
         (multi_target)
-        (auto_respond)
     )
     
     DEFINE_ENUM_FLAGS(game_flags,

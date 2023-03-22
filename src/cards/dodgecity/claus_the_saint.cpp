@@ -8,9 +8,9 @@
 
 namespace banggame {
 
-    struct request_claus_the_saint : request_base {
+    struct request_claus_the_saint : request_auto_select {
         request_claus_the_saint(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target, effect_flags::auto_respond) {}
+            : request_auto_select(origin_card, nullptr, target) {}
 
         std::vector<player *> targets;
 

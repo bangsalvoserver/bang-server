@@ -6,14 +6,14 @@
 
 namespace banggame {
 
-    struct request_mail_car : request_base {
+    struct request_mail_car : request_auto_select {
         request_mail_car(card *origin_card, player *origin)
-            : request_base(origin_card, origin, origin, effect_flags::auto_respond) {}
+            : request_auto_select(origin_card, nullptr, origin) {}
         
         void on_update() override {
             if (state == request_state::pending) {
                 for (int i=0; i<3; ++i) {
-                    origin->m_game->move_card(origin->m_game->top_of_deck(), pocket_type::selection, origin);
+                    target->m_game->move_card(target->m_game->top_of_deck(), pocket_type::selection, target);
                 }
             }
         }

@@ -6,9 +6,9 @@
 
 namespace banggame {
 
-    struct request_lemonade_jim : request_base {
+    struct request_lemonade_jim : request_auto_select {
         request_lemonade_jim(card *origin_card, player *origin, player *target)
-            : request_base(origin_card, origin, target, effect_flags::auto_respond) {}
+            : request_auto_select(origin_card, origin, target) {}
         
         game_string status_text(player *owner) const override {
             if (target == owner) {

@@ -6,24 +6,24 @@
 
 namespace banggame {
 
-    struct request_lounge_car : request_base {
+    struct request_lounge_car : request_auto_select {
         request_lounge_car(card *origin_card, player *origin)
-            : request_base(origin_card, origin, origin, effect_flags::auto_respond) {}
+            : request_auto_select(origin_card, nullptr, origin) {}
         
         void on_update() override {
             if (state == request_state::pending) {
-                for (int i=0; i<2 && !origin->m_game->m_train_deck.empty(); ++i) {
-                    origin->m_game->move_card(origin->m_game->m_train_deck.front(), pocket_type::selection, origin);
+                for (int i=0; i<2 && !target->m_game->m_train_deck.empty(); ++i) {
+                    target->m_game->move_card(target->m_game->m_train_deck.front(), pocket_type::selection, target);
                 }
             }
-            if (origin->m_game->m_selection.size() <= 1 && std::ranges::all_of(origin->m_game->m_selection, [&](card *target_card) {
+            if (target->m_game->m_selection.size() <= 1 && std::ranges::all_of(target->m_game->m_selection, [&](card *target_card) {
                 return !filters::check_player_filter(target, target_card->equip_target, target);
             })) {
-                origin->m_game->pop_request();
-                while (!origin->m_game->m_selection.empty()) {
-                    card *c = origin->m_game->m_selection.front();
-                    origin->m_game->add_log("LOG_EQUIPPED_CARD", c, origin);
-                    origin->equip_card(c);
+                target->m_game->pop_request();
+                while (!target->m_game->m_selection.empty()) {
+                    card *c = target->m_game->m_selection.front();
+                    target->m_game->add_log("LOG_EQUIPPED_CARD", c, target);
+                    target->equip_card(c);
                 }
             }
         }

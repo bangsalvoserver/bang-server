@@ -88,6 +88,8 @@ namespace banggame {
 
         virtual game_string status_text(player *owner) const { return {}; };
 
+        virtual bool auto_select() const { return false; }
+
         virtual bool can_pick(card *target_card) const { return false; }
         virtual void on_pick(card *target_card) { throw std::runtime_error("missing on_pick(card)"); }
 
@@ -104,6 +106,12 @@ namespace banggame {
         using request_base::request_base;
 
         bool can_pick(card *target_card) const override;
+    };
+
+    struct request_auto_select : request_base {
+        using request_base::request_base;
+
+        bool auto_select() const override { return true; }
     };
 
     struct resolvable_request {
