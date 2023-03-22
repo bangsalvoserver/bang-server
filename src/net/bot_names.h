@@ -13,7 +13,8 @@ namespace banggame {
         "Will",
         "Sam",
         "Michele",
-        "Jack"
+        "Jack",
+        "Klaus"
     };
 
     static inline const sdl::image_pixels bot_profile_picture {
