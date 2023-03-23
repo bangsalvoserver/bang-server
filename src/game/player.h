@@ -135,8 +135,10 @@ namespace banggame {
         void add_to_hand_phase_one(card *card);
         void draw_card(int ncards = 1, card *origin_card = nullptr);
 
-        void discard_card(card *target);
-        void discard_used_card(card *target);
+        void discard_card(card *target, bool used = false);
+        void discard_used_card(card *target) {
+            discard_card(target, true);
+        }
         void steal_card(card *target);
 
         int get_initial_cards();

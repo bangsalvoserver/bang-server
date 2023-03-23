@@ -119,21 +119,19 @@ namespace banggame {
         }
     }
 
-    void player::discard_card(card *target) {
-        move_owned_card(this, target, false, [&]{
+    void player::discard_card(card *target, bool used) {
+        move_owned_card(this, target, used, [&]{
             if (target->is_train()) {
-                m_game->discard_train_card(target);
+                if (m_game->m_train.size() < 4) {
+                    m_game->move_card(target, pocket_type::train);
+                } else {
+                    m_game->move_card(target, pocket_type::train_deck, nullptr, card_visibility::hidden);
+                }
             } else if (target->is_black()) {
                 m_game->move_card(target, pocket_type::shop_discard);
             } else {
                 m_game->move_card(target, pocket_type::discard_pile);
             }
-        });
-    }
-
-    void player::discard_used_card(card *target) {
-        move_owned_card(this, target, true, [&]{
-            m_game->move_card(target, pocket_type::discard_pile);
         });
     }
 

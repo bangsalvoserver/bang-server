@@ -104,7 +104,7 @@ namespace banggame {
     }
 
     void effect_discard::on_play(card *origin_card, player *origin) {
-        origin->discard_card(origin_card);
+        origin->discard_used_card(origin_card);
     }
 
     void effect_discard::on_play(card *origin_card, player *origin, card *target_card) {

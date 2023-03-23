@@ -431,9 +431,7 @@ namespace banggame {
         player *next_player = *it;
         
         if (next_player == m_train_holder) {
-            if (!m_stations.empty()) {
-                effect_next_stop{}.on_play(nullptr, next_player);
-            }
+            effect_next_stop{}.on_play(nullptr, next_player);
         }
         if (next_player == m_scenario_holder) {
             draw_scenario_card();

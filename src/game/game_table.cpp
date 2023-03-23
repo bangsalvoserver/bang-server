@@ -124,14 +124,6 @@ namespace banggame {
         add_update<game_update_type::move_card>(c, owner, pocket, instant);
     }
 
-    void game_table::discard_train_card(card *c) {
-        if (m_train.size() < 4) {
-            move_card(c, pocket_type::train);
-        } else {
-            move_card(c, pocket_type::train_deck, nullptr, card_visibility::hidden);
-        }
-    }
-
     card *game_table::top_of_deck() {
         if (m_deck.empty()) {
             if (m_discards.empty()) {
