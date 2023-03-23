@@ -20,7 +20,7 @@ namespace banggame {
         }
     };
     
-    template<typename Function = median_fun>
+    template<typename Function = decltype(ranges::max)>
     static ticks get_total_update_time(game *game, Function operation = {}) {
         return operation(game->m_players | ranges::views::transform([&](player *p) {
             return ranges::accumulate(game->m_updates | ranges::views::transform([&](const game_update_tuple &tup) {
