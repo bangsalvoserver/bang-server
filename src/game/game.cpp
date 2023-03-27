@@ -391,7 +391,7 @@ namespace banggame {
         })) {
             m_playing->pass_turn();
             update();
-        } else {
+        } else if (m_playing->user_id > 0) {
             add_update<game_update_type::status_ready>(update_target::includes_private(m_playing), std::move(args));
         }
     }

@@ -74,16 +74,15 @@ namespace banggame {
                 m_delayed_actions.pop();
                 std::invoke(std::move(fun));
                 update();
-            } else if (m_game->m_playing) {
-                if (m_game->m_playing->is_bot()) {
-                    if (m_bot_play) {
-                        bot_ai::play_in_turn(m_game->m_playing);
-                    } else {
+            } else if (player *origin = m_game->m_playing) {
+                if (m_bot_play) {
+                    bot_ai::play_in_turn(origin);
+                } else {
+                    m_game->send_request_status_ready();
+                    if (!m_update_timer && origin->is_bot()) {
                         m_update_timer = get_bot_play_timer(m_game);
                         m_bot_play = true;
                     }
-                } else {
-                    m_game->send_request_status_ready();
                 }
             }
         } else if (auto req = top_request()) {
