@@ -31,6 +31,10 @@ namespace banggame {
             }), ticks{0});
         }));
     }
+
+    static ticks get_bot_play_timer(game *game) {
+        return get_total_update_time(game) + clamp_ticks(game->m_options.bot_play_timer);
+    }
     
     void request_queue::tick() {
         if (m_game->is_game_over()) return;
@@ -38,25 +42,32 @@ namespace banggame {
         if (m_update_timer && --(*m_update_timer) <= ticks{}) {
             m_update_timer.reset();
             if (auto req = top_request()) {
-                req->on_update();
-
-                if (req->state == request_state::pending) {
-                    req->state = request_state::live;
-                }
-
-                if (top_request() == req) {
-                    if (auto *timer = req->timer()) {
-                        timer->start(get_total_update_time(m_game));
-                    }
-                    m_game->send_request_update();
-
+                if (m_bot_play) {
+                    m_bot_play = false;
                     for (player *p : m_game->m_players) {
                         if (p->is_bot() && bot_ai::respond_to_request(p)) {
                             break;
                         }
                     }
                 } else {
-                    update();
+                    req->on_update();
+
+                    if (req->state == request_state::pending) {
+                        req->state = request_state::live;
+                    }
+
+                    if (top_request() == req) {
+                        if (auto *timer = req->timer()) {
+                            timer->start(get_total_update_time(m_game));
+                        }
+                        m_game->send_request_update();
+                        if (std::ranges::any_of(m_game->m_players, &player::is_bot)) {
+                            m_update_timer = get_bot_play_timer(m_game);
+                            m_bot_play = true;
+                        }
+                    } else {
+                        update();
+                    }
                 }
             } else if (!m_delayed_actions.empty()) {
                 auto fun = std::move(m_delayed_actions.top().first);
@@ -65,7 +76,12 @@ namespace banggame {
                 update();
             } else if (m_game->m_playing) {
                 if (m_game->m_playing->is_bot()) {
-                    bot_ai::play_in_turn(m_game->m_playing);
+                    if (m_bot_play) {
+                        bot_ai::play_in_turn(m_game->m_playing);
+                    } else {
+                        m_update_timer = get_bot_play_timer(m_game);
+                        m_bot_play = true;
+                    }
                 } else {
                     m_game->send_request_status_ready();
                 }
@@ -85,5 +101,6 @@ namespace banggame {
     
     void request_queue::update() {
         m_update_timer = get_total_update_time(m_game);
+        m_bot_play = false;
     }
 }

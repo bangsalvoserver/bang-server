@@ -40,6 +40,11 @@ namespace banggame {
 
     static constexpr ticks max_timer_duration = 10s;
 
+    template<typename Rep, typename Period>
+    inline ticks clamp_ticks(std::chrono::duration<Rep, Period> duration) {
+        return std::clamp(std::chrono::duration_cast<ticks>(duration), ticks{0}, max_timer_duration);
+    }
+
     class request_timer {
     protected:
         request_base *request;
@@ -49,10 +54,8 @@ namespace banggame {
         ticks lifetime = max_timer_duration;
 
     public:
-        template<typename Duration>
-        request_timer(request_base *request, Duration duration)
-            : request(request)
-            , duration(std::clamp(std::chrono::duration_cast<ticks>(duration), ticks{0}, max_timer_duration)) {}
+        request_timer(request_base *request, auto duration)
+            : request(request), duration(clamp_ticks(duration)) {}
 
     public:
         void start(ticks total_update_time);

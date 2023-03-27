@@ -205,6 +205,7 @@ namespace banggame {
         (int, num_bots, 0)
         (std::chrono::milliseconds, damage_timer, 1500)
         (std::chrono::milliseconds, escape_timer, 3000)
+        (std::chrono::milliseconds, bot_play_timer, 500)
         (std::chrono::milliseconds, tumbleweed_timer, 3000)
     )
 
