@@ -446,13 +446,6 @@ namespace banggame {
 
     void game::handle_player_death(player *killer, player *target, discard_all_reason reason) {
         if (killer != m_playing) killer = nullptr;
-        
-        target->remove_extra_characters();
-        for (card *c : target->m_characters) {
-            target->disable_equip(c);
-        }
-
-        if (!m_first_dead) m_first_dead = target;
 
         if (killer && killer != target) {
             add_log("LOG_PLAYER_KILLED", killer, target);
@@ -465,6 +458,13 @@ namespace banggame {
             target->set_hp(0, true);
 
             if (!target->alive()) {
+                if (!m_first_dead) m_first_dead = target;
+
+                target->remove_extra_characters();
+                for (card *c : target->m_characters) {
+                    target->disable_equip(c);
+                }
+
                 if (target->add_player_flags(player_flags::role_revealed)) {
                     add_update<game_update_type::player_show_role>(update_target::excludes(target), target, target->m_role);
                 }
