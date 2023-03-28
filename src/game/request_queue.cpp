@@ -26,6 +26,8 @@ namespace banggame {
         if (auto req = top_request()) {
             if (m_bot_play) {
                 m_bot_play = false;
+                req.reset();
+                
                 for (player *origin : m_game->m_players) {
                     if (origin->is_bot() && bot_ai::respond_to_request(origin)) {
                         break;
