@@ -13,7 +13,14 @@ namespace banggame {
         card_format_id(card *value);
     )
 
-    using game_format_arg = std::variant<int, std::string, card_format_id, serial::opt_player>;
+    DEFINE_ENUM_TYPES(game_format_arg_type,
+        (integer, int)
+        (string, std::string)
+        (card, card_format_id)
+        (player, serial::opt_player)
+    )
+
+    using game_format_arg = enums::enum_variant<game_format_arg_type>;
     
     DEFINE_STRUCT(game_string,
         (std::string, format_str)
