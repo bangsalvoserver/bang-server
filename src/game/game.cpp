@@ -383,7 +383,7 @@ namespace banggame {
         add_update<game_update_type::status_clear>();
     }
 
-    void game::send_request_status_ready() {
+    bool game::send_request_status_ready() {
         auto args = make_status_ready_update(m_playing);
         
         if (m_playing->empty_hand() && std::ranges::all_of(args.play_cards, [](const card_modifier_node &node) {
@@ -391,9 +391,11 @@ namespace banggame {
         })) {
             m_playing->pass_turn();
             update();
+            return false;
         } else if (m_playing->user_id > 0) {
             add_update<game_update_type::status_ready>(update_target::includes_private(m_playing), std::move(args));
         }
+        return true;
     }
 
     void game::send_request_update() {

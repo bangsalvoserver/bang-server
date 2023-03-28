@@ -33,6 +33,8 @@ namespace banggame {
         std::optional<ticks> m_update_timer;
         bool m_bot_play = false;
 
+        void invoke_update();
+
     public:
         request_queue(game *m_game) : m_game(m_game) {}
         
