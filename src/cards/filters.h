@@ -30,7 +30,7 @@ namespace banggame::filters {
         int count_player_table_cards(player_ptr origin);
         int count_player_cubes(player_ptr origin);
         int get_distance(player_ptr origin, player_ptr target);
-        card_sign get_card_sign(player_ptr origin, card_ptr target);
+        card_sign get_card_sign(card_ptr target);
         card_color_type get_card_color(card_ptr target);
         pocket_type get_card_pocket(card_ptr target);
         card_deck_type get_card_deck(card_ptr target);
@@ -183,7 +183,7 @@ namespace banggame::filters {
         if (bool(filter & target_card_filter::black) != (color == card_color_type::black))
             return "ERROR_TARGET_BLACK_CARD";
 
-        card_sign sign = detail::get_card_sign(origin, target);
+        card_sign sign = detail::get_card_sign(target);
 
         if (bool(filter & target_card_filter::hearts) && !sign.is_hearts())
             return "ERROR_TARGET_NOT_HEARTS";
@@ -200,7 +200,7 @@ namespace banggame::filters {
         if (bool(filter & target_card_filter::origin_card_suit)) {
             detail::card_ptr req_origin_card = detail::get_request_origin_card(origin);
             if (!req_origin_card) return "ERROR_NO_ORIGIN_CARD_SUIT";
-            switch (detail::get_card_sign(origin, req_origin_card).suit) {
+            switch (detail::get_card_sign(req_origin_card).suit) {
                 case card_suit::hearts: if (!sign.is_hearts()) { return "ERROR_TARGET_NOT_HEARTS"; } break;
                 case card_suit::diamonds: if (!sign.is_diamonds()) { return "ERROR_TARGET_NOT_DIAMONDS"; } break;
                 case card_suit::clubs: if (!sign.is_clubs()) { return "ERROR_TARGET_NOT_CLUBS"; } break;
