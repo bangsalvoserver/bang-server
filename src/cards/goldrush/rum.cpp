@@ -53,7 +53,7 @@ namespace banggame {
         }
 
         bool check() const override {
-            return count_suits() > 2;
+            return count_suits() > 2 && target->m_max_hp >= target->m_hp + 2;
         }
 
         void resolve() override {
