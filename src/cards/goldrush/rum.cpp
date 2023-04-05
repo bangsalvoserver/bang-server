@@ -53,7 +53,7 @@ namespace banggame {
         }
 
         bool check() const override {
-            return count_suits() > 2 && target->m_max_hp >= target->m_hp + 2;
+            return count_suits() > 2 && target->m_max_hp > target->m_hp + 2;
         }
 
         void resolve() override {
@@ -70,6 +70,10 @@ namespace banggame {
             target->heal(heal);
         }
     };
+
+    bool effect_rum::on_check_target(card *origin_card, player *origin) {
+        return origin->m_max_hp - origin->m_hp >= 2;
+    }
 
     game_string effect_rum::on_prompt(card *origin_card, player *origin) {
         if (origin->m_hp == origin->m_max_hp) {
