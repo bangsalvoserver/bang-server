@@ -45,7 +45,6 @@ namespace banggame {
             origin->m_game->add_log("LOG_MOVE_BOMB_ON", origin_card, origin, target);
             origin->disable_equip(origin_card);
             origin_card->on_unequip(origin);
-            origin_card->on_equip(target);
             target->equip_card(origin_card);
         }
     }

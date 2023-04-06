@@ -380,7 +380,6 @@ namespace banggame {
                 add_played_card(origin, origin_card, modifiers, ctx);
 
                 origin->add_gold(-cost);
-                origin_card->on_equip(target);
                 for (const auto &[mod_card, mod_targets] : modifiers) {
                     apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
                 }

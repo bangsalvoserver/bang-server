@@ -48,6 +48,7 @@ namespace banggame {
     }
 
     void player::equip_card(card *target) {
+        target->on_equip(this);
         m_game->move_card(target, pocket_type::player_table, this, card_visibility::shown);
         enable_equip(target);
     }
