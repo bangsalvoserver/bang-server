@@ -8,6 +8,14 @@
 
 namespace banggame {
 
+    game_string handler_squaw::get_error(card *origin_card, player *origin, card *target_card, bool paid_cubes) {
+        if (target_card->owner && paid_cubes) {
+            return effect_steal{}.get_error(origin_card, origin, target_card);
+        } else {
+            return {};
+        }
+    }
+
     game_string handler_squaw::on_prompt(card *origin_card, player *origin, card *target_card, bool paid_cubes) {
         if (target_card->owner == origin) {
             return {"PROMPT_TARGET_SELF", origin_card};
