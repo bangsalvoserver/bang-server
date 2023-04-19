@@ -10,7 +10,6 @@
 
 #include "cards/base/requests.h"
 
-#include "utils/raii_editor.h"
 #include "utils/utils.h"
 
 namespace banggame {
