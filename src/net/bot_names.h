@@ -12,6 +12,7 @@ namespace banggame {
         "Lela",
         "Will",
         "Sam",
+        "Ignazio",
         "Michele",
         "Jack",
         "Klaus"
