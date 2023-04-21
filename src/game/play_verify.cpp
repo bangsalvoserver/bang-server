@@ -386,7 +386,9 @@ namespace banggame {
             return "ERROR_NOT_ENOUGH_GOLD";
         }
 
-        origin->prompt_then(check_prompt_play(origin, origin_card, is_response, targets, modifiers, ctx), [=]{
+        auto action = [=]{
+            origin->m_game->send_request_status_clear();
+
             if (origin_card->pocket != pocket_type::button_row) {
                 origin->m_played_cards.emplace_back(origin_card, modifiers, ctx);
             }
@@ -401,7 +403,17 @@ namespace banggame {
             } else {
                 apply_target_list(origin, origin_card, is_response, targets, ctx);
             }
-        });
+
+            origin->m_game->update();
+        };
+
+        if (auto prompt_message = check_prompt_play(origin, origin_card, is_response, targets, modifiers, ctx)) {
+            origin->m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(origin), prompt_message);
+            origin->m_prompt.emplace(std::move(action), std::move(prompt_message));
+        } else {
+            std::invoke(action);
+        }
+
         return {};
     }
 }

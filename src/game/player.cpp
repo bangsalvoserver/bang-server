@@ -313,17 +313,6 @@ namespace banggame {
         return verify_and_play(this, args.card, args.is_response, args.targets, args.modifiers);
     }
 
-    void player::prompt_then(game_string &&message, std::function<void()> &&fun) {
-        if (message) {
-            m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), message);
-            m_prompt.emplace(std::move(fun), std::move(message));
-        } else {
-            m_game->send_request_status_clear();
-            std::invoke(std::move(fun));
-            m_game->update();
-        }
-    }
-
     game_string player::handle_action(enums::enum_tag_t<game_action_type::prompt_respond>, bool response) {
         if (!m_prompt) {
             return "ERROR_NO_PROMPT";
@@ -332,9 +321,7 @@ namespace banggame {
         m_prompt.reset();
 
         if (response) {
-            m_game->send_request_status_clear();
-            std::invoke(std::move(fun));
-            m_game->update();
+            std::invoke(fun);
         }
         return {};
     }
