@@ -149,22 +149,28 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_equip_target(player *origin, card *origin_card, const target_list &targets, const effect_context &ctx) {
-        player *target = origin;
-        if (origin_card->self_equippable()) {
-            if (!targets.empty()) {
-                return "ERROR_INVALID_EQUIP_TARGET";
-            }
-        } else {
-            if (targets.size() != 1 || !targets.front().is(target_type::player)) {
-                return "ERROR_INVALID_EQUIP_TARGET";
-            }
-            target = targets.front().get<target_type::player>();
-        }
-        return get_equip_error(origin, origin_card, target, ctx);
-    }
-
     static game_string verify_card_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
+        if (filters::is_equip_card(origin_card)) {
+            if (is_response) {
+                return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
+            }
+            
+            MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
+
+            player *target = origin;
+            if (origin_card->self_equippable()) {
+                if (!targets.empty()) {
+                    return "ERROR_INVALID_EQUIP_TARGET";
+                }
+            } else {
+                if (targets.size() != 1 || !targets.front().is(target_type::player)) {
+                    return "ERROR_INVALID_EQUIP_TARGET";
+                }
+                target = targets.front().get<target_type::player>();
+            }
+            return get_equip_error(origin, origin_card, target, ctx);
+        }
+        
         if (origin_card->is_modifier()) {
             return "ERROR_CARD_IS_MODIFIER";
         }
@@ -222,30 +228,20 @@ namespace banggame {
         return origin_card->get_mth(is_response).on_prompt(origin_card, origin, mth_targets, ctx);
     }
 
-    static game_string check_prompt_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, const effect_context &ctx) {
+    static game_string check_prompt_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         for (const auto &[mod_card, mod_targets] : modifiers) {
             MAYBE_RETURN(mod_card->modifier.on_prompt(mod_card, origin, origin_card, ctx));
             MAYBE_RETURN(check_prompt(origin, mod_card, is_response, mod_targets, ctx));
         }
-        return {};
-    }
-
-    static game_string check_prompt_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
-        MAYBE_RETURN(check_prompt_modifiers(origin, origin_card, is_response, modifiers, ctx));
-        return check_prompt(origin, origin_card, is_response, targets, ctx);
-    }
-
-    static game_string check_prompt_equip(card *origin_card, player *origin, player *target, const modifier_list &modifiers, const effect_context &ctx) {
-        MAYBE_RETURN(check_prompt_modifiers(origin, origin_card, false, modifiers, ctx));
-        for (const auto &e : origin_card->equips) {
-            MAYBE_RETURN(e.on_prompt(origin_card, origin, target));
-        }
-        return {};
-    }
-
-    inline void add_played_card(player *origin, card *origin_card, const modifier_list &modifiers, const effect_context &ctx) {
-        if (origin_card->pocket != pocket_type::button_row) {
-            origin->m_played_cards.emplace_back(origin_card, modifiers, ctx);
+        if (filters::is_equip_card(origin_card)) {
+            player *target = origin_card->self_equippable() ? origin
+                : targets.front().get<target_type::player>().get();
+            for (const auto &e : origin_card->equips) {
+                MAYBE_RETURN(e.on_prompt(origin_card, origin, target));
+            }
+            return {};
+        } else {
+            return check_prompt(origin, origin_card, is_response, targets, ctx);
         }
     }
 
@@ -346,6 +342,32 @@ namespace banggame {
         origin_card->get_mth(is_response).on_play(origin_card, origin, mth_targets, ctx);
     }
 
+    void apply_equip(player *origin, card *origin_card, const target_list &targets, const effect_context &ctx) {
+        player *target = origin_card->self_equippable() ? origin
+            : targets.front().get<target_type::player>().get();
+            
+        origin->m_game->queue_action([=]{ 
+            if (!origin->alive()) return;
+
+            log_equipped_card(origin_card, origin, target);
+            
+            if (origin_card->pocket == pocket_type::player_hand) {
+                origin->m_game->call_event<event_type::on_discard_hand_card>(origin, origin_card, true);
+            }
+
+            target->equip_card(origin_card);
+
+            if (origin_card->is_green()) {
+                origin_card->inactive = true;
+                origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
+            } else if (origin_card->is_black()) {
+                origin->m_game->draw_shop_card();
+            }
+
+            origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card, ctx);
+        });
+    }
+
     game_string verify_and_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers) {
         if (origin->m_game->pending_requests()) {
             if (!is_response) {
@@ -357,71 +379,29 @@ namespace banggame {
 
         effect_context ctx;
 
-        if (filters::is_equip_card(origin_card)) {
-            if (is_response) {
-                return "ERROR_INVALID_RESPONSE_CARD";
-            }
+        MAYBE_RETURN(verify_card_targets(origin, origin_card, is_response, targets, modifiers, ctx));
 
-            MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
-            MAYBE_RETURN(verify_equip_target(origin, origin_card, targets, ctx));
-
-            int cost = filters::get_card_cost(origin_card, is_response, ctx);
-            if (origin->m_gold < cost) {
-                return "ERROR_NOT_ENOUGH_GOLD";
-            }
-
-            player *target = origin;
-            if (!origin_card->self_equippable()) {
-                target = targets.front().get<target_type::player>();
-            }
-
-            origin->prompt_then(check_prompt_equip(origin_card, origin, target, modifiers, ctx), [=]{
-                add_played_card(origin, origin_card, modifiers, ctx);
-
-                origin->add_gold(-cost);
-                for (const auto &[mod_card, mod_targets] : modifiers) {
-                    apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
-                }
-                
-                origin->m_game->queue_action([=]{
-                    if (origin->alive()) {
-                        log_equipped_card(origin_card, origin, target);
-                        
-                        if (origin_card->pocket == pocket_type::player_hand) {
-                            origin->m_game->call_event<event_type::on_discard_hand_card>(origin, origin_card, true);
-                        }
-
-                        target->equip_card(origin_card);
-
-                        if (origin_card->is_green()) {
-                            origin_card->inactive = true;
-                            origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
-                        } else if (origin_card->is_black()) {
-                            origin->m_game->draw_shop_card();
-                        }
-
-                        origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card, ctx);
-                    }
-                });
-            });
-        } else {
-            MAYBE_RETURN(verify_card_targets(origin, origin_card, is_response, targets, modifiers, ctx));
-
-            int cost = filters::get_card_cost(origin_card, is_response, ctx);
-            if (origin->m_gold < cost) {
-                return "ERROR_NOT_ENOUGH_GOLD";
-            }
-
-            origin->prompt_then(check_prompt_play(origin, origin_card, is_response, targets, modifiers, ctx), [=]{
-                add_played_card(origin, origin_card, modifiers, ctx);
-
-                origin->add_gold(-cost);
-                for (const auto &[mod_card, mod_targets] : modifiers) {
-                    apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
-                }
-                apply_target_list(origin, origin_card, is_response, targets, ctx);
-            });
+        int cost = filters::get_card_cost(origin_card, is_response, ctx);
+        if (origin->m_gold < cost) {
+            return "ERROR_NOT_ENOUGH_GOLD";
         }
+
+        origin->prompt_then(check_prompt_play(origin, origin_card, is_response, targets, modifiers, ctx), [=]{
+            if (origin_card->pocket != pocket_type::button_row) {
+                origin->m_played_cards.emplace_back(origin_card, modifiers, ctx);
+            }
+
+            origin->add_gold(-cost);
+            for (const auto &[mod_card, mod_targets] : modifiers) {
+                apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
+            }
+
+            if (filters::is_equip_card(origin_card)) {
+                apply_equip(origin, origin_card, targets, ctx);
+            } else {
+                apply_target_list(origin, origin_card, is_response, targets, ctx);
+            }
+        });
         return {};
     }
 }
