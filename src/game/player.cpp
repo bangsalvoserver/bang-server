@@ -364,7 +364,9 @@ namespace banggame {
         if (m_hand.size() > max_cards_end_of_turn()) {
             m_game->queue_request<request_discard_pass>(this);
         } else {
-            untap_inactive_cards();
+            for (player *p : range_all_players(this)) {
+                p->untap_inactive_cards();
+            }
 
             m_game->call_event<event_type::on_turn_end>(this, false);
             m_game->queue_action([&]{
@@ -381,7 +383,10 @@ namespace banggame {
     }
 
     void player::skip_turn() {
-        untap_inactive_cards();
+        for (player *p : range_all_players(this)) {
+            p->untap_inactive_cards();
+        }
+
         remove_player_flags(player_flags::extra_turn);
         m_game->call_event<event_type::on_turn_end>(this, true);
         m_game->start_next_turn();
