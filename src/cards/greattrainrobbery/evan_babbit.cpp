@@ -28,5 +28,6 @@ namespace banggame {
         auto req = origin->m_game->top_request();
         origin->m_game->add_log("LOG_DEFLECTED_BANG_TO", origin_card, origin, req->origin_card, target);
         req->target = target;
+        req->flags |= effect_flags::deflected;
     }
 }
