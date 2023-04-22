@@ -2,6 +2,7 @@
 
 #include "cards/filter_enums.h"
 #include "cards/effect_context.h"
+#include "cards/effect_enums.h"
 
 #include "game/game.h"
 
@@ -32,7 +33,7 @@ namespace banggame {
     }
 
     bool modifier_locomotive::valid_with_modifier(card *origin_card, player *origin, card *target_card) {
-        return target_card->pocket == pocket_type::stations;
+        return target_card->modifier.type == modifier_type::traincost && target_card->deck != card_deck_type::main_deck;
     }
 
     bool modifier_locomotive::valid_with_card(card *origin_card, player *origin, card *target_card) {
