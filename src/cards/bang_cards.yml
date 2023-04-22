@@ -2594,6 +2594,10 @@ train:
       - max_usages(1)
       - discard card self | blue_or_train
       - bang player reachable notself
+    responses:
+      - max_usages(1)
+      - discard card self | blue_or_train
+      - bangresponse
 locomotive:
   - name: IRONHORSE
     image: 27_ironhorse

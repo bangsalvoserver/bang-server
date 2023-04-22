@@ -78,6 +78,16 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
+    class respondable_with_bang {
+    public:
+        virtual void respond_with_bang() = 0;
+    };
+
+    struct effect_bangresponse {
+        bool can_play(card *origin_card, player *origin);
+        void on_play(card *origin_card, player *origin);
+    };
+
 }
 
 #endif

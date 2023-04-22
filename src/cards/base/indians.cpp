@@ -2,12 +2,13 @@
 
 #include "cards/game_enums.h"
 #include "cards/filters.h"
+#include "bang.h"
 
 #include "game/game.h"
 
 namespace banggame {
 
-    struct request_indians : request_base, resolvable_request {
+    struct request_indians : request_base, resolvable_request, respondable_with_bang {
         request_indians(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags) {}
 
@@ -28,10 +29,14 @@ namespace banggame {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target && filters::is_bang_card(target, target_card);
         }
 
-        void on_pick(card *target_card) override {
+        void respond_with_bang() override {
             target->m_game->pop_request();
+        }
+        
+        void on_pick(card *target_card) override {
             target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
             target->discard_used_card(target_card);
+            respond_with_bang();
         }
 
         void on_resolve() override {

@@ -1,12 +1,13 @@
 #include "duel.h"
 
 #include "cards/filters.h"
+#include "bang.h"
 
 #include "game/game.h"
 
 namespace banggame {
 
-    struct request_duel : request_base, resolvable_request {
+    struct request_duel : request_base, resolvable_request, respondable_with_bang {
         request_duel(card *origin_card, player *origin, player *target, player *respond_to, effect_flags flags = {})
             : request_base(origin_card, origin, target, flags)
             , respond_to(respond_to) {}
@@ -32,11 +33,15 @@ namespace banggame {
                 && !target->m_game->is_disabled(target_card);
         }
 
-        void on_pick(card *target_card) override {
+        void respond_with_bang() override {
             target->m_game->pop_request();
+            target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target);
+        }
+
+        void on_pick(card *target_card) override {
             target->m_game->add_log("LOG_RESPONDED_WITH_CARD", target_card, target);
             target->discard_used_card(target_card);
-            target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target);
+            respond_with_bang();
         }
 
         void on_resolve() override {

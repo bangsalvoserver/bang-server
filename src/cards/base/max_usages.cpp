@@ -18,9 +18,7 @@ namespace banggame {
             }
         });
         origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player *e_origin, bool skipped) {
-            if (e_origin == origin) {
-                origin->m_game->remove_listeners(key);
-            }
+            origin->m_game->remove_listeners(key);
         });
     }
 }
