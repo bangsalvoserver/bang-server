@@ -24,15 +24,17 @@ namespace banggame {
         return {c, c->pocket};
     }
 
+    void effect_context_deleter::operator ()(effect_context *ctx) const noexcept {
+        delete ctx;
+    }
+
     played_card_history::played_card_history(card *origin_card, const modifier_list &modifiers, const effect_context &context)
         : origin_card{to_card_pocket_pair(origin_card)}
         , modifiers{modifiers
             | ranges::views::transform(&modifier_pair::card)
             | ranges::views::transform(to_card_pocket_pair)
             | ranges::to<std::vector>}
-        , context{std::make_unique<effect_context>(context)} {}
-
-    played_card_history::~played_card_history() = default;
+        , context{new effect_context(context)} {}
 
     bool player::is_bot() const {
         return user_id < 0;

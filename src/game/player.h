@@ -66,14 +66,20 @@ namespace banggame {
         pocket_type pocket;
     };
 
+    struct effect_context_deleter {
+        void operator ()(effect_context *ctx) const noexcept;
+    };
+
+    using effect_context_ptr = std::unique_ptr<effect_context, effect_context_deleter>;
+    using shared_effect_context = std::shared_ptr<effect_context_ptr>;
+
     struct played_card_history {
         card_pocket_pair origin_card;
         std::vector<card_pocket_pair> modifiers;
-        std::unique_ptr<effect_context> context;
+        effect_context_ptr context;
 
         played_card_history(card *origin_card, const modifier_list &modifiers, const effect_context &context);
         played_card_history(played_card_history &&) noexcept = default;
-        ~played_card_history();
     };
 
     struct player {

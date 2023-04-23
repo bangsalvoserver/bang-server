@@ -1894,11 +1894,21 @@ character:
   - name: SGT_BLAZE
     image: 27_sgt_blaze
     expansion: greattrainrobbery
+    equip:
+      - sgt_blaze
     effects:
       - ctx_add player
-    modifier: skip_player
+    modifier: sgt_blaze
     tags:
       - max_hp(5)
+  - expansion: greattrainrobbery
+    responses:
+      - none
+    optional:
+      - mth_add player
+    mth_response: sgt_blaze
+    tags:
+      - hidden
   - name: SHADE_OCONNOR
     image: 27_shadeoconnor
     expansion: greattrainrobbery

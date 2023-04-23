@@ -25,7 +25,7 @@ target_sources(bangserver PRIVATE
     refund.cpp
     ruleset.cpp
     shade_oconnor.cpp
-    skip_player.cpp
+    sgt_blaze.cpp
     strongbox.cpp
     switch_cards.cpp
     traincost.cpp

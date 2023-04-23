@@ -27,7 +27,7 @@
 #include "refund.h"
 #include "ruleset.h"
 #include "shade_oconnor.h"
-#include "skip_player.h"
+#include "sgt_blaze.h"
 #include "strongbox.h"
 #include "switch_cards.h"
 #include "traincost.h"

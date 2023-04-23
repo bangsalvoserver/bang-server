@@ -20,9 +20,9 @@ namespace banggame {
     };
     
     void equip_shade_oconnor::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_train_advance>({target_card, 2}, [=](player *target, int locomotive_count) {
+        origin->m_game->add_listener<event_type::on_train_advance>({target_card, 2}, [=](player *target, shared_effect_context ctx) {
             if (origin != target && !origin->empty_hand()) {
-                origin->m_game->queue_request_front<request_shade_oconnor>(target_card, origin);
+                origin->m_game->queue_request<request_shade_oconnor>(target_card, origin);
             }
         });
     }

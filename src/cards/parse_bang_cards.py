@@ -136,7 +136,10 @@ def parse_file(data):
     
     for card in data['character']:
         card['deck'] = 'character'
-        result['characters'].append(parse_all_effects(card))
+        if is_hidden(card):
+            result['hidden'].append(parse_all_effects(card))
+        else:
+            result['characters'].append(parse_all_effects(card))
     
     for card in data['goldrush']:
         card['deck'] = 'goldrush'
