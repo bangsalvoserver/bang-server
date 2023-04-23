@@ -26,6 +26,10 @@ namespace banggame {
         });
     }
 
+    game_string effect_bangcard::get_error(card *origin_card, player *origin, player *target) {
+        return origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target, game_string{});
+    }
+
     void effect_bangcard::on_play(card *origin_card, player *origin, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         queue_request_bang(origin_card, origin, target);
@@ -37,6 +41,15 @@ namespace banggame {
             return bot_suggestion::target_enemy{}.on_check_target(chosen_card, origin, target_player);
         } else {
             return true;
+        }
+    }
+
+    game_string handler_play_as_bang::get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
+        if (target.target.is(target_type::player)) {
+            player *target_player = target.target.get<target_type::player>();
+            return origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target_player, game_string{});
+        } else {
+            return {};
         }
     }
 

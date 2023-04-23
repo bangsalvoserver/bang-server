@@ -37,8 +37,8 @@ namespace banggame {
         // verifica per gli effetti che rubano carte in alcune condizioni
         EVENT(check_card_taker, player *target, int type, card* &value)
 
-        // verifica l'effetto ha un bersaglio unico
-        EVENT(check_target_unique, card *origin_card, player *origin, player *target, game_string &out_error)
+        // verifica il bersaglio di un'azione
+        EVENT(check_card_target, card *origin_card, player *origin, player *target, game_string &out_error)
 
         // verifica prima di passare il turno
         EVENT(check_pass_turn, player *origin, game_string &out_error)

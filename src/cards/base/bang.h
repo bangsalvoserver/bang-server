@@ -12,11 +12,13 @@ namespace banggame {
     };
 
     struct effect_bangcard : prompt_target_ghost, bot_suggestion::target_enemy {
+        game_string get_error(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };
 
     struct handler_play_as_bang {
         bool on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
+        game_string get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
         game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
         void on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
     };
