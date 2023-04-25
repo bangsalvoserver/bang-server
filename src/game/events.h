@@ -69,6 +69,9 @@ namespace banggame {
         // viene chiamato quando il treno avanza
         EVENT(on_train_advance, player *origin, shared_effect_context ctx)
 
+        // viene chiamato per attivare l'effetto della locomotiva
+        EVENT(on_locomotive_effect, player *origin, shared_effect_context ctx)
+
         // viene chiamato quando un giocatore viene colpito
         EVENT(on_hit, card *origin_card, player *origin, player *target, int damage, effect_flags flags)
 

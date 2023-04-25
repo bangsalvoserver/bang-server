@@ -28,6 +28,10 @@ namespace banggame {
         delete ctx;
     }
 
+    shared_effect_context make_shared_effect_context(effect_context &&ctx) {
+        return shared_effect_context(new effect_context(std::move(ctx)), effect_context_deleter{});
+    }
+
     played_card_history::played_card_history(card *origin_card, const modifier_list &modifiers, const effect_context &context)
         : origin_card{to_card_pocket_pair(origin_card)}
         , modifiers{modifiers

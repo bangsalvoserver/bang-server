@@ -71,7 +71,9 @@ namespace banggame {
     };
 
     using effect_context_ptr = std::unique_ptr<effect_context, effect_context_deleter>;
-    using shared_effect_context = std::shared_ptr<effect_context_ptr>;
+    using shared_effect_context = std::shared_ptr<effect_context>;
+
+    shared_effect_context make_shared_effect_context(effect_context &&ctx);
 
     struct played_card_history {
         card_pocket_pair origin_card;

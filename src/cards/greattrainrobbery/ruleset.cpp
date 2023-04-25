@@ -5,6 +5,7 @@
 #include "next_stop.h"
 
 #include "game/game.h"
+#include "cards/effect_context.h"
 
 namespace banggame {
 
@@ -107,11 +108,17 @@ namespace banggame {
             }
         });
 
-        game->add_listener<event_type::on_train_advance>({nullptr, -1}, [](player *origin, shared_effect_context ctx) {
+        game->add_listener<event_type::on_train_advance>(nullptr, [](player *origin, shared_effect_context ctx) {
             if (origin->m_game->train_position == origin->m_game->m_stations.size()) {
+                origin->m_game->add_log("LOG_END_OF_LINE");
+                for (int i=0; i < ctx->locomotive_count; ++i) {
+                    origin->m_game->queue_action([=]{
+                        origin->m_game->call_event<event_type::on_locomotive_effect>(origin, ctx);
+                    }, -1);
+                }
                 origin->m_game->queue_action([=]{
                     shuffle_stations_and_trains(origin);
-                }, -2);
+                }, -1);
             }
         });
     }

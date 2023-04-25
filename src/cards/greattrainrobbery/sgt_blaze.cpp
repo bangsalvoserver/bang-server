@@ -44,8 +44,8 @@ namespace banggame {
     };
 
     void equip_sgt_blaze::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_train_advance>({origin_card, 1}, [=](player *target, shared_effect_context ctx) {
-            if (origin == target && (*ctx)->locomotive_count > 0 && origin->m_game->train_position == origin->m_game->m_stations.size()) {
+        origin->m_game->add_listener<event_type::on_locomotive_effect>({origin_card, 1}, [=](player *target, shared_effect_context ctx) {
+            if (origin == target) {
                 origin->m_game->queue_request<request_sgt_blaze>(origin_card, origin, ctx);
             }
         });
@@ -59,9 +59,11 @@ namespace banggame {
     }
 
     void handler_sgt_blaze::on_play(card *origin_card, player *origin, std::optional<player *> target) {
+        effect_context &ctx = *(origin->m_game->top_request<request_sgt_blaze>(origin)->ctx);
         if (target) {
-            effect_context &ctx = **(origin->m_game->top_request<request_sgt_blaze>(origin)->ctx);
             ctx.skipped_player = *target;
+        } else {
+            ctx.skipped_player = nullptr;
         }
         origin->m_game->pop_request();
     }
