@@ -118,7 +118,7 @@ namespace banggame {
                 }
                 origin->m_game->queue_action([=]{
                     shuffle_stations_and_trains(origin);
-                }, -1);
+                }, -6);
             }
         });
     }
