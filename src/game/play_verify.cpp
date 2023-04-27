@@ -85,37 +85,34 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_duplicates(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers) {
-        struct {
-            std::set<card *> selected_cards;
-            std::set<player *> selected_players;
-            card_cube_count selected_cubes;
-
-            game_string operator()(player *origin, card *origin_card, const effect_holder &effect, const play_card_target &target) {
-                return enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
-                    auto [players, cards, cubes] = play_visitor<E>{origin, origin_card, effect}.duplicates(FWD(args) ... );
-                    selected_players.merge(players);
-                    if (!players.empty()) {
-                        return {"ERROR_DUPLICATE_PLAYER", *players.begin()};
-                    }
-                    selected_cards.merge(cards);
-                    if (!cards.empty()) {
-                        return {"ERROR_DUPLICATE_CARD", *cards.begin()};
-                    }
-                    for (auto &[card, ncubes] : cubes) {
-                        if (selected_cubes[card] += ncubes > card->num_cubes) {
-                            return {"ERROR_NOT_ENOUGH_CUBES_ON", card};
-                        }
-                    }
-                    return {};
-                }, target);
+    game_string duplicate_set::merge(duplicate_set &&other) {
+        players.merge(other.players);
+        if (!other.players.empty()) {
+            return {"ERROR_DUPLICATE_PLAYER", *other.players.begin()};
+        }
+        cards.merge(other.cards);
+        if (!other.cards.empty()) {
+            return {"ERROR_DUPLICATE_CARD", *other.cards.begin()};
+        }
+        for (auto &[card, ncubes] : other.cubes) {
+            if (cubes[card] += ncubes > card->num_cubes) {
+                return {"ERROR_NOT_ENOUGH_CUBES_ON", card};
             }
-        } check;
+        }
+        return {};
+    }
+
+    static game_string verify_duplicates(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers) {
+        duplicate_set set;
+
+        auto check = [&set](player *origin, card *origin_card, const effect_holder &effect, const play_card_target &target) {
+            return set.merge(enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+                return play_visitor<E>{origin, origin_card, effect}.duplicates(FWD(args) ... );
+            }, target));
+        };
 
         for (const auto &[mod_card, mod_targets] : modifiers) {
-            if (!check.selected_cards.emplace(mod_card).second) {
-                return {"ERROR_DUPLICATE_CARD", mod_card.get()};
-            }
+            MAYBE_RETURN(set.merge({.cards{mod_card}}));
             for (const auto &[target, effect] : zip_card_targets(mod_targets, mod_card, is_response)) {
                 MAYBE_RETURN(check(origin, mod_card, effect, target));
             }

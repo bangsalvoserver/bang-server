@@ -19,9 +19,11 @@ namespace banggame {
     using card_cube_count = std::map<card *, int, card_cube_ordering>;
 
     struct duplicate_set {
-        std::multiset<player *> players;
-        std::multiset<card *> cards;
+        std::set<player *> players;
+        std::set<card *> cards;
         card_cube_count cubes;
+
+        game_string merge(duplicate_set &&other);
     };
 
     template<target_type E> struct play_visitor {
