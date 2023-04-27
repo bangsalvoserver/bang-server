@@ -167,7 +167,11 @@ namespace banggame {
                 return "ERROR_TARGET_SET_NOT_EMPTY";
             }
         } else {
-            return play_visitor<target_type::card>{origin, origin_card, effect}.get_error(ctx, target);
+            if (ctx.repeat_card) {
+                return "ERROR_TARGET_SET_EMPTY";
+            } else {
+                return play_visitor<target_type::card>{origin, origin_card, effect}.get_error(ctx, target);
+            }
         }
     }
 
