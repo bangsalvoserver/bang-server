@@ -430,11 +430,17 @@ void lobby::start_game(game_manager &mgr) {
         }
     }
 
-    std::vector<std::string_view> names;
-    std::ranges::sample(bot_names, std::back_inserter(names), options.num_bots, m_game->rng);
+    std::vector<std::string_view> names = bot_names
+        | ranges::views::sample(options.num_bots, m_game->rng)
+        | ranges::to<std::vector>;
+
+    std::vector<const sdl::image_pixels *> propics = bot_profile_pictures
+        | ranges::views::transform([](const sdl::image_pixels &image) { return &image; })
+        | ranges::views::sample(options.num_bots, m_game->rng)
+        | ranges::to<std::vector>;
 
     for (int i=0; i<options.num_bots; ++i) {
-        auto &bot = bots.emplace_back(-1 - i, fmt::format("BOT {}", names[i]), bot_profile_picture);
+        auto &bot = bots.emplace_back(-1 - i, fmt::format("BOT {}", names[i % names.size()]), *propics[i % propics.size()]);
         user_ids.push_back(bot.user_id);
 
         mgr.broadcast_message_lobby<server_message_type::lobby_add_user>(*this, bot);
