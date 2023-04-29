@@ -163,17 +163,12 @@ namespace banggame::bot_ai {
                 node_set.erase(selected_node);
 
                 try {
-                    if (!origin->handle_action(enums::enum_tag<game_action_type::play_card>,
-                        generate_random_play(origin, *selected_node, is_response)))
-                    {
-                        if (origin->m_prompt) {
-                            // maybe add random variation to fix softlock?
-                            bool response = node_set.empty() && i>=5;
-                            origin->handle_action(enums::enum_tag<game_action_type::prompt_respond>, response);
-                            if (response) return true;
-                        } else {
-                            return true;
-                        }
+                    auto args = generate_random_play(origin, *selected_node, is_response);
+                    // maybe add random variation to fix softlock?
+                    args.bypass_prompt = node_set.empty() && i>=5;
+                    auto [message, is_prompt] = verify_and_play(origin, args.card, args.is_response, args.targets, args.modifiers, args.bypass_prompt);
+                    if (!message) {
+                        return true;
                     }
                 } catch (const std::exception &e) {
                     std::cout << "BOT ERROR: " << e.what() << std::endl;
@@ -192,8 +187,7 @@ namespace banggame::bot_ai {
         if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](const card_modifier_node &node) {
             return node.card->has_tag(tag_type::confirm);
         })) {
-            origin->handle_action(enums::enum_tag<game_action_type::pick_card>,
-                random_element(update.pick_cards, origin->m_game->rng));
+            verify_and_pick(origin, random_element(update.pick_cards, origin->m_game->rng));
             return true;
         } else if (!update.respond_cards.empty()) {
             return execute_random_play(origin, true, update.respond_cards, {

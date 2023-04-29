@@ -133,10 +133,6 @@ namespace banggame {
         } else if (target == m_playing) {
             co_yield make_update<game_update_type::status_ready>(make_status_ready_update(target));
         }
-
-        if (target->m_prompt) {
-            co_yield make_update<game_update_type::game_prompt>(target->m_prompt->second);
-        }
     }
 
     void game::add_players(std::span<int> user_ids) {

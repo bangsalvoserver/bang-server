@@ -103,8 +103,6 @@ namespace banggame {
 
         std::map<card *, predraw_check> m_predraw_checks;
 
-        std::optional<std::pair<std::function<void()>, game_string>> m_prompt;
-
         int8_t m_range_mod = 0;
         int8_t m_weapon_range = 1;
         int8_t m_distance_mod = 0;
@@ -210,9 +208,7 @@ namespace banggame {
         void untap_inactive_cards();
         void remove_extra_characters();
 
-        game_string handle_action(enums::enum_tag_t<game_action_type::pick_card>, card *target_card);
-        game_string handle_action(enums::enum_tag_t<game_action_type::play_card>, const play_card_args &args);
-        game_string handle_action(enums::enum_tag_t<game_action_type::prompt_respond>, bool response);
+        void handle_game_action(const game_action &action);
     };
 
 }

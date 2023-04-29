@@ -251,17 +251,21 @@ namespace banggame {
 
     using modifier_list = std::vector<modifier_pair>;
 
+    DEFINE_STRUCT(pick_card_args,
+        (serial::card, card)
+    )
+
     DEFINE_STRUCT(play_card_args,
         (serial::card, card)
         (modifier_list, modifiers)
         (target_list, targets)
         (bool, is_response)
+        (bool, bypass_prompt)
     )
 
     DEFINE_ENUM_TYPES(game_action_type,
-        (pick_card, serial::card)
+        (pick_card, pick_card_args)
         (play_card, play_card_args)
-        (prompt_respond, bool)
     )
 
     using game_action = enums::enum_variant<game_action_type>;

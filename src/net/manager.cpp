@@ -394,16 +394,12 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
         return "ERROR_LOBBY_NOT_PLAYING";
     }
 
-    if (player *p = lobby.m_game->find_player_by_userid(user->second.user_id)) {
-        if (auto error = enums::visit_indexed([&]<game_action_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
-            return p->handle_action(tag, FWD(args) ...);
-        }, json::deserialize<banggame::game_action>(value, lobby.m_game->context()))) {
-            lobby.m_game->add_update<game_update_type::game_error>(update_target::includes_private(p), std::move(error));
-        }
+    if (player *origin = lobby.m_game->find_player_by_userid(user->second.user_id)) {
+        origin->handle_game_action(json::deserialize<banggame::game_action>(value, lobby.m_game->context()));
+        return {};
     } else {
         return "ERROR_USER_NOT_CONTROLLING_PLAYER";
     }
-    return {};
 }
 
 void lobby::send_updates(game_manager &mgr) {

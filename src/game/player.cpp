@@ -294,42 +294,23 @@ namespace banggame {
         }
     }
 
-    game_string player::handle_action(enums::enum_tag_t<game_action_type::pick_card>, card *target_card) {
-        if (m_prompt) {
-            return "ERROR_MUST_RESPOND_PROMPT";
-        } else if (auto req = m_game->top_request(this)) {
-            if (req->can_pick(target_card)) {
-                m_game->send_request_status_clear();
-                req->on_pick(target_card);
-                req.reset();
-                m_game->update();
-                return {};
-            } else {
-                return "ERROR_INVALID_PICK";
+    void player::handle_game_action(const game_action &action) {
+        auto [message, is_prompt] = enums::visit(overloaded{
+            [&](const pick_card_args &args) {
+                return verify_and_pick(this, args.card);
+            },
+            [&](const play_card_args &args) {
+                return verify_and_play(this, args.card, args.is_response, args.targets, args.modifiers, args.bypass_prompt);
             }
-        } else {
-            return "ERROR_NO_PENDING_REQUEST";
-        }
-    }
+        }, action);
 
-    game_string player::handle_action(enums::enum_tag_t<game_action_type::play_card>, const play_card_args &args) {
-        if (m_prompt) {
-            return "ERROR_MUST_RESPOND_PROMPT";
+        if (message) {
+            if (is_prompt) {
+                m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(message));
+            } else {
+                m_game->add_update<game_update_type::game_error>(update_target::includes_private(this), std::move(message));
+            }
         }
-        return verify_and_play(this, args.card, args.is_response, args.targets, args.modifiers);
-    }
-
-    game_string player::handle_action(enums::enum_tag_t<game_action_type::prompt_respond>, bool response) {
-        if (!m_prompt) {
-            return "ERROR_NO_PROMPT";
-        }
-        auto fun = std::move(m_prompt->first);
-        m_prompt.reset();
-
-        if (response) {
-            std::invoke(fun);
-        }
-        return {};
     }
 
     void player::start_of_turn() {
