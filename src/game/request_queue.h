@@ -47,7 +47,7 @@ namespace banggame {
         }
 
         bool pending_updates() const {
-            return m_update_timer.has_value();
+            return !m_bot_play && m_update_timer.has_value();
         }
 
         template<typename T = request_base>
