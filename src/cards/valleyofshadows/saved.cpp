@@ -17,13 +17,27 @@ namespace banggame {
             auto_pick();
         }
 
-        bool can_pick(card *target_card) const override {
-            bool is_deck = target_card->pocket == (target->m_game->m_deck.empty() ? pocket_type::discard_pile : pocket_type::main_deck);
-            bool is_hand = target_card->pocket == pocket_type::player_hand && target_card->owner == saved;
-            if (!saved->empty_hand() && target->is_bot()) {
-                return bot_suggestion::target_enemy{}.on_check_target(origin_card, target, saved) ? is_hand : is_deck;
+        game_string pick_prompt(card *target_card) const override {
+            if (target->is_bot()
+                && (bot_suggestion::target_enemy{}.on_check_target(origin_card, target, saved)
+                != (target_card->pocket == pocket_type::player_hand)))
+            {
+                return "BOT_BAD_PICK";
             } else {
-                return is_deck || is_hand;
+                return {};
+            }
+        }
+
+        bool can_pick(card *target_card) const override {
+            switch (target_card->pocket) {
+            case pocket_type::player_hand:
+                return target_card->owner == saved;
+            case pocket_type::main_deck:
+                return true;
+            case pocket_type::discard_pile:
+                return target->m_game->m_deck.empty();
+            default:
+                return false;
             }
         }
 
