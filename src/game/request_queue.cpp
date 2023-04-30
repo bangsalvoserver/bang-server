@@ -94,6 +94,7 @@ namespace banggame {
         m_bot_play = false;
         auto timer = get_total_update_time(m_game);
         if (timer < clamp_ticks(max_timer_duration)) {
+            m_update_timer.reset();
             invoke_update();
         } else {
             m_update_timer = timer;
