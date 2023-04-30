@@ -259,7 +259,6 @@ namespace banggame {
         (serial::card, card)
         (modifier_list, modifiers)
         (target_list, targets)
-        (bool, is_response)
         (bool, bypass_prompt)
     )
 

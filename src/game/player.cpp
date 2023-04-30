@@ -295,22 +295,18 @@ namespace banggame {
     }
 
     void player::handle_game_action(const game_action &action) {
-        auto [message, is_prompt] = enums::visit(overloaded{
-            [&](const pick_card_args &args) {
-                return verify_and_pick(this, args.card);
-            },
-            [&](const play_card_args &args) {
-                return verify_and_play(this, args.card, args.is_response, args.targets, args.modifiers, args.bypass_prompt);
-            }
-        }, action);
-
-        if (message) {
-            if (is_prompt) {
-                m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(message));
-            } else {
+        enums::visit_indexed(overloaded{
+            [](enums::enum_tag_t<message_type::ok>) {},
+            [&](enums::enum_tag_t<message_type::error>, game_string message) {
                 m_game->add_update<game_update_type::game_error>(update_target::includes_private(this), std::move(message));
+            },
+            [&](enums::enum_tag_t<message_type::prompt>, game_string message) {
+                m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(message));
             }
-        }
+        }, enums::visit(overloaded{
+            [&](const pick_card_args &args) { return verify_and_pick(this, args); },
+            [&](const play_card_args &args) { return verify_and_play(this, args); }
+        }, action));
     }
 
     void player::start_of_turn() {

@@ -3,6 +3,8 @@
 #include "cards/effect_enums.h"
 #include "cards/filters.h"
 
+#include "play_verify.h"
+
 namespace banggame {
 
     static auto get_all_active_cards(player *origin) {

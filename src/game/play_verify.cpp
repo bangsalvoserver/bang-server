@@ -365,63 +365,61 @@ namespace banggame {
         });
     }
 
-    std::pair<game_string, bool> verify_and_pick(player *origin, card *target_card) {
+    game_message verify_and_pick(player *origin, const pick_card_args &args) {
         if (auto req = origin->m_game->top_request(origin)) {
-            if (req->can_pick(target_card)) {
+            if (req->can_pick(args.card)) {
                 origin->m_game->send_request_status_clear();
-                req->on_pick(target_card);
+                req->on_pick(args.card);
                 req.reset();
                 origin->m_game->update();
                 return {};
             } else {
-                return {"ERROR_INVALID_PICK", false};
+                return {enums::enum_tag<message_type::error>, "ERROR_INVALID_PICK"};
             }
         } else {
-            return {"ERROR_NO_PENDING_REQUEST", false};
+            return {enums::enum_tag<message_type::error>, "ERROR_NO_PENDING_REQUEST"};
         }
     }
 
-    std::pair<game_string, bool> verify_and_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, bool bypass_prompt) {
-        if (origin->m_game->pending_requests()) {
-            if (!is_response) {
-                return {"ERROR_MUST_RESPOND_TO_REQUEST", false};
-            }
-        } else if (is_response || origin->m_game->m_playing != origin || origin->m_game->pending_updates()) {
-            return {"ERROR_PLAYER_NOT_IN_TURN", false};
+    game_message verify_and_play(player *origin, const play_card_args &args) {
+        bool is_response = origin->m_game->pending_requests();
+
+        if (!is_response && origin->m_game->m_playing != origin) {
+            return {enums::enum_tag<message_type::error>, "ERROR_PLAYER_NOT_IN_TURN"};
         }
 
         effect_context ctx;
 
-        if (game_string error = verify_card_targets(origin, origin_card, is_response, targets, modifiers, ctx)) {
-            return {error, false};
+        if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
+            return {enums::enum_tag<message_type::error>, error};
         }
 
-        int cost = filters::get_card_cost(origin_card, is_response, ctx);
+        int cost = filters::get_card_cost(args.card, is_response, ctx);
         if (origin->m_gold < cost) {
-            return {"ERROR_NOT_ENOUGH_GOLD", false};
+            return {enums::enum_tag<message_type::error>, "ERROR_NOT_ENOUGH_GOLD"};
         }
 
-        if (!bypass_prompt) {
-            if (game_string prompt_message = check_prompt_play(origin, origin_card, is_response, targets, modifiers, ctx)) {
-                return {prompt_message, true};
+        if (!args.bypass_prompt) {
+            if (game_string prompt_message = check_prompt_play(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
+                return {enums::enum_tag<message_type::prompt>, prompt_message};
             }
         }
 
         origin->m_game->send_request_status_clear();
 
-        if (origin_card->pocket != pocket_type::button_row) {
-            origin->m_played_cards.emplace_back(origin_card, modifiers, ctx);
+        if (args.card->pocket != pocket_type::button_row) {
+            origin->m_played_cards.emplace_back(args.card, args.modifiers, ctx);
         }
 
         origin->add_gold(-cost);
-        for (const auto &[mod_card, mod_targets] : modifiers) {
+        for (const auto &[mod_card, mod_targets] : args.modifiers) {
             apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
         }
 
-        if (filters::is_equip_card(origin_card)) {
-            apply_equip(origin, origin_card, targets, ctx);
+        if (filters::is_equip_card(args.card)) {
+            apply_equip(origin, args.card, args.targets, ctx);
         } else {
-            apply_target_list(origin, origin_card, is_response, targets, ctx);
+            apply_target_list(origin, args.card, is_response, args.targets, ctx);
         }
 
         origin->m_game->update();

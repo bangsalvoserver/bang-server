@@ -394,6 +394,10 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
         return "ERROR_LOBBY_NOT_PLAYING";
     }
 
+    if (lobby.m_game->pending_updates()) {
+        return "ERROR_GAME_PENDING_UPDATES";
+    }
+
     if (player *origin = lobby.m_game->find_player_by_userid(user->second.user_id)) {
         origin->handle_game_action(json::deserialize<banggame::game_action>(value, lobby.m_game->context()));
         return {};

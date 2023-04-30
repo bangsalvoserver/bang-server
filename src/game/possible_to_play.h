@@ -6,8 +6,6 @@
 
 #include "game.h"
 
-#include "play_verify.h"
-
 #include "cards/effect_context.h"
 
 namespace banggame {

@@ -92,7 +92,7 @@ namespace banggame::bot_ai {
         }, holder.target);
     }
 
-    static play_card_args generate_random_play(player *origin, const card_modifier_node &node, bool is_response) {
+    static play_card_args generate_random_play(player *origin, const card_modifier_node &node, bool is_response, bool bypass_prompt) {
         play_card_args ret;
         effect_context ctx;
 
@@ -138,7 +138,7 @@ namespace banggame::bot_ai {
             }
         }
         ret.card = playing_card;
-        ret.is_response = is_response;
+        ret.bypass_prompt = bypass_prompt;
         return ret;
     }
 
@@ -163,11 +163,9 @@ namespace banggame::bot_ai {
                 node_set.erase(selected_node);
 
                 try {
-                    auto args = generate_random_play(origin, *selected_node, is_response);
                     // maybe add random variation to fix softlock?
-                    args.bypass_prompt = node_set.empty() && i>=5;
-                    auto [message, is_prompt] = verify_and_play(origin, args.card, args.is_response, args.targets, args.modifiers, args.bypass_prompt);
-                    if (!message) {
+                    bool bypass_prompt = node_set.empty() && i>=5;
+                    if (verify_and_play(origin, generate_random_play(origin, *selected_node, is_response, bypass_prompt)).is(message_type::ok)) {
                         return true;
                     }
                 } catch (const std::exception &e) {
@@ -187,7 +185,7 @@ namespace banggame::bot_ai {
         if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](const card_modifier_node &node) {
             return node.card->has_tag(tag_type::confirm);
         })) {
-            verify_and_pick(origin, random_element(update.pick_cards, origin->m_game->rng));
+            verify_and_pick(origin, pick_card_args{random_element(update.pick_cards, origin->m_game->rng)});
             return true;
         } else if (!update.respond_cards.empty()) {
             return execute_random_play(origin, true, update.respond_cards, {
