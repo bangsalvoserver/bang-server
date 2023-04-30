@@ -2159,7 +2159,7 @@ wildwestshow:
     mth_effect: play_as_bang
     responses:
       - missed
-      - discard card self | hand bangcard
+      - discard(1) card self | hand bangcard
     tags:
       - play_as_bang
   - name: SACAGAWAY

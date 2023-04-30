@@ -114,7 +114,7 @@ namespace banggame {
         } else {
             origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_player, target_card);
         }
-        target_player->discard_card(target_card);
+        target_player->discard_card(target_card, used);
     }
 
     void effect_destroy::on_resolve(card *origin_card, player *origin, card *target_card) {
