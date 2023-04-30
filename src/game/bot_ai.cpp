@@ -92,7 +92,7 @@ namespace banggame::bot_ai {
         }, holder.target);
     }
 
-    static play_card_args generate_random_play(player *origin, const card_modifier_node &node, bool is_response, bool bypass_prompt) {
+    static play_card_args generate_random_play(player *origin, const card_modifier_node &node, bool is_response) {
         play_card_args ret;
         effect_context ctx;
 
@@ -138,7 +138,6 @@ namespace banggame::bot_ai {
             }
         }
         ret.card = playing_card;
-        ret.bypass_prompt = bypass_prompt;
         return ret;
     }
 
@@ -163,9 +162,10 @@ namespace banggame::bot_ai {
                 node_set.erase(selected_node);
 
                 try {
+                    auto args = generate_random_play(origin, *selected_node, is_response);
                     // maybe add random variation to fix softlock?
-                    bool bypass_prompt = node_set.empty() && i>=5;
-                    if (verify_and_play(origin, generate_random_play(origin, *selected_node, is_response, bypass_prompt)).is(message_type::ok)) {
+                    args.bypass_prompt = node_set.empty() && i>=5;
+                    if (verify_and_play(origin, args).is(message_type::ok)) {
                         return true;
                     }
                 } catch (const std::exception &e) {
