@@ -179,14 +179,35 @@ namespace banggame::bot_ai {
         return false;
     }
 
+    bool pick_random_card(player *origin, const serial::card_list &cards) {
+        auto card_set = cards | ranges::to<std::set>;
+        
+        while (!card_set.empty()) {
+            card *picked = random_element(card_set, origin->m_game->rng);
+            card_set.erase(picked);
+
+            if (verify_and_pick(origin, {picked, false}).is(message_type::ok)) {
+                return true;
+            }
+        }
+
+        card *picked = random_element(cards, origin->m_game->rng);
+        if (verify_and_pick(origin, {picked, true}).is(message_type::ok)) {
+            return true;
+        }
+
+        // softlock, should never happen
+        std::cout << "BOT ERROR: could not find card in pick_random_card" << std::endl;
+        return false;
+    }
+
     bool respond_to_request(player *origin) {
         auto update = origin->m_game->make_request_update(origin);
 
         if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](const card_modifier_node &node) {
             return node.card->has_tag(tag_type::confirm);
         })) {
-            verify_and_pick(origin, pick_card_args{random_element(update.pick_cards, origin->m_game->rng)});
-            return true;
+            return pick_random_card(origin, update.pick_cards);
         } else if (!update.respond_cards.empty()) {
             return execute_random_play(origin, true, update.respond_cards, {
                 pocket_type::player_character,

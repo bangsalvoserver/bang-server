@@ -10,17 +10,12 @@ namespace banggame {
         }
     }
 
-    bool request_check::can_pick(card *target_card) const {
-        if (target_card->pocket == pocket_type::selection) {
-            if (!target->is_bot()) return true;
-
-            if (std::ranges::none_of(m_game->m_selection, [&](card *c) { return check_for(c); })) {
-                return true;
-            } else {
-                return check_for(target_card);
-            }
+    game_string request_check::pick_prompt(card *target_card) const {
+        if (target->is_bot() && !check_for(target_card)) {
+            return "PROMPT_BAD_DRAW";
+        } else {
+            return {};
         }
-        return false;
     }
 
     void request_check::on_pick(card *target_card) {

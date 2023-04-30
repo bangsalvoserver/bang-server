@@ -95,6 +95,7 @@ namespace banggame {
 
         virtual bool can_pick(card *target_card) const { return false; }
         virtual void on_pick(card *target_card) { throw std::runtime_error("missing on_pick(card)"); }
+        virtual game_string pick_prompt(card *target_card) const { return {}; }
 
         virtual void on_update() {}
 

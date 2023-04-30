@@ -14,9 +14,9 @@ namespace banggame {
         virtual void restart() = 0;
     };
     
-    struct request_check : request_base, draw_check_handler {
+    struct request_check : selection_picker, draw_check_handler {
         request_check(game *m_game, card *origin_card, player *target, draw_check_condition &&condition, draw_check_function &&function)
-            : request_base(origin_card, nullptr, target)
+            : selection_picker(origin_card, nullptr, target)
             , m_game(m_game)
             , m_condition(std::move(condition))
             , m_function(std::move(function)) {}
@@ -29,7 +29,7 @@ namespace banggame {
 
         void on_update() override;
 
-        bool can_pick(card *target_card) const override;
+        game_string pick_prompt(card *target_card) const override;
 
         void on_pick(card *target_card) override;
 

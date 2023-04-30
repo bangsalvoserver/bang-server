@@ -368,6 +368,12 @@ namespace banggame {
     game_message verify_and_pick(player *origin, const pick_card_args &args) {
         if (auto req = origin->m_game->top_request(origin)) {
             if (req->can_pick(args.card)) {
+                if (!args.bypass_prompt) {
+                    if (game_string prompt_message = req->pick_prompt(args.card)) {
+                        return {enums::enum_tag<message_type::prompt>, prompt_message};
+                    }
+                }
+                
                 origin->m_game->send_request_status_clear();
                 req->on_pick(args.card);
                 req.reset();

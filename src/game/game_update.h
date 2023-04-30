@@ -253,6 +253,7 @@ namespace banggame {
 
     DEFINE_STRUCT(pick_card_args,
         (serial::card, card)
+        (bool, bypass_prompt)
     )
 
     DEFINE_STRUCT(play_card_args,
