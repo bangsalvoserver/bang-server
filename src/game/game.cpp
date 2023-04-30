@@ -577,11 +577,13 @@ namespace banggame {
         }, -4);
 
         queue_action([this, killer, target]{
-            if (killer && killer != target && m_players.size() <= 3) {
-                killer->draw_card(3);
-            }
-            if (m_playing == target) {
-                start_next_turn();
+            if (!target->alive()) {
+                if (killer && killer != target && m_players.size() <= 3) {
+                    killer->draw_card(3);
+                }
+                if (m_playing == target) {
+                    start_next_turn();
+                }
             }
         }, -5);
     }
