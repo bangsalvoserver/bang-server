@@ -15,5 +15,11 @@ namespace banggame {
                 origin->add_gold(damage);
             }
         });
+
+        game->add_listener<event_type::on_equip_card>({nullptr, 5}, [](player *origin, player *target, card *origin_card, const effect_context &ctx) {
+            if (origin_card->is_black()) {
+                origin->m_game->draw_shop_card();
+            }
+        });
     }
 }

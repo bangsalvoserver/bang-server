@@ -97,7 +97,8 @@ namespace banggame {
     static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
         const auto &effects = origin_card->get_effect_list(is_response);
         const auto &mth = origin_card->get_mth(is_response);
-        return is_possible_mth_impl(origin, origin_card, mth, effects, effects.begin(), ctx, {});
+        return is_possible_to_play_effects(origin, origin_card, effects, ctx)
+            && is_possible_mth_impl(origin, origin_card, mth, effects, effects.begin(), ctx, {});
     }
 
     bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx) {
@@ -144,28 +145,28 @@ namespace banggame {
             if (mod_card->modifier.get_error(mod_card, origin, origin_card, ctx)) return false;
         }
 
-        if (filters::is_equip_card(origin_card)) {
-            return !is_response
-                && contains_at_least(make_equip_set(origin, origin_card, ctx), 1)
-                && origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
-        }
-        
-        if (origin->get_play_card_error(origin_card, ctx)
-            || origin->m_game->is_disabled(origin_card)
-            || !is_possible_to_play_effects(origin, origin_card, origin_card->get_effect_list(is_response), ctx)
-            || !is_possible_mth(origin, origin_card, is_response, ctx))
-        {
+        if (origin->get_play_card_error(origin_card, ctx) || origin->m_game->is_disabled(origin_card)) {
             return false;
         }
-        
-        if (origin_card->is_modifier()) {
-            auto ctx_copy = ctx;
-            origin_card->modifier.add_context(origin_card, origin, ctx_copy);
-            
-            return contains_at_least(cards_playable_with_modifiers(origin, vector_concat(modifiers, origin_card), is_response, ctx_copy), 1);
+
+        if (filters::is_equip_card(origin_card)) {
+            if (is_response || !contains_at_least(make_equip_set(origin, origin_card, ctx), 1)) {
+                return false;
+            }
         } else {
-            return origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
+            if (!is_possible_mth(origin, origin_card, is_response, ctx)) {
+                return false;
+            }
+            
+            if (origin_card->is_modifier()) {
+                auto ctx_copy = ctx;
+                origin_card->modifier.add_context(origin_card, origin, ctx_copy);
+                
+                return contains_at_least(cards_playable_with_modifiers(origin, vector_concat(modifiers, origin_card), is_response, ctx_copy), 1);
+            }
         }
+        
+        return origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
     }
 
     static card_modifier_node generate_card_modifier_node(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {

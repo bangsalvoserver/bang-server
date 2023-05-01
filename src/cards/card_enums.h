@@ -62,7 +62,7 @@ namespace banggame {
     )
 
     DEFINE_ENUM_FLAGS_FWD_TYPES(expansion_type,
-        (dodgecity)
+        (dodgecity,             ruleset_dodgecity)
         (goldrush,              ruleset_goldrush)
         (armedanddangerous,     ruleset_armedanddangerous)
         (greattrainrobbery,     ruleset_greattrainrobbery)

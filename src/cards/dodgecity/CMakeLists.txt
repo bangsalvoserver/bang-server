@@ -9,6 +9,7 @@ target_sources(bangserver PRIVATE
     johnny_kisch.cpp
     molly_stark.cpp
     pixie_pete.cpp
+    ruleset.cpp
     tequila_joe.cpp
     vera_custer.cpp
 )

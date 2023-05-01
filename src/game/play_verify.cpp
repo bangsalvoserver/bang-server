@@ -126,13 +126,9 @@ namespace banggame {
     }
 
     game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx) {
-        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
-            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
-        }
         if (origin->m_game->check_flags(game_flags::disable_equipping)) {
             return "ERROR_CANT_EQUIP_CARDS";
         }
-        MAYBE_RETURN(origin->get_play_card_error(origin_card, ctx));
         if (origin_card->self_equippable()) {
             if (origin != target) {
                 return "ERROR_INVALID_EQUIP_TARGET";
@@ -147,12 +143,21 @@ namespace banggame {
     }
 
     static game_string verify_card_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
+        if (!is_response && origin->m_game->m_playing != origin) {
+            return "ERROR_PLAYER_NOT_IN_TURN";
+        }
+        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
+            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
+        }
+        if (origin_card->inactive) {
+            return {"ERROR_CARD_INACTIVE", origin_card};
+        }
+        MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
+
         if (filters::is_equip_card(origin_card)) {
             if (is_response) {
                 return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
             }
-            
-            MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
 
             player *target = origin;
             if (origin_card->self_equippable()) {
@@ -165,47 +170,45 @@ namespace banggame {
                 }
                 target = targets.front().get<target_type::player>();
             }
-            return get_equip_error(origin, origin_card, target, ctx);
-        }
-        
-        if (origin_card->is_modifier()) {
+            
+            MAYBE_RETURN(get_equip_error(origin, origin_card, target, ctx));
+        } else if (origin_card->is_modifier()) {
             return "ERROR_CARD_IS_MODIFIER";
-        }
-        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
-            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
-        }
-        if (origin_card->inactive) {
-            return {"ERROR_CARD_INACTIVE", origin_card};
-        }
-        MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
-        MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
-        MAYBE_RETURN(verify_duplicates(origin, origin_card, is_response, targets, modifiers));
-        MAYBE_RETURN(origin->get_play_card_error(origin_card, ctx));
+        } else {
+            MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
+            MAYBE_RETURN(verify_duplicates(origin, origin_card, is_response, targets, modifiers));
 
-        if (ctx.repeat_card != origin_card) {
-            switch (origin_card->pocket) {
-            case pocket_type::player_hand:
-            case pocket_type::player_table:
-            case pocket_type::player_character:
-            case pocket_type::button_row:
-            case pocket_type::shop_selection:
-            case pocket_type::hidden_deck:
-            case pocket_type::stations:
-            case pocket_type::train:
-                break;
-            case pocket_type::scenario_card:
-                if (origin_card != origin->m_game->m_scenario_cards.back()) {
-                    return "ERROR_INVALID_SCENARIO_CARD";
+            if (ctx.repeat_card != origin_card) {
+                switch (origin_card->pocket) {
+                case pocket_type::player_hand:
+                case pocket_type::player_table:
+                case pocket_type::player_character:
+                case pocket_type::button_row:
+                case pocket_type::shop_selection:
+                case pocket_type::hidden_deck:
+                case pocket_type::stations:
+                case pocket_type::train:
+                    break;
+                case pocket_type::scenario_card:
+                    if (origin_card != origin->m_game->m_scenario_cards.back()) {
+                        return "ERROR_INVALID_SCENARIO_CARD";
+                    }
+                    break;
+                case pocket_type::wws_scenario_card:
+                    if (origin_card != origin->m_game->m_wws_scenario_cards.back()) {
+                        return "ERROR_INVALID_SCENARIO_CARD";
+                    }
+                    break;
+                default:
+                    return "ERROR_INVALID_CARD_POCKET";
                 }
-                break;
-            case pocket_type::wws_scenario_card:
-                if (origin_card != origin->m_game->m_wws_scenario_cards.back()) {
-                    return "ERROR_INVALID_SCENARIO_CARD";
-                }
-                break;
-            default:
-                return "ERROR_INVALID_CARD_POCKET";
             }
+        }
+
+        MAYBE_RETURN(origin->get_play_card_error(origin_card, ctx));
+        
+        if (origin->m_gold < filters::get_card_cost(origin_card, is_response, ctx)) {
+            return "ERROR_NOT_ENOUGH_GOLD";
         }
 
         return {};
@@ -354,45 +357,34 @@ namespace banggame {
 
             target->equip_card(origin_card);
 
-            if (origin_card->is_green()) {
-                origin_card->inactive = true;
-                origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
-            } else if (origin_card->is_black()) {
-                origin->m_game->draw_shop_card();
-            }
-
             origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card, ctx);
         });
     }
 
     game_message verify_and_pick(player *origin, const pick_card_args &args) {
-        if (auto req = origin->m_game->top_request(origin)) {
-            if (req->can_pick(args.card)) {
-                if (!args.bypass_prompt) {
-                    if (game_string prompt_message = req->pick_prompt(args.card)) {
-                        return {enums::enum_tag<message_type::prompt>, prompt_message};
-                    }
-                }
-                
-                origin->m_game->send_request_status_clear();
-                req->on_pick(args.card);
-                req.reset();
-                origin->m_game->update();
-                return {};
-            } else {
-                return {enums::enum_tag<message_type::error>, "ERROR_INVALID_PICK"};
-            }
-        } else {
-            return {enums::enum_tag<message_type::error>, "ERROR_NO_PENDING_REQUEST"};
+        auto req = origin->m_game->top_request(origin);
+
+        if (!req || !req->can_pick(args.card)) {
+            return {enums::enum_tag<message_type::error>, "ERROR_INVALID_PICK"};
         }
+
+        if (!args.bypass_prompt) {
+            if (game_string prompt = req->pick_prompt(args.card)) {
+                return {enums::enum_tag<message_type::prompt>, prompt};
+            }
+        }
+        
+        origin->m_game->send_request_status_clear();
+
+        req->on_pick(args.card);
+        req.reset();
+
+        origin->m_game->update();
+        return {};
     }
 
     game_message verify_and_play(player *origin, const play_card_args &args) {
         bool is_response = origin->m_game->pending_requests();
-
-        if (!is_response && origin->m_game->m_playing != origin) {
-            return {enums::enum_tag<message_type::error>, "ERROR_PLAYER_NOT_IN_TURN"};
-        }
 
         effect_context ctx;
 
@@ -400,14 +392,9 @@ namespace banggame {
             return {enums::enum_tag<message_type::error>, error};
         }
 
-        int cost = filters::get_card_cost(args.card, is_response, ctx);
-        if (origin->m_gold < cost) {
-            return {enums::enum_tag<message_type::error>, "ERROR_NOT_ENOUGH_GOLD"};
-        }
-
         if (!args.bypass_prompt) {
-            if (game_string prompt_message = check_prompt_play(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-                return {enums::enum_tag<message_type::prompt>, prompt_message};
+            if (game_string prompt = check_prompt_play(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
+                return {enums::enum_tag<message_type::prompt>, prompt};
             }
         }
 
@@ -417,7 +404,8 @@ namespace banggame {
             origin->m_played_cards.emplace_back(args.card, args.modifiers, ctx);
         }
 
-        origin->add_gold(-cost);
+        origin->add_gold(-filters::get_card_cost(args.card, is_response, ctx));
+
         for (const auto &[mod_card, mod_targets] : args.modifiers) {
             apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
         }
