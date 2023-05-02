@@ -52,14 +52,14 @@ template<> not_null<banggame::player *> deserializer<not_null<banggame::player *
     return context.find_player(value.get<int>());
 }
 
-}
-
-namespace banggame {
-
-card_format_id::card_format_id(card *value) {
-    if (value) {
-        name = value->name;
-        sign = value->sign;
+template<> json serializer<banggame::serial::card_format, banggame::game_context>::operator()(banggame::serial::card_format value) const {
+    if (value.card) {
+        return serialize(banggame::card_format{
+            .name = value.card->name,
+            .sign = value.card->sign
+        });
+    } else {
+        return json::object();
     }
 }
 

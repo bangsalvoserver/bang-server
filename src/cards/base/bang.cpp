@@ -199,7 +199,7 @@ namespace banggame {
                 return {"STATUS_CARD_AS_BANG_OTHER", target, origin_card};
             } else if (bang_strength > 1) {
                 if (bang_damage > 1) {
-                    return {"STATUS_CARD_AS_BANG_DAMAGE_STRONG", origin_card, bang_strength, bang_damage};
+                    return {"STATUS_CARD_AS_BANG_DMG_STRONG", origin_card, bang_strength, bang_damage};
                 } else {
                     return {"STATUS_CARD_AS_BANG_STRONG", origin_card, bang_strength};
                 }

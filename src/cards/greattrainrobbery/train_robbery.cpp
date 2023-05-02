@@ -36,7 +36,7 @@ namespace banggame {
                 if (owner == target) {
                     return {"STATUS_TRAIN_ROBBERY_CHOOSE", origin_card, target_card};
                 } else {
-                    return {"STATUS_TRAIN_ROBBERY_CHOOSE_OTHER", target, origin_card, target_card};
+                    return {"STATUS_TRAIN_ROBBERY_CHOOSE_OTH", target, origin_card, target_card};
                 }
             } else {
                 return request_bang::status_text(owner);

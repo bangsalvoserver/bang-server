@@ -6,6 +6,8 @@
 #include "filter_enums.h"
 #include "game_enums.h"
 
+#include "game/game_string.h"
+
 namespace banggame::filters {
 
     namespace detail {
@@ -51,7 +53,7 @@ namespace banggame::filters {
             || is_player_ghost(origin);
     }
 
-    inline const char *check_player_filter(detail::player_ptr origin, target_player_filter filter, detail::player_ptr target, const effect_context &ctx = {}) {
+    inline game_string check_player_filter(detail::player_ptr origin, target_player_filter filter, detail::player_ptr target, const effect_context &ctx = {}) {
         if (bool(filter & target_player_filter::dead)) {
             if (!bool(filter & target_player_filter::alive) && !detail::check_player_flags(target, player_flags::dead)) {
                 return "ERROR_TARGET_NOT_DEAD";
@@ -99,7 +101,7 @@ namespace banggame::filters {
             }
         }
 
-        return nullptr;
+        return {};
     }
 
     inline bool is_equip_card(detail::card_ptr target) {
@@ -132,7 +134,7 @@ namespace banggame::filters {
         }
     }
 
-    inline const char *check_card_filter(detail::card_ptr origin_card, detail::player_ptr origin, target_card_filter filter, detail::card_ptr target, const effect_context &ctx = {}) {
+    inline game_string check_card_filter(detail::card_ptr origin_card, detail::player_ptr origin, target_card_filter filter, detail::card_ptr target, const effect_context &ctx = {}) {
         if (!bool(filter & target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";
         
@@ -164,7 +166,7 @@ namespace banggame::filters {
         if (bool(filter & target_card_filter::catbalou_panic)
             && !detail::get_card_tag(target, tag_type::cat_balou)
             && !detail::get_card_tag(target, tag_type::panic))
-            return "ERROR_TARGET_NOT_CATBALOU_OR_PANIC";
+            return "ERROR_TARGET_NOT_CATBALOU_PANIC";
 
         card_color_type color = detail::get_card_color(target);
 
@@ -216,7 +218,7 @@ namespace banggame::filters {
             return "ERROR_TARGET_NOT_TEN_TO_ACE";
 
         if (bool(filter & target_card_filter::selection) && detail::get_card_pocket(target) != pocket_type::selection)
-            return "ERROR_TARGET_NOT_SELECTION_CARD";
+            return "ERROR_TARGET_NOT_SELECTION";
 
         if (bool(filter & target_card_filter::table) && detail::get_card_pocket(target) != pocket_type::player_table)
             return "ERROR_TARGET_NOT_TABLE_CARD";
@@ -224,7 +226,7 @@ namespace banggame::filters {
         if (bool(filter & target_card_filter::hand) && detail::get_card_pocket(target) != pocket_type::player_hand)
             return "ERROR_TARGET_NOT_HAND_CARD";
 
-        return nullptr;
+        return {};
     }
 }
 

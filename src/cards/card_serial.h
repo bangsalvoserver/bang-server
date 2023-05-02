@@ -3,12 +3,14 @@
 
 #include "utils/json_serial.h"
 #include "utils/utils.h"
+#include "utils/small_pod.h"
 
 namespace banggame {
     struct game_context;
     struct game;
     struct card;
     struct player;
+    struct card_format;
 }
 
 template<typename T, typename ... Ts>
@@ -28,6 +30,8 @@ namespace banggame {
         using opt_card = card;
         using player = banggame::player_view *;
         using opt_player = player;
+        using card_format = banggame::card_format;
+        template<typename T> using small_vector = std::vector<T>;
 
         template<typename T>
         concept serializable = is_one_of<T, card, player>;
@@ -42,9 +46,16 @@ namespace banggame::serial {
     using card = not_null<opt_card>;
     using opt_player = banggame::player *;
     using player = not_null<opt_player>;
+    template<typename T> using small_vector = ::small_vector<T>;
+    
+    struct card_format {
+        banggame::card *card;
+        card_format() = default;
+        card_format(banggame::card *card) : card(card) {}
+    };
 
     template<typename T>
-    concept serializable = is_one_of<T, opt_card, card, opt_player, player>;
+    concept serializable = is_one_of<T, opt_card, card, opt_player, player, card_format>;
 }
 
 #ifndef BUILD_BANG_SERVER

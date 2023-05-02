@@ -262,7 +262,7 @@ namespace banggame {
                         if (handler.valid_with_equip(origin_card, origin, target_card)) {
                             return {};
                         } else {
-                            return {"ERROR_CANNOT_PLAY_WHILE_EQUIPPING", origin_card, target_card};
+                            return {"ERROR_CANT_PLAY_WHILE_EQUIPPING", origin_card, target_card};
                         }
                     }
                 } else if (target_card->is_modifier()) {

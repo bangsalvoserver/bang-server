@@ -163,7 +163,7 @@ namespace banggame {
             if (target == owner) {
                 return "STATUS_SHERIFF_KILLED_DEPUTY";
             } else {
-                return {"STATUS_SHERIFF_KILLED_DEPUTY_OTHER", target};
+                return {"STATUS_SHERIFF_KILLED_DEPUTY_OTH", target};
             }
         }
     }

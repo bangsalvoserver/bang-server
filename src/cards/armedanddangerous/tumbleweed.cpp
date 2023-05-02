@@ -46,15 +46,15 @@ namespace banggame {
             if (cards.size() == 1) {
                 card *drawn_card = cards.front();
                 if (target == owner) {
-                    return {"STATUS_CAN_PLAY_TUMBLEWEED", origin, origin_card, drawing_card, drawn_card};
+                    return {"STATUS_REQ_TUMBLEWEED", origin, origin_card, drawing_card, drawn_card};
                 } else {
-                    return {"STATUS_CAN_PLAY_TUMBLEWEED_OTHER", origin, origin_card, drawing_card, drawn_card, target};
+                    return {"STATUS_REQ_TUMBLEWEED_OTHER", origin, origin_card, drawing_card, drawn_card, target};
                 }
             } else {
                 if (target == owner) {
-                    return {"STATUS_CAN_PLAY_TUMBLEWEED_FOR", origin, origin_card, drawing_card};
+                    return {"STATUS_REQ_TUMBLEWEED_FOR", origin, origin_card, drawing_card};
                 } else {
-                    return {"STATUS_CAN_PLAY_TUMBLEWEED_FOR_OTHER", origin, origin_card, drawing_card, target};
+                    return {"STATUS_REQ_TUMBLEWEED_FOR_OTHER", origin, origin_card, drawing_card, target};
                 }
             }
         }

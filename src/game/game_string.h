@@ -5,31 +5,27 @@
 
 namespace banggame {
 
-    DEFINE_STRUCT(card_format_id,
+    DEFINE_STRUCT(card_format,
         (std::string, name)
-        (card_sign, sign),
-
-        card_format_id() = default;
-        card_format_id(card *value);
+        (card_sign, sign)
     )
 
     DEFINE_ENUM_TYPES(game_format_arg_type,
         (integer, int)
-        (string, std::string)
-        (card, card_format_id)
+        (card, serial::card_format)
         (player, serial::opt_player)
     )
 
     using game_format_arg = enums::enum_variant<game_format_arg_type>;
     
     DEFINE_STRUCT(game_string,
-        (std::string, format_str)
-        (std::vector<game_format_arg>, format_args),
+        (small_string, format_str)
+        (serial::small_vector<game_format_arg>, format_args),
 
         game_string() = default;
     
         game_string(
-                std::convertible_to<std::string> auto &&message,
+                std::convertible_to<small_string> auto &&message,
                 auto && ... args)
             : format_str(FWD(message))
             , format_args{game_format_arg(FWD(args)) ...} {}

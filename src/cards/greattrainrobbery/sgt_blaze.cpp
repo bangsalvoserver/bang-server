@@ -38,7 +38,7 @@ namespace banggame {
             if (owner == target) {
                 return {"STATUS_SGT_BLAZE_LOCOMOTIVE", origin_card};
             } else {
-                return {"STATUS_SGT_BLAZE_LOCOMOTIVE_OTHER", origin_card, target};
+                return {"STATUS_SGT_BLAZE_LOCOMOTIVE_OTH", origin_card, target};
             }
         }
     };
