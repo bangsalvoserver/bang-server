@@ -134,15 +134,15 @@ namespace banggame {
             add_update<E>(update_target::excludes(), FWD(args) ... );
         }
 
-        template<typename ... Ts>
-        void add_log(update_target target, auto && ... args) {
-            const auto &log = m_saved_log.emplace_back(std::piecewise_construct,
-                std::make_tuple(target), std::make_tuple(FWD(args) ... ));
+        template<size_t N, typename ... Ts>
+        void add_log(update_target target, const char (&message)[N], Ts && ... args) {
+            const auto &log = m_saved_log.emplace_back(target, game_string(message, FWD(args) ...));
             add_update<game_update_type::game_log>(std::move(target), log.second);
         }
 
-        void add_log(auto && ... args) {
-            add_log(update_target::excludes(), FWD(args) ... );
+        template<size_t N, typename ... Ts>
+        void add_log(const char (&message)[N], Ts && ... args) {
+            add_log(update_target::excludes(), message, FWD(args) ... );
         }
     };
 

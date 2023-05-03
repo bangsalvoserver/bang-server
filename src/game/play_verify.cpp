@@ -253,18 +253,30 @@ namespace banggame {
         case pocket_type::scenario_card:
         case pocket_type::hidden_deck:
             if (!origin_card->name.empty()) {
-                origin->m_game->add_log(is_response ? "LOG_RESPONDED_WITH_CARD" : "LOG_PLAYED_CARD", origin_card, origin);
+                if (is_response) {
+                    origin->m_game->add_log("LOG_RESPONDED_WITH_CARD", origin_card, origin);
+                } else {
+                    origin->m_game->add_log("LOG_PLAYED_CARD", origin_card, origin);
+                }
             }
             break;
         case pocket_type::player_table:
-            origin->m_game->add_log(is_response ? "LOG_RESPONDED_WITH_CARD" : "LOG_PLAYED_TABLE_CARD", origin_card, origin);
+            if (is_response) {
+                origin->m_game->add_log("LOG_RESPONDED_WITH_CARD", origin_card, origin);
+            } else {
+                origin->m_game->add_log("LOG_PLAYED_TABLE_CARD", origin_card, origin);
+            }
             break;
         case pocket_type::player_character:
-            origin->m_game->add_log(is_response ?
-                origin_card->has_tag(tag_type::drawing)
-                    ? "LOG_DRAWN_WITH_CHARACTER"
-                    : "LOG_RESPONDED_WITH_CHARACTER"
-                : "LOG_PLAYED_CHARACTER", origin_card, origin);
+            if (is_response) {
+                if (origin_card->has_tag(tag_type::drawing)) {
+                    origin->m_game->add_log("LOG_DRAWN_WITH_CHARACTER", origin_card, origin);
+                } else {
+                    origin->m_game->add_log("LOG_RESPONDED_WITH_CHARACTER", origin_card, origin);
+                }
+            } else {
+                origin->m_game->add_log("LOG_PLAYED_CHARACTER", origin_card, origin);
+            }
             break;
         case pocket_type::shop_selection:
             origin->m_game->add_log("LOG_BOUGHT_CARD", origin_card, origin);
