@@ -2,6 +2,7 @@
 #define __GAME_STRING_H__
 
 #include "cards/card_enums.h"
+#include "utils/small_pod.h"
 
 namespace banggame {
 
@@ -17,15 +18,23 @@ namespace banggame {
     )
 
     using game_format_arg = enums::enum_variant<game_format_arg_type>;
+
+#ifdef BUILD_BANG_CLIENT
+    using format_str_type = std::string;
+    using format_args_type = std::vector<game_format_arg>;
+#else
+    using format_str_type = small_string;
+    using format_args_type = small_vector<game_format_arg>;
+#endif
     
     DEFINE_STRUCT(game_string,
-        (small_string, format_str)
-        (serial::small_vector<game_format_arg>, format_args),
+        (format_str_type, format_str)
+        (format_args_type, format_args),
 
         game_string() = default;
     
         game_string(
-                std::convertible_to<small_string> auto &&message,
+                std::convertible_to<format_str_type> auto &&message,
                 auto && ... args)
             : format_str(FWD(message))
             , format_args{game_format_arg(FWD(args)) ...} {}
