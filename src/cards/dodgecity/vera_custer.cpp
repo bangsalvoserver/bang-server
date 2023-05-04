@@ -5,17 +5,27 @@
 
 namespace banggame {
 
+    static card *get_card_copy(card *target_card) {
+        auto &cards = target_card->owner->m_game->m_context.cards;
+        auto it = std::ranges::find_if(cards, [&](const card &c) {
+            return &c != target_card && c.deck == target_card->deck && c.name == target_card->name;
+        });
+        if (it != cards.end()) {
+            return &*it;
+        } else {
+            return &cards.emplace(int(cards.first_available_id()), *target_card);
+        }
+    }
+
     static void copy_characters(player *origin, player *target) {
         origin->remove_extra_characters();
 
         for (card *target_card : target->m_characters | ranges::views::take_last(2)) {
             origin->m_game->add_log("LOG_COPY_CHARACTER", origin, target_card);
             
-            card *new_card = &origin->m_game->m_context.cards.emplace(int(origin->m_game->m_context.cards.first_available_id()), *target_card);
+            card *new_card = get_card_copy(target_card);
             new_card->pocket = pocket_type::player_character;
             new_card->owner = origin;
-            
-            new_card->tags.push_back(tag_holder{ .type = tag_type::temp_card });
             
             origin->m_characters.emplace_back(new_card);
             origin->enable_equip(new_card);

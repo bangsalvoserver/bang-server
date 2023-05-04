@@ -391,13 +391,9 @@ namespace banggame {
             for (card *character : range) {
                 disable_equip(character);
                 
-                if (character->has_tag(tag_type::temp_card)) {
-                    m_game->m_context.cards.erase(character->id);
-                } else {
-                    character->pocket = pocket_type::none;
-                    character->owner = nullptr;
-                    character->visibility = card_visibility::hidden;
-                }
+                character->pocket = pocket_type::none;
+                character->owner = nullptr;
+                character->visibility = card_visibility::hidden;
             }
 
             m_characters.resize(1);
