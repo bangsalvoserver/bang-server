@@ -1299,7 +1299,7 @@ main_deck:
     color: blue
     equip_target: any
     equip:
-      - predraw_check(-1)
+      - predraw_check(-2)
       - taxman
   - name: BROTHEL
     signs:
@@ -1309,7 +1309,7 @@ main_deck:
     color: blue
     equip_target: any
     equip:
-      - predraw_check(-2)
+      - predraw_check(-3)
       - brothel
   - name: BRONCO
     signs:
@@ -1634,6 +1634,7 @@ character:
     image: 03_vera_custer
     expansion: dodgecity
     equip:
+      - predraw_check(-10)
       - vera_custer
     tags:
       - max_hp(3)
@@ -2529,6 +2530,7 @@ train:
     image: 27_dining_car
     color: train
     equip:
+      - predraw_check(-1)
       - dining_car
   - name: EXPRESS_CAR
     image: 27_express_car

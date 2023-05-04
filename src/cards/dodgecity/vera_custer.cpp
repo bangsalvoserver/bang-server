@@ -66,8 +66,8 @@ namespace banggame {
     };
 
     void equip_vera_custer::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_turn_start>({origin_card, 1}, [=](player *target) {
-            if (origin == target) {
+        origin->m_game->add_listener<event_type::on_predraw_check>(origin_card, [=](player *target, card *target_card) {
+            if (origin == target && origin_card == target_card) {
                 origin->m_game->queue_request<request_vera_custer>(origin_card, target);
             }
         });
