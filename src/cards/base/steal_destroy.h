@@ -17,6 +17,7 @@ namespace banggame {
         bool used;
         effect_discard(int value = 0) : used(value) {}
 
+        game_string on_prompt(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin, card *target);
     };

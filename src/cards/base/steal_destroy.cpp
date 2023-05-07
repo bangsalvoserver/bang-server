@@ -103,6 +103,16 @@ namespace banggame {
         });
     }
 
+    game_string effect_discard::on_prompt(card *origin_card, player *origin, card *target_card) {
+        if (target_card->pocket == pocket_type::player_table
+            && target_card->owner == origin
+            && target_card->has_tag(tag_type::ghost_card))
+        {
+            return "PROMPT_TARGET_SELF_GHOST_CARD";
+        }
+        return {};
+    }
+
     void effect_discard::on_play(card *origin_card, player *origin) {
         origin->discard_used_card(origin_card);
     }
