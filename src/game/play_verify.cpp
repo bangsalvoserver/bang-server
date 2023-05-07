@@ -79,6 +79,36 @@ namespace banggame {
             }, target)));
         }
 
+        if (ctx.repeat_card != origin_card) {
+            switch (origin_card->pocket) {
+            case pocket_type::player_hand:
+            case pocket_type::player_table:
+            case pocket_type::player_character:
+                if (origin_card->owner != origin) {
+                    return "ERROR_INVALID_CARD_OWNER";
+                }
+                break;
+            case pocket_type::button_row:
+            case pocket_type::shop_selection:
+            case pocket_type::hidden_deck:
+            case pocket_type::stations:
+            case pocket_type::train:
+                break;
+            case pocket_type::scenario_card:
+                if (origin_card != origin->m_game->m_scenario_cards.back()) {
+                    return "ERROR_INVALID_SCENARIO_CARD";
+                }
+                break;
+            case pocket_type::wws_scenario_card:
+                if (origin_card != origin->m_game->m_wws_scenario_cards.back()) {
+                    return "ERROR_INVALID_SCENARIO_CARD";
+                }
+                break;
+            default:
+                return "ERROR_INVALID_CARD_POCKET";
+            }
+        }
+
         return {};
     }
     
@@ -149,6 +179,10 @@ namespace banggame {
                 return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
             }
 
+            if (origin_card->pocket == pocket_type::player_hand && origin_card->owner != origin) {
+                return "ERROR_INVALID_CARD_OWNER";
+            }
+
             player *target = origin;
             if (origin_card->self_equippable()) {
                 if (!targets.empty()) {
@@ -166,32 +200,6 @@ namespace banggame {
             return "ERROR_CARD_IS_MODIFIER";
         } else {
             MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx, duplicates));
-
-            if (ctx.repeat_card != origin_card) {
-                switch (origin_card->pocket) {
-                case pocket_type::player_hand:
-                case pocket_type::player_table:
-                case pocket_type::player_character:
-                case pocket_type::button_row:
-                case pocket_type::shop_selection:
-                case pocket_type::hidden_deck:
-                case pocket_type::stations:
-                case pocket_type::train:
-                    break;
-                case pocket_type::scenario_card:
-                    if (origin_card != origin->m_game->m_scenario_cards.back()) {
-                        return "ERROR_INVALID_SCENARIO_CARD";
-                    }
-                    break;
-                case pocket_type::wws_scenario_card:
-                    if (origin_card != origin->m_game->m_wws_scenario_cards.back()) {
-                        return "ERROR_INVALID_SCENARIO_CARD";
-                    }
-                    break;
-                default:
-                    return "ERROR_INVALID_CARD_POCKET";
-                }
-            }
         }
 
         MAYBE_RETURN(origin->get_play_card_error(origin_card, ctx));
