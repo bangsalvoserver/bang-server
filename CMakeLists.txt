@@ -30,6 +30,10 @@ add_custom_command(
 add_library(bang_cards_obj OBJECT "${bang_cards_cpp}")
 target_include_directories(bang_cards_obj PRIVATE src)
 target_link_libraries(bang_cards_obj PRIVATE cpputils)
+if(MINGW)
+    # disable optimization, fix ICE in gcc 13 in mingw
+    target_compile_options(bang_cards_obj PRIVATE -O0)
+endif()
 
 add_library(bangcommon INTERFACE)
 target_include_directories(bangcommon INTERFACE src)
