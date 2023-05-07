@@ -120,7 +120,6 @@ namespace banggame {
         (lucky_duke,            equip_lucky_duke)
         (luckycharm,            equip_luckycharm)
         (gunbelt,               equip_gunbelt)
-        (initialcards,          equip_initialcards)
         (wanted,                equip_wanted)
         (bomb,                  equip_bomb)
         (tumbleweed,            equip_tumbleweed)

@@ -1701,7 +1701,6 @@ character:
     expansion: wildwestshow
     equip:
       - big_spencer
-      - initialcards(5)
     tags:
       - max_hp(9)
   - name: FLINT_WESTWOOD

@@ -16,7 +16,6 @@ target_sources(bangserver PRIVATE
     heal.cpp
     lucky_duke.cpp
     indians.cpp
-    initialcards.cpp
     jail.cpp
     kit_carlson.cpp
     max_usages.cpp

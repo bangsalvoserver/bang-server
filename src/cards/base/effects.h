@@ -18,7 +18,6 @@
 #include "heal.h"
 #include "lucky_duke.h"
 #include "indians.h"
-#include "initialcards.h"
 #include "jail.h"
 #include "kit_carlson.h"
 #include "max_usages.h"
