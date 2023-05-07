@@ -22,8 +22,6 @@ namespace banggame {
         std::set<player *> players;
         std::set<card *> cards;
         card_cube_count cubes;
-
-        game_string merge(duplicate_set &&other);
     };
 
     template<target_type E> struct play_visitor {
