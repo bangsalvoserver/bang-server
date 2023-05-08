@@ -10,7 +10,7 @@ namespace banggame {
     static auto get_all_active_cards(player *origin) {
         return ranges::views::concat(
             origin->m_hand,
-            origin->m_table | ranges::views::remove_if(&card::inactive),
+            origin->m_table,
             origin->m_characters,
             origin->m_game->m_button_row,
             origin->m_game->m_hidden_deck,
@@ -145,7 +145,7 @@ namespace banggame {
             if (mod_card->modifier.get_error(mod_card, origin, origin_card, ctx)) return false;
         }
 
-        if (origin->get_play_card_error(origin_card, ctx) || origin->m_game->is_disabled(origin_card)) {
+        if (get_play_card_error(origin, origin_card, ctx)) {
             return false;
         }
 

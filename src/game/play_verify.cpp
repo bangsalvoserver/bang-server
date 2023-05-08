@@ -126,16 +126,11 @@ namespace banggame {
                 return "ERROR_CARD_IS_NOT_MODIFIER";
             }
 
-            if (card *disabler = origin->m_game->get_disabler(mod_card)) {
-                return {"ERROR_CARD_DISABLED_BY", mod_card.get(), disabler};
-            }
-            MAYBE_RETURN(origin->get_play_card_error(mod_card, ctx));
-
             mod_card->modifier.add_context(mod_card, origin, ctx);
 
             MAYBE_RETURN(merge_duplicate_sets(duplicates, {.cards{ mod_card }}));
-
             MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx, duplicates));
+            MAYBE_RETURN(get_play_card_error(origin, mod_card, ctx));
         }
 
         for (size_t i=0; i<modifiers.size(); ++i) {
@@ -148,6 +143,40 @@ namespace banggame {
             }
         }
         return {};
+    }
+
+    static game_string verify_equip_target(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+        if (is_response) {
+            return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
+        }
+
+        if (origin_card->pocket == pocket_type::player_hand && origin_card->owner != origin) {
+            return "ERROR_INVALID_CARD_OWNER";
+        }
+
+        player *target = origin;
+        if (origin_card->self_equippable()) {
+            if (!targets.empty()) {
+                return "ERROR_INVALID_EQUIP_TARGET";
+            }
+        } else {
+            if (targets.size() != 1 || !targets.front().is(target_type::player)) {
+                return "ERROR_INVALID_EQUIP_TARGET";
+            }
+            target = targets.front().get<target_type::player>();
+        }
+        
+        return get_equip_error(origin, origin_card, target, ctx);
+    }
+
+    game_string get_play_card_error(player *origin, card *origin_card, const effect_context &ctx) {
+        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
+            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
+        }
+        if (origin_card->inactive) {
+            return {"ERROR_CARD_INACTIVE", origin_card};
+        }
+        return origin->m_game->call_event<event_type::check_play_card>(origin, origin_card, ctx, game_string{});
     }
 
     game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx) {
@@ -171,46 +200,20 @@ namespace banggame {
         if (!is_response && origin->m_game->m_playing != origin) {
             return "ERROR_PLAYER_NOT_IN_TURN";
         }
-        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
-            return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
-        }
-        if (origin_card->inactive) {
-            return {"ERROR_CARD_INACTIVE", origin_card};
-        }
 
         duplicate_set_unique duplicates;
 
         MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx, duplicates));
 
         if (filters::is_equip_card(origin_card)) {
-            if (is_response) {
-                return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
-            }
-
-            if (origin_card->pocket == pocket_type::player_hand && origin_card->owner != origin) {
-                return "ERROR_INVALID_CARD_OWNER";
-            }
-
-            player *target = origin;
-            if (origin_card->self_equippable()) {
-                if (!targets.empty()) {
-                    return "ERROR_INVALID_EQUIP_TARGET";
-                }
-            } else {
-                if (targets.size() != 1 || !targets.front().is(target_type::player)) {
-                    return "ERROR_INVALID_EQUIP_TARGET";
-                }
-                target = targets.front().get<target_type::player>();
-            }
-            
-            MAYBE_RETURN(get_equip_error(origin, origin_card, target, ctx));
+            MAYBE_RETURN(verify_equip_target(origin, origin_card, is_response, targets, ctx));
         } else if (origin_card->is_modifier()) {
             return "ERROR_CARD_IS_MODIFIER";
         } else {
             MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx, duplicates));
         }
 
-        MAYBE_RETURN(origin->get_play_card_error(origin_card, ctx));
+        MAYBE_RETURN(get_play_card_error(origin, origin_card, ctx));
         
         if (origin->m_gold < filters::get_card_cost(origin_card, is_response, ctx)) {
             return "ERROR_NOT_ENOUGH_GOLD";

@@ -13,6 +13,8 @@ namespace banggame {
 
     using game_message = enums::enum_variant<message_type>;
 
+    game_string get_play_card_error(player *origin, card *origin_card, const effect_context &ctx);
+
     game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx);
 
     void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx);
