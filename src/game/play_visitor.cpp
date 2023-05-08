@@ -208,13 +208,11 @@ namespace banggame {
     }
 
     template<> duplicate_set play_visitor<target_type::cards>::duplicates(const serial::card_list &targets) {
-        duplicate_set ret;
         if (!bool(effect.card_filter & target_card_filter::can_repeat)) {
-            for (card *target : targets) {
-                ret.cards.emplace(target);
-            }
+            return {.cards{ targets | ranges::to<std::vector<card *>> }};
+        } else {
+            return {};
         }
-        return ret;
     }
 
     template<> game_string play_visitor<target_type::cards>::prompt(const effect_context &ctx, const serial::card_list &targets) {

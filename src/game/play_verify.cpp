@@ -14,24 +14,32 @@
 
 namespace banggame {
 
-    static game_string merge_duplicate_sets(duplicate_set &set, duplicate_set &&other) {
-        set.players.merge(other.players);
-        if (!other.players.empty()) {
-            return {"ERROR_DUPLICATE_PLAYER", *other.players.begin()};
+    struct duplicate_set_unique {
+        std::set<player *> players;
+        std::set<card *> cards;
+        card_cube_count cubes;
+    };
+
+    static game_string merge_duplicate_sets(duplicate_set_unique &set, duplicate_set &&other) {
+        for (player *p : other.players) {
+            if (!set.players.insert(p).second) {
+                return {"ERROR_DUPLICATE_PLAYER", p};
+            }
         }
-        set.cards.merge(other.cards);
-        if (!other.cards.empty()) {
-            return {"ERROR_DUPLICATE_CARD", *other.cards.begin()};
+        for (card *c : other.cards) {
+            if (!set.cards.insert(c).second) {
+                return {"ERROR_DUPLICATE_CARD", c};
+            }
         }
         for (auto &[card, ncubes] : other.cubes) {
-            if (set.cubes[card] += ncubes > card->num_cubes) {
+            if ((set.cubes[card] += ncubes) > card->num_cubes) {
                 return {"ERROR_NOT_ENOUGH_CUBES_ON", card};
             }
         }
         return {};
     }
 
-    static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx, duplicate_set &duplicates) {
+    static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx, duplicate_set_unique &duplicates) {
         auto &effects = origin_card->get_effect_list(is_response);
 
         if (effects.empty()) {
@@ -112,7 +120,7 @@ namespace banggame {
         return {};
     }
     
-    static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx, duplicate_set &duplicates) {
+    static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx, duplicate_set_unique &duplicates) {
         for (const auto &[mod_card, targets] : modifiers) {
             if (!mod_card->is_modifier()) {
                 return "ERROR_CARD_IS_NOT_MODIFIER";
@@ -170,7 +178,7 @@ namespace banggame {
             return {"ERROR_CARD_INACTIVE", origin_card};
         }
 
-        duplicate_set duplicates;
+        duplicate_set_unique duplicates;
 
         MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx, duplicates));
 

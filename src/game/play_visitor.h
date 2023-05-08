@@ -19,8 +19,8 @@ namespace banggame {
     using card_cube_count = std::map<card *, int, card_cube_ordering>;
 
     struct duplicate_set {
-        std::set<player *> players;
-        std::set<card *> cards;
+        std::vector<player *> players;
+        std::vector<card *> cards;
         card_cube_count cubes;
     };
 
