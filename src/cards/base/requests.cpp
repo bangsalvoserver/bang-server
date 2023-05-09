@@ -120,7 +120,9 @@ namespace banggame {
 
     void request_discard_all::on_update() {
         if (state == request_state::pending) {
-            target->untap_inactive_cards();
+            for (card *target_card : target->m_table) {
+                target->m_game->tap_card(target_card, false);
+            }
         }
         
         if (target->m_game->m_options.quick_discard_all

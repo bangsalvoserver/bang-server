@@ -76,7 +76,10 @@ namespace banggame {
         });
         origin->m_game->add_listener<event_type::on_player_death>(target_card, [=](player *killer, player *target) {
             if (target->only_black_cards_equipped()) return;
-            target->untap_inactive_cards();
+            
+            for (card *target_card : target->m_table) {
+                target->m_game->tap_card(target_card, false);
+            }
 
             std::vector<player *> range_targets;
             for (player *p : range_other_players(target)) {

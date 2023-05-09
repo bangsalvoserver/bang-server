@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/dodgecity/ruleset.h"
+
 namespace banggame {
     void ruleset_canyondiablo::on_apply(game *game) {
         game->add_listener<event_type::check_damage_response>(nullptr, [=](player *target, bool &value) {
@@ -11,12 +13,7 @@ namespace banggame {
                 value = true;
             }
         });
-        
-        game->add_listener<event_type::on_equip_card>({nullptr, 5}, [](player *origin, player *target, card *origin_card, const effect_context &ctx) {
-            if (origin_card->is_green() && !origin_card->inactive) {
-                origin_card->inactive = true;
-                origin->m_game->add_update<game_update_type::tap_card>(origin_card, true);
-            }
-        });
+
+        ruleset_dodgecity{}.on_apply(game);
     }
 }

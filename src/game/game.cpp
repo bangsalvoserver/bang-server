@@ -582,7 +582,7 @@ namespace banggame {
                     killer->draw_card(3);
                 }
                 if (m_playing == target) {
-                    start_next_turn();
+                    target->skip_turn();
                 }
             }
         }, -5);

@@ -203,7 +203,6 @@ namespace banggame {
             );
         }
 
-        void untap_inactive_cards();
         void remove_extra_characters();
 
         void handle_game_action(const game_action &action);

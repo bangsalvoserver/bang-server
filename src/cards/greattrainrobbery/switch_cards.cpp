@@ -9,6 +9,12 @@
 
 namespace banggame {
 
+    static bool has_equipped_card(player *origin, card *target_card) {
+        return std::ranges::any_of(origin->m_played_cards, [&](const card_pocket_pair &pair) {
+            return pair.origin_card == target_card && pair.pocket == pocket_type::player_hand;
+        }, &played_card_history::origin_card);
+    }
+
     static void resolve_switch_cards(card *origin_card, player *origin, card *chosen_card, card *target_card) {
         player *target = target_card->owner;
         origin->m_game->add_log("LOG_SWAP_CARDS", origin, target, chosen_card, target_card);
@@ -16,10 +22,14 @@ namespace banggame {
         target->disable_equip(target_card);
         target_card->on_unequip(target);
         origin->equip_card(target_card);
+        if (target_card->is_green() && has_equipped_card(origin, target_card)) {
+            origin->m_game->tap_card(target_card, true);
+        }
         if (chosen_card->owner == origin) {
             origin->disable_equip(chosen_card);
             chosen_card->on_unequip(origin);
         }
+        origin->m_game->tap_card(chosen_card, false);
         target->equip_card(chosen_card);
     }
 

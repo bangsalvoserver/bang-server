@@ -107,10 +107,7 @@ namespace banggame {
     static void move_owned_card(player *owner, card *target_card, bool used, std::invocable auto &&fun) {
         if (target_card->owner == owner) {
             if (target_card->pocket == pocket_type::player_table) {
-                if (target_card->inactive) {
-                    target_card->inactive = false;
-                    owner->m_game->add_update<game_update_type::tap_card>(target_card, false);
-                }
+                owner->m_game->tap_card(target_card, false);
                 owner->disable_equip(target_card);
                 owner->drop_all_cubes(target_card);
                 std::invoke(FWD(fun));
@@ -343,10 +340,6 @@ namespace banggame {
         if (m_hand.size() > max_cards_end_of_turn()) {
             m_game->queue_request<request_discard_pass>(this);
         } else {
-            for (player *p : range_all_players(this)) {
-                p->untap_inactive_cards();
-            }
-
             m_game->call_event<event_type::on_turn_end>(this, false);
             m_game->queue_action([&]{
                 if (m_extra_turns == 0) {
@@ -362,22 +355,9 @@ namespace banggame {
     }
 
     void player::skip_turn() {
-        for (player *p : range_all_players(this)) {
-            p->untap_inactive_cards();
-        }
-
         remove_player_flags(player_flags::extra_turn);
         m_game->call_event<event_type::on_turn_end>(this, true);
         m_game->start_next_turn();
-    }
-
-    void player::untap_inactive_cards() {
-        for (card *c : m_table) {
-            if (c->inactive) {
-                c->inactive = false;
-                m_game->add_update<game_update_type::tap_card>(c, false);
-            }
-        }
     }
 
     void player::remove_extra_characters() {
