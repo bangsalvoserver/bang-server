@@ -1703,6 +1703,7 @@ character:
       - big_spencer
     tags:
       - max_hp(9)
+      - initial_cards(5)
   - name: FLINT_WESTWOOD
     image: 06_flintwestwood
     expansion: wildwestshow

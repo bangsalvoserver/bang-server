@@ -77,6 +77,7 @@ namespace banggame {
         (handcuffs)
         (buy_cost)
         (max_hp)
+        (initial_cards)
         (bronco)
     )
 }
