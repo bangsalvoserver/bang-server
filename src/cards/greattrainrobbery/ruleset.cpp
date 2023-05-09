@@ -57,7 +57,9 @@ namespace banggame {
             origin->disable_equip(c);
         }
 
-        origin->m_game->shuffle_cards_and_ids(origin->m_game->m_train_deck);
+        if (!origin->m_game->m_train_deck.empty()) {
+            origin->m_game->shuffle_cards_and_ids(origin->m_game->m_train_deck);
+        }
         
         origin->m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(origin->m_game->m_stations));
         for (card *c : origin->m_game->m_stations) {
