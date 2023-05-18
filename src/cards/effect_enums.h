@@ -236,6 +236,7 @@ namespace banggame {
         (none)
         (bangmod,               modifier_bangmod)
         (doublebarrel,          modifier_doublebarrel)
+        (bigfifty,              modifier_bigfifty)
         (bandolier,             modifier_bandolier)
         (belltower,             modifier_belltower)
         (card_choice,           modifier_card_choice)

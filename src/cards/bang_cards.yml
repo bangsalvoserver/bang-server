@@ -872,7 +872,7 @@ main_deck:
     image: 17_bigfifty
     expansion: armedanddangerous
     color: orange
-    modifier: bangmod
+    modifier: bigfifty
     equip:
       - weapon(6)
     effects:

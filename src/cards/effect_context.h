@@ -15,6 +15,7 @@ namespace banggame {
         int8_t discount = 0;
         bool ignore_distances = false;
         bool disable_banglimit = false;
+        bool disable_bang_checks = false;
     };
 
 }

@@ -1,7 +1,7 @@
 #include "bigfifty.h"
 
 #include "game/game.h"
-#include "cards/base/bang.h"
+#include "cards/effect_context.h"
 
 namespace banggame {
 
@@ -19,5 +19,9 @@ namespace banggame {
                 origin->m_game->remove_listeners(origin_card);
             }
         });
+    }
+
+    void modifier_bigfifty::add_context(card *origin_card, player *origin, effect_context &ctx) {
+        ctx.disable_bang_checks = true;
     }
 }

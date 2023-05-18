@@ -12,7 +12,7 @@ namespace banggame {
     };
 
     struct effect_bangcard : prompt_target_ghost, bot_suggestion::target_enemy {
-        game_string get_error(card *origin_card, player *origin, player *target);
+        game_string get_error(card *origin_card, player *origin, player *target, const effect_context &ctx);
         void on_play(card *origin_card, player *origin, player *target);
     };
 

@@ -26,8 +26,12 @@ namespace banggame {
         });
     }
 
-    game_string effect_bangcard::get_error(card *origin_card, player *origin, player *target) {
-        return origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target, game_string{});
+    game_string effect_bangcard::get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) {
+        if (!ctx.disable_bang_checks) {
+            return origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target, game_string{});
+        } else {
+            return {};
+        }
     }
 
     void effect_bangcard::on_play(card *origin_card, player *origin, player *target) {
@@ -37,8 +41,7 @@ namespace banggame {
 
     bool handler_play_as_bang::on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
         if (target.target.is(target_type::player)) {
-            player *target_player = target.target.get<target_type::player>();
-            return bot_suggestion::target_enemy{}.on_check_target(chosen_card, origin, target_player);
+            return effect_bangcard{}.on_check_target(chosen_card, origin, target.target.get<target_type::player>());
         } else {
             return true;
         }
@@ -46,8 +49,7 @@ namespace banggame {
 
     game_string handler_play_as_bang::get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
         if (target.target.is(target_type::player)) {
-            player *target_player = target.target.get<target_type::player>();
-            return origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target_player, game_string{});
+            return effect_bangcard{}.get_error(chosen_card, origin, target.target.get<target_type::player>(), ctx);
         } else {
             return {};
         }
@@ -55,8 +57,7 @@ namespace banggame {
 
     game_string handler_play_as_bang::on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
         if (target.target.is(target_type::player)) {
-            player *target_player = target.target.get<target_type::player>();
-            return prompt_target_ghost{}.on_prompt(chosen_card, origin, target_player);
+            return effect_bangcard{}.on_prompt(chosen_card, origin, target.target.get<target_type::player>());
         } else {
             return {};
         }
@@ -120,9 +121,10 @@ namespace banggame {
     static constexpr bool is_bangmod<E> = std::is_base_of_v<modifier_bangmod, enums::enum_type_t<E>>;
 
     bool modifier_bangmod::valid_with_modifier(card *origin_card, player *origin, card *target_card) {
-        return []<modifier_type ... Es>(enums::enum_sequence<Es...>, modifier_type type) {
-            return ((is_bangmod<Es> && Es == type) || ...);
-        }(enums::make_enum_sequence<modifier_type>(), target_card->modifier.type);
+        static constexpr auto bangmods = []<modifier_type ... Es>(enums::enum_sequence<Es ...>) {
+            return std::array { is_bangmod<Es> ... };
+        }(enums::make_enum_sequence<modifier_type>());
+        return bangmods[enums::indexof(target_card->modifier.type)];
     }
 
     bool modifier_bangmod::valid_with_card(card *origin_card, player *origin, card *target_card) {
