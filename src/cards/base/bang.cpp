@@ -7,6 +7,7 @@
 #include "cards/filters.h"
 
 #include "game/game.h"
+#include "game/play_verify.h"
 #include "damage.h"
 
 namespace banggame {
@@ -48,6 +49,7 @@ namespace banggame {
     }
 
     game_string handler_play_as_bang::get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
+        MAYBE_RETURN(get_play_card_error(origin, chosen_card, ctx));
         if (target.target.is(target_type::player)) {
             return effect_bangcard{}.get_error(chosen_card, origin, target.target.get<target_type::player>(), ctx);
         } else {
