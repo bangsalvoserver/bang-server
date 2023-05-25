@@ -28,11 +28,12 @@ namespace banggame {
         (serial::card, card)
         (serial::opt_player, player)
         (pocket_type, pocket)
-        (bool, instant),
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return instant ? 0ms : durations::move_card;
-        }
+        move_card_update() = default;
+        move_card_update(serial::card card, serial::opt_player player, pocket_type pocket, bool instant = false)
+            : card{card}, player{player}, pocket{pocket}
+            , duration{instant ? 0ms : durations.move_card} {}
     )
 
     DEFINE_STRUCT(add_cubes_update,
@@ -43,83 +44,93 @@ namespace banggame {
     DEFINE_STRUCT(move_cubes_update,
         (int, num_cubes)
         (serial::opt_card, origin_card)
-        (serial::opt_card, target_card),
-        
-        auto get_duration() const {
-            return num_cubes == 1 ? durations::move_cube : durations::move_cubes;
-        }
+        (serial::opt_card, target_card)
+        (game_duration, duration),
+
+        move_cubes_update() = default;
+        move_cubes_update(int num_cubes, serial::opt_card origin_card, serial::opt_card target_card)
+            : num_cubes{num_cubes}, origin_card{origin_card}, target_card{target_card}
+            , duration{num_cubes == 1 ? durations.move_cube : durations.move_cubes} {}
     )
 
     DEFINE_STRUCT(move_scenario_deck_update,
         (serial::player, player)
         (pocket_type, pocket)
-        (bool, instant),
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return instant ? 0ms : durations::move_card;
-        }
+        move_scenario_deck_update() = default;
+        move_scenario_deck_update(serial::player player, pocket_type pocket, bool instant = false)
+            : player{player}, pocket{pocket}
+            , duration{instant ? 0ms : durations.move_card} {}
     )
 
     DEFINE_STRUCT(move_train_update,
         (int, position)
-        (bool, instant),
-        
-        auto get_duration() const {
-            return instant ? 0ms : durations::move_train;
-        }
+        (game_duration, duration),
+
+        move_train_update() = default;
+        move_train_update(int position, bool instant = false)
+            : position{position}
+            , duration{instant ? 0ms : durations.move_train} {}
     )
 
     DEFINE_STRUCT(deck_shuffled_update,
-        (pocket_type, pocket),
+        (pocket_type, pocket)
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return durations::deck_shuffle;
-        }
+        deck_shuffled_update() = default;
+        deck_shuffled_update(pocket_type pocket, game_duration duration = durations.deck_shuffle)
+            : pocket{pocket}, duration{duration} {}
     )
 
     DEFINE_STRUCT(show_card_update,
         (serial::card, card)
         (card_data, info)
-        (bool, instant),
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return instant ? 0ms : durations::flip_card;
-        }
+        show_card_update() = default;
+        show_card_update(serial::card card, const card_data &info, bool instant = false)
+            : card{card}, info{info}
+            , duration{instant ? 0ms : durations.flip_card} {}
     )
 
     DEFINE_STRUCT(hide_card_update,
         (serial::card, card)
-        (bool, instant),
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return instant ? 0ms : durations::flip_card;
-        }
+        hide_card_update() = default;
+        hide_card_update(serial::card card, bool instant = false)
+            : card{card}
+            , duration{instant ? 0ms : durations.flip_card} {}
     )
 
     DEFINE_STRUCT(tap_card_update,
         (serial::card, card)
         (bool, inactive)
-        (bool, instant),
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return instant ? 0ms : durations::tap_card;
-        }
+        tap_card_update() = default;
+        tap_card_update(serial::card card, bool inactive, bool instant = false)
+            : card{card}, inactive{inactive}
+            , duration{instant ? 0ms : durations.tap_card} {}
     )
 
     DEFINE_STRUCT(flash_card_update,
-        (serial::card, card),
+        (serial::card, card)
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return durations::flash_card;
-        }
+        flash_card_update() = default;
+        flash_card_update(serial::card card, game_duration duration = durations.flash_card)
+            : card{card}, duration{duration} {}
     )
 
     DEFINE_STRUCT(short_pause_update,
-        (serial::opt_card, card),
+        (serial::opt_card, card)
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return durations::short_pause;
-        }
+        short_pause_update() = default;
+        short_pause_update(serial::opt_card card, game_duration duration = durations.short_pause)
+            : card{card}, duration{duration} {}
     )
 
     DEFINE_STRUCT(player_add_update,
@@ -128,11 +139,12 @@ namespace banggame {
 
     DEFINE_STRUCT(player_order_update,
         (serial::player_list, players)
-        (bool, instant),
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return instant ? 0ms : durations::move_player;
-        }
+        player_order_update() = default;
+        player_order_update(const serial::player_list &players, bool instant = false)
+            : players{players}
+            , duration{instant ? 0ms : durations.move_player} {}
     )
 
     DEFINE_STRUCT(player_user_update,
@@ -143,11 +155,12 @@ namespace banggame {
     DEFINE_STRUCT(player_hp_update,
         (serial::player, player)
         (int, hp)
-        (bool, instant),
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return instant ? 0ms : durations::player_hp;
-        }
+        player_hp_update() = default;
+        player_hp_update(serial::player player, int hp, bool instant = false)
+            : player{player}, hp{hp}
+            , duration{instant ? 0ms : durations.player_hp} {}
     )
 
     DEFINE_STRUCT(player_gold_update,
@@ -158,11 +171,12 @@ namespace banggame {
     DEFINE_STRUCT(player_show_role_update,
         (serial::player, player)
         (player_role, role)
-        (bool, instant),
+        (game_duration, duration),
 
-        auto get_duration() const {
-            return instant ? 0ms : durations::flip_card;
-        }
+        player_show_role_update() = default;
+        player_show_role_update(serial::player player, player_role role, bool instant = false)
+            : player{player}, role{role}
+            , duration{instant ? 0ms : durations.flip_card} {}
     )
 
     DEFINE_STRUCT(player_status_update,

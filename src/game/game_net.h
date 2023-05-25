@@ -120,9 +120,9 @@ namespace banggame {
             game_update update{enums::enum_tag<E>, FWD(args) ... };
             m_updates.emplace_back(target, serialize_update(update), [&]{
                 if constexpr (game_update::has_type<E>) {
-                    const auto &value = update.get<E>();
-                    if constexpr (requires { value.get_duration(); }) {
-                        return std::chrono::duration_cast<ticks>(value.get_duration());
+                    using value_type = enums::enum_type_t<E>;
+                    if constexpr (requires { value_type::duration; }) {
+                        return std::chrono::duration_cast<ticks>(update.get<E>().duration);
                     }
                 }
                 return ticks{0};

@@ -5,12 +5,11 @@ PRIVATE
     game.cpp
     game_table.cpp
     draw_check_handler.cpp
+    durations.cpp
     player.cpp
     player_iterator.cpp
     play_verify.cpp
     play_visitor.cpp
     possible_to_play.cpp
     request_queue.cpp
-PUBLIC
-    durations.cpp
 )
