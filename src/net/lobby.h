@@ -28,9 +28,9 @@ static constexpr ticks lobby_lifetime = 10s;
 using lobby_map = std::map<int, lobby>;
 using lobby_ptr = lobby_map::iterator;
 
-struct game_user : lobby_add_user_args {
+struct game_user : user_info_id_args {
     game_user(auto && ... args)
-        : lobby_add_user_args(FWD(args) ... ) {}
+        : user_info_id_args(FWD(args) ... ) {}
     
     std::optional<lobby_ptr> in_lobby;
 };
