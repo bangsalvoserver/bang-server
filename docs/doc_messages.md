@@ -80,11 +80,6 @@
         "lobby_id": 1
     }}
 
-### Rientra in una partita dopo che sei uscito
-    {"lobby_rejoin": {
-        "player_id": 1 // id di player (vedi game_update)
-    }}
-
 ### Esci dalla lobby
     {"lobby_leave": {}}
 

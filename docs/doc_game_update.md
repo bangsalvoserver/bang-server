@@ -101,19 +101,26 @@
 
 ### Aggiunge un player
     {"player_add": {
-        "num_players": 6 // numero di giocatori da creare
+        [
+            {
+                "player_id": 1,
+                "user_id": 123478264
+            },
+            {
+                "player_id": 2,
+                "user_id": 68713561
+            },
+            {
+                "player_id": 3,
+                "user_id": 5456465
+            }
+        ]
     }}
 
 ### Cambia l'ordine dei giocatori nel tavolo
     {"player_order": {
         "players": [1,2,3,4,5,6],
         "duration": 1000
-    }}
-
-### Associa un id giocatore a un id utente
-    {"player_user": {
-        "player": 2,
-        "user_id": 1
     }}
 
 ### Imposta gli hp di un giocatore
