@@ -43,7 +43,7 @@ namespace banggame {
         auto &lobby = (*user->second.in_lobby)->second;
         for (auto [team, lobby_user] : lobby.users) {
             send_message<server_message_type::lobby_chat>(user->first, 0,
-                fmt::format("{} : {} ({})", lobby_user->second.user_id, lobby_user->second.name, enums::to_string(team)));
+                fmt::format("{} : {} ({})", lobby_user->second.user_id, lobby_user->second.user.name, enums::to_string(team)));
         }
         return {};
     }

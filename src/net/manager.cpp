@@ -62,9 +62,21 @@ void game_manager::tick() {
 std::string game_manager::handle_message(MSG_TAG(connect), client_handle client, const connect_args &args) {
     if (!net::validate_commit_hash(args.commit_hash)) {
         kick_client(client, "INVALID_CLIENT_COMMIT_HASH");
-    } else if (auto [it, inserted] = users.try_emplace(client, ++m_user_counter, args.user_name, args.profile_image); inserted) {
+    } else if (auto [it, inserted] = users.try_emplace(client, ++m_user_counter, args.user); inserted) {
         send_message<server_message_type::client_accepted>(client, it->second.user_id);
+    } else {
+        return "USER_ALREADY_CONNECTED";
     }
+    return {};
+}
+
+std::string game_manager::handle_message(MSG_TAG(user_edit), user_ptr user, const user_info &args) {
+    user->second.user = args;
+
+    if (auto lobby = user->second.in_lobby) {
+        broadcast_message_lobby<server_message_type::lobby_add_user>((*lobby)->second, user->second.user_id, args);
+    }
+
     return {};
 }
 
@@ -215,7 +227,6 @@ void game_manager::kick_user_from_lobby(user_ptr user) {
     if (lobby.m_game) {
         if (player *p = lobby.m_game->find_player_by_userid(user->second.user_id)) {
             p->user_id = 0;
-            broadcast_message_lobby<server_message_type::game_update>(lobby, lobby.m_game->make_update<game_update_type::player_user>(p, 0));
         }
     }
     
@@ -440,7 +451,7 @@ void lobby::start_game(game_manager &mgr) {
         | ranges::to<std::vector>;
 
     for (int i=0; i<options.num_bots; ++i) {
-        auto &bot = bots.emplace_back(-1 - i, fmt::format("BOT {}", names[i % names.size()]), *propics[i % propics.size()]);
+        auto &bot = bots.emplace_back(-1 - i, user_info{fmt::format("BOT {}", names[i % names.size()]), *propics[i % propics.size()] });
         user_ids.push_back(bot.user_id);
 
         mgr.broadcast_message_lobby<server_message_type::lobby_add_user>(*this, bot);

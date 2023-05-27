@@ -15,9 +15,13 @@ namespace sdl {
 
 namespace banggame {
 
-    DEFINE_STRUCT(connect_args,
-        (std::string, user_name)
+    DEFINE_STRUCT(user_info,
+        (std::string, name)
         (sdl::image_pixels, profile_image)
+    )
+
+    DEFINE_STRUCT(connect_args,
+        (user_info, user)
         (std::string, commit_hash)
     )
 
@@ -40,6 +44,7 @@ namespace banggame {
 
     DEFINE_ENUM_TYPES(client_message_type,
         (connect, connect_args)
+        (user_edit, user_info)
         (lobby_list)
         (lobby_make, lobby_info)
         (lobby_edit, lobby_info)
@@ -72,10 +77,9 @@ namespace banggame {
         (lobby_state, state)
     )
 
-    DEFINE_STRUCT(lobby_add_user_args,
+    DEFINE_STRUCT(user_info_id_args,
         (int, user_id)
-        (std::string, name)
-        (sdl::image_pixels, profile_image)
+        (user_info, user)
     )
 
     DEFINE_STRUCT(user_id_args,
@@ -95,7 +99,7 @@ namespace banggame {
         (lobby_edited, lobby_info)
         (lobby_removed, lobby_id_args)
         (lobby_owner, user_id_args)
-        (lobby_add_user, lobby_add_user_args)
+        (lobby_add_user, user_info_id_args)
         (lobby_remove_user, user_id_args)
         (lobby_chat, lobby_chat_args)
         (game_update, json::json)
