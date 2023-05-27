@@ -35,8 +35,7 @@
 ### Aggiunge un utente alla lobby
     {"lobby_add_user": {
         "id": 1, // id utente
-        "name": "Tizio",
-        "profile_image": { /* oggetto image_pixels */ }
+        "user": { /* oggetto user_info */ }
     }}
 
 ### Rimuove un utente dalla lobby
@@ -60,10 +59,12 @@
 
 ### Bisogna mandare questo come primo messaggio per entrare nel server
     {"connect": {
-        "user_name": "Tizio",
-        "profile_image": { /* oggetto image_pixels */ },
+        "user": { /* oggetto user_info */ }
         "commit_hash": "..." // deve essere uguale all'hash di commit della versione deployata di banggameserver
     }}
+
+### Permette all'utente di cambiare nome e immagine di profilo dopo che si e' collegato
+    {"user_edit": { /* oggetto user_info */ }}
 
 ### Richiede la lista delle lobby, ritorna una serie di lobby_update
     {"lobby_list":{}}
@@ -102,6 +103,11 @@
     {"game_action": { /* oggetto game_action */ }}
 
 ---
+### oggetto **user_info**
+    {
+        "name": "Salvo",
+        "profile_image": { /* oggetto image_pixels */ }
+    }
     
 ### oggetto **lobby_info**
     {
