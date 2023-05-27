@@ -22,6 +22,7 @@ namespace banggame {
 
     DEFINE_STRUCT(connect_args,
         (user_info, user)
+        (int, user_id)
         (std::string, commit_hash)
     )
 
@@ -32,10 +33,6 @@ namespace banggame {
 
     DEFINE_STRUCT(lobby_id_args,
         (int, lobby_id)
-    )
-
-    DEFINE_STRUCT(lobby_rejoin_args,
-        (int, player_id)
     )
 
     DEFINE_STRUCT(lobby_chat_client_args,
@@ -49,7 +46,6 @@ namespace banggame {
         (lobby_make, lobby_info)
         (lobby_edit, lobby_info)
         (lobby_join, lobby_id_args)
-        (lobby_rejoin, lobby_rejoin_args)
         (lobby_leave)
         (lobby_chat, lobby_chat_client_args)
         (lobby_return)

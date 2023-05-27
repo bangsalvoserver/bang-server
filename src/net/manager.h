@@ -4,6 +4,8 @@
 #include "lobby.h"
 #include "chat_commands.h"
 
+#include <random>
+
 namespace banggame {
 
 template<server_message_type E>
@@ -21,6 +23,8 @@ struct server_options {
 
 class game_manager {
 public:
+    game_manager();
+
     template<std::invocable<client_handle, server_message> Function>
     void set_send_message_function(Function &&fun) {
         m_send_message = [this, fun=std::forward<Function>(fun)](client_handle hdl, server_message msg) {
@@ -84,7 +88,6 @@ private:
     std::string handle_message(MSG_TAG(lobby_make),     user_ptr user, const lobby_info &value);
     std::string handle_message(MSG_TAG(lobby_edit),     user_ptr user, const lobby_info &args);
     std::string handle_message(MSG_TAG(lobby_join),     user_ptr user, const lobby_id_args &value);
-    std::string handle_message(MSG_TAG(lobby_rejoin),   user_ptr user, const lobby_rejoin_args &value);
     std::string handle_message(MSG_TAG(lobby_leave),    user_ptr user);
     std::string handle_message(MSG_TAG(lobby_chat),     user_ptr user, const lobby_chat_client_args &value);
     std::string handle_message(MSG_TAG(lobby_return),   user_ptr user);
@@ -107,8 +110,10 @@ private:
 
     server_options m_options;
 
-    int m_lobby_counter = 0;
-    int m_user_counter = 0;
+    int generate_lobby_id();
+    int generate_user_id(int user_id);
+
+    std::default_random_engine m_rng;
     
     send_message_function m_send_message;
     kick_client_function m_kick_client;

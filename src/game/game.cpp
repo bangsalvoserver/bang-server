@@ -22,12 +22,13 @@ namespace banggame {
         return json::serialize(update, context());
     }
 
+    player_user_pair::player_user_pair(player *p)
+        : player_id{p->id}, user_id{p->user_id} {}
+
     util::generator<json::json> game::get_spectator_updates() {
-        co_yield make_update<game_update_type::player_add>(int(m_players.size()));
-        co_yield make_update<game_update_type::player_order>(ranges::to<serial::player_list>(m_players), true);
+        co_yield make_update<game_update_type::player_add>(m_players | ranges::to<std::vector<player_user_pair>>);
 
         for (player *p : m_players) {
-            co_yield make_update<game_update_type::player_user>(p, p->user_id);
             co_yield make_update<game_update_type::player_status>(p, p->m_player_flags, p->m_range_mod, p->m_weapon_range, p->m_distance_mod);
         }
 
@@ -155,11 +156,7 @@ namespace banggame {
 
         apply_rulesets(this);
 
-        add_update<game_update_type::player_add>(int(m_players.size()));
-
-        for (player *p : m_players) {
-            add_update<game_update_type::player_user>(p, p->user_id);
-        }
+        add_update<game_update_type::player_add>(m_players | ranges::to<std::vector<player_user_pair>>);
         
         auto add_cards = [&](const std::vector<card_data> &cards, pocket_type pocket, std::vector<card *> *out_pocket = nullptr) {
             if (!out_pocket && pocket != pocket_type::none) out_pocket = &get_pocket(pocket);
@@ -388,7 +385,7 @@ namespace banggame {
             m_playing->pass_turn();
             update();
             return false;
-        } else if (m_playing->user_id > 0) {
+        } else if (!m_playing->is_bot()) {
             add_update<game_update_type::status_ready>(update_target::includes_private(m_playing), std::move(args));
         }
         return true;
@@ -398,7 +395,7 @@ namespace banggame {
         auto spectator_target = update_target::excludes_public();
         for (player *p : m_players) {
             spectator_target.add(p);
-            if (p->user_id > 0) {
+            if (!p->is_bot()) {
                 add_update<game_update_type::request_status>(update_target::includes_private(p), make_request_update(p));
             }
         }
