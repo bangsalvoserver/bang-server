@@ -213,13 +213,13 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
 void game_manager::kick_user_from_lobby(user_ptr user) {
     auto &lobby = *std::exchange(user->second.in_lobby, nullptr);
     
-    broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user->second.user_id);
-
     auto it = std::ranges::find(lobby.users, user, &team_user_pair::second);
     bool is_owner = it == lobby.users.begin();
     lobby.users.erase(it);
 
     send_lobby_update(lobby);
+    broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user->second.user_id);
+    send_message<server_message_type::lobby_remove_user>(user->first, user->second.user_id);
 
     if (!lobby.users.empty() && is_owner) {
         broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front().second->second.user_id);
