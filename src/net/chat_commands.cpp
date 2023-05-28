@@ -40,7 +40,7 @@ namespace banggame {
     }
 
     std::string game_manager::command_print_users(user_ptr user) {
-        auto &lobby = (*user->second.in_lobby)->second;
+        auto &lobby = *user->second.in_lobby;
         for (auto [team, lobby_user] : lobby.users) {
             send_message<server_message_type::lobby_chat>(user->first, 0,
                 fmt::format("{} : {} ({})", lobby_user->second.user_id, lobby_user->second.user.name, enums::to_string(team)));
@@ -54,7 +54,7 @@ namespace banggame {
             return "INVALID_USERID_STRING";
         }
 
-        auto &lobby = (*user->second.in_lobby)->second;
+        auto &lobby = *user->second.in_lobby;
         auto kicked = std::ranges::find(lobby.users, user_id, [](const team_user_pair &pair) {
             return pair.second->second.user_id;
         });
@@ -78,7 +78,7 @@ namespace banggame {
     }
 
     std::string game_manager::command_get_game_options(user_ptr user) {
-        print_game_options(*this, user, (*user->second.in_lobby)->second.options, std::make_index_sequence<reflector::num_fields<game_options>>());
+        print_game_options(*this, user, user->second.in_lobby->options, std::make_index_sequence<reflector::num_fields<game_options>>());
         return {};
     }
 
@@ -103,7 +103,7 @@ namespace banggame {
         static constexpr auto set_option_map = gen_set_option_map(std::make_index_sequence<reflector::num_fields<game_options>>());
         
         if (auto it = set_option_map.find(name); it != set_option_map.end()) {
-            auto &lobby = (*user->second.in_lobby)->second;
+            auto &lobby = *user->second.in_lobby;
 
             if (it->second(lobby.options, value)) {
                 broadcast_message_lobby<server_message_type::lobby_edited>(lobby, lobby);
@@ -117,7 +117,7 @@ namespace banggame {
     }
 
     std::string game_manager::command_give_card(user_ptr user, std::string_view name) {
-        auto &lobby = (*user->second.in_lobby)->second;
+        auto &lobby = *user->second.in_lobby;
 
         player *target = lobby.m_game->find_player_by_userid(user->second.user_id);
         if (!target) return "ERROR_USER_NOT_CONTROLLING_PLAYER";
@@ -233,9 +233,8 @@ namespace banggame {
     }
 
     std::string game_manager::command_set_team(user_ptr user, std::string_view value) {
-        auto &lobby = (*user->second.in_lobby)->second;
         if (auto team = enums::from_string<lobby_team>(value)) {
-            std::ranges::find(lobby.users, user, &team_user_pair::second)->first = *team;
+            std::ranges::find(user->second.in_lobby->users, user, &team_user_pair::second)->first = *team;
             return {};
         } else {
             return "ERROR_INVALID_TEAM";

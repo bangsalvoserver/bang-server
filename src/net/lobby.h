@@ -6,6 +6,8 @@
 
 #include "game/game.h"
 
+#include <list>
+
 namespace banggame {
 
 class game_manager;
@@ -25,17 +27,22 @@ using team_user_pair = std::pair<lobby_team, user_ptr>;
 
 static constexpr ticks lobby_lifetime = 10s;
 
-using lobby_map = std::map<int, lobby>;
-using lobby_ptr = lobby_map::iterator;
+using lobby_list = std::list<lobby>;
+using lobby_ptr = lobby_list::iterator;
 
 struct game_user : user_info_id_args {
     game_user(auto && ... args)
         : user_info_id_args(FWD(args) ... ) {}
     
-    std::optional<lobby_ptr> in_lobby;
+    lobby *in_lobby = nullptr;
 };
 
 struct lobby : lobby_info {
+    int id;
+
+    lobby(int id, const lobby_info &info)
+        : lobby_info{info}, id{id} {}
+
     std::vector<team_user_pair> users;
     std::vector<game_user> bots;
     lobby_state state;
@@ -44,6 +51,7 @@ struct lobby : lobby_info {
     std::unique_ptr<banggame::game> m_game;
     void start_game(game_manager &mgr);
     void send_updates(game_manager &mgr);
+    lobby_data make_lobby_data() const;
 };
 
 }

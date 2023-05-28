@@ -17,7 +17,11 @@
     }}
 
 ### Informa il client che sei entrato in una lobby
-    {"lobby_entered": { /* oggetto lobby_info */ }}
+    {"lobby_entered": {
+        "lobby_id": 098543,
+        "name": "Kasplode",
+        "options": { /* oggetto game_options */ }
+    }}
 
 ### Informa il client che le informazioni della lobby sono cambiate
     {"lobby_edited": { /* oggetto lobby_info */ }}

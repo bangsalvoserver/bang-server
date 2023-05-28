@@ -47,8 +47,7 @@ public:
 
     void tick();
 
-    lobby_data make_lobby_data(lobby_ptr it);
-    void send_lobby_update(lobby_ptr it);
+    void send_lobby_update(const lobby &lobby);
 
     template<server_message_type E>
     void send_message(client_handle client, auto && ... args) {
@@ -106,7 +105,7 @@ private:
 
 private:
     user_map users;
-    lobby_map m_lobbies;
+    lobby_list m_lobbies;
 
     server_options m_options;
 

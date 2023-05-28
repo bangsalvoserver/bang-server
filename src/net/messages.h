@@ -73,6 +73,12 @@ namespace banggame {
         (lobby_state, state)
     )
 
+    DEFINE_STRUCT(lobby_entered_args,
+        (int, lobby_id)
+        (std::string, name)
+        (game_options, options)
+    )
+
     DEFINE_STRUCT(user_info_id_args,
         (int, user_id)
         (user_info, user)
@@ -91,7 +97,7 @@ namespace banggame {
         (client_accepted, client_accepted_args)
         (lobby_error, std::string)
         (lobby_update, lobby_data)
-        (lobby_entered, lobby_info)
+        (lobby_entered, lobby_entered_args)
         (lobby_edited, lobby_info)
         (lobby_removed, lobby_id_args)
         (lobby_owner, user_id_args)
