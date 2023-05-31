@@ -32,6 +32,8 @@ namespace banggame {
             co_yield make_update<game_update_type::player_status>(p, p->m_player_flags, p->m_range_mod, p->m_weapon_range, p->m_distance_mod);
         }
 
+        co_yield make_update<game_update_type::player_order>(m_players | ranges::views::filter(&player::alive) | ranges::to<serial::player_list>, true);
+
         auto add_cards = [&](pocket_type pocket, player *owner = nullptr) -> util::generator<json::json> {
             auto &range = get_pocket(pocket, owner);
             if (!range.empty()) {
