@@ -289,7 +289,7 @@ namespace banggame {
         if (m_options.character_choice) {
             for (player *p : m_players) {
                 while (!p->m_characters.empty()) {
-                    move_card(p->first_character(), pocket_type::player_hand, p, card_visibility::shown, true);
+                    move_card(p->first_character(), pocket_type::player_table, p, card_visibility::shown, true);
                 }
             }
             for (player *p : range_all_players(first_player)) {
