@@ -11,6 +11,7 @@ namespace banggame {
         game_duration move_cube;
         game_duration move_cubes;
         game_duration move_card;
+        game_duration move_deck;
         game_duration deck_shuffle;
         game_duration flip_card;
         game_duration tap_card;

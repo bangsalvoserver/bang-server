@@ -61,7 +61,7 @@ namespace banggame {
         move_scenario_deck_update() = default;
         move_scenario_deck_update(serial::player player, pocket_type pocket, bool instant = false)
             : player{player}, pocket{pocket}
-            , duration{instant ? 0ms : durations.move_card} {}
+            , duration{instant ? 0ms : durations.move_deck} {}
     )
 
     DEFINE_STRUCT(move_train_update,

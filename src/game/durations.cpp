@@ -8,6 +8,7 @@ namespace banggame {
         .move_cube =       133ms,
         .move_cubes =      250ms,
         .move_card =       333ms,
+        .move_deck =       333ms,
         .deck_shuffle =    1333ms,
         .flip_card =       167ms,
         .tap_card =        167ms,
