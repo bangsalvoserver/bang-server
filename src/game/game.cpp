@@ -327,10 +327,10 @@ namespace banggame {
             }
 
             if (!m_scenario_deck.empty()) {
-                set_card_visibility(m_scenario_deck.back(), nullptr, card_visibility::shown, true);
+                set_card_visibility(m_scenario_deck.back(), nullptr, card_visibility::shown);
             }
             if (!m_wws_scenario_deck.empty()) {
-                set_card_visibility(m_wws_scenario_deck.back(), nullptr, card_visibility::shown, true);
+                set_card_visibility(m_wws_scenario_deck.back(), nullptr, card_visibility::shown);
             }
 
             m_playing = first_player;
