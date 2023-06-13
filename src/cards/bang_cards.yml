@@ -2628,13 +2628,14 @@ locomotive:
       - next_stop
     modifier: locomotive
 button_row:
-  - name: GAME_PASS_CONFIRM
-    effects:
-      - pass_turn
+  - name: GAME_CONFIRM
     responses:
       - resolve
     tags:
       - confirm
+  - name: GAME_PASS
+    effects:
+      - pass_turn
   - name: GAME_SELL_BEER
     expansion: goldrush
     effects:
