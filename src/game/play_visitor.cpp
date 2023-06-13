@@ -238,6 +238,9 @@ namespace banggame {
             return "ERROR_INVALID_TARGETS";
         } else {
             for (card *c : target_cards) {
+                if (c->deck == card_deck_type::character) {
+                    return "ERROR_TARGET_NOT_CARD";
+                }
                 MAYBE_RETURN(effect.get_error(origin_card, origin, c, ctx));
             }
             return {};
