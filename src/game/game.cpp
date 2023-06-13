@@ -25,6 +25,15 @@ namespace banggame {
     player_user_pair::player_user_pair(player *p)
         : player_id{p->id}, user_id{p->user_id} {}
 
+    player_order_update game::make_player_order_update(bool instant) {
+        return player_order_update{m_players
+            | ranges::views::filter([](player *p) {
+                return !p->check_player_flags(player_flags::removed);
+            })
+            | ranges::to<serial::player_list>,
+            instant};
+    }
+
     util::generator<json::json> game::get_spectator_updates() {
         co_yield make_update<game_update_type::player_add>(m_players | ranges::to<std::vector<player_user_pair>>);
 
@@ -32,7 +41,7 @@ namespace banggame {
             co_yield make_update<game_update_type::player_status>(p, p->m_player_flags, p->m_range_mod, p->m_weapon_range, p->m_distance_mod);
         }
 
-        co_yield make_update<game_update_type::player_order>(m_players | ranges::views::filter(&player::alive) | ranges::to<serial::player_list>, true);
+        co_yield make_update<game_update_type::player_order>(make_player_order_update(true));
 
         auto add_cards = [&](pocket_type pocket, player *owner = nullptr) -> util::generator<json::json> {
             auto &range = get_pocket(pocket, owner);
@@ -520,9 +529,7 @@ namespace banggame {
                         p->add_player_flags(player_flags::removed);
                     }
                     
-                    add_update<game_update_type::player_order>(m_players
-                        | ranges::views::filter(&player::alive)
-                        | ranges::to<serial::player_list>);
+                    add_update<game_update_type::player_order>(make_player_order_update());
                 }
             }, -3);
         }
