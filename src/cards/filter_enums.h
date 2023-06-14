@@ -53,6 +53,7 @@ namespace banggame {
         (none)
         (ghost_card)
         (confirm)
+        (pass_turn)
         (skip_logs)
         (no_auto_discard)
         (hidden)

@@ -2636,6 +2636,8 @@ button_row:
   - name: GAME_PASS
     effects:
       - pass_turn
+    tags:
+      - pass_turn
   - name: GAME_SELL_BEER
     expansion: goldrush
     effects:

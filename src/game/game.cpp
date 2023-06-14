@@ -391,7 +391,7 @@ namespace banggame {
         auto args = make_status_ready_update(m_playing);
         
         if (m_playing->empty_hand() && std::ranges::all_of(args.play_cards, [](const card_modifier_node &node) {
-            return node.card->has_tag(tag_type::confirm);
+            return node.card->has_tag(tag_type::pass_turn);
         })) {
             m_playing->pass_turn();
             update();
