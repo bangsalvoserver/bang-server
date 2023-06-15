@@ -46,7 +46,7 @@ jobs:
     - name: Build
       shell: bash
       working-directory: ${{github.workspace}}
-      run: cmake --build build --config ${{env.BUILD_TYPE}}
+      run: cmake --build build -j6 --config ${{env.BUILD_TYPE}}
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
