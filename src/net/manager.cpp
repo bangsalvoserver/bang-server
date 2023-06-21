@@ -51,7 +51,12 @@ void game_manager::tick() {
                 send_lobby_update(*it);
             }
         }
-        if (it->users.empty() && --it->lifetime == ticks{0}) {
+        if (it->users.empty()) {
+            --it->lifetime;
+        } else {
+            it->lifetime = lobby_lifetime;
+        }
+        if (it->lifetime <= ticks{0}) {
             broadcast_message<server_message_type::lobby_removed>(it->id);
             it = m_lobbies.erase(it);
         } else {
@@ -181,6 +186,9 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
     send_lobby_update(lobby);
 
     send_message<server_message_type::lobby_entered>(user->first, lobby.id, lobby.name, lobby.options);
+    for (const auto &message: lobby.chat_messages) {
+        send_message<server_message_type::lobby_chat>(user->first, message);
+    }
     for (auto &[team, p] : lobby.users) {
         if (p != user) {
             send_message<server_message_type::lobby_add_user>(p->first, user->second);
@@ -255,7 +263,8 @@ std::string game_manager::handle_message(MSG_TAG(lobby_chat), user_ptr user, con
     }
     if (!value.message.empty()) {
         auto &lobby = *user->second.in_lobby;
-        broadcast_message_lobby<server_message_type::lobby_chat>(lobby, user->second.user_id, value.message);
+        const auto &message = lobby.chat_messages.emplace_back(user->second.user_id, value.message);
+        broadcast_message_lobby<server_message_type::lobby_chat>(lobby, message);
         if (value.message[0] == chat_command::start_char) {
             return handle_chat_command(user, value.message.substr(1));
         }

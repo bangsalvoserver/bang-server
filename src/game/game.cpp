@@ -123,6 +123,12 @@ namespace banggame {
         }
 
         co_yield make_update<game_update_type::game_flags>(m_game_flags);
+        
+        for (const auto &[target, log] : m_saved_log) {
+            if (target.matches(nullptr)) {
+                co_yield make_update<game_update_type::game_log>(log);
+            }
+        }
     }
 
     util::generator<json::json> game::get_rejoin_updates(player *target) {

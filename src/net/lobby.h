@@ -45,6 +45,8 @@ struct lobby : lobby_info {
 
     std::vector<team_user_pair> users;
     std::vector<game_user> bots;
+    std::vector<lobby_chat_args> chat_messages;
+    
     lobby_state state;
     ticks lifetime = lobby_lifetime;
 
