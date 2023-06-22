@@ -30,18 +30,19 @@ static constexpr ticks lobby_lifetime = 10s;
 using lobby_list = std::list<lobby>;
 using lobby_ptr = lobby_list::iterator;
 
-struct game_user : user_info_id_args {
-    game_user(auto && ... args)
-        : user_info_id_args(FWD(args) ... ) {}
+struct game_user: user_info {
+    game_user(int user_id, const user_info &info)
+        : user_info{info}, user_id{user_id} {}
     
+    int user_id = 0;
     lobby *in_lobby = nullptr;
 };
 
 struct lobby : lobby_info {
-    int id;
-
     lobby(int id, const lobby_info &info)
         : lobby_info{info}, id{id} {}
+
+    int id;
 
     std::vector<team_user_pair> users;
     std::vector<game_user> bots;

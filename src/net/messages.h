@@ -82,6 +82,7 @@ namespace banggame {
     DEFINE_STRUCT(user_info_id_args,
         (int, user_id)
         (user_info, user)
+        (bool, is_read)
     )
 
     DEFINE_STRUCT(user_id_args,
@@ -91,6 +92,7 @@ namespace banggame {
     DEFINE_STRUCT(lobby_chat_args,
         (int, user_id)
         (std::string, message)
+        (bool, is_read)
     )
 
     DEFINE_ENUM_TYPES(server_message_type,

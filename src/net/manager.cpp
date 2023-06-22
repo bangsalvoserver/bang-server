@@ -77,7 +77,7 @@ std::string game_manager::handle_message(MSG_TAG(connect), client_handle client,
 }
 
 std::string game_manager::handle_message(MSG_TAG(user_edit), user_ptr user, const user_info &args) {
-    user->second.user = args;
+    static_cast<user_info &>(user->second) = args;
 
     if (user->second.in_lobby) {
         broadcast_message_lobby<server_message_type::lobby_add_user>(*user->second.in_lobby, user->second.user_id, args);
@@ -139,7 +139,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_make), user_ptr user, con
     send_lobby_update(l);
 
     send_message<server_message_type::lobby_entered>(user->first, l.id, l.name, l.options);
-    send_message<server_message_type::lobby_add_user>(user->first, user->second);
+    send_message<server_message_type::lobby_add_user>(user->first, user->second.user_id, user->second);
     send_message<server_message_type::lobby_owner>(user->first, user->second.user_id);
 
     return {};
@@ -186,19 +186,19 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
     send_lobby_update(lobby);
 
     send_message<server_message_type::lobby_entered>(user->first, lobby.id, lobby.name, lobby.options);
+    for (auto &[team, p] : lobby.users) {
+        if (p != user) {
+            send_message<server_message_type::lobby_add_user>(p->first, user->second.user_id, user->second);
+        }
+        send_message<server_message_type::lobby_add_user>(user->first, p->second.user_id, p->second, true);
+    }
+    for (auto &bot : lobby.bots) {
+        send_message<server_message_type::lobby_add_user>(user->first, bot.user_id, bot, true);
+    }
+    send_message<server_message_type::lobby_owner>(user->first, lobby.users.front().second->second.user_id);
     for (const auto &message: lobby.chat_messages) {
         send_message<server_message_type::lobby_chat>(user->first, message);
     }
-    for (auto &[team, p] : lobby.users) {
-        if (p != user) {
-            send_message<server_message_type::lobby_add_user>(p->first, user->second);
-        }
-        send_message<server_message_type::lobby_add_user>(user->first, p->second);
-    }
-    for (auto &bot : lobby.bots) {
-        send_message<server_message_type::lobby_add_user>(user->first, bot);
-    }
-    send_message<server_message_type::lobby_owner>(user->first, lobby.users.front().second->second.user_id);
     
     if (lobby.state != lobby_state::waiting && lobby.m_game) {
         pair.first = lobby_team::game_spectator;
@@ -263,8 +263,8 @@ std::string game_manager::handle_message(MSG_TAG(lobby_chat), user_ptr user, con
     }
     if (!value.message.empty()) {
         auto &lobby = *user->second.in_lobby;
-        const auto &message = lobby.chat_messages.emplace_back(user->second.user_id, value.message);
-        broadcast_message_lobby<server_message_type::lobby_chat>(lobby, message);
+        lobby.chat_messages.emplace_back(user->second.user_id, value.message, true);
+        broadcast_message_lobby<server_message_type::lobby_chat>(lobby, user->second.user_id, value.message);
         if (value.message[0] == chat_command::start_char) {
             return handle_chat_command(user, value.message.substr(1));
         }
@@ -339,7 +339,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
 
     broadcast_message_lobby<server_message_type::lobby_entered>(lobby, lobby.id, lobby.name, lobby.options);
     for (auto &[team, p] : lobby.users) {
-        broadcast_message_lobby<server_message_type::lobby_add_user>(lobby, p->second);
+        broadcast_message_lobby<server_message_type::lobby_add_user>(lobby, p->second.user_id, p->second, true);
     }
     broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front().second->second.user_id);
     
@@ -435,7 +435,7 @@ void lobby::start_game(game_manager &mgr) {
         auto &bot = bots.emplace_back(-1 - i, user_info{fmt::format("BOT {}", names[i % names.size()]), *propics[i % propics.size()] });
         user_ids.push_back(bot.user_id);
 
-        mgr.broadcast_message_lobby<server_message_type::lobby_add_user>(*this, bot);
+        mgr.broadcast_message_lobby<server_message_type::lobby_add_user>(*this, bot.user_id, bot, true);
     }
 
     m_game->add_players(user_ids);
