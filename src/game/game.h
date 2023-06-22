@@ -15,7 +15,6 @@ namespace banggame {
 
         game() : request_queue(this) {}
 
-        util::generator<json::json> get_spectator_updates();
         util::generator<json::json> get_rejoin_updates(player *target);
 
         card_sign get_card_sign(card *c);

@@ -204,14 +204,9 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
         pair.first = lobby_team::game_spectator;
         send_message<server_message_type::game_started>(user->first);
 
-        for (const auto &msg : lobby.m_game->get_spectator_updates()) {
+        player *target = lobby.m_game->find_player_by_userid(user->second.user_id);
+        for (const auto &msg : lobby.m_game->get_rejoin_updates(target)) {
             send_message<server_message_type::game_update>(user->first, msg);
-        }
-
-        if (player *target = lobby.m_game->find_player_by_userid(user->second.user_id)) {
-            for (const auto &msg : lobby.m_game->get_rejoin_updates(target)) {
-                send_message<server_message_type::game_update>(user->first, msg);
-            }
         }
     }
 
