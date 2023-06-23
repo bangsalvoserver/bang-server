@@ -507,10 +507,6 @@ namespace banggame {
             }
         }, 3);
 
-        if (reason == discard_all_reason::disable_temp_ghost) {
-            return;
-        }
-
         queue_action([this, target]{
             if (num_alive() > 1) {
                 player *next_player = *std::next(player_iterator(target));
