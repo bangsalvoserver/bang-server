@@ -1928,6 +1928,111 @@ character:
       - next_stop
     tags:
       - max_hp(5)
+  # - name: ANNIE_OAKEY
+  #   image: 20_annie_oakey
+  #   expansion: canyondiablo
+  #   # TODO
+  #   # prima di pescare request_annie_oakey
+  #   # mostra 6 carte in selection: colori + semi
+  #   # on_pick: match colore: +1 carta, match seme: +2 carte
+  #   # equip:
+  #   #   - annie_oakey
+  # - name: PAT_BARRETT
+  #   image: 20_pat_barrett
+  #   expansion: canyondiablo
+  #   # range modifier: + max_hp - hp
+  #   # TODO: cambiare sistema range modifier
+  #   # equip:
+  #   #   - pat_barrett
+  # - name: BIG_SPENCER_2
+  #   image: 20_big_spencer
+  #   expansion: canyondiablo
+  #   # TODO: cambiare sistema max_hp
+  #   tags:
+  #     - initial_hp(3)
+  #     - max_hp(6)
+  # - name: BUFFALO_BELL
+  #   image: 20_buffalo_bell
+  #   expansion: canyondiablo
+  #   # TODO effect_buffalo_bell: effect_missed
+  #   # sum = seme origin_card + seme target_card
+  #   # sum >= 13 : mancato
+  #   # sum >= 17 : schivata
+  #   # sum >= 20 : ritorno di fiamma
+  #   # responses:
+  #   #   - buffalo_bell card self | hand
+  # - name: CLASH_THE_STAMPEDE
+  #   image: 20_clash_the_stampede
+  #   expansion: canyondiablo
+  #   # TODO
+  #   # prima di pescare request_clash_the_stampede
+  #   # target = giocatore con piu' carte in mano
+  #   # on_pick: dare carta
+  - name: CRAZY_HOG
+    image: 20_crazy_hog
+    expansion: canyondiablo
+    effects:
+      - max_usages(1)
+      - discard card self | hand blue
+      - draw(2)
+  # - name: EVA_PLACE
+  #   image: 20_eva_place
+  #   expansion: canyondiablo
+  #   # TODO effect_eva_place: pesca, se quadri, +1 carta
+  #   # effects:
+  #   #   - max_usages(1)
+  #   #   - discard card self | hand
+  #   #   - eva_place
+  # - name: JOSEY_BASSETT
+  #   image: 20_josey_bassett
+  #   expansion: canyondiablo
+  #   # TODO prima di pescare, stesso evento di vera_custer, priorita' +1
+  #   # copia carta blu in characters
+  #   # TODO gestire vera custer, copia solo personaggi
+  #   # equip:
+  #   #   - josey_bassett
+  #   tags:
+  #     - max_hp(3)
+  # - name: LAURA_BILLION
+  #   image: 20_laura_billion
+  #   expansion: canyondiablo
+  #   # TODO quando una carta e' estratta: request_laura_billion (auto_select)
+  #   # effect_laura_billion: pop_request, pesca carta estratta
+  #   # equip:
+  #   #   - laura_billion
+  #   # responses:
+  #   #   - discard card self | hand
+  #   #   - laura_billion
+  - name: SID_CURRY
+    image: 20_sid_curry
+    expansion: canyondiablo
+    equip:
+      - johnny_kisch
+  # - name: SOUNDANCE_KID
+  #   image: 20_soundance_kid
+  #   expansion: canyondiablo
+  #   # TODO on_hit: if origin == this: draw
+  #   # equip:
+  #   #   - soundance_kid
+  - name: SPIKE_SPIEZEL
+    image: 20_spike_spiezel
+    expansion: canyondiablo
+    modifier: leevankliff
+    effects:
+      - discard card self | hand bang
+  - name: TEREN_KILL_2
+    image: 20_teren_kill
+    expansion: canyondiablo
+    equip:
+      - teren_kill
+    tags:
+      - max_hp(3)
+  # - name: WYATT_EARL
+  #   image: 20_wyatt_earl
+  #   expansion: canyondiablo
+  #   # TODO check_card_immunity, se multi_target: immune=true
+  #   # equip:
+  #   #   - wyatt_earl
 highnoon:
   - name: BLESSING
     image: 05_benedizione
