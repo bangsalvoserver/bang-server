@@ -16,12 +16,12 @@ namespace banggame::filters::detail {
         return origin->m_role;
     }
 
-    int get_player_range_mod(player *origin) {
-        return origin->m_range_mod;
+    int get_player_range_mod(const player *origin) {
+        return origin->get_range_mod();
     }
 
-    int get_player_weapon_range(player *origin) {
-        return origin->m_weapon_range;
+    int get_player_weapon_range(const player *origin) {
+        return origin->get_weapon_range();
     }
 
     int count_player_hand_cards(player *origin) {

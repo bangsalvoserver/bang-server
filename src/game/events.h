@@ -29,6 +29,7 @@ namespace banggame {
         EVENT(count_num_checks,                 player *origin, int &num_checks)
         EVENT(count_bangs_played,               player *origin, int &num_bangs_played)
         EVENT(count_cards_to_draw,              player *origin, int &cards_to_draw)
+        EVENT(count_range_mod,                  const player *origin, range_mod_type type, int &value)
         EVENT(count_train_equips,               player *origin, int &num_cards, int &num_advance)
 
         EVENT(check_play_card, player *origin, card *origin_card, const effect_context &ctx, game_string &out_error)

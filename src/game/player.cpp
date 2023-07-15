@@ -91,6 +91,18 @@ namespace banggame {
         return m_game->call_event<event_type::count_cards_to_draw>(this, 2);
     }
 
+    int player::get_range_mod() const {
+        return m_game->call_event<event_type::count_range_mod>(this, range_mod_type::range_mod, 0);
+    }
+
+    int player::get_weapon_range() const {
+        return m_game->call_event<event_type::count_range_mod>(this, range_mod_type::weapon_range, 1);
+    }
+
+    int player::get_distance_mod() const {
+        return m_game->call_event<event_type::count_range_mod>(this, range_mod_type::distance_mod, 0);
+    }
+
     card *player::find_equipped_card(card *card) {
         auto it = std::ranges::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {
@@ -391,14 +403,10 @@ namespace banggame {
         m_max_hp = first_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
     }
 
-    void player::send_player_status() {
-        m_game->add_update<game_update_type::player_status>(this, m_player_flags, m_range_mod, m_weapon_range, m_distance_mod);
-    }
-
     bool player::add_player_flags(player_flags flags) {
         if (!check_player_flags(flags)) {
             m_player_flags |= flags;
-            send_player_status();
+            m_game->add_update<game_update_type::player_flags>(this, m_player_flags);
             return true;
         }
         return false;
@@ -407,7 +415,7 @@ namespace banggame {
     bool player::remove_player_flags(player_flags flags) {
         if (check_player_flags(flags)) {
             m_player_flags &= ~flags;
-            send_player_status();
+            m_game->add_update<game_update_type::player_flags>(this, m_player_flags);
             return true;
         }
         return false;

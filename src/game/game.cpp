@@ -44,7 +44,7 @@ namespace banggame {
         }
 
         for (player *p : m_players) {
-            co_yield make_update<game_update_type::player_status>(p, p->m_player_flags, p->m_range_mod, p->m_weapon_range, p->m_distance_mod);
+            co_yield make_update<game_update_type::player_flags>(p, p->m_player_flags);
         }
 
         co_yield make_update<game_update_type::player_order>(make_player_order_update(true));
@@ -353,6 +353,24 @@ namespace banggame {
         });
     }
 
+    player_distances game::make_player_distances(player *owner) {
+        if (!owner) return {};
+
+        return {
+            .distances = m_players
+                | ranges::views::filter([&](player *target) { return target != owner; })
+                | ranges::views::transform([&](player *target) {
+                    return player_distance_item {
+                        .player = target,
+                        .distance = calc_distance(owner, target)
+                    };
+                })
+                | ranges::to<std::vector>,
+            .range_mod = owner->get_range_mod(),
+            .weapon_range = owner->get_weapon_range()
+        };
+    }
+
     request_status_args game::make_request_update(player *owner) {
         auto req = top_request();
         return request_status_args {
@@ -379,13 +397,16 @@ namespace banggame {
                 | ranges::to<serial::card_list>
                 : serial::card_list{},
 
-            .highlight_cards = ranges::to<serial::card_list>(req->get_highlights())
+            .highlight_cards = ranges::to<serial::card_list>(req->get_highlights()),
+
+            .distances = make_player_distances(owner)
         };
     }
 
     status_ready_args game::make_status_ready_update(player *owner) {
         return {
-            .play_cards = generate_card_modifier_tree(owner)
+            .play_cards = generate_card_modifier_tree(owner),
+            .distances = make_player_distances(owner)
         };
     }
 

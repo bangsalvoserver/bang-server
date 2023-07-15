@@ -7,9 +7,8 @@
 
 namespace banggame {
 
-    struct equip_lumber_flatcar : prompt_target_self, bot_suggestion::target_enemy {
+    struct equip_lumber_flatcar : event_equip, prompt_target_self, bot_suggestion::target_enemy {
         void on_enable(card *target_card, player *target);
-        void on_disable(card *target_card, player *target);
     };
 }
 

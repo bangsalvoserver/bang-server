@@ -10,9 +10,8 @@ namespace banggame {
         void on_equip(card *target_card, player *target);
     };
 
-    struct equip_mustang {
+    struct equip_mustang : event_equip {
         void on_enable(card *target_card, player *target);
-        void on_disable(card *target_card, player *target);
     };
 }
 
