@@ -26,8 +26,8 @@ namespace banggame::filters {
         bool check_player_flags(const_player_ptr origin, player_flags flags);
         bool check_game_flags(const_player_ptr origin, game_flags flags);
         player_role get_player_role(player_ptr origin);
-        int get_player_range_mod(player_ptr origin);
-        int get_player_weapon_range(player_ptr origin);
+        int get_player_range_mod(const_player_ptr origin);
+        int get_player_weapon_range(const_player_ptr origin);
         int count_player_hand_cards(player_ptr origin);
         int count_player_table_cards(player_ptr origin);
         int count_player_cubes(player_ptr origin);

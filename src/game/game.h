@@ -22,6 +22,7 @@ namespace banggame {
         void add_players(std::span<int> user_ids);
         void start_game(const game_options &options);
 
+        player_distances make_player_distances(const player *p);
         request_status_args make_request_update(player *p);
         status_ready_args make_status_ready_update(player *p);
         player_order_update make_player_order_update(bool instant = false);

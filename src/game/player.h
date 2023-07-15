@@ -84,6 +84,12 @@ namespace banggame {
         played_card_history(played_card_history &&) noexcept = default;
     };
 
+    enum class range_mod_type {
+        range_mod,
+        weapon_range,
+        distance_mod
+    };
+
     struct player {
         game *m_game;
         int id;
@@ -102,10 +108,6 @@ namespace banggame {
         };
 
         std::map<card *, predraw_check> m_predraw_checks;
-
-        int8_t m_range_mod = 0;
-        int8_t m_weapon_range = 1;
-        int8_t m_distance_mod = 0;
 
         int8_t m_hp = 0;
         int8_t m_max_hp = 0;
@@ -154,6 +156,9 @@ namespace banggame {
         int get_num_checks();
         int get_bangs_played();
         int get_cards_to_draw();
+        int get_range_mod() const;
+        int get_weapon_range() const;
+        int get_distance_mod() const;
 
         bool is_bot() const;
         bool is_ghost() const;
@@ -189,7 +194,6 @@ namespace banggame {
         void pass_turn();
         void skip_turn();
 
-        void send_player_status();
         bool add_player_flags(player_flags flags);
         bool remove_player_flags(player_flags flags);
         bool check_player_flags(player_flags flags) const;

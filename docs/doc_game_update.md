@@ -144,12 +144,9 @@
     }}
 
 ### Setta le flag del giocatore
-    {"player_status": {
+    {"player_flags": {
         "player": 2,
         "flags": "",
-        "range_mod": 0,
-        "weapon_range": 1,
-        "distance_mod": 0
     }}
 
 ### Cambia l'indicatore di turno

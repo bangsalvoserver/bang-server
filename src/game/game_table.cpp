@@ -39,11 +39,13 @@ namespace banggame {
         }
     }
 
-    int game_table::calc_distance(player *from, player *to) {
+    int game_table::calc_distance(const player *from, const player *to) {
         if (from == to) return 0;
 
+        int distance_mod = to->get_distance_mod();
+
         if (check_flags(game_flags::disable_player_distances)) {
-            return 1 + to->m_distance_mod;
+            return 1 + distance_mod;
         }
 
         player_iterator from_it{from};
@@ -53,12 +55,12 @@ namespace banggame {
             return std::min(
                 std::distance(from_it, to_it),
                 std::distance(std::reverse_iterator(from_it), std::reverse_iterator(to_it))
-            ) + to->m_distance_mod;
+            ) + distance_mod;
         } else {
             return std::min(
                 std::distance(from_it, std::prev(to_it)),
                 std::distance(std::reverse_iterator(from_it), std::reverse_iterator(std::next(to_it)))
-            ) + 1 + to->m_distance_mod;
+            ) + 1 + distance_mod;
         }
     }
 

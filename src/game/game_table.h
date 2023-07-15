@@ -58,7 +58,7 @@ namespace banggame {
         
         std::vector<card *> &get_pocket(pocket_type pocket, player *owner = nullptr);
 
-        int calc_distance(player *from, player *to);
+        int calc_distance(const player *from, const player *to);
 
         int num_alive() const;
 

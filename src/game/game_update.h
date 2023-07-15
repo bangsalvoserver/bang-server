@@ -182,12 +182,9 @@ namespace banggame {
             , duration{instant ? 0ms : durations.flip_card} {}
     )
 
-    DEFINE_STRUCT(player_status_update,
+    DEFINE_STRUCT(player_flags_update,
         (serial::player, player)
         (player_flags, flags)
-        (int, range_mod)
-        (int, weapon_range)
-        (int, distance_mod)
     )
 
     DEFINE_STRUCT(card_modifier_node,
@@ -196,6 +193,17 @@ namespace banggame {
     )
 
     using card_modifier_tree = std::vector<card_modifier_node>;
+
+    DEFINE_STRUCT(player_distance_item,
+        (serial::player, player)
+        (int, distance)
+    )
+
+    DEFINE_STRUCT(player_distances,
+        (std::vector<player_distance_item>, distances)
+        (int, range_mod)
+        (int, weapon_range)
+    )
 
     DEFINE_STRUCT(request_status_args,
         (serial::opt_card, origin_card)
@@ -206,10 +214,12 @@ namespace banggame {
         (card_modifier_tree, respond_cards)
         (serial::card_list, pick_cards)
         (serial::card_list, highlight_cards)
+        (player_distances, distances)
     )
 
     DEFINE_STRUCT(status_ready_args,
         (card_modifier_tree, play_cards)
+        (player_distances, distances)
     )
 
     DEFINE_STRUCT(game_options,
@@ -248,7 +258,7 @@ namespace banggame {
         (player_hp, player_hp_update)
         (player_gold, player_gold_update)
         (player_show_role, player_show_role_update)
-        (player_status, player_status_update)
+        (player_flags, player_flags_update)
         (switch_turn, serial::player)
         (request_status, request_status_args)
         (status_ready, status_ready_args)

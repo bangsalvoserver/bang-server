@@ -17,7 +17,7 @@ public:
     using reference = value_type &;
 
     player_iterator() = default;
-    explicit player_iterator(player *p);
+    explicit player_iterator(const player *p);
 
     reference operator *() const { return *m_it; }
     pointer operator ->() { return &*m_it; }
@@ -44,9 +44,9 @@ private:
     decltype(game_table::m_players)::iterator m_it;
 };
 
-util::generator<player *> range_all_players(player *begin);
-util::generator<player *> range_all_players_and_dead(player *begin);
-util::generator<player *> range_other_players(player *begin);
+util::generator<player *> range_all_players(const player *begin);
+util::generator<player *> range_all_players_and_dead(const player *begin);
+util::generator<player *> range_other_players(const player *begin);
 
 }
 
