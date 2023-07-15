@@ -353,20 +353,22 @@ namespace banggame {
         });
     }
 
-    player_distances game::make_player_distances(const player *owner) {
-        return owner ? {
+    player_distances game::make_player_distances(player *owner) {
+        if (!owner) return {};
+
+        return {
             .distances = m_players
-                | ranges::views::filter([=](const player *target) { return target != owner; })
-                | ranges::views::transform([=](const player *target) {
+                | ranges::views::filter([&](player *target) { return target != owner; })
+                | ranges::views::transform([&](player *target) {
                     return player_distance_item {
                         .player = target,
                         .distance = calc_distance(owner, target)
-                    }
+                    };
                 })
                 | ranges::to<std::vector>,
             .range_mod = owner->get_range_mod(),
             .weapon_range = owner->get_weapon_range()
-        } : {};
+        };
     }
 
     request_status_args game::make_request_update(player *owner) {
