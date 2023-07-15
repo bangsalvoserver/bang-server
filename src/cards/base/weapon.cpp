@@ -29,7 +29,7 @@ namespace banggame {
     }
 
     void equip_weapon::on_enable(card *target_card, player *target) {
-        target->m_game->add_event<event_type::count_range_mod>(target_card, [=, range=range](const player *origin, range_mod_type type, int &value) {
+        target->m_game->add_listener<event_type::count_range_mod>(target_card, [=, range=range](const player *origin, range_mod_type type, int &value) {
             if (origin == target && type == range_mod_type::weapon_range) {
                 value = range;
             }
