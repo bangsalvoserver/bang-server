@@ -7,6 +7,7 @@ target_sources(bangserver PRIVATE
     lastwill.cpp
     mirage.cpp
     packmule.cpp
+    pat_barrett.cpp
     ruleset.cpp
     sacrifice.cpp
     taxman.cpp

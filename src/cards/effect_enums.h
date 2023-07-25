@@ -210,6 +210,7 @@ namespace banggame {
         (private_car,           equip_private_car)
         (dining_car,            equip_dining_car)
         (lumber_flatcar,        equip_lumber_flatcar)
+        (pat_barrett,           equip_pat_barrett)
     )
 
     DEFINE_ENUM_FWD_TYPES(mth_type,

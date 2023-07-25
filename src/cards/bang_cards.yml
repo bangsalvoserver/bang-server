@@ -1937,13 +1937,11 @@ character:
   #   # on_pick: match colore: +1 carta, match seme: +2 carte
   #   # equip:
   #   #   - annie_oakey
-  # - name: PAT_BARRETT
-  #   image: 20_pat_barrett
-  #   expansion: canyondiablo
-  #   # range modifier: + max_hp - hp
-  #   # TODO: cambiare sistema range modifier
-  #   # equip:
-  #   #   - pat_barrett
+  - name: PAT_BARRETT
+    image: 20_pat_barrett
+    expansion: canyondiablo
+    equip:
+      - pat_barrett
   # - name: BIG_SPENCER_2
   #   image: 20_big_spencer
   #   expansion: canyondiablo

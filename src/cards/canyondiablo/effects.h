@@ -9,6 +9,7 @@
 #include "lastwill.h"
 #include "mirage.h"
 #include "packmule.h"
+#include "pat_barrett.h"
 #include "ruleset.h"
 #include "sacrifice.h"
 #include "taxman.h"
