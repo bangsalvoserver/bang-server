@@ -202,8 +202,8 @@ main_deck:
     image: 01_emporio
     color: brown
     effects:
-      - generalstore(1) players
-      - generalstore(2) players
+      - generalstore
+      - generalstore players
   - &gatling
     name: GATLING
     signs:
@@ -1152,7 +1152,7 @@ main_deck:
     effects:
       - graverobber players
       - discard
-      - generalstore(2) players
+      - generalstore players
     tags:
       - no_auto_discard
   - name: CARD_SHARPER
@@ -1526,8 +1526,8 @@ character:
     effects:
       - max_usages(1)
       - discard card self | hand
-      - generalstore(1) players
-      - generalstore(2) players
+      - generalstore
+      - generalstore players
   - name: ANNIE_VERSARY
     image: 02_annieversary
     expansion: thebullet
@@ -2265,12 +2265,12 @@ goldrush:
     color: brown
     effects:
       - card_choice
-      - generalstore(1) players
-      - generalstore(2) players
+      - generalstore
+      - generalstore players
     responses:
       - card_choice
-      - generalstore(1) players
-      - generalstore(2) players
+      - generalstore
+      - generalstore players
     tags:
       - card_choice(2)
       - hidden
