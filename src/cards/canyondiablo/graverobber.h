@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_graverobber {
-        void on_play(card *origin_card, player *origin, player *target);
+        void on_play(card *origin_card, player *origin, const effect_context &ctx);
     };
 }
 
