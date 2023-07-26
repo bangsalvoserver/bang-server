@@ -141,17 +141,37 @@ namespace banggame::bot_ai {
         return ret;
     }
 
-    static bool execute_random_play(player *origin, bool is_response, const card_modifier_tree &cards, std::initializer_list<pocket_type> pockets) {
+    struct play_card_node { const card_modifier_node *node; auto operator <=> (const play_card_node &) const = default; };
+    struct pick_card_node { card *target_card; auto operator <=> (const pick_card_node &) const = default; };
+
+    using play_or_pick_node = std::variant<play_card_node, pick_card_node>;
+    using play_card_node_set = std::set<play_or_pick_node>;
+
+    play_card_node_set make_node_set(const card_modifier_tree &play_cards, const serial::card_list &pick_cards = {}) {
+        play_card_node_set ret;
+        for (const card_modifier_node &node : play_cards) {
+            ret.emplace(play_card_node{ &node });
+        }
+        for (card *target_card : pick_cards) {
+            ret.emplace(pick_card_node{ target_card });
+        }
+        return ret;
+    }
+
+    static bool execute_random_play(player *origin, bool is_response, const play_card_node_set &in_node_set, std::initializer_list<pocket_type> pockets) {
         for (int i=0; i<10; ++i) {
-            auto node_set = cards
-                | ranges::views::transform([](const card_modifier_node &node) { return &node; })
-                | ranges::to<std::set>;
+            auto node_set = in_node_set;
             
             while (!node_set.empty()) {
-                const card_modifier_node *selected_node = [&]{
+                play_or_pick_node selected_node = [&]{
                     for (pocket_type pocket : pockets) {
                         if (auto filter = node_set
-                            | std::views::filter([&](const card_modifier_node *node) { return node->card->pocket == pocket; }))
+                            | std::views::filter([&](const play_or_pick_node &node) {
+                                if (auto *play_card = std::get_if<play_card_node>(&node)) {
+                                    return play_card->node->card->pocket == pocket;
+                                }
+                                return false;
+                            }))
                         {
                             return random_element(filter, origin->m_game->rng);
                         }
@@ -162,10 +182,18 @@ namespace banggame::bot_ai {
                 node_set.erase(selected_node);
 
                 try {
-                    auto args = generate_random_play(origin, *selected_node, is_response);
                     // maybe add random variation to fix softlock?
-                    args.bypass_prompt = node_set.empty() && i>=5;
-                    if (verify_and_play(origin, args).is(message_type::ok)) {
+                    bool bypass_prompt = node_set.empty() && i>=5;
+                    if (std::visit(overloaded{
+                        [&](const play_card_node &node) {
+                            auto args = generate_random_play(origin, *(node.node), is_response);
+                            args.bypass_prompt = bypass_prompt;
+                            return verify_and_play(origin, args);
+                        },
+                        [&](const pick_card_node &node) {
+                            return verify_and_pick(origin, { node.target_card, bypass_prompt });
+                        }
+                    }, selected_node).is(message_type::ok)) {
                         return true;
                     }
                 } catch (const std::exception &e) {
@@ -203,25 +231,21 @@ namespace banggame::bot_ai {
 
     bool respond_to_request(player *origin) {
         auto update = origin->m_game->make_request_update(origin);
-
-        if (!update.pick_cards.empty() && std::ranges::all_of(update.respond_cards, [](const card_modifier_node &node) {
-            return node.card->has_tag(tag_type::confirm);
-        })) {
-            return pick_random_card(origin, update.pick_cards);
-        } else if (!update.respond_cards.empty()) {
-            return execute_random_play(origin, true, update.respond_cards, {
-                pocket_type::player_character,
-                pocket_type::player_table,
-                pocket_type::player_hand
-            });
+        
+        if (update.pick_cards.empty() && update.respond_cards.empty()) {
+            return false;
         }
-        return false;
+        return execute_random_play(origin, true, make_node_set(update.respond_cards, update.pick_cards), {
+            pocket_type::player_character,
+            pocket_type::player_table,
+            pocket_type::player_hand
+        });
     }
 
     bool play_in_turn(player *origin) {
         auto update = origin->m_game->make_status_ready_update(origin);
 
-        return execute_random_play(origin, false, update.play_cards, {
+        return execute_random_play(origin, false, make_node_set(update.play_cards), {
             pocket_type::player_character,
             pocket_type::player_table,
             pocket_type::player_hand,
