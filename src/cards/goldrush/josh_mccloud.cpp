@@ -99,12 +99,11 @@ namespace banggame {
     void effect_josh_mccloud::on_play(card *origin_card, player *target) {
         card *target_card = target->m_game->draw_shop_card();
         if (target_card->is_black()) {
-            auto equip_set = make_equip_set(target, target_card) | ranges::to<std::vector>;
-            if (equip_set.empty()) {
+            if (!contains_at_least(make_equip_set(target, target_card), 1)) {
                 target->m_game->add_short_pause(target_card);
                 target->m_game->move_card(target_card, pocket_type::shop_discard);
-            } else if (equip_set.size() == 1) {
-                equip_set.front()->equip_card(target_card);
+            } else if (target_card->self_equippable()) {
+                target->equip_card(target_card);
             } else {
                 target->m_game->queue_request<request_force_equip_card>(origin_card, target, target_card);
             }
