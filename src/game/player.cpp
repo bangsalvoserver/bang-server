@@ -219,9 +219,9 @@ namespace banggame {
         }
         if (origin->sign && origin->num_cubes == 0) {
             m_game->add_log("LOG_DISCARDED_ORANGE_CARD", this, origin);
+            m_game->call_event<event_type::on_discard_orange_card>(this, origin);
             disable_equip(origin);
             m_game->move_card(origin, pocket_type::discard_pile);
-            m_game->call_event<event_type::on_discard_orange_card>(this, origin);
         }
     }
 
