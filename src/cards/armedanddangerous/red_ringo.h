@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct equip_red_ringo {
+    struct equip_red_ringo: event_equip {
         void on_enable(card *target_card, player *target);
     };
 
