@@ -5,12 +5,15 @@
 
 namespace banggame {
     
-    static bool is_horse(const card *c) {
-        return c->has_tag(tag_type::horse);
-    }
+    struct is_horse {
+        const card *target_card;
+        bool operator ()(const card *c) const {
+            return c != target_card && c->has_tag(tag_type::horse);
+        }
+    };
 
     game_string equip_horse::on_prompt(card *origin_card, player *origin, player *target) {
-        if (auto it = std::ranges::find_if(target->m_table, is_horse); it != target->m_table.end()) {
+        if (auto it = std::ranges::find_if(target->m_table, is_horse{origin_card}); it != target->m_table.end()) {
             return {"PROMPT_REPLACE", origin_card, *it};
         } else {
             return {};
@@ -18,7 +21,7 @@ namespace banggame {
     }
 
     void equip_horse::on_equip(card *target_card, player *target) {
-        if (auto it = std::ranges::find_if(target->m_table, is_horse); it != target->m_table.end()) {
+        if (auto it = std::ranges::find_if(target->m_table, is_horse{target_card}); it != target->m_table.end()) {
             target->discard_card(*it);
         }
     }

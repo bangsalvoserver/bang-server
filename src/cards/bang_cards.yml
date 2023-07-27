@@ -2650,5 +2650,3 @@ button_row:
     effects:
       - discard cards(2) self | hand
       - destroy card | table bronco
-    tags:
-      - bronco
