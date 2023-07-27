@@ -1,7 +1,6 @@
 #ifndef __CANYONDIABLO_EFFECTS_H__
 #define __CANYONDIABLO_EFFECTS_H__
 
-#include "bronco.h"
 #include "brothel.h"
 #include "disarm.h"
 #include "graverobber.h"

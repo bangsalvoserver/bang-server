@@ -1320,7 +1320,6 @@ main_deck:
     equip:
       - horse
       - mustang
-      - bronco
     tags:
       - horse
       - bronco
@@ -2653,4 +2652,3 @@ button_row:
       - destroy card | table bronco
     tags:
       - bronco
-      - hidden
