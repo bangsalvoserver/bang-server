@@ -27,7 +27,7 @@ namespace banggame {
     }
 
     void equip_greygory_deck::on_enable(card *target_card, player *target) {
-        if (!target->m_game->m_playing) {
+        if (target->m_characters.size() == 1) {
             greygory_deck_add_characters(target_card, target);
         }    
     }
