@@ -131,6 +131,7 @@ namespace banggame {
                 return true;
             }
         }
+        return false;
     }
 
     void player::discard_card(card *target, bool used) {
