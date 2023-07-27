@@ -19,15 +19,15 @@ namespace banggame {
         player *target = target_card->owner;
         origin->m_game->add_log("LOG_SWAP_CARDS", origin, target, chosen_card, target_card);
 
-        target->disable_equip(target_card);
         target_card->on_unequip(target);
+        target->disable_equip(target_card);
         origin->equip_card(target_card);
         if (target_card->is_green() && has_equipped_card(origin, target_card)) {
             origin->m_game->tap_card(target_card, true);
         }
         if (chosen_card->owner == origin) {
-            origin->disable_equip(chosen_card);
             chosen_card->on_unequip(origin);
+            origin->disable_equip(chosen_card);
         }
         origin->m_game->tap_card(chosen_card, false);
         target->equip_card(chosen_card);
