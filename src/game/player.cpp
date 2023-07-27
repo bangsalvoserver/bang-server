@@ -60,13 +60,17 @@ namespace banggame {
 
     void player::enable_equip(card *target_card) {
         if (!m_game->is_disabled(target_card)) {
-            target_card->enable_equip(this);
+            for (const equip_holder &e : target_card->equips) {
+                e.on_enable(target_card, this);
+            }
         }
     }
 
     void player::disable_equip(card *target_card) {
         if (!m_game->is_disabled(target_card)) {
-            target_card->disable_equip(this);
+            for (const equip_holder &e : target_card->equips) {
+                e.on_disable(target_card, this);
+            }
         }
     }
 

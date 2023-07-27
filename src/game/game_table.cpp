@@ -239,7 +239,9 @@ namespace banggame {
     void game_table::add_disabler(event_card_key key, card_disabler_fun &&fun) {
         for (auto [owner, c] : disableable_cards(this)) {
             if (!is_disabled(c) && fun(c) && !c->has_tag(tag_type::nodisable)) {
-                c->disable_equip(owner);
+                for (const equip_holder &e : c->equips) {
+                    e.on_disable(c, owner);
+                }
             }
         }
 
@@ -255,7 +257,9 @@ namespace banggame {
                 else b = b || fun(c);
             }
             if (!a && b && !c->has_tag(tag_type::nodisable)) {
-                c->enable_equip(owner);
+                for (const equip_holder &e : c->equips) {
+                    e.on_enable(c, owner);
+                }
             }
         }
 
