@@ -20,7 +20,7 @@ namespace banggame {
         }
     }
 
-    void equip_horse::on_equip(card *target_card, player *target) {
+    void equip_horse::on_enable(card *target_card, player *target) {
         if (auto it = std::ranges::find_if(target->m_table, is_horse{target_card}); it != target->m_table.end()) {
             target->discard_card(*it);
         }

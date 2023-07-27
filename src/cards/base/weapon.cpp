@@ -24,14 +24,12 @@ namespace banggame {
         return {};
     }
 
-    void equip_weapon::on_equip(card *target_card, player *target) {
+    void equip_weapon::on_enable(card *target_card, player *target) {
         if (auto it = std::ranges::find_if(target->m_table, is_weapon{target_card}); it != target->m_table.end()) {
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, *it);
             target->discard_card(*it);
         }
-    }
 
-    void equip_weapon::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::count_range_mod>(target_card, [=, range=range](const player *origin, range_mod_type type, int &value) {
             if (origin == target && type == range_mod_type::weapon_range) {
                 value = range;

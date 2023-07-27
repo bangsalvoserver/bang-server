@@ -9,7 +9,7 @@ namespace banggame {
     equip_ghost::equip_ghost(int value)
         : flag(value == 1 ? player_flags::ghost_1 : player_flags::ghost_2) {}
     
-    void equip_ghost::on_equip(card *target_card, player *target) {
+    void equip_ghost::on_enable(card *target_card, player *target) {
         if (!target->alive()) {
             for (card *c : target->m_characters) {
                 target->enable_equip(c);
@@ -18,7 +18,7 @@ namespace banggame {
         target->add_player_flags(flag);
     }
     
-    void equip_ghost::on_unequip(card *target_card, player *target) {
+    void equip_ghost::on_disable(card *target_card, player *target) {
         target->remove_player_flags(flag);
         if (!target->alive()) {
             target->m_game->queue_action([=]{

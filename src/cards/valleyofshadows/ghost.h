@@ -10,8 +10,8 @@ namespace banggame {
         player_flags flag;
         equip_ghost(int value);
         
-        void on_equip(card *target_card, player *target);
-        void on_unequip(card *target_card, player *target);
+        void on_enable(card *target_card, player *target);
+        void on_disable(card *target_card, player *target);
     };
 }
 

@@ -56,18 +56,17 @@ namespace banggame {
     void player::equip_card(card *target) {
         m_game->move_card(target, pocket_type::player_table, this, card_visibility::shown);
         enable_equip(target);
-        target->on_equip(this);
     }
 
     void player::enable_equip(card *target_card) {
         if (!m_game->is_disabled(target_card)) {
-            target_card->on_enable(this);
+            target_card->enable_equip(this);
         }
     }
 
     void player::disable_equip(card *target_card) {
         if (!m_game->is_disabled(target_card)) {
-            target_card->on_disable(this);
+            target_card->disable_equip(this);
         }
     }
 
@@ -120,7 +119,6 @@ namespace banggame {
         if (target_card->owner == owner) {
             if (target_card->pocket == pocket_type::player_table) {
                 owner->m_game->tap_card(target_card, false);
-                target_card->on_unequip(owner);
                 owner->disable_equip(target_card);
                 owner->drop_all_cubes(target_card);
                 return true;
@@ -224,7 +222,6 @@ namespace banggame {
             disable_equip(origin);
             m_game->move_card(origin, pocket_type::discard_pile);
             m_game->call_event<event_type::on_discard_orange_card>(this, origin);
-            origin->on_unequip(this);
         }
     }
 
