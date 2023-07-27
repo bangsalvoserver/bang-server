@@ -44,15 +44,13 @@ namespace banggame {
         if (target != origin) {
             origin->m_game->add_log("LOG_MOVE_BOMB_ON", origin_card, origin, target);
             origin->disable_equip(origin_card);
-            origin_card->on_unequip(origin);
             target->equip_card(origin_card);
         }
     }
 
-    void equip_bomb::on_equip(card *target_card, player *target) {
+    void equip_bomb::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_discard_orange_card>(target_card, [=](player *e_target, card *e_card) {
-            if (e_target == target && e_card == target_card
-                && !target->m_game->is_disabled(target_card) && !target->immune_to(target_card, nullptr, {})) {
+            if (e_target == target && e_card == target_card && !target->immune_to(target_card, nullptr, {})) {
                 target->m_game->queue_action([=]{
                     target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
                     target->m_game->play_sound(nullptr, "dynamite");
@@ -72,10 +70,6 @@ namespace banggame {
                 });
             }
         });
-    }
-
-    void equip_bomb::on_unequip(card *target_card, player *target) {
-        target->m_game->remove_listeners(target_card);
     }
 
 }

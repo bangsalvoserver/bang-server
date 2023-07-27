@@ -54,20 +54,23 @@ namespace banggame {
     }
 
     void player::equip_card(card *target) {
-        target->on_equip(this);
         m_game->move_card(target, pocket_type::player_table, this, card_visibility::shown);
         enable_equip(target);
     }
 
     void player::enable_equip(card *target_card) {
         if (!m_game->is_disabled(target_card)) {
-            target_card->on_enable(this);
+            for (const equip_holder &e : target_card->equips) {
+                e.on_enable(target_card, this);
+            }
         }
     }
 
     void player::disable_equip(card *target_card) {
         if (!m_game->is_disabled(target_card)) {
-            target_card->on_disable(this);
+            for (const equip_holder &e : target_card->equips) {
+                e.on_disable(target_card, this);
+            }
         }
     }
 
@@ -116,23 +119,23 @@ namespace banggame {
         return m_hand[std::uniform_int_distribution(0, int(m_hand.size() - 1))(m_game->rng)];
     }
 
-    static void move_owned_card(player *owner, card *target_card, bool used, std::invocable auto &&fun) {
+    static bool move_owned_card(player *owner, card *target_card, bool used) {
         if (target_card->owner == owner) {
             if (target_card->pocket == pocket_type::player_table) {
                 owner->m_game->tap_card(target_card, false);
                 owner->disable_equip(target_card);
                 owner->drop_all_cubes(target_card);
-                std::invoke(FWD(fun));
-                target_card->on_unequip(owner);
+                return true;
             } else if (target_card->pocket == pocket_type::player_hand) {
                 owner->m_game->call_event<event_type::on_discard_hand_card>(owner, target_card, used);
-                std::invoke(FWD(fun));
+                return true;
             }
         }
+        return false;
     }
 
     void player::discard_card(card *target, bool used) {
-        move_owned_card(this, target, used, [&]{
+        if (move_owned_card(this, target, used)) {
             if (target->is_train()) {
                 if (m_game->m_train.size() < 4) {
                     m_game->move_card(target, pocket_type::train);
@@ -144,14 +147,14 @@ namespace banggame {
             } else {
                 m_game->move_card(target, pocket_type::discard_pile);
             }
-        });
+        }
     }
 
     void player::steal_card(card *target) {
         if (target->owner != this || target->pocket != pocket_type::player_table || !target->is_train()) {
-            move_owned_card(target->owner, target, false, [&]{
+            if (move_owned_card(target->owner, target, false)) {
                 add_to_hand(target);
-            });
+            }
         }
     }
 
@@ -221,10 +224,9 @@ namespace banggame {
         }
         if (origin->sign && origin->num_cubes == 0) {
             m_game->add_log("LOG_DISCARDED_ORANGE_CARD", this, origin);
+            m_game->call_event<event_type::on_discard_orange_card>(this, origin);
             disable_equip(origin);
             m_game->move_card(origin, pocket_type::discard_pile);
-            m_game->call_event<event_type::on_discard_orange_card>(this, origin);
-            origin->on_unequip(this);
         }
     }
 

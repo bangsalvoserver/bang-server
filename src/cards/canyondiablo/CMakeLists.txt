@@ -1,5 +1,4 @@
 target_sources(bangserver PRIVATE
-    bronco.cpp
     brothel.cpp
     disarm.cpp
     graverobber.cpp

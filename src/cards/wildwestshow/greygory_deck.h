@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct equip_greygory_deck {
-        void on_equip(card *target_card, player *target);
+        void on_enable(card *target_card, player *target);
     };
 
     struct effect_greygory_deck {

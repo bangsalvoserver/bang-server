@@ -184,7 +184,6 @@ namespace banggame {
 
             target->reset_max_hp();
             target->enable_equip(target_card);
-            target_card->on_equip(target);
             target->add_cubes(target_card, ncubes);
             break;
         }

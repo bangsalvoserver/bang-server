@@ -573,6 +573,7 @@ main_deck:
     tags:
       - discard_if_two_players
       - ghost_card
+      - nodisable
   - name: LEMAT
     signs:
       - 4 diamonds
@@ -1320,7 +1321,6 @@ main_deck:
     equip:
       - horse
       - mustang
-      - bronco
     tags:
       - horse
       - bronco
@@ -2650,6 +2650,7 @@ train:
     tags:
       - discard_if_two_players
       - ghost_card
+      - nodisable
   - name: LOUNGE_CAR
     image: 27_lounge_car
     color: train
@@ -2754,6 +2755,3 @@ button_row:
     effects:
       - discard cards(2) self | hand
       - destroy card | table bronco
-    tags:
-      - bronco
-      - hidden
