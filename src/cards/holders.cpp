@@ -188,14 +188,6 @@ namespace banggame {
         }, *this);
     }
 
-    void equip_holder::on_equip(card *target_card, player *target) const {
-        visit_effect([&](auto &&value) {
-            if constexpr (requires { value.on_equip(target_card, target); }) {
-                value.on_equip(target_card, target);
-            }
-        }, *this);
-    }
-
     void equip_holder::on_enable(card *target_card, player *target) const {
         visit_effect([&](auto &&value) {
             if constexpr (requires { value.on_enable(target_card, target); }) {
@@ -208,14 +200,6 @@ namespace banggame {
         visit_effect([&](auto &&value) {
             if constexpr (requires { value.on_disable(target_card, target); }) {
                 value.on_disable(target_card, target);
-            }
-        }, *this);
-    }
-
-    void equip_holder::on_unequip(card *target_card, player *target) const {
-        visit_effect([&](auto &&value) {
-            if constexpr (requires { value.on_unequip(target_card, target); }) {
-                value.on_unequip(target_card, target);
             }
         }, *this);
     }

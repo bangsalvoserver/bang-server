@@ -30,30 +30,6 @@ namespace banggame {
         
         bool inactive = false;
         int8_t num_cubes = 0;
-
-        void on_equip(player *target) {
-            for (auto &e : equips) {
-                e.on_equip(this, target);
-            }
-        }
-
-        void on_enable(player *target) {
-            for (auto &e : equips) {
-                e.on_enable(this, target);
-            }
-        }
-
-        void on_disable(player *target) {
-            for (auto &e : equips) {
-                e.on_disable(this, target);
-            }
-        }
-
-        void on_unequip(player *target) {
-            for (auto &e : equips) {
-                e.on_unequip(this, target);
-            }
-        }
     };
 
     inline card_backface::card_backface(card *c): id(c->id), deck(c->deck) {}

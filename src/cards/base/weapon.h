@@ -10,7 +10,6 @@ namespace banggame {
         equip_weapon(int range): range(range) {}
 
         game_string on_prompt(card *origin_card, player *origin, player *target);
-        void on_equip(card *target_card, player *target);
         void on_enable(card *target_card, player *target);
     };
 }

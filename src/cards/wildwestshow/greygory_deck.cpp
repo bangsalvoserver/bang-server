@@ -4,7 +4,7 @@
 
 namespace banggame {
     
-    void equip_greygory_deck::on_equip(card *target_card, player *target) {
+    static void greygory_deck_add_characters(card *target_card, player *target) {
         std::array<card *, 2> base_characters;
         std::ranges::sample(target->m_game->m_context.cards
             | std::views::transform([](card &c) { return &c; })
@@ -25,9 +25,15 @@ namespace banggame {
             target->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
         }
     }
+
+    void equip_greygory_deck::on_enable(card *target_card, player *target) {
+        if (!target->m_game->m_playing) {
+            greygory_deck_add_characters(target_card, target);
+        }    
+    }
     
     void effect_greygory_deck::on_play(card *target_card, player *target) {
         target->remove_extra_characters();
-        equip_greygory_deck{}.on_equip(target_card, target);
+        greygory_deck_add_characters(target_card, target);
     }
 }

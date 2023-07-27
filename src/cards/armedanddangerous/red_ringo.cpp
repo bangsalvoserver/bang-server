@@ -4,8 +4,10 @@
 
 namespace banggame {
     
-    void equip_red_ringo::on_equip(card *target_card, player *target) {
-        target->add_cubes(target->first_character(), max_cubes);
+    void equip_red_ringo::on_enable(card *target_card, player *target) {
+        if (!target->m_game->m_playing) {
+            target->add_cubes(target->first_character(), max_cubes);
+        }
     }
 
     game_string handler_red_ringo::get_error(card *origin_card, player *origin, const effect_target_list &targets) {

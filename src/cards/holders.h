@@ -33,10 +33,8 @@ namespace banggame {
         (equip_type, type),
 
         game_string on_prompt(card *origin_card, player *origin, player *target) const;
-        void on_equip(card *target_card, player *target) const;
         void on_enable(card *target_card, player *target) const;
         void on_disable(card *target_card, player *target) const;
-        void on_unequip(card *target_card, player *target) const;
     )
 
     DEFINE_STRUCT(modifier_holder,
