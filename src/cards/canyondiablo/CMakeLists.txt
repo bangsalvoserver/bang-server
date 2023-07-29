@@ -11,4 +11,5 @@ target_sources(bangserver PRIVATE
     sacrifice.cpp
     soundance_kid.cpp
     taxman.cpp
+    wyatt_earl.cpp
 )

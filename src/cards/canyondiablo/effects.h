@@ -13,5 +13,6 @@
 #include "sacrifice.h"
 #include "soundance_kid.h"
 #include "taxman.h"
+#include "wyatt_earl.h"
 
 #endif

@@ -2024,12 +2024,11 @@ character:
       - teren_kill
     tags:
       - max_hp(3)
-  # - name: WYATT_EARL
-  #   image: 20_wyatt_earl
-  #   expansion: canyondiablo
-  #   # TODO check_card_immunity, se multi_target: immune=true
-  #   # equip:
-  #   #   - wyatt_earl
+  - name: WYATT_EARL
+    image: 20_wyatt_earl
+    expansion: canyondiablo
+    equip:
+      - wyatt_earl
 highnoon:
   - name: BLESSING
     image: 05_benedizione

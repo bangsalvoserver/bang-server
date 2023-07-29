@@ -211,6 +211,7 @@ namespace banggame {
         (lumber_flatcar,        equip_lumber_flatcar)
         (pat_barrett,           equip_pat_barrett)
         (soundance_kid,         equip_soundance_kid)
+        (wyatt_earl,            equip_wyatt_earl)
     )
 
     DEFINE_ENUM_FWD_TYPES(mth_type,
