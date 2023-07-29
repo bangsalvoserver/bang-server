@@ -11,6 +11,7 @@
 #include "pat_barrett.h"
 #include "ruleset.h"
 #include "sacrifice.h"
+#include "soundance_kid.h"
 #include "taxman.h"
 
 #endif

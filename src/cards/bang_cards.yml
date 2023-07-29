@@ -2006,12 +2006,11 @@ character:
     expansion: canyondiablo
     equip:
       - johnny_kisch
-  # - name: SOUNDANCE_KID
-  #   image: 20_soundance_kid
-  #   expansion: canyondiablo
-  #   # TODO on_hit: if origin == this: draw
-  #   # equip:
-  #   #   - soundance_kid
+  - name: SOUNDANCE_KID
+    image: 20_soundance_kid
+    expansion: canyondiablo
+    equip:
+      - soundance_kid
   - name: SPIKE_SPIEZEL
     image: 20_spike_spiezel
     expansion: canyondiablo

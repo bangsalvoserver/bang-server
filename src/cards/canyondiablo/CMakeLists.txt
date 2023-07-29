@@ -9,5 +9,6 @@ target_sources(bangserver PRIVATE
     pat_barrett.cpp
     ruleset.cpp
     sacrifice.cpp
+    soundance_kid.cpp
     taxman.cpp
 )
