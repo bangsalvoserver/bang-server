@@ -2025,7 +2025,7 @@ character:
     tags:
       - max_hp(3)
   - name: WYATT_EARL
-    image: 20_wyatt_earl
+    image: 20_wyattearl
     expansion: canyondiablo
     equip:
       - wyatt_earl
