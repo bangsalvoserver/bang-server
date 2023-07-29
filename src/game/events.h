@@ -21,7 +21,7 @@ namespace banggame {
         EVENT(apply_sign_modifier,              card_sign &value)
         EVENT(apply_beer_modifier,              player *origin, int &value)
         EVENT(apply_maxcards_modifier,          player *origin, int &value)
-        EVENT(apply_immunity_modifier,          card *origin_card, player *origin, const player *target, effect_flags flags, bool &value)
+        EVENT(apply_immunity_modifier,          card *origin_card, player *origin, const player *target, effect_flags flags, serial::card_list &cards)
         EVENT(apply_escapable_modifier,         card *origin_card, player *origin, const player *target, effect_flags flags, int &value)
         EVENT(apply_bang_modifier,              player *origin, request_bang *req)
 

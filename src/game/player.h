@@ -147,7 +147,7 @@ namespace banggame {
 
         void add_gold(int amount);
 
-        bool immune_to(card *origin_card, player *origin, effect_flags flags) const;
+        bool immune_to(card *origin_card, player *origin, effect_flags flags, bool quiet = false);
 
         bool only_black_cards_equipped() const {
             return empty_hand() && std::ranges::all_of(m_table, &card::is_black);

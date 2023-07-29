@@ -187,8 +187,15 @@ namespace banggame {
         }
     }
 
-    bool player::immune_to(card *origin_card, player *origin, effect_flags flags) const {
-        return m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, false);
+    bool player::immune_to(card *origin_card, player *origin, effect_flags flags, bool quiet) {
+        auto cards = m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, serial::card_list{});
+        if (!quiet) {
+            for (card *target_card : cards) {
+                m_game->add_log("LOG_PLAYER_IMMUNE_TO_CARD", this, origin_card, target_card);
+                m_game->flash_card(target_card);
+            }
+        }
+        return !cards.empty();
     }
 
     int player::can_escape(player *origin, card *origin_card, effect_flags flags) const {
