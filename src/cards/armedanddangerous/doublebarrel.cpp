@@ -6,12 +6,13 @@
 namespace banggame {
 
     void effect_doublebarrel::on_play(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player *p, request_bang *req) {
+        event_card_key key{origin_card, 1};
+        origin->m_game->add_listener<event_type::apply_bang_modifier>(key, [=](player *p, request_bang *req) {
             if (p == origin) {
                 if (origin->m_game->get_card_sign(req->origin_card).is_diamonds()) {
                     req->unavoidable = true;
                 }
-                origin->m_game->remove_listeners(origin_card);
+                origin->m_game->remove_listeners(key);
             }
         });
     }
