@@ -502,17 +502,25 @@ namespace banggame {
             }
         }, 3);
 
-        if (killer && m_players.size() > 3 && reason != discard_all_reason::discard_ghost) {
+        if (killer && reason != discard_all_reason::discard_ghost) {
             queue_action([this, killer, target] {
                 if (killer->alive() && !target->alive()) {
-                    if (target->m_role == player_role::outlaw) {
-                        add_log("LOG_KILLED_OUTLAW", killer);
+                    if (m_players.size() > 3) {
+                        if (target->m_role == player_role::outlaw) {
+                            add_log("LOG_KILLED_OUTLAW", killer);
+                            killer->draw_card(3);
+                        } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
+                            queue_action([this, killer] {
+                                add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
+                                queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy);
+                            }, -2);
+                        }
+                    } else if (
+                        (target->m_role == player_role::deputy_3p && killer->m_role == player_role::renegade_3p) ||
+                        (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::deputy_3p) ||
+                        (target->m_role == player_role::renegade_3p && killer->m_role == player_role::outlaw_3p))
+                    {
                         killer->draw_card(3);
-                    } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
-                        queue_action([this, killer] {
-                            add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                            queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy);
-                        }, -2);
                     }
                 }
             }, 3);
@@ -600,17 +608,6 @@ namespace banggame {
                 }
             }
         }, -4);
-
-        queue_action([this, killer, target]{
-            if (!target->alive()) {
-                if (killer && killer != target && m_players.size() <= 3) {
-                    killer->draw_card(3);
-                }
-                if (m_playing == target) {
-                    target->skip_turn();
-                }
-            }
-        }, -5);
     }
 
 }

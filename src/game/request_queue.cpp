@@ -60,7 +60,9 @@ namespace banggame {
             std::invoke(std::move(fun));
             update();
         } else if (player *origin = m_game->m_playing) {
-            if (m_bot_play) {
+            if (!origin->alive()) {
+                m_game->start_next_turn();
+            } else if (m_bot_play) {
                 m_bot_play = false;
                 bot_ai::play_in_turn(origin);
             } else if (m_game->send_request_status_ready() && origin->is_bot()) {
