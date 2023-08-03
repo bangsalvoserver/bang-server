@@ -61,7 +61,9 @@ namespace banggame {
             update();
         } else if (player *origin = m_game->m_playing) {
             if (!origin->alive()) {
+                m_bot_play = false;
                 m_game->start_next_turn();
+                update();
             } else if (m_bot_play) {
                 m_bot_play = false;
                 bot_ai::play_in_turn(origin);
