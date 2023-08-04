@@ -7,6 +7,12 @@
 
 namespace banggame {
 
+    game_table::game_table() {
+        std::random_device rd;
+        rng_seed = rd();
+        rng.seed(rng_seed);
+    }
+
     player *game_table::find_player_by_userid(int user_id) const {
         if (auto it = std::ranges::find(m_players, user_id, &player::user_id); it != m_players.end()) {
             return *it;

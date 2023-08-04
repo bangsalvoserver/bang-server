@@ -13,6 +13,7 @@ namespace banggame {
     using card_disabler_fun = std::function<bool(card *)>;
 
     struct game_table : game_net_manager {
+        unsigned int rng_seed;
         std::default_random_engine rng;
 
         std::vector<player *> m_players;
@@ -49,10 +50,7 @@ namespace banggame {
 
         std::multimap<event_card_key, card_disabler_fun, std::less<>> m_disablers;
 
-        game_table() {
-            std::random_device rd;
-            rng.seed(rd());
-        }
+        game_table();
         
         player *find_player_by_userid(int user_id) const;
         

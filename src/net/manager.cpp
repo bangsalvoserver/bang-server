@@ -410,6 +410,10 @@ void lobby::start_game(game_manager &mgr) {
 
     m_game = std::make_unique<banggame::game>();
 
+    if (mgr.m_options.verbose) {
+        std::cout << "Started game " << m_game.get() << " in lobby " << name << " with seed " << m_game->rng_seed << std::endl;
+    }
+
     std::vector<int> user_ids;
     for (const team_user_pair &pair : users) {
         if (pair.first == lobby_team::game_player) {
