@@ -10,6 +10,8 @@ namespace banggame {
 
     void equip_update_max_hp::on_disable(card *target_card, player *target) {
         target->reset_max_hp();
-        target->set_hp(std::max(target->m_hp, target->m_max_hp));
+        if (target->m_hp > target->m_max_hp) {
+            target->set_hp(target->m_max_hp);
+        }
     }
 }

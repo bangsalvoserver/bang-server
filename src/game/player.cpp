@@ -75,7 +75,7 @@ namespace banggame {
     }
 
     int player::get_initial_cards() {
-        return first_character()->get_tag_value(tag_type::initial_cards).value_or(m_max_hp);
+        return first_character()->get_tag_value(tag_type::initial_cards).value_or(m_hp);
     }
 
     int player::max_cards_end_of_turn() {
