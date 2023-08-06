@@ -69,7 +69,7 @@ namespace banggame {
     }
 
     bool request_check::bot_check_redraw(card *target_card, player *owner) const {
-        return bot_suggestion::target_friend{}.on_check_target(target_card, owner, origin) == is_lucky(drawn_card);
+        return bot_suggestion::target_friend{}.on_check_target(target_card, owner, target) == is_lucky(drawn_card);
     }
 
     void request_check::resolve() {
