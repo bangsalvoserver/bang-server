@@ -9,7 +9,8 @@ namespace banggame {
         virtual std::vector<card *> get_drawn_cards() const = 0;
         virtual card *get_drawing_card() const = 0;
 
-        virtual bool check() const = 0;
+        virtual bool bot_check_redraw(card *target_card, player *owner) const = 0;
+
         virtual void resolve() = 0;
         virtual void restart() = 0;
     };
@@ -46,9 +47,10 @@ namespace banggame {
             return origin_card;
         }
 
-        bool check_for(card *target_card) const;
+        bool is_lucky(card *target_card) const;
 
-        bool check() const override;
+        bool bot_check_redraw(card *target_card, player *owner) const override;
+        
         void resolve() override;
         void restart() override;
     };

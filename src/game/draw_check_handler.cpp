@@ -2,6 +2,8 @@
 
 #include "game.h"
 
+#include "game/bot_suggestion.h"
+
 namespace banggame {
 
     void request_check::on_update() {
@@ -11,7 +13,7 @@ namespace banggame {
     }
 
     game_string request_check::pick_prompt(card *target_card) const {
-        if (target->is_bot() && !check_for(target_card)) {
+        if (target->is_bot() && !is_lucky(target_card)) {
             return "PROMPT_BAD_DRAW";
         } else {
             return {};
@@ -62,12 +64,12 @@ namespace banggame {
         start();
     }
 
-    bool request_check::check_for(card *target_card) const {
+    bool request_check::is_lucky(card *target_card) const {
         return std::invoke(m_condition, m_game->get_card_sign(target_card));
     }
 
-    bool request_check::check() const {
-        return check_for(drawn_card);
+    bool request_check::bot_check_redraw(card *target_card, player *owner) const {
+        return bot_suggestion::target_friend{}.on_check_target(target_card, owner, origin) == is_lucky(drawn_card);
     }
 
     void request_check::resolve() {
@@ -83,6 +85,6 @@ namespace banggame {
         } else {
             m_game->call_event<event_type::on_draw_check_resolve>(target, drawn_card);
         }
-        std::invoke(m_function, check());
+        std::invoke(m_function, is_lucky(drawn_card));
     }
 }

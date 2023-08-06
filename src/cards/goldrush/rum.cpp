@@ -52,8 +52,8 @@ namespace banggame {
             return int(std::unique(suits.begin(), suits.end()) - suits.begin());
         }
 
-        bool check() const override {
-            return count_suits() > 2 && target->m_max_hp > target->m_hp + 2;
+        bool bot_check_redraw(card *target_card, player *owner) const override {
+            return false;
         }
 
         void resolve() override {
