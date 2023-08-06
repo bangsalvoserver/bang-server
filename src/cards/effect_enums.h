@@ -212,6 +212,7 @@ namespace banggame {
         (pat_barrett,           equip_pat_barrett)
         (soundance_kid,         equip_soundance_kid)
         (wyatt_earl,            equip_wyatt_earl)
+        (update_max_hp,         equip_update_max_hp)
     )
 
     DEFINE_ENUM_FWD_TYPES(mth_type,

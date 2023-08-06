@@ -1942,13 +1942,13 @@ character:
     expansion: canyondiablo
     equip:
       - pat_barrett
-  # - name: BIG_SPENCER_2
-  #   image: 20_big_spencer
-  #   expansion: canyondiablo
-  #   # TODO: cambiare sistema max_hp
-  #   tags:
-  #     - initial_hp(3)
-  #     - max_hp(6)
+  - name: BIG_SPENCER_2
+    image: 20_big_spencer
+    expansion: canyondiablo
+    equip:
+      - update_max_hp(6)
+    tags:
+      - max_hp(3)
   # - name: BUFFALO_BELL
   #   image: 20_buffalo_bell
   #   expansion: canyondiablo
