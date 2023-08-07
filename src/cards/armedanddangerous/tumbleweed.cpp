@@ -68,7 +68,7 @@ namespace banggame {
 
     bool effect_tumbleweed::on_check_target(card *origin_card, player *origin) {
         auto req = origin->m_game->top_request<request_tumbleweed>();
-        return req->origin && req->handler->bot_check_redraw(origin_card, origin);
+        return req->handler->bot_check_redraw(origin_card, origin);
     }
 
     bool effect_tumbleweed::can_play(card *origin_card, player *origin) {
