@@ -234,6 +234,7 @@ namespace banggame {
         (std::chrono::milliseconds, escape_timer, 3000)
         (std::chrono::milliseconds, bot_play_timer, 500)
         (std::chrono::milliseconds, tumbleweed_timer, 3000)
+        (unsigned int, game_seed)
     )
 
     DEFINE_ENUM_TYPES(game_update_type,

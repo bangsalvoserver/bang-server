@@ -7,9 +7,13 @@
 
 namespace banggame {
 
-    game_table::game_table() {
-        std::random_device rd;
-        rng_seed = rd();
+    void game_table::reset_rng(unsigned int seed) {
+        if (seed == 0) {
+            std::random_device rd;
+            rng_seed = rd();
+        } else {
+            rng_seed = seed;
+        }
         rng.seed(rng_seed);
     }
 

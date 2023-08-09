@@ -50,7 +50,7 @@ namespace banggame {
 
         std::multimap<event_card_key, card_disabler_fun, std::less<>> m_disablers;
 
-        game_table();
+        void reset_rng(unsigned int seed = 0);
         
         player *find_player_by_userid(int user_id) const;
         
