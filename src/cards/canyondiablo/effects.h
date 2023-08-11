@@ -2,6 +2,7 @@
 #define __CANYONDIABLO_EFFECTS_H__
 
 #include "brothel.h"
+#include "eva_place.h"
 #include "disarm.h"
 #include "graverobber.h"
 #include "indianguide.h"

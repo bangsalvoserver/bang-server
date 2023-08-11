@@ -1,5 +1,6 @@
 target_sources(bangserver PRIVATE
     brothel.cpp
+    eva_place.cpp
     disarm.cpp
     graverobber.cpp
     indianguide.cpp

@@ -1973,14 +1973,13 @@ character:
       - max_usages(1)
       - discard card self | hand blue
       - draw(2)
-  # - name: EVA_PLACE
-  #   image: 20_eva_place
-  #   expansion: canyondiablo
-  #   # TODO effect_eva_place: pesca, se quadri, +1 carta
-  #   # effects:
-  #   #   - max_usages(1)
-  #   #   - discard card self | hand
-  #   #   - eva_place
+  - name: EVA_PLACE
+    image: 20_eva_place
+    expansion: canyondiablo
+    effects:
+      - max_usages(1)
+      - discard card self | hand
+      - eva_place
   # - name: JOSEY_BASSETT
   #   image: 20_josey_bassett
   #   expansion: canyondiablo

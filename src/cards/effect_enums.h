@@ -97,6 +97,7 @@ namespace banggame {
         (circus_wagon,          effect_circus_wagon)
         (express_car,           effect_express_car)
         (mail_car,              effect_mail_car)
+        (eva_place,             effect_eva_place)
     )
 
     DEFINE_ENUM_FWD_TYPES(equip_type,
