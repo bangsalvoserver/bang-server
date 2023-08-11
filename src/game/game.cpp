@@ -442,6 +442,8 @@ namespace banggame {
     }
 
     void game::start_next_turn() {
+        if (num_alive() == 0) return;
+        
         auto it = std::ranges::find(m_players, m_playing);
         while (true) {
             if (check_flags(game_flags::invert_rotation)) {
