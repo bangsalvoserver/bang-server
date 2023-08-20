@@ -141,19 +141,27 @@ namespace banggame::bot_ai {
         return ret;
     }
 
+    struct compare_card_node {
+        bool operator ()(const card_modifier_node &lhs, const card_modifier_node &rhs) const {
+            return lhs.card == rhs.card
+                ? std::ranges::lexicographical_compare(lhs.branches, rhs.branches, compare_card_node{})
+                : get_card_id(lhs.card) < get_card_id(rhs.card);
+        }
+    };
+
     struct play_card_node {
         const card_modifier_node *node;
         
-        auto operator <=> (const play_card_node &other) const {
-            return get_card_id(node->card) <=> get_card_id(other.node->card);
+        auto operator < (const play_card_node &other) const {
+            return compare_card_node{}(*node, *other.node);
         }
     };
 
     struct pick_card_node {
         card *target_card;
         
-        auto operator <=> (const pick_card_node &other) const {
-            return get_card_id(target_card) <=> get_card_id(other.target_card);
+        auto operator < (const pick_card_node &other) const {
+            return get_card_id(target_card) < get_card_id(other.target_card);
         }
     };
 
