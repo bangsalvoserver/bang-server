@@ -141,8 +141,21 @@ namespace banggame::bot_ai {
         return ret;
     }
 
-    struct play_card_node { const card_modifier_node *node; auto operator <=> (const play_card_node &) const = default; };
-    struct pick_card_node { card *target_card; auto operator <=> (const pick_card_node &) const = default; };
+    struct play_card_node {
+        const card_modifier_node *node;
+        
+        auto operator <=> (const play_card_node &other) const {
+            return get_card_id(node->card) <=> get_card_id(other.node->card);
+        }
+    };
+
+    struct pick_card_node {
+        card *target_card;
+        
+        auto operator <=> (const pick_card_node &other) const {
+            return get_card_id(target_card) <=> get_card_id(other.target_card);
+        }
+    };
 
     using play_or_pick_node = std::variant<play_card_node, pick_card_node>;
     using play_card_node_set = std::set<play_or_pick_node>;

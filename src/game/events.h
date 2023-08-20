@@ -109,6 +109,10 @@ namespace banggame {
         EVENT(on_turn_end, player *origin, bool skipped)
     )
 
+    inline int get_card_id(card *target_card) {
+        return target_card ? target_card->id : 0;
+    }
+
     struct event_card_key {
         card *target_card;
         int priority;
@@ -122,16 +126,16 @@ namespace banggame {
         auto operator <=> (const event_card_key &other) const {
             return target_card == other.target_card ?
                 priority <=> other.priority :
-                target_card <=> other.target_card;
+                get_card_id(target_card) <=> get_card_id(other.target_card);
         }
 
         auto operator <=> (card *other) const {
-            return target_card <=> other;
+            return get_card_id(target_card) <=> get_card_id(other);
         }
 
         bool priority_greater(const event_card_key &other) const {
             return priority == other.priority ?
-                target_card < other.target_card :
+                get_card_id(target_card) < get_card_id(other.target_card) :
                 priority > other.priority;
         }
     };
