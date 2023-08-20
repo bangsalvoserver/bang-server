@@ -1,7 +1,6 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
-#include "events.h"
 #include "game_table.h"
 #include "request_queue.h"
 #include "player_iterator.h"

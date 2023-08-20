@@ -6,7 +6,7 @@
 
 #include "player.h"
 #include "game_net.h"
-#include "events.h"
+#include "event_map.h"
 
 namespace banggame {
 
