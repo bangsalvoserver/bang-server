@@ -133,19 +133,16 @@ namespace banggame {
             return get_card_id(target_card) <=> get_card_id(other);
         }
 
-        bool priority_greater(const event_card_key &other) const {
-            return priority == other.priority ?
-                get_card_id(target_card) < get_card_id(other.target_card) :
-                priority > other.priority;
-        }
+        struct priority_greater {
+            bool operator()(const event_card_key &lhs, const event_card_key &rhs) const {
+                return lhs.priority == rhs.priority ?
+                    get_card_id(lhs.target_card) < get_card_id(rhs.target_card) :
+                    lhs.priority > rhs.priority;
+            }
+        };
     };
 
-    template<typename T>
-    concept priority_key = requires (T value) {
-        { value.priority_greater(value) } -> std::convertible_to<bool>;
-    };
-
-    template<priority_key Key, enums::reflected_enum EnumType>
+    template<enums::reflected_enum EnumType, typename Key, typename Compare = std::greater<Key>>
     struct priority_double_map {
     private:
         enum value_status : uint8_t {
@@ -163,8 +160,8 @@ namespace banggame {
         struct iterator_compare {
             template<typename T>
             bool operator()(const T &lhs, const T &rhs) const {
-                return lhs->first.priority_greater(rhs->first)
-                    || !rhs->first.priority_greater(lhs->first)
+                return Compare{}(lhs->first, rhs->first)
+                    || !Compare{}(rhs->first, lhs->first)
                     && (&*lhs < &*rhs);
             }
         };
@@ -335,7 +332,7 @@ namespace banggame {
 
     class listener_map {
     private:
-        priority_double_map<event_card_key, event_type> m_listeners;
+        priority_double_map<event_type, event_card_key, event_card_key::priority_greater> m_listeners;
 
     public:
         template<event_type E, invocable_for_event<E> Function>
