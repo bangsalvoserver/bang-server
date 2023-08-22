@@ -20,8 +20,9 @@ namespace banggame {
     };
     
     struct card : card_data {
-        card(int id, const card_data &data): card_data(data), id(id) {}
+        card(int id, const card_data &data): card_data(data), order(id), id(id) {}
         
+        const int order;
         int id;
 
         player *owner = nullptr;
@@ -31,10 +32,6 @@ namespace banggame {
         bool inactive = false;
         int8_t num_cubes = 0;
     };
-
-    inline int get_card_id(card *target_card) {
-        return target_card ? target_card->id : 0;
-    }
 
     inline card_backface::card_backface(card *c): id(c->id), deck(c->deck) {}
 

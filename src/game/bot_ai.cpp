@@ -145,7 +145,7 @@ namespace banggame::bot_ai {
         bool operator ()(const card_modifier_node &lhs, const card_modifier_node &rhs) const {
             return lhs.card == rhs.card
                 ? std::ranges::lexicographical_compare(lhs.branches, rhs.branches, compare_card_node{})
-                : get_card_id(lhs.card) < get_card_id(rhs.card);
+                : get_card_order(lhs.card) < get_card_order(rhs.card);
         }
     };
 
@@ -161,7 +161,7 @@ namespace banggame::bot_ai {
         card *target_card;
         
         auto operator < (const pick_card_node &other) const {
-            return get_card_id(target_card) < get_card_id(other.target_card);
+            return get_card_order(target_card) < get_card_order(other.target_card);
         }
     };
 
