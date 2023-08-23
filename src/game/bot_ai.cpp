@@ -228,28 +228,6 @@ namespace banggame::bot_ai {
         return false;
     }
 
-    bool pick_random_card(player *origin, const serial::card_list &cards) {
-        auto card_set = cards | ranges::to<std::set>;
-        
-        while (!card_set.empty()) {
-            card *picked = random_element(card_set, origin->m_game->rng);
-            card_set.erase(picked);
-
-            if (verify_and_pick(origin, {picked, false}).is(message_type::ok)) {
-                return true;
-            }
-        }
-
-        card *picked = random_element(cards, origin->m_game->rng);
-        if (verify_and_pick(origin, {picked, true}).is(message_type::ok)) {
-            return true;
-        }
-
-        // softlock, should never happen
-        std::cout << "BOT ERROR: could not find card in pick_random_card" << std::endl;
-        return false;
-    }
-
     bool respond_to_request(player *origin) {
         auto update = origin->m_game->make_request_update(origin);
         
