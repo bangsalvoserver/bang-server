@@ -2015,6 +2015,7 @@ character:
     expansion: canyondiablo
     modifier: leevankliff
     effects:
+      - max_usages(1)
       - discard card self | hand bang
   - name: TEREN_KILL_2
     image: 20_teren_kill
