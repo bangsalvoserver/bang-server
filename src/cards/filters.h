@@ -90,7 +90,11 @@ namespace banggame::filters {
         if (!ctx.ignore_distances && bool(filter & (target_player_filter::reachable | target_player_filter::range_1 | target_player_filter::range_2))) {
             int range = detail::get_player_range_mod(origin);
             if (bool(filter & target_player_filter::reachable)) {
-                range += detail::get_player_weapon_range(origin);
+                int weapon_range = detail::get_player_weapon_range(origin);
+                if (weapon_range == 0) {
+                    return "ERROR_TARGET_NOT_IN_RANGE";
+                }
+                range += weapon_range;
             } else if (bool(filter & target_player_filter::range_1)) {
                 ++range;
             } else if (bool(filter & target_player_filter::range_2)) {
