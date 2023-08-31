@@ -2013,7 +2013,7 @@ character:
   - name: SPIKE_SPIEZEL
     image: 20_spike_spiezel
     expansion: canyondiablo
-    modifier: leevankliff
+    modifier: spike_spiezel
     effects:
       - max_usages(1)
       - discard card self | hand bang

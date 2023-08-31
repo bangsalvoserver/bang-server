@@ -246,6 +246,7 @@ namespace banggame {
         (card_choice,           modifier_card_choice)
         (discount,              modifier_discount)
         (leevankliff,           modifier_leevankliff)
+        (spike_spiezel,         modifier_spike_spiezel)
         (moneybag,              modifier_moneybag)
         (sgt_blaze,             modifier_sgt_blaze)
         (traincost,             modifier_traincost)

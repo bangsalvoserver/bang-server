@@ -13,6 +13,7 @@
 #include "ruleset.h"
 #include "sacrifice.h"
 #include "soundance_kid.h"
+#include "spike_spiezel.h"
 #include "taxman.h"
 #include "update_max_hp.h"
 #include "wyatt_earl.h"
