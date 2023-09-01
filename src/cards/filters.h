@@ -2,7 +2,6 @@
 #define __FILTERS_H__
 
 #include "card_data.h"
-#include "effect_context.h"
 #include "filter_enums.h"
 #include "game_enums.h"
 

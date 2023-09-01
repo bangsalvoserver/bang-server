@@ -1,7 +1,6 @@
 #include "game/play_verify.h"
 
 #include "cards/game_enums.h"
-#include "cards/effect_context.h"
 
 namespace banggame {
 

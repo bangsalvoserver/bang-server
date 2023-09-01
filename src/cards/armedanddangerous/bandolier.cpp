@@ -2,7 +2,6 @@
 
 #include "game/game.h"
 
-#include "cards/effect_context.h"
 #include "cards/effect_enums.h"
 
 namespace banggame {

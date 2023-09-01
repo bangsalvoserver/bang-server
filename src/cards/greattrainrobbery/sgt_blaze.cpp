@@ -1,6 +1,5 @@
 #include "sgt_blaze.h"
 
-#include "cards/effect_context.h"
 #include "cards/filters.h"
 
 #include "game/game.h"

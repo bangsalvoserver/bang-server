@@ -150,6 +150,19 @@ namespace banggame {
         (train)
     )
 
+    DEFINE_STRUCT(effect_context,
+        (serial::opt_card, card_choice)
+        (serial::opt_player, skipped_player)
+        (serial::opt_card, repeat_card)
+        (serial::opt_card, traincost)
+        (int8_t, train_advance)
+        (int8_t, locomotive_count)
+        (int8_t, discount)
+        (bool, ignore_distances)
+        (bool, disable_banglimit)
+        (bool, disable_bang_checks)
+    )
+
     enum class effect_flags;
     enum class game_flags;
     enum class player_flags;

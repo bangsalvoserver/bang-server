@@ -43,22 +43,12 @@ namespace banggame {
         pocket_type pocket;
     };
 
-    struct effect_context_deleter {
-        void operator ()(effect_context *ctx) const noexcept;
-    };
-
-    using effect_context_ptr = std::unique_ptr<effect_context, effect_context_deleter>;
-    using shared_effect_context = std::shared_ptr<effect_context>;
-
-    shared_effect_context make_shared_effect_context(effect_context &&ctx);
-
     struct played_card_history {
         card_pocket_pair origin_card;
         std::vector<card_pocket_pair> modifiers;
-        effect_context_ptr context;
+        effect_context context;
 
         played_card_history(card *origin_card, const modifier_list &modifiers, const effect_context &context);
-        played_card_history(played_card_history &&) noexcept = default;
     };
 
     enum class range_mod_type {

@@ -8,7 +8,6 @@
 #include "cards/holders.h"
 #include "cards/filters.h"
 #include "cards/game_enums.h"
-#include "cards/effect_context.h"
 
 #include "cards/base/damage.h"
 #include "cards/base/draw.h"
@@ -24,21 +23,13 @@ namespace banggame {
         return {c, c->pocket};
     }
 
-    void effect_context_deleter::operator ()(effect_context *ctx) const noexcept {
-        delete ctx;
-    }
-
-    shared_effect_context make_shared_effect_context(effect_context &&ctx) {
-        return shared_effect_context(new effect_context(std::move(ctx)), effect_context_deleter{});
-    }
-
     played_card_history::played_card_history(card *origin_card, const modifier_list &modifiers, const effect_context &context)
         : origin_card{to_card_pocket_pair(origin_card)}
         , modifiers{modifiers
             | ranges::views::transform(&modifier_pair::card)
             | ranges::views::transform(to_card_pocket_pair)
             | ranges::to<std::vector>}
-        , context{new effect_context(context)} {}
+        , context{context} {}
 
     bool player::is_bot() const {
         return user_id < 0;

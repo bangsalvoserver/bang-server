@@ -1,6 +1,5 @@
 #include "spike_spiezel.h"
 
-#include "cards/effect_context.h"
 #include "cards/filter_enums.h"
 
 #include "cards/wildwestshow/leevankliff.h"
@@ -31,7 +30,7 @@ namespace banggame {
         if (auto range = origin->m_played_cards
             | std::views::reverse
             | std::views::transform([](const played_card_history &history) {
-                return get_repeat_playing_card(history.origin_card.origin_card, *history.context);
+                return get_repeat_playing_card(history.origin_card.origin_card, history.context);
             })
             | std::views::filter(&card::is_brown))
         {
