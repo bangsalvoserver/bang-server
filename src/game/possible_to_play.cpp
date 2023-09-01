@@ -173,11 +173,11 @@ namespace banggame {
         card_modifier_node node { .card = origin_card };
         if (!filters::is_equip_card(origin_card) && origin_card->is_modifier()) {
             std::vector<card *> modifiers_copy = vector_concat(modifiers, origin_card);
-            node.context = ctx;
-            origin_card->modifier.add_context(origin_card, origin, node.context);
+            auto ctx_copy = ctx;
+            origin_card->modifier.add_context(origin_card, origin, ctx_copy);
 
-            for (card *target_card : cards_playable_with_modifiers(origin, modifiers_copy, is_response, node.context)) {
-                node.branches.push_back(generate_card_modifier_node(origin, target_card, is_response, modifiers_copy, node.context));
+            for (card *target_card : cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy)) {
+                node.branches.push_back(generate_card_modifier_node(origin, target_card, is_response, modifiers_copy, ctx_copy));
             }
         }
         return node;
