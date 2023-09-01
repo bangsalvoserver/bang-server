@@ -4,6 +4,8 @@
 
 #include "cards/filter_enums.h"
 
+#include "cards/wildwestshow/leevankliff.h"
+
 #include "game/game.h"
 
 namespace banggame {
@@ -13,11 +15,7 @@ namespace banggame {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
 
-        if (ctx.card_choice) {
-            playing_card = ctx.card_choice;
-        } else if (ctx.traincost) {
-            playing_card = ctx.traincost;
-        }
+        playing_card = get_repeat_playing_card(playing_card, ctx);
         
         if (ctx.repeat_card != playing_card) {
             return "INVALID_MODIFIER_CARD";
