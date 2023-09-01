@@ -1,7 +1,6 @@
 #include "next_stop.h"
 
 #include "game/game.h"
-#include "cards/effect_context.h"
 
 namespace banggame {
 
@@ -11,7 +10,7 @@ namespace banggame {
         origin->m_game->add_update<game_update_type::move_train>(origin->m_game->train_position);
         origin->m_game->queue_action([=]{
             origin->m_game->call_event<event_type::on_train_advance>(origin,
-                make_shared_effect_context({ .locomotive_count = 1 }));
+                std::make_shared<effect_context>(effect_context{ .locomotive_count = 1 }));
         }, -1);
     }
 }

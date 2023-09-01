@@ -1,7 +1,6 @@
 #include "bigfifty.h"
 
 #include "game/game.h"
-#include "cards/effect_context.h"
 
 namespace banggame {
 

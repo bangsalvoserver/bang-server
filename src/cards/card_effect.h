@@ -122,8 +122,6 @@ namespace banggame {
         virtual void on_resolve() = 0;
     };
 
-    struct effect_context;
-
 }
 
 

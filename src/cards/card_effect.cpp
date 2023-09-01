@@ -1,7 +1,5 @@
 #include "card_effect.h"
 
-#include "effect_context.h"
-
 #include "game/game.h"
 #include "game/play_verify.h"
 

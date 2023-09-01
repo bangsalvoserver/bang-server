@@ -1,7 +1,6 @@
 #include "traincost.h"
 
 #include "cards/filter_enums.h"
-#include "cards/effect_context.h"
 #include "cards/effect_enums.h"
 
 #include "game/game.h"

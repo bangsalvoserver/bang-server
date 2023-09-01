@@ -1,7 +1,5 @@
 #include "moneybag.h"
 
-#include "cards/effect_context.h"
-
 #include "cards/filter_enums.h"
 
 #include "cards/wildwestshow/leevankliff.h"

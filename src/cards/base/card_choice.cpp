@@ -1,7 +1,6 @@
 #include "card_choice.h"
 
 #include "cards/filter_enums.h"
-#include "cards/effect_context.h"
 
 #include "game/game.h"
 

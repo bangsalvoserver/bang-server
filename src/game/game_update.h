@@ -190,6 +190,7 @@ namespace banggame {
     DEFINE_STRUCT(card_modifier_node,
         (serial::card, card)
         (std::vector<card_modifier_node>, branches)
+        (effect_context, context)
     )
 
     using card_modifier_tree = std::vector<card_modifier_node>;
