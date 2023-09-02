@@ -85,13 +85,6 @@ namespace banggame {
         co_await add_cards(pocket_type::train_deck);
         co_await add_cards(pocket_type::train);
 
-        if (m_scenario_holder) {
-            co_yield make_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck, true);
-        }
-        if (m_wws_scenario_holder) {
-            co_yield make_update<game_update_type::move_scenario_deck>(m_wws_scenario_holder, pocket_type::wws_scenario_deck, true);
-        }
-
         co_await add_cards(pocket_type::scenario_deck);
         co_await add_cards(pocket_type::scenario_card);
         co_await add_cards(pocket_type::wws_scenario_deck);
@@ -248,7 +241,7 @@ namespace banggame {
             p->set_role(*role_ptr++);
         }
 
-        player *first_player = *std::ranges::find(m_players,
+        m_first_player = *std::ranges::find(m_players,
             m_players.size() > 3 ? player_role::sheriff : player_role::deputy_3p, &player::m_role);
 
         auto is_last_scenario_card = [](card *c) {
@@ -265,22 +258,17 @@ namespace banggame {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
             }
 
-            m_scenario_holder = first_player;
-            add_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck, true);
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_scenario_deck), pocket_type::scenario_deck);
         }
 
         if (add_cards(all_cards.wildwestshow, pocket_type::wws_scenario_deck)) {
             shuffle_cards_and_ids(m_wws_scenario_deck);
             std::ranges::partition(m_wws_scenario_deck, is_last_scenario_card);
-            m_wws_scenario_holder = first_player;
-            add_update<game_update_type::move_scenario_deck>(m_wws_scenario_holder, pocket_type::wws_scenario_deck, true);
             add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_wws_scenario_deck), pocket_type::wws_scenario_deck);
         }
 
-        if (add_cards(all_cards.stations, pocket_type::none) && add_cards(all_cards.locomotive, pocket_type::none)) {
-            m_train_holder = first_player;
-        }
+        add_cards(all_cards.stations, pocket_type::none);
+        add_cards(all_cards.locomotive, pocket_type::none);
 
         std::vector<card *> character_ptrs;
         if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
@@ -307,7 +295,7 @@ namespace banggame {
                     move_card(p->first_character(), pocket_type::player_table, p, card_visibility::shown, true);
                 }
             }
-            for (player *p : range_all_players(first_player)) {
+            for (player *p : range_all_players(m_first_player)) {
                 queue_request<request_characterchoice>(p);
             }
         } else {
@@ -322,20 +310,20 @@ namespace banggame {
             }
         }
 
-        queue_action([this, first_player] {
+        queue_action([this] {
             add_log("LOG_GAME_START");
             play_sound(nullptr, "gamestart");
 
             int cycles = std::ranges::max(m_players | std::views::transform(&player::get_initial_cards));
             for (int i=0; i<cycles; ++i) {
-                for (player *p : range_all_players(first_player)) {
+                for (player *p : range_all_players(m_first_player)) {
                     if (p->m_hand.size() < p->get_initial_cards()) {
                         p->draw_card();
                     }
                 }
             }
             
-            call_event<event_type::on_game_setup>(first_player);
+            call_event<event_type::on_game_setup>(m_first_player);
 
             if (!m_scenario_deck.empty()) {
                 set_card_visibility(m_scenario_deck.back(), nullptr, card_visibility::shown);
@@ -344,8 +332,8 @@ namespace banggame {
                 set_card_visibility(m_wws_scenario_deck.back(), nullptr, card_visibility::shown);
             }
 
-            m_playing = first_player;
-            first_player->start_of_turn();
+            m_playing = m_first_player;
+            m_first_player->start_of_turn();
         });
     }
 
@@ -441,6 +429,27 @@ namespace banggame {
         queue_request_front<request_check>(this, origin_card, origin, std::move(condition), std::move(fun));
     }
 
+    void game::draw_scenario_card() {
+        if (m_scenario_deck.size() > 1) {
+            set_card_visibility(*(m_scenario_deck.rbegin() + 1), nullptr, card_visibility::shown, true);
+        }
+        if (!m_scenario_cards.empty()) {
+            m_first_player->disable_equip(m_scenario_cards.back());
+        }
+        add_log("LOG_DRAWN_SCENARIO_CARD", m_scenario_deck.back());
+        move_card(m_scenario_deck.back(), pocket_type::scenario_card);
+        m_first_player->enable_equip(m_scenario_cards.back());
+    }
+
+    void game::advance_train(player *origin) {
+        add_log("LOG_TRAIN_ADVANCE");
+        add_update<game_update_type::move_train>(++train_position);
+        queue_action([=]{
+            call_event<event_type::on_train_advance>(origin,
+                std::make_shared<effect_context>(effect_context{ .locomotive_count = 1 }));
+        }, -1);
+    }
+
     void game::start_next_turn() {
         if (num_alive() == 0) return;
         
@@ -461,11 +470,14 @@ namespace banggame {
 
         player *next_player = *it;
         
-        if (next_player == m_train_holder) {
-            effect_next_stop{}.on_play(nullptr, next_player);
-        }
-        if (next_player == m_scenario_holder) {
-            draw_scenario_card();
+        if (next_player == m_first_player) {
+            if (!m_stations.empty()) {
+                advance_train(m_first_player);
+            }
+
+            if (!m_scenario_deck.empty()) {
+                draw_scenario_card();
+            }
         }
 
         queue_action([next_player]{
@@ -534,23 +546,6 @@ namespace banggame {
             }
         }, 3);
 
-        queue_action([this, target]{
-            if (num_alive() > 1) {
-                player *next_player = *std::next(player_iterator(target));
-                if (target == m_scenario_holder) {
-                    m_scenario_holder = next_player;
-                    add_update<game_update_type::move_scenario_deck>(m_scenario_holder, pocket_type::scenario_deck);
-                }
-                if (target == m_wws_scenario_holder) {
-                    m_wws_scenario_holder = next_player;
-                    add_update<game_update_type::move_scenario_deck>(m_wws_scenario_holder, pocket_type::wws_scenario_deck);
-                }
-                if (target == m_train_holder) {
-                    m_train_holder = next_player;
-                }
-            }
-        }, -3);
-
         if (!m_options.enable_ghost_cards) {
             queue_action([this]{
                 if (auto range = std::views::filter(m_players, [](player *p) { return !p->alive() && !p->check_player_flags(player_flags::removed); })) {
@@ -564,6 +559,10 @@ namespace banggame {
         }
 
         queue_action([this, killer, target] {
+            if (target == m_first_player && num_alive() > 1) {
+                m_first_player = *std::next(player_iterator(target));
+            }
+
             auto declare_winners = [this](auto &&winners) {
                 for (player *p : range_all_players_and_dead(m_playing)) {
                     if (p->add_player_flags(player_flags::role_revealed)) {

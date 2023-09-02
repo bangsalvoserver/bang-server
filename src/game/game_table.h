@@ -43,10 +43,9 @@ namespace banggame {
         game_flags m_game_flags{};
         game_options m_options;
 
-        player *m_scenario_holder = nullptr;
-        player *m_wws_scenario_holder = nullptr;
-        player *m_train_holder = nullptr;
+        player *m_first_player = nullptr;
         player *m_first_dead = nullptr;
+        player *m_playing = nullptr;
 
         std::multimap<event_card_key, card_disabler_fun, std::less<>> m_disablers;
 
@@ -69,8 +68,6 @@ namespace banggame {
         card *phase_one_drawn_card();
 
         card *draw_shop_card();
-        
-        void draw_scenario_card();
 
         void flash_card(card *c);
         void add_short_pause(card *c = nullptr);

@@ -48,13 +48,6 @@
         "duration": 250
     }}
 
-### Sposta il mazzetto delle carte scenario
-    {"move_scenario_deck": {
-        "pocket": "scenario_deck", // scenario_deck o wws_scenario_deck
-        "player": 2, // id di destinazione
-        "duration": 333
-    }}
-
 ### Sposta il treno
     {"move_train": {
         "position": 2, // posizione del treno

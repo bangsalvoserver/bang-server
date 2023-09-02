@@ -53,17 +53,6 @@ namespace banggame {
             , duration{num_cubes == 1 ? durations.move_cube : durations.move_cubes} {}
     )
 
-    DEFINE_STRUCT(move_scenario_deck_update,
-        (serial::player, player)
-        (pocket_type, pocket)
-        (game_duration, duration),
-
-        move_scenario_deck_update() = default;
-        move_scenario_deck_update(serial::player player, pocket_type pocket, bool instant = false)
-            : player{player}, pocket{pocket}
-            , duration{instant ? 0ms : durations.move_deck} {}
-    )
-
     DEFINE_STRUCT(move_train_update,
         (int, position)
         (game_duration, duration),
@@ -246,7 +235,6 @@ namespace banggame {
         (move_card, move_card_update)
         (add_cubes, add_cubes_update)
         (move_cubes, move_cubes_update)
-        (move_scenario_deck, move_scenario_deck_update)
         (move_train, move_train_update)
         (deck_shuffled, deck_shuffled_update)
         (show_card, show_card_update)

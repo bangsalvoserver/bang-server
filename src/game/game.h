@@ -10,10 +10,8 @@
 namespace banggame {
 
     struct game : game_table, listener_map, request_queue {
-        player *m_playing = nullptr;
-
         game() : request_queue(this) {}
-
+        
         util::generator<json::json> get_rejoin_updates(player *target);
 
         card_sign get_card_sign(card *c);
@@ -29,6 +27,9 @@ namespace banggame {
         void send_request_status_clear();
         bool send_request_status_ready();
         void send_request_update();
+        
+        void draw_scenario_card();
+        void advance_train(player *origin);
 
         void start_next_turn();
 

@@ -187,20 +187,6 @@ namespace banggame {
         return drawn_card;
     }
 
-    void game_table::draw_scenario_card() {
-        if (m_scenario_deck.empty()) return;
-
-        if (m_scenario_deck.size() > 1) {
-            set_card_visibility(*(m_scenario_deck.rbegin() + 1), nullptr, card_visibility::shown, true);
-        }
-        if (!m_scenario_cards.empty()) {
-            m_scenario_holder->disable_equip(m_scenario_cards.back());
-        }
-        add_log("LOG_DRAWN_SCENARIO_CARD", m_scenario_deck.back());
-        move_card(m_scenario_deck.back(), pocket_type::scenario_card);
-        m_scenario_holder->enable_equip(m_scenario_cards.back());
-    }
-
     void game_table::flash_card(card *c) {
         add_update<game_update_type::flash_card>(c);
     }
@@ -233,10 +219,10 @@ namespace banggame {
         return ranges::views::concat(
             table->m_scenario_cards
                 | ranges::views::take_last(1)
-                | ranges::views::transform(to_player_card_pair{table->m_scenario_holder}),
+                | ranges::views::transform(to_player_card_pair{table->m_first_player}),
             table->m_wws_scenario_cards
                 | ranges::views::take_last(1)
-                | ranges::views::transform(to_player_card_pair{table->m_wws_scenario_holder}),
+                | ranges::views::transform(to_player_card_pair{table->m_first_player}),
             table->m_players
                 | ranges::views::filter(&player::alive)
                 | ranges::views::for_each([](player *p) {
