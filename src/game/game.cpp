@@ -444,7 +444,7 @@ namespace banggame {
     void game::advance_train(player *origin) {
         add_log("LOG_TRAIN_ADVANCE");
         add_update<game_update_type::move_train>(++train_position);
-        queue_action([=]{
+        queue_action([=, this]{
             call_event<event_type::on_train_advance>(origin,
                 std::make_shared<effect_context>(effect_context{ .locomotive_count = 1 }));
         }, -1);
