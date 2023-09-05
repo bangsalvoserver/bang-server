@@ -204,6 +204,17 @@ namespace banggame {
         }, *this);
     }
 
+    template<equip_type E> static constexpr bool is_nodisable_v = requires {
+        typename enums::enum_type_t<E>::nodisable;
+    };
+
+    bool equip_holder::is_nodisable() const {
+        static constexpr auto nodisable_table = []<equip_type ... Es>(enums::enum_sequence<Es ...>) {
+            return std::array { is_nodisable_v<Es> ... };
+        }(enums::make_enum_sequence<equip_type>());
+        return nodisable_table[enums::indexof(type)];
+    }
+
     void modifier_holder::add_context(card *origin_card, player *origin, effect_context &ctx) const {
         enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) {
             if constexpr (enums::value_with_type<E>) {

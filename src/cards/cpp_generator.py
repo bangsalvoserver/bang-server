@@ -20,6 +20,8 @@ def object_to_string(object_value, indent = 0):
         return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(value, indent + 1)}" for value in object_value if value is not None) + '\n' + (SPACE * indent) + '}'
     elif isinstance(object_value, str):
         return f'{{\"{object_value}\"}}'
+    elif isinstance(object_value, bool):
+        return f"{{{'true' if object_value else 'false'}}}"
     else:
         return f'{{{object_value}}}'
 

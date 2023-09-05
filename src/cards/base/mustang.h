@@ -6,6 +6,8 @@
 namespace banggame {
     
     struct equip_horse {
+        struct nodisable {};
+        
         game_string on_prompt(card *origin_card, player *origin, player *target);
         void on_enable(card *target_card, player *target);
     };

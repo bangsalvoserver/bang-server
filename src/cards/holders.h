@@ -35,6 +35,7 @@ namespace banggame {
         game_string on_prompt(card *origin_card, player *origin, player *target) const;
         void on_enable(card *target_card, player *target) const;
         void on_disable(card *target_card, player *target) const;
+        bool is_nodisable() const;
     )
 
     DEFINE_STRUCT(modifier_holder,

@@ -56,7 +56,6 @@ namespace banggame {
         (pass_turn)
         (skip_logs)
         (no_auto_discard)
-        (nodisable)
         (hidden)
         (discard_if_two_players)
         (bangcard)

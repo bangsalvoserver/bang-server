@@ -31,7 +31,7 @@ namespace banggame {
         }
 
         target->m_game->add_listener<event_type::count_range_mod>(target_card, [=, range=range](const player *origin, range_mod_type type, int &value) {
-            if (origin == target && type == range_mod_type::weapon_range) {
+            if (origin == target && type == range_mod_type::weapon_range && !origin->m_game->is_disabled(target_card)) {
                 value = range;
             }
         });

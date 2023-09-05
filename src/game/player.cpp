@@ -50,16 +50,18 @@ namespace banggame {
     }
 
     void player::enable_equip(card *target_card) {
-        if (!m_game->is_disabled(target_card)) {
-            for (const equip_holder &e : target_card->equips) {
+        bool card_disabled = m_game->is_disabled(target_card);
+        for (const equip_holder &e : target_card->equips) {
+            if (!card_disabled || e.is_nodisable()) {
                 e.on_enable(target_card, this);
             }
         }
     }
 
     void player::disable_equip(card *target_card) {
-        if (!m_game->is_disabled(target_card)) {
-            for (const equip_holder &e : target_card->equips) {
+        bool card_disabled = m_game->is_disabled(target_card);
+        for (const equip_holder &e : target_card->equips) {
+            if (!card_disabled || e.is_nodisable()) {
                 e.on_disable(target_card, this);
             }
         }

@@ -573,7 +573,6 @@ main_deck:
     tags:
       - discard_if_two_players
       - ghost_card
-      - nodisable
   - name: LEMAT
     signs:
       - 4 diamonds
@@ -2648,7 +2647,6 @@ train:
     tags:
       - discard_if_two_players
       - ghost_card
-      - nodisable
   - name: LOUNGE_CAR
     image: 27_lounge_car
     color: train

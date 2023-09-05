@@ -6,6 +6,8 @@
 namespace banggame {
 
     struct equip_weapon : event_equip {
+        struct nodisable {};
+        
         int range;
         equip_weapon(int range): range(range) {}
 

@@ -59,26 +59,49 @@ def parse_effects(effect_list):
         })
     return result
 
-def parse_effect_simple(effect_list, value_name, type_name):
-    if not isinstance(effect_list, list):
-        raise RuntimeError(f'in parse_effect_simple: expected list, got {effect_list}')
+def parse_equips(equip_list):
+    if not isinstance(equip_list, list):
+        raise RuntimeError(f'in parse_equip: expected list, got {equip_list}')
 
     result = []
-    for effect in effect_list:
+    for effect in equip_list:
         match = re.match(
             r'^\s*(\w+)' # type
             r'(?:\s*\((-?\d+)\))?\s*$', # effect_value
             effect
         )
         if not match:
-            raise RuntimeError(f'Invalid effect string: {effect}')
+            raise RuntimeError(f'Invalid equip string: {effect}')
         
         effect_type = match.group(1)
         effect_value = match.group(2)
 
         result.append({
-            value_name: int(effect_value) if effect_value else None,
-            'type': CppEnum(type_name, effect_type)
+            'effect_value': int(effect_value) if effect_value else None,
+            'type': CppEnum('equip_type', effect_type)
+        })
+    return result
+
+def parse_tags(tag_list):
+    if not isinstance(tag_list, list):
+        raise RuntimeError(f'in parse_tags: expected list, got {tag_list}')
+
+    result = []
+    for effect in tag_list:
+        match = re.match(
+            r'^\s*(\w+)' # type
+            r'(?:\s*\((-?\d+)\))?\s*$', # tag_value
+            effect
+        )
+        if not match:
+            raise RuntimeError(f'Invalid tag string: {effect}')
+        
+        effect_type = match.group(1)
+        effect_value = match.group(2)
+
+        result.append({
+            'tag_value': int(effect_value) if effect_value else None,
+            'type': CppEnum('tag_type', effect_type)
         })
     return result
 
@@ -90,8 +113,8 @@ def parse_all_effects(card):
             'effects':      parse_effects(card['effects']) if 'effects' in card else None,
             'responses':    parse_effects(card['responses']) if 'responses' in card else None,
             'optionals':    parse_effects(card['optional']) if 'optional' in card else None,
-            'equips':       parse_effect_simple(card['equip'], 'effect_value', 'equip_type') if 'equip' in card else None,
-            'tags':         parse_effect_simple(card['tags'], 'tag_value', 'tag_type') if 'tags' in card else None,
+            'equips':       parse_equips(card['equip']) if 'equip' in card else None,
+            'tags':         parse_tags(card['tags']) if 'tags' in card else None,
             'expansion':    CppEnum('expansion_type', card['expansion']) if 'expansion' in card else None,
             'deck':         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
             'modifier':     {'type': CppEnum('modifier_type', card['modifier'])} if 'modifier' in card else None,
