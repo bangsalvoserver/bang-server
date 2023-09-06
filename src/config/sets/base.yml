@@ -1,0 +1,384 @@
+main_deck:
+  - &barrel
+    name: BARREL
+    signs:
+      - Q spades
+      - K spades
+    image: 01_barile
+    color: blue
+    responses:
+      - barrel
+  - &dynamite
+    name: DYNAMITE
+    signs:
+      - 2 hearts
+    image: 01_dinamite
+    color: blue
+    equip:
+      - predraw_check(2)
+      - dynamite
+  - &scope
+    name: SCOPE
+    signs:
+      - A spades
+    image: 01_mirino
+    color: blue
+    equip:
+      - scope
+  - &mustang
+    name: MUSTANG
+    signs:
+      - 8 hearts
+      - 9 hearts
+    image: 01_mustang
+    color: blue
+    equip:
+      - horse
+      - mustang
+    tags:
+      - horse
+  - &jail
+    name: JAIL
+    signs:
+      - J spades
+      - 4 hearts
+      - 10 spades
+    image: 01_prigione
+    color: blue
+    equip_target: notsheriff
+    equip:
+      - predraw_check(1)
+      - jail
+  - &remington
+    name: REMINGTON
+    signs:
+      - K clubs
+    image: 01_remington
+    color: blue
+    equip:
+      - weapon(3)
+    tags:
+      - weapon
+  - &rev_carabine
+    name: REV_CARABINE
+    signs:
+      - A clubs
+    image: 01_carabine
+    color: blue
+    equip:
+      - weapon(4)
+    tags:
+      - weapon
+  - &schofield
+    name: SCHOFIELD
+    signs:
+      - J clubs
+      - Q clubs
+      - K spades
+    image: 01_schofield
+    color: blue
+    equip:
+      - weapon(2)
+    tags:
+      - weapon
+  - &volcanic
+    name: VOLCANIC
+    signs:
+      - 10 spades
+      - 10 clubs
+    image: 01_volcanic
+    color: blue
+    equip:
+      - weapon(1)
+      - volcanic
+    tags:
+      - weapon
+  - &winchester
+    name: WINCHESTER
+    signs:
+      - 8 spades
+    image: 01_winchester
+    color: blue
+    equip:
+      - weapon(5)
+    tags:
+      - weapon
+  - &bang
+    name: BANG
+    signs:
+      - 2 clubs
+      - 3 clubs
+      - 4 clubs
+      - 5 clubs
+      - 6 clubs
+      - 7 clubs
+      - 8 clubs
+      - 9 clubs
+      - A diamonds
+      - 2 diamonds
+      - 3 diamonds
+      - 4 diamonds
+      - 5 diamonds
+      - 6 diamonds
+      - 7 diamonds
+      - 8 diamonds
+      - 9 diamonds
+      - 10 diamonds
+      - J diamonds
+      - Q diamonds
+      - K diamonds
+      - A hearts
+      - Q hearts
+      - K hearts
+      - A spades
+    image: 01_bang
+    color: brown
+    effects:
+      - banglimit
+      - bangcard player reachable notself
+    tags:
+      - bangcard
+      - skip_logs
+  - &beer
+    name: BEER
+    signs:
+      - 6 hearts
+      - 7 hearts
+      - 8 hearts
+      - 9 hearts
+      - 10 hearts
+      - J hearts
+    image: 01_birra
+    color: brown
+    effects:
+      - beer
+    responses:
+      - beer
+      - deathsave
+    tags:
+      - beer
+  - &cat_balou
+    name: CAT_BALOU
+    signs:
+      - K hearts
+      - 9 diamonds
+      - 10 diamonds
+      - J diamonds
+    image: 01_catbalou
+    color: brown
+    effects:
+      - destroy card
+    tags:
+      - skip_logs
+      - cat_balou
+  - &stagecoach
+    name: STAGECOACH
+    signs:
+      - 9 spades
+      - 9 spades
+    image: 01_diligenza
+    color: brown
+    effects:
+      - draw(2)
+      - changewws
+  - &duel
+    name: DUEL
+    signs:
+      - Q diamonds
+      - J spades
+      - 8 clubs
+    image: 01_duello
+    color: brown
+    effects:
+      - duel player notself
+    tags:
+      - skip_logs
+  - &general_store
+    name: GENERAL_STORE
+    signs:
+      - 9 clubs
+      - Q spades
+    image: 01_emporio
+    color: brown
+    effects:
+      - generalstore
+      - generalstore players
+  - &gatling
+    name: GATLING
+    signs:
+      - 10 hearts
+    image: 01_gatling
+    color: brown
+    effects:
+      - bang players notself
+  - &indians
+    name: INDIANS
+    signs:
+      - K diamonds
+      - A diamonds
+    image: 01_indiani
+    color: brown
+    effects:
+      - indians players notself
+    tags:
+      - indians
+  - &missed
+    name: MISSED
+    signs:
+      - 2 spades
+      - 3 spades
+      - 4 spades
+      - 5 spades
+      - 6 spades
+      - 7 spades
+      - 8 spades
+      - A clubs
+      - 10 clubs
+      - J clubs
+      - Q clubs
+      - K clubs
+    image: 01_mancato
+    color: brown
+    responses:
+      - missed
+    tags:
+      - missed
+      - missedcard
+  - &panic
+    name: PANIC
+    signs:
+      - J hearts
+      - Q hearts
+      - A hearts
+      - 8 diamonds
+    image: 01_panico
+    color: brown
+    effects:
+      - steal card range_1
+    tags:
+      - skip_logs
+      - panic
+  - &saloon
+    name: SALOON
+    signs:
+      - 5 hearts
+    image: 01_saloon
+    color: brown
+    effects:
+      - heal players
+  - &wells_fargo
+    name: WELLS_FARGO
+    signs:
+      - 3 hearts
+    image: 01_wellsfargo
+    color: brown
+    effects:
+      - draw(3)
+      - changewws
+
+character:
+  - name: BART_CASSIDY
+    image: 01_bartcassidy
+    equip:
+      - bart_cassidy
+  - name: BLACK_JACK
+    image: 01_blackjack
+    equip:
+      - black_jack
+  - name: CALAMITY_JANET
+    image: 01_calamityjanet
+    equip:
+      - calamity_janet
+    effects:
+      - banglimit
+      - mth_add card self | hand missed
+      - mth_add player reachable notself
+    mth_effect: play_as_bang
+    responses:
+      - missed
+      - discard card self | hand bangcard
+    tags:
+      - play_as_bang
+  - name: EL_GRINGO
+    image: 01_elgringo
+    equip:
+      - el_gringo
+    tags:
+      - max_hp(3)
+  - name: JESSE_JONES
+    image: 01_jessejones
+    responses:
+      - end_drawing
+      - steal card notself | hand
+      - draw_one_less
+    tags:
+      - drawing
+  - name: JOURDONNAIS
+    image: 01_jourdonnais
+    responses:
+      - barrel
+  - name: KIT_CARLSON
+    image: 01_kitcarlson
+    equip:
+      - kit_carlson
+  - name: LUCKY_DUKE
+    image: 01_luckyduke
+    equip:
+      - lucky_duke
+  - name: PAUL_REGRET
+    image: 01_paulregret
+    equip:
+      - mustang
+    tags:
+      - max_hp(3)
+  - name: PEDRO_RAMIREZ
+    image: 01_pedroramirez
+    responses:
+      - end_drawing
+      - draw_discard
+      - draw_one_less
+    tags:
+      - drawing
+  - name: ROSE_DOOLAN
+    image: 01_rosedoolan
+    equip:
+      - scope
+  - name: SID_KETCHUM
+    image: 01_sidketchum
+    effects:
+      - discard cards(2) self | hand
+      - heal
+    responses:
+      - discard cards(2) self | hand
+      - heal
+      - deathsave
+  - name: SLAB_THE_KILLER
+    image: 01_slab
+    equip:
+      - slab_the_killer
+  - name: SUZY_LAFAYETTE
+    image: 01_suzylafayette
+    equip:
+      - suzy_lafayette
+  - name: VULTURE_SAM
+    image: 01_vulturesam
+    equip:
+      - vulture_sam
+    tags:
+      - discard_if_two_players
+  - name: WILLY_THE_KID
+    image: 01_willythekid
+    equip:
+      - volcanic
+
+button_row:
+  - name: GAME_CONFIRM
+    responses:
+      - resolve
+    tags:
+      - confirm
+  - name: GAME_PASS
+    effects:
+      - pass_turn
+    tags:
+      - pass_turn

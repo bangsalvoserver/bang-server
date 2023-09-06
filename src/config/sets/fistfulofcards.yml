@@ -1,0 +1,94 @@
+fistfulofcards:
+  - name: AMBUSH
+    image: 05_agguato
+    equip:
+      - ambush
+    tags:
+      - discard_if_two_players
+  - name: SNIPER
+    image: 05_cecchino
+    effects:
+      - discard cards(2) self | hand bang
+      - sniper player reachable notself
+  - name: DEAD_MAN
+    image: 05_deadman
+    equip:
+      - deadman
+    tags:
+      - discard_if_two_players
+      - ghost_card
+  - name: BLOOD_BROTHERS
+    image: 05_fratellidisangue
+    responses:
+      - max_usages(1)
+      - startofturn
+      - damage
+      - queue_heal_notfull player notself
+      - reset_drawing
+  - name: THE_JUDGE
+    image: 05_ilgiudice
+    equip:
+      - judge
+  - name: LASSO
+    image: 05_lazo
+    equip:
+      - lasso
+  - name: LAW_OF_THE_WEST
+    image: 05_leggedelwest
+    equip:
+      - lawofthewest
+  - name: HARD_LIQUOR
+    image: 05_liquoreforte
+    responses:
+      - startofturn
+      - end_drawing
+      - heal_notfull
+  - name: ABANDONED_MINE
+    image: 05_minieraabbandonata
+    equip:
+      - abandonedmine
+  - name: PEYOTE
+    image: 05_peyote
+    equip:
+      - peyote
+  - name: PEYOTE_RED
+    image: 05_peyote_rosso
+    tags:
+      - peyote(1)
+      - hidden
+  - name: PEYOTE_BLACK
+    image: 05_peyote_nero
+    tags:
+      - peyote(2)
+      - hidden
+  - name: RANCH
+    image: 05_ranch
+    equip:
+      - ranch
+    responses:
+      - ranch
+    optional:
+      - discard card self | hand
+      - mth_add
+    tags:
+      - repeatable
+    mth_response: draw_multi
+  - name: RICOCHET
+    image: 05_rimbalzo
+    effects:
+      - discard card self | hand bang
+      - ricochet card notself | table
+  - name: RUSSIAN_ROULETTE
+    image: 05_rouletterussa
+    equip:
+      - russianroulette
+  - name: VENDETTA
+    image: 05_vendetta
+    equip:
+      - vendetta
+  - name: A_FISTFUL_OF_CARDS
+    image: 05_perunpugnodicarte
+    equip:
+      - fistfulofcards
+    tags:
+      - last_scenario_card

@@ -2,7 +2,7 @@
 
 import re
 import sys
-import yaml
+import yaml_custom as yaml
 from cpp_generator import CppEnum, print_cpp_file
 
 def is_hidden(card):
@@ -133,6 +133,18 @@ def add_expansion(card, name):
     else:
         card['expansion'] = name
 
+def merge_cards(card_sets):
+    result = {}
+    for card_set in card_sets:
+        for k, v in card_set.items():
+            if not isinstance(v, list):
+                raise RuntimeError(f'Error in merge_cards: Expected list, got {v}')
+            if k in result:
+                result[k].extend(v)
+            else:
+                result[k] = v
+    return result
+
 def parse_file(data):
     result = {
         'deck': [],
@@ -218,9 +230,14 @@ if __name__ == '__main__':
         sys.exit(1)
 
     with open(sys.argv[1], 'r', encoding='utf8') as file:
-        bang_cards = parse_file(yaml.safe_load(file))
+        bang_cards = parse_file(merge_cards(yaml.safe_load(file)))
     
-    with open(sys.argv[2], 'w', encoding='utf8') as file:
+    if sys.argv[2] == '-':
         print_cpp_file(bang_cards, OBJECT_DECLARATION,
             include_filenames=INCLUDE_FILENAMES,
-            file=file)
+            file=sys.stdout)
+    else:
+        with open(sys.argv[2], 'w', encoding='utf8') as file:
+            print_cpp_file(bang_cards, OBJECT_DECLARATION,
+                include_filenames=INCLUDE_FILENAMES,
+                file=file)

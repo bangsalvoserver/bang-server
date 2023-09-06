@@ -1,0 +1,279 @@
+character:
+  - name: DON_BELL
+    image: 04_don_bell
+    expansion: goldrush
+    equip:
+      - don_bell
+  - name: DUTCH_WILL
+    image: 04_dutch_will
+    expansion: goldrush
+    equip:
+      - dutch_will
+  - name: JACKY_MURIETA
+    image: 04_jacky_murieta
+    expansion: goldrush
+    effects:
+      - pay_gold(2)
+      - bang player reachable notself
+    tags:
+      - skip_logs
+  - name: JOSH_MCCLOUD
+    image: 04_josh_mccloud
+    expansion: goldrush
+    effects:
+      - pay_gold(2)
+      - josh_mccloud
+    responses:
+      - forced_equip player
+  - name: MADAME_YTO
+    image: 04_madame_yto
+    expansion: goldrush
+    equip:
+      - madam_yto
+  - name: PRETTY_LUZENA
+    image: 04_pretty_luzena
+    expansion: goldrush
+    modifier: discount
+    effects:
+      - max_usages(1)
+  - name: RADDIE_SNAKE
+    image: 04_raddie_snake
+    expansion: goldrush
+    effects:
+      - max_usages(2)
+      - pay_gold(1)
+      - draw
+  - name: SIMEON_PICOS
+    image: 04_simeon_picos
+    expansion: goldrush
+    equip:
+      - luckycharm
+
+goldrush:
+  - count: 3
+    name: SHOT
+    image: 04_bicchierino
+    color: brown
+    effects:
+      - heal player
+    responses:
+      - forced_play
+      - heal player
+    tags:
+      - buy_cost(1)
+  - count: 3
+    name: BOTTLE
+    image: 04_bottiglia
+    color: brown
+    modifier: card_choice
+    effects:
+      - none
+    responses:
+      - forced_play
+    tags:
+      - card_choice(1)
+      - buy_cost(2)
+  - name: BOTTLE_PANIC
+    image: main_deck/01_panico
+    color: brown
+    effects:
+      - card_choice
+      - steal card range_1
+    responses:
+      - card_choice
+      - steal card range_1
+    tags:
+      - card_choice(1)
+      - hidden
+  - name: BOTTLE_BEER
+    image: main_deck/01_birra
+    color: brown
+    effects:
+      - card_choice
+      - heal
+    responses:
+      - card_choice
+      - heal
+    tags:
+      - card_choice(1)
+      - hidden
+  - name: BOTTLE_BANG
+    image: main_deck/01_bang
+    color: brown
+    effects:
+      - card_choice
+      - bang player reachable notself
+    responses:
+      - card_choice
+      - bang player reachable notself
+    tags:
+      - card_choice(1)
+      - hidden
+  - name: CALUMET
+    image: 04_calumet
+    color: black
+    equip:
+      - apache_kid
+    tags:
+      - buy_cost(3)
+  - name: GUN_BELT
+    image: 04_cinturone
+    color: black
+    equip:
+      - gunbelt(8)
+    tags:
+      - buy_cost(2)
+  - count: 3
+    name: PARDNER
+    image: 04_complice
+    color: brown
+    modifier: card_choice
+    effects:
+      - none
+    responses:
+      - forced_play
+    tags:
+      - card_choice(2)
+      - buy_cost(2)
+  - name: PARDNER_GENERAL_STORE
+    image: main_deck/01_emporio
+    color: brown
+    effects:
+      - card_choice
+      - generalstore
+      - generalstore players
+    responses:
+      - card_choice
+      - generalstore
+      - generalstore players
+    tags:
+      - card_choice(2)
+      - hidden
+  - name: PARDNER_DUEL
+    image: main_deck/01_duello
+    color: brown
+    effects:
+      - card_choice
+      - duel player notself
+    responses:
+      - card_choice
+      - duel player notself
+    tags:
+      - card_choice(2)
+      - hidden
+  - name: PARDNER_CAT_BALOU
+    image: main_deck/01_catbalou
+    color: brown
+    effects:
+      - card_choice
+      - destroy card
+    responses:
+      - card_choice
+      - destroy card
+    tags:
+      - card_choice(2)
+      - hidden
+  - name: GOLD_RUSH
+    image: 04_corsa_all_oro
+    color: brown
+    effects:
+      - goldrush
+      - pass_turn
+    responses:
+      - forced_play
+      - goldrush
+      - pass_turn
+    tags:
+      - buy_cost(5)
+  - name: HORSESHOE
+    image: 04_ferro_di_cavallo
+    color: black
+    equip:
+      - lucky_duke
+    tags:
+      - buy_cost(2)
+  - name: PICKAXE
+    image: 04_piccone
+    color: black
+    equip:
+      - pixie_pete
+    tags:
+      - buy_cost(4)
+  - count: 3
+    name: WANTED
+    image: 04_ricercato
+    color: black
+    equip_target: any
+    equip:
+      - wanted
+    tags:
+      - buy_cost(2)
+      - discard_if_two_players
+  - count: 2
+    name: RHUM
+    image: 04_rum
+    color: brown
+    effects:
+      - rum
+    responses:
+      - forced_play
+      - rum
+    tags:
+      - buy_cost(3)
+  - name: GOLD_PAN
+    image: 04_setaccio
+    color: black
+    effects:
+      - max_usages(2)
+      - pay_gold(1)
+      - draw
+    tags:
+      - buy_cost(3)
+  - name: BOOTS
+    image: 04_stivali
+    color: black
+    equip:
+      - bart_cassidy
+    tags:
+      - buy_cost(3)
+  - name: LUCKY_CHARM
+    image: 04_talismano
+    color: black
+    equip:
+      - luckycharm
+    tags:
+      - buy_cost(3)
+  - name: UNION_PACIFIC
+    image: 04_union_pacific
+    color: brown
+    effects:
+      - draw(4)
+      - changewws
+    responses:
+      - forced_play
+      - draw(4)
+      - changewws
+    tags:
+      - buy_cost(4)
+  - name: RUCKSACK
+    image: 04_zaino
+    color: black
+    effects:
+      - pay_gold(2)
+      - heal
+    responses:
+      - pay_gold(2)
+      - heal
+      - deathsave
+    tags:
+      - buy_cost(3)
+
+button_row:
+  - name: GAME_SELL_BEER
+    expansion: goldrush
+    effects:
+      - sell_beer card self | hand beer
+  - name: GAME_DISCARD_BLACK
+    expansion: goldrush
+    effects:
+      - discard_black card | table black

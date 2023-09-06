@@ -1,0 +1,213 @@
+main_deck:
+  - name: GHOST
+    signs:
+      - 9 spades
+      - 10 spades
+    image: 07_fantasma
+    expansion: valleyofshadows
+    color: blue
+    equip_target: dead
+    equip:
+      - ghost(1)
+    tags:
+      - discard_if_two_players
+      - ghost_card
+  - name: LEMAT
+    signs:
+      - 4 diamonds
+    image: 07_lemat
+    expansion: valleyofshadows
+    color: blue
+    equip:
+      - weapon(1)
+    effects:
+      - banglimit
+      - mth_add card self | hand
+      - mth_add player reachable notself
+    mth_effect: play_as_bang
+    tags:
+      - weapon
+      - play_as_bang
+      - skip_logs
+  - name: RATTLESNAKE
+    signs:
+      - 7 hearts
+    image: 07_serpenteasonagli
+    expansion: valleyofshadows
+    color: blue
+    equip_target: any
+    equip:
+      - predraw_check(0)
+      - snake
+  - name: SHOTGUN
+    signs:
+      - K spades
+    image: 07_shotgun
+    expansion: valleyofshadows
+    color: blue
+    equip:
+      - weapon(1)
+      - shotgun
+    tags:
+      - weapon
+  - name: BOUNTY
+    signs:
+      - 9 clubs
+    image: 07_taglia
+    expansion: valleyofshadows
+    color: blue
+    equip_target: any
+    equip:
+      - bounty
+  - name: BANDIDOS
+    signs:
+      - Q diamonds
+    image: 07_bandidos
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - bandidos players
+  - name: ESCAPE
+    signs:
+      - 3 hearts
+    image: 07_fuga
+    expansion: valleyofshadows
+    color: brown
+    responses:
+      - escape
+  - name: AIM
+    signs:
+      - 6 clubs
+    image: 07_mira
+    expansion: valleyofshadows
+    color: brown
+    modifier: bangmod
+    effects:
+      - aim
+  - name: POKER
+    signs:
+      - J hearts
+    image: 07_poker
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - poker players notself not_empty_hand
+      - poker
+  - name: BACKFIRE
+    signs:
+      - Q clubs
+    image: 07_ritornodifiamma
+    expansion: valleyofshadows
+    color: brown
+    responses:
+      - backfire
+    tags:
+      - missed
+  - name: SAVED
+    signs:
+      - 5 hearts
+    image: 07_salvo
+    expansion: valleyofshadows
+    color: brown
+    responses:
+      - saved
+  - name: FANNING
+    signs:
+      - 2 spades
+    image: 07_sventagliata
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - banglimit
+      - mth_add player reachable notself
+      - mth_add player notself
+    mth_effect: fanning
+    tags:
+      - discard_if_two_players
+      - skip_logs
+  - name: TOMAHAWK
+    signs:
+      - A diamonds
+    image: 07_tomahawk
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - bang player notself range_2
+    tags:
+      - skip_logs
+  - name: TORNADO
+    signs:
+      - A clubs
+    image: 07_tornado
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - tornado players
+  - name: LAST_CALL
+    signs:
+      - 8 diamonds
+    image: 07_ultimogiro
+    expansion: valleyofshadows
+    color: brown
+    effects:
+      - heal
+
+character:
+  - name: BLACK_FLOWER
+    image: 07_blackflower
+    expansion: valleyofshadows
+    effects:
+      - max_usages(1)
+      - discard card self | hand clubs
+      - bang player reachable notself
+    tags:
+      - skip_logs
+  - name: COLORADO_BILL
+    image: 07_coloradobill
+    expansion: valleyofshadows
+    equip:
+      - colorado_bill
+  - name: DER_SPOT_BURST_RINGER
+    image: 07_derspot
+    expansion: valleyofshadows
+    effects:
+      - max_usages(1)
+      - mth_add card self | hand bang
+      - mth_add players notself
+    mth_effect: play_as_bang
+  - name: EVELYN_SHEBANG
+    image: 07_evelynshebang
+    expansion: valleyofshadows
+    responses:
+      - evelyn_shebang player notself reachable
+      - reset_drawing
+  - name: HENRY_BLOCK
+    image: 07_henryblock
+    expansion: valleyofshadows
+    equip:
+      - henry_block
+  - name: LEMONADE_JIM
+    image: 07_lemonadejim
+    expansion: valleyofshadows
+    equip:
+      - lemonade_jim
+    responses:
+      - lemonade_jim
+    optional:
+      - discard card self | hand
+      - heal
+  - name: MICK_DEFENDER
+    image: 07_mickdefender
+    expansion: valleyofshadows
+    equip:
+      - mick_defender
+    responses:
+      - escape
+      - discard card self | hand missed
+  - name: TUCO_FRANZISKANER
+    image: 07_tucofranziskaner
+    expansion: valleyofshadows
+    equip:
+      - tuco_franziskaner
+    tags:
+      - max_hp(5)

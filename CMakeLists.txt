@@ -15,26 +15,6 @@ target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_STL_)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
 target_include_directories(networking INTERFACE external/websocketpp)
 
-set(bang_cards_cpp "${CMAKE_CURRENT_BINARY_DIR}/bang_cards.cpp")
-add_custom_command(
-    OUTPUT "${bang_cards_cpp}"
-    COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/src/cards/parse_bang_cards.py"
-        src/cards/bang_cards.yml
-        "${bang_cards_cpp}"
-    VERBATIM
-    DEPENDS
-        src/cards/bang_cards.yml
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/cards/parse_bang_cards.py"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-)
-add_library(bang_cards_obj OBJECT "${bang_cards_cpp}")
-target_include_directories(bang_cards_obj PRIVATE src)
-target_link_libraries(bang_cards_obj PRIVATE cpputils)
-if(MINGW)
-    # disable optimization, fix ICE in gcc 13 in mingw
-    target_compile_options(bang_cards_obj PRIVATE -O0)
-endif()
-
 add_library(bangcommon INTERFACE)
 target_include_directories(bangcommon INTERFACE src)
 target_link_libraries(bangcommon INTERFACE cpputils networking)
@@ -42,7 +22,7 @@ target_link_libraries(bangcommon INTERFACE cpputils networking)
 add_executable(bangserver "")
 add_subdirectory(src)
 
-target_link_libraries(bangserver PUBLIC bang_cards_obj bangcommon cxxopts::cxxopts)
+target_link_libraries(bangserver PUBLIC bangcommon cxxopts::cxxopts)
 target_compile_definitions(bangserver PRIVATE BUILD_BANG_SERVER)
 
 option(BUILD_GAME_RELEASE "Build Game Release" OFF)

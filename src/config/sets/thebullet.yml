@@ -1,0 +1,71 @@
+character:
+  - name: CLAUS_THE_SAINT
+    image: 02_clausthesaint
+    expansion: thebullet
+    equip:
+      - claus_the_saint
+    responses:
+      - mth_add card | selection
+      - mth_add player notself
+    mth_response: claus_the_saint
+    tags:
+      - max_hp(3)
+  - name: JOHNNY_KISCH
+    image: 02_johnnykisch
+    expansion: thebullet
+    equip:
+      - johnny_kisch
+  - name: UNCLE_WILL
+    image: 02_unclewill
+    expansion: thebullet
+    effects:
+      - max_usages(1)
+      - discard card self | hand
+      - generalstore
+      - generalstore players
+  - name: ANNIE_VERSARY
+    image: 02_annieversary
+    expansion: thebullet
+    effects:
+      - banglimit
+      - mth_add card self | hand
+      - mth_add player reachable notself
+    mth_effect: play_as_bang
+    tags:
+      - play_as_bang
+
+highnoon:
+  - name: HANDCUFFS
+    image: 05_manette
+    expansion: thebullet
+    equip:
+      - handcuffs
+  - expansion: thebullet
+    name: HANDCUFFS_HEARTS
+    image: 05_manette_hearts
+    tags:
+      - handcuffs(1)
+      - hidden
+  - expansion: thebullet
+    name: HANDCUFFS_DIAMONDS
+    image: 05_manette_diamonds
+    tags:
+      - handcuffs(2)
+      - hidden
+  - expansion: thebullet
+    name: HANDCUFFS_CLUBS
+    image: 05_manette_clubs
+    tags:
+      - handcuffs(3)
+      - hidden
+  - expansion: thebullet
+    name: HANDCUFFS_SPADES
+    image: 05_manette_spades
+    tags:
+      - handcuffs(4)
+      - hidden
+  - name: NEW_IDENTITY
+    image: 05_nuovaidentita
+    expansion: thebullet
+    equip:
+      - newidentity

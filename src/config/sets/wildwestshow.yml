@@ -1,0 +1,115 @@
+character:
+  - name: BIG_SPENCER
+    image: 06_bigspencer
+    expansion: wildwestshow
+    equip:
+      - big_spencer
+    tags:
+      - max_hp(9)
+      - initial_cards(5)
+  - name: FLINT_WESTWOOD
+    image: 06_flintwestwood
+    expansion: wildwestshow
+    effects:
+      - max_usages(1)
+      - mth_add card self | hand
+      - mth_add card notself | hand
+    mth_effect: flint_westwood
+  - name: GARY_LOOTER
+    image: 06_garylooter
+    expansion: wildwestshow
+    equip:
+      - gary_looter
+    tags:
+      - max_hp(5)
+  - name: GREYGORY_DECK
+    image: 06_greygorydeck
+    expansion: wildwestshow
+    responses:
+      - max_usages(1)
+      - while_drawing
+      - greygory_deck
+    equip:
+      - greygory_deck
+  - name: JOHN_PAIN
+    image: 06_johnpain
+    expansion: wildwestshow
+    equip:
+      - john_pain
+  - name: LEE_VAN_KLIFF
+    image: 06_leevankliff
+    expansion: wildwestshow
+    modifier: leevankliff
+    effects:
+      - discard card self | hand bang
+  - name: TEREN_KILL
+    image: 06_terenkill
+    expansion: wildwestshow
+    equip:
+      - teren_kill
+    tags:
+      - max_hp(3)
+  - name: YOUL_GRINNER
+    image: 06_youlgrinner
+    expansion: wildwestshow
+    equip:
+      - youl_grinner
+
+wildwestshow:
+  # - name: GAG
+  #   image: 06_bavaglio
+  - name: BONE_ORCHARD
+    image: 06_camposanto
+    equip:
+      - bone_orchard
+    tags:
+      - ghost_card
+      - discard_if_two_players
+  - name: DARLING_VALENTINE
+    image: 06_darlingvalentine
+    equip:
+      - darling_valentine
+  # - name: DOROTHY_RAGE
+  #   image: 06_dorothyrage
+  - name: HELENA_ZONTERO
+    image: 06_helenazontero
+    equip:
+      - helena_zontero
+    tags:
+      - discard_if_two_players
+  - name: LADY_ROSA_OF_TEXAS
+    image: 06_ladyrosadeltexas
+    effects:
+      - max_usages(1)
+      - ladyrosaoftexas
+    tags:
+      - discard_if_two_players
+  - name: MISS_SUSANNA
+    image: 06_misssusanna
+    equip:
+      - miss_susanna
+  - name: SHOWDOWN
+    image: 06_regolamentodiconti
+    equip:
+      - showdown
+    effects:
+      - banglimit
+      - mth_add card self | hand
+      - mth_add player reachable notself
+    mth_effect: play_as_bang
+    responses:
+      - missed
+      - discard(1) card self | hand bangcard
+    tags:
+      - play_as_bang
+  - name: SACAGAWAY
+    image: 06_sacagaway
+    equip:
+      - sacagaway
+  - name: WILD_WEST_SHOW
+    image: 06_wildwestshow
+    equip:
+      - wildwestshow
+    tags:
+      - last_scenario_card
+      - discard_if_two_players

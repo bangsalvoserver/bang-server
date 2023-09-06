@@ -1,0 +1,348 @@
+main_deck:
+  - <<: *bang
+    signs:
+      - 6 hearts
+      - 2 clubs
+      - 2 diamonds
+      - 3 diamonds
+    image: 17_bang
+    expansion: armedanddangerous
+  - name: CARAVAN
+    signs:
+      - 2 spades
+    image: 17_carovana
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - mth_add
+      - mth_add
+      - changewws
+    optional:
+      - pay_cube select_cubes(2)
+      - mth_add
+    mth_effect: draw_multi
+    tags:
+      - repeatable
+  - <<: *cat_balou
+    signs:
+      - 3 hearts
+    image: 17_catbalou
+    expansion: armedanddangerous
+  - name: A_LITTLE_NIP
+    signs:
+      - 5 hearts
+    image: 17_cicchetto
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - mth_add
+    optional:
+      - pay_cube select_cubes(3)
+      - mth_add
+    tags:
+      - repeatable
+    mth_effect: heal_multi
+  - name: QUICK_SHOT
+    signs:
+      - 3 spades
+    image: 17_colporapido
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - bang player reachable notself
+    optional:
+      - pay_cube select_cubes(1)
+      - bang player reachable notself
+    tags:
+      - repeatable
+      - auto_confirm
+      - skip_logs
+  - name: FLINTLOCK
+    signs:
+      - A spades
+    image: 17_flintlock
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - mth_add player reachable notself
+    optional:
+      - pay_cube select_cubes(2)
+      - mth_add
+    mth_effect: flintlock
+    tags:
+      - skip_logs
+  - name: ARROW
+    signs:
+      - 5 diamonds
+    image: 17_freccia
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - indians player notself
+    optional:
+      - pay_cube select_cubes(1)
+      - indians player notself
+    tags:
+      - repeatable
+      - auto_confirm
+      - indians
+      - skip_logs
+  - name: DUCK
+    signs:
+      - 3 diamonds
+    image: 17_giulatesta
+    expansion: armedanddangerous
+    color: brown
+    responses:
+      - missed
+    optional:
+      - pay_cube select_cubes(2)
+      - mth_add
+    mth_response: duck
+  - <<: *missed
+    signs:
+      - K spades
+    image: 17_mancato
+    expansion: armedanddangerous
+  - name: RELOAD
+    signs:
+      - 4 diamonds
+    image: 17_ricarica
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - add_cube(3)
+  - name: RUST
+    signs:
+      - 9 spades
+    image: 17_ruggine
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - rust players notself not_empty_cubes
+  - name: SQUAW
+    signs:
+      - 3 diamonds
+    image: 17_squaw
+    expansion: armedanddangerous
+    color: brown
+    effects:
+      - mth_add card | table
+    optional:
+      - pay_cube select_cubes(2)
+      - mth_add
+    mth_effect: squaw
+    tags:
+      - skip_logs
+  - name: ACE_UP_THE_SLEEVE
+    signs:
+      - A hearts
+    image: 17_assonellamanica
+    expansion: armedanddangerous
+    color: orange
+    effects:
+      - pay_cube self_cubes(2)
+      - draw
+  - name: BANDOLIER
+    signs:
+      - 2 hearts
+    image: 17_bandoliera
+    expansion: armedanddangerous
+    color: orange
+    modifier: bandolier
+    effects:
+      - max_usages(1)
+      - pay_cube self_cubes(1)
+  - name: BIG_FIFTY
+    signs:
+      - Q spades
+    image: 17_bigfifty
+    expansion: armedanddangerous
+    color: orange
+    modifier: bigfifty
+    equip:
+      - weapon(6)
+    effects:
+      - pay_cube self_cubes(1)
+      - bigfifty
+    tags:
+      - weapon
+  - name: BOMB
+    signs:
+      - 7 diamonds
+    image: 17_bomba
+    expansion: armedanddangerous
+    color: orange
+    equip_target: any
+    equip:
+      - predraw_check(0)
+      - bomb
+    responses:
+      - move_bomb player
+  - name: BUNTLINE_SPECIAL
+    signs:
+      - J spades
+    image: 17_buntlinespecial
+    expansion: armedanddangerous
+    color: orange
+    modifier: bangmod
+    equip:
+      - weapon(2)
+    effects:
+      - pay_cube self_cubes(1)
+      - buntlinespecial
+    tags:
+      - weapon
+  - name: BELL_TOWER
+    signs:
+      - 7 clubs
+    image: 17_campanile
+    expansion: armedanddangerous
+    color: orange
+    modifier: belltower
+    effects:
+      - pay_cube self_cubes(1)
+  - name: CRATE
+    signs:
+      - 3 hearts
+    image: 17_cassa
+    expansion: armedanddangerous
+    color: orange
+    responses:
+      - pay_cube self_cubes(2)
+      - missed
+  - name: TUMBLEWEED
+    signs:
+      - 4 clubs
+    image: 17_cespuglio
+    expansion: armedanddangerous
+    color: orange
+    equip:
+      - tumbleweed
+    responses:
+      - pay_cube self_cubes(1)
+      - tumbleweed
+  - name: DOUBLE_BARREL
+    signs:
+      - 6 clubs
+    image: 17_doppiacanna
+    expansion: armedanddangerous
+    color: orange
+    modifier: doublebarrel
+    equip:
+      - weapon(1)
+    effects:
+      - pay_cube self_cubes(1)
+      - doublebarrel
+    tags:
+      - weapon
+  - name: WHIP
+    signs:
+      - 5 clubs
+    image: 17_frusta
+    expansion: armedanddangerous
+    color: orange
+    effects:
+      - pay_cube self_cubes(3)
+      - destroy card | table
+    tags:
+      - skip_logs
+  - name: BEER_KEG
+    signs:
+      - 4 hearts
+    image: 17_fustodibirra
+    expansion: armedanddangerous
+    color: orange
+    effects:
+      - pay_cube self_cubes(3)
+      - heal
+  - name: LOCKPICK
+    signs:
+      - 2 clubs
+    image: 17_grimaldello
+    expansion: armedanddangerous
+    color: orange
+    effects:
+      - pay_cube self_cubes(3)
+      - steal card notself | hand
+    tags:
+      - skip_logs
+  - name: THUNDERER
+    signs:
+      - 3 clubs
+    image: 17_thunderer
+    expansion: armedanddangerous
+    color: orange
+    modifier: bangmod
+    equip:
+      - weapon(3)
+    effects:
+      - pay_cube self_cubes(1)
+      - thunderer
+    tags:
+      - weapon
+
+character:
+  - name: AL_PREACHER
+    image: 17_alpreacher
+    expansion: armedanddangerous
+    equip:
+      - al_preacher
+    responses:
+      - al_preacher
+    optional:
+      - pay_cube select_cubes(2)
+      - draw
+  - name: BASS_GREEVES
+    image: 17_bassgreeves
+    expansion: armedanddangerous
+    effects:
+      - max_usages(1)
+      - discard card self | hand
+      - add_cube(2) card self | cube_slot can_target_self
+  - name: BLOODY_MARY
+    image: 17_bloodymary
+    expansion: armedanddangerous
+    equip:
+      - bloody_mary
+  - name: FRANKIE_CANTON
+    image: 17_frankiecanton
+    expansion: armedanddangerous
+    effects:
+      - max_usages(1)
+      - frankie_canton card | cube_slot
+  - name: JULIE_CUTTER
+    image: 17_juliecutter
+    expansion: armedanddangerous
+    equip:
+      - julie_cutter
+  - name: MEXICALI_KID
+    image: 17_mexicalikid
+    expansion: armedanddangerous
+    effects:
+      - max_usages(1)
+      - pay_cube select_cubes(2)
+      - bang player reachable notself
+    tags:
+      - skip_logs
+  - name: MS_ABIGAIL
+    image: 17_msabigail
+    expansion: armedanddangerous
+    equip:
+      - ms_abigail
+    responses:
+      - ms_abigail
+  - name: RED_RINGO
+    image: 17_redringo
+    expansion: armedanddangerous
+    equip:
+      - red_ringo
+    effects:
+      - max_usages(1)
+      - mth_add card self | cube_slot table
+    optional:
+      - mth_add card self | cube_slot table can_repeat
+    mth_effect: red_ringo
+    tags:
+      - max_hp(5)
+      - auto_confirm_red_ringo

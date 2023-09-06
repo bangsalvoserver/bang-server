@@ -1,0 +1,60 @@
+highnoon:
+  - name: BLESSING
+    image: 05_benedizione
+    equip:
+      - blessing
+  - name: GHOST_TOWN
+    image: 05_cittafantasma
+    equip:
+      - ghosttown
+    tags:
+      - discard_if_two_players
+      - ghost_card
+  - name: INVERT_ROTATION
+    image: 05_corsaalloro
+    equip:
+      - invert_rotation
+    tags:
+      - discard_if_two_players
+  - name: THE_DALTONS
+    image: 05_idalton
+    equip:
+      - thedaltons
+  - name: THE_DOCTOR
+    image: 05_ildottore
+    equip:
+      - thedoctor
+  - name: THE_REVEREND
+    image: 05_ilreverendo
+    equip:
+      - reverend
+  - name: TRAIN_ARRIVAL
+    image: 05_iltreno
+    equip:
+      - trainarrival
+  - name: CURSE
+    image: 05_maledizione
+    equip:
+      - curse
+  - name: HANGOVER
+    image: 05_sbornia
+    equip:
+      - hangover
+  - name: SERMON
+    image: 05_sermone
+    equip:
+      - sermon
+  - name: THIRST
+    image: 05_sete
+    equip:
+      - thirst
+  - name: SHOOTOUT
+    image: 05_sparatoria
+    equip:
+      - shootout
+  - name: HIGH_NOON
+    image: 05_mezzogiornodifuoco
+    equip:
+      - highnoon
+    tags:
+      - last_scenario_card

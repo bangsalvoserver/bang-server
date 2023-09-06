@@ -1,0 +1,11 @@
+- !include sets/base.yml
+- !include sets/dodgecity.yml
+- !include sets/valleyofshadows.yml
+- !include sets/goldrush.yml
+- !include sets/armedanddangerous.yml
+- !include sets/greattrainrobbery.yml
+- !include sets/highnoon.yml
+- !include sets/fistfulofcards.yml
+- !include sets/wildwestshow.yml
+- !include sets/thebullet.yml
+- !include sets/canyondiablo.yml

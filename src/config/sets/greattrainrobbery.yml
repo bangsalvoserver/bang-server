@@ -1,0 +1,455 @@
+main_deck:
+  - name: CACTUS
+    signs:
+      - 7 hearts
+    image: 27_cactus
+    expansion: greattrainrobbery
+    color: brown
+    responses:
+      - missed
+      - cactus
+  - name: DRAGOON
+    signs:
+      - J spades
+    image: 27_dragoon
+    expansion: greattrainrobbery
+    color: blue
+    equip:
+      - weapon(2)
+      - dragoon
+    tags:
+      - weapon
+  - name: EVADED
+    signs:
+      - Q clubs
+    image: 27_evaded
+    expansion: greattrainrobbery
+    color: brown
+    responses:
+      - evaded
+  - name: FULL_STEAM
+    signs:
+      - 2 spades
+    image: 27_full_steam
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - none
+    modifier: card_choice
+    tags:
+      - card_choice(4)
+  - name: FULL_STEAM_NO_EFFECT
+    image: 27_full_steam_no_effect
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - card_choice
+      - full_steam(0)
+    tags:
+      - card_choice(4)
+      - hidden
+  - name: FULL_STEAM_DOUBLE_EFFECT
+    image: 27_full_steam_double_effect
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - card_choice
+      - full_steam(2)
+    tags:
+      - card_choice(4)
+      - hidden
+  - name: KNIFE_REVOLVER
+    signs:
+      - 5 diamonds
+    image: 27_knife_revolver
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - banglimit
+      - knife_revolver player reachable notself
+  - name: MAP
+    signs:
+      - 3 diamonds
+    image: 27_map
+    expansion: greattrainrobbery
+    color: blue
+    equip:
+      - map
+  - name: MONEY_BAG
+    signs:
+      - Q clubs
+    image: 27_money_bag
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - none
+    modifier: moneybag
+  - name: MOST_WANTED
+    signs:
+      - K spades
+    image: 27_most_wanted
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - draw
+      - most_wanted players
+  - name: NEXT_STOP
+    signs:
+      - 2 diamonds
+      - K clubs
+    image: 27_next_stop
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - draw
+      - next_stop
+  - name: REFUND
+    signs:
+      - 3 spades
+    image: 27_refund
+    expansion: greattrainrobbery
+    color: blue
+    equip:
+      - refund
+  - name: STRONGBOX
+    signs:
+      - 9 hearts
+    image: 27_strongbox
+    expansion: greattrainrobbery
+    color: blue
+    equip:
+      - strongbox
+  - name: SWITCH
+    signs:
+      - 6 hearts
+    image: 27_switch
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - mth_add card self | table nottrain
+      - mth_add card notself | table nottrain
+    mth_effect: switch_cards
+  - name: TRAIN_ROBBERY
+    signs:
+      - 4 diamonds
+      - J clubs
+    image: 27_train_robbery
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - banglimit
+      - train_robbery player notself
+  - name: WATER_TOWER
+    signs:
+      - 8 hearts
+    image: 27_water_tower
+    expansion: greattrainrobbery
+    color: brown
+    effects:
+      - none
+    modifier: traincost
+
+character:
+  - name: BENNY_BRAWLER
+    image: 27_benny_brawler
+    expansion: greattrainrobbery
+    equip:
+      - benny_brawler
+  - name: EVAN_BABBIT
+    image: 27_evan_babbit
+    expansion: greattrainrobbery
+    responses:
+      - discard card self | hand origin_card_suit
+      - evan_babbit player notself notorigin range_1
+  - name: JIMMY_TEXAS
+    image: 27_jimmy_texas
+    expansion: greattrainrobbery
+    equip:
+      - strongbox
+  - name: MANUELITA
+    image: 27_manuelita
+    expansion: greattrainrobbery
+    equip:
+      - manuelita
+  - name: SANCHO
+    image: 27_sancho
+    expansion: greattrainrobbery
+    effects:
+      - max_usages(1)
+    modifier: traincost
+    tags:
+      - max_hp(3)
+  - name: SGT_BLAZE
+    image: 27_sgt_blaze
+    expansion: greattrainrobbery
+    equip:
+      - sgt_blaze
+    effects:
+      - ctx_add player
+    modifier: sgt_blaze
+    tags:
+      - max_hp(5)
+  - expansion: greattrainrobbery
+    responses:
+      - none
+    optional:
+      - mth_add player
+    mth_response: sgt_blaze
+    tags:
+      - hidden
+  - name: SHADE_OCONNOR
+    image: 27_shadeoconnor
+    expansion: greattrainrobbery
+    equip:
+      - shade_oconnor
+    responses:
+      - shade_oconnor
+    optional:
+      - discard card self | hand
+      - draw
+  - name: ZIPPY_ROY
+    image: 27_zippy_roy
+    expansion: greattrainrobbery
+    effects:
+      - max_usages(1)
+      - next_stop
+    tags:
+      - max_hp(5)
+
+station:
+  - name: BOOM_TOWN
+    image: 27_boom_town
+    effects:
+      - discard card self | bangcard
+    modifier: traincost
+  - name: CATICO
+    image: 27_catico
+    effects:
+      - discard card self | catbalou_panic
+    modifier: traincost
+  - name: CREEPY_CREEK
+    image: 27_creepy_creek
+    effects:
+      - discard card self | spades
+    modifier: traincost
+  - name: CROWNS_HOLE
+    image: 27_crowns_hole
+    effects:
+      - discard card self | beer
+    modifier: traincost
+  - name: DEATHWOOD
+    image: 27_deathwood
+    effects:
+      - discard card self | blue
+    modifier: traincost
+  - name: DODGEVILLE
+    image: 27_dodgeville
+    effects:
+      - discard card self | missedcard
+    modifier: traincost
+  - name: FORT_WROTH
+    image: 27_fort_wroth
+    effects:
+      - discard card self | ten_to_ace
+    modifier: traincost
+  - name: FRISCO
+    image: 27_frisco
+    effects:
+      - discard card self | clubs
+    modifier: traincost
+  - name: MINERS_OATH
+    image: 27_miners_oath
+    effects:
+      - discard card self | diamonds
+    modifier: traincost
+  - name: SAN_TAFE
+    image: 27_san_tafe
+    effects:
+      - discard card self | hearts
+    modifier: traincost
+  - name: TOMBROCK
+    image: 27_tombrock
+    effects:
+      - damage
+    modifier: traincost
+  - name: VIRGINIA_TOWN
+    image: 27_virginia_town
+    effects:
+      - discard cards(2) self
+    modifier: traincost
+  - name: YOOMA
+    image: 27_yooma
+    effects:
+      - discard card self | two_to_nine
+    modifier: traincost
+
+train:
+  - name: BAGGAGE_CAR
+    image: 27_baggage_car
+    color: train
+    effects:
+      - discard
+    responses:
+      - discard
+    modifier: card_choice
+    tags:
+      - card_choice(3)
+  - name: BAGGAGE_CAR_MISSED
+    image: main_deck/01_mancato
+    responses:
+      - card_choice
+      - missed
+    tags:
+      - card_choice(3)
+      - hidden
+  - name: BAGGAGE_CAR_PANIC
+    image: main_deck/01_panico
+    effects:
+      - card_choice
+      - steal card range_1
+    tags:
+      - card_choice(3)
+      - hidden
+  - name: BAGGAGE_CAR_CAT_BALOU
+    image: main_deck/01_catbalou
+    effects:
+      - card_choice
+      - destroy card
+    tags:
+      - card_choice(3)
+      - hidden
+  - name: BAGGAGE_CAR_BANG
+    image: main_deck/01_bang
+    effects:
+      - card_choice
+      - bang player reachable notself
+    tags:
+      - card_choice(3)
+      - hidden
+  - name: CABOOSE
+    image: 27_caboose
+    color: train
+    responses:
+      - discard card self | blue_or_train
+      - missed
+  - name: CATTLE_TRUCK
+    image: 27_cattle_truck
+    color: train
+    effects:
+      - discard
+      - cattle_truck
+  - name: CIRCUS_WAGON
+    image: 27_circus_wagon
+    color: train
+    effects:
+      - discard
+      - circus_wagon players notself not_empty_table
+  - name: COAL_HOPPER
+    image: 27_coal_hopper
+    color: train
+    effects:
+      - discard
+      - draw
+      - destroy card | train
+  - name: DINING_CAR
+    image: 27_dining_car
+    color: train
+    equip:
+      - predraw_check(-1)
+      - dining_car
+  - name: EXPRESS_CAR
+    image: 27_express_car
+    color: train
+    effects:
+      - discard
+      - express_car
+  - name: GHOST_CAR
+    image: 27_ghost_car
+    color: train
+    equip_target: notsheriff dead alive
+    equip:
+      - ghost(2)
+    tags:
+      - discard_if_two_players
+      - ghost_card
+  - name: LOUNGE_CAR
+    image: 27_lounge_car
+    color: train
+    effects:
+      - discard
+      - lounge_car
+  - responses:
+      - mth_add card | selection
+      - mth_add player notself
+    mth_response: lounge_car
+    tags:
+      - hidden
+  - name: LUMBER_FLATCAR
+    image: 27_lumber_flatcar
+    color: train
+    equip_target: any
+    equip:
+      - lumber_flatcar
+  - name: MAIL_CAR
+    image: 27_mail_car
+    color: train
+    effects:
+      - discard
+      - mail_car
+  - responses:
+      - mth_add card | selection
+      - mth_add player notself
+    mth_response: mail_car
+    tags:
+      - hidden
+  - name: OBSERVATION_CAR
+    image: 27_observation_car
+    color: train
+    equip:
+      - scope
+      - mustang
+  - name: PASSENGER_CAR
+    image: 27_passenger_car
+    color: train
+    effects:
+      - discard
+      - steal card
+  - name: PRISONER_CAR
+    image: 27_prisoner_car
+    color: train
+    equip:
+      - prisoner_car
+  - name: PRIVATE_CAR
+    image: 27_private_car
+    color: train
+    equip:
+      - private_car
+  - name: SLEEPER_CAR
+    image: 27_sleeper_car
+    color: train
+    effects:
+      - max_usages(1)
+      - discard card self | blue_or_train
+      - bang player reachable notself
+    responses:
+      - max_usages(1)
+      - discard card self | blue_or_train
+      - bangresponse
+
+locomotive:
+  - name: IRONHORSE
+    image: 27_ironhorse
+    color: train
+    equip:
+      - ironhorse
+    effects:
+      - next_stop
+    modifier: locomotive
+  - name: LELAND
+    image: 27_leland
+    color: train
+    equip:
+      - leland
+    effects:
+      - next_stop
+    modifier: locomotive

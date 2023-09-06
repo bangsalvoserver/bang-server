@@ -1,0 +1,377 @@
+main_deck:
+  - name: GRAVE_ROBBER
+    signs:
+      - 8 spades
+    image: 20_tombarolo
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - graverobber
+      - discard
+      - generalstore players
+    tags:
+      - no_auto_discard
+  - name: CARD_SHARPER
+    signs:
+      - 10 clubs
+    image: 20_baro
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - mth_add card self | table blue
+      - mth_add card notself | table blue
+    mth_effect: switch_cards
+    tags:
+      - skip_logs
+  - name: MIRAGE
+    signs:
+      - 8 hearts
+    image: 20_miraggio
+    expansion: canyondiablo
+    color: brown
+    responses:
+      - mirage
+    tags:
+      - missed
+  - name: BLOOD_PACT
+    signs:
+      - J hearts
+    image: 20_pattodisangue
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - damage
+      - queue_heal_notfull player notself
+  - name: SACRIFICE
+    signs:
+      - 10 hearts
+    image: 20_sacrificio
+    expansion: canyondiablo
+    color: brown
+    responses:
+      - sacrifice
+  - name: DISARM
+    signs:
+      - 7 hearts
+    image: 20_disarmare
+    expansion: canyondiablo
+    color: brown
+    responses:
+      - disarm
+    tags:
+      - missed
+  - name: MOLOTOV
+    signs:
+      - A hearts
+    image: 20_molotov
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - bang player reachable notself
+    tags:
+      - skip_logs
+  - <<: *missed
+    signs:
+      - J spades
+      - 6 clubs
+    image: 20_mancato
+    expansion: canyondiablo
+  - <<: *bang
+    signs:
+      - 10 spades
+      - Q clubs
+      - 8 diamonds
+      - 6 diamonds
+    image: 20_bang
+    expansion: canyondiablo
+  - <<: *panic
+    signs:
+      - 9 hearts
+    image: 20_panico
+    expansion: canyondiablo
+  - <<: *beer
+    signs:
+      - Q hearts
+    image: 20_birra
+    expansion: canyondiablo
+  - <<: *cat_balou
+    signs:
+      - J clubs
+    image: 20_catbalou
+    expansion: canyondiablo
+  - name: BULLDOG
+    signs:
+      - 7 diamonds
+    image: 20_bulldog
+    expansion: canyondiablo
+    color: blue
+    equip:
+      - weapon(2)
+    effects:
+      - max_usages(1)
+      - mth_add card self | hand bang
+      - discard card self | hand
+      - mth_add players notself
+    mth_effect: play_as_bang
+    tags:
+      - weapon
+  - name: LAST_WILL
+    signs:
+      - A spades
+    image: 20_ultimevolonta
+    expansion: canyondiablo
+    color: blue
+    equip_target: any
+    equip:
+      - lastwill
+    responses:
+      - lastwill
+      - mth_add player notself
+      - mth_add card self
+    optional:
+      - mth_add card self
+    mth_response: lastwill
+    tags:
+      - repeatable(2)
+      - discard_if_two_players
+  - name: INDIAN_GUIDE
+    signs:
+      - 8 clubs
+    image: 20_guidaindiana
+    expansion: canyondiablo
+    color: blue
+    equip:
+      - indianguide
+  - <<: *remington
+    signs:
+      - K spades
+    image: 20_remington
+    expansion: canyondiablo
+  - name: TAXMAN
+    signs:
+      - K clubs
+    image: 20_esattore
+    expansion: canyondiablo
+    color: blue
+    equip_target: any
+    equip:
+      - predraw_check(-2)
+      - taxman
+  - name: BROTHEL
+    signs:
+      - 7 clubs
+    image: 20_bordello
+    expansion: canyondiablo
+    color: blue
+    equip_target: any
+    equip:
+      - predraw_check(-3)
+      - brothel
+  - name: BRONCO
+    signs:
+      - Q diamonds
+    image: 20_bronco
+    expansion: canyondiablo
+    color: blue
+    equip:
+      - horse
+      - mustang
+    tags:
+      - horse
+      - bronco
+  - name: PACK_MULE
+    signs:
+      - Q spades
+    image: 20_mulo
+    expansion: canyondiablo
+    color: blue
+    equip:
+      - horse
+      - packmule
+    tags:
+      - horse
+  - name: WAR_PATH
+    signs:
+      - K diamonds
+    image: 20_sentierodiguerra
+    expansion: canyondiablo
+    color: green
+    effects:
+      - indians players notself
+    tags:
+      - indians
+  - name: ARSON
+    signs:
+      - J diamonds
+    image: 20_incendio
+    expansion: canyondiablo
+    color: green
+    effects:
+      - destroy cards_other_players
+    tags:
+      - skip_logs
+  - name: FLYING_BULLET
+    signs:
+      - 10 diamonds
+    image: 20_proiettilevagante
+    expansion: canyondiablo
+    color: brown
+    responses:
+      - missed
+      - bang conditional_player notself range_1
+    tags:
+      - missed
+  - name: ON_THE_HOUSE
+    signs:
+      - K hearts
+    image: 20_offrelacasa
+    expansion: canyondiablo
+    color: green
+    effects:
+      - heal_notfull
+      - draw
+  - name: GUITAR
+    signs:
+      - 9 clubs
+    image: 20_chitarra
+    expansion: canyondiablo
+    color: blue
+    equip_target: any
+    equip:
+      - weapon(0)
+    tags:
+      - weapon
+  - name: SCRAPPER
+    signs:
+      - 9 spades
+    image: 20_attaccabrighe
+    expansion: canyondiablo
+    color: green
+    effects:
+      - steal card range_1
+    tags:
+      - skip_logs
+  - name: SHYLOCK
+    signs:
+      - 9 diamonds
+    image: 20_strozzino
+    expansion: canyondiablo
+    color: brown
+    effects:
+      - damage
+      - queue_draw(2)
+  - <<: *dodge
+    signs:
+      - 7 spades
+    image: 20_schivata
+    expansion: canyondiablo
+
+character:
+  # - name: ANNIE_OAKEY
+  #   image: 20_annie_oakey
+  #   expansion: canyondiablo
+  #   # TODO
+  #   # prima di pescare request_annie_oakey
+  #   # mostra 6 carte in selection: colori + semi
+  #   # on_pick: match colore: +1 carta, match seme: +2 carte
+  #   # equip:
+  #   #   - annie_oakey
+  - name: PAT_BARRETT
+    image: 20_pat_barrett
+    expansion: canyondiablo
+    equip:
+      - pat_barrett
+  - name: BIG_SPENCER_2
+    image: 20_big_spencer
+    expansion: canyondiablo
+    equip:
+      - update_max_hp(6)
+    tags:
+      - max_hp(3)
+  # - name: BUFFALO_BELL
+  #   image: 20_buffalo_bell
+  #   expansion: canyondiablo
+  #   # TODO effect_buffalo_bell: effect_missed
+  #   # sum = seme origin_card + seme target_card
+  #   # sum >= 13 : mancato
+  #   # sum >= 17 : schivata
+  #   # sum >= 20 : ritorno di fiamma
+  #   # responses:
+  #   #   - buffalo_bell card self | hand
+  # - name: CLASH_THE_STAMPEDE
+  #   image: 20_clash_the_stampede
+  #   expansion: canyondiablo
+  #   # TODO
+  #   # prima di pescare request_clash_the_stampede
+  #   # target = giocatore con piu' carte in mano
+  #   # on_pick: dare carta
+  - name: CRAZY_HOG
+    image: 20_crazy_hog
+    expansion: canyondiablo
+    effects:
+      - max_usages(1)
+      - discard card self | hand blue
+      - draw(2)
+  - name: EVA_PLACE
+    image: 20_eva_place
+    expansion: canyondiablo
+    effects:
+      - max_usages(1)
+      - discard card self | hand
+      - eva_place
+  # - name: JOSEY_BASSETT
+  #   image: 20_josey_bassett
+  #   expansion: canyondiablo
+  #   # TODO prima di pescare, stesso evento di vera_custer, priorita' +1
+  #   # copia carta blu in characters
+  #   # TODO gestire vera custer, copia solo personaggi
+  #   # equip:
+  #   #   - josey_bassett
+  #   tags:
+  #     - max_hp(3)
+  # - name: LAURA_BILLION
+  #   image: 20_laura_billion
+  #   expansion: canyondiablo
+  #   # TODO quando una carta e' estratta: request_laura_billion (auto_select)
+  #   # effect_laura_billion: pop_request, pesca carta estratta
+  #   # equip:
+  #   #   - laura_billion
+  #   # responses:
+  #   #   - discard card self | hand
+  #   #   - laura_billion
+  - name: SID_CURRY
+    image: 20_sid_curry
+    expansion: canyondiablo
+    equip:
+      - johnny_kisch
+  - name: SOUNDANCE_KID
+    image: 20_soundance_kid
+    expansion: canyondiablo
+    equip:
+      - soundance_kid
+  - name: SPIKE_SPIEZEL
+    image: 20_spike_spiezel
+    expansion: canyondiablo
+    modifier: spike_spiezel
+    effects:
+      - max_usages(1)
+      - discard card self | hand bang
+  - name: TEREN_KILL_2
+    image: 20_teren_kill
+    expansion: canyondiablo
+    equip:
+      - teren_kill
+    tags:
+      - max_hp(3)
+  - name: WYATT_EARL
+    image: 20_wyattearl
+    expansion: canyondiablo
+    equip:
+      - wyatt_earl
+
+button_row:
+  - name: GAME_DISCARD_BRONCO
+    expansion: canyondiablo
+    effects:
+      - discard cards(2) self | hand
+      - destroy card | table bronco
