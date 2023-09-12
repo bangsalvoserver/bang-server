@@ -200,6 +200,11 @@ namespace banggame {
         if (ncubes > 0) {
             m_game->num_cubes -= ncubes;
             target->num_cubes += ncubes;
+            if (ncubes == 1) {
+                m_game->add_log("LOG_ADD_CUBE", this, target);
+            } else {
+                m_game->add_log("LOG_ADD_CUBES", this, target, ncubes);
+            }
             m_game->add_update<game_update_type::move_cubes>(ncubes, nullptr, target);
         }
     }
@@ -215,11 +220,29 @@ namespace banggame {
             target->num_cubes += added_cubes;
             origin->num_cubes -= added_cubes;
             ncubes -= added_cubes;
+            if (origin->owner == this) {
+                if (added_cubes == 1) {
+                    m_game->add_log("LOG_MOVED_CUBE", this, origin, target);
+                } else {
+                    m_game->add_log("LOG_MOVED_CUBES", this, origin, target, added_cubes);
+                }
+            } else {
+                if (added_cubes == 1) {
+                    m_game->add_log("LOG_MOVED_CUBE_FROM", this, origin->owner, origin, target);
+                } else {
+                    m_game->add_log("LOG_MOVED_CUBES_FROM", this, origin->owner, origin, target, added_cubes);
+                }
+            }
             m_game->add_update<game_update_type::move_cubes>(added_cubes, origin, target);
         }
         if (ncubes > 0) {
             origin->num_cubes -= ncubes;
             m_game->num_cubes += ncubes;
+            if (ncubes == 1) {
+                m_game->add_log("LOG_PAID_CUBE", this, origin);
+            } else {
+                m_game->add_log("LOG_PAID_CUBES", this, origin, ncubes);
+            }
             m_game->add_update<game_update_type::move_cubes>(ncubes, origin, nullptr);
         }
         if (origin->sign && origin->num_cubes == 0) {
@@ -232,6 +255,11 @@ namespace banggame {
 
     void player::drop_all_cubes(card *target) {
         if (target->num_cubes > 0) {
+            if (target->num_cubes == 1) {
+                m_game->add_log("LOG_DROP_CUBE", this, target);
+            } else {
+                m_game->add_log("LOG_DROP_CUBES", this, target, target->num_cubes);
+            }
             m_game->num_cubes += target->num_cubes;
             m_game->add_update<game_update_type::move_cubes>(target->num_cubes, target, nullptr);
             target->num_cubes = 0;
