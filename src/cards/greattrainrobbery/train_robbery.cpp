@@ -31,6 +31,10 @@ namespace banggame {
             target->discard_card(target_card);
         }
 
+        std::vector<card *> get_highlights() const override {
+            return {target_card};
+        }
+
         game_string status_text(player *owner) const override {
             if (num_cards_used() == 0) {
                 if (owner == target) {
