@@ -8,6 +8,7 @@ namespace banggame {
     DEFINE_ENUM_FLAGS(command_permissions,
         (lobby_owner)
         (lobby_waiting)
+        (lobby_finished)
         (game_cheat)
     )
 

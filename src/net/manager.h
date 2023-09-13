@@ -102,6 +102,7 @@ private:
     std::string command_set_game_option(user_ptr user, std::string_view name, std::string_view value);
     std::string command_give_card(user_ptr user, std::string_view name);
     std::string command_set_team(user_ptr user, std::string_view value);
+    std::string command_get_rng_seed(user_ptr user);
 
 private:
     user_map users;
