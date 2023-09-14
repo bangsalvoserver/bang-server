@@ -18,6 +18,10 @@
 
 namespace banggame {
 
+    game::game(unsigned int seed)
+        : game_table(seed)
+        , request_queue(this) {}
+
     json::json game_net_manager::serialize_update(const game_update &update) const {
         return json::serialize(update, context());
     }

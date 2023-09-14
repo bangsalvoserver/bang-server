@@ -412,9 +412,7 @@ void lobby::send_updates(game_manager &mgr) {
 void lobby::start_game(game_manager &mgr) {
     mgr.broadcast_message_lobby<server_message_type::game_started>(*this);
 
-    m_game = std::make_unique<banggame::game>();
-
-    m_game->reset_rng(options.game_seed);
+    m_game = std::make_unique<banggame::game>(options.game_seed);
 
     if (mgr.m_options.verbose) {
         std::cout << "Started game " << m_game.get() << " in lobby " << name << " with seed " << m_game->rng_seed << std::endl;

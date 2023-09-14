@@ -7,12 +7,11 @@
 #include "player.h"
 #include "game_net.h"
 #include "event_map.h"
+#include "disabler_map.h"
 
 namespace banggame {
 
-    using card_disabler_fun = std::function<bool(card *)>;
-
-    struct game_table : game_net_manager, listener_map {
+    struct game_table : game_net_manager, listener_map, disabler_map {
         unsigned int rng_seed;
         std::default_random_engine rng;
 
@@ -47,9 +46,7 @@ namespace banggame {
         player *m_first_dead = nullptr;
         player *m_playing = nullptr;
 
-        std::multimap<event_card_key, card_disabler_fun, std::less<>> m_disablers;
-
-        void reset_rng(unsigned int seed = 0);
+        game_table(unsigned int seed);
         
         player *find_player_by_userid(int user_id) const;
         
@@ -77,12 +74,6 @@ namespace banggame {
         void add_cubes(card *target, int ncubes);
         void move_cubes(card *origin, card *target, int ncubes);
         void drop_cubes(card *target);
-
-        void add_disabler(event_card_key key, card_disabler_fun &&fun);
-        void remove_disablers(event_card_key key);
-
-        card *get_disabler(card *target_card);
-        bool is_disabled(card *target_card);
 
         void add_game_flags(game_flags flags);
         void remove_game_flags(game_flags flags);

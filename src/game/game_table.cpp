@@ -7,7 +7,9 @@
 
 namespace banggame {
 
-    void game_table::reset_rng(unsigned int seed) {
+    game_table::game_table(unsigned int seed)
+        : disabler_map(this)
+    {
         if (seed == 0) {
             std::random_device rd;
             rng_seed = rd();
@@ -275,73 +277,6 @@ namespace banggame {
             add_update<game_update_type::move_cubes>(target->num_cubes, target, nullptr);
             target->num_cubes = 0;
         }
-    }
-
-    inline auto disableable_cards(game_table *table) {
-        struct to_player_card_pair {
-            player *p;
-            auto operator()(card *c) const { return std::pair{p, c}; }
-        };
-
-        return ranges::views::concat(
-            table->m_scenario_cards
-                | ranges::views::take_last(1)
-                | ranges::views::transform(to_player_card_pair{table->m_first_player}),
-            table->m_wws_scenario_cards
-                | ranges::views::take_last(1)
-                | ranges::views::transform(to_player_card_pair{table->m_first_player}),
-            table->m_players
-                | ranges::views::filter(&player::alive)
-                | ranges::views::for_each([](player *p) {
-                    return ranges::views::concat(p->m_table, p->m_characters)
-                        | ranges::views::transform(to_player_card_pair{p});
-                })
-        );
-    }
-
-    void game_table::add_disabler(event_card_key key, card_disabler_fun &&fun) {
-        for (auto [owner, c] : disableable_cards(this)) {
-            if (!is_disabled(c) && fun(c)) {
-                for (const equip_holder &e : c->equips) {
-                    if (!e.is_nodisable()) {
-                        e.on_disable(c, owner);
-                    }
-                }
-            }
-        }
-
-        m_disablers.emplace(std::make_pair(key, std::move(fun)));
-    }
-
-    void game_table::remove_disablers(event_card_key key) {
-        for (auto [owner, c] : disableable_cards(this)) {
-            bool a = false;
-            bool b = false;
-            for (const auto &[t, fun] : m_disablers) {
-                if (t != key) a = a || fun(c);
-                else b = b || fun(c);
-            }
-            if (!a && b) {
-                for (const equip_holder &e : c->equips) {
-                    if (!e.is_nodisable()) {
-                        e.on_enable(c, owner);
-                    }
-                }
-            }
-        }
-
-        m_disablers.erase(key);
-    }
-
-    card *game_table::get_disabler(card *target_card) {
-        for (auto &[card_key, fun] : m_disablers) {
-            if (fun(target_card)) return card_key.target_card;
-        }
-        return nullptr;
-    }
-
-    bool game_table::is_disabled(card *target_card) {
-        return get_disabler(target_card) != nullptr;
     }
 
     void game_table::add_game_flags(game_flags flags) {
