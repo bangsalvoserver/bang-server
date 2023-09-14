@@ -348,7 +348,7 @@ namespace banggame {
             }
         }
         for (const auto &[c, ncubes] : selected_cubes) {
-            origin->pay_cubes(c, ncubes);
+            origin->m_game->move_cubes(c, nullptr, ncubes);
         }
         for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
             enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {

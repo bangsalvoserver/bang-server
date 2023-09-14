@@ -24,7 +24,7 @@ namespace banggame {
                 for (card *c : target->cube_slots()) {
                     int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes);
                     ncubes -= cubes_to_add;
-                    target->add_cubes(c, cubes_to_add);
+                    target->m_game->add_cubes(c, cubes_to_add);
                 }
             }
         }
@@ -45,7 +45,7 @@ namespace banggame {
                 target->m_game->pop_request();
             }
         
-            target->add_cubes(target_card->pocket == pocket_type::player_character
+            target->m_game->add_cubes(target_card->pocket == pocket_type::player_character
                 ? target->first_character()
                 : target_card, 1);
         }
@@ -102,7 +102,7 @@ namespace banggame {
     }
 
     void effect_add_cube::on_play(card *origin_card, player *origin, card *target) {
-        target->owner->add_cubes(target, ncubes);
+        origin->m_game->add_cubes(target, ncubes);
     }
 
 }

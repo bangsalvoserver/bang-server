@@ -99,11 +99,6 @@ namespace banggame {
         
         card *random_hand_card();
 
-        void add_cubes(card *target, int ncubes);
-        void pay_cubes(card *target, int ncubes);
-        void move_cubes(card *origin, card *target, int ncubes);
-        void drop_all_cubes(card *target);
-
         int can_escape(player *origin, card *origin_card, effect_flags flags) const;
         
         void add_to_hand(card *card);

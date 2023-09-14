@@ -117,7 +117,7 @@ namespace banggame {
             if (target_card->pocket == pocket_type::player_table) {
                 owner->m_game->tap_card(target_card, false);
                 owner->disable_equip(target_card);
-                owner->drop_all_cubes(target_card);
+                owner->m_game->drop_cubes(target_card);
                 return true;
             } else if (target_card->pocket == pocket_type::player_hand) {
                 owner->m_game->call_event<event_type::on_discard_hand_card>(owner, target_card, used);
@@ -193,77 +193,6 @@ namespace banggame {
 
     int player::can_escape(player *origin, card *origin_card, effect_flags flags) const {
         return m_game->call_event<event_type::apply_escapable_modifier>(origin_card, origin, this, flags, 0);
-    }
-    
-    void player::add_cubes(card *target, int ncubes) {
-        ncubes = std::min<int>({ncubes, m_game->num_cubes, max_cubes - target->num_cubes});
-        if (ncubes > 0) {
-            m_game->num_cubes -= ncubes;
-            target->num_cubes += ncubes;
-            if (ncubes == 1) {
-                m_game->add_log("LOG_ADD_CUBE", this, target);
-            } else {
-                m_game->add_log("LOG_ADD_CUBES", this, target, ncubes);
-            }
-            m_game->add_update<game_update_type::move_cubes>(ncubes, nullptr, target);
-        }
-    }
-
-    void player::pay_cubes(card *origin, int ncubes) {
-        move_cubes(origin, nullptr, ncubes);
-    }
-
-    void player::move_cubes(card *origin, card *target, int ncubes) {
-        ncubes = std::min<int>(ncubes, origin->num_cubes);
-        if (target && ncubes > 0 && target->num_cubes < max_cubes) {
-            int added_cubes = std::min<int>(ncubes, max_cubes - target->num_cubes);
-            target->num_cubes += added_cubes;
-            origin->num_cubes -= added_cubes;
-            ncubes -= added_cubes;
-            if (origin->owner == this) {
-                if (added_cubes == 1) {
-                    m_game->add_log("LOG_MOVED_CUBE", this, origin, target);
-                } else {
-                    m_game->add_log("LOG_MOVED_CUBES", this, origin, target, added_cubes);
-                }
-            } else {
-                if (added_cubes == 1) {
-                    m_game->add_log("LOG_MOVED_CUBE_FROM", this, origin->owner, origin, target);
-                } else {
-                    m_game->add_log("LOG_MOVED_CUBES_FROM", this, origin->owner, origin, target, added_cubes);
-                }
-            }
-            m_game->add_update<game_update_type::move_cubes>(added_cubes, origin, target);
-        }
-        if (ncubes > 0) {
-            origin->num_cubes -= ncubes;
-            m_game->num_cubes += ncubes;
-            if (ncubes == 1) {
-                m_game->add_log("LOG_PAID_CUBE", this, origin);
-            } else {
-                m_game->add_log("LOG_PAID_CUBES", this, origin, ncubes);
-            }
-            m_game->add_update<game_update_type::move_cubes>(ncubes, origin, nullptr);
-        }
-        if (origin->sign && origin->num_cubes == 0) {
-            m_game->add_log("LOG_DISCARDED_ORANGE_CARD", this, origin);
-            m_game->call_event<event_type::on_discard_orange_card>(this, origin);
-            disable_equip(origin);
-            m_game->move_card(origin, pocket_type::discard_pile);
-        }
-    }
-
-    void player::drop_all_cubes(card *target) {
-        if (target->num_cubes > 0) {
-            if (target->num_cubes == 1) {
-                m_game->add_log("LOG_DROP_CUBE", this, target);
-            } else {
-                m_game->add_log("LOG_DROP_CUBES", this, target, target->num_cubes);
-            }
-            m_game->num_cubes += target->num_cubes;
-            m_game->add_update<game_update_type::move_cubes>(target->num_cubes, target, nullptr);
-            target->num_cubes = 0;
-        }
     }
 
     void player::add_to_hand(card *target) {

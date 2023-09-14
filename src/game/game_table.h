@@ -12,7 +12,7 @@ namespace banggame {
 
     using card_disabler_fun = std::function<bool(card *)>;
 
-    struct game_table : game_net_manager {
+    struct game_table : game_net_manager, listener_map {
         unsigned int rng_seed;
         std::default_random_engine rng;
 
@@ -73,6 +73,10 @@ namespace banggame {
         void add_short_pause(card *c = nullptr);
         void tap_card(card *c, bool inactive);
         void play_sound(player *target, const std::string &sound_id);
+
+        void add_cubes(card *target, int ncubes);
+        void move_cubes(card *origin, card *target, int ncubes);
+        void drop_cubes(card *target);
 
         void add_disabler(event_card_key key, card_disabler_fun &&fun);
         void remove_disablers(event_card_key key);

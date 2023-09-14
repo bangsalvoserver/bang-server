@@ -65,7 +65,7 @@ namespace banggame {
                     if (result) {
                         target->m_game->queue_request_front<request_move_bomb>(target_card, target);
                     } else {
-                        target->pay_cubes(target_card, 2);
+                        target->m_game->move_cubes(target_card, nullptr, 2);
                     }
                 });
             }

@@ -209,6 +209,73 @@ namespace banggame {
             add_update<game_update_type::play_sound>(file_id);
         }
     }
+    
+    void game_table::add_cubes(card *target, int ncubes) {
+        ncubes = std::min<int>({ncubes, num_cubes, max_cubes - target->num_cubes});
+        if (ncubes > 0) {
+            num_cubes -= ncubes;
+            target->num_cubes += ncubes;
+            if (ncubes == 1) {
+                add_log("LOG_ADD_CUBE", target->owner, target);
+            } else {
+                add_log("LOG_ADD_CUBES", target->owner, target, ncubes);
+            }
+            add_update<game_update_type::move_cubes>(ncubes, nullptr, target);
+        }
+    }
+
+    void game_table::move_cubes(card *origin, card *target, int ncubes) {
+        ncubes = std::min<int>(ncubes, origin->num_cubes);
+        if (target && ncubes > 0 && target->num_cubes < max_cubes) {
+            int added_cubes = std::min<int>(ncubes, max_cubes - target->num_cubes);
+            target->num_cubes += added_cubes;
+            origin->num_cubes -= added_cubes;
+            ncubes -= added_cubes;
+            if (origin->owner == target->owner) {
+                if (added_cubes == 1) {
+                    add_log("LOG_MOVED_CUBE", target->owner, origin, target);
+                } else {
+                    add_log("LOG_MOVED_CUBES", target->owner, origin, target, added_cubes);
+                }
+            } else {
+                if (added_cubes == 1) {
+                    add_log("LOG_MOVED_CUBE_FROM", target->owner, origin->owner, origin, target);
+                } else {
+                    add_log("LOG_MOVED_CUBES_FROM", target->owner, origin->owner, origin, target, added_cubes);
+                }
+            }
+            add_update<game_update_type::move_cubes>(added_cubes, origin, target);
+        }
+        if (ncubes > 0) {
+            origin->num_cubes -= ncubes;
+            num_cubes += ncubes;
+            if (ncubes == 1) {
+                add_log("LOG_PAID_CUBE", origin->owner, origin);
+            } else {
+                add_log("LOG_PAID_CUBES", origin->owner, origin, ncubes);
+            }
+            add_update<game_update_type::move_cubes>(ncubes, origin, nullptr);
+        }
+        if (origin->sign && origin->num_cubes == 0) {
+            add_log("LOG_DISCARDED_ORANGE_CARD", origin->owner, origin);
+            call_event<event_type::on_discard_orange_card>(origin->owner, origin);
+            origin->owner->disable_equip(origin);
+            move_card(origin, pocket_type::discard_pile);
+        }
+    }
+
+    void game_table::drop_cubes(card *target) {
+        if (target->num_cubes > 0) {
+            if (target->num_cubes == 1) {
+                add_log("LOG_DROP_CUBE", target->owner, target);
+            } else {
+                add_log("LOG_DROP_CUBES", target->owner, target, target->num_cubes);
+            }
+            num_cubes += target->num_cubes;
+            add_update<game_update_type::move_cubes>(target->num_cubes, target, nullptr);
+            target->num_cubes = 0;
+        }
+    }
 
     inline auto disableable_cards(game_table *table) {
         struct to_player_card_pair {

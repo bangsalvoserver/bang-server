@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    struct game : game_table, listener_map, request_queue {
+    struct game : game_table, request_queue {
         game() : request_queue(this) {}
         
         util::generator<json::json> get_rejoin_updates(player *target);

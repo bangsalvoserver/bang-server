@@ -168,7 +168,7 @@ namespace banggame {
             card *old_character = target->first_character();
             int ncubes = old_character->num_cubes;
 
-            target->pay_cubes(old_character, ncubes);
+            target->m_game->move_cubes(old_character, nullptr, ncubes);
             target->m_game->add_update<game_update_type::remove_cards>(std::vector{not_null{old_character}});
 
             old_character->pocket = pocket_type::none;
@@ -186,7 +186,7 @@ namespace banggame {
 
             target->reset_max_hp();
             target->enable_equip(target_card);
-            target->add_cubes(target_card, ncubes);
+            target->m_game->add_cubes(target_card, ncubes);
             break;
         }
         case card_deck_type::goldrush: {

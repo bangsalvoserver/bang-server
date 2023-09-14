@@ -29,7 +29,7 @@ namespace banggame {
 
                 target->reset_max_hp();
                 target->enable_equip(target_card);
-                target->move_cubes(old_character, target_card, old_character->num_cubes);
+                target->m_game->move_cubes(old_character, target_card, old_character->num_cubes);
                 
                 if (!target->is_ghost()) {
                     target->set_hp(2);
