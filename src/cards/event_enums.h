@@ -41,7 +41,7 @@ namespace banggame {
         EVENT(check_card_taker, player *target, int type, card* &value)
 
         // verifica il bersaglio di un'azione
-        EVENT(check_card_target, card *origin_card, player *origin, player *target, game_string &out_error)
+        EVENT(check_card_target, card *origin_card, player *origin, player *target, effect_flags flags, game_string &out_error)
 
         // verifica prima di passare il turno
         EVENT(check_pass_turn, player *origin, game_string &out_error)

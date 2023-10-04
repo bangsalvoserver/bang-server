@@ -28,7 +28,7 @@ namespace banggame {
 
     game_string effect_bangcard::get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) {
         if (!ctx.disable_bang_checks) {
-            return origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target, game_string{});
+            return origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target, effect_flags::is_bang, game_string{});
         } else {
             return {};
         }
