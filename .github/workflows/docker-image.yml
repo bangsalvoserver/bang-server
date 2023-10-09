@@ -9,7 +9,7 @@ on:
 env:
   BUILD_TYPE: Release
   BUILD_PARALLEL_JOBS: 6
-  DOCKER_IMAGE_TAG: salvoilmiosi/bang-online:bangserver
+  DOCKER_IMAGE_TAG: salvoilmiosi/banggameserver:latest
 
 jobs:
   build:
