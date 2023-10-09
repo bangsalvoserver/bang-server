@@ -70,4 +70,4 @@ jobs:
     - name: Run Docker container
       shell: bash
       run: |
-        docker run -d ${{ env.DOCKER_IMAGE_TAG }}
+        docker run -d -p 47654:47654 ${{ env.DOCKER_IMAGE_TAG }}
