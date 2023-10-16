@@ -1,15 +1,15 @@
-name: Docker Image
+name: Build and Release
 
 on:
   push:
-    branches:
-      - release
-  workflow_dispatch:
+    tags:
+      - 'alpha*'
+      - 'beta*'
+      - 'v*'
 
 env:
   BUILD_TYPE: Release
   BUILD_PARALLEL_JOBS: 6
-  DOCKER_IMAGE_TAG: salvoilmiosi/banggameserver:latest
 
 jobs:
   build:
@@ -42,33 +42,25 @@ jobs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: cmake --build build -j ${{ env.BUILD_PARALLEL_JOBS }} --config ${{env.BUILD_TYPE}}
-        
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
     
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v4
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
       with:
-        context: .
-        file: ./Dockerfile
-        push: true
-        tags: ${{ env.DOCKER_IMAGE_TAG }}
-  
-  deploy:
-    runs-on: self-hosted
-    needs: build
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: false
+        prerelease: ${{contains(github.ref, 'alpha')}}
     
-    steps:
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    
-    - name: Run Docker container
-      shell: bash
-      run: |
-        docker run -d -p 47654:47654 ${{ env.DOCKER_IMAGE_TAG }}
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/bangserver
+        asset_name: bangserver
+        asset_content_type: application/x-binary
