@@ -9,7 +9,6 @@ on:
 env:
   BUILD_TYPE: Release
   BUILD_PARALLEL_JOBS: 6
-  DEPLOY_SCRIPT_PATH: /home/ubuntu/bang/actions-runner/scripts/bang-deploy.sh
 
 jobs:
   build:
@@ -62,4 +61,4 @@ jobs:
     
     - name: Run Deploy Script
       shell: bash
-      run: ${{ env.DEPLOY_SCRIPT_PATH }} ${{ steps.download.outputs.download-path }}
+      run: ${{ vars.DEPLOY_SCRIPT_PATH }} ${{ steps.download.outputs.download-path }}
