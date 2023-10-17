@@ -1,11 +1,10 @@
-name: Build and Release
+name: Build and Deploy
 
 on:
   push:
-    tags:
-      - 'alpha*'
-      - 'beta*'
-      - 'v*'
+    branches:
+      - release
+  workflow_dispatch:
 
 env:
   BUILD_TYPE: Release
@@ -43,24 +42,19 @@ jobs:
       working-directory: ${{github.workspace}}
       run: cmake --build build -j ${{ env.BUILD_PARALLEL_JOBS }} --config ${{env.BUILD_TYPE}}
     
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+    - name: Upload Server Artifact
+      uses: actions/upload-artifact@v3
       with:
-        tag_name: ${{ github.ref }}
-        release_name: ${{ github.ref }}
-        draft: false
-        prerelease: ${{contains(github.ref, 'alpha')}}
+        name: bangserver
+        path: build/bangserver
+  
+  # deploy:
+  #   runs-on: self-hosted
+  #   needs: [build]
     
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: build/bangserver
-        asset_name: bangserver
-        asset_content_type: application/x-binary
+  #   steps:
+  #   - name: Download Server Artifact
+  #     uses: actions/download-artifact@v3
+  #     with:
+  #       name: bangserver
+        
