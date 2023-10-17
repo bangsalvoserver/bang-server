@@ -9,6 +9,7 @@ on:
 env:
   BUILD_TYPE: Release
   BUILD_PARALLEL_JOBS: 6
+  DEPLOY_SCRIPT_PATH: /home/ubuntu/bang/actions-runner/scripts/bang-deploy.sh
 
 jobs:
   build:
@@ -48,13 +49,17 @@ jobs:
         name: bangserver
         path: build/bangserver
   
-  # deploy:
-  #   runs-on: self-hosted
-  #   needs: [build]
+  deploy:
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+    - name: Download Server Artifact
+      uses: actions/download-artifact@v3
+      id: download
+      with:
+        name: bangserver
     
-  #   steps:
-  #   - name: Download Server Artifact
-  #     uses: actions/download-artifact@v3
-  #     with:
-  #       name: bangserver
-        
+    - name: Run Deploy Script
+      shell: bash
+      run: ${{ env.DEPLOY_SCRIPT_PATH }} ${{ steps.download.outputs.download-path }}
