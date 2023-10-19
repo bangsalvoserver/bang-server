@@ -40,6 +40,7 @@ namespace banggame {
     )
 
     DEFINE_ENUM_TYPES(client_message_type,
+        (pong)
         (connect, connect_args)
         (user_edit, user_info)
         (lobby_list)
@@ -96,6 +97,7 @@ namespace banggame {
     )
 
     DEFINE_ENUM_TYPES(server_message_type,
+        (ping)
         (client_accepted, client_accepted_args)
         (lobby_error, std::string)
         (lobby_update, lobby_data)

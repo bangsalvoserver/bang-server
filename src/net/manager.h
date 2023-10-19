@@ -82,6 +82,7 @@ private:
     void kick_user_from_lobby(user_ptr user);
 
     std::string handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
+    std::string handle_message(MSG_TAG(pong),           user_ptr user);
     std::string handle_message(MSG_TAG(user_edit),      user_ptr user, const user_info &value);
     std::string handle_message(MSG_TAG(lobby_list),     user_ptr user);
     std::string handle_message(MSG_TAG(lobby_make),     user_ptr user, const lobby_info &value);
