@@ -26,7 +26,7 @@ DEFINE_ENUM(lobby_team,
 using team_user_pair = std::pair<lobby_team, user_ptr>;
 
 static constexpr ticks lobby_lifetime = 5min;
-static constexpr ticks ping_rate = 30s;
+static constexpr ticks ping_interval = 30s;
 static constexpr int pings_until_disconnect = 3;
 
 using lobby_list = std::list<lobby>;

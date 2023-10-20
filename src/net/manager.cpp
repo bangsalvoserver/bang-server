@@ -43,8 +43,8 @@ void game_manager::on_receive_message(client_handle client, const client_message
 
 void game_manager::tick() {
     for (auto &[client, user] : users) {
-        if (--user.ping_timer <= ticks{}) {
-            user.ping_timer = ping_rate;
+        if (++user.ping_timer > ping_interval) {
+            user.ping_timer = ticks{};
             if (++user.ping_count > pings_until_disconnect) {
                 kick_client(client, "INACTIVITY");
             } else {
@@ -87,9 +87,7 @@ std::string game_manager::handle_message(MSG_TAG(connect), client_handle client,
 }
 
 std::string game_manager::handle_message(MSG_TAG(pong), user_ptr user) {
-    if (user->second.ping_count > 0) {
-        --user->second.ping_count;
-    }
+    user->second.ping_count = 0;
     return {};
 }
 
