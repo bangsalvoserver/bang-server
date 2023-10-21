@@ -23,7 +23,7 @@ namespace banggame {
         if (!target->alive()) {
             target->m_game->queue_action([=]{
                 target->m_game->handle_player_death(nullptr, target, discard_all_reason::discard_ghost);
-            }, 1);
+            }, 2);
         }
     }
 }
