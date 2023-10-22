@@ -533,10 +533,10 @@ namespace banggame {
                                 queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy);
                             }, -2);
                         }
-                    } else if (
+                    } else if (m_players.size() == 3 && (
                         (target->m_role == player_role::deputy_3p && killer->m_role == player_role::renegade_3p) ||
                         (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::deputy_3p) ||
-                        (target->m_role == player_role::renegade_3p && killer->m_role == player_role::outlaw_3p))
+                        (target->m_role == player_role::renegade_3p && killer->m_role == player_role::outlaw_3p)))
                     {
                         killer->draw_card(3);
                     }
