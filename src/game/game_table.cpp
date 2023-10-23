@@ -52,7 +52,7 @@ namespace banggame {
     }
 
     int game_table::calc_distance(const player *from, const player *to) {
-        if (from == to) return 0;
+        if (from == to || !from->alive()) return 0;
 
         int distance_mod = to->get_distance_mod();
 
