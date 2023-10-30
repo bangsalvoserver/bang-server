@@ -326,18 +326,10 @@ namespace banggame {
                     }
                 }
             }
-            
+
             call_event<event_type::on_game_setup>(m_first_player);
 
-            if (!m_scenario_deck.empty()) {
-                set_card_visibility(m_scenario_deck.back(), nullptr, card_visibility::shown);
-            }
-            if (!m_wws_scenario_deck.empty()) {
-                set_card_visibility(m_wws_scenario_deck.back(), nullptr, card_visibility::shown);
-            }
-
-            m_playing = m_first_player;
-            m_first_player->start_of_turn();
+            queue_action([this]{ m_first_player->start_of_turn(); });
         });
     }
 

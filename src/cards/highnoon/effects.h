@@ -10,6 +10,7 @@
 #include "invert_rotation.h"
 #include "newidentity.h"
 #include "reverend.h"
+#include "ruleset.h"
 #include "sermon.h"
 #include "shootout.h"
 #include "thedaltons.h"

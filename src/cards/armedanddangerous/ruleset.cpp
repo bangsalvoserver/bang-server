@@ -6,7 +6,7 @@
 namespace banggame {
 
     void ruleset_armedanddangerous::on_apply(game *game) {
-        game->add_listener<event_type::on_game_setup>({nullptr, 3}, [](player *origin){
+        game->add_listener<event_type::on_game_setup>({nullptr, 4}, [](player *origin){
             origin->m_game->add_update<game_update_type::add_cubes>(origin->m_game->num_cubes = 32);
         });
 

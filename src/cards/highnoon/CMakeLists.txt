@@ -8,6 +8,7 @@ target_sources(bangserver PRIVATE
     invert_rotation.cpp
     newidentity.cpp
     reverend.cpp
+    ruleset.cpp
     sermon.cpp
     shootout.cpp
     thedaltons.cpp
