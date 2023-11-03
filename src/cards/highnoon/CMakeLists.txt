@@ -2,11 +2,9 @@ target_sources(bangserver PRIVATE
     blessing.cpp
     curse.cpp
     ghosttown.cpp
-    handcuffs.cpp
     hangover.cpp
     highnoon.cpp
     invert_rotation.cpp
-    newidentity.cpp
     reverend.cpp
     ruleset.cpp
     sermon.cpp

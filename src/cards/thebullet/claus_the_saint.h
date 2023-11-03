@@ -1,5 +1,5 @@
-#ifndef __DODGECITY_CLAUS_THE_SAINT_H__
-#define __DODGECITY_CLAUS_THE_SAINT_H__
+#ifndef __THEBULLET_CLAUS_THE_SAINT_H__
+#define __THEBULLET_CLAUS_THE_SAINT_H__
 
 #include "cards/card_effect.h"
 

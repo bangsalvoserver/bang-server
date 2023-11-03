@@ -1,14 +1,13 @@
-#ifndef __HIGHNOON_NEWIDENTITY_H__
-#define __HIGHNOON_NEWIDENTITY_H__
+#ifndef __THEBULLET_JOHHNY_KISCH_H__
+#define __THEBULLET_JOHHNY_KISCH_H__
 
 #include "cards/card_effect.h"
 
 namespace banggame {
 
-    struct equip_newidentity : event_equip {
+    struct equip_johnny_kisch : event_equip {
         void on_enable(card *target_card, player *target);
     };
-
 }
 
 #endif
