@@ -39,6 +39,7 @@ namespace banggame::filters {
         bool is_cube_slot(card_ptr target);
         card_ptr get_request_origin_card(player_ptr origin);
         player_ptr get_request_origin(player_ptr origin);
+        target_list get_request_target_set(player_ptr origin);
     }
 
     inline bool is_player_ghost(detail::const_player_ptr origin) {
@@ -85,6 +86,18 @@ namespace banggame::filters {
 
         if (bool(filter & target_player_filter::not_empty_cubes) && detail::count_player_cubes(target) == 0)
             return "ERROR_TARGET_EMPTY_CUBES";
+        
+        if (bool(filter & target_player_filter::target_set)) {
+            target_list target_set = detail::get_request_target_set(target);
+            if (std::ranges::none_of(target_set, [&](const play_card_target &t) {
+                if (auto *p = t.get_if<target_type::player>()) {
+                    return *p == target;
+                }
+                return false;
+            })) {
+                return "ERROR_TARGET_NOT_IN_TARGET_SET";
+            }
+        }
 
         if (!ctx.ignore_distances && bool(filter & (target_player_filter::reachable | target_player_filter::range_1 | target_player_filter::range_2))) {
             int range = detail::get_player_range_mod(origin);

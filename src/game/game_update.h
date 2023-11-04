@@ -203,6 +203,7 @@ namespace banggame {
         (card_modifier_tree, respond_cards)
         (serial::card_list, pick_cards)
         (serial::card_list, highlight_cards)
+        (target_list, target_set)
         (player_distances, distances)
     )
 

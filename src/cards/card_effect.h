@@ -100,6 +100,7 @@ namespace banggame {
         virtual void on_update() {}
 
         virtual std::vector<card *> get_highlights() const { return {}; }
+        virtual target_list get_target_set() const { return {}; }
     
     protected:
         void auto_pick();

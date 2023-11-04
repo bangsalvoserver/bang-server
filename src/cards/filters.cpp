@@ -77,4 +77,11 @@ namespace banggame::filters::detail {
         }
         return nullptr;
     }
+
+    target_list get_request_target_set(player *origin) {
+        if (auto req = origin->m_game->top_request()) {
+            return req->get_target_set();
+        }
+        return {};
+    }
 }

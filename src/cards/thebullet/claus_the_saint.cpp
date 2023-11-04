@@ -12,7 +12,7 @@ namespace banggame {
         request_claus_the_saint(card *origin_card, player *target)
             : request_auto_select(origin_card, nullptr, target) {}
 
-        std::vector<player *> targets;
+        std::vector<player *> selected_targets;
 
         void on_update() override {
             if (state == request_state::pending) {
@@ -30,6 +30,17 @@ namespace banggame {
                 return {"STATUS_CLAUS_THE_SAINT_OTHER", target, origin_card};
             }
         }
+
+        target_list get_target_set() const override {
+            return target->m_game->m_players
+                | ranges::views::filter([&](player *p) {
+                    return p != target && !ranges::contains(selected_targets, p);
+                })
+                | ranges::views::transform([](player *p) {
+                    return play_card_target{enums::enum_tag<target_type::player>, p};
+                })
+                | ranges::to<target_list>;
+        }
     };
     
     void equip_claus_the_saint::on_enable(card *target_card, player *target) {
@@ -42,19 +53,15 @@ namespace banggame {
     }
 
     game_string handler_claus_the_saint::get_error(card *origin_card, player *origin, card *target_card, player *target_player) {
-        if (auto req = origin->m_game->top_request<request_claus_the_saint>(origin)) {
-            if (ranges::contains(req->targets, target_player)) {
-                return "ERROR_TARGET_NOT_UNIQUE";
-            } else {
-                return {};
-            }
-        } else {
+        if (origin->m_game->top_request<request_claus_the_saint>(origin) == nullptr) {
             return "ERROR_INVALID_RESPONSE";
+        } else {
+            return {};
         }
     }
 
     void handler_claus_the_saint::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {
-        origin->m_game->top_request<request_claus_the_saint>(origin)->targets.push_back(target_player);
+        origin->m_game->top_request<request_claus_the_saint>(origin)->selected_targets.push_back(target_player);
         
         if (!origin->m_game->check_flags(game_flags::hands_shown)) {
             origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_GIFTED_CARD", origin, target_player, target_card);
