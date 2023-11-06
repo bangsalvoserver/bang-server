@@ -13,11 +13,11 @@ namespace banggame {
                         pair.modifiers
                     );
                 }),
-                [](pocket_type pocket) {
-                    return pocket == pocket_type::player_hand
-                        || pocket == pocket_type::shop_selection;
-                },
-                &card_pocket_pair::pocket);
+                [](const card_pocket_pair &pair) {
+                    return pair.pocket == pocket_type::player_hand
+                        || pair.pocket == pocket_type::shop_selection
+                        || pair.pocket == pocket_type::train && pair.origin_card->deck == card_deck_type::train;
+                });
             if ((!skipped || count) && count < 3) {
                 origin->damage(target_card, nullptr, 1);
             }
