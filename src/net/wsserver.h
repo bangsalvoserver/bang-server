@@ -52,7 +52,7 @@ public:
             m_clients.emplace(con);
         });
 
-        m_server.set_close_handler([this](client_handle con) {
+        auto client_disconnect_handler = [this](client_handle con) {
             std::scoped_lock lock(m_con_mutex);
             std::erase_if(m_clients, [&](client_handle c) {
                 if (auto ptr = c.lock()) {
@@ -67,7 +67,10 @@ public:
                     return true;
                 }
             });
-        });
+        };
+
+        m_server.set_close_handler(client_disconnect_handler);
+        m_server.set_fail_handler(client_disconnect_handler);
 
         m_server.set_message_handler([this](client_handle con, server_type::message_ptr msg) {
             try {
