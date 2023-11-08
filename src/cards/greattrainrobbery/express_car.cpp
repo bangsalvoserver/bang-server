@@ -20,12 +20,8 @@ namespace banggame {
             if (ranges::any_of(get_all_playable_cards(origin), [](card *c) { return c->pocket == pocket_type::player_hand; })) {
                 return "BOT_BAD_PLAY";
             }
-        } else if (auto ncards = origin->m_hand.size()) {
-            if (ncards == 1) {
-                return "PROMPT_PASS_DISCARD";
-            } else {
-                return {"PROMPT_PASS_DISCARD_PLURAL", int(ncards)};
-            }
+        } else if (int ncards = int(origin->m_hand.size())) {
+            return {"PROMPT_PASS_DISCARD", ncards};
         }
         return {};
     }

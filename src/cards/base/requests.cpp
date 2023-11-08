@@ -94,16 +94,10 @@ namespace banggame {
 
     game_string request_discard_pass::status_text(player *owner) const {
         int diff = int(target->m_hand.size()) - target->max_cards_end_of_turn();
-        if (diff > 1) {
-            if (target == owner) {
-                return {"STATUS_DISCARD_PASS_PLURAL", diff};
-            } else {
-                return {"STATUS_DISCARD_PASS_PLURAL_OTHER", target, diff};
-            }
-        } else if (target == owner) {
-            return "STATUS_DISCARD_PASS";
+        if (target == owner) {
+            return {"STATUS_DISCARD_PASS", diff};
         } else {
-            return {"STATUS_DISCARD_PASS_OTHER", target};
+            return {"STATUS_DISCARD_PASS_OTHER", target, diff};
         }
     }
         

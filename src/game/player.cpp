@@ -157,12 +157,7 @@ namespace banggame {
 
     void player::heal(int value) {
         if (is_ghost() || m_hp == m_max_hp) return;
-        
-        if (value == 1) {
-            m_game->add_log("LOG_HEALED", this);
-        } else {
-            m_game->add_log("LOG_HEALED_PLURAL", this, value);
-        }
+        m_game->add_log("LOG_HEALED", this, value);
         set_hp(std::min<int>(m_hp + value, m_max_hp));
     }
 

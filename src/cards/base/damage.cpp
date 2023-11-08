@@ -43,17 +43,11 @@ namespace banggame {
         if (bool(flags & effect_flags::play_as_bang)) {
             if (bool(flags & effect_flags::multi_target)) {
                 target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_GATLING", origin_card, target);
-            } else if (damage > 1) {
-                target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_BANG_PLURAL", origin_card, target, damage);
             } else {
-                target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_BANG", origin_card, target);
+                target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_BANG", origin_card, target, damage);
             }
         } else {
-            if (damage > 1) {
-                target->m_game->add_log("LOG_TAKEN_DAMAGE_PLURAL", origin_card, target, damage);
-            } else {
-                target->m_game->add_log("LOG_TAKEN_DAMAGE", origin_card, target);
-            }
+            target->m_game->add_log("LOG_TAKEN_DAMAGE", origin_card, target, damage);
         }
         target->set_hp(target->m_hp - damage);
         target->m_game->queue_action([origin_card=origin_card, origin=origin, target=target] {
@@ -77,17 +71,11 @@ namespace banggame {
         if (bool(flags & effect_flags::play_as_bang)) {
             if (bool(flags & effect_flags::multi_target)) {
                 return {"STATUS_DAMAGING_AS_GATLING", target, origin_card};
-            } else if (damage > 1) {
-                return {"STATUS_DAMAGING_AS_BANG_PLURAL", target, origin_card, damage};
             } else {
-                return {"STATUS_DAMAGING_AS_BANG", target, origin_card};
+                return {"STATUS_DAMAGING_AS_BANG", target, origin_card, damage};
             }
         } else {
-            if (damage > 1) {
-                return {"STATUS_DAMAGING_PLURAL", target, origin_card, damage};
-            } else {
-                return {"STATUS_DAMAGING", target, origin_card};
-            }
+            return {"STATUS_DAMAGING", target, origin_card, damage};
         }
     }
 

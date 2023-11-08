@@ -52,27 +52,15 @@ namespace banggame {
         
         game_string status_text(player *owner) const override {
             if (owner == target) {
-                if (ncubes == 1) {
-                    if (origin_card) {
-                        return {"STATUS_ADD_CUBE_FOR", origin_card};
-                    } else {
-                        return "STATUS_ADD_CUBE";
-                    }
-                } else if (origin_card) {
-                    return {"STATUS_ADD_CUBE_PLURAL_FOR", origin_card, ncubes};
-                } else {
-                    return {"STATUS_ADD_CUBE_PLURAL", ncubes};
-                }
-            } else if (ncubes == 1) {
                 if (origin_card) {
-                    return {"STATUS_ADD_CUBE_FOR_OTHER", target, origin_card};
+                    return {"STATUS_ADD_CUBE_FOR", origin_card, ncubes};
                 } else {
-                    return {"STATUS_ADD_CUBE_OTHER", target};
+                    return {"STATUS_ADD_CUBE", ncubes};
                 }
             } else if (origin_card) {
-                return {"STATUS_ADD_CUBE_PLURAL_FOR_OTHER", target, origin_card, ncubes};
+                return {"STATUS_ADD_CUBE_FOR_OTHER", target, origin_card, ncubes};
             } else {
-                return {"STATUS_ADD_CUBE_PLURAL_OTHER", target, ncubes};
+                return {"STATUS_ADD_CUBE_OTHER", target, ncubes};
             }
         }
     };

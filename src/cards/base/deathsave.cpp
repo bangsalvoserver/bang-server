@@ -35,17 +35,9 @@ namespace banggame {
     game_string request_death::status_text(player *owner) const {
         int nbeers = 1 - target->m_hp;
         if (target == owner) {
-            if (nbeers == 1) {
-                return "STATUS_DEATH";
-            } else {
-                return {"STATUS_DEATH_PLURAL", nbeers};
-            }
+            return {"STATUS_DEATH", nbeers};
         } else {
-            if (nbeers == 1) {
-                return {"STATUS_DEATH_OTHER", target};
-            } else {
-                return {"STATUS_DEATH_OTHER_PLURAL", target, nbeers};
-            }
+            return {"STATUS_DEATH_OTHER", target, nbeers};
         }
     }
 }
