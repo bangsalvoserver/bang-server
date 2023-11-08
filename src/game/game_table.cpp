@@ -217,11 +217,7 @@ namespace banggame {
         if (ncubes > 0) {
             num_cubes -= ncubes;
             target->num_cubes += ncubes;
-            if (ncubes == 1) {
-                add_log("LOG_ADD_CUBE", target->owner, target);
-            } else {
-                add_log("LOG_ADD_CUBES", target->owner, target, ncubes);
-            }
+            add_log("LOG_ADD_CUBE", target->owner, target, ncubes);
             add_update<game_update_type::move_cubes>(ncubes, nullptr, target);
         }
     }
@@ -234,28 +230,16 @@ namespace banggame {
             origin->num_cubes -= added_cubes;
             ncubes -= added_cubes;
             if (origin->owner == target->owner) {
-                if (added_cubes == 1) {
-                    add_log("LOG_MOVED_CUBE", target->owner, origin, target);
-                } else {
-                    add_log("LOG_MOVED_CUBES", target->owner, origin, target, added_cubes);
-                }
+                add_log("LOG_MOVED_CUBE", target->owner, origin, target, added_cubes);
             } else {
-                if (added_cubes == 1) {
-                    add_log("LOG_MOVED_CUBE_FROM", target->owner, origin->owner, origin, target);
-                } else {
-                    add_log("LOG_MOVED_CUBES_FROM", target->owner, origin->owner, origin, target, added_cubes);
-                }
+                add_log("LOG_MOVED_CUBE_FROM", target->owner, origin->owner, origin, target, added_cubes);
             }
             add_update<game_update_type::move_cubes>(added_cubes, origin, target);
         }
         if (ncubes > 0) {
             origin->num_cubes -= ncubes;
             num_cubes += ncubes;
-            if (ncubes == 1) {
-                add_log("LOG_PAID_CUBE", origin->owner, origin);
-            } else {
-                add_log("LOG_PAID_CUBES", origin->owner, origin, ncubes);
-            }
+            add_log("LOG_PAID_CUBE", origin->owner, origin, ncubes);
             add_update<game_update_type::move_cubes>(ncubes, origin, nullptr);
         }
         if (origin->sign && origin->num_cubes == 0) {
@@ -268,11 +252,7 @@ namespace banggame {
 
     void game_table::drop_cubes(card *target) {
         if (target->num_cubes > 0) {
-            if (target->num_cubes == 1) {
-                add_log("LOG_DROP_CUBE", target->owner, target);
-            } else {
-                add_log("LOG_DROP_CUBES", target->owner, target, target->num_cubes);
-            }
+            add_log("LOG_DROP_CUBE", target->owner, target, target->num_cubes);
             num_cubes += target->num_cubes;
             add_update<game_update_type::move_cubes>(target->num_cubes, target, nullptr);
             target->num_cubes = 0;

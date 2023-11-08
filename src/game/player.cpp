@@ -212,7 +212,7 @@ namespace banggame {
             m_game->set_card_visibility(drawn_card);
             m_game->add_short_pause(drawn_card);
         } else {
-            m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);
+            m_game->add_log(update_target::excludes(this), "LOG_DRAWN_CARDS", this, 1);
             m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);
         }
         add_to_hand(drawn_card);
@@ -220,18 +220,10 @@ namespace banggame {
 
     void player::draw_card(int ncards, card *origin_card) {
         if (!m_game->check_flags(game_flags::hands_shown)) {
-            if (ncards == 1) {
-                if (origin_card) {
-                    m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD_FOR", this, origin_card);
-                } else {
-                    m_game->add_log(update_target::excludes(this), "LOG_DRAWN_A_CARD", this);
-                }
+            if (origin_card) {
+                m_game->add_log(update_target::excludes(this), "LOG_DRAWN_CARDS_FOR", this, ncards, origin_card);
             } else {
-                if (origin_card) {
-                    m_game->add_log(update_target::excludes(this), "LOG_DRAWN_N_CARDS_FOR", this, ncards, origin_card);
-                } else {
-                    m_game->add_log(update_target::excludes(this), "LOG_DRAWN_N_CARDS", this, ncards);
-                }
+                m_game->add_log(update_target::excludes(this), "LOG_DRAWN_CARDS", this, ncards);
             }
         }
         for (int i=0; i<ncards; ++i) {

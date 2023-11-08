@@ -53,7 +53,7 @@ namespace banggame {
             card *c = origin->m_game->m_selection.front();
             if (!origin->m_game->check_flags(game_flags::hands_shown)) {
                 origin->m_game->add_log(update_target::includes(origin), "LOG_DRAWN_CARD", origin, c);
-                origin->m_game->add_log(update_target::excludes(origin), "LOG_DRAWN_A_CARD", origin);
+                origin->m_game->add_log(update_target::excludes(origin), "LOG_DRAWN_CARDS", origin, 1);
             } else {
                 origin->m_game->add_log("LOG_DRAWN_CARD", origin, c);
             }
