@@ -71,7 +71,7 @@ namespace banggame {
     template<size_t I>
     static std::string get_field_string(const game_options &options) {
         const auto field_data = reflector::get_field_data<I>(options);
-        return fmt::format("{} = {}", field_data.name(), to_string(field_data.get()));
+        return fmt::format("{} = {}", field_data.name(), field_data.get());
     }
 
     template<size_t ... Is>
