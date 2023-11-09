@@ -294,9 +294,10 @@ namespace banggame {
         }
 
         if (m_options.character_choice) {
+            add_game_flags(game_flags::hands_shown);
             for (player *p : m_players) {
                 while (!p->m_characters.empty()) {
-                    move_card(p->first_character(), pocket_type::player_table, p, card_visibility::shown, true);
+                    move_card(p->first_character(), pocket_type::player_hand, p, card_visibility::shown, true);
                 }
             }
             for (player *p : range_all_players(m_first_player)) {
@@ -315,6 +316,7 @@ namespace banggame {
         }
 
         queue_action([this] {
+            remove_game_flags(game_flags::hands_shown);
             add_log("LOG_GAME_START");
             play_sound(nullptr, "gamestart");
 

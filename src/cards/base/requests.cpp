@@ -7,7 +7,7 @@
 namespace banggame {
 
     bool request_characterchoice::can_pick(card *target_card) const {
-        return target_card->pocket == pocket_type::player_table && target_card->owner == target;
+        return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
     void request_characterchoice::on_pick(card *target_card) {
@@ -18,7 +18,7 @@ namespace banggame {
         target->set_hp(target->m_max_hp, true);
         target->enable_equip(target_card);
 
-        target->m_game->move_card(target->m_table.front(), pocket_type::player_backup, target, card_visibility::hidden);
+        target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, card_visibility::hidden);
     }
 
     game_string request_characterchoice::status_text(player *owner) const {
