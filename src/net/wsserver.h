@@ -97,6 +97,15 @@ public:
         m_server.close(con, 0, msg);
     }
 
+    std::string get_client_ip(client_handle con) {
+        std::error_code ec;
+        auto client_con = m_server.get_con_from_hdl(con, ec);
+        if (client_con) {
+            return fmt::format("{}:{}", client_con->get_host(), client_con->get_port());
+        }
+        return "(unknown host)";
+    }
+
 };
 
 }

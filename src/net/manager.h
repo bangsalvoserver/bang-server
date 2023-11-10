@@ -15,6 +15,7 @@ server_message make_message(auto && ... args) {
 
 using send_message_function = std::function<void(client_handle, server_message)>;
 using kick_client_function = std::function<void(client_handle, const std::string &message)>;
+using client_ip_function = std::function<std::string(client_handle)>;
 
 struct server_options {
     bool enable_cheats = false;
@@ -29,7 +30,7 @@ public:
     void set_send_message_function(Function &&fun) {
         m_send_message = [this, fun=std::forward<Function>(fun)](client_handle hdl, server_message msg) {
             if (m_options.verbose) {
-                std::cout << hdl.lock().get() << ": Sent " << json::serialize(msg) << std::endl;
+                std::cout << m_get_client_ip(hdl) << ": Sent " << json::serialize(msg) << std::endl;
             }
             std::invoke(fun, hdl, std::move(msg));
         };
@@ -37,6 +38,10 @@ public:
 
     void set_kick_client_function(kick_client_function &&fun) {
         m_kick_client = std::move(fun);
+    }
+
+    void set_client_ip_function(client_ip_function &&fun) {
+        m_get_client_ip = std::move(fun);
     }
 
     void on_receive_message(client_handle client, const client_message &msg);
@@ -118,6 +123,7 @@ private:
     
     send_message_function m_send_message;
     kick_client_function m_kick_client;
+    client_ip_function m_get_client_ip;
 
     friend struct lobby;
     friend class chat_command;

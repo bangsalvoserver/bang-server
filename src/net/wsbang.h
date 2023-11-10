@@ -27,6 +27,10 @@ namespace banggame {
             m_mgr.set_kick_client_function([&](client_handle con, const std::string &msg) {
                 this->kick_client(con, msg);
             });
+
+            m_mgr.set_client_ip_function([&](client_handle con) {
+                return this->get_client_ip(con);
+            });
         }
 
         void tick() {

@@ -21,7 +21,7 @@ game_manager::game_manager() {
 void game_manager::on_receive_message(client_handle client, const client_message &msg) {
     try {
         if (m_options.verbose) {
-            std::cout << client.lock().get() << ": Received " << json::serialize(msg) << std::endl;
+            std::cout << m_get_client_ip(client) << ": Received " << json::serialize(msg) << std::endl;
         }
         auto error = enums::visit_indexed([&]<client_message_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
             if constexpr (requires { handle_message(tag, client, args ...); }) {
@@ -430,7 +430,7 @@ void lobby::start_game(game_manager &mgr) {
     m_game = std::make_unique<banggame::game>(options.game_seed);
 
     if (mgr.m_options.verbose) {
-        std::cout << "Started game " << m_game.get() << " in lobby " << name << " with seed " << m_game->rng_seed << std::endl;
+        std::cout << "Started game " << name << " with seed " << m_game->rng_seed << std::endl;
     }
 
     std::vector<int> user_ids;
