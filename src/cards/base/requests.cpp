@@ -18,7 +18,7 @@ namespace banggame {
         target->set_hp(target->m_max_hp, true);
         target->enable_equip(target_card);
 
-        target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, card_visibility::hidden);
+        target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, card_visibility::hidden, true);
     }
 
     game_string request_characterchoice::status_text(player *owner) const {
