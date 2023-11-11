@@ -12,9 +12,6 @@ namespace banggame {
             auto &scenario_deck = origin->m_game->m_wws_scenario_deck;
             auto &scenario_cards = origin->m_game->m_wws_scenario_cards;
             
-            if (scenario_deck.size() > 1) {
-                origin->m_game->set_card_visibility(*(scenario_deck.rbegin() + 1), nullptr, card_visibility::shown, true);
-            }
             if (!scenario_cards.empty()) {
                 origin->m_game->m_first_player->disable_equip(scenario_cards.back());
             }

@@ -12,7 +12,6 @@ target_sources(bangserver PRIVATE
     ladyrosaoftexas.cpp
     leevankliff.cpp
     miss_susanna.cpp
-    ruleset.cpp
     sacagaway.cpp
     showdown.cpp
     teren_kill.cpp

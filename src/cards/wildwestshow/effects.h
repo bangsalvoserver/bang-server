@@ -13,7 +13,6 @@
 #include "ladyrosaoftexas.h"
 #include "leevankliff.h"
 #include "miss_susanna.h"
-#include "ruleset.h"
 #include "sacagaway.h"
 #include "showdown.h"
 #include "teren_kill.h"
