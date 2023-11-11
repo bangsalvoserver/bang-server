@@ -400,6 +400,25 @@ namespace banggame {
         return {};
     }
 
+    static played_card_history make_played_card_history(const play_card_args &args, const effect_context &ctx) {
+        auto to_card_pocket_pair = [&](card *c) {
+            if (ctx.repeat_card == c) {
+                return card_pocket_pair{c, pocket_type::none};
+            } else {
+                return card_pocket_pair{c, c->pocket};
+            }
+        };
+
+        return {
+            .origin_card{to_card_pocket_pair(args.card)},
+            .modifiers{args.modifiers
+                | ranges::views::transform(&modifier_pair::card)
+                | ranges::views::transform(to_card_pocket_pair)
+                | ranges::to<std::vector>},
+            .context{ctx}
+        };
+    }
+
     game_message verify_and_play(player *origin, const play_card_args &args) {
         bool is_response = origin->m_game->pending_requests();
 
@@ -418,7 +437,7 @@ namespace banggame {
         origin->m_game->send_request_status_clear();
 
         if (args.card->pocket != pocket_type::button_row) {
-            origin->m_played_cards.emplace_back(args.card, args.modifiers, ctx);
+            origin->m_played_cards.push_back(make_played_card_history(args, ctx));
         }
 
         origin->add_gold(-filters::get_card_cost(args.card, is_response, ctx));

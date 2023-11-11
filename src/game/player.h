@@ -47,8 +47,6 @@ namespace banggame {
         card_pocket_pair origin_card;
         std::vector<card_pocket_pair> modifiers;
         effect_context context;
-
-        played_card_history(card *origin_card, const modifier_list &modifiers, const effect_context &context);
     };
 
     enum class range_mod_type {
