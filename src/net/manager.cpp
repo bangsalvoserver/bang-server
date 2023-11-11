@@ -13,31 +13,36 @@
 
 using namespace banggame;
 
-game_manager::game_manager() {
+game_manager::game_manager(asio::io_context &ctx): net::wsserver(ctx) {
     std::random_device rd;
     m_rng.seed(rd());
 }
 
-void game_manager::on_receive_message(client_handle client, const client_message &msg) {
+void game_manager::on_message(client_handle client, const std::string &msg) {
     try {
+        auto client_msg = json::deserialize<client_message>(json::json::parse(msg));
         if (m_options.verbose) {
-            std::cout << m_get_client_ip(client) << ": Received " << json::serialize(msg) << std::endl;
+            std::cout << get_client_ip(client) << ": Received " << msg << std::endl;
         }
-        auto error = enums::visit_indexed([&]<client_message_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
-            if constexpr (requires { handle_message(tag, client, args ...); }) {
-                return handle_message(tag, client, FWD(args) ...);
-            } else if (auto it = users.find(client); it != users.end()) {
-                return handle_message(tag, it, FWD(args) ...);
-            } else {
-                kick_client(client, "INVALID_MESSAGE");
-                return std::string();
+        try {
+            auto error = enums::visit_indexed([&]<client_message_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
+                if constexpr (requires { handle_message(tag, client, args ...); }) {
+                    return handle_message(tag, client, FWD(args) ...);
+                } else if (auto it = users.find(client); it != users.end()) {
+                    return handle_message(tag, it, FWD(args) ...);
+                } else {
+                    kick_client(client, "INVALID_MESSAGE");
+                    return std::string();
+                }
+            }, client_msg);
+            if (!error.empty()) {
+                send_message<server_message_type::lobby_error>(client, std::move(error));
             }
-        }, msg);
-        if (!error.empty()) {
-            send_message<server_message_type::lobby_error>(client, std::move(error));
+        } catch (const std::exception &e) {
+            std::cerr << fmt::format("Error in game_manager: {}", e.what()) << std::endl;
         }
-    } catch (const std::exception &e) {
-        std::cerr << fmt::format("Error in game_manager: {}", e.what()) << std::endl;
+    } catch (const std::exception &) {
+        kick_client(client, "INVALID_MESSAGE");
     }
 }
 
@@ -244,7 +249,7 @@ void game_manager::kick_user_from_lobby(user_ptr user) {
     }
 }
 
-void game_manager::client_disconnected(client_handle client) {
+void game_manager::on_disconnect(client_handle client) {
     if (auto it = users.find(client); it != users.end()) {
         if (it->second.in_lobby) {
             kick_user_from_lobby(it);

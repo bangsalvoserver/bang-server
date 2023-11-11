@@ -3,50 +3,25 @@
 
 #include "lobby.h"
 #include "chat_commands.h"
+#include "wsserver.h"
 
 #include <random>
 
 namespace banggame {
 
 template<server_message_type E>
-server_message make_message(auto && ... args) {
-    return server_message{enums::enum_tag<E>, FWD(args) ...};
+std::string make_message(auto && ... args) {
+    return json::serialize(server_message{enums::enum_tag<E>, FWD(args) ...}).dump();
 }
-
-using send_message_function = std::function<void(client_handle, server_message)>;
-using kick_client_function = std::function<void(client_handle, const std::string &message)>;
-using client_ip_function = std::function<std::string(client_handle)>;
 
 struct server_options {
     bool enable_cheats = false;
     bool verbose = false;
 };
 
-class game_manager {
+class game_manager: public net::wsserver {
 public:
-    game_manager();
-
-    template<std::invocable<client_handle, server_message> Function>
-    void set_send_message_function(Function &&fun) {
-        m_send_message = [this, fun=std::forward<Function>(fun)](client_handle hdl, server_message msg) {
-            if (m_options.verbose) {
-                std::cout << m_get_client_ip(hdl) << ": Sent " << json::serialize(msg) << std::endl;
-            }
-            std::invoke(fun, hdl, std::move(msg));
-        };
-    }
-
-    void set_kick_client_function(kick_client_function &&fun) {
-        m_kick_client = std::move(fun);
-    }
-
-    void set_client_ip_function(client_ip_function &&fun) {
-        m_get_client_ip = std::move(fun);
-    }
-
-    void on_receive_message(client_handle client, const client_message &msg);
-
-    void client_disconnected(client_handle client);
+    game_manager(asio::io_context &ctx);
     
     bool client_validated(client_handle client) const;
 
@@ -56,32 +31,40 @@ public:
 
     template<server_message_type E>
     void send_message(client_handle client, auto && ... args) {
-        m_send_message(client, make_message<E>(FWD(args) ... ));
+        std::string message = make_message<E>(FWD(args) ... );
+        if (m_options.verbose) {
+            std::cout << get_client_ip(client) << ": Sent " << message << std::endl;
+        }
+        push_message(client, message);
     }
 
     template<server_message_type E>
     void broadcast_message(auto && ... args) {
-        auto msg = make_message<E>(FWD(args) ... );
+        std::string message = make_message<E>(FWD(args) ... );
+        if (m_options.verbose) {
+            std::cout << "All users: Sent " << message << std::endl;
+        }
         for (client_handle client : users | std::views::keys) {
-            m_send_message(client, msg);
+            push_message(client, message);
         }
     }
 
     template<server_message_type E>
     void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
-        auto msg = make_message<E>(FWD(args) ... );
-        for (auto [team, it] : lobby.users) {
-            m_send_message(it->first, msg);
+        std::string message = make_message<E>(FWD(args) ... );
+        if (m_options.verbose) {
+            std::cout << "Lobby " << lobby.name << ": Sent " << message << std::endl;
         }
-    }
-
-    void kick_client(client_handle client, const std::string &message) {
-        if (m_kick_client) {
-            m_kick_client(client, message);
+        for (auto [team, it] : lobby.users) {
+            push_message(it->first, message);
         }
     }
 
     server_options &options() { return m_options; }
+
+protected:
+    void on_disconnect(client_handle client) override;
+    void on_message(client_handle client, const std::string &message) override;
 
 private:
     void kick_user_from_lobby(user_ptr user);
@@ -120,10 +103,6 @@ private:
     int generate_user_id(int user_id);
 
     std::default_random_engine m_rng;
-    
-    send_message_function m_send_message;
-    kick_client_function m_kick_client;
-    client_ip_function m_get_client_ip;
 
     friend struct lobby;
     friend class chat_command;

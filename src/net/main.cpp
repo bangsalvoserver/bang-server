@@ -4,14 +4,14 @@
 
 #include <cxxopts.hpp>
 
-#include "wsbang.h"
+#include "manager.h"
 
 volatile bool g_stop = false;
 
 int main(int argc, char **argv) {
     asio::io_context ctx;
 
-    banggame::bang_server server(ctx);
+    banggame::game_manager server(ctx);
 
     cxxopts::Options options(argv[0], "Bang! Server");
 
@@ -19,8 +19,8 @@ int main(int argc, char **argv) {
 
     options.add_options()
         ("port",        "",                 cxxopts::value(port))
-        ("cheats",      "Enable Cheats",    cxxopts::value(server.m_mgr.options().enable_cheats))
-        ("v,verbose",   "Verbose Logging",  cxxopts::value(server.m_mgr.options().verbose))
+        ("cheats",      "Enable Cheats",    cxxopts::value(server.options().enable_cheats))
+        ("v,verbose",   "Verbose Logging",  cxxopts::value(server.options().verbose))
         ("h,help",      "Print Help")
     ;
 
