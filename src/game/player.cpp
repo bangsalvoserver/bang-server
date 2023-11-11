@@ -19,15 +19,22 @@
 
 namespace banggame {
 
-    inline card_pocket_pair to_card_pocket_pair(card *c) {
-        return {c, c->pocket};
-    }
+    struct to_card_pocket_pair {
+        const effect_context &context;
+        card_pocket_pair operator()(card *c) const {
+            if (context.repeat_card == c) {
+                return {c, pocket_type::none};
+            } else {
+                return {c, c->pocket};
+            }
+        }
+    };
 
     played_card_history::played_card_history(card *origin_card, const modifier_list &modifiers, const effect_context &context)
-        : origin_card{to_card_pocket_pair(origin_card)}
+        : origin_card{to_card_pocket_pair{context}(origin_card)}
         , modifiers{modifiers
             | ranges::views::transform(&modifier_pair::card)
-            | ranges::views::transform(to_card_pocket_pair)
+            | ranges::views::transform(to_card_pocket_pair{context})
             | ranges::to<std::vector>}
         , context{context} {}
 

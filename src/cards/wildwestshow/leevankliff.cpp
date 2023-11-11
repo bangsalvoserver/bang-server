@@ -38,7 +38,7 @@ namespace banggame {
         if (auto it = std::ranges::find_if(origin->m_played_cards | std::views::reverse,
             [](const played_card_history &history) {
                 return history.origin_card.pocket == pocket_type::player_hand
-                    || history.origin_card.pocket == pocket_type::discard_pile;
+                    || history.origin_card.pocket == pocket_type::none;
             }); it != origin->m_played_cards.rend())
         {
             const played_card_history &history = *it;
