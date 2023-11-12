@@ -222,7 +222,7 @@ namespace banggame {
         }
     }
 
-    void game_table::move_cubes(card *origin, card *target, int ncubes) {
+    void game_table::move_cubes(card *origin, card *target, int ncubes, bool instant) {
         ncubes = std::min<int>(ncubes, origin->num_cubes);
         if (target && ncubes > 0 && target->num_cubes < max_cubes) {
             int added_cubes = std::min<int>(ncubes, max_cubes - target->num_cubes);
@@ -234,13 +234,13 @@ namespace banggame {
             } else {
                 add_log("LOG_MOVED_CUBE_FROM", target->owner, origin->owner, origin, target, added_cubes);
             }
-            add_update<game_update_type::move_cubes>(added_cubes, origin, target);
+            add_update<game_update_type::move_cubes>(added_cubes, origin, target, instant);
         }
         if (ncubes > 0) {
             origin->num_cubes -= ncubes;
             num_cubes += ncubes;
             add_log("LOG_PAID_CUBE", origin->owner, origin, ncubes);
-            add_update<game_update_type::move_cubes>(ncubes, origin, nullptr);
+            add_update<game_update_type::move_cubes>(ncubes, origin, nullptr, instant);
         }
         if (origin->sign && origin->num_cubes == 0) {
             add_log("LOG_DISCARDED_ORANGE_CARD", origin->owner, origin);

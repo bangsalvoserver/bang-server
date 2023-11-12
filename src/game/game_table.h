@@ -72,7 +72,7 @@ namespace banggame {
         void play_sound(player *target, const std::string &sound_id);
 
         void add_cubes(card *target, int ncubes);
-        void move_cubes(card *origin, card *target, int ncubes);
+        void move_cubes(card *origin, card *target, int ncubes, bool instant = false);
         void drop_cubes(card *target);
 
         void add_game_flags(game_flags flags);

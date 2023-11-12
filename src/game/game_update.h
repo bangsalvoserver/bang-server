@@ -48,9 +48,9 @@ namespace banggame {
         (game_duration, duration),
 
         move_cubes_update() = default;
-        move_cubes_update(int num_cubes, serial::opt_card origin_card, serial::opt_card target_card)
+        move_cubes_update(int num_cubes, serial::opt_card origin_card, serial::opt_card target_card, bool instant = false)
             : num_cubes{num_cubes}, origin_card{origin_card}, target_card{target_card}
-            , duration{num_cubes == 1 ? durations.move_cube : durations.move_cubes} {}
+            , duration{instant ? 0ms : num_cubes == 1 ? durations.move_cube : durations.move_cubes} {}
     )
 
     DEFINE_STRUCT(move_train_update,

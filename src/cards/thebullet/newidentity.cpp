@@ -24,12 +24,13 @@ namespace banggame {
                 target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
 
                 card *old_character = target->first_character();
-                target->m_game->move_card(old_character, pocket_type::player_backup, target, card_visibility::hidden);
+                target->m_game->set_card_visibility(old_character, target, card_visibility::hidden);
+                target->m_game->move_card(old_character, pocket_type::player_backup, target, card_visibility::hidden, true);
                 target->m_game->move_card(target_card, pocket_type::player_character, target, card_visibility::shown);
+                target->m_game->move_cubes(old_character, target_card, old_character->num_cubes, true);
 
                 target->reset_max_hp();
                 target->enable_equip(target_card);
-                target->m_game->move_cubes(old_character, target_card, old_character->num_cubes);
                 
                 if (!target->is_ghost()) {
                     target->set_hp(2);
