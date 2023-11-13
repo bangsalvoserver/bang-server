@@ -30,3 +30,22 @@ if(MINGW)
 endif()
 
 target_link_libraries(bangserver PRIVATE bang_cards_obj)
+
+set(bot_info_cpp "${CMAKE_CURRENT_BINARY_DIR}/bot_info.cpp")
+add_custom_command(
+    OUTPUT "${bot_info_cpp}"
+    COMMAND python3 parse_bots.py
+        bot_info.yml
+        "${bot_info_cpp}"
+    VERBATIM
+    DEPENDS
+        bot_info.yml
+        bot_propics/bot.png
+        parse_bots.py
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+add_library(bot_info_obj OBJECT "${bot_info_cpp}")
+target_include_directories(bot_info_obj PRIVATE ..)
+target_link_libraries(bot_info_obj PRIVATE cpputils)
+
+target_link_libraries(bangserver PRIVATE bot_info_obj)

@@ -9,7 +9,7 @@
 #include <ctime>
 
 #include "git_version.h"
-#include "bot_names.h"
+#include "bot_info.h"
 
 using namespace banggame;
 
@@ -445,17 +445,18 @@ void lobby::start_game(game_manager &mgr) {
         }
     }
 
-    std::vector<std::string_view> names = bot_names
+    std::vector<const std::string *> names = bot_info.names
+        | ranges::views::transform([](const std::string &str) { return &str; })
         | ranges::views::sample(options.num_bots, m_game->rng)
         | ranges::to<std::vector>;
 
-    std::vector<const sdl::image_pixels *> propics = bot_profile_pictures
+    std::vector<const sdl::image_pixels *> propics = bot_info.propics
         | ranges::views::transform([](const sdl::image_pixels &image) { return &image; })
         | ranges::views::sample(options.num_bots, m_game->rng)
         | ranges::to<std::vector>;
 
     for (int i=0; i<options.num_bots; ++i) {
-        auto &bot = bots.emplace_back(-1 - i, user_info{fmt::format("BOT {}", names[i % names.size()]), *propics[i % propics.size()] });
+        auto &bot = bots.emplace_back(-1 - i, user_info{fmt::format("BOT {}", *names[i % names.size()]), *propics[i % propics.size()] });
         user_ids.push_back(bot.user_id);
 
         mgr.broadcast_message_lobby<server_message_type::lobby_add_user>(*this, bot.user_id, bot, true);

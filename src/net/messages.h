@@ -9,7 +9,7 @@ namespace sdl {
     DEFINE_STRUCT(image_pixels,
         (int, width)
         (int, height)
-        (std::vector<std::byte>, pixels)
+        (base64::encoded_bytes, pixels)
     )
 }
 
