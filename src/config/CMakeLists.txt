@@ -40,7 +40,7 @@ add_custom_command(
     VERBATIM
     DEPENDS
         bot_info.yml
-        bot_propics/bot.png
+        bot_propics/robot.png
         parse_bots.py
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )

@@ -13,6 +13,7 @@ bots:
   - Michele
   - Jack
   - Klaus
-    
+  - Ale
+
   propics:
-  - bot_propics/bot.png
+  - bot_propics/robot.png
