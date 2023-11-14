@@ -142,10 +142,12 @@ namespace banggame {
                 }
             }
 
-            if (pending_requests()) {
-                co_yield make_update<game_update_type::request_status>(make_request_update(target));
-            } else if (target == m_playing) {
-                co_yield make_update<game_update_type::status_ready>(make_status_ready_update(target));
+            if (!is_game_over()) {
+                if (pending_requests()) {
+                    co_yield make_update<game_update_type::request_status>(make_request_update(target));
+                } else if (target == m_playing) {
+                    co_yield make_update<game_update_type::status_ready>(make_status_ready_update(target));
+                }
             }
         }
     }
