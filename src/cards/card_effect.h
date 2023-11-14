@@ -44,6 +44,8 @@ namespace banggame {
     inline ticks clamp_ticks(std::chrono::duration<Rep, Period> duration) {
         return std::clamp(std::chrono::duration_cast<ticks>(duration), ticks{0}, max_timer_duration);
     }
+    
+    using timer_id_t = size_t;
 
     class request_timer {
     protected:
@@ -56,6 +58,14 @@ namespace banggame {
     public:
         request_timer(request_base *request, auto duration)
             : request(request), duration(clamp_ticks(duration)) {}
+
+        timer_id_t get_timer_id() const {
+            return std::hash<const request_timer *>{}(this);
+        }
+
+        ticks get_duration() const {
+            return duration;
+        }
 
     public:
         void start(ticks total_update_time);

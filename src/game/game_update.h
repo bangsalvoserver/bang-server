@@ -194,6 +194,11 @@ namespace banggame {
         (int, weapon_range)
     )
 
+    DEFINE_STRUCT(timer_status_args,
+        (timer_id_t, timer_id)
+        (game_duration, duration)
+    )
+
     DEFINE_STRUCT(request_status_args,
         (serial::opt_card, origin_card)
         (serial::opt_player, origin)
@@ -205,6 +210,7 @@ namespace banggame {
         (serial::card_list, highlight_cards)
         (target_list, target_set)
         (player_distances, distances)
+        (std::optional<timer_status_args>, timer)
     )
 
     DEFINE_STRUCT(status_ready_args,
@@ -220,10 +226,10 @@ namespace banggame {
         (bool, quick_discard_all)
         (int, scenario_deck_size, 12)
         (int, num_bots, 0)
-        (std::chrono::milliseconds, damage_timer, 1500)
-        (std::chrono::milliseconds, escape_timer, 3000)
-        (std::chrono::milliseconds, bot_play_timer, 500)
-        (std::chrono::milliseconds, tumbleweed_timer, 3000)
+        (game_duration, damage_timer, 1500)
+        (game_duration, escape_timer, 3000)
+        (game_duration, bot_play_timer, 500)
+        (game_duration, tumbleweed_timer, 3000)
         (unsigned int, game_seed)
     )
 
@@ -270,6 +276,7 @@ namespace banggame {
     DEFINE_STRUCT(pick_card_args,
         (serial::card, card)
         (bool, bypass_prompt)
+        (std::optional<timer_id_t>, timer_id)
     )
 
     DEFINE_STRUCT(play_card_args,
@@ -277,6 +284,7 @@ namespace banggame {
         (modifier_list, modifiers)
         (target_list, targets)
         (bool, bypass_prompt)
+        (std::optional<timer_id_t>, timer_id)
     )
 
     DEFINE_ENUM_TYPES(game_action_type,

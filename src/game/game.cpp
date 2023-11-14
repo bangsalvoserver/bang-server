@@ -357,6 +357,7 @@ namespace banggame {
 
     request_status_args game::make_request_update(player *owner) {
         auto req = top_request();
+        auto *timer = req->timer();
         return request_status_args {
             .origin_card = req->origin_card,
             .origin = req->origin,
@@ -385,7 +386,12 @@ namespace banggame {
 
             .target_set = owner && req->target == owner ? req->get_target_set() : target_list{},
 
-            .distances = make_player_distances(owner)
+            .distances = make_player_distances(owner),
+
+            .timer = timer ? std::optional{timer_status_args{
+                .timer_id = timer->get_timer_id(),
+                .duration = std::chrono::duration_cast<game_duration>(timer->get_duration())
+            }} : std::optional<timer_status_args>{}
         };
     }
 

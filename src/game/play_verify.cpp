@@ -36,6 +36,19 @@ namespace banggame {
         return {};
     }
 
+    static game_string verify_timer_response(player *origin, std::optional<timer_id_t> timer_id) {
+        std::optional<timer_id_t> current_timer_id;
+        if (auto req = origin->m_game->top_request()) {
+            if (auto *timer = req->timer()) {
+                current_timer_id = timer->get_timer_id();
+            }
+        }
+        if (timer_id != current_timer_id) {
+            return "ERROR_TIMER_EXPIRED";
+        }
+        return {};
+    }
+
     static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx, duplicate_set_unique &duplicates) {
         auto &effects = origin_card->get_effect_list(is_response);
 
@@ -381,7 +394,11 @@ namespace banggame {
     game_message verify_and_pick(player *origin, const pick_card_args &args) {
         auto req = origin->m_game->top_request(origin);
 
-        if (!req || !req->can_pick(args.card)) {
+        if (game_string error = verify_timer_response(origin, args.timer_id)) {
+            return {enums::enum_tag<message_type::error>, error};
+        }
+
+        if (!req || req->target != origin || !req->can_pick(args.card)) {
             return {enums::enum_tag<message_type::error>, "ERROR_INVALID_PICK"};
         }
 
@@ -423,6 +440,10 @@ namespace banggame {
         bool is_response = origin->m_game->pending_requests();
 
         effect_context ctx;
+
+        if (game_string error = verify_timer_response(origin, args.timer_id)) {
+            return {enums::enum_tag<message_type::error>, error};
+        }
 
         if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
             return {enums::enum_tag<message_type::error>, error};
