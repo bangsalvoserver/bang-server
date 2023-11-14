@@ -23,8 +23,8 @@ namespace banggame {
             }
         };
 
-        rust_timer m_timer{this};
-        request_timer *timer() override { return &m_timer; }
+        std::optional<rust_timer> m_timer{this};
+        request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
 
         void on_update() override {
             switch (target->can_escape(origin, origin_card, flags)) {
@@ -32,7 +32,7 @@ namespace banggame {
                 auto_respond();
                 break;
             case 2:
-                m_timer.disable();
+                m_timer.reset();
             }
         }
 

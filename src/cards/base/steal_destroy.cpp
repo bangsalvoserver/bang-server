@@ -20,7 +20,7 @@ namespace banggame {
             auto_respond();
             break;
         case 2:
-            m_timer.disable();
+            m_timer.reset();
         }
     }
 

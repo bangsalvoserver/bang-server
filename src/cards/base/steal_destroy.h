@@ -42,8 +42,8 @@ namespace banggame {
             }
         };
 
-        timer_targeting m_timer{this};
-        request_timer *timer() override { return &m_timer; }
+        std::optional<timer_targeting> m_timer{this};
+        request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
 
         void on_update() override;
 

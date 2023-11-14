@@ -72,9 +72,6 @@ namespace banggame {
         void tick();
         bool finished() const { return lifetime <= ticks{0}; }
         virtual void on_finished() {}
-
-        void disable() { request = nullptr; }
-        bool enabled() const { return request != nullptr; }
     };
 
     enum class request_state : uint8_t {
