@@ -413,7 +413,6 @@ namespace banggame {
         req->on_pick(args.card);
         req.reset();
 
-        origin->m_game->update();
         return {};
     }
 
@@ -472,8 +471,6 @@ namespace banggame {
         } else {
             apply_target_list(origin, args.card, is_response, args.targets, ctx);
         }
-
-        origin->m_game->update();
 
         return {};
     }

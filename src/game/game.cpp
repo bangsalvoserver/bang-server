@@ -417,12 +417,11 @@ namespace banggame {
             return node.card->has_tag(tag_type::pass_turn);
         })) {
             m_playing->pass_turn();
-            update();
             return false;
-        } else if (!m_playing->is_bot()) {
+        } else {
             add_update<game_update_type::status_ready>(update_target::includes_private(m_playing), std::move(args));
+            return true;
         }
-        return true;
     }
 
     void game::send_request_update() {

@@ -209,21 +209,21 @@ namespace banggame::bot_ai {
                 try {
                     // maybe add random variation to fix softlock?
                     bool bypass_prompt = node_set.empty() && i>=5;
-                    if (std::visit(overloaded{
+                    if (auto [message, done] = std::visit(overloaded{
                         [](std::monostate) {
-                            return game_message{};
+                            return std::pair{game_message{}, false};
                         },
                         [&](const play_card_node &node) {
                             auto args = generate_random_play(origin, *(node.node), is_response);
                             args.bypass_prompt = bypass_prompt;
                             args.timer_id = timer_id;
-                            return verify_and_play(origin, args);
+                            return std::pair{verify_and_play(origin, args), true};
                         },
                         [&](const pick_card_node &node) {
-                            return verify_and_pick(origin, { node.target_card, bypass_prompt, timer_id });
+                            return std::pair{verify_and_pick(origin, { node.target_card, bypass_prompt, timer_id }), true};
                         }
-                    }, selected_node).is(message_type::ok)) {
-                        return true;
+                    }, selected_node); message.is(message_type::ok)) {
+                        return done;
                     }
                 } catch (const std::exception &e) {
                     std::cout << "BOT ERROR: " << e.what() << std::endl;

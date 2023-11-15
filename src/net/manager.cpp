@@ -476,5 +476,5 @@ void lobby::start_game(game_manager &mgr) {
 
     m_game->add_players(user_ids);
     m_game->start_game(options);
-    m_game->update();
+    m_game->commit_updates();
 }

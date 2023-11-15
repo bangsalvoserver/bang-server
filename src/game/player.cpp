@@ -235,7 +235,9 @@ namespace banggame {
 
     void player::handle_game_action(const game_action &action) {
         enums::visit_indexed(overloaded{
-            [](enums::enum_tag_t<message_type::ok>) {},
+            [&](enums::enum_tag_t<message_type::ok>) {
+                m_game->commit_updates();
+            },
             [&](enums::enum_tag_t<message_type::error>, game_string message) {
                 m_game->add_update<game_update_type::game_error>(update_target::includes_private(this), std::move(message));
             },
