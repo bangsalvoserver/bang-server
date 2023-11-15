@@ -38,13 +38,17 @@ namespace banggame {
         std::string_view m_description;
         command_permissions m_permissions;
 
+        static std::string_view get_arg(std::span<std::string> args, size_t index) {
+            if (index < args.size()) {
+                return args[index];
+            } else {
+                return {};
+            }
+        }
+
         template<typename Proxy, size_t ... Is>
         static std::string call_manager_fun_impl(game_manager *mgr, user_ptr user, std::span<std::string> args, std::index_sequence<Is...>) {
-            if (args.size() == sizeof...(Is)) {
-                return (mgr->*Proxy::value)(user, args[Is]...);
-            } else {
-                return "INVALID_ARGUMENT_NUMBER";
-            }
+            return (mgr->*Proxy::value)(user, get_arg(args, Is) ...);
         }
 
         template<typename Proxy>

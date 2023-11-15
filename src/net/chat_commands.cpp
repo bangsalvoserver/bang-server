@@ -19,7 +19,7 @@ namespace banggame {
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
     static constexpr std::string_view SET_TEAM_DESCRIPTION = "[game_player / game_spectator] : set team";
     static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed";
-    static constexpr std::string_view REJOIN_DESCRIPTION = "rejoin on disconnected user";
+    static constexpr std::string_view REJOIN_DESCRIPTION = "[character] : rejoin disconnected player";
 
     const std::map<std::string, chat_command, std::less<>> chat_command::commands {
         { "help",           { proxy<&game_manager::command_print_help>,         HELP_DESCRIPTION }},
@@ -249,10 +249,24 @@ namespace banggame {
         return {};
     }
 
-    std::string game_manager::command_rejoin(user_ptr user) {
-        int user_id = user->second.user_id;
-
+    std::string game_manager::command_rejoin(user_ptr user, std::string_view value) {
         auto &lobby = *user->second.in_lobby;
+
+        auto check_disconnected = [&](player *p) {
+            return !ranges::contains(lobby.users, p->user_id, [](const team_user_pair &pair) {
+                return pair.second->second.user_id;
+            });
+        };
+
+        if (value.empty()) {
+            auto &lobby = *user->second.in_lobby;
+            for (player *p : lobby.m_game->m_players | std::views::filter(check_disconnected)) {
+                if (card *c = p->first_character()) {
+                    send_message<server_message_type::lobby_chat>(user->first, 0, fmt::format("/rejoin {}", c->name));
+                }
+            }
+            return {};
+        }
 
         lobby_team &user_team = std::ranges::find(lobby.users, user, &team_user_pair::second)->first;
         if (user_team != lobby_team::game_spectator) {
@@ -260,18 +274,23 @@ namespace banggame {
         }
 
         auto it = std::ranges::find_if(lobby.m_game->m_players, [&](player *p) {
-            return !p->is_bot() && !ranges::contains(lobby.users, p->user_id, [](const team_user_pair &pair) {
-                return pair.second->second.user_id;
-            });
+            if (card *c = p->first_character()) {
+                return std::ranges::equal(value, c->name, {}, toupper, toupper);
+            }
+            return false;
         });
         if (it == lobby.m_game->m_players.end()) {
-            return "ERROR_NO_DISCONNECTED_USER";
+            return "ERROR_CANNOT_FIND_CHARACTER";
         }
 
         player *disconnected = *it;
+        if (!check_disconnected(disconnected)) {
+            return "ERROR_PLAYER_NOT_DISCONNECTED";
+        }
+
         user_team = lobby_team::game_player;
 
-        disconnected->user_id = user_id;
+        disconnected->user_id = user->second.user_id;
         lobby.m_game->add_update<game_update_type::player_add>(std::vector{player_user_pair{ disconnected }});
         
         for (const auto &msg : lobby.m_game->get_rejoin_updates(disconnected)) {

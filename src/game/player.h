@@ -142,7 +142,10 @@ namespace banggame {
         }
 
         card *first_character() const {
-            return m_characters.front();
+            if (!m_characters.empty()) {
+                return m_characters.front();
+            }
+            return nullptr;
         }
 
         void set_role(player_role role, bool instant = true);
