@@ -41,6 +41,7 @@ namespace banggame {
         request_update_state m_state;
 
         request_update_state invoke_update();
+        request_update_state invoke_tick_update();
 
     public:
         request_queue(game *m_game) : m_game(m_game) {}

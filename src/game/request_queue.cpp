@@ -58,47 +58,55 @@ namespace banggame {
         }
         return update_done{};
     }
-    
-    void request_queue::tick() {
-        if (m_game->is_game_over()) return;
 
-        if (update_waiting *waiting = std::get_if<update_waiting>(&m_state)) {
-            if (--waiting->timer <= ticks{}) {
-                commit_updates();
-                return;
-            }
-        }
-        
-        if (update_bot_play *bot_play = std::get_if<update_bot_play>(&m_state)) {
-            if (--bot_play->timer <= ticks{}) {
-                m_state = update_done{};
-                if (pending_requests()) {
-                    for (player *origin : m_game->m_players | std::views::filter(&player::is_bot)) {
-                        if (bot_ai::respond_to_request(origin)) {
-                            commit_updates();
-                            return;
-                        }
-                    }
-                } else if (m_delayed_actions.empty() && m_game->m_playing && m_game->m_playing->is_bot()) {
-                    if (bot_ai::play_in_turn(m_game->m_playing)) {
-                        commit_updates();
-                        return;
-                    }
-                }
-            }
-        }
-        
-        if (auto req = top_request()) {
+    request_update_state request_queue::invoke_tick_update() {
+        if (m_game->is_game_over()) {
+            return update_done{};
+        } else if (auto req = top_request()) {
             if (auto *timer = req->timer()) {
                 timer->tick();
                 if (timer->finished()) {
                     m_game->send_request_status_clear();
                     pop_request();
                     timer->on_finished();
-                    req.reset();
-                    commit_updates();
+                    return update_next{};
                 }
             }
+        }
+
+        return std::visit(overloaded{
+            [](const auto &state) -> request_update_state { return state; },
+            [](const update_waiting &state) -> request_update_state {
+                if (state.timer > ticks{}) {
+                    return update_waiting{ state.timer - ticks{1} };
+                } else {
+                    return update_next{};
+                }
+            },
+            [&](const update_bot_play &state) -> request_update_state {
+                if (state.timer > ticks{}) {
+                    return update_bot_play{ state.timer - ticks{1} };
+                } else if (pending_requests()) {
+                    for (player *origin : m_game->m_players | std::views::filter(&player::is_bot)) {
+                        if (bot_ai::respond_to_request(origin)) {
+                            return update_next{};
+                        }
+                    }
+                } else if (m_game->m_playing && m_game->m_playing->is_bot()) {
+                    if (bot_ai::play_in_turn(m_game->m_playing)) {
+                        return update_next{};
+                    }
+                }
+                return update_done{};
+            }
+        }, m_state);
+    }
+    
+    void request_queue::tick() {
+        m_state = invoke_tick_update();
+
+        if (std::holds_alternative<update_next>(m_state)) {
+            commit_updates();
         }
     }
 
