@@ -1,4 +1,3 @@
-#include "bot_ai.h"
 #include "game.h"
 #include "play_verify.h"
 #include "possible_to_play.h"
@@ -6,7 +5,7 @@
 #include "cards/effect_enums.h"
 #include "cards/filters.h"
 
-namespace banggame::bot_ai {
+namespace banggame {
 
     template<std::ranges::range Range, typename Rng>
     decltype(auto) random_element(Range &&range, Rng &rng) {
@@ -236,30 +235,37 @@ namespace banggame::bot_ai {
         return false;
     }
 
-    bool respond_to_request(player *origin) {
-        auto update = origin->m_game->make_request_update(origin);
-        
-        if (update.pick_cards.empty() && update.respond_cards.empty()) {
-            return false;
+    bool game::request_bot_play() {
+        if (pending_requests()) {
+            for (player *origin : m_players | std::views::filter(&player::is_bot)) {
+                auto update = make_request_update(origin);
+                
+                if (update.pick_cards.empty() && update.respond_cards.empty()) {
+                    continue;
+                }
+                std::optional<timer_id_t> timer_id;
+                if (update.timer) timer_id = update.timer->timer_id;
+
+                if (execute_random_play(origin, true, timer_id, make_node_set(update.respond_cards, update.pick_cards), {
+                    pocket_type::player_character,
+                    pocket_type::player_table,
+                    pocket_type::player_hand
+                })) {
+                    return true;
+                }
+            }
+        } else if (m_playing && m_playing->is_bot()) {
+            auto update = make_status_ready_update(m_playing);
+
+            return execute_random_play(m_playing, false, std::nullopt, make_node_set(update.play_cards), {
+                pocket_type::player_character,
+                pocket_type::player_table,
+                pocket_type::player_hand,
+                pocket_type::shop_selection
+            });
         }
-        std::optional<timer_id_t> timer_id;
-        if (update.timer) timer_id = update.timer->timer_id;
-
-        return execute_random_play(origin, true, timer_id, make_node_set(update.respond_cards, update.pick_cards), {
-            pocket_type::player_character,
-            pocket_type::player_table,
-            pocket_type::player_hand
-        });
+        return false;
     }
 
-    bool play_in_turn(player *origin) {
-        auto update = origin->m_game->make_status_ready_update(origin);
-
-        return execute_random_play(origin, false, std::nullopt, make_node_set(update.play_cards), {
-            pocket_type::player_character,
-            pocket_type::player_table,
-            pocket_type::player_hand,
-            pocket_type::shop_selection
-        });
-    }
+    
 }

@@ -1,7 +1,6 @@
 #include "request_queue.h"
 
 #include "game.h"
-#include "bot_ai.h"
 
 namespace banggame {
     
@@ -86,18 +85,11 @@ namespace banggame {
             [&](const update_bot_play &state) -> request_update_state {
                 if (state.timer > ticks{}) {
                     return update_bot_play{ state.timer - ticks{1} };
-                } else if (pending_requests()) {
-                    for (player *origin : m_game->m_players | std::views::filter(&player::is_bot)) {
-                        if (bot_ai::respond_to_request(origin)) {
-                            return update_next{};
-                        }
-                    }
-                } else if (m_game->m_playing && m_game->m_playing->is_bot()) {
-                    if (bot_ai::play_in_turn(m_game->m_playing)) {
-                        return update_next{};
-                    }
+                } else if (m_game->request_bot_play()) {
+                    return update_next{};
+                } else {
+                    return update_done{};
                 }
-                return update_done{};
             }
         }, m_state);
     }

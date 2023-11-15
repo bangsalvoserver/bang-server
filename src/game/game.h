@@ -35,6 +35,8 @@ namespace banggame {
 
         void start_next_turn();
 
+        bool request_bot_play();
+
         void draw_check_then(player *origin, card *origin_card, draw_check_condition condition, draw_check_function fun);
 
         void handle_player_death(player *killer, player *target, discard_all_reason reason);
