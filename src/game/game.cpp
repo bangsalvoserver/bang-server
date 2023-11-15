@@ -38,14 +38,8 @@ namespace banggame {
             instant};
     }
 
-    util::generator<json::json> game::get_rejoin_updates(player *target) {
+    util::generator<json::json> game::get_spectator_join_updates() {
         co_yield make_update<game_update_type::player_add>(m_players | ranges::to<std::vector<player_user_pair>>);
-        
-        for (const auto &[upd_target, log] : m_saved_log) {
-            if (upd_target.matches(target)) {
-                co_yield make_update<game_update_type::game_log>(log);
-            }
-        }
 
         for (player *p : m_players) {
             co_yield make_update<game_update_type::player_flags>(p, p->m_player_flags);
@@ -126,28 +120,38 @@ namespace banggame {
         }
 
         co_yield make_update<game_update_type::game_flags>(m_game_flags);
+    }
 
-        if (target) {
-            if (!target->check_player_flags(player_flags::role_revealed)) {
-                co_yield make_update<game_update_type::player_show_role>(target, target->m_role, true);
+    util::generator<json::json> game::get_game_log_updates(player *target) {
+        co_yield make_update<game_update_type::clear_logs>();
+        
+        for (const auto &[upd_target, log] : m_saved_log) {
+            if (upd_target.matches(target)) {
+                co_yield make_update<game_update_type::game_log>(log);
             }
+        }
+    }
 
-            for (card *c : target->m_hand) {
+    util::generator<json::json> game::get_rejoin_updates(player *target) {
+        if (!target->check_player_flags(player_flags::role_revealed)) {
+            co_yield make_update<game_update_type::player_show_role>(target, target->m_role, true);
+        }
+
+        for (card *c : target->m_hand) {
+            co_yield make_update<game_update_type::show_card>(c, *c, true);
+        }
+
+        for (card *c : m_selection) {
+            if (c->owner == target) {
                 co_yield make_update<game_update_type::show_card>(c, *c, true);
             }
+        }
 
-            for (card *c : m_selection) {
-                if (c->owner == target) {
-                    co_yield make_update<game_update_type::show_card>(c, *c, true);
-                }
-            }
-
-            if (!is_game_over()) {
-                if (pending_requests()) {
-                    co_yield make_update<game_update_type::request_status>(make_request_update(target));
-                } else if (target == m_playing) {
-                    co_yield make_update<game_update_type::status_ready>(make_status_ready_update(target));
-                }
+        if (!is_game_over()) {
+            if (pending_requests()) {
+                co_yield make_update<game_update_type::request_status>(make_request_update(target));
+            } else if (target == m_playing) {
+                co_yield make_update<game_update_type::status_ready>(make_status_ready_update(target));
             }
         }
     }

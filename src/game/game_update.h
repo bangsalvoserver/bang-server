@@ -261,6 +261,7 @@ namespace banggame {
         (game_flags, game_flags)
         (play_sound, std::string)
         (status_clear)
+        (clear_logs)
     )
 
     using game_update = enums::enum_variant<game_update_type>;

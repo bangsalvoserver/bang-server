@@ -224,9 +224,17 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
         pair.first = lobby_team::game_spectator;
         send_message<server_message_type::game_started>(user->first);
 
-        player *target = lobby.m_game->find_player_by_userid(user->second.user_id);
-        for (const auto &msg : lobby.m_game->get_rejoin_updates(target)) {
+        for (const auto &msg : lobby.m_game->get_spectator_join_updates()) {
             send_message<server_message_type::game_update>(user->first, msg);
+        }
+        player *target = lobby.m_game->find_player_by_userid(user->second.user_id);
+        for (const auto &msg : lobby.m_game->get_game_log_updates(target)) {
+            send_message<server_message_type::game_update>(user->first, msg);
+        }
+        if (target) {
+            for (const auto &msg : lobby.m_game->get_rejoin_updates(target)) {
+                send_message<server_message_type::game_update>(user->first, msg);
+            }
         }
     }
 
@@ -304,6 +312,10 @@ std::string game_manager::handle_chat_command(user_ptr user, const std::string &
 
     if (bool(command.permissions() & command_permissions::lobby_waiting) && lobby.state != lobby_state::waiting) {
         return "ERROR_LOBBY_NOT_WAITING";
+    }
+
+    if (bool(command.permissions() & command_permissions::lobby_playing) && lobby.state != lobby_state::playing) {
+        return "ERROR_LOBBY_NOT_PLAYING";
     }
 
     if (bool(command.permissions() & command_permissions::lobby_finished) && lobby.state != lobby_state::finished) {

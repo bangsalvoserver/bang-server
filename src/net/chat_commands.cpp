@@ -19,6 +19,7 @@ namespace banggame {
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
     static constexpr std::string_view SET_TEAM_DESCRIPTION = "[game_player / game_spectator] : set team";
     static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed";
+    static constexpr std::string_view REJOIN_DESCRIPTION = "rejoin on disconnected user";
 
     const std::map<std::string, chat_command, std::less<>> chat_command::commands {
         { "help",           { proxy<&game_manager::command_print_help>,         HELP_DESCRIPTION }},
@@ -28,7 +29,8 @@ namespace banggame {
         { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, command_permissions::lobby_owner | command_permissions::lobby_waiting }},
         { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
         { "set-team",       { proxy<&game_manager::command_set_team>,           SET_TEAM_DESCRIPTION, command_permissions::lobby_waiting }},
-        { "seed",           { proxy<&game_manager::command_get_rng_seed>,       GET_RNG_SEED_DESCRIPTION, command_permissions::lobby_finished }}
+        { "seed",           { proxy<&game_manager::command_get_rng_seed>,       GET_RNG_SEED_DESCRIPTION, command_permissions::lobby_finished }},
+        { "rejoin",         { proxy<&game_manager::command_rejoin>,             REJOIN_DESCRIPTION, command_permissions::lobby_playing }}
     };
 
     std::string game_manager::command_print_help(user_ptr user) {
@@ -244,6 +246,41 @@ namespace banggame {
 
     std::string game_manager::command_get_rng_seed(user_ptr user) {
         send_message<server_message_type::lobby_chat>(user->first, 0, std::to_string(user->second.in_lobby->m_game->rng_seed));
+        return {};
+    }
+
+    std::string game_manager::command_rejoin(user_ptr user) {
+        int user_id = user->second.user_id;
+
+        auto &lobby = *user->second.in_lobby;
+
+        lobby_team &user_team = std::ranges::find(lobby.users, user, &team_user_pair::second)->first;
+        if (user_team != lobby_team::game_spectator) {
+            return "ERROR_USER_NOT_SPECTATOR";
+        }
+
+        auto it = std::ranges::find_if(lobby.m_game->m_players, [&](player *p) {
+            return !p->is_bot() && !ranges::contains(lobby.users, p->user_id, [](const team_user_pair &pair) {
+                return pair.second->second.user_id;
+            });
+        });
+        if (it == lobby.m_game->m_players.end()) {
+            return "ERROR_NO_DISCONNECTED_USER";
+        }
+
+        player *disconnected = *it;
+        user_team = lobby_team::game_player;
+
+        disconnected->user_id = user_id;
+        lobby.m_game->add_update<game_update_type::player_add>(std::vector{player_user_pair{ disconnected }});
+        
+        for (const auto &msg : lobby.m_game->get_rejoin_updates(disconnected)) {
+            send_message<server_message_type::game_update>(user->first, msg);
+        }
+        for (const auto &msg : lobby.m_game->get_game_log_updates(disconnected)) {
+            send_message<server_message_type::game_update>(user->first, msg);
+        }
+
         return {};
     }
 
