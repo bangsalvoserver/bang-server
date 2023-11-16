@@ -25,7 +25,6 @@ namespace banggame {
         (destroy,               effect_destroy)
         (startofturn,           effect_startofturn)
         (while_drawing,         effect_while_drawing)
-        (reset_drawing,         effect_reset_drawing)
         (end_drawing,           effect_end_drawing)
         (steal,                 effect_steal)
         (duel,                  effect_duel)

@@ -52,10 +52,6 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin);
     };
 
-    struct effect_reset_drawing : effect_while_drawing {
-        void on_play(card *origin_card, player *origin);
-    };
-
     struct effect_end_drawing : effect_while_drawing {
         void on_play(card *origin_card, player *origin);
     };
@@ -66,7 +62,7 @@ namespace banggame {
 
     struct request_draw : request_base {
         request_draw(player *target)
-            : request_base(nullptr, nullptr, target) {}
+            : request_base(nullptr, nullptr, target, {}, -7) {}
 
         void on_update() override;
         bool can_pick(card *target_card) const override;

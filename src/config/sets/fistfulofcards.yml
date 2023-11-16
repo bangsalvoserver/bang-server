@@ -22,9 +22,9 @@ fistfulofcards:
     responses:
       - max_usages(1)
       - startofturn
+      - while_drawing
       - damage
       - queue_heal_notfull player notself
-      - reset_drawing
   - name: THE_JUDGE
     image: 05_ilgiudice
     equip:

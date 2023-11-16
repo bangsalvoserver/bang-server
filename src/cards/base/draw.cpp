@@ -57,7 +57,11 @@ namespace banggame {
         if (state == request_state::pending) {
             target->m_game->play_sound(target, "draw");
         }
-        auto_pick();
+        if (target->alive() && target->m_game->m_playing == target && target->m_num_drawn_cards < target->get_cards_to_draw()) {
+            auto_pick();
+        } else {
+            target->m_game->pop_request();
+        }
     }
 
     bool request_draw::can_pick(card *target_card) const {
@@ -89,17 +93,6 @@ namespace banggame {
     
     bool effect_while_drawing::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_draw>(origin) != nullptr;
-    }
-
-    void effect_reset_drawing::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request();
-        origin->m_game->queue_action([=]{
-            if (origin->alive() && origin->m_game->m_playing == origin
-                && origin->m_num_drawn_cards < origin->get_cards_to_draw())
-            {
-                origin->m_game->queue_request<request_draw>(origin);
-            }
-        }, -7);
     }
 
     void effect_end_drawing::on_play(card *origin_card, player *origin) {
