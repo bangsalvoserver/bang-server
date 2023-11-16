@@ -22,9 +22,9 @@ namespace banggame {
                     }, 1);
                 }
             });
-            req->on_cleanup([=]{
+            origin->m_game->queue_action([=]{
                 origin->m_game->remove_listeners(origin_card);
-            });
+            }, 90);
         }
         origin->m_game->queue_request(std::move(req));
     }

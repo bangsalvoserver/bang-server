@@ -19,7 +19,7 @@ namespace banggame {
     }
 
     static void queue_request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {}) {
-        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags | effect_flags::is_bang | effect_flags::single_target, 0);
+        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags | effect_flags::is_bang | effect_flags::single_target);
         req->origin->m_game->call_event<event_type::apply_bang_modifier>(req->origin, req.get());
         req->origin->m_game->queue_request(std::move(req));
     }
@@ -147,28 +147,7 @@ namespace banggame {
 
     void request_bang::on_resolve() {
         target->m_game->pop_request();
-        target->m_game->queue_request([&]{
-            auto req = std::make_shared<request_damage>(origin_card, origin, target, bang_damage, flags);
-            req->cleanup_function = std::exchange(cleanup_function, nullptr);
-            return req;
-        }());
-    }
-
-    request_bang::~request_bang() {
-        if (cleanup_function) {
-            std::invoke(std::exchange(cleanup_function, nullptr));
-        }
-    }
-
-    void request_bang::on_cleanup(std::function<void()> &&fun) {
-        if (cleanup_function) {
-            cleanup_function = [fun1=std::move(cleanup_function), fun2=std::move(fun)]{
-                std::invoke(fun1);
-                std::invoke(fun2);
-            };
-        } else {
-            cleanup_function = std::move(fun);
-        }
+        target->damage(origin_card, origin, bang_damage, flags);
     }
 
     void request_bang::on_update() {

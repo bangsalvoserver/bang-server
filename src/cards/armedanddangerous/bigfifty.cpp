@@ -13,9 +13,9 @@ namespace banggame {
                         || c->pocket == pocket_type::player_character)
                         && c->owner == target;
                 });
-                req->on_cleanup([=]{
-                    p->m_game->remove_disablers(key);
-                });
+                origin->m_game->queue_action([=]{
+                    origin->m_game->remove_disablers(key);
+                }, 90);
                 origin->m_game->remove_listeners(key);
             }
         });

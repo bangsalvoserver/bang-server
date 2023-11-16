@@ -18,9 +18,9 @@ namespace banggame {
                         target->m_game->queue_request<request_discard>(origin_card, origin, target, effect_flags{}, 0);
                     }
                 });
-                req->on_cleanup([=]{
-                    p->m_game->remove_listeners(key);
-                });
+                origin->m_game->queue_action([=]{
+                    origin->m_game->remove_listeners(key);
+                }, 90);
             }
         });
     }

@@ -59,15 +59,9 @@ namespace banggame {
     struct request_bang : request_base, missable_request, resolvable_request {
         using request_base::request_base;
 
-        ~request_bang();
-
         int bang_strength = 1;
         int bang_damage = 1;
         bool unavoidable = false;
-
-        std::function<void()> cleanup_function;
-
-        void on_cleanup(std::function<void()> &&fun);
 
         void on_update() override;
 
