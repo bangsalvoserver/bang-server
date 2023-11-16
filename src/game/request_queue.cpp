@@ -15,8 +15,14 @@ namespace banggame {
         }));
     }
 
-    static ticks get_bot_play_timer(game *game) {
-        return get_total_update_time(game) + clamp_ticks(game->m_options.bot_play_timer);
+    static request_update_state make_bot_play_timer(game *m_game) {
+        if (m_game->m_options.bot_play_timer > game_duration{0}) {
+            return update_bot_play{ get_total_update_time(m_game) + clamp_ticks(m_game->m_options.bot_play_timer) };
+        } else if (m_game->request_bot_play()) {
+            return update_next{};
+        } else {
+            return update_done{};
+        }
     }
 
     request_update_state request_queue::invoke_update() {
@@ -35,7 +41,7 @@ namespace banggame {
                 }
                 m_game->send_request_update();
                 if (std::ranges::any_of(m_game->m_players, &player::is_bot)) {
-                    return update_bot_play{ get_bot_play_timer(m_game) };
+                    return make_bot_play_timer(m_game);
                 }
             } else {
                 return update_next{};
@@ -52,7 +58,7 @@ namespace banggame {
             } else if (!m_game->send_request_status_ready()) {
                 return update_next{};
             } else if (origin->is_bot()) {
-                return update_bot_play{ get_bot_play_timer(m_game) };
+                return make_bot_play_timer(m_game);
             }
         }
         return update_done{};
@@ -103,14 +109,17 @@ namespace banggame {
     }
 
     static constexpr ticks max_update_timer_duration = 10s;
+    static constexpr int max_update_count = 30;
     
     void request_queue::commit_updates() {
+        int count = 0;
         do {
             auto timer = get_total_update_time(m_game);
-            if (timer > max_update_timer_duration) {
+            if (timer > max_update_timer_duration || count > max_update_count) {
                 m_state = update_waiting{ timer };
             } else {
                 m_state = invoke_update();
+                ++count;
             }
         } while (std::holds_alternative<update_next>(m_state));
     }
