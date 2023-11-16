@@ -15,11 +15,7 @@ namespace banggame {
             if (p == origin) {
                 p->m_game->add_listener<event_type::on_missed>(key, [=](card *bang_card, player *origin, player *target, effect_flags flags) {
                     if (target && origin == p && bool(flags & effect_flags::is_bang)) {
-                        target->m_game->queue_action([=]{
-                            if (!target->empty_hand()) {
-                                target->m_game->queue_request<request_discard>(origin_card, origin, target);
-                            }
-                        });
+                        target->m_game->queue_request<request_discard>(origin_card, origin, target, effect_flags{}, 0);
                     }
                 });
                 req->on_cleanup([=]{

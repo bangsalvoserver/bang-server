@@ -19,11 +19,9 @@ namespace banggame {
     }
 
     static void queue_request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {}) {
-        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags | effect_flags::is_bang | effect_flags::single_target);
+        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags | effect_flags::is_bang | effect_flags::single_target, 0);
         req->origin->m_game->call_event<event_type::apply_bang_modifier>(req->origin, req.get());
-        req->origin->m_game->queue_action([req = std::move(req)]() mutable {
-            req->origin->m_game->queue_request(std::move(req));
-        });
+        req->origin->m_game->queue_request(std::move(req));
     }
 
     game_string effect_bangcard::get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) {
@@ -174,7 +172,7 @@ namespace banggame {
     }
 
     void request_bang::on_update() {
-        if (target->immune_to(origin_card, origin, flags)) {
+        if (!target->alive() || target->immune_to(origin_card, origin, flags)) {
             target->m_game->pop_request();
         } else {
             if (state == request_state::pending) {

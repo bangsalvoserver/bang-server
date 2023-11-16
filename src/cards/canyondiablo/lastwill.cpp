@@ -6,7 +6,13 @@ namespace banggame {
 
     struct request_lastwill : request_base, resolvable_request {
         request_lastwill(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target) {}
+            : request_base(origin_card, nullptr, target, {}, 3) {}
+
+        void on_update() override {
+            if (target->m_hp > 0) {
+                target->m_game->pop_request();
+            }
+        }
 
         void on_resolve() override {
             target->m_game->pop_request();
@@ -24,11 +30,7 @@ namespace banggame {
     void equip_lastwill::on_enable(card *origin_card, player *origin) {
         origin->m_game->add_listener<event_type::on_player_death_resolve>({origin_card, -1}, [=](player *target, bool tried_save) {
             if (origin == target) {
-                target->m_game->queue_action([=]{
-                    if (target->m_hp <= 0) {
-                        origin->m_game->queue_request<request_lastwill>(origin_card, origin);
-                    }
-                }, 3);
+                origin->m_game->queue_request<request_lastwill>(origin_card, origin);
             }
         });
     }

@@ -28,14 +28,20 @@ namespace banggame {
         }
     }
 
+    void request_discard::on_update() {
+        if (!target->alive() || target->empty_hand()) {
+            target->m_game->pop_request();
+        } else {
+            auto_pick();
+        }
+    }
+
     bool request_discard::can_pick(card *target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
     
     void request_discard::on_pick(card *target_card) {
-        if (--ncards == 0) {
-            target->m_game->pop_request();
-        }
+        target->m_game->pop_request();
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_used_card(target_card);
     }

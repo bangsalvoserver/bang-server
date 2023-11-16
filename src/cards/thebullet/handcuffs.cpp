@@ -9,16 +9,20 @@ namespace banggame {
     
     struct request_handcuffs : selection_picker {
         request_handcuffs(card *origin_card, player *target)
-            : selection_picker(origin_card, nullptr, target) {}
+            : selection_picker(origin_card, nullptr, target, {}, 0) {}
 
         void on_update() override {
-            if (state == request_state::pending) {
-                for (card *c : target->m_game->m_hidden_deck
-                    | std::views::filter([](card *c) { return c->has_tag(tag_type::handcuffs); })
-                    | ranges::to<std::vector>
-                ) {
-                    target->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
+            if (target->alive() && target->m_game->m_playing == target) {
+                if (state == request_state::pending) {
+                    for (card *c : target->m_game->m_hidden_deck
+                        | std::views::filter([](card *c) { return c->has_tag(tag_type::handcuffs); })
+                        | ranges::to<std::vector>
+                    ) {
+                        target->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
+                    }
                 }
+            } else {
+                target->m_game->pop_request();
             }
         }
 
@@ -65,11 +69,7 @@ namespace banggame {
 
     void equip_handcuffs::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>({target_card, -1}, [=](player *origin) {
-            origin->m_game->queue_action([=]{
-                if (origin->alive() && origin->m_game->m_playing == origin) {
-                    origin->m_game->queue_request<request_handcuffs>(target_card, origin);
-                }
-            });
+            origin->m_game->queue_request<request_handcuffs>(target_card, origin);
         });
         target->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player *origin, bool skipped) {
             origin->m_game->remove_listeners(event_card_key{target_card, 1});

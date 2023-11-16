@@ -8,7 +8,13 @@ namespace banggame {
 
     struct request_ranch : request_auto_select {
         request_ranch(card *target_card, player *target)
-            : request_auto_select(target_card, nullptr, target) {}
+            : request_auto_select(target_card, nullptr, target, {}, 0) {}
+
+        void on_update() override {
+            if (!target->alive() || target->m_game->m_playing != target) {
+                target->m_game->pop_request();
+            }
+        }
 
         game_string status_text(player *owner) const override {
             if (owner == target) {
@@ -21,11 +27,7 @@ namespace banggame {
 
     void equip_ranch::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>({target_card, -1}, [=](player *origin) {
-            origin->m_game->queue_action([=]{
-                if (origin->alive() && origin->m_game->m_playing == origin) {
-                    origin->m_game->queue_request<request_ranch>(target_card, origin);
-                }
-            });
+            origin->m_game->queue_request<request_ranch>(target_card, origin);
         });
     }
 

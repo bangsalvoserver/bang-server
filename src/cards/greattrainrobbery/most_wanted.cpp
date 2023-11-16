@@ -29,12 +29,16 @@ namespace banggame {
         request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
         
         void on_update() override {
-            switch (target->can_escape(origin, origin_card, flags)) {
-            case 0:
-                auto_respond();
-                break;
-            case 2:
-                m_timer.reset();
+            if (target->immune_to(origin_card, origin, flags)) {
+                target->m_game->pop_request();
+            } else {
+                switch (target->can_escape(origin, origin_card, flags)) {
+                case 0:
+                    auto_respond();
+                    break;
+                case 2:
+                    m_timer.reset();
+                }
             }
         }
 

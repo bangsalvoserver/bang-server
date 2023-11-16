@@ -10,17 +10,21 @@ namespace banggame {
         : request_timer(request, request->target->m_game->m_options.escape_timer) {}
 
     void request_targeting::on_update() {
-        switch (target->can_escape(origin, origin_card, flags)) {
-        case 1:
-            if (origin != target_card->owner) {
+        if (target->immune_to(origin_card, origin, flags)) {
+            target->m_game->pop_request();
+        } else {
+            switch (target->can_escape(origin, origin_card, flags)) {
+            case 1:
+                if (origin != target_card->owner) {
+                    break;
+                }
+                [[fallthrough]];
+            case 0:
+                auto_respond();
                 break;
+            case 2:
+                m_timer.reset();
             }
-            [[fallthrough]];
-        case 0:
-            auto_respond();
-            break;
-        case 2:
-            m_timer.reset();
         }
     }
 
@@ -60,6 +64,26 @@ namespace banggame {
     struct request_steal : request_targeting {
         using request_targeting::request_targeting;
 
+        void on_update() override {
+            if (state == request_state::pending) {
+                if (origin != target) {
+                    if (target_card->pocket == pocket_type::player_hand) {
+                        origin->m_game->add_log("LOG_PLAYED_CARD_STEAL_HAND", origin_card, origin, target);
+                    } else {
+                        origin->m_game->add_log("LOG_PLAYED_CARD_STEAL", origin_card, origin, target, target_card);
+                    }
+                } else {
+                    if (target_card->visibility != card_visibility::shown) {
+                        origin->m_game->add_log(update_target::includes(origin), "LOG_PLAYED_CARD_STEAL_OWN", origin_card, origin, target_card);
+                        origin->m_game->add_log(update_target::excludes(origin), "LOG_PLAYED_CARD_STEAL_OWN_HAND", origin_card, origin);
+                    } else {
+                        origin->m_game->add_log("LOG_PLAYED_CARD_STEAL_OWN", origin_card, origin, target_card);
+                    }
+                }
+            }
+            request_targeting::on_update();
+        }
+
         void on_resolve_target() override {
             effect_steal{}.on_resolve(origin_card, origin, target_card);
         }
@@ -82,25 +106,7 @@ namespace banggame {
     };
 
     void effect_steal::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
-        origin->m_game->queue_action([=]{
-            player *target_player = target_card->owner;
-            if (origin != target_player) {
-                if (target_card->pocket == pocket_type::player_hand) {
-                    origin->m_game->add_log("LOG_PLAYED_CARD_STEAL_HAND", origin_card, origin, target_player);
-                } else {
-                    origin->m_game->add_log("LOG_PLAYED_CARD_STEAL", origin_card, origin, target_player, target_card);
-                }
-            } else {
-                if (target_card->visibility != card_visibility::shown) {
-                    origin->m_game->add_log(update_target::includes(origin), "LOG_PLAYED_CARD_STEAL_OWN", origin_card, origin, target_card);
-                    origin->m_game->add_log(update_target::excludes(origin), "LOG_PLAYED_CARD_STEAL_OWN_HAND", origin_card, origin);
-                } else {
-                    origin->m_game->add_log("LOG_PLAYED_CARD_STEAL_OWN", origin_card, origin, target_card);
-                }
-            }
-            if (target_player->immune_to(origin_card, origin, flags)) return;
-            origin->m_game->queue_request<request_steal>(origin_card, origin, target_player, target_card, flags);
-        });
+        origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
     }
 
     game_string effect_discard::on_prompt(card *origin_card, player *origin, card *target_card) {
@@ -143,6 +149,21 @@ namespace banggame {
     struct request_destroy : request_targeting {
         using request_targeting::request_targeting;
 
+        void on_update() override {
+            if (state == request_state::pending) {
+                if (origin != target) {
+                    if (target_card->pocket == pocket_type::player_hand) {
+                        origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_HAND", origin_card, origin, target);
+                    } else {
+                        origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY", origin_card, origin, target, target_card);
+                    }
+                } else {
+                    origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_OWN", origin_card, origin, target_card);
+                }
+            }
+            request_targeting::on_update();
+        }
+
         void on_resolve_target() override {
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
         }
@@ -165,19 +186,6 @@ namespace banggame {
     };
     
     void effect_destroy::on_play(card *origin_card, player *origin, card *target_card, effect_flags flags) {
-        origin->m_game->queue_action([=]{
-            player *target_player = target_card->owner;
-            if (origin != target_player) {
-                if (target_card->pocket == pocket_type::player_hand) {
-                    origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_HAND", origin_card, origin, target_player);
-                } else {
-                    origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY", origin_card, origin, target_player, target_card);
-                }
-            } else {
-                origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_OWN", origin_card, origin, target_card);
-            }
-            if (target_player->immune_to(origin_card, origin, flags)) return;
-            origin->m_game->queue_request<request_destroy>(origin_card, origin, target_player, target_card, flags);
-        });
+        origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
     }
 }

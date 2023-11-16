@@ -8,13 +8,17 @@ namespace banggame {
     
     struct request_saved : request_base {
         request_saved(card *origin_card, player *target, player *saved)
-            : request_base(origin_card, nullptr, target)
+            : request_base(origin_card, nullptr, target, {}, 0)
             , saved(saved) {}
 
         player *saved = nullptr;
 
         void on_update() override {
-            auto_pick();
+            if (target->alive() && saved->alive()) {
+                auto_pick();
+            } else {
+                target->m_game->pop_request();
+            }
         }
 
         game_string pick_prompt(card *target_card) const override {
@@ -84,10 +88,6 @@ namespace banggame {
             origin->m_game->pop_request();
         }
 
-        origin->m_game->queue_action([=]{
-            if (origin->alive() && saved->alive()) {
-                origin->m_game->queue_request<request_saved>(origin_card, origin, saved);
-            }
-        });
+        origin->m_game->queue_request<request_saved>(origin_card, origin, saved);
     }
 }

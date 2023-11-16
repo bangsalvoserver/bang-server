@@ -34,7 +34,7 @@ namespace banggame {
             target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->discard_used_card(target_card);
             if (!target->empty_hand()) {
-                target->m_game->queue_request<request_discard>(origin_card, origin, target);
+                target->m_game->queue_request<request_discard>(origin_card, origin, target, effect_flags{}, 110);
             }
         }
 

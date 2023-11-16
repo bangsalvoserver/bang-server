@@ -10,11 +10,7 @@ namespace banggame {
             if (!p->empty_hand()) {
                 p->m_game->add_log("LOG_RECEIVED_N_BANGS_FOR", p, target_card, int(p->m_hand.size()));
                 for (int i=0; i<p->m_hand.size(); ++i) {
-                    p->m_game->queue_action([=]{
-                        if (p->alive()) {
-                            p->m_game->queue_request<request_bang>(target_card, nullptr, p);
-                        }
-                    }, -1);
+                    p->m_game->queue_request<request_bang>(target_card, nullptr, p, effect_flags{}, -1);
                 }
             }
         });

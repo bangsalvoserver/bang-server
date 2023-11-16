@@ -53,14 +53,12 @@ namespace banggame {
 
         std::vector<card *> selected_cards;
 
-        bool is_valid() const {
-            return std::ranges::any_of(target->m_table, [&](card *target_card) {
-                return can_pick(target_card);
-            });
-        }
-
         void on_update() override {
-            if (target->immune_to(origin_card, origin, flags) || !is_valid()) {
+            if (!target->alive() || target->immune_to(origin_card, origin, flags)
+                || std::ranges::none_of(target->m_table, [&](card *target_card) {
+                    return can_pick(target_card);
+                })
+            ) {
                 target->m_game->pop_request();
             } else {
                 auto_pick();
@@ -74,16 +72,10 @@ namespace banggame {
 
         void on_pick(card *target_card) override {
             selected_cards.push_back(target_card);
+
+            flags &= ~effect_flags::escapable;
+            state = request_state::pending;
             
-            target->m_game->queue_action([req=target->m_game->top_request<request_train_robbery>()] () mutable {
-                if (req->target->alive() && req->is_valid()) {
-                    req->flags &= ~effect_flags::escapable;
-                    req->state = request_state::pending;
-                    req->priority = 110;
-                    req->target->m_game->queue_request(std::move(req));
-                }
-            }, 1);
-            target->m_game->pop_request();
             target->m_game->queue_request<request_train_robbery_choose>(origin_card, origin, target, target_card);
         }
 
@@ -106,6 +98,6 @@ namespace banggame {
 
     void effect_train_robbery::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
-        origin->m_game->queue_request<request_train_robbery>(origin_card, origin, target, flags);
+        origin->m_game->queue_request<request_train_robbery>(origin_card, origin, target, flags, 0);
     }
 }

@@ -15,13 +15,9 @@ namespace banggame {
     };
     
     struct request_discard : request_base {
-        request_discard(card *origin_card, player *origin, player *target, int ncards = 1)
-            : request_base(origin_card, origin, target, {}, 120)
-            , ncards(ncards) {}
-
-        int ncards;
+        using request_base::request_base;
         
-        void on_update() override { auto_pick(); }
+        void on_update() override;
         bool can_pick(card *target_card) const override;
         void on_pick(card *target_card) override;
         game_string status_text(player *owner) const override;
