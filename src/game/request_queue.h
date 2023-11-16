@@ -35,23 +35,23 @@ namespace banggame {
 
     struct game;
 
-    struct update_done {};
-    struct update_next {};
-    struct update_waiting { ticks timer; };
-    struct update_bot_play { ticks timer; };
-
-    using request_update_state = std::variant<update_done, update_next, update_waiting, update_bot_play>;
-
     class request_queue {
     private:
-        utils::stable_priority_queue<std::shared_ptr<request_base>, request_priority_ordering> m_requests;
+        struct state_done {};
+        struct state_next {};
+        struct state_waiting { ticks timer; };
+        struct state_bot_play { ticks timer; };
 
+        using state_t = std::variant<state_done, state_next, state_waiting, state_bot_play>;
+
+    private:
         game *m_game;
 
-        request_update_state m_state;
+        utils::stable_priority_queue<std::shared_ptr<request_base>, request_priority_ordering> m_requests;
+        state_t m_state;
 
-        request_update_state invoke_update();
-        request_update_state invoke_tick_update();
+        state_t invoke_update();
+        state_t invoke_tick_update();
 
     public:
         request_queue(game *m_game) : m_game(m_game) {}
@@ -65,7 +65,7 @@ namespace banggame {
         }
 
         bool pending_updates() const {
-            return std::holds_alternative<update_waiting>(m_state);
+            return std::holds_alternative<state_waiting>(m_state);
         }
 
         template<typename T = request_base>
