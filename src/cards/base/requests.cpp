@@ -6,18 +6,27 @@
 
 namespace banggame {
 
+    void request_characterchoice::on_update() {
+        if (!target->m_game->m_options.character_choice) {
+            on_pick(target->m_hand.front());
+        }
+    }
+
     bool request_characterchoice::can_pick(card *target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
     void request_characterchoice::on_pick(card *target_card) {
+        bool instant = !target->m_game->m_options.character_choice;
+
         target->m_game->pop_request();
         target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
-        target->m_game->move_card(target_card, pocket_type::player_character, target, card_visibility::shown); target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, card_visibility::hidden, true);
+        target->m_game->move_card(target_card, pocket_type::player_character, target, card_visibility::shown, instant);
+        target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, card_visibility::hidden, true);
 
         target->enable_equip(target_card);
         target->reset_max_hp();
-        target->set_hp(target->m_max_hp);
+        target->set_hp(target->m_max_hp, instant);
     }
 
     game_string request_characterchoice::status_text(player *owner) const {

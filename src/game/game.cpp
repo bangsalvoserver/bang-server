@@ -285,40 +285,21 @@ namespace banggame {
             std::ranges::shuffle(character_ptrs, rng);
         }
 
-        auto add_character_to = [&](card *c, player *p) {
-            p->m_characters.push_back(c);
-            c->pocket = pocket_type::player_character;
-            c->owner = p;
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(std::views::single(c)), pocket_type::player_character, p);
-        };
+        add_game_flags(game_flags::hands_shown);
 
         auto character_it = character_ptrs.rbegin();
-
-        for (player *p : m_players) {
-            add_character_to(*character_it++, p);
-            add_character_to(*character_it++, p);
-        }
-
-        if (m_options.character_choice) {
-            add_game_flags(game_flags::hands_shown);
-            for (player *p : m_players) {
-                while (!p->m_characters.empty()) {
-                    move_card(p->first_character(), pocket_type::player_hand, p, card_visibility::shown, true);
-                }
+        for (player *p : range_all_players(m_first_player)) {
+            for (int i=0; i<2; ++i) {
+                card *c = *character_it++;
+                p->m_hand.push_back(c);
+                c->pocket = pocket_type::player_hand;
+                c->owner = p;
             }
-            for (player *p : range_all_players(m_first_player)) {
-                queue_request<request_characterchoice>(p);
+            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(p->m_hand), pocket_type::player_hand, p);
+            for (card *c : p->m_hand) {
+                set_card_visibility(c, p, card_visibility::shown, true);
             }
-        } else {
-            for (player *p : m_players) {
-                add_log("LOG_CHARACTER_CHOICE", p, p->first_character());
-                set_card_visibility(p->first_character(), nullptr, card_visibility::shown, true);
-                p->reset_max_hp();
-                p->set_hp(p->m_max_hp, true);
-                p->enable_equip(p->first_character());
-
-                move_card(p->m_characters.back(), pocket_type::player_backup, p, card_visibility::hidden, true);
-            }
+            queue_request<request_characterchoice>(p);
         }
 
         queue_action([this] {
