@@ -46,14 +46,13 @@ namespace banggame {
             } else {
                 return update_next{};
             }
-        } else if (player *origin = m_game->m_playing) {
-            if (!origin->alive()) {
-                m_game->start_next_turn();
+        } else if (m_game->m_playing) {
+            if (m_game->send_request_status_ready()) {
+                if (m_game->m_playing->is_bot()) {
+                    return make_bot_play_timer(m_game);
+                }
+            } else {
                 return update_next{};
-            } else if (!m_game->send_request_status_ready()) {
-                return update_next{};
-            } else if (origin->is_bot()) {
-                return make_bot_play_timer(m_game);
             }
         }
         return update_done{};

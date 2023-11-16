@@ -411,6 +411,11 @@ namespace banggame {
     }
 
     bool game::send_request_status_ready() {
+        if (!m_playing->alive()) {
+            start_next_turn();
+            return false;
+        }
+
         auto args = make_status_ready_update(m_playing);
         
         if (m_playing->empty_hand() && std::ranges::all_of(args.play_cards, [](const card_modifier_node &node) {
