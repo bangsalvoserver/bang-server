@@ -437,7 +437,7 @@ namespace banggame {
     
     void game::draw_check_then(player *origin, card *origin_card, draw_check_condition condition, draw_check_function fun) {
         flash_card(origin_card);
-        queue_request_front<request_check>(this, origin_card, origin, std::move(condition), std::move(fun));
+        queue_request<request_check>(this, origin_card, origin, std::move(condition), std::move(fun));
     }
 
     void game::draw_scenario_card() {

@@ -23,7 +23,7 @@ namespace banggame {
         : request_timer(request, request->target->m_game->m_options.damage_timer) {}
 
     request_damage::request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags)
-        : request_base(origin_card, origin, target, flags & ~(effect_flags::escapable | effect_flags::single_target))
+        : request_base(origin_card, origin, target, flags & ~(effect_flags::escapable | effect_flags::single_target), 200)
         , damage(damage) {}
     
     std::vector<card *> request_damage::get_highlights() const {

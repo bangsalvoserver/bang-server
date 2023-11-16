@@ -149,7 +149,7 @@ namespace banggame {
 
     void request_bang::on_resolve() {
         target->m_game->pop_request();
-        target->m_game->queue_request_front([&]{
+        target->m_game->queue_request([&]{
             auto req = std::make_shared<request_damage>(origin_card, origin, target, bang_damage, flags);
             req->cleanup_function = std::exchange(cleanup_function, nullptr);
             return req;

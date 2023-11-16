@@ -46,11 +46,6 @@ namespace banggame {
             } else {
                 return update_next{};
             }
-        } else if (!m_delayed_actions.empty()) {
-            auto fun = std::move(m_delayed_actions.top().first);
-            m_delayed_actions.pop();
-            std::invoke(std::move(fun));
-            return update_next{};
         } else if (player *origin = m_game->m_playing) {
             if (!origin->alive()) {
                 m_game->start_next_turn();

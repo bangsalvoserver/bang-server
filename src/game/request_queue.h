@@ -1,7 +1,6 @@
 #ifndef __REQUEST_QUEUE_H__
 #define __REQUEST_QUEUE_H__
 
-#include <deque>
 #include <memory>
 #include <concepts>
 #include <functional>
@@ -12,14 +11,26 @@
 
 namespace banggame {
 
-    using delayed_action = std::function<void()>;
-
-    using action_priority_pair = std::pair<delayed_action, int>;
-
-    struct action_ordering {
-        bool operator()(const action_priority_pair &lhs, const action_priority_pair &rhs) const {
-            return lhs.second < rhs.second;
+    struct request_priority_ordering {
+        bool operator()(const std::shared_ptr<request_base> &lhs, const std::shared_ptr<request_base> &rhs) const {
+            return lhs->priority < rhs->priority;
         }
+    };
+
+    class request_queue;
+
+    template<std::invocable Function>
+    class request_action: public request_base, private Function {
+    private:
+        request_queue *queue;
+    
+    public:
+        request_action(Function &&fun, request_queue *queue, int priority)
+            : request_base(nullptr, nullptr, nullptr, {}, priority)
+            , Function(FWD(fun))
+            , queue(queue) {}
+
+        void on_update() override;
     };
 
     struct game;
@@ -33,8 +44,7 @@ namespace banggame {
 
     class request_queue {
     private:
-        std::deque<std::shared_ptr<request_base>> m_requests;
-        utils::stable_priority_queue<action_priority_pair, action_ordering> m_delayed_actions;
+        utils::stable_priority_queue<std::shared_ptr<request_base>, request_priority_ordering> m_requests;
 
         game *m_game;
 
@@ -61,7 +71,7 @@ namespace banggame {
         template<typename T = request_base>
         std::shared_ptr<T> top_request(player *target = nullptr) {
             if (!m_requests.empty()) {
-                auto req = m_requests.front();
+                auto req = m_requests.top();
                 if (!target || req->target == target) {
                     return std::dynamic_pointer_cast<T>(req);
                 }
@@ -69,12 +79,8 @@ namespace banggame {
             return nullptr;
         }
 
-        void queue_action(delayed_action &&fun, int priority = 0) {
-            m_delayed_actions.emplace(std::move(fun), priority);
-        }
-
         void queue_request(std::shared_ptr<request_base> &&value) {
-            m_requests.emplace_back(std::move(value));
+            m_requests.emplace(std::move(value));
         }
 
         template<std::derived_from<request_base> T>
@@ -82,20 +88,22 @@ namespace banggame {
             queue_request(std::make_shared<T>(FWD(args) ... ));
         }
 
-        void queue_request_front(std::shared_ptr<request_base> &&value) {
-            m_requests.emplace_front(std::move(value));
-        }
-
-        template<std::derived_from<request_base> T>
-        void queue_request_front(auto && ... args) {
-            queue_request_front(std::make_shared<T>(FWD(args) ... ));
+        template<std::invocable Function>
+        void queue_action(Function &&fun, int priority = 0) {
+            queue_request<request_action<Function>>(FWD(fun), this, priority);
         }
 
         void pop_request() {
             top_request()->state = request_state::dead;
-            m_requests.pop_front();
+            m_requests.pop();
         }
     };
+
+    template<std::invocable Function>
+    void request_action<Function>::on_update() {
+        queue->pop_request();
+        std::invoke(static_cast<Function>(*this));
+    }
 
 }
 

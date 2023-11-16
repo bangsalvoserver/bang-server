@@ -17,7 +17,7 @@ namespace banggame {
     
     struct request_check : selection_picker, draw_check_handler {
         request_check(game *m_game, card *origin_card, player *target, draw_check_condition &&condition, draw_check_function &&function)
-            : selection_picker(origin_card, nullptr, target)
+            : selection_picker(origin_card, nullptr, target, {}, 110)
             , m_game(m_game)
             , m_condition(std::move(condition))
             , m_function(std::move(function)) {}

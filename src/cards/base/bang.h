@@ -57,8 +57,7 @@ namespace banggame {
     };
 
     struct request_bang : request_base, missable_request, resolvable_request {
-        request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags) {}
+        using request_base::request_base;
 
         ~request_bang();
 

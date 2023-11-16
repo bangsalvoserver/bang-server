@@ -67,7 +67,7 @@ namespace banggame {
     void request_discard_pass::on_update() {
         if (target->max_cards_end_of_turn() == 0) {
             target->m_game->pop_request();
-            target->m_game->queue_request_front<request_discard_hand_pass>(target);
+            target->m_game->queue_request<request_discard_hand_pass>(target);
         }
     }
 

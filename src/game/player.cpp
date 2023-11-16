@@ -140,7 +140,7 @@ namespace banggame {
     }
 
     void player::damage(card *origin_card, player *origin, int value, effect_flags flags) {
-        m_game->queue_request_front<request_damage>(origin_card, origin, this, value, flags);
+        m_game->queue_request<request_damage>(origin_card, origin, this, value, flags);
     }
 
     void player::heal(int value) {

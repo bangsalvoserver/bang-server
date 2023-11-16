@@ -16,7 +16,7 @@ namespace banggame {
     
     struct request_discard : request_base {
         request_discard(card *origin_card, player *origin, player *target, int ncards = 1)
-            : request_base(origin_card, origin, target)
+            : request_base(origin_card, origin, target, {}, 120)
             , ncards(ncards) {}
 
         int ncards;
@@ -29,7 +29,7 @@ namespace banggame {
 
     struct request_discard_pass : request_base {
         request_discard_pass(player *target)
-            : request_base(nullptr, nullptr, target) {}
+            : request_base(nullptr, nullptr, target, {}, 200) {}
 
         int ndiscarded = 0;
 

@@ -8,7 +8,7 @@ namespace banggame {
     
     struct request_move_bomb : request_auto_select {
         request_move_bomb(card *origin_card, player *target)
-            : request_auto_select(origin_card, nullptr, target) {}
+            : request_auto_select(origin_card, nullptr, target, {}, 110) {}
 
         game_string status_text(player *owner) const override {
             if (target == owner) {
@@ -63,7 +63,7 @@ namespace banggame {
             if (p == target && e_card == target_card) {
                 target->m_game->draw_check_then(target, target_card, &card_sign::is_red, [=](bool result) {
                     if (result) {
-                        target->m_game->queue_request_front<request_move_bomb>(target_card, target);
+                        target->m_game->queue_request<request_move_bomb>(target_card, target);
                     } else {
                         target->m_game->move_cubes(target_card, nullptr, 2);
                     }

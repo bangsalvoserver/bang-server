@@ -12,7 +12,7 @@ namespace banggame {
 
     struct request_rust : request_base, resolvable_request {
         request_rust(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags) {}
+            : request_base(origin_card, origin, target, flags, 0) {}
 
         struct rust_timer : request_timer {
             explicit rust_timer(request_rust *request)

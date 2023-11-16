@@ -82,8 +82,8 @@ namespace banggame {
 
     class request_base {
     public:
-        request_base(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : origin_card(origin_card), origin(origin), target(target), flags(flags) {}
+        request_base(card *origin_card, player *origin, player *target, effect_flags flags = {}, int priority = 100)
+            : origin_card(origin_card), origin(origin), target(target), flags(flags), priority(priority) {}
         
         virtual ~request_base() {}
 
@@ -91,6 +91,7 @@ namespace banggame {
         player *origin;
         player *target;
         effect_flags flags;
+        int priority;
 
         request_state state = request_state::pending;
 

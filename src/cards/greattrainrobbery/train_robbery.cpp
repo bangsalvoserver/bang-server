@@ -10,7 +10,7 @@ namespace banggame {
 
     struct request_train_robbery_choose : request_bang {
         request_train_robbery_choose(card *origin_card, player *origin, player *target, card *target_card)
-            : request_bang(origin_card, origin, target)
+            : request_bang(origin_card, origin, target, {}, 110)
             , target_card(target_card) {}
         
         card *target_card;
@@ -79,11 +79,12 @@ namespace banggame {
                 if (req->target->alive() && req->is_valid()) {
                     req->flags &= ~effect_flags::escapable;
                     req->state = request_state::pending;
-                    req->target->m_game->queue_request_front(std::move(req));
+                    req->priority = 110;
+                    req->target->m_game->queue_request(std::move(req));
                 }
             }, 1);
             target->m_game->pop_request();
-            target->m_game->queue_request_front<request_train_robbery_choose>(origin_card, origin, target, target_card);
+            target->m_game->queue_request<request_train_robbery_choose>(origin_card, origin, target, target_card);
         }
 
         game_string status_text(player *owner) const override {
