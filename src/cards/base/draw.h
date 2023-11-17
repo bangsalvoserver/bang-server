@@ -39,15 +39,17 @@ namespace banggame {
     };
 
     struct effect_while_drawing {
+        int cards_to_add;
+        effect_while_drawing(int value): cards_to_add(value) {}
+        
         bool can_play(card *origin_card, player *origin);
-    };
-
-    struct effect_end_drawing : effect_while_drawing {
         void on_play(card *origin_card, player *origin);
     };
 
-    struct effect_draw_one_less {
-        void on_play(card *origin_card, player *target);
+    struct effect_end_drawing : effect_while_drawing {
+        using effect_while_drawing::effect_while_drawing;
+        
+        void on_play(card *origin_card, player *origin);
     };
 
     struct request_draw : request_base {

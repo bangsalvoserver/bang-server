@@ -179,7 +179,7 @@ character:
     image: 07_evelynshebang
     expansion: valleyofshadows
     responses:
-      - while_drawing
+      - while_drawing(1)
       - evelyn_shebang player notself reachable
   - name: HENRY_BLOCK
     image: 07_henryblock

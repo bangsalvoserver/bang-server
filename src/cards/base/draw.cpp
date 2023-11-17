@@ -36,18 +36,6 @@ namespace banggame {
             origin->m_game->move_card(origin->m_game->top_of_deck(), pocket_type::discard_pile);
         }
     }
-
-    void effect_draw_one_less::on_play(card *origin_card, player *target) {
-        target->m_game->queue_action([=]{
-            if (target->alive()) {
-                ++target->m_num_drawn_cards;
-                int ncards = target->get_cards_to_draw();
-                while (target->m_num_drawn_cards < ncards) {
-                    target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
-                }
-            }
-        });
-    }
     
     void request_draw::on_update() {
         if (state == request_state::pending) {
@@ -89,6 +77,10 @@ namespace banggame {
     
     bool effect_while_drawing::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_draw>(origin) != nullptr;
+    }
+
+    void effect_while_drawing::on_play(card *origin_card, player *origin) {
+        origin->m_num_drawn_cards += cards_to_add;
     }
 
     void effect_end_drawing::on_play(card *origin_card, player *origin) {

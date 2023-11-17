@@ -308,9 +308,9 @@ character:
   - name: JESSE_JONES
     image: 01_jessejones
     responses:
-      - end_drawing
+      - while_drawing(1)
+      - max_usages(1)
       - steal card notself | hand
-      - draw_one_less
     tags:
       - drawing
   - name: JOURDONNAIS
@@ -334,9 +334,9 @@ character:
   - name: PEDRO_RAMIREZ
     image: 01_pedroramirez
     responses:
-      - end_drawing
+      - while_drawing(1)
+      - max_usages(1)
       - draw_discard
-      - draw_one_less
     tags:
       - drawing
   - name: ROSE_DOOLAN
