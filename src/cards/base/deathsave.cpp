@@ -11,11 +11,7 @@ namespace banggame {
     }
 
     void effect_deathsave::on_play(card *origin_card, player *origin) {
-        if (origin->m_hp > 0) {
-            origin->m_game->pop_request();
-        } else {
-            origin->m_game->top_request<request_death>()->tried_save = true;
-        }
+        origin->m_game->top_request<request_death>()->tried_save = true;
     }
 
     void request_death::on_update() {

@@ -262,9 +262,9 @@ goldrush:
       - pay_gold(2)
       - heal
     responses:
+      - deathsave
       - pay_gold(2)
       - heal
-      - deathsave
     tags:
       - buy_cost(3)
 

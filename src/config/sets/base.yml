@@ -153,8 +153,8 @@ main_deck:
     effects:
       - beer
     responses:
-      - beer
       - deathsave
+      - beer
     tags:
       - beer
   - &cat_balou
@@ -349,9 +349,9 @@ character:
       - discard cards(2) self | hand
       - heal
     responses:
+      - deathsave
       - discard cards(2) self | hand
       - heal
-      - deathsave
   - name: SLAB_THE_KILLER
     image: 01_slab
     equip:
