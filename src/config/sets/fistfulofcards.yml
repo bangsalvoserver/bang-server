@@ -24,7 +24,7 @@ fistfulofcards:
       - startofturn
       - while_drawing
       - damage
-      - queue_heal_notfull player notself
+      - heal_notfull player notself
   - name: THE_JUDGE
     image: 05_ilgiudice
     equip:

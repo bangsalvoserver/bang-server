@@ -14,7 +14,9 @@ namespace banggame {
     }
 
     void effect_heal::on_play(card *origin_card, player *origin, player *target) {
-        target->heal(amount);
+        target->m_game->queue_action([=, amount=amount]{
+            target->heal(amount);
+        }, 200);
     }
 
     game_string effect_heal_notfull::get_error(card *origin_card, player *origin, player *target) {
@@ -22,12 +24,6 @@ namespace banggame {
             return "ERROR_CANT_HEAL_PAST_FULL_HP";
         }
         return {};
-    }
-
-    void effect_queue_heal_notfull::on_play(card *origin_card, player *origin, player *target) {
-        origin->m_game->queue_action([target, amount=amount]{
-            target->heal(amount);
-        });
     }
 
     game_string handler_heal_multi::on_prompt(card *origin_card, player *origin, int amount) {

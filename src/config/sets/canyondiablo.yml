@@ -41,7 +41,7 @@ main_deck:
     color: brown
     effects:
       - damage
-      - queue_heal_notfull player notself
+      - heal_notfull player notself
   - name: SACRIFICE
     signs:
       - 10 hearts
@@ -259,7 +259,7 @@ main_deck:
     color: brown
     effects:
       - damage
-      - queue_draw(2)
+      - draw(2)
   - <<: *dodge
     signs:
       - 7 spades
