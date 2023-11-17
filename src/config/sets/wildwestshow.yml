@@ -28,6 +28,7 @@ character:
     responses:
       - max_usages(1)
       - while_drawing
+      - startofturn
       - greygory_deck
     equip:
       - greygory_deck
