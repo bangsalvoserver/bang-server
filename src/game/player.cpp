@@ -251,29 +251,26 @@ namespace banggame {
     }
 
     void player::start_of_turn() {
-        m_game->m_playing = this;
-        m_played_cards.clear();
-        m_num_drawn_cards = 0;
-        for (auto &[card_id, obj] : m_predraw_checks) {
-            obj.resolved = false;
-        }
-        m_game->add_update<game_update_type::switch_turn>(this);
-        m_game->add_log("LOG_TURN_START", this);
-        m_game->call_event<event_type::pre_turn_start>(this);
-        m_game->queue_action([this]{ request_drawing(); }, -7);
-    }
+        m_game->queue_action([this]{
+            m_game->m_playing = this;
+            m_num_drawn_cards = 0;
+            m_played_cards.clear();
+            
+            m_game->add_log("LOG_TURN_START", this);
+            m_game->add_update<game_update_type::switch_turn>(this);
 
-    void player::request_drawing() {
-        if (alive() && m_game->m_playing == this) {
-            if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
+            m_game->call_event<event_type::pre_turn_start>(this);
+            m_game->queue_request<request_predraw>(this);
+        }, -10);
+
+        m_game->queue_action([this]{
+            if (alive() && m_game->m_playing == this) {
                 m_game->call_event<event_type::on_turn_start>(this);
                 if (!m_game->check_flags(game_flags::phase_one_override)) {
                     m_game->queue_request<request_draw>(this);
                 }
-            } else {
-                m_game->queue_request<request_predraw>(this);
             }
-        }
+        }, -10);
     }
 
     void player::pass_turn() {
@@ -281,7 +278,7 @@ namespace banggame {
             m_game->queue_request<request_discard_pass>(this);
         } else {
             m_game->call_event<event_type::on_turn_end>(this, false);
-            m_game->queue_action([&]{
+            m_game->queue_action([this]{
                 if (m_extra_turns == 0) {
                     remove_player_flags(player_flags::extra_turn);
                     m_game->start_next_turn();

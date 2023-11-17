@@ -65,6 +65,8 @@ namespace banggame {
         card *phase_one_drawn_card();
 
         card *draw_shop_card();
+        void draw_scenario_card();
+        void advance_train(player *origin);
 
         void flash_card(card *c);
         void add_short_pause(card *c = nullptr);

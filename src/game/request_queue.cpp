@@ -2,6 +2,8 @@
 
 #include "game.h"
 
+#include "utils/type_name.h"
+
 namespace banggame {
     
     static ticks get_total_update_time(game *game) {
@@ -19,6 +21,11 @@ namespace banggame {
         if (m_game->is_game_over()) {
             return state_done{};
         } else if (auto req = top_request()) {
+#ifndef NDEBUG
+            fmt::print("{: >5}: {}\n", req->priority, utils::demangle(typeid(*req).name()));
+            fflush(stdout);
+#endif
+
             req->on_update();
 
             if (req->state == request_state::pending) {

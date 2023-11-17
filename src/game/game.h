@@ -30,9 +30,6 @@ namespace banggame {
         void send_request_status_clear();
         bool send_request_status_ready();
         void send_request_update();
-        
-        void draw_scenario_card();
-        void advance_train(player *origin);
 
         void start_next_turn();
 

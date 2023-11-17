@@ -38,10 +38,10 @@ namespace banggame {
     }
     
     void request_draw::on_update() {
-        if (state == request_state::pending) {
-            target->m_game->play_sound(target, "draw");
-        }
         if (target->alive() && target->m_game->m_playing == target && target->m_num_drawn_cards < target->get_cards_to_draw()) {
+            if (state == request_state::pending) {
+                target->m_game->play_sound(target, "draw");
+            }
             auto_pick();
         } else {
             target->m_game->pop_request();
@@ -76,7 +76,7 @@ namespace banggame {
     }
     
     game_string effect_startofturn::get_error(card *origin_card, player *origin) const {
-        if (origin->m_num_drawn_cards != 0) {
+        if (origin->m_num_drawn_cards != 0 || !origin->m_played_cards.empty()) {
             return "ERROR_NOT_START_OF_TURN";
         }
         return {};

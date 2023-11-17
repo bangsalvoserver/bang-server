@@ -14,6 +14,8 @@ namespace banggame {
 
     using shared_effect_context = std::shared_ptr<effect_context>;
 
+    using card_priority_pair = std::pair<card *, int>;
+
     #define EVENT(name, ...) (name, std::function<void(__VA_ARGS__)>)
     
     DEFINE_ENUM_TYPES(event_type,
@@ -53,6 +55,8 @@ namespace banggame {
         EVENT(on_discard_pass, player *origin, card *target_card)
 
         EVENT(post_discard_pass, player *origin, int ndiscarded)
+
+        EVENT(get_predraw_checks, player *origin, std::vector<card_priority_pair> &result)
 
         // viene chiamata quando un giocatore deve estrarre prima di pescare
         EVENT(on_predraw_check, player *origin, card *target_card)

@@ -64,13 +64,6 @@ namespace banggame {
 
         player_role m_role;
 
-        struct predraw_check {
-            int priority;
-            bool resolved;
-        };
-
-        std::map<card *, predraw_check> m_predraw_checks;
-
         int8_t m_hp = 0;
         int8_t m_max_hp = 0;
         
@@ -149,7 +142,6 @@ namespace banggame {
         void reset_max_hp();
 
         void start_of_turn();
-        void request_drawing();
         
         void pass_turn();
         void skip_turn();

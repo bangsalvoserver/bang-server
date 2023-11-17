@@ -318,7 +318,7 @@ namespace banggame {
             call_event<event_type::on_game_setup>(m_first_player);
         });
 
-        queue_action([this]{ m_first_player->start_of_turn(); });
+        m_first_player->start_of_turn();
     }
 
     player_distances game::make_player_distances(player *owner) {
@@ -420,27 +420,6 @@ namespace banggame {
         add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
     }
 
-    void game::draw_scenario_card() {
-        if (m_scenario_deck.size() > 1) {
-            set_card_visibility(*(m_scenario_deck.rbegin() + 1), nullptr, card_visibility::shown, true);
-        }
-        if (!m_scenario_cards.empty()) {
-            m_first_player->disable_equip(m_scenario_cards.back());
-        }
-        add_log("LOG_DRAWN_SCENARIO_CARD", m_scenario_deck.back());
-        move_card(m_scenario_deck.back(), pocket_type::scenario_card);
-        m_first_player->enable_equip(m_scenario_cards.back());
-    }
-
-    void game::advance_train(player *origin) {
-        add_log("LOG_TRAIN_ADVANCE");
-        add_update<game_update_type::move_train>(++train_position);
-        queue_action([=, this]{
-            call_event<event_type::on_train_advance>(origin,
-                std::make_shared<effect_context>(effect_context{ .locomotive_count = 1 }));
-        }, -1);
-    }
-
     void game::start_next_turn() {
         if (num_alive() == 0) return;
         
@@ -470,10 +449,8 @@ namespace banggame {
                 draw_scenario_card();
             }
         }
-
-        queue_action([next_player]{
-            next_player->start_of_turn();
-        }, 1);
+        
+        next_player->start_of_turn();
     }
 
     void game::handle_player_death(player *killer, player *target, discard_all_reason reason) {

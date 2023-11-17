@@ -7,9 +7,11 @@ namespace banggame {
 
     struct request_predraw : request_base {
         request_predraw(player *target)
-            : request_base(nullptr, nullptr, target) {}
+            : request_base(nullptr, nullptr, target, {}, -7) {}
 
-        void on_update() override { auto_pick(); }
+        std::vector<std::pair<card *, int>> checks;
+
+        void on_update() override;
         bool can_pick(card *target_card) const override;
         void on_pick(card *target_card) override;
         game_string status_text(player *owner) const override;
