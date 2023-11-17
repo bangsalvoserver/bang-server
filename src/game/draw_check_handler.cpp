@@ -8,6 +8,7 @@ namespace banggame {
 
     void request_check::on_update() {
         if (state == request_state::pending) {
+            m_game->flash_card(origin_card);
             start();
         }
     }
@@ -65,7 +66,7 @@ namespace banggame {
     }
 
     bool request_check::is_lucky(card *target_card) const {
-        return std::invoke(m_condition, m_game->get_card_sign(target_card));
+        return check_condition(m_game->get_card_sign(target_card));
     }
 
     bool request_check::bot_check_redraw(card *target_card, player *owner) const {
@@ -85,6 +86,6 @@ namespace banggame {
         } else {
             m_game->call_event<event_type::on_draw_check_resolve>(target, drawn_card);
         }
-        std::invoke(m_function, is_lucky(drawn_card));
+        on_resolve(is_lucky(drawn_card));
     }
 }

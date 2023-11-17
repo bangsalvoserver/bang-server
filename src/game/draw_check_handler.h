@@ -16,15 +16,11 @@ namespace banggame {
     };
     
     struct request_check : selection_picker, draw_check_handler {
-        request_check(game *m_game, card *origin_card, player *target, draw_check_condition &&condition, draw_check_function &&function)
+        request_check(game *m_game, card *origin_card, player *target)
             : selection_picker(origin_card, nullptr, target, {}, 110)
-            , m_game(m_game)
-            , m_condition(std::move(condition))
-            , m_function(std::move(function)) {}
+            , m_game(m_game) {}
 
         game *m_game;
-        draw_check_condition m_condition;
-        draw_check_function m_function;
 
         card *drawn_card = nullptr;
 
@@ -53,6 +49,36 @@ namespace banggame {
         
         void resolve() override;
         void restart() override;
+
+        virtual bool check_condition(card_sign sign) const = 0;
+        virtual void on_resolve(bool result) = 0;
+    };
+
+    template<typename T>
+    concept draw_check_condition = std::predicate<T, card_sign>;
+
+    template<typename T>
+    concept draw_check_function = std::invocable<T, bool>;
+
+    template<draw_check_condition Condition, draw_check_function Function>
+    class request_check_impl : public request_check {
+    private:
+        Condition m_condition;
+        Function m_function;
+
+    public:
+        request_check_impl(game *m_game, card *origin_card, player *target, Condition &&condition, Function &&function)
+            : request_check(m_game, origin_card, target)
+            , m_condition(FWD(condition))
+            , m_function(FWD(function)) {}
+        
+        bool check_condition(card_sign sign) const override {
+            return std::invoke(m_condition, sign);
+        }
+
+        void on_resolve(bool result) override {
+            std::invoke(m_function, result);
+        }
     };
 
 }

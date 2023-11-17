@@ -1,7 +1,6 @@
 #include "tumbleweed.h"
 
 #include "game/game.h"
-#include "game/draw_check_handler.h"
 
 namespace banggame {
 
