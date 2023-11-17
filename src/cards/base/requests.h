@@ -40,8 +40,8 @@ namespace banggame {
     struct request_discard_all : request_base, resolvable_request {
         discard_all_reason reason;
 
-        request_discard_all(player *target, discard_all_reason reason)
-            : request_base(nullptr, nullptr, target)
+        request_discard_all(player *target, discard_all_reason reason, int priority = 100)
+            : request_base(nullptr, nullptr, target, {}, priority)
             , reason(reason) {}
         
         bool can_pick(card *target_card) const override;

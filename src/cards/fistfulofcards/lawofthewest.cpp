@@ -12,9 +12,7 @@ namespace banggame {
                 event_card_key key{target_card, 1};
 
                 if (!drawn_card->is_brown() || !drawn_card->effects.empty()) {
-                    origin->m_game->queue_action([=] {
-                        origin->m_game->add_log("LOG_MANDATORY_CARD", origin, drawn_card);
-                    }, 1);
+                    origin->m_game->add_log("LOG_MANDATORY_CARD", origin, drawn_card);
                 }
                 
                 origin->m_game->add_listener<event_type::check_pass_turn>(key, [=](player *p, game_string &out_error) {

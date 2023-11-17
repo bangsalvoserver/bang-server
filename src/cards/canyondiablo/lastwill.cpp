@@ -6,7 +6,7 @@ namespace banggame {
 
     struct request_lastwill : request_base, resolvable_request {
         request_lastwill(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target, {}, 3) {}
+            : request_base(origin_card, nullptr, target) {}
 
         void on_update() override {
             if (target->m_hp > 0) {

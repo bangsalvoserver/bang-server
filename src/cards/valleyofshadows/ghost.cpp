@@ -21,9 +21,7 @@ namespace banggame {
     void equip_ghost::on_disable(card *target_card, player *target) {
         target->remove_player_flags(flag);
         if (!target->alive()) {
-            target->m_game->queue_action([=]{
-                target->m_game->handle_player_death(nullptr, target, discard_all_reason::discard_ghost);
-            }, 2);
+            target->m_game->handle_player_death(nullptr, target, discard_all_reason::discard_ghost);
         }
     }
 }

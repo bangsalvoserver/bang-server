@@ -11,6 +11,20 @@ namespace banggame {
         request_peyote(card *origin_card, player *target)
             : selection_picker(origin_card, nullptr, target) {}
 
+        void on_update() override {
+            if (state == request_state::pending) {
+                std::vector<card *> target_cards;
+                for (card *c : target->m_game->m_hidden_deck) {
+                    if (c->has_tag(tag_type::peyote)) {
+                        target_cards.push_back(c);
+                    }
+                }
+                for (card *c : target_cards) {
+                    target->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
+                }
+            }
+        }
+
         void on_pick(card *target_card) override {
             target->m_game->flash_card(target_card);
             
@@ -50,17 +64,7 @@ namespace banggame {
     };
     
     void equip_peyote::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_from_deck>({target_card, 1}, [=](player *p) {
-            std::vector<card *> target_cards;
-            for (card *c : p->m_game->m_hidden_deck) {
-                if (c->has_tag(tag_type::peyote)) {
-                    target_cards.push_back(c);
-                }
-            }
-            for (card *c : target_cards) {
-                p->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
-            }
-            
+        target->m_game->add_listener<event_type::on_turn_start>({target_card, -2}, [=](player *p) {
             p->m_game->queue_request<request_peyote>(target_card, p);
         });
 

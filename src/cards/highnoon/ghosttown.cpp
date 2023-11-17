@@ -18,11 +18,9 @@ namespace banggame {
         });
         origin->m_game->add_listener<event_type::on_turn_end>({target_card, -3}, [](player *target, bool skipped) {
             if (target->check_player_flags(player_flags::temp_ghost)) {
-                target->m_game->queue_action([=]{
-                    if (target->m_extra_turns == 0 && target->remove_player_flags(player_flags::temp_ghost) && !target->alive()) {
-                        target->m_game->handle_player_death(nullptr, target, discard_all_reason::disable_temp_ghost);
-                    }
-                });
+                if (target->m_extra_turns == 0 && target->remove_player_flags(player_flags::temp_ghost) && !target->alive()) {
+                    target->m_game->handle_player_death(nullptr, target, discard_all_reason::disable_temp_ghost);
+                }
             }
         });
         origin->m_game->add_listener<event_type::count_cards_to_draw>({target_card, 1}, [](player *target, int &value) {

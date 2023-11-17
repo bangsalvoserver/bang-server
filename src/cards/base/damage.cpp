@@ -14,9 +14,7 @@ namespace banggame {
     }
 
     void effect_damage::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
-        target->m_game->queue_action([=, damage=damage]{
-            target->damage(origin_card, origin, damage, flags);
-        });
+        target->damage(origin_card, origin, damage, flags);
     }
 
     request_damage::timer_damage::timer_damage(request_damage *request)

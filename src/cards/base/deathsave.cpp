@@ -28,16 +28,8 @@ namespace banggame {
     
     void request_death::on_resolve() {
         target->m_game->pop_request();
-    
-        target->m_game->queue_action([target=target, tried_save=tried_save]{
-            target->m_game->call_event<event_type::on_player_death_resolve>(target, tried_save);
-        }, 3);
-        
-        target->m_game->queue_action([origin=origin, target=target]{
-            if (target->m_hp <= 0) {
-                target->m_game->handle_player_death(origin, target, discard_all_reason::death);
-            }
-        }, 3);
+        target->m_game->call_event<event_type::on_player_death_resolve>(target, tried_save);
+        target->m_game->handle_player_death(origin, target, discard_all_reason::death);
     }
 
     game_string request_death::status_text(player *owner) const {

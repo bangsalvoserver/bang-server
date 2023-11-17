@@ -252,32 +252,24 @@ namespace banggame {
 
     void player::start_of_turn() {
         m_game->m_playing = this;
-        m_game->queue_action([this]{
-            m_game->add_update<game_update_type::switch_turn>(this);
-            m_game->add_log("LOG_TURN_START", this);
-            m_game->call_event<event_type::pre_turn_start>(this);
-        }, -7);
-        m_game->queue_action([this]{
-            m_played_cards.clear();
-            m_num_drawn_cards = 0;
-            for (auto &[card_id, obj] : m_predraw_checks) {
-                obj.resolved = false;
-            }
-            request_drawing();
-        }, -7);
+        m_played_cards.clear();
+        m_num_drawn_cards = 0;
+        for (auto &[card_id, obj] : m_predraw_checks) {
+            obj.resolved = false;
+        }
+        m_game->add_update<game_update_type::switch_turn>(this);
+        m_game->add_log("LOG_TURN_START", this);
+        m_game->call_event<event_type::pre_turn_start>(this);
+        m_game->queue_action([this]{ request_drawing(); }, -7);
     }
 
     void player::request_drawing() {
         if (alive() && m_game->m_playing == this) {
             if (std::ranges::all_of(m_predraw_checks | std::views::values, &predraw_check::resolved)) {
                 m_game->call_event<event_type::on_turn_start>(this);
-                m_game->queue_action([this]{
-                    if (m_game->check_flags(game_flags::phase_one_override)) {
-                        m_game->call_event<event_type::on_draw_from_deck>(this);
-                    } else {
-                        m_game->queue_request<request_draw>(this);
-                    }
-                });
+                if (!m_game->check_flags(game_flags::phase_one_override)) {
+                    m_game->queue_request<request_draw>(this);
+                }
             } else {
                 m_game->queue_request<request_predraw>(this);
             }

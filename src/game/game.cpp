@@ -316,9 +316,9 @@ namespace banggame {
             }
 
             call_event<event_type::on_game_setup>(m_first_player);
-
-            queue_action([this]{ m_first_player->start_of_turn(); });
         });
+
+        queue_action([this]{ m_first_player->start_of_turn(); });
     }
 
     player_distances game::make_player_distances(player *owner) {
@@ -478,16 +478,18 @@ namespace banggame {
 
     void game::handle_player_death(player *killer, player *target, discard_all_reason reason) {
         if (killer != m_playing) killer = nullptr;
-
-        if (killer && killer != target) {
-            add_log("LOG_PLAYER_KILLED", killer, target);
-        } else {
-            add_log("LOG_PLAYER_DIED", target);
-        }
         
         queue_action([this, killer, target, reason]{
-            target->add_player_flags(player_flags::dead);
-            target->set_hp(0, true);
+            if (target->m_hp <= 0) {
+                if (killer && killer != target) {
+                    add_log("LOG_PLAYER_KILLED", killer, target);
+                } else {
+                    add_log("LOG_PLAYER_DIED", target);
+                }
+
+                target->add_player_flags(player_flags::dead);
+                target->set_hp(0, true);
+            }
 
             if (!target->alive()) {
                 if (!m_first_dead) m_first_dead = target;
@@ -515,10 +517,8 @@ namespace banggame {
                             add_log("LOG_KILLED_OUTLAW", killer);
                             killer->draw_card(3);
                         } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
-                            queue_action([this, killer] {
-                                add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                                queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy);
-                            }, -2);
+                            target->m_game->add_log("LOG_SHERIFF_KILLED_DEPUTY", target);
+                            queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy, -2);
                         }
                     } else if (m_players.size() == 3 && (
                         (target->m_role == player_role::deputy_3p && killer->m_role == player_role::renegade_3p) ||
@@ -550,7 +550,7 @@ namespace banggame {
         }
 
         queue_action([this, killer, target] {
-            if (target == m_first_player && num_alive() > 1) {
+            if (target == m_first_player && !target->alive() && num_alive() > 1) {
                 m_first_player = *std::next(player_iterator(target));
             }
 
