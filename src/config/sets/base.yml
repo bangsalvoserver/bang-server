@@ -310,6 +310,7 @@ character:
     responses:
       - while_drawing(1)
       - max_usages(1)
+      - startofturn
       - steal card notself | hand
     tags:
       - drawing
@@ -336,6 +337,7 @@ character:
     responses:
       - while_drawing(1)
       - max_usages(1)
+      - startofturn
       - draw_discard
     tags:
       - drawing
