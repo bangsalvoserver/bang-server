@@ -38,6 +38,10 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
+    struct effect_startofturn {
+        game_string get_error(card *origin_card, player *origin) const;
+    };
+
     struct effect_while_drawing {
         int cards_to_add;
         effect_while_drawing(int value): cards_to_add(value) {}

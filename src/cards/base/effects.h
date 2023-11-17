@@ -29,7 +29,6 @@
 #include "resolve.h"
 #include "scope.h"
 #include "slab_the_killer.h"
-#include "startofturn.h"
 #include "steal_destroy.h"
 #include "suzy_lafayette.h"
 #include "volcanic.h"

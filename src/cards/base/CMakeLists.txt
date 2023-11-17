@@ -28,7 +28,6 @@ target_sources(bangserver PRIVATE
     resolve.cpp
     scope.cpp
     slab_the_killer.cpp
-    startofturn.cpp
     steal_destroy.cpp
     suzy_lafayette.cpp
     volcanic.cpp

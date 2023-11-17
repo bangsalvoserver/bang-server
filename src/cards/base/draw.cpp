@@ -75,6 +75,13 @@ namespace banggame {
         }
     }
     
+    game_string effect_startofturn::get_error(card *origin_card, player *origin) const {
+        if (origin->m_num_drawn_cards != 0) {
+            return "ERROR_NOT_START_OF_TURN";
+        }
+        return {};
+    }
+    
     bool effect_while_drawing::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_draw>(origin) != nullptr;
     }
