@@ -270,7 +270,7 @@ namespace banggame {
                     m_game->queue_request<request_draw>(this);
                 }
             }
-        });
+        }, -10);
     }
 
     void player::pass_turn() {
