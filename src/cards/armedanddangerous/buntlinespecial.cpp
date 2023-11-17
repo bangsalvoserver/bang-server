@@ -13,7 +13,7 @@ namespace banggame {
         event_card_key key{origin_card, 1};
         p->m_game->add_listener<event_type::apply_bang_modifier>(key, [=](player *origin, request_bang *req) {
             if (p == origin) {
-                p->m_game->add_listener<event_type::on_missed>(key, [=](card *bang_card, player *origin, player *target, effect_flags flags) {
+                p->m_game->add_listener<event_type::on_missed>(key, [=](card *bang_card, player *origin, player *target, card *missed_card, effect_flags flags) {
                     if (target && origin == p && bool(flags & effect_flags::is_bang)) {
                         target->m_game->queue_request<request_discard>(origin_card, origin, target, effect_flags{}, 0);
                     }

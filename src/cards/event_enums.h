@@ -83,7 +83,7 @@ namespace banggame {
         EVENT(on_hit, card *origin_card, player *origin, player *target, int damage, effect_flags flags)
 
         // viene chiamato quando un giocatore gioca mancato
-        EVENT(on_missed, card *origin_card, player *origin, player *target, effect_flags flags)
+        EVENT(on_missed, card *origin_card, player *origin, player *target, card *missed_card, effect_flags flags)
 
         // viene chiamato quando un giocatore clicca su prendi danno quando muore
         EVENT(on_player_death_resolve, player *target, bool tried_save)

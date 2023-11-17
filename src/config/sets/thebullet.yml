@@ -33,6 +33,11 @@ character:
     mth_effect: play_as_bang
     tags:
       - play_as_bang
+  - name: EMILIANO
+    image: 02_emiliano
+    expansion: thebullet
+    equip:
+      - emiliano
 
 highnoon:
   - name: HANDCUFFS

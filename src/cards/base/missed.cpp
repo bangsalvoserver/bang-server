@@ -28,6 +28,6 @@ namespace banggame {
 
     void effect_missed::on_play(card *origin_card, player *origin) {
         auto req = origin->m_game->top_request<missable_request>();
-        req->on_miss();
+        req->on_miss(origin_card);
     }
 }

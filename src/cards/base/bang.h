@@ -50,7 +50,7 @@ namespace banggame {
             return std::ranges::find(m_cards_used, c) == m_cards_used.end();
         }
 
-        virtual void on_miss() = 0;
+        virtual void on_miss(card *c) = 0;
 
     private:
         std::vector<card *> m_cards_used;
@@ -67,7 +67,7 @@ namespace banggame {
 
         bool can_miss(card *c) const override;
 
-        void on_miss() override;
+        void on_miss(card *c) override;
         void on_resolve() override;
 
         game_string status_text(player *owner) const override;
