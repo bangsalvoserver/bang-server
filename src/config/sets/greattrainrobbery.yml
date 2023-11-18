@@ -330,8 +330,8 @@ train:
     image: 27_caboose
     color: train
     responses:
-      - discard card self | blue_or_train
-      - missed
+      - mth_add card self | blue_or_train
+    mth_response: play_as_missed
   - name: CATTLE_TRUCK
     image: 27_cattle_truck
     color: train

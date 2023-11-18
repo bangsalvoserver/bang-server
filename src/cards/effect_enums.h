@@ -215,6 +215,7 @@ namespace banggame {
     DEFINE_ENUM_FWD_TYPES(mth_type,
         (none)
         (play_as_bang,          handler_play_as_bang)
+        (play_as_missed,        handler_play_as_missed)
         (fanning,               handler_fanning)
         (claus_the_saint,       handler_claus_the_saint)
         (doc_holyday,           handler_doc_holyday)

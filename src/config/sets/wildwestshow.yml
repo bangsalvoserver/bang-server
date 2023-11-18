@@ -98,8 +98,8 @@ wildwestshow:
       - mth_add player reachable notself
     mth_effect: play_as_bang
     responses:
-      - missed
-      - discard(1) card self | hand bangcard
+      - mth_add card self | hand bangcard
+    mth_response: play_as_missed
     tags:
       - play_as_bang
   - name: SACAGAWAY
