@@ -33,6 +33,11 @@ namespace banggame {
                 return state_next{};
             }
             if (auto *timer = req->timer()) {
+                if (timer->get_duration() <= ticks{0}) {
+                    pop_request();
+                    timer->on_finished();
+                    return state_next{};
+                }
                 timer->start(get_total_update_time(m_game));
             }
             m_game->send_request_update();

@@ -409,9 +409,7 @@ namespace banggame {
         }
         
         origin->m_game->send_request_status_clear();
-
         req->on_pick(args.card);
-        req.reset();
 
         return {};
     }
