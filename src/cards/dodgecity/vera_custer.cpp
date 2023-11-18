@@ -40,9 +40,14 @@ namespace banggame {
             : request_base(origin_card, nullptr, target, {}, -8) {}
 
         void on_update() override {
-            if (target->m_game->num_alive() == 2) {
+            if (target->m_game->m_playing == target) {
+                if (target->m_game->num_alive() == 2) {
+                    target->m_game->pop_request();
+                    copy_characters(target, *std::next(player_iterator(target)));
+                }
+            } else {
                 target->m_game->pop_request();
-                copy_characters(target, *std::next(player_iterator(target)));
+                target->remove_extra_characters();
             }
         }
         
@@ -69,11 +74,6 @@ namespace banggame {
         origin->m_game->add_listener<event_type::pre_turn_start>(origin_card, [=](player *target) {
             if (origin == target) {
                 origin->m_game->queue_request<request_vera_custer>(origin_card, target);
-            }
-        });
-        origin->m_game->add_listener<event_type::on_turn_end>(origin_card, [=](player *target, bool skipped) {
-            if (skipped && origin == target && origin->m_num_drawn_cards == 0) {
-                origin->remove_extra_characters();
             }
         });
     }
