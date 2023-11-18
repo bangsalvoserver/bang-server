@@ -20,9 +20,8 @@ fistfulofcards:
   - name: BLOOD_BROTHERS
     image: 05_fratellidisangue
     responses:
-      - max_usages(1)
       - startofturn
-      - while_drawing
+      - max_usages(1)
       - damage
       - heal_notfull player notself
   - name: THE_JUDGE
@@ -40,8 +39,8 @@ fistfulofcards:
   - name: HARD_LIQUOR
     image: 05_liquoreforte
     responses:
-      - startofturn
       - while_drawing(-1)
+      - startofturn
       - heal_notfull
   - name: ABANDONED_MINE
     image: 05_minieraabbandonata

@@ -38,7 +38,7 @@ namespace banggame {
     }
     
     void request_draw::on_update() {
-        if (target->alive() && target->m_game->m_playing == target && target->m_num_drawn_cards < target->get_cards_to_draw()) {
+        if (target->alive() && target->m_game->m_playing == target && num_drawn_cards < target->get_cards_to_draw()) {
             if (!live) {
                 target->m_game->play_sound(target, "draw");
             }
@@ -56,13 +56,39 @@ namespace banggame {
         }
     }
 
+    card *request_draw::phase_one_drawn_card() {
+        if (!target->m_game->check_flags(game_flags::phase_one_draw_discard) || target->m_game->m_discards.empty()) {
+            return target->m_game->top_of_deck();
+        } else {
+            return target->m_game->m_discards.back();
+        }
+    }
+
+    void request_draw::add_to_hand_phase_one(card *drawn_card) {
+        ++num_drawn_cards;
+        
+        bool reveal = target->m_game->call_event<event_type::on_card_drawn>(target, drawn_card, shared_from_this(), false);
+        if (drawn_card->pocket == pocket_type::discard_pile) {
+            target->m_game->add_log("LOG_DRAWN_FROM_DISCARD", target, drawn_card);
+        } else if (target->m_game->check_flags(game_flags::hands_shown)) {
+            target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
+        } else if (reveal) {
+            target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
+            target->m_game->set_card_visibility(drawn_card);
+            target->m_game->add_short_pause(drawn_card);
+        } else {
+            target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_CARDS", target, 1);
+            target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, drawn_card);
+        }
+        target->add_to_hand(drawn_card);
+    }
+
     void request_draw::on_pick(card *target_card) {
-        bool handled = target->m_game->call_event<event_type::on_draw_from_deck>(target, false);
-        if (!handled) {
-            target->m_game->pop_request();
+        target->m_game->pop_request();
+        if (!target->m_game->call_event<event_type::on_draw_from_deck>(target, shared_from_this(), false)) {
             int ncards = target->get_cards_to_draw();
-            while (target->m_num_drawn_cards < ncards) {
-                target->add_to_hand_phase_one(target->m_game->phase_one_drawn_card());
+            while (num_drawn_cards < ncards) {
+                add_to_hand_phase_one(phase_one_drawn_card());
             }
         }
     }
@@ -76,10 +102,12 @@ namespace banggame {
     }
     
     game_string effect_startofturn::get_error(card *origin_card, player *origin) const {
-        if (origin->m_num_drawn_cards != 0) {
-            return "ERROR_NOT_START_OF_TURN";
+        if (auto req = origin->m_game->top_request<request_draw>(origin)) {
+            if (req->num_drawn_cards == 0) {
+                return {};
+            }
         }
-        return {};
+        return "ERROR_NOT_START_OF_TURN";
     }
     
     bool effect_while_drawing::can_play(card *origin_card, player *origin) {
@@ -89,7 +117,7 @@ namespace banggame {
     void effect_while_drawing::on_play(card *origin_card, player *origin) {
         if (cards_to_add != 0) {
             if (cards_to_add > 0) {
-                origin->m_num_drawn_cards += cards_to_add;
+                origin->m_game->top_request<request_draw>(origin)->num_drawn_cards += cards_to_add;
             } else {
                 origin->m_game->pop_request();
             }

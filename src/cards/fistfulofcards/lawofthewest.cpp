@@ -1,13 +1,15 @@
 #include "lawofthewest.h"
 
+#include "cards/base/draw.h"
+
 #include "game/game.h"
 #include "game/possible_to_play.h"
 
 namespace banggame {
     
     void equip_lawofthewest::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_card_drawn>(target_card, [=](player *origin, card *drawn_card, bool &reveal) {
-            if (origin->m_num_drawn_cards == 2) {
+        target->m_game->add_listener<event_type::on_card_drawn>(target_card, [=](player *origin, card *drawn_card, shared_request_draw req_draw, bool &reveal) {
+            if (req_draw->num_drawn_cards == 2) {
                 reveal = true;
                 event_card_key key{target_card, 1};
 

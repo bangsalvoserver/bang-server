@@ -309,8 +309,8 @@ character:
     image: 01_jessejones
     responses:
       - while_drawing(1)
-      - max_usages(1)
       - startofturn
+      - max_usages(1)
       - steal card notself | hand
     tags:
       - drawing
@@ -336,8 +336,8 @@ character:
     image: 01_pedroramirez
     responses:
       - while_drawing(1)
-      - max_usages(1)
       - startofturn
+      - max_usages(1)
       - draw_discard
     tags:
       - drawing

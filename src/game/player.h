@@ -67,8 +67,6 @@ namespace banggame {
         int8_t m_hp = 0;
         int8_t m_max_hp = 0;
         
-        int8_t m_num_drawn_cards = 0;
-        
         int8_t m_extra_turns = 0;
 
         std::vector<played_card_history> m_played_cards;
@@ -90,7 +88,6 @@ namespace banggame {
         int can_escape(player *origin, card *origin_card, effect_flags flags) const;
         
         void add_to_hand(card *card);
-        void add_to_hand_phase_one(card *card);
         void draw_card(int ncards = 1, card *origin_card = nullptr);
 
         void discard_card(card *target, bool used = false);

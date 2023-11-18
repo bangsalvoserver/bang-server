@@ -62,7 +62,6 @@ namespace banggame {
         void move_card(card *c, pocket_type pocket, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
         
         card *top_of_deck();
-        card *phase_one_drawn_card();
 
         card *draw_shop_card();
         void draw_scenario_card();

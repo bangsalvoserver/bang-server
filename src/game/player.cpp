@@ -187,25 +187,6 @@ namespace banggame {
         }
     }
 
-    void player::add_to_hand_phase_one(card *drawn_card) {
-        ++m_num_drawn_cards;
-        
-        bool reveal = m_game->call_event<event_type::on_card_drawn>(this, drawn_card, false);
-        if (drawn_card->pocket == pocket_type::discard_pile) {
-            m_game->add_log("LOG_DRAWN_FROM_DISCARD", this, drawn_card);
-        } else if (m_game->check_flags(game_flags::hands_shown)) {
-            m_game->add_log("LOG_DRAWN_CARD", this, drawn_card);
-        } else if (reveal) {
-            m_game->add_log("LOG_DRAWN_CARD", this, drawn_card);
-            m_game->set_card_visibility(drawn_card);
-            m_game->add_short_pause(drawn_card);
-        } else {
-            m_game->add_log(update_target::excludes(this), "LOG_DRAWN_CARDS", this, 1);
-            m_game->add_log(update_target::includes(this), "LOG_DRAWN_CARD", this, drawn_card);
-        }
-        add_to_hand(drawn_card);
-    }
-
     void player::draw_card(int ncards, card *origin_card) {
         if (!m_game->check_flags(game_flags::hands_shown)) {
             if (origin_card) {
@@ -253,7 +234,6 @@ namespace banggame {
     void player::start_of_turn() {
         m_game->queue_action([this]{
             m_game->m_playing = this;
-            m_num_drawn_cards = 0;
             m_played_cards.clear();
             
             m_game->add_log("LOG_TURN_START", this);

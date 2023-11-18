@@ -50,9 +50,14 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
-    struct request_draw : request_base {
+    struct request_draw : request_base, std::enable_shared_from_this<request_draw> {
         request_draw(player *target)
             : request_base(nullptr, nullptr, target, {}, -7) {}
+
+        int num_drawn_cards = 0;
+        
+        card *phase_one_drawn_card();
+        void add_to_hand_phase_one(card *target_card);
 
         void on_update() override;
         bool can_pick(card *target_card) const override;

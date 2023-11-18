@@ -158,14 +158,6 @@ namespace banggame {
         return m_deck.back();
     }
 
-    card *game_table::phase_one_drawn_card() {
-        if (!check_flags(game_flags::phase_one_draw_discard) || m_discards.empty()) {
-            return top_of_deck();
-        } else {
-            return m_discards.back();
-        }
-    }
-
     card *game_table::draw_shop_card() {
         if (m_shop_deck.empty()) {
             if (m_shop_discards.empty()) {

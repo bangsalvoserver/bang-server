@@ -10,9 +10,11 @@
 namespace banggame {
 
     struct request_bang;
+    struct request_draw;
     struct effect_context;
 
     using shared_effect_context = std::shared_ptr<effect_context>;
+    using shared_request_draw = std::shared_ptr<request_draw>;
 
     using card_priority_pair = std::pair<card *, int>;
 
@@ -107,10 +109,10 @@ namespace banggame {
         EVENT(on_turn_start, player *origin)
 
         // viene chiamato quando si clicca sul mazzo per pescare in fase di pesca
-        EVENT(on_draw_from_deck, player *origin, bool &handled)
+        EVENT(on_draw_from_deck, player *origin, shared_request_draw req, bool &handled)
 
         // viene chiamato quando si pesca una carta in fase di pesca
-        EVENT(on_card_drawn, player *origin, card *target_card, bool &reveal)
+        EVENT(on_card_drawn, player *origin, card *target_card, shared_request_draw req, bool &reveal)
         
         // viene chiamato alla fine del turno
         EVENT(on_turn_end, player *origin, bool skipped)

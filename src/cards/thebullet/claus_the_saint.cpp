@@ -9,16 +9,19 @@
 namespace banggame {
 
     struct request_claus_the_saint : request_auto_select {
-        request_claus_the_saint(card *origin_card, player *target)
-            : request_auto_select(origin_card, nullptr, target) {}
+        request_claus_the_saint(card *origin_card, player *target, shared_request_draw &&req_draw)
+            : request_auto_select(origin_card, nullptr, target)
+            , req_draw(std::move(req_draw)) {}
 
         std::vector<player *> selected_targets;
+
+        shared_request_draw req_draw;
 
         void on_update() override {
             if (!live) {
                 int ncards = target->m_game->num_alive() + target->get_cards_to_draw() - 1;
                 for (int i=0; i<ncards; ++i) {
-                    target->m_game->move_card(target->m_game->phase_one_drawn_card(), pocket_type::selection, target);
+                    target->m_game->move_card(req_draw->phase_one_drawn_card(), pocket_type::selection, target);
                 }
             }
         }
@@ -44,10 +47,9 @@ namespace banggame {
     };
     
     void equip_claus_the_saint::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, bool &handled) {
-            if (target->m_game->top_request<request_draw>(target) && origin == target) {
-                target->m_game->pop_request();
-                target->m_game->queue_request<request_claus_the_saint>(target_card, target);
+        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, shared_request_draw req_draw, bool &handled) {
+            if (!handled && origin == target) {
+                target->m_game->queue_request<request_claus_the_saint>(target_card, target, std::move(req_draw));
                 handled = true;
             }
         });
@@ -62,7 +64,8 @@ namespace banggame {
     }
 
     void handler_claus_the_saint::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {
-        origin->m_game->top_request<request_claus_the_saint>(origin)->selected_targets.push_back(target_player);
+        auto req = origin->m_game->top_request<request_claus_the_saint>(origin);
+        req->selected_targets.push_back(target_player);
         
         if (!origin->m_game->check_flags(game_flags::hands_shown)) {
             origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_GIFTED_CARD", origin, target_player, target_card);
@@ -74,7 +77,7 @@ namespace banggame {
 
         if (origin->m_game->m_selection.size() <= origin->get_cards_to_draw()) {
             while (!origin->m_game->m_selection.empty()) {
-                origin->add_to_hand_phase_one(origin->m_game->m_selection.front());
+                req->req_draw->add_to_hand_phase_one(origin->m_game->m_selection.front());
             }
             
             origin->m_game->pop_request();
