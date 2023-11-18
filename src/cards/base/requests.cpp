@@ -127,7 +127,7 @@ namespace banggame {
     }
 
     void request_discard_all::on_update() {
-        if (state == request_state::pending) {
+        if (!live) {
             for (card *target_card : target->m_table) {
                 target->m_game->tap_card(target_card, false);
             }

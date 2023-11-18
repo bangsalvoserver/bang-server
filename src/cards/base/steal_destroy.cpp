@@ -65,7 +65,7 @@ namespace banggame {
         using request_targeting::request_targeting;
 
         void on_update() override {
-            if (state == request_state::pending) {
+            if (!live) {
                 if (origin != target) {
                     if (target_card->pocket == pocket_type::player_hand) {
                         origin->m_game->add_log("LOG_PLAYED_CARD_STEAL_HAND", origin_card, origin, target);
@@ -150,7 +150,7 @@ namespace banggame {
         using request_targeting::request_targeting;
 
         void on_update() override {
-            if (state == request_state::pending) {
+            if (!live) {
                 if (origin != target) {
                     if (target_card->pocket == pocket_type::player_hand) {
                         origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_HAND", origin_card, origin, target);

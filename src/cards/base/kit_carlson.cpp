@@ -11,7 +11,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
         
         void on_update() override {
-            if (state == request_state::pending) {
+            if (!live) {
                 for (int i=0; i<3; ++i) {
                     target->m_game->move_card(target->m_game->phase_one_drawn_card(), pocket_type::selection, target);
                 }
@@ -38,10 +38,11 @@ namespace banggame {
     };
 
     void equip_kit_carlson::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, bool &handled) {
             if (target->m_game->top_request<request_draw>(target) && target == origin && target->get_cards_to_draw() < 3) {
                 target->m_game->pop_request();
                 target->m_game->queue_request<request_kit_carlson>(target_card, target);
+                handled = true;
             }
         });
     }

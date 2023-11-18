@@ -12,7 +12,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
 
         void on_update() override {
-            if (state == request_state::pending) {
+            if (!live) {
                 std::vector<card *> target_cards;
                 for (card *c : target->m_game->m_hidden_deck) {
                     if (c->has_tag(tag_type::peyote)) {

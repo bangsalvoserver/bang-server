@@ -67,17 +67,19 @@ namespace banggame {
             return duration;
         }
 
-    public:
-        void start(ticks total_update_time);
-        void tick();
-        bool finished() const { return lifetime <= ticks{0}; }
-        virtual void on_finished() {}
-    };
+        void start(ticks total_update_time) {
+            lifetime = duration + total_update_time;
+        }
 
-    enum class request_state : uint8_t {
-        pending,
-        live,
-        dead
+        void tick() {
+            --lifetime;
+        }
+
+        bool finished() const {
+            return lifetime <= ticks{0};
+        }
+
+        virtual void on_finished() {}
     };
 
     class request_base {
@@ -92,8 +94,7 @@ namespace banggame {
         player *target;
         effect_flags flags;
         int priority;
-
-        request_state state = request_state::pending;
+        bool live = false;
 
         virtual request_timer *timer() { return nullptr; }
 

@@ -6,7 +6,7 @@ namespace banggame {
 
     void request_predraw::on_update() {
         if (target->alive() && target->m_game->m_playing == target) {
-            if (state == request_state::pending) {
+            if (!live) {
                 checks = target->m_game->call_event<event_type::get_predraw_checks>(target, std::vector<card_priority_pair>{});
             }
             if (checks.empty()) {

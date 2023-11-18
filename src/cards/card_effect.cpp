@@ -27,16 +27,6 @@ namespace banggame {
         }
     }
 
-    void request_timer::start(ticks total_update_time) {
-        lifetime = duration + total_update_time;
-    }
-
-    void request_timer::tick() {
-        if (request->state == request_state::live) {
-            --lifetime;
-        }
-    }
-
     bool selection_picker::can_pick(card *target_card) const {
         return target_card->pocket == pocket_type::selection;
     }

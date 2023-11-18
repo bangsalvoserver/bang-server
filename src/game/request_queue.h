@@ -94,7 +94,6 @@ namespace banggame {
         }
 
         void pop_request() {
-            top_request()->state = request_state::dead;
             m_requests.pop();
         }
     };

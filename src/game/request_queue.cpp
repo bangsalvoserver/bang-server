@@ -27,10 +27,8 @@ namespace banggame {
 #endif
 
             req->on_update();
-
-            if (req->state == request_state::pending) {
-                req->state = request_state::live;
-            }
+            req->live = true;
+            
             if (top_request() != req) {
                 return state_next{};
             }

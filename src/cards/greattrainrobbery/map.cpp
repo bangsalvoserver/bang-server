@@ -9,7 +9,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
         
         void on_update() override {
-            if (state == request_state::pending) {
+            if (!live) {
                 for (int i=0; i<2; ++i) {
                     target->m_game->move_card(target->m_game->top_of_deck(), pocket_type::selection, target);
                 }

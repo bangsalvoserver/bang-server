@@ -154,7 +154,7 @@ namespace banggame {
         if (!target->alive() || target->immune_to(origin_card, origin, flags)) {
             target->m_game->pop_request();
         } else {
-            if (state == request_state::pending) {
+            if (!live) {
                 if (bool(flags & effect_flags::multi_target)) {
                     target->m_game->play_sound(target, "gatling");
                 } else {

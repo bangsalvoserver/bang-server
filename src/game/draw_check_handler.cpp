@@ -7,7 +7,7 @@
 namespace banggame {
 
     void request_check::on_update() {
-        if (state == request_state::pending) {
+        if (!live) {
             m_game->flash_card(origin_card);
             start();
         }

@@ -40,7 +40,7 @@ namespace banggame {
         int num_cards = 2;
 
         void on_update() override {
-            if (state != request_state::pending) return;
+            if (live) return;
             
             for (card *target_card : target->m_game->m_selection) {
                 target->m_game->add_log("LOG_POKER_REVEAL", origin_card, target_card);

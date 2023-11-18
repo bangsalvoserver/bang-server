@@ -12,7 +12,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target, {}, -8) {}
 
         void on_update() override {
-            if (state == request_state::pending) {
+            if (!live) {
                 for (card *c : target->m_game->m_hidden_deck
                     | std::views::filter([](card *c) { return c->has_tag(tag_type::handcuffs); })
                     | ranges::to<std::vector>
