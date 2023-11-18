@@ -152,6 +152,8 @@ namespace banggame {
         if (card_it == lobby.m_game->m_context.cards.end()) return "ERROR_CANNOT_FIND_CARD";
         card *target_card = &*card_it;
         
+        lobby.m_game->send_request_status_clear();
+        
         switch (target_card->deck) {
         case card_deck_type::main_deck: {
             if (target_card->owner) {
@@ -229,8 +231,7 @@ namespace banggame {
         }
         }
 
-        lobby.m_game->send_request_status_clear();
-        lobby.m_game->send_request_status_ready();
+        lobby.m_game->commit_updates();
 
         return {};
     }
