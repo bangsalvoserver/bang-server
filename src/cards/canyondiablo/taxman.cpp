@@ -21,11 +21,9 @@ namespace banggame {
                                 --value;
                             }
                         });
-                        target->m_game->add_listener<event_type::on_draw_from_deck>(key, [=](player *origin) {
+                        target->m_game->add_listener<event_type::on_turn_end>(key, [=](player *origin, bool skipped) {
                             if (origin == target) {
-                                origin->m_game->queue_action([=]{
-                                    origin->m_game->remove_listeners(key);
-                                }, -1);
+                                origin->m_game->remove_listeners(key);
                             }
                         });
                     }

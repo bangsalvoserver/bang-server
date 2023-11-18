@@ -37,7 +37,7 @@ namespace banggame {
 
     struct request_vera_custer : request_base {
         request_vera_custer(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target) {}
+            : request_base(origin_card, nullptr, target, {}, -8) {}
 
         void on_update() override {
             if (target->m_game->num_alive() == 2) {
@@ -66,8 +66,8 @@ namespace banggame {
     };
 
     void equip_vera_custer::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_predraw_check>(origin_card, [=](player *target, card *target_card) {
-            if (origin == target && origin_card == target_card) {
+        origin->m_game->add_listener<event_type::pre_turn_start>(origin_card, [=](player *target) {
+            if (origin == target) {
                 origin->m_game->queue_request<request_vera_custer>(origin_card, target);
             }
         });

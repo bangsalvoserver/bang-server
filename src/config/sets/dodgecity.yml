@@ -354,7 +354,7 @@ character:
     image: 03_pat_brennan
     expansion: dodgecity
     responses:
-      - end_drawing
+      - while_drawing(-1)
       - steal card | table
     tags:
       - drawing
@@ -381,7 +381,6 @@ character:
     image: 03_vera_custer
     expansion: dodgecity
     equip:
-      - predraw_check(-10)
       - vera_custer
     tags:
       - max_hp(3)

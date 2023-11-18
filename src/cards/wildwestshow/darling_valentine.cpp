@@ -13,7 +13,7 @@ namespace banggame {
             if (ncards > 0) {
                 origin->m_game->queue_action([=]{
                     origin->draw_card(ncards, target_card);
-                });
+                }, 100);
             }
         });
     }

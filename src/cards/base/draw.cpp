@@ -87,15 +87,12 @@ namespace banggame {
     }
 
     void effect_while_drawing::on_play(card *origin_card, player *origin) {
-        origin->m_num_drawn_cards += cards_to_add;
-    }
-
-    void effect_end_drawing::on_play(card *origin_card, player *origin) {
-        if (origin->m_game->top_request<request_draw>()) {
-            origin->m_game->pop_request();
-            origin->m_game->queue_action([=]{
-                origin->m_game->call_event<event_type::on_draw_from_deck>(origin);
-            }, -1);
+        if (cards_to_add != 0) {
+            if (cards_to_add > 0) {
+                origin->m_num_drawn_cards += cards_to_add;
+            } else {
+                origin->m_game->pop_request();
+            }
         }
     }
 }
