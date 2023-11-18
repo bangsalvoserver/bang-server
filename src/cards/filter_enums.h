@@ -40,6 +40,7 @@ namespace banggame {
         (ten_to_ace)
         (bang)
         (bangcard)
+        (not_bangcard)
         (missed)
         (missedcard)
         (beer)

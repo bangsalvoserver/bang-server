@@ -28,7 +28,7 @@ character:
     expansion: thebullet
     effects:
       - banglimit
-      - mth_add card self | hand
+      - mth_add card self | hand not_bangcard
       - mth_add player reachable notself
     mth_effect: play_as_bang
     tags:

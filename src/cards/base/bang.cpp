@@ -25,7 +25,9 @@ namespace banggame {
     }
 
     game_string effect_bangcard::get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) {
-        if (!ctx.disable_bang_checks) {
+        if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flags::treat_any_as_bang)) {
+            return "ERROR_CARD_INACTIVE";
+        } else if (!ctx.disable_bang_checks) {
             return origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target, effect_flags::is_bang, game_string{});
         } else {
             return {};
@@ -40,7 +42,7 @@ namespace banggame {
     bool handler_play_as_bang::on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
         if (target.target.is(target_type::player)) {
             return effect_bangcard{}.on_check_target(chosen_card, origin, target.target.get<target_type::player>());
-        } else {
+    } else {
             return true;
         }
     }

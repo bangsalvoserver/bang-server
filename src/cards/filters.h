@@ -170,6 +170,9 @@ namespace banggame::filters {
         if (bool(filter & target_card_filter::bangcard) && !detail::get_card_tag(target, tag_type::bangcard))
             return "ERROR_TARGET_NOT_BANG";
 
+        if (bool(filter & target_card_filter::not_bangcard) && detail::get_card_tag(target, tag_type::bangcard))
+            return "ERROR_TARGET_BANG";
+
         if (bool(filter & target_card_filter::missed) && !detail::get_card_tag(target, tag_type::missed))
             return "ERROR_TARGET_NOT_MISSED";
 
