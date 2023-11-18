@@ -261,7 +261,7 @@ namespace banggame {
 
             m_game->call_event<event_type::pre_turn_start>(this);
             m_game->queue_request<request_predraw>(this);
-        });
+        }, -6);
 
         m_game->queue_action([this]{
             if (alive() && m_game->m_playing == this) {
