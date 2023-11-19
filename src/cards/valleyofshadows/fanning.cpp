@@ -11,7 +11,7 @@
 namespace banggame {
 
     game_string handler_fanning::get_error(card *origin_card, player *origin, player *target1, player *target2) {
-        if (target1 == target2 || origin->m_game->calc_distance(target1, target2) > 1) {
+        if (target1 == target2 || origin->m_game->calc_distance(target1, target2) + target2->get_distance_mod() > 1) {
             return "ERROR_TARGETS_NOT_ADJACENT";
         }
         return {};

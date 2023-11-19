@@ -330,7 +330,7 @@ namespace banggame {
                 | ranges::views::transform([&](player *target) {
                     return player_distance_item {
                         .player = target,
-                        .distance = calc_distance(owner, target)
+                        .distance = target->get_distance_mod()
                     };
                 })
                 | ranges::to<std::vector>,
