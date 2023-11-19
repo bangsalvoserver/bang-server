@@ -11,7 +11,6 @@
 #include "peyote.h"
 #include "ranch.h"
 #include "ricochet.h"
-#include "ruleset.h"
 #include "russianroulette.h"
 #include "sniper.h"
 #include "vendetta.h"

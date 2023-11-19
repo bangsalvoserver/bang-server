@@ -427,10 +427,7 @@ namespace banggame {
 
         player *next_player;
 
-        bool first_turn = m_playing == nullptr;
-        if (first_turn) {
-            next_player = m_first_player;
-        } else {
+        if (m_playing) {
             auto it = std::ranges::find(m_players, m_playing);
             while (true) {
                 if (check_flags(game_flags::invert_rotation)) {
@@ -447,6 +444,8 @@ namespace banggame {
             }
 
             next_player = *it;
+        } else {
+            next_player = m_first_player;
         }
         
         next_player->start_of_turn();
@@ -456,7 +455,7 @@ namespace banggame {
                 advance_train(m_first_player);
             }
 
-            if (!m_scenario_deck.empty() && !first_turn) {
+            if (!m_scenario_deck.empty()) {
                 draw_scenario_card();
             }
         }

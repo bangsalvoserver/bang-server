@@ -182,15 +182,19 @@ namespace banggame {
     }
 
     void game_table::draw_scenario_card() {
-        if (m_scenario_deck.size() > 1) {
-            set_card_visibility(*(m_scenario_deck.rbegin() + 1), nullptr, card_visibility::shown, true);
+        if (!m_scenario_deck.empty() && m_scenario_deck.back()->visibility == card_visibility::hidden) {
+            set_card_visibility(m_scenario_deck.back(), nullptr, card_visibility::shown);
+        } else {
+            if (m_scenario_deck.size() > 1) {
+                set_card_visibility(*(m_scenario_deck.rbegin() + 1), nullptr, card_visibility::shown, true);
+            }
+            if (!m_scenario_cards.empty()) {
+                m_first_player->disable_equip(m_scenario_cards.back());
+            }
+            add_log("LOG_DRAWN_SCENARIO_CARD", m_scenario_deck.back());
+            move_card(m_scenario_deck.back(), pocket_type::scenario_card);
+            m_first_player->enable_equip(m_scenario_cards.back());
         }
-        if (!m_scenario_cards.empty()) {
-            m_first_player->disable_equip(m_scenario_cards.back());
-        }
-        add_log("LOG_DRAWN_SCENARIO_CARD", m_scenario_deck.back());
-        move_card(m_scenario_deck.back(), pocket_type::scenario_card);
-        m_first_player->enable_equip(m_scenario_cards.back());
     }
 
     void game_table::advance_train(player *origin) {
