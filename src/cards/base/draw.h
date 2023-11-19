@@ -14,6 +14,16 @@ namespace banggame {
         }
         void on_play(card *origin_card, player *origin, player *target);
     };
+
+    struct effect_queue_draw {
+        int ncards;
+        effect_queue_draw(int value) : ncards(std::max(1, value)) {}
+
+        void on_play(card *origin_card, player *origin) {
+            on_play(origin_card, origin, origin);
+        }
+        void on_play(card *origin_card, player *origin, player *target);
+    };
     
     struct handler_draw_multi {
         void on_play(card *origin_card, player *origin, int amount);

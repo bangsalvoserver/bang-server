@@ -307,7 +307,7 @@ character:
     expansion: dodgecity
     effects:
       - damage
-      - draw(2)
+      - queue_draw(2)
   - name: DOC_HOLYDAY
     image: 03_doc_holyday
     expansion: dodgecity

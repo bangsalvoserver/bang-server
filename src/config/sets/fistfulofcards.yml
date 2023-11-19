@@ -23,7 +23,7 @@ fistfulofcards:
       - startofturn
       - max_usages(1)
       - damage
-      - heal_notfull player notself
+      - queue_heal_notfull player notself
   - name: THE_JUDGE
     image: 05_ilgiudice
     equip:

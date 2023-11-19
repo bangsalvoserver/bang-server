@@ -7,9 +7,13 @@
 namespace banggame {
 
     void effect_draw::on_play(card *origin_card, player *origin, player *target) {
+        target->draw_card(ncards, origin_card);
+    }
+
+    void effect_queue_draw::on_play(card *origin_card, player *origin, player *target) {
         origin->m_game->queue_action([=, ncards=ncards]{
             target->draw_card(ncards, origin_card);
-        }, 200);
+        });
     }
 
     void handler_draw_multi::on_play(card *origin_card, player *origin, int amount) {
