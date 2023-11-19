@@ -33,7 +33,8 @@ public:
     void send_message(client_handle client, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
-            std::cout << get_client_ip(client) << ": Sent " << message << std::endl;
+            fmt::print("{}: Sent {}\n", get_client_ip(client), message);
+            fflush(stdout);
         }
         push_message(client, message);
     }
@@ -42,7 +43,8 @@ public:
     void broadcast_message(auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
-            std::cout << "All users: Sent " << message << std::endl;
+            fmt::print("All users: Sent {}\n", message);
+            fflush(stdout);
         }
         for (client_handle client : users | std::views::keys) {
             push_message(client, message);
@@ -53,7 +55,8 @@ public:
     void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
-            std::cout << "Lobby " << lobby.name << ": Sent " << message << std::endl;
+            fmt::print("Lobby {}: Sent {}\n", lobby.name, message);
+            fflush(stdout);
         }
         for (auto [team, it] : lobby.users) {
             push_message(it->first, message);

@@ -22,7 +22,8 @@ void game_manager::on_message(client_handle client, const std::string &msg) {
     try {
         auto client_msg = json::deserialize<client_message>(json::json::parse(msg));
         if (m_options.verbose) {
-            std::cout << get_client_ip(client) << ": Received " << msg << std::endl;
+            fmt::print("{}: Received {}\n", get_client_ip(client), msg);
+            fflush(stdout);
         }
         try {
             auto error = enums::visit_indexed([&]<client_message_type E>(enums::enum_tag_t<E> tag, auto && ... args) {
@@ -39,7 +40,7 @@ void game_manager::on_message(client_handle client, const std::string &msg) {
                 send_message<server_message_type::lobby_error>(client, std::move(error));
             }
         } catch (const std::exception &e) {
-            std::cerr << fmt::format("Error in game_manager: {}", e.what()) << std::endl;
+            fmt::print(stderr, "Error in on_message(): {}\n", e.what());
         }
     } catch (const std::exception &) {
         kick_client(client, "INVALID_MESSAGE");
@@ -59,11 +60,15 @@ void game_manager::tick() {
     }
     for (auto it = m_lobbies.begin(); it != m_lobbies.end();) {
         if (it->state == lobby_state::playing && it->m_game) {
-            it->m_game->tick();
-            it->send_updates(*this);
-            if (it->m_game->is_game_over()) {
-                it->state = lobby_state::finished;
-                send_lobby_update(*it);
+            try {
+                it->m_game->tick();
+                it->send_updates(*this);
+                if (it->m_game->is_game_over()) {
+                    it->state = lobby_state::finished;
+                    send_lobby_update(*it);
+                }
+            } catch (const std::exception &e) {
+                fmt::print(stderr, "Error in tick(): {}\n", e.what());
             }
         }
         if (it->users.empty()) {
@@ -447,7 +452,8 @@ void lobby::start_game(game_manager &mgr) {
     m_game = std::make_unique<banggame::game>(options.game_seed);
 
     if (mgr.m_options.verbose) {
-        std::cout << "Started game " << name << " with seed " << m_game->rng_seed << std::endl;
+        fmt::print("Started game {} with seed {}\n", name, m_game->rng_seed);
+        fflush(stdout);
     }
 
     std::vector<int> user_ids;

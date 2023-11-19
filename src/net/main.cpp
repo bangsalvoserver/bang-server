@@ -31,16 +31,17 @@ int main(int argc, char **argv) {
         auto results = options.parse(argc, argv);
 
         if (results.count("help")) {
-            std::cout << options.help() << std::endl;
+            fmt::print("{}\n", options.help());
             return 0;
         }
     } catch (const std::exception &error) {
-        std::cout << "Invalid arguments: " << error.what() << "\n";
+        fmt::print("Invalid arguments: {}\n", error.what());
         return 1;
     }
 
     if (server.start(port)) {
-        std::cout << "Server listening on port " << port << std::endl;
+        fmt::print("Server listening on port {}\n", port);
+        fflush(stdout);
 
         ::signal(SIGTERM, [](int) {
             g_stop = true;
@@ -57,11 +58,11 @@ int main(int argc, char **argv) {
             std::this_thread::sleep_until(next_tick);
         }
 
-        std::cout << "Server stopped" << std::endl;
+        fmt::print("Server stopped\n");
 
         return 0;
     } else {
-        std::cerr << "Could not start server" << std::endl;
+        fmt::print(stderr, "Could not start server\n");
         return 1;
     }
 }

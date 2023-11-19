@@ -231,13 +231,14 @@ namespace banggame {
                         return done;
                     }
                 } catch (const std::exception &e) {
-                    std::cout << "BOT ERROR: " << e.what() << std::endl;
+                    fmt::print(stderr, "BOT ERROR: {}\n", e.what());
                 }
             }
         }
 
         // softlock
-        std::cout << "BOT ERROR: could not find card in execute_random_play" << std::endl;
+        fmt::print(stderr, "BOT ERROR: could not find card in execute_random_play()\n");
+
         return false;
     }
 
