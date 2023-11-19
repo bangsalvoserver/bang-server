@@ -101,6 +101,7 @@ namespace banggame {
         (none)
         (player,                serial::player)
         (conditional_player,    serial::opt_player)
+        (adjacent_players,      serial::player_list)
         (card,                  serial::card)
         (extra_card,            serial::opt_card)
         (players)

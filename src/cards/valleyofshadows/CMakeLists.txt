@@ -6,7 +6,6 @@ target_sources(bangserver PRIVATE
     colorado_bill.cpp
     escape.cpp
     evelyn_shebang.cpp
-    fanning.cpp
     ghost.cpp
     henry_block.cpp
     lemonade_jim.cpp

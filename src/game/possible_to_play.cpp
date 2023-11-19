@@ -44,6 +44,20 @@ namespace banggame {
             });
     }
 
+    ranges::any_view<std::pair<player *, player *>> make_adjacent_players_target_set(player *origin, card *origin_card, const effect_context &ctx) {
+        effect_holder effect1 { .player_filter = target_player_filter::notself | target_player_filter::reachable };
+        effect_holder effect2 { .player_filter = target_player_filter::notself };
+        return make_player_target_set(origin, origin_card, effect1, ctx) | ranges::views::for_each([=](player *target1) {
+            return make_player_target_set(origin, origin_card, effect2, ctx) | ranges::views::transform([=](player *target2) {
+                return std::pair{target1, target2};
+            });
+        })
+        | ranges::views::filter([=](const auto &targets) {
+            auto [target1, target2] = targets;
+            return origin->m_game->calc_distance(target1, target2) == 1;
+        });
+    }
+
     ranges::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
         return ranges::views::concat(
             make_player_target_set(origin, origin_card, holder)
@@ -108,6 +122,8 @@ namespace banggame {
                 return !holder.get_error(origin_card, origin, ctx);
             case target_type::player:
                 return contains_at_least(make_player_target_set(origin, origin_card, holder, ctx), 1);
+            case target_type::adjacent_players:
+                return contains_at_least(make_adjacent_players_target_set(origin, origin_card, ctx), 1);
             case target_type::card:
                 return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::extra_card:

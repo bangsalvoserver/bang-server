@@ -37,7 +37,7 @@ namespace banggame::filters::detail {
     }
 
     int get_distance(player *origin, player *target) {
-        return origin->m_game->calc_distance(origin, target) + target->get_distance_mod();
+        return origin->m_game->calc_distance(origin, target);
     }
 
     card_sign get_card_sign(card *target) {

@@ -35,6 +35,12 @@ namespace banggame {
             }
         }
 
+        serial::player_list operator()(enums::enum_tag_t<target_type::adjacent_players>) const {
+            auto targets = ranges::to<std::vector>(make_adjacent_players_target_set(origin, origin_card, ctx));
+            auto [target1, target2] = random_element(targets, origin->m_game->rng);
+            return {target1, target2};
+        }
+
         card *operator()(enums::enum_tag_t<target_type::card>) const {
             auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
             return random_element(targets, origin->m_game->rng);
