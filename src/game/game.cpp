@@ -318,7 +318,9 @@ namespace banggame {
             call_event<event_type::on_game_setup>(m_first_player);
         });
 
-        m_first_player->start_of_turn();
+        queue_action([this]{
+            start_next_turn();
+        });
     }
 
     player_distances game::make_player_distances(player *owner) {
@@ -422,35 +424,42 @@ namespace banggame {
 
     void game::start_next_turn() {
         if (num_alive() == 0) return;
-        
-        auto it = std::ranges::find(m_players, m_playing);
-        while (true) {
-            if (check_flags(game_flags::invert_rotation)) {
-                if (it == m_players.begin()) it = m_players.end();
-                --it;
-            } else {
-                ++it;
-                if (it == m_players.end()) it = m_players.begin();
-            }
-            if (!(*it)->remove_player_flags(player_flags::skip_turn)) {
-                call_event<event_type::check_revivers>(*it);
-                if ((*it)->alive()) break;
-            }
-        }
 
-        player *next_player = *it;
+        player *next_player;
+
+        bool first_turn = m_playing == nullptr;
+        if (first_turn) {
+            next_player = m_first_player;
+        } else {
+            auto it = std::ranges::find(m_players, m_playing);
+            while (true) {
+                if (check_flags(game_flags::invert_rotation)) {
+                    if (it == m_players.begin()) it = m_players.end();
+                    --it;
+                } else {
+                    ++it;
+                    if (it == m_players.end()) it = m_players.begin();
+                }
+                if (!(*it)->remove_player_flags(player_flags::skip_turn)) {
+                    call_event<event_type::check_revivers>(*it);
+                    if ((*it)->alive()) break;
+                }
+            }
+
+            next_player = *it;
+        }
         
+        next_player->start_of_turn();
+
         if (next_player == m_first_player) {
             if (!m_stations.empty()) {
                 advance_train(m_first_player);
             }
 
-            if (!m_scenario_deck.empty()) {
+            if (!m_scenario_deck.empty() && !first_turn) {
                 draw_scenario_card();
             }
         }
-        
-        next_player->start_of_turn();
     }
 
     void game::handle_player_death(player *killer, player *target, discard_all_reason reason) {

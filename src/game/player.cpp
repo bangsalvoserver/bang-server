@@ -232,23 +232,21 @@ namespace banggame {
     }
 
     void player::start_of_turn() {
-        m_game->queue_action([this]{
-            m_game->m_playing = this;
-            m_played_cards.clear();
-            
-            m_game->add_log("LOG_TURN_START", this);
-            m_game->add_update<game_update_type::switch_turn>(this);
+        m_game->m_playing = this;
+        m_played_cards.clear();
 
+        m_game->add_log("LOG_TURN_START", this);
+        m_game->add_update<game_update_type::switch_turn>(this);
+
+        m_game->queue_action([this]{
             m_game->call_event<event_type::pre_turn_start>(this);
             m_game->queue_request<request_predraw>(this);
-        }, -6);
+        }, -10);
 
         m_game->queue_action([this]{
             if (alive() && m_game->m_playing == this) {
                 m_game->call_event<event_type::on_turn_start>(this);
-                if (!m_game->check_flags(game_flags::phase_one_override)) {
-                    m_game->queue_request<request_draw>(this);
-                }
+                m_game->queue_request<request_draw>(this);
             }
         }, -10);
     }

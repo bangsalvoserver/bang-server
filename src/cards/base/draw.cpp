@@ -38,7 +38,10 @@ namespace banggame {
     }
     
     void request_draw::on_update() {
-        if (target->alive() && target->m_game->m_playing == target && num_drawn_cards < target->get_cards_to_draw()) {
+        if (!target->m_game->check_flags(game_flags::phase_one_override)
+            && target->alive() && target->m_game->m_playing == target
+            && num_drawn_cards < target->get_cards_to_draw())
+        {
             if (!live) {
                 target->m_game->play_sound(target, "draw");
             }

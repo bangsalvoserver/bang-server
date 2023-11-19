@@ -71,7 +71,6 @@ namespace banggame {
     void ruleset_greattrainrobbery::on_apply(game *game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 1}, [](player *origin) {
             init_stations_and_train(origin);
-            origin->m_game->advance_train(origin);
         });
 
         game->add_listener<event_type::check_play_card>(nullptr, [](player *origin, card *origin_card, const effect_context &ctx, game_string &out_error) {
