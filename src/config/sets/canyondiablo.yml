@@ -332,13 +332,15 @@ character:
   # - name: LAURA_BILLION
   #   image: 20_laura_billion
   #   expansion: canyondiablo
-  #   # TODO quando una carta e' estratta: request_laura_billion (auto_select)
+  #   # TODO quando una carta e' estratta: request_laura_billion
   #   # effect_laura_billion: pop_request, pesca carta estratta
   #   # equip:
   #   #   - laura_billion
   #   # responses:
   #   #   - discard card self | hand
   #   #   - laura_billion
+  #   # tags:
+  #   #   - auto_select
   - name: SID_CURRY
     image: 20_sid_curry
     expansion: canyondiablo

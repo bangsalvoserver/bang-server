@@ -72,6 +72,7 @@ namespace banggame {
         (weapon)
         (horse)
         (repeatable)
+        (auto_select)
         (auto_confirm)
         (auto_confirm_red_ringo)
         (card_choice)

@@ -151,7 +151,6 @@
         "origin": 4, // giocatore che ha attivato l'effetto
         "target": 3, // giocatore contro cui e' attivato l'effetto
         "status_text": { /* oggetto game_string */ },
-        "auto_select": false, // se true il client auto clicca sull'unica carta giocabile di risposta
         "respond_cards": [ /* oggetto card_modifier_tree */ ],
         "pick_card": [ 123, 124, 125 ], // lista di carte che si possono 'selezionare'
         "highlight_cards": [] // lista di carte da evidenziare

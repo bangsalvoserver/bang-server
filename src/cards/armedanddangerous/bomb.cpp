@@ -6,9 +6,9 @@
 
 namespace banggame {
     
-    struct request_move_bomb : request_auto_select {
+    struct request_move_bomb : request_base {
         request_move_bomb(card *origin_card, player *target)
-            : request_auto_select(origin_card, nullptr, target, {}, 110) {}
+            : request_base(origin_card, nullptr, target, {}, 110) {}
 
         game_string status_text(player *owner) const override {
             if (target == owner) {

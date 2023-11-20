@@ -26,9 +26,9 @@ namespace banggame {
         ctx.skipped_player = target;
     }
 
-    struct request_sgt_blaze : request_auto_select {
+    struct request_sgt_blaze : request_base {
         request_sgt_blaze(card *origin_card, player *target, shared_effect_context ctx)
-            : request_auto_select(origin_card, nullptr, target)
+            : request_base(origin_card, nullptr, target)
             , ctx(std::move(ctx)) {}
         
         shared_effect_context ctx;

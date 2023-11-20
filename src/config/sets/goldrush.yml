@@ -25,6 +25,8 @@ character:
       - josh_mccloud
     responses:
       - forced_equip player
+    tags:
+      - auto_select
   - name: MADAME_YTO
     image: 04_madame_yto
     expansion: goldrush
@@ -61,6 +63,7 @@ goldrush:
       - heal player
     tags:
       - buy_cost(1)
+      - auto_select
   - count: 3
     name: BOTTLE
     image: 04_bottiglia
@@ -73,6 +76,7 @@ goldrush:
     tags:
       - card_choice(1)
       - buy_cost(2)
+      - auto_select
   - name: BOTTLE_PANIC
     image: main_deck/01_panico
     color: brown
@@ -135,6 +139,7 @@ goldrush:
     tags:
       - card_choice(2)
       - buy_cost(2)
+      - auto_select
   - name: PARDNER_GENERAL_STORE
     image: main_deck/01_emporio
     color: brown
@@ -185,6 +190,7 @@ goldrush:
       - pass_turn
     tags:
       - buy_cost(5)
+      - auto_select
   - name: HORSESHOE
     image: 04_ferro_di_cavallo
     color: black
@@ -220,6 +226,7 @@ goldrush:
       - rum
     tags:
       - buy_cost(3)
+      - auto_select
   - name: GOLD_PAN
     image: 04_setaccio
     color: black
@@ -255,6 +262,7 @@ goldrush:
       - changewws
     tags:
       - buy_cost(4)
+      - auto_select
   - name: RUCKSACK
     image: 04_zaino
     color: black

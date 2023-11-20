@@ -6,9 +6,9 @@
 
 namespace banggame {
 
-    struct request_mail_car : request_auto_select {
+    struct request_mail_car : request_base {
         request_mail_car(card *origin_card, player *origin)
-            : request_auto_select(origin_card, nullptr, origin) {}
+            : request_base(origin_card, nullptr, origin) {}
         
         void on_update() override {
             if (!live) {

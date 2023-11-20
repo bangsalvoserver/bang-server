@@ -10,6 +10,7 @@ character:
     mth_response: claus_the_saint
     tags:
       - max_hp(3)
+      - auto_select
   - name: JOHNNY_KISCH
     image: 02_johnnykisch
     expansion: thebullet

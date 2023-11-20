@@ -204,7 +204,6 @@ namespace banggame {
         (serial::opt_player, origin)
         (serial::opt_player, target)
         (game_string, status_text)
-        (bool, auto_select)
         (card_modifier_tree, respond_cards)
         (serial::card_list, pick_cards)
         (serial::card_list, highlight_cards)

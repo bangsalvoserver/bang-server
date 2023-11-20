@@ -179,6 +179,8 @@ main_deck:
       - bomb
     responses:
       - move_bomb player
+    tags:
+      - auto_select
   - name: BUNTLINE_SPECIAL
     signs:
       - J spades
@@ -293,6 +295,8 @@ character:
     optional:
       - pay_cube select_cubes(2)
       - draw
+    tags:
+      - auto_select
   - name: BASS_GREEVES
     image: 17_bassgreeves
     expansion: armedanddangerous

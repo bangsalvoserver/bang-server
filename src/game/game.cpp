@@ -349,7 +349,6 @@ namespace banggame {
             .origin = req->origin,
             .target = req->target,
             .status_text = req->status_text(owner),
-            .auto_select = req->auto_select(),
 
             .respond_cards = owner ? generate_card_modifier_tree(owner, true) : card_modifier_tree{},
 

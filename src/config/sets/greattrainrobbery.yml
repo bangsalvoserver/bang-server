@@ -197,6 +197,7 @@ character:
     mth_response: sgt_blaze
     tags:
       - hidden
+      - auto_select
   - name: SHADE_OCONNOR
     image: 27_shadeoconnor
     expansion: greattrainrobbery
@@ -207,6 +208,8 @@ character:
     optional:
       - discard card self | hand
       - draw
+    tags:
+      - auto_select
   - name: ZIPPY_ROY
     image: 27_zippy_roy
     expansion: greattrainrobbery
@@ -384,6 +387,7 @@ train:
     mth_response: lounge_car
     tags:
       - hidden
+      - auto_select
   - name: LUMBER_FLATCAR
     image: 27_lumber_flatcar
     color: train
@@ -402,6 +406,7 @@ train:
     mth_response: mail_car
     tags:
       - hidden
+      - auto_select
   - name: OBSERVATION_CAR
     image: 27_observation_car
     color: train

@@ -6,9 +6,9 @@
 
 namespace banggame {
     
-    struct request_shade_oconnor : request_auto_select {
+    struct request_shade_oconnor : request_base {
         request_shade_oconnor(card *origin_card, player *target)
-            : request_auto_select(origin_card, nullptr, target, {}, -1) {}
+            : request_base(origin_card, nullptr, target, {}, -1) {}
         
         game_string status_text(player *owner) const override {
             if (target == owner) {

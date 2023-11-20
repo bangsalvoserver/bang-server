@@ -6,8 +6,8 @@
 
 namespace banggame {
 
-    struct request_al_preacher : request_auto_select {
-        using request_auto_select::request_auto_select;
+    struct request_al_preacher : request_base {
+        using request_base::request_base;
 
         game_string status_text(player *owner) const override {
             if (target == owner) {

@@ -194,6 +194,8 @@ character:
     optional:
       - discard card self | hand
       - heal
+    tags:
+      - auto_select
   - name: MICK_DEFENDER
     image: 07_mickdefender
     expansion: valleyofshadows

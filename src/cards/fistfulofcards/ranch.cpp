@@ -6,9 +6,9 @@
 
 namespace banggame {
 
-    struct request_ranch : request_auto_select {
+    struct request_ranch : request_base {
         request_ranch(card *target_card, player *target)
-            : request_auto_select(target_card, nullptr, target, {}, -8) {}
+            : request_base(target_card, nullptr, target, {}, -8) {}
 
         void on_update() override {
             if (!target->alive() || target->m_game->m_playing != target) {

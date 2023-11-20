@@ -71,6 +71,7 @@ fistfulofcards:
       - mth_add
     tags:
       - repeatable
+      - auto_select
     mth_response: draw_multi
   - name: RICOCHET
     image: 05_rimbalzo
