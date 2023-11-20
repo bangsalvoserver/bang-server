@@ -450,12 +450,16 @@ namespace banggame {
         next_player->start_of_turn();
 
         if (next_player == m_first_player) {
-            if (!m_stations.empty()) {
-                advance_train(m_first_player);
-            }
-
             if (!m_scenario_deck.empty()) {
                 draw_scenario_card();
+            }
+
+            if (!m_stations.empty()) {
+                queue_action([this]{
+                    if (m_first_player->alive()) {
+                        advance_train(m_first_player);
+                    }
+                });
             }
         }
     }
