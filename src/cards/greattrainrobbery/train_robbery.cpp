@@ -10,7 +10,7 @@ namespace banggame {
 
     struct request_train_robbery_choose : request_bang {
         request_train_robbery_choose(card *origin_card, player *origin, player *target, card *target_card)
-            : request_bang(origin_card, origin, target, {}, 110)
+            : request_bang(origin_card, origin, target, {}, 105)
             , target_card(target_card) {}
         
         card *target_card;
