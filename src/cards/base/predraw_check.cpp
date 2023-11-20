@@ -8,11 +8,12 @@ namespace banggame {
         if (target->alive() && target->m_game->m_playing == target) {
             if (!live) {
                 checks = target->m_game->call_event<event_type::get_predraw_checks>(target, std::vector<card_priority_pair>{});
+                std::ranges::sort(checks, std::greater{}, &card_priority_pair::second);
             }
             if (checks.empty()) {
                 target->m_game->pop_request();
             } else {
-                on_pick(checks[0].first);
+                auto_pick();
             }
         } else {
             target->m_game->pop_request();
@@ -21,10 +22,10 @@ namespace banggame {
 
     bool request_predraw::can_pick(card *target_card) const {
         if (target_card->owner == target) {
-            int top_priority = std::ranges::max(checks | ranges::views::transform(&card_priority_pair::second));
-            return std::ranges::any_of(checks, [&](const card_priority_pair &key) {
-                return key.first == target_card && key.second == top_priority;
-            });
+            int top_priority = checks[0].second;
+            return ranges::contains(checks | ranges::views::take_while([=](const card_priority_pair &pair) {
+                return pair.second == top_priority;
+            }), target_card, &card_priority_pair::first);
         }
         return false;
     }
