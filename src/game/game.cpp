@@ -114,7 +114,7 @@ namespace banggame {
         if (m_playing) {
             co_yield make_update<game_update_type::switch_turn>(m_playing);
         }
-        if (pending_requests()) {
+        if (!pending_updates() && pending_requests()) {
             co_yield make_update<game_update_type::request_status>(make_request_update(nullptr));
         }
 
@@ -146,7 +146,7 @@ namespace banggame {
             }
         }
 
-        if (!is_game_over()) {
+        if (!is_game_over() && !pending_updates()) {
             if (pending_requests()) {
                 co_yield make_update<game_update_type::request_status>(make_request_update(target));
             } else if (target == m_playing) {
