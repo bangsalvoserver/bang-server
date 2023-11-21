@@ -76,12 +76,10 @@ namespace banggame {
         template<event_type E, invocable_for_event<E> Function>
         void add_listener(event_card_key key, Function &&fun) {
             m_listeners.add<E>(key, std::forward<Function>(fun));
-            m_listeners.commit_changes();
         }
 
         void remove_listeners(auto key) {
             m_listeners.erase(key);
-            m_listeners.commit_changes();
         }
 
         template<event_type E, typename ... Ts>
@@ -89,10 +87,10 @@ namespace banggame {
             using function_type = enums::enum_type_t<E>;
             function_argument_tuple_t<function_type> tup{FWD(args) ...};
 
-            for (auto &fun : m_listeners.get_table<E>()) {
+            auto lock = m_listeners.lock_table<E>();
+            for (auto &fun : lock.values()) {
                 std::apply(fun, tup);
             }
-            m_listeners.commit_changes();
             
             auto ret = filter_reference_params<function_type>(tup);
             if constexpr (std::tuple_size_v<decltype(ret)> == 1) {
