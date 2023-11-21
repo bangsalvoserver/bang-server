@@ -10,7 +10,7 @@ namespace banggame {
 
     struct request_train_robbery_choose : request_bang {
         request_train_robbery_choose(card *origin_card, player *origin, player *target, card *target_card)
-            : request_bang(origin_card, origin, target, {}, 105)
+            : request_bang(origin_card, origin, target, {}, 21)
             , target_card(target_card) {}
         
         card *target_card;
@@ -96,6 +96,6 @@ namespace banggame {
 
     void effect_train_robbery::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
-        origin->m_game->queue_request<request_train_robbery>(origin_card, origin, target, flags, 0);
+        origin->m_game->queue_request<request_train_robbery>(origin_card, origin, target, flags, 20);
     }
 }

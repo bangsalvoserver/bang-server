@@ -13,7 +13,7 @@ namespace banggame {
         effect_missed::on_play(origin_card, origin);
         if (target) {
             target->m_game->queue_request<request_bang>(origin_card, origin, target,
-                effect_flags::escapable | effect_flags::single_target);
+                effect_flags::escapable | effect_flags::single_target, 20);
         }
     }
 }
