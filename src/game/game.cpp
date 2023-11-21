@@ -455,11 +455,7 @@ namespace banggame {
             }
 
             if (!m_stations.empty()) {
-                queue_action([this]{
-                    if (m_first_player->alive()) {
-                        advance_train(m_first_player);
-                    }
-                });
+                queue_action([this]{ advance_train(m_first_player); }, -5);
             }
         }
     }
