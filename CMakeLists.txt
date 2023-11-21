@@ -10,10 +10,15 @@ find_package(Threads REQUIRED)
 find_package(cxxopts REQUIRED)
 
 add_library(networking INTERFACE)
-target_link_libraries(networking INTERFACE asio Threads::Threads)
+target_link_libraries(networking INTERFACE Threads::Threads)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_STL_)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
 target_include_directories(networking INTERFACE external/websocketpp)
+target_include_directories(networking INTERFACE external/asio/asio/include)
+
+if(MINGW)
+    target_link_libraries(networking INTERFACE wsock32 ws2_32)
+endif()
 
 add_library(bangcommon INTERFACE)
 target_include_directories(bangcommon INTERFACE src)
