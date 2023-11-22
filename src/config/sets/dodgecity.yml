@@ -320,8 +320,8 @@ character:
     image: 03_elena_fuente
     expansion: dodgecity
     responses:
-      - mth_add card self | hand
-    mth_response: play_as_missed
+      - discard card self | hand
+      - missed
     tags:
       - max_hp(3)
   - name: GREG_DIGGER

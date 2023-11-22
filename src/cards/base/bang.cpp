@@ -140,9 +140,9 @@ namespace banggame {
         return !unavoidable && missable_request::can_miss(c);
     }
 
-    void request_bang::on_miss(card *c) {
+    void request_bang::on_miss(card *c, effect_flags missed_flags) {
         if (--bang_strength == 0) {
-            target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, c, flags);
+            target->m_game->call_event<event_type::on_missed>(origin_card, origin, target, c, flags | missed_flags);
             target->m_game->pop_request();
         }
     }

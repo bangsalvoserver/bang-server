@@ -11,7 +11,7 @@ namespace banggame {
             if (bool(flags & effect_flags::is_bang)) {
                 auto draw_card = [=](card *c) {
                     p->m_game->queue_action([=]{
-                        if (p->alive() && c->pocket == pocket_type::discard_pile) {
+                        if (p->alive() && c->pocket != pocket_type::player_hand) {
                             p->m_game->add_log("LOG_STOLEN_SELF_CARD", p, c);
                             p->m_game->add_short_pause(c);
                             p->add_to_hand(c);
@@ -20,7 +20,7 @@ namespace banggame {
                 };
                 if (target == p) {
                     draw_card(origin_card);
-                } else if (origin == p) {
+                } else if (origin == p && bool(flags & effect_flags::is_missed)) {
                     draw_card(missed_card);
                 }
             }

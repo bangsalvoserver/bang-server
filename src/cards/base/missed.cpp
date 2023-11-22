@@ -4,6 +4,7 @@
 #include "bang.h"
 
 #include "game/possible_to_play.h"
+#include "cards/game_enums.h"
 
 namespace banggame {
     
@@ -29,5 +30,10 @@ namespace banggame {
     void effect_missed::on_play(card *origin_card, player *origin) {
         auto req = origin->m_game->top_request<missable_request>();
         req->on_miss(origin_card);
+    }
+
+    void effect_missedcard::on_play(card *origin_card, player *origin) {
+        auto req = origin->m_game->top_request<missable_request>();
+        req->on_miss(origin_card, effect_flags::is_missed);
     }
 }

@@ -21,7 +21,7 @@ namespace banggame {
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
         }
 
-        void on_miss(card *c) override {
+        void on_miss(card *c, effect_flags missed_flags = {}) override {
             target->m_game->pop_request();
         }
 

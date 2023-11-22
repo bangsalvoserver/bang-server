@@ -240,7 +240,7 @@ main_deck:
     image: 01_mancato
     color: brown
     responses:
-      - missed
+      - missedcard
     tags:
       - missed
       - missedcard
