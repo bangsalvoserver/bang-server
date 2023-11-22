@@ -13,6 +13,7 @@ add_library(networking INTERFACE)
 target_link_libraries(networking INTERFACE Threads::Threads)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_STL_)
 target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
+target_compile_definitions(networking INTERFACE ASIO_STANDALONE)
 target_include_directories(networking INTERFACE external/websocketpp)
 target_include_directories(networking INTERFACE external/asio/asio/include)
 
