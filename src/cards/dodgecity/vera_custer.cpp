@@ -40,7 +40,7 @@ namespace banggame {
             : request_base(origin_card, nullptr, target, {}, -8) {}
 
         void on_update() override {
-            if (target->m_game->m_playing == target) {
+            if (target->alive() && target->m_game->m_playing == target) {
                 if (target->m_game->num_alive() == 2) {
                     target->m_game->pop_request();
                     copy_characters(target, *std::next(player_iterator(target)));
