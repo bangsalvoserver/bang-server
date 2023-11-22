@@ -383,7 +383,7 @@ train:
       - lounge_car
   - responses:
       - mth_add card | selection
-      - mth_add player notself
+      - mth_add player notself target_set
     mth_response: lounge_car
     tags:
       - hidden
