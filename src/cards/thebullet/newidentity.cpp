@@ -6,7 +6,17 @@ namespace banggame {
 
     struct request_newidentity : request_base {
         request_newidentity(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target) {}
+            : request_base(origin_card, nullptr, target, {}, -7) {}
+
+        void on_update() override {
+            if (target->alive() && target->m_game->m_playing == target) {
+                if (!live) {
+                    target->m_game->move_card(target->m_backup_character.front(), pocket_type::selection);
+                }
+            } else {
+                target->m_game->pop_request();
+            }
+        }
 
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::selection
@@ -50,9 +60,8 @@ namespace banggame {
     };
 
     void equip_newidentity::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player *p) {
-            target->m_game->move_card(p->m_backup_character.front(), pocket_type::selection);
-            target->m_game->queue_request<request_newidentity>(target_card, p);
+        target->m_game->add_listener<event_type::on_turn_switch>(target_card, [=](player *origin) {
+            target->m_game->queue_request<request_newidentity>(target_card, origin);
         });
     }
 }

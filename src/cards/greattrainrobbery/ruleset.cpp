@@ -124,6 +124,14 @@ namespace banggame {
                 }, -6);
             }
         });
+
+        game->add_listener<event_type::on_turn_switch>({nullptr, 1}, [](player *origin) {
+            if (origin == origin->m_game->m_first_player) {
+                origin->m_game->queue_action([=]{
+                    origin->m_game->advance_train(origin);
+                }, -5);
+            }
+        });
     }
 
 }

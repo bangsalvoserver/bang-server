@@ -102,6 +102,9 @@ namespace banggame {
         // viene chiamato quando un giocatore gioca birra
         EVENT(on_play_beer, player *origin)
 
+        // viene chiamato durante il cambio del turno da un giocatore all'altro
+        EVENT(on_turn_switch, player *origin)
+
         // viene chiamato prima dell'inizio del turno, prima delle estrazioni
         EVENT(pre_turn_start, player *origin)
 
