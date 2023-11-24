@@ -114,11 +114,14 @@ namespace banggame {
             return {"STATUS_DISCARD_PASS_OTHER", target, diff};
         }
     }
+
+    static bool is_valid_card(card *target_card) {
+        return !target_card->is_black() && !target_card->is_train();
+    }
         
     bool request_discard_all::can_pick(card *target_card) const {
         return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
-            && target_card->owner == target
-            && !target_card->is_black();
+            && target_card->owner == target && is_valid_card(target_card);
     }
 
     void request_discard_all::on_pick(card *target_card) {
@@ -134,25 +137,22 @@ namespace banggame {
         }
         
         if (target->m_game->m_options.quick_discard_all
-            || (std::ranges::count_if(target->m_table, std::not_fn(&card::is_black)) + target->m_hand.size()) <= 1)
+            || (std::ranges::count_if(target->m_table, is_valid_card) + target->m_hand.size()) <= 1)
         {
             on_resolve();
         }
     }
 
     void request_discard_all::on_resolve() {
-        for (card *target_card : ranges::to<std::vector>(ranges::views::concat(
-            target->m_table | ranges::views::remove_if(&card::is_black),
-            target->m_hand
-        ))) {
+        target->m_game->pop_request();
+
+        std::vector<card *> cards_to_discard = ranges::views::concat(target->m_table, target->m_hand) | ranges::to<std::vector>;
+        std::ranges::stable_partition(cards_to_discard, is_valid_card);
+
+        for (card *target_card : cards_to_discard) {
             on_pick(target_card);
         }
-
-        target->m_game->pop_request();
         
-        while (!target->m_table.empty()) {
-            on_pick(target->m_table.front());
-        }
         target->m_game->drop_cubes(target->first_character());
         if (reason != discard_all_reason::sheriff_killed_deputy) {
             target->add_gold(-target->m_gold);
