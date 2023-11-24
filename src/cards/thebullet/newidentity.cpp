@@ -60,7 +60,7 @@ namespace banggame {
     };
 
     void equip_newidentity::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_turn_switch>(target_card, [=](player *origin) {
+        target->m_game->add_listener<event_type::on_turn_switch>({target_card, -1}, [=](player *origin) {
             target->m_game->queue_request<request_newidentity>(target_card, origin);
         });
     }
