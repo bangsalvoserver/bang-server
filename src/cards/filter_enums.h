@@ -43,6 +43,7 @@ namespace banggame {
         (not_bangcard)
         (missed)
         (missedcard)
+        (not_missedcard)
         (beer)
         (bronco)
         (cube_slot)

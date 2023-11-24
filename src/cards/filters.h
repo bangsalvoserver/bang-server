@@ -179,6 +179,9 @@ namespace banggame::filters {
         if (bool(filter & target_card_filter::missedcard) && !detail::get_card_tag(target, tag_type::missedcard))
             return "ERROR_TARGET_NOT_MISSED";
 
+        if (bool(filter & target_card_filter::not_missedcard) && detail::get_card_tag(target, tag_type::missedcard))
+            return "ERROR_TARGET_MISSED";
+
         if (bool(filter & target_card_filter::bronco) && !detail::get_card_tag(target, tag_type::bronco))
             return "ERROR_TARGET_NOT_BRONCO";
 

@@ -320,7 +320,7 @@ character:
     image: 03_elena_fuente
     expansion: dodgecity
     responses:
-      - discard card self | hand
+      - discard card self | hand not_missedcard
       - missed
     tags:
       - max_hp(3)
