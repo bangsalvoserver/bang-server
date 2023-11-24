@@ -449,11 +449,6 @@ namespace banggame {
         
         next_player->start_of_turn();
 
-        if (next_player == m_first_player && !m_scenario_deck.empty()) {
-            // TODO handle with on_turn_switch in highnoon and fistfulofcards rulesets
-            draw_scenario_card();
-        }
-
         call_event<event_type::on_turn_switch>(next_player);
     }
 
