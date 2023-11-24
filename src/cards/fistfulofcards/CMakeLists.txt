@@ -8,7 +8,6 @@ target_sources(bangserver PRIVATE
     lawofthewest.cpp
     peyote.cpp
     ranch.cpp
-    ruleset.cpp
     ricochet.cpp
     russianroulette.cpp
     sniper.cpp

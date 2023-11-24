@@ -8,7 +8,6 @@
 #include "highnoon.h"
 #include "invert_rotation.h"
 #include "reverend.h"
-#include "ruleset.h"
 #include "sermon.h"
 #include "shootout.h"
 #include "thedaltons.h"
