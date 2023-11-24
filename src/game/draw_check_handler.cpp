@@ -53,7 +53,7 @@ namespace banggame {
         drawn_card = target_card;
 
         m_game->add_log("LOG_CHECK_DREW_CARD", origin_card, target, target_card);
-        if (m_game->call_event<event_type::on_draw_check_select>(target, true)) {
+        if (!m_game->call_event<event_type::on_draw_check_select>(target, shared_from_this(), false)) {
             resolve();
         }
     }

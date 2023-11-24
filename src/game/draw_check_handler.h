@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    struct draw_check_handler {
+    struct draw_check_handler : std::enable_shared_from_this<draw_check_handler> {
         virtual std::vector<card *> get_drawn_cards() const = 0;
         virtual card *get_drawing_card() const = 0;
 

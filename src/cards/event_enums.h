@@ -11,10 +11,12 @@ namespace banggame {
 
     struct request_bang;
     struct request_draw;
+    struct draw_check_handler;
     struct effect_context;
 
     using shared_effect_context = std::shared_ptr<effect_context>;
     using shared_request_draw = std::shared_ptr<request_draw>;
+    using shared_request_check = std::shared_ptr<draw_check_handler>;
 
     using card_priority_pair = std::pair<card *, int>;
 
@@ -67,7 +69,7 @@ namespace banggame {
         EVENT(on_draw_check_resolve, player *origin, card *target_card)
 
         // viene chiamato quando estrai una carta nel momento che viene scelta
-        EVENT(on_draw_check_select, player *origin, bool &auto_resolve)
+        EVENT(on_draw_check_select, player *origin, shared_request_check req, bool &handled)
 
         // viene chiamato quando si scarta VOLONTARIAMENTE una carta (si gioca cat balou o panico contro una carta)
         EVENT(on_destroy_card, player *origin, player *target, card *target_card)
