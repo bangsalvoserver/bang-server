@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
         ("v,verbose",   "Verbose Logging",  cxxopts::value(server.options().verbose))
         ("h,help",      "Print Help")
 #ifdef HAVE_GIT_VERSION
-        ("v,version",   "Print Version")
+        ("version",   "Print Version")
 #endif
     ;
 
