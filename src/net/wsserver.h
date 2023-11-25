@@ -26,11 +26,13 @@ protected:
     virtual void on_message(client_handle hdl, const std::string &message) = 0;
 
 public:
-    wsserver(asio::io_context &ctx);
+    wsserver();
 
     virtual ~wsserver();
 
     bool start(uint16_t port);
+
+    void tick();
 
     void push_message(client_handle con, const std::string &message);
 

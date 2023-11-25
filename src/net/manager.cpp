@@ -13,7 +13,7 @@
 
 using namespace banggame;
 
-game_manager::game_manager(asio::io_context &ctx): net::wsserver(ctx) {
+game_manager::game_manager() {
     std::random_device rd;
     m_rng.seed(rd());
 }
@@ -48,6 +48,8 @@ void game_manager::on_message(client_handle client, const std::string &msg) {
 }
 
 void game_manager::tick() {
+    net::wsserver::tick();
+    
     for (auto &[client, user] : users) {
         if (++user.ping_timer > ping_interval) {
             user.ping_timer = ticks{};

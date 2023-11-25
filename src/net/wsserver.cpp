@@ -2,8 +2,8 @@
 
 namespace net {
 
-wsserver::wsserver(asio::io_context &ctx) {
-    m_server.init_asio(&ctx);
+wsserver::wsserver() {
+    m_server.init_asio();
 
     m_server.set_access_channels(websocketpp::log::alevel::all);
     m_server.clear_access_channels(
@@ -51,6 +51,10 @@ bool wsserver::start(uint16_t port) {
     m_server.listen(port, ec);
     m_server.start_accept(ec);
     return !ec;
+}
+
+void wsserver::tick() {
+    m_server.poll();
 }
 
 void wsserver::push_message(client_handle con, const std::string &message) {

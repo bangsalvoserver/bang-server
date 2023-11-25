@@ -21,7 +21,7 @@ struct server_options {
 
 class game_manager: public net::wsserver {
 public:
-    game_manager(asio::io_context &ctx);
+    game_manager();
     
     bool client_validated(client_handle client) const;
 

@@ -11,9 +11,7 @@
 volatile bool g_stop = false;
 
 int main(int argc, char **argv) {
-    asio::io_context ctx;
-
-    banggame::game_manager server(ctx);
+    banggame::game_manager server;
 
     cxxopts::Options options(argv[0], "Bang! Server");
 
@@ -62,10 +60,7 @@ int main(int argc, char **argv) {
 
         while (!g_stop) {
             next_tick += banggame::ticks64{1};
-
-            ctx.poll();
             server.tick();
-
             std::this_thread::sleep_until(next_tick);
         }
 
