@@ -6,6 +6,8 @@
 
 #include "manager.h"
 
+#include "git_version.h"
+
 volatile bool g_stop = false;
 
 int main(int argc, char **argv) {
@@ -22,6 +24,9 @@ int main(int argc, char **argv) {
         ("cheats",      "Enable Cheats",    cxxopts::value(server.options().enable_cheats))
         ("v,verbose",   "Verbose Logging",  cxxopts::value(server.options().verbose))
         ("h,help",      "Print Help")
+#ifdef HAVE_GIT_VERSION
+        ("v,version",   "Print Version")
+#endif
     ;
 
     options.positional_help("Port Number");
@@ -34,6 +39,12 @@ int main(int argc, char **argv) {
             fmt::print("{}\n", options.help());
             return 0;
         }
+#ifdef HAVE_GIT_VERSION
+        else if (results.count("version")) {
+            fmt::print("{}\n", net::server_commit_hash);
+            return 0;
+        }
+#endif
     } catch (const std::exception &error) {
         fmt::print("Invalid arguments: {}\n", error.what());
         return 1;
