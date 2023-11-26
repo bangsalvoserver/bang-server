@@ -60,9 +60,9 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
-    struct request_draw : request_base, std::enable_shared_from_this<request_draw> {
+    struct request_draw : request_picking, std::enable_shared_from_this<request_draw> {
         request_draw(player *target)
-            : request_base(nullptr, nullptr, target, {}, -7) {}
+            : request_picking(nullptr, nullptr, target, {}, -7) {}
 
         int num_drawn_cards = 0;
         

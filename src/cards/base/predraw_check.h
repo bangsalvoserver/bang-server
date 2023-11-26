@@ -5,9 +5,9 @@
 
 namespace banggame {
 
-    struct request_predraw : request_base {
+    struct request_predraw : request_picking {
         request_predraw(player *target)
-            : request_base(nullptr, nullptr, target, {}, -7) {}
+            : request_picking(nullptr, nullptr, target, {}, -7) {}
 
         std::vector<std::pair<card *, int>> checks;
 

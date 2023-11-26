@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    struct request_train_robbery_choose : request_bang {
+    struct request_train_robbery_choose : request_bang, request_picking_base {
         request_train_robbery_choose(card *origin_card, player *origin, player *target, card *target_card)
             : request_bang(origin_card, origin, target, {}, 21)
             , target_card(target_card) {}
@@ -48,8 +48,8 @@ namespace banggame {
         }
     };
 
-    struct request_train_robbery : request_base {
-        using request_base::request_base;
+    struct request_train_robbery : request_picking {
+        using request_picking::request_picking;
 
         std::vector<card *> selected_cards;
 

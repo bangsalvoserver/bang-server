@@ -4,9 +4,9 @@
 
 namespace banggame {
     
-    struct request_add_cube : request_base {
+    struct request_add_cube : request_picking {
         request_add_cube(card *origin_card, player *target, int ncubes = 1)
-            : request_base(origin_card, nullptr, target)
+            : request_picking(origin_card, nullptr, target)
             , ncubes(ncubes) {}
 
         int ncubes = 1;

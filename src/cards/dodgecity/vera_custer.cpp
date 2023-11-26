@@ -35,9 +35,9 @@ namespace banggame {
         }
     }
 
-    struct request_vera_custer : request_base {
+    struct request_vera_custer : request_picking {
         request_vera_custer(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target, {}, -8) {}
+            : request_picking(origin_card, nullptr, target, {}, -8) {}
 
         void on_update() override {
             if (target->alive() && target->m_game->m_playing == target) {

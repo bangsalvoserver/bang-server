@@ -8,9 +8,9 @@
 
 namespace banggame {
 
-    struct request_indians : request_base, resolvable_request, respondable_with_bang {
+    struct request_indians : request_picking, resolvable_request, respondable_with_bang {
         request_indians(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags) {}
+            : request_picking(origin_card, origin, target, flags) {}
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {

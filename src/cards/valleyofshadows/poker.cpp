@@ -4,9 +4,9 @@
 
 namespace banggame {
 
-    struct request_poker : request_base {
+    struct request_poker : request_picking {
         request_poker(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags) {}
+            : request_picking(origin_card, origin, target, flags) {}
 
         void on_update() override {
             auto_pick();

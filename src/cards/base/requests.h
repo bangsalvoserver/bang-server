@@ -5,9 +5,9 @@
 
 namespace banggame {
 
-    struct request_characterchoice : request_base {
+    struct request_characterchoice : request_picking {
         request_characterchoice(player *target)
-            : request_base(nullptr, nullptr, target) {}
+            : request_picking(nullptr, nullptr, target) {}
         
         void on_update() override;
         bool can_pick(card *target_card) const override;
@@ -15,8 +15,8 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
     
-    struct request_discard : request_base {
-        using request_base::request_base;
+    struct request_discard : request_picking {
+        using request_picking::request_picking;
         
         void on_update() override;
         bool can_pick(card *target_card) const override;
@@ -24,9 +24,9 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
-    struct request_discard_pass : request_base {
+    struct request_discard_pass : request_picking {
         request_discard_pass(player *target)
-            : request_base(nullptr, nullptr, target, {}, 200) {}
+            : request_picking(nullptr, nullptr, target, {}, 200) {}
 
         int ndiscarded = 0;
 
@@ -37,11 +37,11 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
-    struct request_discard_all : request_base, resolvable_request {
+    struct request_discard_all : request_picking, resolvable_request {
         discard_all_reason reason;
 
         request_discard_all(player *target, discard_all_reason reason, int priority = 100)
-            : request_base(nullptr, nullptr, target, {}, priority)
+            : request_picking(nullptr, nullptr, target, {}, priority)
             , reason(reason) {}
         
         bool can_pick(card *target_card) const override;
@@ -51,9 +51,9 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
     
-    struct request_discard_hand : request_base, resolvable_request {
+    struct request_discard_hand : request_picking, resolvable_request {
         request_discard_hand(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target) {}
+            : request_picking(origin_card, nullptr, target) {}
         
         bool can_pick(card *target_card) const override;
         void on_pick(card *target_card) override;

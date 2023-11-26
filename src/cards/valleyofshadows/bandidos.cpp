@@ -5,9 +5,9 @@
 
 namespace banggame {
 
-    struct request_bandidos : request_base, resolvable_request {
+    struct request_bandidos : request_picking, resolvable_request {
         request_bandidos(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags) {}
+            : request_picking(origin_card, origin, target, flags) {}
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {

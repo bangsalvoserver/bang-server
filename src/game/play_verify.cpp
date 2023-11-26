@@ -392,13 +392,12 @@ namespace banggame {
     }
 
     game_message verify_and_pick(player *origin, const pick_card_args &args) {
-        auto req = origin->m_game->top_request(origin);
-
         if (game_string error = verify_timer_response(origin, args.timer_id)) {
             return {enums::enum_tag<message_type::error>, error};
         }
 
-        if (!req || req->target != origin || !req->can_pick(args.card)) {
+        auto req = origin->m_game->top_request<request_picking_base>(origin);
+        if (!req || !req->can_pick(args.card)) {
             return {enums::enum_tag<message_type::error>, "ERROR_INVALID_PICK"};
         }
 

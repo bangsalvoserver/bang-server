@@ -4,9 +4,9 @@
 
 namespace banggame {
 
-    struct request_newidentity : request_base {
+    struct request_newidentity : request_picking {
         request_newidentity(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target, {}, -7) {}
+            : request_picking(origin_card, nullptr, target, {}, -7) {}
 
         void on_update() override {
             if (target->alive() && target->m_game->m_playing == target) {

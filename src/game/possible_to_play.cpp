@@ -201,9 +201,30 @@ namespace banggame {
 
     card_modifier_tree generate_card_modifier_tree(player *origin, bool is_response) {
         card_modifier_tree tree;
-        for (card *origin_card : get_all_playable_cards(origin, is_response)) {
-            tree.push_back(generate_card_modifier_node(origin, origin_card, is_response, {}, {}));
+        if (origin) {
+            for (card *origin_card : get_all_playable_cards(origin, is_response)) {
+                tree.push_back(generate_card_modifier_node(origin, origin_card, is_response, {}, {}));
+            }
         }
         return tree;
+    }
+
+    ranges::any_view<card *> get_pick_cards(player *origin) {
+        if (origin) {
+            if (auto req = origin->m_game->top_request<request_picking_base>(origin)) {
+                return ranges::views::concat(
+                    origin->m_game->m_players | ranges::views::for_each([](player *p) {
+                        return ranges::views::concat(p->m_hand, p->m_table, p->m_characters);
+                    }),
+                    origin->m_game->m_selection,
+                    origin->m_game->m_deck | ranges::views::take(1),
+                    origin->m_game->m_discards | ranges::views::take(1)
+                )
+                | ranges::views::filter([=](card *target_card) {
+                    return req->can_pick(target_card);
+                });
+            }
+        }
+        return ranges::views::empty<card *>;
     }
 }

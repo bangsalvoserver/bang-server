@@ -350,22 +350,9 @@ namespace banggame {
             .target = req->target,
             .status_text = req->status_text(owner),
 
-            .respond_cards = owner ? generate_card_modifier_tree(owner, true) : card_modifier_tree{},
+            .respond_cards = generate_card_modifier_tree(owner, true),
 
-            .pick_cards = owner && req->target == owner
-                ? ranges::views::concat(
-                    m_players | ranges::views::for_each([](player *p) {
-                        return ranges::views::concat(p->m_hand, p->m_table, p->m_characters);
-                    }),
-                    m_selection,
-                    m_deck | ranges::views::take(1),
-                    m_discards | ranges::views::take(1)
-                )
-                | ranges::views::filter([&](card *target_card) {
-                    return req->can_pick(target_card);
-                })
-                | ranges::to<serial::card_list>
-                : serial::card_list{},
+            .pick_cards = ranges::to<serial::card_list>(get_pick_cards(owner)),
 
             .highlight_cards = ranges::to<serial::card_list>(req->get_highlights()),
 

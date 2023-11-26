@@ -28,6 +28,8 @@ namespace banggame {
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response = false, const std::vector<card *> &modifiers = {}, const effect_context &ctx = {});
 
     card_modifier_tree generate_card_modifier_tree(player *origin, bool is_response = false);
+
+    ranges::any_view<card *> get_pick_cards(player *origin);
     
 }
 

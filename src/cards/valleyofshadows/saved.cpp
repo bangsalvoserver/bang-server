@@ -6,9 +6,9 @@
 
 namespace banggame {
     
-    struct request_saved : request_base {
+    struct request_saved : request_picking {
         request_saved(card *origin_card, player *target, player *saved)
-            : request_base(origin_card, nullptr, target, {}, 0)
+            : request_picking(origin_card, nullptr, target, {}, 0)
             , saved(saved) {}
 
         player *saved = nullptr;

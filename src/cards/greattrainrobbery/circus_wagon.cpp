@@ -4,8 +4,8 @@
 
 namespace banggame {
 
-    struct request_discard_table : request_base {
-        using request_base::request_base;
+    struct request_discard_table : request_picking {
+        using request_picking::request_picking;
 
         void on_update() override {
             auto_pick();

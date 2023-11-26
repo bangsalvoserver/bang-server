@@ -4,9 +4,9 @@
 
 namespace banggame {
 
-    struct request_thedaltons : request_base {
+    struct request_thedaltons : request_picking {
         request_thedaltons(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target) {}
+            : request_picking(origin_card, nullptr, target) {}
 
         void on_update() override {
             auto_pick();
