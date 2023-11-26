@@ -26,6 +26,9 @@ namespace banggame {
         if (target->m_game->m_discards.empty()) {
             return "ERROR_DISCARD_PILE_EMPTY";
         }
+        if (target->m_game->check_flags(game_flags::phase_one_draw_discard)) {
+            return "ERROR_INVALID_ACTION";
+        }
         return {};
     }
     
