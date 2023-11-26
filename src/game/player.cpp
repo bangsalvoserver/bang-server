@@ -265,7 +265,7 @@ namespace banggame {
                     add_player_flags(player_flags::extra_turn);
                     start_of_turn();
                 }
-            });
+            }, -5);
         }
     }
 
