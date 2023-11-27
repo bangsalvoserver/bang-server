@@ -2,7 +2,7 @@ import sys
 import yaml_custom as yaml
 import base64
 from PIL import Image
-from cpp_generator import print_cpp_file
+from cpp_generator import print_cpp_file, CppEnum
 
 PROPIC_SIZE = 50
 INCLUDE_FILENAMES = ['net/bot_info.h']
@@ -25,10 +25,20 @@ def sdl_image_pixels(filename):
             'pixels': base64.b64encode(image.resize((w, h)).convert('RGBA').tobytes('raw', 'RGBA', 0, 1)).decode('utf8')
         }
 
+def parse_settings(settings):
+    return {
+        'allow_timer_no_action': settings['allow_timer_no_action'],
+        'max_random_tries': settings['max_random_tries'],
+        'bypass_prompt_after': settings['bypass_prompt_after'],
+        'response_pockets': [CppEnum('pocket_type', name) for name in settings['response_pockets']],
+        'in_play_pockets': [CppEnum('pocket_type', name) for name in settings['in_play_pockets']]
+    }
+
 def parse_file(data):
     return {
         'names': data['names'],
-        'propics': [sdl_image_pixels(filename) for filename in data['propics']]
+        'propics': [sdl_image_pixels(filename) for filename in data['propics']],
+        'settings': parse_settings(data['settings'])
     }
 
 if __name__ == '__main__':

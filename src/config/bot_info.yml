@@ -1,4 +1,21 @@
 bots:
+  settings:
+    allow_timer_no_action: false
+    max_random_tries: 10
+    bypass_prompt_after: 5
+    
+    response_pockets:
+    - player_character
+    - player_table
+    - player_hand
+    
+    in_play_pockets:
+    - player_character
+    - player_table
+    - player_hand
+    - shop_selection
+    - train
+  
   names:
   - Salvo
   - Chris
