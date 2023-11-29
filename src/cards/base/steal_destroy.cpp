@@ -58,7 +58,7 @@ namespace banggame {
                 }
                 origin->steal_card(target_card);
             }
-        }, 2);
+        }, 82);
     }
 
     struct request_steal : request_targeting {
@@ -143,7 +143,7 @@ namespace banggame {
                 }
                 target_player->discard_card(target_card);
             }
-        }, 2);
+        }, 82);
     }
     
     struct request_destroy : request_targeting {

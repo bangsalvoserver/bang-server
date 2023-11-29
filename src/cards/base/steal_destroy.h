@@ -28,7 +28,7 @@ namespace banggame {
     };
 
     struct request_targeting : request_base, resolvable_request {
-        request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {}, int priority = 0)
+        request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {}, int priority = 80)
             : request_base(origin_card, origin, target, flags, priority)
             , target_card(target_card) {}
         

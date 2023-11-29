@@ -13,7 +13,7 @@ namespace banggame {
                         origin->m_game->flash_card(origin_card);
                         origin->draw_card(1, origin_card);
                     }
-                }, 1);
+                }, 81);
             }
         });
     }
