@@ -281,9 +281,6 @@ namespace banggame {
 
             for (card *character : range) {
                 disable_equip(character);
-                
-                character->pocket = pocket_type::none;
-                character->owner = nullptr;
                 character->visibility = card_visibility::hidden;
             }
 
