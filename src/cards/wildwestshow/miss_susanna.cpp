@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/effect_enums.h"
+
 namespace banggame {
 
     void equip_miss_susanna::on_enable(card *target_card, player *target) {
@@ -17,7 +19,8 @@ namespace banggame {
                             return pair.pocket == pocket_type::player_hand
                                 || pair.pocket == pocket_type::shop_selection
                                 || pair.pocket == pocket_type::player_character && history.context.repeat_card
-                                || pair.pocket == pocket_type::train && pair.origin_card->deck == card_deck_type::train;
+                                || pair.pocket == pocket_type::train && pair.origin_card->deck == card_deck_type::train
+                                || pair.origin_card->get_mth(history.is_response).type == mth_type::play_as_bang;
                         }
                     );
                 }), 0);

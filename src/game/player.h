@@ -43,6 +43,7 @@ namespace banggame {
     struct played_card_history {
         card_pocket_pair origin_card;
         std::vector<card_pocket_pair> modifiers;
+        bool is_response;
         effect_context context;
     };
 
