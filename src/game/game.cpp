@@ -176,14 +176,23 @@ namespace banggame {
         apply_rulesets(this);
 
         add_update<game_update_type::player_add>(m_players | ranges::to<std::vector<player_user_pair>>);
+
+        bool ghost_card_added = false;
         
         auto add_cards = [&](const std::vector<card_data> &cards, pocket_type pocket, std::vector<card *> *out_pocket = nullptr) {
             if (!out_pocket && pocket != pocket_type::none) out_pocket = &get_pocket(pocket);
 
             int count = 0;
             for (const card_data &c : cards) {
-                if (c.has_tag(tag_type::ghost_card) && !m_options.enable_ghost_cards) continue;
                 if ((c.expansion & m_options.expansions) != c.expansion) continue;
+
+                if (c.has_tag(tag_type::ghost_card)) {
+                    if (m_options.enable_ghost_cards) {
+                        ghost_card_added = true;
+                    } else {
+                        continue;
+                    }
+                }
 
                 card *new_card = &m_context.cards.emplace(int(m_context.cards.first_available_id()), c);
                 new_card->pocket = pocket;
@@ -282,6 +291,8 @@ namespace banggame {
         if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
             std::ranges::shuffle(character_ptrs, rng);
         }
+
+        m_options.enable_ghost_cards = ghost_card_added;
 
         add_game_flags(game_flags::hands_shown);
 
