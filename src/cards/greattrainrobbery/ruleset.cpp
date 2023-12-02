@@ -50,11 +50,11 @@ namespace banggame {
         origin->m_game->train_position = 0;
         origin->m_game->add_update<game_update_type::move_train>(0);
 
-        origin->m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(origin->m_game->m_train));
         for (card *c : origin->m_game->m_train) {
-            c->visibility = card_visibility::hidden;
+            origin->m_game->set_card_visibility(c, nullptr, card_visibility::hidden);
             origin->disable_equip(c);
         }
+        origin->m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(origin->m_game->m_train));
 
         if (!origin->m_game->m_train_deck.empty()) {
             origin->m_game->shuffle_cards_and_ids(origin->m_game->m_train_deck);

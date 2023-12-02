@@ -442,7 +442,7 @@ train:
 
 locomotive:
   - name: IRONHORSE
-    image: 27_ironhorse
+    image: 27_ironhorse:27_leland
     color: train
     equip:
       - ironhorse
@@ -450,7 +450,7 @@ locomotive:
       - next_stop
     modifier: locomotive
   - name: LELAND
-    image: 27_leland
+    image: 27_leland:27_ironhorse
     color: train
     equip:
       - leland
