@@ -221,7 +221,7 @@ namespace banggame {
         (expansion_type, expansions)
         (bool, enable_ghost_cards, false)
         (bool, character_choice, true)
-        (bool, quick_discard_all)
+        (bool, quick_discard_all, true)
         (int, scenario_deck_size, 12)
         (int, num_bots, 0)
         (game_duration, damage_timer, 1500)
