@@ -364,8 +364,6 @@ character:
     image: 01_vulturesam
     equip:
       - vulture_sam
-    tags:
-      - discard_if_two_players
   - name: WILLY_THE_KID
     image: 01_willythekid
     equip:

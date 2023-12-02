@@ -329,15 +329,11 @@ character:
     expansion: dodgecity
     equip:
       - greg_digger
-    tags:
-      - discard_if_two_players
   - name: HERB_HUNTER
     image: 03_herb_hunter
     expansion: dodgecity
     equip:
       - herb_hunter
-    tags:
-      - discard_if_two_players
   - name: JOSE_DELGADO
     image: 03_jose_delgado
     expansion: dodgecity

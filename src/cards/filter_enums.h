@@ -60,7 +60,6 @@ namespace banggame {
         (skip_logs)
         (no_auto_discard)
         (hidden)
-        (discard_if_two_players)
         (bangcard)
         (missed)
         (missedcard)

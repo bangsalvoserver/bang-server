@@ -124,7 +124,6 @@
         "expansions": "valleyofshadows armedanddangerous", // stringa che contiene tutte le espansioni della partita
         "enable_ghost_cards": false,
         "character_choice":" false,
-        "allow_beer_in_duel": false,
         "quick_discard_all": false,
         "scenario_deck_size": 12,
         "num_bots": 0,

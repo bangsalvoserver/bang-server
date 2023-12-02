@@ -400,7 +400,7 @@ std::string game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
 
     size_t num_players = std::ranges::count(lobby.users, lobby_team::game_player, &team_user_pair::first) + lobby.options.num_bots;
 
-    if (num_players <= 1) {
+    if (num_players < 3) {
         return "ERROR_NOT_ENOUGH_PLAYERS";
     } else if (num_players > lobby_max_players) {
         return "ERROR_TOO_MANY_PLAYERS";

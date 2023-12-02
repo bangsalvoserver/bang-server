@@ -214,7 +214,6 @@ goldrush:
       - wanted
     tags:
       - buy_cost(2)
-      - discard_if_two_players
   - count: 2
     name: RHUM
     image: 04_rum

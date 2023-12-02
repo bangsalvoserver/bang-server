@@ -3,30 +3,22 @@
 #include "game/game.h"
 
 namespace banggame {
-
-    static bool can_use_beer(game *game) {
-        if (game->m_players.size() <= 2) {
-            return game->m_options.allow_beer_in_duel;
-        } else {
-            return game->num_alive() > 2;
-        }
-    }
     
     game_string effect_beer::on_prompt(card *origin_card, player *target) {
-        if (!can_use_beer(target->m_game) || (target->m_hp == target->m_max_hp)) {
+        if (target->m_game->num_alive() <= 2 || (target->m_hp == target->m_max_hp)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
         return {};
     }
 
     void effect_beer::on_play(card *origin_card, player *target) {
-        if (can_use_beer(target->m_game)) {
+        if (target->m_game->num_alive() > 2) {
             target->heal(target->m_game->call_event<event_type::apply_beer_modifier>(target, 1));
         }
         target->m_game->call_event<event_type::on_play_beer>(target);
     }
 
     bool effect_beer::can_play(card *origin_card, player *target) {
-        return !target->m_game->pending_requests() || can_use_beer(target->m_game);
+        return !target->m_game->pending_requests() || target->m_game->num_alive() > 2;
     }
 }

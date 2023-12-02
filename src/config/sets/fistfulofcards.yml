@@ -3,8 +3,6 @@ fistfulofcards:
     image: 05_agguato
     equip:
       - ambush
-    tags:
-      - discard_if_two_players
   - name: SNIPER
     image: 05_cecchino
     effects:
@@ -15,7 +13,6 @@ fistfulofcards:
     equip:
       - deadman
     tags:
-      - discard_if_two_players
       - ghost_card
   - name: BLOOD_BROTHERS
     image: 05_fratellidisangue

@@ -8,14 +8,11 @@ highnoon:
     equip:
       - ghosttown
     tags:
-      - discard_if_two_players
       - ghost_card
   - name: INVERT_ROTATION
     image: 05_corsaalloro
     equip:
       - invert_rotation
-    tags:
-      - discard_if_two_players
   - name: THE_DALTONS
     image: 05_idalton
     equip:

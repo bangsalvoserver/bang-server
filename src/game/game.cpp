@@ -182,7 +182,6 @@ namespace banggame {
 
             int count = 0;
             for (const card_data &c : cards) {
-                if (m_players.size() <= 2 && c.has_tag(tag_type::discard_if_two_players)) continue;
                 if (c.has_tag(tag_type::ghost_card) && !m_options.enable_ghost_cards) continue;
                 if ((c.expansion & m_options.expansions) != c.expansion) continue;
 

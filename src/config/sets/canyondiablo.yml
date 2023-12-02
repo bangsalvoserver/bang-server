@@ -133,7 +133,6 @@ main_deck:
     mth_response: lastwill
     tags:
       - repeatable(2)
-      - discard_if_two_players
   - name: INDIAN_GUIDE
     signs:
       - 8 clubs
