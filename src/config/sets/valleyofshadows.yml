@@ -4,7 +4,6 @@ main_deck:
       - 9 spades
       - 10 spades
     image: 07_fantasma
-    expansion: valleyofshadows
     color: blue
     equip_target: dead
     equip:
@@ -15,7 +14,6 @@ main_deck:
     signs:
       - 4 diamonds
     image: 07_lemat
-    expansion: valleyofshadows
     color: blue
     equip:
       - weapon(1)
@@ -32,7 +30,6 @@ main_deck:
     signs:
       - 7 hearts
     image: 07_serpenteasonagli
-    expansion: valleyofshadows
     color: blue
     equip_target: any
     equip:
@@ -42,7 +39,6 @@ main_deck:
     signs:
       - K spades
     image: 07_shotgun
-    expansion: valleyofshadows
     color: blue
     equip:
       - weapon(1)
@@ -53,7 +49,6 @@ main_deck:
     signs:
       - 9 clubs
     image: 07_taglia
-    expansion: valleyofshadows
     color: blue
     equip_target: any
     equip:
@@ -62,7 +57,6 @@ main_deck:
     signs:
       - Q diamonds
     image: 07_bandidos
-    expansion: valleyofshadows
     color: brown
     effects:
       - bandidos players
@@ -70,7 +64,6 @@ main_deck:
     signs:
       - 3 hearts
     image: 07_fuga
-    expansion: valleyofshadows
     color: brown
     responses:
       - escape
@@ -78,7 +71,6 @@ main_deck:
     signs:
       - 6 clubs
     image: 07_mira
-    expansion: valleyofshadows
     color: brown
     modifier: bangmod
     effects:
@@ -87,7 +79,6 @@ main_deck:
     signs:
       - J hearts
     image: 07_poker
-    expansion: valleyofshadows
     color: brown
     effects:
       - poker players notself not_empty_hand
@@ -96,7 +87,6 @@ main_deck:
     signs:
       - Q clubs
     image: 07_ritornodifiamma
-    expansion: valleyofshadows
     color: brown
     responses:
       - backfire
@@ -106,7 +96,6 @@ main_deck:
     signs:
       - 5 hearts
     image: 07_salvo
-    expansion: valleyofshadows
     color: brown
     responses:
       - saved
@@ -114,7 +103,6 @@ main_deck:
     signs:
       - 2 spades
     image: 07_sventagliata
-    expansion: valleyofshadows
     color: brown
     effects:
       - banglimit
@@ -125,7 +113,6 @@ main_deck:
     signs:
       - A diamonds
     image: 07_tomahawk
-    expansion: valleyofshadows
     color: brown
     effects:
       - bang player notself range_2
@@ -135,7 +122,6 @@ main_deck:
     signs:
       - A clubs
     image: 07_tornado
-    expansion: valleyofshadows
     color: brown
     effects:
       - tornado players
@@ -143,7 +129,6 @@ main_deck:
     signs:
       - 8 diamonds
     image: 07_ultimogiro
-    expansion: valleyofshadows
     color: brown
     effects:
       - heal
@@ -151,7 +136,6 @@ main_deck:
 character:
   - name: BLACK_FLOWER
     image: 07_blackflower
-    expansion: valleyofshadows
     effects:
       - max_usages(1)
       - discard card self | hand clubs
@@ -160,12 +144,10 @@ character:
       - skip_logs
   - name: COLORADO_BILL
     image: 07_coloradobill
-    expansion: valleyofshadows
     equip:
       - colorado_bill
   - name: DER_SPOT_BURST_RINGER
     image: 07_derspot
-    expansion: valleyofshadows
     effects:
       - max_usages(1)
       - mth_add card self | hand bang
@@ -173,18 +155,15 @@ character:
     mth_effect: play_as_bang
   - name: EVELYN_SHEBANG
     image: 07_evelynshebang
-    expansion: valleyofshadows
     responses:
       - while_drawing(1)
       - evelyn_shebang player notself reachable
   - name: HENRY_BLOCK
     image: 07_henryblock
-    expansion: valleyofshadows
     equip:
       - henry_block
   - name: LEMONADE_JIM
     image: 07_lemonadejim
-    expansion: valleyofshadows
     equip:
       - lemonade_jim
     responses:
@@ -196,7 +175,6 @@ character:
       - auto_select
   - name: MICK_DEFENDER
     image: 07_mickdefender
-    expansion: valleyofshadows
     equip:
       - mick_defender
     responses:
@@ -204,7 +182,6 @@ character:
       - discard card self | hand missed
   - name: TUCO_FRANZISKANER
     image: 07_tucofranziskaner
-    expansion: valleyofshadows
     equip:
       - tuco_franziskaner
     tags:

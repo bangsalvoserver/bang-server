@@ -1,7 +1,6 @@
 character:
   - name: BIG_SPENCER
     image: 06_bigspencer
-    expansion: wildwestshow
     equip:
       - big_spencer
     tags:
@@ -9,7 +8,6 @@ character:
       - initial_cards(5)
   - name: FLINT_WESTWOOD
     image: 06_flintwestwood
-    expansion: wildwestshow
     effects:
       - max_usages(1)
       - mth_add card self | hand
@@ -17,14 +15,12 @@ character:
     mth_effect: flint_westwood
   - name: GARY_LOOTER
     image: 06_garylooter
-    expansion: wildwestshow
     equip:
       - gary_looter
     tags:
       - max_hp(5)
   - name: GREYGORY_DECK
     image: 06_greygorydeck
-    expansion: wildwestshow
     responses:
       - max_usages(1)
       - startofturn
@@ -33,25 +29,21 @@ character:
       - greygory_deck
   - name: JOHN_PAIN
     image: 06_johnpain
-    expansion: wildwestshow
     equip:
       - john_pain
   - name: LEE_VAN_KLIFF
     image: 06_leevankliff
-    expansion: wildwestshow
     modifier: leevankliff
     effects:
       - discard card self | hand bang
   - name: TEREN_KILL
     image: 06_terenkill
-    expansion: wildwestshow
     equip:
       - teren_kill
     tags:
       - max_hp(3)
   - name: YOUL_GRINNER
     image: 06_youlgrinner
-    expansion: wildwestshow
     equip:
       - youl_grinner
 

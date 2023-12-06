@@ -59,7 +59,6 @@ namespace banggame {
         (pass_turn)
         (skip_logs)
         (no_auto_discard)
-        (hidden)
         (bangcard)
         (missed)
         (missedcard)

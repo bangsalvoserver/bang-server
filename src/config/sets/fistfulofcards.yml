@@ -47,16 +47,6 @@ fistfulofcards:
     image: 05_peyote
     equip:
       - peyote
-  - name: PEYOTE_RED
-    image: 05_peyote_rosso
-    tags:
-      - peyote(1)
-      - hidden
-  - name: PEYOTE_BLACK
-    image: 05_peyote_nero
-    tags:
-      - peyote(2)
-      - hidden
   - name: RANCH
     image: 05_ranch
     equip:
@@ -89,3 +79,13 @@ fistfulofcards:
       - fistfulofcards
     tags:
       - last_scenario_card
+
+hidden:
+  - name: PEYOTE_RED
+    image: fistfulofcards/05_peyote_rosso
+    tags:
+      - peyote(1)
+  - name: PEYOTE_BLACK
+    image: fistfulofcards/05_peyote_nero
+    tags:
+      - peyote(2)

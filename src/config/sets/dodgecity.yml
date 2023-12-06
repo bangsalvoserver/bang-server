@@ -3,12 +3,10 @@ main_deck:
     signs:
       - A clubs
     image: 03_barile
-    expansion: dodgecity
   - name: BINOCULAR
     signs:
       - 10 diamonds
     image: 03_binocolo
-    expansion: dodgecity
     color: blue
     equip:
       - scope
@@ -16,27 +14,22 @@ main_deck:
     signs:
       - 10 clubs
     image: 03_dinamite
-    expansion: dodgecity
   - <<: *mustang
     signs:
       - 5 hearts
     image: 03_mustang
-    expansion: dodgecity
   - <<: *remington
     signs:
       - 6 diamonds
     image: 03_remington
-    expansion: dodgecity
   - <<: *rev_carabine
     signs:
       - 5 spades
     image: 03_rev_carabine
-    expansion: dodgecity
   - name: HIDEOUT
     signs:
       - K diamonds
     image: 03_riparo
-    expansion: dodgecity
     color: blue
     equip:
       - mustang
@@ -47,43 +40,35 @@ main_deck:
       - 6 clubs
       - K clubs
     image: 03_bang
-    expansion: dodgecity
   - <<: *beer
     signs:
       - 6 hearts
       - 6 spades
     image: 03_birra
-    expansion: dodgecity
   - <<: *cat_balou
     signs:
       - 8 clubs
     image: 03_cat_balou
-    expansion: dodgecity
   - <<: *general_store
     signs:
       - A spades
     image: 03_emporio
-    expansion: dodgecity
   - <<: *indians
     signs:
       - 5 diamonds
     image: 03_indiani
-    expansion: dodgecity
   - <<: *missed
     signs:
       - 8 diamonds
     image: 03_mancato
-    expansion: dodgecity
   - <<: *panic
     signs:
       - J hearts
     image: 03_panico
-    expansion: dodgecity
   - name: PUNCH
     signs:
       - 10 spades
     image: 03_pugno
-    expansion: dodgecity
     color: brown
     effects:
       - bang player notself range_1
@@ -93,7 +78,6 @@ main_deck:
     signs:
       - 9 hearts
     image: 03_rag_time
-    expansion: dodgecity
     color: brown
     effects:
       - discard extra_card self | hand
@@ -106,7 +90,6 @@ main_deck:
     signs:
       - J spades
     image: 03_rissa
-    expansion: dodgecity
     color: brown
     effects:
       - discard extra_card self | hand
@@ -121,7 +104,6 @@ main_deck:
       - 7 diamonds
       - K hearts
     image: 03_schivata
-    expansion: dodgecity
     color: brown
     responses:
       - missed
@@ -130,7 +112,6 @@ main_deck:
     signs:
       - K spades
     image: 03_springfield
-    expansion: dodgecity
     color: brown
     effects:
       - discard extra_card self | hand
@@ -143,7 +124,6 @@ main_deck:
     signs:
       - 9 clubs
     image: 03_tequila
-    expansion: dodgecity
     color: brown
     effects:
       - discard extra_card self | hand
@@ -155,7 +135,6 @@ main_deck:
     signs:
       - Q hearts
     image: 03_whisky
-    expansion: dodgecity
     color: brown
     effects:
       - discard extra_card self | hand
@@ -167,7 +146,6 @@ main_deck:
     signs:
       - 10 hearts
     image: 03_bibbia
-    expansion: dodgecity
     color: green
     responses:
       - missed
@@ -176,7 +154,6 @@ main_deck:
     signs:
       - 7 hearts
     image: 03_borraccia
-    expansion: dodgecity
     color: green
     effects:
       - heal
@@ -184,7 +161,6 @@ main_deck:
     signs:
       - J clubs
     image: 03_can_can
-    expansion: dodgecity
     color: green
     effects:
       - destroy card
@@ -194,7 +170,6 @@ main_deck:
     signs:
       - J diamonds
     image: 03_cappello
-    expansion: dodgecity
     color: green
     responses:
       - missed
@@ -202,7 +177,6 @@ main_deck:
     signs:
       - 9 diamonds
     image: 03_conestoga
-    expansion: dodgecity
     color: green
     effects:
       - steal card
@@ -212,7 +186,6 @@ main_deck:
     signs:
       - 7 spades
     image: 03_derringer
-    expansion: dodgecity
     color: green
     effects:
       - draw
@@ -223,7 +196,6 @@ main_deck:
     signs:
       - 9 clubs
     image: 03_fucile_da_caccia
-    expansion: dodgecity
     color: green
     effects:
       - bang player notself
@@ -233,7 +205,6 @@ main_deck:
     signs:
       - 9 spades
     image: 03_howitzer
-    expansion: dodgecity
     color: green
     effects:
       - bang players notself
@@ -241,7 +212,6 @@ main_deck:
     signs:
       - A hearts
     image: 03_pepperbox
-    expansion: dodgecity
     color: green
     effects:
       - bang player reachable notself
@@ -252,7 +222,6 @@ main_deck:
       - A diamonds
       - Q spades
     image: 03_placca_di_ferro
-    expansion: dodgecity
     color: green
     responses:
       - missed
@@ -260,7 +229,6 @@ main_deck:
     signs:
       - Q diamonds
     image: 03_pony_express
-    expansion: dodgecity
     color: green
     effects:
       - draw(3)
@@ -269,7 +237,6 @@ main_deck:
     signs:
       - 8 hearts
     image: 03_pugnale
-    expansion: dodgecity
     color: green
     effects:
       - bang player notself range_1
@@ -279,7 +246,6 @@ main_deck:
     signs:
       - 7 clubs
     image: 03_sombrero
-    expansion: dodgecity
     color: green
     responses:
       - missed
@@ -287,30 +253,25 @@ main_deck:
 character:
   - name: APACHE_KID
     image: 03_apache_kid
-    expansion: dodgecity
     equip:
       - apache_kid
     tags:
       - max_hp(3)
   - name: BELLE_STAR
     image: 03_belle_star
-    expansion: dodgecity
     equip:
       - bellestar
   - name: BILL_NOFACE
     image: 03_bill_noface
-    expansion: dodgecity
     equip:
       - bill_noface
   - name: CHUCK_WENGAM
     image: 03_chuck_wengam
-    expansion: dodgecity
     effects:
       - damage
       - queue_draw(2)
   - name: DOC_HOLYDAY
     image: 03_doc_holyday
-    expansion: dodgecity
     effects:
       - max_usages(1)
       - mth_add cards(2) self | hand
@@ -318,7 +279,6 @@ character:
     mth_effect: doc_holyday
   - name: ELENA_FUENTE
     image: 03_elena_fuente
-    expansion: dodgecity
     responses:
       - discard card self | hand not_missedcard
       - missed
@@ -326,29 +286,24 @@ character:
       - max_hp(3)
   - name: GREG_DIGGER
     image: 03_greg_digger
-    expansion: dodgecity
     equip:
       - greg_digger
   - name: HERB_HUNTER
     image: 03_herb_hunter
-    expansion: dodgecity
     equip:
       - herb_hunter
   - name: JOSE_DELGADO
     image: 03_jose_delgado
-    expansion: dodgecity
     effects:
       - max_usages(2)
       - discard card self | hand blue
       - draw(2)
   - name: MOLLY_STARK
     image: 03_molly_stark
-    expansion: dodgecity
     equip:
       - molly_stark
   - name: PAT_BRENNAN
     image: 03_pat_brennan
-    expansion: dodgecity
     responses:
       - while_drawing(-1)
       - steal card | table
@@ -356,26 +311,22 @@ character:
       - drawing
   - name: PIXIE_PETE
     image: 03_pixie_pete
-    expansion: dodgecity
     equip:
       - pixie_pete
     tags:
       - max_hp(3)
   - name: SEAN_MALLORY
     image: 03_sean_mallory
-    expansion: dodgecity
     equip:
       - gunbelt(10)
     tags:
       - max_hp(3)
   - name: TEQUILA_JOE
     image: 03_tequila_joe
-    expansion: dodgecity
     equip:
       - tequila_joe
   - name: VERA_CUSTER
     image: 03_vera_custer
-    expansion: dodgecity
     equip:
       - vera_custer
     tags:

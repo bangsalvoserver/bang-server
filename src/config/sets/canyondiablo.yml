@@ -3,7 +3,6 @@ main_deck:
     signs:
       - 8 spades
     image: 20_tombarolo
-    expansion: canyondiablo
     color: brown
     effects:
       - graverobber
@@ -15,7 +14,6 @@ main_deck:
     signs:
       - 10 clubs
     image: 20_baro
-    expansion: canyondiablo
     color: brown
     effects:
       - mth_add card self | table blue
@@ -27,7 +25,6 @@ main_deck:
     signs:
       - 8 hearts
     image: 20_miraggio
-    expansion: canyondiablo
     color: brown
     responses:
       - mirage
@@ -37,7 +34,6 @@ main_deck:
     signs:
       - J hearts
     image: 20_pattodisangue
-    expansion: canyondiablo
     color: brown
     effects:
       - damage
@@ -46,7 +42,6 @@ main_deck:
     signs:
       - 10 hearts
     image: 20_sacrificio
-    expansion: canyondiablo
     color: brown
     responses:
       - sacrifice
@@ -54,7 +49,6 @@ main_deck:
     signs:
       - 7 hearts
     image: 20_disarmare
-    expansion: canyondiablo
     color: brown
     responses:
       - disarm
@@ -64,7 +58,6 @@ main_deck:
     signs:
       - A hearts
     image: 20_molotov
-    expansion: canyondiablo
     color: brown
     effects:
       - bang player reachable notself
@@ -75,7 +68,6 @@ main_deck:
       - J spades
       - 6 clubs
     image: 20_mancato
-    expansion: canyondiablo
   - <<: *bang
     signs:
       - 10 spades
@@ -83,27 +75,22 @@ main_deck:
       - 8 diamonds
       - 6 diamonds
     image: 20_bang
-    expansion: canyondiablo
   - <<: *panic
     signs:
       - 9 hearts
     image: 20_panico
-    expansion: canyondiablo
   - <<: *beer
     signs:
       - Q hearts
     image: 20_birra
-    expansion: canyondiablo
   - <<: *cat_balou
     signs:
       - J clubs
     image: 20_catbalou
-    expansion: canyondiablo
   - name: BULLDOG
     signs:
       - 7 diamonds
     image: 20_bulldog
-    expansion: canyondiablo
     color: blue
     equip:
       - weapon(2)
@@ -119,7 +106,6 @@ main_deck:
     signs:
       - A spades
     image: 20_ultimevolonta
-    expansion: canyondiablo
     color: blue
     equip_target: any
     equip:
@@ -137,7 +123,6 @@ main_deck:
     signs:
       - 8 clubs
     image: 20_guidaindiana
-    expansion: canyondiablo
     color: blue
     equip:
       - indianguide
@@ -145,12 +130,10 @@ main_deck:
     signs:
       - K spades
     image: 20_remington
-    expansion: canyondiablo
   - name: TAXMAN
     signs:
       - K clubs
     image: 20_esattore
-    expansion: canyondiablo
     color: blue
     equip_target: any
     equip:
@@ -160,7 +143,6 @@ main_deck:
     signs:
       - 7 clubs
     image: 20_bordello
-    expansion: canyondiablo
     color: blue
     equip_target: any
     equip:
@@ -170,7 +152,6 @@ main_deck:
     signs:
       - Q diamonds
     image: 20_bronco
-    expansion: canyondiablo
     color: blue
     equip:
       - horse
@@ -182,7 +163,6 @@ main_deck:
     signs:
       - Q spades
     image: 20_mulo
-    expansion: canyondiablo
     color: blue
     equip:
       - horse
@@ -193,7 +173,6 @@ main_deck:
     signs:
       - K diamonds
     image: 20_sentierodiguerra
-    expansion: canyondiablo
     color: green
     effects:
       - indians players notself
@@ -203,7 +182,6 @@ main_deck:
     signs:
       - J diamonds
     image: 20_incendio
-    expansion: canyondiablo
     color: green
     effects:
       - destroy cards_other_players
@@ -213,7 +191,6 @@ main_deck:
     signs:
       - 10 diamonds
     image: 20_proiettilevagante
-    expansion: canyondiablo
     color: brown
     responses:
       - missed
@@ -224,7 +201,6 @@ main_deck:
     signs:
       - K hearts
     image: 20_offrelacasa
-    expansion: canyondiablo
     color: green
     effects:
       - heal_notfull
@@ -233,7 +209,6 @@ main_deck:
     signs:
       - 9 clubs
     image: 20_chitarra
-    expansion: canyondiablo
     color: blue
     equip_target: any
     equip:
@@ -244,7 +219,6 @@ main_deck:
     signs:
       - 9 spades
     image: 20_attaccabrighe
-    expansion: canyondiablo
     color: green
     effects:
       - steal card range_1
@@ -254,7 +228,6 @@ main_deck:
     signs:
       - 9 diamonds
     image: 20_strozzino
-    expansion: canyondiablo
     color: brown
     effects:
       - damage
@@ -263,12 +236,10 @@ main_deck:
     signs:
       - 7 spades
     image: 20_schivata
-    expansion: canyondiablo
 
 character:
   # - name: ANNIE_OAKEY
   #   image: 20_annie_oakey
-  #   expansion: canyondiablo
   #   # TODO
   #   # prima di pescare request_annie_oakey
   #   # mostra 6 carte in selection: colori + semi
@@ -277,19 +248,16 @@ character:
   #   #   - annie_oakey
   - name: PAT_BARRETT
     image: 20_pat_barrett
-    expansion: canyondiablo
     equip:
       - pat_barrett
   - name: BIG_SPENCER_2
     image: 20_big_spencer
-    expansion: canyondiablo
     equip:
       - update_max_hp(6)
     tags:
       - max_hp(3)
   # - name: BUFFALO_BELL
   #   image: 20_buffalo_bell
-  #   expansion: canyondiablo
   #   # TODO effect_buffalo_bell: effect_missed
   #   # sum = seme origin_card + seme target_card
   #   # sum >= 13 : mancato
@@ -299,28 +267,24 @@ character:
   #   #   - buffalo_bell card self | hand
   # - name: CLASH_THE_STAMPEDE
   #   image: 20_clash_the_stampede
-  #   expansion: canyondiablo
   #   # TODO
   #   # prima di pescare request_clash_the_stampede
   #   # target = giocatore con piu' carte in mano
   #   # on_pick: dare carta
   - name: CRAZY_HOG
     image: 20_crazy_hog
-    expansion: canyondiablo
     effects:
       - max_usages(1)
       - discard card self | hand blue
       - draw(2)
   - name: EVA_PLACE
     image: 20_eva_place
-    expansion: canyondiablo
     effects:
       - max_usages(1)
       - discard card self | hand
       - eva_place
   # - name: JOSEY_BASSETT
   #   image: 20_josey_bassett
-  #   expansion: canyondiablo
   #   # TODO prima di pescare, stesso evento di vera_custer, priorita' +1
   #   # copia carta blu in characters
   #   # TODO gestire vera custer, copia solo personaggi
@@ -330,7 +294,6 @@ character:
   #     - max_hp(3)
   # - name: LAURA_BILLION
   #   image: 20_laura_billion
-  #   expansion: canyondiablo
   #   # TODO quando una carta e' estratta: request_laura_billion
   #   # effect_laura_billion: pop_request, pesca carta estratta
   #   # equip:
@@ -342,37 +305,31 @@ character:
   #   #   - auto_select
   - name: SID_CURRY
     image: 20_sid_curry
-    expansion: canyondiablo
     equip:
       - johnny_kisch
   - name: SOUNDANCE_KID
     image: 20_soundance_kid
-    expansion: canyondiablo
     equip:
       - soundance_kid
   - name: SPIKE_SPIEZEL
     image: 20_spike_spiezel
-    expansion: canyondiablo
     modifier: spike_spiezel
     effects:
       - max_usages(1)
       - discard card self | hand bang
   - name: TEREN_KILL_2
     image: 20_teren_kill
-    expansion: canyondiablo
     equip:
       - teren_kill
     tags:
       - max_hp(3)
   - name: WYATT_EARL
     image: 20_wyattearl
-    expansion: canyondiablo
     equip:
       - wyatt_earl
 
 button_row:
   - name: GAME_DISCARD_BRONCO
-    expansion: canyondiablo
     effects:
       - discard cards(2) self | hand
       - destroy card | table bronco

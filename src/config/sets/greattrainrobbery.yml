@@ -3,7 +3,6 @@ main_deck:
     signs:
       - 7 hearts
     image: 27_cactus
-    expansion: greattrainrobbery
     color: brown
     responses:
       - missed
@@ -12,7 +11,6 @@ main_deck:
     signs:
       - J spades
     image: 27_dragoon
-    expansion: greattrainrobbery
     color: blue
     equip:
       - weapon(2)
@@ -23,7 +21,6 @@ main_deck:
     signs:
       - Q clubs
     image: 27_evaded
-    expansion: greattrainrobbery
     color: brown
     responses:
       - evaded
@@ -31,38 +28,16 @@ main_deck:
     signs:
       - 2 spades
     image: 27_full_steam
-    expansion: greattrainrobbery
     color: brown
     effects:
       - none
     modifier: card_choice
     tags:
       - card_choice(4)
-  - name: FULL_STEAM_NO_EFFECT
-    image: 27_full_steam_no_effect
-    expansion: greattrainrobbery
-    color: brown
-    effects:
-      - card_choice
-      - full_steam(0)
-    tags:
-      - card_choice(4)
-      - hidden
-  - name: FULL_STEAM_DOUBLE_EFFECT
-    image: 27_full_steam_double_effect
-    expansion: greattrainrobbery
-    color: brown
-    effects:
-      - card_choice
-      - full_steam(2)
-    tags:
-      - card_choice(4)
-      - hidden
   - name: KNIFE_REVOLVER
     signs:
       - 5 diamonds
     image: 27_knife_revolver
-    expansion: greattrainrobbery
     color: brown
     effects:
       - banglimit
@@ -71,7 +46,6 @@ main_deck:
     signs:
       - 3 diamonds
     image: 27_map
-    expansion: greattrainrobbery
     color: blue
     equip:
       - map
@@ -79,7 +53,6 @@ main_deck:
     signs:
       - Q clubs
     image: 27_money_bag
-    expansion: greattrainrobbery
     color: brown
     effects:
       - none
@@ -88,7 +61,6 @@ main_deck:
     signs:
       - K spades
     image: 27_most_wanted
-    expansion: greattrainrobbery
     color: brown
     effects:
       - draw
@@ -98,7 +70,6 @@ main_deck:
       - 2 diamonds
       - K clubs
     image: 27_next_stop
-    expansion: greattrainrobbery
     color: brown
     effects:
       - draw
@@ -107,7 +78,6 @@ main_deck:
     signs:
       - 3 spades
     image: 27_refund
-    expansion: greattrainrobbery
     color: blue
     equip:
       - refund
@@ -115,7 +85,6 @@ main_deck:
     signs:
       - 9 hearts
     image: 27_strongbox
-    expansion: greattrainrobbery
     color: blue
     equip:
       - strongbox
@@ -123,7 +92,6 @@ main_deck:
     signs:
       - 6 hearts
     image: 27_switch
-    expansion: greattrainrobbery
     color: brown
     effects:
       - mth_add card self | table nottrain
@@ -134,7 +102,6 @@ main_deck:
       - 4 diamonds
       - J clubs
     image: 27_train_robbery
-    expansion: greattrainrobbery
     color: brown
     effects:
       - banglimit
@@ -143,7 +110,6 @@ main_deck:
     signs:
       - 8 hearts
     image: 27_water_tower
-    expansion: greattrainrobbery
     color: brown
     effects:
       - none
@@ -152,28 +118,23 @@ main_deck:
 character:
   - name: BENNY_BRAWLER
     image: 27_benny_brawler
-    expansion: greattrainrobbery
     equip:
       - benny_brawler
   - name: EVAN_BABBIT
     image: 27_evan_babbit
-    expansion: greattrainrobbery
     responses:
       - discard card self | hand origin_card_suit
       - evan_babbit player notself notorigin range_1
   - name: JIMMY_TEXAS
     image: 27_jimmy_texas
-    expansion: greattrainrobbery
     equip:
       - strongbox
   - name: MANUELITA
     image: 27_manuelita
-    expansion: greattrainrobbery
     equip:
       - manuelita
   - name: SANCHO
     image: 27_sancho
-    expansion: greattrainrobbery
     effects:
       - max_usages(1)
     modifier: traincost
@@ -181,7 +142,6 @@ character:
       - max_hp(3)
   - name: SGT_BLAZE
     image: 27_sgt_blaze
-    expansion: greattrainrobbery
     equip:
       - sgt_blaze
     effects:
@@ -189,18 +149,8 @@ character:
     modifier: sgt_blaze
     tags:
       - max_hp(5)
-  - expansion: greattrainrobbery
-    responses:
-      - none
-    optional:
-      - mth_add player
-    mth_response: sgt_blaze
-    tags:
-      - hidden
-      - auto_select
   - name: SHADE_OCONNOR
     image: 27_shadeoconnor
-    expansion: greattrainrobbery
     equip:
       - shade_oconnor
     responses:
@@ -212,7 +162,6 @@ character:
       - auto_select
   - name: ZIPPY_ROY
     image: 27_zippy_roy
-    expansion: greattrainrobbery
     effects:
       - max_usages(1)
       - next_stop
@@ -297,38 +246,6 @@ train:
     modifier: card_choice
     tags:
       - card_choice(3)
-  - name: BAGGAGE_CAR_MISSED
-    image: main_deck/01_mancato
-    responses:
-      - card_choice
-      - missed
-    tags:
-      - card_choice(3)
-      - hidden
-  - name: BAGGAGE_CAR_PANIC
-    image: main_deck/01_panico
-    effects:
-      - card_choice
-      - steal card range_1
-    tags:
-      - card_choice(3)
-      - hidden
-  - name: BAGGAGE_CAR_CAT_BALOU
-    image: main_deck/01_catbalou
-    effects:
-      - card_choice
-      - destroy card
-    tags:
-      - card_choice(3)
-      - hidden
-  - name: BAGGAGE_CAR_BANG
-    image: main_deck/01_bang
-    effects:
-      - card_choice
-      - bang player reachable notself
-    tags:
-      - card_choice(3)
-      - hidden
   - name: CABOOSE
     image: 27_caboose
     color: train
@@ -380,13 +297,6 @@ train:
     effects:
       - discard
       - lounge_car
-  - responses:
-      - mth_add card | selection
-      - mth_add player notself target_set dead alive
-    mth_response: lounge_car
-    tags:
-      - hidden
-      - auto_select
   - name: LUMBER_FLATCAR
     image: 27_lumber_flatcar
     color: train
@@ -399,13 +309,6 @@ train:
     effects:
       - discard
       - mail_car
-  - responses:
-      - mth_add card | selection
-      - mth_add player notself
-    mth_response: mail_car
-    tags:
-      - hidden
-      - auto_select
   - name: OBSERVATION_CAR
     image: 27_observation_car
     color: train
@@ -457,3 +360,75 @@ locomotive:
     effects:
       - next_stop
     modifier: locomotive
+
+hidden:
+  - name: FULL_STEAM_NO_EFFECT
+    image: main_deck/27_full_steam_no_effect
+    color: brown
+    effects:
+      - card_choice
+      - full_steam(0)
+    tags:
+      - card_choice(4)
+  - name: FULL_STEAM_DOUBLE_EFFECT
+    image: main_deck/27_full_steam_double_effect
+    color: brown
+    effects:
+      - card_choice
+      - full_steam(2)
+    tags:
+      - card_choice(4)
+
+  - name: SGT_BLAZE
+    responses:
+      - none
+    optional:
+      - mth_add player
+    mth_response: sgt_blaze
+    tags:
+      - auto_select
+  - name: BAGGAGE_CAR_MISSED
+    image: main_deck/01_mancato
+    responses:
+      - card_choice
+      - missed
+    tags:
+      - card_choice(3)
+
+  - name: BAGGAGE_CAR_PANIC
+    image: main_deck/01_panico
+    effects:
+      - card_choice
+      - steal card range_1
+    tags:
+      - card_choice(3)
+  - name: BAGGAGE_CAR_CAT_BALOU
+    image: main_deck/01_catbalou
+    effects:
+      - card_choice
+      - destroy card
+    tags:
+      - card_choice(3)
+  - name: BAGGAGE_CAR_BANG
+    image: main_deck/01_bang
+    effects:
+      - card_choice
+      - bang player reachable notself
+    tags:
+      - card_choice(3)
+      
+  - name: LOUNGE_CAR
+    responses:
+      - mth_add card | selection
+      - mth_add player notself target_set dead alive
+    mth_response: lounge_car
+    tags:
+      - auto_select
+
+  - name: MAIL_CAR
+    responses:
+      - mth_add card | selection
+      - mth_add player notself
+    mth_response: mail_car
+    tags:
+      - auto_select

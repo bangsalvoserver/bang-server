@@ -5,9 +5,6 @@ import sys
 import yaml_custom as yaml
 from cpp_generator import CppEnum, print_cpp_file
 
-def is_hidden(card):
-    return 'tags' in card and any(value == 'hidden' for value in card['tags'])
-
 def parse_sign(sign):
     match = re.match(r'^\s*([\w\d]+)\s*(\w+)\s*$', sign)
     if match:
@@ -127,99 +124,68 @@ def parse_all_effects(card):
     except RuntimeError as error:
         raise RuntimeError(f"Error in card {card['name']}:\n{error}") from error
 
-def add_expansion(card, name):
-    if 'expansion' in card:
-        card['expansion'] += ' ' + name
-    else:
-        card['expansion'] = name
-
 def merge_cards(card_sets):
     result = {}
-    for card_set in card_sets:
-        for k, v in card_set.items():
-            if not isinstance(v, list):
-                raise RuntimeError(f'Error in merge_cards: Expected list, got {v}')
-            if k in result:
-                result[k].extend(v)
+    if not isinstance(card_sets, dict):
+        raise RuntimeError(f'Error in merge_cards: Expected dict, got {card_sets}')
+    for expansion, card_set in card_sets.items():
+        for deck, cards in card_set.items():
+            if not isinstance(cards, list):
+                raise RuntimeError(f'Error in merge_cards: Expected list, got {cards}')
+            if expansion != 'base':
+                for card in cards:
+                    if 'expansion' in card:
+                        card['expansion'] += ' ' + expansion
+                    else:
+                        card['expansion'] = expansion
+            if deck in result:
+                result[deck].extend(cards)
             else:
-                result[k] = v
+                result[deck] = cards
     return result
 
 def parse_file(data):
-    result = {
-        'deck': [],
-        'characters': [],
-        'goldrush': [],
-        'highnoon': [],
-        'fistfulofcards': [],
-        'wildwestshow': [],
-        'button_row': [],
-        'stations': [],
-        'train': [],
-        'locomotive': [],
-        'hidden': []
+    def get_main_deck_cards(card):
+        for sign in card['signs']:
+            card['sign'] = sign
+            yield card
+
+    def get_goldrush_cards(card):
+        return [card] * card.get('count', 1)
+    
+    def get_cards_default(card):
+        return [card]
+
+    class Deck:
+        def __init__(self, strategy=get_cards_default, key=None, order=0, deck=None) -> None:
+            self.strategy = strategy
+            self.key = key
+            self.order = order
+            self.deck = deck
+
+    DECKS = {
+        'main_deck': Deck(strategy=get_main_deck_cards, key='deck', order=0),
+        'character': Deck(key='characters', order=1),
+        'goldrush': Deck(strategy=get_goldrush_cards, order=2),
+        'highnoon': Deck(order=3),
+        'fistfulofcards': Deck(order=4),
+        'wildwestshow': Deck(order=5),
+        'button_row': Deck(deck='none', order=6),
+        'station': Deck(key='stations', order=7),
+        'train': Deck(order=8),
+        'locomotive': Deck(order=9),
+        'hidden': Deck(deck='none', order=10),
     }
 
-    for card in data['main_deck']:
-        card['deck'] = 'main_deck'
-        if is_hidden(card):
-            result['hidden'].append(parse_all_effects(card))
-        else:
-            for sign in card['signs']:
-                card['sign'] = sign
-                result['deck'].append(parse_all_effects(card))
-    
-    for card in data['character']:
-        card['deck'] = 'character'
-        if is_hidden(card):
-            result['hidden'].append(parse_all_effects(card))
-        else:
-            result['characters'].append(parse_all_effects(card))
-    
-    for card in data['goldrush']:
-        card['deck'] = 'goldrush'
-        add_expansion(card, 'goldrush')
-        count = card['count'] if 'count' in card else 1
-        for _ in range(count):
-            if is_hidden(card):
-                result['hidden'].append(parse_all_effects(card))
-            else:
-                result['goldrush'].append(parse_all_effects(card))
+    def get_cards_for_deck(key, cards):
+        deck = DECKS.get(key, Deck())
+        def add_deck(card):
+            if 'deck' not in card:
+                card['deck'] = deck.deck or key
+            return card
+        return deck.key or key, list(parse_all_effects(card) for c in cards for card in deck.strategy(add_deck(c)))
 
-    for name in ('highnoon', 'fistfulofcards', 'wildwestshow'):
-        for card in data[name]:
-            card['deck'] = name
-            add_expansion(card, name)
-            if is_hidden(card):
-                result['hidden'].append(parse_all_effects(card))
-            else:
-                result[name].append(parse_all_effects(card))
-
-    for card in data['station']:
-        card['deck'] = 'station'
-        add_expansion(card, 'greattrainrobbery')
-        result['stations'].append(parse_all_effects(card))
-
-    for card in data['train']:
-        card['deck'] = 'train'
-        add_expansion(card, 'greattrainrobbery')
-        if is_hidden(card):
-            result['hidden'].append(parse_all_effects(card))
-        else:
-            result['train'].append(parse_all_effects(card))
-    
-    for card in data['locomotive']:
-        card['deck'] = 'locomotive'
-        add_expansion(card, 'greattrainrobbery')
-        result['locomotive'] .append(parse_all_effects(card))
-
-    for card in data['button_row']:
-        if is_hidden(card):
-            result['hidden'].append(parse_all_effects(card))
-        else:
-            result['button_row'].append(parse_all_effects(card))
-
-    return result
+    return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
 
 INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/effect_enums.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'

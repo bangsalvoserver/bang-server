@@ -6,12 +6,10 @@ main_deck:
       - 2 diamonds
       - 3 diamonds
     image: 17_bang
-    expansion: armedanddangerous
   - name: CARAVAN
     signs:
       - 2 spades
     image: 17_carovana
-    expansion: armedanddangerous
     color: brown
     effects:
       - mth_add
@@ -27,12 +25,10 @@ main_deck:
     signs:
       - 3 hearts
     image: 17_catbalou
-    expansion: armedanddangerous
   - name: A_LITTLE_NIP
     signs:
       - 5 hearts
     image: 17_cicchetto
-    expansion: armedanddangerous
     color: brown
     effects:
       - mth_add
@@ -46,7 +42,6 @@ main_deck:
     signs:
       - 3 spades
     image: 17_colporapido
-    expansion: armedanddangerous
     color: brown
     effects:
       - bang player reachable notself
@@ -61,7 +56,6 @@ main_deck:
     signs:
       - A spades
     image: 17_flintlock
-    expansion: armedanddangerous
     color: brown
     effects:
       - mth_add player reachable notself
@@ -75,7 +69,6 @@ main_deck:
     signs:
       - 5 diamonds
     image: 17_freccia
-    expansion: armedanddangerous
     color: brown
     effects:
       - indians player notself
@@ -91,7 +84,6 @@ main_deck:
     signs:
       - 3 diamonds
     image: 17_giulatesta
-    expansion: armedanddangerous
     color: brown
     responses:
       - missed
@@ -103,12 +95,10 @@ main_deck:
     signs:
       - K spades
     image: 17_mancato
-    expansion: armedanddangerous
   - name: RELOAD
     signs:
       - 4 diamonds
     image: 17_ricarica
-    expansion: armedanddangerous
     color: brown
     effects:
       - add_cube(3)
@@ -116,7 +106,6 @@ main_deck:
     signs:
       - 9 spades
     image: 17_ruggine
-    expansion: armedanddangerous
     color: brown
     effects:
       - rust players notself not_empty_cubes
@@ -124,7 +113,6 @@ main_deck:
     signs:
       - 3 diamonds
     image: 17_squaw
-    expansion: armedanddangerous
     color: brown
     effects:
       - mth_add card | table
@@ -138,7 +126,6 @@ main_deck:
     signs:
       - A hearts
     image: 17_assonellamanica
-    expansion: armedanddangerous
     color: orange
     effects:
       - pay_cube self_cubes(2)
@@ -147,7 +134,6 @@ main_deck:
     signs:
       - 2 hearts
     image: 17_bandoliera
-    expansion: armedanddangerous
     color: orange
     modifier: bandolier
     effects:
@@ -157,7 +143,6 @@ main_deck:
     signs:
       - Q spades
     image: 17_bigfifty
-    expansion: armedanddangerous
     color: orange
     modifier: bigfifty
     equip:
@@ -171,7 +156,6 @@ main_deck:
     signs:
       - 7 diamonds
     image: 17_bomba
-    expansion: armedanddangerous
     color: orange
     equip_target: any
     equip:
@@ -185,7 +169,6 @@ main_deck:
     signs:
       - J spades
     image: 17_buntlinespecial
-    expansion: armedanddangerous
     color: orange
     modifier: bangmod
     equip:
@@ -199,7 +182,6 @@ main_deck:
     signs:
       - 7 clubs
     image: 17_campanile
-    expansion: armedanddangerous
     color: orange
     modifier: belltower
     effects:
@@ -208,7 +190,6 @@ main_deck:
     signs:
       - 3 hearts
     image: 17_cassa
-    expansion: armedanddangerous
     color: orange
     responses:
       - pay_cube self_cubes(2)
@@ -217,7 +198,6 @@ main_deck:
     signs:
       - 4 clubs
     image: 17_cespuglio
-    expansion: armedanddangerous
     color: orange
     equip:
       - tumbleweed
@@ -228,7 +208,6 @@ main_deck:
     signs:
       - 6 clubs
     image: 17_doppiacanna
-    expansion: armedanddangerous
     color: orange
     modifier: doublebarrel
     equip:
@@ -242,7 +221,6 @@ main_deck:
     signs:
       - 5 clubs
     image: 17_frusta
-    expansion: armedanddangerous
     color: orange
     effects:
       - pay_cube self_cubes(3)
@@ -253,7 +231,6 @@ main_deck:
     signs:
       - 4 hearts
     image: 17_fustodibirra
-    expansion: armedanddangerous
     color: orange
     effects:
       - pay_cube self_cubes(3)
@@ -262,7 +239,6 @@ main_deck:
     signs:
       - 2 clubs
     image: 17_grimaldello
-    expansion: armedanddangerous
     color: orange
     effects:
       - pay_cube self_cubes(3)
@@ -273,7 +249,6 @@ main_deck:
     signs:
       - 3 clubs
     image: 17_thunderer
-    expansion: armedanddangerous
     color: orange
     modifier: bangmod
     equip:
@@ -287,7 +262,6 @@ main_deck:
 character:
   - name: AL_PREACHER
     image: 17_alpreacher
-    expansion: armedanddangerous
     equip:
       - al_preacher
     responses:
@@ -299,30 +273,25 @@ character:
       - auto_select
   - name: BASS_GREEVES
     image: 17_bassgreeves
-    expansion: armedanddangerous
     effects:
       - max_usages(1)
       - discard card self | hand
       - add_cube(2) card self | cube_slot can_target_self
   - name: BLOODY_MARY
     image: 17_bloodymary
-    expansion: armedanddangerous
     equip:
       - bloody_mary
   - name: FRANKIE_CANTON
     image: 17_frankiecanton
-    expansion: armedanddangerous
     effects:
       - max_usages(1)
       - frankie_canton card | cube_slot
   - name: JULIE_CUTTER
     image: 17_juliecutter
-    expansion: armedanddangerous
     equip:
       - julie_cutter
   - name: MEXICALI_KID
     image: 17_mexicalikid
-    expansion: armedanddangerous
     effects:
       - max_usages(1)
       - pay_cube select_cubes(2)
@@ -331,14 +300,12 @@ character:
       - skip_logs
   - name: MS_ABIGAIL
     image: 17_msabigail
-    expansion: armedanddangerous
     equip:
       - ms_abigail
     responses:
       - ms_abigail
   - name: RED_RINGO
     image: 17_redringo
-    expansion: armedanddangerous
     equip:
       - red_ringo
     effects:
