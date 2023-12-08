@@ -485,7 +485,7 @@ namespace banggame {
                     call_event<event_type::on_player_death>(killer, target);
                 }
             }
-        }, 30);
+        }, 50);
 
         if (killer && reason != discard_all_reason::discard_ghost) {
             queue_action([this, killer, target] {
@@ -506,14 +506,14 @@ namespace banggame {
                         killer->draw_card(3);
                     }
                 }
-            }, 30);
+            }, 50);
         }
         
         queue_action([this, target, reason]{
             if (!target->alive()) {
                 queue_request<request_discard_all>(target, reason);
             }
-        }, 30);
+        }, 50);
 
         if (!m_options.enable_ghost_cards) {
             queue_action([this]{

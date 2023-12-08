@@ -12,7 +12,7 @@ namespace banggame {
     
     struct request_death : request_base, resolvable_request {
         request_death(card *origin_card, player *origin, player *target)
-            : request_base(origin_card, origin, target, {}, 30) {}
+            : request_base(origin_card, origin, target, {}, 50) {}
 
         bool tried_save = false;
 

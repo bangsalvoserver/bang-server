@@ -143,7 +143,7 @@ namespace banggame {
                 }
                 target_player->discard_card(target_card);
             }
-        }, 82);
+        }, 42);
     }
     
     struct request_destroy : request_targeting {
