@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/game_enums.h"
+
 namespace banggame {
 
     void equip_helena_zontero::on_enable(card *target_card, player *origin) {
@@ -17,6 +19,7 @@ namespace banggame {
                 
                 for (player *p : alive_players) {
                     p->set_role(player_role::unknown, false);
+                    p->remove_player_flags(player_flags::role_revealed);
                 }
 
                 for (auto [p, role] : ranges::views::zip(alive_players, roles)) {
