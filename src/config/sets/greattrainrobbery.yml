@@ -41,7 +41,8 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - knife_revolver player reachable notself
+      - knife_revolver
+      - bang player reachable notself
   - name: MAP
     signs:
       - 3 diamonds

@@ -8,7 +8,7 @@
 namespace banggame {
 
     struct effect_knife_revolver : bot_suggestion::target_enemy {
-        void on_play(card *origin_card, player *origin, player *target, effect_flags flags);
+        void on_play(card *origin_card, player *origin);
     };
 }
 
