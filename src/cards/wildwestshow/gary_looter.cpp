@@ -7,7 +7,9 @@ namespace banggame {
     static constexpr int equip_type_gary_looter = 2;
 
     static card *get_gary_looter(player *target) {
-        return target->m_game->call_event<event_type::check_card_taker>(target, equip_type_gary_looter, nullptr);
+        card *origin_card = nullptr;
+        target->m_game->call_event<event_type::check_card_taker>(target, equip_type_gary_looter, origin_card);
+        return origin_card;
     }
 
     void equip_gary_looter::on_enable(card *target_card, player *player_end) {

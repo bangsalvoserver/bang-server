@@ -1,102 +1,152 @@
 #ifndef __EVENTS_H__
 #define __EVENTS_H__
 
-#include "utils/priority_double_map.h"
-#include "cards/event_enums.h"
 #include "event_card_key.h"
 
-namespace banggame {
+#include "utils/reflector.h"
 
-    using event_map = util::priority_double_map<event_type, event_card_key, event_card_key::priority_greater>;
+#include <functional>
+#include <memory>
+#include <set>
+#include <map>
 
-    template<typename T, typename U> struct same_function_args {};
+namespace banggame::detail {
+    struct event_listener_base {
+        const size_t id;
+        const size_t priority;
 
-    template<typename Function, typename RetType, typename ... Ts>
-    struct same_function_args<Function, std::function<RetType(Ts...)>> : std::is_invocable_r<RetType, Function, Ts...> {};
+        event_listener_base(size_t id, size_t priority)
+            : id{id}
+            , priority{priority} {}
 
-    template<typename T, event_type E>
-    concept invocable_for_event = same_function_args<T, enums::enum_type_t<E>>::value;
+        virtual ~event_listener_base() = default;
 
-    template<typename Tuple, typename ISeqIn, typename ISeqOut>
-    struct find_reference_params_impl;
+        auto operator <=> (const event_listener_base &other) const {
+            if (id == other.id) {
+                return other.priority <=> priority;
+            } else {
+                return id <=> other.id;
+            }
+        }
 
-    template<typename First, typename ... Ts, size_t IFirst, size_t ... Is, size_t ... Os>
-    struct find_reference_params_impl<std::tuple<First, Ts...>, std::index_sequence<IFirst, Is...>, std::index_sequence<Os...>>
-        : find_reference_params_impl<std::tuple<Ts...>, std::index_sequence<Is...>, std::index_sequence<Os...>> {};
-
-    template<typename First, typename ... Ts, size_t IFirst, size_t ... Is, size_t ... Os> requires (!std::is_const_v<First>)
-    struct find_reference_params_impl<std::tuple<First&, Ts...>, std::index_sequence<IFirst, Is...>, std::index_sequence<Os...>>
-        : find_reference_params_impl<std::tuple<Ts...>, std::index_sequence<Is...>, std::index_sequence<Os..., IFirst>> {};
-
-    template<size_t ... Os>
-    struct find_reference_params_impl<std::tuple<>, std::index_sequence<>, std::index_sequence<Os...>> {
-        using type = std::index_sequence<Os...>;
+        auto operator <=> (size_t other_id) const {
+            return id <=> other_id;
+        }
     };
 
-    template<typename ... Ts>
-    struct find_reference_params : find_reference_params_impl<std::tuple<Ts...>, std::index_sequence_for<Ts...>, std::index_sequence<>> {};
+    struct global_unique_id {
+        static inline size_t count = 0;
+        const size_t value;
 
-    template<typename ... Ts>
-    using find_reference_params_t = typename find_reference_params<Ts...>::type;
+        global_unique_id() : value(++count) {}
+    };
 
-    template<typename Function>
-    struct filter_reference_params_impl;
+    template<reflector::reflectable T, size_t ... Is>
+    auto build_tuple_helper(const T &value, std::index_sequence<Is...>) {
+        return std::tie(reflector::get_field_data<Is, T>(value).get() ...);
+    }
 
-    template<typename RetType, typename ... Ts>
-    struct filter_reference_params_impl<std::function<RetType(Ts...)>> {
-        template<typename Tuple, size_t ... Is>
-        auto operator ()(const Tuple &tup, std::index_sequence<Is ...>) const {
-            return std::make_tuple(std::get<Is>(tup) ... );
-        }
+    template<reflector::reflectable T>
+    auto build_tuple(const T &value) {
+        return build_tuple_helper(value, std::make_index_sequence<reflector::num_fields<T>>());
+    }
 
-        template<typename Tuple>
-        auto operator ()(const Tuple &tup) const {
-            return (*this)(tup, find_reference_params_t<Ts...>{});
-        }
+    template<typename T>
+    using build_tuple_t = decltype(build_tuple(std::declval<const T &>()));
+
+    template<typename T>
+    struct event_listener : event_listener_base {
+        static inline const global_unique_id id;
+
+        event_listener(size_t priority): event_listener_base(id.value, priority) {}
+
+        virtual void operator()(const T &value) = 0;
     };
 
     template<typename Function, typename Tuple>
-    auto filter_reference_params(const Tuple &tup) {
-        return filter_reference_params_impl<Function>{}(tup);
-    }
-
-    template<typename Function> struct function_argument_tuple;
-    template<typename Function> using function_argument_tuple_t = typename function_argument_tuple<Function>::type;
-
-    template<typename RetType, typename ... Ts>
-    struct function_argument_tuple<std::function<RetType(Ts...)>> {
-        using type = std::tuple<std::remove_reference_t<Ts> ...>;
+    concept appliable = requires (Function fun, Tuple tup) {
+        std::apply(fun, tup);
     };
+
+    template<typename T, typename Function> requires appliable<Function, build_tuple_t<T>>
+    class event_listener_impl : public event_listener<T>, private std::decay_t<Function> {
+    private:
+        using base = std::decay_t<Function>;
+
+    public:
+        template<std::convertible_to<Function> U>
+        event_listener_impl(size_t priority, U &&function)
+            : event_listener<T>(priority)
+            , base(std::forward<U>(function)) {}
+
+        void operator()(const T &value) override {
+            std::apply(static_cast<Function &>(*this), build_tuple(value));
+        }
+    };
+
+    struct shared_ptr_less {
+        struct is_transparent {};
+
+        template<typename T>
+        bool operator()(const std::shared_ptr<T> &lhs, const std::shared_ptr<T> &rhs) const {
+            return *lhs < *rhs;
+        }
+
+        template<typename T, typename U>
+        bool operator()(const std::shared_ptr<T> &lhs, const U &rhs) const {
+            return *lhs < rhs;
+        }
+
+        template<typename T, typename U>
+        bool operator()(const U &lhs, const std::shared_ptr<T> &rhs) const {
+            return lhs < *rhs;
+        }
+    };
+
+}
+
+namespace banggame {
 
     class listener_map {
     private:
-        event_map m_listeners;
+        using listener_set = std::multiset<std::shared_ptr<detail::event_listener_base>, detail::shared_ptr_less>;
+        using iterator_map = std::multimap<event_card_key, listener_set::const_iterator, std::less<>>;
+
+        listener_set m_listeners;
+        iterator_map m_map;
 
     public:
-        template<event_type E, invocable_for_event<E> Function>
+        template<typename T, typename Function> requires detail::appliable<Function, detail::build_tuple_t<T>>
         void add_listener(event_card_key key, Function &&fun) {
-            m_listeners.add<E>(key, std::forward<Function>(fun));
+            auto it = m_listeners.emplace(std::make_shared<detail::event_listener_impl<T, Function>>(key.priority, std::forward<Function>(fun)));
+            m_map.emplace(key, it);
         }
 
         void remove_listeners(auto key) {
-            m_listeners.erase(key);
+            auto [low, high] = m_map.equal_range(key);
+            if (low != high) {
+                for (auto it = low; it != high; ++it) {
+                    m_listeners.erase(it->second);
+                }
+                m_map.erase(low, high);
+            }
         }
 
-        template<event_type E, typename ... Ts>
-        auto call_event(Ts && ... args) {
-            using function_type = enums::enum_type_t<E>;
-            function_argument_tuple_t<function_type> tup{FWD(args) ...};
-
-            auto lock = m_listeners.lock_table<E>();
-            for (auto &fun : lock.values()) {
-                std::apply(fun, tup);
-            }
-            
-            auto ret = filter_reference_params<function_type>(tup);
-            if constexpr (std::tuple_size_v<decltype(ret)> == 1) {
-                return std::get<0>(ret);
-            } else if constexpr (std::tuple_size_v<decltype(ret)> > 1) {
-                return ret;
+        template<typename T, typename ... Ts>
+        void call_event(Ts && ... args) {
+            using listener_type = detail::event_listener<T>;
+            auto [low, high] = m_listeners.equal_range(listener_type::id.value);
+            if (low != high) {
+                auto listeners = ranges::subrange(low, high)
+                    | ranges::views::transform([](const std::shared_ptr<detail::event_listener_base> &ptr) {
+                        return std::static_pointer_cast<listener_type>(ptr);
+                    })
+                    | ranges::to<std::vector>;
+                
+                T value{FWD(args) ...};
+                for (const std::shared_ptr<listener_type> &ptr : listeners) {
+                    std::invoke(*ptr, value);
+                }
             }
         }
     };

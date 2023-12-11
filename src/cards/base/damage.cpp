@@ -31,9 +31,13 @@ namespace banggame {
     void request_damage::on_update() {
         if (target->is_ghost()) {
             target->m_game->pop_request();
-        } else if (!target->m_game->call_event<event_type::check_damage_response>(target, false)) {
-            target->m_game->pop_request();
-            on_finished();
+        } else {
+            bool handled = false;
+            target->m_game->call_event<event_type::check_damage_response>(target, handled);
+            if (!handled) {
+                target->m_game->pop_request();
+                on_finished();
+            }
         }
     }
 

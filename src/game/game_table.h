@@ -9,6 +9,8 @@
 #include "event_map.h"
 #include "disabler_map.h"
 
+#include "event_type.h"
+
 namespace banggame {
 
     struct game_table : game_net_manager, listener_map, disabler_map {

@@ -9,7 +9,9 @@
 namespace banggame {
 
     game_string effect_express_car::get_error(card *origin_card, player *origin) {
-        if (origin->m_game->call_event<event_type::count_usages>(origin, origin_card, 0) >= 1) {
+        int usages = 0;
+        origin->m_game->call_event<event_type::count_usages>(origin, origin_card, usages);
+        if (usages >= 1) {
             return {"ERROR_MAX_USAGES", origin_card, 1};
         }
         return {};

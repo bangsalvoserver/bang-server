@@ -186,7 +186,9 @@ namespace banggame {
         if (origin_card->inactive) {
             return {"ERROR_CARD_INACTIVE", origin_card};
         }
-        return origin->m_game->call_event<event_type::check_play_card>(origin, origin_card, ctx, game_string{});
+        game_string out_error;
+        origin->m_game->call_event<event_type::check_play_card>(origin, origin_card, ctx, out_error);
+        return out_error;
     }
 
     game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx) {

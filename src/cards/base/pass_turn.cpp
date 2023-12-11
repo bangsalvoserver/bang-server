@@ -13,7 +13,9 @@ namespace banggame {
     }
 
     game_string effect_pass_turn::get_error(card *origin_card, player *origin) {
-        return origin->m_game->call_event<event_type::check_pass_turn>(origin, game_string{});
+        game_string out_error;
+        origin->m_game->call_event<event_type::check_pass_turn>(origin, out_error);
+        return out_error;
     }
 
     void effect_pass_turn::on_play(card *origin_card, player *origin) {

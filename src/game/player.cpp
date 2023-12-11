@@ -60,31 +60,45 @@ namespace banggame {
     }
 
     int player::max_cards_end_of_turn() {
-        return m_game->call_event<event_type::apply_maxcards_modifier>(this, m_hp);
+        int ncards = m_hp;
+        m_game->call_event<event_type::apply_maxcards_modifier>(this, ncards);
+        return ncards;
     }
 
     int player::get_num_checks() {
-        return m_game->call_event<event_type::count_num_checks>(this, 1);
+        int nchecks = 1;
+        m_game->call_event<event_type::count_num_checks>(this, nchecks);
+        return nchecks;
     }
 
     int player::get_bangs_played() {
-        return m_game->call_event<event_type::count_bangs_played>(this, 0);
+        int nbangs = 0;
+        m_game->call_event<event_type::count_bangs_played>(this, nbangs);
+        return nbangs;
     }
 
     int player::get_cards_to_draw() {
-        return m_game->call_event<event_type::count_cards_to_draw>(this, 2);
+        int ncards = 2;
+        m_game->call_event<event_type::count_cards_to_draw>(this, ncards);
+        return ncards;
     }
 
     int player::get_range_mod() const {
-        return m_game->call_event<event_type::count_range_mod>(this, range_mod_type::range_mod, 0);
+        int mod = 0;
+        m_game->call_event<event_type::count_range_mod>(this, range_mod_type::range_mod, mod);
+        return mod;
     }
 
     int player::get_weapon_range() const {
-        return m_game->call_event<event_type::count_range_mod>(this, range_mod_type::weapon_range, 1);
+        int range = 1;
+        m_game->call_event<event_type::count_range_mod>(this, range_mod_type::weapon_range, range);
+        return range;
     }
 
     int player::get_distance_mod() const {
-        return m_game->call_event<event_type::count_range_mod>(this, range_mod_type::distance_mod, 0);
+        int mod = 0;
+        m_game->call_event<event_type::count_range_mod>(this, range_mod_type::distance_mod, mod);
+        return mod;
     }
 
     card *player::find_equipped_card(card *card) {
@@ -164,7 +178,8 @@ namespace banggame {
     }
 
     bool player::immune_to(card *origin_card, player *origin, effect_flags flags, bool quiet) {
-        auto cards = m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, serial::card_list{});
+        serial::card_list cards;
+        m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, cards);
         if (!quiet) {
             for (card *target_card : cards) {
                 m_game->add_log("LOG_PLAYER_IMMUNE_TO_CARD", this, origin_card, target_card);
@@ -175,7 +190,9 @@ namespace banggame {
     }
 
     int player::can_escape(player *origin, card *origin_card, effect_flags flags) const {
-        return m_game->call_event<event_type::apply_escapable_modifier>(origin_card, origin, this, flags, 0);
+        int result = 0;
+        m_game->call_event<event_type::apply_escapable_modifier>(origin_card, origin, this, flags, result);
+        return result;
     }
 
     void player::add_to_hand(card *target) {

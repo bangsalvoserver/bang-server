@@ -6,7 +6,9 @@
 namespace banggame {
 
     game_string effect_evelyn_shebang::get_error(card *origin_card, player *origin, player *target) {
-        return origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target, effect_flags{}, game_string{});
+        game_string out_error;
+        origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target, effect_flags{}, out_error);
+        return out_error;
     }
 
     void effect_evelyn_shebang::on_play(card *origin_card, player *origin, player *target) {

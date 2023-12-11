@@ -7,7 +7,9 @@ namespace banggame {
     static constexpr int equip_type_john_pain = 3;
 
     static card *get_john_pain(player *target) {
-        return target->m_game->call_event<event_type::check_card_taker>(target, equip_type_john_pain, nullptr);
+        card *origin_card = nullptr;
+        target->m_game->call_event<event_type::check_card_taker>(target, equip_type_john_pain, origin_card);
+        return origin_card;
     }
     
     void equip_john_pain::on_enable(card *target_card, player *player_end) {

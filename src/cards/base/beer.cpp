@@ -13,7 +13,9 @@ namespace banggame {
 
     void effect_beer::on_play(card *origin_card, player *target) {
         if (target->m_game->num_alive() > 2) {
-            target->heal(target->m_game->call_event<event_type::apply_beer_modifier>(target, 1));
+            int amount = 1;
+            target->m_game->call_event<event_type::apply_beer_modifier>(target, amount);
+            target->heal(amount);
         }
         target->m_game->call_event<event_type::on_play_beer>(target);
     }

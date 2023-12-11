@@ -78,7 +78,9 @@ namespace banggame {
                 if (!ctx.traincost) {
                     out_error = "ERROR_MUST_PAY_TRAIN_COST";
                 } else if (ctx.traincost->deck != card_deck_type::main_deck) {
-                    auto [train_equips, num_advance] = origin->m_game->call_event<event_type::count_train_equips>(origin, 0, 0);
+                    int train_equips = 0;
+                    int num_advance = 0;
+                    origin->m_game->call_event<event_type::count_train_equips>(origin, train_equips, num_advance);
                     if (train_equips >= 1) {
                         out_error = "ERROR_ONE_TRAIN_EQUIP_PER_TURN";
                     } else if (ctx.train_advance >= 1 && num_advance >= 1) {

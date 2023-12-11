@@ -17,7 +17,9 @@ namespace banggame {
     }
 
     static card *get_vulture_sam(player *target) {
-        return target->m_game->call_event<event_type::check_card_taker>(target, equip_type_vulture_sam, nullptr);
+        card *origin_card = nullptr;
+        target->m_game->call_event<event_type::check_card_taker>(target, equip_type_vulture_sam, origin_card);
+        return origin_card;
     }
 
     struct request_multi_vulture_sam : request_picking {

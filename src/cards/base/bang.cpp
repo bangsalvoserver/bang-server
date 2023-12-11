@@ -24,7 +24,7 @@ namespace banggame {
 
     static void queue_request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {}) {
         auto req = std::make_shared<request_bang>(origin_card, origin, target, flags | effect_flags::is_bang | effect_flags::single_target);
-        req->origin->m_game->call_event<event_type::apply_bang_modifier>(req->origin, req.get());
+        req->origin->m_game->call_event<event_type::apply_bang_modifier>(req->origin, req);
         req->origin->m_game->queue_request(std::move(req));
     }
 
@@ -32,7 +32,9 @@ namespace banggame {
         if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flags::treat_any_as_bang)) {
             return "ERROR_CARD_INACTIVE";
         } else if (!ctx.disable_bang_checks) {
-            return origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target, effect_flags::is_bang, game_string{});
+            game_string out_error;
+            origin->m_game->call_event<event_type::check_card_target>(origin_card, origin, target, effect_flags::is_bang, out_error);
+            return out_error;
         } else {
             return {};
         }

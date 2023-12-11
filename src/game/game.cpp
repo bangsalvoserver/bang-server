@@ -167,7 +167,9 @@ namespace banggame {
     }
 
     card_sign game::get_card_sign(card *target_card) {
-        return call_event<event_type::apply_sign_modifier>(target_card->sign);
+        auto sign = target_card->sign;
+        call_event<event_type::apply_sign_modifier>(sign);
+        return sign;
     }
 
     void game::start_game(const game_options &options) {
