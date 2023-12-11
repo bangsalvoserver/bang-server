@@ -33,7 +33,7 @@ namespace banggame {
             target->m_game->pop_request();
         } else {
             bool handled = false;
-            target->m_game->call_event<event_type::check_damage_response>(target, handled);
+            target->m_game->call_event(event_type::check_damage_response{ target, handled });
             if (!handled) {
                 target->m_game->pop_request();
                 on_finished();
@@ -53,7 +53,7 @@ namespace banggame {
         }
         target->set_hp(target->m_hp - damage);
         target->m_game->queue_request<request_death>(origin_card, origin, target);
-        target->m_game->call_event<event_type::on_hit>(origin_card, origin, target, damage, flags);
+        target->m_game->call_event(event_type::on_hit{ origin_card, origin, target, damage, flags });
     }
 
     game_string request_damage::status_text(player *owner) const {

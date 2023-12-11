@@ -9,7 +9,7 @@ namespace banggame {
         origin->m_game->train_position = int8_t(origin->m_game->m_stations.size());
         origin->m_game->add_update<game_update_type::move_train>(origin->m_game->train_position);
 
-        origin->m_game->call_event<event_type::on_train_advance>(origin,
-            std::make_shared<effect_context>(effect_context{ .locomotive_count = value }));
+        origin->m_game->call_event(event_type::on_train_advance{ origin,
+            std::make_shared<effect_context>(effect_context{ .locomotive_count = value }) });
     }
 }

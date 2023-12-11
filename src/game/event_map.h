@@ -60,27 +60,24 @@ namespace banggame::detail {
 
         event_listener(size_t priority): event_listener_base(id.value, priority) {}
 
-        virtual void operator()(const T &value) = 0;
+        virtual void operator()(const build_tuple_t<T> &tuple) = 0;
     };
 
     template<typename Function, typename Tuple>
-    concept appliable = requires (Function fun, Tuple tup) {
+    concept applicable = requires (Function fun, Tuple tup) {
         std::apply(fun, tup);
     };
 
-    template<typename T, typename Function> requires appliable<Function, build_tuple_t<T>>
-    class event_listener_impl : public event_listener<T>, private std::decay_t<Function> {
-    private:
-        using base = std::decay_t<Function>;
-
+    template<typename T, typename Function> requires applicable<Function, build_tuple_t<T>>
+    class event_listener_impl : public event_listener<T>, private Function {
     public:
         template<std::convertible_to<Function> U>
         event_listener_impl(size_t priority, U &&function)
             : event_listener<T>(priority)
-            , base(std::forward<U>(function)) {}
+            , Function(std::forward<U>(function)) {}
 
-        void operator()(const T &value) override {
-            std::apply(static_cast<Function &>(*this), build_tuple(value));
+        void operator()(const build_tuple_t<T> &tuple) override {
+            std::apply(static_cast<Function>(*this), tuple);
         }
     };
 
@@ -116,9 +113,9 @@ namespace banggame {
         iterator_map m_map;
 
     public:
-        template<typename T, typename Function> requires detail::appliable<Function, detail::build_tuple_t<T>>
+        template<typename T, typename Function> requires detail::applicable<Function, detail::build_tuple_t<T>>
         void add_listener(event_card_key key, Function &&fun) {
-            auto it = m_listeners.emplace(std::make_shared<detail::event_listener_impl<T, Function>>(key.priority, std::forward<Function>(fun)));
+            auto it = m_listeners.emplace(std::make_shared<detail::event_listener_impl<T, std::decay_t<Function>>>(key.priority, std::forward<Function>(fun)));
             m_map.emplace(key, it);
         }
 
@@ -132,8 +129,8 @@ namespace banggame {
             }
         }
 
-        template<typename T, typename ... Ts>
-        void call_event(Ts && ... args) {
+        template<typename T>
+        void call_event(const T &value) {
             using listener_type = detail::event_listener<T>;
             auto [low, high] = m_listeners.equal_range(listener_type::id.value);
             if (low != high) {
@@ -143,9 +140,9 @@ namespace banggame {
                     })
                     | ranges::to<std::vector>;
                 
-                T value{FWD(args) ...};
+                auto tuple = detail::build_tuple(value);
                 for (const std::shared_ptr<listener_type> &ptr : listeners) {
-                    std::invoke(*ptr, value);
+                    std::invoke(*ptr, tuple);
                 }
             }
         }

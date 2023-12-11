@@ -98,10 +98,10 @@ namespace banggame {
             target->discard_card(target_card);
         }
         ++ndiscarded;
-        target->m_game->call_event<event_type::on_discard_pass>(target, target_card);
+        target->m_game->call_event(event_type::on_discard_pass{ target, target_card });
         if (target->m_hand.size() <= target->max_cards_end_of_turn()) {
             target->m_game->pop_request();
-            target->m_game->call_event<event_type::post_discard_pass>(target, ndiscarded);
+            target->m_game->call_event(event_type::post_discard_pass{ target, ndiscarded });
             target->m_game->queue_action([target = target]{ target->pass_turn(); }, 1);
         }
     }

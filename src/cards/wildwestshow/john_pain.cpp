@@ -8,7 +8,7 @@ namespace banggame {
 
     static card *get_john_pain(player *target) {
         card *origin_card = nullptr;
-        target->m_game->call_event<event_type::check_card_taker>(target, equip_type_john_pain, origin_card);
+        target->m_game->call_event(event_type::check_card_taker{ target, equip_type_john_pain, origin_card });
         return origin_card;
     }
     

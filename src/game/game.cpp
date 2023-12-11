@@ -168,7 +168,7 @@ namespace banggame {
 
     card_sign game::get_card_sign(card *target_card) {
         auto sign = target_card->sign;
-        call_event<event_type::apply_sign_modifier>(sign);
+        call_event(event_type::apply_sign_modifier{ sign });
         return sign;
     }
 
@@ -327,7 +327,7 @@ namespace banggame {
                 }
             }
 
-            call_event<event_type::on_game_setup>(m_first_player);
+            call_event(event_type::on_game_setup{ m_first_player });
         });
 
         queue_action([this]{
@@ -436,7 +436,7 @@ namespace banggame {
                     if (it == m_players.end()) it = m_players.begin();
                 }
                 if (!(*it)->remove_player_flags(player_flags::skip_turn)) {
-                    call_event<event_type::check_revivers>(*it);
+                    call_event(event_type::check_revivers{ *it });
                     if ((*it)->alive()) break;
                 }
             }
@@ -453,7 +453,7 @@ namespace banggame {
             draw_scenario_card();
         }
 
-        call_event<event_type::on_turn_switch>(next_player);
+        call_event(event_type::on_turn_switch{ next_player });
     }
 
     void game::handle_player_death(player *killer, player *target, discard_all_reason reason) {
@@ -484,7 +484,7 @@ namespace banggame {
                 }
 
                 if (reason != discard_all_reason::discard_ghost) {
-                    call_event<event_type::on_player_death>(killer, target);
+                    call_event(event_type::on_player_death{ killer, target });
                 }
             }
         }, 50);

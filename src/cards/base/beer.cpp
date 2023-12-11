@@ -14,10 +14,10 @@ namespace banggame {
     void effect_beer::on_play(card *origin_card, player *target) {
         if (target->m_game->num_alive() > 2) {
             int amount = 1;
-            target->m_game->call_event<event_type::apply_beer_modifier>(target, amount);
+            target->m_game->call_event(event_type::apply_beer_modifier{ target, amount });
             target->heal(amount);
         }
-        target->m_game->call_event<event_type::on_play_beer>(target);
+        target->m_game->call_event(event_type::on_play_beer{ target });
     }
 
     bool effect_beer::can_play(card *origin_card, player *target) {

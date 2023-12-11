@@ -61,43 +61,43 @@ namespace banggame {
 
     int player::max_cards_end_of_turn() {
         int ncards = m_hp;
-        m_game->call_event<event_type::apply_maxcards_modifier>(this, ncards);
+        m_game->call_event(event_type::apply_maxcards_modifier{ this, ncards });
         return ncards;
     }
 
     int player::get_num_checks() {
         int nchecks = 1;
-        m_game->call_event<event_type::count_num_checks>(this, nchecks);
+        m_game->call_event(event_type::count_num_checks{ this, nchecks });
         return nchecks;
     }
 
     int player::get_bangs_played() {
         int nbangs = 0;
-        m_game->call_event<event_type::count_bangs_played>(this, nbangs);
+        m_game->call_event(event_type::count_bangs_played{ this, nbangs });
         return nbangs;
     }
 
     int player::get_cards_to_draw() {
         int ncards = 2;
-        m_game->call_event<event_type::count_cards_to_draw>(this, ncards);
+        m_game->call_event(event_type::count_cards_to_draw{ this, ncards });
         return ncards;
     }
 
     int player::get_range_mod() const {
         int mod = 0;
-        m_game->call_event<event_type::count_range_mod>(this, range_mod_type::range_mod, mod);
+        m_game->call_event(event_type::count_range_mod{ this, range_mod_type::range_mod, mod });
         return mod;
     }
 
     int player::get_weapon_range() const {
         int range = 1;
-        m_game->call_event<event_type::count_range_mod>(this, range_mod_type::weapon_range, range);
+        m_game->call_event(event_type::count_range_mod{ this, range_mod_type::weapon_range, range });
         return range;
     }
 
     int player::get_distance_mod() const {
         int mod = 0;
-        m_game->call_event<event_type::count_range_mod>(this, range_mod_type::distance_mod, mod);
+        m_game->call_event(event_type::count_range_mod{ this, range_mod_type::distance_mod, mod });
         return mod;
     }
 
@@ -122,7 +122,7 @@ namespace banggame {
                 owner->m_game->drop_cubes(target_card);
                 return true;
             } else if (target_card->pocket == pocket_type::player_hand) {
-                owner->m_game->call_event<event_type::on_discard_hand_card>(owner, target_card, used);
+                owner->m_game->call_event(event_type::on_discard_hand_card{ owner, target_card, used });
                 return true;
             }
         }
@@ -179,7 +179,7 @@ namespace banggame {
 
     bool player::immune_to(card *origin_card, player *origin, effect_flags flags, bool quiet) {
         serial::card_list cards;
-        m_game->call_event<event_type::apply_immunity_modifier>(origin_card, origin, this, flags, cards);
+        m_game->call_event(event_type::apply_immunity_modifier{ origin_card, origin, this, flags, cards });
         if (!quiet) {
             for (card *target_card : cards) {
                 m_game->add_log("LOG_PLAYER_IMMUNE_TO_CARD", this, origin_card, target_card);
@@ -191,7 +191,7 @@ namespace banggame {
 
     int player::can_escape(player *origin, card *origin_card, effect_flags flags) const {
         int result = 0;
-        m_game->call_event<event_type::apply_escapable_modifier>(origin_card, origin, this, flags, result);
+        m_game->call_event(event_type::apply_escapable_modifier{ origin_card, origin, this, flags, result });
         return result;
     }
 
@@ -256,13 +256,13 @@ namespace banggame {
         m_game->add_update<game_update_type::switch_turn>(this);
 
         m_game->queue_action([this]{
-            m_game->call_event<event_type::pre_turn_start>(this);
+            m_game->call_event(event_type::pre_turn_start{ this });
             m_game->queue_request<request_predraw>(this);
         }, -10);
 
         m_game->queue_action([this]{
             if (alive() && m_game->m_playing == this) {
-                m_game->call_event<event_type::on_turn_start>(this);
+                m_game->call_event(event_type::on_turn_start{ this });
                 m_game->queue_request<request_draw>(this);
             }
         }, -10);
@@ -272,7 +272,7 @@ namespace banggame {
         if (m_hand.size() > max_cards_end_of_turn()) {
             m_game->queue_request<request_discard_pass>(this);
         } else {
-            m_game->call_event<event_type::on_turn_end>(this, false);
+            m_game->call_event(event_type::on_turn_end{ this, false });
             m_game->queue_action([this]{
                 if (m_extra_turns == 0) {
                     remove_player_flags(player_flags::extra_turn);
@@ -288,7 +288,7 @@ namespace banggame {
 
     void player::skip_turn() {
         remove_player_flags(player_flags::extra_turn);
-        m_game->call_event<event_type::on_turn_end>(this, true);
+        m_game->call_event(event_type::on_turn_end{ this, true });
         m_game->start_next_turn();
     }
 

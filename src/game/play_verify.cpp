@@ -187,7 +187,7 @@ namespace banggame {
             return {"ERROR_CARD_INACTIVE", origin_card};
         }
         game_string out_error;
-        origin->m_game->call_event<event_type::check_play_card>(origin, origin_card, ctx, out_error);
+        origin->m_game->call_event(event_type::check_play_card{ origin, origin_card, ctx, out_error });
         return out_error;
     }
 
@@ -384,12 +384,12 @@ namespace banggame {
             log_equipped_card(origin_card, origin, target);
             
             if (origin_card->pocket == pocket_type::player_hand) {
-                origin->m_game->call_event<event_type::on_discard_hand_card>(origin, origin_card, true);
+                origin->m_game->call_event(event_type::on_discard_hand_card{ origin, origin_card, true });
             }
 
             target->equip_card(origin_card);
 
-            origin->m_game->call_event<event_type::on_equip_card>(origin, target, origin_card, ctx);
+            origin->m_game->call_event(event_type::on_equip_card{ origin, target, origin_card, ctx });
         });
     }
 

@@ -201,8 +201,8 @@ namespace banggame {
         add_log("LOG_TRAIN_ADVANCE");
         add_update<game_update_type::move_train>(++train_position);
 
-        call_event<event_type::on_train_advance>(origin,
-            std::make_shared<effect_context>(effect_context{ .locomotive_count = 1 }));
+        call_event(event_type::on_train_advance{ origin,
+            std::make_shared<effect_context>(effect_context{ .locomotive_count = 1 }) });
     }
 
     void game_table::flash_card(card *c) {
@@ -260,7 +260,7 @@ namespace banggame {
         }
         if (origin->sign && origin->num_cubes == 0) {
             add_log("LOG_DISCARDED_ORANGE_CARD", origin->owner, origin);
-            call_event<event_type::on_discard_orange_card>(origin->owner, origin);
+            call_event(event_type::on_discard_orange_card{ origin->owner, origin });
             origin->owner->disable_equip(origin);
             move_card(origin, pocket_type::discard_pile);
         }

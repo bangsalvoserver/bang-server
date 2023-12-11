@@ -78,7 +78,7 @@ namespace banggame {
         ++num_drawn_cards;
         
         bool reveal = false;
-        target->m_game->call_event<event_type::on_card_drawn>(target, drawn_card, shared_from_this(), reveal);
+        target->m_game->call_event(event_type::on_card_drawn{ target, drawn_card, shared_from_this(), reveal });
         if (drawn_card->pocket == pocket_type::discard_pile) {
             target->m_game->add_log("LOG_DRAWN_FROM_DISCARD", target, drawn_card);
         } else if (target->m_game->check_flags(game_flags::hands_shown)) {
@@ -97,7 +97,7 @@ namespace banggame {
     void request_draw::on_pick(card *target_card) {
         target->m_game->pop_request();
         bool handled = false;
-        target->m_game->call_event<event_type::on_draw_from_deck>(target, shared_from_this(), handled);
+        target->m_game->call_event(event_type::on_draw_from_deck{ target, shared_from_this(), handled });
         if (!handled) {
             int ncards = target->get_cards_to_draw();
             while (num_drawn_cards < ncards) {

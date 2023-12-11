@@ -54,7 +54,7 @@ namespace banggame {
 
         m_game->add_log("LOG_CHECK_DREW_CARD", origin_card, target, target_card);
         bool handled = false;
-        m_game->call_event<event_type::on_draw_check_select>(target, shared_from_this(), handled);
+        m_game->call_event(event_type::on_draw_check_select{ target, shared_from_this(), handled });
         if (!handled) {
             resolve();
         }
@@ -80,13 +80,13 @@ namespace banggame {
         if (!m_game->m_selection.empty()) {
             while (!m_game->m_selection.empty()) {
                 card *c = m_game->m_selection.front();
-                m_game->call_event<event_type::on_draw_check_resolve>(target, c);
+                m_game->call_event(event_type::on_draw_check_resolve{ target, c });
                 if (c->pocket == pocket_type::selection) {
                     m_game->move_card(c, pocket_type::discard_pile);
                 }
             }
         } else {
-            m_game->call_event<event_type::on_draw_check_resolve>(target, drawn_card);
+            m_game->call_event(event_type::on_draw_check_resolve{ target, drawn_card });
         }
         on_resolve(is_lucky(drawn_card));
     }

@@ -5,7 +5,7 @@
 namespace banggame {
     game_string effect_max_usages::get_error(card *origin_card, player *origin) {
         int usages = 0;
-        origin->m_game->call_event<event_type::count_usages>(origin, origin_card, usages);
+        origin->m_game->call_event(event_type::count_usages{ origin, origin_card, usages });
         if (usages >= max_usages) {
             return {"ERROR_MAX_USAGES", origin_card, max_usages};
         }

@@ -7,7 +7,7 @@ namespace banggame {
     void request_predraw::on_update() {
         if (target->alive() && target->m_game->m_playing == target) {
             if (!live) {
-                target->m_game->call_event<event_type::get_predraw_checks>(target, checks);
+                target->m_game->call_event(event_type::get_predraw_checks{ target, checks });
                 std::ranges::sort(checks, std::greater{}, &card_priority_pair::second);
             }
             if (checks.empty()) {
@@ -34,7 +34,7 @@ namespace banggame {
         std::erase_if(checks, [&](const card_priority_pair &key) {
             return key.first == target_card;
         });
-        target->m_game->call_event<event_type::on_predraw_check>(target, target_card);
+        target->m_game->call_event(event_type::on_predraw_check{ target, target_card });
     }
 
     game_string request_predraw::status_text(player *owner) const {

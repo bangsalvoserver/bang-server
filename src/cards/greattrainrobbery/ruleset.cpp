@@ -80,7 +80,7 @@ namespace banggame {
                 } else if (ctx.traincost->deck != card_deck_type::main_deck) {
                     int train_equips = 0;
                     int num_advance = 0;
-                    origin->m_game->call_event<event_type::count_train_equips>(origin, train_equips, num_advance);
+                    origin->m_game->call_event(event_type::count_train_equips{ origin, train_equips, num_advance });
                     if (train_equips >= 1) {
                         out_error = "ERROR_ONE_TRAIN_EQUIP_PER_TURN";
                     } else if (ctx.train_advance >= 1 && num_advance >= 1) {
@@ -118,7 +118,7 @@ namespace banggame {
                 for (int i=0; i < ctx->locomotive_count; ++i) {
                     origin->m_game->queue_action([=]{
                         origin->m_game->add_log("LOG_END_OF_LINE");
-                        origin->m_game->call_event<event_type::on_locomotive_effect>(origin, ctx);
+                        origin->m_game->call_event(event_type::on_locomotive_effect{ origin, ctx });
                     }, -1);
                 }
                 origin->m_game->queue_action([=]{

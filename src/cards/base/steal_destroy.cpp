@@ -49,7 +49,7 @@ namespace banggame {
     }
 
     void effect_steal::on_resolve(card *origin_card, player *origin, card *target_card) {
-        origin->m_game->call_event<event_type::on_destroy_card>(origin, target_card->owner, target_card);
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card->owner, target_card });
         origin->m_game->queue_action([=]{
             player *target_player = target_card->owner;
             if (origin->alive() && target_player) {
@@ -135,7 +135,7 @@ namespace banggame {
 
     void effect_destroy::on_resolve(card *origin_card, player *origin, card *target_card) {
         player *target_player = target_card->owner;
-        origin->m_game->call_event<event_type::on_destroy_card>(origin, target_player, target_card);
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_player, target_card });
         origin->m_game->queue_action([=]{
             if (origin->alive() && target_player) {
                 if (origin != target_player && target_card->visibility != card_visibility::shown) {
