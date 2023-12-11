@@ -2,6 +2,9 @@
 
 #include "game/game.h"
 
+#include "cards/base/deathsave.h"
+#include "cards/base/predraw_check.h"
+
 namespace banggame {
 
     static uint8_t brothel_counter = 0;

@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "bang.h"
+
 namespace banggame {
     
     void equip_volcanic::on_enable(card *target_card, player *target) {

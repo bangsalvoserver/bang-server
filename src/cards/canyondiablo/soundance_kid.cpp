@@ -1,6 +1,7 @@
 #include "soundance_kid.h"
 
 #include "cards/game_enums.h"
+#include "cards/base/damage.h"
 
 #include "game/game.h"
 

@@ -1,6 +1,7 @@
 #include "luckycharm.h"
 
 #include "game/game.h"
+#include "cards/base/damage.h"
 
 namespace banggame {
 

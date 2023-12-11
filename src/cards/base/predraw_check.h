@@ -2,14 +2,27 @@
 #define __BASE_PREDRAW_CHECK_H__
 
 #include "cards/card_effect.h"
+#include "game/event_card_key.h"
 
 namespace banggame {
+
+    namespace event_type {
+        DEFINE_STRUCT(get_predraw_checks,
+            (player *, origin)
+            (nullable_ref<std::vector<event_card_key>>, result)
+        )
+        
+        DEFINE_STRUCT(on_predraw_check,
+            (player *, origin)
+            (card *, target_card)
+        )
+    }
 
     struct request_predraw : request_picking {
         request_predraw(player *target)
             : request_picking(nullptr, nullptr, target, {}, -7) {}
 
-        std::vector<std::pair<card *, int>> checks;
+        std::vector<event_card_key> checks;
 
         void on_update() override;
         bool can_pick(card *target_card) const override;

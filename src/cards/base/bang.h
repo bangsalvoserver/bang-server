@@ -77,6 +77,36 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
+    using shared_request_bang = std::shared_ptr<request_bang>;
+    
+    namespace event_type {
+        DEFINE_STRUCT(count_bangs_played,
+            (player *, origin)
+            (nullable_ref<int>, num_bangs_played)
+        )
+
+        DEFINE_STRUCT(apply_bang_modifier,
+            (player *, origin)
+            (shared_request_bang, req)
+        )
+        
+        DEFINE_STRUCT(check_bang_target,
+            (card *, origin_card)
+            (player *, origin)
+            (player *, target)
+            (effect_flags, flags)
+            (nullable_ref<game_string>, out_error)
+        )
+        
+        DEFINE_STRUCT(on_missed,
+            (card *, origin_card)
+            (player *, origin)
+            (player *, target)
+            (card *, missed_card)
+            (effect_flags, flags)
+        )
+    }
+
     class respondable_with_bang {
     public:
         virtual void respond_with_bang() = 0;

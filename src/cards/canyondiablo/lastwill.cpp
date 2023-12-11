@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/deathsave.h"
+
 namespace banggame {
 
     struct request_lastwill : request_base, resolvable_request {

@@ -2,6 +2,7 @@
 
 #include "game/game.h"
 #include "cards/base/bang.h"
+#include "cards/base/damage.h"
 
 namespace banggame {
 

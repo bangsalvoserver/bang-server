@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/predraw_check.h"
+
 namespace banggame {
 
     void equip_jail::on_enable(card *target_card, player *target) {

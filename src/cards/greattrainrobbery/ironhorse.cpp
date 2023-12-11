@@ -6,6 +6,8 @@
 
 #include "cards/game_enums.h"
 
+#include "ruleset.h"
+
 namespace banggame {
 
     void equip_ironhorse::on_enable(card *origin_card, player *origin) {

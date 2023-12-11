@@ -9,6 +9,7 @@
 #include "cards/filters.h"
 #include "cards/game_enums.h"
 
+#include "cards/base/bang.h"
 #include "cards/base/damage.h"
 #include "cards/base/draw.h"
 #include "cards/base/predraw_check.h"
@@ -178,7 +179,7 @@ namespace banggame {
     }
 
     bool player::immune_to(card *origin_card, player *origin, effect_flags flags, bool quiet) {
-        serial::card_list cards;
+        std::vector<card *> cards;
         m_game->call_event(event_type::apply_immunity_modifier{ origin_card, origin, this, flags, cards });
         if (!quiet) {
             for (card *target_card : cards) {

@@ -1,5 +1,7 @@
 #include "tequila_joe.h"
 
+#include "cards/base/beer.h"
+
 #include "game/game.h"
 
 namespace banggame {

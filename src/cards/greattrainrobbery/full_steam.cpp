@@ -1,6 +1,7 @@
 #include "full_steam.h"
 
 #include "game/game.h"
+#include "ruleset.h"
 
 namespace banggame {
     

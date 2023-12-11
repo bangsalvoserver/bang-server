@@ -7,6 +7,14 @@
 
 namespace banggame {
 
+    namespace event_type {
+        DEFINE_STRUCT(on_destroy_card,
+            (player *, origin)
+            (player *, target)
+            (card *, target_card)
+        )
+    }
+
     struct effect_steal : prompt_target_self, bot_suggestion::target_enemy_card {
         game_string get_error(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});

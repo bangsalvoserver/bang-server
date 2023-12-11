@@ -1,6 +1,7 @@
 #include "bloody_mary.h"
 
 #include "cards/game_enums.h"
+#include "cards/base/bang.h"
 
 #include "game/game.h"
 

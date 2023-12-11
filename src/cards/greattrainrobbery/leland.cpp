@@ -4,6 +4,8 @@
 
 #include "cards/base/generalstore.h"
 
+#include "ruleset.h"
+
 namespace banggame {
 
     void equip_leland::on_enable(card *origin_card, player *origin) {

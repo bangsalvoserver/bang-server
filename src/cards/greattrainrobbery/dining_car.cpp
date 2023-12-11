@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/predraw_check.h"
+
 namespace banggame {
 
     void equip_dining_car::on_enable(card *origin_card, player *origin) {

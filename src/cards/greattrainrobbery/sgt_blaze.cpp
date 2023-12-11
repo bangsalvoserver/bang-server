@@ -4,6 +4,8 @@
 
 #include "game/game.h"
 
+#include "ruleset.h"
+
 namespace banggame {
 
     game_string modifier_sgt_blaze::get_error(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) {

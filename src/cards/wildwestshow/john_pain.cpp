@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/vulture_sam.h"
+
 namespace banggame {
 
     static constexpr int equip_type_john_pain = 3;

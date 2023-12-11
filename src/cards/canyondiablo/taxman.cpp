@@ -1,6 +1,7 @@
 #include "taxman.h"
 
 #include "cards/base/draw.h"
+#include "cards/base/predraw_check.h"
 
 #include "cards/game_enums.h"
 

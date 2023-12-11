@@ -4,6 +4,21 @@
 #include "cards/card_effect.h"
 
 namespace banggame {
+
+    namespace event_type {
+        DEFINE_STRUCT(check_damage_response,
+            (player *, target)
+            (nullable_ref<bool>, value)
+        )
+        
+        DEFINE_STRUCT(on_hit,
+            (card *, origin_card)
+            (player *, origin)
+            (player *, target)
+            (int, damage)
+            (effect_flags, flags)
+        )
+    }
     
     struct effect_damage {
         int damage;

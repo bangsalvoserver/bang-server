@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/bang.h"
+
 namespace banggame {
 
     void equip_shootout::on_enable(card *target_card, player *target) {

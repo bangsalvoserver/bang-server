@@ -1,6 +1,7 @@
 #include "bounty.h"
 
 #include "cards/game_enums.h"
+#include "cards/base/damage.h"
 
 #include "game/game.h"
 

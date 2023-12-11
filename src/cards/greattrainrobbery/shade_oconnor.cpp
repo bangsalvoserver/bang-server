@@ -3,6 +3,7 @@
 #include "cards/game_enums.h"
 
 #include "game/game.h"
+#include "ruleset.h"
 
 namespace banggame {
     

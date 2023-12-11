@@ -5,6 +5,14 @@
 
 namespace banggame {
 
+    namespace event_type {
+        DEFINE_STRUCT(count_usages,
+            (player *, origin)
+            (card *, origin_card)
+            (nullable_ref<int>, usages)
+        )
+    }
+
     struct effect_max_usages {
         int max_usages;
         

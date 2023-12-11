@@ -1,6 +1,7 @@
 #include "lawofthewest.h"
 
 #include "cards/base/draw.h"
+#include "cards/base/pass_turn.h"
 
 #include "game/game.h"
 #include "game/possible_to_play.h"

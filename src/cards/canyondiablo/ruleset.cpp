@@ -2,6 +2,7 @@
 
 #include "game/game.h"
 
+#include "cards/base/damage.h"
 #include "cards/dodgecity/ruleset.h"
 
 namespace banggame {

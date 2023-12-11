@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/deathsave.h"
+
 namespace banggame {
 
     static constexpr int equip_type_vulture_sam = 1;

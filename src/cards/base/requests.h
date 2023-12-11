@@ -24,6 +24,18 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
+    namespace event_type {
+        DEFINE_STRUCT(on_discard_pass,
+            (player *, origin)
+            (card *, target_card)
+        )
+        
+        DEFINE_STRUCT(post_discard_pass,
+            (player *, origin)
+            (int, ndiscarded)
+        )
+    }
+
     struct request_discard_pass : request_picking {
         request_discard_pass(player *target)
             : request_picking(nullptr, nullptr, target, {}, 200) {}

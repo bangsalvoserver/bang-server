@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "ruleset.h"
+
 namespace banggame {
 
     void equip_benny_brawler::on_enable(card *target_card, player *target) {

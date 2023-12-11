@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/damage.h"
+
 namespace banggame {
     void ruleset_goldrush::on_apply(game *game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 2}, [](player *origin){

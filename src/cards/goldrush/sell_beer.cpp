@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/beer.h"
+
 namespace banggame {
 
     void effect_sell_beer::on_play(card *origin_card, player *origin, card *target_card) {

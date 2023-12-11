@@ -4,6 +4,9 @@
 
 #include "game/game.h"
 
+#include "ruleset.h"
+#include "cards/base/predraw_check.h"
+
 namespace banggame {
     
     struct request_move_bomb : request_base {

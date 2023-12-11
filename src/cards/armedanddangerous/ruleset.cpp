@@ -3,6 +3,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/requests.h"
+
 namespace banggame {
 
     void ruleset_armedanddangerous::on_apply(game *game) {

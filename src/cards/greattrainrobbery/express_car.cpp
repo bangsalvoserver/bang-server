@@ -3,6 +3,7 @@
 #include "game/game.h"
 
 #include "cards/base/requests.h"
+#include "cards/base/max_usages.h"
 
 #include "game/possible_to_play.h"
 

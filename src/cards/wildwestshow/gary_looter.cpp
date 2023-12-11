@@ -2,6 +2,9 @@
 
 #include "game/game.h"
 
+#include "cards/base/vulture_sam.h"
+#include "cards/base/requests.h"
+
 namespace banggame {
 
     static constexpr int equip_type_gary_looter = 2;

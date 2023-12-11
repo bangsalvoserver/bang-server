@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/deathsave.h"
+
 namespace banggame {
     
     void equip_teren_kill::on_enable(card *origin_card, player *origin) {

@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/draw.h"
+
 namespace banggame {
 
     void equip_thirst::on_enable(card *target_card, player *target) {

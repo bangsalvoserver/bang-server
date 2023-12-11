@@ -1,7 +1,7 @@
 #include "shotgun.h"
 
 #include "cards/base/requests.h"
-
+#include "cards/base/damage.h"
 #include "cards/game_enums.h"
 
 #include "game/game.h"

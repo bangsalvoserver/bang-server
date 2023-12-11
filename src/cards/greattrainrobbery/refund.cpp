@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/steal_destroy.h"
+
 namespace banggame {
 
     void equip_refund::on_enable(card *origin_card, player *origin) {

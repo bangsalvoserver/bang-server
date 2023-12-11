@@ -8,7 +8,7 @@
 #include "cards/game_enums.h"
 
 #include "cards/base/requests.h"
-#include "cards/greattrainrobbery/next_stop.h"
+#include "cards/base/deathsave.h"
 
 #include "play_verify.h"
 #include "possible_to_play.h"

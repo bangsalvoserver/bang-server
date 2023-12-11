@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/beer.h"
+
 namespace banggame {
 
     void equip_madam_yto::on_enable(card *target_card, player *p) {

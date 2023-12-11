@@ -8,7 +8,7 @@ namespace banggame {
         if (target->alive() && target->m_game->m_playing == target) {
             if (!live) {
                 target->m_game->call_event(event_type::get_predraw_checks{ target, checks });
-                std::ranges::sort(checks, std::greater{}, &card_priority_pair::second);
+                std::ranges::sort(checks, std::greater{}, &event_card_key::priority);
             }
             if (checks.empty()) {
                 target->m_game->pop_request();
@@ -22,17 +22,17 @@ namespace banggame {
 
     bool request_predraw::can_pick(card *target_card) const {
         if (target_card->owner == target) {
-            int top_priority = checks[0].second;
-            return ranges::contains(checks | ranges::views::take_while([=](const card_priority_pair &pair) {
-                return pair.second == top_priority;
-            }), target_card, &card_priority_pair::first);
+            int top_priority = checks[0].priority;
+            return ranges::contains(checks | ranges::views::take_while([=](const event_card_key &key) {
+                return key.priority == top_priority;
+            }), target_card, &event_card_key::target_card);
         }
         return false;
     }
 
     void request_predraw::on_pick(card *target_card) {
-        std::erase_if(checks, [&](const card_priority_pair &key) {
-            return key.first == target_card;
+        std::erase_if(checks, [&](const event_card_key &key) {
+            return key.target_card == target_card;
         });
         target->m_game->call_event(event_type::on_predraw_check{ target, target_card });
     }
@@ -47,7 +47,7 @@ namespace banggame {
 
     void equip_predraw_check::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::get_predraw_checks>({target_card, 10},
-            [=, priority=priority](player *origin, std::vector<card_priority_pair> &ret) {
+            [=, priority=priority](player *origin, std::vector<event_card_key> &ret) {
                 if (origin == target) {
                     ret.emplace_back(target_card, priority);
                 };

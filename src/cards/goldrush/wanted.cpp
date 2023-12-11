@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/deathsave.h"
+
 namespace banggame {
 
     game_string equip_wanted::on_prompt(card *origin_card, player *origin, player *target) {

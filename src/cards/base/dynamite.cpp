@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/predraw_check.h"
+
 namespace banggame {
     void equip_dynamite::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *e_player, card *e_card) {

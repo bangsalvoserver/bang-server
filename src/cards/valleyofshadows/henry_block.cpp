@@ -1,7 +1,9 @@
 #include "henry_block.h"
 
 #include "game/game.h"
+
 #include "cards/base/bang.h"
+#include "cards/base/steal_destroy.h"
 
 namespace banggame {
 

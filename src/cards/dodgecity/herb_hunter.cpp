@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/base/deathsave.h"
+
 namespace banggame {
     
     void equip_herb_hunter::on_enable(card *target_card, player *p) {

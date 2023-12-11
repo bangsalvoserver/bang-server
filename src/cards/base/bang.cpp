@@ -33,7 +33,7 @@ namespace banggame {
             return "ERROR_CARD_INACTIVE";
         } else if (!ctx.disable_bang_checks) {
             game_string out_error;
-            origin->m_game->call_event(event_type::check_card_target{ origin_card, origin, target, effect_flags::is_bang, out_error });
+            origin->m_game->call_event(event_type::check_bang_target{ origin_card, origin, target, effect_flags::is_bang, out_error });
             return out_error;
         } else {
             return {};

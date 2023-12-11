@@ -1,6 +1,7 @@
 #include "lemonade_jim.h"
 
 #include "cards/game_enums.h"
+#include "cards/base/beer.h"
 
 #include "game/game.h"
 
