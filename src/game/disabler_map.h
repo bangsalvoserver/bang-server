@@ -10,17 +10,40 @@ namespace banggame {
 
     struct game_table;
 
-    using card_disabler_fun = std::function<bool(card *)>;
+    template<typename T>
+    concept card_predicate = std::predicate<T, card *>;
+
+    struct card_disabler {
+        virtual ~card_disabler() = default;
+        virtual bool operator()(card *target_card) const = 0;
+    };
+
+    template<card_predicate Function>
+    class card_disabler_impl : public card_disabler, private Function {
+    public:
+        template<std::convertible_to<Function> U>
+        card_disabler_impl(U &&function) : Function(std::forward<U>(function)) {}
+
+        bool operator()(card *target_card) const override {
+            return std::invoke(static_cast<const Function &>(*this), target_card);
+        }
+    };
 
     class disabler_map {
     private:
-        std::multimap<event_card_key, card_disabler_fun, std::less<>> m_disablers;
+        std::multimap<event_card_key, std::unique_ptr<card_disabler>, std::less<>> m_disablers;
         game_table *m_game;
+
+        void do_add_disabler(event_card_key key, std::unique_ptr<card_disabler> &&fun);
 
     public:
         disabler_map(game_table *game): m_game(game) {}
 
-        void add_disabler(event_card_key key, card_disabler_fun &&fun);
+        template<card_predicate Function>
+        void add_disabler(event_card_key key, Function &&fun) {
+            do_add_disabler(key, std::make_unique<card_disabler_impl<std::decay_t<Function>>>(std::forward<Function>(fun)));
+        }
+
         void remove_disablers(event_card_key key);
 
         card *get_disabler(card *target_card) const;

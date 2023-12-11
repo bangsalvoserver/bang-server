@@ -26,9 +26,9 @@ namespace banggame {
         );
     }
 
-    void disabler_map::add_disabler(event_card_key key, card_disabler_fun &&fun) {
+    void disabler_map::do_add_disabler(event_card_key key, std::unique_ptr<card_disabler> &&fun) {
         for (auto [owner, c] : disableable_cards(m_game)) {
-            if (!is_disabled(c) && fun(c)) {
+            if (!is_disabled(c) && std::invoke(*fun, c)) {
                 for (const equip_holder &e : c->equips) {
                     if (!e.is_nodisable()) {
                         e.on_disable(c, owner);
@@ -37,7 +37,7 @@ namespace banggame {
             }
         }
 
-        m_disablers.emplace(std::make_pair(key, std::move(fun)));
+        m_disablers.emplace(key, std::move(fun));
     }
 
     void disabler_map::remove_disablers(event_card_key key) {
@@ -45,8 +45,8 @@ namespace banggame {
             bool a = false;
             bool b = false;
             for (const auto &[t, fun] : m_disablers) {
-                if (t != key) a = a || fun(c);
-                else b = b || fun(c);
+                if (t != key) a = a || std::invoke(*fun, c);
+                else b = b || std::invoke(*fun, c);
             }
             if (!a && b) {
                 for (const equip_holder &e : c->equips) {
@@ -62,7 +62,7 @@ namespace banggame {
 
     card *disabler_map::get_disabler(card *target_card) const {
         for (auto &[card_key, fun] : m_disablers) {
-            if (fun(target_card)) return card_key.target_card;
+            if (std::invoke(*fun, target_card)) return card_key.target_card;
         }
         return nullptr;
     }
