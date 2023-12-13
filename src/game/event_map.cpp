@@ -12,11 +12,13 @@ namespace banggame {
 
         for (const auto &[key, it] : range) {
             auto &listener = **it;
-            if (m_lock) {
-                m_to_remove.insert(it);
-                listener.active = false;
-            } else {
-                m_listeners.erase(it);
+            if (listener.active) {
+                if (m_lock) {
+                    m_to_remove.push_back(it);
+                    listener.active = false;
+                } else {
+                    m_listeners.erase(it);
+                }
             }
         }
         m_map.erase(range.begin(), range.end());

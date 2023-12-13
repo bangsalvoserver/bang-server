@@ -120,20 +120,6 @@ namespace banggame::detail {
         }
     };
 
-    template<typename T>
-    concept hashable = requires (const T &value) {
-        std::hash<T>{}(value);
-    };
-
-    struct deref_hash {
-        struct is_transparent {};
-
-        template<dereferenceable T> requires hashable<deref_t<T>>
-        auto operator()(const T &value) const {
-            return std::hash<deref_t<T>>{}(*value);
-        }
-    };
-
 }
 
 namespace banggame {
@@ -150,11 +136,11 @@ namespace banggame {
         using iterator_map = std::multimap<event_card_key, listener_iterator, std::less<>>;
         using iterator_map_range = std::ranges::subrange<iterator_map::const_iterator>;
         
-        using iterator_set = std::unordered_set<listener_iterator, detail::deref_hash>;
+        using iterator_vector = std::vector<listener_iterator>;
 
         listener_set m_listeners;
         iterator_map m_map;
-        iterator_set m_to_remove;
+        iterator_vector m_to_remove;
 
         int m_lock = 0;
 
