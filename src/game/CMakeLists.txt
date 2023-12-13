@@ -9,6 +9,7 @@ PRIVATE
     disabler_map.cpp
     draw_check_handler.cpp
     durations.cpp
+    event_map.cpp
     player.cpp
     player_iterator.cpp
     play_verify.cpp
