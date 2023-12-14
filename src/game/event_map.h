@@ -28,7 +28,7 @@ namespace banggame {
             return reinterpret_cast<size_t>(&event_listener_interface<T>::get_id);
         }
 
-        virtual void operator()(const reflector::as_ref_tuple_t<T> &tuple) const = 0;
+        virtual void operator()(const reflector::as_ref_tuple_t<T> &tuple) = 0;
     };
 
     template<typename Function, typename T>
@@ -46,8 +46,8 @@ namespace banggame {
         event_listener_impl(U &&function)
             : Function(std::forward<U>(function)) {}
 
-        void operator()(const reflector::as_ref_tuple_t<T> &tuple) const override {
-            std::apply(static_cast<Function>(*this), tuple);
+        void operator()(const reflector::as_ref_tuple_t<T> &tuple) override {
+            std::apply(static_cast<Function &>(*this), tuple);
         }
     };
 
@@ -72,7 +72,7 @@ namespace banggame {
 
         template<event T>
         void invoke(const void *tuple) const {
-            std::invoke(static_cast<const event_listener_interface<T> &>(*ptr), *static_cast<const reflector::as_ref_tuple_t<T> *>(tuple));
+            std::invoke(static_cast<event_listener_interface<T> &>(*ptr), *static_cast<const reflector::as_ref_tuple_t<T> *>(tuple));
         }
     };
 

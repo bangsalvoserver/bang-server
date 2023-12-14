@@ -101,7 +101,7 @@ namespace banggame {
     template<std::invocable Function>
     void request_action<Function>::on_update() {
         queue->pop_request();
-        std::invoke(static_cast<Function>(*this));
+        std::invoke(static_cast<Function &>(*this));
     }
 
 }
