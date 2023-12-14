@@ -79,15 +79,17 @@ namespace banggame {
     using event_listener_invoke_fun = void (event_listener:: *)(const void *) const;
 
     class listener_map {
-    private:
+    public:
         using listener_set = std::multiset<event_listener, std::less<>>;
         using listener_iterator = listener_set::const_iterator;
 
         using iterator_map = std::multimap<event_card_key, listener_iterator, std::less<>>;
-        using iterator_map_range = std::ranges::subrange<iterator_map::const_iterator>;
+        using iterator_map_iterator = iterator_map::const_iterator;
+        using iterator_map_range = std::ranges::subrange<iterator_map_iterator>;
         
         using iterator_vector = std::vector<listener_iterator>;
 
+    private:
         listener_set m_listeners;
         iterator_map m_map;
         iterator_vector m_to_remove;
@@ -95,18 +97,27 @@ namespace banggame {
         int m_lock = 0;
 
     private:
-        void do_add_listener(event_card_key key, size_t id, event_listener_ptr &&ptr);
+        iterator_map_iterator do_add_listener(event_card_key key, size_t id, event_listener_ptr &&ptr);
         void do_remove_listeners(iterator_map_range range);
         void do_call_event(size_t id, event_listener_invoke_fun fun, const void *tuple);
 
     public:
         template<typename T, typename Function> requires applicable_to_event<Function, T>
-        void add_listener(event_card_key key, Function &&fun) {
-            do_add_listener(key, event_listener_interface<T>::get_id(),
+        iterator_map_iterator add_listener(event_card_key key, Function &&fun) {
+            return do_add_listener(key, event_listener_interface<T>::get_id(),
                 std::make_unique<event_listener_impl<T, std::decay_t<Function>>>(std::forward<Function>(fun)));
         }
 
-        void remove_listeners(auto key) {
+        void remove_listener(iterator_map_iterator it) {
+            do_remove_listeners({it, std::next(it)});
+        }
+
+        void remove_listeners(event_card_key key) {
+            auto [low, high] = m_map.equal_range(key);
+            do_remove_listeners({low, high});
+        }
+
+        void remove_listeners(card *key) {
             auto [low, high] = m_map.equal_range(key);
             do_remove_listeners({low, high});
         }

@@ -2,9 +2,9 @@
 
 namespace banggame {
     
-    void listener_map::do_add_listener(event_card_key key, size_t id, event_listener_ptr &&ptr) {
+    listener_map::iterator_map_iterator listener_map::do_add_listener(event_card_key key, size_t id, event_listener_ptr &&ptr) {
         auto listener = m_listeners.emplace(id, std::move(ptr), key);
-        m_map.emplace(key, listener);
+        return m_map.emplace(key, listener);
     }
 
     void listener_map::do_remove_listeners(iterator_map_range range) {
