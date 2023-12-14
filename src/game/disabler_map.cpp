@@ -26,7 +26,7 @@ namespace banggame {
         );
     }
 
-    void disabler_map::do_add_disabler(event_card_key key, std::unique_ptr<card_disabler> &&fun) {
+    disabler_map::disabler_map_iterator disabler_map::do_add_disabler(event_card_key key, std::unique_ptr<card_disabler> &&fun) {
         for (auto [owner, c] : disableable_cards(m_game)) {
             if (!is_disabled(c) && std::invoke(*fun, c)) {
                 for (const equip_holder &e : c->equips) {
@@ -37,16 +37,19 @@ namespace banggame {
             }
         }
 
-        m_disablers.emplace(key, std::move(fun));
+        return m_disablers.emplace(key, std::move(fun));
     }
 
-    void disabler_map::remove_disablers(event_card_key key) {
+    void disabler_map::do_remove_disablers(disabler_map_range range) {
         for (auto [owner, c] : disableable_cards(m_game)) {
             bool a = false;
             bool b = false;
             for (const auto &[t, fun] : m_disablers) {
-                if (t != key) a = a || std::invoke(*fun, c);
-                else b = b || std::invoke(*fun, c);
+                if (std::ranges::none_of(range, [&](const auto &pair) { return pair.first == t; })) {
+                    a = a || std::invoke(*fun, c);
+                } else {
+                    b = b || std::invoke(*fun, c);
+                }
             }
             if (!a && b) {
                 for (const equip_holder &e : c->equips) {
@@ -57,7 +60,7 @@ namespace banggame {
             }
         }
 
-        m_disablers.erase(key);
+        m_disablers.erase(range.begin(), range.end());
     }
 
     card *disabler_map::get_disabler(card *target_card) const {
