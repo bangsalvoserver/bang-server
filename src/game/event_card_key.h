@@ -20,23 +20,25 @@ namespace banggame {
         bool operator == (const event_card_key &other) const = default;
 
         auto operator <=> (const event_card_key &other) const {
-            return target_card == other.target_card ?
-                priority <=> other.priority :
-                get_card_order(target_card) <=> get_card_order(other.target_card);
+            if (target_card == other.target_card) {
+                return priority <=> other.priority;
+            } else {
+                return get_card_order(target_card) <=> get_card_order(other.target_card);
+            }
         }
 
         auto operator <=> (card *other) const {
             return get_card_order(target_card) <=> get_card_order(other);
         }
 
-        struct priority_greater {
-            bool operator()(const event_card_key &lhs, const event_card_key &rhs) const {
-                return lhs.priority == rhs.priority ?
-                    get_card_order(lhs.target_card) < get_card_order(rhs.target_card) :
-                    lhs.priority > rhs.priority;
+        auto priority_compare(const event_card_key &other) const {
+            if (priority == other.priority) {
+                return get_card_order(target_card) <=> get_card_order(other.target_card);
+            } else {
+                return other.priority <=> priority;
             }
-        };
-    };
+        }
+    }; 
 
 }
 

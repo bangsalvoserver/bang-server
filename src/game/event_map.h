@@ -54,13 +54,13 @@ namespace banggame {
     struct event_listener {
         size_t id;
         event_listener_ptr ptr;
-        int priority;
+        event_card_key key;
         
         mutable bool active = true;
 
         auto operator <=> (const event_listener &other) const {
             if (id == other.id) {
-                return other.priority <=> priority;
+                return key.priority_compare(other.key);
             } else {
                 return id <=> other.id;
             }
