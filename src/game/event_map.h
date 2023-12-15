@@ -13,25 +13,13 @@
 
 namespace banggame {
 
-    struct event_listener_base {
-        virtual ~event_listener_base() = default;
-        virtual void operator()(const void *tuple) = 0;
-    };
-
-    using event_listener_ptr = std::unique_ptr<event_listener_base>;
+    using event_listener_fun = std::function<void(const void *tuple)>;
 
     template<typename T>
     concept event = reflector::convertible_to_tuple<T>;
 
     template<event T>
     using event_tuple = reflector::as_tuple_t<T>;
-
-    template<event T>
-    struct event_listener_interface : event_listener_base {
-        static size_t get_id() {
-            return reinterpret_cast<size_t>(&event_listener_interface<T>::get_id);
-        }
-    };
 
     template<typename Function, typename T>
     concept applicable = requires (Function fun, T tup) {
@@ -41,21 +29,9 @@ namespace banggame {
     template<typename Function, typename T>
     concept applicable_to_event = event<T> && applicable<Function, event_tuple<T>>;
 
-    template<typename T, typename Function> requires applicable_to_event<Function, T>
-    class event_listener_impl : public event_listener_interface<T>, private Function {
-    public:
-        template<std::convertible_to<Function> U>
-        event_listener_impl(U &&function)
-            : Function(std::forward<U>(function)) {}
-
-        void operator()(const void *tuple) override {
-            std::apply(static_cast<Function &>(*this), *static_cast<const event_tuple<T> *>(tuple));
-        }
-    };
-
     struct event_listener {
         size_t id;
-        event_listener_ptr ptr;
+        event_listener_fun fun;
         event_card_key key;
         
         mutable bool active = true;
@@ -70,6 +46,13 @@ namespace banggame {
 
         auto operator <=> (size_t other_id) const {
             return id <=> other_id;
+        }
+    };
+
+    template<typename T>
+    struct type_id {
+        static size_t get() {
+            return reinterpret_cast<size_t>(&type_id<T>::get);
         }
     };
 
@@ -92,15 +75,16 @@ namespace banggame {
         int m_lock = 0;
 
     private:
-        iterator_map_iterator do_add_listener(event_card_key key, size_t id, event_listener_ptr &&ptr);
+        iterator_map_iterator do_add_listener(event_card_key key, size_t id, event_listener_fun &&fun);
         void do_remove_listeners(iterator_map_range range);
         void do_call_event(size_t id, const void *tuple);
 
     public:
         template<typename T, typename Function> requires applicable_to_event<Function, T>
         iterator_map_iterator add_listener(event_card_key key, Function &&fun) {
-            return do_add_listener(key, event_listener_interface<T>::get_id(),
-                std::make_unique<event_listener_impl<T, std::decay_t<Function>>>(std::forward<Function>(fun)));
+            return do_add_listener(key, type_id<T>::get(), [fun=std::move(fun)](const void *tuple) {
+                std::apply(fun, *static_cast<const event_tuple<T> *>(tuple));
+            });
         }
 
         void remove_listener(iterator_map_iterator it) {
@@ -120,7 +104,7 @@ namespace banggame {
         template<event T>
         void call_event(const T &value) {
             auto tuple = reflector::as_tuple(value);
-            do_call_event(event_listener_interface<T>::get_id(), &tuple);
+            do_call_event(type_id<T>::get(), &tuple);
         }
     };
 

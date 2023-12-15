@@ -2,8 +2,8 @@
 
 namespace banggame {
     
-    listener_map::iterator_map_iterator listener_map::do_add_listener(event_card_key key, size_t id, event_listener_ptr &&ptr) {
-        auto listener = m_listeners.emplace(id, std::move(ptr), key);
+    listener_map::iterator_map_iterator listener_map::do_add_listener(event_card_key key, size_t id, event_listener_fun &&fun) {
+        auto listener = m_listeners.emplace(id, std::move(fun), key);
         return m_map.emplace(key, listener);
     }
 
@@ -31,7 +31,7 @@ namespace banggame {
         ++m_lock;
         for (const event_listener &listener : range) {
             if (listener.id == id && listener.active) {
-                std::invoke(*listener.ptr, tuple);
+                std::invoke(listener.fun, tuple);
             }
         }
         --m_lock;
