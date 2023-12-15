@@ -5,6 +5,8 @@
 
 #include "utils/reflector.h"
 
+#include <typeinfo>
+#include <typeindex>
 #include <functional>
 #include <memory>
 #include <vector>
@@ -27,29 +29,22 @@ namespace banggame {
     };
 
     struct event_listener {
-        size_t id;
-        event_listener_fun fun;
+        std::type_index type;
         event_card_key key;
+        event_listener_fun fun;
         
         mutable bool active = true;
 
         auto operator <=> (const event_listener &other) const {
-            if (id == other.id) {
+            if (type == other.type) {
                 return key.priority_compare(other.key);
             } else {
-                return id <=> other.id;
+                return type <=> other.type;
             }
         }
 
-        auto operator <=> (size_t other_id) const {
-            return id <=> other_id;
-        }
-    };
-
-    template<typename T>
-    struct type_id {
-        static size_t get() {
-            return reinterpret_cast<size_t>(&type_id<T>::get);
+        auto operator <=> (std::type_index other_type) const {
+            return type <=> other_type;
         }
     };
 
@@ -72,14 +67,14 @@ namespace banggame {
         int m_lock = 0;
 
     private:
-        iterator_map_iterator do_add_listener(event_card_key key, size_t id, event_listener_fun &&fun);
+        iterator_map_iterator do_add_listener(std::type_index type, event_card_key key, event_listener_fun &&fun);
         void do_remove_listeners(iterator_map_range range);
-        void do_call_event(size_t id, const void *tuple);
+        void do_call_event(std::type_index type, const void *tuple);
 
     public:
         template<event T, typename Function> requires applicable<Function, event_tuple<T>>
         iterator_map_iterator add_listener(event_card_key key, Function &&fun) {
-            return do_add_listener(key, type_id<T>::get(), [fun=std::move(fun)](const void *tuple) mutable {
+            return do_add_listener(typeid(T), key, [fun=std::move(fun)](const void *tuple) mutable {
                 std::apply(fun, *static_cast<const event_tuple<T> *>(tuple));
             });
         }
@@ -101,7 +96,7 @@ namespace banggame {
         template<event T>
         void call_event(const T &value) {
             auto tuple = reflector::as_tuple(value);
-            do_call_event(type_id<T>::get(), &tuple);
+            do_call_event(typeid(T), &tuple);
         }
     };
 
