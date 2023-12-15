@@ -26,9 +26,6 @@ namespace banggame {
         std::apply(fun, tup);
     };
 
-    template<typename Function, typename T>
-    concept applicable_to_event = event<T> && applicable<Function, event_tuple<T>>;
-
     struct event_listener {
         size_t id;
         event_listener_fun fun;
@@ -80,9 +77,9 @@ namespace banggame {
         void do_call_event(size_t id, const void *tuple);
 
     public:
-        template<typename T, typename Function> requires applicable_to_event<Function, T>
+        template<event T, typename Function> requires applicable<Function, event_tuple<T>>
         iterator_map_iterator add_listener(event_card_key key, Function &&fun) {
-            return do_add_listener(key, type_id<T>::get(), [fun=std::move(fun)](const void *tuple) {
+            return do_add_listener(key, type_id<T>::get(), [fun=std::move(fun)](const void *tuple) mutable {
                 std::apply(fun, *static_cast<const event_tuple<T> *>(tuple));
             });
         }
