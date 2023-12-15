@@ -23,7 +23,7 @@ namespace banggame {
         m_map.erase(range.begin(), range.end());
     }
 
-    void listener_map::do_call_event(size_t id, event_listener_invoke_fun fun, const void *tuple) {
+    void listener_map::do_call_event(size_t id, const void *tuple) {
         auto [low, high] = m_listeners.equal_range(id);
         std::ranges::subrange range(low, high);
         if (range.empty()) return;
@@ -31,7 +31,7 @@ namespace banggame {
         ++m_lock;
         for (const event_listener &listener : range) {
             if (listener.id == id && listener.active) {
-                std::invoke(fun, listener, tuple);
+                std::invoke(*listener.ptr, tuple);
             }
         }
         --m_lock;

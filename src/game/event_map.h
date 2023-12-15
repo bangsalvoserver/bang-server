@@ -15,6 +15,7 @@ namespace banggame {
 
     struct event_listener_base {
         virtual ~event_listener_base() = default;
+        virtual void operator()(const void *tuple) = 0;
     };
 
     using event_listener_ptr = std::unique_ptr<event_listener_base>;
@@ -30,8 +31,6 @@ namespace banggame {
         static size_t get_id() {
             return reinterpret_cast<size_t>(&event_listener_interface<T>::get_id);
         }
-
-        virtual void operator()(const event_tuple<T> &tuple) = 0;
     };
 
     template<typename Function, typename T>
@@ -49,8 +48,8 @@ namespace banggame {
         event_listener_impl(U &&function)
             : Function(std::forward<U>(function)) {}
 
-        void operator()(const event_tuple<T> &tuple) override {
-            std::apply(static_cast<Function &>(*this), tuple);
+        void operator()(const void *tuple) override {
+            std::apply(static_cast<Function &>(*this), *static_cast<const event_tuple<T> *>(tuple));
         }
     };
 
@@ -72,14 +71,7 @@ namespace banggame {
         auto operator <=> (size_t other_id) const {
             return id <=> other_id;
         }
-
-        template<event T>
-        void invoke(const void *tuple) const {
-            std::invoke(static_cast<event_listener_interface<T> &>(*ptr), *static_cast<const event_tuple<T> *>(tuple));
-        }
     };
-
-    using event_listener_invoke_fun = void (event_listener:: *)(const void *) const;
 
     class listener_map {
     public:
@@ -102,7 +94,7 @@ namespace banggame {
     private:
         iterator_map_iterator do_add_listener(event_card_key key, size_t id, event_listener_ptr &&ptr);
         void do_remove_listeners(iterator_map_range range);
-        void do_call_event(size_t id, event_listener_invoke_fun fun, const void *tuple);
+        void do_call_event(size_t id, const void *tuple);
 
     public:
         template<typename T, typename Function> requires applicable_to_event<Function, T>
@@ -128,7 +120,7 @@ namespace banggame {
         template<event T>
         void call_event(const T &value) {
             auto tuple = reflector::as_tuple(value);
-            do_call_event(event_listener_interface<T>::get_id(), &event_listener::invoke<T>, &tuple);
+            do_call_event(event_listener_interface<T>::get_id(), &tuple);
         }
     };
 
