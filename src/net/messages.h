@@ -43,7 +43,6 @@ namespace banggame {
         (pong)
         (connect, connect_args)
         (user_edit, user_info)
-        (lobby_list)
         (lobby_make, lobby_info)
         (lobby_edit, lobby_info)
         (lobby_join, lobby_id_args)

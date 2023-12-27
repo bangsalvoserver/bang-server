@@ -70,9 +70,6 @@
 ### Permette all'utente di cambiare nome e immagine di profilo dopo che si e' collegato
     {"user_edit": { /* oggetto user_info */ }}
 
-### Richiede la lista delle lobby, ritorna una serie di lobby_update
-    {"lobby_list":{}}
-
 ### Crea una lobby
     {"lobby_make": { /* oggetto lobby_info */ }}
 
