@@ -356,8 +356,8 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
         return "ERROR_PLAYER_NOT_LOBBY_OWNER";
     }
 
-    if (lobby.state != lobby_state::finished) {
-        return "ERROR_LOBBY_NOT_FINISHED";
+    if (lobby.state == lobby_state::waiting) {
+        return "ERROR_LOBBY_WAITING";
     }
 
     lobby.bots.clear();
