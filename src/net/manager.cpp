@@ -360,6 +360,9 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
         return "ERROR_LOBBY_WAITING";
     }
 
+    for (const auto &bot : lobby.bots) {
+        broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, bot.user_id);
+    }
     lobby.bots.clear();
     lobby.m_game.reset();
     
@@ -371,10 +374,6 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), user_ptr user) {
     }
 
     broadcast_message_lobby<server_message_type::lobby_entered>(lobby, lobby.id, lobby.name, lobby.options);
-    for (auto &[team, p] : lobby.users) {
-        broadcast_message_lobby<server_message_type::lobby_add_user>(lobby, p->second.user_id, p->second, true);
-    }
-    broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front().second->second.user_id);
     
     return {};
 }
