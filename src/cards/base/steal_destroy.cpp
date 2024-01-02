@@ -58,7 +58,7 @@ namespace banggame {
                 }
                 origin->steal_card(target_card);
             }
-        }, 82);
+        }, 42);
     }
 
     struct request_steal : request_targeting {
