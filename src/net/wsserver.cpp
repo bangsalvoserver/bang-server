@@ -21,6 +21,7 @@ bool wsserver::start(uint16_t port) {
     m_server.set_open_handler([this](client_handle con) {
         std::scoped_lock lock(m_con_mutex);
         m_clients.emplace(con);
+        on_connect(con);
     });
 
     auto client_disconnect_handler = [this](client_handle con) {
@@ -70,7 +71,12 @@ std::string wsserver::get_client_ip(client_handle con) {
     std::error_code ec;
     auto client_con = m_server.get_con_from_hdl(con, ec);
     if (client_con) {
-        return client_con->get_remote_endpoint();
+        std::string header_ip = client_con->get_request_header("X-Real-IP");
+        if (!header_ip.empty()) {
+            return header_ip;
+        } else {
+            return client_con->get_remote_endpoint();
+        }
     }
     return "(unknown host)";
 }

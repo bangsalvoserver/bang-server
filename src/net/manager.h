@@ -66,6 +66,7 @@ public:
     server_options &options() { return m_options; }
 
 protected:
+    void on_connect(client_handle client) override;
     void on_disconnect(client_handle client) override;
     void on_message(client_handle client, const std::string &message) override;
 

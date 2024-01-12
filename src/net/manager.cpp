@@ -259,6 +259,13 @@ void game_manager::kick_user_from_lobby(user_ptr user) {
     }
 }
 
+void game_manager::on_connect(client_handle client) {
+    if (m_options.verbose) {
+        fmt::print("{}: Connected\n", get_client_ip(client));
+        fflush(stdout);
+    }
+}
+
 void game_manager::on_disconnect(client_handle client) {
     if (auto it = users.find(client); it != users.end()) {
         if (it->second.in_lobby) {
