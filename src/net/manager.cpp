@@ -133,7 +133,7 @@ int game_manager::generate_lobby_id() {
     std::uniform_int_distribution dist{1, std::numeric_limits<int>::max()};
     while (true) {
         int lobby_id = dist(m_rng);
-        if (!ranges::contains(m_lobbies, lobby_id, &lobby::id)) {
+        if (!rn::contains(m_lobbies, lobby_id, &lobby::id)) {
             return lobby_id;
         }
     }
@@ -141,7 +141,7 @@ int game_manager::generate_lobby_id() {
 
 int game_manager::generate_user_id(int user_id) {
     std::uniform_int_distribution dist{1, std::numeric_limits<int>::max()};
-    while (user_id <= 0 || ranges::contains(users | ranges::views::values, user_id, &game_user::user_id)) {
+    while (user_id <= 0 || rn::contains(users | rv::values, user_id, &game_user::user_id)) {
         user_id = dist(m_rng);
     }
     return user_id;
@@ -196,7 +196,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
         return "ERROR_PLAYER_IN_LOBBY";
     }
 
-    auto lobby_it = std::ranges::find(m_lobbies, value.lobby_id, &lobby::id);
+    auto lobby_it = rn::find(m_lobbies, value.lobby_id, &lobby::id);
     if (lobby_it == m_lobbies.end()) {
         return "ERROR_INVALID_LOBBY";
     }
@@ -246,7 +246,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_join), user_ptr user, con
 void game_manager::kick_user_from_lobby(user_ptr user) {
     auto &lobby = *std::exchange(user->second.in_lobby, nullptr);
     
-    auto it = std::ranges::find(lobby.users, user, &team_user_pair::second);
+    auto it = rn::find(lobby.users, user, &team_user_pair::second);
     bool is_owner = it == lobby.users.begin();
     lobby.users.erase(it);
 
@@ -399,7 +399,7 @@ std::string game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
         return "ERROR_LOBBY_NOT_WAITING";
     }
 
-    size_t num_players = std::ranges::count(lobby.users, lobby_team::game_player, &team_user_pair::first) + lobby.options.num_bots;
+    size_t num_players = rn::count(lobby.users, lobby_team::game_player, &team_user_pair::first) + lobby.options.num_bots;
 
     if (num_players < 3) {
         return "ERROR_NOT_ENOUGH_PLAYERS";
@@ -467,14 +467,14 @@ void lobby::start_game(game_manager &mgr) {
     }
 
     std::vector<const std::string *> names = bot_info.names
-        | ranges::views::transform([](const std::string &str) { return &str; })
-        | ranges::views::sample(options.num_bots, m_game->rng)
-        | ranges::to<std::vector>;
+        | rv::transform([](const std::string &str) { return &str; })
+        | rv::sample(options.num_bots, m_game->rng)
+        | rn::to<std::vector>;
 
     std::vector<const sdl::image_pixels *> propics = bot_info.propics
-        | ranges::views::transform([](const sdl::image_pixels &image) { return &image; })
-        | ranges::views::sample(options.num_bots, m_game->rng)
-        | ranges::to<std::vector>;
+        | rv::transform([](const sdl::image_pixels &image) { return &image; })
+        | rv::sample(options.num_bots, m_game->rng)
+        | rn::to<std::vector>;
 
     for (int i=0; i<options.num_bots; ++i) {
         auto &bot = bots.emplace_back(-1 - i, user_info{fmt::format("BOT {}", *names[i % names.size()]), *propics[i % propics.size()] });

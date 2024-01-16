@@ -9,7 +9,7 @@ namespace banggame {
     struct card_cube_ordering {
         bool operator()(card *lhs, card *rhs) const {
             if (lhs->pocket == pocket_type::player_table && rhs->pocket == pocket_type::player_table) {
-                return std::ranges::find(lhs->owner->m_table, lhs) < std::ranges::find(rhs->owner->m_table, rhs);
+                return rn::find(lhs->owner->m_table, lhs) < rn::find(rhs->owner->m_table, rhs);
             } else {
                 return lhs->pocket == pocket_type::player_table;
             }

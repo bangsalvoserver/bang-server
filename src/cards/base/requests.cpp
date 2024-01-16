@@ -137,7 +137,7 @@ namespace banggame {
         }
         
         if (target->m_game->m_options.quick_discard_all
-            || (std::ranges::count_if(target->m_table, is_valid_card) + target->m_hand.size()) <= 1)
+            || (rn::count_if(target->m_table, is_valid_card) + target->m_hand.size()) <= 1)
         {
             on_resolve();
         }
@@ -146,8 +146,8 @@ namespace banggame {
     void request_discard_all::on_resolve() {
         target->m_game->pop_request();
 
-        std::vector<card *> cards_to_discard = ranges::views::concat(target->m_table, target->m_hand) | ranges::to<std::vector>;
-        std::ranges::stable_partition(cards_to_discard, is_valid_card);
+        std::vector<card *> cards_to_discard = rv::concat(target->m_table, target->m_hand) | rn::to<std::vector>;
+        rn::stable_partition(cards_to_discard, is_valid_card);
 
         for (card *target_card : cards_to_discard) {
             on_pick(target_card);

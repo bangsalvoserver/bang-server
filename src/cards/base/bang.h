@@ -51,7 +51,7 @@ namespace banggame {
         }
 
         virtual bool can_miss(card *c) const {
-            return std::ranges::find(m_cards_used, c) == m_cards_used.end();
+            return rn::find(m_cards_used, c) == m_cards_used.end();
         }
 
         virtual void on_miss(card *c, effect_flags missed_flags = {}) = 0;

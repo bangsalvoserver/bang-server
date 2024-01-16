@@ -43,7 +43,7 @@ namespace banggame {
         }
 
         bool has_tag(tag_type tag) const {
-            return std::ranges::find(tags, tag, &tag_holder::type) != tags.end();
+            return rn::contains(tags, tag, &tag_holder::type);
         }
 
         bool is_modifier() const {
@@ -51,7 +51,7 @@ namespace banggame {
         }
 
         std::optional<short> get_tag_value(tag_type tag) const {
-            if (auto it = std::ranges::find(tags, tag, &tag_holder::type); it != tags.end()) {
+            if (auto it = rn::find(tags, tag, &tag_holder::type); it != tags.end()) {
                 return it->tag_value;
             } else {
                 return std::nullopt;

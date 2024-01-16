@@ -30,15 +30,15 @@ namespace banggame {
 
     player_order_update game::make_player_order_update(bool instant) {
         return player_order_update{m_players
-            | ranges::views::filter([](player *p) {
+            | rv::filter([](player *p) {
                 return !p->check_player_flags(player_flags::removed);
             })
-            | ranges::to<serial::player_list>,
+            | rn::to<serial::player_list>,
             instant};
     }
 
     util::generator<json::json> game::get_spectator_join_updates() {
-        co_yield make_update<game_update_type::player_add>(m_players | ranges::to<std::vector<player_user_pair>>);
+        co_yield make_update<game_update_type::player_add>(m_players | rn::to<std::vector<player_user_pair>>);
 
         for (player *p : m_players) {
             co_yield make_update<game_update_type::player_flags>(p, p->m_player_flags);
@@ -49,7 +49,7 @@ namespace banggame {
         auto add_cards = [&](pocket_type pocket, player *owner = nullptr) -> util::generator<json::json> {
             auto &range = get_pocket(pocket, owner);
             if (!range.empty()) {
-                co_yield make_update<game_update_type::add_cards>(range | ranges::to<std::vector<card_backface>>, pocket, owner);
+                co_yield make_update<game_update_type::add_cards>(range | rn::to<std::vector<card_backface>>, pocket, owner);
             }
             for (card *c : range) {
                 if (c->visibility == card_visibility::shown) {
@@ -156,7 +156,7 @@ namespace banggame {
     }
 
     void game::add_players(std::span<int> user_ids) {
-        std::ranges::shuffle(user_ids, rng);
+        rn::shuffle(user_ids, rng);
 
         int player_id = 0;
         for (int id : user_ids) {
@@ -177,7 +177,7 @@ namespace banggame {
 
         apply_rulesets(this);
 
-        add_update<game_update_type::player_add>(m_players | ranges::to<std::vector<player_user_pair>>);
+        add_update<game_update_type::player_add>(m_players | rn::to<std::vector<player_user_pair>>);
 
         bool ghost_card_added = false;
         
@@ -208,7 +208,7 @@ namespace banggame {
         };
 
         if (add_cards(all_cards.button_row, pocket_type::button_row)) {
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_button_row), pocket_type::button_row);
+            add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_button_row), pocket_type::button_row);
             for (card *c : m_button_row) {
                 set_card_visibility(c, nullptr, card_visibility::shown, true);
             }
@@ -216,21 +216,21 @@ namespace banggame {
 
         if (add_cards(all_cards.deck, pocket_type::main_deck)) {
             shuffle_cards_and_ids(m_deck);
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_deck), pocket_type::main_deck);
+            add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_deck), pocket_type::main_deck);
         }
 
         if (add_cards(all_cards.goldrush, pocket_type::shop_deck)) {
             shuffle_cards_and_ids(m_shop_deck);
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_shop_deck), pocket_type::shop_deck);
+            add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_shop_deck), pocket_type::shop_deck);
         }
 
         if (add_cards(all_cards.train, pocket_type::train_deck)) {
             shuffle_cards_and_ids(m_train_deck);
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_train_deck), pocket_type::train_deck);
+            add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_train_deck), pocket_type::train_deck);
         }
 
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
+            add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
             for (card *c : m_hidden_deck) {
                 set_card_visibility(c, nullptr, card_visibility::shown, true);
             }
@@ -255,12 +255,12 @@ namespace banggame {
 
         auto role_ptr = m_players.size() > 3 ? roles : roles_3players;
 
-        std::ranges::shuffle(role_ptr, role_ptr + m_players.size(), rng);
+        rn::shuffle(role_ptr, role_ptr + m_players.size(), rng);
         for (player *p : m_players) {
             p->set_role(*role_ptr++);
         }
 
-        m_first_player = *std::ranges::find(m_players,
+        m_first_player = *rn::find(m_players,
             m_players.size() > 3 ? player_role::sheriff : player_role::deputy_3p, &player::m_role);
 
         auto is_last_scenario_card = [](card *c) {
@@ -269,21 +269,21 @@ namespace banggame {
 
         if (add_cards(all_cards.highnoon, pocket_type::scenario_deck) + add_cards(all_cards.fistfulofcards, pocket_type::scenario_deck)) {
             shuffle_cards_and_ids(m_scenario_deck);
-            auto last_scenario_cards = std::ranges::partition(m_scenario_deck, is_last_scenario_card);
-            if (last_scenario_cards.begin() != m_scenario_deck.begin()) {
-                m_scenario_deck.erase(m_scenario_deck.begin() + 1, last_scenario_cards.begin());
+            auto last_scenario_cards = rn::partition(m_scenario_deck, is_last_scenario_card);
+            if (last_scenario_cards != m_scenario_deck.begin()) {
+                m_scenario_deck.erase(m_scenario_deck.begin() + 1, last_scenario_cards);
             }
             if (m_scenario_deck.size() > m_options.scenario_deck_size) {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
             }
 
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_scenario_deck), pocket_type::scenario_deck);
+            add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_scenario_deck), pocket_type::scenario_deck);
         }
 
         if (add_cards(all_cards.wildwestshow, pocket_type::wws_scenario_deck)) {
             shuffle_cards_and_ids(m_wws_scenario_deck);
-            std::ranges::partition(m_wws_scenario_deck, is_last_scenario_card);
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(m_wws_scenario_deck), pocket_type::wws_scenario_deck);
+            rn::partition(m_wws_scenario_deck, is_last_scenario_card);
+            add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_wws_scenario_deck), pocket_type::wws_scenario_deck);
         }
 
         add_cards(all_cards.stations, pocket_type::none);
@@ -291,7 +291,7 @@ namespace banggame {
 
         std::vector<card *> character_ptrs;
         if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
-            std::ranges::shuffle(character_ptrs, rng);
+            rn::shuffle(character_ptrs, rng);
         }
 
         m_options.enable_ghost_cards = ghost_card_added;
@@ -306,7 +306,7 @@ namespace banggame {
                 c->pocket = pocket_type::player_hand;
                 c->owner = p;
             }
-            add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(p->m_hand), pocket_type::player_hand, p);
+            add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(p->m_hand), pocket_type::player_hand, p);
             for (card *c : p->m_hand) {
                 set_card_visibility(c, p, card_visibility::shown, true);
             }
@@ -318,7 +318,7 @@ namespace banggame {
             add_log("LOG_GAME_START");
             play_sound(nullptr, "gamestart");
 
-            int cycles = std::ranges::max(m_players | std::views::transform(&player::get_initial_cards));
+            int cycles = rn::max(m_players | rv::transform(&player::get_initial_cards));
             for (int i=0; i<cycles; ++i) {
                 for (player *p : range_all_players(m_first_player)) {
                     if (p->m_hand.size() < p->get_initial_cards()) {
@@ -340,14 +340,14 @@ namespace banggame {
 
         return {
             .distances = m_players
-                | ranges::views::filter([&](player *target) { return target != owner; })
-                | ranges::views::transform([&](player *target) {
+                | rv::filter([&](player *target) { return target != owner; })
+                | rv::transform([&](player *target) {
                     return player_distance_item {
                         .player = target,
                         .distance = target->get_distance_mod()
                     };
                 })
-                | ranges::to<std::vector>,
+                | rn::to<std::vector>,
             .range_mod = owner->get_range_mod(),
             .weapon_range = owner->get_weapon_range()
         };
@@ -364,9 +364,9 @@ namespace banggame {
 
             .respond_cards = generate_card_modifier_tree(owner, true),
 
-            .pick_cards = ranges::to<serial::card_list>(get_pick_cards(owner)),
+            .pick_cards = rn::to<serial::card_list>(get_pick_cards(owner)),
 
-            .highlight_cards = ranges::to<serial::card_list>(req->get_highlights()),
+            .highlight_cards = rn::to<serial::card_list>(req->get_highlights()),
 
             .target_set = owner && req->target == owner ? req->get_target_set() : target_list{},
 
@@ -398,7 +398,7 @@ namespace banggame {
 
         auto args = make_status_ready_update(m_playing);
         
-        if (m_playing->empty_hand() && std::ranges::all_of(args.play_cards, [](const card_modifier_node &node) {
+        if (m_playing->empty_hand() && rn::all_of(args.play_cards, [](const card_modifier_node &node) {
             return node.card->has_tag(tag_type::pass_turn);
         })) {
             m_playing->pass_turn();
@@ -426,7 +426,7 @@ namespace banggame {
         player *next_player;
 
         if (m_playing) {
-            auto it = std::ranges::find(m_players, m_playing);
+            auto it = rn::find(m_players, m_playing);
             while (true) {
                 if (check_flags(game_flags::invert_rotation)) {
                     if (it == m_players.begin()) it = m_players.end();
@@ -514,7 +514,7 @@ namespace banggame {
 
         if (!m_options.enable_ghost_cards) {
             queue_action([this]{
-                if (auto range = std::views::filter(m_players, [](player *p) { return !p->alive() && !p->check_player_flags(player_flags::removed); })) {
+                if (auto range = rv::filter(m_players, [](player *p) { return !p->alive() && !p->check_player_flags(player_flags::removed); })) {
                     for (player *p : range) {
                         p->add_player_flags(player_flags::removed);
                     }
@@ -542,10 +542,10 @@ namespace banggame {
                 add_game_flags(game_flags::game_over);
             };
 
-            auto alive_players = std::views::filter(m_players, &player::alive);
+            auto alive_players = rv::filter(m_players, &player::alive);
 
             if (check_flags(game_flags::free_for_all)) {
-                if (std::ranges::distance(alive_players) <= 1) {
+                if (rn::distance(alive_players) <= 1) {
                     declare_winners(alive_players);
                 }
             } else if (m_players.size() > 3) {
@@ -554,24 +554,24 @@ namespace banggame {
                 auto is_sheriff = [](player *p) { return p->m_role == player_role::sheriff; };
                 auto is_sheriff_or_deputy = [](player *p) { return p->m_role == player_role::sheriff || p->m_role == player_role::deputy; };
 
-                if (std::ranges::none_of(alive_players, is_sheriff)) {
-                    if (std::ranges::distance(alive_players) == 1 && is_renegade(alive_players.front())) {
+                if (rn::none_of(alive_players, is_sheriff)) {
+                    if (rn::distance(alive_players) == 1 && is_renegade(alive_players.front())) {
                         declare_winners(alive_players);
                     } else {
-                        declare_winners(std::views::filter(m_players, is_outlaw));
+                        declare_winners(rv::filter(m_players, is_outlaw));
                     }
-                } else if (std::ranges::all_of(alive_players, is_sheriff_or_deputy)) {
-                    declare_winners(std::views::filter(m_players, is_sheriff_or_deputy));
+                } else if (rn::all_of(alive_players, is_sheriff_or_deputy)) {
+                    declare_winners(rv::filter(m_players, is_sheriff_or_deputy));
                 }
             } else {
-                if (std::ranges::distance(alive_players) <= 1) {
+                if (rn::distance(alive_players) <= 1) {
                     declare_winners(alive_players);
                 } else if (killer && !target->alive() && (
                     (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::renegade_3p) ||
                     (target->m_role == player_role::renegade_3p && killer->m_role == player_role::deputy_3p) ||
                     (target->m_role == player_role::deputy_3p && killer->m_role == player_role::outlaw_3p)))
                 {
-                    declare_winners(std::views::single(killer));
+                    declare_winners(rv::single(killer));
                 }
             }
         }, -4);

@@ -61,11 +61,11 @@ namespace banggame {
         }
 
         bool matches(player *target) const {
-            return ranges::contains(targets(), target) == m_inclusive;
+            return rn::contains(targets(), target) == m_inclusive;
         }
 
         bool matches(int user_id) const {
-            return ranges::contains(targets(), user_id, &player::user_id) == m_inclusive;
+            return rn::contains(targets(), user_id, &player::user_id) == m_inclusive;
         }
 
         bool is_public() const {

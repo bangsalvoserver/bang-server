@@ -7,7 +7,7 @@ namespace banggame {
 
     static card *get_card_copy(card *target_card) {
         auto &cards = target_card->owner->m_game->m_context.cards;
-        auto it = std::ranges::find_if(cards, [&](const card &c) {
+        auto it = rn::find_if(cards, [&](const card &c) {
             return &c != target_card && c.deck == target_card->deck && c.name == target_card->name;
         });
         if (it != cards.end()) {
@@ -20,7 +20,7 @@ namespace banggame {
     static void copy_characters(player *origin, player *target) {
         origin->remove_extra_characters();
 
-        for (card *target_card : target->m_characters | ranges::views::take_last(2)) {
+        for (card *target_card : target->m_characters | rv::take_last(2)) {
             origin->m_game->add_log("LOG_COPY_CHARACTER", origin, target_card);
             
             card *new_card = get_card_copy(target_card);

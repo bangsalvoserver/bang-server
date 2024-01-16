@@ -35,15 +35,16 @@ namespace banggame {
     }
 
     void modifier_leevankliff::add_context(card *origin_card, player *origin, effect_context &ctx) {
-        if (auto it = std::ranges::find_if(origin->m_played_cards | std::views::reverse,
+        auto range = origin->m_played_cards | rv::reverse;
+        if (auto it = rn::find_if(range,
             [](const played_card_history &history) {
                 return history.origin_card.pocket == pocket_type::player_hand
                     || history.origin_card.pocket == pocket_type::none;
-            }); it != origin->m_played_cards.rend())
+            }); it != range.end())
         {
             const played_card_history &history = *it;
             card *playing_card = get_repeat_playing_card(history.origin_card.origin_card, history.context);
-            if (playing_card->is_brown() && !ranges::contains(history.modifiers, origin_card, &card_pocket_pair::origin_card)) {
+            if (playing_card->is_brown() && !rn::contains(history.modifiers, origin_card, &card_pocket_pair::origin_card)) {
                 ctx.disable_banglimit = true;
                 ctx.repeat_card = playing_card;
             }

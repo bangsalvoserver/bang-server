@@ -55,7 +55,7 @@ namespace banggame {
 
         using iterator_map = std::multimap<event_card_key, listener_iterator, std::less<>>;
         using iterator_map_iterator = iterator_map::const_iterator;
-        using iterator_map_range = std::ranges::subrange<iterator_map_iterator>;
+        using iterator_map_range = rn::subrange<iterator_map_iterator>;
         
         using iterator_vector = std::vector<listener_iterator>;
 

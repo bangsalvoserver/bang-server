@@ -10,7 +10,7 @@
 namespace banggame {
 
     static bool has_equipped_card(player *origin, card *target_card) {
-        return std::ranges::any_of(origin->m_played_cards, [&](const card_pocket_pair &pair) {
+        return rn::any_of(origin->m_played_cards, [&](const card_pocket_pair &pair) {
             return pair.origin_card == target_card && pair.pocket == pocket_type::player_hand;
         }, &played_card_history::origin_card);
     }

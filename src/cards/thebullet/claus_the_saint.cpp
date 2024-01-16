@@ -36,13 +36,13 @@ namespace banggame {
 
         target_list get_target_set() const override {
             return target->m_game->m_players
-                | ranges::views::filter([&](player *p) {
-                    return p != target && !ranges::contains(selected_targets, p);
+                | rv::filter([&](player *p) {
+                    return p != target && !rn::contains(selected_targets, p);
                 })
-                | ranges::views::transform([](player *p) {
+                | rv::transform([](player *p) {
                     return play_card_target{enums::enum_tag<target_type::player>, p};
                 })
-                | ranges::to<target_list>;
+                | rn::to<target_list>;
         }
     };
     

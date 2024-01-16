@@ -20,7 +20,7 @@ namespace banggame {
 
     game_string effect_express_car::on_prompt(card *origin_card, player *origin) {
         if (origin->is_bot()) {
-            if (ranges::any_of(get_all_playable_cards(origin), [](card *c) { return c->pocket == pocket_type::player_hand; })) {
+            if (rn::any_of(get_all_playable_cards(origin), [](card *c) { return c->pocket == pocket_type::player_hand; })) {
                 return "BOT_BAD_PLAY";
             }
         } else if (int ncards = int(origin->m_hand.size())) {

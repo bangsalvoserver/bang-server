@@ -8,7 +8,7 @@
 namespace banggame {
 
     static auto get_all_active_cards(player *origin) {
-        return ranges::views::concat(
+        return rv::concat(
             origin->m_hand,
             origin->m_table,
             origin->m_characters,
@@ -17,59 +17,59 @@ namespace banggame {
             origin->m_game->m_shop_selection,
             origin->m_game->m_stations,
             origin->m_game->m_train,
-            origin->m_game->m_scenario_cards | ranges::views::take_last(1),
-            origin->m_game->m_wws_scenario_cards | ranges::views::take_last(1)
+            origin->m_game->m_scenario_cards | rv::take_last(1),
+            origin->m_game->m_wws_scenario_cards | rv::take_last(1)
         );
     }
 
-    ranges::any_view<card *> get_all_playable_cards(player *origin, bool is_response) {
+    rn::any_view<card *> get_all_playable_cards(player *origin, bool is_response) {
         return get_all_active_cards(origin)
-            | ranges::views::filter([=](card *origin_card) {
+            | rv::filter([=](card *origin_card) {
                 return is_possible_to_play(origin, origin_card, is_response);
             });
     }
 
-    ranges::any_view<player *> make_equip_set(player *origin, card *origin_card, const effect_context &ctx) {
+    rn::any_view<player *> make_equip_set(player *origin, card *origin_card, const effect_context &ctx) {
         return origin->m_game->m_players
-            | ranges::views::filter([=](player *target) {
+            | rv::filter([=](player *target) {
                 return !get_equip_error(origin, origin_card, target, ctx);
             });
     }
 
-    ranges::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
+    rn::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
         return origin->m_game->m_players
-            | ranges::views::filter([=](player *target) {
+            | rv::filter([=](player *target) {
                 return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
                     && !holder.get_error(origin_card, origin, target, ctx);
             });
     }
 
-    ranges::any_view<std::pair<player *, player *>> make_adjacent_players_target_set(player *origin, card *origin_card, const effect_context &ctx) {
+    rn::any_view<std::pair<player *, player *>> make_adjacent_players_target_set(player *origin, card *origin_card, const effect_context &ctx) {
         effect_holder effect1 { .player_filter = target_player_filter::notself | target_player_filter::reachable };
         effect_holder effect2 { .player_filter = target_player_filter::notself };
-        return make_player_target_set(origin, origin_card, effect1, ctx) | ranges::views::for_each([=](player *target1) {
-            return make_player_target_set(origin, origin_card, effect2, ctx) | ranges::views::transform([=](player *target2) {
+        return make_player_target_set(origin, origin_card, effect1, ctx) | rv::for_each([=](player *target1) {
+            return make_player_target_set(origin, origin_card, effect2, ctx) | rv::transform([=](player *target2) {
                 return std::pair{target1, target2};
             });
         })
-        | ranges::views::filter([=](const auto &targets) {
+        | rv::filter([=](const auto &targets) {
             auto [target1, target2] = targets;
             return origin->m_game->calc_distance(target1, target2) == 1;
         });
     }
 
-    ranges::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
-        return ranges::views::concat(
+    rn::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
+        return rv::concat(
             make_player_target_set(origin, origin_card, holder)
-            | ranges::views::for_each([](player *target) {
-                return ranges::views::concat(
+            | rv::for_each([](player *target) {
+                return rv::concat(
                     target->m_hand,
                     target->m_table,
-                    target->m_characters | ranges::views::take(1)
+                    target->m_characters | rv::take(1)
                 );
             }),
             origin->m_game->m_selection)
-            | ranges::views::filter([=](card *target_card) {
+            | rv::filter([=](card *target_card) {
                 return !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
                     && !holder.get_error(origin_card, origin, target_card, ctx);
             });
@@ -83,7 +83,7 @@ namespace banggame {
     }
 
     static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, effect_list::const_iterator effect_it, const effect_context &ctx, const effect_target_list &targets) {
-        effect_it = std::ranges::find(effect_it, effects.end(), effect_type::mth_add, &effect_holder::type);
+        effect_it = rn::find(effect_it, effects.end(), effect_type::mth_add, &effect_holder::type);
         if (effect_it == effects.end()) {
             return !mth.get_error(origin_card, origin, targets, ctx);
         } else {
@@ -92,12 +92,12 @@ namespace banggame {
                 return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
                     vector_concat(targets, *effect_it, play_card_target{enums::enum_tag<target_type::none>}));
             case target_type::player:
-                return std::ranges::any_of(make_player_target_set(origin, origin_card, *effect_it, ctx), [&](player *target) {
+                return rn::any_of(make_player_target_set(origin, origin_card, *effect_it, ctx), [&](player *target) {
                     return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
                         vector_concat(targets, *effect_it, play_card_target{enums::enum_tag<target_type::player>, target}));
                 });
             case target_type::card:
-                return std::ranges::any_of(make_card_target_set(origin, origin_card, *effect_it, ctx), [&](card *target) {
+                return rn::any_of(make_card_target_set(origin, origin_card, *effect_it, ctx), [&](card *target) {
                     return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
                         vector_concat(targets, *effect_it, play_card_target{enums::enum_tag<target_type::card>, target}));
                 });
@@ -116,7 +116,7 @@ namespace banggame {
     }
 
     bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx) {
-        return !effects.empty() && std::ranges::all_of(effects, [&](const effect_holder &holder) {
+        return !effects.empty() && rn::all_of(effects, [&](const effect_holder &holder) {
             switch (holder.target) {
             case target_type::none:
                 return !holder.get_error(origin_card, origin, ctx);
@@ -140,8 +140,8 @@ namespace banggame {
         });
     }
 
-    static ranges::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
-        auto filter = ranges::views::filter([=](card *origin_card) {
+    static rn::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
+        auto filter = rv::filter([=](card *origin_card) {
             return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
         });
         if (ctx.card_choice) {
@@ -149,7 +149,7 @@ namespace banggame {
         } else if (ctx.traincost) {
             return origin->m_game->m_train | filter;
         } else if (ctx.repeat_card) {
-            return ranges::views::single(ctx.repeat_card) | filter;
+            return rv::single(ctx.repeat_card) | filter;
         } else {
             return get_all_active_cards(origin) | filter;
         }
@@ -209,22 +209,22 @@ namespace banggame {
         return tree;
     }
 
-    ranges::any_view<card *> get_pick_cards(player *origin) {
+    rn::any_view<card *> get_pick_cards(player *origin) {
         if (origin) {
             if (auto req = origin->m_game->top_request<request_picking_base>(origin)) {
-                return ranges::views::concat(
-                    origin->m_game->m_players | ranges::views::for_each([](player *p) {
-                        return ranges::views::concat(p->m_hand, p->m_table, p->m_characters);
+                return rv::concat(
+                    origin->m_game->m_players | rv::for_each([](player *p) {
+                        return rv::concat(p->m_hand, p->m_table, p->m_characters);
                     }),
                     origin->m_game->m_selection,
-                    origin->m_game->m_deck | ranges::views::take(1),
-                    origin->m_game->m_discards | ranges::views::take(1)
+                    origin->m_game->m_deck | rv::take(1),
+                    origin->m_game->m_discards | rv::take(1)
                 )
-                | ranges::views::filter([=](card *target_card) {
+                | rv::filter([=](card *target_card) {
                     return req->can_pick(target_card);
                 });
             }
         }
-        return ranges::views::empty<card *>;
+        return rv::empty<card *>;
     }
 }

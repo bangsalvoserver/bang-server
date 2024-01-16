@@ -17,7 +17,7 @@ namespace banggame {
         if (range == 0) {
             return prompt_target_self{}.on_prompt(origin_card, origin, target);
         } else if (!origin->is_bot() && target == origin && origin->get_weapon_range() != 0) {
-            if (auto it = std::ranges::find_if(target->m_table, is_weapon{origin_card}); it != target->m_table.end()) {
+            if (auto it = rn::find_if(target->m_table, is_weapon{origin_card}); it != target->m_table.end()) {
                 return {"PROMPT_REPLACE", origin_card, *it};
             }
         }
@@ -25,7 +25,7 @@ namespace banggame {
     }
 
     void equip_weapon::on_enable(card *target_card, player *target) {
-        if (auto it = std::ranges::find_if(target->m_table, is_weapon{target_card}); it != target->m_table.end()) {
+        if (auto it = rn::find_if(target->m_table, is_weapon{target_card}); it != target->m_table.end()) {
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, *it);
             target->discard_card(*it);
         }

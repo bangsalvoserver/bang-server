@@ -19,7 +19,7 @@ namespace banggame {
             if (origin_card->equips.empty()
                 && origin_card->optionals.empty()
                 && !origin_card->is_modifier()
-                && std::ranges::all_of(origin_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
+                && rn::all_of(origin_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
             ) {
                 apply_target_list(target, origin_card, true,
                     target_list{origin_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}, {});

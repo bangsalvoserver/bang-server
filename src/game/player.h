@@ -122,7 +122,7 @@ namespace banggame {
         bool immune_to(card *origin_card, player *origin, effect_flags flags, bool quiet = false);
 
         bool only_black_cards_equipped() const {
-            return empty_hand() && std::ranges::all_of(m_table, &card::is_black);
+            return empty_hand() && rn::all_of(m_table, &card::is_black);
         }
 
         bool empty_hand() const {
@@ -151,9 +151,9 @@ namespace banggame {
         int count_cubes() const;
 
         auto cube_slots() const {
-            return ranges::views::concat(
-                m_table | ranges::views::filter(&card::is_orange),
-                ranges::views::single(first_character())
+            return rv::concat(
+                m_table | rv::filter(&card::is_orange),
+                rv::single(first_character())
             );
         }
 

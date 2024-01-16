@@ -103,7 +103,7 @@ namespace banggame {
     }
 
     card *player::find_equipped_card(card *card) {
-        auto it = std::ranges::find(m_table, card->name, &card::name);
+        auto it = rn::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {
             return *it;
         } else {
@@ -294,8 +294,8 @@ namespace banggame {
     }
 
     void player::remove_extra_characters() {
-        if (auto range = m_characters | std::views::drop(1)) {
-            m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(range));
+        if (auto range = m_characters | rv::drop(1)) {
+            m_game->add_update<game_update_type::remove_cards>(rn::to<serial::card_list>(range));
 
             for (card *character : range) {
                 disable_equip(character);
@@ -344,7 +344,7 @@ namespace banggame {
     }
 
     int player::count_cubes() const {
-        return ranges::accumulate(cube_slots()
-            | ranges::views::transform(&card::num_cubes), 0);
+        return rn::accumulate(cube_slots()
+            | rv::transform(&card::num_cubes), 0);
     }
 }

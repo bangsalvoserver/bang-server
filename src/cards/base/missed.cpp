@@ -18,7 +18,7 @@ namespace banggame {
     game_string effect_missed::on_prompt(card *origin_card, player *origin) {
         if (auto req = origin->m_game->top_request<request_bang>(origin)) {
             if (req->bang_strength > 1 && !contains_at_least(get_all_playable_cards(origin, true)
-                | ranges::views::filter([](card *c) { return c->pocket != pocket_type::button_row; }),
+                | rv::filter([](card *c) { return c->pocket != pocket_type::button_row; }),
                 req->bang_strength))
             {
                 return {"PROMPT_BANG_STRENGTH", req->bang_strength};

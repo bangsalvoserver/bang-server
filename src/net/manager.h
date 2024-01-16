@@ -46,7 +46,7 @@ public:
             fmt::print("All users: Sent {}\n", message);
             fflush(stdout);
         }
-        for (client_handle client : users | std::views::keys) {
+        for (client_handle client : users | rv::keys) {
             push_message(client, message);
         }
     }

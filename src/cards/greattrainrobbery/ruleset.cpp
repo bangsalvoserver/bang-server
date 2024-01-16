@@ -10,26 +10,26 @@ namespace banggame {
 
     static void init_stations_and_train(player *origin) {
         origin->m_game->m_stations = origin->m_game->m_context.cards
-            | ranges::views::transform([](card &c) { return &c; })
-            | ranges::views::filter([](card *c) { return c->deck == card_deck_type::station; })
-            | ranges::views::sample(std::max(int(origin->m_game->m_players.size()), 4), origin->m_game->rng)
-            | ranges::to<std::vector>;
+            | rv::transform([](card &c) { return &c; })
+            | rv::filter([](card *c) { return c->deck == card_deck_type::station; })
+            | rv::sample(std::max(int(origin->m_game->m_players.size()), 4), origin->m_game->rng)
+            | rn::to<std::vector>;
             
-        origin->m_game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(origin->m_game->m_stations), pocket_type::stations);
+        origin->m_game->add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(origin->m_game->m_stations), pocket_type::stations);
         for (card *c : origin->m_game->m_stations) {
             c->pocket = pocket_type::stations;
             origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
         }
 
         origin->m_game->m_train = origin->m_game->m_context.cards
-            | ranges::views::transform([](card &c) { return &c; })
-            | ranges::views::filter([&](card *c) {
-                return c->deck == card_deck_type::locomotive && !ranges::contains(origin->m_game->m_train, c);
+            | rv::transform([](card &c) { return &c; })
+            | rv::filter([&](card *c) {
+                return c->deck == card_deck_type::locomotive && !rn::contains(origin->m_game->m_train, c);
             })
-            | ranges::views::sample(1, origin->m_game->rng)
-            | ranges::to<std::vector>;
+            | rv::sample(1, origin->m_game->rng)
+            | rn::to<std::vector>;
 
-        origin->m_game->add_update<game_update_type::add_cards>(ranges::to<std::vector<card_backface>>(origin->m_game->m_train), pocket_type::train);
+        origin->m_game->add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(origin->m_game->m_train), pocket_type::train);
         for (card *c : origin->m_game->m_train) {
             c->pocket = pocket_type::train;
             origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
@@ -54,13 +54,13 @@ namespace banggame {
             origin->m_game->set_card_visibility(c, nullptr, card_visibility::hidden);
             origin->disable_equip(c);
         }
-        origin->m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(origin->m_game->m_train));
+        origin->m_game->add_update<game_update_type::remove_cards>(rn::to<serial::card_list>(origin->m_game->m_train));
 
         if (!origin->m_game->m_train_deck.empty()) {
             origin->m_game->shuffle_cards_and_ids(origin->m_game->m_train_deck);
         }
         
-        origin->m_game->add_update<game_update_type::remove_cards>(ranges::to<serial::card_list>(origin->m_game->m_stations));
+        origin->m_game->add_update<game_update_type::remove_cards>(rn::to<serial::card_list>(origin->m_game->m_stations));
         for (card *c : origin->m_game->m_stations) {
             c->visibility = card_visibility::hidden;
         }

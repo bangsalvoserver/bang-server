@@ -18,7 +18,7 @@ namespace banggame {
 
     template<> duplicate_set visit_cards::duplicates(const serial::card_list &targets) {
         if (!bool(effect.card_filter & target_card_filter::can_repeat)) {
-            return {.cards{ targets | ranges::to<std::vector<card *>> }};
+            return {.cards{ targets | rn::to<std::vector<card *>> }};
         } else {
             return {};
         }

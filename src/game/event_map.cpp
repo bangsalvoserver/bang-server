@@ -25,7 +25,7 @@ namespace banggame {
 
     void listener_map::do_call_event(std::type_index type, const void *tuple) {
         auto [low, high] = m_listeners.equal_range(type);
-        std::ranges::subrange range(low, high);
+        rn::subrange range(low, high);
         if (range.empty()) return;
 
         ++m_lock;

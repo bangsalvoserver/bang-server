@@ -8,11 +8,11 @@ namespace banggame {
 
     void equip_miss_susanna::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_turn_end>({target_card, 1}, [=](player *origin, bool skipped) {
-            auto count = ranges::accumulate(
-                origin->m_played_cards | ranges::views::transform([](const played_card_history &history) {
-                    return ranges::count_if(
-                        ranges::views::concat(
-                            ranges::views::single(history.origin_card),
+            auto count = rn::accumulate(
+                origin->m_played_cards | rv::transform([](const played_card_history &history) {
+                    return rn::count_if(
+                        rv::concat(
+                            rv::single(history.origin_card),
                             history.modifiers
                         ),
                         [&](const card_pocket_pair &pair) {

@@ -66,7 +66,7 @@ namespace banggame {
     };
 
     game_string effect_add_cube::on_prompt(card *origin_card, player *origin) {
-        if (std::ranges::all_of(origin->cube_slots(), [](card *target) {
+        if (rn::all_of(origin->cube_slots(), [](card *target) {
             return target->num_cubes == max_cubes;
         })) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};

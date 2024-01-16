@@ -11,7 +11,7 @@ namespace banggame {
         for (card *c : target_cards.value) {
             effect_discard{}.on_play(origin_card, origin, c);
         }
-        if (!std::ranges::all_of(target_cards.value, [&](card *target_card) {
+        if (!rn::all_of(target_cards.value, [&](card *target_card) {
             return target->immune_to(target_card, origin, {}, true);
         })) {
             effect_bang{}.on_play(origin_card, origin, target);

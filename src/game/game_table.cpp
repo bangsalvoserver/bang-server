@@ -23,7 +23,7 @@ namespace banggame {
     }
 
     player *game_table::find_player_by_userid(int user_id) const {
-        if (auto it = std::ranges::find(m_players, user_id, &player::user_id); it != m_players.end()) {
+        if (auto it = rn::find(m_players, user_id, &player::user_id); it != m_players.end()) {
             return *it;
         }
         return nullptr;
@@ -80,7 +80,7 @@ namespace banggame {
     }
 
     int game_table::num_alive() const {
-        return int(std::ranges::count_if(m_players, &player::alive));
+        return int(rn::count_if(m_players, &player::alive));
     }
 
     void game_table::shuffle_cards_and_ids(std::span<card *> vec) {
@@ -131,7 +131,7 @@ namespace banggame {
         set_card_visibility(c, owner, visibility, instant);
 
         auto &prev_pile = get_pocket(c->pocket, c->owner);
-        prev_pile.erase(std::ranges::find(prev_pile, c));
+        prev_pile.erase(rn::find(prev_pile, c));
 
         get_pocket(pocket, owner).emplace_back(c);
         

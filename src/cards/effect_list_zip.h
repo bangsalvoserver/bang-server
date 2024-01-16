@@ -64,7 +64,7 @@ namespace banggame {
     };
 
     inline auto zip_card_targets(const target_list &targets, const effect_list &effects, const effect_list &optionals) {
-        return std::ranges::subrange(
+        return rn::subrange(
             effect_zip_iterator(targets, effects, optionals),
             targets.end()
         );

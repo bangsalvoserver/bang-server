@@ -7,8 +7,8 @@
 namespace banggame {
     
     static ticks get_total_update_time(game *game) {
-        return ranges::max(game->m_players | ranges::views::transform([&](player *p) {
-            return ranges::accumulate(game->m_updates | ranges::views::transform([&](const game_update_tuple &tup) {
+        return rn::max(game->m_players | rv::transform([&](player *p) {
+            return rn::accumulate(game->m_updates | rv::transform([&](const game_update_tuple &tup) {
                 if (tup.duration >= ticks{0} && tup.target.matches(p)) {
                     return tup.duration;
                 }
@@ -44,7 +44,7 @@ namespace banggame {
         } else if (m_game->m_playing && !m_game->send_request_status_ready()) {
             return state_next{};
         }
-        if (std::ranges::any_of(m_game->m_players, &player::is_bot)) {
+        if (rn::any_of(m_game->m_players, &player::is_bot)) {
             if (m_game->m_options.bot_play_timer > game_duration{0}) {
                 return state_bot_play{ get_total_update_time(m_game) + clamp_ticks(m_game->m_options.bot_play_timer) };
             } else if (m_game->request_bot_play()) {

@@ -14,11 +14,11 @@ namespace banggame {
         if (origin->first_character()->num_cubes < targets.size()) {
             return {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
         }
-        auto target_cards = targets | std::views::transform([](const effect_target_pair &target) -> card * {
+        auto target_cards = targets | rv::transform([](const effect_target_pair &target) -> card * {
             return target.target.get<target_type::card>();
         });
-        if (auto it = std::ranges::find_if(target_cards, [&](card *target_card) {
-            return int(std::ranges::count(target_cards, target_card)) + target_card->num_cubes > max_cubes;
+        if (auto it = rn::find_if(target_cards, [&](card *target_card) {
+            return int(rn::count(target_cards, target_card)) + target_card->num_cubes > max_cubes;
         }); it != target_cards.end()) {
             return {"ERROR_CARD_HAS_FULL_CUBES", *it};
         }

@@ -28,11 +28,11 @@ namespace banggame {
 
     void modifier_spike_spiezel::add_context(card *origin_card, player *origin, effect_context &ctx) {
         if (auto range = origin->m_played_cards
-            | std::views::reverse
-            | std::views::transform([](const played_card_history &history) {
+            | rv::reverse
+            | rv::transform([](const played_card_history &history) {
                 return get_repeat_playing_card(history.origin_card.origin_card, history.context);
             })
-            | std::views::filter(&card::is_brown))
+            | rv::filter(&card::is_brown))
         {
             ctx.disable_banglimit = true;
             ctx.repeat_card = *range.begin();

@@ -16,7 +16,7 @@ namespace banggame {
                     target->m_game->move_card(target->m_game->m_train_deck.front(), pocket_type::selection, target);
                 }
             }
-            if (target->m_game->m_selection.size() <= 1 && std::ranges::all_of(target->m_game->m_selection, [&](card *target_card) {
+            if (target->m_game->m_selection.size() <= 1 && rn::all_of(target->m_game->m_selection, [&](card *target_card) {
                 return !filters::check_player_filter(target, target_card->equip_target, target);
             })) {
                 target->m_game->pop_request();
@@ -30,15 +30,15 @@ namespace banggame {
 
         target_list get_target_set() const override {
             return target->m_game->m_players
-                | ranges::views::filter([&](player *p) {
-                    return ranges::any_of(target->m_game->m_selection, [&](card *target_card) {
+                | rv::filter([&](player *p) {
+                    return rn::any_of(target->m_game->m_selection, [&](card *target_card) {
                         return !filters::check_player_filter(target, target_card->equip_target, p);
                     });
                 })
-                | ranges::views::transform([](player *p) {
+                | rv::transform([](player *p) {
                     return play_card_target{enums::enum_tag<target_type::player>, p};
                 })
-                | ranges::to<target_list>;
+                | rn::to<target_list>;
         }
 
         game_string status_text(player *owner) const override {

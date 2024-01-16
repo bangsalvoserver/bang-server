@@ -55,7 +55,7 @@ namespace banggame {
 
         void on_update() override {
             if (!target->alive() || target->immune_to(origin_card, origin, flags)
-                || std::ranges::none_of(target->m_table, [&](card *target_card) {
+                || rn::none_of(target->m_table, [&](card *target_card) {
                     return can_pick(target_card);
                 })
             ) {
@@ -67,7 +67,7 @@ namespace banggame {
 
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::player_table && target_card->owner == target
-                && !target_card->is_black() && !ranges::contains(selected_cards, target_card);
+                && !target_card->is_black() && !rn::contains(selected_cards, target_card);
         }
 
         void on_pick(card *target_card) override {
@@ -87,7 +87,7 @@ namespace banggame {
     };
 
     game_string effect_train_robbery::on_prompt(card *origin_card, player *origin, player *target) {
-        if (std::ranges::all_of(target->m_table, &card::is_black)) {
+        if (rn::all_of(target->m_table, &card::is_black)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
             return {};

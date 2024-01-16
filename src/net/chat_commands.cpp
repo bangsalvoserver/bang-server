@@ -59,7 +59,7 @@ namespace banggame {
         }
 
         auto &lobby = *user->second.in_lobby;
-        auto kicked = std::ranges::find(lobby.users, user_id, [](const team_user_pair &pair) {
+        auto kicked = rn::find(lobby.users, user_id, [](const team_user_pair &pair) {
             return pair.second->second.user_id;
         });
         if (kicked == lobby.users.end()) {
@@ -130,8 +130,8 @@ namespace banggame {
             return "ERROR_PLAYER_NOT_IN_TURN";
         }
 
-        auto card_it = std::ranges::find_if(lobby.m_game->m_context.cards, [&](const card &target_card) {
-            if (std::ranges::equal(name, target_card.name, {}, toupper, toupper)) {
+        auto card_it = rn::find_if(lobby.m_game->m_context.cards, [&](const card &target_card) {
+            if (rn::equal(name, target_card.name, {}, toupper, toupper)) {
                 switch (target_card.deck) {
                 case card_deck_type::main_deck:
                     return target_card.pocket != pocket_type::player_hand || target_card.owner != target;
@@ -201,7 +201,7 @@ namespace banggame {
         case card_deck_type::highnoon:
         case card_deck_type::fistfulofcards: {
             if (target_card->pocket == pocket_type::scenario_deck) {
-                if (auto it = std::ranges::find(target->m_game->m_scenario_deck, target_card); it != target->m_game->m_scenario_deck.end()) {
+                if (auto it = rn::find(target->m_game->m_scenario_deck, target_card); it != target->m_game->m_scenario_deck.end()) {
                     target->m_game->m_scenario_deck.erase(it);
                 } else {
                     target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::scenario_deck);
@@ -216,7 +216,7 @@ namespace banggame {
         }
         case card_deck_type::wildwestshow: {
             if (target_card->pocket == pocket_type::wws_scenario_deck) {
-                if (auto it = std::ranges::find(target->m_game->m_wws_scenario_deck, target_card); it != target->m_game->m_wws_scenario_deck.end()) {
+                if (auto it = rn::find(target->m_game->m_wws_scenario_deck, target_card); it != target->m_game->m_wws_scenario_deck.end()) {
                     target->m_game->m_wws_scenario_deck.erase(it);
                 } else {
                     target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::wws_scenario_deck);
@@ -238,7 +238,7 @@ namespace banggame {
 
     std::string game_manager::command_set_team(user_ptr user, std::string_view value) {
         if (auto team = enums::from_string<lobby_team>(value)) {
-            std::ranges::find(user->second.in_lobby->users, user, &team_user_pair::second)->first = *team;
+            rn::find(user->second.in_lobby->users, user, &team_user_pair::second)->first = *team;
             return {};
         } else {
             return "ERROR_INVALID_TEAM";
@@ -254,14 +254,14 @@ namespace banggame {
         auto &lobby = *user->second.in_lobby;
 
         auto check_disconnected = [&](player *p) {
-            return !ranges::contains(lobby.users, p->user_id, [](const team_user_pair &pair) {
+            return !rn::contains(lobby.users, p->user_id, [](const team_user_pair &pair) {
                 return pair.second->second.user_id;
             });
         };
 
         if (value.empty()) {
             auto &lobby = *user->second.in_lobby;
-            for (player *p : lobby.m_game->m_players | std::views::filter(check_disconnected)) {
+            for (player *p : lobby.m_game->m_players | rv::filter(check_disconnected)) {
                 if (card *c = p->first_character()) {
                     send_message<server_message_type::lobby_chat>(user->first, 0, fmt::format("/rejoin {}", c->name));
                 }
@@ -269,14 +269,14 @@ namespace banggame {
             return {};
         }
 
-        lobby_team &user_team = std::ranges::find(lobby.users, user, &team_user_pair::second)->first;
+        lobby_team &user_team = rn::find(lobby.users, user, &team_user_pair::second)->first;
         if (user_team != lobby_team::game_spectator) {
             return "ERROR_USER_NOT_SPECTATOR";
         }
 
-        auto it = std::ranges::find_if(lobby.m_game->m_players, [&](player *p) {
+        auto it = rn::find_if(lobby.m_game->m_players, [&](player *p) {
             if (card *c = p->first_character()) {
-                return std::ranges::equal(value, c->name, {}, toupper, toupper);
+                return rn::equal(value, c->name, {}, toupper, toupper);
             }
             return false;
         });

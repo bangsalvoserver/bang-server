@@ -33,8 +33,8 @@ namespace banggame {
         player *target = get_next_player(origin);
         target->add_player_flags(player_flags::skip_turn);
         std::iter_swap(
-            std::ranges::find(origin->m_game->m_players, origin),
-            std::ranges::find(origin->m_game->m_players, target));
+            rn::find(origin->m_game->m_players, origin),
+            rn::find(origin->m_game->m_players, target));
         origin->m_game->add_update<game_update_type::player_order>(origin->m_game->make_player_order_update());
     }
 }

@@ -47,7 +47,7 @@ namespace banggame {
                 target->m_game->set_card_visibility(target_card);
             }
             
-            if (auto aces = std::views::filter(target->m_game->m_selection, [this](card *c) {
+            if (auto aces = rv::filter(target->m_game->m_selection, [this](card *c) {
                 return target->m_game->get_card_sign(c).rank == card_rank::rank_A;
             })) {
                 for (card *c : aces) {

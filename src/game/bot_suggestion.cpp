@@ -19,14 +19,14 @@ namespace banggame::bot_suggestion {
             return target->m_role == player_role::outlaw
                 || target->m_role == player_role::renegade;
         case player_role::renegade: {
-            auto targets = std::ranges::filter_view(origin->m_game->m_players, [origin](player *p) {
+            auto targets = origin->m_game->m_players | rv::filter([origin](player *p) {
                 return p != origin && p->alive();
             });
-            auto num_outlaws = std::ranges::count_if(targets, [](player_role role) {
+            auto num_outlaws = rn::count_if(targets, [](player_role role) {
                 return role == player_role::outlaw
                     || role == player_role::renegade;
             }, &player::m_role);
-            auto num_sheriff_or_deputy = std::ranges::count_if(targets, [](player_role role) {
+            auto num_sheriff_or_deputy = rn::count_if(targets, [](player_role role) {
                 return role == player_role::sheriff
                     || role == player_role::deputy;
             }, &player::m_role);

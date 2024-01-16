@@ -427,9 +427,9 @@ namespace banggame {
         return {
             .origin_card{to_card_pocket_pair(args.card)},
             .modifiers{args.modifiers
-                | ranges::views::transform(&modifier_pair::card)
-                | ranges::views::transform(to_card_pocket_pair)
-                | ranges::to<std::vector>},
+                | rv::transform(&modifier_pair::card)
+                | rv::transform(to_card_pocket_pair)
+                | rn::to<std::vector>},
             .is_response{is_response},
             .context{ctx}
         };

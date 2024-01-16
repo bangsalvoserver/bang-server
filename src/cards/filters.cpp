@@ -29,7 +29,7 @@ namespace banggame::filters::detail {
     }
 
     int count_player_table_cards(player *origin) {
-        return int(std::ranges::count_if(origin->m_table, std::not_fn(&card::is_black)));
+        return int(rn::count_if(origin->m_table, std::not_fn(&card::is_black)));
     }
 
     int count_player_cubes(player *origin) {

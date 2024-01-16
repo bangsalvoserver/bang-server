@@ -10,18 +10,18 @@ namespace banggame {
             auto operator()(card *c) const { return std::pair{p, c}; }
         };
 
-        return ranges::views::concat(
+        return rv::concat(
             table->m_scenario_cards
-                | ranges::views::take_last(1)
-                | ranges::views::transform(to_player_card_pair{table->m_first_player}),
+                | rv::take_last(1)
+                | rv::transform(to_player_card_pair{table->m_first_player}),
             table->m_wws_scenario_cards
-                | ranges::views::take_last(1)
-                | ranges::views::transform(to_player_card_pair{table->m_first_player}),
+                | rv::take_last(1)
+                | rv::transform(to_player_card_pair{table->m_first_player}),
             table->m_players
-                | ranges::views::filter(&player::alive)
-                | ranges::views::for_each([](player *p) {
-                    return ranges::views::concat(p->m_table, p->m_characters)
-                        | ranges::views::transform(to_player_card_pair{p});
+                | rv::filter(&player::alive)
+                | rv::for_each([](player *p) {
+                    return rv::concat(p->m_table, p->m_characters)
+                        | rv::transform(to_player_card_pair{p});
                 })
         );
     }
@@ -45,7 +45,7 @@ namespace banggame {
             bool a = false;
             bool b = false;
             for (const auto &[t, fun] : m_disablers) {
-                if (std::ranges::none_of(range, [&](const auto &pair) { return pair.first == t; })) {
+                if (rn::none_of(range, [&](const auto &pair) { return pair.first == t; })) {
                     a = a || std::invoke(fun, c);
                 } else {
                     b = b || std::invoke(fun, c);

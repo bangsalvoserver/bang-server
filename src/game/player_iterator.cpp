@@ -5,7 +5,7 @@
 
 namespace banggame {
     player_iterator::player_iterator(const player *p)
-        : m_it(std::ranges::find(p->m_game->m_players, p)) {}
+        : m_it(rn::find(p->m_game->m_players, p)) {}
 
     player_iterator &player_iterator::operator++() {
         auto &list = (*m_it)->m_game->m_players;
@@ -45,7 +45,7 @@ namespace banggame {
 
     util::generator<player *> range_all_players(const player *begin) {
         auto &list = begin->m_game->m_players;
-        auto it = std::ranges::find(list, begin);
+        auto it = rn::find(list, begin);
         while (true) {
             if ((*it)->alive()) {
                 co_yield *it;
@@ -61,7 +61,7 @@ namespace banggame {
 
     util::generator<player *> range_all_players_and_dead(const player *begin) {
         auto &list = begin->m_game->m_players;
-        auto it = std::ranges::find(list, begin);
+        auto it = rn::find(list, begin);
         while (true) {
             co_yield *it;
             if (++it == list.end()) {
@@ -75,7 +75,7 @@ namespace banggame {
 
     util::generator<player *> range_other_players(const player *begin) {
         auto &list = begin->m_game->m_players;
-        auto it = std::ranges::find(list, begin);
+        auto it = rn::find(list, begin);
         while (true) {
             if (++it == list.end()) {
                 it = list.begin();

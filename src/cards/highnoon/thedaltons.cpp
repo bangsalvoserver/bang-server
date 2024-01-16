@@ -35,7 +35,7 @@ namespace banggame {
 
     void equip_thedaltons::on_enable(card *target_card, player *target) {
         for (player *p : range_all_players(target)) {
-            if (std::ranges::any_of(p->m_table, &card::is_blue)) {
+            if (rn::any_of(p->m_table, &card::is_blue)) {
                 p->m_game->queue_request<request_thedaltons>(target_card, p);
             }
         }

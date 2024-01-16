@@ -13,10 +13,10 @@ namespace banggame {
         bot_error(game_string message): message{message} {}
     };
 
-    template<std::ranges::range Range, typename Rng>
+    template<rn::range Range, typename Rng>
     decltype(auto) random_element(Range &&range, Rng &rng) {
-        std::ranges::range_value_t<Range> ret;
-        if (std::ranges::sample(std::forward<Range>(range), &ret, 1, rng) == &ret) {
+        rn::range_value_t<Range> ret;
+        if (rn::sample(std::forward<Range>(range), &ret, 1, rng).out == &ret) {
             throw bot_error{"EMPTY_RANGE_IN_RANDOM_ELEMENT"};
         }
         return ret;
@@ -33,7 +33,7 @@ namespace banggame {
         }
 
         player *operator()(enums::enum_tag_t<target_type::conditional_player>) const {
-            auto targets = ranges::to<std::vector>(make_player_target_set(origin, origin_card, holder, ctx));
+            auto targets = rn::to<std::vector>(make_player_target_set(origin, origin_card, holder, ctx));
             if (targets.empty()) {
                 return nullptr;
             } else {
@@ -42,13 +42,13 @@ namespace banggame {
         }
 
         serial::player_list operator()(enums::enum_tag_t<target_type::adjacent_players>) const {
-            auto targets = ranges::to<std::vector>(make_adjacent_players_target_set(origin, origin_card, ctx));
+            auto targets = rn::to<std::vector>(make_adjacent_players_target_set(origin, origin_card, ctx));
             auto [target1, target2] = random_element(targets, origin->m_game->rng);
             return {target1, target2};
         }
 
         card *operator()(enums::enum_tag_t<target_type::card>) const {
-            auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
+            auto targets = rn::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
             return random_element(targets, origin->m_game->rng);
         }
 
@@ -56,24 +56,24 @@ namespace banggame {
             if (ctx.repeat_card) {
                 return nullptr;
             } else {
-                auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
+                auto targets = rn::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
                 return random_element(targets, origin->m_game->rng);
             }
         }
 
         auto operator()(enums::enum_tag_t<target_type::cards> tag) const {
-            auto targets = ranges::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
+            auto targets = rn::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
             return targets
-                | ranges::views::sample(holder.target_value, origin->m_game->rng)
-                | ranges::to<serial::card_list>;
+                | rv::sample(holder.target_value, origin->m_game->rng)
+                | rn::to<serial::card_list>;
         }
 
         auto operator()(enums::enum_tag_t<target_type::cards_other_players>) const {
             serial::card_list ret;
             for (player *target : range_other_players(origin)) {
-                if (auto targets = ranges::views::concat(
-                    target->m_table | ranges::views::remove_if(&card::is_black),
-                    target->m_hand | ranges::views::take(1)
+                if (auto targets = rv::concat(
+                    target->m_table | rv::remove_if(&card::is_black),
+                    target->m_hand | rv::take(1)
                 )) {
                     ret.push_back(random_element(targets, origin->m_game->rng));
                 }
@@ -83,13 +83,13 @@ namespace banggame {
 
         auto operator()(enums::enum_tag_t<target_type::select_cubes>) const {
             auto cubes = origin->cube_slots()
-                | ranges::views::for_each([](card *slot) {
-                    return ranges::views::repeat_n(slot, slot->num_cubes);
+                | rv::for_each([](card *slot) {
+                    return rv::repeat_n(slot, slot->num_cubes);
                 })
-                | ranges::to<std::vector>;
+                | rn::to<std::vector>;
             return cubes
-                | ranges::views::sample(holder.target_value, origin->m_game->rng)
-                | ranges::to<serial::card_list>;
+                | rv::sample(holder.target_value, origin->m_game->rng)
+                | rn::to<serial::card_list>;
         }
     };
 
@@ -144,7 +144,7 @@ namespace banggame {
                 }
 
                 cur_node = random_element(cur_node->branches
-                    | ranges::views::transform([](const card_modifier_node &node) { return &node; }),
+                    | rv::transform([](const card_modifier_node &node) { return &node; }),
                     origin->m_game->rng);
             }
         }
@@ -155,7 +155,7 @@ namespace banggame {
     struct compare_card_node {
         bool operator ()(const card_modifier_node &lhs, const card_modifier_node &rhs) const {
             return lhs.card == rhs.card
-                ? std::ranges::lexicographical_compare(lhs.branches, rhs.branches, compare_card_node{})
+                ? rn::lexicographical_compare(lhs.branches, rhs.branches, compare_card_node{})
                 : get_card_order(lhs.card) < get_card_order(rhs.card);
         }
     };
@@ -203,7 +203,7 @@ namespace banggame {
                 play_or_pick_node selected_node = [&]{
                     for (pocket_type pocket : pockets) {
                         if (auto filter = node_set
-                            | std::views::filter([&](const play_or_pick_node &node) {
+                            | rv::filter([&](const play_or_pick_node &node) {
                                 if (auto *play_card = std::get_if<play_card_node>(&node)) {
                                     return play_card->node->card->pocket == pocket;
                                 }
@@ -255,7 +255,7 @@ namespace banggame {
 
     bool game::request_bot_play() {
         if (pending_requests()) {
-            for (player *origin : m_players | std::views::filter(&player::is_bot)) {
+            for (player *origin : m_players | rv::filter(&player::is_bot)) {
                 auto update = make_request_update(origin);
                 
                 if (!update.pick_cards.empty() || !update.respond_cards.empty()) {

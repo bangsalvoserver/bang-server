@@ -10,19 +10,19 @@ namespace banggame {
         origin->m_game->draw_check_then(nullptr, target_card, &card_sign::is_red, [=](bool condition) {
             if (condition) {
                 auto alive_players = origin->m_game->m_players
-                    | ranges::views::filter([](player *p) {
+                    | rv::filter([](player *p) {
                         return p->alive() && p->m_role != player_role::sheriff;
                     });
                 
-                auto roles = alive_players | ranges::views::transform(&player::m_role) | ranges::to<std::vector>;
-                std::ranges::shuffle(roles, origin->m_game->rng);
+                auto roles = alive_players | rv::transform(&player::m_role) | rn::to<std::vector>;
+                rn::shuffle(roles, origin->m_game->rng);
                 
                 for (player *p : alive_players) {
                     p->set_role(player_role::unknown, false);
                     p->remove_player_flags(player_flags::role_revealed);
                 }
 
-                for (auto [p, role] : ranges::views::zip(alive_players, roles)) {
+                for (auto [p, role] : rv::zip(alive_players, roles)) {
                     p->set_role(role, false);
                 }
             }

@@ -16,7 +16,7 @@ namespace banggame {
     public:
         using disabler_map_t = std::multimap<event_card_key, card_disabler_fun, std::less<>>;
         using disabler_map_iterator = disabler_map_t::const_iterator;
-        using disabler_map_range = std::ranges::subrange<disabler_map_iterator>;
+        using disabler_map_range = rn::subrange<disabler_map_iterator>;
 
     private:
         disabler_map_t m_disablers;

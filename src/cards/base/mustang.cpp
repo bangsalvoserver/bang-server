@@ -13,7 +13,7 @@ namespace banggame {
     };
 
     game_string equip_horse::on_prompt(card *origin_card, player *origin, player *target) {
-        if (auto it = std::ranges::find_if(target->m_table, is_horse{origin_card}); it != target->m_table.end()) {
+        if (auto it = rn::find_if(target->m_table, is_horse{origin_card}); it != target->m_table.end()) {
             return {"PROMPT_REPLACE", origin_card, *it};
         } else {
             return {};
@@ -21,7 +21,7 @@ namespace banggame {
     }
 
     void equip_horse::on_enable(card *target_card, player *target) {
-        if (auto it = std::ranges::find_if(target->m_table, is_horse{target_card}); it != target->m_table.end()) {
+        if (auto it = rn::find_if(target->m_table, is_horse{target_card}); it != target->m_table.end()) {
             target->discard_card(*it);
         }
     }

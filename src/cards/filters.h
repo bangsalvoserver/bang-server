@@ -89,7 +89,7 @@ namespace banggame::filters {
         
         if (bool(filter & target_player_filter::target_set)) {
             target_list target_set = detail::get_request_target_set(target);
-            if (std::ranges::none_of(target_set, [&](const play_card_target &t) {
+            if (rn::none_of(target_set, [&](const play_card_target &t) {
                 if (auto *p = t.get_if<target_type::player>()) {
                     return *p == target;
                 }
