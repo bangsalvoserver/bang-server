@@ -125,6 +125,7 @@ namespace banggame {
             case target_type::adjacent_players:
                 return contains_at_least(make_adjacent_players_target_set(origin, origin_card, ctx), 1);
             case target_type::card:
+            case target_type::max_cards:
                 return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::extra_card:
                 return ctx.repeat_card || contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);

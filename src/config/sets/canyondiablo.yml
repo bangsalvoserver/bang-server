@@ -111,14 +111,13 @@ main_deck:
     equip:
       - lastwill
     responses:
-      - lastwill
-      - mth_add player notself
-      - mth_add card self
+      - none
     optional:
-      - mth_add card self
+      - mth_add player notself
+      - mth_add max_cards(3) self
     mth_response: lastwill
     tags:
-      - repeatable(2)
+      - auto_select
   - name: INDIAN_GUIDE
     signs:
       - 8 clubs

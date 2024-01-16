@@ -68,6 +68,13 @@ namespace banggame {
                 | rn::to<serial::card_list>;
         }
 
+        auto operator()(enums::enum_tag_t<target_type::max_cards> tag) const {
+            auto targets = rn::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
+            return targets
+                | rv::sample(holder.target_value, origin->m_game->rng)
+                | rn::to<serial::card_list>;
+        }
+
         auto operator()(enums::enum_tag_t<target_type::cards_other_players>) const {
             serial::card_list ret;
             for (player *target : range_other_players(origin)) {

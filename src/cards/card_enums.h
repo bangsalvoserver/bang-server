@@ -106,6 +106,7 @@ namespace banggame {
         (extra_card,            serial::opt_card)
         (players)
         (cards,                 serial::card_list)
+        (max_cards,             serial::card_list)
         (cards_other_players,   serial::card_list)
         (select_cubes,          serial::card_list)
         (self_cubes)

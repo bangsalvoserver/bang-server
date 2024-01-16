@@ -6,6 +6,7 @@ PRIVATE
     conditional_player.cpp
     adjacent_players.cpp
     extra_card.cpp
+    max_cards.cpp
     none.cpp
     player.cpp
     players.cpp

@@ -79,7 +79,6 @@ namespace banggame {
         (mirage,                effect_mirage)
         (disarm,                effect_disarm)
         (sacrifice,             effect_sacrifice)
-        (lastwill,              effect_lastwill)
         (ladyrosaoftexas,       effect_ladyrosaoftexas)
         (changewws,             effect_changewws)
         (cactus,                effect_cactus)

@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    struct request_lastwill : request_base, resolvable_request {
+    struct request_lastwill : request_base {
         request_lastwill(card *origin_card, player *target)
             : request_base(origin_card, nullptr, target) {}
 
@@ -14,10 +14,6 @@ namespace banggame {
             if (target->m_hp > 0) {
                 target->m_game->pop_request();
             }
-        }
-
-        void on_resolve() override {
-            target->m_game->pop_request();
         }
         
         game_string status_text(player *owner) const override {
@@ -37,15 +33,21 @@ namespace banggame {
         });
     }
 
-    bool effect_lastwill::can_play(card *origin_card, player *origin) {
-        return origin->m_game->top_request<request_lastwill>(origin) != nullptr;
+    game_string handler_lastwill::get_error(card *origin_card, player *origin, const effect_target_list &targets) {
+        if (origin->m_game->top_request<request_lastwill>(origin) != nullptr) {
+            return {};
+        }
+        return "ERROR_INVALID_ACTION";
     }
 
     void handler_lastwill::on_play(card *origin_card, player *origin, const effect_target_list &targets) {
         origin->m_game->pop_request();
+        if (targets.empty()) {
+            return;
+        }
         player *target = targets[0].target.get<target_type::player>();
-        for (auto c : targets | rv::drop(1)) {
-            card *chosen_card = c.target.get<target_type::card>();
+        const auto &target_cards = targets[1].target.get<target_type::max_cards>();
+        for (card *chosen_card : target_cards) {
             if (chosen_card->visibility != card_visibility::shown) {
                 origin->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, chosen_card);
                 origin->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", origin, target);

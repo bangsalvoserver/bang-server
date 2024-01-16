@@ -57,10 +57,8 @@ namespace banggame {
         }
         
         size_t diff = targets.size() - effects.size();
-        if (auto repeatable = origin_card->get_tag_value(tag_type::repeatable)) {
-            if (diff < 0 || diff % origin_card->optionals.size() != 0
-                || (*repeatable > 0 && diff > (origin_card->optionals.size() * *repeatable)))
-            {
+        if (origin_card->has_tag(tag_type::repeatable)) {
+            if (diff < 0 || diff % origin_card->optionals.size() != 0) {
                 return "ERROR_INVALID_TARGETS";
             }
         } else if (diff != 0 && diff != origin_card->optionals.size()) {
