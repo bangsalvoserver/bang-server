@@ -45,8 +45,8 @@ namespace banggame {
         if (targets.empty()) {
             return;
         }
-        player *target = targets[0].target.get<target_type::player>();
-        const auto &target_cards = targets[1].target.get<target_type::max_cards>();
+        const auto &target_cards = targets[0].target.get<target_type::max_cards>();
+        player *target = targets[1].target.get<target_type::player>();
         for (card *chosen_card : target_cards) {
             if (chosen_card->visibility != card_visibility::shown) {
                 origin->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, chosen_card);

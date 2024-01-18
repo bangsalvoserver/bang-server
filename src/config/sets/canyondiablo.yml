@@ -113,8 +113,8 @@ main_deck:
     responses:
       - none
     optional:
-      - mth_add player notself
       - mth_add max_cards(3) self
+      - mth_add player notself
     mth_response: lastwill
     tags:
       - auto_select
