@@ -11,11 +11,9 @@ namespace banggame {
     };
 
     struct handler_lastwill {
-        bool on_check_target(card *origin_card, player *origin, const effect_target_list &targets) {
-            return targets.empty() || bot_suggestion::target_friend{}.on_check_target(origin_card, origin, targets[0].target.get<target_type::player>());
-        }
-        game_string get_error(card *origin_card, player *origin, const effect_target_list &targets);
-        void on_play(card *origin_card, player *origin, const effect_target_list &targets);
+        bool on_check_target(card *origin_card, player *origin, opt_tagged_value<target_type::max_cards> target_cards, std::optional<player *> target);
+        game_string get_error(card *origin_card, player *origin, opt_tagged_value<target_type::max_cards> target_cards, std::optional<player *> target);
+        void on_play(card *origin_card, player *origin, opt_tagged_value<target_type::max_cards> target_cards, std::optional<player *> target);
     };
 }
 
