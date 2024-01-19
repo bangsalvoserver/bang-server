@@ -48,7 +48,7 @@ namespace banggame {
     bool handler_play_as_bang::on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
         if (target.target.is(target_type::player)) {
             return effect_bangcard{}.on_check_target(chosen_card, origin, target.target.get<target_type::player>());
-    } else {
+        } else {
             return true;
         }
     }

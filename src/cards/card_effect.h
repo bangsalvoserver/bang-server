@@ -20,17 +20,6 @@ namespace banggame {
     
     using effect_target_list = std::vector<effect_target_pair>;
 
-    template<target_type E> struct tagged_value {};
-
-    template<target_type E>
-    requires (play_card_target::has_type<E>)
-    struct tagged_value<E> {
-        typename play_card_target::value_type<E> value;
-    };
-
-    template<target_type E>
-    using opt_tagged_value = std::optional<tagged_value<E>>;
-
     struct event_equip {
         void on_disable(card *target_card, player *target);
     };

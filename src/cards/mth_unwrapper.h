@@ -3,23 +3,27 @@
 
 #include "cards/card_effect.h"
 
-namespace banggame {
+#include <stdexcept>
 
+namespace banggame {
 template<typename T> struct target_getter {
     T operator()(const effect_target_list &targets, size_t index) {
-        return std::get<T>(targets.at(index).target);
-    }
-};
-
-template<> struct target_getter<card *> {
-    card *operator()(const effect_target_list &targets, size_t index) {
-        return targets.at(index).target.get<target_type::card>();
-    }
-};
-
-template<> struct target_getter<player *> {
-    player *operator()(const effect_target_list &targets, size_t index) {
-        return targets.at(index).target.get<target_type::player>();
+        if (index < targets.size()) {
+            return std::visit([](const auto &value) -> T {
+                if constexpr (std::is_convertible_v<std::remove_cvref_t<decltype(value)>, T>) {
+                    return value;
+                } else {
+                    throw std::runtime_error("invalid access to mth: wrong target type");
+                }
+            }, targets[index].target);
+        } else if constexpr(std::is_pointer_v<T>) {
+            return nullptr;
+        } else if constexpr(std::is_default_constructible_v<std::remove_cvref_t<T>>) {
+            static const std::remove_cvref_t<T> empty_value;
+            return empty_value;
+        } else {
+            throw std::runtime_error("invalid access to mth: out of bounds");
+        }
     }
 };
 
@@ -30,36 +34,9 @@ struct target_getter<T> {
     }
 };
 
-template<target_type E> struct target_getter<tagged_value<E>> {
-    tagged_value<E> operator()(const effect_target_list &targets, size_t index) {
-        if (index >= targets.size() || !targets[index].target.is(E)) {
-            throw std::bad_variant_access();
-        }
-        return {};
-    }
-};
-
-template<target_type E>
-requires (play_card_target::has_type<E>)
-struct target_getter<tagged_value<E>> {
-    tagged_value<E> operator()(const effect_target_list &targets, size_t index) {
-        return {targets.at(index).target.get<E>()};
-    }
-};
-
-template<typename T> struct target_getter<std::optional<T>> {
-    std::optional<T> operator()(const effect_target_list &targets, size_t index) {
-        if (index < targets.size()) {
-            return target_getter<T>{}(targets, index);
-        } else {
-            return std::nullopt;
-        }
-    }
-};
-
 template<> struct target_getter<bool> {
     bool operator()(const effect_target_list &targets, size_t index) {
-        return target_getter<opt_tagged_value<target_type::none>>{}(targets, index).has_value();
+        return index < targets.size();
     }
 };
 

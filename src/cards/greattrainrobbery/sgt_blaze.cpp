@@ -52,20 +52,16 @@ namespace banggame {
         });
     }
 
-    game_string handler_sgt_blaze::get_error(card *origin_card, player *origin, std::optional<player *> target) {
+    game_string handler_sgt_blaze::get_error(card *origin_card, player *origin, player *target) {
         if (origin->m_game->top_request<request_sgt_blaze>(origin) == nullptr) {
             return "ERROR_INVALID_ACTION";
         }
         return {};
     }
 
-    void handler_sgt_blaze::on_play(card *origin_card, player *origin, std::optional<player *> target) {
+    void handler_sgt_blaze::on_play(card *origin_card, player *origin, player *target) {
         effect_context &ctx = *(origin->m_game->top_request<request_sgt_blaze>(origin)->ctx);
-        if (target) {
-            ctx.skipped_player = *target;
-        } else {
-            ctx.skipped_player = nullptr;
-        }
+        ctx.skipped_player = target;
         origin->m_game->pop_request();
     }
 

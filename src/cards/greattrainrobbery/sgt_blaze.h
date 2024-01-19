@@ -21,8 +21,8 @@ namespace banggame {
     };
 
     struct handler_sgt_blaze {
-        game_string get_error(card *origin_card, player *origin, std::optional<player *> target);
-        void on_play(card *origin_card, player *origin, std::optional<player *> target);
+        game_string get_error(card *origin_card, player *origin, player *target);
+        void on_play(card *origin_card, player *origin, player *target);
     };
 }
 
