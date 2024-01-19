@@ -1,6 +1,7 @@
 #include "weapon.h"
 
 #include "game/game.h"
+#include "game/bot_suggestion.h"
 #include "prompts.h"
 #include "cards/filter_enums.h"
 
@@ -15,6 +16,9 @@ namespace banggame {
 
     game_string equip_weapon::on_prompt(card *origin_card, player *origin, player *target) {
         if (range == 0) {
+            if (origin->is_bot() && !bot_suggestion::target_enemy{}.on_check_target(origin_card, origin, target)) {
+                return "BOT_BAD_PLAY";
+            }
             return prompt_target_self{}.on_prompt(origin_card, origin, target);
         } else if (!origin->is_bot() && target == origin && origin->get_weapon_range() != 0) {
             if (auto it = rn::find_if(target->m_table, is_weapon{origin_card}); it != target->m_table.end()) {
