@@ -11,9 +11,11 @@ namespace banggame {
             if (target == origin) {
                 auto max_ncards = rn::max(target->m_game->m_players
                     | rv::transform([](player *p) { return p->m_hand.size(); }));
-                for (player *p : range_other_players(target)) {
-                    if (p->m_hand.size() == max_ncards) {
-                        target->m_game->queue_request<request_youl_grinner>(target_card, target, p);
+                if (max_ncards > 0) {
+                    for (player *p : range_other_players(target)) {
+                        if (p->m_hand.size() == max_ncards) {
+                            target->m_game->queue_request<request_youl_grinner>(target_card, target, p);
+                        }
                     }
                 }
             }
