@@ -255,15 +255,10 @@ character:
       - update_max_hp(6)
     tags:
       - max_hp(3)
-  # - name: BUFFALO_BELL
-  #   image: 20_buffalo_bell
-  #   # TODO effect_buffalo_bell: effect_missed
-  #   # sum = seme origin_card + seme target_card
-  #   # sum >= 13 : mancato
-  #   # sum >= 17 : schivata
-  #   # sum >= 20 : ritorno di fiamma
-  #   # responses:
-  #   #   - buffalo_bell card self | hand
+  - name: BUFFALO_BELL
+    image: 20_buffalo_bell
+    responses:
+      - buffalo_bell card self | hand
   - name: CLASH_THE_STAMPEDE
     image: 20_clash_the_stampede
     equip:
