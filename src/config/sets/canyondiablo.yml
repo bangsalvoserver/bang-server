@@ -264,12 +264,10 @@ character:
   #   # sum >= 20 : ritorno di fiamma
   #   # responses:
   #   #   - buffalo_bell card self | hand
-  # - name: CLASH_THE_STAMPEDE
-  #   image: 20_clash_the_stampede
-  #   # TODO
-  #   # prima di pescare request_clash_the_stampede
-  #   # target = giocatore con piu' carte in mano
-  #   # on_pick: dare carta
+  - name: CLASH_THE_STAMPEDE
+    image: 20_clash_the_stampede
+    equip:
+      - clash_the_stampede
   - name: CRAZY_HOG
     image: 20_crazy_hog
     effects:

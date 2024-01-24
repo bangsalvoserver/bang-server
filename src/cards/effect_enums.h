@@ -211,6 +211,7 @@ namespace banggame {
         (pat_barrett,           equip_pat_barrett)
         (soundance_kid,         equip_soundance_kid)
         (wyatt_earl,            equip_wyatt_earl)
+        (clash_the_stampede,    equip_clash_the_stampede)
         (update_max_hp,         equip_update_max_hp)
         (emiliano,              equip_emiliano)
     )
