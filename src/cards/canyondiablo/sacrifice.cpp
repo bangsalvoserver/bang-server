@@ -24,7 +24,7 @@ namespace banggame {
     
         origin->damage(origin_card, origin, 1);
         origin->m_game->queue_action([=]{
-            if (origin->alive()) {
+            if (origin->alive() && saved->alive()) {
                 origin->draw_card(2 + fatal, origin_card);
             }
         });
