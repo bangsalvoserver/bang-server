@@ -5,10 +5,16 @@
 
 namespace banggame {
 
+    enum class card_taker_type {
+        dead_players,
+        discards,
+        draw_checks
+    };
+
     namespace event_type {
         DEFINE_STRUCT(check_card_taker,
             (player *, target)
-            (int, type)
+            (card_taker_type, type)
             (nullable_ref<card *>, value)
         )
     }

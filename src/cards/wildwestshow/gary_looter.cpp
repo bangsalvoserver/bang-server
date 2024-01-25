@@ -7,17 +7,15 @@
 
 namespace banggame {
 
-    static constexpr int equip_type_gary_looter = 2;
-
     static card *get_gary_looter(player *target) {
         card *origin_card = nullptr;
-        target->m_game->call_event(event_type::check_card_taker{ target, equip_type_gary_looter, origin_card });
+        target->m_game->call_event(event_type::check_card_taker{ target, card_taker_type::discards, origin_card });
         return origin_card;
     }
 
     void equip_gary_looter::on_enable(card *target_card, player *player_end) {
-        player_end->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player *e_target, int type, card* &value) {
-            if (type == equip_type_gary_looter && e_target == player_end) {
+        player_end->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player *e_target, card_taker_type type, card* &value) {
+            if (type == card_taker_type::discards && e_target == player_end) {
                 value = target_card;
             }
         });

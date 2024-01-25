@@ -6,17 +6,15 @@
 
 namespace banggame {
 
-    static constexpr int equip_type_john_pain = 3;
-
     static card *get_john_pain(player *target) {
         card *origin_card = nullptr;
-        target->m_game->call_event(event_type::check_card_taker{ target, equip_type_john_pain, origin_card });
+        target->m_game->call_event(event_type::check_card_taker{ target, card_taker_type::draw_checks, origin_card });
         return origin_card;
     }
     
     void equip_john_pain::on_enable(card *target_card, player *player_end) {
-        player_end->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player *e_target, int type, card* &value) {
-            if (type == equip_type_john_pain && e_target == player_end && e_target->m_hand.size() < 6) {
+        player_end->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player *e_target, card_taker_type type, card* &value) {
+            if (type == card_taker_type::draw_checks && e_target == player_end && e_target->m_hand.size() < 6) {
                 value = target_card;
             }
         });
