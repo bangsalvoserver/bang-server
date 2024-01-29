@@ -7,6 +7,7 @@
 namespace banggame {
 
     struct equip_lastwill : event_equip, bot_suggestion::target_friend {
+        game_string on_prompt(card *origin_card, player *origin, player *target);
         void on_enable(card *origin_card, player *origin);
     };
 

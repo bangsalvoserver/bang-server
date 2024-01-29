@@ -25,6 +25,14 @@ namespace banggame {
         }
     };
 
+    game_string equip_lastwill::on_prompt(card *origin_card, player *origin, player *target) {
+        if (target->m_role == player_role::sheriff) {
+            return {"PROMPT_CARD_NO_EFFECT", origin_card};
+        } else {
+            return {};
+        }
+    }
+
     void equip_lastwill::on_enable(card *origin_card, player *origin) {
         origin->m_game->add_listener<event_type::on_player_death_resolve>({origin_card, -1}, [=](player *target, bool tried_save) {
             if (origin == target) {

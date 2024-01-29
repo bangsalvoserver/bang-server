@@ -279,7 +279,7 @@ character:
   #   image: 20_josey_bassett
   #   # TODO prima di pescare, stesso evento di vera_custer, priorita' +1
   #   # copia carta blu in characters
-  #   # TODO gestire vera custer, copia solo personaggi
+  #   # (da gestire che vera custer copia solo personaggi)
   #   # equip:
   #   #   - josey_bassett
   #   tags:
