@@ -18,20 +18,26 @@ namespace banggame {
     }
 
     static void copy_characters(player *origin, player *target) {
-        origin->remove_extra_characters();
+        auto new_cards = target->m_characters
+            | rv::take_last(2)
+            | rv::transform(get_card_copy)
+            | rn::to_vector;
 
-        for (card *target_card : target->m_characters | rv::take_last(2)) {
-            origin->m_game->add_log("LOG_COPY_CHARACTER", origin, target_card);
-            
-            card *new_card = get_card_copy(target_card);
-            new_card->pocket = pocket_type::player_character;
-            new_card->owner = origin;
-            
-            origin->m_characters.emplace_back(new_card);
-            origin->enable_equip(new_card);
+        if (!rn::equal(origin->m_characters | rv::drop(1), new_cards)) {
+            origin->remove_extra_characters();
 
-            origin->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{new_card}}, pocket_type::player_character, origin);
-            origin->m_game->set_card_visibility(new_card, nullptr, card_visibility::shown, true);
+            for (card *target_card : new_cards) {
+                origin->m_game->add_log("LOG_COPY_CHARACTER", origin, target_card);
+
+                target_card->pocket = pocket_type::player_character;
+                target_card->owner = origin;
+                
+                origin->m_characters.emplace_back(target_card);
+                origin->enable_equip(target_card);
+
+                origin->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::player_character, origin);
+                origin->m_game->set_card_visibility(target_card, nullptr, card_visibility::shown, true);
+            }
         }
     }
 
@@ -40,7 +46,7 @@ namespace banggame {
             : request_picking(origin_card, nullptr, target, {}, -8) {}
 
         void on_update() override {
-            if (target->alive() && target->m_game->m_playing == target) {
+            if (target->alive() && target->m_game->m_playing == target && !target->m_game->is_disabled(origin_card)) {
                 if (target->m_game->num_alive() == 2) {
                     target->m_game->pop_request();
                     copy_characters(target, *std::next(player_iterator(target)));
