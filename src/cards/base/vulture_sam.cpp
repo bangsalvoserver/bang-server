@@ -92,7 +92,7 @@ namespace banggame {
             if (range_targets.size() == 1) {
                 for (card *target_card : target->m_table
                     | rv::remove_if(&card::is_black)
-                    | rn::to<std::vector>
+                    | rn::to_vector
                 ) {
                     steal_card(origin, target, target_card);
                 }

@@ -469,12 +469,12 @@ void lobby::start_game(game_manager &mgr) {
     std::vector<const std::string *> names = bot_info.names
         | rv::transform([](const std::string &str) { return &str; })
         | rv::sample(options.num_bots, m_game->rng)
-        | rn::to<std::vector>;
+        | rn::to_vector;
 
     std::vector<const sdl::image_pixels *> propics = bot_info.propics
         | rv::transform([](const sdl::image_pixels &image) { return &image; })
         | rv::sample(options.num_bots, m_game->rng)
-        | rn::to<std::vector>;
+        | rn::to_vector;
 
     for (int i=0; i<options.num_bots; ++i) {
         auto &bot = bots.emplace_back(-1 - i, user_info{fmt::format("BOT {}", *names[i % names.size()]), *propics[i % propics.size()] });

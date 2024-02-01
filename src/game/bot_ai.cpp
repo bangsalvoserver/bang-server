@@ -33,7 +33,7 @@ namespace banggame {
         }
 
         player *operator()(enums::enum_tag_t<target_type::conditional_player>) const {
-            auto targets = rn::to<std::vector>(make_player_target_set(origin, origin_card, holder, ctx));
+            auto targets = make_player_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
             if (targets.empty()) {
                 return nullptr;
             } else {
@@ -42,13 +42,13 @@ namespace banggame {
         }
 
         serial::player_list operator()(enums::enum_tag_t<target_type::adjacent_players>) const {
-            auto targets = rn::to<std::vector>(make_adjacent_players_target_set(origin, origin_card, ctx));
+            auto targets = make_adjacent_players_target_set(origin, origin_card, ctx) | rn::to_vector;
             auto [target1, target2] = random_element(targets, origin->m_game->rng);
             return {target1, target2};
         }
 
         card *operator()(enums::enum_tag_t<target_type::card>) const {
-            auto targets = rn::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
+            auto targets = make_card_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
             return random_element(targets, origin->m_game->rng);
         }
 
@@ -56,20 +56,20 @@ namespace banggame {
             if (ctx.repeat_card) {
                 return nullptr;
             } else {
-                auto targets = rn::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
+                auto targets = make_card_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
                 return random_element(targets, origin->m_game->rng);
             }
         }
 
         auto operator()(enums::enum_tag_t<target_type::cards> tag) const {
-            auto targets = rn::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
+            auto targets = make_card_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
             return targets
                 | rv::sample(holder.target_value, origin->m_game->rng)
                 | rn::to<serial::card_list>;
         }
 
         auto operator()(enums::enum_tag_t<target_type::max_cards> tag) const {
-            auto targets = rn::to<std::vector>(make_card_target_set(origin, origin_card, holder, ctx));
+            auto targets = make_card_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
             return targets
                 | rv::sample(holder.target_value, origin->m_game->rng)
                 | rn::to<serial::card_list>;
@@ -93,7 +93,7 @@ namespace banggame {
                 | rv::for_each([](card *slot) {
                     return rv::repeat_n(slot, slot->num_cubes);
                 })
-                | rn::to<std::vector>;
+                | rn::to_vector;
             return cubes
                 | rv::sample(holder.target_value, origin->m_game->rng)
                 | rn::to<serial::card_list>;

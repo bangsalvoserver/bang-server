@@ -14,7 +14,7 @@ namespace banggame {
                         return p->alive() && p->m_role != player_role::sheriff;
                     });
                 
-                auto roles = alive_players | rv::transform(&player::m_role) | rn::to<std::vector>;
+                auto roles = alive_players | rv::transform(&player::m_role) | rn::to_vector;
                 rn::shuffle(roles, origin->m_game->rng);
                 
                 for (player *p : alive_players) {

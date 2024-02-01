@@ -347,7 +347,7 @@ namespace banggame {
                         .distance = target->get_distance_mod()
                     };
                 })
-                | rn::to<std::vector>,
+                | rn::to_vector,
             .range_mod = owner->get_range_mod(),
             .weapon_range = owner->get_weapon_range()
         };

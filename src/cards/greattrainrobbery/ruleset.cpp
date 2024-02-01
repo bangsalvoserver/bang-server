@@ -13,7 +13,7 @@ namespace banggame {
             | rv::transform([](card &c) { return &c; })
             | rv::filter([](card *c) { return c->deck == card_deck_type::station; })
             | rv::sample(std::max(int(origin->m_game->m_players.size()), 4), origin->m_game->rng)
-            | rn::to<std::vector>;
+            | rn::to_vector;
             
         origin->m_game->add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(origin->m_game->m_stations), pocket_type::stations);
         for (card *c : origin->m_game->m_stations) {
@@ -27,7 +27,7 @@ namespace banggame {
                 return c->deck == card_deck_type::locomotive && !rn::contains(origin->m_game->m_train, c);
             })
             | rv::sample(1, origin->m_game->rng)
-            | rn::to<std::vector>;
+            | rn::to_vector;
 
         origin->m_game->add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(origin->m_game->m_train), pocket_type::train);
         for (card *c : origin->m_game->m_train) {

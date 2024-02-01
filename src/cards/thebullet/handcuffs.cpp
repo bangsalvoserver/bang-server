@@ -15,7 +15,7 @@ namespace banggame {
             if (!live) {
                 for (card *c : target->m_game->m_hidden_deck
                     | rv::filter([](card *c) { return c->has_tag(tag_type::handcuffs); })
-                    | rn::to<std::vector>
+                    | rn::to_vector
                 ) {
                     target->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
                 }

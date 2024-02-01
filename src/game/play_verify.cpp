@@ -427,7 +427,7 @@ namespace banggame {
             .modifiers{args.modifiers
                 | rv::transform(&modifier_pair::card)
                 | rv::transform(to_card_pocket_pair)
-                | rn::to<std::vector>},
+                | rn::to_vector},
             .is_response{is_response},
             .context{ctx}
         };
