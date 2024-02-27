@@ -492,7 +492,7 @@ namespace banggame {
                             add_log("LOG_KILLED_OUTLAW", killer);
                             killer->draw_card(3);
                         } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
-                            target->m_game->add_log("LOG_SHERIFF_KILLED_DEPUTY", target);
+                            target->m_game->add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
                             queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy, -2);
                         }
                     } else if (m_players.size() == 3 && (
