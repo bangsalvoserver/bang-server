@@ -5,7 +5,7 @@ namespace banggame {
     using visit_cards = play_visitor<target_type::max_cards>;
 
     template<> game_string visit_cards::get_error(const effect_context &ctx, const serial::card_list &targets) {
-        if (targets.empty() || targets.size() > std::max<size_t>(1, effect.target_value)) {
+        if (targets.empty() || effect.target_value != 0 && targets.size() > effect.target_value) {
             return "ERROR_INVALID_TARGETS";
         }
         for (card *c : targets) {

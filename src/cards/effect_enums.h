@@ -67,7 +67,6 @@ namespace banggame {
         (tumbleweed,            effect_tumbleweed)
         (sniper,                effect_sniper)
         (ricochet,              effect_ricochet)
-        (ranch,                 effect_ranch)
         (greygory_deck,         effect_greygory_deck)
         (lemonade_jim,          effect_lemonade_jim)
         (josh_mccloud,          effect_josh_mccloud)
@@ -235,6 +234,7 @@ namespace banggame {
         (switch_cards,          handler_switch_cards)
         (lounge_car,            handler_lounge_car)
         (mail_car,              handler_mail_car)
+        (ranch,                 handler_ranch)
     )
 
     DEFINE_ENUM_FWD_TYPES(modifier_type,

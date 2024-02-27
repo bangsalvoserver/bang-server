@@ -52,14 +52,12 @@ fistfulofcards:
     equip:
       - ranch
     responses:
-      - ranch
+      - none
     optional:
-      - discard card self | hand
-      - mth_add
+      - mth_add max_cards self | hand
+    mth_response: ranch
     tags:
-      - repeatable
       - auto_select
-    mth_response: draw_multi
   - name: RICOCHET
     image: 05_rimbalzo
     effects:

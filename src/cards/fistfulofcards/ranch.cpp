@@ -2,6 +2,8 @@
 
 #include "cards/game_enums.h"
 
+#include "cards/base/steal_destroy.h"
+
 #include "game/game.h"
 
 namespace banggame {
@@ -31,11 +33,21 @@ namespace banggame {
         });
     }
 
-    bool effect_ranch::can_play(card *origin_card, player *origin) {
-        return origin->m_game->top_request<request_ranch>(origin) != nullptr;
+    game_string handler_ranch::get_error(card *origin_card, player *origin, const serial::card_list &target_cards) {
+        if (origin->m_game->top_request<request_ranch>(origin)) {
+            return {};
+        }
+        return "ERROR_INVALID_ACTION";
     }
 
-    void effect_ranch::on_play(card *origin_card, player *origin) {
+    void handler_ranch::on_play(card *origin_card, player *origin, const serial::card_list &target_cards) {
         origin->m_game->pop_request();
+
+        if (!target_cards.empty()) {
+            for (card *target : target_cards) {
+                effect_discard{}.on_play(origin_card, origin, target);
+            }
+            origin->draw_card(target_cards.size(), origin_card);
+        }
     }
 }

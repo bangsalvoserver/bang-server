@@ -9,9 +9,9 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
-    struct effect_ranch {
-        bool can_play(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+    struct handler_ranch {
+        game_string get_error(card *origin_card, player *origin, const serial::card_list &target_cards);
+        void on_play(card *origin_card, player *origin, const serial::card_list &target_cards);
     };
 }
 

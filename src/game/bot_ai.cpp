@@ -70,8 +70,12 @@ namespace banggame {
 
         auto operator()(enums::enum_tag_t<target_type::max_cards> tag) const {
             auto targets = make_card_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
+            size_t count = holder.target_value;
+            if (count == 0) {
+                count = std::uniform_int_distribution<size_t>{1, targets.size()}(origin->m_game->rng);
+            }
             return targets
-                | rv::sample(holder.target_value, origin->m_game->rng)
+                | rv::sample(count, origin->m_game->rng)
                 | rn::to<serial::card_list>;
         }
 
