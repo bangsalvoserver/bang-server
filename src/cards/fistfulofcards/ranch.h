@@ -10,7 +10,7 @@ namespace banggame {
     };
 
     struct handler_ranch {
-        game_string get_error(card *origin_card, player *origin, const serial::card_list &target_cards);
+        bool can_play(card *origin_card, player *origin, const serial::card_list &target_cards);
         void on_play(card *origin_card, player *origin, const serial::card_list &target_cards);
     };
 }

@@ -33,11 +33,8 @@ namespace banggame {
         });
     }
 
-    game_string handler_ranch::get_error(card *origin_card, player *origin, const serial::card_list &target_cards) {
-        if (origin->m_game->top_request<request_ranch>(origin)) {
-            return {};
-        }
-        return "ERROR_INVALID_ACTION";
+    bool handler_ranch::can_play(card *origin_card, player *origin, const serial::card_list &target_cards) {
+        return origin->m_game->top_request<request_ranch>(origin) != nullptr;
     }
 
     void handler_ranch::on_play(card *origin_card, player *origin, const serial::card_list &target_cards) {

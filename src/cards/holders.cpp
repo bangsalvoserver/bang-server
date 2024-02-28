@@ -304,6 +304,10 @@ namespace banggame {
                 using handler_type = enums::enum_type_t<E>;
                 if constexpr (requires { mth_unwrapper{&handler_type::get_error}; }) {
                     return mth_unwrapper{&handler_type::get_error}(origin_card, origin, targets, ctx);
+                } else  if constexpr (requires { mth_unwrapper{&handler_type::can_play}; }) {
+                    if (!mth_unwrapper{&handler_type::can_play}(origin_card, origin, targets, ctx)) {
+                        return "ERROR_INVALID_ACTION";
+                    }
                 }
             }
             return {};

@@ -41,11 +41,8 @@ namespace banggame {
         });
     }
 
-    game_string handler_lastwill::get_error(card *origin_card, player *origin, const serial::card_list &target_cards, player *target) {
-        if (origin->m_game->top_request<request_lastwill>(origin) != nullptr) {
-            return {};
-        }
-        return "ERROR_INVALID_ACTION";
+    bool handler_lastwill::can_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target) {
+        return origin->m_game->top_request<request_lastwill>(origin) != nullptr;
     }
 
     void handler_lastwill::on_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target) {

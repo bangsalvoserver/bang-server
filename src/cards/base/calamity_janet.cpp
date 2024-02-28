@@ -16,11 +16,8 @@ namespace banggame {
         p->remove_player_flags(player_flags::treat_missed_as_bang);
     }
 
-    game_string handler_play_as_missed::get_error(card *origin_card, player *origin, card *target_card) {
-        if (effect_missedcard{}.can_play(target_card, origin)) {
-            return {};
-        }
-        return "ERROR_INVALID_ACTION";
+    bool handler_play_as_missed::can_play(card *origin_card, player *origin, card *target_card) {
+        return effect_missedcard{}.can_play(target_card, origin);
     }
 
     game_string handler_play_as_missed::on_prompt(card *origin_card, player *origin, card *target_card) {

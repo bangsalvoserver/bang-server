@@ -55,12 +55,8 @@ namespace banggame {
         });
     }
 
-    game_string handler_claus_the_saint::get_error(card *origin_card, player *origin, card *target_card, player *target_player) {
-        if (origin->m_game->top_request<request_claus_the_saint>(origin) == nullptr) {
-            return "ERROR_INVALID_RESPONSE";
-        } else {
-            return {};
-        }
+    bool handler_claus_the_saint::can_play(card *origin_card, player *origin, card *target_card, player *target_player) {
+        return origin->m_game->top_request<request_claus_the_saint>(origin) != nullptr;
     }
 
     void handler_claus_the_saint::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {

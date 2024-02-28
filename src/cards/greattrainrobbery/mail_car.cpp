@@ -31,11 +31,8 @@ namespace banggame {
         origin->m_game->queue_request<request_mail_car>(origin_card, origin);
     }
 
-    game_string handler_mail_car::get_error(card *origin_card, player *origin, card *target_card, player *target_player) {
-        if (origin->m_game->top_request<request_mail_car>(origin) == nullptr) {
-            return "ERROR_INVALID_RESPONSE";
-        }
-        return {};
+    bool handler_mail_car::can_play(card *origin_card, player *origin, card *target_card, player *target_player) {
+        return origin->m_game->top_request<request_mail_car>(origin) != nullptr;
     }
 
     void handler_mail_car::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {

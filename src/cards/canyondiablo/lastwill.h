@@ -16,7 +16,7 @@ namespace banggame {
             return !target || bot_suggestion::target_friend{}.on_check_target(origin_card, origin, target);
         }
         
-        game_string get_error(card *origin_card, player *origin, const serial::card_list &target_cards, player *target);
+        bool can_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target);
         void on_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target);
     };
 }
