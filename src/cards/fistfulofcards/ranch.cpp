@@ -13,7 +13,7 @@ namespace banggame {
             : request_base(target_card, nullptr, target, {}, -8) {}
 
         void on_update() override {
-            if (!target->alive() || target->m_game->m_playing != target) {
+            if (!target->alive() || target->empty_hand() || target->m_game->m_playing != target) {
                 target->m_game->pop_request();
             }
         }
