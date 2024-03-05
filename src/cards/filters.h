@@ -134,6 +134,7 @@ namespace banggame::filters {
 
     inline bool is_bang_card(detail::player_ptr origin, detail::card_ptr target) {
         return detail::check_game_flags(origin, game_flags::treat_any_as_bang)
+            || detail::check_player_flags(origin, player_flags::treat_any_as_bang)
             || detail::get_card_tag(target, tag_type::bangcard).has_value()
             || detail::check_player_flags(origin, player_flags::treat_missed_as_bang)
             && detail::get_card_tag(target, tag_type::missed).has_value();

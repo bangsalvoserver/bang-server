@@ -23,6 +23,8 @@ character:
       - generalstore players
   - name: ANNIE_VERSARY
     image: 02_annieversary
+    equip:
+      - calamity_janet(1)
     effects:
       - banglimit
       - mth_add card self | hand not_bangcard

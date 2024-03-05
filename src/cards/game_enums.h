@@ -33,6 +33,7 @@ namespace banggame {
         (temp_ghost)
         (extra_turn)
         (treat_missed_as_bang)
+        (treat_any_as_bang)
         (role_revealed)
         (skip_turn)
         (removed)
