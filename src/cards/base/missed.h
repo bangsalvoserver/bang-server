@@ -14,6 +14,12 @@ namespace banggame {
     struct effect_missedcard : effect_missed {
         void on_play(card *origin_card, player *origin);
     };
+
+    struct handler_play_as_missed {
+        bool can_play(card *origin_card, player *origin, card *target_card);
+        game_string on_prompt(card *origin_card, player *origin, card *target_card);
+        void on_play(card *origin_card, player *origin, card *target_card);
+    };
 }
 
 #endif

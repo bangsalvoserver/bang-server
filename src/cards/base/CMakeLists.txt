@@ -4,7 +4,6 @@ target_sources(bangserver PRIVATE
     beer.cpp
     black_jack.cpp
     bart_cassidy.cpp
-    calamity_janet.cpp
     card_choice.cpp
     damage.cpp
     deathsave.cpp

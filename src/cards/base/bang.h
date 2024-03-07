@@ -32,6 +32,14 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, const effect_context &ctx);
     };
 
+    struct equip_treat_as_bang {
+        player_flags flag;
+        equip_treat_as_bang(int value);
+        
+        void on_enable(card *target_card, player *target);
+        void on_disable(card *target_card, player *target);
+    };
+
     struct modifier_bangmod {
         bool valid_with_equip(card *origin_card, player *origin, card *target_card) {
             return false;

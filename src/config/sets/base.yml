@@ -288,7 +288,7 @@ character:
   - name: CALAMITY_JANET
     image: 01_calamityjanet
     equip:
-      - calamity_janet
+      - treat_as_bang(1)
     effects:
       - banglimit
       - mth_add card self | hand missed

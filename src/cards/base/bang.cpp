@@ -121,6 +121,17 @@ namespace banggame {
         });
     }
 
+    equip_treat_as_bang::equip_treat_as_bang(int value)
+        : flag{value == 1 ? player_flags::treat_missed_as_bang : player_flags::treat_any_as_bang} {}
+
+    void equip_treat_as_bang::on_enable(card *origin_card, player *p) {
+        p->add_player_flags(flag);
+    }
+
+    void equip_treat_as_bang::on_disable(card *origin_card, player *p) {
+        p->remove_player_flags(flag);
+    }
+
     template<modifier_type E>
     static constexpr bool is_bangmod = false;
 

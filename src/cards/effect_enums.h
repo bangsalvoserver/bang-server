@@ -122,7 +122,7 @@ namespace banggame {
         (wanted,                equip_wanted)
         (bomb,                  equip_bomb)
         (tumbleweed,            equip_tumbleweed)
-        (calamity_janet,        equip_calamity_janet)
+        (treat_as_bang,         equip_treat_as_bang)
         (black_jack,            equip_black_jack)
         (kit_carlson,           equip_kit_carlson)
         (claus_the_saint,       equip_claus_the_saint)
