@@ -233,6 +233,8 @@ namespace banggame {
     }
 
     void player::handle_game_action(const game_action &action) {
+        auto result = verify_and_play(this, action);
+        
         enums::visit_indexed(overloaded{
             [&](enums::enum_tag_t<message_type::ok>) {
                 m_game->commit_updates();
@@ -243,10 +245,7 @@ namespace banggame {
             [&](enums::enum_tag_t<message_type::prompt>, game_string message) {
                 m_game->add_update<game_update_type::game_prompt>(update_target::includes_private(this), std::move(message));
             }
-        }, enums::visit(overloaded{
-            [&](const pick_card_args &args) { return verify_and_pick(this, args); },
-            [&](const play_card_args &args) { return verify_and_play(this, args); }
-        }, action));
+        }, result);
     }
 
     void player::start_of_turn() {

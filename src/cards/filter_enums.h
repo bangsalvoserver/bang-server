@@ -23,6 +23,7 @@ namespace banggame {
     )
 
     DEFINE_ENUM_FLAGS(target_card_filter,
+        (pick_card)
         (selection)
         (table)
         (hand)
@@ -57,6 +58,7 @@ namespace banggame {
         (ghost_card)
         (confirm)
         (pass_turn)
+        (pick)
         (skip_logs)
         (no_auto_discard)
         (bangcard)

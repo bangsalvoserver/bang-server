@@ -84,4 +84,11 @@ namespace banggame::filters::detail {
         }
         return {};
     }
+
+    bool can_pick_card(player *origin, card *target) {
+        if (auto req = origin->m_game->top_request<request_picking_base>(origin)) {
+            return req->can_pick(target);
+        }
+        return false;
+    }
 }

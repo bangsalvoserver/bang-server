@@ -114,8 +114,8 @@ namespace banggame {
         }, holder.target);
     }
 
-    static play_card_args generate_random_play(player *origin, const card_modifier_node &node, bool is_response) {
-        play_card_args ret;
+    static game_action generate_random_play(player *origin, const card_modifier_node &node, bool is_response) {
+        game_action ret;
         effect_context ctx;
 
         const card_modifier_node *cur_node = &node;
@@ -179,46 +179,23 @@ namespace banggame {
         }
     };
 
-    struct pick_card_node {
-        card *target_card;
-        
-        auto operator < (const pick_card_node &other) const {
-            return get_card_order(target_card) < get_card_order(other.target_card);
-        }
-    };
-
-    using play_or_pick_node = std::variant<std::monostate, play_card_node, pick_card_node>;
-    using play_card_node_set = std::set<play_or_pick_node>;
-
-    play_card_node_set make_node_set(const card_modifier_tree &play_cards, const serial::card_list &pick_cards = {}, bool add_empty_action = false) {
-        play_card_node_set ret;
-        for (const card_modifier_node &node : play_cards) {
-            ret.emplace(play_card_node{ &node });
-        }
-        for (card *target_card : pick_cards) {
-            ret.emplace(pick_card_node{ target_card });
-        }
-        if (add_empty_action) {
-            ret.emplace(std::monostate{});
-        }
-        return ret;
-    }
-
-    static bool execute_random_play(player *origin, bool is_response, std::optional<timer_id_t> timer_id, const play_card_node_set &in_node_set) {
+    static bool execute_random_play(player *origin, bool is_response, std::optional<timer_id_t> timer_id, const card_modifier_tree &play_cards) {
         auto &pockets = is_response ? bot_info.settings.response_pockets : bot_info.settings.in_play_pockets;
+
+        std::set<play_card_node> play_card_set;
+        for (const card_modifier_node &node : play_cards) {
+            play_card_set.emplace(play_card_node{ &node });
+        }
         
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
-            auto node_set = in_node_set;
+            auto node_set = play_card_set;
             
             while (!node_set.empty()) {
-                play_or_pick_node selected_node = [&]{
+                play_card_node selected_node = [&]{
                     for (pocket_type pocket : pockets) {
                         if (auto filter = node_set
-                            | rv::filter([&](const play_or_pick_node &node) {
-                                if (auto *play_card = std::get_if<play_card_node>(&node)) {
-                                    return play_card->node->card->pocket == pocket;
-                                }
-                                return false;
+                            | rv::filter([&](const play_card_node &node) {
+                                return node.node->card->pocket == pocket;
                             }))
                         {
                             return random_element(filter, origin->m_game->rng);
@@ -231,29 +208,15 @@ namespace banggame {
 
                 // maybe add random variation?
                 bool bypass_prompt = node_set.empty() && i >= bot_info.settings.bypass_prompt_after;
-                if (auto [message, done] = std::visit(overloaded{
-                    [](std::monostate) {
-                        if (bot_info.settings.allow_timer_no_action) {
-                            return std::pair{game_message{}, false};
-                        } else {
-                            return std::pair{game_message{enums::enum_tag<message_type::error>, "NO_EMPTY_ACTION"}, false};
-                        }
-                    },
-                    [&](const play_card_node &node) {
-                        try {
-                            auto args = generate_random_play(origin, *(node.node), is_response);
-                            args.bypass_prompt = bypass_prompt;
-                            args.timer_id = timer_id;
-                            return std::pair{verify_and_play(origin, args), true};
-                        } catch (const bot_error &error) {
-                            return std::pair{game_message{enums::enum_tag<message_type::error>, error.message}, false};
-                        }
-                    },
-                    [&](const pick_card_node &node) {
-                        return std::pair{verify_and_pick(origin, { node.target_card, bypass_prompt, timer_id }), true};
+                try {
+                    auto args = generate_random_play(origin, *(selected_node.node), is_response);
+                    args.bypass_prompt = bypass_prompt;
+                    args.timer_id = timer_id;
+                    if (verify_and_play(origin, args).is(message_type::ok)) {
+                        return true;
                     }
-                }, selected_node); message.is(message_type::ok)) {
-                    return done;
+                } catch (const bot_error &error) {
+                    // ignore
                 }
             }
         }
@@ -267,21 +230,22 @@ namespace banggame {
     bool game::request_bot_play() {
         if (pending_requests()) {
             for (player *origin : m_players | rv::filter(&player::is_bot)) {
-                auto update = make_request_update(origin);
+                card_modifier_tree play_cards = generate_card_modifier_tree(origin, true);
                 
-                if (!update.pick_cards.empty() || !update.respond_cards.empty()) {
+                if (!play_cards.empty()) {
                     std::optional<timer_id_t> timer_id;
-                    if (update.timer) timer_id = update.timer->timer_id;
+                    if (auto *timer = origin->m_game->top_request()->timer()) {
+                        timer_id = timer->get_timer_id();
+                    }
 
-                    if (execute_random_play(origin, true, timer_id, make_node_set(update.respond_cards, update.pick_cards, timer_id.has_value()))) {
+                    if (execute_random_play(origin, true, timer_id, play_cards)) {
                         return true;
                     }
                 }
             }
         } else if (m_playing && m_playing->is_bot()) {
-            auto update = make_status_ready_update(m_playing);
-
-            return execute_random_play(m_playing, false, std::nullopt, make_node_set(update.play_cards));
+            card_modifier_tree play_cards = generate_card_modifier_tree(m_playing);
+            return execute_random_play(m_playing, false, std::nullopt, play_cards);
         }
         return false;
     }

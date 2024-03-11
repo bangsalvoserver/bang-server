@@ -380,3 +380,11 @@ button_row:
       - pass_turn
     tags:
       - pass_turn
+
+hidden:
+  - name: PICK
+    responses:
+      - pick card | pick_card
+    tags:
+      - pick
+      - skip_logs

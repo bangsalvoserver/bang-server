@@ -40,6 +40,7 @@ namespace banggame::filters {
         card_ptr get_request_origin_card(player_ptr origin);
         player_ptr get_request_origin(player_ptr origin);
         target_list get_request_target_set(player_ptr origin);
+        bool can_pick_card(player_ptr origin, card_ptr target);
     }
 
     inline bool is_player_ghost(detail::const_player_ptr origin) {
@@ -152,6 +153,14 @@ namespace banggame::filters {
     }
 
     inline game_string check_card_filter(detail::card_ptr origin_card, detail::player_ptr origin, target_card_filter filter, detail::card_ptr target, const effect_context &ctx = {}) {
+        if (bool(filter & target_card_filter::pick_card)) {
+            if (detail::can_pick_card(origin, target)) {
+                return {};
+            } else {
+                return "ERROR_INVALID_PICK";
+            }
+        }
+
         if (!bool(filter & target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";
         

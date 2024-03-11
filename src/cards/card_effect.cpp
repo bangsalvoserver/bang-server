@@ -2,12 +2,13 @@
 
 #include "game/game.h"
 #include "game/play_verify.h"
+#include "cards/filter_enums.h"
 
 namespace banggame {
 
     void request_picking::auto_pick() {
         auto update = target->m_game->make_request_update(target);
-        if (update.pick_cards.size() == 1 && update.respond_cards.empty()) {
+        if (update.pick_cards.size() == 1 && update.respond_cards.size() == 1 && update.respond_cards.front().card->has_tag(tag_type::pick)) {
             on_pick(update.pick_cards.front());
         }
     }

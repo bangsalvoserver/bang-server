@@ -23,6 +23,7 @@
 #include "missed.h"
 #include "mustang.h"
 #include "pass_turn.h"
+#include "pick.h"
 #include "predraw_check.h"
 #include "requests.h"
 #include "resolve.h"

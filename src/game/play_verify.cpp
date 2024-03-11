@@ -391,29 +391,7 @@ namespace banggame {
         });
     }
 
-    game_message verify_and_pick(player *origin, const pick_card_args &args) {
-        if (game_string error = verify_timer_response(origin, args.timer_id)) {
-            return {enums::enum_tag<message_type::error>, error};
-        }
-
-        auto req = origin->m_game->top_request<request_picking_base>(origin);
-        if (!req || !req->can_pick(args.card)) {
-            return {enums::enum_tag<message_type::error>, "ERROR_INVALID_PICK"};
-        }
-
-        if (!args.bypass_prompt) {
-            if (game_string prompt = req->pick_prompt(args.card)) {
-                return {enums::enum_tag<message_type::prompt>, prompt};
-            }
-        }
-        
-        origin->m_game->send_request_status_clear();
-        req->on_pick(args.card);
-
-        return {};
-    }
-
-    static played_card_history make_played_card_history(const play_card_args &args, bool is_response, const effect_context &ctx) {
+    static played_card_history make_played_card_history(const game_action &args, bool is_response, const effect_context &ctx) {
         auto to_card_pocket_pair = [&](card *c) {
             if (ctx.repeat_card == c) {
                 return card_pocket_pair{c, pocket_type::none};
@@ -433,7 +411,7 @@ namespace banggame {
         };
     }
 
-    game_message verify_and_play(player *origin, const play_card_args &args) {
+    game_message verify_and_play(player *origin, const game_action &args) {
         bool is_response = origin->m_game->pending_requests();
 
         effect_context ctx;

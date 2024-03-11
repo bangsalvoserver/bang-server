@@ -12,6 +12,7 @@ namespace banggame {
         (mth_add)
         (ctx_add)
         (pay_cube)
+        (pick,                  effect_pick)
         (human,                 effect_human)
         (max_usages,            effect_max_usages)
         (pass_turn,             effect_pass_turn)
