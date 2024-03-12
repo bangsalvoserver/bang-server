@@ -40,6 +40,10 @@ namespace banggame::filters::detail {
         return origin->m_game->calc_distance(origin, target);
     }
 
+    const player *get_card_owner(card *target) {
+        return target->owner;
+    }
+
     card_sign get_card_sign(card *target) {
         return target->sign;
     }
