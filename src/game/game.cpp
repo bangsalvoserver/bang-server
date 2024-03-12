@@ -214,6 +214,13 @@ namespace banggame {
             }
         }
 
+        if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
+            add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
+            for (card *c : m_hidden_deck) {
+                set_card_visibility(c, nullptr, card_visibility::shown, true);
+            }
+        }
+
         if (add_cards(all_cards.deck, pocket_type::main_deck)) {
             shuffle_cards_and_ids(m_deck);
             add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_deck), pocket_type::main_deck);
@@ -227,13 +234,6 @@ namespace banggame {
         if (add_cards(all_cards.train, pocket_type::train_deck)) {
             shuffle_cards_and_ids(m_train_deck);
             add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_train_deck), pocket_type::train_deck);
-        }
-
-        if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
-            add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
-            for (card *c : m_hidden_deck) {
-                set_card_visibility(c, nullptr, card_visibility::shown, true);
-            }
         }
         
         player_role roles[] = {
