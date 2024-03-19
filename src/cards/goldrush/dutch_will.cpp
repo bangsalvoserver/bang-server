@@ -15,7 +15,7 @@ namespace banggame {
         
         void on_update() override {
             if (!live) {
-                int ncards = target->get_cards_to_draw();
+                int ncards = req_draw->num_cards_to_draw;
                 for (int i=0; i<ncards; ++i) {
                     target->m_game->move_card(req_draw->phase_one_drawn_card(), pocket_type::selection, target);
                 }
@@ -43,7 +43,7 @@ namespace banggame {
 
     void equip_dutch_will::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, shared_request_draw req_draw, bool &handled) {
-            if (!handled && origin == target && target->get_cards_to_draw() > 1) {
+            if (!handled && origin == target && req_draw->num_cards_to_draw > 1) {
                 target->m_game->queue_request<request_dutch_will>(target_card, target, std::move(req_draw));
                 handled = true;
             }

@@ -43,11 +43,17 @@ namespace banggame {
             origin->m_game->move_card(origin->m_game->top_of_deck(), pocket_type::discard_pile);
         }
     }
+
+    request_draw::request_draw(player *target)
+        : request_picking(nullptr, nullptr, target, {}, -7)
+    {
+        target->m_game->call_event(event_type::count_cards_to_draw{ target, num_cards_to_draw });
+    }
     
     void request_draw::on_update() {
         if (!target->m_game->check_flags(game_flags::phase_one_override)
             && target->alive() && target->m_game->m_playing == target
-            && num_drawn_cards < target->get_cards_to_draw())
+            && num_drawn_cards < num_cards_to_draw)
         {
             if (!live) {
                 target->m_game->play_sound(target, "draw");
@@ -99,7 +105,7 @@ namespace banggame {
         bool handled = false;
         target->m_game->call_event(event_type::on_draw_from_deck{ target, shared_from_this(), handled });
         if (!handled) {
-            int ncards = target->get_cards_to_draw();
+            int ncards = num_cards_to_draw;
             while (num_drawn_cards < ncards) {
                 add_to_hand_phase_one(phase_one_drawn_card());
             }

@@ -61,10 +61,10 @@ namespace banggame {
     };
 
     struct request_draw : request_picking, std::enable_shared_from_this<request_draw> {
-        request_draw(player *target)
-            : request_picking(nullptr, nullptr, target, {}, -7) {}
+        request_draw(player *target);
 
         int num_drawn_cards = 0;
+        int num_cards_to_draw = 2;
         
         card *phase_one_drawn_card();
         void add_to_hand_phase_one(card *target_card);

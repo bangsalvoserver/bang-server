@@ -11,9 +11,7 @@ namespace banggame {
                 reveal = true;
 
                 if (target->m_game->get_card_sign(drawn_card).is_red()) {
-                    origin->m_game->queue_action([=]{
-                        req_draw->add_to_hand_phase_one(req_draw->phase_one_drawn_card());
-                    }, 2);
+                    ++req_draw->num_cards_to_draw;
                 }
             }
         });

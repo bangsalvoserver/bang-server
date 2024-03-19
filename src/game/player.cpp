@@ -78,12 +78,6 @@ namespace banggame {
         return nbangs;
     }
 
-    int player::get_cards_to_draw() {
-        int ncards = 2;
-        m_game->call_event(event_type::count_cards_to_draw{ this, ncards });
-        return ncards;
-    }
-
     int player::get_range_mod() const {
         int mod = 0;
         m_game->call_event(event_type::count_range_mod{ this, range_mod_type::range_mod, mod });

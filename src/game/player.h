@@ -103,7 +103,6 @@ namespace banggame {
 
         int get_num_checks();
         int get_bangs_played();
-        int get_cards_to_draw();
         int get_range_mod() const;
         int get_weapon_range() const;
         int get_distance_mod() const;
