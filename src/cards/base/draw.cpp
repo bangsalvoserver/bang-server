@@ -105,8 +105,7 @@ namespace banggame {
         bool handled = false;
         target->m_game->call_event(event_type::on_draw_from_deck{ target, shared_from_this(), handled });
         if (!handled) {
-            int ncards = num_cards_to_draw;
-            while (num_drawn_cards < ncards) {
+            while (num_drawn_cards < num_cards_to_draw) {
                 add_to_hand_phase_one(phase_one_drawn_card());
             }
         }
