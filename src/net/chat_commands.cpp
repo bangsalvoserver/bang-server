@@ -19,7 +19,7 @@ namespace banggame {
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
     static constexpr std::string_view SET_TEAM_DESCRIPTION = "[game_player / game_spectator] : set team";
     static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed";
-    static constexpr std::string_view REJOIN_DESCRIPTION = "[character] : rejoin disconnected player";
+    static constexpr std::string_view REJOIN_DESCRIPTION = "[index] : rejoin disconnected player";
 
     const std::map<std::string, chat_command, std::less<>> chat_command::commands {
         { "help",           { proxy<&game_manager::command_print_help>,         HELP_DESCRIPTION }},
@@ -253,40 +253,47 @@ namespace banggame {
     std::string game_manager::command_rejoin(user_ptr user, std::string_view value) {
         auto &lobby = *user->second.in_lobby;
 
-        auto check_disconnected = [&](player *p) {
-            return !rn::contains(lobby.users, p->user_id, [](const team_user_pair &pair) {
-                return pair.second->second.user_id;
-            });
-        };
-
-        if (value.empty()) {
-            auto &lobby = *user->second.in_lobby;
-            for (player *p : lobby.m_game->m_players | rv::filter(check_disconnected)) {
-                if (card *c = p->first_character()) {
-                    send_message<server_message_type::lobby_chat>(user->first, 0, fmt::format("/rejoin {}", c->name));
-                }
-            }
-            return {};
-        }
-
         lobby_team &user_team = rn::find(lobby.users, user, &team_user_pair::second)->first;
         if (user_team != lobby_team::game_spectator) {
             return "ERROR_USER_NOT_SPECTATOR";
         }
 
-        auto it = rn::find_if(lobby.m_game->m_players, [&](player *p) {
-            if (card *c = p->first_character()) {
-                return rn::equal(value, c->name, {}, toupper, toupper);
-            }
-            return false;
-        });
-        if (it == lobby.m_game->m_players.end()) {
-            return "ERROR_CANNOT_FIND_CHARACTER";
+        std::vector<player *> rejoinable_players = lobby.m_game->m_players
+            | rv::filter([&](player *p) {
+                return !rn::contains(lobby.users, p->user_id, [](const team_user_pair &pair) {
+                    return pair.second->second.user_id;
+                });
+            })
+            | rn::to_vector;
+
+        if (rejoinable_players.empty()) {
+            return "ERROR_NO_REJOINABLE_PLAYERS";
         }
 
-        player *disconnected = *it;
-        if (!check_disconnected(disconnected)) {
-            return "ERROR_PLAYER_NOT_DISCONNECTED";
+        player *disconnected = nullptr;
+
+        if (value.empty()) {
+            if (rejoinable_players.size() == 1) {
+                disconnected = rejoinable_players.front();
+            } else {
+                auto &lobby = *user->second.in_lobby;
+                for (const auto &[i, p] : rv::enumerate(rejoinable_players)) {
+                    card *c = p->first_character();
+                    send_message<server_message_type::lobby_chat>(user->first, 0,
+                        fmt::format("{} : /rejoin {}", c ? c->name : "UNKNOWN", i + 1));
+                }
+                return {};
+            }
+        } else {
+            int player_index;
+            if (auto [end, ec] = std::from_chars(value.data(), value.data() + value.size(), player_index); ec != std::errc{}) {
+                return "INVALID_INTEGER";
+            }
+            if (player_index >= 1 && player_index <= rejoinable_players.size()) {
+                disconnected = rejoinable_players[player_index - 1];
+            } else {
+                return "PLAYER_INDEX_OUT_OF_RANGE";
+            }
         }
 
         user_team = lobby_team::game_player;
