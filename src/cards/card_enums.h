@@ -153,6 +153,7 @@ namespace banggame {
     )
 
     DEFINE_STRUCT(effect_context,
+        (serial::card_list, selected_cubes)
         (serial::opt_card, card_choice)
         (serial::opt_player, skipped_player)
         (serial::opt_card, repeat_card)

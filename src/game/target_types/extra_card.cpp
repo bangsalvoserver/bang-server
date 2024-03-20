@@ -38,6 +38,12 @@ namespace banggame {
         }
     }
 
+    template<> void visit_card::add_context(effect_context &ctx, card *target) {
+        if (target) {
+            effect.add_context(origin_card, origin, target, ctx);
+        }
+    }
+
     template<> void visit_card::play(const effect_context &ctx, card *target) {
         if (target) {
             effect.on_play(origin_card, origin, target, {}, ctx);

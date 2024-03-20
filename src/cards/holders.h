@@ -17,14 +17,17 @@ namespace banggame {
 
         game_string get_error(card *origin_card, player *origin, const effect_context &ctx) const;
         game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx) const;
+        void add_context(card *origin_card, player *origin, effect_context &ctx) const;
         void on_play(card *origin_card, player *origin, effect_flags flags, const effect_context &ctx) const;
 
         game_string get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) const;
         game_string on_prompt(card *origin_card, player *origin, player *target, const effect_context &ctx) const;
+        void add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const;
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags, const effect_context &ctx) const;
         
         game_string get_error(card *origin_card, player *origin, card *target, const effect_context &ctx) const;
         game_string on_prompt(card *origin_card, player *origin, card *target, const effect_context &ctx) const;
+        void add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const;
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags, const effect_context &ctx) const;
     )
     
@@ -42,8 +45,6 @@ namespace banggame {
         (modifier_type, type),
         
         void add_context(card *origin_card, player *origin, effect_context &ctx) const;
-        void add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const;
-        void add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const;
 
         game_string get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx) const;
         game_string on_prompt(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) const;

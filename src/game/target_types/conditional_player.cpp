@@ -32,6 +32,12 @@ namespace banggame {
         }
     }
 
+    template<> void visit_player::add_context(effect_context &ctx, player *target) {
+        if (target) {
+            play_visitor<target_type::player>{origin, origin_card, effect}.add_context(ctx, target);
+        }
+    }
+
     template<> void visit_player::play(const effect_context &ctx, player *target) {
         if (target) {
             play_visitor<target_type::player>{origin, origin_card, effect}.play(ctx, target);

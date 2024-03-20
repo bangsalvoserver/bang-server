@@ -16,6 +16,10 @@ namespace banggame {
         return effect.on_prompt(origin_card, origin, ctx);
     }
 
+    template<> void visit_none::add_context(effect_context &ctx) {
+        effect.add_context(origin_card, origin, ctx);
+    }
+
     template<> void visit_none::play(const effect_context &ctx) {
         effect.on_play(origin_card, origin, {}, ctx);
     }

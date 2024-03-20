@@ -145,13 +145,7 @@ namespace banggame {
                 origin_card->modifier.add_context(origin_card, origin, ctx);
                 for (const effect_holder &holder : origin_card->get_effect_list(is_response)) {
                     const auto &target = targets.emplace_back(generate_random_target(origin, origin_card, holder, ctx));
-                    if (holder.type == effect_type::ctx_add) {
-                        if (target.is(target_type::card)) {
-                            origin_card->modifier.add_context(origin_card, origin, target.get<target_type::card>(), ctx);
-                        } else if (target.is(target_type::player)) {
-                            origin_card->modifier.add_context(origin_card, origin, target.get<target_type::player>(), ctx);
-                        }
-                    }
+                    apply_add_context(origin, origin_card, holder, target, ctx);
                 }
 
                 cur_node = random_element(cur_node->branches

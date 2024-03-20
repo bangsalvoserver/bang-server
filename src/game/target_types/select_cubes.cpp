@@ -7,9 +7,6 @@ namespace banggame {
     using visit_cubes = play_visitor<target_type::select_cubes>;
 
     template<> game_string visit_cubes::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
-        if (effect.type != effect_type::pay_cube) {
-            return "ERROR_INVALID_EFFECT_TYPE";
-        }
         if (target_cards.size() != effect.target_value) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -31,6 +28,12 @@ namespace banggame {
 
     template<> game_string visit_cubes::prompt(const effect_context &ctx, const serial::card_list &target_cards) {
         return {};
+    }
+
+    template<> void visit_cubes::add_context(effect_context &ctx, const serial::card_list &target_cards) {
+        for (card *target : target_cards) {
+            ctx.selected_cubes.push_back(target);
+        }
     }
 
     template<> void visit_cubes::play(const effect_context &ctx, const serial::card_list &target_cards) {}

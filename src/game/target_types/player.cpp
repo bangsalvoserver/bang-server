@@ -19,6 +19,10 @@ namespace banggame {
         return effect.on_prompt(origin_card, origin, target, ctx);
     }
 
+    template<> void visit_player::add_context(effect_context &ctx, player *target) {
+        effect.add_context(origin_card, origin, target, ctx);
+    }
+
     template<> void visit_player::play(const effect_context &ctx, player *target) {
         auto flags = effect_flags::single_target;
         if (origin_card->is_brown()) {

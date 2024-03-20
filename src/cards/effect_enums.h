@@ -10,7 +10,6 @@ namespace banggame {
     DEFINE_ENUM_FWD_TYPES(effect_type,
         (none)
         (mth_add)
-        (ctx_add)
         (pay_cube)
         (pick,                  effect_pick)
         (human,                 effect_human)
@@ -88,6 +87,7 @@ namespace banggame {
         (most_wanted,           effect_most_wanted)
         (next_stop,             effect_next_stop)
         (train_robbery,         effect_train_robbery)
+        (skip_player,           effect_skip_player)
         (evan_babbit,           effect_evan_babbit)
         (shade_oconnor,         effect_shade_oconnor)
         (lounge_car,            effect_lounge_car)

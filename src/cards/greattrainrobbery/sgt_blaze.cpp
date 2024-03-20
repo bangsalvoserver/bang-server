@@ -24,7 +24,7 @@ namespace banggame {
         return {};
     }
 
-    void modifier_sgt_blaze::add_context(card *origin_card, player *origin, player *target, effect_context &ctx) {
+    void effect_skip_player::add_context(card *origin_card, player *origin, player *target, effect_context &ctx) {
         ctx.skipped_player = target;
     }
 

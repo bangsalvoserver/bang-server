@@ -13,6 +13,9 @@ namespace banggame {
             return true;
         }
         game_string get_error(card *origin_card, player *origin, card *playing_card, const effect_context &ctx);
+    };
+
+    struct effect_skip_player {
         void add_context(card *origin_card, player *origin, player *target, effect_context &ctx);
     };
 

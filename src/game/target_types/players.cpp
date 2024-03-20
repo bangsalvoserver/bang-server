@@ -37,6 +37,12 @@ namespace banggame {
         return msg;
     }
 
+    template<> void visit_players::add_context(effect_context &ctx) {
+        for (player *target : range_all_players(origin)) {
+            effect.add_context(origin_card, origin, target, ctx);
+        }
+    }
+
     template<> void visit_players::play(const effect_context &ctx) {
         std::vector<player *> targets;
         for (player *target : range_all_players(origin)) {

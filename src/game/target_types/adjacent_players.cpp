@@ -32,6 +32,12 @@ namespace banggame {
         return msg;
     }
 
+    template<> void visit_players::add_context(effect_context &ctx, const serial::player_list &targets) {
+        for (player *target : targets) {
+            play_visitor<target_type::player>{origin, origin_card, effect}.add_context(ctx, target);
+        }
+    }
+
     template<> void visit_players::play(const effect_context &ctx, const serial::player_list &targets) {
         for (player *target : targets) {
             play_visitor<target_type::player>{origin, origin_card, effect}.play(ctx, target);

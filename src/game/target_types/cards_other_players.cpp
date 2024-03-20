@@ -41,6 +41,12 @@ namespace banggame {
         return msg;
     }
 
+    template<> void visit_cards::add_context(effect_context &ctx, const serial::card_list &target_cards) {
+        for (card *target_card : target_cards) {
+            effect.add_context(origin_card, origin, ctx);
+        }
+    }
+
     template<> void visit_cards::play(const effect_context &ctx, const serial::card_list &target_cards) {
         auto flags = effect_flags::multi_target;
         if (origin_card->is_brown()) {

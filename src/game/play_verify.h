@@ -6,22 +6,10 @@
 
 namespace banggame {
 
-    struct card_cube_ordering {
-        bool operator()(card *lhs, card *rhs) const {
-            if (lhs->pocket == pocket_type::player_table && rhs->pocket == pocket_type::player_table) {
-                return rn::find(lhs->owner->m_table, lhs) < rn::find(rhs->owner->m_table, rhs);
-            } else {
-                return lhs->pocket == pocket_type::player_table;
-            }
-        }
-    };
-
-    using card_cube_count = std::map<card *, int, card_cube_ordering>;
-
     struct duplicate_set {
         std::vector<player *> players;
         std::vector<card *> cards;
-        card_cube_count cubes;
+        std::map<card *, int> cubes;
     };
 
     template<target_type E> struct play_visitor {
@@ -32,6 +20,7 @@ namespace banggame {
         game_string get_error(const effect_context &ctx);
         duplicate_set duplicates();
         game_string prompt(const effect_context &ctx);
+        void add_context(effect_context &ctx);
         void play(const effect_context &ctx);
     };
 
@@ -46,6 +35,7 @@ namespace banggame {
         game_string get_error(const effect_context &ctx, arg_type arg);
         duplicate_set duplicates(arg_type arg);
         game_string prompt(const effect_context &ctx, arg_type arg);
+        void add_context(effect_context &ctx, arg_type arg);
         void play(const effect_context &ctx, arg_type arg);
     };
 
@@ -62,6 +52,8 @@ namespace banggame {
     game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx);
 
     void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx);
+
+    void apply_add_context(player *origin, card *origin_card, const effect_holder &effect, const play_card_target &target, effect_context &ctx);
 
     game_message verify_and_play(player *origin, const game_action &action);
 

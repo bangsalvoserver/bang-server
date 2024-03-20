@@ -146,7 +146,7 @@ character:
     equip:
       - sgt_blaze
     effects:
-      - ctx_add player
+      - skip_player player
     modifier: sgt_blaze
     tags:
       - max_hp(5)
