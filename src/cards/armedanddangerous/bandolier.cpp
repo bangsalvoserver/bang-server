@@ -7,8 +7,7 @@
 namespace banggame {
 
     bool modifier_bandolier::valid_with_card(card *origin_card, player *origin, card *playing_card) {
-        return rn::contains(playing_card->get_effect_list(origin->m_game->pending_requests()),
-                effect_type::banglimit, &effect_holder::type);
+        return playing_card->has_tag(tag_type::banglimit);
     }
 
     game_string modifier_bandolier::on_prompt(card *origin_card, player *origin, card *playing_card) {

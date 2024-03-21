@@ -32,6 +32,7 @@ character:
     mth_effect: play_as_bang(1,2)
     tags:
       - play_as_bang
+      - banglimit
   - name: EMILIANO
     image: 02_emiliano
     equip:

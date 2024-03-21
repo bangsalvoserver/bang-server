@@ -89,6 +89,7 @@ wildwestshow:
     mth_response: play_as_missed(0)
     tags:
       - play_as_bang
+      - banglimit
   - name: SACAGAWAY
     image: 06_sacagaway
     equip:

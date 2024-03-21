@@ -65,6 +65,7 @@ namespace banggame {
         (missed)
         (missedcard)
         (play_as_bang)
+        (banglimit)
         (beer)
         (indians)
         (panic)

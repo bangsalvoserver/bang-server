@@ -25,6 +25,7 @@ main_deck:
     tags:
       - weapon
       - play_as_bang
+      - banglimit
       - skip_logs
   - name: RATTLESNAKE
     signs:
@@ -109,6 +110,7 @@ main_deck:
       - bang adjacent_players
     tags:
       - skip_logs
+      - banglimit
   - name: TOMAHAWK
     signs:
       - A diamonds

@@ -43,6 +43,8 @@ main_deck:
       - banglimit
       - knife_revolver
       - bang player reachable notself
+    tags:
+      - banglimit
   - name: MAP
     signs:
       - 3 diamonds
@@ -107,6 +109,8 @@ main_deck:
     effects:
       - banglimit
       - train_robbery player notself
+    tags:
+      - banglimit
   - name: WATER_TOWER
     signs:
       - 8 hearts

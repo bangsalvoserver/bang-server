@@ -138,6 +138,7 @@ main_deck:
       - bangcard player reachable notself
     tags:
       - bangcard
+      - banglimit
       - skip_logs
   - &beer
     name: BEER
@@ -299,6 +300,7 @@ character:
     mth_response: play_as_missed(0)
     tags:
       - play_as_bang
+      - banglimit
   - name: EL_GRINGO
     image: 01_elgringo
     equip:
