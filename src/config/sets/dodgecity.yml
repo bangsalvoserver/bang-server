@@ -274,9 +274,9 @@ character:
     image: 03_doc_holyday
     effects:
       - max_usages(1)
-      - mth_add cards(2) self | hand
-      - mth_add player reachable notself
-    mth_effect: doc_holyday
+      - none cards(2) self | hand
+      - none player reachable notself
+    mth_effect: doc_holyday(1,2)
   - name: ELENA_FUENTE
     image: 03_elena_fuente
     responses:

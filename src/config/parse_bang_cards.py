@@ -102,6 +102,21 @@ def parse_tags(tag_list):
         })
     return result
 
+def parse_mth(effect):
+    match = re.match(
+        r'^(\w+)\s*' # type
+        r'\(((?:\s*\d+,)*\s*\d+\s*)\)', #args
+        effect
+    )
+    if not match:
+        raise RuntimeError(f'Invalid mth string: {effect}')
+    effect_type = match.group(1)
+    effect_value = match.group(2)
+    return {
+        'type': CppEnum('mth_type', effect_type),
+        'args': [int(value.strip()) for value in effect_value.split(',')]
+    }
+
 def parse_all_effects(card):
     try:
         return {
@@ -115,8 +130,8 @@ def parse_all_effects(card):
             'expansion':    CppEnum('expansion_type', card['expansion']) if 'expansion' in card else None,
             'deck':         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
             'modifier':     {'type': CppEnum('modifier_type', card['modifier'])} if 'modifier' in card else None,
-            'mth_effect':   {'type': CppEnum('mth_type', card['mth_effect'])} if 'mth_effect' in card else None,
-            'mth_response': {'type': CppEnum('mth_type', card['mth_response'])} if 'mth_response' in card else None,
+            'mth_effect':   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
+            'mth_response': parse_mth(card['mth_response']) if 'mth_response' in card else None,
             'equip_target': CppEnum('target_player_filter', card['equip_target']) if 'equip_target' in card else None,
             'color':        CppEnum('card_color_type', card['color']) if 'color' in card else None,
             'sign':         parse_sign(card['sign']) if 'sign' in card else None

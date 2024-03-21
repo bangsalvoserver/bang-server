@@ -51,7 +51,8 @@ namespace banggame {
     )
 
     DEFINE_STRUCT(mth_holder,
-        (mth_type, type),
+        (mth_type, type)
+        (std::vector<int>, args),
         
         game_string get_error(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx) const;
         game_string on_prompt(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx) const;

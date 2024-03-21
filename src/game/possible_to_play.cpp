@@ -85,37 +85,39 @@ namespace banggame {
         return copy;
     }
 
-    static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, effect_list::const_iterator effect_it, const effect_context &ctx, const effect_target_list &targets) {
-        effect_it = rn::find(effect_it, effects.end(), effect_type::mth_add, &effect_holder::type);
-        if (effect_it == effects.end()) {
-            return !mth.get_error(origin_card, origin, targets, ctx);
-        } else {
-            switch (effect_it->target) {
-            case target_type::none:
-                return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
-                    vector_concat(targets, *effect_it, play_card_target{enums::enum_tag<target_type::none>}));
-            case target_type::player:
-                return rn::any_of(make_player_target_set(origin, origin_card, *effect_it, ctx), [&](player *target) {
-                    return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
-                        vector_concat(targets, *effect_it, play_card_target{enums::enum_tag<target_type::player>, target}));
-                });
-            case target_type::card:
-                return rn::any_of(make_card_target_set(origin, origin_card, *effect_it, ctx), [&](card *target) {
-                    return is_possible_mth_impl(origin, origin_card, mth, effects, std::next(effect_it), ctx,
-                        vector_concat(targets, *effect_it, play_card_target{enums::enum_tag<target_type::card>, target}));
-                });
-            default:
-                // ignore other target types
-                return true;
+    static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const effect_target_list &targets) {
+        if (targets.size() < mth.args.size()) {
+            auto index = mth.args[targets.size()];
+            if (index < effects.size()) {
+                const auto &effect = effects[index];
+                switch (effect.target) {
+                case target_type::none:
+                    return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
+                        vector_concat(targets, effect, play_card_target{enums::enum_tag<target_type::none>}));
+                case target_type::player:
+                    return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
+                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
+                            vector_concat(targets, effect, play_card_target{enums::enum_tag<target_type::player>, target}));
+                    });
+                case target_type::card:
+                    return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
+                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
+                            vector_concat(targets, effect, play_card_target{enums::enum_tag<target_type::card>, target}));
+                    });
+                default:
+                    // ignore other target types
+                    return true;
+                }
             }
         }
+        return !mth.get_error(origin_card, origin, targets, ctx);
     }
 
     static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
         const auto &effects = origin_card->get_effect_list(is_response);
         const auto &mth = origin_card->get_mth(is_response);
         return is_possible_to_play_effects(origin, origin_card, effects, ctx)
-            && is_possible_mth_impl(origin, origin_card, mth, effects, effects.begin(), ctx, {});
+            && is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {});
     }
 
     bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx) {

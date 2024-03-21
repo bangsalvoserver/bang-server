@@ -9,7 +9,6 @@ namespace banggame {
 
     DEFINE_ENUM_FWD_TYPES(effect_type,
         (none)
-        (mth_add)
         (pick,                  effect_pick)
         (human,                 effect_human)
         (max_usages,            effect_max_usages)

@@ -49,10 +49,13 @@ namespace banggame {
         return {};
     }
 
-    static effect_target_list get_mth_targets(player *origin, card *origin_card, bool is_response, const target_list &targets) {
+    static effect_target_list get_mth_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const std::vector<int> &args) {
         effect_target_list mth_targets;
-        for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
-            if (effect.type == effect_type::mth_add) {
+        auto zip_targets = zip_card_targets(targets, origin_card, is_response);
+        size_t num_targets = rn::distance(zip_targets);
+        for (int arg : args) {
+            if (arg < num_targets) {
+                const auto &[target, effect] = *std::next(zip_targets.begin(), arg);
                 mth_targets.emplace_back(effect, target);
             }
         }
@@ -84,8 +87,9 @@ namespace banggame {
                 }, target));
         }
 
-        effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets);
-        MAYBE_RETURN(origin_card->get_mth(is_response).get_error(origin_card, origin, mth_targets, ctx));
+        const auto &mth = origin_card->get_mth(is_response);
+        effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
+        MAYBE_RETURN(mth.get_error(origin_card, origin, mth_targets, ctx));
 
         for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
             MAYBE_RETURN(merge_duplicate_sets(duplicates, enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
@@ -237,8 +241,9 @@ namespace banggame {
             }, target));
         }
 
-        effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets);
-        return origin_card->get_mth(is_response).on_prompt(origin_card, origin, mth_targets, ctx);
+        const auto &mth = origin_card->get_mth(is_response);
+        effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
+        return mth.on_prompt(origin_card, origin, mth_targets, ctx);
     }
 
     static game_string check_prompt_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
@@ -345,8 +350,9 @@ namespace banggame {
             }, target);
         }
 
-        effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets);
-        origin_card->get_mth(is_response).on_play(origin_card, origin, mth_targets, ctx);
+        const auto &mth = origin_card->get_mth(is_response);
+        effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
+        mth.on_play(origin_card, origin, mth_targets, ctx);
     }
 
     void apply_add_context(player *origin, card *origin_card, const effect_holder &effect, const play_card_target &target, effect_context &ctx) {

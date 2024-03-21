@@ -95,9 +95,9 @@ main_deck:
     image: 27_switch
     color: brown
     effects:
-      - mth_add card self | table nottrain
-      - mth_add card notself | table nottrain
-    mth_effect: switch_cards
+      - none card self | table nottrain
+      - none card notself | table nottrain
+    mth_effect: switch_cards(0,1)
   - name: TRAIN_ROBBERY
     signs:
       - 4 diamonds
@@ -384,8 +384,8 @@ hidden:
     responses:
       - none
     optional:
-      - mth_add player
-    mth_response: sgt_blaze
+      - none player
+    mth_response: sgt_blaze(1)
     tags:
       - auto_select
   - name: BAGGAGE_CAR_MISSED
@@ -420,16 +420,16 @@ hidden:
       
   - name: LOUNGE_CAR
     responses:
-      - mth_add card | selection
-      - mth_add player notself target_set dead alive
-    mth_response: lounge_car
+      - none card | selection
+      - none player notself target_set dead alive
+    mth_response: lounge_car(0,1)
     tags:
       - auto_select
 
   - name: MAIL_CAR
     responses:
-      - mth_add card | selection
-      - mth_add player notself
-    mth_response: mail_car
+      - none card | selection
+      - none player notself
+    mth_response: mail_car(0,1)
     tags:
       - auto_select

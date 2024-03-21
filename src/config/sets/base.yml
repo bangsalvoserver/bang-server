@@ -291,12 +291,12 @@ character:
       - treat_as_bang(1)
     effects:
       - banglimit
-      - mth_add card self | hand missed
-      - mth_add player reachable notself
-    mth_effect: play_as_bang
+      - none card self | hand missed
+      - none player reachable notself
+    mth_effect: play_as_bang(1,2)
     responses:
-      - mth_add card self | hand bangcard
-    mth_response: play_as_missed
+      - none card self | hand bangcard
+    mth_response: play_as_missed(0)
     tags:
       - play_as_bang
   - name: EL_GRINGO

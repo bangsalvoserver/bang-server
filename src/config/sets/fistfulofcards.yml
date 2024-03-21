@@ -54,8 +54,8 @@ fistfulofcards:
     responses:
       - none
     optional:
-      - mth_add max_cards self | hand
-    mth_response: ranch
+      - none max_cards self | hand
+    mth_response: ranch(1)
     tags:
       - auto_select
   - name: RICOCHET

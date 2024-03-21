@@ -4,9 +4,9 @@ character:
     equip:
       - claus_the_saint
     responses:
-      - mth_add card | selection
-      - mth_add player target_set
-    mth_response: claus_the_saint
+      - none card | selection
+      - none player target_set
+    mth_response: claus_the_saint(0,1)
     tags:
       - max_hp(3)
       - auto_select
@@ -27,9 +27,9 @@ character:
       - treat_as_bang(2)
     effects:
       - banglimit
-      - mth_add card self | hand not_bangcard
-      - mth_add player reachable notself
-    mth_effect: play_as_bang
+      - none card self | hand not_bangcard
+      - none player reachable notself
+    mth_effect: play_as_bang(1,2)
     tags:
       - play_as_bang
   - name: EMILIANO

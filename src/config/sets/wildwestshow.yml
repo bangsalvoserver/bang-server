@@ -10,9 +10,9 @@ character:
     image: 06_flintwestwood
     effects:
       - max_usages(1)
-      - mth_add card self | hand
-      - mth_add card notself | hand
-    mth_effect: flint_westwood
+      - none card self | hand
+      - none card notself | hand
+    mth_effect: flint_westwood(1,2)
   - name: GARY_LOOTER
     image: 06_garylooter
     equip:
@@ -81,12 +81,12 @@ wildwestshow:
       - showdown
     effects:
       - banglimit
-      - mth_add card self | hand not_bangcard
-      - mth_add player reachable notself
-    mth_effect: play_as_bang
+      - none card self | hand not_bangcard
+      - none player reachable notself
+    mth_effect: play_as_bang(1,2)
     responses:
-      - mth_add card self | hand bangcard
-    mth_response: play_as_missed
+      - none card self | hand bangcard
+    mth_response: play_as_missed(0)
     tags:
       - play_as_bang
   - name: SACAGAWAY
