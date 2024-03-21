@@ -24,10 +24,6 @@ namespace banggame {
         }
         void on_play(card *origin_card, player *origin, player *target);
     };
-    
-    struct handler_draw_multi {
-        void on_play(card *origin_card, player *origin, int amount);
-    };
 
     struct effect_draw_discard {
         game_string get_error(card *origin_card, player *origin) {

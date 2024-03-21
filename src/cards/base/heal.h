@@ -38,11 +38,6 @@ namespace banggame {
         }
         void on_play(card *origin_card, player *origin, player *target);
     };
-    
-    struct handler_heal_multi {
-        game_string on_prompt(card *origin_card, player *origin, int amount);
-        void on_play(card *origin_card, player *origin, int amount);
-    };
 }
 
 #endif

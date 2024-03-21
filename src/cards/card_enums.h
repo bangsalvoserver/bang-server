@@ -102,6 +102,7 @@ namespace banggame {
         (player,                serial::player)
         (conditional_player,    serial::opt_player)
         (adjacent_players,      serial::player_list)
+        (player_per_cube,       serial::player_list)
         (card,                  serial::card)
         (extra_card,            serial::opt_card)
         (players)
@@ -109,6 +110,7 @@ namespace banggame {
         (max_cards,             serial::card_list)
         (cards_other_players,   serial::card_list)
         (select_cubes,          serial::card_list)
+        (select_cubes_repeat,   serial::card_list)
         (self_cubes)
     )
 
@@ -152,8 +154,15 @@ namespace banggame {
         (train)
     )
 
+    DEFINE_STRUCT(card_cubes_pair,
+        (serial::card, card)
+        (serial::card_list, cubes)
+    )
+
+    using selected_cubes_count = std::vector<card_cubes_pair>;
+
     DEFINE_STRUCT(effect_context,
-        (serial::card_list, selected_cubes)
+        (selected_cubes_count, selected_cubes)
         (serial::opt_card, card_choice)
         (serial::opt_player, skipped_player)
         (serial::opt_card, repeat_card)

@@ -12,15 +12,9 @@ main_deck:
     image: 17_carovana
     color: brown
     effects:
-      - mth_add
-      - mth_add
+      - pay_cube select_cubes_repeat(2)
+      - caravan
       - changewws
-    optional:
-      - pay_cube select_cubes(2)
-      - mth_add
-    mth_effect: draw_multi
-    tags:
-      - repeatable
   - <<: *cat_balou
     signs:
       - 3 hearts
@@ -31,13 +25,8 @@ main_deck:
     image: 17_cicchetto
     color: brown
     effects:
-      - mth_add
-    optional:
-      - pay_cube select_cubes(3)
-      - mth_add
-    tags:
-      - repeatable
-    mth_effect: heal_multi
+      - pay_cube select_cubes_repeat(3)
+      - a_little_nip
   - name: QUICK_SHOT
     signs:
       - 3 spades
@@ -45,12 +34,9 @@ main_deck:
     color: brown
     effects:
       - bang player reachable notself
-    optional:
-      - pay_cube select_cubes(1)
-      - bang player reachable notself
+      - pay_cube select_cubes_repeat(1)
+      - bang player_per_cube reachable notself
     tags:
-      - repeatable
-      - auto_confirm
       - skip_logs
   - name: FLINTLOCK
     signs:
@@ -72,12 +58,9 @@ main_deck:
     color: brown
     effects:
       - indians player notself
-    optional:
-      - pay_cube select_cubes(1)
-      - indians player notself
+      - pay_cube select_cubes_repeat(1)
+      - indians player_per_cube notself
     tags:
-      - repeatable
-      - auto_confirm
       - indians
       - skip_logs
   - name: DUCK
@@ -316,4 +299,4 @@ character:
     mth_effect: red_ringo
     tags:
       - max_hp(5)
-      - auto_confirm_red_ringo
+      - red_ringo

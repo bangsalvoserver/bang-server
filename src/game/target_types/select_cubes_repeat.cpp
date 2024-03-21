@@ -4,10 +4,10 @@
 
 namespace banggame {
 
-    using visit_cubes = play_visitor<target_type::select_cubes>;
+    using visit_cubes = play_visitor<target_type::select_cubes_repeat>;
 
     template<> game_string visit_cubes::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
-        if (target_cards.size() != effect.target_value) {
+        if (target_cards.size() % effect.target_value != 0) {
             return "ERROR_INVALID_TARGETS";
         }
         for (card *c : target_cards) {
@@ -19,11 +19,7 @@ namespace banggame {
     }
 
     template<> duplicate_set visit_cubes::duplicates(const serial::card_list &target_cards) {
-        duplicate_set ret;
-        for (card *target : target_cards) {
-            ++ret.cubes[target];
-        }
-        return ret;
+        return play_visitor<target_type::select_cubes>{origin, origin_card, effect}.duplicates(target_cards);
     }
 
     template<> game_string visit_cubes::prompt(const effect_context &ctx, const serial::card_list &target_cards) {
@@ -31,9 +27,7 @@ namespace banggame {
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const serial::card_list &target_cards) {
-        for (card *target : target_cards) {
-            effect.add_context(origin_card, origin, target, ctx);
-        }
+        play_visitor<target_type::select_cubes>{origin, origin_card, effect}.add_context(ctx, target_cards);
     }
 
     template<> void visit_cubes::play(const effect_context &ctx, const serial::card_list &target_cards) {

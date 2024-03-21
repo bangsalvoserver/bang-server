@@ -55,6 +55,15 @@ namespace banggame::filters {
             || is_player_ghost(origin);
     }
 
+    inline const serial::card_list &get_selected_cubes(serial::card origin_card, const effect_context &ctx) {
+        static const serial::card_list empty_list;
+        auto it = rn::find_if(ctx.selected_cubes, [&](const card_cubes_pair &pair) { return pair.card == origin_card; });
+        if (it != ctx.selected_cubes.end()) {
+            return it->cubes;
+        }
+        return empty_list;
+    }
+
     inline game_string check_player_filter(detail::player_ptr origin, target_player_filter filter, detail::player_ptr target, const effect_context &ctx = {}) {
         if (bool(filter & target_player_filter::dead)) {
             if (!bool(filter & target_player_filter::alive) && !detail::check_player_flags(target, player_flags::dead)) {

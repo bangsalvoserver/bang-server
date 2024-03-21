@@ -8,8 +8,10 @@ PRIVATE
     extra_card.cpp
     max_cards.cpp
     none.cpp
+    player_per_cube.cpp
     player.cpp
     players.cpp
+    select_cubes_repeat.cpp
     select_cubes.cpp
     self_cubes.cpp
 )

@@ -16,12 +16,6 @@ namespace banggame {
         });
     }
 
-    void handler_draw_multi::on_play(card *origin_card, player *origin, int amount) {
-        if (amount > 0) {
-            effect_draw{amount}.on_play(origin_card, origin);
-        }
-    }
-
     game_string effect_draw_discard::get_error(card *origin_card, player *origin, player *target) {
         if (target->m_game->m_discards.empty()) {
             return "ERROR_DISCARD_PILE_EMPTY";

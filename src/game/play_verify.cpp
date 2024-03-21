@@ -67,11 +67,7 @@ namespace banggame {
         }
         
         size_t diff = targets.size() - effects.size();
-        if (origin_card->has_tag(tag_type::repeatable)) {
-            if (diff < 0 || diff % origin_card->optionals.size() != 0) {
-                return "ERROR_INVALID_TARGETS";
-            }
-        } else if (diff != 0 && diff != origin_card->optionals.size()) {
+        if (diff != 0 && diff != origin_card->optionals.size()) {
             return "ERROR_INVALID_TARGETS";
         }
 
@@ -398,16 +394,6 @@ namespace banggame {
         };
     }
 
-    struct card_cube_ordering {
-        bool operator()(card *lhs, card *rhs) const {
-            if (lhs->pocket == pocket_type::player_table && rhs->pocket == pocket_type::player_table) {
-                return rn::find(lhs->owner->m_table, lhs) < rn::find(rhs->owner->m_table, rhs);
-            } else {
-                return lhs->pocket == pocket_type::player_character;
-            }
-        }
-    };
-
     game_message verify_and_play(player *origin, const game_action &args) {
         bool is_response = origin->m_game->pending_requests();
 
@@ -434,14 +420,6 @@ namespace banggame {
         }
 
         origin->add_gold(-filters::get_card_cost(args.card, is_response, ctx));
-        
-        std::map<card *, int, card_cube_ordering> selected_cubes;
-        for (card *target_card : ctx.selected_cubes) {
-            ++selected_cubes[target_card];
-        }
-        for (const auto &[c, ncubes] : selected_cubes) {
-            origin->m_game->move_cubes(c, nullptr, ncubes);
-        }
 
         for (const auto &[mod_card, mod_targets] : args.modifiers) {
             apply_target_list(origin, mod_card, is_response, mod_targets, ctx);

@@ -89,24 +89,6 @@ struct mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, const effe
     }
 };
 
-template<typename RetType, typename HandlerType, std::integral SizeType>
-struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, SizeType>> {
-    fun_mem_ptr_t<RetType, HandlerType, SizeType> m_value;
-
-    RetType operator()(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx) {
-        return (HandlerType{}.*m_value)(origin_card, origin, static_cast<SizeType>(targets.size()));
-    }
-};
-
-template<typename RetType, typename HandlerType, typename CtxType, std::integral SizeType>
-struct mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, SizeType>> {
-    ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, SizeType> m_value;
-
-    RetType operator()(card *origin_card, player *origin, const effect_target_list &targets, CtxType ctx) {
-        return (HandlerType{}.*m_value)(origin_card, origin, ctx, static_cast<SizeType>(targets.size()));
-    }
-};
-
 template<typename RetType, typename HandlerType, typename ... Args>
 mth_unwrapper(fun_mem_ptr_t<RetType, HandlerType, Args...>) -> mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>>;
 

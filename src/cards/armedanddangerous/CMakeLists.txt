@@ -1,4 +1,5 @@
 target_sources(bangserver PRIVATE
+    a_little_nip.cpp
     add_cube.cpp
     al_preacher.cpp
     bandolier.cpp
@@ -7,12 +8,14 @@ target_sources(bangserver PRIVATE
     bloody_mary.cpp
     bomb.cpp
     buntlinespecial.cpp
+    caravan.cpp
     doublebarrel.cpp
     duck.cpp
     flintlock.cpp
     frankie_canton.cpp
     julie_cutter.cpp
     ms_abigail.cpp
+    pay_cube.cpp
     red_ringo.cpp
     ruleset.cpp
     rust.cpp

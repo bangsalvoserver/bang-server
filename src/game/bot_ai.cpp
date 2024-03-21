@@ -47,6 +47,17 @@ namespace banggame {
             return {target1, target2};
         }
 
+        serial::player_list operator()(enums::enum_tag_t<target_type::player_per_cube>) const {
+            size_t num_cubes = filters::get_selected_cubes(origin_card, ctx).size();
+            if (num_cubes == 0) {
+                return {};
+            }
+            auto targets = make_player_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
+            return targets
+                | rv::sample(num_cubes)
+                | rn::to<serial::player_list>;
+        }
+
         card *operator()(enums::enum_tag_t<target_type::card>) const {
             auto targets = make_card_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
             return random_element(targets, origin->m_game->rng);
@@ -100,6 +111,22 @@ namespace banggame {
                 | rn::to_vector;
             return cubes
                 | rv::sample(holder.target_value, origin->m_game->rng)
+                | rn::to<serial::card_list>;
+        }
+
+        auto operator()(enums::enum_tag_t<target_type::select_cubes_repeat>) const {
+            auto cubes = origin->cube_slots()
+                | rv::for_each([](card *slot) {
+                    return rv::repeat_n(slot, slot->num_cubes);
+                })
+                | rn::to_vector;
+            size_t max_count = cubes.size() / holder.target_value;
+            if (max_count == 0) {
+                return serial::card_list{};
+            }
+            size_t num_repeats = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->rng);
+            return cubes
+                | rv::sample(holder.target_value * num_repeats, origin->m_game->rng)
                 | rn::to<serial::card_list>;
         }
     };
