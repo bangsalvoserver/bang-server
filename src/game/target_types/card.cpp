@@ -15,11 +15,7 @@ namespace banggame {
     }
 
     template<> duplicate_set visit_card::duplicates(card *target) {
-        if (bool(effect.card_filter & target_card_filter::can_repeat)) {
-            return {};
-        } else {
-            return {.cards{target}};
-        }
+        return {.cards{target}};
     }
 
     template<> game_string visit_card::prompt(const effect_context &ctx, card *target) {

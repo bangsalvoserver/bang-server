@@ -7,6 +7,7 @@ PRIVATE
     adjacent_players.cpp
     extra_card.cpp
     max_cards.cpp
+    move_cube_slot.cpp
     none.cpp
     player_per_cube.cpp
     player.cpp

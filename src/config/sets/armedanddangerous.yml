@@ -290,10 +290,6 @@ character:
       - red_ringo
     effects:
       - max_usages(1)
-      - none card self | cube_slot table
-    optional:
-      - none card self | cube_slot table can_repeat
-    mth_effect: red_ringo(1,2)
+      - red_ringo move_cube_slot(2) self | cube_slot table
     tags:
       - max_hp(5)
-      - red_ringo

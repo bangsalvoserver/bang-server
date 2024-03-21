@@ -103,6 +103,14 @@ namespace banggame {
             return ret;
         }
 
+        serial::card_list operator()(enums::enum_tag_t<target_type::move_cube_slot>) const {
+            auto targets = make_move_cube_target_set(origin, origin_card, ctx) | rn::to_vector;
+            size_t num_cubes = std::min<size_t>(origin->first_character()->num_cubes, holder.target_value);
+            return targets
+                | rv::sample(num_cubes, origin->m_game->rng)
+                | rn::to<serial::card_list>;
+        }
+
         auto operator()(enums::enum_tag_t<target_type::select_cubes>) const {
             auto cubes = origin->cube_slots()
                 | rv::for_each([](card *slot) {

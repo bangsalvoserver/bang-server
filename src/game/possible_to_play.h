@@ -21,6 +21,8 @@ namespace banggame {
 
     rn::any_view<std::pair<player *, player *>> make_adjacent_players_target_set(player *origin, card *origin_card, const effect_context &ctx = {});
 
+    rn::any_view<card *> make_move_cube_target_set(player *origin, card *origin_card, const effect_context &ctx = {});
+
     rn::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {});
 
     bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx = {});

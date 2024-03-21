@@ -23,7 +23,7 @@ namespace banggame {
     }
 
     template<> duplicate_set visit_card::duplicates(card *target) {
-        if (!target || bool(effect.card_filter & target_card_filter::can_repeat)) {
+        if (!target) {
             return {};
         } else {
             return {.cards{target}};

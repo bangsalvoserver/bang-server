@@ -58,6 +58,14 @@ namespace banggame {
         });
     }
 
+    rn::any_view<card *> make_move_cube_target_set(player *origin, card *origin_card, const effect_context &ctx) {
+        return origin->m_table
+            | rv::filter(&card::is_orange)
+            | rv::for_each([](card *slot) {
+                return rv::repeat_n(slot, max_cubes - slot->num_cubes);
+            });
+    }
+
     rn::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
         if (origin_card->has_tag(tag_type::pick)) {
             return get_pick_cards(origin);
@@ -136,6 +144,9 @@ namespace banggame {
                 return ctx.repeat_card || contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::cards:
                 return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), std::max<int>(1, holder.target_value));
+            case target_type::move_cube_slot:
+                return origin->first_character()->num_cubes != 0
+                    && contains_at_least(make_move_cube_target_set(origin, origin_card, ctx), 1);
             case target_type::select_cubes:
                 return origin->count_cubes() >= holder.target_value;
             case target_type::self_cubes:
