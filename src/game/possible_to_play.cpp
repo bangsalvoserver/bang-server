@@ -134,6 +134,7 @@ namespace banggame {
             case target_type::none:
                 return !holder.get_error(origin_card, origin, ctx);
             case target_type::player:
+            case target_type::player_per_cube:
                 return contains_at_least(make_player_target_set(origin, origin_card, holder, ctx), 1);
             case target_type::adjacent_players:
                 return contains_at_least(make_adjacent_players_target_set(origin, origin_card, ctx), 1);

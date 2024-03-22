@@ -49,12 +49,9 @@ namespace banggame {
 
         serial::player_list operator()(enums::enum_tag_t<target_type::player_per_cube>) const {
             size_t num_cubes = filters::get_selected_cubes(origin_card, ctx).size();
-            if (num_cubes == 0) {
-                return {};
-            }
             auto targets = make_player_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
             return targets
-                | rv::sample(num_cubes)
+                | rv::sample(num_cubes + 1)
                 | rn::to<serial::player_list>;
         }
 

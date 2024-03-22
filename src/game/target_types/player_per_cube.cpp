@@ -8,8 +8,8 @@ namespace banggame {
     using visit_players = play_visitor<target_type::player_per_cube>;
 
     template<> game_string visit_players::get_error(const effect_context &ctx, const serial::player_list &targets) {
-        int num_targets = filters::get_selected_cubes(origin_card, ctx).size();
-        if (targets.size() != num_targets) {
+        int num_cubes = filters::get_selected_cubes(origin_card, ctx).size();
+        if (targets.size() != num_cubes + 1) {
             return "ERROR_INVALID_TARGETS";
         }
         for (player *target : targets) {
