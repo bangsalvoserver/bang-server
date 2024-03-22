@@ -3,6 +3,7 @@
 
 #include "utils/json_serial.h"
 #include "utils/utils.h"
+#include "utils/int_set.h"
 
 namespace banggame {
     struct game_context;
@@ -30,6 +31,7 @@ namespace banggame {
         using player = banggame::player_view *;
         using opt_player = player;
         using card_format = banggame::card_format;
+        using int_list = std::vector<int>;
 
         template<typename T>
         concept serializable = is_one_of<T, card, player>;
@@ -44,6 +46,7 @@ namespace banggame::serial {
     using card = not_null<opt_card>;
     using opt_player = banggame::player *;
     using player = not_null<opt_player>;
+    using int_list = utils::int_set;
     
     struct card_format {
         banggame::card *card;
@@ -52,7 +55,7 @@ namespace banggame::serial {
     };
 
     template<typename T>
-    concept serializable = is_one_of<T, opt_card, card, opt_player, player, card_format>;
+    concept serializable = is_one_of<T, opt_card, card, opt_player, player, card_format, int_list>;
 }
 
 #ifndef BUILD_BANG_SERVER

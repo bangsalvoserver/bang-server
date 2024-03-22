@@ -49,15 +49,17 @@ namespace banggame {
         return {};
     }
 
-    static effect_target_list get_mth_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const std::vector<int> &args) {
+    static effect_target_list get_mth_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const serial::int_list &args) {
         effect_target_list mth_targets;
         auto zip_targets = zip_card_targets(targets, origin_card, is_response);
-        size_t num_targets = rn::distance(zip_targets);
+        auto it = zip_targets.begin();
+        int prev = 0;
         for (int arg : args) {
-            if (arg < num_targets) {
-                const auto &[target, effect] = *std::next(zip_targets.begin(), arg);
-                mth_targets.emplace_back(effect, target);
-            }
+            for(; prev != arg && it != zip_targets.end(); ++prev, ++it);
+            if (it == zip_targets.end()) break;
+
+            const auto &[target, effect] = *it;
+            mth_targets.emplace_back(effect, target);
         }
         return mth_targets;
     }
