@@ -126,8 +126,11 @@ namespace banggame {
                 })
                 | rn::to_vector;
             size_t max_count = cubes.size() / holder.target_value;
-            if (max_count == 0) {
-                return serial::card_list{};
+            if (holder.player_filter != target_player_filter{}) {
+                size_t num_players = rn::distance(make_player_target_set(origin, origin_card, holder, ctx));
+                if (num_players <= max_count) {
+                    max_count = num_players - 1;
+                }
             }
             size_t num_repeats = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->rng);
             return cubes
