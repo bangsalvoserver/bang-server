@@ -21,7 +21,7 @@ namespace banggame {
             if (lhs->pocket == pocket_type::player_table && rhs->pocket == pocket_type::player_table) {
                 return rn::find(lhs->owner->m_table, lhs) < rn::find(rhs->owner->m_table, rhs);
             } else {
-                return lhs->pocket == pocket_type::player_character;
+                return rhs->pocket == pocket_type::player_table;
             }
         }
     };
