@@ -40,10 +40,10 @@ def parse_effects(effect_list):
         player_filter = match.group(5)
         card_filter = match.group(6)
 
-        if player_filter and target_type not in ('player', 'conditional_player', 'players', 'player_per_cube', 'card', 'extra_card', 'cards', 'max_cards', 'move_cube_slot', 'select_cubes_repeat'):
+        if player_filter and target_type not in ('player', 'conditional_player', 'players', 'player_per_cube', 'card', 'extra_card', 'cards', 'max_cards', 'select_cubes_repeat'):
             raise RuntimeError(f'Invalid effect string: {effect}\nPlayer filter not allowed with {target_type}')
             
-        if card_filter and target_type not in ('card', 'extra_card', 'cards', 'max_cards', 'move_cube_slot'):
+        if card_filter and target_type not in ('card', 'extra_card', 'cards', 'max_cards'):
             raise RuntimeError(f'Invalid effect string: {effect}\nCard filter not allowed with {target_type}')
 
         result.append({

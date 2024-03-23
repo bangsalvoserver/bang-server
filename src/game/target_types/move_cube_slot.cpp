@@ -14,14 +14,17 @@ namespace banggame {
         if (origin_card->num_cubes < targets.size()) {
             return {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
         }
-        if (auto it = rn::find_if(targets, [&](card *target_card) {
+        for (card *target_card : targets) {
+            if (target_card->pocket != pocket_type::player_table || target_card->owner != origin) {
+                return "ERROR_TARGET_NOT_SELF";
+            }
             int count = target_card->num_cubes;
             for (card *target : targets) {
                 if (target == target_card) ++count;
             }
-            return count > max_cubes;
-        }); it != targets.end()) {
-            return {"ERROR_CARD_HAS_FULL_CUBES", static_cast<card *>(*it)};
+            if (count > max_cubes) {
+                return {"ERROR_CARD_HAS_FULL_CUBES", target_card};
+            }
         }
         return {};
     }

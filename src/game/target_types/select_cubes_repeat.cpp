@@ -11,7 +11,7 @@ namespace banggame {
             return "ERROR_INVALID_TARGETS";
         }
         for (card *c : target_cards) {
-            if (!c || c->owner != origin) {
+            if (c->owner != origin) {
                 return "ERROR_TARGET_NOT_SELF";
             }
         }
