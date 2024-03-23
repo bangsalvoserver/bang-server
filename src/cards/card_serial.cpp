@@ -63,14 +63,4 @@ template<> json serializer<banggame::serial::card_format, banggame::game_context
     }
 }
 
-// no serialization needed for int_set, just return null
-
-template<> json serializer<utils::int_set, banggame::game_context>::operator()(utils::int_set value) const {
-    return {};
-}
-
-template<> utils::int_set deserializer<utils::int_set, banggame::game_context>::operator()(const json &value) const {
-    return {};
-}
-
 }
