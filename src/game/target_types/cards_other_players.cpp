@@ -25,10 +25,6 @@ namespace banggame {
         }
     }
 
-    template<> duplicate_set visit_cards::duplicates(const serial::card_list &target_cards) {
-        return {};
-    }
-
     template<> game_string visit_cards::prompt(const effect_context &ctx, const serial::card_list &target_cards) {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};

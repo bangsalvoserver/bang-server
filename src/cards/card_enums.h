@@ -163,6 +163,8 @@ namespace banggame {
     using selected_cubes_count = std::vector<card_cubes_pair>;
 
     DEFINE_STRUCT(effect_context,
+        (serial::player_list, selected_players)
+        (serial::card_list, selected_cards)
         (selected_cubes_count, selected_cubes)
         (serial::opt_card, card_choice)
         (serial::opt_player, skipped_player)

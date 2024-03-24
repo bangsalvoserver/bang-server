@@ -10,12 +10,6 @@ namespace banggame {
         return {};
     }
 
-    template<> duplicate_set visit_cubes::duplicates() {
-        return {.cubes{
-            {origin_card, effect.target_value}
-        }};
-    }
-
     template<> game_string visit_cubes::prompt(const effect_context &ctx) {
         return {};
     }

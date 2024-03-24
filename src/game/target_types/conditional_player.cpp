@@ -16,14 +16,6 @@ namespace banggame {
         }
     }
 
-    template<> duplicate_set visit_player::duplicates(player *target) {
-        if (target) {
-            return {.players{target}};
-        } else {
-            return {};
-        }
-    }
-
     template<> game_string visit_player::prompt(const effect_context &ctx, player *target) {
         if (target) {
             return play_visitor<target_type::player>{origin, origin_card, effect}.prompt(ctx, target);

@@ -8,10 +8,6 @@ namespace banggame {
         return effect.get_error(origin_card, origin, ctx);
     }
 
-    template<> duplicate_set visit_none::duplicates() {
-        return {};
-    }
-
     template<> game_string visit_none::prompt(const effect_context &ctx) {
         return effect.on_prompt(origin_card, origin, ctx);
     }

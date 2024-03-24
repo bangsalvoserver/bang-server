@@ -14,15 +14,12 @@ namespace banggame {
         return effect.get_error(origin_card, origin, target, ctx);
     }
 
-    template<> duplicate_set visit_card::duplicates(card *target) {
-        return {.cards{target}};
-    }
-
     template<> game_string visit_card::prompt(const effect_context &ctx, card *target) {
         return effect.on_prompt(origin_card, origin, target, ctx);
     }
 
     template<> void visit_card::add_context(effect_context &ctx, card *target) {
+        ctx.selected_cards.push_back(target);
         effect.add_context(origin_card, origin, target, ctx);
     }
 

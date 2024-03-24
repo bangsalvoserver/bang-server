@@ -15,10 +15,6 @@ namespace banggame {
         return {};
     }
 
-    template<> duplicate_set visit_players::duplicates() {
-        return {};
-    }
-
     template<> game_string visit_players::prompt(const effect_context &ctx) {
         std::vector<player *> targets;
         for (player *target : range_all_players(origin)) {
@@ -39,7 +35,9 @@ namespace banggame {
 
     template<> void visit_players::add_context(effect_context &ctx) {
         for (player *target : range_all_players(origin)) {
-            effect.add_context(origin_card, origin, target, ctx);
+            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
+                play_visitor<target_type::player>{origin, origin_card, effect}.add_context(ctx, target);
+            }
         }
     }
 

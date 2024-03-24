@@ -16,10 +16,6 @@ namespace banggame {
         return {};
     }
 
-    template<> duplicate_set visit_cards::duplicates(const serial::card_list &targets) {
-        return {.cards{ targets | rn::to<std::vector<card *>> }};
-    }
-
     template<> game_string visit_cards::prompt(const effect_context &ctx, const serial::card_list &targets) {
         for (card *c : targets) {
             MAYBE_RETURN(play_visitor<target_type::card>{origin, origin_card, effect}.prompt(ctx, c));

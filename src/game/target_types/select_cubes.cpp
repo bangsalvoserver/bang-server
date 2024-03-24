@@ -18,14 +18,6 @@ namespace banggame {
         return {};
     }
 
-    template<> duplicate_set visit_cubes::duplicates(const serial::card_list &target_cards) {
-        duplicate_set ret;
-        for (card *target : target_cards) {
-            ++ret.cubes[target];
-        }
-        return ret;
-    }
-
     template<> game_string visit_cubes::prompt(const effect_context &ctx, const serial::card_list &target_cards) {
         return {};
     }

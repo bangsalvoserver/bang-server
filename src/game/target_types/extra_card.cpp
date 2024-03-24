@@ -22,17 +22,9 @@ namespace banggame {
         }
     }
 
-    template<> duplicate_set visit_card::duplicates(card *target) {
-        if (!target) {
-            return {};
-        } else {
-            return {.cards{target}};
-        }
-    }
-
     template<> game_string visit_card::prompt(const effect_context &ctx, card *target) {
         if (target) {
-            return effect.on_prompt(origin_card, origin, target, ctx);
+            return play_visitor<target_type::card>{origin, origin_card, effect}.prompt(ctx, target);
         } else {
             return {};
         }
@@ -40,13 +32,13 @@ namespace banggame {
 
     template<> void visit_card::add_context(effect_context &ctx, card *target) {
         if (target) {
-            effect.add_context(origin_card, origin, target, ctx);
+            play_visitor<target_type::card>{origin, origin_card, effect}.add_context(ctx, target);
         }
     }
 
     template<> void visit_card::play(const effect_context &ctx, card *target) {
         if (target) {
-            effect.on_play(origin_card, origin, target, {}, ctx);
+            return play_visitor<target_type::card>{origin, origin_card, effect}.play(ctx, target);
         }
     }
 

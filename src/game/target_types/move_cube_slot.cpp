@@ -29,10 +29,6 @@ namespace banggame {
         return {};
     }
 
-    template<> duplicate_set visit_cards::duplicates(const serial::card_list &targets) {
-        return {};
-    }
-
     template<> game_string visit_cards::prompt(const effect_context &ctx, const serial::card_list &targets) {
         game_string msg;
         for (card *target : targets) {

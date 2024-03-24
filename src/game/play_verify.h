@@ -6,19 +6,12 @@
 
 namespace banggame {
 
-    struct duplicate_set {
-        std::vector<player *> players;
-        std::vector<card *> cards;
-        std::map<card *, int> cubes;
-    };
-
     template<target_type E> struct play_visitor {
         player *origin;
         card *origin_card;
         const effect_holder &effect;
 
         game_string get_error(const effect_context &ctx);
-        duplicate_set duplicates();
         game_string prompt(const effect_context &ctx);
         void add_context(effect_context &ctx);
         void play(const effect_context &ctx);
@@ -33,7 +26,6 @@ namespace banggame {
         const effect_holder &effect;
 
         game_string get_error(const effect_context &ctx, arg_type arg);
-        duplicate_set duplicates(arg_type arg);
         game_string prompt(const effect_context &ctx, arg_type arg);
         void add_context(effect_context &ctx, arg_type arg);
         void play(const effect_context &ctx, arg_type arg);

@@ -11,26 +11,26 @@
 
 namespace banggame {
 
-    struct duplicate_set_unique {
+    static game_string check_duplicates(card *origin_card, player *origin, const effect_context &ctx) {
         std::set<player *> players;
         std::set<card *> cards;
         std::map<card *, int> cubes;
-    };
 
-    static game_string merge_duplicate_sets(duplicate_set_unique &set, duplicate_set &&other) {
-        for (player *p : other.players) {
-            if (!set.players.insert(p).second) {
+        for (player *p : ctx.selected_players) {
+            if (auto [it, inserted] = players.insert(p); !inserted) {
                 return {"ERROR_DUPLICATE_PLAYER", p};
             }
         }
-        for (card *c : other.cards) {
-            if (!set.cards.insert(c).second) {
+        for (card *c : ctx.selected_cards) {
+            if (auto [it, inserted] = cards.insert(c); !inserted) {
                 return {"ERROR_DUPLICATE_CARD", c};
             }
         }
-        for (auto &[card, ncubes] : other.cubes) {
-            if ((set.cubes[card] += ncubes) > card->num_cubes) {
-                return {"ERROR_NOT_ENOUGH_CUBES_ON", card};
+        for (const auto &[selected_card, selected_cubes] : ctx.selected_cubes) {
+            for (card *c : selected_cubes) {
+                if (++cubes[c] > c->num_cubes) {
+                    return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
+                }
             }
         }
         return {};
@@ -64,7 +64,7 @@ namespace banggame {
         return mth_targets;
     }
 
-    static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx, duplicate_set_unique &duplicates) {
+    static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
         auto &effects = origin_card->get_effect_list(is_response);
 
         if (effects.empty()) {
@@ -93,11 +93,7 @@ namespace banggame {
         effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
         MAYBE_RETURN(mth.get_error(origin_card, origin, mth_targets, ctx));
 
-        for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
-            MAYBE_RETURN(merge_duplicate_sets(duplicates, enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                return play_visitor<E>{origin, origin_card, effect}.duplicates(FWD(args) ... );
-            }, target)));
-        }
+        MAYBE_RETURN(check_duplicates(origin_card, origin, ctx));
 
         if (ctx.repeat_card != origin_card) {
             switch (origin_card->pocket) {
@@ -132,16 +128,16 @@ namespace banggame {
         return {};
     }
     
-    static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx, duplicate_set_unique &duplicates) {
+    static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
         for (const auto &[mod_card, targets] : modifiers) {
             if (!mod_card->is_modifier()) {
                 return "ERROR_CARD_IS_NOT_MODIFIER";
             }
 
+            ctx.selected_cards.push_back(mod_card);
             mod_card->modifier.add_context(mod_card, origin, ctx);
             
-            MAYBE_RETURN(merge_duplicate_sets(duplicates, {.cards{ mod_card }}));
-            MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx, duplicates));
+            MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
             MAYBE_RETURN(get_play_card_error(origin, mod_card, ctx));
         }
 
@@ -215,16 +211,14 @@ namespace banggame {
             return "ERROR_PLAYER_NOT_IN_TURN";
         }
 
-        duplicate_set_unique duplicates;
-
-        MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx, duplicates));
+        MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
 
         if (filters::is_equip_card(origin_card)) {
             MAYBE_RETURN(verify_equip_target(origin, origin_card, is_response, targets, ctx));
         } else if (origin_card->is_modifier()) {
             return "ERROR_CARD_IS_MODIFIER";
         } else {
-            MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx, duplicates));
+            MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
         }
 
         MAYBE_RETURN(get_play_card_error(origin, origin_card, ctx));
