@@ -40,10 +40,6 @@ namespace banggame::filters::detail {
         return origin->m_game->calc_distance(origin, target);
     }
 
-    const player *get_card_owner(card *target) {
-        return target->owner;
-    }
-
     card_sign get_card_sign(card *target) {
         return target->sign;
     }
@@ -87,12 +83,5 @@ namespace banggame::filters::detail {
             return req->get_target_set();
         }
         return {};
-    }
-
-    bool can_pick_card(player *origin, card *target) {
-        if (auto req = origin->m_game->top_request<request_picking_base>(origin)) {
-            return req->can_pick(target);
-        }
-        return false;
     }
 }

@@ -7,9 +7,19 @@ namespace banggame {
     using visit_card = play_visitor<target_type::card>;
 
     template<> game_string visit_card::get_error(const effect_context &ctx, card *target) {
-        if (target->owner) {
-            MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target->owner, ctx));
+        if (bool(effect.card_filter & target_card_filter::pick_card)) {
+            if (auto req = origin->m_game->top_request<request_picking_base>(origin)) {
+                if (req->can_pick(target)) {
+                    return {};
+                }
+            }
+            return "ERROR_INVALID_PICK";
         }
+
+        if (!target->owner) {
+            return "ERROR_CARD_HAS_NO_OWNER";
+        }
+        MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target->owner, ctx));
         MAYBE_RETURN(filters::check_card_filter(origin_card, origin, effect.card_filter, target, ctx));
         return effect.get_error(origin_card, origin, target, ctx);
     }

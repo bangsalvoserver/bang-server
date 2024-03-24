@@ -67,7 +67,7 @@ namespace banggame {
     }
 
     rn::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
-        if (origin_card->has_tag(tag_type::pick)) {
+        if (bool(holder.card_filter & target_card_filter::pick_card)) {
             return get_pick_cards(origin);
         }
         return rv::concat(
