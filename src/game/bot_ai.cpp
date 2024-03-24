@@ -165,11 +165,13 @@ namespace banggame {
                     }
                 } else {
                     for (const effect_holder &holder : playing_card->get_effect_list(is_response)) {
-                        ret.targets.push_back(generate_random_target(origin, playing_card, holder, ctx));
+                        const auto &target = ret.targets.emplace_back(generate_random_target(origin, playing_card, holder, ctx));
+                        apply_add_context(origin, playing_card, holder, target, ctx);
                     }
                     if (is_possible_to_play_effects(origin, playing_card, playing_card->optionals, ctx)) {
                         for (const effect_holder &holder : playing_card->optionals) {
-                            ret.targets.push_back(generate_random_target(origin, playing_card, holder, ctx));
+                            const auto &target = ret.targets.emplace_back(generate_random_target(origin, playing_card, holder, ctx));
+                            apply_add_context(origin, playing_card, holder, target, ctx);
                         }
                     }
                 }
