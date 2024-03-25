@@ -119,6 +119,8 @@ main_deck:
     effects:
       - none
     modifier: traincost
+    tags:
+      - traincost
 
 character:
   - name: BENNY_BRAWLER
@@ -145,6 +147,7 @@ character:
     modifier: traincost
     tags:
       - max_hp(3)
+      - traincost
   - name: SGT_BLAZE
     image: 27_sgt_blaze
     equip:

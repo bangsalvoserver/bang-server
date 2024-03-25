@@ -1,7 +1,5 @@
 #include "game/play_verify.h"
 
-#include "cards/effect_enums.h"
-
 namespace banggame {
 
     using visit_cubes = play_visitor<target_type::select_cubes_repeat>;

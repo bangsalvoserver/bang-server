@@ -2,7 +2,7 @@
 
 #include "game/game.h"
 
-#include "cards/effect_enums.h"
+#include "cards/filter_enums.h"
 
 namespace banggame {
 

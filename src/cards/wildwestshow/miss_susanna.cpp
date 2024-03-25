@@ -2,7 +2,7 @@
 
 #include "game/game.h"
 
-#include "cards/effect_enums.h"
+#include "cards/filter_enums.h"
 
 namespace banggame {
 
@@ -20,7 +20,7 @@ namespace banggame {
                                 || pair.pocket == pocket_type::shop_selection
                                 || pair.pocket == pocket_type::player_character && history.context.repeat_card
                                 || pair.pocket == pocket_type::train && pair.origin_card->deck == card_deck_type::train
-                                || pair.origin_card->get_mth(history.is_response).type == mth_type::play_as_bang;
+                                || pair.origin_card->has_tag(tag_type::play_as_bang);
                         }
                     );
                 }), 0);

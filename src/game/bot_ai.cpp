@@ -3,7 +3,6 @@
 #include "possible_to_play.h"
 #include "net/bot_info.h"
 
-#include "cards/effect_enums.h"
 #include "cards/filters.h"
 
 namespace banggame {

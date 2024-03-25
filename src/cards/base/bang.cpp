@@ -1,7 +1,5 @@
 #include "bang.h"
 
-#include "cards/effects.h"
-#include "cards/effect_enums.h"
 #include "cards/game_enums.h"
 #include "cards/filters.h"
 
@@ -132,17 +130,8 @@ namespace banggame {
         p->remove_player_flags(flag);
     }
 
-    template<modifier_type E>
-    static constexpr bool is_bangmod = false;
-
-    template<modifier_type E> requires enums::value_with_type<E>
-    static constexpr bool is_bangmod<E> = std::is_base_of_v<modifier_bangmod, enums::enum_type_t<E>>;
-
     bool modifier_bangmod::valid_with_modifier(card *origin_card, player *origin, card *target_card) {
-        static constexpr auto bangmods = []<modifier_type ... Es>(enums::enum_sequence<Es ...>) {
-            return std::array { is_bangmod<Es> ... };
-        }(enums::make_enum_sequence<modifier_type>());
-        return bangmods[enums::indexof(target_card->modifier.type)];
+        return target_card->has_tag(tag_type::bangmod);
     }
 
     bool modifier_bangmod::valid_with_card(card *origin_card, player *origin, card *target_card) {

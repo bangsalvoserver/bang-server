@@ -76,6 +76,8 @@ main_deck:
     modifier: bangmod
     effects:
       - aim
+    tags:
+      - bangmod
   - name: POKER
     signs:
       - J hearts
