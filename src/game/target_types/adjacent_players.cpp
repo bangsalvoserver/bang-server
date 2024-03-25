@@ -1,10 +1,34 @@
 #include "game/play_verify.h"
 
-#include "game/possible_to_play.h"
+#include "cards/filters.h"
 
 namespace banggame {
 
     using visit_players = play_visitor<target_type::adjacent_players>;
+
+    static auto make_adjacent_players_target_set(player *origin, card *origin_card, const effect_context &ctx) {
+        effect_holder effect1 { .player_filter = target_player_filter::notself | target_player_filter::reachable };
+        effect_holder effect2 { .player_filter = target_player_filter::notself };
+        return make_player_target_set(origin, origin_card, effect1, ctx) | rv::for_each([=](player *target1) {
+            return make_player_target_set(origin, origin_card, effect2, ctx) | rv::transform([=](player *target2) {
+                return std::pair{target1, target2};
+            });
+        })
+        | rv::filter([=](const auto &targets) {
+            auto [target1, target2] = targets;
+            return origin->m_game->calc_distance(target1, target2) == 1;
+        });
+    }
+
+    template<> bool visit_players::possible(const effect_context &ctx) {
+        return contains_at_least(make_adjacent_players_target_set(origin, origin_card, ctx), 1);
+    }
+
+    template<> serial::player_list visit_players::random_target(const effect_context &ctx) {
+        auto targets = make_adjacent_players_target_set(origin, origin_card, ctx) | rn::to_vector;
+        auto [target1, target2] = random_element(targets, origin->m_game->rng);
+        return {target1, target2};
+    }
 
     template<> game_string visit_players::get_error(const effect_context &ctx, const serial::player_list &targets) {
         if (targets.size() != 2) {
@@ -14,7 +38,7 @@ namespace banggame {
             return "ERROR_TARGETS_NOT_ADJACENT";
         }
         for (player *target : targets) {
-            MAYBE_RETURN(play_visitor<target_type::player>{origin, origin_card, effect}.get_error(ctx, target));
+            MAYBE_RETURN(defer<target_type::player>().get_error(ctx, target));
         }
         return {};
     }
@@ -22,7 +46,7 @@ namespace banggame {
     template<> game_string visit_players::prompt(const effect_context &ctx, const serial::player_list &targets) {
         game_string msg;
         for (player *target : targets) {
-            msg = play_visitor<target_type::player>{origin, origin_card, effect}.prompt(ctx, target);
+            msg = defer<target_type::player>().prompt(ctx, target);
             if (!msg) break;
         }
         return msg;
@@ -30,13 +54,13 @@ namespace banggame {
 
     template<> void visit_players::add_context(effect_context &ctx, const serial::player_list &targets) {
         for (player *target : targets) {
-            play_visitor<target_type::player>{origin, origin_card, effect}.add_context(ctx, target);
+            defer<target_type::player>().add_context(ctx, target);
         }
     }
 
     template<> void visit_players::play(const effect_context &ctx, const serial::player_list &targets) {
         for (player *target : targets) {
-            play_visitor<target_type::player>{origin, origin_card, effect}.play(ctx, target);
+            defer<target_type::player>().play(ctx, target);
         }
     }
 

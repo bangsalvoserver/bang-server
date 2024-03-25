@@ -6,6 +6,14 @@ namespace banggame {
 
     using visit_player = play_visitor<target_type::player>;
 
+    template<> bool visit_player::possible(const effect_context &ctx) {
+        return contains_at_least(make_player_target_set(origin, origin_card, effect, ctx), 1);
+    }
+
+    template<> player *visit_player::random_target(const effect_context &ctx) {
+        return random_element(make_player_target_set(origin, origin_card, effect, ctx), origin->m_game->rng);
+    }
+
     template<> game_string visit_player::get_error(const effect_context &ctx, player *target) {
         MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target, ctx));
         return effect.get_error(origin_card, origin, target, ctx);

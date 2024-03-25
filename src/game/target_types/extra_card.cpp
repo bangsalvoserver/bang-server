@@ -6,6 +6,18 @@ namespace banggame {
     
     using visit_card = play_visitor<target_type::extra_card>;
 
+    template<> bool visit_card::possible(const effect_context &ctx) {
+        return ctx.repeat_card || contains_at_least(make_card_target_set(origin, origin_card, effect, ctx), 1);
+    }
+
+    template<> card *visit_card::random_target(const effect_context &ctx) {
+        if (ctx.repeat_card) {
+            return nullptr;
+        } else {
+            return defer<target_type::card>().random_target(ctx);
+        }
+    }
+
     template<> game_string visit_card::get_error(const effect_context &ctx, card *target) {
         if (!target) {
             if (ctx.repeat_card) {
@@ -17,14 +29,14 @@ namespace banggame {
             if (ctx.repeat_card) {
                 return "ERROR_TARGET_SET_EMPTY";
             } else {
-                return play_visitor<target_type::card>{origin, origin_card, effect}.get_error(ctx, target);
+                return defer<target_type::card>().get_error(ctx, target);
             }
         }
     }
 
     template<> game_string visit_card::prompt(const effect_context &ctx, card *target) {
         if (target) {
-            return play_visitor<target_type::card>{origin, origin_card, effect}.prompt(ctx, target);
+            return defer<target_type::card>().prompt(ctx, target);
         } else {
             return {};
         }
@@ -32,13 +44,13 @@ namespace banggame {
 
     template<> void visit_card::add_context(effect_context &ctx, card *target) {
         if (target) {
-            play_visitor<target_type::card>{origin, origin_card, effect}.add_context(ctx, target);
+            defer<target_type::card>().add_context(ctx, target);
         }
     }
 
     template<> void visit_card::play(const effect_context &ctx, card *target) {
         if (target) {
-            return play_visitor<target_type::card>{origin, origin_card, effect}.play(ctx, target);
+            return defer<target_type::card>().play(ctx, target);
         }
     }
 

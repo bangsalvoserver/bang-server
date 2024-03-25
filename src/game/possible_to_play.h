@@ -13,15 +13,24 @@ namespace banggame {
         return rn::distance(rn::take_view(FWD(range), size)) == size;
     }
 
+    struct random_element_error : std::runtime_error {
+        random_element_error(): std::runtime_error{"Empty range in random_element"} {}
+    };
+
+    template<rn::range Range, typename Rng>
+    decltype(auto) random_element(Range &&range, Rng &rng) {
+        rn::range_value_t<Range> ret;
+        if (rn::sample(std::forward<Range>(range), &ret, 1, rng).out == &ret) {
+            throw random_element_error();
+        }
+        return ret;
+    }
+
     rn::any_view<card *> get_all_playable_cards(player *origin, bool is_response = false);
 
     rn::any_view<player *> make_equip_set(player *origin, card *origin_card, const effect_context &ctx = {});
 
     rn::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {});
-
-    rn::any_view<std::pair<player *, player *>> make_adjacent_players_target_set(player *origin, card *origin_card, const effect_context &ctx = {});
-
-    rn::any_view<card *> make_move_cube_target_set(player *origin, card *origin_card, const effect_context &ctx = {});
 
     rn::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {});
 

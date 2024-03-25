@@ -6,6 +6,10 @@ namespace banggame {
 
     using visit_players = play_visitor<target_type::players>;
 
+    template<> bool visit_players::possible(const effect_context &ctx) {
+        return true;
+    }
+
     template<> game_string visit_players::get_error(const effect_context &ctx) {
         for (player *target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
@@ -36,7 +40,7 @@ namespace banggame {
     template<> void visit_players::add_context(effect_context &ctx) {
         for (player *target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
-                play_visitor<target_type::player>{origin, origin_card, effect}.add_context(ctx, target);
+                defer<target_type::player>().add_context(ctx, target);
             }
         }
     }

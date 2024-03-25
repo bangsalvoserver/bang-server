@@ -8,145 +8,14 @@
 
 namespace banggame {
 
-    struct bot_error : std::exception {
-        game_string message;
-        bot_error(game_string message): message{message} {}
-    };
-
-    template<rn::range Range, typename Rng>
-    decltype(auto) random_element(Range &&range, Rng &rng) {
-        rn::range_value_t<Range> ret;
-        if (rn::sample(std::forward<Range>(range), &ret, 1, rng).out == &ret) {
-            throw bot_error{"EMPTY_RANGE_IN_RANDOM_ELEMENT"};
-        }
-        return ret;
-    }
-
-    struct random_target_visitor {
-        player *origin;
-        card *origin_card;
-        const effect_holder &holder;
-        const effect_context &ctx;
-
-        player *operator()(enums::enum_tag_t<target_type::player>) const {
-            return random_element(make_player_target_set(origin, origin_card, holder, ctx), origin->m_game->rng);
-        }
-
-        player *operator()(enums::enum_tag_t<target_type::conditional_player>) const {
-            auto targets = make_player_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
-            if (targets.empty()) {
-                return nullptr;
-            } else {
-                return random_element(targets, origin->m_game->rng);
-            }
-        }
-
-        serial::player_list operator()(enums::enum_tag_t<target_type::adjacent_players>) const {
-            auto targets = make_adjacent_players_target_set(origin, origin_card, ctx) | rn::to_vector;
-            auto [target1, target2] = random_element(targets, origin->m_game->rng);
-            return {target1, target2};
-        }
-
-        serial::player_list operator()(enums::enum_tag_t<target_type::player_per_cube>) const {
-            size_t num_cubes = filters::get_selected_cubes(origin_card, ctx).size();
-            auto targets = make_player_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
-            return targets
-                | rv::sample(num_cubes + 1)
-                | rn::to<serial::player_list>;
-        }
-
-        card *operator()(enums::enum_tag_t<target_type::card>) const {
-            auto targets = make_card_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
-            return random_element(targets, origin->m_game->rng);
-        }
-
-        card *operator()(enums::enum_tag_t<target_type::extra_card> tag) const {
-            if (ctx.repeat_card) {
-                return nullptr;
-            } else {
-                auto targets = make_card_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
-                return random_element(targets, origin->m_game->rng);
-            }
-        }
-
-        auto operator()(enums::enum_tag_t<target_type::cards> tag) const {
-            auto targets = make_card_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
-            return targets
-                | rv::sample(holder.target_value, origin->m_game->rng)
-                | rn::to<serial::card_list>;
-        }
-
-        auto operator()(enums::enum_tag_t<target_type::max_cards> tag) const {
-            auto targets = make_card_target_set(origin, origin_card, holder, ctx) | rn::to_vector;
-            size_t count = holder.target_value;
-            if (count == 0) {
-                count = std::uniform_int_distribution<size_t>{1, targets.size()}(origin->m_game->rng);
-            }
-            return targets
-                | rv::sample(count, origin->m_game->rng)
-                | rn::to<serial::card_list>;
-        }
-
-        auto operator()(enums::enum_tag_t<target_type::cards_other_players>) const {
-            serial::card_list ret;
-            for (player *target : range_other_players(origin)) {
-                if (auto targets = rv::concat(
-                    target->m_table | rv::remove_if(&card::is_black),
-                    target->m_hand | rv::take(1)
-                )) {
-                    ret.push_back(random_element(targets, origin->m_game->rng));
-                }
-            }
-            return ret;
-        }
-
-        serial::card_list operator()(enums::enum_tag_t<target_type::move_cube_slot>) const {
-            auto targets = make_move_cube_target_set(origin, origin_card, ctx) | rn::to_vector;
-            size_t num_cubes = std::min<size_t>(origin->first_character()->num_cubes, holder.target_value);
-            return targets
-                | rv::sample(num_cubes, origin->m_game->rng)
-                | rn::to<serial::card_list>;
-        }
-
-        auto operator()(enums::enum_tag_t<target_type::select_cubes>) const {
-            auto cubes = origin->cube_slots()
-                | rv::for_each([](card *slot) {
-                    return rv::repeat_n(slot, slot->num_cubes);
-                })
-                | rn::to_vector;
-            return cubes
-                | rv::sample(holder.target_value, origin->m_game->rng)
-                | rn::to<serial::card_list>;
-        }
-
-        auto operator()(enums::enum_tag_t<target_type::select_cubes_repeat>) const {
-            auto cubes = origin->cube_slots()
-                | rv::for_each([](card *slot) {
-                    return rv::repeat_n(slot, slot->num_cubes);
-                })
-                | rn::to_vector;
-            size_t max_count = cubes.size() / holder.target_value;
-            if (holder.player_filter != target_player_filter{}) {
-                size_t num_players = rn::distance(make_player_target_set(origin, origin_card, holder, ctx));
-                if (num_players <= max_count) {
-                    max_count = num_players - 1;
-                }
-            }
-            size_t num_repeats = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->rng);
-            return cubes
-                | rv::sample(holder.target_value * num_repeats, origin->m_game->rng)
-                | rn::to<serial::card_list>;
-        }
-    };
-
-    static play_card_target generate_random_target(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
+    static play_card_target generate_random_target(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
         return enums::visit_enum([&]<target_type E>(enums::enum_tag_t<E> tag) -> play_card_target {
             if constexpr (play_card_target::has_type<E>) {
-                return {tag, random_target_visitor{origin, origin_card, holder, ctx}(tag)};
+                return {tag, play_visitor<E>{origin, origin_card, effect}.random_target(ctx)};
             } else {
                 return tag;
             }
-        }, holder.target);
+        }, effect.target);
     }
 
     static game_action generate_random_play(player *origin, const card_modifier_node &node, bool is_response) {
@@ -246,7 +115,7 @@ namespace banggame {
                     if (verify_and_play(origin, args).is(message_type::ok)) {
                         return true;
                     }
-                } catch (const bot_error &error) {
+                } catch (const random_element_error &error) {
                     // ignore
                 }
             }

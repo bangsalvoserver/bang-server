@@ -6,6 +6,29 @@ namespace banggame {
 
     using visit_cubes = play_visitor<target_type::select_cubes_repeat>;
 
+    template<> bool visit_cubes::possible(const effect_context &ctx) {
+        return true;
+    }
+
+    template<> serial::card_list visit_cubes::random_target(const effect_context &ctx) {
+        auto cubes = origin->cube_slots()
+            | rv::for_each([](card *slot) {
+                return rv::repeat_n(slot, slot->num_cubes);
+            })
+            | rn::to_vector;
+        size_t max_count = cubes.size() / effect.target_value;
+        if (effect.player_filter != target_player_filter{}) {
+            size_t num_players = rn::distance(make_player_target_set(origin, origin_card, effect, ctx));
+            if (num_players <= max_count) {
+                max_count = num_players - 1;
+            }
+        }
+        size_t num_repeats = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->rng);
+        return cubes
+            | rv::sample(effect.target_value * num_repeats, origin->m_game->rng)
+            | rn::to<serial::card_list>;
+    }
+
     template<> game_string visit_cubes::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
         if (target_cards.size() % effect.target_value != 0) {
             return "ERROR_INVALID_TARGETS";
@@ -23,7 +46,7 @@ namespace banggame {
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const serial::card_list &target_cards) {
-        play_visitor<target_type::select_cubes>{origin, origin_card, effect}.add_context(ctx, target_cards);
+        defer<target_type::select_cubes>().add_context(ctx, target_cards);
     }
 
     template<> void visit_cubes::play(const effect_context &ctx, const serial::card_list &target_cards) {

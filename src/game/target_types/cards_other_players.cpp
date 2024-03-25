@@ -6,6 +6,23 @@ namespace banggame {
 
     using visit_cards = play_visitor<target_type::cards_other_players>;
 
+    template<> bool visit_cards::possible(const effect_context &ctx) {
+        return true;
+    }
+
+    template<> serial::card_list visit_cards::random_target(const effect_context &ctx) {
+        serial::card_list ret;
+        for (player *target : range_other_players(origin)) {
+            if (auto targets = rv::concat(
+                target->m_table | rv::remove_if(&card::is_black),
+                target->m_hand | rv::take(1)
+            )) {
+                ret.push_back(random_element(targets, origin->m_game->rng));
+            }
+        }
+        return ret;
+    }
+
     template<> game_string visit_cards::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
         if (!rn::all_of(origin->m_game->m_players | rv::filter(&player::alive), [&](player *p) {
             size_t found = rn::count(target_cards, p, &card::owner);

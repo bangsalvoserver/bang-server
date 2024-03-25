@@ -44,28 +44,6 @@ namespace banggame {
             });
     }
 
-    rn::any_view<std::pair<player *, player *>> make_adjacent_players_target_set(player *origin, card *origin_card, const effect_context &ctx) {
-        effect_holder effect1 { .player_filter = target_player_filter::notself | target_player_filter::reachable };
-        effect_holder effect2 { .player_filter = target_player_filter::notself };
-        return make_player_target_set(origin, origin_card, effect1, ctx) | rv::for_each([=](player *target1) {
-            return make_player_target_set(origin, origin_card, effect2, ctx) | rv::transform([=](player *target2) {
-                return std::pair{target1, target2};
-            });
-        })
-        | rv::filter([=](const auto &targets) {
-            auto [target1, target2] = targets;
-            return origin->m_game->calc_distance(target1, target2) == 1;
-        });
-    }
-
-    rn::any_view<card *> make_move_cube_target_set(player *origin, card *origin_card, const effect_context &ctx) {
-        return origin->m_table
-            | rv::filter(&card::is_orange)
-            | rv::for_each([](card *slot) {
-                return rv::repeat_n(slot, max_cubes - slot->num_cubes);
-            });
-    }
-
     rn::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
         if (bool(holder.card_filter & target_card_filter::pick_card)) {
             return get_pick_cards(origin);
@@ -129,32 +107,10 @@ namespace banggame {
     }
 
     bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx) {
-        return !effects.empty() && rn::all_of(effects, [&](const effect_holder &holder) {
-            switch (holder.target) {
-            case target_type::none:
-                return !holder.get_error(origin_card, origin, ctx);
-            case target_type::player:
-            case target_type::player_per_cube:
-                return contains_at_least(make_player_target_set(origin, origin_card, holder, ctx), 1);
-            case target_type::adjacent_players:
-                return contains_at_least(make_adjacent_players_target_set(origin, origin_card, ctx), 1);
-            case target_type::card:
-            case target_type::max_cards:
-                return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
-            case target_type::extra_card:
-                return ctx.repeat_card || contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), 1);
-            case target_type::cards:
-                return contains_at_least(make_card_target_set(origin, origin_card, holder, ctx), std::max<int>(1, holder.target_value));
-            case target_type::move_cube_slot:
-                return origin->first_character()->num_cubes != 0
-                    && contains_at_least(make_move_cube_target_set(origin, origin_card, ctx), 1);
-            case target_type::select_cubes:
-                return origin->count_cubes() >= holder.target_value;
-            case target_type::self_cubes:
-                return origin_card->num_cubes >= holder.target_value;
-            default:
-                return true;
-            }
+        return !effects.empty() && rn::all_of(effects, [&](const effect_holder &effect) {
+            return enums::visit_enum([&]<target_type E>(enums::enum_tag_t<E>) {
+                return play_visitor<E>{origin, origin_card, effect}.possible(ctx);
+            }, effect.target);
         });
     }
 
