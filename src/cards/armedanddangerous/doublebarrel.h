@@ -13,6 +13,8 @@ namespace banggame {
     struct modifier_doublebarrel : modifier_bangmod {
         game_string on_prompt(card *origin_card, player *origin, card *playing_card);
     };
+
+    DEFINE_MODIFIER(doublebarrel, modifier_doublebarrel)
 }
 
 #endif

@@ -15,6 +15,8 @@ namespace banggame {
         game_string get_error(card *origin_card, player *origin, card *playing_card);
         void add_context(card *origin_card, player *origin, effect_context &ctx);
     };
+    
+    DEFINE_MODIFIER(belltower, modifier_belltower)
 }
 
 #endif

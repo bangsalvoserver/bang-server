@@ -10,6 +10,8 @@ namespace banggame {
 
         void add_context(card *origin_card, player *origin, effect_context &ctx);
     };
+
+    DEFINE_MODIFIER(discount, modifier_discount)
 }
 
 #endif

@@ -13,6 +13,8 @@ namespace banggame {
     struct modifier_bigfifty : modifier_bangmod {
         void add_context(card *origin_card, player *origin, effect_context &ctx);
     };
+
+    DEFINE_MODIFIER(bigfifty, modifier_bigfifty)
 }
 
 #endif

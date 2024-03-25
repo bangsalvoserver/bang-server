@@ -195,7 +195,6 @@ namespace banggame {
 
     enum class effect_type;
     enum class equip_type;
-    enum class modifier_type;
 
     enum class target_player_filter;
     enum class target_card_filter;

@@ -9,6 +9,10 @@
 
 namespace banggame {
 
+    DEFINE_STRUCT(modifier_holder,
+        (serial::modifier_type, type)
+    )
+
     DEFINE_STRUCT(mth_holder,
         (serial::mth_type, type)
         (serial::int_list, args)
@@ -57,7 +61,7 @@ namespace banggame {
         }
 
         bool is_modifier() const {
-            return static_cast<bool>(modifier.type);
+            return modifier.type != nullptr;
         }
 
         std::optional<short> get_tag_value(tag_type tag) const {

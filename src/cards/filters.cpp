@@ -44,15 +44,15 @@ namespace banggame::filters::detail {
         return target->sign;
     }
 
-    card_color_type get_card_color(card *target) {
+    card_color_type get_card_color(const card *target) {
         return target->color;
     }
 
-    pocket_type get_card_pocket(card *target) {
+    pocket_type get_card_pocket(const card *target) {
         return target->pocket;
     }
 
-    card_deck_type get_card_deck(card *target) {
+    card_deck_type get_card_deck(const card *target) {
         return target->deck;
     }
 

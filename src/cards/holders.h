@@ -40,15 +40,6 @@ namespace banggame {
         void on_disable(card *target_card, player *target) const;
         bool is_nodisable() const;
     )
-
-    DEFINE_STRUCT(modifier_holder,
-        (modifier_type, type),
-        
-        void add_context(card *origin_card, player *origin, effect_context &ctx) const;
-
-        game_string get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx) const;
-        game_string on_prompt(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) const;
-    )
 }
 
 #endif

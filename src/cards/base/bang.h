@@ -46,6 +46,8 @@ namespace banggame {
         bool valid_with_card(card *origin_card, player *origin, card *target_card);
     };
 
+    DEFINE_MODIFIER(bangmod, modifier_bangmod)
+
     class missable_request {
     public:
         size_t num_cards_used() const {

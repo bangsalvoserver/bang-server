@@ -13,6 +13,8 @@ namespace banggame {
         bool valid_with_card(card *origin_card, player *origin, card *target_card);
         void add_context(card *origin_card, player *origin, effect_context &ctx);
     };
+    
+    DEFINE_MODIFIER(card_choice, modifier_card_choice)
 }
 
 #endif

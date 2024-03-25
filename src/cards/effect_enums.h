@@ -220,23 +220,6 @@ namespace banggame {
         (emiliano,              equip_emiliano)
     )
 
-    DEFINE_ENUM_FWD_TYPES(modifier_type,
-        (none)
-        (bangmod,               modifier_bangmod)
-        (doublebarrel,          modifier_doublebarrel)
-        (bigfifty,              modifier_bigfifty)
-        (bandolier,             modifier_bandolier)
-        (belltower,             modifier_belltower)
-        (card_choice,           modifier_card_choice)
-        (discount,              modifier_discount)
-        (leevankliff,           modifier_leevankliff)
-        (spike_spiezel,         modifier_spike_spiezel)
-        (moneybag,              modifier_moneybag)
-        (sgt_blaze,             modifier_sgt_blaze)
-        (traincost,             modifier_traincost)
-        (locomotive,            modifier_locomotive)
-    )
-
 }
 
 #endif

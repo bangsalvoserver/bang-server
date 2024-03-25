@@ -32,9 +32,9 @@ namespace banggame::filters {
         int count_player_cubes(player_ptr origin);
         int get_distance(player_ptr origin, player_ptr target);
         card_sign get_card_sign(card_ptr target);
-        card_color_type get_card_color(card_ptr target);
-        pocket_type get_card_pocket(card_ptr target);
-        card_deck_type get_card_deck(card_ptr target);
+        card_color_type get_card_color(const_card_ptr target);
+        pocket_type get_card_pocket(const_card_ptr target);
+        card_deck_type get_card_deck(const_card_ptr target);
         std::optional<short> get_card_tag(card_ptr target, tag_type tag);
         bool is_cube_slot(card_ptr target);
         card_ptr get_request_origin_card(player_ptr origin);
@@ -129,7 +129,7 @@ namespace banggame::filters {
         return {};
     }
 
-    inline bool is_equip_card(detail::card_ptr target) {
+    inline bool is_equip_card(detail::const_card_ptr target) {
         switch (detail::get_card_pocket(target)) {
         case pocket_type::player_hand:
         case pocket_type::shop_selection:

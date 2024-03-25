@@ -2,9 +2,19 @@
 
 #include "game/game.h"
 
+#include "cards/filters.h"
+
 namespace banggame {
     bool player_is_bot(const player *origin) {
         return origin->is_bot();
+    }
+
+    bool card_is_equip(const card *origin_card) {
+        return filters::is_equip_card(origin_card);
+    }
+
+    bool card_is_modifier(const card *origin_card) {
+        return origin_card->is_modifier();
     }
 }
 
@@ -66,6 +76,14 @@ template<> json serializer<banggame::serial::card_format, banggame::game_context
         });
     } else {
         return json::object();
+    }
+}
+
+template<> json serializer<banggame::serial::modifier_type, banggame::game_context>::operator()(banggame::serial::modifier_type value) const {
+    if (value) {
+        return std::string(value->name);
+    } else {
+        return "none";
     }
 }
 

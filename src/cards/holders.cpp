@@ -238,66 +238,6 @@ namespace banggame {
         }(enums::make_enum_sequence<equip_type>());
         return nodisable_table[enums::indexof(type)];
     }
-
-    void modifier_holder::add_context(card *origin_card, player *origin, effect_context &ctx) const {
-        enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) {
-            if constexpr (enums::value_with_type<E>) {
-                enums::enum_type_t<E> handler;
-                if constexpr (requires { handler.add_context(origin_card, origin, ctx); }) {
-                    handler.add_context(origin_card, origin, ctx);
-                }
-            }
-        }, type);
-    }
-
-    game_string modifier_holder::get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx) const {
-        return enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) -> game_string {
-            if constexpr (enums::value_with_type<E>) {
-                enums::enum_type_t<E> handler;
-                if (filters::is_equip_card(target_card)) {
-                    if constexpr (requires { handler.valid_with_equip(origin_card, origin, target_card); }) {
-                        if (handler.valid_with_equip(origin_card, origin, target_card)) {
-                            return {};
-                        } else {
-                            return {"ERROR_CANT_PLAY_WHILE_EQUIPPING", origin_card, target_card};
-                        }
-                    }
-                } else if (target_card->is_modifier()) {
-                    if constexpr (requires { handler.valid_with_modifier(origin_card, origin, target_card); }) {
-                        if (handler.valid_with_modifier(origin_card, origin, target_card)) {
-                            return {};
-                        } else {
-                            return {"ERROR_NOT_ALLOWED_WITH_MODIFIER", origin_card, target_card};
-                        }
-                    }
-                }
-                if constexpr (requires { handler.valid_with_card(origin_card, origin, target_card); }) {
-                    if (!handler.valid_with_card(origin_card, origin, target_card)) {
-                        return {"ERROR_NOT_ALLOWED_WITH_CARD", origin_card, target_card};
-                    }
-                }
-                if constexpr (requires { handler.get_error(origin_card, origin, target_card, ctx); }) {
-                    return handler.get_error(origin_card, origin, target_card, ctx);
-                } else if constexpr (requires { handler.get_error(origin_card, origin, target_card); }) {
-                    return handler.get_error(origin_card, origin, target_card);
-                }
-            }
-            return {};
-        }, type);
-    }
-
-    game_string modifier_holder::on_prompt(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) const {
-        return enums::visit_enum([&]<modifier_type E>(enums::enum_tag_t<E>) -> game_string {
-            if constexpr (enums::value_with_type<E>) {
-                enums::enum_type_t<E> handler;
-                if constexpr (requires { handler.on_prompt(origin_card, origin, playing_card, ctx); }) {
-                    return handler.on_prompt(origin_card, origin, playing_card);
-                } else if constexpr (requires { handler.on_prompt(origin_card, origin, playing_card); }) {
-                    return handler.on_prompt(origin_card, origin, playing_card);
-                }
-            }
-            return {};
-        }, type);
     }
 
 }
