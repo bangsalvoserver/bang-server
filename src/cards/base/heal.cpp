@@ -7,8 +7,10 @@ namespace banggame {
     
     game_string effect_heal::on_prompt(card *origin_card, player *origin, player *target) {
         MAYBE_RETURN(prompt_target_ghost{}.on_prompt(origin_card, origin, target));
-        if (origin->m_hp + amount > origin->m_max_hp) {
-            return {"PROMPT_WASTEFUL_HEAL", origin_card, amount, origin->m_hp + amount - origin->m_max_hp};
+        if (target->m_hp == target->m_max_hp) {
+            return {"PROMPT_CARD_NO_EFFECT", origin_card};
+        } else if (target->m_hp + amount > target->m_max_hp) {
+            return {"PROMPT_WASTEFUL_HEAL", origin_card, amount, target->m_hp + amount - target->m_max_hp};
         }
         return {};
     }
