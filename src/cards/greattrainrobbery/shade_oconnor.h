@@ -10,6 +10,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
+    DEFINE_EFFECT(shade_oconnor, effect_shade_oconnor)
+
     struct equip_shade_oconnor : event_equip {
         void on_enable(card *target_card, player *target);
     };

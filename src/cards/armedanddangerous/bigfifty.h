@@ -10,6 +10,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
+    DEFINE_EFFECT(bigfifty, effect_bigfifty)
+
     struct modifier_bigfifty : modifier_bangmod {
         void add_context(card *origin_card, player *origin, effect_context &ctx);
     };

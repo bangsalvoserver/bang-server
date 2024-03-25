@@ -52,7 +52,7 @@ def parse_effects(effect_list):
             'card_filter':      CppEnum('target_card_filter', card_filter) if card_filter else None,
             'effect_value':     int(effect_value) if effect_value else None,
             'target_value':     int(target_value) if target_value else None,
-            'type':             CppEnum('effect_type', effect_type)
+            'type':             CppLiteral(f'GET_EFFECT({effect_type})')
         })
     return result
 

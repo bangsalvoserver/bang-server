@@ -21,6 +21,8 @@ namespace banggame {
         void on_resolve(card *origin_card, player *origin, card *target);
     };
 
+    DEFINE_EFFECT(steal, effect_steal)
+
     struct effect_discard {
         bool used;
         effect_discard(int value = 0) : used(value) {}
@@ -30,10 +32,14 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, card *target);
     };
 
+    DEFINE_EFFECT(discard, effect_discard)
+
     struct effect_destroy: prompt_target_self, bot_suggestion::target_enemy_card {
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
         void on_resolve(card *origin_card, player *origin, card *target);
     };
+
+    DEFINE_EFFECT(destroy, effect_destroy)
 
     struct request_targeting : request_base, resolvable_request {
         request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {}, int priority = 40)

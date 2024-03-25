@@ -10,6 +10,8 @@ namespace banggame {
     struct card;
     struct player;
     struct card_format;
+
+    struct effect_vtable;
     struct modifier_vtable;
     struct mth_vtable;
 
@@ -37,6 +39,8 @@ namespace banggame {
         using opt_player = player;
         using card_format = banggame::card_format;
         using int_list = std::vector<int>;
+
+        using effect_vtable = std::string;
         using modifier_type = std::string;
         using mth_type = std::string;
 
@@ -54,6 +58,7 @@ namespace banggame::serial {
     using opt_player = banggame::player *;
     using player = not_null<opt_player>;
     using int_list = small_int_set;
+    using effect_type = const banggame::effect_vtable *;
     using modifier_type = const banggame::modifier_vtable *;
     using mth_type = const banggame::mth_vtable *;
     
@@ -64,7 +69,7 @@ namespace banggame::serial {
     };
 
     template<typename T>
-    concept serializable = is_one_of<T, opt_card, card, opt_player, player, card_format, modifier_type, mth_type>;
+    concept serializable = is_one_of<T, opt_card, card, opt_player, player, card_format, effect_type, modifier_type, mth_type>;
 }
 
 #ifndef BUILD_BANG_SERVER

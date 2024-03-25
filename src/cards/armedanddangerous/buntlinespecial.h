@@ -8,6 +8,8 @@ namespace banggame {
     struct effect_buntlinespecial {
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(buntlinespecial, effect_buntlinespecial)
 }
 
 #endif

@@ -8,6 +8,15 @@
 #include "holders.h"
 
 namespace banggame {
+    
+    DEFINE_STRUCT(effect_holder,
+        (target_type, target)
+        (target_player_filter, player_filter)
+        (target_card_filter, card_filter)
+        (int8_t, effect_value)
+        (int8_t, target_value)
+        (serial::effect_type, type)
+    )
 
     DEFINE_STRUCT(modifier_holder,
         (serial::modifier_type, type)

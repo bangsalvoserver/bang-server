@@ -13,6 +13,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(al_preacher, effect_al_preacher)
 }
 
 #endif

@@ -8,6 +8,8 @@ namespace banggame {
     struct effect_eva_place {
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(eva_place, effect_eva_place)
 }
 
 #endif

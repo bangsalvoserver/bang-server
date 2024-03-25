@@ -11,6 +11,8 @@ namespace banggame {
         game_string get_error(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target);
     };
+
+    DEFINE_EFFECT(discard_black, effect_discard_black)
 }
 
 #endif

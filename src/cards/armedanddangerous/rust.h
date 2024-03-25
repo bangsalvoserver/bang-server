@@ -8,6 +8,8 @@ namespace banggame {
     struct effect_rust {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
+
+    DEFINE_EFFECT(rust, effect_rust)
 }
 
 #endif

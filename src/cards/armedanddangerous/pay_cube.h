@@ -9,6 +9,8 @@ namespace banggame {
         void add_context(card *origin_card, player *origin, card *target, effect_context &ctx);
         void on_play(card *origin_card, player *origin, const effect_context &ctx);
     };
+
+    DEFINE_EFFECT(pay_cube, effect_pay_cube)
 }
 
 #endif

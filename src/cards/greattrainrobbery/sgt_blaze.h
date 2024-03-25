@@ -21,6 +21,8 @@ namespace banggame {
         void add_context(card *origin_card, player *origin, player *target, effect_context &ctx);
     };
 
+    DEFINE_EFFECT(skip_player, effect_skip_player)
+
     struct equip_sgt_blaze : event_equip {
         void on_enable(card *origin_card, player *origin);
     };

@@ -10,6 +10,8 @@ namespace banggame {
     struct effect_indians : prompt_target_ghost, bot_suggestion::target_enemy {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
+
+    DEFINE_EFFECT(indians, effect_indians)
 }
 
 #endif

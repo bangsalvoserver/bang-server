@@ -9,6 +9,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin);
     };
 
+    DEFINE_EFFECT(human, effect_human)
+
     struct effect_set_playing {
         void add_context(card *origin_card, player *origin, effect_context &ctx) {
             add_context(origin_card, origin, origin_card, ctx);
@@ -16,6 +18,8 @@ namespace banggame {
         
         void add_context(card *origin_card, player *origin, card *target, effect_context &ctx);
     };
+
+    DEFINE_EFFECT(set_playing, effect_set_playing)
 
 }
 

@@ -13,6 +13,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *target);
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(ms_abigail, effect_ms_abigail)
 }
 
 #endif

@@ -11,6 +11,8 @@ namespace banggame {
         
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(full_steam, effect_full_steam)
 }
 
 #endif

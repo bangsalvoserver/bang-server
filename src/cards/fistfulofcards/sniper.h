@@ -10,6 +10,8 @@ namespace banggame {
     struct effect_sniper : prompt_target_ghost, bot_suggestion::target_enemy {
         void on_play(card *origin_card, player *origin, player *target);
     };
+
+    DEFINE_EFFECT(sniper, effect_sniper)
 }
 
 #endif

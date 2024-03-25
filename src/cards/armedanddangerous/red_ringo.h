@@ -12,6 +12,8 @@ namespace banggame {
     struct effect_red_ringo {
         void on_play(card *origin_card, player *origin, card *target);
     };
+
+    DEFINE_EFFECT(red_ringo, effect_red_ringo)
 }
 
 #endif

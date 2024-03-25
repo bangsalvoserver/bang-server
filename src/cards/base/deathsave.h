@@ -21,6 +21,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(deathsave, effect_deathsave)
     
     struct request_death : request_base, resolvable_request {
         request_death(card *origin_card, player *origin, player *target)

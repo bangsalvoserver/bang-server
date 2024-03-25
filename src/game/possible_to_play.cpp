@@ -39,7 +39,7 @@ namespace banggame {
         return origin->m_game->m_players
             | rv::filter([=](player *target) {
                 return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
-                    && !holder.get_error(origin_card, origin, target, ctx);
+                    && !holder.type->get_error_player(holder.effect_value, origin_card, origin, target, ctx);
             });
     }
 
@@ -59,7 +59,7 @@ namespace banggame {
             origin->m_game->m_selection)
             | rv::filter([=](card *target_card) {
                 return !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
-                    && !holder.get_error(origin_card, origin, target_card, ctx);
+                    && !holder.type->get_error_card(holder.effect_value, origin_card, origin, target_card, ctx);
             });
     }
 
@@ -95,7 +95,7 @@ namespace banggame {
                 }
             }
         }
-        return !mth.type->get_error(origin_card, origin, targets, ctx);
+        return !mth.type || !mth.type->get_error(origin_card, origin, targets, ctx);
     }
 
     static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {

@@ -15,6 +15,8 @@ namespace banggame {
         game_string on_prompt(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target);
     };
+
+    DEFINE_EFFECT(add_cube, effect_add_cube)
 }
 
 #endif

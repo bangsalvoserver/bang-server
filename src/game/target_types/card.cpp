@@ -30,16 +30,16 @@ namespace banggame {
         }
         MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target->owner, ctx));
         MAYBE_RETURN(filters::check_card_filter(origin_card, origin, effect.card_filter, target, ctx));
-        return effect.get_error(origin_card, origin, target, ctx);
+        return effect.type->get_error_card(effect.effect_value, origin_card, origin, target, ctx);
     }
 
     template<> game_string visit_card::prompt(const effect_context &ctx, card *target) {
-        return effect.on_prompt(origin_card, origin, target, ctx);
+        return effect.type->on_prompt_card(effect.effect_value, origin_card, origin, target, ctx);
     }
 
     template<> void visit_card::add_context(effect_context &ctx, card *target) {
         ctx.selected_cards.push_back(target);
-        effect.add_context(origin_card, origin, target, ctx);
+        effect.type->add_context_card(effect.effect_value, origin_card, origin, target, ctx);
     }
 
     template<> void visit_card::play(const effect_context &ctx, card *target) {
@@ -48,9 +48,9 @@ namespace banggame {
             flags |= effect_flags::escapable;
         }
         if (target->owner != origin && target->pocket == pocket_type::player_hand) {
-            effect.on_play(origin_card, origin, target->owner->random_hand_card(), flags, ctx);
+            effect.type->on_play_card(effect.effect_value, origin_card, origin, target->owner->random_hand_card(), flags, ctx);
         } else {
-            effect.on_play(origin_card, origin, target, flags, ctx);
+            effect.type->on_play_card(effect.effect_value, origin_card, origin, target, flags, ctx);
         }
     }
 

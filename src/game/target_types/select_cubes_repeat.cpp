@@ -48,7 +48,7 @@ namespace banggame {
     }
 
     template<> void visit_cubes::play(const effect_context &ctx, const serial::card_list &target_cards) {
-        effect.on_play(origin_card, origin, {}, ctx);
+        effect.type->on_play(effect.effect_value, origin_card, origin, {}, ctx);
     }
 
 }

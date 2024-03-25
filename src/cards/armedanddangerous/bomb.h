@@ -12,6 +12,8 @@ namespace banggame {
         game_string get_error(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };
+
+    DEFINE_EFFECT(move_bomb, effect_move_bomb)
     
     struct equip_bomb : event_equip, prompt_target_self, bot_suggestion::target_enemy {
         void on_enable(card *target_card, player *target);

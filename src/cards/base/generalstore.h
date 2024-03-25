@@ -20,6 +20,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, const effect_context &ctx);
         void on_play(card *origin_card, player *origin, player *target);
     };
+
+    DEFINE_EFFECT(generalstore, effect_generalstore)
 }
 
 #endif

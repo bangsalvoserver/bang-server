@@ -10,6 +10,8 @@
 #include "net/options.h"
 
 #include "effect_vtable.h"
+#include "modifier_vtable.h"
+#include "mth_vtable.h"
 
 namespace banggame {
 

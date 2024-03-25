@@ -14,6 +14,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(tumbleweed, effect_tumbleweed)
 }
 
 #endif

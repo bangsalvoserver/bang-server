@@ -9,6 +9,8 @@ namespace banggame {
     struct effect_disarm : effect_missed {
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(disarm, effect_disarm)
 }
 
 #endif

@@ -8,6 +8,8 @@ namespace banggame {
     struct effect_circus_wagon {
         void on_play(card *origin_card, player *origin, player *target);
     };
+
+    DEFINE_EFFECT(circus_wagon, effect_circus_wagon)
 }
 
 #endif

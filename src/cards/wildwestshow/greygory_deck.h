@@ -12,6 +12,8 @@ namespace banggame {
     struct effect_greygory_deck {
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(greygory_deck, effect_greygory_deck)
 }
 
 #endif

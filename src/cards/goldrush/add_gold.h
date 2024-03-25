@@ -11,6 +11,8 @@ namespace banggame {
 
         void on_play(card *origin_card, player *origin, player *target);
     };
+
+    DEFINE_EFFECT(add_gold, effect_add_gold)
 }
 
 #endif

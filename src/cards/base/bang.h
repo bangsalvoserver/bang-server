@@ -11,10 +11,14 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
 
+    DEFINE_EFFECT(bang, effect_bang)
+
     struct effect_bangcard : prompt_target_ghost, bot_suggestion::target_enemy {
         game_string get_error(card *origin_card, player *origin, player *target, const effect_context &ctx);
         void on_play(card *origin_card, player *origin, player *target);
     };
+
+    DEFINE_EFFECT(bangcard, effect_bangcard)
 
     struct handler_play_as_bang {
         bool on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
@@ -29,6 +33,8 @@ namespace banggame {
         game_string get_error(card *origin_card, player *origin, const effect_context &ctx);
         void on_play(card *origin_card, player *origin, const effect_context &ctx);
     };
+
+    DEFINE_EFFECT(banglimit, effect_banglimit)
 
     struct equip_treat_as_bang {
         player_flags flag;
@@ -124,6 +130,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
+    
+    DEFINE_EFFECT(bangresponse, effect_bangresponse)
 
 }
 

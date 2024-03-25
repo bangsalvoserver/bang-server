@@ -79,6 +79,10 @@ template<> json serializer<banggame::serial::card_format, banggame::game_context
     }
 }
 
+template<> json serializer<banggame::serial::effect_type, banggame::game_context>::operator()(banggame::serial::effect_type value) const {
+    return std::string(value->name);
+}
+
 template<> json serializer<banggame::serial::modifier_type, banggame::game_context>::operator()(banggame::serial::modifier_type value) const {
     if (value) {
         return std::string(value->name);
@@ -88,7 +92,11 @@ template<> json serializer<banggame::serial::modifier_type, banggame::game_conte
 }
 
 template<> json serializer<banggame::serial::mth_type, banggame::game_context>::operator()(banggame::serial::mth_type value) const {
-    return std::string(value->name);
+    if (value) {
+        return std::string(value->name);
+    } else {
+        return "none";
+    }
 }
 
 }

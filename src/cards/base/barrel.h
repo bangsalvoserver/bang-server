@@ -8,6 +8,8 @@ namespace banggame {
     struct effect_barrel : effect_missed {
         void on_play(card *origin_card, player *target);
     };
+
+    DEFINE_EFFECT(barrel, effect_barrel)
 }
 
 #endif
