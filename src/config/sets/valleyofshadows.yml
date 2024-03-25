@@ -19,7 +19,7 @@ main_deck:
       - weapon(1)
     effects:
       - banglimit
-      - none card self | hand not_bangcard
+      - set_playing card self | hand not_bangcard
       - none player reachable notself
     mth_effect: play_as_bang(1,2)
     tags:
@@ -154,7 +154,7 @@ character:
     image: 07_derspot
     effects:
       - max_usages(1)
-      - none card self | hand bang
+      - set_playing card self | hand bang
       - none players notself
     mth_effect: play_as_bang(1,2)
   - name: EVELYN_SHEBANG

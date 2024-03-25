@@ -11,6 +11,7 @@ namespace banggame {
         (none)
         (pick,                  effect_pick)
         (human,                 effect_human)
+        (set_playing,           effect_set_playing)
         (max_usages,            effect_max_usages)
         (pass_turn,             effect_pass_turn)
         (resolve,               effect_resolve)

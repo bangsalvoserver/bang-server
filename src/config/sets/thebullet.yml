@@ -27,7 +27,7 @@ character:
       - treat_as_bang(2)
     effects:
       - banglimit
-      - none card self | hand not_bangcard
+      - set_playing card self | hand not_bangcard
       - none player reachable notself
     mth_effect: play_as_bang(1,2)
     tags:

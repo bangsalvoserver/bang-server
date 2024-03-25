@@ -31,6 +31,7 @@
 #include "slab_the_killer.h"
 #include "steal_destroy.h"
 #include "suzy_lafayette.h"
+#include "utils.h"
 #include "volcanic.h"
 #include "vulture_sam.h"
 #include "weapon.h"

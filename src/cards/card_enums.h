@@ -170,6 +170,7 @@ namespace banggame {
         (serial::opt_player, skipped_player)
         (serial::opt_card, repeat_card)
         (serial::opt_card, traincost)
+        (serial::opt_card, playing_card)
         (int8_t, train_advance)
         (int8_t, locomotive_count)
         (int8_t, discount)

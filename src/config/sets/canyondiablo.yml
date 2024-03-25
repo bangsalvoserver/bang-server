@@ -96,7 +96,7 @@ main_deck:
       - weapon(2)
     effects:
       - max_usages(1)
-      - none card self | hand bang
+      - set_playing card self | hand bang
       - discard card self | hand
       - none players notself
     mth_effect: play_as_bang(1,3)
@@ -309,6 +309,7 @@ character:
     effects:
       - max_usages(1)
       - discard card self | hand bang
+      - set_playing
   - name: TEREN_KILL_2
     image: 20_teren_kill
     equip:

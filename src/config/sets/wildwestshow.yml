@@ -36,6 +36,7 @@ character:
     modifier: leevankliff
     effects:
       - discard card self | hand bang
+      - set_playing
   - name: TEREN_KILL
     image: 06_terenkill
     equip:
@@ -81,11 +82,11 @@ wildwestshow:
       - showdown
     effects:
       - banglimit
-      - none card self | hand not_bangcard
+      - set_playing card self | hand not_bangcard
       - none player reachable notself
     mth_effect: play_as_bang(1,2)
     responses:
-      - none card self | hand bangcard
+      - set_playing card self | hand bangcard
     mth_response: play_as_missed(0)
     tags:
       - play_as_bang

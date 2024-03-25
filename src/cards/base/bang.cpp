@@ -8,10 +8,6 @@
 #include "damage.h"
 
 namespace banggame {
-
-    bool effect_human::can_play(card *origin_card, player *origin) {
-        return !origin->is_bot();
-    }
     
     void effect_bang::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
         if (!bool(flags & effect_flags::multi_target)) {

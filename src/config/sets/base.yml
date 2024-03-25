@@ -292,11 +292,11 @@ character:
       - treat_as_bang(1)
     effects:
       - banglimit
-      - none card self | hand missed
+      - set_playing card self | hand missed
       - none player reachable notself
     mth_effect: play_as_bang(1,2)
     responses:
-      - none card self | hand bangcard
+      - set_playing card self | hand bangcard
     mth_response: play_as_missed(0)
     tags:
       - play_as_bang

@@ -30,6 +30,7 @@ target_sources(bangserver PRIVATE
     slab_the_killer.cpp
     steal_destroy.cpp
     suzy_lafayette.cpp
+    utils.cpp
     volcanic.cpp
     vulture_sam.cpp
     weapon.cpp
