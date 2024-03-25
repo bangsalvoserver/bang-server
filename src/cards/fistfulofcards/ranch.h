@@ -13,6 +13,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin, const serial::card_list &target_cards);
         void on_play(card *origin_card, player *origin, const serial::card_list &target_cards);
     };
+
+    DEFINE_MTH(ranch, handler_ranch)
 }
 
 #endif

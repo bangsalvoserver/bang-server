@@ -27,6 +27,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };
+
+    DEFINE_MTH(sgt_blaze, handler_sgt_blaze)
 }
 
 #endif

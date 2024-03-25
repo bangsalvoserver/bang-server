@@ -14,6 +14,8 @@ namespace banggame {
         game_string on_prompt(card *origin_card, player *origin, card *discarded_card, bool paid_cubes);
         void on_play(card *origin_card, player *origin, card *discarded_card, bool paid_cubes);
     };
+
+    DEFINE_MTH(squaw, handler_squaw)
 }
 
 #endif

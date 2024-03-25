@@ -220,24 +220,6 @@ namespace banggame {
         (emiliano,              equip_emiliano)
     )
 
-    DEFINE_ENUM_FWD_TYPES(mth_type,
-        (none)
-        (play_as_bang,          handler_play_as_bang)
-        (play_as_missed,        handler_play_as_missed)
-        (claus_the_saint,       handler_claus_the_saint)
-        (doc_holyday,           handler_doc_holyday)
-        (flint_westwood,        handler_flint_westwood)
-        (flintlock,             handler_flintlock)
-        (duck,                  handler_duck)
-        (squaw,                 handler_squaw)
-        (sgt_blaze,             handler_sgt_blaze)
-        (lastwill,              handler_lastwill)
-        (switch_cards,          handler_switch_cards)
-        (lounge_car,            handler_lounge_car)
-        (mail_car,              handler_mail_car)
-        (ranch,                 handler_ranch)
-    )
-
     DEFINE_ENUM_FWD_TYPES(modifier_type,
         (none)
         (bangmod,               modifier_bangmod)

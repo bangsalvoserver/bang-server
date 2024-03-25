@@ -18,6 +18,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin, card *target_card, player *target);
         void on_play(card *origin_card, player *origin, card *target_card, player *target);  
     };
+
+    DEFINE_MTH(mail_car, handler_mail_car)
 }
 
 #endif

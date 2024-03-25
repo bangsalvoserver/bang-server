@@ -19,6 +19,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target);
         void on_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target);
     };
+
+    DEFINE_MTH(lastwill, handler_lastwill)
 }
 
 #endif

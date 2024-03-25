@@ -2,6 +2,12 @@
 
 #include "game/game.h"
 
+namespace banggame {
+    bool player_is_bot(const player *origin) {
+        return origin->is_bot();
+    }
+}
+
 namespace json {
 
 template<> json serializer<banggame::card *, banggame::game_context>::operator()(banggame::card *card) const {
@@ -61,6 +67,10 @@ template<> json serializer<banggame::serial::card_format, banggame::game_context
     } else {
         return json::object();
     }
+}
+
+template<> json serializer<banggame::serial::mth_type, banggame::game_context>::operator()(banggame::serial::mth_type value) const {
+    return std::string(value->name);
 }
 
 }

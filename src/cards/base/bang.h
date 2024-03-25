@@ -23,6 +23,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
     };
 
+    DEFINE_MTH(play_as_bang, handler_play_as_bang)
+
     struct effect_banglimit {
         game_string get_error(card *origin_card, player *origin, const effect_context &ctx);
         void on_play(card *origin_card, player *origin, const effect_context &ctx);

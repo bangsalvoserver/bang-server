@@ -95,7 +95,7 @@ namespace banggame {
                 }
             }
         }
-        return !mth.get_error(origin_card, origin, targets, ctx);
+        return !mth.type->get_error(origin_card, origin, targets, ctx);
     }
 
     static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {

@@ -3,7 +3,7 @@
 import re
 import sys
 import yaml_custom as yaml
-from cpp_generator import CppEnum, print_cpp_file
+from cpp_generator import CppEnum, CppLiteral, print_cpp_file
 
 def parse_sign(sign):
     match = re.match(r'^\s*([\w\d]+)\s*(\w+)\s*$', sign)
@@ -113,7 +113,7 @@ def parse_mth(effect):
     effect_type = match.group(1)
     effect_value = match.group(2)
     return {
-        'type': CppEnum('mth_type', effect_type),
+        'type': CppLiteral(f'GET_MTH({effect_type})'),
         'args': [int(value.strip()) for value in effect_value.split(',')]
     }
 
@@ -202,7 +202,7 @@ def parse_file(data):
 
     return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
 
-INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/effect_enums.h']
+INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/effect_enums.h', 'cards/effects.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':

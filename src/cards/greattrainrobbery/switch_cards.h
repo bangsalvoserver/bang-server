@@ -13,6 +13,8 @@ namespace banggame {
         game_string get_error(card *origin_card, player *origin, card *chosen_card, card *target_card);
         void on_play(card *origin_card, player *origin, card *chosen_card, card *target_card);
     };
+
+    DEFINE_MTH(switch_cards, handler_switch_cards)
 }
 
 #endif

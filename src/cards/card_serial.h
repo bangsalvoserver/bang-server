@@ -10,6 +10,9 @@ namespace banggame {
     struct card;
     struct player;
     struct card_format;
+    struct mth_vtable;
+
+    bool player_is_bot(const player *p);
 }
 
 template<typename T, typename ... Ts>
@@ -31,6 +34,7 @@ namespace banggame {
         using opt_player = player;
         using card_format = banggame::card_format;
         using int_list = std::vector<int>;
+        using mth_type = std::string;
 
         template<typename T>
         concept serializable = is_one_of<T, card, player>;
@@ -46,6 +50,7 @@ namespace banggame::serial {
     using opt_player = banggame::player *;
     using player = not_null<opt_player>;
     using int_list = small_int_set;
+    using mth_type = const banggame::mth_vtable *;
     
     struct card_format {
         banggame::card *card;
@@ -54,7 +59,7 @@ namespace banggame::serial {
     };
 
     template<typename T>
-    concept serializable = is_one_of<T, opt_card, card, opt_player, player, card_format>;
+    concept serializable = is_one_of<T, opt_card, card, opt_player, player, card_format, mth_type>;
 }
 
 #ifndef BUILD_BANG_SERVER

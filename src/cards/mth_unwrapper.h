@@ -1,7 +1,7 @@
 #ifndef __MTH_UNWRAPPER_H__
 #define __MTH_UNWRAPPER_H__
 
-#include "cards/card_effect.h"
+#include "cards/card_data.h"
 
 #include <stdexcept>
 

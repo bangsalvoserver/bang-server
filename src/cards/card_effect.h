@@ -1,24 +1,19 @@
 #ifndef __CARD_EFFECT_H__
 #define __CARD_EFFECT_H__
 
+#include <memory>
+
 #include "card_enums.h"
 
 #include "game/game_string.h"
 
 #include "net/options.h"
 
-#include <memory>
+#include "effect_vtable.h"
 
 namespace banggame {
 
     struct effect_holder;
-
-    struct effect_target_pair {
-        const effect_holder &effect;
-        play_card_target target;
-    };
-    
-    using effect_target_list = std::vector<effect_target_pair>;
 
     struct event_equip {
         void on_disable(card *target_card, player *target);

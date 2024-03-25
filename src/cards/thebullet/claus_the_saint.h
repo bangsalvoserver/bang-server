@@ -13,6 +13,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin, card *target_card, player *target_player);
         void on_play(card *origin_card, player *origin, card *target_card, player *target_player);
     };
+
+    DEFINE_MTH(claus_the_saint, handler_claus_the_saint)
 }
 
 #endif

@@ -118,6 +118,15 @@ namespace banggame {
     using play_card_target = enums::enum_variant<target_type>;
     using target_list = std::vector<play_card_target>;
 
+    struct effect_holder;
+
+    struct effect_target_pair {
+        const effect_holder &effect;
+        const play_card_target &target;
+    };
+    
+    using effect_target_list = std::vector<effect_target_pair>;
+
     DEFINE_ENUM(card_deck_type,
         (none)
         (main_deck)
@@ -186,7 +195,6 @@ namespace banggame {
 
     enum class effect_type;
     enum class equip_type;
-    enum class mth_type;
     enum class modifier_type;
 
     enum class target_player_filter;

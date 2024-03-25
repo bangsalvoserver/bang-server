@@ -300,46 +300,4 @@ namespace banggame {
         }, type);
     }
 
-    game_string mth_holder::get_error(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx) const {
-        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> game_string {
-            if constexpr (enums::value_with_type<E>) {
-                using handler_type = enums::enum_type_t<E>;
-                if constexpr (requires { mth_unwrapper{&handler_type::get_error}; }) {
-                    return mth_unwrapper{&handler_type::get_error}(origin_card, origin, targets, ctx);
-                } else  if constexpr (requires { mth_unwrapper{&handler_type::can_play}; }) {
-                    if (!mth_unwrapper{&handler_type::can_play}(origin_card, origin, targets, ctx)) {
-                        return "ERROR_INVALID_ACTION";
-                    }
-                }
-            }
-            return {};
-        }, type);
-    }
-
-    game_string mth_holder::on_prompt(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx) const {
-        return enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) -> game_string {
-            if constexpr (enums::value_with_type<E>) {
-                using handler_type = enums::enum_type_t<E>;
-                if constexpr (requires { mth_unwrapper{&handler_type::on_check_target}; }) {
-                    if (origin->is_bot() && !mth_unwrapper{&handler_type::on_check_target}(origin_card, origin, targets, ctx)) {
-                        return "BOT_BAD_PLAY";
-                    }
-                }
-                if constexpr (requires { mth_unwrapper{&handler_type::on_prompt}; }) {
-                    return mth_unwrapper{&handler_type::on_prompt}(origin_card, origin, targets, ctx);
-                }
-            }
-            return {};
-        }, type);
-    }
-    
-    void mth_holder::on_play(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx) const {
-        enums::visit_enum([&]<mth_type E>(enums::enum_tag_t<E>) {
-            if constexpr (enums::value_with_type<E>) {
-                using handler_type = enums::enum_type_t<E>;
-                return mth_unwrapper{&handler_type::on_play}(origin_card, origin, targets, ctx);
-            }
-        }, type);
-    }
-
 }

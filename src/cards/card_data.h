@@ -9,6 +9,16 @@
 
 namespace banggame {
 
+    DEFINE_STRUCT(mth_holder,
+        (serial::mth_type, type)
+        (serial::int_list, args)
+    )
+
+    DEFINE_STRUCT(tag_holder,
+        (short, tag_value)
+        (tag_type, type)
+    )
+
     using effect_list = std::vector<effect_holder>;
     using equip_list = std::vector<equip_holder>;
     using tag_list = std::vector<tag_holder>;

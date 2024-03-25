@@ -12,6 +12,8 @@ namespace banggame {
         }
         void on_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target);
     };
+
+    DEFINE_MTH(doc_holyday, handler_doc_holyday)
 }
 
 #endif
