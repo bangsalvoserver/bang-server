@@ -83,6 +83,10 @@ template<> json serializer<banggame::serial::effect_type, banggame::game_context
     return std::string(value->name);
 }
 
+template<> json serializer<banggame::serial::equip_type, banggame::game_context>::operator()(banggame::serial::equip_type value) const {
+    return std::string(value->name);
+}
+
 template<> json serializer<banggame::serial::modifier_type, banggame::game_context>::operator()(banggame::serial::modifier_type value) const {
     if (value) {
         return std::string(value->name);

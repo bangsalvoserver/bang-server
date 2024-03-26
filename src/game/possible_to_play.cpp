@@ -78,16 +78,16 @@ namespace banggame {
                 switch (effect.target) {
                 case target_type::none:
                     return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                        vector_concat(targets, effect, play_card_target{enums::enum_tag<target_type::none>}));
+                        vector_concat(targets, play_card_target{enums::enum_tag<target_type::none>}, effect));
                 case target_type::player:
                     return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
                         return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                            vector_concat(targets, effect, play_card_target{enums::enum_tag<target_type::player>, target}));
+                            vector_concat(targets, play_card_target{enums::enum_tag<target_type::player>, target}, effect));
                     });
                 case target_type::card:
                     return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
                         return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                            vector_concat(targets, effect, play_card_target{enums::enum_tag<target_type::card>, target}));
+                            vector_concat(targets, play_card_target{enums::enum_tag<target_type::card>, target}, effect));
                     });
                 default:
                     // ignore other target types

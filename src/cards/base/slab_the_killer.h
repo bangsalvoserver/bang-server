@@ -8,6 +8,8 @@ namespace banggame {
     struct equip_slab_the_killer : event_equip {
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(slab_the_killer, equip_slab_the_killer)
 }
 
 #endif

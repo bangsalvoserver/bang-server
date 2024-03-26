@@ -9,6 +9,8 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
+    DEFINE_EQUIP(red_ringo, equip_red_ringo)
+
     struct effect_red_ringo {
         void on_play(card *origin_card, player *origin, card *target);
     };

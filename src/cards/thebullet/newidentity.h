@@ -9,6 +9,8 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
+    DEFINE_EQUIP(newidentity, equip_newidentity)
+
 }
 
 #endif

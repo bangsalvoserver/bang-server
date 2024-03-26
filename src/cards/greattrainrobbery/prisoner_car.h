@@ -8,6 +8,8 @@ namespace banggame {
     struct equip_prisoner_car : event_equip {
         void on_enable(card *origin_card, player *origin);
     };
+
+    DEFINE_EQUIP(prisoner_car, equip_prisoner_car)
 }
 
 #endif

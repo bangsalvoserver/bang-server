@@ -27,6 +27,8 @@ namespace banggame {
         void on_enable(card *origin_card, player *origin);
     };
 
+    DEFINE_EQUIP(sgt_blaze, equip_sgt_blaze)
+
     struct handler_sgt_blaze {
         bool can_play(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);

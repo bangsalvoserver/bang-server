@@ -9,6 +9,8 @@ namespace banggame {
         void on_enable(card *origin_card, player *origin);
     };
 
+    DEFINE_EQUIP(ms_abigail, equip_ms_abigail)
+
     struct effect_ms_abigail {
         bool can_play(card *origin_card, player *target);
         void on_play(card *origin_card, player *origin);

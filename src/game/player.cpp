@@ -5,7 +5,6 @@
 #include "play_verify.h"
 #include "game_update.h"
 
-#include "cards/holders.h"
 #include "cards/filters.h"
 #include "cards/game_enums.h"
 
@@ -40,18 +39,18 @@ namespace banggame {
 
     void player::enable_equip(card *target_card) {
         bool card_disabled = m_game->is_disabled(target_card);
-        for (const equip_holder &e : target_card->equips) {
-            if (!card_disabled || e.is_nodisable()) {
-                e.on_enable(target_card, this);
+        for (const equip_holder &holder : target_card->equips) {
+            if (!card_disabled || holder.type->is_nodisable) {
+                holder.type->on_enable(holder.effect_value, target_card, this);
             }
         }
     }
 
     void player::disable_equip(card *target_card) {
         bool card_disabled = m_game->is_disabled(target_card);
-        for (const equip_holder &e : target_card->equips) {
-            if (!card_disabled || e.is_nodisable()) {
-                e.on_disable(target_card, this);
+        for (const equip_holder &holder : target_card->equips) {
+            if (!card_disabled || holder.type->is_nodisable) {
+                holder.type->on_disable(holder.effect_value, target_card, this);
             }
         }
     }

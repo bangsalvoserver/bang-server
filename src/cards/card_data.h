@@ -5,36 +5,9 @@
 #include <string>
 
 #include "card_enums.h"
-#include "holders.h"
+#include "card_effect.h"
 
 namespace banggame {
-    
-    DEFINE_STRUCT(effect_holder,
-        (target_type, target)
-        (target_player_filter, player_filter)
-        (target_card_filter, card_filter)
-        (int8_t, effect_value)
-        (int8_t, target_value)
-        (serial::effect_type, type)
-    )
-
-    DEFINE_STRUCT(modifier_holder,
-        (serial::modifier_type, type)
-    )
-
-    DEFINE_STRUCT(mth_holder,
-        (serial::mth_type, type)
-        (serial::int_list, args)
-    )
-
-    DEFINE_STRUCT(tag_holder,
-        (short, tag_value)
-        (tag_type, type)
-    )
-
-    using effect_list = std::vector<effect_holder>;
-    using equip_list = std::vector<equip_holder>;
-    using tag_list = std::vector<tag_holder>;
 
     DEFINE_STRUCT(card_data,
         (std::string, name)

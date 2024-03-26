@@ -1,9 +1,9 @@
 #ifndef __MTH_UNWRAPPER_H__
 #define __MTH_UNWRAPPER_H__
 
-#include "cards/card_data.h"
-
 #include <stdexcept>
+
+#include "cards/card_enums.h"
 
 namespace banggame {
 template<typename T> struct target_getter {

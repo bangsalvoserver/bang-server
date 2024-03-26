@@ -11,6 +11,8 @@ namespace banggame {
         
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(gunbelt, equip_gunbelt)
 }
 
 #endif

@@ -56,9 +56,7 @@ namespace banggame {
         for (int arg : args) {
             for(; prev != arg && it != zip_targets.end(); ++prev, ++it);
             if (it == zip_targets.end()) break;
-
-            const auto &[target, effect] = *it;
-            mth_targets.emplace_back(effect, target);
+            mth_targets.push_back(*it);
         }
         return mth_targets;
     }
@@ -243,6 +241,7 @@ namespace banggame {
             effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
             return mth.type->on_prompt(origin_card, origin, mth_targets, ctx);
         }
+        return {};
     }
 
     static game_string check_prompt_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
@@ -253,8 +252,8 @@ namespace banggame {
         if (filters::is_equip_card(origin_card)) {
             player *target = origin_card->self_equippable() ? origin
                 : targets.front().get<target_type::player>().get();
-            for (const auto &e : origin_card->equips) {
-                MAYBE_RETURN(e.on_prompt(origin_card, origin, target));
+            for (const equip_holder &holder : origin_card->equips) {
+                MAYBE_RETURN(holder.type->on_prompt(holder.effect_value, origin_card, origin, target));
             }
             return {};
         } else {

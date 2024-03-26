@@ -9,6 +9,8 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
+    DEFINE_EQUIP(ranch, equip_ranch)
+
     struct handler_ranch {
         bool can_play(card *origin_card, player *origin, const serial::card_list &target_cards);
         void on_play(card *origin_card, player *origin, const serial::card_list &target_cards);

@@ -8,6 +8,8 @@ namespace banggame {
     struct equip_thedoctor  {
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(thedoctor, equip_thedoctor)
 }
 
 #endif

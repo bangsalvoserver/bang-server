@@ -9,6 +9,8 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
         void on_disable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(lasso, equip_lasso)
 }
 
 #endif

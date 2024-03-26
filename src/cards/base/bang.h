@@ -44,6 +44,8 @@ namespace banggame {
         void on_disable(card *target_card, player *target);
     };
 
+    DEFINE_EQUIP(treat_as_bang, equip_treat_as_bang)
+
     struct modifier_bangmod {
         bool valid_with_equip(card *origin_card, player *origin, card *target_card) {
             return false;

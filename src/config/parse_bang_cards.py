@@ -75,7 +75,7 @@ def parse_equips(equip_list):
 
         result.append({
             'effect_value': int(effect_value) if effect_value else None,
-            'type': CppEnum('equip_type', effect_type)
+            'type': CppLiteral(f'GET_EQUIP({effect_type})')
         })
     return result
 
@@ -202,7 +202,7 @@ def parse_file(data):
 
     return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
 
-INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/effect_enums.h', 'cards/effects.h']
+INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/filter_enums.h', 'cards/effects.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':

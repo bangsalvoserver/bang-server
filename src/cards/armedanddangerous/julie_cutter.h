@@ -9,6 +9,8 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
+    DEFINE_EQUIP(julie_cutter, equip_julie_cutter)
+
 }
 
 #endif

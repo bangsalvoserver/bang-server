@@ -11,6 +11,8 @@ namespace banggame {
         void on_enable(card *origin_card, player *origin);
     };
 
+    DEFINE_EQUIP(lastwill, equip_lastwill)
+
     struct handler_lastwill {
         bool on_check_target(card *origin_card, player *origin, const serial::card_list &target_cards, player *target) {
             return !target || bot_suggestion::target_friend{}.on_check_target(origin_card, origin, target);

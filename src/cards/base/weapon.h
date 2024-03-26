@@ -14,6 +14,8 @@ namespace banggame {
         game_string on_prompt(card *origin_card, player *origin, player *target);
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(weapon, equip_weapon)
 }
 
 #endif

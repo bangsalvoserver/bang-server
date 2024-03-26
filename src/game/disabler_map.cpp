@@ -2,6 +2,8 @@
 
 #include "game_table.h"
 
+#include "cards/card_effect.h"
+
 namespace banggame {
 
     static auto disableable_cards(game_table *table) {
@@ -29,9 +31,9 @@ namespace banggame {
     disabler_map::disabler_map_iterator disabler_map::add_disabler(event_card_key key, card_disabler_fun &&fun) {
         for (auto [owner, c] : disableable_cards(m_game)) {
             if (!is_disabled(c) && std::invoke(fun, c)) {
-                for (const equip_holder &e : c->equips) {
-                    if (!e.is_nodisable()) {
-                        e.on_disable(c, owner);
+                for (const equip_holder &holder : c->equips) {
+                    if (!holder.type->is_nodisable) {
+                        holder.type->on_disable(holder.effect_value, c, owner);
                     }
                 }
             }
@@ -52,9 +54,9 @@ namespace banggame {
                 }
             }
             if (!a && b) {
-                for (const equip_holder &e : c->equips) {
-                    if (!e.is_nodisable()) {
-                        e.on_enable(c, owner);
+                for (const equip_holder &holder : c->equips) {
+                    if (!holder.type->is_nodisable) {
+                        holder.type->on_enable(holder.effect_value, c, owner);
                     }
                 }
             }

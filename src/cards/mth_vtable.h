@@ -9,6 +9,7 @@ namespace banggame {
 
     struct mth_vtable {
         std::string_view name;
+        
         game_string (*get_error)(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx);
         game_string (*on_prompt)(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx);
         void (*on_play)(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx);

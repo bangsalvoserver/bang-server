@@ -10,12 +10,11 @@
 #include "net/options.h"
 
 #include "effect_vtable.h"
+#include "equip_vtable.h"
 #include "modifier_vtable.h"
 #include "mth_vtable.h"
 
 namespace banggame {
-
-    struct effect_holder;
 
     struct event_equip {
         void on_disable(card *target_card, player *target);

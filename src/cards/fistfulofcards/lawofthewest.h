@@ -8,6 +8,8 @@ namespace banggame {
     struct equip_lawofthewest : event_equip {
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(lawofthewest, equip_lawofthewest)
 }
 
 #endif

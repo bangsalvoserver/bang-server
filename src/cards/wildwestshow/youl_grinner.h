@@ -21,6 +21,8 @@ namespace banggame {
     struct equip_youl_grinner : event_equip {
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(youl_grinner, equip_youl_grinner)
 }
 
 #endif

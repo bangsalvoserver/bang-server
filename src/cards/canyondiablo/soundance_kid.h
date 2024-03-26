@@ -8,6 +8,8 @@ namespace banggame {
     struct equip_soundance_kid : event_equip {
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(soundance_kid, equip_soundance_kid)
 }
 
 #endif
