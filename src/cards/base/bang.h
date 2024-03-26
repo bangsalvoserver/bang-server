@@ -11,10 +11,14 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
 
+    DEFINE_EFFECT(bang, effect_bang)
+
     struct effect_bangcard : prompt_target_ghost, bot_suggestion::target_enemy {
         game_string get_error(card *origin_card, player *origin, player *target, const effect_context &ctx);
         void on_play(card *origin_card, player *origin, player *target);
     };
+
+    DEFINE_EFFECT(bangcard, effect_bangcard)
 
     struct handler_play_as_bang {
         bool on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
@@ -23,10 +27,14 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
     };
 
+    DEFINE_MTH(play_as_bang, handler_play_as_bang)
+
     struct effect_banglimit {
         game_string get_error(card *origin_card, player *origin, const effect_context &ctx);
         void on_play(card *origin_card, player *origin, const effect_context &ctx);
     };
+
+    DEFINE_EFFECT(banglimit, effect_banglimit)
 
     struct equip_treat_as_bang {
         player_flags flag;
@@ -36,6 +44,8 @@ namespace banggame {
         void on_disable(card *target_card, player *target);
     };
 
+    DEFINE_EQUIP(treat_as_bang, equip_treat_as_bang)
+
     struct modifier_bangmod {
         bool valid_with_equip(card *origin_card, player *origin, card *target_card) {
             return false;
@@ -43,6 +53,8 @@ namespace banggame {
         bool valid_with_modifier(card *origin_card, player *origin, card *target_card);
         bool valid_with_card(card *origin_card, player *origin, card *target_card);
     };
+
+    DEFINE_MODIFIER(bangmod, modifier_bangmod)
 
     class missable_request {
     public:
@@ -120,6 +132,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
+    
+    DEFINE_EFFECT(bangresponse, effect_bangresponse)
 
 }
 

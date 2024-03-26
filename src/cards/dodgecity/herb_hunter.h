@@ -8,6 +8,8 @@ namespace banggame {
     struct equip_herb_hunter : event_equip {
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(herb_hunter, equip_herb_hunter)
 }
 
 #endif

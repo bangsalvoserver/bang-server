@@ -11,7 +11,7 @@ namespace banggame {
     public:
         using iterator_category = std::forward_iterator_tag;
         using difference_type = ptrdiff_t;
-        using value_type = std::pair<const play_card_target &, const effect_holder &>;
+        using value_type = effect_target_pair;
 
         using target_iterator = typename target_list::const_iterator;
         using effect_iterator = typename effect_list::const_iterator;

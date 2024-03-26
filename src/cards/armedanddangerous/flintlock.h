@@ -12,6 +12,8 @@ namespace banggame {
         }
         void on_play(card *origin_card, player *origin, player *target, bool paid_cubes);
     };
+
+    DEFINE_MTH(flintlock, handler_flintlock)
 }
 
 #endif

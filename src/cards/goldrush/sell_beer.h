@@ -8,6 +8,8 @@ namespace banggame {
     struct effect_sell_beer {
         void on_play(card *origin_card, player *origin, card *target);
     };
+
+    DEFINE_EFFECT(sell_beer, effect_sell_beer)
 }
 
 #endif

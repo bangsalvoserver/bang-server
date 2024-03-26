@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "cards/filters.h"
+
 namespace json {
 
 template<> json serializer<banggame::card *, banggame::game_context>::operator()(banggame::card *card) const {
@@ -60,6 +62,30 @@ template<> json serializer<banggame::serial::card_format, banggame::game_context
         });
     } else {
         return json::object();
+    }
+}
+
+template<> json serializer<banggame::serial::effect_type, banggame::game_context>::operator()(banggame::serial::effect_type value) const {
+    return std::string(value->name);
+}
+
+template<> json serializer<banggame::serial::equip_type, banggame::game_context>::operator()(banggame::serial::equip_type value) const {
+    return std::string(value->name);
+}
+
+template<> json serializer<banggame::serial::modifier_type, banggame::game_context>::operator()(banggame::serial::modifier_type value) const {
+    if (value) {
+        return std::string(value->name);
+    } else {
+        return "none";
+    }
+}
+
+template<> json serializer<banggame::serial::mth_type, banggame::game_context>::operator()(banggame::serial::mth_type value) const {
+    if (value) {
+        return std::string(value->name);
+    } else {
+        return "none";
     }
 }
 

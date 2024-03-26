@@ -1,6 +1,8 @@
 #include "game/play_verify.h"
 
 #include "cards/filters.h"
+#include "cards/filter_enums.h"
+#include "cards/game_enums.h"
 
 namespace banggame {
 
@@ -13,7 +15,7 @@ namespace banggame {
     template<> game_string visit_players::get_error(const effect_context &ctx) {
         for (player *target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
-                MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
+                MAYBE_RETURN(effect.type->get_error_player(effect.effect_value, origin_card, origin, target, ctx));
             }
         }
         return {};
@@ -31,7 +33,7 @@ namespace banggame {
         }
         game_string msg;
         for (player *target : targets) {
-            msg = effect.on_prompt(origin_card, origin, target, ctx);
+            msg = effect.type->on_prompt_player(effect.effect_value, origin_card, origin, target, ctx);
             if (!msg) break;
         }
         return msg;
@@ -62,7 +64,7 @@ namespace banggame {
         }
 
         for (player *target : targets) {
-            effect.on_play(origin_card, origin, target, flags, ctx);
+            effect.type->on_play_player(effect.effect_value, origin_card, origin, target, flags, ctx);
         }
     }
 

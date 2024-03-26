@@ -5,13 +5,9 @@
 #include <string>
 
 #include "card_enums.h"
-#include "holders.h"
+#include "card_effect.h"
 
 namespace banggame {
-
-    using effect_list = std::vector<effect_holder>;
-    using equip_list = std::vector<equip_holder>;
-    using tag_list = std::vector<tag_holder>;
 
     DEFINE_STRUCT(card_data,
         (std::string, name)
@@ -47,7 +43,7 @@ namespace banggame {
         }
 
         bool is_modifier() const {
-            return static_cast<bool>(modifier.type);
+            return modifier.type != nullptr;
         }
 
         std::optional<short> get_tag_value(tag_type tag) const {

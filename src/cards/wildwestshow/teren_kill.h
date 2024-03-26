@@ -8,6 +8,8 @@ namespace banggame {
     struct equip_teren_kill : event_equip {
         void on_enable(card *origin_card, player *origin);
     };
+
+    DEFINE_EQUIP(teren_kill, equip_teren_kill)
 }
 
 #endif

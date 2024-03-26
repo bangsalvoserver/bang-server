@@ -5,8 +5,8 @@
 #include "play_verify.h"
 #include "game_update.h"
 
-#include "cards/holders.h"
 #include "cards/filters.h"
+#include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
 #include "cards/base/bang.h"
@@ -24,13 +24,20 @@ namespace banggame {
         return user_id < 0;
     }
 
+    static bool has_ghost_tag(const player *origin) {
+        return bool(origin->m_player_flags & (
+            player_flags::ghost_1 |
+            player_flags::ghost_2 |
+            player_flags::temp_ghost
+        ));
+    }
+
     bool player::is_ghost() const {
-        return check_player_flags(player_flags::dead)
-            && filters::is_player_ghost(this);
+        return check_player_flags(player_flags::dead) && has_ghost_tag(this);
     }
 
     bool player::alive() const {
-        return filters::is_player_alive(this);
+        return !check_player_flags(player_flags::dead) || has_ghost_tag(this);
     }
 
     void player::equip_card(card *target) {
@@ -40,18 +47,18 @@ namespace banggame {
 
     void player::enable_equip(card *target_card) {
         bool card_disabled = m_game->is_disabled(target_card);
-        for (const equip_holder &e : target_card->equips) {
-            if (!card_disabled || e.is_nodisable()) {
-                e.on_enable(target_card, this);
+        for (const equip_holder &holder : target_card->equips) {
+            if (!card_disabled || holder.type->is_nodisable) {
+                holder.type->on_enable(holder.effect_value, target_card, this);
             }
         }
     }
 
     void player::disable_equip(card *target_card) {
         bool card_disabled = m_game->is_disabled(target_card);
-        for (const equip_holder &e : target_card->equips) {
-            if (!card_disabled || e.is_nodisable()) {
-                e.on_disable(target_card, this);
+        for (const equip_holder &holder : target_card->equips) {
+            if (!card_disabled || holder.type->is_nodisable) {
+                holder.type->on_disable(holder.effect_value, target_card, this);
             }
         }
     }

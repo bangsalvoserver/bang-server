@@ -11,6 +11,8 @@ namespace banggame {
         game_string on_prompt(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags);
     };
+
+    DEFINE_EFFECT(train_robbery, effect_train_robbery)
 }
 
 #endif

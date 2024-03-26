@@ -14,5 +14,4 @@ target_sources(bangserver PRIVATE
     card_effect.cpp
     card_serial.cpp
     filters.cpp
-    holders.cpp
 )

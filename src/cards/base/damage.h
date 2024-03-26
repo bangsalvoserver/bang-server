@@ -33,6 +33,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags = {});
     };
 
+    DEFINE_EFFECT(damage, effect_damage)
+
     struct request_damage : request_base {
         request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags = {});
 

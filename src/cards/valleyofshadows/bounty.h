@@ -10,6 +10,8 @@ namespace banggame {
     struct equip_bounty : event_equip, prompt_target_self, bot_suggestion::target_enemy {
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(bounty, equip_bounty)
 }
 
 #endif

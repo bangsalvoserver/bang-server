@@ -12,7 +12,6 @@
 #include "luckycharm.h"
 #include "madam_yto.h"
 #include "pay_gold.h"
-#include "ruleset.h"
 #include "rum.h"
 #include "sell_beer.h"
 #include "wanted.h"

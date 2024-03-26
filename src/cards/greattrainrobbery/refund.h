@@ -8,6 +8,8 @@ namespace banggame {
     struct equip_refund : event_equip {
         void on_enable(card *origin_card, player *origin);
     };
+
+    DEFINE_EQUIP(refund, equip_refund)
 }
 
 #endif

@@ -3,9 +3,9 @@
 #include "game_update.h"
 
 #include "cards/filters.h"
-#include "cards/holders.h"
-#include "cards/effect_enums.h"
+#include "cards/filter_enums.h"
 #include "cards/game_enums.h"
+#include "cards/rulesets.h"
 
 #include "cards/base/requests.h"
 #include "cards/base/deathsave.h"

@@ -12,6 +12,8 @@ namespace banggame {
         }
         void on_play(card *origin_card, player *origin, card *chosen_card, card *target_card);
     };
+
+    DEFINE_MTH(flint_westwood, handler_flint_westwood)
 }
 
 #endif

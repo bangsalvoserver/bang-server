@@ -15,6 +15,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target);
     };
 
+    DEFINE_EFFECT(draw, effect_draw)
+
     struct effect_queue_draw {
         int ncards;
         effect_queue_draw(int value) : ncards(std::max(1, value)) {}
@@ -24,6 +26,8 @@ namespace banggame {
         }
         void on_play(card *origin_card, player *origin, player *target);
     };
+
+    DEFINE_EFFECT(queue_draw, effect_queue_draw)
 
     struct effect_draw_discard {
         game_string get_error(card *origin_card, player *origin) {
@@ -37,6 +41,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target);
     };
 
+    DEFINE_EFFECT(draw_discard, effect_draw_discard)
+
     struct effect_draw_to_discard {
         int ncards;
         effect_draw_to_discard(int value) : ncards(std::max(1, value)) {}
@@ -44,9 +50,13 @@ namespace banggame {
         void on_play(card *origin_card, player *origin);
     };
 
+    DEFINE_EFFECT(draw_to_discard, effect_draw_to_discard)
+
     struct effect_startofturn {
         game_string get_error(card *origin_card, player *origin) const;
     };
+
+    DEFINE_EFFECT(startofturn, effect_startofturn)
 
     struct effect_while_drawing {
         int cards_to_add;
@@ -55,6 +65,8 @@ namespace banggame {
         bool can_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(while_drawing, effect_while_drawing)
 
     struct request_draw : request_picking, std::enable_shared_from_this<request_draw> {
         request_draw(player *target);

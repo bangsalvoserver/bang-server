@@ -12,7 +12,6 @@
 #include "mirage.h"
 #include "packmule.h"
 #include "pat_barrett.h"
-#include "ruleset.h"
 #include "sacrifice.h"
 #include "soundance_kid.h"
 #include "spike_spiezel.h"

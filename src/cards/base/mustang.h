@@ -12,9 +12,13 @@ namespace banggame {
         void on_enable(card *target_card, player *target);
     };
 
+    DEFINE_EQUIP(horse, equip_horse)
+
     struct equip_mustang : event_equip {
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(mustang, equip_mustang)
 }
 
 #endif

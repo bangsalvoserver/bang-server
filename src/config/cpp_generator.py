@@ -9,6 +9,13 @@ class CppEnum:
     def __str__(self):
         return ' | '.join(f'{self.enum_name}::{value}' for value in self.values)
 
+class CppLiteral:
+    def __init__(self, value):
+        self.value = value
+    
+    def __str__(self):
+        return self.value
+
 SPACE = '  '
 
 def object_to_string(object_value, indent = 0):
@@ -36,7 +43,7 @@ def print_cpp_file(object_value, object_declaration, include_filenames = None, d
     if isinstance(include_filenames, list):
         for filename in include_filenames:
             print(f"#include \"{filename}\"\n", file=file)
-    elif isinstance(include_filenames, string):
+    elif isinstance(include_filenames, str):
         print(f"#include \"{include_filenames}\"\n", file=file)
     indent = 0
     if namespace_name:

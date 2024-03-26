@@ -8,6 +8,8 @@ namespace banggame {
     struct effect_thunderer {
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(thunderer, effect_thunderer)
 }
 
 #endif

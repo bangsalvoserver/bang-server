@@ -2,6 +2,7 @@
 
 #include "cards/effect_list_zip.h"
 #include "cards/game_enums.h"
+#include "cards/filter_enums.h"
 #include "cards/filters.h"
 
 #include "cards/base/requests.h"
@@ -56,9 +57,7 @@ namespace banggame {
         for (int arg : args) {
             for(; prev != arg && it != zip_targets.end(); ++prev, ++it);
             if (it == zip_targets.end()) break;
-
-            const auto &[target, effect] = *it;
-            mth_targets.emplace_back(effect, target);
+            mth_targets.push_back(*it);
         }
         return mth_targets;
     }
@@ -89,8 +88,10 @@ namespace banggame {
         }
 
         const auto &mth = origin_card->get_mth(is_response);
-        effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
-        MAYBE_RETURN(mth.get_error(origin_card, origin, mth_targets, ctx));
+        if (mth.type) {
+            effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
+            MAYBE_RETURN(mth.type->get_error(origin_card, origin, mth_targets, ctx));
+        }
 
         MAYBE_RETURN(check_duplicates(origin_card, origin, ctx));
 
@@ -134,7 +135,7 @@ namespace banggame {
             }
 
             ctx.selected_cards.push_back(mod_card);
-            mod_card->modifier.add_context(mod_card, origin, ctx);
+            mod_card->modifier.type->add_context(mod_card, origin, ctx);
             
             MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
             MAYBE_RETURN(get_play_card_error(origin, mod_card, ctx));
@@ -143,10 +144,10 @@ namespace banggame {
         for (size_t i=0; i<modifiers.size(); ++i) {
             const auto &[mod_card, targets] = modifiers[i];
 
-            MAYBE_RETURN(mod_card->modifier.get_error(mod_card, origin, origin_card, ctx));
+            MAYBE_RETURN(mod_card->modifier.type->get_error(mod_card, origin, origin_card, ctx));
             for (size_t j=0; j<i; ++j) {
                 card *mod_card_before = modifiers[j].card;
-                MAYBE_RETURN(mod_card_before->modifier.get_error(mod_card_before, origin, mod_card, ctx));
+                MAYBE_RETURN(mod_card_before->modifier.type->get_error(mod_card_before, origin, mod_card, ctx));
             }
         }
         return {};
@@ -237,20 +238,23 @@ namespace banggame {
         }
 
         const auto &mth = origin_card->get_mth(is_response);
-        effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
-        return mth.on_prompt(origin_card, origin, mth_targets, ctx);
+        if (mth.type) {
+            effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
+            return mth.type->on_prompt(origin_card, origin, mth_targets, ctx);
+        }
+        return {};
     }
 
     static game_string check_prompt_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         for (const auto &[mod_card, mod_targets] : modifiers) {
-            MAYBE_RETURN(mod_card->modifier.on_prompt(mod_card, origin, origin_card, ctx));
+            MAYBE_RETURN(mod_card->modifier.type->on_prompt(mod_card, origin, origin_card, ctx));
             MAYBE_RETURN(check_prompt(origin, mod_card, is_response, mod_targets, ctx));
         }
         if (filters::is_equip_card(origin_card)) {
             player *target = origin_card->self_equippable() ? origin
                 : targets.front().get<target_type::player>().get();
-            for (const auto &e : origin_card->equips) {
-                MAYBE_RETURN(e.on_prompt(origin_card, origin, target));
+            for (const equip_holder &holder : origin_card->equips) {
+                MAYBE_RETURN(holder.type->on_prompt(holder.effect_value, origin_card, origin, target));
             }
             return {};
         } else {
@@ -346,8 +350,10 @@ namespace banggame {
         }
 
         const auto &mth = origin_card->get_mth(is_response);
-        effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
-        mth.on_play(origin_card, origin, mth_targets, ctx);
+        if (mth.type) {
+            effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
+            mth.type->on_play(origin_card, origin, mth_targets, ctx);
+        }
     }
 
     void apply_add_context(player *origin, card *origin_card, const effect_holder &effect, const play_card_target &target, effect_context &ctx) {

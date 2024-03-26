@@ -10,6 +10,8 @@ namespace banggame {
         game_string get_error(card *origin_card, player *origin, card *target);
         void on_play(card *origin_card, player *origin, card *target);
     };
+
+    DEFINE_EFFECT(frankie_canton, effect_frankie_canton)
 }
 
 #endif

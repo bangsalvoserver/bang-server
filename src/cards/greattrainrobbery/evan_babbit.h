@@ -11,6 +11,8 @@ namespace banggame {
         game_string get_error(card *origin_card, player *origin, player *target_player);
         void on_play(card *origin_card, player *origin, player *target_player);
     };
+
+    DEFINE_EFFECT(evan_babbit, effect_evan_babbit)
 }
 
 #endif

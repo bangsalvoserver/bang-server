@@ -117,6 +117,49 @@ namespace banggame {
 
     using play_card_target = enums::enum_variant<target_type>;
     using target_list = std::vector<play_card_target>;
+    
+    enum class target_player_filter;
+    enum class target_card_filter;
+    enum class tag_type;
+
+    DEFINE_STRUCT(effect_holder,
+        (target_type, target)
+        (target_player_filter, player_filter)
+        (target_card_filter, card_filter)
+        (short, effect_value)
+        (short, target_value)
+        (serial::effect_type, type)
+    )
+
+    DEFINE_STRUCT(equip_holder,
+        (short, effect_value)
+        (serial::equip_type, type)
+    )
+
+    DEFINE_STRUCT(modifier_holder,
+        (serial::modifier_type, type)
+    )
+
+    DEFINE_STRUCT(mth_holder,
+        (serial::mth_type, type)
+        (serial::int_list, args)
+    )
+
+    DEFINE_STRUCT(tag_holder,
+        (short, tag_value)
+        (tag_type, type)
+    )
+
+    using effect_list = std::vector<effect_holder>;
+    using equip_list = std::vector<equip_holder>;
+    using tag_list = std::vector<tag_holder>;
+
+    struct effect_target_pair {
+        const play_card_target &target;
+        const effect_holder &effect;
+    };
+    
+    using effect_target_list = std::vector<effect_target_pair>;
 
     DEFINE_ENUM(card_deck_type,
         (none)
@@ -183,15 +226,6 @@ namespace banggame {
     enum class game_flags;
     enum class player_flags;
     enum class discard_all_reason;
-
-    enum class effect_type;
-    enum class equip_type;
-    enum class mth_type;
-    enum class modifier_type;
-
-    enum class target_player_filter;
-    enum class target_card_filter;
-    enum class tag_type;
 
 }
 

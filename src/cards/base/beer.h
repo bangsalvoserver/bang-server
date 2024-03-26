@@ -21,6 +21,8 @@ namespace banggame {
         void on_play(card *origin_card, player *target);
         bool can_play(card *origin_card, player *target);
     };
+
+    DEFINE_EFFECT(beer, effect_beer)
 }
 
 #endif

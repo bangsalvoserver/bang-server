@@ -3,7 +3,7 @@
 import re
 import sys
 import yaml_custom as yaml
-from cpp_generator import CppEnum, print_cpp_file
+from cpp_generator import CppEnum, CppLiteral, print_cpp_file
 
 def parse_sign(sign):
     match = re.match(r'^\s*([\w\d]+)\s*(\w+)\s*$', sign)
@@ -52,7 +52,7 @@ def parse_effects(effect_list):
             'card_filter':      CppEnum('target_card_filter', card_filter) if card_filter else None,
             'effect_value':     int(effect_value) if effect_value else None,
             'target_value':     int(target_value) if target_value else None,
-            'type':             CppEnum('effect_type', effect_type)
+            'type':             CppLiteral(f'GET_EFFECT({effect_type})')
         })
     return result
 
@@ -75,7 +75,7 @@ def parse_equips(equip_list):
 
         result.append({
             'effect_value': int(effect_value) if effect_value else None,
-            'type': CppEnum('equip_type', effect_type)
+            'type': CppLiteral(f'GET_EQUIP({effect_type})')
         })
     return result
 
@@ -113,7 +113,7 @@ def parse_mth(effect):
     effect_type = match.group(1)
     effect_value = match.group(2)
     return {
-        'type': CppEnum('mth_type', effect_type),
+        'type': CppLiteral(f'GET_MTH({effect_type})'),
         'args': [int(value.strip()) for value in effect_value.split(',')]
     }
 
@@ -129,7 +129,7 @@ def parse_all_effects(card):
             'tags':         parse_tags(card['tags']) if 'tags' in card else None,
             'expansion':    CppEnum('expansion_type', card['expansion']) if 'expansion' in card else None,
             'deck':         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
-            'modifier':     {'type': CppEnum('modifier_type', card['modifier'])} if 'modifier' in card else None,
+            'modifier':     {'type': CppLiteral(f"GET_MODIFIER({card['modifier']})")} if 'modifier' in card else None,
             'mth_effect':   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
             'mth_response': parse_mth(card['mth_response']) if 'mth_response' in card else None,
             'equip_target': CppEnum('target_player_filter', card['equip_target']) if 'equip_target' in card else None,
@@ -202,7 +202,7 @@ def parse_file(data):
 
     return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
 
-INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/effect_enums.h']
+INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/filter_enums.h', 'cards/effects.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':

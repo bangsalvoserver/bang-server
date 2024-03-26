@@ -9,6 +9,8 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags);
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(poker, effect_poker)
 }
 
 #endif

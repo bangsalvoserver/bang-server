@@ -36,7 +36,7 @@ namespace banggame {
                 if (c->deck == card_deck_type::character) {
                     return "ERROR_TARGET_NOT_CARD";
                 }
-                MAYBE_RETURN(effect.get_error(origin_card, origin, c, ctx));
+                MAYBE_RETURN(effect.type->get_error_card(effect.effect_value, origin_card, origin, c, ctx));
             }
             return {};
         }
@@ -48,7 +48,7 @@ namespace banggame {
         }
         game_string msg;
         for (card *target_card : target_cards) {
-            msg = effect.on_prompt(origin_card, origin, target_card, ctx);
+            msg = effect.type->on_prompt_card(effect.effect_value, origin_card, origin, target_card, ctx);
             if (!msg) break;
         }
         return msg;
@@ -56,7 +56,7 @@ namespace banggame {
 
     template<> void visit_cards::add_context(effect_context &ctx, const serial::card_list &target_cards) {
         for (card *target_card : target_cards) {
-            effect.add_context(origin_card, origin, ctx);
+            effect.type->add_context_card(effect.effect_value, origin_card, origin, target_card, ctx);
         }
     }
 
@@ -70,9 +70,9 @@ namespace banggame {
         }
         for (card *target_card : target_cards) {
             if (target_card->pocket == pocket_type::player_hand) {
-                effect.on_play(origin_card, origin, target_card->owner->random_hand_card(), flags, ctx);
+                effect.type->on_play_card(effect.effect_value, origin_card, origin, target_card->owner->random_hand_card(), flags, ctx);
             } else {
-                effect.on_play(origin_card, origin, target_card, flags, ctx);
+                effect.type->on_play_card(effect.effect_value, origin_card, origin, target_card, flags, ctx);
             }
         }
     }

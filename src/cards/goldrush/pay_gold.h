@@ -12,6 +12,8 @@ namespace banggame {
         game_string get_error(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(pay_gold, effect_pay_gold)
 }
 
 #endif

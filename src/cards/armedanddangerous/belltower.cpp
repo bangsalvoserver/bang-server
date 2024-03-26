@@ -1,6 +1,6 @@
 #include "belltower.h"
 
-#include "cards/filters.h"
+#include "cards/filter_enums.h"
 
 #include "game/game.h"
 

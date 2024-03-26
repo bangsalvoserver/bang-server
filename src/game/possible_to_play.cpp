@@ -1,6 +1,7 @@
 #include "possible_to_play.h"
 
 #include "cards/filters.h"
+#include "cards/filter_enums.h"
 
 #include "play_verify.h"
 
@@ -39,7 +40,7 @@ namespace banggame {
         return origin->m_game->m_players
             | rv::filter([=](player *target) {
                 return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
-                    && !holder.get_error(origin_card, origin, target, ctx);
+                    && !holder.type->get_error_player(holder.effect_value, origin_card, origin, target, ctx);
             });
     }
 
@@ -59,7 +60,7 @@ namespace banggame {
             origin->m_game->m_selection)
             | rv::filter([=](card *target_card) {
                 return !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
-                    && !holder.get_error(origin_card, origin, target_card, ctx);
+                    && !holder.type->get_error_card(holder.effect_value, origin_card, origin, target_card, ctx);
             });
     }
 
@@ -70,24 +71,61 @@ namespace banggame {
         return copy;
     }
 
-    static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const effect_target_list &targets) {
+    class effect_target_list_value {
+    private:
+        target_list targets;
+        effect_list effects;
+    
+    public:
+        effect_target_list_value add(const effect_holder &effect) const {
+            effect_target_list_value copy{*this};
+            copy.targets.emplace_back(enums::enum_tag<target_type::none>);
+            copy.effects.push_back(effect);
+            return copy;
+        }
+
+        effect_target_list_value add(player *target, const effect_holder &effect) const {
+            effect_target_list_value copy{*this};
+            copy.targets.emplace_back(enums::enum_tag<target_type::player>, target);
+            copy.effects.push_back(effect);
+            return copy;
+        }
+
+        effect_target_list_value add(card *target, const effect_holder &effect) const {
+            effect_target_list_value copy{*this};
+            copy.targets.emplace_back(enums::enum_tag<target_type::card>, target);
+            copy.effects.push_back(effect);
+            return copy;
+        }
+
+        operator effect_target_list() const {
+            effect_target_list ret;
+            for (const auto &[target, effect] : rv::zip(targets, effects)) {
+                ret.emplace_back(target, effect);
+            }
+            return ret;
+        }
+
+        size_t size() const {
+            return targets.size();
+        }
+    };
+
+    static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const effect_target_list_value &targets) {
         if (targets.size() < mth.args.size()) {
             auto index = mth.args[targets.size()];
             if (index < effects.size()) {
                 const auto &effect = effects[index];
                 switch (effect.target) {
                 case target_type::none:
-                    return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                        vector_concat(targets, effect, play_card_target{enums::enum_tag<target_type::none>}));
+                    return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets.add(effect));
                 case target_type::player:
                     return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
-                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                            vector_concat(targets, effect, play_card_target{enums::enum_tag<target_type::player>, target}));
+                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets.add(target, effect));
                     });
                 case target_type::card:
                     return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
-                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                            vector_concat(targets, effect, play_card_target{enums::enum_tag<target_type::card>, target}));
+                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets.add(target, effect));
                     });
                 default:
                     // ignore other target types
@@ -95,7 +133,7 @@ namespace banggame {
                 }
             }
         }
-        return !mth.get_error(origin_card, origin, targets, ctx);
+        return !mth.type || !mth.type->get_error(origin_card, origin, targets, ctx);
     }
 
     static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
@@ -131,7 +169,7 @@ namespace banggame {
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
         for (card *mod_card : modifiers) {
             if (mod_card == origin_card) return false;
-            if (mod_card->modifier.get_error(mod_card, origin, origin_card, ctx)) return false;
+            if (mod_card->modifier.type->get_error(mod_card, origin, origin_card, ctx)) return false;
         }
 
         if (get_play_card_error(origin, origin_card, ctx)) {
@@ -149,7 +187,7 @@ namespace banggame {
             
             if (origin_card->is_modifier()) {
                 auto ctx_copy = ctx;
-                origin_card->modifier.add_context(origin_card, origin, ctx_copy);
+                origin_card->modifier.type->add_context(origin_card, origin, ctx_copy);
                 
                 return contains_at_least(cards_playable_with_modifiers(origin, vector_concat(modifiers, origin_card), is_response, ctx_copy), 1);
             }
@@ -163,7 +201,7 @@ namespace banggame {
         if (!filters::is_equip_card(origin_card) && origin_card->is_modifier()) {
             std::vector<card *> modifiers_copy = vector_concat(modifiers, origin_card);
             auto ctx_copy = ctx;
-            origin_card->modifier.add_context(origin_card, origin, ctx_copy);
+            origin_card->modifier.type->add_context(origin_card, origin, ctx_copy);
 
             for (card *target_card : cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy)) {
                 node.branches.push_back(generate_card_modifier_node(origin, target_card, is_response, modifiers_copy, ctx_copy));

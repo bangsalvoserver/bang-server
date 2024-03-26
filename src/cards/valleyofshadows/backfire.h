@@ -9,6 +9,8 @@ namespace banggame {
     struct effect_backfire : effect_missed {
         void on_play(card *origin_card, player *origin);
     };
+
+    DEFINE_EFFECT(backfire, effect_backfire)
 }
 
 #endif

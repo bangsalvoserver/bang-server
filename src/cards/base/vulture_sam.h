@@ -22,6 +22,8 @@ namespace banggame {
     struct equip_vulture_sam : event_equip {
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(vulture_sam, equip_vulture_sam)
 }
 
 #endif

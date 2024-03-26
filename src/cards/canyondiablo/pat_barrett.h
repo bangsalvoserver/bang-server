@@ -8,6 +8,8 @@ namespace banggame {
     struct equip_pat_barrett : event_equip {
         void on_enable(card *target_card, player *target);
     };
+
+    DEFINE_EQUIP(pat_barrett, equip_pat_barrett)
 }
 
 #endif
