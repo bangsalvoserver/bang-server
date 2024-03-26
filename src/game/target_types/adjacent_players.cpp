@@ -8,17 +8,14 @@ namespace banggame {
     using visit_players = play_visitor<target_type::adjacent_players>;
 
     static auto make_adjacent_players_target_set(player *origin, card *origin_card, const effect_context &ctx) {
-        effect_holder effect1 { .player_filter = target_player_filter::notself | target_player_filter::reachable };
-        effect_holder effect2 { .player_filter = target_player_filter::notself };
-        return make_player_target_set(origin, origin_card, effect1, ctx) | rv::for_each([=](player *target1) {
-            return make_player_target_set(origin, origin_card, effect2, ctx) | rv::transform([=](player *target2) {
-                return std::pair{target1, target2};
+        return rv::cartesian_product(origin->m_game->m_players, origin->m_game->m_players)
+            | rv::filter([origin, ignore_distances=ctx.ignore_distances](const auto &pair) {
+                auto [target1, target2] = pair;
+                return target1 != origin && target2 != origin && target1 != target2
+                    && target1->alive() && target2->alive()
+                    && (ignore_distances || origin->m_game->calc_distance(origin, target1) <= origin->get_weapon_range() + origin->get_range_mod())
+                    && origin->m_game->calc_distance(target1, target2) == 1;
             });
-        })
-        | rv::filter([=](const auto &targets) {
-            auto [target1, target2] = targets;
-            return origin->m_game->calc_distance(target1, target2) == 1;
-        });
     }
 
     template<> bool visit_players::possible(const effect_context &ctx) {
