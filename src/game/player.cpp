@@ -6,6 +6,7 @@
 #include "game_update.h"
 
 #include "cards/filters.h"
+#include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
 #include "cards/base/bang.h"

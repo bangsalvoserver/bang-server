@@ -1,6 +1,7 @@
 #include "bang.h"
 
 #include "cards/game_enums.h"
+#include "cards/filter_enums.h"
 #include "cards/filters.h"
 
 #include "game/game.h"
