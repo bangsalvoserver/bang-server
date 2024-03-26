@@ -1,9 +1,9 @@
-#ifndef __EFFECT_VTABLE_H__
-#define __EFFECT_VTABLE_H__
+#ifndef __VTABLE_EFFECT_H__
+#define __VTABLE_EFFECT_H__
 
 #include "utils/tstring.h"
 
-#include "cards/card_data.h"
+#include "filters_simple.h"
 
 namespace banggame {
 
@@ -61,7 +61,7 @@ namespace banggame {
             .on_prompt = [](int effect_value, card *origin_card, player *origin, const effect_context &ctx) -> game_string {
                 T value = build_effect<T>(effect_value);
                 if constexpr (requires { value.on_check_target(origin_card, origin); }) {
-                    if (player_is_bot(origin) && !value.on_check_target(origin_card, origin)) {
+                    if (filters::is_player_bot(origin) && !value.on_check_target(origin_card, origin)) {
                         return "BOT_BAD_PLAY";
                     }
                 }
@@ -106,7 +106,7 @@ namespace banggame {
             .on_prompt_player = [](int effect_value, card *origin_card, player *origin, player *target, const effect_context &ctx) -> game_string {
                 T value = build_effect<T>(effect_value);
                 if constexpr (requires { value.on_check_target(origin_card, origin, target); }) {
-                    if (player_is_bot(origin) && !value.on_check_target(origin_card, origin, target)) {
+                    if (filters::is_player_bot(origin) && !value.on_check_target(origin_card, origin, target)) {
                         return "BOT_BAD_PLAY";
                     }
                 }
@@ -151,7 +151,7 @@ namespace banggame {
             .on_prompt_card = [](int effect_value, card *origin_card, player *origin, card *target, const effect_context &ctx) -> game_string {
                 T value = build_effect<T>(effect_value);
                 if constexpr (requires { value.on_check_target(origin_card, origin, target); }) {
-                    if (player_is_bot(origin) && !value.on_check_target(origin_card, origin, target)) {
+                    if (filters::is_player_bot(origin) && !value.on_check_target(origin_card, origin, target)) {
                         return "BOT_BAD_PLAY";
                     }
                 }
@@ -193,9 +193,6 @@ namespace banggame {
         };
     
     #define GET_EFFECT(name) (&effect_vtable_map<#name>::value)
-
-    struct effect_none {};
-    DEFINE_EFFECT(none, effect_none)
 }
 
 #endif

@@ -1,9 +1,9 @@
-#ifndef __EQUIP_VTABLE_H__
-#define __EQUIP_VTABLE_H__
+#ifndef __VTABLE_EQUIP_H__
+#define __VTABLE_EQUIP_H__
 
 #include "utils/tstring.h"
 
-#include "cards/card_data.h"
+#include "filters_simple.h"
 
 namespace banggame {
 
@@ -33,7 +33,7 @@ namespace banggame {
             .on_prompt = [](int effect_value, card *origin_card, player *origin, player *target) -> game_string {
                 auto value = build_equip<T>(effect_value);
                 if constexpr (requires { value.on_check_target(origin_card, origin, target); }) {
-                    if (player_is_bot(origin) && !value.on_check_target(origin_card, origin, target)) {
+                    if (filters::is_player_bot(origin) && !value.on_check_target(origin_card, origin, target)) {
                         return "BOT_BAD_PLAY";
                     }
                 }
@@ -69,9 +69,6 @@ namespace banggame {
         };
     
     #define GET_EQUIP(name) (&equip_vtable_map<#name>::value)
-
-    struct equip_none {};
-    DEFINE_EQUIP(none, equip_none)
 
 }
 

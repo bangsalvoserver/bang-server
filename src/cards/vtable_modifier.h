@@ -1,9 +1,9 @@
-#ifndef __MODIFIER_VTABLE_H__
-#define __MODIFIER_VTABLE_H__
+#ifndef __VTABLE_MODIFIER_H__
+#define __VTABLE_MODIFIER_H__
 
 #include "utils/tstring.h"
 
-#include "cards/card_data.h"
+#include "filters_simple.h"
 
 namespace banggame {
 
@@ -27,7 +27,7 @@ namespace banggame {
             },
 
             .get_error = [](card *origin_card, player *origin, card *target_card, const effect_context &ctx) -> game_string {
-                if (card_is_equip(target_card)) {
+                if (filters::is_equip_card(target_card)) {
                     if constexpr (requires (T handler) { handler.valid_with_equip(origin_card, origin, target_card); }) {
                         if (T{}.valid_with_equip(origin_card, origin, target_card)) {
                             return {};
@@ -35,7 +35,7 @@ namespace banggame {
                             return {"ERROR_CANT_PLAY_WHILE_EQUIPPING", origin_card, target_card};
                         }
                     }
-                } else if (card_is_modifier(target_card)) {
+                } else if (filters::is_modifier_card(target_card)) {
                     if constexpr (requires (T handler) { handler.valid_with_modifier(origin_card, origin, target_card); }) {
                         if (T{}.valid_with_modifier(origin_card, origin, target_card)) {
                             return {};

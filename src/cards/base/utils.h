@@ -5,6 +5,10 @@
 
 namespace banggame {
 
+    struct effect_none {};
+
+    DEFINE_EFFECT(none, effect_none)
+
     struct effect_human {
         bool can_play(card *origin_card, player *origin);
     };

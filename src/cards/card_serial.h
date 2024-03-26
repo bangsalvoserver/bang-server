@@ -15,10 +15,6 @@ namespace banggame {
     struct equip_vtable;
     struct modifier_vtable;
     struct mth_vtable;
-
-    bool player_is_bot(const player *p);
-    bool card_is_equip(const card *c);
-    bool card_is_modifier(const card *c);
 }
 
 template<typename T, typename ... Ts>

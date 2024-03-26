@@ -7,15 +7,8 @@
 
 namespace banggame::filters {
 
-    bool is_player_ghost(const player *origin) {
-        return origin->check_player_flags(player_flags::ghost_1)
-            || origin->check_player_flags(player_flags::ghost_2)
-            || origin->check_player_flags(player_flags::temp_ghost);
-    }
-
-    bool is_player_alive(const player *origin) {
-        return !origin->check_player_flags(player_flags::dead)
-            || is_player_ghost(origin);
+    bool is_player_bot(const player *origin) {
+        return origin->is_bot();
     }
 
     const serial::card_list &get_selected_cubes(const card *origin_card, const effect_context &ctx) {
@@ -32,7 +25,7 @@ namespace banggame::filters {
             if (!bool(filter & target_player_filter::alive) && !target->check_player_flags(player_flags::dead)) {
                 return "ERROR_TARGET_NOT_DEAD";
             }
-        } else if (!is_player_alive(target)) {
+        } else if (!target->alive()) {
             return "ERROR_TARGET_DEAD";
         }
 
@@ -105,6 +98,10 @@ namespace banggame::filters {
         default:
             return false;
         }
+    }
+
+    bool is_modifier_card(const card *origin_card) {
+        return origin_card->is_modifier();
     }
 
     bool is_bang_card(const player *origin, const card *target) {

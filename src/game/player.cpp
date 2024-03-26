@@ -24,13 +24,20 @@ namespace banggame {
         return user_id < 0;
     }
 
+    static bool has_ghost_tag(const player *origin) {
+        return bool(origin->m_player_flags & (
+            player_flags::ghost_1 |
+            player_flags::ghost_2 |
+            player_flags::temp_ghost
+        ));
+    }
+
     bool player::is_ghost() const {
-        return check_player_flags(player_flags::dead)
-            && filters::is_player_ghost(this);
+        return check_player_flags(player_flags::dead) && has_ghost_tag(this);
     }
 
     bool player::alive() const {
-        return filters::is_player_alive(this);
+        return !check_player_flags(player_flags::dead) || has_ghost_tag(this);
     }
 
     void player::equip_card(card *target) {
