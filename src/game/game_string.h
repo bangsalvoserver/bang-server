@@ -6,11 +6,6 @@
 
 namespace banggame {
 
-    DEFINE_STRUCT(card_format,
-        (std::string, name)
-        (card_sign, sign)
-    )
-
     DEFINE_ENUM_TYPES(game_format_arg_type,
         (integer, int)
         (card, serial::card_format)
@@ -18,14 +13,8 @@ namespace banggame {
     )
 
     using game_format_arg = enums::enum_variant<game_format_arg_type>;
-
-#ifdef BUILD_BANG_CLIENT
-    using format_str_type = std::string;
-    using format_args_type = std::vector<game_format_arg>;
-#else
     using format_str_type = small_string;
     using format_args_type = small_vector<game_format_arg>;
-#endif
     
     DEFINE_STRUCT(game_string,
         (format_str_type, format_str)

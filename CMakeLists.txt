@@ -39,7 +39,6 @@ add_executable(bangserver "")
 add_subdirectory(src)
 
 target_link_libraries(bangserver PUBLIC bangcommon cxxopts::cxxopts)
-target_compile_definitions(bangserver PRIVATE BUILD_BANG_SERVER)
 
 option(BUILD_GAME_RELEASE "Build Game Release" OFF)
 
