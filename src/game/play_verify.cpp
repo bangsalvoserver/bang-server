@@ -268,13 +268,15 @@ namespace banggame {
         switch (origin_card->pocket) {
         case pocket_type::player_hand:
         case pocket_type::scenario_card:
+            if (is_response) {
+                origin->m_game->add_log("LOG_RESPONDED_WITH_CARD", origin_card, origin);
+            } else {
+                origin->m_game->add_log("LOG_PLAYED_CARD", origin_card, origin);
+            }
+            break;
         case pocket_type::hidden_deck:
-            if (!origin_card->name.empty()) {
-                if (is_response) {
-                    origin->m_game->add_log("LOG_RESPONDED_WITH_CARD", origin_card, origin);
-                } else {
-                    origin->m_game->add_log("LOG_PLAYED_CARD", origin_card, origin);
-                }
+            if (origin_card->has_tag(tag_type::card_choice)) {
+                origin->m_game->add_log("LOG_CHOSE_CARD", origin_card, origin);
             }
             break;
         case pocket_type::player_table:
