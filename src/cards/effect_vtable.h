@@ -125,6 +125,19 @@ namespace banggame {
                 }
             },
 
+            .on_play_player = [](int effect_value, card *origin_card, player *origin, player *target, effect_flags flags, const effect_context &ctx) {
+                T value = build_effect<T>(effect_value);
+                if constexpr (requires { value.on_play(origin_card, origin, target, flags, ctx); }) {
+                    value.on_play(origin_card, origin, target, flags, ctx);
+                } else if constexpr (requires { value.on_play(origin_card, origin, target, ctx); }) {
+                    value.on_play(origin_card, origin, target, ctx);
+                } else if constexpr (requires { value.on_play(origin_card, origin, target, flags); }) {
+                    value.on_play(origin_card, origin, target, flags);
+                } else if constexpr (requires { value.on_play(origin_card, origin, target); }) {
+                    value.on_play(origin_card, origin, target);
+                }
+            },
+
             .get_error_card = [](int effect_value, card *origin_card, player *origin, card *target, const effect_context &ctx) -> game_string {
                 T value = build_effect<T>(effect_value);
                 if constexpr (requires { value.get_error(origin_card, origin, target, ctx); }) {
