@@ -71,24 +71,61 @@ namespace banggame {
         return copy;
     }
 
-    static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const effect_target_list &targets) {
+    class effect_target_list_value {
+    private:
+        target_list targets;
+        effect_list effects;
+    
+    public:
+        effect_target_list_value add(const effect_holder &effect) const {
+            effect_target_list_value copy{*this};
+            copy.targets.emplace_back(enums::enum_tag<target_type::none>);
+            copy.effects.push_back(effect);
+            return copy;
+        }
+
+        effect_target_list_value add(player *target, const effect_holder &effect) const {
+            effect_target_list_value copy{*this};
+            copy.targets.emplace_back(enums::enum_tag<target_type::player>, target);
+            copy.effects.push_back(effect);
+            return copy;
+        }
+
+        effect_target_list_value add(card *target, const effect_holder &effect) const {
+            effect_target_list_value copy{*this};
+            copy.targets.emplace_back(enums::enum_tag<target_type::card>, target);
+            copy.effects.push_back(effect);
+            return copy;
+        }
+
+        operator effect_target_list() const {
+            effect_target_list ret;
+            for (const auto &[target, effect] : rv::zip(targets, effects)) {
+                ret.emplace_back(target, effect);
+            }
+            return ret;
+        }
+
+        size_t size() const {
+            return targets.size();
+        }
+    };
+
+    static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const effect_target_list_value &targets) {
         if (targets.size() < mth.args.size()) {
             auto index = mth.args[targets.size()];
             if (index < effects.size()) {
                 const auto &effect = effects[index];
                 switch (effect.target) {
                 case target_type::none:
-                    return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                        vector_concat(targets, play_card_target{enums::enum_tag<target_type::none>}, effect));
+                    return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets.add(effect));
                 case target_type::player:
                     return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
-                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                            vector_concat(targets, play_card_target{enums::enum_tag<target_type::player>, target}, effect));
+                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets.add(target, effect));
                     });
                 case target_type::card:
                     return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
-                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                            vector_concat(targets, play_card_target{enums::enum_tag<target_type::card>, target}, effect));
+                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets.add(target, effect));
                     });
                 default:
                     // ignore other target types
