@@ -4,6 +4,7 @@
 
 #include "cards/filters.h"
 #include "cards/game_enums.h"
+#include "cards/rulesets.h"
 
 #include "cards/base/requests.h"
 #include "cards/base/deathsave.h"
@@ -170,22 +171,10 @@ namespace banggame {
         return sign;
     }
 
-    template<expansion_type E>
-    static void apply_ruleset(game *game, enums::enum_tag_t<E>) {
-        if constexpr (enums::value_with_type<E>) {
-            if (bool(game->m_options.expansions & E)) {
-                using type = enums::enum_type_t<E>;
-                type{}.on_apply(game);
-            }
-        }
-    }
-
     void game::start_game(const game_options &options) {
         m_options = options;
 
-        [&]<expansion_type ... Es>(enums::enum_sequence<Es ...>) {
-            (apply_ruleset(this, enums::enum_tag<Es>), ...);
-        }(enums::make_enum_sequence<expansion_type>());
+        apply_rulesets(this);
 
         add_update<game_update_type::player_add>(m_players | rn::to<std::vector<player_user_pair>>);
 

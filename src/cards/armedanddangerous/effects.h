@@ -19,7 +19,6 @@
 #include "ms_abigail.h"
 #include "pay_cube.h"
 #include "red_ringo.h"
-#include "ruleset.h"
 #include "rust.h"
 #include "squaw.h"
 #include "thunderer.h"
