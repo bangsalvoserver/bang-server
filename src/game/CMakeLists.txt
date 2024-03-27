@@ -5,14 +5,17 @@ PRIVATE
     bot_ai.cpp
     bot_suggestion.cpp
     game.cpp
+    game_net.cpp
     game_table.cpp
     disabler_map.cpp
     draw_check_handler.cpp
     durations.cpp
     event_map.cpp
+    filters.cpp
     player.cpp
     player_iterator.cpp
     play_verify.cpp
     possible_to_play.cpp
+    request_base.cpp
     request_queue.cpp
 )

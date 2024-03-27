@@ -1,9 +1,9 @@
 #ifndef __CANYONDIABLO_RULESET_H__
 #define __CANYONDIABLO_RULESET_H__
 
-namespace banggame {
+#include "cards/card_fwd.h"
 
-    struct game;
+namespace banggame {
 
     struct ruleset_canyondiablo {
         void on_apply(game *game);

@@ -1,38 +1,35 @@
-#ifndef __CARD_ENUMS_H__
-#define __CARD_ENUMS_H__
+#ifndef __CARD_DEFS_H__
+#define __CARD_DEFS_H__
 
-#include "utils/enum_variant.h"
-#include "utils/reflector.h"
-
-#include "card_serial.h"
+#include "card_fwd.h"
 
 namespace banggame {
 
     using namespace enums::flag_operators;
 
-    DEFINE_ENUM_DATA(card_suit,
-        (none,      u8"")
-        (hearts,    u8"\u2665")
-        (diamonds,  u8"\u2666")
-        (clubs,     u8"\u2663")
-        (spades,    u8"\u2660")
+    DEFINE_ENUM(card_suit,
+        (none)
+        (hearts)
+        (diamonds)
+        (clubs)
+        (spades)
     )
 
-    DEFINE_ENUM_DATA(card_rank,
-        (none,      "")
-        (rank_2,    "2")
-        (rank_3,    "3")
-        (rank_4,    "4")
-        (rank_5,    "5")
-        (rank_6,    "6")
-        (rank_7,    "7")
-        (rank_8,    "8")
-        (rank_9,    "9")
-        (rank_10,   "10")
-        (rank_J,    "J")
-        (rank_Q,    "Q")
-        (rank_K,    "K")
-        (rank_A,    "A")
+    DEFINE_ENUM(card_rank,
+        (none)
+        (rank_2)
+        (rank_3)
+        (rank_4)
+        (rank_5)
+        (rank_6)
+        (rank_7)
+        (rank_8)
+        (rank_9)
+        (rank_10)
+        (rank_J)
+        (rank_Q)
+        (rank_K)
+        (rank_A)
     )
 
     DEFINE_STRUCT(card_sign,
@@ -73,8 +70,6 @@ namespace banggame {
         (thebullet,             ruleset_thebullet)
         (canyondiablo,          ruleset_canyondiablo)
     )
-
-    constexpr auto unofficial_expansions = expansion_type::canyondiablo;
 
     DEFINE_ENUM(card_color_type,
         (none)
@@ -117,10 +112,6 @@ namespace banggame {
 
     using play_card_target = enums::enum_variant<target_type>;
     using target_list = std::vector<play_card_target>;
-    
-    enum class target_player_filter;
-    enum class target_card_filter;
-    enum class tag_type;
 
     DEFINE_STRUCT(effect_holder,
         (target_type, target)
@@ -128,20 +119,20 @@ namespace banggame {
         (target_card_filter, card_filter)
         (short, effect_value)
         (short, target_value)
-        (serial::effect_type, type)
+        (const effect_vtable *, type)
     )
 
     DEFINE_STRUCT(equip_holder,
         (short, effect_value)
-        (serial::equip_type, type)
+        (const equip_vtable *, type)
     )
 
     DEFINE_STRUCT(modifier_holder,
-        (serial::modifier_type, type)
+        (const modifier_vtable *, type)
     )
 
     DEFINE_STRUCT(mth_holder,
-        (serial::mth_type, type)
+        (const mth_vtable *, type)
         (serial::int_list, args)
     )
 
@@ -221,11 +212,6 @@ namespace banggame {
         (bool, disable_banglimit)
         (bool, disable_bang_checks)
     )
-
-    enum class effect_flags;
-    enum class game_flags;
-    enum class player_flags;
-    enum class discard_all_reason;
 
 }
 

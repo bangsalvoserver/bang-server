@@ -1,6 +1,6 @@
 #include "possible_to_play.h"
 
-#include "cards/filters.h"
+#include "game/filters.h"
 #include "cards/filter_enums.h"
 
 #include "play_verify.h"

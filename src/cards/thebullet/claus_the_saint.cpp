@@ -34,15 +34,12 @@ namespace banggame {
             }
         }
 
-        target_list get_target_set() const override {
+        std::vector<player *> get_target_set() const override {
             return target->m_game->m_players
                 | rv::filter([&](player *p) {
                     return p != target && !rn::contains(selected_targets, p);
                 })
-                | rv::transform([](player *p) {
-                    return play_card_target{enums::enum_tag<target_type::player>, p};
-                })
-                | rn::to<target_list>;
+                | rn::to_vector;
         }
     };
     

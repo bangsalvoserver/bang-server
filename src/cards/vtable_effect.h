@@ -3,7 +3,7 @@
 
 #include "utils/tstring.h"
 
-#include "filters_simple.h"
+#include "game/filters_simple.h"
 
 namespace banggame {
 

@@ -1,7 +1,7 @@
 #include "caravan.h"
 
 #include "cards/base/draw.h"
-#include "cards/filters.h"
+#include "game/filters.h"
 
 #include "game/game.h"
 

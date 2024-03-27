@@ -1,9 +1,9 @@
 #include "a_little_nip.h"
 
 #include "cards/base/heal.h"
-#include "cards/filters.h"
 
 #include "game/game.h"
+#include "game/filters.h"
 
 namespace banggame {
 

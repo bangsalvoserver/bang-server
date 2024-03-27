@@ -1,6 +1,6 @@
 #include "ruleset.h"
 
-#include "cards/filters.h"
+#include "game/filters.h"
 
 #include "next_stop.h"
 

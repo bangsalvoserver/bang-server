@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "cards/card_serial.h"
+#include "cards/card_fwd.h"
 
 namespace banggame {
 

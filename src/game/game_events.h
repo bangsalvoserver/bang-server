@@ -1,7 +1,7 @@
 #ifndef __GAME_EVENTS_H__
 #define __GAME_EVENTS_H__
 
-#include "cards/card_serial.h"
+#include "cards/card_fwd.h"
 
 namespace banggame::event_type {
 

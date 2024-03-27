@@ -1,9 +1,9 @@
 #ifndef __VALLEYOFSHADOWS_RULESET_H__
 #define __VALLEYOFSHADOWS_RULESET_H__
 
-namespace banggame {
+#include "cards/card_fwd.h"
 
-    struct game;
+namespace banggame {
 
     struct ruleset_valleyofshadows {
         void on_apply(game *game);

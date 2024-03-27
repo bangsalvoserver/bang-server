@@ -1,13 +1,12 @@
 #include "play_verify.h"
 
-#include "cards/effect_list_zip.h"
-#include "cards/game_enums.h"
-#include "cards/filter_enums.h"
-#include "cards/filters.h"
-
 #include "cards/base/requests.h"
 
-#include "utils/utils.h"
+#include "cards/game_enums.h"
+#include "cards/filter_enums.h"
+
+#include "zip_card_targets.h"
+#include "filters.h"
 
 namespace banggame {
 

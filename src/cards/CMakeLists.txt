@@ -9,9 +9,3 @@ add_subdirectory(thebullet)
 add_subdirectory(highnoon)
 add_subdirectory(valleyofshadows)
 add_subdirectory(wildwestshow)
-
-target_sources(bangserver PRIVATE
-    card_effect.cpp
-    card_serial.cpp
-    filters.cpp
-)

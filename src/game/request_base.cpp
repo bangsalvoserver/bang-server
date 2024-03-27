@@ -1,8 +1,9 @@
-#include "card_effect.h"
+#include "request_base.h"
 
-#include "game/game.h"
-#include "game/play_verify.h"
 #include "cards/filter_enums.h"
+
+#include "game.h"
+#include "play_verify.h"
 
 namespace banggame {
 
@@ -32,7 +33,4 @@ namespace banggame {
         return target_card->pocket == pocket_type::selection;
     }
     
-    void event_equip::on_disable(card *target_card, player *target) {
-        target->m_game->remove_listeners(target_card);
-    }
 }

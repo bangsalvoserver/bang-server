@@ -1,7 +1,7 @@
 #ifndef __BOT_SUGGESTION_H__
 #define __BOT_SUGGESTION_H__
 
-#include "cards/card_enums.h"
+#include "cards/card_fwd.h"
 
 namespace banggame::bot_suggestion {
 

@@ -1,9 +1,7 @@
-#include "card_serial.h"
-
-#include "filter_enums.h"
-#include "game_enums.h"
-
 #include "game/game_net.h"
+
+#include "cards/filter_enums.h"
+#include "cards/game_enums.h"
 
 namespace json {
 
@@ -88,20 +86,20 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<banggame::serial::effect_type, Context> {
-        json operator()(banggame::serial::effect_type value) const {
+    template<typename Context> struct serializer<const banggame::effect_vtable *, Context> {
+        json operator()(const banggame::effect_vtable *value) const {
             return std::string(value->name);
         }
     };
 
-    template<typename Context> struct serializer<banggame::serial::equip_type, Context> {
-        json operator()(banggame::serial::equip_type value) const {
+    template<typename Context> struct serializer<const banggame::equip_vtable *, Context> {
+        json operator()(const banggame::equip_vtable *value) const {
             return std::string(value->name);
         }
     };
 
-    template<typename Context> struct serializer<banggame::serial::modifier_type, Context> {
-        json operator()(banggame::serial::modifier_type value) const {
+    template<typename Context> struct serializer<const banggame::modifier_vtable *, Context> {
+        json operator()(const banggame::modifier_vtable *value) const {
             if (value) {
                 return std::string(value->name);
             } else {
@@ -110,8 +108,8 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<banggame::serial::mth_type, Context> {
-        json operator()(banggame::serial::mth_type value) const {
+    template<typename Context> struct serializer<const banggame::mth_vtable *, Context> {
+        json operator()(const banggame::mth_vtable *value) const {
             if (value) {
                 return std::string(value->name);
             } else {

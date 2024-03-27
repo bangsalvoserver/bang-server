@@ -1,9 +1,9 @@
 #ifndef __FISTFULOFCARDS_RULESET_H__
 #define __FISTFULOFCARDS_RULESET_H__
 
-namespace banggame {
+#include "cards/card_fwd.h"
 
-    struct game;
+namespace banggame {
 
     struct ruleset_fistfulofcards {
         void on_apply(game *game);

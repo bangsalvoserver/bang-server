@@ -1,7 +1,7 @@
 #include "game/play_verify.h"
 
 #include "game/possible_to_play.h"
-#include "cards/filters.h"
+#include "game/filters.h"
 
 namespace banggame {
 

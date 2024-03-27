@@ -1,7 +1,7 @@
 #ifndef __GAME_STRING_H__
 #define __GAME_STRING_H__
 
-#include "cards/card_enums.h"
+#include "cards/card_fwd.h"
 #include "utils/small_pod.h"
 
 namespace banggame {
@@ -15,7 +15,7 @@ namespace banggame {
     DEFINE_ENUM_TYPES(game_format_arg_type,
         (integer, int)
         (card, card_format)
-        (player, serial::opt_player)
+        (player, banggame::player *)
     )
 
     using game_format_arg = enums::enum_variant<game_format_arg_type>;

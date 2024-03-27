@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 
-#include "card_enums.h"
 #include "card_effect.h"
 
 namespace banggame {

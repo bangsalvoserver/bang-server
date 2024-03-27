@@ -1,6 +1,6 @@
 #include "sgt_blaze.h"
 
-#include "cards/filters.h"
+#include "game/filters.h"
 
 #include "game/game.h"
 

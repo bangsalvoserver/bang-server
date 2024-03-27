@@ -1,6 +1,6 @@
 #include "duel.h"
 
-#include "cards/filters.h"
+#include "game/filters.h"
 #include "bang.h"
 
 #include "game/game.h"

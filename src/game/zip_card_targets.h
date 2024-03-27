@@ -1,9 +1,7 @@
-#ifndef __EFFECT_LIST_ZIP_H__
-#define __EFFECT_LIST_ZIP_H__
+#ifndef __ZIP_CARD_TARGETS_H__
+#define __ZIP_CARD_TARGETS_H__
 
-#include <ranges>
-
-#include "card_data.h"
+#include "cards/card_defs.h"
 
 namespace banggame {
 

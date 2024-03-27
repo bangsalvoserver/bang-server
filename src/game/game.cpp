@@ -363,7 +363,7 @@ namespace banggame {
 
             .highlight_cards = rn::to<serial::card_list>(req->get_highlights()),
 
-            .target_set = owner && req->target == owner ? req->get_target_set() : target_list{},
+            .target_set = owner && req->target == owner ? rn::to<serial::player_list>(req->get_target_set()) : serial::player_list{},
 
             .distances = make_player_distances(owner),
 

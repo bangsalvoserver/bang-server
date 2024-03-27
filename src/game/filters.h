@@ -1,9 +1,8 @@
 #ifndef __FILTERS_H__
 #define __FILTERS_H__
 
-#include "filters_simple.h"
-
-#include "game/game_string.h"
+#include "cards/card_defs.h"
+#include "game_string.h"
 
 namespace banggame::filters {
 

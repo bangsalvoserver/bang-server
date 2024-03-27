@@ -3,7 +3,7 @@
 #include "cards/base/requests.h"
 
 #include "cards/game_enums.h"
-#include "cards/filters.h"
+#include "game/filters.h"
 
 #include "game/game.h"
 #include "game/possible_to_play.h"

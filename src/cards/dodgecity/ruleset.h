@@ -1,9 +1,9 @@
 #ifndef __DODGECITY_RULESET_H__
 #define __DODGECITY_RULESET_H__
 
-namespace banggame {
+#include "cards/card_fwd.h"
 
-    struct game;
+namespace banggame {
 
     struct ruleset_dodgecity {
         void on_apply(game *game);

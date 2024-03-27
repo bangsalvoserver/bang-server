@@ -33,8 +33,6 @@ namespace banggame {
         void on_update() override;
     };
 
-    struct game;
-
     class request_queue {
     private:
         struct state_done {};

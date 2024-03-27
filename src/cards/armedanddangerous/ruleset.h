@@ -1,7 +1,7 @@
 #ifndef __ARMEDANDDANGERSOUS_RULESET_H__
 #define __ARMEDANDDANGERSOUS_RULESET_H__
 
-#include "cards/card_serial.h"
+#include "cards/card_fwd.h"
 
 namespace banggame {
 

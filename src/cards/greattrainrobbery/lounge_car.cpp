@@ -2,7 +2,7 @@
 
 #include "game/game.h"
 
-#include "cards/filters.h"
+#include "game/filters.h"
 
 namespace banggame {
 
@@ -28,17 +28,14 @@ namespace banggame {
             }
         }
 
-        target_list get_target_set() const override {
+        std::vector<player *> get_target_set() const override {
             return target->m_game->m_players
                 | rv::filter([&](player *p) {
                     return rn::any_of(target->m_game->m_selection, [&](card *target_card) {
                         return !filters::check_player_filter(target, target_card->equip_target, p);
                     });
                 })
-                | rv::transform([](player *p) {
-                    return play_card_target{enums::enum_tag<target_type::player>, p};
-                })
-                | rn::to<target_list>;
+                | rn::to_vector;
         }
 
         game_string status_text(player *owner) const override {

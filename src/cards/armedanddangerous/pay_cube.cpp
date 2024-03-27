@@ -1,7 +1,7 @@
 #include "pay_cube.h"
 
 #include "cards/base/heal.h"
-#include "cards/filters.h"
+#include "game/filters.h"
 
 #include "game/game.h"
 

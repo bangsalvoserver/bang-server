@@ -1,7 +1,7 @@
 #include "indians.h"
 
 #include "cards/game_enums.h"
-#include "cards/filters.h"
+#include "game/filters.h"
 #include "bang.h"
 
 #include "game/game.h"

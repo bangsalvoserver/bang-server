@@ -1,9 +1,9 @@
 #include "filters.h"
 
-#include "game/game.h"
+#include "cards/filter_enums.h"
+#include "cards/game_enums.h"
 
-#include "filter_enums.h"
-#include "game_enums.h"
+#include "game.h"
 
 namespace banggame::filters {
 
@@ -55,15 +55,10 @@ namespace banggame::filters {
             return "ERROR_TARGET_EMPTY_CUBES";
         
         if (bool(filter & target_player_filter::target_set)) {
-            auto req = target->m_game->top_request();
-            target_list target_set = req ? req->get_target_set() : target_list{};
-            if (rn::none_of(target_set, [&](const play_card_target &t) {
-                if (auto *p = t.get_if<target_type::player>()) {
-                    return *p == target;
+            if (auto req = target->m_game->top_request()) {
+                if (!rn::contains(req->get_target_set(), target)) {
+                    return "ERROR_TARGET_NOT_IN_TARGET_SET";
                 }
-                return false;
-            })) {
-                return "ERROR_TARGET_NOT_IN_TARGET_SET";
             }
         }
 
