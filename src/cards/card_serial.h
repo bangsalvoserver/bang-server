@@ -30,35 +30,7 @@ namespace banggame {
         using equip_type = const banggame::equip_vtable *;
         using modifier_type = const banggame::modifier_vtable *;
         using mth_type = const banggame::mth_vtable *;
-        
-        struct card_format {
-            banggame::card *card;
-            card_format() = default;
-            card_format(banggame::card *card) : card(card) {}
-        };
-
-        template<typename T, typename ... Ts>
-        static constexpr bool is_one_of = (std::is_same_v<T, Ts> || ...);
-
-        template<typename T>
-        concept serializable = is_one_of<T, opt_card, card, opt_player, player, card_format, effect_type, equip_type, modifier_type, mth_type>;
-
-        template<typename T>
-        concept deserializable = is_one_of<T, opt_card, card, opt_player, player>;
     }
-
-}
-
-namespace json {
-    template<banggame::serial::serializable T> struct serializer<T, banggame::game_context> {
-        const banggame::game_context &context;
-        json operator()(same_if_trivial_t<T> value) const;
-    };
-
-    template<banggame::serial::deserializable T> struct deserializer<T, banggame::game_context> {
-        const banggame::game_context &context;
-        T operator()(const json &value) const;
-    };
 
 }
 

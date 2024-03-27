@@ -430,7 +430,7 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
     }
 
     if (player *origin = lobby.m_game->find_player_by_userid(user->second.user_id)) {
-        origin->handle_game_action(json::deserialize<banggame::game_action>(value, lobby.m_game->context()));
+        origin->handle_game_action(lobby.m_game->deserialize_action(value));
         return {};
     } else {
         return "ERROR_USER_NOT_CONTROLLING_PLAYER";

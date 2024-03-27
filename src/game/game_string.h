@@ -5,10 +5,16 @@
 #include "utils/small_pod.h"
 
 namespace banggame {
+        
+    struct card_format {
+        banggame::card *card;
+        card_format() = default;
+        card_format(banggame::card *card) : card(card) {}
+    };
 
     DEFINE_ENUM_TYPES(game_format_arg_type,
         (integer, int)
-        (card, serial::card_format)
+        (card, card_format)
         (player, serial::opt_player)
     )
 

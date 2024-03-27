@@ -2,7 +2,6 @@
 
 #include "game_update.h"
 
-#include "cards/filters.h"
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 #include "cards/rulesets.h"
@@ -20,10 +19,6 @@ namespace banggame {
     game::game(unsigned int seed)
         : game_table(seed)
         , request_queue(this) {}
-
-    json::json game_net_manager::serialize_update(const game_update &update) const {
-        return json::serialize(update, context());
-    }
 
     player_user_pair::player_user_pair(player *p)
         : player_id{p->id}, user_id{p->user_id} {}

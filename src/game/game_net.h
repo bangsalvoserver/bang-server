@@ -108,6 +108,8 @@ namespace banggame {
             return m_context;
         }
 
+        game_action deserialize_action(const json::json &action) const;
+        
         json::json serialize_update(const game_update &update) const;
 
         template<game_update_type E>
