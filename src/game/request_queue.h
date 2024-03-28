@@ -62,7 +62,7 @@ namespace banggame {
             return !m_requests.empty();
         }
 
-        bool pending_updates() const {
+        bool is_waiting() const {
             return std::holds_alternative<state_waiting>(m_state);
         }
 

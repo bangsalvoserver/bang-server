@@ -157,8 +157,6 @@ namespace banggame {
         }
 
         void remove_extra_characters();
-
-        void handle_game_action(const game_action &action);
     };
 
 }

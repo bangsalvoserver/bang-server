@@ -126,11 +126,11 @@ namespace banggame {
         player *target = lobby.m_game->find_player_by_userid(user->second.user_id);
         if (!target) return "ERROR_USER_NOT_CONTROLLING_PLAYER";
 
-        if (lobby.m_game->pending_requests() || lobby.m_game->pending_updates() || lobby.m_game->m_playing != target) {
+        if (lobby.m_game->pending_requests() || lobby.m_game->is_waiting() || lobby.m_game->m_playing != target) {
             return "ERROR_PLAYER_NOT_IN_TURN";
         }
 
-        auto card_it = rn::find_if(lobby.m_game->m_context.cards, [&](const card &target_card) {
+        auto card_it = rn::find_if(lobby.m_game->context().cards, [&](const card &target_card) {
             if (rn::equal(name, target_card.name, {}, toupper, toupper)) {
                 switch (target_card.deck) {
                 case card_deck_type::main_deck:
@@ -149,7 +149,7 @@ namespace banggame {
             }
             return false;
         });
-        if (card_it == lobby.m_game->m_context.cards.end()) return "ERROR_CANNOT_FIND_CARD";
+        if (card_it == lobby.m_game->context().cards.end()) return "ERROR_CANNOT_FIND_CARD";
         card *target_card = &*card_it;
         
         lobby.m_game->send_request_status_clear();

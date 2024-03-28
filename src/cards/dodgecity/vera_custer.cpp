@@ -6,15 +6,13 @@
 namespace banggame {
 
     static card *get_card_copy(card *target_card) {
-        auto &cards = target_card->owner->m_game->m_context.cards;
-        auto it = rn::find_if(cards, [&](const card &c) {
-            return &c != target_card && c.deck == target_card->deck && c.name == target_card->name;
-        });
-        if (it != cards.end()) {
-            return &*it;
-        } else {
-            return &cards.emplace(int(cards.first_available_id()), *target_card);
+        game *m_game = target_card->owner->m_game;
+        for (card &c : m_game->context().cards) {
+            if (&c != target_card && c.deck == target_card->deck && c.name == target_card->name) {
+                return &c;
+            }
         }
+        return m_game->add_card(*target_card);
     }
 
     static void copy_characters(player *origin, player *target) {

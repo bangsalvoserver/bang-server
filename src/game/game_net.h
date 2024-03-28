@@ -15,7 +15,7 @@ namespace banggame {
 
     class update_target {
     private:
-        player *m_targets[lobby_max_players];
+        const player *m_targets[lobby_max_players];
 
         struct {
             bool m_inclusive:1;
@@ -23,7 +23,7 @@ namespace banggame {
             int m_num_targets:6;
         };
 
-        update_target(bool inclusive, bool invert_public, std::same_as<player *> auto ... targets)
+        update_target(bool inclusive, bool invert_public, std::convertible_to<const player *> auto ... targets)
             : m_targets{targets ...}
             , m_inclusive{inclusive}
             , m_invert_public{invert_public}
@@ -32,7 +32,7 @@ namespace banggame {
             static_assert(sizeof...(targets) <= lobby_max_players);
         }
 
-        update_target(bool inclusive, std::same_as<player *> auto ... targets)
+        update_target(bool inclusive, std::convertible_to<const player *> auto ... targets)
             : update_target(inclusive, false, targets...) {}
 
         auto targets() const {
@@ -40,19 +40,19 @@ namespace banggame {
         }
 
     public:
-        static update_target includes(std::same_as<player *> auto ... targets) {
+        static update_target includes(std::convertible_to<const player *> auto ... targets) {
             return update_target(true, targets...);
         }
 
-        static update_target excludes(std::same_as<player *> auto ... targets) {
+        static update_target excludes(std::convertible_to<const player *> auto ... targets) {
             return update_target(false, targets...);
         }
 
-        static update_target includes_private(std::same_as<player *> auto ... targets) {
+        static update_target includes_private(std::convertible_to<const player *> auto ... targets) {
             return update_target(true, true, targets...);
         }
 
-        static update_target excludes_public(std::same_as<player *> auto ... targets) {
+        static update_target excludes_public(std::convertible_to<const player *> auto ... targets) {
             return update_target(false, true, targets...);
         }
 
@@ -60,7 +60,7 @@ namespace banggame {
             m_targets[m_num_targets++] = target;
         }
 
-        bool matches(player *target) const {
+        bool matches(const player *target) const {
             return rn::contains(targets(), target) == m_inclusive;
         }
 
@@ -98,25 +98,44 @@ namespace banggame {
         ticks duration;
     };
 
-    struct game_net_manager {
+    class game_net_manager {
+    protected:
         std::deque<game_update_tuple> m_updates;
         std::deque<std::pair<update_target, game_string>> m_saved_log;
 
         game_context m_context;
 
-        const game_context &context() const {
-            return m_context;
-        }
-
-        game_action deserialize_action(const json::json &action) const;
-        
+    private:
         json::json serialize_update(const game_update &update) const;
 
+    protected:
         template<game_update_type E>
         json::json make_update(auto && ... args) {
             return serialize_update(game_update{enums::enum_tag<E>, FWD(args) ... });
         }
+    
+    public:
+        const game_context &context() const {
+            return m_context;
+        }
+        
+        player *find_player_by_userid(int user_id) const;
 
+        bool pending_updates() const {
+            return !m_updates.empty();
+        }
+
+        game_update_tuple get_next_update() {
+            auto update = std::move(m_updates.front());
+            m_updates.pop_front();
+            return update;
+        }
+
+        std::string handle_game_action(int user_id, const json::json &value);
+
+        ticks get_total_update_time() const;
+
+    public:
         template<game_update_type E>
         void add_update(update_target target, auto && ... args) {
             game_update update{enums::enum_tag<E>, FWD(args) ... };

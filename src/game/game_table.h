@@ -49,8 +49,6 @@ namespace banggame {
 
         game_table(unsigned int seed);
         
-        player *find_player_by_userid(int user_id) const;
-        
         std::vector<card *> &get_pocket(pocket_type pocket, player *owner = nullptr);
 
         int calc_distance(const player *from, const player *to);
@@ -58,10 +56,11 @@ namespace banggame {
         int num_alive() const;
 
         void shuffle_cards_and_ids(std::span<card *> vec);
+        card *add_card(const card_data &data);
 
         void set_card_visibility(card *c, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
         void move_card(card *c, pocket_type pocket, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
-        
+
         card *top_of_deck();
 
         card *draw_shop_card();

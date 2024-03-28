@@ -21,13 +21,6 @@ namespace banggame {
         }
         rng.seed(rng_seed);
     }
-
-    player *game_table::find_player_by_userid(int user_id) const {
-        if (auto it = rn::find(m_players, user_id, &player::user_id); it != m_players.end()) {
-            return *it;
-        }
-        return nullptr;
-    }
     
     std::vector<card *> &game_table::get_pocket(pocket_type pocket, player *owner) {
         switch (pocket) {
@@ -95,6 +88,10 @@ namespace banggame {
             m_context.cards.insert(std::move(a));
             m_context.cards.insert(std::move(b));
         }
+    }
+
+    card *game_table::add_card(const card_data &data) {
+        return &m_context.cards.emplace(int(m_context.cards.first_available_id()), data);
     }
 
     void game_table::set_card_visibility(card *c, player *owner, card_visibility visibility, bool instant) {

@@ -9,7 +9,7 @@
 namespace banggame {
 
     static void init_stations_and_train(player *origin) {
-        origin->m_game->m_stations = origin->m_game->m_context.cards
+        origin->m_game->m_stations = origin->m_game->context().cards
             | rv::transform([](card &c) { return &c; })
             | rv::filter([](card *c) { return c->deck == card_deck_type::station; })
             | rv::sample(std::max(int(origin->m_game->m_players.size()), 4), origin->m_game->rng)
@@ -21,7 +21,7 @@ namespace banggame {
             origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
         }
 
-        origin->m_game->m_train = origin->m_game->m_context.cards
+        origin->m_game->m_train = origin->m_game->context().cards
             | rv::transform([](card &c) { return &c; })
             | rv::filter([&](card *c) {
                 return c->deck == card_deck_type::locomotive && !rn::contains(origin->m_game->m_train, c);

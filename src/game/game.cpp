@@ -109,7 +109,7 @@ namespace banggame {
         if (m_playing) {
             co_yield make_update<game_update_type::switch_turn>(m_playing);
         }
-        if (!pending_updates() && pending_requests()) {
+        if (!is_waiting() && pending_requests()) {
             co_yield make_update<game_update_type::request_status>(make_request_update(nullptr));
         }
 
@@ -141,7 +141,7 @@ namespace banggame {
             }
         }
 
-        if (!is_game_over() && !pending_updates()) {
+        if (!is_game_over() && !is_waiting()) {
             if (pending_requests()) {
                 co_yield make_update<game_update_type::request_status>(make_request_update(target));
             } else if (target == m_playing) {
@@ -191,7 +191,7 @@ namespace banggame {
                     }
                 }
 
-                card *new_card = &m_context.cards.emplace(int(m_context.cards.first_available_id()), c);
+                card *new_card = add_card(c);
                 new_card->pocket = pocket;
                 
                 if (out_pocket) {

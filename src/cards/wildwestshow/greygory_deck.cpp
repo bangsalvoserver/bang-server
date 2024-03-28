@@ -6,7 +6,7 @@ namespace banggame {
     
     static void greygory_deck_add_characters(card *target_card, player *target) {
         std::array<card *, 2> base_characters;
-        rn::sample(target->m_game->m_context.cards
+        rn::sample(target->m_game->context().cards
             | rv::transform([](card &c) { return &c; })
             | rv::filter([&](card *c) {
                 return c != target_card && c->expansion == expansion_type{}

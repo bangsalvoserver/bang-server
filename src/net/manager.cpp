@@ -425,27 +425,21 @@ std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, co
         return "ERROR_LOBBY_NOT_PLAYING";
     }
 
-    if (lobby.m_game->pending_updates()) {
-        return "ERROR_GAME_PENDING_UPDATES";
+    if (lobby.m_game->is_waiting()) {
+        return "ERROR_GAME_STATE_WAITING";
     }
 
-    if (player *origin = lobby.m_game->find_player_by_userid(user->second.user_id)) {
-        origin->handle_game_action(lobby.m_game->deserialize_action(value));
-        return {};
-    } else {
-        return "ERROR_USER_NOT_CONTROLLING_PLAYER";
-    }
+    return lobby.m_game->handle_game_action(user->second.user_id, value);
 }
 
 void lobby::send_updates(game_manager &mgr) {
-    while (state == lobby_state::playing && m_game && !m_game->m_updates.empty()) {
-        auto &[target, update, update_time] = m_game->m_updates.front();
+    while (state == lobby_state::playing && m_game && m_game->pending_updates()) {
+        auto [target, update, update_time] = m_game->get_next_update();
         for (auto &[team, it] : users) {
             if (target.matches(it->second.user_id)) {
                 mgr.send_message<server_message_type::game_update>(it->first, update);
             }
         }
-        m_game->m_updates.pop_front();
     }
 }
 

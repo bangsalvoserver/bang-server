@@ -5,17 +5,6 @@
 #include "utils/type_name.h"
 
 namespace banggame {
-    
-    static ticks get_total_update_time(game *game) {
-        return rn::max(game->m_players | rv::transform([&](player *p) {
-            return rn::accumulate(game->m_updates | rv::transform([&](const game_update_tuple &tup) {
-                if (tup.duration >= ticks{0} && tup.target.matches(p)) {
-                    return tup.duration;
-                }
-                return ticks{0};
-            }), ticks{0});
-        }));
-    }
 
     request_queue::state_t request_queue::invoke_update() {
         if (m_game->is_game_over()) {
@@ -38,7 +27,7 @@ namespace banggame {
                     timer->on_finished();
                     return state_next{};
                 }
-                timer->start(get_total_update_time(m_game));
+                timer->start(m_game->get_total_update_time());
             }
             m_game->send_request_update();
         } else if (m_game->m_playing && !m_game->send_request_status_ready()) {
@@ -46,7 +35,7 @@ namespace banggame {
         }
         if (rn::any_of(m_game->m_players, &player::is_bot)) {
             if (m_game->m_options.bot_play_timer > game_duration{0}) {
-                return state_bot_play{ get_total_update_time(m_game) + clamp_ticks(m_game->m_options.bot_play_timer) };
+                return state_bot_play{ m_game->get_total_update_time() + clamp_ticks(m_game->m_options.bot_play_timer) };
             } else if (m_game->request_bot_play()) {
                 return state_next{};
             }
@@ -104,7 +93,7 @@ namespace banggame {
     void request_queue::commit_updates() {
         int count = 0;
         do {
-            auto timer = get_total_update_time(m_game);
+            auto timer = m_game->get_total_update_time();
             if (timer > max_update_timer_duration || count > max_update_count) {
                 m_state = state_waiting{ timer };
             } else {
