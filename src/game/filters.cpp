@@ -45,10 +45,10 @@ namespace banggame::filters {
         if (bool(filter & target_player_filter::notsheriff) && target->m_role == player_role::sheriff)
             return "ERROR_TARGET_SHERIFF";
 
-        if (bool(filter & target_player_filter::not_empty_hand) && target->m_hand.empty())
+        if (bool(filter & target_player_filter::not_empty_hand) && target->empty_hand())
             return "ERROR_TARGET_EMPTY_HAND";
         
-        if (bool(filter & target_player_filter::not_empty_table) && target->m_table.empty())
+        if (bool(filter & target_player_filter::not_empty_table) && target->empty_table())
             return "ERROR_TARGET_EMPTY_TABLE";
 
         if (bool(filter & target_player_filter::not_empty_cubes) && target->count_cubes() == 0)
@@ -158,19 +158,19 @@ namespace banggame::filters {
             && !target->has_tag(tag_type::panic))
             return "ERROR_TARGET_NOT_CATBALOU_PANIC";
 
-        if (bool(filter & target_card_filter::blue) && target->color != card_color_type::blue)
+        if (bool(filter & target_card_filter::blue) && !target->is_blue())
             return "ERROR_TARGET_NOT_BLUE_CARD";
 
-        if (bool(filter & target_card_filter::train) && target->color != card_color_type::train)
+        if (bool(filter & target_card_filter::train) && !target->is_train())
             return "ERROR_TARGET_NOT_TRAIN";
 
-        if (bool(filter & target_card_filter::nottrain) && target->color == card_color_type::train)
+        if (bool(filter & target_card_filter::nottrain) && target->is_train())
             return "ERROR_TARGET_TRAIN";
 
-        if (bool(filter & target_card_filter::blue_or_train) && target->color != card_color_type::blue && target->color != card_color_type::train)
+        if (bool(filter & target_card_filter::blue_or_train) && !target->is_blue() && !target->is_train())
             return "ERROR_TARGET_NOT_BLUE_OR_TRAIN";
 
-        if (bool(filter & target_card_filter::black) != (target->color == card_color_type::black))
+        if (bool(filter & target_card_filter::black) != target->is_black())
             return "ERROR_TARGET_BLACK_CARD";
 
         if (bool(filter & target_card_filter::hearts) && !target->sign.is_hearts())

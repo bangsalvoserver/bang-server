@@ -39,7 +39,7 @@ namespace banggame {
             }
             steal_card(target, origin, target_card);
 
-            if (!origin->only_black_cards_equipped()) {
+            if (!origin->empty_hand() || !origin->empty_table()) {
                 for (player *next_target : range_other_players(target)) {
                     if (next_target == origin) continue;
 
@@ -77,7 +77,7 @@ namespace banggame {
             }
         });
         origin->m_game->add_listener<event_type::on_player_death>(target_card, [=](player *killer, player *target) {
-            if (target->only_black_cards_equipped()) return;
+            if (target->empty_hand() && target->empty_table()) return;
             
             for (card *target_card : target->m_table) {
                 target->m_game->tap_card(target_card, false);

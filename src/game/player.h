@@ -120,8 +120,8 @@ namespace banggame {
 
         bool immune_to(card *origin_card, player *origin, effect_flags flags, bool quiet = false);
 
-        bool only_black_cards_equipped() const {
-            return empty_hand() && rn::all_of(m_table, &card::is_black);
+        bool empty_table() const {
+            return rn::all_of(m_table, &card::is_black);
         }
 
         bool empty_hand() const {

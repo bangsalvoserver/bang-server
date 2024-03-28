@@ -26,7 +26,7 @@ namespace banggame {
     template<> game_string visit_cards::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
         if (!rn::all_of(origin->m_game->m_players | rv::filter(&player::alive), [&](player *p) {
             size_t found = rn::count(target_cards, p, &card::owner);
-            if (p->only_black_cards_equipped()) return found == 0;
+            if (p->empty_hand() && p->empty_table()) return found == 0;
             if (p == origin || p == ctx.skipped_player) return found == 0;
             else return found == 1;
         })) {
