@@ -83,6 +83,7 @@ private:
     std::string handle_message(MSG_TAG(lobby_chat),     user_ptr user, const lobby_chat_client_args &value);
     std::string handle_message(MSG_TAG(lobby_return),   user_ptr user);
     std::string handle_message(MSG_TAG(game_start),     user_ptr user);
+    std::string handle_message(MSG_TAG(game_rejoin),    user_ptr user, int player_id);
     std::string handle_message(MSG_TAG(game_action),    user_ptr user, const json::json &value);
 
     std::string handle_chat_command(user_ptr user, const std::string &command);
@@ -95,7 +96,6 @@ private:
     std::string command_give_card(user_ptr user, std::string_view name);
     std::string command_set_team(user_ptr user, std::string_view value);
     std::string command_get_rng_seed(user_ptr user);
-    std::string command_rejoin(user_ptr user, std::string_view value);
 
 private:
     user_map users;

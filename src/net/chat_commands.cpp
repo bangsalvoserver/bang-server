@@ -19,7 +19,6 @@ namespace banggame {
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
     static constexpr std::string_view SET_TEAM_DESCRIPTION = "[game_player / game_spectator] : set team";
     static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed";
-    static constexpr std::string_view REJOIN_DESCRIPTION = "[index] : rejoin disconnected player";
 
     const std::map<std::string, chat_command, std::less<>> chat_command::commands {
         { "help",           { proxy<&game_manager::command_print_help>,         HELP_DESCRIPTION }},
@@ -30,7 +29,6 @@ namespace banggame {
         { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
         { "set-team",       { proxy<&game_manager::command_set_team>,           SET_TEAM_DESCRIPTION, command_permissions::lobby_waiting }},
         { "seed",           { proxy<&game_manager::command_get_rng_seed>,       GET_RNG_SEED_DESCRIPTION, command_permissions::lobby_finished }},
-        { "rejoin",         { proxy<&game_manager::command_rejoin>,             REJOIN_DESCRIPTION, command_permissions::lobby_playing }}
     };
 
     std::string game_manager::command_print_help(user_ptr user) {
@@ -247,67 +245,6 @@ namespace banggame {
 
     std::string game_manager::command_get_rng_seed(user_ptr user) {
         send_message<server_message_type::lobby_chat>(user->first, 0, std::to_string(user->second.in_lobby->m_game->rng_seed));
-        return {};
-    }
-
-    std::string game_manager::command_rejoin(user_ptr user, std::string_view value) {
-        auto &lobby = *user->second.in_lobby;
-
-        lobby_team &user_team = rn::find(lobby.users, user, &team_user_pair::second)->first;
-        if (user_team != lobby_team::game_spectator) {
-            return "ERROR_USER_NOT_SPECTATOR";
-        }
-
-        std::vector<player *> rejoinable_players = lobby.m_game->m_players
-            | rv::filter([&](player *p) {
-                return !rn::contains(lobby.users, p->user_id, [](const team_user_pair &pair) {
-                    return pair.second->second.user_id;
-                });
-            })
-            | rn::to_vector;
-
-        if (rejoinable_players.empty()) {
-            return "ERROR_NO_REJOINABLE_PLAYERS";
-        }
-
-        player *disconnected = nullptr;
-
-        if (value.empty()) {
-            if (rejoinable_players.size() == 1) {
-                disconnected = rejoinable_players.front();
-            } else {
-                auto &lobby = *user->second.in_lobby;
-                for (const auto &[i, p] : rv::enumerate(rejoinable_players)) {
-                    card *c = p->first_character();
-                    send_message<server_message_type::lobby_chat>(user->first, 0,
-                        fmt::format("{} : /rejoin {}", c ? c->name : "UNKNOWN", i + 1));
-                }
-                return {};
-            }
-        } else {
-            int player_index;
-            if (auto [end, ec] = std::from_chars(value.data(), value.data() + value.size(), player_index); ec != std::errc{}) {
-                return "INVALID_INTEGER";
-            }
-            if (player_index >= 1 && player_index <= rejoinable_players.size()) {
-                disconnected = rejoinable_players[player_index - 1];
-            } else {
-                return "PLAYER_INDEX_OUT_OF_RANGE";
-            }
-        }
-
-        user_team = lobby_team::game_player;
-
-        disconnected->user_id = user->second.user_id;
-        lobby.m_game->add_update<game_update_type::player_add>(std::vector{player_user_pair{ disconnected }});
-        
-        for (const auto &msg : lobby.m_game->get_rejoin_updates(disconnected)) {
-            send_message<server_message_type::game_update>(user->first, msg);
-        }
-        for (const auto &msg : lobby.m_game->get_game_log_updates(disconnected)) {
-            send_message<server_message_type::game_update>(user->first, msg);
-        }
-
         return {};
     }
 

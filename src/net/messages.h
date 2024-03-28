@@ -50,6 +50,7 @@ namespace banggame {
         (lobby_chat, lobby_chat_client_args)
         (lobby_return)
         (game_start)
+        (game_rejoin, int)
         (game_action, json::json)
     )
 

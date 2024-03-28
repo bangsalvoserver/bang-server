@@ -415,6 +415,40 @@ std::string game_manager::handle_message(MSG_TAG(game_start), user_ptr user) {
     return {};
 }
 
+std::string game_manager::handle_message(MSG_TAG(game_rejoin), user_ptr user, int player_id) {
+    auto &lobby = *user->second.in_lobby;
+
+    if (lobby.state != lobby_state::playing) {
+        return "ERROR_LOBBY_NOT_PLAYING";
+    }
+
+    lobby_team &user_team = rn::find(lobby.users, user, &team_user_pair::second)->first;
+    if (user_team != lobby_team::game_spectator) {
+        return "ERROR_USER_NOT_SPECTATOR";
+    }
+
+    player *target = lobby.m_game->context().find_player(player_id);
+    for (const auto &[team, user]: lobby.users) {
+        if (user->second.user_id == target->user_id) {
+            return "ERROR_PLAYER_NOT_REJOINABLE";
+        }
+    }
+
+    user_team = lobby_team::game_player;
+    target->user_id = user->second.user_id;
+
+    lobby.m_game->add_update<game_update_type::player_add>(std::vector{player_user_pair{ target }});
+    
+    for (const auto &msg : lobby.m_game->get_rejoin_updates(target)) {
+        send_message<server_message_type::game_update>(user->first, msg);
+    }
+    for (const auto &msg : lobby.m_game->get_game_log_updates(target)) {
+        send_message<server_message_type::game_update>(user->first, msg);
+    }
+
+    return {};
+}
+
 std::string game_manager::handle_message(MSG_TAG(game_action), user_ptr user, const json::json &value) {
     if (!user->second.in_lobby) {
         return "ERROR_PLAYER_NOT_IN_LOBBY";
