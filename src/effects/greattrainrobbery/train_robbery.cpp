@@ -72,7 +72,7 @@ namespace banggame {
 
         void on_pick(card *target_card) override {
             selected_cards.push_back(target_card);
-            flags &= ~effect_flags::escapable;
+            flags &= ~(effect_flags::escapable | effect_flags::single_target);
             
             target->m_game->queue_request<request_train_robbery_choose>(origin_card, origin, target, target_card);
         }
