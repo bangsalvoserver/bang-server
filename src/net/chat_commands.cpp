@@ -131,6 +131,7 @@ namespace banggame {
         auto card_it = rn::find_if(lobby.m_game->context().cards, [&](const card &target_card) {
             if (rn::equal(name, target_card.name, {}, toupper, toupper)) {
                 switch (target_card.deck) {
+                case card_deck_type::train:
                 case card_deck_type::main_deck:
                     return target_card.pocket != pocket_type::player_hand || target_card.owner != target;
                 case card_deck_type::character:
@@ -224,6 +225,18 @@ namespace banggame {
                 target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::wws_scenario_deck, true);
             } else {
                 target->m_game->move_card(target_card, pocket_type::wws_scenario_deck);
+            }
+            break;
+        }
+        case card_deck_type::train: {
+            if (target_card->owner) {
+                target->steal_card(target_card);
+            } else {
+                bool from_train = target_card->pocket == pocket_type::train;
+                target->equip_card(target_card);
+                if (from_train && !target->m_game->m_train_deck.empty()) {
+                    target->m_game->move_card(target->m_game->m_train_deck.front(), pocket_type::train);
+                }
             }
             break;
         }
