@@ -1,5 +1,3 @@
-add_subdirectory(target_types)
-
 target_sources(bangserver
 PRIVATE
     bot_ai.cpp

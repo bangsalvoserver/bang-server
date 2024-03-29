@@ -9,11 +9,11 @@
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
-#include "cards/base/bang.h"
-#include "cards/base/damage.h"
-#include "cards/base/draw.h"
-#include "cards/base/predraw_check.h"
-#include "cards/base/requests.h"
+#include "effects/base/bang.h"
+#include "effects/base/damage.h"
+#include "effects/base/draw.h"
+#include "effects/base/predraw_check.h"
+#include "effects/base/requests.h"
 
 #include <cassert>
 #include <numeric>

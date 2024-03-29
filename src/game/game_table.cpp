@@ -3,8 +3,8 @@
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
-#include "cards/armedanddangerous/ruleset.h"
-#include "cards/greattrainrobbery/ruleset.h"
+#include "effects/armedanddangerous/ruleset.h"
+#include "effects/greattrainrobbery/ruleset.h"
 
 #include "player_iterator.h"
 

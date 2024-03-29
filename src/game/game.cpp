@@ -4,10 +4,10 @@
 
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
-#include "cards/rulesets.h"
 
-#include "cards/base/requests.h"
-#include "cards/base/deathsave.h"
+#include "effects/rulesets.h"
+#include "effects/base/requests.h"
+#include "effects/base/deathsave.h"
 
 #include "play_verify.h"
 #include "possible_to_play.h"
