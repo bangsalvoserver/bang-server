@@ -8,6 +8,20 @@
 
 namespace banggame {
 
+    template<rn::input_range R> requires std::is_pointer_v<rn::range_value_t<R>>
+    rn::range_value_t<R> get_single_element(R &&range) {
+        auto begin = rn::begin(range);
+        auto end = rn::end(range);
+
+        if (begin != end) {
+            auto first = *begin;
+            if (++begin == end) {
+                return first;
+            }
+        }
+        return nullptr;
+    }
+
     template<typename Rng>
     inline bool contains_at_least(Rng &&range, int size) {
         return rn::distance(rn::take_view(FWD(range), size)) == size;

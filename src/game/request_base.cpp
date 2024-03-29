@@ -8,23 +8,24 @@
 namespace banggame {
 
     void request_picking::auto_pick() {
-        auto update = target->m_game->make_request_update(target);
-        if (update.pick_cards.size() == 1 && update.respond_cards.size() == 1 && update.respond_cards.front().card->has_tag(tag_type::pick)) {
-            on_pick(update.pick_cards.front());
+        if (card *only_card = get_single_element(get_all_playable_cards(target, true))) {
+            if (only_card->has_tag(tag_type::pick)) {
+                if (card *target_card = get_single_element(get_pick_cards(target))) {
+                    on_pick(target_card);
+                }
+            }
         }
     }
 
     void request_base::auto_respond() {
-        auto update = target->m_game->make_request_update(target);
-        if (update.pick_cards.empty() && update.respond_cards.size() == 1) {
-            card *origin_card = update.respond_cards.front().card;
-            if (origin_card->equips.empty()
-                && origin_card->optionals.empty()
-                && !origin_card->is_modifier()
-                && rn::all_of(origin_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
+        if (card *only_card = get_single_element(get_all_playable_cards(target, true))) {
+            if (only_card->equips.empty()
+                && only_card->optionals.empty()
+                && !only_card->is_modifier()
+                && rn::all_of(only_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
             ) {
-                apply_target_list(target, origin_card, true,
-                    target_list{origin_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}, {});
+                apply_target_list(target, only_card, true,
+                    target_list{only_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}, {});
             }
         }
     }
