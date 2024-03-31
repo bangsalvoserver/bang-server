@@ -2,6 +2,8 @@
 #define __BASE_REQUESTS_H__
 
 #include "cards/card_effect.h"
+#include "pick.h"
+#include "resolve.h"
 
 namespace banggame {
 
@@ -49,7 +51,7 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
 
-    struct request_discard_all : request_picking, resolvable_request {
+    struct request_discard_all : request_picking, interface_resolvable {
         discard_all_reason reason;
 
         request_discard_all(player *target, discard_all_reason reason, int priority = 100)
@@ -63,7 +65,7 @@ namespace banggame {
         game_string status_text(player *owner) const override;
     };
     
-    struct request_discard_hand : request_picking, resolvable_request {
+    struct request_discard_hand : request_picking, interface_resolvable {
         request_discard_hand(card *origin_card, player *target)
             : request_picking(origin_card, nullptr, target) {}
         

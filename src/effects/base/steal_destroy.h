@@ -4,6 +4,7 @@
 #include "cards/card_effect.h"
 #include "game/bot_suggestion.h"
 #include "prompts.h"
+#include "resolve.h"
 
 namespace banggame {
 
@@ -41,9 +42,9 @@ namespace banggame {
 
     DEFINE_EFFECT(destroy, effect_destroy)
 
-    struct request_targeting : request_base, resolvable_request {
+    struct request_targeting : request_resolvable {
         request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {}, int priority = 40)
-            : request_base(origin_card, origin, target, flags, priority)
+            : request_resolvable(origin_card, origin, target, flags, priority)
             , target_card(target_card) {}
         
         card *target_card;

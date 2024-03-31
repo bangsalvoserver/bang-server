@@ -2,6 +2,7 @@
 #define __BASE_DRAW_H__
 
 #include "cards/card_effect.h"
+#include "pick.h"
 
 namespace banggame {
     

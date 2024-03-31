@@ -16,7 +16,7 @@ namespace banggame {
 
     void request_death::on_update() {
         if (target->m_hp <= 0 && !target->check_player_flags(player_flags::dead)) {
-            auto_respond();
+            auto_resolve();
         } else {
             target->m_game->pop_request();
         }

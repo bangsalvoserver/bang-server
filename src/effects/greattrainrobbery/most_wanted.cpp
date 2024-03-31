@@ -1,6 +1,7 @@
 #include "most_wanted.h"
 
 #include "game/game.h"
+#include "effects/base/resolve.h"
 
 namespace banggame {
 
@@ -12,9 +13,9 @@ namespace banggame {
         });
     }
 
-    struct request_most_wanted : request_base, resolvable_request {
+    struct request_most_wanted : request_resolvable {
         request_most_wanted(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_base(origin_card, origin, target, flags) {}
+            : request_resolvable(origin_card, origin, target, flags) {}
 
         struct most_wanted_timer : request_timer {
             explicit most_wanted_timer(request_most_wanted *request)
@@ -34,7 +35,7 @@ namespace banggame {
             } else {
                 switch (target->can_escape(origin, origin_card, flags)) {
                 case 0:
-                    auto_respond();
+                    auto_resolve();
                     break;
                 case 2:
                     m_timer.reset();

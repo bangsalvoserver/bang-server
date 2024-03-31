@@ -8,9 +8,9 @@
 
 namespace banggame {
 
-    struct request_indians : request_picking, resolvable_request, respondable_with_bang {
+    struct request_indians : request_resolvable, interface_picking, respondable_with_bang {
         request_indians(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_picking(origin_card, origin, target, flags) {}
+            : request_resolvable(origin_card, origin, target, flags) {}
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
@@ -20,7 +20,7 @@ namespace banggame {
                     target->m_game->play_sound(target, "indians");
                 }
                 if (target->empty_hand()) {
-                    auto_respond();
+                    auto_resolve();
                 }
             }
         }

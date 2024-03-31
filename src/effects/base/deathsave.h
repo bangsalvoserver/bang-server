@@ -2,6 +2,7 @@
 #define __BASE_DEATHSAVE_H__
 
 #include "cards/card_effect.h"
+#include "resolve.h"
 
 namespace banggame {
 
@@ -24,9 +25,9 @@ namespace banggame {
 
     DEFINE_EFFECT(deathsave, effect_deathsave)
     
-    struct request_death : request_base, resolvable_request {
+    struct request_death : request_resolvable {
         request_death(card *origin_card, player *origin, player *target)
-            : request_base(origin_card, origin, target, {}, 50) {}
+            : request_resolvable(origin_card, origin, target, {}, 50) {}
 
         bool tried_save = false;
 

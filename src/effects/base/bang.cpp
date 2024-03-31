@@ -167,7 +167,7 @@ namespace banggame {
                 }
             }
             if (target->empty_hand() || unavoidable) {
-                auto_respond();
+                auto_resolve();
             }
         }
     }

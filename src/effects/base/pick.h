@@ -12,6 +12,26 @@ namespace banggame {
     
     DEFINE_EFFECT(pick, effect_pick)
 
+    struct interface_picking {
+        virtual bool can_pick(card *target_card) const = 0;
+        virtual void on_pick(card *target_card) = 0;
+        virtual game_string pick_prompt(card *target_card) const { return {}; }
+    };
+
+    class request_picking : public request_base, public interface_picking {
+    public:
+        using request_base::request_base;
+
+    protected:
+        void auto_pick();
+    };
+
+    struct selection_picker : request_picking {
+        using request_picking::request_picking;
+
+        bool can_pick(card *target_card) const override;
+    };
+
 }
 
 #endif

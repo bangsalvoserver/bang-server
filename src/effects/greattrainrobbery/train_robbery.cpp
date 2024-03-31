@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    struct request_train_robbery_choose : request_bang, request_picking_base {
+    struct request_train_robbery_choose : request_bang, interface_picking {
         request_train_robbery_choose(card *origin_card, player *origin, player *target, card *target_card)
             : request_bang(origin_card, origin, target, {}, 21)
             , target_card(target_card) {}
@@ -17,7 +17,7 @@ namespace banggame {
 
         void on_update() override {
             if (target->empty_hand()) {
-                auto_respond();
+                auto_resolve();
             }
         }
 

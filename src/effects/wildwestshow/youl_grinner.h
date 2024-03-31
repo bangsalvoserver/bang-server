@@ -2,6 +2,7 @@
 #define __WILDWESTSHOW_YOUL_GRINNER__
 
 #include "cards/card_effect.h"
+#include "effects/base/pick.h"
 
 namespace banggame {
 

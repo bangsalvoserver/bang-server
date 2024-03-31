@@ -2,6 +2,7 @@
 #define __DRAW_CHECK_HANDLER_H__
 
 #include "player.h"
+#include "effects/base/pick.h"
 
 namespace banggame {
 

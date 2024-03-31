@@ -64,7 +64,7 @@ namespace banggame {
         }
     }
 
-    struct request_discard_hand_pass : request_discard_pass, resolvable_request {
+    struct request_discard_hand_pass : request_discard_pass, interface_resolvable {
         using request_discard_pass::request_discard_pass;
 
         void on_update() override {

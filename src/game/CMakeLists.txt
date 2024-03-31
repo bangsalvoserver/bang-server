@@ -14,6 +14,5 @@ PRIVATE
     player_iterator.cpp
     play_verify.cpp
     possible_to_play.cpp
-    request_base.cpp
     request_queue.cpp
 )

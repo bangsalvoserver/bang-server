@@ -1,12 +1,13 @@
 #include "tumbleweed.h"
 
 #include "game/game.h"
+#include "effects/base/resolve.h"
 
 namespace banggame {
 
-    struct request_tumbleweed : request_base, resolvable_request {
+    struct request_tumbleweed : request_resolvable {
         request_tumbleweed(card *origin_card, player *origin, player *target, shared_request_check &&handler)
-            : request_base(origin_card, origin, target, {}, 120)
+            : request_resolvable(origin_card, origin, target, {}, 120)
             , handler(std::move(handler)) {}
 
         shared_request_check handler;

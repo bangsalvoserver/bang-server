@@ -19,7 +19,7 @@ namespace banggame {
 
     template<> game_string visit_card::get_error(const effect_context &ctx, card *target) {
         if (bool(effect.card_filter & target_card_filter::pick_card)) {
-            if (auto req = origin->m_game->top_request<request_picking_base>(origin)) {
+            if (auto req = origin->m_game->top_request<interface_picking>(origin)) {
                 if (req->can_pick(target)) {
                     return {};
                 }

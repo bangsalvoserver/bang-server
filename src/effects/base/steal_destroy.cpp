@@ -21,7 +21,7 @@ namespace banggame {
                 }
                 [[fallthrough]];
             case 0:
-                auto_respond();
+                auto_resolve();
                 break;
             case 2:
                 m_timer.reset();

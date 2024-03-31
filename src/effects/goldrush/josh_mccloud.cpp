@@ -6,7 +6,7 @@
 #include "game/filters.h"
 
 #include "game/game.h"
-#include "game/possible_to_play.h"
+#include "game/play_verify.h"
 
 namespace banggame {
 
@@ -16,10 +16,6 @@ namespace banggame {
             , target_card(target_card) {}
         
         card *target_card;
-
-        void on_update() override {
-            auto_respond();
-        }
 
         game_string status_text(player *owner) const override {
             if (owner == target) {
@@ -107,6 +103,11 @@ namespace banggame {
             } else {
                 target->m_game->queue_request<request_force_equip_card>(origin_card, target, target_card);
             }
+        } else if (!target_card->is_modifier() && target_card->optionals.empty()
+            && rn::all_of(target_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
+        ) {
+            apply_target_list(target, target_card, true,
+                target_list{target_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}, {});
         } else {
             target->m_game->queue_request<request_force_play_card>(origin_card, target, target_card);
         }

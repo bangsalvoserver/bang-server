@@ -5,9 +5,9 @@
 
 namespace banggame {
 
-    struct request_bandidos : request_picking, resolvable_request {
+    struct request_bandidos : request_resolvable, interface_picking {
         request_bandidos(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_picking(origin_card, origin, target, flags) {}
+            : request_resolvable(origin_card, origin, target, flags) {}
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
@@ -16,7 +16,7 @@ namespace banggame {
                 if (!live) {
                     target->m_game->play_sound(target, "bandidos");
                 }
-                auto_respond();
+                auto_resolve();
             }
         }
 

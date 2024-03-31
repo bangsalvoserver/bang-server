@@ -55,7 +55,7 @@ namespace banggame {
     DEFINE_ENUM(tag_type,
         (none)
         (ghost_card)
-        (confirm)
+        (resolve)
         (pass_turn)
         (pick)
         (skip_logs)

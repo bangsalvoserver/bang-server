@@ -1,10 +1,12 @@
 #include "map.h"
 
 #include "game/game.h"
+#include "effects/base/pick.h"
+#include "effects/base/resolve.h"
 
 namespace banggame {
 
-    struct request_map : selection_picker, resolvable_request {
+    struct request_map : selection_picker, interface_resolvable {
         request_map(card *origin_card, player *target)
             : selection_picker(origin_card, nullptr, target) {}
         

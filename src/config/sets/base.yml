@@ -376,7 +376,7 @@ button_row:
     responses:
       - resolve
     tags:
-      - confirm
+      - resolve
   - name: GAME_PASS
     effects:
       - pass_turn

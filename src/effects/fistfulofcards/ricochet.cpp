@@ -13,7 +13,7 @@ namespace banggame {
 
         void on_update() override {
             if (target->empty_hand()) {
-                auto_respond();
+                auto_resolve();
             }
         }
 

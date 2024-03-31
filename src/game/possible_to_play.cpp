@@ -222,7 +222,7 @@ namespace banggame {
 
     rn::any_view<card *> get_pick_cards(player *origin) {
         if (origin) {
-            if (auto req = origin->m_game->top_request<request_picking_base>(origin)) {
+            if (auto req = origin->m_game->top_request<interface_picking>(origin)) {
                 return rv::concat(
                     origin->m_game->m_players | rv::for_each([](player *p) {
                         return rv::concat(p->m_hand, p->m_table, p->m_characters);
