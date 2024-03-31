@@ -17,6 +17,21 @@ namespace banggame {
         
         card *target_card;
 
+        void on_update() override {
+            if (target_card == get_single_element(get_all_playable_cards(target, true))) {
+                if (!target_card->is_modifier() && target_card->optionals.empty()
+                    && rn::all_of(target_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
+                ) {
+                    apply_target_list(target, target_card, true,
+                        target_list{target_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}, {});
+                }
+            } else {
+                target->m_game->pop_request();
+                target->m_game->add_short_pause(target_card);
+                target->m_game->move_card(target_card, pocket_type::shop_discard);
+            }
+        }
+
         game_string status_text(player *owner) const override {
             if (owner == target) {
                 return {"STATUS_FORCE_PLAY_CARD", target_card};
@@ -103,11 +118,6 @@ namespace banggame {
             } else {
                 target->m_game->queue_request<request_force_equip_card>(origin_card, target, target_card);
             }
-        } else if (!target_card->is_modifier() && target_card->optionals.empty()
-            && rn::all_of(target_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
-        ) {
-            apply_target_list(target, target_card, true,
-                target_list{target_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}, {});
         } else {
             target->m_game->queue_request<request_force_play_card>(origin_card, target, target_card);
         }
