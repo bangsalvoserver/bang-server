@@ -7,6 +7,7 @@
 namespace banggame {
 
     game_string equip_wanted::on_prompt(card *origin_card, player *origin, player *target) {
+        MAYBE_RETURN(prompt_target_self::on_prompt(origin_card, origin, target));
         if (target->m_role == player_role::sheriff) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
