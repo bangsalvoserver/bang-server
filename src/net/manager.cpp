@@ -92,6 +92,7 @@ std::string game_manager::handle_message(MSG_TAG(connect), client_handle client,
         kick_client(client, "INVALID_CLIENT_COMMIT_HASH");
     } else if (auto [it, inserted] = users.try_emplace(client, generate_user_id(args.user_id), args.user); inserted) {
         send_message<server_message_type::client_accepted>(client, it->second.user_id);
+        broadcast_message<server_message_type::client_count>(users.size());
         for (const lobby &l : m_lobbies) {
             send_message<server_message_type::lobby_update>(client, l.make_lobby_data());
         }
@@ -272,6 +273,7 @@ void game_manager::on_disconnect(client_handle client) {
             kick_user_from_lobby(it);
         }
         users.erase(it);
+        broadcast_message<server_message_type::client_count>(users.size());
     }
 }
 

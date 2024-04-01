@@ -99,6 +99,7 @@ namespace banggame {
     DEFINE_ENUM_TYPES(server_message_type,
         (ping)
         (client_accepted, client_accepted_args)
+        (client_count, int)
         (lobby_error, std::string)
         (lobby_update, lobby_data)
         (lobby_entered, lobby_entered_args)
