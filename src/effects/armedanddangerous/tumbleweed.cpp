@@ -22,7 +22,13 @@ namespace banggame {
         };
 
         timer_tumbleweed m_timer{this};
-        request_timer *timer() override { return &m_timer; }
+        request_timer *timer() override {
+            if (m_timer.get_duration() <= ticks{}) {
+                return nullptr;
+            } else {
+                return &m_timer;
+            }
+        }
 
         std::vector<card *> get_highlights() const override {
             auto vec = handler->get_drawn_cards();
