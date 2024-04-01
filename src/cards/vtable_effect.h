@@ -35,10 +35,10 @@ namespace banggame {
         }
     }
     
-    template<utils::tstring Name, typename T>
-    constexpr effect_vtable build_effect_vtable() {
+    template<typename T>
+    constexpr effect_vtable build_effect_vtable(std::string_view name) {
         return {
-            .name = std::string_view(Name),
+            .name = name,
 
             .get_error = [](int effect_value, card *origin_card, player *origin, const effect_context &ctx) -> game_string {
                 T value = build_effect<T>(effect_value);
@@ -189,7 +189,7 @@ namespace banggame {
 
     #define DEFINE_EFFECT(name, type) \
         template<> struct effect_vtable_map<#name> { \
-            static constexpr effect_vtable value = build_effect_vtable<#name, type>(); \
+            static constexpr effect_vtable value = build_effect_vtable<type>(#name); \
         };
     
     #define GET_EFFECT(name) (&effect_vtable_map<#name>::value)

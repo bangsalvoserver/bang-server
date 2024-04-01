@@ -15,10 +15,10 @@ namespace banggame {
         game_string (*on_prompt)(card *origin_card, player *origin, card *playing_card, const effect_context &ctx);
     };
 
-    template<utils::tstring Name, typename T>
-    constexpr modifier_vtable build_modifier_vtable() {
+    template<typename T>
+    constexpr modifier_vtable build_modifier_vtable(std::string_view name) {
         return {
-            .name = std::string_view(Name),
+            .name = name,
 
             .add_context = [](card *origin_card, player *origin, effect_context &ctx) {
                 if constexpr (requires (T value) { value.add_context(origin_card, origin, ctx); }) {
@@ -72,7 +72,7 @@ namespace banggame {
 
     #define DEFINE_MODIFIER(name, type) \
         template<> struct modifier_vtable_map<#name> { \
-            static constexpr modifier_vtable value = build_modifier_vtable<#name, type>(); \
+            static constexpr modifier_vtable value = build_modifier_vtable<type>(#name); \
         };
     
     #define GET_MODIFIER(name) (&modifier_vtable_map<#name>::value)

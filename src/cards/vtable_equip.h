@@ -25,10 +25,10 @@ namespace banggame {
         }
     }
     
-    template<utils::tstring Name, typename T>
-    constexpr equip_vtable build_equip_vtable() {
+    template<typename T>
+    constexpr equip_vtable build_equip_vtable(std::string_view name) {
         return {
-            .name = std::string_view(Name),
+            .name = name,
 
             .on_prompt = [](int effect_value, card *origin_card, player *origin, player *target) -> game_string {
                 auto value = build_equip<T>(effect_value);
@@ -65,7 +65,7 @@ namespace banggame {
 
     #define DEFINE_EQUIP(name, type) \
         template<> struct equip_vtable_map<#name> { \
-            static constexpr equip_vtable value = build_equip_vtable<#name, type>(); \
+            static constexpr equip_vtable value = build_equip_vtable<type>(#name); \
         };
     
     #define GET_EQUIP(name) (&equip_vtable_map<#name>::value)

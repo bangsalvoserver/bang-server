@@ -106,10 +106,10 @@ namespace banggame {
         void (*on_play)(card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx);
     };
 
-    template<utils::tstring Name, typename T>
-    constexpr mth_vtable build_mth_vtable() {
+    template<typename T>
+    constexpr mth_vtable build_mth_vtable(std::string_view name) {
         return {
-            .name = std::string_view(Name),
+            .name = name,
 
             .get_error = [](card *origin_card, player *origin, const effect_target_list &targets, const effect_context &ctx) -> game_string {
                 if constexpr (requires { mth_unwrapper{&T::get_error}; }) {
@@ -146,7 +146,7 @@ namespace banggame {
 
     #define DEFINE_MTH(name, type) \
         template<> struct mth_vtable_map<#name> { \
-            static constexpr mth_vtable value = build_mth_vtable<#name, type>(); \
+            static constexpr mth_vtable value = build_mth_vtable<type>(#name); \
         };
     
     #define GET_MTH(name) (&mth_vtable_map<#name>::value)
