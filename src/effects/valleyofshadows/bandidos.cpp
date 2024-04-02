@@ -47,6 +47,13 @@ namespace banggame {
         }
     };
 
+    game_string effect_bandidos::on_prompt(card *origin_card, player *origin, const effect_context &ctx) {
+        if (origin != ctx.skipped_player && origin->m_hp <= 1 && origin->m_hand.size() <= 1) {
+            return {"PROMPT_BANDIDOS_SUICIDE", origin_card};
+        }
+        return {};
+    }
+
     void effect_bandidos::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
         target->m_game->queue_request<request_bandidos>(origin_card, origin, target, flags);
     }
