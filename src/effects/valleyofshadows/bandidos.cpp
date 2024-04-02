@@ -24,6 +24,13 @@ namespace banggame {
             target->m_game->pop_request();
             target->damage(origin_card, origin, 1);
         }
+
+        game_string resolve_prompt() const override {
+            if (target->is_bot() && target->m_hp <= 1 && rn::any_of(target->m_hand, [&](card *target_card) { return can_pick(target_card); })) {
+                return "BOT_BAD_PLAY";
+            }
+            return {};
+        }
         
         bool can_pick(card *target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
