@@ -62,6 +62,16 @@ namespace json {
         }
     };
 
+    template<typename Context> struct serializer<banggame::tag_map, Context> {
+        json operator()(const banggame::tag_map &map) const {
+            auto result = json::object();
+            for (const auto &[k, v] : map) {
+                result.push_back({enums::to_string(k), v});
+            }
+            return result;
+        }
+    };
+
     template<typename Context> struct serializer<const banggame::effect_vtable *, Context> {
         json operator()(const banggame::effect_vtable *value) const {
             return std::string(value->name);

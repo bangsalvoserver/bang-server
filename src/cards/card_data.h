@@ -16,7 +16,7 @@ namespace banggame {
         (effect_list, responses)
         (effect_list, optionals)
         (equip_list, equips)
-        (tag_list, tags)
+        (tag_map, tags)
 
         (expansion_type, expansion)
         (card_deck_type, deck)
@@ -38,7 +38,7 @@ namespace banggame {
         }
 
         bool has_tag(tag_type tag) const {
-            return rn::contains(tags, tag, &tag_holder::type);
+            return tags.find(tag) != tags.end();
         }
 
         bool is_modifier() const {
@@ -46,8 +46,8 @@ namespace banggame {
         }
 
         std::optional<short> get_tag_value(tag_type tag) const {
-            if (auto it = rn::find(tags, tag, &tag_holder::type); it != tags.end()) {
-                return it->tag_value;
+            if (auto it = tags.find(tag); it != tags.end()) {
+                return it->second;
             } else {
                 return std::nullopt;
             }

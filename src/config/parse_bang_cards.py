@@ -3,15 +3,15 @@
 import re
 import sys
 import yaml_custom as yaml
-from cpp_generator import CppEnum, CppLiteral, print_cpp_file
+from cpp_generator import CppObject, CppEnum, CppLiteral, print_cpp_file
 
 def parse_sign(sign):
     match = re.match(r'^\s*([\w\d]+)\s*(\w+)\s*$', sign)
     if match:
-        return {
-            'suit': CppEnum('card_suit', match.group(2)),
-            'rank' : CppEnum('card_rank', 'rank_' + match.group(1))
-        }
+        return CppObject(
+            suit = CppEnum('card_suit', match.group(2)),
+            rank = CppEnum('card_rank', 'rank_' + match.group(1))
+        )
     else:
         raise RuntimeError(f'Invalid sign string: {sign}')
 
@@ -46,14 +46,14 @@ def parse_effects(effect_list):
         if card_filter and target_type not in ('card', 'extra_card', 'cards', 'max_cards'):
             raise RuntimeError(f'Invalid effect string: {effect}\nCard filter not allowed with {target_type}')
 
-        result.append({
-            'target':           CppEnum('target_type', target_type) if target_type else None,
-            'player_filter':    CppEnum('target_player_filter', player_filter) if player_filter else None,
-            'card_filter':      CppEnum('target_card_filter', card_filter) if card_filter else None,
-            'effect_value':     int(effect_value) if effect_value else None,
-            'target_value':     int(target_value) if target_value else None,
-            'type':             CppLiteral(f'GET_EFFECT({effect_type})')
-        })
+        result.append(CppObject(
+            target =           CppEnum('target_type', target_type) if target_type else None,
+            player_filter =    CppEnum('target_player_filter', player_filter) if player_filter else None,
+            card_filter =      CppEnum('target_card_filter', card_filter) if card_filter else None,
+            effect_value =     int(effect_value) if effect_value else None,
+            target_value =     int(target_value) if target_value else None,
+            type =             CppLiteral(f'GET_EFFECT({effect_type})')
+        ))
     return result
 
 def parse_equips(equip_list):
@@ -73,33 +73,33 @@ def parse_equips(equip_list):
         effect_type = match.group(1)
         effect_value = match.group(2)
 
-        result.append({
-            'effect_value': int(effect_value) if effect_value else None,
-            'type': CppLiteral(f'GET_EQUIP({effect_type})')
-        })
+        result.append(CppObject(
+            effect_value = int(effect_value) if effect_value else None,
+            type = CppLiteral(f'GET_EQUIP({effect_type})')
+        ))
     return result
 
 def parse_tags(tag_list):
     if not isinstance(tag_list, list):
         raise RuntimeError(f'in parse_tags: expected list, got {tag_list}')
 
-    result = []
-    for effect in tag_list:
+    result = dict()
+    for tag in tag_list:
         match = re.match(
             r'^\s*(\w+)' # type
             r'(?:\s*\((-?\d+)\))?\s*$', # tag_value
-            effect
+            tag
         )
         if not match:
-            raise RuntimeError(f'Invalid tag string: {effect}')
+            raise RuntimeError(f'Invalid tag string: {tag}')
         
-        effect_type = match.group(1)
-        effect_value = match.group(2)
+        tag_type_str = match.group(1)
+        tag_value = match.group(2)
 
-        result.append({
-            'tag_value': int(effect_value) if effect_value else None,
-            'type': CppEnum('tag_type', effect_type)
-        })
+        tag_type = CppEnum('tag_type', tag_type_str)
+        if tag_type in result:
+            raise RuntimeError(f'Duplicate tag: {tag_type_str}')
+        result[tag_type] = int(tag_value) if tag_value else 0
     return result
 
 def parse_mth(effect):
@@ -112,30 +112,30 @@ def parse_mth(effect):
         raise RuntimeError(f'Invalid mth string: {effect}')
     effect_type = match.group(1)
     effect_value = match.group(2)
-    return {
-        'type': CppLiteral(f'GET_MTH({effect_type})'),
-        'args': [int(value.strip()) for value in effect_value.split(',')]
-    }
+    return CppObject(
+        type = CppLiteral(f'GET_MTH({effect_type})'),
+        args = [int(value.strip()) for value in effect_value.split(',')]
+    )
 
 def parse_all_effects(card):
     try:
-        return {
-            'name':         card['name'] if 'name' in card else None,
-            'image':        card['image'] if 'image' in card else None,
-            'effects':      parse_effects(card['effects']) if 'effects' in card else None,
-            'responses':    parse_effects(card['responses']) if 'responses' in card else None,
-            'optionals':    parse_effects(card['optional']) if 'optional' in card else None,
-            'equips':       parse_equips(card['equip']) if 'equip' in card else None,
-            'tags':         parse_tags(card['tags']) if 'tags' in card else None,
-            'expansion':    CppEnum('expansion_type', card['expansion']) if 'expansion' in card else None,
-            'deck':         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
-            'modifier':     {'type': CppLiteral(f"GET_MODIFIER({card['modifier']})")} if 'modifier' in card else None,
-            'mth_effect':   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
-            'mth_response': parse_mth(card['mth_response']) if 'mth_response' in card else None,
-            'equip_target': CppEnum('target_player_filter', card['equip_target']) if 'equip_target' in card else None,
-            'color':        CppEnum('card_color_type', card['color']) if 'color' in card else None,
-            'sign':         parse_sign(card['sign']) if 'sign' in card else None
-        }
+        return CppObject(
+            name =         card['name'] if 'name' in card else None,
+            image =        card['image'] if 'image' in card else None,
+            effects =      parse_effects(card['effects']) if 'effects' in card else None,
+            responses =    parse_effects(card['responses']) if 'responses' in card else None,
+            optionals =    parse_effects(card['optional']) if 'optional' in card else None,
+            equips =       parse_equips(card['equip']) if 'equip' in card else None,
+            tags =         parse_tags(card['tags']) if 'tags' in card else None,
+            expansion =    CppEnum('expansion_type', card['expansion']) if 'expansion' in card else None,
+            deck =         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
+            modifier =     CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier']})")) if 'modifier' in card else None,
+            mth_effect =   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
+            mth_response = parse_mth(card['mth_response']) if 'mth_response' in card else None,
+            equip_target = CppEnum('target_player_filter', card['equip_target']) if 'equip_target' in card else None,
+            color =        CppEnum('card_color_type', card['color']) if 'color' in card else None,
+            sign =         parse_sign(card['sign']) if 'sign' in card else None
+        )
     except RuntimeError as error:
         raise RuntimeError(f"Error in card {card['name']}:\n{error}") from error
 
@@ -200,7 +200,7 @@ def parse_file(data):
             return card
         return deck.key or key, list(parse_all_effects(card) for c in cards for card in deck.strategy(add_deck(c)))
 
-    return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
+    return CppObject(**dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order)))
 
 INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/filter_enums.h', 'effects/effects.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'

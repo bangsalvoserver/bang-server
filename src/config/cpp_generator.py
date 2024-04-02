@@ -1,6 +1,10 @@
 import sys
 import re
 
+class CppObject:
+    def __init__(self, **value):
+        self.value = value
+
 class CppEnum:
     def __init__(self, enum_name, values):
         self.enum_name = enum_name
@@ -19,9 +23,12 @@ class CppLiteral:
 SPACE = '  '
 
 def object_to_string(object_value, indent = 0):
-    if isinstance(object_value, dict):
+    if isinstance(object_value, CppObject):
         if not object_value: return '{}'
-        return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}.{key} {object_to_string(value, indent + 1)}" for key, value in object_value.items() if value is not None) + '\n' + (SPACE * indent) + '}'
+        return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}.{key} {object_to_string(value, indent + 1)}" for key, value in object_value.value.items() if value is not None) + '\n' + (SPACE * indent) + '}'
+    elif isinstance(object_value, dict):
+        if not object_value: return '{}'
+        return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{{{object_to_string(key)}, {object_to_string(value)}}}" for key, value in object_value.items()) + '\n' + (SPACE * indent) + '}'
     elif isinstance(object_value, list):
         if not object_value: return '{}'
         return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(value, indent + 1)}" for value in object_value if value is not None) + '\n' + (SPACE * indent) + '}'
