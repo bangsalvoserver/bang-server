@@ -7,6 +7,10 @@
 
 namespace banggame {
 
+    game_string effect_resolve::on_prompt(card *origin_card, player *origin) {
+        return origin->m_game->top_request<interface_resolvable>(origin)->resolve_prompt();
+    }
+
     bool effect_resolve::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<interface_resolvable>(origin) != nullptr;
     }
