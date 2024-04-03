@@ -52,6 +52,8 @@ namespace banggame {
 
     using game_message = enums::enum_variant<message_type>;
 
+    game_string check_duplicates(card *origin_card, player *origin, const effect_context &ctx);
+
     game_string get_play_card_error(player *origin, card *origin_card, const effect_context &ctx);
 
     game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx);

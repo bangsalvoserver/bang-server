@@ -64,14 +64,10 @@ namespace banggame {
             });
     }
 
-    template<typename T, typename ... Ts>
-    inline std::vector<T> vector_concat(const std::vector<T> &vec, Ts && ... args) {
-        auto copy = vec;
-        copy.emplace_back(FWD(args) ... );
-        return copy;
-    }
-
     static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const target_list &targets) {
+        if (!mth.type) {
+            return true;
+        }
         if (targets.size() < mth.args.size()) {
             auto index = mth.args[targets.size()];
             if (index < effects.size()) {
@@ -79,13 +75,15 @@ namespace banggame {
                 switch (effect.target) {
                 case target_type::player:
                     return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
-                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                            vector_concat(targets, enums::enum_tag<target_type::player>, target));
+                        auto targets_copy = targets;
+                        targets_copy.emplace_back(enums::enum_tag<target_type::player>, target);
+                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
                     });
                 case target_type::card:
                     return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
-                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx,
-                            vector_concat(targets, enums::enum_tag<target_type::card>, target));
+                        auto targets_copy = targets;
+                        targets_copy.emplace_back(enums::enum_tag<target_type::card>, target);
+                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
                     });
                 default:
                     // ignore other target types
@@ -93,8 +91,8 @@ namespace banggame {
                 }
             }
         }
-        return !mth.type || !mth.type->get_error(origin_card, origin, targets,
-            serial::int_list(small_int_set_sized_tag, targets.size()), ctx);
+        return !mth.type->get_error(origin_card, origin, targets,
+                serial::int_list(small_int_set_sized_tag, targets.size()), ctx);
     }
 
     static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
@@ -142,10 +140,12 @@ namespace banggame {
             }
             
             if (origin_card->is_modifier()) {
+                auto modifiers_copy = modifiers;
+                modifiers_copy.push_back(origin_card);
                 auto ctx_copy = ctx;
                 origin_card->modifier.type->add_context(origin_card, origin, ctx_copy);
                 
-                return contains_at_least(cards_playable_with_modifiers(origin, vector_concat(modifiers, origin_card), is_response, ctx_copy), 1);
+                return contains_at_least(cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy), 1);
             }
         }
         
@@ -155,7 +155,8 @@ namespace banggame {
     static card_modifier_node generate_card_modifier_node(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
         card_modifier_node node { .card = origin_card };
         if (!filters::is_equip_card(origin_card) && origin_card->is_modifier()) {
-            std::vector<card *> modifiers_copy = vector_concat(modifiers, origin_card);
+            auto modifiers_copy = modifiers;
+            modifiers_copy.push_back(origin_card);
             auto ctx_copy = ctx;
             origin_card->modifier.type->add_context(origin_card, origin, ctx_copy);
 

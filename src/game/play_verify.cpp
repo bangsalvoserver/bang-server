@@ -10,7 +10,7 @@
 
 namespace banggame {
 
-    static game_string check_duplicates(card *origin_card, player *origin, const effect_context &ctx) {
+    game_string check_duplicates(card *origin_card, player *origin, const effect_context &ctx) {
         std::set<player *> players;
         std::set<card *> cards;
         std::map<card *, int> cubes;
