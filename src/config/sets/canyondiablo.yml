@@ -98,8 +98,7 @@ main_deck:
       - max_usages(1)
       - set_playing card self | hand bang
       - discard card self | hand
-      - none players notself
-    mth_effect: play_as_bang(1,3)
+    mth_effect: play_as_gatling(1)
     tags:
       - weapon
   - name: LAST_WILL

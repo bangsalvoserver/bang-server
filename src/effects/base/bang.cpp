@@ -40,55 +40,64 @@ namespace banggame {
         queue_request_bang(origin_card, origin, target);
     }
 
-    bool handler_play_as_bang::on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
-        if (target.target.is(target_type::player)) {
-            return effect_bangcard{}.on_check_target(chosen_card, origin, target.target.get<target_type::player>());
-        } else {
-            return true;
-        }
+    bool handler_play_as_bang::on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target) {
+        return effect_bangcard{}.on_check_target(chosen_card, origin, target);
     }
 
-    game_string handler_play_as_bang::get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
+    game_string handler_play_as_bang::get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target) {
         MAYBE_RETURN(get_play_card_error(origin, chosen_card, ctx));
-        if (target.target.is(target_type::player)) {
-            return effect_bangcard{}.get_error(chosen_card, origin, target.target.get<target_type::player>(), ctx);
-        } else {
-            return {};
-        }
+        return effect_bangcard{}.get_error(chosen_card, origin, target, ctx);
     }
 
-    game_string handler_play_as_bang::on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target) {
-        if (target.target.is(target_type::player)) {
-            return effect_bangcard{}.on_prompt(chosen_card, origin, target.target.get<target_type::player>());
-        } else {
-            return {};
-        }
+    game_string handler_play_as_bang::on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target) {
+        return effect_bangcard{}.on_prompt(chosen_card, origin, target);
     }
 
-    void handler_play_as_bang::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target_variant) {
-        if (target_variant.target.is(target_type::player)) {
-            player *target = target_variant.target.get<target_type::player>();
-            origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
-            origin->discard_used_card(chosen_card);
-            queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
+    void handler_play_as_bang::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target) {
+        origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
+        origin->discard_used_card(chosen_card);
+        queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
+    }
 
-        } else if (target_variant.target.is(target_type::players)) {
-            origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
-            origin->discard_used_card(chosen_card);
+    game_string handler_play_as_gatling::get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card) {
+        return get_play_card_error(origin, chosen_card, ctx);
+    }
 
-            std::vector<player *> targets;
-            for (player *target : range_all_players(origin)) {
-                if (target != ctx.skipped_player && !filters::check_player_filter(origin, target_variant.effect.player_filter, target, ctx)) {
-                    targets.push_back(target);
-                }
+    game_string handler_play_as_gatling::on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card) {
+        std::vector<player *> targets;
+        for (player *target : range_all_players(origin)) {
+            if (target != ctx.skipped_player && target != origin) {
+                targets.push_back(target);
             }
-            auto flags = effect_flags::play_as_bang | effect_flags::multi_target;
-            if (targets.size() == 1) {
-                flags |= effect_flags::single_target;
+        }
+        game_string msg;
+        for (player *target : targets) {
+            if (origin->is_bot() && !bot_suggestion::target_enemy{}.on_check_target(chosen_card, origin, target)) {
+                msg = "BOT_BAD_PLAY";
+            } else {
+                msg = effect_bang{}.on_prompt(chosen_card, origin, target);
             }
-            for (player *p : targets) {
-                origin->m_game->queue_request<request_bang>(chosen_card, origin, p, flags);
+            if (!msg) break;
+        }
+        return msg;
+    }
+
+    void handler_play_as_gatling::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card) {
+        origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
+        origin->discard_used_card(chosen_card);
+
+        std::vector<player *> targets;
+        for (player *target : range_all_players(origin)) {
+            if (target != ctx.skipped_player && target != origin) {
+                targets.push_back(target);
             }
+        }
+        auto flags = effect_flags::play_as_bang | effect_flags::multi_target;
+        if (targets.size() == 1) {
+            flags |= effect_flags::single_target;
+        }
+        for (player *p : targets) {
+            origin->m_game->queue_request<request_bang>(chosen_card, origin, p, flags);
         }
     }
     

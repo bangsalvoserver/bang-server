@@ -156,8 +156,7 @@ character:
     effects:
       - max_usages(1)
       - set_playing card self | hand bang
-      - none players notself
-    mth_effect: play_as_bang(1,2)
+    mth_effect: play_as_gatling(1)
   - name: EVELYN_SHEBANG
     image: 07_evelynshebang
     responses:

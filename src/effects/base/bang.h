@@ -22,13 +22,21 @@ namespace banggame {
     DEFINE_EFFECT(bangcard, effect_bangcard)
 
     struct handler_play_as_bang {
-        bool on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
-        game_string get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
-        game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
-        void on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, const effect_target_pair &target);
+        bool on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target);
+        game_string get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target);
+        game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target);
+        void on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target);
     };
 
     DEFINE_MTH(play_as_bang, handler_play_as_bang)
+
+    struct handler_play_as_gatling {
+        game_string get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card);
+        game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card);
+        void on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card);
+    };
+
+    DEFINE_MTH(play_as_gatling, handler_play_as_gatling)
 
     struct effect_banglimit {
         game_string get_error(card *origin_card, player *origin, const effect_context &ctx);
