@@ -19,6 +19,7 @@ namespace banggame {
 
     struct effect_skip_player {
         void add_context(card *origin_card, player *origin, player *target, effect_context &ctx);
+        void on_play(card *origin_card, player *origin, player *target, const effect_context &ctx);
     };
 
     DEFINE_EFFECT(skip_player, effect_skip_player)

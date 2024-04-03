@@ -30,6 +30,10 @@ namespace banggame {
         ctx.skipped_player = target;
     }
 
+    void effect_skip_player::on_play(card *origin_card, player *origin, player *target, const effect_context &ctx) {
+        origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, ctx.playing_card);
+    }
+
     struct request_sgt_blaze : request_resolvable {
         request_sgt_blaze(card *origin_card, player *target, shared_effect_context ctx)
             : request_resolvable(origin_card, nullptr, target)
@@ -68,6 +72,7 @@ namespace banggame {
     void effect_skip_player_locomotive::on_play(card *origin_card, player *origin, player *target) {
         auto req = origin->m_game->top_request<request_sgt_blaze>();
         req->ctx->skipped_player = target;
+        origin->m_game->add_log("LOG_SKIP_PLAYER_LOCOMOTIVE", origin_card, origin, target);
         origin->m_game->pop_request();
     }
 

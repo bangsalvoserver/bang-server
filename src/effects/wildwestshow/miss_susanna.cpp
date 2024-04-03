@@ -15,7 +15,7 @@ namespace banggame {
             size_t count = 0;
             for (const played_card_history &history : origin->m_played_cards) {
                 count += rn::count_if(history.modifiers, is_playing_card_pair);
-                if (history.context.playing_card) {
+                if (history.context.playing_card != history.origin_card.origin_card) {
                     ++count;
                 } else if (is_playing_card_pair(history.origin_card)) {
                     ++count;
