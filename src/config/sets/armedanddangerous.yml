@@ -33,7 +33,7 @@ main_deck:
     image: 17_colporapido
     color: brown
     effects:
-      - pay_cube select_cubes_repeat(1) reachable notself
+      - pay_cube select_cubes_players reachable notself
       - bang player_per_cube reachable notself
     tags:
       - skip_logs
@@ -54,7 +54,7 @@ main_deck:
     image: 17_freccia
     color: brown
     effects:
-      - pay_cube select_cubes_repeat(1) notself
+      - pay_cube select_cubes_players notself
       - indians player_per_cube notself
     tags:
       - indians
