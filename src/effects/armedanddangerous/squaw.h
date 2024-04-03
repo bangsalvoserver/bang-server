@@ -6,16 +6,13 @@
 
 namespace banggame {
 
-    struct handler_squaw {
-        bool on_check_target(card *origin_card, player *origin, card *discarded_card, bool paid_cubes) {
-            return bot_suggestion::target_enemy_card{}.on_check_target(origin_card, origin, discarded_card);
-        }
-        game_string get_error(card *origin_card, player *origin, card *discarded_card, bool paid_cubes);
-        game_string on_prompt(card *origin_card, player *origin, card *discarded_card, bool paid_cubes);
-        void on_play(card *origin_card, player *origin, card *discarded_card, bool paid_cubes);
+    struct effect_squaw : bot_suggestion::target_enemy_card {
+        game_string get_error(card *origin_card, player *origin, card *discarded_card, const effect_context &ctx);
+        game_string on_prompt(card *origin_card, player *origin, card *discarded_card, const effect_context &ctx);
+        void on_play(card *origin_card, player *origin, card *discarded_card, const effect_context &ctx);
     };
 
-    DEFINE_MTH(squaw, handler_squaw)
+    DEFINE_EFFECT(squaw, effect_squaw)
 }
 
 #endif

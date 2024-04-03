@@ -5,12 +5,12 @@
 
 namespace banggame {
 
-    struct handler_duck {
-        game_string on_prompt(card *origin_card, player *origin, bool paid_cubes);
-        void on_play(card *origin_card, player *origin, bool paid_cubes);
+    struct effect_duck {
+        game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx);
+        void on_play(card *origin_card, player *origin, const effect_context &ctx);
     };
 
-    DEFINE_MTH(duck, handler_duck)
+    DEFINE_EFFECT(duck, effect_duck)
 }
 
 #endif

@@ -43,10 +43,8 @@ main_deck:
     image: 17_flintlock
     color: brown
     effects:
-      - none player reachable notself
-    optional:
-      - pay_cube select_cubes(2)
-    mth_effect: flintlock(0,1)
+      - pay_cube select_cubes_optional(2)
+      - flintlock player reachable notself
     tags:
       - skip_logs
   - name: ARROW
@@ -66,10 +64,9 @@ main_deck:
     image: 17_giulatesta
     color: brown
     responses:
+      - pay_cube select_cubes_optional(2)
       - missed
-    optional:
-      - pay_cube select_cubes(2)
-    mth_response: duck(1)
+      - duck
   - <<: *missed
     signs:
       - K spades
@@ -94,10 +91,8 @@ main_deck:
     image: 17_squaw
     color: brown
     effects:
-      - none card | table
-    optional:
-      - pay_cube select_cubes(2)
-    mth_effect: squaw(0,1)
+      - pay_cube select_cubes_optional(2)
+      - squaw card | table
     tags:
       - skip_logs
   - name: ACE_UP_THE_SLEEVE

@@ -5,13 +5,14 @@
 #include "cards/game_enums.h"
 
 #include "game/game.h"
+#include "game/filters.h"
 
 namespace banggame {
 
-    void handler_flintlock::on_play(card *origin_card, player *origin, player *target, bool paid_cubes) {
+    void effect_flintlock::on_play(card *origin_card, player *origin, player *target, const effect_context &ctx) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         auto req = std::make_shared<request_bang>(origin_card, origin, target, effect_flags::escapable | effect_flags::single_target);
-        if (paid_cubes) {
+        if (!filters::get_selected_cubes(origin_card, ctx).empty()) {
             origin->m_game->add_listener<event_type::on_missed>(origin_card, [=](card *origin_card, player *p, player *target, card *missed_card, effect_flags flags) {
                 if (origin == p) {
                     origin->m_game->queue_action([=]{

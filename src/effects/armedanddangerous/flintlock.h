@@ -6,14 +6,11 @@
 
 namespace banggame {
 
-    struct handler_flintlock {
-        bool on_check_target(card *origin_card, player *origin, player *target, bool paid_cubes) {
-            return bot_suggestion::target_enemy{}.on_check_target(origin_card, origin, target);
-        }
-        void on_play(card *origin_card, player *origin, player *target, bool paid_cubes);
+    struct effect_flintlock : bot_suggestion::target_enemy {
+        void on_play(card *origin_card, player *origin, player *target, const effect_context &ctx);
     };
 
-    DEFINE_MTH(flintlock, handler_flintlock)
+    DEFINE_EFFECT(flintlock, effect_flintlock)
 }
 
 #endif

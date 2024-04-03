@@ -37,12 +37,6 @@ namespace banggame {
         }
     };
 
-    template<> struct target_getter<bool> {
-        bool operator()(const effect_target_list &targets, size_t index) {
-            return index < targets.size();
-        }
-    };
-
     template<typename RetType, typename HandlerType, typename ... Args>
     using fun_mem_ptr_t = RetType (HandlerType::*)(card *origin_card, player *origin, Args...);
 
