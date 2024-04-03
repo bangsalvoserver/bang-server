@@ -5,7 +5,6 @@
 #include "cards/game_enums.h"
 #include "cards/filter_enums.h"
 
-#include "zip_card_targets.h"
 #include "filters.h"
 
 namespace banggame {
@@ -58,7 +57,7 @@ namespace banggame {
             return "ERROR_INVALID_TARGETS";
         }
 
-        for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
+        for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
             if (!target.is(effect.target)) {
                 return "ERROR_INVALID_TARGET_TYPE";
             }
@@ -214,7 +213,7 @@ namespace banggame {
     }
 
     static game_string check_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
-        for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
+        for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
             MAYBE_RETURN(enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
                 return play_visitor<E>{origin, origin_card, effect}.prompt(ctx, FWD(args) ... );
             }, target));
@@ -327,7 +326,7 @@ namespace banggame {
             }
         }
 
-        for (const auto &[target, effect] : zip_card_targets(targets, origin_card, is_response)) {
+        for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
             enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
                 play_visitor<E>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
             }, target);
