@@ -67,9 +67,7 @@ namespace banggame {
         if (effects.empty()) {
             return "ERROR_EFFECT_LIST_EMPTY";
         }
-        
-        size_t diff = targets.size() - effects.size();
-        if (diff != 0 && diff != origin_card->optionals.size()) {
+        if (targets.size() != effects.size()) {
             return "ERROR_INVALID_TARGETS";
         }
 

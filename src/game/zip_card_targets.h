@@ -18,10 +18,9 @@ namespace banggame {
         effect_zip_iterator(const effect_zip_iterator&) = default;
         effect_zip_iterator& operator = (const effect_zip_iterator&) = default;
 
-        effect_zip_iterator(const target_list &targets, const effect_list &effects, const effect_list &optionals)
+        effect_zip_iterator(const target_list &targets, const effect_list &effects)
             : m_target_it(targets.begin())
-            , m_effect_it(effects.begin()), m_effect_end(effects.end())
-            , m_optionals_begin(optionals.begin()), m_optionals_end(optionals.end()) {}
+            , m_effect_it(effects.begin()), m_effect_end(effects.end()) {}
 
         value_type operator *() const {
             return {*m_target_it, *m_effect_it};
@@ -30,10 +29,6 @@ namespace banggame {
         effect_zip_iterator& operator++() {
             ++m_target_it;
             ++m_effect_it;
-            if (m_effect_it == m_effect_end) {
-                m_effect_it = m_optionals_begin;
-                m_effect_end = m_optionals_end;
-            }
             return *this;
         }
 
@@ -56,20 +51,14 @@ namespace banggame {
 
         effect_iterator m_effect_it;
         effect_iterator m_effect_end;
-
-        effect_iterator m_optionals_begin;
-        effect_iterator m_optionals_end;
     };
 
-    inline auto zip_card_targets(const target_list &targets, const effect_list &effects, const effect_list &optionals) {
-        return rn::subrange(
-            effect_zip_iterator(targets, effects, optionals),
-            targets.end()
-        );
+    inline auto zip_card_targets(const target_list &targets, const effect_list &effects) {
+        return rn::subrange(effect_zip_iterator(targets, effects), targets.end());
     }
 
     inline auto zip_card_targets(const target_list &targets, card_data *origin_card, bool is_response) {
-        return zip_card_targets(targets, origin_card->get_effect_list(is_response), origin_card->optionals);
+        return zip_card_targets(targets, origin_card->get_effect_list(is_response));
     }
 
 }

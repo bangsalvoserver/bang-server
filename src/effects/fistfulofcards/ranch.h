@@ -11,8 +11,13 @@ namespace banggame {
 
     DEFINE_EQUIP(ranch, equip_ranch)
 
+    struct effect_ranch {
+        bool can_play(card *origin_card, player *origin);
+    };
+
+    DEFINE_EFFECT(ranch, effect_ranch)
+
     struct handler_ranch {
-        bool can_play(card *origin_card, player *origin, const serial::card_list &target_cards);
         void on_play(card *origin_card, player *origin, const serial::card_list &target_cards);
     };
 

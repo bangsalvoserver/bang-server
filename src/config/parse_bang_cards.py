@@ -124,7 +124,6 @@ def parse_all_effects(card):
             image =        card['image'] if 'image' in card else None,
             effects =      parse_effects(card['effects']) if 'effects' in card else None,
             responses =    parse_effects(card['responses']) if 'responses' in card else None,
-            optionals =    parse_effects(card['optional']) if 'optional' in card else None,
             equips =       parse_equips(card['equip']) if 'equip' in card else None,
             tags =         parse_tags(card['tags']) if 'tags' in card else None,
             expansion =    CppEnum('expansion_type', card['expansion']) if 'expansion' in card else None,

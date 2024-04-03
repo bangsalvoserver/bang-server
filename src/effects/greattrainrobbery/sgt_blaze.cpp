@@ -4,6 +4,8 @@
 
 #include "game/game.h"
 
+#include "effects/base/resolve.h"
+
 #include "ruleset.h"
 
 namespace banggame {
@@ -28,12 +30,16 @@ namespace banggame {
         ctx.skipped_player = target;
     }
 
-    struct request_sgt_blaze : request_base {
+    struct request_sgt_blaze : request_resolvable {
         request_sgt_blaze(card *origin_card, player *target, shared_effect_context ctx)
-            : request_base(origin_card, nullptr, target)
+            : request_resolvable(origin_card, nullptr, target)
             , ctx(std::move(ctx)) {}
         
         shared_effect_context ctx;
+
+        void on_resolve() override {
+            target->m_game->pop_request();
+        }
 
         game_string status_text(player *owner) const override {
             if (owner == target) {
@@ -52,13 +58,16 @@ namespace banggame {
         });
     }
 
-    bool handler_sgt_blaze::can_play(card *origin_card, player *origin, player *target) {
-        return origin->m_game->top_request<request_sgt_blaze>(origin) != nullptr;
+    game_string effect_skip_player_locomotive::get_error(card *origin_card, player *origin, player *target) {
+        if (origin->m_game->top_request<request_sgt_blaze>(origin)) {
+            return {};
+        }
+        return "ERROR_INVALID_ACTION";
     }
 
-    void handler_sgt_blaze::on_play(card *origin_card, player *origin, player *target) {
-        effect_context &ctx = *(origin->m_game->top_request<request_sgt_blaze>(origin)->ctx);
-        ctx.skipped_player = target;
+    void effect_skip_player_locomotive::on_play(card *origin_card, player *origin, player *target) {
+        auto req = origin->m_game->top_request<request_sgt_blaze>();
+        req->ctx->skipped_player = target;
         origin->m_game->pop_request();
     }
 

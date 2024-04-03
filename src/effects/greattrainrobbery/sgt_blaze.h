@@ -29,12 +29,12 @@ namespace banggame {
 
     DEFINE_EQUIP(sgt_blaze, equip_sgt_blaze)
 
-    struct handler_sgt_blaze {
-        bool can_play(card *origin_card, player *origin, player *target);
+    struct effect_skip_player_locomotive {
+        game_string get_error(card *origin_card, player *origin, player *target);
         void on_play(card *origin_card, player *origin, player *target);
     };
 
-    DEFINE_MTH(sgt_blaze, handler_sgt_blaze)
+    DEFINE_EFFECT(skip_player_locomotive, effect_skip_player_locomotive)
 }
 
 #endif

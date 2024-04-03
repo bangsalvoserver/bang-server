@@ -3,19 +3,24 @@
 #include "cards/game_enums.h"
 
 #include "effects/base/steal_destroy.h"
+#include "effects/base/resolve.h"
 
 #include "game/game.h"
 
 namespace banggame {
 
-    struct request_ranch : request_base {
+    struct request_ranch : request_resolvable {
         request_ranch(card *target_card, player *target)
-            : request_base(target_card, nullptr, target, {}, -8) {}
-
+            : request_resolvable(target_card, nullptr, target, {}, -8) {}
+        
         void on_update() override {
             if (!target->alive() || target->empty_hand() || target->m_game->m_playing != target) {
                 target->m_game->pop_request();
             }
+        }
+
+        void on_resolve() override {
+            target->m_game->pop_request();
         }
 
         game_string status_text(player *owner) const override {
@@ -33,7 +38,7 @@ namespace banggame {
         });
     }
 
-    bool handler_ranch::can_play(card *origin_card, player *origin, const serial::card_list &target_cards) {
+    bool effect_ranch::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_ranch>(origin) != nullptr;
     }
 

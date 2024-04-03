@@ -163,11 +163,8 @@ character:
       - shade_oconnor
     responses:
       - shade_oconnor
-    optional:
       - discard card self | hand
       - draw
-    tags:
-      - auto_select
   - name: ZIPPY_ROY
     image: 27_zippy_roy
     effects:
@@ -389,12 +386,7 @@ hidden:
 
   - name: SGT_BLAZE
     responses:
-      - none
-    optional:
-      - none player
-    mth_response: sgt_blaze(1)
-    tags:
-      - auto_select
+      - skip_player_locomotive player
   - name: BAGGAGE_CAR_MISSED
     image: main_deck/01_mancato
     responses:

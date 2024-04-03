@@ -5,11 +5,21 @@
 #include "game/game.h"
 #include "ruleset.h"
 
+#include "effects/base/resolve.h"
+
 namespace banggame {
     
-    struct request_shade_oconnor : request_base {
+    struct request_shade_oconnor : request_resolvable {
         request_shade_oconnor(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target, {}, -1) {}
+            : request_resolvable(origin_card, nullptr, target, {}, -1) {}
+
+        void on_update() override {
+            auto_resolve();
+        }
+
+        void on_resolve() override {
+            target->m_game->pop_request();
+        }
         
         game_string status_text(player *owner) const override {
             if (target == owner) {
@@ -22,7 +32,7 @@ namespace banggame {
     
     void equip_shade_oconnor::on_enable(card *target_card, player *origin) {
         origin->m_game->add_listener<event_type::on_train_advance>({target_card, 1}, [=](player *target, shared_effect_context ctx) {
-            if (origin != target && !origin->empty_hand()) {
+            if (origin != target) {
                 origin->m_game->queue_request<request_shade_oconnor>(target_card, origin);
             }
         });

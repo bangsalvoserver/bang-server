@@ -14,7 +14,6 @@ namespace banggame {
 
         (effect_list, effects)
         (effect_list, responses)
-        (effect_list, optionals)
         (equip_list, equips)
         (tag_map, tags)
 

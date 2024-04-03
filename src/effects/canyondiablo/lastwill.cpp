@@ -3,16 +3,23 @@
 #include "game/game.h"
 
 #include "effects/base/deathsave.h"
+#include "effects/base/resolve.h"
 
 namespace banggame {
 
-    struct request_lastwill : request_base {
+    struct request_lastwill : request_resolvable {
         request_lastwill(card *origin_card, player *target)
-            : request_base(origin_card, nullptr, target) {}
+            : request_resolvable(origin_card, nullptr, target) {}
+
+        void on_resolve() override {
+            target->m_game->pop_request();
+        }
 
         void on_update() override {
             if (target->m_hp > 0) {
-                target->m_game->pop_request();
+                on_resolve();
+            } else {
+                auto_resolve();
             }
         }
         
@@ -41,15 +48,12 @@ namespace banggame {
         });
     }
 
-    bool handler_lastwill::can_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target) {
+    bool effect_lastwill::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_lastwill>(origin) != nullptr;
     }
 
     void handler_lastwill::on_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target) {
         origin->m_game->pop_request();
-        if (!target) {
-            return;
-        }
         for (card *chosen_card : target_cards) {
             if (chosen_card->visibility != card_visibility::shown) {
                 origin->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, chosen_card);

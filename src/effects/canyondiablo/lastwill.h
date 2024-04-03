@@ -13,12 +13,17 @@ namespace banggame {
 
     DEFINE_EQUIP(lastwill, equip_lastwill)
 
+    struct effect_lastwill {
+        bool can_play(card *origin_card, player *origin);
+    };
+
+    DEFINE_EFFECT(lastwill, effect_lastwill)
+
     struct handler_lastwill {
         bool on_check_target(card *origin_card, player *origin, const serial::card_list &target_cards, player *target) {
             return !target || bot_suggestion::target_friend{}.on_check_target(origin_card, origin, target);
         }
         
-        bool can_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target);
         void on_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target);
     };
 

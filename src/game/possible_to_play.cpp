@@ -139,16 +139,11 @@ namespace banggame {
     static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
         const auto &effects = origin_card->get_effect_list(is_response);
         const auto &mth = origin_card->get_mth(is_response);
-        return is_possible_to_play_effects(origin, origin_card, effects, ctx)
-            && is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {});
-    }
-
-    bool is_possible_to_play_effects(player *origin, card *origin_card, const effect_list &effects, const effect_context &ctx) {
         return !effects.empty() && rn::all_of(effects, [&](const effect_holder &effect) {
             return enums::visit_enum([&]<target_type E>(enums::enum_tag_t<E>) {
                 return play_visitor<E>{origin, origin_card, effect}.possible(ctx);
             }, effect.target);
-        });
+        }) && is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {});
     }
 
     static rn::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {

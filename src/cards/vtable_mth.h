@@ -11,29 +11,20 @@ namespace banggame {
 
     template<typename T> struct target_getter {
         T operator()(const effect_target_list &targets, size_t index) {
-            if (index < targets.size()) {
-                return std::visit([](const auto &value) -> T {
-                    if constexpr (std::is_convertible_v<std::remove_cvref_t<decltype(value)>, T>) {
-                        return value;
-                    } else {
-                        throw std::runtime_error("invalid access to mth: wrong target type");
-                    }
-                }, targets[index].target);
-            } else if constexpr(std::is_pointer_v<T>) {
-                return nullptr;
-            } else if constexpr(std::is_default_constructible_v<std::remove_cvref_t<T>>) {
-                static const std::remove_cvref_t<T> empty_value;
-                return empty_value;
-            } else {
-                throw std::runtime_error("invalid access to mth: out of bounds");
-            }
+            return std::visit([](const auto &value) -> T {
+                if constexpr (std::is_convertible_v<std::remove_cvref_t<decltype(value)>, T>) {
+                    return value;
+                } else {
+                    throw std::runtime_error("invalid access to mth: wrong target type");
+                }
+            }, targets[index].target);
         }
     };
 
     template<typename T> requires std::same_as<std::remove_cvref_t<T>, effect_target_pair>
     struct target_getter<T> {
         T operator()(const effect_target_list &targets, size_t index) {
-            return targets.at(index);
+            return targets[index];
         }
     };
 

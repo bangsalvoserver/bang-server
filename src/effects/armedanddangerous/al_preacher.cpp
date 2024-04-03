@@ -4,10 +4,20 @@
 
 #include "game/game.h"
 
+#include "effects/base/resolve.h"
+
 namespace banggame {
 
-    struct request_al_preacher : request_base {
-        using request_base::request_base;
+    struct request_al_preacher : request_resolvable {
+        using request_resolvable::request_resolvable;
+
+        void on_update() override {
+            auto_resolve();
+        }
+
+        void on_resolve() override {
+            target->m_game->pop_request();
+        }
 
         game_string status_text(player *owner) const override {
             if (target == owner) {
@@ -21,9 +31,7 @@ namespace banggame {
     void equip_al_preacher::on_enable(card *target_card, player *p) {
         p->m_game->add_listener<event_type::on_equip_card>(target_card, [=](player *origin, player *target, card *equipped_card, const effect_context &ctx) {
             if (p != origin && (equipped_card->is_blue() || equipped_card->is_orange())) {
-                if (p->count_cubes() >= 2) {
-                    p->m_game->queue_request<request_al_preacher>(target_card, origin, p);
-                }
+                p->m_game->queue_request<request_al_preacher>(target_card, origin, p);
             }
         });
     }

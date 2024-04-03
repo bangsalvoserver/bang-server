@@ -245,11 +245,8 @@ character:
       - al_preacher
     responses:
       - al_preacher
-    optional:
       - pay_cube select_cubes(2)
       - draw
-    tags:
-      - auto_select
   - name: BASS_GREEVES
     image: 17_bassgreeves
     effects:
