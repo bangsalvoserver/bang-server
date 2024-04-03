@@ -48,19 +48,6 @@ namespace banggame {
         return {};
     }
 
-    static effect_target_list get_mth_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const serial::int_list &args) {
-        effect_target_list mth_targets;
-        auto zip_targets = zip_card_targets(targets, origin_card, is_response);
-        auto it = zip_targets.begin();
-        int prev = 0;
-        for (int arg : args) {
-            for(; prev != arg && it != zip_targets.end(); ++prev, ++it);
-            if (it == zip_targets.end()) break;
-            mth_targets.push_back(*it);
-        }
-        return mth_targets;
-    }
-
     static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
         auto &effects = origin_card->get_effect_list(is_response);
 
@@ -86,8 +73,7 @@ namespace banggame {
 
         const auto &mth = origin_card->get_mth(is_response);
         if (mth.type) {
-            effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
-            MAYBE_RETURN(mth.type->get_error(origin_card, origin, mth_targets, ctx));
+            MAYBE_RETURN(mth.type->get_error(origin_card, origin, targets, mth.args, ctx));
         }
 
         MAYBE_RETURN(check_duplicates(origin_card, origin, ctx));
@@ -236,8 +222,7 @@ namespace banggame {
 
         const auto &mth = origin_card->get_mth(is_response);
         if (mth.type) {
-            effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
-            return mth.type->on_prompt(origin_card, origin, mth_targets, ctx);
+            return mth.type->on_prompt(origin_card, origin, targets, mth.args, ctx);
         }
         return {};
     }
@@ -350,8 +335,7 @@ namespace banggame {
 
         const auto &mth = origin_card->get_mth(is_response);
         if (mth.type) {
-            effect_target_list mth_targets = get_mth_targets(origin, origin_card, is_response, targets, mth.args);
-            mth.type->on_play(origin_card, origin, mth_targets, ctx);
+            mth.type->on_play(origin_card, origin, targets, mth.args, ctx);
         }
     }
 

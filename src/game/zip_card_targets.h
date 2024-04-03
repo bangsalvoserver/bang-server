@@ -5,6 +5,11 @@
 
 namespace banggame {
 
+    struct effect_target_pair {
+        const play_card_target &target;
+        const effect_holder &effect;
+    };
+
     class effect_zip_iterator {
     public:
         using iterator_category = std::forward_iterator_tag;

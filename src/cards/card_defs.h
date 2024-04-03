@@ -141,13 +141,6 @@ namespace banggame {
     using equip_list = std::vector<equip_holder>;
     using tag_map = std::unordered_map<tag_type, short>;
 
-    struct effect_target_pair {
-        const play_card_target &target;
-        const effect_holder &effect;
-    };
-    
-    using effect_target_list = std::vector<effect_target_pair>;
-
     DEFINE_ENUM(card_deck_type,
         (none)
         (main_deck)
