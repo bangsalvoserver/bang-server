@@ -419,16 +419,18 @@ hidden:
       
   - name: LOUNGE_CAR
     responses:
+      - lounge_car_response
       - none card | selection
       - none player notself target_set dead alive
-    mth_response: lounge_car(0,1)
+    mth_response: lounge_car(1,2)
     tags:
       - auto_select
 
   - name: MAIL_CAR
     responses:
+      - mail_car_response
       - none card | selection
       - none player notself
-    mth_response: mail_car(0,1)
+    mth_response: mail_car(1,2)
     tags:
       - auto_select

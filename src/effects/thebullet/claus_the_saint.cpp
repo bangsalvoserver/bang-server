@@ -52,7 +52,7 @@ namespace banggame {
         });
     }
 
-    bool handler_claus_the_saint::can_play(card *origin_card, player *origin, card *target_card, player *target_player) {
+    bool effect_claus_the_saint::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_claus_the_saint>(origin) != nullptr;
     }
 

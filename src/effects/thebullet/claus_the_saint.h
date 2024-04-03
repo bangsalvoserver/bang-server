@@ -11,8 +11,13 @@ namespace banggame {
 
     DEFINE_EQUIP(claus_the_saint, equip_claus_the_saint)
 
+    struct effect_claus_the_saint {
+        bool can_play(card *origin_card, player *origin);
+    };
+
+    DEFINE_EFFECT(claus_the_saint, effect_claus_the_saint)
+
     struct handler_claus_the_saint {
-        bool can_play(card *origin_card, player *origin, card *target_card, player *target_player);
         void on_play(card *origin_card, player *origin, card *target_card, player *target_player);
     };
 

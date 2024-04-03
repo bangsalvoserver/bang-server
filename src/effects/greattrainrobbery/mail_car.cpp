@@ -31,7 +31,7 @@ namespace banggame {
         origin->m_game->queue_request<request_mail_car>(origin_card, origin);
     }
 
-    bool handler_mail_car::can_play(card *origin_card, player *origin, card *target_card, player *target_player) {
+    bool effect_mail_car_response::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_mail_car>(origin) != nullptr;
     }
 

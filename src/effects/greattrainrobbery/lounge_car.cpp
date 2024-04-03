@@ -59,12 +59,12 @@ namespace banggame {
         origin->m_game->queue_request<request_lounge_car>(origin_card, origin);
     }
 
+    bool effect_lounge_car_response::can_play(card *origin_card, player *origin) {
+        return origin->m_game->top_request<request_lounge_car>(origin) != nullptr;
+    }
+
     game_string handler_lounge_car::get_error(card *origin_card, player *origin, card *target_card, player *target_player) {
-        if (origin->m_game->top_request<request_lounge_car>(origin) == nullptr) {
-            return "ERROR_INVALID_RESPONSE";
-        }
-        MAYBE_RETURN(filters::check_player_filter(origin, target_card->equip_target, target_player));
-        return {};
+        return filters::check_player_filter(origin, target_card->equip_target, target_player);
     }
 
     void handler_lounge_car::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {

@@ -4,9 +4,10 @@ character:
     equip:
       - claus_the_saint
     responses:
+      - claus_the_saint
       - none card | selection
       - none player target_set
-    mth_response: claus_the_saint(0,1)
+    mth_response: claus_the_saint(1,2)
     tags:
       - max_hp(3)
       - auto_select
