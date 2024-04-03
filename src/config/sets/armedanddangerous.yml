@@ -44,7 +44,8 @@ main_deck:
     color: brown
     effects:
       - pay_cube select_cubes_optional(2)
-      - flintlock player reachable notself
+      - bang player reachable notself
+      - flintlock
     tags:
       - skip_logs
   - name: ARROW
