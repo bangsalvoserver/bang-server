@@ -41,6 +41,16 @@ namespace banggame {
         
         shared_effect_context ctx;
 
+        std::vector<card *> get_highlights() const override {
+            return {target->m_game->m_train.front()};
+        }
+
+        void on_update() override {
+            if (!live) {
+                ctx->skipped_player = nullptr;
+            }
+        }
+
         void on_resolve() override {
             target->m_game->pop_request();
         }
@@ -72,7 +82,7 @@ namespace banggame {
     void effect_skip_player_locomotive::on_play(card *origin_card, player *origin, player *target) {
         auto req = origin->m_game->top_request<request_sgt_blaze>();
         req->ctx->skipped_player = target;
-        origin->m_game->add_log("LOG_SKIP_PLAYER_LOCOMOTIVE", origin_card, origin, target);
+        origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, origin->m_game->m_train.front());
         origin->m_game->pop_request();
     }
 
