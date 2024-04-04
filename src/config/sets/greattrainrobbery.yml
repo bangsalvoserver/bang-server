@@ -159,6 +159,7 @@ character:
     modifier: sgt_blaze
     tags:
       - max_hp(5)
+      - auto_select
   - name: SHADE_OCONNOR
     image: 27_shadeoconnor
     equip:
@@ -167,6 +168,8 @@ character:
       - shade_oconnor
       - discard card self | hand
       - draw
+    tags:
+      - auto_select
   - name: ZIPPY_ROY
     image: 27_zippy_roy
     effects:

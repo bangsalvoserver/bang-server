@@ -114,6 +114,8 @@ main_deck:
       - none max_cards(3) self
       - none player notself
     mth_response: lastwill(1,2)
+    tags:
+      - auto_select
   - name: INDIAN_GUIDE
     signs:
       - 8 clubs
