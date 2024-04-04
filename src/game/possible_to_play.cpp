@@ -123,7 +123,7 @@ namespace banggame {
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
         for (card *mod_card : modifiers) {
             if (mod_card == origin_card) return false;
-            if (mod_card->modifier.type->get_error(mod_card, origin, origin_card, ctx)) return false;
+            if (mod_card->get_modifier(is_response).type->get_error(mod_card, origin, origin_card, ctx)) return false;
         }
 
         if (get_play_card_error(origin, origin_card, ctx)) {
@@ -138,12 +138,13 @@ namespace banggame {
             if (!is_possible_mth(origin, origin_card, is_response, ctx)) {
                 return false;
             }
-            
-            if (origin_card->is_modifier()) {
+
+            const modifier_holder &modifier = origin_card->get_modifier(is_response);
+            if (modifier.type != nullptr) {
                 auto modifiers_copy = modifiers;
                 modifiers_copy.push_back(origin_card);
                 auto ctx_copy = ctx;
-                origin_card->modifier.type->add_context(origin_card, origin, ctx_copy);
+                modifier.type->add_context(origin_card, origin, ctx_copy);
                 
                 return contains_at_least(cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy), 1);
             }
@@ -154,11 +155,12 @@ namespace banggame {
 
     static card_modifier_node generate_card_modifier_node(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
         card_modifier_node node { .card = origin_card };
-        if (!filters::is_equip_card(origin_card) && origin_card->is_modifier()) {
+        const modifier_holder &modifier = origin_card->get_modifier(is_response);
+        if (!filters::is_equip_card(origin_card) && modifier.type != nullptr) {
             auto modifiers_copy = modifiers;
             modifiers_copy.push_back(origin_card);
             auto ctx_copy = ctx;
-            origin_card->modifier.type->add_context(origin_card, origin, ctx_copy);
+            modifier.type->add_context(origin_card, origin, ctx_copy);
 
             for (card *target_card : cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy)) {
                 node.branches.push_back(generate_card_modifier_node(origin, target_card, is_response, modifiers_copy, ctx_copy));

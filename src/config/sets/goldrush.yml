@@ -61,6 +61,7 @@ goldrush:
     image: 04_bottiglia
     color: brown
     modifier: card_choice
+    modifier_response: card_choice
     effects:
       - none
     responses:
@@ -88,6 +89,7 @@ goldrush:
     image: 04_complice
     color: brown
     modifier: card_choice
+    modifier_response: card_choice
     effects:
       - none
     responses:

@@ -154,6 +154,8 @@ character:
       - sgt_blaze
     effects:
       - skip_player player
+    responses:
+      - skip_player_locomotive player
     modifier: sgt_blaze
     tags:
       - max_hp(5)
@@ -249,6 +251,7 @@ train:
     responses:
       - discard
     modifier: card_choice
+    modifier_response: card_choice
     tags:
       - card_choice(3)
   - name: CABOOSE
@@ -384,9 +387,6 @@ hidden:
     tags:
       - card_choice(4)
 
-  - name: SGT_BLAZE
-    responses:
-      - skip_player_locomotive player
   - name: BAGGAGE_CAR_MISSED
     image: main_deck/01_mancato
     responses:

@@ -9,7 +9,7 @@ namespace banggame::filters {
 
     bool is_equip_card(const card *c);
 
-    bool is_modifier_card(const card *c);
+    bool is_modifier_card(const player *origin, const card *c);
 
     bool is_bang_card(const player *origin, const card *target);
 

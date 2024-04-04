@@ -19,7 +19,7 @@ namespace banggame {
 
         void on_update() override {
             if (target_card == get_single_element(get_all_playable_cards(target, true))) {
-                if (!target_card->is_modifier()
+                if (target_card->modifier_response.type == nullptr
                     && rn::all_of(target_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
                 ) {
                     apply_target_list(target, target_card, true,

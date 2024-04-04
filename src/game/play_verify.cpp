@@ -112,12 +112,14 @@ namespace banggame {
     
     static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
         for (const auto &[mod_card, targets] : modifiers) {
-            if (!mod_card->is_modifier()) {
+            const modifier_holder &modifier = mod_card->get_modifier(is_response);
+
+            if (modifier.type == nullptr) {
                 return "ERROR_CARD_IS_NOT_MODIFIER";
             }
 
             ctx.selected_cards.push_back(mod_card);
-            mod_card->modifier.type->add_context(mod_card, origin, ctx);
+            modifier.type->add_context(mod_card, origin, ctx);
             
             MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
             MAYBE_RETURN(get_play_card_error(origin, mod_card, ctx));
@@ -126,10 +128,10 @@ namespace banggame {
         for (size_t i=0; i<modifiers.size(); ++i) {
             const auto &[mod_card, targets] = modifiers[i];
 
-            MAYBE_RETURN(mod_card->modifier.type->get_error(mod_card, origin, origin_card, ctx));
+            MAYBE_RETURN(mod_card->get_modifier(is_response).type->get_error(mod_card, origin, origin_card, ctx));
             for (size_t j=0; j<i; ++j) {
                 card *mod_card_before = modifiers[j].card;
-                MAYBE_RETURN(mod_card_before->modifier.type->get_error(mod_card_before, origin, mod_card, ctx));
+                MAYBE_RETURN(mod_card_before->get_modifier(is_response).type->get_error(mod_card_before, origin, mod_card, ctx));
             }
         }
         return {};
@@ -197,7 +199,7 @@ namespace banggame {
 
         if (filters::is_equip_card(origin_card)) {
             MAYBE_RETURN(verify_equip_target(origin, origin_card, is_response, targets, ctx));
-        } else if (origin_card->is_modifier()) {
+        } else if (origin_card->get_modifier(is_response).type != nullptr) {
             return "ERROR_CARD_IS_MODIFIER";
         } else {
             MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
@@ -228,7 +230,7 @@ namespace banggame {
 
     static game_string check_prompt_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         for (const auto &[mod_card, mod_targets] : modifiers) {
-            MAYBE_RETURN(mod_card->modifier.type->on_prompt(mod_card, origin, origin_card, ctx));
+            MAYBE_RETURN(mod_card->get_modifier(is_response).type->on_prompt(mod_card, origin, origin_card, ctx));
             MAYBE_RETURN(check_prompt(origin, mod_card, is_response, mod_targets, ctx));
         }
         if (filters::is_equip_card(origin_card)) {

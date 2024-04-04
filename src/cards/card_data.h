@@ -21,6 +21,7 @@ namespace banggame {
         (card_deck_type, deck)
 
         (modifier_holder, modifier)
+        (modifier_holder, modifier_response)
         (mth_holder, mth_effect)
         (mth_holder, mth_response)
         (target_player_filter, equip_target)
@@ -36,12 +37,12 @@ namespace banggame {
             return is_response ? mth_response : mth_effect;
         }
 
-        bool has_tag(tag_type tag) const {
-            return tags.find(tag) != tags.end();
+        const modifier_holder &get_modifier(bool is_response) const {
+            return is_response ? modifier_response : modifier;
         }
 
-        bool is_modifier() const {
-            return modifier.type != nullptr;
+        bool has_tag(tag_type tag) const {
+            return tags.find(tag) != tags.end();
         }
 
         std::optional<short> get_tag_value(tag_type tag) const {

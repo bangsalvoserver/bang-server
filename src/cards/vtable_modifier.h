@@ -35,7 +35,7 @@ namespace banggame {
                             return {"ERROR_CANT_PLAY_WHILE_EQUIPPING", origin_card, target_card};
                         }
                     }
-                } else if (filters::is_modifier_card(target_card)) {
+                } else if (filters::is_modifier_card(origin, target_card)) {
                     if constexpr (requires (T handler) { handler.valid_with_modifier(origin_card, origin, target_card); }) {
                         if (T{}.valid_with_modifier(origin_card, origin, target_card)) {
                             return {};
