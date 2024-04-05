@@ -201,7 +201,7 @@ namespace banggame {
     rn::any_view<player *> get_request_target_set(player *origin) {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_target_set>(origin)) {
-                return origin->m_game->m_players | rv::filter([&](const player *p) {
+                return origin->m_game->m_players | rv::filter([=](const player *p) {
                     return req->in_target_set(p);
                 });
             }
