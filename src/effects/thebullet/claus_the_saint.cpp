@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    struct request_claus_the_saint : request_base {
+    struct request_claus_the_saint : request_base, interface_target_set {
         request_claus_the_saint(card *origin_card, player *target, shared_request_draw &&req_draw)
             : request_base(origin_card, nullptr, target)
             , req_draw(std::move(req_draw)) {}
@@ -34,12 +34,8 @@ namespace banggame {
             }
         }
 
-        std::vector<player *> get_target_set() const override {
-            return target->m_game->m_players
-                | rv::filter([&](player *p) {
-                    return p != target && !rn::contains(selected_targets, p);
-                })
-                | rn::to_vector;
+        bool in_target_set(const player *target_player) const override {
+            return target_player != target && !rn::contains(selected_targets, target_player);
         }
     };
     

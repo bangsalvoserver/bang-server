@@ -53,6 +53,8 @@ namespace banggame {
     card_modifier_tree generate_card_modifier_tree(player *origin, bool is_response = false);
 
     rn::any_view<card *> get_pick_cards(player *origin);
+
+    rn::any_view<player *> get_request_target_set(player *origin);
     
 }
 

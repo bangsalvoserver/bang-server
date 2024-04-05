@@ -67,7 +67,7 @@ namespace banggame {
         }
 
         template<typename T = request_base>
-        std::shared_ptr<T> top_request(player *target = nullptr) {
+        std::shared_ptr<T> top_request(const player *target = nullptr) {
             if (!m_requests.empty()) {
                 auto req = m_requests.top();
                 if (!target || req->target == target) {

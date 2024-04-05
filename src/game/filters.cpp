@@ -55,10 +55,9 @@ namespace banggame::filters {
             return "ERROR_TARGET_EMPTY_CUBES";
         
         if (bool(filter & target_player_filter::target_set)) {
-            if (auto req = target->m_game->top_request()) {
-                if (!rn::contains(req->get_target_set(), target)) {
-                    return "ERROR_TARGET_NOT_IN_TARGET_SET";
-                }
+            auto req = target->m_game->top_request<interface_target_set>(origin);
+            if (!req || !req->in_target_set(target)) {
+                return "ERROR_TARGET_NOT_IN_TARGET_SET";
             }
         }
 

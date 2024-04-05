@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    struct request_lounge_car : request_base {
+    struct request_lounge_car : request_base, interface_target_set {
         request_lounge_car(card *origin_card, player *origin)
             : request_base(origin_card, nullptr, origin) {}
         
@@ -28,14 +28,10 @@ namespace banggame {
             }
         }
 
-        std::vector<player *> get_target_set() const override {
-            return target->m_game->m_players
-                | rv::filter([&](player *p) {
-                    return rn::any_of(target->m_game->m_selection, [&](card *target_card) {
-                        return !filters::check_player_filter(target, target_card->equip_target, p);
-                    });
-                })
-                | rn::to_vector;
+        bool in_target_set(const player *target_player) const override {
+            return rn::any_of(target->m_game->m_selection, [&](card *target_card) {
+                return !filters::check_player_filter(target, target_card->equip_target, target_player);
+            });
         }
 
         game_string status_text(player *owner) const override {

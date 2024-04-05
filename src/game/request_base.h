@@ -75,7 +75,10 @@ namespace banggame {
 
         virtual game_string status_text(player *owner) const { return {}; };
         virtual std::vector<card *> get_highlights() const { return {}; }
-        virtual std::vector<player *> get_target_set() const { return {}; }
+    };
+
+    struct interface_target_set {
+        virtual bool in_target_set(const player *target_player) const = 0;
     };
 
 }
