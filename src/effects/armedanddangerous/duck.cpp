@@ -2,16 +2,24 @@
 
 #include "game/game.h"
 #include "game/filters.h"
-#include "effects/base/missed.h"
+#include "effects/base/bang.h"
 
 namespace banggame {
 
+    static int get_bang_strength(player *origin) {
+        if (auto req = origin->m_game->top_request<request_bang>(origin)) {
+            return req->bang_strength;
+        }
+        return 1;
+    }
+
     game_string effect_duck::on_prompt(card *origin_card, player *origin, const effect_context &ctx) {
         if (filters::get_selected_cubes(origin_card, ctx).empty()) {
-            return {"PROMPT_NO_REDRAW", origin_card};
-        } else {
-            return {};
+            if (!origin->is_bot() || origin->m_hp > get_bang_strength(origin)) {
+                return {"PROMPT_NO_REDRAW", origin_card};
+            }
         }
+        return {};
     }
 
     void effect_duck::on_play(card *origin_card, player *origin, const effect_context &ctx) {
