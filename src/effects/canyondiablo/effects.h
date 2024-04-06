@@ -3,6 +3,7 @@
 
 #include "brothel.h"
 #include "buffalo_bell.h"
+#include "bullldog.h"
 #include "clash_the_stampede.h"
 #include "eva_place.h"
 #include "disarm.h"

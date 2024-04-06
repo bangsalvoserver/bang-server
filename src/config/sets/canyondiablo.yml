@@ -98,7 +98,7 @@ main_deck:
       - max_usages(1)
       - set_playing card self | hand bang
       - discard card self | hand
-    mth_effect: play_as_gatling(1)
+    mth_effect: bulldog(1, 2)
     tags:
       - weapon
   - name: LAST_WILL
