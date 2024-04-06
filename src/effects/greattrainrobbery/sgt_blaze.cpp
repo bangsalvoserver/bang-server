@@ -1,6 +1,7 @@
 #include "sgt_blaze.h"
 
 #include "game/filters.h"
+#include "cards/filter_enums.h"
 
 #include "game/game.h"
 
@@ -16,7 +17,7 @@ namespace banggame {
             if (ctx.skipped_player && filters::check_player_filter(origin, it->player_filter, ctx.skipped_player, ctx)) {
                 return {"ERROR_CANNOT_SKIP_PLAYER", ctx.skipped_player};
             }
-        } else if (auto it = rn::find(effects, target_type::cards_other_players, &effect_holder::target); it != effects.end()) {
+        } else if (playing_card->has_tag(tag_type::multi_target)) {
             if (ctx.skipped_player == origin) {
                 return {"ERROR_CANNOT_SKIP_PLAYER", origin};
             }

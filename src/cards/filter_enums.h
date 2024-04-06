@@ -63,6 +63,7 @@ namespace banggame {
         (bangcard)
         (missed)
         (missedcard)
+        (multi_target)
         (play_as_bang)
         (banglimit)
         (bangmod)

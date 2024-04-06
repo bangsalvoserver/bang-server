@@ -101,6 +101,7 @@ main_deck:
     mth_effect: bulldog(1, 2)
     tags:
       - weapon
+      - multi_target
   - name: LAST_WILL
     signs:
       - A spades
@@ -184,6 +185,7 @@ main_deck:
       - destroy cards_other_players
     tags:
       - skip_logs
+      - multi_target
   - name: FLYING_BULLET
     signs:
       - 10 diamonds

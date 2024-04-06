@@ -98,6 +98,7 @@ main_deck:
     tags:
       - skip_logs
       - no_auto_discard
+      - multi_target
   - &dodge
     name: DODGE
     signs:

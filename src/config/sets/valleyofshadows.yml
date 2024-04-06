@@ -157,6 +157,8 @@ character:
       - max_usages(1)
       - set_playing card self | hand bang
     mth_effect: play_as_gatling(1)
+    tags:
+      - multi_target
   - name: EVELYN_SHEBANG
     image: 07_evelynshebang
     responses:
