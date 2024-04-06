@@ -11,6 +11,7 @@ target_sources(bangserver PRIVATE
     lemonade_jim.cpp
     mick_defender.cpp
     poker.cpp
+    play_as_gatling.cpp
     ruleset.cpp
     saved.cpp
     shotgun.cpp

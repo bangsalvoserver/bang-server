@@ -30,14 +30,6 @@ namespace banggame {
 
     DEFINE_MTH(play_as_bang, handler_play_as_bang)
 
-    struct handler_play_as_gatling {
-        game_string get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card);
-        game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card);
-        void on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card);
-    };
-
-    DEFINE_MTH(play_as_gatling, handler_play_as_gatling)
-
     struct effect_banglimit {
         game_string get_error(card *origin_card, player *origin, const effect_context &ctx);
         void on_play(card *origin_card, player *origin, const effect_context &ctx);

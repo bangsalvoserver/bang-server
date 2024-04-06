@@ -13,6 +13,7 @@
 #include "lemonade_jim.h"
 #include "mick_defender.h"
 #include "poker.h"
+#include "play_as_gatling.h"
 #include "saved.h"
 #include "shotgun.h"
 #include "snake.h"
