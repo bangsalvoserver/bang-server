@@ -65,34 +65,28 @@ namespace banggame {
     }
 
     static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const target_list &targets) {
-        if (!mth.type) {
+        if (targets.size() == mth.args.size()) {
+            return !mth.type->get_error(origin_card, origin, targets,
+                    serial::int_list(small_int_set_sized_tag, targets.size()), ctx);
+        }
+        const auto &effect = effects.at(mth.args[targets.size()]);
+        switch (effect.target) {
+        case target_type::player:
+            return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
+                auto targets_copy = targets;
+                targets_copy.emplace_back(enums::enum_tag<target_type::player>, target);
+                return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
+            });
+        case target_type::card:
+            return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
+                auto targets_copy = targets;
+                targets_copy.emplace_back(enums::enum_tag<target_type::card>, target);
+                return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
+            });
+        default:
+            // ignore other target types
             return true;
         }
-        if (targets.size() < mth.args.size()) {
-            auto index = mth.args[targets.size()];
-            if (index < effects.size()) {
-                const auto &effect = effects[index];
-                switch (effect.target) {
-                case target_type::player:
-                    return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
-                        auto targets_copy = targets;
-                        targets_copy.emplace_back(enums::enum_tag<target_type::player>, target);
-                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
-                    });
-                case target_type::card:
-                    return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
-                        auto targets_copy = targets;
-                        targets_copy.emplace_back(enums::enum_tag<target_type::card>, target);
-                        return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
-                    });
-                default:
-                    // ignore other target types
-                    return true;
-                }
-            }
-        }
-        return !mth.type->get_error(origin_card, origin, targets,
-                serial::int_list(small_int_set_sized_tag, targets.size()), ctx);
     }
 
     static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
@@ -102,7 +96,7 @@ namespace banggame {
             return enums::visit_enum([&]<target_type E>(enums::enum_tag_t<E>) {
                 return play_visitor<E>{origin, origin_card, effect}.possible(ctx);
             }, effect.target);
-        }) && is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {});
+        }) && (!mth.type || is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {}));
     }
 
     static rn::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
