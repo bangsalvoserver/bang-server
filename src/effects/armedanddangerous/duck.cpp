@@ -1,7 +1,6 @@
 #include "duck.h"
 
 #include "game/game.h"
-#include "game/filters.h"
 #include "effects/base/bang.h"
 
 namespace banggame {
@@ -14,7 +13,7 @@ namespace banggame {
     }
 
     game_string effect_duck::on_prompt(card *origin_card, player *origin, const effect_context &ctx) {
-        if (filters::get_selected_cubes(origin_card, ctx).empty()) {
+        if (ctx.selected_cubes[origin_card].empty()) {
             if (!origin->is_bot() || origin->m_hp > get_bang_damage(origin)) {
                 return {"PROMPT_NO_REDRAW", origin_card};
             }
@@ -23,7 +22,7 @@ namespace banggame {
     }
 
     void effect_duck::on_play(card *origin_card, player *origin, const effect_context &ctx) {
-        if (!filters::get_selected_cubes(origin_card, ctx).empty()) {
+        if (!ctx.selected_cubes[origin_card].empty()) {
             origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
             origin->m_game->add_short_pause(origin_card);
             origin->add_to_hand(origin_card);

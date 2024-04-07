@@ -11,15 +11,6 @@ namespace banggame::filters {
         return origin->is_bot();
     }
 
-    const serial::card_list &get_selected_cubes(const card *origin_card, const effect_context &ctx) {
-        static const serial::card_list empty_list;
-        auto it = rn::find_if(ctx.selected_cubes, [&](const card_cubes_pair &pair) { return pair.card == origin_card; });
-        if (it != ctx.selected_cubes.end()) {
-            return it->cubes;
-        }
-        return empty_list;
-    }
-
     game_string check_player_filter(const player *origin, target_player_filter filter, const player *target, const effect_context &ctx) {
         if (bool(filter & target_player_filter::dead)) {
             if (!bool(filter & target_player_filter::alive) && !target->check_player_flags(player_flags::dead)) {

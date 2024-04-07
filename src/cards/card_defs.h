@@ -179,29 +179,45 @@ namespace banggame {
         (train)
     )
 
-    DEFINE_STRUCT(card_cubes_pair,
-        (serial::card, card)
-        (serial::card_list, cubes)
-    )
+    class selected_cubes_count {
+    private:
+        std::unordered_multimap<const card *, card *> m_value;
 
-    using selected_cubes_count = std::vector<card_cubes_pair>;
+    public:
+        void insert(const card *origin_card, card *cube) {
+            m_value.emplace(origin_card, cube);
+        }
 
-    DEFINE_STRUCT(effect_context,
-        (serial::opt_card, playing_card)
-        (serial::player_list, selected_players)
-        (serial::card_list, selected_cards)
-        (selected_cubes_count, selected_cubes)
-        (serial::opt_card, card_choice)
-        (serial::opt_player, skipped_player)
-        (serial::opt_card, repeat_card)
-        (serial::opt_card, traincost)
-        (int8_t, train_advance)
-        (int8_t, locomotive_count)
-        (int8_t, discount)
-        (bool, ignore_distances)
-        (bool, disable_banglimit)
-        (bool, disable_bang_checks)
-    )
+        auto operator[](const card *origin_card) const {
+            auto [low, high] = m_value.equal_range(origin_card);
+            return rn::subrange(low, high) | rv::values;
+        }
+
+        int count(const card *origin_card) const {
+            return static_cast<int>(rn::distance((*this)[origin_card]));
+        }
+
+        auto all() const {
+            return m_value | rv::values;
+        }
+    };
+
+    struct effect_context {
+        card *playing_card;
+        std::vector<player *> selected_players;
+        std::vector<card *> selected_cards;
+        selected_cubes_count selected_cubes;
+        card *card_choice;
+        player *skipped_player;
+        card *repeat_card;
+        card *traincost;
+        int8_t train_advance;
+        int8_t locomotive_count;
+        int8_t discount;
+        bool ignore_distances;
+        bool disable_banglimit;
+        bool disable_bang_checks;
+    };
 
 }
 

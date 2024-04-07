@@ -24,11 +24,9 @@ namespace banggame {
                 return {"ERROR_DUPLICATE_CARD", c};
             }
         }
-        for (const auto &[selected_card, selected_cubes] : ctx.selected_cubes) {
-            for (card *c : selected_cubes) {
-                if (++cubes[c] > c->num_cubes) {
-                    return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
-                }
+        for (card *c : ctx.selected_cubes.all()) {
+            if (++cubes[c] > c->num_cubes) {
+                return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
             }
         }
         return {};

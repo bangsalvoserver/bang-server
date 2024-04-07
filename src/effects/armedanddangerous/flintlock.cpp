@@ -3,12 +3,11 @@
 #include "effects/base/bang.h"
 
 #include "game/game.h"
-#include "game/filters.h"
 
 namespace banggame {
 
     void effect_flintlock::on_play(card *origin_card, player *origin, const effect_context &ctx) {
-        if (!filters::get_selected_cubes(origin_card, ctx).empty()) {
+        if (!ctx.selected_cubes[origin_card].empty()) {
             origin->m_game->add_listener<event_type::on_missed>(origin_card, [=](card *origin_card, player *p, player *target, card *missed_card, effect_flags flags) {
                 if (origin == p) {
                     origin->m_game->queue_action([=]{
