@@ -289,6 +289,6 @@ character:
       - red_ringo
     effects:
       - max_usages(1)
-      - red_ringo move_cube_slot(2)
+      - none move_cube_slot(2)
     tags:
       - max_hp(5)

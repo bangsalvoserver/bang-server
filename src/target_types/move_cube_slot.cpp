@@ -51,23 +51,14 @@ namespace banggame {
     }
 
     template<> game_string visit_cards::prompt(const effect_context &ctx, const serial::card_list &targets) {
-        game_string msg;
-        for (card *target : targets) {
-            msg = defer<target_type::card>().prompt(ctx, target);
-            if (!msg) break;
-        }
-        return msg;
+        return {};
     }
 
-    template<> void visit_cards::add_context(effect_context &ctx, const serial::card_list &targets) {
-        for (card *c : targets) {
-            defer<target_type::card>().add_context(ctx, c);
-        }
-    }
+    template<> void visit_cards::add_context(effect_context &ctx, const serial::card_list &targets) {}
 
     template<> void visit_cards::play(const effect_context &ctx, const serial::card_list &targets) {
-        for (card *c : targets) {
-            defer<target_type::card>().play(ctx, c);
+        for (card *target_card : targets) {
+            origin->m_game->move_cubes(origin->first_character(), target_card, 1);
         }
     }
 
