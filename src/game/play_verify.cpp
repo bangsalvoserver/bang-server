@@ -7,23 +7,26 @@
 
 #include "filters.h"
 
+#include <unordered_set>
+
 namespace banggame {
 
-    game_string check_duplicates(card *origin_card, player *origin, const effect_context &ctx) {
-        std::set<player *> players;
-        std::set<card *> cards;
-        std::map<card *, int> cubes;
-
+    static game_string check_duplicates(const effect_context &ctx) {
+        std::unordered_set<player *> players;
         for (player *p : ctx.selected_players) {
             if (auto [it, inserted] = players.insert(p); !inserted) {
                 return {"ERROR_DUPLICATE_PLAYER", p};
             }
         }
+
+        std::unordered_set<card *> cards;
         for (card *c : ctx.selected_cards) {
             if (auto [it, inserted] = cards.insert(c); !inserted) {
                 return {"ERROR_DUPLICATE_CARD", c};
             }
         }
+
+        std::unordered_map<card *, int> cubes;
         for (card *c : ctx.selected_cubes.all()) {
             if (++cubes[c] > c->num_cubes) {
                 return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
@@ -73,7 +76,7 @@ namespace banggame {
             MAYBE_RETURN(mth.type->get_error(origin_card, origin, targets, mth.args, ctx));
         }
 
-        MAYBE_RETURN(check_duplicates(origin_card, origin, ctx));
+        MAYBE_RETURN(check_duplicates(ctx));
 
         if (ctx.repeat_card != origin_card) {
             switch (origin_card->pocket) {
