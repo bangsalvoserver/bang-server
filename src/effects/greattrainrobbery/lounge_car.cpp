@@ -48,7 +48,7 @@ namespace banggame {
     };
 
     game_string effect_lounge_car::on_prompt(card *origin_card, player *origin) {
-        if (origin->m_game->top_train_card()) {
+        if (origin->m_game->top_train_card() == nullptr) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
             return {};
