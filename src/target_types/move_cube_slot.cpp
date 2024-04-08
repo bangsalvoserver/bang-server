@@ -36,7 +36,7 @@ namespace banggame {
             return {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
         }
         for (card *target_card : targets) {
-            if (target_card->pocket != pocket_type::player_table || target_card->owner != origin) {
+            if (target_card->pocket != pocket_type::player_table || target_card->owner != origin || !target_card->is_orange()) {
                 return "ERROR_TARGET_NOT_SELF";
             }
             int count = target_card->num_cubes;
@@ -57,8 +57,12 @@ namespace banggame {
     template<> void visit_cards::add_context(effect_context &ctx, const serial::card_list &targets) {}
 
     template<> void visit_cards::play(const effect_context &ctx, const serial::card_list &targets) {
-        for (card *target_card : targets) {
-            origin->m_game->move_cubes(origin->first_character(), target_card, 1);
+        if (rn::all_of(targets, [first=targets.front()](card *target_card) { return target_card == first; })) {
+            origin->m_game->move_cubes(origin->first_character(), targets.front(), targets.size());
+        } else {
+            for (card *target_card : targets) {
+                origin->m_game->move_cubes(origin->first_character(), target_card, 1);
+            }
         }
     }
 
