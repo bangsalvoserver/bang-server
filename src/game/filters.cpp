@@ -154,9 +154,6 @@ namespace banggame::filters {
         if (bool(filter & target_card_filter::train) && !target->is_train())
             return "ERROR_TARGET_NOT_TRAIN";
 
-        if (bool(filter & target_card_filter::nottrain) && target->is_train())
-            return "ERROR_TARGET_TRAIN";
-
         if (bool(filter & target_card_filter::blue_or_train) && !target->is_blue() && !target->is_train())
             return "ERROR_TARGET_NOT_BLUE_OR_TRAIN";
 
