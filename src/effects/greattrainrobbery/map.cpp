@@ -26,9 +26,13 @@ namespace banggame {
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
-            target->m_game->move_card(target_card, pocket_type::discard_pile);
-            on_resolve();
+            target->m_game->pop_request();
+            target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
+            while (!target->m_game->m_selection.empty()) {
+                card *discarded = target->m_game->m_selection.front();
+                target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, discarded);
+                target->m_game->move_card(discarded, pocket_type::discard_pile);
+            }
         }
 
         game_string status_text(player *owner) const override {
