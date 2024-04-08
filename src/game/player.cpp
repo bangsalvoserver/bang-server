@@ -137,7 +137,8 @@ namespace banggame {
                 if (m_game->m_train.size() < 4) {
                     m_game->move_card(target, pocket_type::train);
                 } else {
-                    m_game->move_card(target, pocket_type::train_deck, nullptr, card_visibility::hidden);
+                    m_game->move_card(target, pocket_type::train_deck, nullptr, card_visibility::shown, false, true);
+                    m_game->set_card_visibility(target, nullptr, card_visibility::hidden, true);
                 }
             } else if (target->is_black()) {
                 m_game->move_card(target, pocket_type::shop_discard);

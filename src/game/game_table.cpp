@@ -122,7 +122,7 @@ namespace banggame {
         }
     }
 
-    void game_table::move_card(card *c, pocket_type pocket, player *owner, card_visibility visibility, bool instant) {
+    void game_table::move_card(card *c, pocket_type pocket, player *owner, card_visibility visibility, bool instant, bool front) {
         if (c->pocket == pocket && c->owner == owner) return;
         
         set_card_visibility(c, owner, visibility, instant);
@@ -130,12 +130,17 @@ namespace banggame {
         auto &prev_pile = get_pocket(c->pocket, c->owner);
         prev_pile.erase(rn::find(prev_pile, c));
 
-        get_pocket(pocket, owner).emplace_back(c);
-        
         c->pocket = pocket;
         c->owner = owner;
+
+        auto &new_pile = get_pocket(pocket, owner);
+        if (front) {
+            new_pile.insert(new_pile.begin(), c);
+        } else {
+            new_pile.push_back(c);
+        }
         
-        add_update<game_update_type::move_card>(c, owner, pocket, instant);
+        add_update<game_update_type::move_card>(c, owner, pocket, instant, front);
     }
 
     card *game_table::top_of_deck() {
@@ -179,6 +184,13 @@ namespace banggame {
         add_log("LOG_DRAWN_SHOP_CARD", drawn_card);
         move_card(drawn_card, pocket_type::shop_selection);
         return drawn_card;
+    }
+
+    card *game_table::top_train_card() {
+        if (!m_train_deck.empty()) {
+            return m_train_deck.back();
+        }
+        return nullptr;
     }
 
     void game_table::draw_scenario_card() {

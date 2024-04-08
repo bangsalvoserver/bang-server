@@ -59,11 +59,12 @@ namespace banggame {
         card *add_card(const card_data &data);
 
         void set_card_visibility(card *c, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
-        void move_card(card *c, pocket_type pocket, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
+        void move_card(card *c, pocket_type pocket, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false, bool front = false);
 
         card *top_of_deck();
-
+        card *top_train_card();
         card *draw_shop_card();
+
         void draw_scenario_card();
         void advance_train(player *origin);
 

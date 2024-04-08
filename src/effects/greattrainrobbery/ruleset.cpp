@@ -36,9 +36,12 @@ namespace banggame {
             origin->enable_equip(c);
         }
         
-        for (int i=0; i<3 && !origin->m_game->m_train_deck.empty(); ++i) {
-            card *drawn_card = origin->m_game->m_train_deck.front();
-            origin->m_game->move_card(drawn_card, pocket_type::train);
+        for (int i=0; i<3; ++i) {
+            if (card *drawn_card = origin->m_game->top_train_card()) {
+                origin->m_game->move_card(drawn_card, pocket_type::train);
+            } else {
+                break;
+            }
         }
     }
 
@@ -107,8 +110,8 @@ namespace banggame {
                     });
                 }
 
-                if (!origin->m_game->m_train_deck.empty()) {
-                    origin->m_game->move_card(origin->m_game->m_train_deck.front(), pocket_type::train);
+                if (card *drawn_card = origin->m_game->top_train_card()) {
+                    origin->m_game->move_card(drawn_card, pocket_type::train);
                 }
             }
         });

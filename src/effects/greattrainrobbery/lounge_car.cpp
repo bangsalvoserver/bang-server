@@ -12,8 +12,12 @@ namespace banggame {
         
         void on_update() override {
             if (!live) {
-                for (int i=0; i<2 && !target->m_game->m_train_deck.empty(); ++i) {
-                    target->m_game->move_card(target->m_game->m_train_deck.front(), pocket_type::selection, target);
+                for (int i=0; i<2; ++i) {
+                    if (card *drawn_card = target->m_game->top_train_card()) {
+                        target->m_game->move_card(drawn_card, pocket_type::selection, target);
+                    } else {
+                        break;
+                    }
                 }
             }
             if (target->m_game->m_selection.size() <= 1 && rn::all_of(target->m_game->m_selection, [&](card *target_card) {
@@ -44,7 +48,7 @@ namespace banggame {
     };
 
     game_string effect_lounge_car::on_prompt(card *origin_card, player *origin) {
-        if (origin->m_game->m_train_deck.empty()) {
+        if (origin->m_game->top_train_card()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
             return {};

@@ -28,11 +28,13 @@ namespace banggame {
         (serial::card, card)
         (serial::opt_player, player)
         (pocket_type, pocket)
+        (bool, front)
         (game_duration, duration),
 
         move_card_update() = default;
-        move_card_update(serial::card card, serial::opt_player player, pocket_type pocket, bool instant = false)
+        move_card_update(serial::card card, serial::opt_player player, pocket_type pocket, bool instant = false, bool front = false)
             : card{card}, player{player}, pocket{pocket}
+            , front{front}
             , duration{instant ? 0ms : durations.move_card} {}
     )
 
