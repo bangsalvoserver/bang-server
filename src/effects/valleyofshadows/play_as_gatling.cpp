@@ -42,7 +42,7 @@ namespace banggame {
                 targets.push_back(target);
             }
         }
-        auto flags = effect_flags::play_as_bang | effect_flags::multi_target;
+        auto flags = effect_flags::play_as_bang | effect_flags::multi_target | effect_flags::skip_target_logs;
         if (targets.size() == 1) {
             flags |= effect_flags::single_target;
         }

@@ -2,6 +2,7 @@
 
 #include "game/filters.h"
 #include "cards/filter_enums.h"
+#include "cards/game_enums.h"
 
 namespace banggame {
 
@@ -32,11 +33,14 @@ namespace banggame {
         if (targets.size() != 2) {
             return "ERROR_INVALID_TARGETS";
         }
+        if (!ctx.ignore_distances && origin->m_game->calc_distance(origin, targets[0]) > origin->get_weapon_range() + origin->get_range_mod()) {
+            return "ERROR_TARGET_NOT_IN_RANGE";
+        }
         if (targets[0] == targets[1] || origin->m_game->calc_distance(targets[0], targets[1]) != 1) {
             return "ERROR_TARGETS_NOT_ADJACENT";
         }
         for (player *target : targets) {
-            MAYBE_RETURN(defer<target_type::player>().get_error(ctx, target));
+            MAYBE_RETURN(effect.type->get_error_player(effect.effect_value, origin_card, origin, target, ctx));
         }
         return {};
     }
@@ -57,8 +61,12 @@ namespace banggame {
     }
 
     template<> void visit_players::play(const effect_context &ctx, const serial::player_list &targets) {
+        auto flags = effect_flags::multi_target;
+        if (origin_card->is_brown()) {
+            flags |= effect_flags::escapable;
+        }
         for (player *target : targets) {
-            defer<target_type::player>().play(ctx, target);
+            effect.type->on_play_player(effect.effect_value, origin_card, origin, target, flags, ctx);
         }
     }
 
