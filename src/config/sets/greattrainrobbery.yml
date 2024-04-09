@@ -97,8 +97,8 @@ main_deck:
     image: 27_switch
     color: brown
     effects:
-      - none card self | table nottrain
-      - none card notself | table nottrain
+      - none card self | table
+      - none card notself | table
     mth_effect: switch_cards(0,1)
   - name: TRAIN_ROBBERY
     signs:

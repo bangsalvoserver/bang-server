@@ -30,7 +30,6 @@ namespace banggame {
         (blue)
         (black)
         (train)
-        (nottrain)
         (blue_or_train)
         (hearts)
         (diamonds)
