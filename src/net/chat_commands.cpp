@@ -234,8 +234,8 @@ namespace banggame {
             } else {
                 bool from_train = target_card->pocket == pocket_type::train;
                 target->equip_card(target_card);
-                if (from_train && !target->m_game->m_train_deck.empty()) {
-                    target->m_game->move_card(target->m_game->m_train_deck.front(), pocket_type::train);
+                if (card *drawn_card = target->m_game->top_train_card(); from_train && drawn_card) {
+                    target->m_game->move_card(drawn_card, pocket_type::train);
                 }
             }
             break;
