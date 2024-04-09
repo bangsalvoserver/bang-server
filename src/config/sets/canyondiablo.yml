@@ -263,6 +263,10 @@ character:
     image: 20_clash_the_stampede
     equip:
       - clash_the_stampede
+    responses:
+      - clash_the_stampede player target_set
+    tags:
+      - auto_select
   - name: CRAZY_HOG
     image: 20_crazy_hog
     effects:
