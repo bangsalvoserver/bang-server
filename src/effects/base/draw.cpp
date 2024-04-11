@@ -55,10 +55,14 @@ namespace banggame {
             }
             auto_pick();
         } else {
-            for (card *target_card : cards_from_selection) {
-                target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
-            }
-            target->m_game->pop_request();
+            phase_one_skip();
+        }
+    }
+
+    void request_draw::phase_one_skip() {
+        target->m_game->pop_request();
+        for (card *target_card : cards_from_selection) {
+            target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
         }
     }
 
@@ -134,17 +138,15 @@ namespace banggame {
         return "ERROR_NOT_START_OF_TURN";
     }
     
-    bool effect_while_drawing::can_play(card *origin_card, player *origin) {
+    bool effect_while_drawing_base::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_draw>(origin) != nullptr;
     }
 
     void effect_while_drawing::on_play(card *origin_card, player *origin) {
-        if (cards_to_add != 0) {
-            if (cards_to_add > 0) {
-                origin->m_game->top_request<request_draw>(origin)->num_drawn_cards += cards_to_add;
-            } else {
-                origin->m_game->pop_request();
-            }
-        }
+        origin->m_game->top_request<request_draw>()->num_drawn_cards += cards_to_add;
+    }
+
+    void effect_skip_drawing::on_play(card *origin_card, player *origin) {
+        origin->m_game->top_request<request_draw>()->phase_one_skip();
     }
 }

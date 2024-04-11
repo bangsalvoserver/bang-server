@@ -59,15 +59,24 @@ namespace banggame {
 
     DEFINE_EFFECT(startofturn, effect_startofturn)
 
-    struct effect_while_drawing {
+    struct effect_while_drawing_base {
+        bool can_play(card *origin_card, player *origin);
+    };
+
+    struct effect_while_drawing: effect_while_drawing_base {
         int cards_to_add;
         effect_while_drawing(int value): cards_to_add(value) {}
         
-        bool can_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
     DEFINE_EFFECT(while_drawing, effect_while_drawing)
+
+    struct effect_skip_drawing: effect_while_drawing_base {
+        void on_play(card *origin_card, player *origin);
+    };
+
+    DEFINE_EFFECT(skip_drawing, effect_skip_drawing)
 
     struct request_draw : request_picking, std::enable_shared_from_this<request_draw> {
         request_draw(player *target);
@@ -79,6 +88,7 @@ namespace banggame {
         
         card *phase_one_drawn_card();
         void add_to_hand_phase_one(card *target_card);
+        void phase_one_skip();
 
         void on_update() override;
         bool can_pick(card *target_card) const override;

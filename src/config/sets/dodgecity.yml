@@ -306,7 +306,7 @@ character:
   - name: PAT_BRENNAN
     image: 03_pat_brennan
     responses:
-      - while_drawing(-1)
+      - skip_drawing
       - steal card | table
     tags:
       - drawing
