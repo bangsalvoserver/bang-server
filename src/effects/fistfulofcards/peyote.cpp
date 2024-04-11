@@ -64,7 +64,7 @@ namespace banggame {
     };
     
     void equip_peyote::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_turn_start>({target_card, -2}, [=](player *p) {
+        target->m_game->add_listener<event_type::on_turn_start>({target_card, -10}, [=](player *p) {
             p->m_game->queue_request<request_peyote>(target_card, p);
         });
 

@@ -45,6 +45,7 @@ namespace banggame {
     }
     
     void request_draw::on_update() {
+        cards_from_selection = target->m_game->m_selection;
         if (!target->m_game->check_flags(game_flags::phase_one_override)
             && target->alive() && target->m_game->m_playing == target
             && num_drawn_cards < num_cards_to_draw)
@@ -54,6 +55,9 @@ namespace banggame {
             }
             auto_pick();
         } else {
+            for (card *target_card : cards_from_selection) {
+                target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
+            }
             target->m_game->pop_request();
         }
     }
@@ -68,6 +72,11 @@ namespace banggame {
 
     card *request_draw::phase_one_drawn_card() {
         if (!target->m_game->check_flags(game_flags::phase_one_draw_discard) || target->m_game->m_discards.empty()) {
+            if (!cards_from_selection.empty()) {
+                card *target_card = cards_from_selection.front();
+                cards_from_selection.erase(cards_from_selection.begin());
+                return target_card;
+            }
             return target->m_game->top_of_deck();
         } else {
             return target->m_game->m_discards.back();
@@ -101,6 +110,9 @@ namespace banggame {
         if (!handled) {
             while (num_drawn_cards < num_cards_to_draw) {
                 add_to_hand_phase_one(phase_one_drawn_card());
+            }
+            for (card *target_card : cards_from_selection) {
+                target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
             }
         }
     }

@@ -3,6 +3,7 @@
 #include "game/game.h"
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"
+#include "cards/game_enums.h"
 
 namespace banggame {
 
@@ -18,18 +19,29 @@ namespace banggame {
             }
         }
 
+        bool move_card_to_deck() const {
+            return target->m_game->check_flags(game_flags::phase_one_override)
+                || target->m_game->check_flags(game_flags::phase_one_draw_discard) && !target->m_game->m_discards.empty();
+        }
+
         void on_resolve() override {
             target->m_game->pop_request();
-            while (!target->m_game->m_selection.empty()) {
-                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
+            if (move_card_to_deck()) {
+                while (!target->m_game->m_selection.empty()) {
+                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
+                }
             }
         }
 
         void on_pick(card *target_card) override {
             target->m_game->pop_request();
-            target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
-            while (!target->m_game->m_selection.empty()) {
-                card *discarded = target->m_game->m_selection.front();
+            if (move_card_to_deck()) {
+                target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
+            }
+            while (auto not_target = target->m_game->m_selection | rv::filter([&](card *selection_card) {
+                return selection_card != target_card;
+            })) {
+                card *discarded = *not_target.begin();
                 target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, discarded);
                 target->m_game->move_card(discarded, pocket_type::discard_pile);
             }
@@ -45,7 +57,7 @@ namespace banggame {
     };
 
     void equip_map::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_turn_start>({origin_card, 2}, [=](player *target) {
+        origin->m_game->add_listener<event_type::on_turn_start>({origin_card, -2}, [=](player *target) {
             if (origin == target) {
                 origin->m_game->queue_request<request_map>(origin_card, origin);
             }

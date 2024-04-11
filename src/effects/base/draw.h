@@ -72,6 +72,8 @@ namespace banggame {
     struct request_draw : request_picking, std::enable_shared_from_this<request_draw> {
         request_draw(player *target);
 
+        std::vector<card *> cards_from_selection;
+        
         int num_drawn_cards = 0;
         int num_cards_to_draw = 2;
         
