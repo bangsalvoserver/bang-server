@@ -88,7 +88,7 @@ namespace banggame {
         
         card *phase_one_drawn_card();
         void add_to_hand_phase_one(card *target_card);
-        void phase_one_skip();
+        void cleanup_selection();
 
         void on_update() override;
         bool can_pick(card *target_card) const override;

@@ -1,8 +1,10 @@
 #include "draw.h"
 
+#include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
 #include "game/game.h"
+#include "game/possible_to_play.h"
 
 namespace banggame {
 
@@ -53,14 +55,19 @@ namespace banggame {
             if (!live) {
                 target->m_game->play_sound(target, "draw");
             }
-            auto_pick();
+            card *only_card = get_single_element(get_all_playable_cards(target, true));
+            if (only_card && only_card->has_tag(tag_type::pick)) {
+                on_pick(nullptr);
+            } else {
+                cleanup_selection();
+            }
         } else {
-            phase_one_skip();
+            target->m_game->pop_request();
+            cleanup_selection();
         }
     }
 
-    void request_draw::phase_one_skip() {
-        target->m_game->pop_request();
+    void request_draw::cleanup_selection() {
         for (card *target_card : cards_from_selection) {
             target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
         }
@@ -115,9 +122,7 @@ namespace banggame {
             while (num_drawn_cards < num_cards_to_draw) {
                 add_to_hand_phase_one(phase_one_drawn_card());
             }
-            for (card *target_card : cards_from_selection) {
-                target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
-            }
+            cleanup_selection();
         }
     }
 
@@ -147,6 +152,7 @@ namespace banggame {
     }
 
     void effect_skip_drawing::on_play(card *origin_card, player *origin) {
-        origin->m_game->top_request<request_draw>()->phase_one_skip();
+        origin->m_game->top_request<request_draw>()->cleanup_selection();
+        origin->m_game->pop_request();
     }
 }
