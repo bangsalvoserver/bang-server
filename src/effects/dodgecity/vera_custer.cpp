@@ -39,9 +39,9 @@ namespace banggame {
         }
     }
 
-    struct request_vera_custer : request_picking {
+    struct request_vera_custer : request_base {
         request_vera_custer(card *origin_card, player *target)
-            : request_picking(origin_card, nullptr, target, {}, -8) {}
+            : request_base(origin_card, nullptr, target, {}, -8) {}
 
         void on_update() override {
             if (target->alive() && target->m_game->m_playing == target && !target->m_game->is_disabled(origin_card)) {
@@ -53,16 +53,6 @@ namespace banggame {
                 target->m_game->pop_request();
                 target->remove_extra_characters();
             }
-        }
-        
-        bool can_pick(card *target_card) const override {
-            return target_card->pocket == pocket_type::player_character
-                && target_card->owner->alive() && target_card->owner != target;
-        }
-
-        void on_pick(card *target_card) override {
-            target->m_game->pop_request();
-            copy_characters(target, target_card->owner);
         }
 
         game_string status_text(player *owner) const override {
@@ -80,6 +70,18 @@ namespace banggame {
                 origin->m_game->queue_request<request_vera_custer>(origin_card, target);
             }
         });
+    }
+
+    game_string effect_vera_custer::get_error(card *origin_card, player *origin, player *target) {
+        if (origin->m_game->top_request<request_vera_custer>(origin) == nullptr) {
+            return "ERROR_INVALID_ACTION";
+        }
+        return {};
+    }
+
+    void effect_vera_custer::on_play(card *origin_card, player *origin, player *target) {
+        origin->m_game->pop_request();
+        copy_characters(origin, target);
     }
 
 }
