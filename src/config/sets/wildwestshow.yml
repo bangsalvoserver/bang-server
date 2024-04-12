@@ -22,8 +22,6 @@ character:
   - name: GREYGORY_DECK
     image: 06_greygorydeck
     responses:
-      - max_usages(1)
-      - startofturn
       - greygory_deck
     equip:
       - greygory_deck

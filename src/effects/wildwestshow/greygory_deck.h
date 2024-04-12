@@ -5,13 +5,14 @@
 
 namespace banggame {
 
-    struct equip_greygory_deck {
+    struct equip_greygory_deck : event_equip {
         void on_enable(card *target_card, player *target);
     };
 
     DEFINE_EQUIP(greygory_deck, equip_greygory_deck)
 
     struct effect_greygory_deck {
+        bool can_play(card *origin_card, player *origin);
         void on_play(card *origin_card, player *origin);
     };
 
