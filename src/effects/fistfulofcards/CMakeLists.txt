@@ -1,6 +1,7 @@
 target_sources(bangserver PRIVATE
     abandonedmine.cpp
     ambush.cpp
+    blood_brothers.cpp
     deadman.cpp
     fistfulofcards.cpp
     judge.cpp

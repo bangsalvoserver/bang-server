@@ -138,7 +138,7 @@ namespace banggame {
         return origin->m_game->top_request<request_draw>(origin) != nullptr;
     }
     
-    bool effect_startofturn::can_play(card *origin_card, player *origin) {
+    bool effect_no_cards_drawn::can_play(card *origin_card, player *origin) {
         auto req = origin->m_game->top_request<request_draw>(origin);
         return req && req->num_drawn_cards == 0;
     }

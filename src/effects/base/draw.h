@@ -59,11 +59,11 @@ namespace banggame {
 
     DEFINE_EFFECT(while_drawing, effect_while_drawing)
 
-    struct effect_startofturn {
+    struct effect_no_cards_drawn {
         bool can_play(card *origin_card, player *origin);
     };
 
-    DEFINE_EFFECT(startofturn, effect_startofturn)
+    DEFINE_EFFECT(no_cards_drawn, effect_no_cards_drawn)
 
     struct effect_add_draw_card: effect_while_drawing {
         void on_play(card *origin_card, player *origin);

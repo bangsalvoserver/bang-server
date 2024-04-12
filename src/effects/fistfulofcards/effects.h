@@ -3,6 +3,7 @@
 
 #include "abandonedmine.h"
 #include "ambush.h"
+#include "blood_brothers.h"
 #include "deadman.h"
 #include "fistfulofcards.h"
 #include "judge.h"

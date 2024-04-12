@@ -36,8 +36,7 @@ main_deck:
     image: 20_pattodisangue
     color: brown
     effects:
-      - damage
-      - queue_heal_notfull player notself
+      - blood_brothers player notself
   - name: SACRIFICE
     signs:
       - 10 hearts

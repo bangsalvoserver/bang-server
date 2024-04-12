@@ -33,17 +33,6 @@ namespace banggame {
     };
 
     DEFINE_EFFECT(heal_notfull, effect_heal_notfull)
-
-    struct effect_queue_heal_notfull : effect_heal_notfull {
-        using effect_heal_notfull::effect_heal_notfull;
-        
-        void on_play(card *origin_card, player *origin) {
-            on_play(origin_card, origin, origin);
-        }
-        void on_play(card *origin_card, player *origin, player *target);
-    };
-
-    DEFINE_EFFECT(queue_heal_notfull, effect_queue_heal_notfull)
 }
 
 #endif

@@ -311,7 +311,7 @@ character:
     image: 01_jessejones
     responses:
       - add_draw_card
-      - startofturn
+      - no_cards_drawn
       - steal card notself | hand
     tags:
       - drawing
@@ -337,7 +337,7 @@ character:
     image: 01_pedroramirez
     responses:
       - add_draw_card
-      - startofturn
+      - no_cards_drawn
       - draw_discard
     tags:
       - drawing

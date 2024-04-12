@@ -25,10 +25,4 @@ namespace banggame {
         }
         return {};
     }
-
-    void effect_queue_heal_notfull::on_play(card *origin_card, player *origin, player *target) {
-        origin->m_game->queue_action([target, amount=amount]{
-            target->heal(amount);
-        });
-    }
 }

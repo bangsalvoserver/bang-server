@@ -16,11 +16,11 @@ fistfulofcards:
       - ghost_card
   - name: BLOOD_BROTHERS
     image: 05_fratellidisangue
+    equip:
+      - blood_brothers
     responses:
-      - startofturn
-      - max_usages(1)
-      - damage
-      - queue_heal_notfull player notself
+      - can_play_card
+      - blood_brothers player notself
   - name: THE_JUDGE
     image: 05_ilgiudice
     equip:
@@ -37,7 +37,7 @@ fistfulofcards:
     image: 05_liquoreforte
     responses:
       - skip_drawing
-      - startofturn
+      - no_cards_drawn
       - heal_notfull
   - name: ABANDONED_MINE
     image: 05_minieraabbandonata
