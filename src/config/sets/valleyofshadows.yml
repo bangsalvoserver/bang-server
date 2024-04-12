@@ -162,7 +162,7 @@ character:
   - name: EVELYN_SHEBANG
     image: 07_evelynshebang
     responses:
-      - while_drawing(1)
+      - add_draw_card
       - evelyn_shebang player notself reachable
   - name: HENRY_BLOCK
     image: 07_henryblock

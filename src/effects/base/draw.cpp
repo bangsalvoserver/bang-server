@@ -134,21 +134,17 @@ namespace banggame {
         }
     }
     
-    game_string effect_startofturn::get_error(card *origin_card, player *origin) const {
-        if (auto req = origin->m_game->top_request<request_draw>(origin)) {
-            if (req->num_drawn_cards == 0) {
-                return {};
-            }
-        }
-        return "ERROR_NOT_START_OF_TURN";
-    }
-    
-    bool effect_while_drawing_base::can_play(card *origin_card, player *origin) {
+    bool effect_while_drawing::can_play(card *origin_card, player *origin) {
         return origin->m_game->top_request<request_draw>(origin) != nullptr;
     }
+    
+    bool effect_startofturn::can_play(card *origin_card, player *origin) {
+        auto req = origin->m_game->top_request<request_draw>(origin);
+        return req && req->num_drawn_cards == 0;
+    }
 
-    void effect_while_drawing::on_play(card *origin_card, player *origin) {
-        origin->m_game->top_request<request_draw>()->num_drawn_cards += cards_to_add;
+    void effect_add_draw_card::on_play(card *origin_card, player *origin) {
+        ++origin->m_game->top_request<request_draw>()->num_drawn_cards;
     }
 
     void effect_skip_drawing::on_play(card *origin_card, player *origin) {

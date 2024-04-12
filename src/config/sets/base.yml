@@ -310,7 +310,7 @@ character:
   - name: JESSE_JONES
     image: 01_jessejones
     responses:
-      - while_drawing(1)
+      - add_draw_card
       - startofturn
       - steal card notself | hand
     tags:
@@ -336,7 +336,7 @@ character:
   - name: PEDRO_RAMIREZ
     image: 01_pedroramirez
     responses:
-      - while_drawing(1)
+      - add_draw_card
       - startofturn
       - draw_discard
     tags:

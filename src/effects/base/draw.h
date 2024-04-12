@@ -53,26 +53,25 @@ namespace banggame {
 
     DEFINE_EFFECT(draw_to_discard, effect_draw_to_discard)
 
-    struct effect_startofturn {
-        game_string get_error(card *origin_card, player *origin) const;
-    };
-
-    DEFINE_EFFECT(startofturn, effect_startofturn)
-
-    struct effect_while_drawing_base {
+    struct effect_while_drawing {
         bool can_play(card *origin_card, player *origin);
-    };
-
-    struct effect_while_drawing: effect_while_drawing_base {
-        int cards_to_add;
-        effect_while_drawing(int value): cards_to_add(value) {}
-        
-        void on_play(card *origin_card, player *origin);
     };
 
     DEFINE_EFFECT(while_drawing, effect_while_drawing)
 
-    struct effect_skip_drawing: effect_while_drawing_base {
+    struct effect_startofturn {
+        bool can_play(card *origin_card, player *origin);
+    };
+
+    DEFINE_EFFECT(startofturn, effect_startofturn)
+
+    struct effect_add_draw_card: effect_while_drawing {
+        void on_play(card *origin_card, player *origin);
+    };
+
+    DEFINE_EFFECT(add_draw_card, effect_add_draw_card)
+
+    struct effect_skip_drawing: effect_while_drawing {
         void on_play(card *origin_card, player *origin);
     };
 
