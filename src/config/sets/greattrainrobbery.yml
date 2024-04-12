@@ -165,7 +165,7 @@ character:
     equip:
       - shade_oconnor
     responses:
-      - shade_oconnor
+      - can_play_card
       - discard card self | hand
       - draw
     tags:

@@ -173,9 +173,9 @@ character:
     equip:
       - lemonade_jim
     responses:
-      - lemonade_jim
+      - can_play_card
       - discard card self | hand
-      - heal
+      - heal_notfull
     tags:
       - auto_select
   - name: MICK_DEFENDER

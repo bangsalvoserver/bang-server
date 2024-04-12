@@ -2,7 +2,7 @@
 
 #include "game/game.h"
 
-#include "effects/base/resolve.h"
+#include "effects/base/can_play_card.h"
 
 namespace banggame {
     
@@ -28,44 +28,18 @@ namespace banggame {
         }
     }
 
-    struct request_greygory_deck : request_resolvable {
-        request_greygory_deck(card *origin_card, player *origin)
-            : request_resolvable(origin_card, nullptr, origin) {}
-
-        void on_update() override {
-            auto_resolve();
-        }
-
-        void on_resolve() override {
-            target->m_game->pop_request();
-        }
-        
-        game_string status_text(player *owner) const {
-            if (target == owner) {
-                return {"STATUS_CAN_PLAY_CARD", origin_card};
-            } else {
-                return {"STATUS_CAN_PLAY_CARD_OTHER", target, origin_card};
-            }
-        }
-    };
-
     void equip_greygory_deck::on_enable(card *target_card, player *target) {
         if (target->m_characters.size() == 1) {
             greygory_deck_add_characters(target_card, target);
         }
         target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player *origin) {
             if (origin == target) {
-                target->m_game->queue_request<request_greygory_deck>(target_card, target);
+                target->m_game->queue_request<request_can_play_card>(target_card, nullptr, target);
             }
         });
     }
-
-    bool effect_greygory_deck::can_play(card *origin_card, player *origin) {
-        return origin->m_game->top_request<request_greygory_deck>(origin) != nullptr;
-    }
     
     void effect_greygory_deck::on_play(card *origin_card, player *origin) {
-        origin->m_game->pop_request();
         origin->remove_extra_characters();
         greygory_deck_add_characters(origin_card, origin);
     }

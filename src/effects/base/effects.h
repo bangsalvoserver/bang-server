@@ -6,6 +6,7 @@
 #include "beer.h"
 #include "black_jack.h"
 #include "bart_cassidy.h"
+#include "can_play_card.h"
 #include "card_choice.h"
 #include "damage.h"
 #include "deathsave.h"

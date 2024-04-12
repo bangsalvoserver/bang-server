@@ -245,7 +245,7 @@ character:
     equip:
       - al_preacher
     responses:
-      - al_preacher
+      - can_play_card
       - pay_cube select_cubes(2)
       - draw
     tags:
