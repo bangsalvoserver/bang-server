@@ -1,5 +1,7 @@
 #include "peyote.h"
 
+#include "effects/base/pick.h"
+
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 

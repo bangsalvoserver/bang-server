@@ -1,5 +1,7 @@
 #include "circus_wagon.h"
 
+#include "effects/base/pick.h"
+
 #include "game/game.h"
 
 namespace banggame {

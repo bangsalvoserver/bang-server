@@ -2,6 +2,7 @@
 
 #include "game/game.h"
 #include "effects/base/resolve.h"
+#include "effects/base/draw_check.h"
 
 namespace banggame {
 

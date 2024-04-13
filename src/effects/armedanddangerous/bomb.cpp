@@ -5,6 +5,7 @@
 #include "game/game.h"
 
 #include "ruleset.h"
+
 #include "effects/base/predraw_check.h"
 
 namespace banggame {
@@ -64,7 +65,7 @@ namespace banggame {
         
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player *p, card *e_card) {
             if (p == target && e_card == target_card) {
-                target->m_game->draw_check_then(target, target_card, &card_sign::is_red, [=](bool result) {
+                target->m_game->queue_request<request_check>(target, target_card, &card_sign::is_red, [=](bool result) {
                     if (result) {
                         target->m_game->queue_request<request_move_bomb>(target_card, target);
                     } else {

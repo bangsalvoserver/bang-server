@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "effects/base/pick.h"
+
 namespace banggame {
     
     struct request_add_cube : request_picking {

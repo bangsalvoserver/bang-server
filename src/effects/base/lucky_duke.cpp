@@ -1,5 +1,7 @@
 #include "lucky_duke.h"
 
+#include "draw_check.h"
+
 #include "game/game.h"
 
 namespace banggame {

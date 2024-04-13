@@ -1,5 +1,7 @@
 #include "thedaltons.h"
 
+#include "effects/base/pick.h"
+
 #include "game/game.h"
 
 namespace banggame {

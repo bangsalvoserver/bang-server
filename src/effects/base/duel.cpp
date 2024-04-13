@@ -1,9 +1,10 @@
 #include "duel.h"
 
-#include "game/filters.h"
 #include "bang.h"
+#include "pick.h"
 
 #include "game/game.h"
+#include "game/filters.h"
 
 namespace banggame {
 

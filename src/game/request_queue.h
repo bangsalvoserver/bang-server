@@ -86,9 +86,16 @@ namespace banggame {
             queue_request(std::make_shared<T>(FWD(args) ... ));
         }
 
+        template<template<typename ... Ts> typename Template>
+        void queue_request(auto && ... args) {
+            using T = decltype(Template(FWD(args)...));
+            queue_request<T>(FWD(args)...);
+        }
+
+
         template<std::invocable Function>
         void queue_action(Function &&fun, int priority = 0) {
-            queue_request<request_action<Function>>(FWD(fun), this, priority);
+            queue_request<request_action>(FWD(fun), this, priority);
         }
 
         void pop_request() {

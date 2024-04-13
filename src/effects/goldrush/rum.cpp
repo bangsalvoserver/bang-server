@@ -1,7 +1,8 @@
 #include "rum.h"
 
+#include "effects/base/draw_check.h"
+
 #include "game/game.h"
-#include "game/draw_check_handler.h"
 
 namespace banggame {
 

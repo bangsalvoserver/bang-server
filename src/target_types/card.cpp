@@ -1,5 +1,7 @@
 #include "game/play_verify.h"
 
+#include "effects/base/pick.h"
+
 #include "game/filters.h"
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"

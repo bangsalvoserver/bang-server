@@ -1,8 +1,9 @@
 #include "john_pain.h"
 
-#include "game/game.h"
-
 #include "effects/base/vulture_sam.h"
+#include "effects/base/draw_check.h"
+
+#include "game/game.h"
 
 namespace banggame {
 
@@ -19,8 +20,6 @@ namespace banggame {
             }
         });
         player_end->m_game->add_listener<event_type::on_draw_check_resolve>(target_card, [=](player *player_begin, card *drawn_card) {
-            if (!player_begin) return;
-            
             player_end->m_game->queue_action([=]{
                 if (drawn_card->pocket != pocket_type::player_hand
                     && std::none_of(player_iterator(player_begin), player_iterator(player_end), get_john_pain)

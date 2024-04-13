@@ -6,7 +6,6 @@ PRIVATE
     game_net.cpp
     game_table.cpp
     disabler_map.cpp
-    draw_check_handler.cpp
     durations.cpp
     event_map.cpp
     filters.cpp

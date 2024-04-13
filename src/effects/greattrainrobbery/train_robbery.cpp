@@ -3,6 +3,7 @@
 #include "game/game.h"
 
 #include "effects/base/bang.h"
+#include "effects/base/pick.h"
 
 #include "cards/game_enums.h"
 

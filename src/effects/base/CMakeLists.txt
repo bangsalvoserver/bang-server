@@ -8,6 +8,7 @@ target_sources(bangserver PRIVATE
     card_choice.cpp
     damage.cpp
     deathsave.cpp
+    draw_check.cpp
     draw.cpp
     duel.cpp
     dynamite.cpp

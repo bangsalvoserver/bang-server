@@ -1,8 +1,9 @@
 #include "vulture_sam.h"
 
-#include "game/game.h"
+#include "deathsave.h"
+#include "pick.h"
 
-#include "effects/base/deathsave.h"
+#include "game/game.h"
 
 namespace banggame {
 

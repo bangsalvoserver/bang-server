@@ -1,7 +1,9 @@
 #include "saved.h"
 
-#include "game/game.h"
 #include "effects/base/damage.h"
+#include "effects/base/pick.h"
+
+#include "game/game.h"
 #include "game/bot_suggestion.h"
 
 namespace banggame {

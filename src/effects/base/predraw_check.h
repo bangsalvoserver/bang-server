@@ -3,7 +3,7 @@
 
 #include "cards/card_effect.h"
 #include "game/event_card_key.h"
-#include "pick.h"
+#include "draw_check.h"
 
 namespace banggame {
 

@@ -1,5 +1,7 @@
 #include "possible_to_play.h"
 
+#include "effects/base/pick.h"
+
 #include "game/filters.h"
 #include "cards/filter_enums.h"
 

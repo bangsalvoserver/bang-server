@@ -2,11 +2,12 @@
 
 #include "game/game.h"
 #include "effects/base/bang.h"
+#include "effects/base/draw_check.h"
 
 namespace banggame {
 
     void effect_knife_revolver::on_play(card *origin_card, player *origin) {
-        origin->m_game->draw_check_then(origin, origin_card, [](card_sign sign) {
+        origin->m_game->queue_request<request_check>(origin, origin_card, [](card_sign sign) {
             switch (sign.rank) {
             case card_rank::rank_J:
             case card_rank::rank_Q:

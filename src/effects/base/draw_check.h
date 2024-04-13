@@ -1,8 +1,9 @@
-#ifndef __DRAW_CHECK_HANDLER_H__
-#define __DRAW_CHECK_HANDLER_H__
+#ifndef __EFFECTS_BASE_DRAW_CHECK_H__
+#define __EFFECTS_BASE_DRAW_CHECK_H__
 
-#include "player.h"
-#include "effects/base/pick.h"
+#include "cards/card_effect.h"
+
+#include "pick.h"
 
 namespace banggame {
 
@@ -36,12 +37,9 @@ namespace banggame {
         )
     }
     
-    struct request_check : selection_picker, draw_check_handler {
-        request_check(game *m_game, card *origin_card, player *target)
-            : selection_picker(origin_card, nullptr, target, {}, 110)
-            , m_game(m_game) {}
-
-        game *m_game;
+    struct request_check_base : selection_picker, draw_check_handler {
+        request_check_base(player *target, card *origin_card)
+            : selection_picker(origin_card, nullptr, target, {}, 110) {}
 
         card *drawn_card = nullptr;
 
@@ -82,14 +80,14 @@ namespace banggame {
     concept draw_check_function = std::invocable<T, bool>;
 
     template<draw_check_condition Condition, draw_check_function Function>
-    class request_check_impl : public request_check {
+    class request_check : public request_check_base {
     private:
         Condition m_condition;
         Function m_function;
 
     public:
-        request_check_impl(game *m_game, card *origin_card, player *target, Condition &&condition, Function &&function)
-            : request_check(m_game, origin_card, target)
+        request_check(player *target, card *origin_card, Condition &&condition, Function &&function)
+            : request_check_base(target, origin_card)
             , m_condition(FWD(condition))
             , m_function(FWD(function)) {}
         

@@ -4,7 +4,6 @@
 #include "game_table.h"
 #include "request_queue.h"
 #include "player_iterator.h"
-#include "draw_check_handler.h"
 #include "utils/utils.h"
 #include "utils/generator.h"
 
@@ -36,11 +35,6 @@ namespace banggame {
         bool request_bot_play();
 
         void handle_player_death(player *killer, player *target, discard_all_reason reason);
-
-        template<draw_check_condition Condition, draw_check_function Function>
-        void draw_check_then(player *origin, card *origin_card, Condition &&condition, Function &&fun) {
-            queue_request<request_check_impl<Condition, Function>>(this, origin_card, origin, FWD(condition), FWD(fun));
-        }
     };
 
 }

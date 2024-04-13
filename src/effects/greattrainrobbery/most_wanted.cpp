@@ -2,11 +2,12 @@
 
 #include "game/game.h"
 #include "effects/base/resolve.h"
+#include "effects/base/draw_check.h"
 
 namespace banggame {
 
     static void resolve_most_wanted(card *origin_card, player *origin, player *target) {
-        target->m_game->draw_check_then(target, origin_card, std::not_fn(&card_sign::is_spades), [=](bool result) {
+        target->m_game->queue_request<request_check>(target, origin_card, std::not_fn(&card_sign::is_spades), [=](bool result) {
             if (!result) {
                 target->damage(origin_card, origin, 1);
             }
