@@ -58,7 +58,7 @@ public:
             fmt::print("Lobby {}: Sent {}\n", lobby.name, message);
             fflush(stdout);
         }
-        for (auto [team, it] : lobby.users) {
+        for (auto &[team, user_id, it] : lobby.users) {
             push_message(it->first, message);
         }
     }
@@ -90,7 +90,7 @@ private:
 
     std::string command_print_help(user_ptr user);
     std::string command_print_users(user_ptr user);
-    std::string command_kick_user(user_ptr user, std::string_view userid);
+    std::string command_kick_user(user_ptr user, std::string_view user_id_str);
     std::string command_get_game_options(user_ptr user);
     std::string command_set_game_option(user_ptr user, std::string_view name, std::string_view value);
     std::string command_give_card(user_ptr user, std::string_view name);
@@ -104,7 +104,7 @@ private:
     server_options m_options;
 
     int generate_lobby_id();
-    int generate_user_id(int user_id);
+    int generate_session_id();
 
     std::default_random_engine m_rng;
 

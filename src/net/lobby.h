@@ -23,8 +23,6 @@ DEFINE_ENUM(lobby_team,
     (game_spectator)
 )
 
-using team_user_pair = std::pair<lobby_team, user_ptr>;
-
 static constexpr ticks lobby_lifetime = 5min;
 static constexpr ticks ping_interval = 10s;
 static constexpr int pings_until_disconnect = 10;
@@ -33,14 +31,25 @@ using lobby_list = std::list<lobby>;
 using lobby_ptr = lobby_list::iterator;
 
 struct game_user: user_info {
-    game_user(int user_id, const user_info &info)
-        : user_info{info}, user_id{user_id} {}
+    game_user(const user_info &info, int session_id)
+        : user_info{info}, session_id{session_id} {}
     
-    int user_id = 0;
+    int session_id = 0;
     lobby *in_lobby = nullptr;
 
     ticks ping_timer{};
     int ping_count = 0;
+};
+
+struct lobby_user {
+    lobby_team team;
+    int user_id;
+    user_ptr user;
+};
+
+struct session_id_to_index {
+    int session_id;
+    int user_id;
 };
 
 struct lobby : lobby_info {
@@ -48,10 +57,19 @@ struct lobby : lobby_info {
         : lobby_info{info}, id{id} {}
 
     int id;
+    int user_id_count = 0;
 
-    std::vector<team_user_pair> users;
+    std::vector<lobby_user> users;
     std::vector<game_user> bots;
     std::vector<lobby_chat_args> chat_messages;
+    std::vector<session_id_to_index> disconnected_users;
+
+    int get_user_id(user_ptr user) const {
+        if (auto it = rn::find(users, user, &lobby_user::user); it != users.end()) {
+            return it->user_id;
+        }
+        return 0;
+    }
     
     lobby_state state;
     ticks lifetime = lobby_lifetime;

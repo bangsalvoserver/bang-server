@@ -43,27 +43,25 @@ namespace banggame {
 
     std::string game_manager::command_print_users(user_ptr user) {
         auto &lobby = *user->second.in_lobby;
-        for (auto [team, lobby_user] : lobby.users) {
+        for (auto [team, user_id, lobby_user] : lobby.users) {
             send_message<server_message_type::lobby_chat>(user->first, 0,
-                fmt::format("{} : {} ({})", lobby_user->second.user_id, lobby_user->second.name, enums::to_string(team)));
+                fmt::format("{} : {} ({})", user_id, lobby_user->second.name, enums::to_string(team)));
         }
         return {};
     }
 
-    std::string game_manager::command_kick_user(user_ptr user, std::string_view userid_str) {
+    std::string game_manager::command_kick_user(user_ptr user, std::string_view user_id_str) {
         int user_id;
-        if (auto [end, ec] = std::from_chars(userid_str.data(), userid_str.data() + userid_str.size(), user_id); ec != std::errc{}) {
+        if (auto [end, ec] = std::from_chars(user_id_str.data(), user_id_str.data() + user_id_str.size(), user_id); ec != std::errc{}) {
             return "INVALID_USERID_STRING";
         }
 
         auto &lobby = *user->second.in_lobby;
-        auto kicked = rn::find(lobby.users, user_id, [](const team_user_pair &pair) {
-            return pair.second->second.user_id;
-        });
+        auto kicked = rn::find(lobby.users, user_id, &lobby_user::user_id);
         if (kicked == lobby.users.end()) {
             return "CANNOT_FIND_USERID";
         }
-        kick_user_from_lobby(kicked->second);
+        kick_user_from_lobby(kicked->user);
 
         return {};
     }
@@ -121,7 +119,7 @@ namespace banggame {
     std::string game_manager::command_give_card(user_ptr user, std::string_view name) {
         auto &lobby = *user->second.in_lobby;
 
-        player *target = lobby.m_game->find_player_by_userid(user->second.user_id);
+        player *target = lobby.m_game->find_player_by_userid(lobby.get_user_id(user));
         if (!target) return "ERROR_USER_NOT_CONTROLLING_PLAYER";
 
         if (lobby.m_game->pending_requests() || lobby.m_game->is_waiting() || lobby.m_game->m_playing != target) {
@@ -249,7 +247,7 @@ namespace banggame {
 
     std::string game_manager::command_set_team(user_ptr user, std::string_view value) {
         if (auto team = enums::from_string<lobby_team>(value)) {
-            rn::find(user->second.in_lobby->users, user, &team_user_pair::second)->first = *team;
+            rn::find(user->second.in_lobby->users, user, &lobby_user::user)->team = *team;
             return {};
         } else {
             return "ERROR_INVALID_TEAM";
