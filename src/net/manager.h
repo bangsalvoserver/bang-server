@@ -96,6 +96,7 @@ private:
     std::string command_give_card(user_ptr user, std::string_view name);
     std::string command_set_team(user_ptr user, std::string_view value);
     std::string command_get_rng_seed(user_ptr user);
+    std::string command_quit(user_ptr user);
 
 private:
     user_map users;

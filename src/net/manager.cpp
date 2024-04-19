@@ -90,26 +90,26 @@ void game_manager::tick() {
 std::string game_manager::handle_message(MSG_TAG(connect), client_handle client, const connect_args &args) {
     if (!net::validate_commit_hash(args.commit_hash)) {
         kick_client(client, "INVALID_CLIENT_COMMIT_HASH");
+        return {};
     }
     int session_id = args.session_id;
     if (session_id == 0) {
         session_id = generate_session_id();
-    } else {
-        for (auto it = users.begin(); it != users.end(); ++it) {
-            if (it->second.session_id == session_id) {
-                kick_client(it->first, "RECONNECT_WITH_SAME_SESSION_ID");
-                break;
-            }
+    } else if (auto it = rn::find(users, session_id, [](const auto &pair) { return pair.second.session_id; }); it != users.end()) {
+        if (it->first.lock().get() == client.lock().get()) {
+            return "USER_ALREADY_CONNECTED";
         }
+        kick_client(it->first, "RECONNECT_WITH_SAME_SESSION_ID");
     }
-    if (auto [it, inserted] = users.try_emplace(client, args.user, session_id); inserted) {
-        send_message<server_message_type::client_accepted>(client, it->second.session_id);
-        broadcast_message<server_message_type::client_count>(users.size());
-        for (const lobby &l : m_lobbies) {
-            send_message<server_message_type::lobby_update>(client, l.make_lobby_data());
-        }
-    } else {
+    auto [it, inserted] = users.try_emplace(client, args.user, session_id);
+    if (!inserted) {
         return "USER_ALREADY_CONNECTED";
+    }
+    
+    send_message<server_message_type::client_accepted>(client, it->second.session_id);
+    broadcast_message<server_message_type::client_count>(users.size());
+    for (const lobby &l : m_lobbies) {
+        send_message<server_message_type::lobby_update>(client, l.make_lobby_data());
     }
     return {};
 }

@@ -19,6 +19,7 @@ namespace banggame {
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
     static constexpr std::string_view SET_TEAM_DESCRIPTION = "[game_player / game_spectator] : set team";
     static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed";
+    static constexpr std::string_view QUIT_DESCRIPTION = "disconnect from server";
 
     const std::map<std::string, chat_command, std::less<>> chat_command::commands {
         { "help",           { proxy<&game_manager::command_print_help>,         HELP_DESCRIPTION }},
@@ -29,6 +30,7 @@ namespace banggame {
         { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
         { "set-team",       { proxy<&game_manager::command_set_team>,           SET_TEAM_DESCRIPTION, command_permissions::lobby_waiting }},
         { "seed",           { proxy<&game_manager::command_get_rng_seed>,       GET_RNG_SEED_DESCRIPTION, command_permissions::lobby_finished }},
+        { "quit",           { proxy<&game_manager::command_quit>,               QUIT_DESCRIPTION }},
     };
 
     std::string game_manager::command_print_help(user_ptr user) {
@@ -256,6 +258,11 @@ namespace banggame {
 
     std::string game_manager::command_get_rng_seed(user_ptr user) {
         send_message<server_message_type::lobby_chat>(user->first, 0, std::to_string(user->second.in_lobby->m_game->rng_seed));
+        return {};
+    }
+
+    std::string game_manager::command_quit(user_ptr user) {
+        kick_client(user->first, "QUIT");
         return {};
     }
 

@@ -64,7 +64,8 @@ void wsserver::push_message(client_handle con, const std::string &message) {
 }
 
 void wsserver::kick_client(client_handle con, const std::string &msg) {
-    m_server.close(con, 0, msg);
+    on_disconnect(con);
+    m_server.close(con, websocketpp::close::status::normal, msg);
 }
 
 std::string wsserver::get_client_ip(client_handle con) {
