@@ -21,8 +21,6 @@ struct server_options {
 
 class game_manager: public net::wsserver {
 public:
-    game_manager();
-    
     bool client_validated(client_handle client) const;
 
     void tick();
@@ -46,7 +44,7 @@ public:
             fmt::print("All users: Sent {}\n", message);
             fflush(stdout);
         }
-        for (client_handle client : users | rv::keys) {
+        for (client_handle client : m_users | rv::keys) {
             push_message(client, message);
         }
     }
@@ -73,6 +71,10 @@ protected:
 private:
     void kick_user_from_lobby(user_ptr user);
 
+    id_type generate_session_id();
+    id_type generate_lobby_id();
+
+private:
     std::string handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
     std::string handle_message(MSG_TAG(pong),           user_ptr user);
     std::string handle_message(MSG_TAG(user_edit),      user_ptr user, const user_info &value);
@@ -99,15 +101,11 @@ private:
     std::string command_quit(user_ptr user);
 
 private:
-    user_map users;
+    user_map m_users;
     lobby_list m_lobbies;
+    std::map<id_type, user_ptr> m_sessions;
 
     server_options m_options;
-
-    int generate_lobby_id();
-    int generate_session_id();
-
-    std::default_random_engine m_rng;
 
     friend struct lobby;
     friend class chat_command;

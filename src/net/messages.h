@@ -14,6 +14,8 @@ namespace sdl {
 }
 
 namespace banggame {
+    
+    using id_type = unsigned int;
 
     DEFINE_STRUCT(user_info,
         (std::string, name)
@@ -22,7 +24,7 @@ namespace banggame {
 
     DEFINE_STRUCT(connect_args,
         (user_info, user)
-        (int, session_id)
+        (id_type, session_id)
         (std::string, commit_hash)
     )
 
@@ -32,7 +34,7 @@ namespace banggame {
     )
 
     DEFINE_STRUCT(lobby_id_args,
-        (int, lobby_id)
+        (id_type, lobby_id)
     )
 
     DEFINE_STRUCT(lobby_chat_client_args,
@@ -64,11 +66,11 @@ namespace banggame {
     )
 
     DEFINE_STRUCT(client_accepted_args,
-        (int, session_id)
+        (id_type, session_id)
     )
 
     DEFINE_STRUCT(lobby_data,
-        (int, lobby_id)
+        (id_type, lobby_id)
         (std::string, name)
         (int, num_players)
         (lobby_state, state)
@@ -76,7 +78,7 @@ namespace banggame {
 
     DEFINE_STRUCT(lobby_entered_args,
         (int, user_id)
-        (int, lobby_id)
+        (id_type, lobby_id)
         (std::string, name)
         (game_options, options)
     )

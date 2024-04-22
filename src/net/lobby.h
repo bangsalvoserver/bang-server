@@ -6,7 +6,7 @@
 
 #include "game/game.h"
 
-#include <list>
+#include "utils/linked_hash_map.h"
 
 namespace banggame {
 
@@ -27,14 +27,14 @@ static constexpr ticks lobby_lifetime = 5min;
 static constexpr ticks ping_interval = 10s;
 static constexpr int pings_until_disconnect = 10;
 
-using lobby_list = std::list<lobby>;
+using lobby_list = ppstd::linked_hash_map<id_type, lobby>;
 using lobby_ptr = lobby_list::iterator;
 
 struct game_user: user_info {
-    game_user(const user_info &info, int session_id)
+    game_user(const user_info &info, id_type session_id)
         : user_info{info}, session_id{session_id} {}
     
-    int session_id = 0;
+    id_type session_id = 0;
     lobby *in_lobby = nullptr;
 
     ticks ping_timer{};
@@ -47,20 +47,27 @@ struct lobby_user {
     user_ptr user;
 };
 
+struct lobby_bot: user_info {
+    lobby_bot(const user_info &info, int user_id)
+        : user_info{info}, user_id{user_id} {}
+
+    int user_id;
+};
+
 struct session_id_to_index {
-    int session_id;
+    id_type session_id;
     int user_id;
 };
 
 struct lobby : lobby_info {
-    lobby(int id, const lobby_info &info)
-        : lobby_info{info}, id{id} {}
+    lobby(const lobby_info &info, id_type lobby_id)
+        : lobby_info{info}, lobby_id{lobby_id} {}
 
-    int id;
+    id_type lobby_id;
     int user_id_count = 0;
 
     std::vector<lobby_user> users;
-    std::vector<game_user> bots;
+    std::vector<lobby_bot> bots;
     std::vector<lobby_chat_args> chat_messages;
     std::vector<session_id_to_index> disconnected_users;
 
