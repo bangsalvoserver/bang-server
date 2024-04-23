@@ -331,7 +331,7 @@ train:
     color: train
     effects:
       - discard
-      - steal card
+      - steal card notself
   - name: PRISONER_CAR
     image: 27_prisoner_car
     color: train
