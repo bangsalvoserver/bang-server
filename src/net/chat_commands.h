@@ -28,10 +28,14 @@ namespace banggame {
 
     using manager_fn = std::string (*)(game_manager *, user_ptr, std::span<std::string>);
 
+    class chat_command;
+
+    using string_command_map = ppstd::linked_hash_map<std::string_view, chat_command>;
+
     class chat_command {
     public:
         static constexpr char start_char = '/';
-        static const std::map<std::string, chat_command, std::less<>> commands;
+        static const string_command_map commands;
 
     private:
         manager_fn m_fun;

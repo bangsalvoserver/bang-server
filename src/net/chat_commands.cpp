@@ -21,7 +21,7 @@ namespace banggame {
     static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed";
     static constexpr std::string_view QUIT_DESCRIPTION = "disconnect from server";
 
-    const std::map<std::string, chat_command, std::less<>> chat_command::commands {
+    const string_command_map chat_command::commands {
         { "help",           { proxy<&game_manager::command_print_help>,         HELP_DESCRIPTION }},
         { "users",          { proxy<&game_manager::command_print_users>,        USERS_DESCRIPTION }},
         { "kick",           { proxy<&game_manager::command_kick_user>,          KICK_DESCRIPTION, command_permissions::lobby_owner }},

@@ -103,7 +103,7 @@ private:
 private:
     user_map m_users;
     lobby_list m_lobbies;
-    std::map<id_type, user_ptr> m_sessions;
+    session_map m_sessions;
 
     server_options m_options;
 

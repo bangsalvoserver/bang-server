@@ -17,6 +17,7 @@ struct lobby;
 using client_handle = std::weak_ptr<void>;
 using user_map = std::map<client_handle, game_user, std::owner_less<client_handle>>;
 using user_ptr = user_map::iterator;
+using session_map = std::unordered_map<id_type, user_ptr>;
 
 DEFINE_ENUM(lobby_team,
     (game_player)
