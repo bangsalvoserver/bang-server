@@ -22,11 +22,11 @@ namespace banggame {
     template<typename FnMemPtr> struct argument_number;
 
     template<typename ... Args>
-    struct argument_number<std::string (game_manager::* const)(user_ptr, Args...)> {
+    struct argument_number<std::string (game_manager::* const)(game_user &, Args...)> {
         static constexpr size_t value = sizeof...(Args);
     };
 
-    using manager_fn = std::string (*)(game_manager *, user_ptr, std::span<std::string>);
+    using manager_fn = std::string (*)(game_manager *, game_user &, std::span<std::string>);
 
     class chat_command;
 
@@ -51,12 +51,12 @@ namespace banggame {
         }
 
         template<typename Proxy, size_t ... Is>
-        static std::string call_manager_fun_impl(game_manager *mgr, user_ptr user, std::span<std::string> args, std::index_sequence<Is...>) {
+        static std::string call_manager_fun_impl(game_manager *mgr, game_user &user, std::span<std::string> args, std::index_sequence<Is...>) {
             return (mgr->*Proxy::value)(user, get_arg(args, Is) ...);
         }
 
         template<typename Proxy>
-        static std::string call_manager_fun(game_manager *mgr, user_ptr user, std::span<std::string> args) {
+        static std::string call_manager_fun(game_manager *mgr, game_user &user, std::span<std::string> args) {
             return call_manager_fun_impl<Proxy>(mgr, user, args,
                 std::make_index_sequence<argument_number<decltype(Proxy::value)>::value>());
         }
@@ -68,7 +68,7 @@ namespace banggame {
             , m_description(description)
             , m_permissions(permissions) {}
 
-        std::string operator()(game_manager *mgr, user_ptr user, std::span<std::string> args) const {
+        std::string operator()(game_manager *mgr, game_user &user, std::span<std::string> args) const {
             return (*m_fun)(mgr, user, args);
         }
 

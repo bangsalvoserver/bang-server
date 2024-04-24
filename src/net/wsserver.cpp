@@ -59,24 +59,30 @@ void wsserver::tick() {
 }
 
 void wsserver::push_message(client_handle con, const std::string &message) {
-    std::error_code ec;
-    m_server.send(con, message, websocketpp::frame::opcode::text, ec);
+    if (!con.expired()) {
+        std::error_code ec;
+        m_server.send(con, message, websocketpp::frame::opcode::text, ec);
+    }
 }
 
 void wsserver::kick_client(client_handle con, const std::string &msg) {
-    on_disconnect(con);
-    m_server.close(con, websocketpp::close::status::normal, msg);
+    if (!con.expired()) {
+        on_disconnect(con);
+        m_server.close(con, websocketpp::close::status::normal, msg);
+    }
 }
 
 std::string wsserver::get_client_ip(client_handle con) {
-    std::error_code ec;
-    auto client_con = m_server.get_con_from_hdl(con, ec);
-    if (client_con) {
-        std::string header_ip = client_con->get_request_header("X-Real-IP");
-        if (!header_ip.empty()) {
-            return header_ip;
-        } else {
-            return client_con->get_remote_endpoint();
+    if (!con.expired()) {
+        std::error_code ec;
+        auto client_con = m_server.get_con_from_hdl(con, ec);
+        if (client_con) {
+            std::string header_ip = client_con->get_request_header("X-Real-IP");
+            if (!header_ip.empty()) {
+                return header_ip;
+            } else {
+                return client_con->get_remote_endpoint();
+            }
         }
     }
     return "(unknown host)";

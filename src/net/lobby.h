@@ -15,9 +15,8 @@ struct game_user;
 struct lobby;
 
 using client_handle = std::weak_ptr<void>;
-using user_map = std::map<client_handle, game_user, std::owner_less<client_handle>>;
-using user_ptr = user_map::iterator;
-using session_map = std::unordered_map<id_type, user_ptr>;
+using user_map = std::unordered_map<id_type, game_user>;
+using client_to_user_map = std::map<client_handle, game_user *, std::owner_less<>>;
 
 DEFINE_ENUM(lobby_team,
     (game_player)
@@ -25,8 +24,10 @@ DEFINE_ENUM(lobby_team,
 )
 
 static constexpr ticks lobby_lifetime = 5min;
+static constexpr ticks user_lifetime = 30s;
+
 static constexpr ticks ping_interval = 10s;
-static constexpr int pings_until_disconnect = 10;
+static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
 using lobby_list = ppstd::linked_hash_map<id_type, lobby>;
 using lobby_ptr = lobby_list::iterator;
@@ -38,25 +39,23 @@ struct game_user: user_info {
     id_type session_id = 0;
     lobby *in_lobby = nullptr;
 
-    ticks ping_timer{};
+    client_handle client;
+
+    ticks ping_timer = ticks{0};
     int ping_count = 0;
+    ticks lifetime = user_lifetime;
 };
 
 struct lobby_user {
     lobby_team team;
     int user_id;
-    user_ptr user;
+    game_user *user;
 };
 
 struct lobby_bot: user_info {
     lobby_bot(const user_info &info, int user_id)
         : user_info{info}, user_id{user_id} {}
 
-    int user_id;
-};
-
-struct session_id_to_index {
-    id_type session_id;
     int user_id;
 };
 
@@ -70,10 +69,11 @@ struct lobby : lobby_info {
     std::vector<lobby_user> users;
     std::vector<lobby_bot> bots;
     std::vector<lobby_chat_args> chat_messages;
-    std::vector<session_id_to_index> disconnected_users;
 
-    int get_user_id(user_ptr user) const {
-        if (auto it = rn::find(users, user, &lobby_user::user); it != users.end()) {
+    lobby_user &add_user(game_user &user);
+
+    int get_user_id(const game_user &user) const {
+        if (auto it = rn::find(users, &user, &lobby_user::user); it != users.end()) {
             return it->user_id;
         }
         return 0;
