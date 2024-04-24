@@ -30,7 +30,7 @@ namespace banggame {
 
     class chat_command;
 
-    using string_command_map = ppstd::linked_hash_map<std::string_view, chat_command>;
+    using string_command_map = std::vector<std::pair<std::string_view, chat_command>>;
 
     class chat_command {
     public:

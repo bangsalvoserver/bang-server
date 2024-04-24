@@ -72,7 +72,7 @@ private:
 
 private:
     std::string handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
-    std::string handle_message(MSG_TAG(pong),           game_user &user);
+    std::string handle_message(MSG_TAG(pong),           client_handle client);
     std::string handle_message(MSG_TAG(user_edit),      game_user &user, const user_info &value);
     std::string handle_message(MSG_TAG(lobby_make),     game_user &user, const lobby_info &value);
     std::string handle_message(MSG_TAG(lobby_edit),     game_user &user, const lobby_info &args);
@@ -98,8 +98,9 @@ private:
 
 private:
     user_map m_users;
-    lobby_list m_lobbies;
-    client_to_user_map m_clients;
+    lobby_map m_lobbies;
+    lobby_list m_lobby_order;
+    client_map m_clients;
 
     server_options m_options;
 

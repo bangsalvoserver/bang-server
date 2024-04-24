@@ -6,17 +6,14 @@
 
 #include "game/game.h"
 
-#include "utils/linked_hash_map.h"
-
 namespace banggame {
 
 class game_manager;
+struct client_state;
 struct game_user;
 struct lobby;
 
 using client_handle = std::weak_ptr<void>;
-using user_map = std::unordered_map<id_type, game_user>;
-using client_to_user_map = std::map<client_handle, game_user *, std::owner_less<>>;
 
 DEFINE_ENUM(lobby_team,
     (game_player)
@@ -29,8 +26,13 @@ static constexpr ticks user_lifetime = 10s;
 static constexpr ticks ping_interval = 10s;
 static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
-using lobby_list = ppstd::linked_hash_map<id_type, lobby>;
-using lobby_ptr = lobby_list::iterator;
+struct client_state {
+    client_state(game_user *user) : user{user} {}
+
+    game_user *user;
+    ticks ping_timer = ticks{0};
+    int ping_count = 0;
+};
 
 struct game_user: user_info {
     game_user(const user_info &info, id_type session_id)
@@ -40,9 +42,6 @@ struct game_user: user_info {
     lobby *in_lobby = nullptr;
 
     client_handle client;
-
-    ticks ping_timer = ticks{0};
-    int ping_count = 0;
     ticks lifetime = user_lifetime;
 };
 
@@ -87,6 +86,11 @@ struct lobby : lobby_info {
     void send_updates(game_manager &mgr);
     lobby_data make_lobby_data() const;
 };
+
+using user_map = std::unordered_map<id_type, game_user>;
+using client_map = std::map<client_handle, client_state, std::owner_less<>>;
+using lobby_map = std::unordered_map<id_type, lobby>;
+using lobby_list = std::vector<lobby_map::iterator>;
 
 }
 
