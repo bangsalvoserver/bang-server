@@ -29,9 +29,11 @@ protected:
 public:
     wsserver();
 
-    virtual ~wsserver();
+    virtual ~wsserver() = default;
 
-    bool start(uint16_t port);
+    void start(uint16_t port);
+
+    void stop();
 
     void tick();
 

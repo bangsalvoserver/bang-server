@@ -1,6 +1,6 @@
 #include <charconv>
 #include <iostream>
-#include <signal.h>
+#include <csignal>
 
 #include <cxxopts.hpp>
 
@@ -9,6 +9,10 @@
 #include "git_version.h"
 
 volatile bool g_stop = false;
+
+void handle_stop(int signal) {
+    g_stop = true;
+}
 
 int main(int argc, char **argv) {
     banggame::game_manager server;
@@ -48,13 +52,13 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if (server.start(port)) {
+    try {
+        server.start(port);
         fmt::print("Server listening on port {}\n", port);
         fflush(stdout);
 
-        ::signal(SIGTERM, [](int) {
-            g_stop = true;
-        });
+        std::signal(SIGTERM, handle_stop);
+        std::signal(SIGINT, handle_stop);
 
         auto next_tick = std::chrono::steady_clock::now() + banggame::ticks64{0};
 
@@ -64,11 +68,12 @@ int main(int argc, char **argv) {
             std::this_thread::sleep_until(next_tick);
         }
 
+        server.stop();
         fmt::print("Server stopped\n");
 
         return 0;
-    } else {
-        fmt::print(stderr, "Could not start server\n");
+    } catch (const std::exception &error) {
+        fmt::print(stderr, "Unhandled exception: {}\n", error.what());
         return 1;
     }
 }

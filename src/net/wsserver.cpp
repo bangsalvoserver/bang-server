@@ -11,13 +11,7 @@ wsserver::wsserver() {
         websocketpp::log::alevel::frame_header);
 }
 
-wsserver::~wsserver() {
-    if (m_server.is_listening()) {
-        m_server.stop_listening();
-    }
-}
-
-bool wsserver::start(uint16_t port) {
+void wsserver::start(uint16_t port) {
     m_server.set_open_handler([this](client_handle con) {
         std::scoped_lock lock(m_con_mutex);
         m_clients.emplace(con);
@@ -49,9 +43,26 @@ bool wsserver::start(uint16_t port) {
     });
 
     std::error_code ec;
+    m_server.set_reuse_addr(true);
     m_server.listen(port, ec);
     m_server.start_accept(ec);
-    return !ec;
+    if (ec) {
+        throw std::system_error(ec);
+    }
+}
+
+void wsserver::stop() {
+    m_server.set_open_handler(nullptr);
+    m_server.set_close_handler(nullptr);
+    m_server.set_fail_handler(nullptr);
+    m_server.set_message_handler(nullptr);
+
+    std::error_code ec;
+    m_server.stop_listening(ec);
+    for (client_handle hdl : m_clients) {
+        m_server.close(hdl, websocketpp::close::status::going_away, "SERVER_STOP", ec);
+    }
+    m_server.run();
 }
 
 void wsserver::tick() {
