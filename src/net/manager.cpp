@@ -78,7 +78,16 @@ void game_manager::tick() {
         if (l.state == lobby_state::playing && l.m_game) {
             try {
                 l.m_game->tick();
-                l.send_updates(*this);
+                
+                while (l.state == lobby_state::playing && l.m_game && l.m_game->pending_updates()) {
+                    auto [target, update, update_time] = l.m_game->get_next_update();
+                    for (auto &[team, user_id, u] : l.users) {
+                        if (target.matches(user_id)) {
+                            send_message<server_message_type::game_update>(u->client, update);
+                        }
+                    }
+                }
+
                 if (l.m_game->is_game_over()) {
                     l.state = lobby_state::finished;
                     broadcast_message<server_message_type::lobby_update>(l);
@@ -172,17 +181,6 @@ std::string game_manager::handle_message(MSG_TAG(user_edit), game_user &user, co
     return {};
 }
 
-lobby::operator lobby_data() const {
-    return {
-        .lobby_id = lobby_id,
-        .name = name,
-        .num_players = int(rn::count(users, lobby_team::game_player, &lobby_user::team)),
-        .num_spectators = int(rn::count(users, lobby_team::game_spectator, &lobby_user::team)),
-        .max_players = lobby_max_players,
-        .state = state
-    };
-}
-
 std::string game_manager::handle_message(MSG_TAG(lobby_make), game_user &user, const lobby_info &value) {
     if (user.in_lobby) {
         return "ERROR_PLAYER_IN_LOBBY";
@@ -228,14 +226,6 @@ std::string game_manager::handle_message(MSG_TAG(lobby_edit), game_user &user, c
     }
 
     return {};
-}
-
-lobby_user &lobby::add_user(game_user &user) {
-    if (auto it = rn::find(users, &user, &lobby_user::user); it != users.end()) {
-        return *it;
-    } else {
-        return users.emplace_back(lobby_team::game_player, ++user_id_count, &user);
-    }
 }
 
 void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
@@ -457,7 +447,42 @@ std::string game_manager::handle_message(MSG_TAG(game_start), game_user &user) {
     lobby.state = lobby_state::playing;
     broadcast_message<server_message_type::lobby_update>(lobby);
 
-    lobby.start_game(*this);
+    broadcast_message_lobby<server_message_type::game_started>(lobby);
+
+    lobby.m_game = std::make_unique<banggame::game>(lobby.options.game_seed);
+
+    if (m_options.verbose) {
+        fmt::print("Started game {} with seed {}\n", lobby.name, lobby.m_game->rng_seed);
+        fflush(stdout);
+    }
+
+    std::vector<int> user_ids;
+    for (const auto &[team, user_id, user] : lobby.users) {
+        if (team == lobby_team::game_player) {
+            user_ids.push_back(user_id);
+        }
+    }
+
+    auto names = bot_info.names
+        | rv::sample(lobby.options.num_bots, lobby.m_game->rng)
+        | rn::to<std::vector<std::string_view>>;
+
+    std::vector<const sdl::image_pixels *> propics = bot_info.propics
+        | rv::transform([](const sdl::image_pixels &image) { return &image; })
+        | rv::sample(lobby.options.num_bots, lobby.m_game->rng)
+        | rn::to_vector;
+
+    for (int i=0; i < lobby.options.num_bots; ++i) {
+        int bot_id = -1-i;
+        auto &bot = lobby.bots.emplace_back(user_info{fmt::format("BOT {}", names[i % names.size()]), *propics[i % propics.size()] }, bot_id);
+        user_ids.push_back(bot_id);
+
+        broadcast_message_lobby<server_message_type::lobby_add_user>(lobby, bot_id, bot, true);
+    }
+
+    lobby.m_game->add_players(user_ids);
+    lobby.m_game->start_game(lobby.options);
+    lobby.m_game->commit_updates();
 
     return {};
 }
@@ -514,54 +539,4 @@ std::string game_manager::handle_message(MSG_TAG(game_action), game_user &user, 
     }
 
     return lobby.m_game->handle_game_action(lobby.get_user_id(user), value);
-}
-
-void lobby::send_updates(game_manager &mgr) {
-    while (state == lobby_state::playing && m_game && m_game->pending_updates()) {
-        auto [target, update, update_time] = m_game->get_next_update();
-        for (auto &[team, user_id, u] : users) {
-            if (target.matches(user_id)) {
-                mgr.send_message<server_message_type::game_update>(u->client, update);
-            }
-        }
-    }
-}
-
-void lobby::start_game(game_manager &mgr) {
-    mgr.broadcast_message_lobby<server_message_type::game_started>(*this);
-
-    m_game = std::make_unique<banggame::game>(options.game_seed);
-
-    if (mgr.m_options.verbose) {
-        fmt::print("Started game {} with seed {}\n", name, m_game->rng_seed);
-        fflush(stdout);
-    }
-
-    std::vector<int> user_ids;
-    for (const auto &[team, user_id, user] : users) {
-        if (team == lobby_team::game_player) {
-            user_ids.push_back(user_id);
-        }
-    }
-
-    auto names = bot_info.names
-        | rv::sample(options.num_bots, m_game->rng)
-        | rn::to<std::vector<std::string_view>>;
-
-    std::vector<const sdl::image_pixels *> propics = bot_info.propics
-        | rv::transform([](const sdl::image_pixels &image) { return &image; })
-        | rv::sample(options.num_bots, m_game->rng)
-        | rn::to_vector;
-
-    for (int i=0; i<options.num_bots; ++i) {
-        int bot_id = -1-i;
-        auto &bot = bots.emplace_back(user_info{fmt::format("BOT {}", names[i % names.size()]), *propics[i % propics.size()] }, bot_id);
-        user_ids.push_back(bot_id);
-
-        mgr.broadcast_message_lobby<server_message_type::lobby_add_user>(*this, bot_id, bot, true);
-    }
-
-    m_game->add_players(user_ids);
-    m_game->start_game(options);
-    m_game->commit_updates();
 }

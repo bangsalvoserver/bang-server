@@ -68,8 +68,19 @@ struct lobby : lobby_info {
     std::vector<lobby_user> users;
     std::vector<lobby_bot> bots;
     std::vector<lobby_chat_args> chat_messages;
+    
+    lobby_state state;
+    ticks lifetime = lobby_lifetime;
 
-    lobby_user &add_user(game_user &user);
+    std::unique_ptr<banggame::game> m_game;
+
+    lobby_user &add_user(game_user &user) {
+        if (auto it = rn::find(users, &user, &lobby_user::user); it != users.end()) {
+            return *it;
+        } else {
+            return users.emplace_back(lobby_team::game_player, ++user_id_count, &user);
+        }
+    }
 
     int get_user_id(const game_user &user) const {
         if (auto it = rn::find(users, &user, &lobby_user::user); it != users.end()) {
@@ -77,14 +88,17 @@ struct lobby : lobby_info {
         }
         return 0;
     }
-    
-    lobby_state state;
-    ticks lifetime = lobby_lifetime;
 
-    std::unique_ptr<banggame::game> m_game;
-    void start_game(game_manager &mgr);
-    void send_updates(game_manager &mgr);
-    explicit operator lobby_data() const;
+    explicit operator lobby_data() const {
+        return {
+            .lobby_id = lobby_id,
+            .name = name,
+            .num_players = int(rn::count(users, lobby_team::game_player, &lobby_user::team)),
+            .num_spectators = int(rn::count(users, lobby_team::game_spectator, &lobby_user::team)),
+            .max_players = lobby_max_players,
+            .state = state
+        };
+    }
 };
 
 using user_map = std::unordered_map<id_type, game_user>;

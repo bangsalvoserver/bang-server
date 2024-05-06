@@ -23,6 +23,14 @@ class game_manager: public net::wsserver {
 public:
     void tick();
 
+    server_options &options() { return m_options; }
+
+protected:
+    void on_connect(client_handle client) override;
+    void on_disconnect(client_handle client) override;
+    void on_message(client_handle client, const std::string &message) override;
+
+private:
     template<server_message_type E>
     void send_message(client_handle client, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
@@ -57,14 +65,6 @@ public:
         }
     }
 
-    server_options &options() { return m_options; }
-
-protected:
-    void on_connect(client_handle client) override;
-    void on_disconnect(client_handle client) override;
-    void on_message(client_handle client, const std::string &message) override;
-
-private:
     void kick_user_from_lobby(game_user &user);
     void handle_join_lobby(game_user &user, lobby &lobby);
 
@@ -104,7 +104,6 @@ private:
 
     id_type m_lobby_count = 0;
 
-    friend struct lobby;
     friend class chat_command;
 };
 

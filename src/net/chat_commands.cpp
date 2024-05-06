@@ -74,13 +74,10 @@ namespace banggame {
         return fmt::format("{} = {}", field_data.name(), field_data.get());
     }
 
-    template<size_t ... Is>
-    static void print_game_options(game_manager &self, game_user &user, const game_options &options, std::index_sequence<Is ...>) {
-        (self.send_message<server_message_type::lobby_chat>(user.client, 0, get_field_string<Is>(options)), ...);
-    }
-
     std::string game_manager::command_get_game_options(game_user &user) {
-        print_game_options(*this, user, user.in_lobby->options, std::make_index_sequence<reflector::num_fields<game_options>>());
+        [this, client = user.client, &options = user.in_lobby->options]<size_t ... Is>(std::index_sequence<Is ...>) {
+            (send_message<server_message_type::lobby_chat>(client, 0, get_field_string<Is>(options)), ...);
+        }(std::make_index_sequence<reflector::num_fields<game_options>>());
         return {};
     }
 
