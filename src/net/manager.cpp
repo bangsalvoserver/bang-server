@@ -479,6 +479,9 @@ std::string game_manager::handle_message(MSG_TAG(game_rejoin), game_user &user, 
     }
 
     player *target = lobby.m_game->context().find_player(player_id);
+    if (target->is_bot()) {
+        return "ERROR_CANNOT_REJOIN_ON_BOT";
+    }
     for (const auto &[team, user_id, user]: lobby.users) {
         if (user_id == target->user_id) {
             return "ERROR_PLAYER_NOT_REJOINABLE";
