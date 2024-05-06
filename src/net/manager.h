@@ -23,8 +23,6 @@ class game_manager: public net::wsserver {
 public:
     void tick();
 
-    void send_lobby_update(const lobby &lobby);
-
     template<server_message_type E>
     void send_message(client_handle client, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );

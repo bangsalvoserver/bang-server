@@ -81,7 +81,7 @@ void game_manager::tick() {
                 l.send_updates(*this);
                 if (l.m_game->is_game_over()) {
                     l.state = lobby_state::finished;
-                    send_lobby_update(l);
+                    broadcast_message<server_message_type::lobby_update>(l);
                 }
             } catch (const std::exception &e) {
                 fmt::print(stderr, "Error in tick(): {}\n", e.what());
@@ -183,10 +183,6 @@ lobby::operator lobby_data() const {
     };
 }
 
-void game_manager::send_lobby_update(const lobby &l) {
-    broadcast_message<server_message_type::lobby_update>(l);
-}
-
 std::string game_manager::handle_message(MSG_TAG(lobby_make), game_user &user, const lobby_info &value) {
     if (user.in_lobby) {
         return "ERROR_PLAYER_IN_LOBBY";
@@ -201,7 +197,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_make), game_user &user, c
     user.in_lobby = &l;
 
     l.state = lobby_state::waiting;
-    send_lobby_update(l);
+    broadcast_message<server_message_type::lobby_update>(l);
 
     send_message<server_message_type::lobby_entered>(user.client, user_id, l.lobby_id, l.name, l.options);
     send_message<server_message_type::lobby_add_user>(user.client, user_id, user);
@@ -246,7 +242,7 @@ void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
     auto &pair = lobby.add_user(user);
 
     user.in_lobby = &lobby;
-    send_lobby_update(lobby);
+    broadcast_message<server_message_type::lobby_update>(lobby);
 
     send_message<server_message_type::lobby_entered>(user.client, pair.user_id, lobby.lobby_id, lobby.name, lobby.options);
     for (auto &[team, user_id, p] : lobby.users) {
@@ -305,7 +301,7 @@ void game_manager::kick_user_from_lobby(game_user &user) {
     int user_id = it->user_id;
     lobby.users.erase(it);
 
-    send_lobby_update(lobby);
+    broadcast_message<server_message_type::lobby_update>(lobby);
     broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user_id);
     send_message<server_message_type::lobby_kick>(user.client);
 
@@ -425,7 +421,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), game_user &user)
     lobby.m_game.reset();
     
     lobby.state = lobby_state::waiting;
-    send_lobby_update(*user.in_lobby);
+    broadcast_message<server_message_type::lobby_update>(lobby);
 
     for (auto &[team, user_id, p] : lobby.users) {
         team = lobby_team::game_player;
@@ -459,7 +455,7 @@ std::string game_manager::handle_message(MSG_TAG(game_start), game_user &user) {
     }
 
     lobby.state = lobby_state::playing;
-    send_lobby_update(*user.in_lobby);
+    broadcast_message<server_message_type::lobby_update>(lobby);
 
     lobby.start_game(*this);
 
