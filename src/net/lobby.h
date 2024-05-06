@@ -84,7 +84,7 @@ struct lobby : lobby_info {
     std::unique_ptr<banggame::game> m_game;
     void start_game(game_manager &mgr);
     void send_updates(game_manager &mgr);
-    lobby_data make_lobby_data() const;
+    explicit operator lobby_data() const;
 };
 
 using user_map = std::unordered_map<id_type, game_user>;

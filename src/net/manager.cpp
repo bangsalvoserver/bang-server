@@ -145,7 +145,7 @@ std::string game_manager::handle_message(MSG_TAG(connect), client_handle client,
     send_message<server_message_type::client_accepted>(client, session_id);
     broadcast_message<server_message_type::client_count>(m_clients.size());
     for (const auto it : m_lobby_order) {
-        send_message<server_message_type::lobby_update>(client, it->second.make_lobby_data());
+        send_message<server_message_type::lobby_update>(client, it->second);
     }
 
     if (user->in_lobby) {
@@ -172,17 +172,19 @@ std::string game_manager::handle_message(MSG_TAG(user_edit), game_user &user, co
     return {};
 }
 
-lobby_data lobby::make_lobby_data() const {
+lobby::operator lobby_data() const {
     return {
         .lobby_id = lobby_id,
         .name = name,
-        .num_players = int(users.size()),
+        .num_players = int(rn::count(users, lobby_team::game_player, &lobby_user::team)),
+        .num_spectators = int(rn::count(users, lobby_team::game_spectator, &lobby_user::team)),
+        .max_players = lobby_max_players,
         .state = state
     };
 }
 
 void game_manager::send_lobby_update(const lobby &l) {
-    broadcast_message<server_message_type::lobby_update>(l.make_lobby_data());
+    broadcast_message<server_message_type::lobby_update>(l);
 }
 
 std::string game_manager::handle_message(MSG_TAG(lobby_make), game_user &user, const lobby_info &value) {

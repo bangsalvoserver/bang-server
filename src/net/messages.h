@@ -73,6 +73,8 @@ namespace banggame {
         (id_type, lobby_id)
         (std::string, name)
         (int, num_players)
+        (int, num_spectators)
+        (int, max_players)
         (lobby_state, state)
     )
 
