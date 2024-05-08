@@ -199,7 +199,6 @@ std::string game_manager::handle_message(MSG_TAG(lobby_make), game_user &user, c
 
     send_message<server_message_type::lobby_entered>(user.client, user_id, l.lobby_id, l.name, l.options);
     send_message<server_message_type::lobby_add_user>(user.client, user_id, user);
-    send_message<server_message_type::lobby_owner>(user.client, user_id);
 
     return {};
 }
@@ -244,7 +243,6 @@ void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
     for (auto &bot : lobby.bots) {
         send_message<server_message_type::lobby_add_user>(user.client, bot.user_id, bot, true);
     }
-    send_message<server_message_type::lobby_owner>(user.client, lobby.users.front().user_id);
     for (const auto &message: lobby.chat_messages) {
         send_message<server_message_type::lobby_chat>(user.client, message);
     }
@@ -287,17 +285,12 @@ void game_manager::kick_user_from_lobby(game_user &user) {
     auto &lobby = *std::exchange(user.in_lobby, nullptr);
 
     auto it = rn::find(lobby.users, &user, &lobby_user::user);
-    bool is_owner = it == lobby.users.begin();
     int user_id = it->user_id;
     lobby.users.erase(it);
 
     broadcast_message<server_message_type::lobby_update>(lobby);
     broadcast_message_lobby<server_message_type::lobby_remove_user>(lobby, user_id);
     send_message<server_message_type::lobby_kick>(user.client);
-
-    if (!lobby.users.empty() && is_owner) {
-        broadcast_message_lobby<server_message_type::lobby_owner>(lobby, lobby.users.front().user_id);
-    }
 }
 
 void game_manager::on_connect(client_handle client) {

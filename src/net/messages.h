@@ -91,10 +91,6 @@ namespace banggame {
         (bool, is_read)
     )
 
-    DEFINE_STRUCT(user_id_args,
-        (int, user_id)
-    )
-
     DEFINE_STRUCT(lobby_chat_args,
         (int, user_id)
         (std::string, message)
@@ -110,9 +106,8 @@ namespace banggame {
         (lobby_entered, lobby_entered_args)
         (lobby_edited, lobby_info)
         (lobby_removed, lobby_id_args)
-        (lobby_owner, user_id_args)
         (lobby_add_user, user_info_id_args)
-        (lobby_remove_user, user_id_args)
+        (lobby_remove_user, int)
         (lobby_kick)
         (lobby_chat, lobby_chat_args)
         (game_update, json::json)
