@@ -67,6 +67,7 @@ private:
 
     void kick_user_from_lobby(game_user &user);
     void handle_join_lobby(game_user &user, lobby &lobby);
+    void set_user_team(game_user &user, lobby_team team);
 
 private:
     std::string handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);

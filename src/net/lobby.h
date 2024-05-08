@@ -78,6 +78,7 @@ struct lobby : lobby_info {
         if (auto it = rn::find(users, &user, &lobby_user::user); it != users.end()) {
             return *it;
         } else {
+            user.in_lobby = this;
             return users.emplace_back(lobby_team::game_player, ++user_id_count, &user);
         }
     }

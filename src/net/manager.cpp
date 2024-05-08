@@ -189,10 +189,7 @@ std::string game_manager::handle_message(MSG_TAG(lobby_make), game_user &user, c
     id_type lobby_id = ++m_lobby_count;
     auto &l = m_lobby_order.emplace_back(m_lobbies.try_emplace(lobby_id, value, lobby_id).first)->second;
 
-    int user_id = ++l.user_id_count;
-
-    l.users.emplace_back(lobby_team::game_player, user_id, &user);
-    user.in_lobby = &l;
+    int user_id = l.add_user(user).user_id;
 
     l.state = lobby_state::waiting;
     broadcast_message<server_message_type::lobby_update>(l);
@@ -228,15 +225,14 @@ std::string game_manager::handle_message(MSG_TAG(lobby_edit), game_user &user, c
 }
 
 void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
-    auto &pair = lobby.add_user(user);
+    int new_user_id = lobby.add_user(user).user_id;
 
-    user.in_lobby = &lobby;
     broadcast_message<server_message_type::lobby_update>(lobby);
 
-    send_message<server_message_type::lobby_entered>(user.client, pair.user_id, lobby.lobby_id, lobby.name, lobby.options);
+    send_message<server_message_type::lobby_entered>(user.client, new_user_id, lobby.lobby_id, lobby.name, lobby.options);
     for (auto &[team, user_id, p] : lobby.users) {
         if (p != &user) {
-            send_message<server_message_type::lobby_add_user>(p->client, pair.user_id, user);
+            send_message<server_message_type::lobby_add_user>(p->client, new_user_id, user);
         }
         send_message<server_message_type::lobby_add_user>(user.client, user_id, *p, true);
     }
@@ -248,13 +244,15 @@ void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
     }
     
     if (lobby.state != lobby_state::waiting && lobby.m_game) {
-        pair.team = lobby_team::game_spectator;
+        player *target = lobby.m_game->find_player_by_userid(new_user_id);
+        if (!target) {
+            set_user_team(user, lobby_team::game_spectator);
+        }
         send_message<server_message_type::game_started>(user.client);
 
         for (const auto &msg : lobby.m_game->get_spectator_join_updates()) {
             send_message<server_message_type::game_update>(user.client, msg);
         }
-        player *target = lobby.m_game->find_player_by_userid(pair.user_id);
         if (target) {
             for (const auto &msg : lobby.m_game->get_rejoin_updates(target)) {
                 send_message<server_message_type::game_update>(user.client, msg);
@@ -262,6 +260,17 @@ void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
         }
         for (const auto &msg : lobby.m_game->get_game_log_updates(target)) {
             send_message<server_message_type::game_update>(user.client, msg);
+        }
+    }
+}
+
+void game_manager::set_user_team(game_user &user, lobby_team team) {
+    if (user.in_lobby) {
+        lobby &lobby = *user.in_lobby;
+        auto it = rn::find(lobby.users, &user, &lobby_user::user);
+        if (it != lobby.users.end()) {
+            it->team = team;
+            broadcast_message<server_message_type::lobby_update>(lobby);
         }
     }
 }
@@ -404,12 +413,12 @@ std::string game_manager::handle_message(MSG_TAG(lobby_return), game_user &user)
     lobby.m_game.reset();
     
     lobby.state = lobby_state::waiting;
-    broadcast_message<server_message_type::lobby_update>(lobby);
 
     for (auto &[team, user_id, p] : lobby.users) {
         team = lobby_team::game_player;
     }
 
+    broadcast_message<server_message_type::lobby_update>(lobby);
     broadcast_message_lobby<server_message_type::lobby_entered>(lobby, lobby.get_user_id(user), lobby.lobby_id, lobby.name, lobby.options);
     
     return {};

@@ -246,7 +246,7 @@ namespace banggame {
 
     std::string game_manager::command_set_team(game_user &user, std::string_view value) {
         if (auto team = enums::from_string<lobby_team>(value)) {
-            rn::find(user.in_lobby->users, &user, &lobby_user::user)->team = *team;
+            set_user_team(user, *team);
             return {};
         } else {
             return "ERROR_INVALID_TEAM";
