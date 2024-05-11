@@ -234,7 +234,7 @@ void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
         if (p != &user) {
             send_message<server_message_type::lobby_add_user>(p->client, new_user_id, user);
         }
-        send_message<server_message_type::lobby_add_user>(user.client, user_id, *p, true);
+        send_message<server_message_type::lobby_add_user>(user.client, user_id, *p, true, p->get_disconnect_lifetime());
     }
     for (auto &bot : lobby.bots) {
         send_message<server_message_type::lobby_add_user>(user.client, bot.user_id, bot, true);
@@ -311,7 +311,12 @@ void game_manager::on_connect(client_handle client) {
 
 void game_manager::on_disconnect(client_handle client) {
     if (auto it = m_clients.find(client); it != m_clients.end()) {
-        it->second.user->client.reset();
+        game_user &user = *it->second.user;
+        user.client.reset();
+        if (user.in_lobby) {
+            lobby &lobby = *user.in_lobby;
+            broadcast_message_lobby<server_message_type::lobby_add_user>(lobby, lobby.get_user_id(user), user, true, user.get_disconnect_lifetime());
+        }
         m_clients.erase(it);
         broadcast_message<server_message_type::client_count>(m_clients.size());
     }

@@ -43,6 +43,13 @@ struct game_user: user_info {
 
     client_handle client;
     ticks lifetime = user_lifetime;
+
+    std::chrono::milliseconds get_disconnect_lifetime() const {
+        if (client.expired()) {
+            return std::chrono::duration_cast<std::chrono::milliseconds>(lifetime);
+        }
+        return {};
+    }
 };
 
 struct lobby_user {

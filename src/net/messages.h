@@ -89,6 +89,7 @@ namespace banggame {
         (int, user_id)
         (user_info, user)
         (bool, is_read)
+        (std::chrono::milliseconds, lifetime)
     )
 
     DEFINE_STRUCT(lobby_chat_args,
