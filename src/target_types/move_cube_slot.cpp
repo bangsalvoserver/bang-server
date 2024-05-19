@@ -23,7 +23,7 @@ namespace banggame {
         auto targets = make_move_cube_target_set(origin, origin_card, ctx) | rn::to_vector;
         size_t num_cubes = std::min<size_t>(origin->first_character()->num_cubes, effect.target_value);
         return targets
-            | rv::sample(num_cubes, origin->m_game->rng)
+            | rv::sample(num_cubes, origin->m_game->bot_rng)
             | rn::to<serial::card_list>;
     }
 

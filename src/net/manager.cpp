@@ -38,6 +38,11 @@ void game_manager::on_message(client_handle client, const std::string &msg) {
     }
 }
 
+game_manager::game_manager() {
+    std::random_device rd;
+    session_rng.seed(rd());
+}
+
 void game_manager::tick() {
     net::wsserver::tick();
 
@@ -111,9 +116,6 @@ void game_manager::tick() {
     }
 }
 
-static std::random_device global_rng;
-static constexpr int max_session_id_count = 10;
-
 std::string game_manager::handle_message(MSG_TAG(connect), client_handle client, const connect_args &args) {
     if (!net::validate_commit_hash(args.commit_hash)) {
         kick_client(client, "INVALID_CLIENT_COMMIT_HASH");
@@ -122,13 +124,13 @@ std::string game_manager::handle_message(MSG_TAG(connect), client_handle client,
     id_type session_id = args.session_id;
     if (session_id == 0) {
         int i = 0;
-        while (i < max_session_id_count) {
-            session_id = global_rng();
+        while (i < m_options.max_session_id_count) {
+            session_id = session_rng();
             if (session_id != 0 && m_users.find(session_id) == m_users.end()) {
                 break;
             }
         }
-        if (i >= max_session_id_count) {
+        if (i >= m_options.max_session_id_count) {
             kick_client(client, "CANNOT_VALIDATE_CLIENT");
             throw std::runtime_error("Surpassed max_count in generate_random_id");
         }
@@ -471,12 +473,12 @@ std::string game_manager::handle_message(MSG_TAG(game_start), game_user &user) {
     }
 
     auto names = bot_info.names
-        | rv::sample(lobby.options.num_bots, lobby.m_game->rng)
+        | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
         | rn::to<std::vector<std::string_view>>;
 
     std::vector<const sdl::image_pixels *> propics = bot_info.propics
         | rv::transform([](const sdl::image_pixels &image) { return &image; })
-        | rv::sample(lobby.options.num_bots, lobby.m_game->rng)
+        | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
         | rn::to_vector;
 
     for (int i=0; i < lobby.options.num_bots; ++i) {

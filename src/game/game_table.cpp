@@ -13,13 +13,14 @@ namespace banggame {
     game_table::game_table(unsigned int seed)
         : disabler_map(this)
     {
+        std::random_device rd;
         if (seed == 0) {
-            std::random_device rd;
             rng_seed = rd();
         } else {
             rng_seed = seed;
         }
         rng.seed(rng_seed);
+        bot_rng.seed(rd());
     }
     
     std::vector<card *> &game_table::get_pocket(pocket_type pocket, player *owner) {

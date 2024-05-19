@@ -13,7 +13,7 @@ namespace banggame {
         if (targets.empty()) {
             return nullptr;
         } else {
-            return random_element(targets, origin->m_game->rng);
+            return random_element(targets, origin->m_game->bot_rng);
         }
     }
 

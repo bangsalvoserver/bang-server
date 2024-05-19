@@ -13,7 +13,7 @@ namespace banggame {
     template<> serial::card_list visit_cards::random_target(const effect_context &ctx) {
         auto targets = make_card_target_set(origin, origin_card, effect, ctx) | rn::to_vector;
         return targets
-            | rv::sample(effect.target_value, origin->m_game->rng)
+            | rv::sample(effect.target_value, origin->m_game->bot_rng)
             | rn::to<serial::card_list>;
     }
 

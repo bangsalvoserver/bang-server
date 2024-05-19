@@ -15,7 +15,7 @@ namespace banggame {
             })
             | rn::to_vector;
         return cubes
-            | rv::sample(effect.target_value, origin->m_game->rng)
+            | rv::sample(effect.target_value, origin->m_game->bot_rng)
             | rn::to<serial::card_list>;
     }
 

@@ -25,7 +25,7 @@ namespace banggame {
 
     template<> serial::player_list visit_players::random_target(const effect_context &ctx) {
         auto targets = make_adjacent_players_target_set(origin, origin_card, ctx) | rn::to_vector;
-        auto [target1, target2] = random_element(targets, origin->m_game->rng);
+        auto [target1, target2] = random_element(targets, origin->m_game->bot_rng);
         return {target1, target2};
     }
 

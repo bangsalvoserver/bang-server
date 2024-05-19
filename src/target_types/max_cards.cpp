@@ -12,10 +12,10 @@ namespace banggame {
         auto targets = make_card_target_set(origin, origin_card, effect, ctx) | rn::to_vector;
         size_t count = effect.target_value;
         if (count == 0) {
-            count = std::uniform_int_distribution<size_t>{1, targets.size()}(origin->m_game->rng);
+            count = std::uniform_int_distribution<size_t>{1, targets.size()}(origin->m_game->bot_rng);
         }
         return targets
-            | rv::sample(count, origin->m_game->rng)
+            | rv::sample(count, origin->m_game->bot_rng)
             | rn::to<serial::card_list>;
     }
 

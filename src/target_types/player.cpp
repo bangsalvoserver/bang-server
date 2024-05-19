@@ -13,7 +13,7 @@ namespace banggame {
     }
 
     template<> player *visit_player::random_target(const effect_context &ctx) {
-        return random_element(make_player_target_set(origin, origin_card, effect, ctx), origin->m_game->rng);
+        return random_element(make_player_target_set(origin, origin_card, effect, ctx), origin->m_game->bot_rng);
     }
 
     template<> game_string visit_player::get_error(const effect_context &ctx, player *target) {

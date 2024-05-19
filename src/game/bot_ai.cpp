@@ -29,7 +29,7 @@ namespace banggame {
                 if (filters::is_equip_card(playing_card)) {
                     if (!playing_card->self_equippable()) {
                         ret.targets.emplace_back(enums::enum_tag<target_type::player>,
-                            random_element(make_equip_set(origin, playing_card, ctx), origin->m_game->rng));
+                            random_element(make_equip_set(origin, playing_card, ctx), origin->m_game->bot_rng));
                     }
                 } else {
                     for (const effect_holder &holder : playing_card->get_effect_list(is_response)) {
@@ -49,7 +49,7 @@ namespace banggame {
 
                 cur_node = random_element(cur_node->branches
                     | rv::transform([](const card_modifier_node &node) { return &node; }),
-                    origin->m_game->rng);
+                    origin->m_game->bot_rng);
             }
         }
         ret.card = playing_card;
@@ -91,10 +91,10 @@ namespace banggame {
                                 return node.node->card->pocket == pocket;
                             }))
                         {
-                            return random_element(filter, origin->m_game->rng);
+                            return random_element(filter, origin->m_game->bot_rng);
                         }
                     }
-                    return random_element(node_set, origin->m_game->rng);
+                    return random_element(node_set, origin->m_game->bot_rng);
                 }();
 
                 node_set.erase(selected_node);

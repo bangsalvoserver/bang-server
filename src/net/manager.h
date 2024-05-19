@@ -17,10 +17,13 @@ std::string make_message(auto && ... args) {
 struct server_options {
     bool enable_cheats = false;
     bool verbose = false;
+    int max_session_id_count = 10;
 };
 
 class game_manager: public net::wsserver {
 public:
+    game_manager();
+
     void tick();
 
     server_options &options() { return m_options; }
@@ -96,6 +99,8 @@ private:
     std::string command_quit(game_user &user);
 
 private:
+    std::default_random_engine session_rng;
+
     user_map m_users;
     lobby_map m_lobbies;
     lobby_list m_lobby_order;

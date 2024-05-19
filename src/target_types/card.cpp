@@ -16,7 +16,7 @@ namespace banggame {
 
     template<> card *visit_card::random_target(const effect_context &ctx) {
         auto targets = make_card_target_set(origin, origin_card, effect, ctx) | rn::to_vector;
-        return random_element(targets, origin->m_game->rng);
+        return random_element(targets, origin->m_game->bot_rng);
     }
 
     template<> game_string visit_card::get_error(const effect_context &ctx, card *target) {

@@ -15,6 +15,7 @@ namespace banggame {
     struct game_table : game_net_manager, listener_map, disabler_map {
         unsigned int rng_seed;
         std::default_random_engine rng;
+        std::default_random_engine bot_rng;
 
         std::vector<player *> m_players;
         

@@ -17,7 +17,7 @@ namespace banggame {
                 target->m_table | rv::remove_if(&card::is_black),
                 target->m_hand | rv::take(1)
             )) {
-                ret.push_back(random_element(targets, origin->m_game->rng));
+                ret.push_back(random_element(targets, origin->m_game->bot_rng));
             }
         }
         return ret;

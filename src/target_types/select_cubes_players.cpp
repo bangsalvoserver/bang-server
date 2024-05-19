@@ -16,9 +16,9 @@ namespace banggame {
             | rn::to_vector;
         size_t num_players = rn::distance(make_player_target_set(origin, origin_card, effect, ctx));
         size_t max_count = std::min(cubes.size(), num_players - 1);
-        size_t num_repeats = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->rng);
+        size_t num_repeats = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng);
         return cubes
-            | rv::sample(num_repeats, origin->m_game->rng)
+            | rv::sample(num_repeats, origin->m_game->bot_rng)
             | rn::to<serial::card_list>;
     }
 
