@@ -43,7 +43,7 @@ void wsserver::start(uint16_t port) {
     });
 
     std::error_code ec;
-    m_server.set_reuse_addr(true);
+    // m_server.set_reuse_addr(true);
     m_server.listen(port, ec);
     m_server.start_accept(ec);
     if (ec) {
