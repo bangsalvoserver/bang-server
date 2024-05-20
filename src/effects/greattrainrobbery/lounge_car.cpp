@@ -20,15 +20,19 @@ namespace banggame {
                     }
                 }
             }
-            if (target->m_game->m_selection.size() <= 1 && rn::all_of(target->m_game->m_selection, [&](card *target_card) {
-                return !filters::check_player_filter(target, target_card->equip_target, target);
-            })) {
+            if (target->m_game->m_selection.empty()) {
                 target->m_game->pop_request();
-                while (!target->m_game->m_selection.empty()) {
-                    card *c = target->m_game->m_selection.front();
-                    target->m_game->add_log("LOG_EQUIPPED_CARD", c, target);
-                    target->equip_card(c);
-                }
+            }
+        }
+
+        void on_resolve(card *target_card, player *target_player) {
+            target->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, target, target_player);
+            target_player->equip_card(target_card);
+
+            while (!target->m_game->m_selection.empty()) {
+                card *c = target->m_game->m_selection.front();
+                target->m_game->add_log("LOG_EQUIPPED_CARD", c, target);
+                target->equip_card(c);
             }
         }
 
@@ -64,11 +68,14 @@ namespace banggame {
     }
 
     game_string handler_lounge_car::get_error(card *origin_card, player *origin, card *target_card, player *target_player) {
-        return filters::check_player_filter(origin, target_card->equip_target, target_player);
+        for (card *selection_card : origin->m_game->m_selection) {
+            MAYBE_RETURN(filters::check_player_filter(origin, selection_card->equip_target,
+                selection_card == target_card ? target_player : origin));
+        }
+        return {};
     }
 
     void handler_lounge_car::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {
-        origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, origin, target_player);
-        target_player->equip_card(target_card);
+        origin->m_game->top_request<request_lounge_car>()->on_resolve(target_card, target_player);
     }
 }
