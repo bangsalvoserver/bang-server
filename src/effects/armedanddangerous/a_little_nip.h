@@ -6,6 +6,9 @@
 namespace banggame {
 
     struct effect_a_little_nip {
+        int num_cubes;
+        effect_a_little_nip(int num_cubes) : num_cubes{num_cubes} {}
+        
         game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx);
         void on_play(card *origin_card, player *origin, const effect_context &ctx);
     };

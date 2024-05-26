@@ -13,7 +13,7 @@ main_deck:
     color: brown
     effects:
       - pay_cube select_cubes_repeat(2)
-      - caravan
+      - caravan(2)
       - changewws
   - <<: *cat_balou
     signs:
@@ -26,7 +26,7 @@ main_deck:
     color: brown
     effects:
       - pay_cube select_cubes_repeat(3)
-      - a_little_nip
+      - a_little_nip(3)
   - name: QUICK_SHOT
     signs:
       - 3 spades
