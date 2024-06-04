@@ -134,8 +134,7 @@ main_deck:
     color: blue
     equip_target: any
     equip:
-      - predraw_check(-2)
-      - taxman
+      - taxman(-2)
   - name: BROTHEL
     signs:
       - 7 clubs

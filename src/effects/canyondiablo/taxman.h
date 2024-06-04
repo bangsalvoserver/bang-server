@@ -8,6 +8,9 @@
 namespace banggame {
 
     struct equip_taxman : event_equip, prompt_target_self, bot_suggestion::target_enemy {
+        int predraw_check_priority;
+        equip_taxman(int predraw_check_priority) : predraw_check_priority{predraw_check_priority} {}
+        
         void on_enable(card *target_card, player *target);
     };
 
