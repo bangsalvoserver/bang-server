@@ -302,8 +302,10 @@ namespace banggame {
                 c->owner = p;
             }
             add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(p->m_hand), pocket_type::player_hand, p);
-            for (card *c : p->m_hand) {
-                set_card_visibility(c, p, card_visibility::shown, true);
+            if (m_options.character_choice) {
+                for (card *c : p->m_hand) {
+                    set_card_visibility(c, p, card_visibility::shown, true);
+                }
             }
             queue_request<request_characterchoice>(p);
         }
