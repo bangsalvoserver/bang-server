@@ -23,13 +23,12 @@ DEFINE_ENUM(lobby_team,
 static constexpr ticks lobby_lifetime = 5min;
 static constexpr ticks user_lifetime = 10s;
 
+static constexpr ticks client_accept_timer = 5s;
 static constexpr ticks ping_interval = 10s;
 static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
 struct client_state {
-    client_state(game_user *user) : user{user} {}
-
-    game_user *user;
+    game_user *user = nullptr;
     ticks ping_timer = ticks{0};
     int ping_count = 0;
 };

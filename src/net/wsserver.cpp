@@ -20,19 +20,10 @@ void wsserver::start(uint16_t port) {
 
     auto client_disconnect_handler = [this](client_handle con) {
         std::scoped_lock lock(m_con_mutex);
-        std::erase_if(m_clients, [&](client_handle c) {
-            if (auto ptr = c.lock()) {
-                if (con.lock().get() == ptr.get()) {
-                    on_disconnect(c);
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                on_disconnect(c);
-                return true;
-            }
-        });
+        if (auto it = m_clients.find(con); it != m_clients.end()) {
+            m_clients.erase(it);
+            on_disconnect(con);
+        }
     };
 
     m_server.set_close_handler(client_disconnect_handler);
@@ -43,7 +34,6 @@ void wsserver::start(uint16_t port) {
     });
 
     std::error_code ec;
-    // m_server.set_reuse_addr(true);
     m_server.listen(port, ec);
     m_server.start_accept(ec);
     if (ec) {

@@ -72,6 +72,12 @@ private:
     void handle_join_lobby(game_user &user, lobby &lobby);
     void set_user_team(game_user &user, lobby_team team);
 
+    client_state &get_client_state(client_handle handle) {
+        auto it = m_clients.find(handle);
+        assert(it != m_clients.end());
+        return it->second;
+    }
+
 private:
     std::string handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
     std::string handle_message(MSG_TAG(pong),           client_handle client);
