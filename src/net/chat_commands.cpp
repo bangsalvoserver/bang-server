@@ -33,39 +33,35 @@ namespace banggame {
         { "quit",           { proxy<&game_manager::command_quit>,               QUIT_DESCRIPTION }},
     };
 
-    std::string game_manager::command_print_help(game_user &user) {
+    void game_manager::command_print_help(game_user &user) {
         for (const auto &[cmd_name, command] : chat_command::commands) {
             if (!bool(command.permissions() & command_permissions::game_cheat) || m_options.enable_cheats) {
                 send_message<server_message_type::lobby_chat>(user.client, 0,
                     fmt::format("{}{} : {}", chat_command::start_char, cmd_name, command.description()));
             }
         }
-        return {};
     }
 
-    std::string game_manager::command_print_users(game_user &user) {
+    void game_manager::command_print_users(game_user &user) {
         auto &lobby = *user.in_lobby;
         for (auto [team, user_id, u] : lobby.users) {
             send_message<server_message_type::lobby_chat>(user.client, 0,
                 fmt::format("{} : {} ({})", user_id, u->name, enums::to_string(team)));
         }
-        return {};
     }
 
-    std::string game_manager::command_kick_user(game_user &user, std::string_view user_id_str) {
+    void game_manager::command_kick_user(game_user &user, std::string_view user_id_str) {
         int user_id;
         if (auto [end, ec] = std::from_chars(user_id_str.data(), user_id_str.data() + user_id_str.size(), user_id); ec != std::errc{}) {
-            return "INVALID_USERID_STRING";
+            throw lobby_error("INVALID_USERID_STRING");
         }
 
         auto &lobby = *user.in_lobby;
         auto kicked = rn::find(lobby.users, user_id, &lobby_user::user_id);
         if (kicked == lobby.users.end()) {
-            return "CANNOT_FIND_USERID";
+            throw lobby_error("CANNOT_FIND_USERID");
         }
         kick_user_from_lobby(*(kicked->user));
-
-        return {};
     }
 
     template<size_t I>
@@ -74,11 +70,10 @@ namespace banggame {
         return fmt::format("{} = {}", field_data.name(), field_data.get());
     }
 
-    std::string game_manager::command_get_game_options(game_user &user) {
+    void game_manager::command_get_game_options(game_user &user) {
         [this, client = user.client, &options = user.in_lobby->options]<size_t ... Is>(std::index_sequence<Is ...>) {
             (send_message<server_message_type::lobby_chat>(client, 0, get_field_string<Is>(options)), ...);
         }(std::make_index_sequence<reflector::num_fields<game_options>>());
-        return {};
     }
 
     template<size_t ... Is>
@@ -98,7 +93,7 @@ namespace banggame {
             }} ... });
     }
 
-    std::string game_manager::command_set_game_option(game_user &user, std::string_view name, std::string_view value) {
+    void game_manager::command_set_game_option(game_user &user, std::string_view name, std::string_view value) {
         static constexpr auto set_option_map = gen_set_option_map(std::make_index_sequence<reflector::num_fields<game_options>>());
         
         if (auto it = set_option_map.find(name); it != set_option_map.end()) {
@@ -106,23 +101,24 @@ namespace banggame {
 
             if (it->second(lobby.options, value)) {
                 broadcast_message_lobby<server_message_type::lobby_edited>(lobby, lobby);
-                return {};
             } else {
-                return "INVALID_OPTION_VALUE";
+                throw lobby_error("INVALID_OPTION_VALUE");
             }
         } else {
-            return "INVALID_OPTION_NAME";
+            throw lobby_error("INVALID_OPTION_NAME");
         }
     }
 
-    std::string game_manager::command_give_card(game_user &user, std::string_view name) {
+    void game_manager::command_give_card(game_user &user, std::string_view name) {
         auto &lobby = *user.in_lobby;
 
         player *target = lobby.m_game->find_player_by_userid(lobby.get_user_id(user));
-        if (!target) return "ERROR_USER_NOT_CONTROLLING_PLAYER";
+        if (!target) {
+            throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");
+        }
 
         if (lobby.m_game->pending_requests() || lobby.m_game->is_waiting() || lobby.m_game->m_playing != target) {
-            return "ERROR_PLAYER_NOT_IN_TURN";
+            throw lobby_error("ERROR_PLAYER_NOT_IN_TURN");
         }
 
         auto card_it = rn::find_if(lobby.m_game->context().cards, [&](const card &target_card) {
@@ -145,7 +141,9 @@ namespace banggame {
             }
             return false;
         });
-        if (card_it == lobby.m_game->context().cards.end()) return "ERROR_CANNOT_FIND_CARD";
+        if (card_it == lobby.m_game->context().cards.end()) {
+            throw lobby_error("ERROR_CANNOT_FIND_CARD");
+        }
         card *target_card = &*card_it;
         
         lobby.m_game->send_request_status_clear();
@@ -240,27 +238,22 @@ namespace banggame {
         }
 
         lobby.m_game->commit_updates();
-
-        return {};
     }
 
-    std::string game_manager::command_set_team(game_user &user, std::string_view value) {
+    void game_manager::command_set_team(game_user &user, std::string_view value) {
         if (auto team = enums::from_string<lobby_team>(value)) {
             set_user_team(user, *team);
-            return {};
         } else {
-            return "ERROR_INVALID_TEAM";
+            throw lobby_error("ERROR_INVALID_TEAM");
         }
     }
 
-    std::string game_manager::command_get_rng_seed(game_user &user) {
+    void game_manager::command_get_rng_seed(game_user &user) {
         send_message<server_message_type::lobby_chat>(user.client, 0, std::to_string(user.in_lobby->m_game->rng_seed));
-        return {};
     }
 
-    std::string game_manager::command_quit(game_user &user) {
+    void game_manager::command_quit(game_user &user) {
         kick_client(user.client, "QUIT");
-        return {};
     }
 
 }

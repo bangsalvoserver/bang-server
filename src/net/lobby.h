@@ -15,6 +15,14 @@ struct lobby;
 
 using client_handle = std::weak_ptr<void>;
 
+struct lobby_error : std::runtime_error {
+    using std::runtime_error::runtime_error;
+};
+
+struct critical_error : std::runtime_error {
+    using std::runtime_error::runtime_error;
+};
+
 DEFINE_ENUM(lobby_team,
     (game_player)
     (game_spectator)
@@ -28,6 +36,9 @@ static constexpr ticks ping_interval = 10s;
 static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
 struct client_state {
+    client_state(client_handle client) : client{client} {}
+    
+    client_handle client;
     game_user *user = nullptr;
     ticks ping_timer = ticks{0};
     int ping_count = 0;

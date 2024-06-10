@@ -72,37 +72,31 @@ private:
     void handle_join_lobby(game_user &user, lobby &lobby);
     void set_user_team(game_user &user, lobby_team team);
 
-    client_state &get_client_state(client_handle handle) {
-        auto it = m_clients.find(handle);
-        assert(it != m_clients.end());
-        return it->second;
-    }
-
 private:
-    std::string handle_message(MSG_TAG(connect),        client_handle client, const connect_args &value);
-    std::string handle_message(MSG_TAG(pong),           client_handle client);
-    std::string handle_message(MSG_TAG(user_edit),      game_user &user, const user_info &value);
-    std::string handle_message(MSG_TAG(lobby_make),     game_user &user, const lobby_info &value);
-    std::string handle_message(MSG_TAG(lobby_edit),     game_user &user, const lobby_info &args);
-    std::string handle_message(MSG_TAG(lobby_join),     game_user &user, const lobby_id_args &value);
-    std::string handle_message(MSG_TAG(lobby_leave),    game_user &user);
-    std::string handle_message(MSG_TAG(lobby_chat),     game_user &user, const lobby_chat_client_args &value);
-    std::string handle_message(MSG_TAG(lobby_return),   game_user &user);
-    std::string handle_message(MSG_TAG(game_start),     game_user &user);
-    std::string handle_message(MSG_TAG(game_rejoin),    game_user &user, int player_id);
-    std::string handle_message(MSG_TAG(game_action),    game_user &user, const json::json &value);
+    void handle_message(MSG_TAG(connect),        client_state &state, const connect_args &value);
+    void handle_message(MSG_TAG(pong),           client_state &state);
+    void handle_message(MSG_TAG(user_edit),      game_user &user, const user_info &value);
+    void handle_message(MSG_TAG(lobby_make),     game_user &user, const lobby_info &value);
+    void handle_message(MSG_TAG(lobby_edit),     game_user &user, const lobby_info &args);
+    void handle_message(MSG_TAG(lobby_join),     game_user &user, const lobby_id_args &value);
+    void handle_message(MSG_TAG(lobby_leave),    game_user &user);
+    void handle_message(MSG_TAG(lobby_chat),     game_user &user, const lobby_chat_client_args &value);
+    void handle_message(MSG_TAG(lobby_return),   game_user &user);
+    void handle_message(MSG_TAG(game_start),     game_user &user);
+    void handle_message(MSG_TAG(game_rejoin),    game_user &user, int player_id);
+    void handle_message(MSG_TAG(game_action),    game_user &user, const json::json &value);
 
-    std::string handle_chat_command(game_user &user, const std::string &command);
+    void handle_chat_command(game_user &user, const std::string &command);
 
-    std::string command_print_help(game_user &user);
-    std::string command_print_users(game_user &user);
-    std::string command_kick_user(game_user &user, std::string_view user_id_str);
-    std::string command_get_game_options(game_user &user);
-    std::string command_set_game_option(game_user &user, std::string_view name, std::string_view value);
-    std::string command_give_card(game_user &user, std::string_view name);
-    std::string command_set_team(game_user &user, std::string_view value);
-    std::string command_get_rng_seed(game_user &user);
-    std::string command_quit(game_user &user);
+    void command_print_help(game_user &user);
+    void command_print_users(game_user &user);
+    void command_kick_user(game_user &user, std::string_view user_id_str);
+    void command_get_game_options(game_user &user);
+    void command_set_game_option(game_user &user, std::string_view name, std::string_view value);
+    void command_give_card(game_user &user, std::string_view name);
+    void command_set_team(game_user &user, std::string_view value);
+    void command_get_rng_seed(game_user &user);
+    void command_quit(game_user &user);
 
 private:
     std::default_random_engine session_rng;
