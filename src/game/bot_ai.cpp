@@ -7,16 +7,6 @@
 
 namespace banggame {
 
-    static play_card_target generate_random_target(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
-        return enums::visit_enum([&]<target_type E>(enums::enum_tag_t<E> tag) -> play_card_target {
-            if constexpr (play_card_target::has_type<E>) {
-                return {tag, play_visitor<E>{origin, origin_card, effect}.random_target(ctx)};
-            } else {
-                return tag;
-            }
-        }, effect.target);
-    }
-
     static game_action generate_random_play(player *origin, const card_modifier_node &node, bool is_response) {
         game_action ret;
         effect_context ctx;
@@ -33,8 +23,8 @@ namespace banggame {
                     }
                 } else {
                     for (const effect_holder &holder : playing_card->get_effect_list(is_response)) {
-                        const auto &target = ret.targets.emplace_back(generate_random_target(origin, playing_card, holder, ctx));
-                        apply_add_context(origin, playing_card, holder, target, ctx);
+                        const auto &target = ret.targets.emplace_back(play_dispatch::random_target(origin, playing_card, holder, ctx));
+                        play_dispatch::add_context(origin, playing_card, holder, ctx, target);
                     }
                 }
             } else {
@@ -43,8 +33,8 @@ namespace banggame {
 
                 origin_card->get_modifier(is_response).type->add_context(origin_card, origin, ctx);
                 for (const effect_holder &holder : origin_card->get_effect_list(is_response)) {
-                    const auto &target = targets.emplace_back(generate_random_target(origin, origin_card, holder, ctx));
-                    apply_add_context(origin, origin_card, holder, target, ctx);
+                    const auto &target = targets.emplace_back(play_dispatch::random_target(origin, origin_card, holder, ctx));
+                    play_dispatch::add_context(origin, origin_card, holder, ctx, target);
                 }
 
                 cur_node = random_element(cur_node->branches

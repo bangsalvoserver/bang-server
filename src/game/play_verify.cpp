@@ -9,6 +9,48 @@
 
 #include <unordered_set>
 
+namespace banggame::play_dispatch {
+    bool possible(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
+        return enums::visit_enum([&]<target_type E>(enums::enum_tag_t<E>) {
+            return play_visitor<E>{origin, origin_card, effect}.possible(ctx);
+        }, effect.target);
+    }
+
+    play_card_target random_target(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
+        return enums::visit_enum([&]<target_type E>(enums::enum_tag_t<E> tag) -> play_card_target {
+            if constexpr (play_card_target::has_type<E>) {
+                return {tag, play_visitor<E>{origin, origin_card, effect}.random_target(ctx)};
+            } else {
+                return tag;
+            }
+        }, effect.target);
+    }
+
+    game_string get_error(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
+        return enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
+            return play_visitor<E>{origin, origin_card, effect}.get_error(ctx, FWD(args) ...);
+        }, target);
+    }
+
+    game_string prompt(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
+        return enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+            return play_visitor<E>{origin, origin_card, effect}.prompt(ctx, FWD(args) ... );
+        }, target);
+    }
+
+    void add_context(player *origin, card *origin_card, const effect_holder &effect, effect_context &ctx, const play_card_target &target) {
+        enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+            play_visitor<E>{origin, origin_card, effect}.add_context(ctx, FWD(args) ... );
+        }, target);
+    }
+
+    void play(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
+        enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
+            play_visitor<E>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
+        }, target);
+    }
+}
+
 namespace banggame {
 
     static game_string check_duplicates(const effect_context &ctx) {
@@ -63,12 +105,9 @@ namespace banggame {
                 return "ERROR_INVALID_TARGET_TYPE";
             }
 
-            apply_add_context(origin, origin_card, effect, target, ctx);
+            play_dispatch::add_context(origin, origin_card, effect, ctx, target);
             
-            MAYBE_RETURN(enums::visit_indexed(
-                [&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) -> game_string {
-                    return play_visitor<E>{origin, origin_card, effect}.get_error(ctx, FWD(args) ...);
-                }, target));
+            MAYBE_RETURN(play_dispatch::get_error(origin, origin_card, effect, ctx, target));
         }
 
         const auto &mth = origin_card->get_mth(is_response);
@@ -217,9 +256,7 @@ namespace banggame {
 
     static game_string check_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
-            MAYBE_RETURN(enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                return play_visitor<E>{origin, origin_card, effect}.prompt(ctx, FWD(args) ... );
-            }, target));
+            MAYBE_RETURN(play_dispatch::prompt(origin, origin_card, effect, ctx, target));
         }
 
         const auto &mth = origin_card->get_mth(is_response);
@@ -306,7 +343,7 @@ namespace banggame {
         }
     }
 
-    void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+    static void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, is_response);
 
         if (origin_card != ctx.repeat_card && !origin_card->has_tag(tag_type::no_auto_discard)) {
@@ -330,9 +367,7 @@ namespace banggame {
         }
 
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
-            enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-                play_visitor<E>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
-            }, target);
+            play_dispatch::play(origin, origin_card, effect, ctx, target);
         }
 
         const auto &mth = origin_card->get_mth(is_response);
@@ -341,13 +376,7 @@ namespace banggame {
         }
     }
 
-    void apply_add_context(player *origin, card *origin_card, const effect_holder &effect, const play_card_target &target, effect_context &ctx) {
-        enums::visit_indexed([&]<target_type E>(enums::enum_tag_t<E>, auto && ... args) {
-            play_visitor<E>{origin, origin_card, effect}.add_context(ctx, FWD(args) ... );
-        }, target);
-    }
-
-    void apply_equip(player *origin, card *origin_card, const target_list &targets, const effect_context &ctx) {
+    static void apply_equip(player *origin, card *origin_card, const target_list &targets, const effect_context &ctx) {
         player *target = origin_card->self_equippable() ? origin
             : targets.front().get<target_type::player>().get();
             

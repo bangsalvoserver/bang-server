@@ -95,9 +95,7 @@ namespace banggame {
         const auto &effects = origin_card->get_effect_list(is_response);
         const auto &mth = origin_card->get_mth(is_response);
         return !effects.empty() && rn::all_of(effects, [&](const effect_holder &effect) {
-            return enums::visit_enum([&]<target_type E>(enums::enum_tag_t<E>) {
-                return play_visitor<E>{origin, origin_card, effect}.possible(ctx);
-            }, effect.target);
+            return play_dispatch::possible(origin, origin_card, effect, ctx);
         }) && (!mth.type || is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {}));
     }
 

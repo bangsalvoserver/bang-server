@@ -22,8 +22,12 @@ namespace banggame {
                 if (target_card->modifier_response.type == nullptr
                     && rn::all_of(target_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
                 ) {
-                    apply_target_list(target, target_card, true,
-                        target_list{target_card->responses.size(), play_card_target{enums::enum_tag<target_type::none>}}, {});
+                    target->m_game->add_log("LOG_PLAYED_CARD", target_card, target);
+                    target->m_game->move_card(target_card, pocket_type::shop_discard);
+                    
+                    for (const effect_holder &effect : target_card->responses) {
+                        play_dispatch::play(target, target_card, effect, {}, enums::enum_tag<target_type::none>);
+                    }
                 }
             } else {
                 target->m_game->pop_request();
