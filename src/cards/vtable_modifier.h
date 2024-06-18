@@ -27,7 +27,8 @@ namespace banggame {
             },
 
             .get_error = [](card *origin_card, player *origin, card *target_card, const effect_context &ctx) -> game_string {
-                if (filters::is_equip_card(target_card)) {
+                if (card *equip_card = filters::get_equip_card(target_card, ctx)) {
+                    target_card = equip_card;
                     if constexpr (requires (T handler) { handler.valid_with_equip(origin_card, origin, target_card); }) {
                         if (T{}.valid_with_equip(origin_card, origin, target_card)) {
                             return {};

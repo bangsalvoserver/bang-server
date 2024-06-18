@@ -16,16 +16,9 @@ namespace banggame {
         while (!playing_card) {
             if (cur_node->branches.empty()) {
                 playing_card = cur_node->card;
-                if (filters::is_equip_card(playing_card)) {
-                    if (!playing_card->self_equippable()) {
-                        ret.targets.emplace_back(enums::enum_tag<target_type::player>,
-                            random_element(make_equip_set(origin, playing_card, ctx), origin->m_game->bot_rng));
-                    }
-                } else {
-                    for (const effect_holder &holder : playing_card->get_effect_list(is_response)) {
-                        const auto &target = ret.targets.emplace_back(play_dispatch::random_target(origin, playing_card, holder, ctx));
-                        play_dispatch::add_context(origin, playing_card, holder, ctx, target);
-                    }
+                for (const effect_holder &holder : playing_card->get_effect_list(is_response)) {
+                    const auto &target = ret.targets.emplace_back(play_dispatch::random_target(origin, playing_card, holder, ctx));
+                    play_dispatch::add_context(origin, playing_card, holder, ctx, target);
                 }
             } else {
                 card *origin_card = cur_node->card;
@@ -67,7 +60,9 @@ namespace banggame {
 
         std::set<play_card_node> play_card_set;
         for (const card_modifier_node &node : play_cards) {
-            play_card_set.emplace(play_card_node{ &node });
+            if (!filters::is_equip_card(node.card)) {
+                play_card_set.emplace(play_card_node{ &node });
+            }
         }
         
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {

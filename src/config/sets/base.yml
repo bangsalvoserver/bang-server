@@ -384,6 +384,13 @@ button_row:
       - pass_turn
 
 hidden:
+  - name: EQUIP
+    effects:
+      - set_playing card | equip_card
+      - none player equip_player
+    mth_effect: equip(0,1)
+    tags:
+      - equip
   - name: PICK
     responses:
       - pick card | pick_card

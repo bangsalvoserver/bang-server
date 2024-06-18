@@ -20,6 +20,17 @@ namespace banggame {
     }
 
     template<> game_string visit_card::get_error(const effect_context &ctx, card *target) {
+        if (bool(effect.card_filter & target_card_filter::equip_card)) {
+            if (filters::is_equip_card(ctx.playing_card)) {
+                if (ctx.playing_card->pocket == pocket_type::player_hand && ctx.playing_card->owner != origin) {
+                    return "ERROR_INVALID_CARD_OWNER";
+                }
+                return {};
+            } else {
+                return "ERROR_INVALID_EQUIP";
+            }
+        }
+
         if (bool(effect.card_filter & target_card_filter::pick_card)) {
             if (auto req = origin->m_game->top_request<interface_picking>(origin)) {
                 if (req->can_pick(target)) {

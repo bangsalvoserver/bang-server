@@ -17,6 +17,14 @@ namespace banggame {
     }
 
     template<> game_string visit_player::get_error(const effect_context &ctx, player *target) {
+        if (bool(effect.player_filter & target_player_filter::equip_player)) {
+            if (filters::is_equip_card(ctx.playing_card)) {
+                return get_equip_error(origin, ctx.playing_card, target, ctx);
+            } else {
+                return "ERROR_INVALID_EQUIP";
+            }
+        }
+
         MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target, ctx));
         return effect.type->get_error_player(effect.effect_value, origin_card, origin, target, ctx);
     }

@@ -13,6 +13,7 @@ target_sources(bangserver PRIVATE
     duel.cpp
     dynamite.cpp
     el_gringo.cpp
+    equip.cpp
     generalstore.cpp
     heal.cpp
     lucky_duke.cpp

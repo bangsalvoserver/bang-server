@@ -7,7 +7,7 @@ namespace banggame::filters {
 
     bool is_player_bot(const player *p);
 
-    bool is_equip_card(const card *c);
+    card *get_equip_card(card *playing_card, const effect_context &ctx);
 
     bool is_modifier_card(const player *origin, const card *c);
 

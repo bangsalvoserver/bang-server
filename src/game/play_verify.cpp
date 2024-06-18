@@ -177,30 +177,6 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_equip_target(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
-        if (is_response) {
-            return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
-        }
-
-        if (origin_card->pocket == pocket_type::player_hand && origin_card->owner != origin) {
-            return "ERROR_INVALID_CARD_OWNER";
-        }
-
-        player *target = origin;
-        if (origin_card->self_equippable()) {
-            if (!targets.empty()) {
-                return "ERROR_INVALID_EQUIP_TARGET";
-            }
-        } else {
-            if (targets.size() != 1 || !targets.front().is(target_type::player)) {
-                return "ERROR_INVALID_EQUIP_TARGET";
-            }
-            target = targets.front().get<target_type::player>();
-        }
-        
-        return get_equip_error(origin, origin_card, target, ctx);
-    }
-
     game_string get_play_card_error(player *origin, card *origin_card, const effect_context &ctx) {
         if (card *disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
@@ -238,7 +214,7 @@ namespace banggame {
         MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
 
         if (filters::is_equip_card(origin_card)) {
-            MAYBE_RETURN(verify_equip_target(origin, origin_card, is_response, targets, ctx));
+            return "ERROR_CARD_IS_EQUIP";
         } else if (origin_card->get_modifier(is_response).type != nullptr) {
             return "ERROR_CARD_IS_MODIFIER";
         } else {
@@ -254,7 +230,7 @@ namespace banggame {
         return {};
     }
 
-    static game_string check_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+    static game_string apply_check_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
             MAYBE_RETURN(play_dispatch::prompt(origin, origin_card, effect, ctx, target));
         }
@@ -269,18 +245,9 @@ namespace banggame {
     static game_string check_prompt_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         for (const auto &[mod_card, mod_targets] : modifiers) {
             MAYBE_RETURN(mod_card->get_modifier(is_response).type->on_prompt(mod_card, origin, origin_card, ctx));
-            MAYBE_RETURN(check_prompt(origin, mod_card, is_response, mod_targets, ctx));
+            MAYBE_RETURN(apply_check_prompt(origin, mod_card, is_response, mod_targets, ctx));
         }
-        if (filters::is_equip_card(origin_card)) {
-            player *target = origin_card->self_equippable() ? origin
-                : targets.front().get<target_type::player>().get();
-            for (const equip_holder &holder : origin_card->equips) {
-                MAYBE_RETURN(holder.type->on_prompt(holder.effect_value, origin_card, origin, target));
-            }
-            return {};
-        } else {
-            return check_prompt(origin, origin_card, is_response, targets, ctx);
-        }
+        return apply_check_prompt(origin, origin_card, is_response, targets, ctx);
     }
 
     static void log_played_card(card *origin_card, player *origin, bool is_response) {
@@ -327,22 +294,6 @@ namespace banggame {
         }
     }
 
-    static void log_equipped_card(card *origin_card, player *origin, player *target) {
-        if (origin_card->pocket == pocket_type::shop_selection) {
-            if (origin == target) {
-                origin->m_game->add_log("LOG_BOUGHT_EQUIP", origin_card, origin);
-            } else {
-                origin->m_game->add_log("LOG_BOUGHT_EQUIP_TO", origin_card, origin, target);
-            }
-        } else {
-            if (origin == target) {
-                origin->m_game->add_log("LOG_EQUIPPED_CARD", origin_card, origin);
-            } else {
-                origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", origin_card, origin, target);
-            }
-        }
-    }
-
     static void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, is_response);
 
@@ -374,25 +325,6 @@ namespace banggame {
         if (mth.type) {
             mth.type->on_play(origin_card, origin, targets, mth.args, ctx);
         }
-    }
-
-    static void apply_equip(player *origin, card *origin_card, const target_list &targets, const effect_context &ctx) {
-        player *target = origin_card->self_equippable() ? origin
-            : targets.front().get<target_type::player>().get();
-            
-        origin->m_game->queue_action([=]{ 
-            if (!origin->alive()) return;
-
-            log_equipped_card(origin_card, origin, target);
-            
-            if (origin_card->pocket == pocket_type::player_hand) {
-                origin->m_game->call_event(event_type::on_discard_hand_card{ origin, origin_card, true });
-            }
-
-            target->equip_card(origin_card);
-
-            origin->m_game->call_event(event_type::on_equip_card{ origin, target, origin_card, ctx });
-        });
     }
 
     static played_card_history make_played_card_history(const game_action &args, bool is_response, const effect_context &ctx) {
@@ -446,11 +378,7 @@ namespace banggame {
             apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
         }
 
-        if (filters::is_equip_card(args.card)) {
-            apply_equip(origin, args.card, args.targets, ctx);
-        } else {
-            apply_target_list(origin, args.card, is_response, args.targets, ctx);
-        }
+        apply_target_list(origin, args.card, is_response, args.targets, ctx);
 
         return {};
     }

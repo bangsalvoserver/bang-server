@@ -85,6 +85,16 @@ namespace banggame::filters {
         }
     }
 
+    card *get_equip_card(card *playing_card, const effect_context &ctx) {
+        if (is_equip_card(playing_card)) {
+            return playing_card;
+        }
+        if (playing_card->has_tag(tag_type::equip)) {
+            return ctx.playing_card;
+        }
+        return nullptr;
+    }
+
     bool is_modifier_card(const player *origin, const card *origin_card) {
         return origin_card->get_modifier(origin->m_game->pending_requests()).type != nullptr;
     }
@@ -101,6 +111,8 @@ namespace banggame::filters {
         if (!is_response && !ctx.repeat_card && target->pocket != pocket_type::player_table) {
             if (ctx.card_choice) {
                 target = ctx.card_choice;
+            } else if (ctx.playing_card) {
+                target = ctx.playing_card;
             }
             return target->get_tag_value(tag_type::buy_cost).value_or(0) - ctx.discount;
         } else {

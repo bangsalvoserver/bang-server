@@ -6,6 +6,8 @@
 
 namespace banggame::filters {
 
+    bool is_equip_card(const card *target);
+
     game_string check_player_filter(const player *origin, target_player_filter filter, const player *target, const effect_context &ctx = {});
 
     int get_card_cost(const card *target, bool is_response, const effect_context &ctx);

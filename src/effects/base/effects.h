@@ -14,6 +14,7 @@
 #include "duel.h"
 #include "dynamite.h"
 #include "el_gringo.h"
+#include "equip.h"
 #include "generalstore.h"
 #include "heal.h"
 #include "lucky_duke.h"

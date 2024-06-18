@@ -10,6 +10,7 @@ namespace banggame {
         (dead)
         (alive)
         (self)
+        (equip_player)
         (notself)
         (notsheriff)
         (notorigin)
@@ -23,6 +24,7 @@ namespace banggame {
     )
 
     DEFINE_ENUM_FLAGS(target_card_filter,
+        (equip_card)
         (pick_card)
         (selection)
         (table)
@@ -56,6 +58,7 @@ namespace banggame {
         (ghost_card)
         (resolve)
         (pass_turn)
+        (equip)
         (pick)
         (skip_logs)
         (no_auto_discard)

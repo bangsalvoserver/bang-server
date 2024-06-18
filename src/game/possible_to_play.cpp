@@ -39,6 +39,12 @@ namespace banggame {
     }
 
     rn::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
+        if (bool(holder.player_filter & target_player_filter::equip_player)) {
+            if (!ctx.playing_card) {
+                return rv::single(origin);
+            }
+            return make_equip_set(origin, ctx.playing_card, ctx);
+        }
         return origin->m_game->m_players
             | rv::filter([=](player *target) {
                 return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
@@ -47,6 +53,9 @@ namespace banggame {
     }
 
     rn::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
+        if (bool(holder.card_filter & target_card_filter::equip_card)) {
+            return get_all_active_cards(origin) | rv::filter(filters::is_equip_card);
+        }
         if (bool(holder.card_filter & target_card_filter::pick_card)) {
             return get_pick_cards(origin);
         }
@@ -72,18 +81,23 @@ namespace banggame {
                     serial::int_list(small_int_set_sized_tag, targets.size()), ctx);
         }
         const auto &effect = effects.at(mth.args[targets.size()]);
+        auto recurse = [&](const play_card_target &target){
+            auto ctx_copy = ctx;
+            play_dispatch::add_context(origin, origin_card, effect, ctx_copy, target);
+
+            auto targets_copy = targets;
+            targets_copy.push_back(target);
+
+            return is_possible_mth_impl(origin, origin_card, mth, effects, ctx_copy, targets_copy);
+        };
         switch (effect.target) {
         case target_type::player:
             return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
-                auto targets_copy = targets;
-                targets_copy.emplace_back(enums::enum_tag<target_type::player>, target);
-                return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
+                return recurse({enums::enum_tag<target_type::player>, target});
             });
         case target_type::card:
             return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
-                auto targets_copy = targets;
-                targets_copy.emplace_back(enums::enum_tag<target_type::card>, target);
-                return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
+                return recurse({enums::enum_tag<target_type::card>, target});
             });
         default:
             // ignore other target types
@@ -93,10 +107,18 @@ namespace banggame {
 
     static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
         const auto &effects = origin_card->get_effect_list(is_response);
-        const auto &mth = origin_card->get_mth(is_response);
-        return !effects.empty() && rn::all_of(effects, [&](const effect_holder &effect) {
+        if (effects.empty() || !rn::all_of(effects, [&](const effect_holder &effect) {
             return play_dispatch::possible(origin, origin_card, effect, ctx);
-        }) && (!mth.type || is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {}));
+        })) {
+            return false;
+        }
+
+        const auto &mth = origin_card->get_mth(is_response);
+        if (mth.type && !is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {})) {
+            return false;
+        }
+
+        return true;
     }
 
     static rn::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
