@@ -90,13 +90,7 @@ namespace banggame {
     }
 
     game_string effect_forced_equip::on_prompt(card *origin_card, player *origin, player *target) {
-        card *target_card = origin->m_game->top_request<request_force_equip_card>()->target_card;
-        for (const equip_holder &holder : target_card->equips) {
-            if (game_string prompt_message = holder.type->on_prompt(holder.effect_value, target_card, origin, target)) {
-                return prompt_message;
-            }
-        }
-        return {};
+        return get_equip_prompt(origin, origin->m_game->top_request<request_force_equip_card>()->target_card, target);
     }
     
     void effect_forced_equip::on_play(card *origin_card, player *origin, player *target) {

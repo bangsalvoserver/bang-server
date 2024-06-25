@@ -254,7 +254,14 @@ namespace banggame {
         return {};
     }
 
-    static game_string check_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+    game_string get_equip_prompt(player *origin, card *origin_card, player *target) {
+        for (const equip_holder &holder : origin_card->equips) {
+            MAYBE_RETURN(holder.type->on_prompt(holder.effect_value, origin_card, origin, target));
+        }
+        return {};
+    }
+
+    static game_string get_play_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
             MAYBE_RETURN(play_dispatch::prompt(origin, origin_card, effect, ctx, target));
         }
@@ -266,20 +273,16 @@ namespace banggame {
         return {};
     }
 
-    static game_string check_prompt_play(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
+    static game_string get_prompt_message(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         for (const auto &[mod_card, mod_targets] : modifiers) {
             MAYBE_RETURN(mod_card->get_modifier(is_response).type->on_prompt(mod_card, origin, origin_card, ctx));
-            MAYBE_RETURN(check_prompt(origin, mod_card, is_response, mod_targets, ctx));
+            MAYBE_RETURN(get_play_prompt(origin, mod_card, is_response, mod_targets, ctx));
         }
         if (filters::is_equip_card(origin_card)) {
-            player *target = origin_card->self_equippable() ? origin
-                : targets.front().get<target_type::player>().get();
-            for (const equip_holder &holder : origin_card->equips) {
-                MAYBE_RETURN(holder.type->on_prompt(holder.effect_value, origin_card, origin, target));
-            }
-            return {};
+            return get_equip_prompt(origin, origin_card,
+                origin_card->self_equippable() ? origin : targets.front().get<target_type::player>().get());
         } else {
-            return check_prompt(origin, origin_card, is_response, targets, ctx);
+            return get_play_prompt(origin, origin_card, is_response, targets, ctx);
         }
     }
 
@@ -429,7 +432,7 @@ namespace banggame {
         }
 
         if (!args.bypass_prompt) {
-            if (game_string prompt = check_prompt_play(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
+            if (game_string prompt = get_prompt_message(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
                 return {enums::enum_tag<message_type::prompt>, prompt};
             }
         }

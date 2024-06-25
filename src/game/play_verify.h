@@ -28,6 +28,8 @@ namespace banggame {
 
     game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx);
 
+    game_string get_equip_prompt(player *origin, card *origin_card, player *target);
+
     game_message verify_and_play(player *origin, const game_action &action);
 
 }
