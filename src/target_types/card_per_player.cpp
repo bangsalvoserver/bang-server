@@ -12,13 +12,17 @@ namespace banggame {
         return true;
     }
 
+    static auto cards_target_set(const player *origin, const card *origin_card, target_card_filter filter, player *target, const effect_context &ctx) {
+        return rv::concat(target->m_table, target->m_hand)
+            | rv::filter([&](const card *target_card) {
+                return !filters::check_card_filter(origin_card, origin, filter, target_card, ctx);
+            });
+    }
+
     template<> serial::card_list visit_cards::random_target(const effect_context &ctx) {
         serial::card_list ret;
         for (player *target : range_other_players(origin)) {
-            if (auto targets = rv::concat(
-                target->m_table | rv::remove_if(&card::is_black),
-                target->m_hand | rv::take(1)
-            )) {
+            if (auto targets = cards_target_set(origin, origin_card, effect.card_filter, target, ctx)) {
                 ret.push_back(random_element(targets, origin->m_game->bot_rng));
             }
         }
@@ -28,16 +32,14 @@ namespace banggame {
     template<> game_string visit_cards::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
         if (!rn::all_of(origin->m_game->m_players | rv::filter(&player::alive), [&](player *p) {
             size_t found = rn::count(target_cards, p, &card::owner);
-            if (p->empty_hand() && p->empty_table()) return found == 0;
+            if (rn::empty(cards_target_set(origin, origin_card, effect.card_filter, p, ctx))) return found == 0;
             if (p == ctx.skipped_player || filters::check_player_filter(origin, effect.player_filter, p, ctx)) return found == 0;
             else return found == 1;
         })) {
             return "ERROR_INVALID_TARGETS";
         } else {
             for (card *c : target_cards) {
-                if (c->deck == card_deck_type::character) {
-                    return "ERROR_TARGET_NOT_CARD";
-                }
+                MAYBE_RETURN(filters::check_card_filter(origin_card, origin, effect.card_filter, c, ctx));
                 MAYBE_RETURN(effect.type->get_error_card(effect.effect_value, origin_card, origin, c, ctx));
             }
             return {};
