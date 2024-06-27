@@ -1,7 +1,7 @@
 target_sources(bangserver
 PRIVATE
     card.cpp
-    cards_other_players.cpp
+    card_per_player.cpp
     cards.cpp
     conditional_player.cpp
     adjacent_players.cpp

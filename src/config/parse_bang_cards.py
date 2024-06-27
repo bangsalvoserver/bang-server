@@ -14,6 +14,42 @@ def parse_sign(sign):
         )
     else:
         raise RuntimeError(f'Invalid sign string: {sign}')
+    
+def check_allowed_filters(effect, target_type, player_filter, card_filter):
+    NONE = 0
+    PLAYER = 1
+    CARD = 2
+
+    ALLOWED_FILTERS = {
+        'none': NONE,
+        'player': PLAYER,
+        'conditional_player': PLAYER,
+        'adjacent_players': NONE,
+        'player_per_cube': PLAYER,
+        'card': CARD,
+        'extra_card': CARD,
+        'players': PLAYER,
+        'cards': CARD,
+        'max_cards': CARD,
+        'card_per_player': PLAYER,
+        'move_cube_slot': NONE,
+        'select_cubes': NONE,
+        'select_cubes_optional': NONE,
+        'select_cubes_repeat': NONE,
+        'select_cubes_players': PLAYER,
+        'self_cubes': NONE
+    }
+
+    if target_type and target_type not in ALLOWED_FILTERS:
+        raise RuntimeError(f'Invalid target_type: {target_type}')
+    
+    allowed_type = ALLOWED_FILTERS[target_type] if target_type else NONE
+
+    if player_filter and allowed_type == NONE:
+        raise RuntimeError(f'Invalid effect string: {effect}\nPlayer filter not allowed with {target_type}')
+        
+    if card_filter and allowed_type != CARD:
+        raise RuntimeError(f'Invalid effect string: {effect}\nCard filter not allowed with {target_type}')
 
 def parse_effects(effect_list):
     if not isinstance(effect_list, list):
@@ -40,11 +76,7 @@ def parse_effects(effect_list):
         player_filter = match.group(5)
         card_filter = match.group(6)
 
-        if player_filter and target_type not in ('player', 'conditional_player', 'players', 'player_per_cube', 'card', 'extra_card', 'cards', 'max_cards', 'select_cubes_players'):
-            raise RuntimeError(f'Invalid effect string: {effect}\nPlayer filter not allowed with {target_type}')
-            
-        if card_filter and target_type not in ('card', 'extra_card', 'cards', 'max_cards'):
-            raise RuntimeError(f'Invalid effect string: {effect}\nCard filter not allowed with {target_type}')
+        check_allowed_filters(effect, target_type, player_filter, card_filter)
 
         result.append(CppObject(
             target =           CppEnum('target_type', target_type) if target_type else None,

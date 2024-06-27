@@ -180,7 +180,7 @@ main_deck:
     image: 20_incendio
     color: green
     effects:
-      - destroy cards_other_players
+      - destroy card_per_player notself
     tags:
       - skip_logs
       - multi_target

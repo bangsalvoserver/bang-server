@@ -94,7 +94,7 @@ main_deck:
     effects:
       - discard extra_card self | hand
       - discard
-      - destroy cards_other_players
+      - destroy card_per_player notself
     tags:
       - skip_logs
       - no_auto_discard

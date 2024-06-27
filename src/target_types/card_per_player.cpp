@@ -2,9 +2,11 @@
 
 #include "cards/game_enums.h"
 
+#include "game/filters.h"
+
 namespace banggame {
 
-    using visit_cards = play_visitor<target_type::cards_other_players>;
+    using visit_cards = play_visitor<target_type::card_per_player>;
 
     template<> bool visit_cards::possible(const effect_context &ctx) {
         return true;
@@ -27,7 +29,7 @@ namespace banggame {
         if (!rn::all_of(origin->m_game->m_players | rv::filter(&player::alive), [&](player *p) {
             size_t found = rn::count(target_cards, p, &card::owner);
             if (p->empty_hand() && p->empty_table()) return found == 0;
-            if (p == origin || p == ctx.skipped_player) return found == 0;
+            if (p == ctx.skipped_player || filters::check_player_filter(origin, effect.player_filter, p, ctx)) return found == 0;
             else return found == 1;
         })) {
             return "ERROR_INVALID_TARGETS";
