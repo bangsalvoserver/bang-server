@@ -7,7 +7,7 @@ namespace banggame {
 
     void request_check_base::on_update() {
         if (!live) {
-            target->m_game->flash_card(origin_card);
+            origin_card->flash_card();
             start();
         }
     }
@@ -21,7 +21,7 @@ namespace banggame {
     }
 
     void request_check_base::on_pick(card *target_card) {
-        target->m_game->flash_card(target_card);
+        target_card->flash_card();
         select(target_card);
     }
 
@@ -39,11 +39,11 @@ namespace banggame {
             for (int i=0; i<num_checks; ++i) {
                 card *target_card = target->m_game->top_of_deck();
                 target->m_game->add_log("LOG_REVEALED_CARD", target, target_card);
-                target->m_game->move_card(target_card, pocket_type::selection);
+                target_card->move_to(pocket_type::selection);
             }
         } else {
             card *target_card = target->m_game->top_of_deck();
-            target->m_game->move_card(target_card, pocket_type::discard_pile);
+            target_card->move_to(pocket_type::discard_pile);
             select(target_card);
         }
     }
@@ -61,7 +61,7 @@ namespace banggame {
 
     void request_check_base::restart() {
         while (!target->m_game->m_selection.empty()) {
-            target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+            target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
         }
         start();
     }
@@ -81,7 +81,7 @@ namespace banggame {
                 card *c = target->m_game->m_selection.front();
                 target->m_game->call_event(event_type::on_draw_check_resolve{ target, c });
                 if (c->pocket == pocket_type::selection) {
-                    target->m_game->move_card(c, pocket_type::discard_pile);
+                    c->move_to(pocket_type::discard_pile);
                 }
             }
         } else {

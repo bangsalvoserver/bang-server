@@ -7,7 +7,7 @@ namespace banggame {
     static void check_empty_hand(card *origin_card, player *origin) {
         origin->m_game->queue_action([=]{
             if (origin->alive() && origin->empty_hand()) {
-                origin->m_game->flash_card(origin_card);
+                origin_card->flash_card();
                 origin->draw_card(1, origin_card);
             }
         });

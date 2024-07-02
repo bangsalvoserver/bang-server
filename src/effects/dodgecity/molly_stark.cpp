@@ -9,7 +9,7 @@ namespace banggame {
             if (origin == target && used && origin->m_game->m_playing != origin) {
                 origin->m_game->queue_action([=]{
                     if (origin->alive()) {                        
-                        origin->m_game->flash_card(origin_card);
+                        origin_card->flash_card();
                         origin->draw_card(1, origin_card);
                     }
                 }, -1);

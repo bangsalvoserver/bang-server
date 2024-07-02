@@ -21,8 +21,8 @@ namespace banggame {
 
         target->m_game->pop_request();
         target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
-        target->m_game->move_card(target_card, pocket_type::player_character, target, card_visibility::shown, instant);
-        target->m_game->move_card(target->m_hand.front(), pocket_type::player_backup, target, card_visibility::hidden, true);
+        target_card->move_to(pocket_type::player_character, target, card_visibility::shown, instant);
+        target->m_hand.front()->move_to(pocket_type::player_backup, target, card_visibility::hidden, true);
 
         target->reset_max_hp();
         target->set_hp(target->m_max_hp, instant);
@@ -94,7 +94,7 @@ namespace banggame {
     void request_discard_pass::on_pick(card *target_card) {
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
         if (target->m_game->check_flags(game_flags::phase_one_draw_discard)) {
-            target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
+            target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
         } else {
             target->discard_card(target_card);
         }
@@ -133,7 +133,7 @@ namespace banggame {
     void request_discard_all::on_update() {
         if (!live) {
             for (card *target_card : target->m_table) {
-                target->m_game->tap_card(target_card, false);
+                target_card->set_inactive(false);
             }
         }
         
@@ -154,7 +154,7 @@ namespace banggame {
             on_pick(target_card);
         }
         
-        target->m_game->drop_cubes(target->first_character());
+        target->first_character()->drop_cubes();
         if (reason != discard_all_reason::sheriff_killed_deputy) {
             target->add_gold(-target->m_gold);
         }

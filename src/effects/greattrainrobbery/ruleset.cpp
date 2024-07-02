@@ -18,7 +18,7 @@ namespace banggame {
         origin->m_game->add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(origin->m_game->m_stations), pocket_type::stations);
         for (card *c : origin->m_game->m_stations) {
             c->pocket = pocket_type::stations;
-            origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
+            c->set_visibility(card_visibility::shown, nullptr, true);
         }
 
         origin->m_game->m_train = origin->m_game->context().cards
@@ -32,13 +32,13 @@ namespace banggame {
         origin->m_game->add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(origin->m_game->m_train), pocket_type::train);
         for (card *c : origin->m_game->m_train) {
             c->pocket = pocket_type::train;
-            origin->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
+            c->set_visibility(card_visibility::shown, nullptr, true);
             origin->enable_equip(c);
         }
         
         for (int i=0; i<3; ++i) {
             if (card *drawn_card = origin->m_game->top_train_card()) {
-                origin->m_game->move_card(drawn_card, pocket_type::train);
+                drawn_card->move_to(pocket_type::train);
             } else {
                 break;
             }
@@ -47,14 +47,14 @@ namespace banggame {
 
     static void shuffle_stations_and_trains(player *origin) {
         while (origin->m_game->m_train.size() != 1) {
-            origin->m_game->move_card(origin->m_game->m_train.back(), pocket_type::train_deck, nullptr, card_visibility::hidden);
+            origin->m_game->m_train.back()->move_to(pocket_type::train_deck, nullptr, card_visibility::hidden);
         }
         
         origin->m_game->train_position = 0;
         origin->m_game->add_update<game_update_type::move_train>(0);
 
         for (card *c : origin->m_game->m_train) {
-            origin->m_game->set_card_visibility(c, nullptr, card_visibility::hidden);
+            c->set_visibility(card_visibility::hidden);
             origin->disable_equip(c);
         }
         origin->m_game->add_update<game_update_type::remove_cards>(rn::to<serial::card_list>(origin->m_game->m_train));
@@ -111,7 +111,7 @@ namespace banggame {
                 }
 
                 if (card *drawn_card = origin->m_game->top_train_card()) {
-                    origin->m_game->move_card(drawn_card, pocket_type::train);
+                    drawn_card->move_to(pocket_type::train);
                 }
             }
         });

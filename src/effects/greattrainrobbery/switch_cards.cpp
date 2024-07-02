@@ -22,12 +22,12 @@ namespace banggame {
         target->disable_equip(target_card);
         origin->disable_equip(chosen_card);
         
-        origin->m_game->move_card(target_card, pocket_type::player_table, origin, card_visibility::shown);
+        target_card->move_to(pocket_type::player_table, origin, card_visibility::shown);
         if (target_card->is_green() && has_equipped_card(origin, target_card)) {
-            origin->m_game->tap_card(target_card, true);
+            target_card->set_inactive(true);
         }
-        origin->m_game->tap_card(chosen_card, false);
-        origin->m_game->move_card(chosen_card, pocket_type::player_table, target, card_visibility::shown);
+        chosen_card->set_inactive(false);
+        chosen_card->move_to(pocket_type::player_table, target, card_visibility::shown);
         
         origin->enable_equip(target_card);
         target->enable_equip(chosen_card);

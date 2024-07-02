@@ -16,7 +16,7 @@ namespace banggame {
         }
 
         origin->m_game->add_log("LOG_DRAWN_SCENARIO_CARD", scenario_deck.back());
-        origin->m_game->move_card(scenario_deck.back(), pocket_type::wws_scenario_card);
+        scenario_deck.back()->move_to(pocket_type::wws_scenario_card);
         origin->m_game->m_first_player->enable_equip(scenario_cards.back());
     }
 }

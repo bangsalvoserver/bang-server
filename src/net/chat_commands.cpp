@@ -166,7 +166,7 @@ namespace banggame {
             card *old_character = target->first_character();
             int ncubes = old_character->num_cubes;
 
-            target->m_game->move_cubes(old_character, nullptr, ncubes);
+            old_character->move_cubes(nullptr, ncubes);
             target->m_game->add_update<game_update_type::remove_cards>(std::vector{not_null{old_character}});
 
             old_character->pocket = pocket_type::none;
@@ -180,16 +180,16 @@ namespace banggame {
             target_card->owner = target;
 
             target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::player_character, target);
-            target->m_game->set_card_visibility(target_card, nullptr, card_visibility::shown, true);
+            target_card->set_visibility(card_visibility::shown, nullptr, true);
 
             target->reset_max_hp();
             target->enable_equip(target_card);
-            target->m_game->add_cubes(target_card, ncubes);
+            target_card->add_cubes(ncubes);
             break;
         }
         case card_deck_type::goldrush: {
-            target->m_game->move_card(target->m_game->m_shop_selection.front(), pocket_type::shop_discard);
-            target->m_game->move_card(target_card, pocket_type::shop_selection);
+            target->m_game->m_shop_selection.front()->move_to(pocket_type::shop_discard);
+            target_card->move_to(pocket_type::shop_selection);
             break;
         }
         case card_deck_type::highnoon:
@@ -201,10 +201,10 @@ namespace banggame {
                     target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::scenario_deck);
                 }
                 target->m_game->m_scenario_deck.push_back(target_card);
-                target->m_game->set_card_visibility(target_card, nullptr, card_visibility::shown, true);
+                target_card->set_visibility(card_visibility::shown, nullptr, true);
                 target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::scenario_deck, true);
             } else {
-                target->m_game->move_card(target_card, pocket_type::scenario_deck);
+                target_card->move_to(pocket_type::scenario_deck);
             }
             break;
         }
@@ -216,10 +216,10 @@ namespace banggame {
                     target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::wws_scenario_deck);
                 }
                 target->m_game->m_wws_scenario_deck.push_back(target_card);
-                target->m_game->set_card_visibility(target_card, nullptr, card_visibility::shown, true);
+                target_card->set_visibility(card_visibility::shown, nullptr, true);
                 target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::wws_scenario_deck, true);
             } else {
-                target->m_game->move_card(target_card, pocket_type::wws_scenario_deck);
+                target_card->move_to(pocket_type::wws_scenario_deck);
             }
             break;
         }
@@ -230,7 +230,7 @@ namespace banggame {
                 bool from_train = target_card->pocket == pocket_type::train;
                 target->equip_card(target_card);
                 if (card *drawn_card = target->m_game->top_train_card(); from_train && drawn_card) {
-                    target->m_game->move_card(drawn_card, pocket_type::train);
+                    drawn_card->move_to(pocket_type::train);
                 }
             }
             break;

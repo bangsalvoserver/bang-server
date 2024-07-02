@@ -21,7 +21,7 @@ namespace banggame {
             if (!live) {
                 int ncards = target->m_game->num_alive() + req_draw->num_cards_to_draw - 1;
                 for (int i=0; i<ncards; ++i) {
-                    target->m_game->move_card(req_draw->phase_one_drawn_card(), pocket_type::selection, target);
+                    req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
                 }
             }
         }

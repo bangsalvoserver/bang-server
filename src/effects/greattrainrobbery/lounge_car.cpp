@@ -14,7 +14,7 @@ namespace banggame {
             if (!live) {
                 for (int i=0; i<2; ++i) {
                     if (card *drawn_card = target->m_game->top_train_card()) {
-                        target->m_game->move_card(drawn_card, pocket_type::selection, target);
+                        drawn_card->move_to(pocket_type::selection, target);
                     } else {
                         break;
                     }

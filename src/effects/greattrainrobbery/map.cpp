@@ -14,7 +14,7 @@ namespace banggame {
         void on_update() override {
             if (!live) {
                 for (int i=0; i<2; ++i) {
-                    target->m_game->move_card(target->m_game->top_of_deck(), pocket_type::selection, target);
+                    target->m_game->top_of_deck()->move_to(pocket_type::selection, target);
                 }
             }
         }
@@ -28,7 +28,7 @@ namespace banggame {
             target->m_game->pop_request();
             if (move_card_to_deck()) {
                 while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
+                    target->m_game->m_selection.front()->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
                 }
             }
         }
@@ -36,14 +36,14 @@ namespace banggame {
         void on_pick(card *target_card) override {
             target->m_game->pop_request();
             if (move_card_to_deck()) {
-                target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
+                target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
             }
             while (auto not_target = target->m_game->m_selection | rv::filter([&](card *selection_card) {
                 return selection_card != target_card;
             })) {
                 card *discarded = *not_target.begin();
                 target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, discarded);
-                target->m_game->move_card(discarded, pocket_type::discard_pile);
+                discarded->move_to(pocket_type::discard_pile);
             }
         }
 

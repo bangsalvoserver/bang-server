@@ -21,7 +21,7 @@ namespace banggame {
             for (int i=0; i < num_cards; ++i) {
                 card *drawn_card = target->m_game->top_of_deck();
                 target->m_game->add_log("LOG_REVEALED_CARD", target, drawn_card);
-                target->m_game->move_card(drawn_card, pocket_type::selection);
+                drawn_card->move_to(pocket_type::selection);
             }
 
             bool handled = false;
@@ -41,7 +41,7 @@ namespace banggame {
 
         void restart() override {
             while (!target->m_game->m_selection.empty()) {
-                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+                target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
             }
             start();
         }
@@ -67,7 +67,7 @@ namespace banggame {
                 card *drawn_card = target->m_game->m_selection.front();
                 target->m_game->call_event(event_type::on_draw_check_resolve{ target, drawn_card });
                 if (drawn_card->pocket == pocket_type::selection) {
-                    target->m_game->move_card(drawn_card, pocket_type::discard_pile);
+                    drawn_card->move_to(pocket_type::discard_pile);
                 }
             }
             target->heal(heal);

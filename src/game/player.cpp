@@ -41,7 +41,7 @@ namespace banggame {
     }
 
     void player::equip_card(card *target) {
-        m_game->move_card(target, pocket_type::player_table, this, card_visibility::shown);
+        target->move_to(pocket_type::player_table, this, card_visibility::shown);
         enable_equip(target);
     }
 
@@ -119,9 +119,9 @@ namespace banggame {
     static bool move_owned_card(player *owner, card *target_card, bool used) {
         if (target_card->owner == owner) {
             if (target_card->pocket == pocket_type::player_table) {
-                owner->m_game->tap_card(target_card, false);
+                target_card->set_inactive(false);
                 owner->disable_equip(target_card);
-                owner->m_game->drop_cubes(target_card);
+                target_card->drop_cubes();
                 return true;
             } else if (target_card->pocket == pocket_type::player_hand) {
                 owner->m_game->call_event(event_type::on_discard_hand_card{ owner, target_card, used });
@@ -135,15 +135,15 @@ namespace banggame {
         if (move_owned_card(this, target, used)) {
             if (target->is_train()) {
                 if (m_game->m_train.size() < 4) {
-                    m_game->move_card(target, pocket_type::train);
+                    target->move_to(pocket_type::train);
                 } else {
-                    m_game->move_card(target, pocket_type::train_deck, nullptr, card_visibility::shown, false, true);
-                    m_game->set_card_visibility(target, nullptr, card_visibility::hidden, true);
+                    target->move_to(pocket_type::train_deck, nullptr, card_visibility::shown, false, true);
+                    target->set_visibility(card_visibility::hidden, nullptr, true);
                 }
             } else if (target->is_black()) {
-                m_game->move_card(target, pocket_type::shop_discard);
+                target->move_to(pocket_type::shop_discard);
             } else {
-                m_game->move_card(target, pocket_type::discard_pile);
+                target->move_to(pocket_type::discard_pile);
             }
         }
     }
@@ -186,7 +186,7 @@ namespace banggame {
         if (!quiet) {
             for (card *target_card : cards) {
                 m_game->add_log("LOG_PLAYER_IMMUNE_TO_CARD", this, origin_card, target_card);
-                m_game->flash_card(target_card);
+                target_card->flash_card();
             }
         }
         return !cards.empty();
@@ -202,7 +202,7 @@ namespace banggame {
         if (target->deck == card_deck_type::train) {
             equip_card(target);
         } else {
-            m_game->move_card(target, pocket_type::player_hand, this, m_game->check_flags(game_flags::hands_shown)
+            target->move_to(pocket_type::player_hand, this, m_game->check_flags(game_flags::hands_shown)
                 ? card_visibility::shown : card_visibility::show_owner);
         }
     }

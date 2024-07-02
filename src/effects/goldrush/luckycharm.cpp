@@ -10,7 +10,7 @@ namespace banggame {
             if (p == target) {
                 target->m_game->queue_action([=]{
                     if (target->alive()) {
-                        target->m_game->flash_card(target_card);
+                        target_card->flash_card();
                         target->add_gold(damage);
                     }
                 });

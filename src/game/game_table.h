@@ -57,10 +57,6 @@ namespace banggame {
         int num_alive() const;
 
         void shuffle_cards_and_ids(std::span<card *> vec);
-        card *add_card(const card_data &data);
-
-        void set_card_visibility(card *c, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false);
-        void move_card(card *c, pocket_type pocket, player *owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false, bool front = false);
 
         card *top_of_deck();
         card *top_train_card();
@@ -69,14 +65,8 @@ namespace banggame {
         void draw_scenario_card();
         void advance_train(player *origin);
 
-        void flash_card(card *c);
-        void add_short_pause(card *c = nullptr);
-        void tap_card(card *c, bool inactive);
+        void add_short_pause();
         void play_sound(player *target, const std::string &sound_id);
-
-        void add_cubes(card *target, int ncubes);
-        void move_cubes(card *origin, card *target, int ncubes, bool instant = false);
-        void drop_cubes(card *target);
 
         void add_game_flags(game_flags flags);
         void remove_game_flags(game_flags flags);

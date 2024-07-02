@@ -16,7 +16,7 @@ namespace banggame {
         void on_update() override {
             if (!live) {
                 for (int i=0; i<3; ++i) {
-                    target->m_game->move_card(req_draw->phase_one_drawn_card(), pocket_type::selection, target);
+                    req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
                 }
             }
             auto_pick();
@@ -27,7 +27,7 @@ namespace banggame {
             if (req_draw->num_drawn_cards >= req_draw->num_cards_to_draw) {
                 target->m_game->pop_request();
                 while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::main_deck, nullptr, card_visibility::hidden);
+                    target->m_game->m_selection.front()->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
                 }
             }
         }

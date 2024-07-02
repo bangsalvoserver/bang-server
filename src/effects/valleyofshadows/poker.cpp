@@ -22,7 +22,7 @@ namespace banggame {
             target->m_game->pop_request();
             target->m_game->add_log(update_target::includes(origin, target), "LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->m_game->add_log(update_target::excludes(origin, target), "LOG_DISCARDED_A_CARD_FOR", origin_card, target);
-            target->m_game->move_card(target_card, pocket_type::selection, origin);
+            target_card->move_to(pocket_type::selection, origin);
             target->m_game->call_event(event_type::on_discard_hand_card{ target, target_card, true });
         }
 
@@ -46,20 +46,20 @@ namespace banggame {
             
             for (card *target_card : target->m_game->m_selection) {
                 target->m_game->add_log("LOG_POKER_REVEAL", origin_card, target_card);
-                target->m_game->set_card_visibility(target_card);
+                target_card->set_visibility(card_visibility::shown);
             }
             
             if (auto aces = rv::filter(target->m_game->m_selection, [this](card *c) {
                 return target->m_game->get_card_sign(c).rank == card_rank::rank_A;
             })) {
                 for (card *c : aces) {
-                    target->m_game->flash_card(c);
+                    c->flash_card();
                 }
                 target->m_game->pop_request();
                 target->m_game->add_short_pause();
                 target->m_game->add_log("LOG_POKER_ACE");
                 while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+                    target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
                 }
             } else if (target->m_game->m_selection.size() <= 2) {
                 target->m_game->pop_request();
@@ -80,7 +80,7 @@ namespace banggame {
             if (--num_cards == 0) {
                 target->m_game->pop_request();
                 while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+                    target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
                 }
             }
         }

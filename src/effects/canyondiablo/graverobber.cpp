@@ -8,9 +8,9 @@ namespace banggame {
         int num_targets = origin->m_game->num_alive() - bool(ctx.skipped_player);
         for (int i=0; i < num_targets; ++i) {
             if (origin->m_game->m_discards.empty()) {
-                origin->m_game->move_card(origin->m_game->top_of_deck(), pocket_type::selection);
+                origin->m_game->top_of_deck()->move_to(pocket_type::selection);
             } else {
-                origin->m_game->move_card(origin->m_game->m_discards.back(), pocket_type::selection);
+                origin->m_game->m_discards.back()->move_to(pocket_type::selection);
             }
         }
     }

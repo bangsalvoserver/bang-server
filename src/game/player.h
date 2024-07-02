@@ -1,39 +1,9 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
-#include <map>
-#include <vector>
-#include <algorithm>
-#include <functional>
-#include <memory>
-
-#include "game_update.h"
+#include "card.h"
 
 namespace banggame {
-
-    constexpr int max_cubes = 4;
-
-    enum class card_visibility : uint8_t {
-        hidden,
-        shown,
-        show_owner
-    };
-    
-    struct card : card_data {
-        card(int id, const card_data &data): card_data(data), order(id), id(id) {}
-        
-        const int order;
-        int id;
-
-        player *owner = nullptr;
-        pocket_type pocket = pocket_type::none;
-        card_visibility visibility = card_visibility::hidden;
-        
-        bool inactive = false;
-        int8_t num_cubes = 0;
-    };
-
-    inline card_backface::card_backface(card *c): id(c->id), deck(c->deck) {}
     
     struct card_pocket_pair {
         card *origin_card;

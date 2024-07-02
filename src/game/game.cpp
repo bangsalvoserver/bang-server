@@ -150,6 +150,10 @@ namespace banggame {
         }
     }
 
+    card *game::add_card(const card_data &data) {
+        return &m_context.cards.emplace(this, int(m_context.cards.first_available_id()), data);
+    }
+
     void game::add_players(std::span<int> user_ids) {
         rn::shuffle(user_ids, rng);
 
@@ -205,14 +209,14 @@ namespace banggame {
         if (add_cards(all_cards.button_row, pocket_type::button_row)) {
             add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_button_row), pocket_type::button_row);
             for (card *c : m_button_row) {
-                set_card_visibility(c, nullptr, card_visibility::shown, true);
+                c->set_visibility(card_visibility::shown, nullptr, true);
             }
         }
 
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
             add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(m_hidden_deck), pocket_type::hidden_deck);
             for (card *c : m_hidden_deck) {
-                set_card_visibility(c, nullptr, card_visibility::shown, true);
+                c->set_visibility(card_visibility::shown, nullptr, true);
             }
         }
 
@@ -304,7 +308,7 @@ namespace banggame {
             add_update<game_update_type::add_cards>(rn::to<std::vector<card_backface>>(p->m_hand), pocket_type::player_hand, p);
             if (m_options.character_choice) {
                 for (card *c : p->m_hand) {
-                    set_card_visibility(c, p, card_visibility::shown, true);
+                    c->set_visibility(card_visibility::shown, p, true);
                 }
             }
             queue_request<request_characterchoice>(p);

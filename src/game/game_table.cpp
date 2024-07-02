@@ -3,7 +3,6 @@
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
-#include "effects/armedanddangerous/ruleset.h"
 #include "effects/greattrainrobbery/ruleset.h"
 
 #include "player_iterator.h"
@@ -91,59 +90,6 @@ namespace banggame {
         }
     }
 
-    card *game_table::add_card(const card_data &data) {
-        return &m_context.cards.emplace(int(m_context.cards.first_available_id()), data);
-    }
-
-    void game_table::set_card_visibility(card *c, player *owner, card_visibility visibility, bool instant) {
-        if (visibility == card_visibility::hidden) {
-            if (c->visibility == card_visibility::show_owner) {
-                add_update<game_update_type::hide_card>(update_target::includes(c->owner), c, instant);
-            } else if (c->visibility == card_visibility::shown) {
-                add_update<game_update_type::hide_card>(c, instant);
-            }
-            c->visibility = card_visibility::hidden;
-        } else if (!owner || visibility == card_visibility::shown) {
-            if (c->visibility == card_visibility::show_owner) {
-                add_update<game_update_type::show_card>(update_target::excludes(c->owner), c, *c, instant);
-            } else if (c->visibility == card_visibility::hidden) {
-                add_update<game_update_type::show_card>(c, *c, instant);
-            }
-            c->visibility = card_visibility::shown;
-        } else if (c->owner != owner || c->visibility != card_visibility::show_owner) {
-            if (c->visibility == card_visibility::shown) {
-                add_update<game_update_type::hide_card>(update_target::excludes(owner), c, instant);
-            } else {
-                if (c->visibility == card_visibility::show_owner) {
-                    add_update<game_update_type::hide_card>(update_target::includes(c->owner), c, instant);
-                }
-                add_update<game_update_type::show_card>(update_target::includes(owner), c, *c, instant);
-            }
-            c->visibility = card_visibility::show_owner;
-        }
-    }
-
-    void game_table::move_card(card *c, pocket_type pocket, player *owner, card_visibility visibility, bool instant, bool front) {
-        if (c->pocket == pocket && c->owner == owner) return;
-        
-        set_card_visibility(c, owner, visibility, instant);
-
-        auto &prev_pile = get_pocket(c->pocket, c->owner);
-        prev_pile.erase(rn::find(prev_pile, c));
-
-        c->pocket = pocket;
-        c->owner = owner;
-
-        auto &new_pile = get_pocket(pocket, owner);
-        if (front) {
-            new_pile.insert(new_pile.begin(), c);
-        } else {
-            new_pile.push_back(c);
-        }
-        
-        add_update<game_update_type::move_card>(c, owner, pocket, instant, front);
-    }
-
     card *game_table::top_of_deck() {
         if (m_deck.empty()) {
             if (m_discards.empty()) {
@@ -183,7 +129,7 @@ namespace banggame {
         }
         card *drawn_card = m_shop_deck.back();
         add_log("LOG_DRAWN_SHOP_CARD", drawn_card);
-        move_card(drawn_card, pocket_type::shop_selection);
+        drawn_card->move_to(pocket_type::shop_selection);
         return drawn_card;
     }
 
@@ -196,16 +142,17 @@ namespace banggame {
 
     void game_table::draw_scenario_card() {
         if (!m_scenario_deck.empty() && m_scenario_deck.back()->visibility == card_visibility::hidden) {
-            set_card_visibility(m_scenario_deck.back(), nullptr, card_visibility::shown);
+            m_scenario_deck.back()->set_visibility(card_visibility::shown);
         } else {
             if (m_scenario_deck.size() > 1) {
-                set_card_visibility(*(m_scenario_deck.rbegin() + 1), nullptr, card_visibility::shown, true);
+                card *second_card = *(m_scenario_deck.rbegin() + 1);
+                second_card->set_visibility(card_visibility::shown, nullptr, true);
             }
             if (!m_scenario_cards.empty()) {
                 m_first_player->disable_equip(m_scenario_cards.back());
             }
             add_log("LOG_DRAWN_SCENARIO_CARD", m_scenario_deck.back());
-            move_card(m_scenario_deck.back(), pocket_type::scenario_card);
+            m_scenario_deck.back()->move_to(pocket_type::scenario_card);
             m_first_player->enable_equip(m_scenario_cards.back());
         }
     }
@@ -218,19 +165,8 @@ namespace banggame {
             std::make_shared<effect_context>(effect_context{ .locomotive_count = 1 }) });
     }
 
-    void game_table::flash_card(card *c) {
-        add_update<game_update_type::flash_card>(c);
-    }
-
-    void game_table::add_short_pause(card *c) {
-        add_update<game_update_type::short_pause>(c);
-    }
-
-    void game_table::tap_card(card *c, bool inactive) {
-        if (inactive != c->inactive) {
-            add_update<game_update_type::tap_card>(c, inactive);
-            c->inactive = inactive;
-        }
+    void game_table::add_short_pause() {
+        add_update<game_update_type::short_pause>(nullptr);
     }
 
     void game_table::play_sound(player *target, const std::string &file_id) {
@@ -238,53 +174,6 @@ namespace banggame {
             add_update<game_update_type::play_sound>(update_target::includes_private(target), file_id);
         } else {
             add_update<game_update_type::play_sound>(file_id);
-        }
-    }
-    
-    void game_table::add_cubes(card *target, int ncubes) {
-        ncubes = std::min<int>({ncubes, num_cubes, max_cubes - target->num_cubes});
-        if (ncubes > 0) {
-            num_cubes -= ncubes;
-            target->num_cubes += ncubes;
-            add_log("LOG_ADD_CUBE", target->owner, target, ncubes);
-            add_update<game_update_type::move_cubes>(ncubes, nullptr, target);
-        }
-    }
-
-    void game_table::move_cubes(card *origin, card *target, int ncubes, bool instant) {
-        ncubes = std::min<int>(ncubes, origin->num_cubes);
-        if (target && ncubes > 0 && target->num_cubes < max_cubes) {
-            int added_cubes = std::min<int>(ncubes, max_cubes - target->num_cubes);
-            target->num_cubes += added_cubes;
-            origin->num_cubes -= added_cubes;
-            ncubes -= added_cubes;
-            if (origin->owner == target->owner) {
-                add_log("LOG_MOVED_CUBE", target->owner, origin, target, added_cubes);
-            } else {
-                add_log("LOG_MOVED_CUBE_FROM", target->owner, origin->owner, origin, target, added_cubes);
-            }
-            add_update<game_update_type::move_cubes>(added_cubes, origin, target, instant);
-        }
-        if (ncubes > 0) {
-            origin->num_cubes -= ncubes;
-            num_cubes += ncubes;
-            add_log("LOG_PAID_CUBE", origin->owner, origin, ncubes);
-            add_update<game_update_type::move_cubes>(ncubes, origin, nullptr, instant);
-        }
-        if (origin->sign && origin->num_cubes == 0) {
-            add_log("LOG_DISCARDED_ORANGE_CARD", origin->owner, origin);
-            call_event(event_type::on_discard_orange_card{ origin->owner, origin });
-            origin->owner->disable_equip(origin);
-            move_card(origin, pocket_type::discard_pile);
-        }
-    }
-
-    void game_table::drop_cubes(card *target) {
-        if (target->num_cubes > 0) {
-            add_log("LOG_DROP_CUBE", target->owner, target, target->num_cubes);
-            num_cubes += target->num_cubes;
-            add_update<game_update_type::move_cubes>(target->num_cubes, target, nullptr);
-            target->num_cubes = 0;
         }
     }
 

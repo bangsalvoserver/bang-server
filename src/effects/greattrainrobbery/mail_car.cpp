@@ -13,7 +13,7 @@ namespace banggame {
         void on_update() override {
             if (!live) {
                 for (int i=0; i<3; ++i) {
-                    target->m_game->move_card(target->m_game->top_of_deck(), pocket_type::selection, target);
+                    target->m_game->top_of_deck()->move_to(pocket_type::selection, target);
                 }
             }
         }

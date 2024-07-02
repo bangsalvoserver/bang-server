@@ -18,6 +18,7 @@ namespace banggame {
 
         card_sign get_card_sign(card *c);
 
+        card *add_card(const card_data &data);
         void add_players(std::span<int> user_ids);
         void start_game(const game_options &options);
 

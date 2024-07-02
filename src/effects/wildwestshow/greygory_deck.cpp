@@ -24,7 +24,7 @@ namespace banggame {
             c->pocket = pocket_type::player_character;
             c->owner = target;
             target->enable_equip(c);
-            target->m_game->set_card_visibility(c, nullptr, card_visibility::shown, true);
+            c->set_visibility(card_visibility::shown, nullptr, true);
         }
     }
 

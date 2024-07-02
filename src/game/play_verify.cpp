@@ -360,7 +360,7 @@ namespace banggame {
                 }
                 break;
             case pocket_type::shop_selection:
-                origin->m_game->move_card(origin_card, pocket_type::shop_discard);
+                origin_card->move_to(pocket_type::shop_discard);
                 origin->m_game->queue_action([m_game=origin->m_game]{
                     if (m_game->m_shop_selection.size() < 3) {
                         m_game->draw_shop_card();

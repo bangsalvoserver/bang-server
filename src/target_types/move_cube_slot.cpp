@@ -58,10 +58,10 @@ namespace banggame {
 
     template<> void visit_cards::play(const effect_context &ctx, const serial::card_list &targets) {
         if (rn::all_of(targets, [first=targets.front()](card *target_card) { return target_card == first; })) {
-            origin->m_game->move_cubes(origin->first_character(), targets.front(), targets.size());
+            origin->first_character()->move_cubes(targets.front(), targets.size());
         } else {
             for (card *target_card : targets) {
-                origin->m_game->move_cubes(origin->first_character(), target_card, 1);
+                origin->first_character()->move_cubes(target_card, 1);
             }
         }
     }

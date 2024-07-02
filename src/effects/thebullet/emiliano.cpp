@@ -14,7 +14,7 @@ namespace banggame {
                     p->m_game->queue_action([=]{
                         if (p->alive() && c->pocket != pocket_type::player_hand) {
                             p->m_game->add_log("LOG_STOLEN_SELF_CARD", p, c);
-                            p->m_game->add_short_pause(c);
+                            c->add_short_pause();
                             p->add_to_hand(c);
                         }
                     });

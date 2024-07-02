@@ -16,6 +16,6 @@ namespace banggame {
 
     void effect_frankie_canton::on_play(card *origin_card, player *origin, card *target_card) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target_card);
-        origin->m_game->move_cubes(target_card, origin->first_character(), 1);
+        target_card->move_cubes(origin->first_character(), 1);
     }
 }

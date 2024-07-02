@@ -24,7 +24,7 @@ namespace banggame {
     void effect_duck::on_play(card *origin_card, player *origin, const effect_context &ctx) {
         if (!ctx.selected_cubes[origin_card].empty()) {
             origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
-            origin->m_game->add_short_pause(origin_card);
+            origin_card->add_short_pause();
             origin->add_to_hand(origin_card);
         }
     }

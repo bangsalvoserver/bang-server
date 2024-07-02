@@ -26,7 +26,7 @@ namespace banggame {
             ++card_cube_map[cube];
         }
         for (const auto &[c, ncubes] : card_cube_map) {
-            origin->m_game->move_cubes(c, nullptr, ncubes);
+            c->move_cubes(nullptr, ncubes);
         }
     }
 

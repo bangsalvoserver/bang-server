@@ -17,7 +17,7 @@ namespace banggame {
             if (!live) {
                 int ncards = req_draw->num_cards_to_draw;
                 for (int i=0; i<ncards; ++i) {
-                    target->m_game->move_card(req_draw->phase_one_drawn_card(), pocket_type::selection, target);
+                    req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
                 }
             }
         }
@@ -27,7 +27,7 @@ namespace banggame {
             if (target->m_game->m_selection.size() == 1) {
                 target->m_game->pop_request();
                 target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_game->m_selection.front());
-                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::discard_pile);
+                target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
                 target->add_gold(1);
             }
         }

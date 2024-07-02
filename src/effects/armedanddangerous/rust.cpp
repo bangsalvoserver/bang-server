@@ -7,7 +7,7 @@ namespace banggame {
 
     static void resolve_rust(card *origin_card, player *origin, player *target) {
         for (card *c : target->cube_slots() | rn::to_vector) {
-            origin->m_game->move_cubes(c, origin->first_character(), 1);
+            c->move_cubes(origin->first_character(), 1);
         }
     }
 

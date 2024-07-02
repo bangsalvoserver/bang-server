@@ -10,7 +10,7 @@ namespace banggame {
             if (origin && p == target) {
                 origin->m_game->queue_action([=]{
                     if (target->alive() && p->m_game->m_playing != p && !origin->empty_hand()) {
-                        target->m_game->flash_card(target_card);
+                        target_card->flash_card();
                         for (int i=0; i<damage && !origin->empty_hand(); ++i) {
                             card *stolen_card = origin->random_hand_card();
                             if (stolen_card->visibility != card_visibility::shown) {

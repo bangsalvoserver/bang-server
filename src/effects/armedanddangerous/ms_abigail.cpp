@@ -38,7 +38,7 @@ namespace banggame {
     }
 
     void effect_ms_abigail::on_play(card *origin_card, player *origin) {
-        origin->m_game->flash_card(origin_card);
+        origin_card->flash_card();
         origin->m_game->pop_request();
     }
 }

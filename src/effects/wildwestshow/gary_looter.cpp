@@ -22,7 +22,7 @@ namespace banggame {
         player_end->m_game->add_listener<event_type::on_discard_pass>(target_card, [=](player *player_begin, card *discarded_card) {
             if (player_begin != player_end && std::none_of(player_iterator(player_begin), player_iterator(player_end), get_gary_looter)) {
                 player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, discarded_card);
-                player_end->m_game->add_short_pause(discarded_card);
+                discarded_card->add_short_pause();
                 player_end->add_to_hand(discarded_card);
             }
         });

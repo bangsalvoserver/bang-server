@@ -81,7 +81,7 @@ namespace banggame {
             if (target->empty_hand() && target->empty_table()) return;
             
             for (card *target_card : target->m_table) {
-                target->m_game->tap_card(target_card, false);
+                target_card->set_inactive(false);
             }
 
             std::vector<player *> range_targets;

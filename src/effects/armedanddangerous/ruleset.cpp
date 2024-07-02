@@ -22,7 +22,7 @@ namespace banggame {
             if (origin_card->is_blue()) {
                 effect_add_cube{1}.on_play(origin_card, origin);
             } else if (origin_card->is_orange()) {
-                origin->m_game->add_cubes(origin_card, 3);
+                origin_card->add_cubes(3);
             }
         });
 

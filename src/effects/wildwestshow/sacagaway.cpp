@@ -11,7 +11,7 @@ namespace banggame {
 
         for (player *p : range_all_players(target)) {
             for (card *c : p->m_hand) {
-                target->m_game->set_card_visibility(c, nullptr);
+                c->set_visibility(card_visibility::shown);
             }
         }
     }
@@ -19,7 +19,7 @@ namespace banggame {
     void equip_sacagaway::on_disable(card *target_card, player *target) {
         for (player *p : range_all_players(target)) {
             for (card *c : p->m_hand) {
-                target->m_game->set_card_visibility(c, p);
+                c->set_visibility(card_visibility::show_owner, p);
             }
         }
 

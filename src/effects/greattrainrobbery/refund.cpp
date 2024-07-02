@@ -12,7 +12,7 @@ namespace banggame {
                 origin->m_game->queue_action([=]{
                     if (origin->alive()) {
                         origin->m_game->add_log("LOG_CARD_HAS_EFFECT", origin_card);
-                        origin->m_game->flash_card(origin_card);
+                        origin_card->flash_card();
                         origin->draw_card(1, origin_card);
                     }
                 }, 41);

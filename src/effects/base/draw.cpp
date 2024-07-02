@@ -36,7 +36,7 @@ namespace banggame {
 
     void effect_draw_to_discard::on_play(card *origin_card, player *origin) {
         for (int i=0; i<ncards; ++i) {
-            origin->m_game->move_card(origin->m_game->top_of_deck(), pocket_type::discard_pile);
+            origin->m_game->top_of_deck()->move_to(pocket_type::discard_pile);
         }
     }
 
@@ -69,7 +69,7 @@ namespace banggame {
 
     void request_draw::cleanup_selection() {
         for (card *target_card : cards_from_selection) {
-            target->m_game->move_card(target_card, pocket_type::main_deck, nullptr, card_visibility::hidden);
+            target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
         }
     }
 
@@ -105,8 +105,8 @@ namespace banggame {
             target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
         } else if (reveal) {
             target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
-            target->m_game->set_card_visibility(drawn_card);
-            target->m_game->add_short_pause(drawn_card);
+            drawn_card->set_visibility(card_visibility::shown);
+            drawn_card->add_short_pause();
         } else {
             target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_CARDS", target, 1);
             target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, drawn_card);

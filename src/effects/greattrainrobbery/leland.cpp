@@ -14,7 +14,7 @@ namespace banggame {
                 std::vector<player *> targets = range_all_players(target) | rn::to_vector;
                 for (player *p : targets) {
                     if (p != ctx->skipped_player) {
-                        origin->m_game->move_card(origin->m_game->top_of_deck(), pocket_type::selection);
+                        origin->m_game->top_of_deck()->move_to(pocket_type::selection);
                     }
                 }
                 for (player *p : targets) {

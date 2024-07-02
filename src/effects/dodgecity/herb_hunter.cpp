@@ -11,7 +11,7 @@ namespace banggame {
             if (p != target) {
                 p->m_game->queue_action([=]{
                     if (p->alive()) {
-                        p->m_game->flash_card(target_card);
+                        target_card->flash_card();
                         p->draw_card(2, target_card);
                     }
                 });

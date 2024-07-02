@@ -15,14 +15,14 @@ namespace banggame {
 
         void on_update() override {
             if (!live) {
-                origin->m_game->flash_card(origin_card);
+                origin_card->flash_card();
                 restart();
             }
         }
 
         void restart() override {
             drawn_card = origin->m_game->top_of_deck();
-            origin->m_game->move_card(drawn_card, pocket_type::discard_pile);
+            drawn_card->move_to(pocket_type::discard_pile);
 
             origin->m_game->add_log("LOG_CHECK_DREW_CARD", origin_card, nullptr, drawn_card);
             bool handled = false;

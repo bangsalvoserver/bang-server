@@ -17,13 +17,13 @@ namespace banggame {
                     | rv::filter([](card *c) { return c->has_tag(tag_type::handcuffs); })
                     | rn::to_vector
                 ) {
-                    target->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
+                    c->move_to(pocket_type::selection, nullptr, card_visibility::shown, true);
                 }
             }
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->flash_card(target_card);
+            target_card->flash_card();
             
             auto declared_suit = static_cast<card_suit>(*target_card->get_tag_value(tag_type::handcuffs));
             switch (declared_suit) {
@@ -50,7 +50,7 @@ namespace banggame {
 
             target->m_game->pop_request();
             while (!target->m_game->m_selection.empty()) {
-                target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, card_visibility::shown, true);
+                target->m_game->m_selection.front()->move_to(pocket_type::hidden_deck, nullptr, card_visibility::shown, true);
             }
         }
 

@@ -22,17 +22,17 @@ namespace banggame {
                     }
                 }
                 for (card *c : target_cards) {
-                    target->m_game->move_card(c, pocket_type::selection, nullptr, card_visibility::shown, true);
+                    c->move_to(pocket_type::selection, nullptr, card_visibility::shown, true);
                 }
             }
         }
 
         void on_pick(card *target_card) override {
-            target->m_game->flash_card(target_card);
+            target_card->flash_card();
             
             auto *drawn_card = target->m_game->top_of_deck();
-            target->m_game->set_card_visibility(drawn_card);
-            target->m_game->add_short_pause(drawn_card);
+            drawn_card->set_visibility(card_visibility::shown);
+            drawn_card->add_short_pause();
 
             short choice = *target_card->get_tag_value(tag_type::peyote);
 
@@ -48,10 +48,10 @@ namespace banggame {
             } else {
                 target->m_game->pop_request();
                 target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, drawn_card);
-                target->m_game->move_card(drawn_card, pocket_type::discard_pile);
+                drawn_card->move_to(pocket_type::discard_pile);
 
                 while (!target->m_game->m_selection.empty()) {
-                    target->m_game->move_card(target->m_game->m_selection.front(), pocket_type::hidden_deck, nullptr, card_visibility::shown, true);
+                    target->m_game->m_selection.front()->move_to(pocket_type::hidden_deck, nullptr, card_visibility::shown, true);
                 }
             }
         }

@@ -12,7 +12,7 @@ namespace banggame {
             if (origin == p && bool(flags & effect_flags::is_bang)) {
                 p->m_game->queue_action([=]{
                     if (p->alive()) {
-                        p->m_game->flash_card(target_card);
+                        target_card->flash_card();
                         p->draw_card(1, target_card);
                     }
                 });

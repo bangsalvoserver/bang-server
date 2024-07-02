@@ -6,13 +6,12 @@
 namespace banggame {
 
     static card *get_card_copy(card *target_card) {
-        game *m_game = target_card->owner->m_game;
-        for (card &c : m_game->context().cards) {
+        for (card &c : target_card->m_game->context().cards) {
             if (&c != target_card && c.deck == target_card->deck && c.name == target_card->name) {
                 return &c;
             }
         }
-        return m_game->add_card(*target_card);
+        return target_card->m_game->add_card(*target_card);
     }
 
     static void copy_characters(player *origin, player *target) {
@@ -34,7 +33,7 @@ namespace banggame {
                 origin->enable_equip(target_card);
 
                 origin->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::player_character, origin);
-                origin->m_game->set_card_visibility(target_card, nullptr, card_visibility::shown, true);
+                target_card->set_visibility(card_visibility::shown, nullptr, true);
             }
         }
     }
