@@ -22,7 +22,7 @@ namespace banggame {
     template<> serial::card_list visit_cards::random_target(const effect_context &ctx) {
         serial::card_list ret;
         for (player *target : range_all_players(origin)) {
-            if (!filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
+            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 if (auto targets = cards_target_set(origin, origin_card, effect.card_filter, target, ctx)) {
                     ret.push_back(random_element(targets, origin->m_game->bot_rng));
                 }
