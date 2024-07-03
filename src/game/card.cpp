@@ -72,9 +72,9 @@ namespace banggame {
     }
     
     void card::add_cubes(int ncubes) {
-        ncubes = std::min<int>({ncubes, num_cubes, max_cubes - num_cubes});
+        ncubes = std::min<int>({ncubes, m_game->num_cubes, max_cubes - num_cubes});
         if (ncubes > 0) {
-            num_cubes -= ncubes;
+            m_game->num_cubes -= ncubes;
             num_cubes += ncubes;
             m_game->add_log("LOG_ADD_CUBE", owner, this, ncubes);
             m_game->add_update<game_update_type::move_cubes>(ncubes, nullptr, this);
