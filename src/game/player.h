@@ -53,6 +53,8 @@ namespace banggame {
 
         void enable_equip(card *target_card);
         void disable_equip(card *target_card);
+
+        void play_sound(std::string_view sound_id);
         
         card *random_hand_card();
 

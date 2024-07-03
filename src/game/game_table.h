@@ -66,7 +66,7 @@ namespace banggame {
         void advance_train(player *origin);
 
         void add_short_pause();
-        void play_sound(player *target, const std::string &sound_id);
+        void play_sound(std::string_view sound_id);
 
         void add_game_flags(game_flags flags);
         void remove_game_flags(game_flags flags);

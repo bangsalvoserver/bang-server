@@ -57,7 +57,7 @@ namespace banggame {
             if (e_target == target && e_card == target_card && !target->immune_to(target_card, nullptr, {})) {
                 target->m_game->queue_action([=]{
                     target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
-                    target->m_game->play_sound(nullptr, "dynamite");
+                    target->m_game->play_sound("dynamite");
                     target->damage(target_card, nullptr, 2);
                 }, 1);
             }

@@ -14,7 +14,7 @@ namespace banggame {
                 target->m_game->pop_request();
             } else {
                 if (!live) {
-                    target->m_game->play_sound(target, "bandidos");
+                    target->play_sound("bandidos");
                 }
                 auto_resolve();
             }

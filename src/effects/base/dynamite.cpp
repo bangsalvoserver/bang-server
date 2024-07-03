@@ -13,7 +13,7 @@ namespace banggame {
                 }, [=](bool result) {
                     if (!result) {
                         target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
-                        target->m_game->play_sound(nullptr, "dynamite");
+                        target->m_game->play_sound("dynamite");
                         target->discard_card(target_card);
                         target->damage(target_card, nullptr, 3);
                     } else {

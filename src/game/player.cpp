@@ -63,6 +63,10 @@ namespace banggame {
         }
     }
 
+    void player::play_sound(std::string_view sound_id) {
+        m_game->add_update<game_update_type::play_sound>(update_target::includes_private(this), std::string(sound_id));
+    }
+
     int player::get_initial_cards() {
         return first_character()->get_tag_value(tag_type::initial_cards).value_or(m_hp);
     }

@@ -19,7 +19,7 @@ namespace banggame {
                 target->m_game->pop_request();
             } else {
                 if (!live) {
-                    target->m_game->play_sound(target, "indians");
+                    target->play_sound("indians");
                 }
                 if (target->empty_hand()) {
                     auto_resolve();

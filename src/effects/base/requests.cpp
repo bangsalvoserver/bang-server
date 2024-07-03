@@ -159,7 +159,7 @@ namespace banggame {
             target->add_gold(-target->m_gold);
         }
         if (reason == discard_all_reason::death) {
-            target->m_game->play_sound(nullptr, "death");
+            target->m_game->play_sound("death");
         }
     }
 

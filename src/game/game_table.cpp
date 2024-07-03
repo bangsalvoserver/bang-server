@@ -104,7 +104,7 @@ namespace banggame {
             }
             shuffle_cards_and_ids(m_deck);
             add_log("LOG_DECK_RESHUFFLED");
-            play_sound(nullptr, "shuffle");
+            play_sound("shuffle");
             add_update<game_update_type::deck_shuffled>(pocket_type::main_deck);
         }
         return m_deck.back();
@@ -124,7 +124,7 @@ namespace banggame {
             }
             shuffle_cards_and_ids(m_shop_deck);
             add_log("LOG_SHOP_RESHUFFLED");
-            play_sound(nullptr, "shuffle");
+            play_sound("shuffle");
             add_update<game_update_type::deck_shuffled>(pocket_type::shop_deck);
         }
         card *drawn_card = m_shop_deck.back();
@@ -169,12 +169,8 @@ namespace banggame {
         add_update<game_update_type::short_pause>(nullptr);
     }
 
-    void game_table::play_sound(player *target, const std::string &file_id) {
-        if (target) {
-            add_update<game_update_type::play_sound>(update_target::includes_private(target), file_id);
-        } else {
-            add_update<game_update_type::play_sound>(file_id);
-        }
+    void game_table::play_sound(std::string_view sound_id) {
+        add_update<game_update_type::play_sound>(std::string(sound_id));
     }
 
     void game_table::add_game_flags(game_flags flags) {

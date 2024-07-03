@@ -317,7 +317,7 @@ namespace banggame {
         queue_action([this] {
             remove_game_flags(game_flags::hands_shown);
             add_log("LOG_GAME_START");
-            play_sound(nullptr, "gamestart");
+            play_sound("gamestart");
 
             int cycles = rn::max(m_players | rv::transform(&player::get_initial_cards));
             for (int i=0; i<cycles; ++i) {

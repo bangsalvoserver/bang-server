@@ -20,7 +20,7 @@ namespace banggame {
                 target->m_game->pop_request();
             } else {
                 if (!live) {
-                    target->m_game->play_sound(target, "duel");
+                    target->play_sound("duel");
                 }
                 if (target->empty_hand()) {
                     auto_resolve();

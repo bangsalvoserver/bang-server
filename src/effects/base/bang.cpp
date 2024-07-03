@@ -128,9 +128,9 @@ namespace banggame {
         } else {
             if (!live) {
                 if (bool(flags & effect_flags::multi_target)) {
-                    target->m_game->play_sound(target, "gatling");
+                    target->play_sound("gatling");
                 } else {
-                    target->m_game->play_sound(target, "bang");
+                    target->play_sound("bang");
                 }
             }
             if (target->empty_hand() || unavoidable) {

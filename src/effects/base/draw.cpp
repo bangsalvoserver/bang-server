@@ -53,7 +53,7 @@ namespace banggame {
             && num_drawn_cards < num_cards_to_draw)
         {
             if (!live) {
-                target->m_game->play_sound(target, "draw");
+                target->play_sound("draw");
             }
             card *only_card = get_single_element(get_all_playable_cards(target, true));
             if (only_card && only_card->has_tag(tag_type::pick)) {
