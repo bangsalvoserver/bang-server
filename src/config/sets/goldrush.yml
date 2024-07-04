@@ -201,7 +201,7 @@ button_row:
       - sell_beer card self | hand beer
   - name: GAME_DISCARD_BLACK
     effects:
-      - discard_black card | table black
+      - discard_black card notself | table black
 
 hidden:
   - name: BOTTLE_PANIC
