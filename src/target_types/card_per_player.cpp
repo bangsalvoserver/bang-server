@@ -32,11 +32,11 @@ namespace banggame {
     }
 
     template<> game_string visit_cards::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
-        if (!rn::all_of(origin->m_game->m_players | rv::filter(&player::alive), [&](player *p) {
+        if (!rn::all_of(origin->m_game->m_players, [&](player *p) {
             size_t found = rn::count(target_cards, p, &card::owner);
-            if (rn::empty(cards_target_set(origin, origin_card, effect.card_filter, p, ctx))) return found == 0;
             if (p == ctx.skipped_player || filters::check_player_filter(origin, effect.player_filter, p, ctx)) return found == 0;
-            else return found == 1;
+            if (rn::empty(cards_target_set(origin, origin_card, effect.card_filter, p, ctx))) return found == 0;
+            return found == 1;
         })) {
             return "ERROR_INVALID_TARGETS";
         } else {
