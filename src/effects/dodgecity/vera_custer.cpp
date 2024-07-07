@@ -6,9 +6,9 @@
 namespace banggame {
 
     static card *get_card_copy(card *target_card) {
-        for (card &c : target_card->m_game->context().cards) {
-            if (&c != target_card && c.deck == target_card->deck && c.name == target_card->name) {
-                return &c;
+        for (card *c : target_card->m_game->get_all_cards()) {
+            if (c != target_card && c->deck == target_card->deck && c->name == target_card->name) {
+                return c;
             }
         }
         return target_card->m_game->add_card(*target_card);

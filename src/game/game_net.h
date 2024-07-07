@@ -74,22 +74,9 @@ namespace banggame {
     };
 
     struct game_context {
-        util::id_map<card> cards;
-        util::id_map<player> players;
-
-        card *find_card(int card_id) const {
-            if (auto it = cards.find(card_id); it != cards.end()) {
-                return &*it;
-            }
-            throw std::runtime_error(fmt::format("server.find_card: ID {} not found", card_id));
-        }
-
-        player *find_player(int player_id) const {
-            if (auto it = players.find(player_id); it != players.end()) {
-                return &*it;
-            }
-            throw std::runtime_error(fmt::format("server.find_player: ID {} not found", player_id));
-        }
+        virtual card *find_card(int card_id) const = 0;
+        virtual player *find_player(int player_id) const = 0;
+        virtual player *find_player_by_userid(int user_id) const = 0;
     };
 
     struct game_update_tuple {
@@ -98,12 +85,10 @@ namespace banggame {
         ticks duration;
     };
 
-    class game_net_manager {
+    class game_net_manager : public game_context {
     protected:
         std::deque<game_update_tuple> m_updates;
         std::deque<std::pair<update_target, game_string>> m_saved_log;
-
-        game_context m_context;
 
     private:
         json::json serialize_update(const game_update &update) const;
@@ -115,12 +100,6 @@ namespace banggame {
         }
     
     public:
-        const game_context &context() const {
-            return m_context;
-        }
-        
-        player *find_player_by_userid(int user_id) const;
-
         bool pending_updates() const {
             return !m_updates.empty();
         }
@@ -132,8 +111,6 @@ namespace banggame {
         }
 
         std::string handle_game_action(int user_id, const json::json &value);
-
-        ticks get_total_update_time() const;
 
     public:
         template<game_update_type E>

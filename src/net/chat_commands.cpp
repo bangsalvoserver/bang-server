@@ -121,30 +121,31 @@ namespace banggame {
             throw lobby_error("ERROR_PLAYER_NOT_IN_TURN");
         }
 
-        auto card_it = rn::find_if(lobby.m_game->context().cards, [&](const card &target_card) {
-            if (rn::equal(name, target_card.name, {}, toupper, toupper)) {
-                switch (target_card.deck) {
+        auto all_cards = lobby.m_game->get_all_cards();
+        auto card_it = rn::find_if(all_cards, [&](const card *target_card) {
+            if (rn::equal(name, target_card->name, {}, toupper, toupper)) {
+                switch (target_card->deck) {
                 case card_deck_type::train:
                 case card_deck_type::main_deck:
-                    return target_card.pocket != pocket_type::player_hand || target_card.owner != target;
+                    return target_card->pocket != pocket_type::player_hand || target_card->owner != target;
                 case card_deck_type::character:
-                    return target_card.pocket != pocket_type::player_character && target_card.pocket != pocket_type::player_backup;
+                    return target_card->pocket != pocket_type::player_character && target_card->pocket != pocket_type::player_backup;
                 case card_deck_type::goldrush:
-                    return target_card.pocket != pocket_type::shop_selection && target_card.pocket != pocket_type::hidden_deck
-                        && (target_card.pocket != pocket_type::player_table || target_card.owner != target);
+                    return target_card->pocket != pocket_type::shop_selection && target_card->pocket != pocket_type::hidden_deck
+                        && (target_card->pocket != pocket_type::player_table || target_card->owner != target);
                 case card_deck_type::highnoon:
                 case card_deck_type::fistfulofcards:
-                    return target->m_game->m_scenario_cards.empty() || &target_card != target->m_game->m_scenario_cards.back();
+                    return target->m_game->m_scenario_cards.empty() || target_card != target->m_game->m_scenario_cards.back();
                 case card_deck_type::wildwestshow:
-                    return target->m_game->m_wws_scenario_cards.empty() || &target_card != target->m_game->m_wws_scenario_cards.back();
+                    return target->m_game->m_wws_scenario_cards.empty() || target_card != target->m_game->m_wws_scenario_cards.back();
                 }
             }
             return false;
         });
-        if (card_it == lobby.m_game->context().cards.end()) {
+        if (card_it == all_cards.end()) {
             throw lobby_error("ERROR_CANNOT_FIND_CARD");
         }
-        card *target_card = &*card_it;
+        card *target_card = *card_it;
         
         lobby.m_game->send_request_status_clear();
         

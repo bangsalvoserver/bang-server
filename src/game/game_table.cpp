@@ -21,6 +21,27 @@ namespace banggame {
         rng.seed(rng_seed);
         bot_rng.seed(rd());
     }
+
+    card *game_table::find_card(int card_id) const {
+        if (auto it = m_cards_storage.find(card_id); it != m_cards_storage.end()) {
+            return &*it;
+        }
+        throw std::runtime_error(fmt::format("server.find_card: ID {} not found", card_id));
+    }
+
+    player *game_table::find_player(int player_id) const {
+        if (auto it = m_players_storage.find(player_id); it != m_players_storage.end()) {
+            return &*it;
+        }
+        throw std::runtime_error(fmt::format("server.find_player: ID {} not found", player_id));
+    }
+    
+    player *game_table::find_player_by_userid(int user_id) const {
+        if (auto it = rn::find(m_players, user_id, &player::user_id); it != m_players.end()) {
+            return *it;
+        }
+        return nullptr;
+    }
     
     std::vector<card *> &game_table::get_pocket(pocket_type pocket, player *owner) {
         switch (pocket) {
@@ -82,11 +103,11 @@ namespace banggame {
             if (i == i2) continue;
 
             std::swap(vec[i], vec[i2]);
-            auto a = m_context.cards.extract(vec[i]->id);
-            auto b = m_context.cards.extract(vec[i2]->id);
+            auto a = m_cards_storage.extract(vec[i]->id);
+            auto b = m_cards_storage.extract(vec[i2]->id);
             std::swap(a->id, b->id);
-            m_context.cards.insert(std::move(a));
-            m_context.cards.insert(std::move(b));
+            m_cards_storage.insert(std::move(a));
+            m_cards_storage.insert(std::move(b));
         }
     }
 

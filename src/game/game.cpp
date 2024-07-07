@@ -31,6 +31,22 @@ namespace banggame {
             | rn::to<serial::player_list>,
             instant};
     }
+    
+    ticks game::get_total_update_time() const {
+        ticks result{0};
+        for (player *p : m_players) {
+            ticks player_result{0};
+            for (const auto &[target, content, duration] : m_updates) {
+                if (duration >= ticks{0} && target.matches(p)) {
+                    player_result += duration;
+                }
+            }
+            if (player_result > result) {
+                result = player_result;
+            }
+        }
+        return result;
+    }
 
     util::generator<json::json> game::get_spectator_join_updates() {
         co_yield make_update<game_update_type::player_add>(m_players | rn::to<std::vector<player_user_pair>>);
@@ -151,7 +167,7 @@ namespace banggame {
     }
 
     card *game::add_card(const card_data &data) {
-        return &m_context.cards.emplace(this, int(m_context.cards.first_available_id()), data);
+        return &m_cards_storage.emplace(this, int(m_cards_storage.first_available_id()), data);
     }
 
     void game::add_players(std::span<int> user_ids) {
@@ -159,9 +175,7 @@ namespace banggame {
 
         int player_id = 0;
         for (int id : user_ids) {
-            player &p = m_context.players.emplace(this, ++player_id);
-            p.user_id = id;
-            m_players.emplace_back(&p);
+            m_players.emplace_back(&m_players_storage.emplace(this, ++player_id, id));
         }
     }
 

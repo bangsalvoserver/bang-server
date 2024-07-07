@@ -46,7 +46,8 @@ namespace banggame {
 
         int8_t m_gold = 0;
 
-        player(game *game, int id) : m_game(game), id(id) {}
+        player(game *game, int id, int user_id)
+            : m_game(game), id(id), user_id(user_id) {}
 
         void equip_card(card *card);
         card *find_equipped_card(card *card);

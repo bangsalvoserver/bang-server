@@ -27,6 +27,8 @@ namespace banggame {
         status_ready_args make_status_ready_update(player *p);
         player_order_update make_player_order_update(bool instant = false);
 
+        ticks get_total_update_time() const;
+
         void send_request_status_clear();
         bool send_request_status_ready();
         void send_request_update();

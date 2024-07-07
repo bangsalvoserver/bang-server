@@ -501,7 +501,7 @@ void game_manager::handle_message(MSG_TAG(game_rejoin), game_user &user, int pla
         throw lobby_error("ERROR_USER_NOT_SPECTATOR");
     }
 
-    player *target = lobby.m_game->context().find_player(player_id);
+    player *target = lobby.m_game->find_player(player_id);
     if (target->is_bot()) {
         throw lobby_error("ERROR_CANNOT_REJOIN_ON_BOT");
     }

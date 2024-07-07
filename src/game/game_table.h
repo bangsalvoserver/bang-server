@@ -17,6 +17,9 @@ namespace banggame {
         std::default_random_engine rng;
         std::default_random_engine bot_rng;
 
+        util::id_map<card> m_cards_storage;
+        util::id_map<player> m_players_storage;
+
         std::vector<player *> m_players;
         
         std::vector<card *> m_deck;
@@ -49,6 +52,14 @@ namespace banggame {
         player *m_playing = nullptr;
 
         game_table(unsigned int seed);
+
+        card *find_card(int card_id) const override;
+        player *find_player(int player_id) const override;
+        player *find_player_by_userid(int user_id) const override;
+
+        auto get_all_cards() const {
+            return m_cards_storage | rv::transform([](card &c) { return &c; });
+        }
         
         std::vector<card *> &get_pocket(pocket_type pocket, player *owner = nullptr);
 

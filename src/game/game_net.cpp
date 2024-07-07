@@ -108,27 +108,7 @@ namespace json {
 
 namespace banggame {
     json::json game_net_manager::serialize_update(const game_update &update) const {
-        return json::serialize(update, context());
-    }
-    
-    ticks game_net_manager::get_total_update_time() const {
-        return rn::max(context().players | rv::transform([&](const player &p) {
-            return rn::accumulate(m_updates | rv::transform([&](const game_update_tuple &tup) {
-                if (tup.duration >= ticks{0} && tup.target.matches(&p)) {
-                    return tup.duration;
-                }
-                return ticks{0};
-            }), ticks{0});
-        }));
-    }
-    
-    player *game_net_manager::find_player_by_userid(int user_id) const {
-        for (player &p : context().players) {
-            if (p.user_id == user_id) {
-                return &p;
-            }
-        }
-        return nullptr;
+        return json::serialize(update);
     }
 
     std::string game_net_manager::handle_game_action(int user_id, const json::json &value) {
@@ -137,7 +117,7 @@ namespace banggame {
             return "ERROR_USER_NOT_CONTROLLING_PLAYER";
         }
         
-        auto result = verify_and_play(origin, json::deserialize<game_action>(value, context()));
+        auto result = verify_and_play(origin, json::deserialize<game_action, game_context>(value, *this));
 
         enums::visit_indexed(overloaded{
             [&](enums::enum_tag_t<message_type::ok>) {
