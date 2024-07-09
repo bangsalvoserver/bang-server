@@ -50,10 +50,11 @@ namespace banggame {
     }
 
     void effect_steal::on_resolve(card *origin_card, player *origin, card *target_card) {
-        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card->owner, target_card });
+        bool handled = false;
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, handled });
         origin->m_game->queue_action([=]{
             player *target_player = target_card->owner;
-            if (origin->alive() && target_player) {
+            if ((!handled || origin->alive()) && target_player) {
                 if (origin != target_player && target_card->visibility != card_visibility::shown) {
                     origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_STOLEN_CARD", origin, target_player, target_card);
                 }
@@ -135,10 +136,11 @@ namespace banggame {
     }
 
     void effect_destroy::on_resolve(card *origin_card, player *origin, card *target_card) {
-        player *target_player = target_card->owner;
-        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_player, target_card });
+        bool handled = false;
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, handled });
         origin->m_game->queue_action([=]{
-            if (origin->alive() && target_player) {
+            player *target_player = target_card->owner;
+            if ((!handled || origin->alive()) && target_player) {
                 if (origin != target_player && target_card->visibility != card_visibility::shown) {
                     origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
                 }

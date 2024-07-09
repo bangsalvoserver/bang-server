@@ -11,8 +11,8 @@ namespace banggame {
     namespace event_type {
         DEFINE_STRUCT(on_destroy_card,
             (player *, origin)
-            (player *, target)
             (card *, target_card)
+            (nullable_ref<bool>, handled)
         )
     }
 
