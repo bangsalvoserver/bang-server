@@ -3,6 +3,7 @@
 #include "draw.h"
 
 #include "game/game.h"
+#include "cards/game_enums.h"
 
 namespace banggame {
     
@@ -27,7 +28,8 @@ namespace banggame {
             if (req_draw->num_drawn_cards >= req_draw->num_cards_to_draw) {
                 target->m_game->pop_request();
                 while (!target->m_game->m_selection.empty()) {
-                    target->m_game->m_selection.front()->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
+                    target->m_game->m_selection.front()->move_to(target->m_game->check_flags(game_flags::phase_one_draw_discard)
+                        ? pocket_type::discard_pile : pocket_type::main_deck, nullptr, card_visibility::hidden);
                 }
             }
         }
