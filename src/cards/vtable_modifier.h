@@ -1,6 +1,8 @@
 #ifndef __VTABLE_MODIFIER_H__
 #define __VTABLE_MODIFIER_H__
 
+#include "card_defs.h"
+
 #include "utils/tstring.h"
 
 #include "game/filters_simple.h"
@@ -14,6 +16,18 @@ namespace banggame {
         game_string (*get_error)(card *origin_card, player *origin, card *target_card, const effect_context &ctx);
         game_string (*on_prompt)(card *origin_card, player *origin, card *playing_card, const effect_context &ctx);
     };
+
+    inline void modifier_holder::add_context(card *origin_card, player *origin, effect_context &ctx) const {
+        type->add_context(origin_card, origin, ctx);
+    }
+
+    inline game_string modifier_holder::get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx) const {
+        return type->get_error(origin_card, origin, target_card, ctx);
+    }
+
+    inline game_string modifier_holder::on_prompt(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) const {
+        return type->on_prompt(origin_card, origin, playing_card, ctx);
+    }
 
     template<typename T>
     constexpr modifier_vtable build_modifier_vtable(std::string_view name) {

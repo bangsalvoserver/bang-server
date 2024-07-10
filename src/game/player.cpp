@@ -48,8 +48,8 @@ namespace banggame {
     void player::enable_equip(card *target_card) {
         bool card_disabled = m_game->is_disabled(target_card);
         for (const equip_holder &holder : target_card->equips) {
-            if (!card_disabled || holder.type->is_nodisable) {
-                holder.type->on_enable(holder.effect_value, target_card, this);
+            if (!card_disabled || holder.is_nodisable()) {
+                holder.on_enable(target_card, this);
             }
         }
     }
@@ -57,8 +57,8 @@ namespace banggame {
     void player::disable_equip(card *target_card) {
         bool card_disabled = m_game->is_disabled(target_card);
         for (const equip_holder &holder : target_card->equips) {
-            if (!card_disabled || holder.type->is_nodisable) {
-                holder.type->on_disable(holder.effect_value, target_card, this);
+            if (!card_disabled || holder.is_nodisable()) {
+                holder.on_disable(target_card, this);
             }
         }
     }

@@ -19,7 +19,7 @@ namespace banggame {
 
         void on_update() override {
             if (target_card == get_single_element(get_all_playable_cards(target, true))) {
-                if (target_card->modifier_response.type == nullptr
+                if (!target_card->modifier_response
                     && rn::all_of(target_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
                 ) {
                     target->m_game->add_log("LOG_PLAYED_CARD", target_card, target);

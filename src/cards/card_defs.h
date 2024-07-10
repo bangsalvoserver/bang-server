@@ -1,7 +1,7 @@
 #ifndef __CARD_DEFS_H__
 #define __CARD_DEFS_H__
 
-#include "card_fwd.h"
+#include "game_string.h"
 
 namespace banggame {
 
@@ -121,21 +121,66 @@ namespace banggame {
         (target_card_filter, card_filter)
         (short, effect_value)
         (short, target_value)
-        (const effect_vtable *, type)
+        (const effect_vtable *, type),
+
+        explicit operator bool () const {
+            return type != nullptr;
+        }
+
+        game_string get_error(card *origin_card, player *origin, const effect_context &ctx) const;
+        game_string get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) const;
+        game_string get_error(card *origin_card, player *origin, card *target, const effect_context &ctx) const;
+
+        game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx) const;
+        game_string on_prompt(card *origin_card, player *origin, player *target, const effect_context &ctx) const;
+        game_string on_prompt(card *origin_card, player *origin, card *target, const effect_context &ctx) const;
+
+        void add_context(card *origin_card, player *origin, effect_context &ctx) const;
+        void add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const;
+        void add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const;
+
+        void on_play(card *origin_card, player *origin, effect_flags flags, const effect_context &ctx) const;
+        void on_play(card *origin_card, player *origin, player *target, effect_flags flags, const effect_context &ctx) const;
+        void on_play(card *origin_card, player *origin, card *target, effect_flags flags, const effect_context &ctx) const;
     )
 
     DEFINE_STRUCT(equip_holder,
         (short, effect_value)
-        (const equip_vtable *, type)
+        (const equip_vtable *, type),
+
+        explicit operator bool () const {
+            return type != nullptr;
+        }
+
+        game_string on_prompt(card *origin_card, player *origin, player *target) const;
+        void on_enable(card *target_card, player *target) const;
+        void on_disable(card *target_card, player *target) const;
+        bool is_nodisable() const;
     )
 
     DEFINE_STRUCT(modifier_holder,
-        (const modifier_vtable *, type)
+        (const modifier_vtable *, type),
+
+        explicit operator bool () const {
+            return type != nullptr;
+        }
+
+        void add_context(card *origin_card, player *origin, effect_context &ctx) const;
+        game_string get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx) const;
+        game_string on_prompt(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) const;
     )
 
     DEFINE_STRUCT(mth_holder,
         (const mth_vtable *, type)
-        (serial::int_list, args)
+        (serial::int_list, args),
+
+        explicit operator bool () const {
+            return type != nullptr;
+        }
+
+        game_string get_error(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const;
+        game_string on_prompt(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const;
+        void on_play(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const;
     )
 
     using effect_list = std::vector<effect_holder>;

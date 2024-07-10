@@ -42,7 +42,7 @@ namespace banggame {
         return origin->m_game->m_players
             | rv::filter([=](player *target) {
                 return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
-                    && !holder.type->get_error_player(holder.effect_value, origin_card, origin, target, ctx);
+                    && !holder.get_error(origin_card, origin, target, ctx);
             });
     }
 
@@ -62,14 +62,16 @@ namespace banggame {
             origin->m_game->m_selection)
             | rv::filter([=](card *target_card) {
                 return !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
-                    && !holder.type->get_error_card(holder.effect_value, origin_card, origin, target_card, ctx);
+                    && !holder.get_error(origin_card, origin, target_card, ctx);
             });
     }
 
     static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const target_list &targets) {
         if (targets.size() == mth.args.size()) {
-            return !mth.type->get_error(origin_card, origin, targets,
-                    serial::int_list(small_int_set_sized_tag, targets.size()), ctx);
+            return !mth_holder{
+                mth.type,
+                serial::int_list(small_int_set_sized_tag, targets.size())
+            }.get_error(origin_card, origin, targets, ctx);
         }
         const auto &effect = effects.at(mth.args[targets.size()]);
         switch (effect.target) {
@@ -96,7 +98,7 @@ namespace banggame {
         const auto &mth = origin_card->get_mth(is_response);
         return !effects.empty() && rn::all_of(effects, [&](const effect_holder &effect) {
             return play_dispatch::possible(origin, origin_card, effect, ctx);
-        }) && (!mth.type || is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {}));
+        }) && (!mth || is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {}));
     }
 
     static rn::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
@@ -117,7 +119,7 @@ namespace banggame {
     bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
         for (card *mod_card : modifiers) {
             if (mod_card == origin_card) return false;
-            if (mod_card->get_modifier(is_response).type->get_error(mod_card, origin, origin_card, ctx)) return false;
+            if (mod_card->get_modifier(is_response).get_error(mod_card, origin, origin_card, ctx)) return false;
         }
 
         if (get_play_card_error(origin, origin_card, ctx)) {
@@ -133,12 +135,11 @@ namespace banggame {
                 return false;
             }
 
-            const modifier_holder &modifier = origin_card->get_modifier(is_response);
-            if (modifier.type != nullptr) {
+            if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
                 auto modifiers_copy = modifiers;
                 modifiers_copy.push_back(origin_card);
                 auto ctx_copy = ctx;
-                modifier.type->add_context(origin_card, origin, ctx_copy);
+                modifier.add_context(origin_card, origin, ctx_copy);
                 
                 return contains_at_least(cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy), 1);
             }
@@ -149,15 +150,16 @@ namespace banggame {
 
     static card_modifier_node generate_card_modifier_node(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
         card_modifier_node node { .card = origin_card };
-        const modifier_holder &modifier = origin_card->get_modifier(is_response);
-        if (!filters::is_equip_card(origin_card) && modifier.type != nullptr) {
-            auto modifiers_copy = modifiers;
-            modifiers_copy.push_back(origin_card);
-            auto ctx_copy = ctx;
-            modifier.type->add_context(origin_card, origin, ctx_copy);
+        if (!filters::is_equip_card(origin_card)) {
+            if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
+                auto modifiers_copy = modifiers;
+                modifiers_copy.push_back(origin_card);
+                auto ctx_copy = ctx;
+                modifier.add_context(origin_card, origin, ctx_copy);
 
-            for (card *target_card : cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy)) {
-                node.branches.push_back(generate_card_modifier_node(origin, target_card, is_response, modifiers_copy, ctx_copy));
+                for (card *target_card : cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy)) {
+                    node.branches.push_back(generate_card_modifier_node(origin, target_card, is_response, modifiers_copy, ctx_copy));
+                }
             }
         }
         return node;

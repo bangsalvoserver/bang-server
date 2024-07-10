@@ -32,8 +32,8 @@ namespace banggame {
         for (auto [owner, c] : disableable_cards(m_game)) {
             if (!is_disabled(c) && std::invoke(fun, c)) {
                 for (const equip_holder &holder : c->equips) {
-                    if (!holder.type->is_nodisable) {
-                        holder.type->on_disable(holder.effect_value, c, owner);
+                    if (!holder.is_nodisable()) {
+                        holder.on_disable(c, owner);
                     }
                 }
             }
@@ -55,8 +55,8 @@ namespace banggame {
             }
             if (!a && b) {
                 for (const equip_holder &holder : c->equips) {
-                    if (!holder.type->is_nodisable) {
-                        holder.type->on_enable(holder.effect_value, c, owner);
+                    if (!holder.is_nodisable()) {
+                        holder.on_enable(c, owner);
                     }
                 }
             }

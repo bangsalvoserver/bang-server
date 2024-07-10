@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "game_string.h"
+#include "cards/game_string.h"
 #include "net/options.h"
 
 namespace banggame {

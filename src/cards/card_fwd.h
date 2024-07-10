@@ -11,6 +11,8 @@ namespace banggame {
     struct game;
     struct card;
     struct player;
+
+    struct effect_context;
     
     struct effect_vtable;
     struct equip_vtable;

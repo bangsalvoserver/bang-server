@@ -1,6 +1,8 @@
 #ifndef __VTABLE_EQUIP_H__
 #define __VTABLE_EQUIP_H__
 
+#include "card_defs.h"
+
 #include "utils/tstring.h"
 
 #include "game/filters_simple.h"
@@ -15,6 +17,22 @@ namespace banggame {
         void (*on_disable)(int effect_value, card *target_card, player *target);
         bool is_nodisable;
     };
+
+    inline game_string equip_holder::on_prompt(card *origin_card, player *origin, player *target) const {
+        return type->on_prompt(effect_value, origin_card, origin, target);
+    }
+
+    inline void equip_holder::on_enable(card *target_card, player *target) const {
+        type->on_enable(effect_value, target_card, target);
+    }
+
+    inline void equip_holder::on_disable(card *target_card, player *target) const {
+        type->on_disable(effect_value, target_card, target);
+    }
+
+    inline bool equip_holder::is_nodisable() const {
+        return type->is_nodisable;
+    }
 
     template<typename T>
     inline auto build_equip(int effect_value) {

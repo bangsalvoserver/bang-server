@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 
+#include "card_defs.h"
+
 #include "utils/tstring.h"
 
 #include "game/filters_simple.h"
@@ -90,6 +92,18 @@ namespace banggame {
         game_string (*on_prompt)(card *origin_card, player *origin, const target_list &targets, serial::int_list args, const effect_context &ctx);
         void (*on_play)(card *origin_card, player *origin, const target_list &targets, serial::int_list args, const effect_context &ctx);
     };
+
+    inline game_string mth_holder::get_error(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
+        return type->get_error(origin_card, origin, targets, args, ctx);
+    }
+
+    inline game_string mth_holder::on_prompt(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
+        return type->on_prompt(origin_card, origin, targets, args, ctx);
+    }
+
+    inline void mth_holder::on_play(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
+        type->on_play(origin_card, origin, targets, args, ctx);
+    }
 
     template<typename T>
     constexpr mth_vtable build_mth_vtable(std::string_view name) {

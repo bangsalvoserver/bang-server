@@ -2,7 +2,6 @@
 #define __FILTERS_H__
 
 #include "cards/card_defs.h"
-#include "game_string.h"
 
 namespace banggame::filters {
 

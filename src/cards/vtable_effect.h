@@ -1,6 +1,8 @@
 #ifndef __VTABLE_EFFECT_H__
 #define __VTABLE_EFFECT_H__
 
+#include "card_defs.h"
+
 #include "utils/tstring.h"
 
 #include "game/filters_simple.h"
@@ -25,6 +27,54 @@ namespace banggame {
         void (*add_context_card)(int effect_value, card *origin_card, player *origin, card *target, effect_context &ctx);
         void (*on_play_card)(int effect_value, card *origin_card, player *origin, card *target, effect_flags flags, const effect_context &ctx);
     };
+    
+    inline game_string effect_holder::get_error(card *origin_card, player *origin, const effect_context &ctx) const {
+        return type->get_error(effect_value, origin_card, origin, ctx);
+    }
+
+    inline game_string effect_holder::get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) const {
+        return type->get_error_player(effect_value, origin_card, origin, target, ctx);
+    }
+
+    inline game_string effect_holder::get_error(card *origin_card, player *origin, card *target, const effect_context &ctx) const {
+        return type->get_error_card(effect_value, origin_card, origin, target, ctx);
+    }
+
+    inline game_string effect_holder::on_prompt(card *origin_card, player *origin, const effect_context &ctx) const {
+        return type->on_prompt(effect_value, origin_card, origin, ctx);
+    }
+
+    inline game_string effect_holder::on_prompt(card *origin_card, player *origin, player *target, const effect_context &ctx) const {
+        return type->on_prompt_player(effect_value, origin_card, origin, target, ctx);
+    }
+
+    inline game_string effect_holder::on_prompt(card *origin_card, player *origin, card *target, const effect_context &ctx) const {
+        return type->on_prompt_card(effect_value, origin_card, origin, target, ctx);
+    }
+
+    inline void effect_holder::add_context(card *origin_card, player *origin, effect_context &ctx) const {
+        type->add_context(effect_value, origin_card, origin, ctx);
+    }
+
+    inline void effect_holder::add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const {
+        type->add_context_player(effect_value, origin_card, origin, target, ctx);
+    }
+
+    inline void effect_holder::add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const {
+        type->add_context_card(effect_value, origin_card, origin, target, ctx);
+    }
+
+    inline void effect_holder::on_play(card *origin_card, player *origin, effect_flags flags, const effect_context &ctx) const {
+        type->on_play(effect_value, origin_card, origin, flags, ctx);
+    }
+
+    inline void effect_holder::on_play(card *origin_card, player *origin, player *target, effect_flags flags, const effect_context &ctx) const {
+        type->on_play_player(effect_value, origin_card, origin, target, flags, ctx);
+    }
+
+    inline void effect_holder::on_play(card *origin_card, player *origin, card *target, effect_flags flags, const effect_context &ctx) const {
+        type->on_play_card(effect_value, origin_card, origin, target, flags, ctx);
+    }
 
     template<typename T>
     inline auto build_effect(int effect_value) {

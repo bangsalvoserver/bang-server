@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include "player.h"
-#include "game_string.h"
 #include "game_update.h"
 
 #include "utils/id_map.h"

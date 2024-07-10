@@ -3,7 +3,6 @@
 
 #include "card_defs.h"
 
-#include "game/game_string.h"
 #include "game/request_base.h"
 
 #include "vtable_effect.h"

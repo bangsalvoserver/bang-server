@@ -31,7 +31,7 @@ namespace banggame {
                 card *origin_card = cur_node->card;
                 auto &targets = ret.modifiers.emplace_back(origin_card).targets;
 
-                origin_card->get_modifier(is_response).type->add_context(origin_card, origin, ctx);
+                origin_card->get_modifier(is_response).add_context(origin_card, origin, ctx);
                 for (const effect_holder &holder : origin_card->get_effect_list(is_response)) {
                     const auto &target = targets.emplace_back(play_dispatch::random_target(origin, origin_card, holder, ctx));
                     play_dispatch::add_context(origin, origin_card, holder, ctx, target);

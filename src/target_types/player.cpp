@@ -18,16 +18,16 @@ namespace banggame {
 
     template<> game_string visit_player::get_error(const effect_context &ctx, player *target) {
         MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target, ctx));
-        return effect.type->get_error_player(effect.effect_value, origin_card, origin, target, ctx);
+        return effect.get_error(origin_card, origin, target, ctx);
     }
 
     template<> game_string visit_player::prompt(const effect_context &ctx, player *target) {
-        return effect.type->on_prompt_player(effect.effect_value, origin_card, origin, target, ctx);
+        return effect.on_prompt(origin_card, origin, target, ctx);
     }
 
     template<> void visit_player::add_context(effect_context &ctx, player *target) {
         ctx.selected_players.push_back(target);
-        effect.type->add_context_player(effect.effect_value, origin_card, origin, target, ctx);
+        effect.add_context(origin_card, origin, target, ctx);
     }
 
     template<> void visit_player::play(const effect_context &ctx, player *target) {
@@ -35,7 +35,7 @@ namespace banggame {
         if (origin_card->is_brown()) {
             flags |= effect_flags::escapable;
         }
-        effect.type->on_play_player(effect.effect_value, origin_card, origin, target, flags, ctx);
+        effect.on_play(origin_card, origin, target, flags, ctx);
     }
 
 }

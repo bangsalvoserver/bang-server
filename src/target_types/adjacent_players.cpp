@@ -40,7 +40,7 @@ namespace banggame {
             return "ERROR_TARGETS_NOT_ADJACENT";
         }
         for (player *target : targets) {
-            MAYBE_RETURN(effect.type->get_error_player(effect.effect_value, origin_card, origin, target, ctx));
+            MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
         return {};
     }
@@ -66,7 +66,7 @@ namespace banggame {
             flags |= effect_flags::escapable;
         }
         for (player *target : targets) {
-            effect.type->on_play_player(effect.effect_value, origin_card, origin, target, flags, ctx);
+            effect.on_play(origin_card, origin, target, flags, ctx);
         }
     }
 

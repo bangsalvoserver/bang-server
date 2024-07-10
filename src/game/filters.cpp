@@ -86,7 +86,7 @@ namespace banggame::filters {
     }
 
     bool is_modifier_card(const player *origin, const card *origin_card) {
-        return origin_card->get_modifier(origin->m_game->pending_requests()).type != nullptr;
+        return bool(origin_card->get_modifier(origin->m_game->pending_requests()));
     }
 
     bool is_bang_card(const player *origin, const card *target) {
