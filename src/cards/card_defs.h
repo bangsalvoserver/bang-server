@@ -58,17 +58,17 @@ namespace banggame {
         }
     )
 
-    DEFINE_ENUM_FLAGS_FWD_TYPES(expansion_type,
-        (dodgecity,             ruleset_dodgecity)
-        (goldrush,              ruleset_goldrush)
-        (armedanddangerous,     ruleset_armedanddangerous)
-        (greattrainrobbery,     ruleset_greattrainrobbery)
-        (valleyofshadows,       ruleset_valleyofshadows)
-        (highnoon,              ruleset_highnoon)
-        (fistfulofcards,        ruleset_fistfulofcards)
-        (wildwestshow,          ruleset_wildwestshow)
-        (thebullet,             ruleset_thebullet)
-        (canyondiablo,          ruleset_canyondiablo)
+    DEFINE_ENUM_FLAGS(expansion_type,
+        (dodgecity)
+        (goldrush)
+        (armedanddangerous)
+        (greattrainrobbery)
+        (valleyofshadows)
+        (highnoon)
+        (fistfulofcards)
+        (wildwestshow)
+        (thebullet)
+        (canyondiablo)
     )
 
     DEFINE_ENUM(card_color_type,

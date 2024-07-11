@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "cards/card_fwd.h"
+#include "cards/card_effect.h"
 
 namespace banggame {
 
@@ -31,6 +31,8 @@ namespace banggame {
     struct ruleset_greattrainrobbery {
         void on_apply(game *game);
     };
+
+    DEFINE_RULESET(greattrainrobbery, ruleset_greattrainrobbery)
 }
 
 #endif

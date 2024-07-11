@@ -1,5 +1,5 @@
-#ifndef __EFFECTS_H__
-#define __EFFECTS_H__
+#ifndef __RULESETS_H__
+#define __RULESETS_H__
 
 #include "armedanddangerous/ruleset.h"
 #include "canyondiablo/ruleset.h"
@@ -14,16 +14,15 @@ namespace banggame {
     
     template<expansion_type E>
     inline void do_apply_ruleset(game *game, enums::enum_tag_t<E>) {
-        if constexpr (enums::value_with_type<E>) {
+        if constexpr (requires { ruleset_vtable_map<E>::value; }) {
             if (bool(game->m_options.expansions & E)) {
-                using type = enums::enum_type_t<E>;
-                type{}.on_apply(game);
+                ruleset_vtable_map<E>::value.on_apply(game);
             }
         }
     }
 
     inline void apply_rulesets(game *game) {
-        [&]<expansion_type ... Es>(enums::enum_sequence<Es ...>) {
+        [game]<expansion_type ... Es>(enums::enum_sequence<Es ...>) {
             (do_apply_ruleset(game, enums::enum_tag<Es>), ...);
         }(enums::make_enum_sequence<expansion_type>());
     }

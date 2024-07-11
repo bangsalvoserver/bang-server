@@ -15,6 +15,8 @@ namespace banggame {
             }
         });
 
-        ruleset_dodgecity{}.on_apply(game);
+        if (!bool(game->m_options.expansions & expansion_type::dodgecity)) {
+            ruleset_dodgecity{}.on_apply(game);
+        }
     }
 }

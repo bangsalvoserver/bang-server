@@ -9,6 +9,7 @@
 #include "vtable_equip.h"
 #include "vtable_modifier.h"
 #include "vtable_mth.h"
+#include "vtable_ruleset.h"
 
 namespace banggame {
 
