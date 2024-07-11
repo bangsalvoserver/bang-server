@@ -69,8 +69,7 @@ namespace banggame {
 
     void request_draw::cleanup_selection() {
         for (card *target_card : cards_from_selection) {
-            target_card->move_to(target->m_game->check_flags(game_flags::phase_one_draw_discard)
-                ? pocket_type::discard_pile : pocket_type::main_deck, nullptr, card_visibility::hidden);
+            target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
         }
     }
 

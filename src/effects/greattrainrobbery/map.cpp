@@ -19,9 +19,14 @@ namespace banggame {
             }
         }
 
+        bool move_card_to_deck() const {
+            return target->m_game->check_flags(game_flags::phase_one_override)
+                || target->m_game->check_flags(game_flags::phase_one_draw_discard) && !target->m_game->m_discards.empty();
+        }
+
         void on_resolve() override {
             target->m_game->pop_request();
-            if (target->m_game->check_flags(game_flags::phase_one_override)) {
+            if (move_card_to_deck()) {
                 while (!target->m_game->m_selection.empty()) {
                     target->m_game->m_selection.front()->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
                 }
@@ -30,7 +35,7 @@ namespace banggame {
 
         void on_pick(card *target_card) override {
             target->m_game->pop_request();
-            if (target->m_game->check_flags(game_flags::phase_one_override)) {
+            if (move_card_to_deck()) {
                 target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
             }
             while (auto not_target = target->m_game->m_selection | rv::filter([&](card *selection_card) {
