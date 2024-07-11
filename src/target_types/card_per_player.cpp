@@ -14,7 +14,7 @@ namespace banggame {
 
     static auto cards_target_set(const player *origin, const card *origin_card, target_card_filter filter, player *target, const effect_context &ctx) {
         return rv::concat(target->m_table, target->m_hand)
-            | rv::filter([&](const card *target_card) {
+            | rv::filter([=, &ctx](const card *target_card) {
                 return !filters::check_card_filter(origin_card, origin, filter, target_card, ctx);
             });
     }
