@@ -8,6 +8,7 @@
 #include "cards/filter_enums.h"
 
 #include <charconv>
+#include <reflect>
 
 namespace banggame {
 
@@ -66,14 +67,13 @@ namespace banggame {
 
     template<size_t I>
     static std::string get_field_string(const game_options &options) {
-        const auto field_data = reflector::get_field_data<I>(options);
-        return fmt::format("{} = {}", field_data.name(), field_data.get());
+        return fmt::format("{} = {}", reflect::member_name<I>(options), reflect::get<I>(options));
     }
 
     void game_manager::command_get_game_options(game_user &user) {
         [this, client = user.client, &options = user.in_lobby->options]<size_t ... Is>(std::index_sequence<Is ...>) {
             (send_message<server_message_type::lobby_chat>(client, 0, get_field_string<Is>(options)), ...);
-        }(std::make_index_sequence<reflector::num_fields<game_options>>());
+        }(std::make_index_sequence<reflect::size<game_options>()>());
     }
 
     template<size_t ... Is>
@@ -81,9 +81,8 @@ namespace banggame {
         using set_option_fn_ptr = bool (*)(game_options &options, std::string_view value_str);
 
         return util::static_map<std::string_view, set_option_fn_ptr>({
-            { reflector::get_field_name<Is, game_options>(), [](game_options &options, std::string_view value_str) {
-                auto field_data = reflector::get_field_data<Is>(options);
-                auto &field = field_data.get();
+            { reflect::member_name<Is, game_options>(), [](game_options &options, std::string_view value_str) {
+                auto &field = reflect::get<Is>(options);
                 if (auto value = parse_string<std::remove_reference_t<decltype(field)>>(value_str)) {
                     field = *value;
                     return true;
@@ -94,7 +93,7 @@ namespace banggame {
     }
 
     void game_manager::command_set_game_option(game_user &user, std::string_view name, std::string_view value) {
-        static constexpr auto set_option_map = gen_set_option_map(std::make_index_sequence<reflector::num_fields<game_options>>());
+        static constexpr auto set_option_map = gen_set_option_map(std::make_index_sequence<reflect::size<game_options>()>());
         
         if (auto it = set_option_map.find(name); it != set_option_map.end()) {
             auto &lobby = *user.in_lobby;

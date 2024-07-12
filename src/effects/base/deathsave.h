@@ -7,15 +7,15 @@
 namespace banggame {
 
     namespace event_type {
-        DEFINE_STRUCT(on_player_death_resolve,
-            (player *, target)
-            (bool, tried_save)
-        )
+        struct on_player_death_resolve {
+            player *target;
+            bool tried_save;
+        };
         
-        DEFINE_STRUCT(on_player_death,
-            (player *, origin)
-            (player *, target)
-        )
+        struct on_player_death {
+            player *origin;
+            player *target;
+        };
     }
 
     struct effect_deathsave {

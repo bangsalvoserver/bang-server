@@ -8,15 +8,15 @@
 namespace banggame {
 
     namespace event_type {
-        DEFINE_STRUCT(get_predraw_checks,
-            (player *, origin)
-            (nullable_ref<std::vector<event_card_key>>, result)
-        )
+        struct get_predraw_checks {
+            player *origin;
+            nullable_ref<std::vector<event_card_key>> result;
+        };
         
-        DEFINE_STRUCT(on_predraw_check,
-            (player *, origin)
-            (card *, target_card)
-        )
+        struct on_predraw_check {
+            player *origin;
+            card *target_card;
+        };
     }
 
     struct request_predraw : request_picking {

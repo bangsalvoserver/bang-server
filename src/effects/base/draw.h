@@ -98,23 +98,23 @@ namespace banggame {
     using shared_request_draw = std::shared_ptr<request_draw>;
 
     namespace event_type {
-        DEFINE_STRUCT(count_cards_to_draw,
-            (player *, origin)
-            (nullable_ref<int>, cards_to_draw)
-        )
+        struct count_cards_to_draw {
+            player *origin;
+            nullable_ref<int> cards_to_draw;
+        };
         
-        DEFINE_STRUCT(on_draw_from_deck,
-            (player *, origin)
-            (shared_request_draw, req)
-            (nullable_ref<bool>, handled)
-        )
+        struct on_draw_from_deck {
+            player *origin;
+            shared_request_draw req;
+            nullable_ref<bool> handled;
+        };
 
-        DEFINE_STRUCT(on_card_drawn,
-            (player *, origin)
-            (card *, target_card)
-            (shared_request_draw, req)
-            (nullable_ref<bool>, reveal)
-        )
+        struct on_card_drawn {
+            player *origin;
+            card *target_card;
+            shared_request_draw req;
+            nullable_ref<bool> reveal;
+        };
     }
 }
 

@@ -12,11 +12,11 @@ namespace banggame {
     };
 
     namespace event_type {
-        DEFINE_STRUCT(check_card_taker,
-            (player *, target)
-            (card_taker_type, type)
-            (nullable_ref<card *>, value)
-        )
+        struct check_card_taker {
+            player *target;
+            card_taker_type type;
+            nullable_ref<card *> value;
+        };
     }
     
     struct equip_vulture_sam : event_equip {

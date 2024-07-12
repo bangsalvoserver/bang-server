@@ -20,21 +20,21 @@ namespace banggame {
     using shared_request_check = std::shared_ptr<draw_check_handler>;
     
     namespace event_type {
-        DEFINE_STRUCT(count_num_checks,
-            (player *, origin)
-            (nullable_ref<int>, num_checks)
-        )
+        struct count_num_checks {
+            player *origin;
+            nullable_ref<int> num_checks;
+        };
 
-        DEFINE_STRUCT(on_draw_check_resolve,
-            (player *, origin)
-            (card *, target_card)
-        )
+        struct on_draw_check_resolve {
+            player *origin;
+            card *target_card;
+        };
         
-        DEFINE_STRUCT(on_draw_check_select,
-            (player *, origin)
-            (shared_request_check, req)
-            (nullable_ref<bool>, handled)
-        )
+        struct on_draw_check_select {
+            player *origin;
+            shared_request_check req;
+            nullable_ref<bool> handled;
+        };
     }
     
     struct request_check_base : selection_picker, draw_check_handler {

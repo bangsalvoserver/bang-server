@@ -1,11 +1,7 @@
 #ifndef __EVENTS_H__
 #define __EVENTS_H__
 
-#include "event_card_key.h"
-
-#include "utils/reflector.h"
-
-#include <typeinfo>
+#include <reflect>
 #include <typeindex>
 #include <functional>
 #include <memory>
@@ -13,15 +9,24 @@
 #include <set>
 #include <map>
 
+#include "event_card_key.h"
+
 namespace banggame {
 
     using event_listener_fun = std::function<void(const void *tuple)>;
 
     template<typename T>
-    concept event = reflector::convertible_to_tuple<T>;
+    auto to_event_tuple(const T &value) {
+        return reflect::to<std::tuple>(value);
+    }
+
+    template<typename T>
+    concept event = requires (const T &value) {
+        to_event_tuple(value);
+    };
 
     template<event T>
-    using event_tuple = reflector::as_tuple_t<T>;
+    using event_tuple = decltype(to_event_tuple(std::declval<const T &>()));
 
     template<typename Function, typename T>
     concept applicable = requires (Function fun, T tup) {
@@ -95,7 +100,7 @@ namespace banggame {
 
         template<event T>
         void call_event(const T &value) {
-            auto tuple = reflector::as_tuple(value);
+            auto tuple = to_event_tuple(value);
             do_call_event(typeid(T), &tuple);
         }
     };

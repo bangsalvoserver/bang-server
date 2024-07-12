@@ -6,14 +6,14 @@
 namespace banggame {
 
     namespace event_type {
-        DEFINE_STRUCT(apply_beer_modifier,
-            (player *, origin)
-            (nullable_ref<int>, value)
-        )
+        struct apply_beer_modifier {
+            player *origin;
+            nullable_ref<int> value;
+        };
 
-        DEFINE_STRUCT(on_play_beer,
-            (player *, origin)
-        )
+        struct on_play_beer {
+            player *origin;
+        };
     }
 
     struct effect_beer {

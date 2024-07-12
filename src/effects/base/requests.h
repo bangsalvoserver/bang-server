@@ -27,15 +27,15 @@ namespace banggame {
     };
 
     namespace event_type {
-        DEFINE_STRUCT(on_discard_pass,
-            (player *, origin)
-            (card *, target_card)
-        )
+        struct on_discard_pass {
+            player *origin;
+            card *target_card;
+        };
         
-        DEFINE_STRUCT(post_discard_pass,
-            (player *, origin)
-            (int, ndiscarded)
-        )
+        struct post_discard_pass {
+            player *origin;
+            int ndiscarded;
+        };
     }
 
     struct request_discard_pass : request_picking {

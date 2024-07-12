@@ -6,10 +6,10 @@
 namespace banggame {
 
     namespace event_type {
-        DEFINE_STRUCT(on_discard_orange_card,
-            (player *, target)
-            (card *, target_card)
-        )
+        struct on_discard_orange_card{
+            player *target;
+            card *target_card;
+        };
     }
 
     struct ruleset_armedanddangerous {

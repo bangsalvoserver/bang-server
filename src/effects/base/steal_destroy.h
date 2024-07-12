@@ -9,11 +9,11 @@
 namespace banggame {
 
     namespace event_type {
-        DEFINE_STRUCT(on_destroy_card,
-            (player *, origin)
-            (card *, target_card)
-            (nullable_ref<bool>, handled)
-        )
+        struct on_destroy_card {
+            player *origin;
+            card *target_card;
+            nullable_ref<bool> handled;
+        };
     }
 
     struct effect_steal : prompt_target_self, bot_suggestion::target_enemy_card {
