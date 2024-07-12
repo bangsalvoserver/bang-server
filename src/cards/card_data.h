@@ -8,26 +8,26 @@
 
 namespace banggame {
 
-    DEFINE_STRUCT(card_data,
-        (std::string, name)
-        (std::string, image)
+    struct card_data {
+        std::string name;
+        std::string image;
 
-        (effect_list, effects)
-        (effect_list, responses)
-        (equip_list, equips)
-        (tag_map, tags)
+        effect_list effects;
+        effect_list responses;
+        equip_list equips;
+        tag_map tags;
 
-        (expansion_type, expansion)
-        (card_deck_type, deck)
+        expansion_type expansion;
+        card_deck_type deck;
 
-        (modifier_holder, modifier)
-        (modifier_holder, modifier_response)
-        (mth_holder, mth_effect)
-        (mth_holder, mth_response)
-        (target_player_filter, equip_target)
+        modifier_holder modifier;
+        modifier_holder modifier_response;
+        mth_holder mth_effect;
+        mth_holder mth_response;
+        target_player_filter equip_target;
         
-        (card_color_type, color)
-        (card_sign, sign),
+        card_color_type color;
+        card_sign sign;
 
         const effect_list &get_effect_list(bool is_response) const {
             return is_response ? responses : effects;
@@ -63,7 +63,7 @@ namespace banggame {
         bool is_black() const { return color == card_color_type::black; }
         bool is_orange() const { return color == card_color_type::orange; }
         bool is_train() const { return color == card_color_type::train; }
-    )
+    };
 
     struct all_cards_t {
         std::vector<card_data> deck;

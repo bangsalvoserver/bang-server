@@ -6,40 +6,40 @@
 #include "utils/json_serial.h"
 
 namespace sdl {
-    DEFINE_STRUCT(image_pixels,
-        (int, width)
-        (int, height)
-        (base64::encoded_bytes, pixels)
-    )
+    struct image_pixels {
+        int width;
+        int height;
+        base64::encoded_bytes pixels;
+    };
 }
 
 namespace banggame {
     
     using id_type = unsigned int;
 
-    DEFINE_STRUCT(user_info,
-        (std::string, name)
-        (sdl::image_pixels, profile_image)
-    )
+    struct user_info {
+        std::string name;
+        sdl::image_pixels profile_image;
+    };
 
-    DEFINE_STRUCT(connect_args,
-        (user_info, user)
-        (id_type, session_id)
-        (std::string, commit_hash)
-    )
+    struct connect_args {
+        user_info user;
+        id_type session_id;
+        std::string commit_hash;
+    };
 
-    DEFINE_STRUCT(lobby_info,
-        (std::string, name)
-        (game_options, options)
-    )
+    struct lobby_info {
+        std::string name;
+        game_options options;
+    };
 
-    DEFINE_STRUCT(lobby_id_args,
-        (id_type, lobby_id)
-    )
+    struct lobby_id_args {
+        id_type lobby_id;
+    };
 
-    DEFINE_STRUCT(lobby_chat_client_args,
-        (std::string, message)
-    )
+    struct lobby_chat_client_args {
+        std::string message;
+    };
 
     DEFINE_ENUM_TYPES(client_message_type,
         (pong)
@@ -65,38 +65,38 @@ namespace banggame {
         (finished)
     )
 
-    DEFINE_STRUCT(client_accepted_args,
-        (id_type, session_id)
-    )
+    struct client_accepted_args {
+        id_type session_id;
+    };
 
-    DEFINE_STRUCT(lobby_data,
-        (id_type, lobby_id)
-        (std::string, name)
-        (int, num_players)
-        (int, num_spectators)
-        (int, max_players)
-        (lobby_state, state)
-    )
+    struct lobby_data {
+        id_type lobby_id;
+        std::string name;
+        int num_players;
+        int num_spectators;
+        int max_players;
+        lobby_state state;
+    };
 
-    DEFINE_STRUCT(lobby_entered_args,
-        (int, user_id)
-        (id_type, lobby_id)
-        (std::string, name)
-        (game_options, options)
-    )
+    struct lobby_entered_args {
+        int user_id;
+        id_type lobby_id;
+        std::string name;
+        game_options options;
+    };
 
-    DEFINE_STRUCT(user_info_id_args,
-        (int, user_id)
-        (user_info, user)
-        (bool, is_read)
-        (std::chrono::milliseconds, lifetime)
-    )
+    struct user_info_id_args {
+        int user_id;
+        user_info user;
+        bool is_read;
+        std::chrono::milliseconds lifetime;
+    };
 
-    DEFINE_STRUCT(lobby_chat_args,
-        (int, user_id)
-        (std::string, message)
-        (bool, is_read)
-    )
+    struct lobby_chat_args {
+        int user_id;
+        std::string message;
+        bool is_read;
+    };
 
     DEFINE_ENUM_TYPES(server_message_type,
         (ping)

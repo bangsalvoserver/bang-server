@@ -267,20 +267,20 @@ namespace banggame {
     using game_update = enums::enum_variant<game_update_type>;
     #define UPD_TAG(name) enums::enum_tag_t<game_update_type::name>
 
-    DEFINE_STRUCT(modifier_pair,
-        (serial::card, card)
-        (target_list, targets)
-    )
+    struct modifier_pair {
+        serial::card card;
+        target_list targets;
+    };
 
     using modifier_list = std::vector<modifier_pair>;
 
-    DEFINE_STRUCT(game_action,
-        (serial::card, card)
-        (modifier_list, modifiers)
-        (target_list, targets)
-        (bool, bypass_prompt)
-        (std::optional<timer_id_t>, timer_id)
-    )
+    struct game_action {
+        serial::card card;
+        modifier_list modifiers;
+        target_list targets;
+        bool bypass_prompt;
+        std::optional<timer_id_t> timer_id;
+    };
 }
 
 #endif

@@ -32,9 +32,9 @@ namespace banggame {
         (rank_A)
     )
 
-    DEFINE_STRUCT(card_sign,
-        (card_suit, suit)
-        (card_rank, rank),
+    struct card_sign {
+        card_suit suit;
+        card_rank rank;
 
         bool is_hearts() const      { return suit == card_suit::hearts; }
         bool is_diamonds() const    { return suit == card_suit::diamonds; }
@@ -56,7 +56,7 @@ namespace banggame {
         explicit operator bool () const {
             return suit != card_suit::none && rank != card_rank::none;
         }
-    )
+    };
 
     DEFINE_ENUM_FLAGS(expansion_type,
         (dodgecity)
@@ -115,13 +115,13 @@ namespace banggame {
     using play_card_target = enums::enum_variant<target_type>;
     using target_list = std::vector<play_card_target>;
 
-    DEFINE_STRUCT(effect_holder,
-        (target_type, target)
-        (target_player_filter, player_filter)
-        (target_card_filter, card_filter)
-        (short, effect_value)
-        (short, target_value)
-        (const effect_vtable *, type),
+    struct effect_holder {
+        target_type target;
+        target_player_filter player_filter;
+        target_card_filter card_filter;
+        short effect_value;
+        short target_value;
+        const effect_vtable *type;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -142,11 +142,11 @@ namespace banggame {
         void on_play(card *origin_card, player *origin, effect_flags flags, const effect_context &ctx) const;
         void on_play(card *origin_card, player *origin, player *target, effect_flags flags, const effect_context &ctx) const;
         void on_play(card *origin_card, player *origin, card *target, effect_flags flags, const effect_context &ctx) const;
-    )
+    };
 
-    DEFINE_STRUCT(equip_holder,
-        (short, effect_value)
-        (const equip_vtable *, type),
+    struct equip_holder {
+        short effect_value;
+        const equip_vtable *type;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -156,10 +156,10 @@ namespace banggame {
         void on_enable(card *target_card, player *target) const;
         void on_disable(card *target_card, player *target) const;
         bool is_nodisable() const;
-    )
+    };
 
-    DEFINE_STRUCT(modifier_holder,
-        (const modifier_vtable *, type),
+    struct modifier_holder {
+        const modifier_vtable *type;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -168,11 +168,11 @@ namespace banggame {
         void add_context(card *origin_card, player *origin, effect_context &ctx) const;
         game_string get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx) const;
         game_string on_prompt(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) const;
-    )
+    };
 
-    DEFINE_STRUCT(mth_holder,
-        (const mth_vtable *, type)
-        (serial::int_list, args),
+    struct mth_holder {
+        const mth_vtable *type;
+        serial::int_list args;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -181,7 +181,7 @@ namespace banggame {
         game_string get_error(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const;
         game_string on_prompt(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const;
         void on_play(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const;
-    )
+    };
 
     using effect_list = std::vector<effect_holder>;
     using equip_list = std::vector<equip_holder>;
