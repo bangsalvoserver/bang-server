@@ -80,8 +80,8 @@ def parse_effects(effect_list):
 
         result.append(CppObject(
             target =           CppEnum('target_type', target_type) if target_type else None,
-            player_filter =    CppEnum('target_player_filter', player_filter) if player_filter else None,
-            card_filter =      CppEnum('target_card_filter', card_filter) if card_filter else None,
+            player_filter =    [CppEnum('target_player_filter', f) for f in player_filter.split()] if player_filter else None,
+            card_filter =      [CppEnum('target_card_filter', f) for f in card_filter.split()] if card_filter else None,
             effect_value =     int(effect_value) if effect_value else None,
             target_value =     int(target_value) if target_value else None,
             type =             CppLiteral(f'GET_EFFECT({effect_type})')
@@ -158,13 +158,13 @@ def parse_all_effects(card):
             responses =    parse_effects(card['responses']) if 'responses' in card else None,
             equips =       parse_equips(card['equip']) if 'equip' in card else None,
             tags =         parse_tags(card['tags']) if 'tags' in card else None,
-            expansion =    CppEnum('expansion_type', card['expansion']) if 'expansion' in card else None,
+            expansion =    [CppEnum('expansion_type', f) for f in card['expansion'].split()] if 'expansion' in card else None,
             deck =         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
             modifier =     CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier']})")) if 'modifier' in card else None,
             modifier_response = CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier_response']})")) if 'modifier_response' in card else None,
             mth_effect =   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
             mth_response = parse_mth(card['mth_response']) if 'mth_response' in card else None,
-            equip_target = CppEnum('target_player_filter', card['equip_target']) if 'equip_target' in card else None,
+            equip_target = [CppEnum('target_player_filter', f) for f in card['equip_target'].split()] if 'equip_target' in card else None,
             color =        CppEnum('card_color_type', card['color']) if 'color' in card else None,
             sign =         parse_sign(card['sign']) if 'sign' in card else None
         )

@@ -6,12 +6,12 @@ class CppObject:
         self.value = value
 
 class CppEnum:
-    def __init__(self, enum_name, values):
+    def __init__(self, enum_name, value):
         self.enum_name = enum_name
-        self.values = values.split()
+        self.value = value
     
     def __str__(self):
-        return ', '.join(f'{self.enum_name}::{value}' for value in self.values)
+        return f'{self.enum_name}::{self.value}'
 
 class CppLiteral:
     def __init__(self, value):
