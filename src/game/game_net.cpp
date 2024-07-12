@@ -49,19 +49,6 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<banggame::card_format, Context> {
-        json operator()(banggame::card_format value) const {
-            if (value.card) {
-                return {
-                    {"name", value.card->name},
-                    {"sign", serialize(value.card->sign)}
-                };
-            } else {
-                return json::object();
-            }
-        }
-    };
-
     template<typename Context> struct serializer<banggame::tag_map, Context> {
         json operator()(const banggame::tag_map &map) const {
             auto result = json::object();
@@ -101,6 +88,34 @@ namespace json {
             } else {
                 return {};
             }
+        }
+    };
+
+    template<typename Context> struct serializer<banggame::format_arg_list, Context> {
+        json operator()(const banggame::format_arg_list &list) const {
+            auto ret = json::array();
+            for (size_t i=0; i<list.count; ++i) {
+                auto [type, value] = list[i];
+                switch (type) {
+                case banggame::format_arg_list::format_number:
+                    ret.push_back({{ "integer", value.number_value }});
+                    break;
+                case banggame::format_arg_list::format_card:
+                    if (value.card_value) {
+                        ret.push_back({{ "card", {
+                            {"name", value.card_value->name},
+                            {"sign", serialize(value.card_value->sign)}
+                        }}});
+                    } else {
+                        ret.push_back({{ "card", json::object() }});
+                    }
+                    break;
+                case banggame::format_arg_list::format_player:
+                    ret.push_back({{ "player", serialize(value.player_value) }});
+                    break;
+                }
+            }
+            return ret;
         }
     };
 

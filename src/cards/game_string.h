@@ -5,39 +5,79 @@
 #include "utils/small_pod.h"
 
 namespace banggame {
+
+    static constexpr size_t format_arg_list_max_size = 5;
+
+    struct format_arg_list {
+        enum format_arg_type {
+            format_number = 0,
+            format_card = 1,
+            format_player = 2,
+        };
+
+        union format_arg {
+            int number_value;
+            card *card_value;
+            player *player_value;
+        };
+
+        std::array<format_arg, format_arg_list_max_size> args{};
+        uint8_t count = 0;
+        uint8_t types = 0;
+
+        template<typename ... Ts>
+        constexpr format_arg_list(Ts ... values) {
+            static_assert(sizeof...(Ts) <= format_arg_list_max_size, "format_arg_list is too big");
+            (add(values), ...);
+        }
+
+        constexpr void add(int value) {
+            args[count].number_value = value;
+            types += exp3(count) * format_number;
+            ++count;
+        }
+
+        constexpr void add(card *value) {
+            args[count].card_value = value;
+            types += exp3(count) * format_card;
+            ++count;
+        }
+
+        constexpr void add(player *value) {
+            args[count].player_value = value;
+            types += exp3(count) * format_player;
+            ++count;
+        }
         
-    struct card_format {
-        banggame::card *card;
-        card_format() = default;
-        card_format(banggame::card *card) : card(card) {}
+        static constexpr uint8_t exp3(uint8_t exp) {
+            uint8_t n = 1;
+            while (exp != 0) {
+                n *= 3;
+                --exp;
+            }
+            return n;
+        }
+
+        constexpr std::pair<format_arg_type, format_arg> operator[](std::size_t index) const {
+            uint8_t result = types;
+            for (std::size_t i=0; i<index; ++i) {
+                result /= 3;
+            }
+            return { static_cast<format_arg_type>(result % 3), args[index] };
+        }
     };
-
-    enum class game_format_arg_type {
-        integer,
-        card,
-        player,
-    };
-
-    using game_format_arg = enums::enum_variant<game_format_arg_type,
-        enums::type_assoc<game_format_arg_type::integer, int>,
-        enums::type_assoc<game_format_arg_type::card, card_format>,
-        enums::type_assoc<game_format_arg_type::player, banggame::player *>
-    >;
-
-    using format_str_type = small_string;
-    using format_args_type = small_vector<game_format_arg>;
     
     struct game_string {
-        format_str_type format_str;
-        format_args_type format_args;
+        small_string format_str;
+        format_arg_list format_args;
 
         game_string() = default;
     
         game_string(
-                std::convertible_to<format_str_type> auto &&message,
+                std::convertible_to<small_string> auto &&message,
                 auto && ... args)
             : format_str(FWD(message))
-            , format_args{game_format_arg(FWD(args)) ...} {}
+            , format_args{FWD(args) ...} {}
 
         explicit operator bool() const {
             return !format_str.empty();

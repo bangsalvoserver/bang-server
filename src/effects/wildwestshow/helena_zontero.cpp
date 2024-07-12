@@ -24,7 +24,7 @@ namespace banggame {
             drawn_card = origin->m_game->top_of_deck();
             drawn_card->move_to(pocket_type::discard_pile);
 
-            origin->m_game->add_log("LOG_CHECK_DREW_CARD", origin_card, nullptr, drawn_card);
+            origin->m_game->add_log("LOG_CHECK_DREW_CARD", origin_card, static_cast<player *>(nullptr), drawn_card);
             bool handled = false;
             origin->m_game->call_event(event_type::on_draw_check_select{ nullptr, shared_from_this(), handled });
             if (!handled) {
