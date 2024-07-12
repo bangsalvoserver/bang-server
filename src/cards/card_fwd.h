@@ -2,7 +2,6 @@
 #define __CARD_FWD_H__
 
 #include "utils/enum_variant.h"
-#include "utils/reflector.h"
 #include "utils/small_pod.h"
 #include "utils/utils.h"
 

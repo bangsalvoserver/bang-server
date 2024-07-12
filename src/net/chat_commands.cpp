@@ -179,7 +179,7 @@ namespace banggame {
             target_card->pocket = pocket_type::player_character;
             target_card->owner = target;
 
-            target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::player_character, target);
+            target->m_game->add_update<game_update_type::add_cards>(std::vector{to_card_backface(target_card)}, pocket_type::player_character, target);
             target_card->set_visibility(card_visibility::shown, nullptr, true);
 
             target->reset_max_hp();
@@ -198,11 +198,11 @@ namespace banggame {
                 if (auto it = rn::find(target->m_game->m_scenario_deck, target_card); it != target->m_game->m_scenario_deck.end()) {
                     target->m_game->m_scenario_deck.erase(it);
                 } else {
-                    target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::scenario_deck);
+                    target->m_game->add_update<game_update_type::add_cards>(std::vector{to_card_backface(target_card)}, pocket_type::scenario_deck);
                 }
                 target->m_game->m_scenario_deck.push_back(target_card);
                 target_card->set_visibility(card_visibility::shown, nullptr, true);
-                target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::scenario_deck, true);
+                target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::scenario_deck, 0ms);
             } else {
                 target_card->move_to(pocket_type::scenario_deck);
             }
@@ -213,11 +213,11 @@ namespace banggame {
                 if (auto it = rn::find(target->m_game->m_wws_scenario_deck, target_card); it != target->m_game->m_wws_scenario_deck.end()) {
                     target->m_game->m_wws_scenario_deck.erase(it);
                 } else {
-                    target->m_game->add_update<game_update_type::add_cards>(std::vector{card_backface{target_card}}, pocket_type::wws_scenario_deck);
+                    target->m_game->add_update<game_update_type::add_cards>(std::vector{to_card_backface(target_card)}, pocket_type::wws_scenario_deck);
                 }
                 target->m_game->m_wws_scenario_deck.push_back(target_card);
                 target_card->set_visibility(card_visibility::shown, nullptr, true);
-                target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::wws_scenario_deck, true);
+                target->m_game->add_update<game_update_type::move_card>(target_card, nullptr, pocket_type::wws_scenario_deck, 0ms);
             } else {
                 target_card->move_to(pocket_type::wws_scenario_deck);
             }

@@ -22,9 +22,9 @@ namespace banggame {
     using format_str_type = small_string;
     using format_args_type = small_vector<game_format_arg>;
     
-    DEFINE_STRUCT(game_string,
-        (format_str_type, format_str)
-        (format_args_type, format_args),
+    struct game_string {
+        format_str_type format_str;
+        format_args_type format_args;
 
         game_string() = default;
     
@@ -37,7 +37,7 @@ namespace banggame {
         explicit operator bool() const {
             return !format_str.empty();
         }
-    )
+    };
     
     #define MAYBE_RETURN(...) if (auto value_ = __VA_ARGS__) return value_
 }

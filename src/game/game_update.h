@@ -6,232 +6,180 @@
 
 namespace banggame {
 
-    DEFINE_STRUCT(card_backface,
-        (int, id)
-        (card_deck_type, deck),
+    struct card_backface {
+        int id;
+        card_deck_type deck;
+    };
 
-        card_backface() = default;
-        card_backface(card *c);
-    )
+    card_backface to_card_backface(const card *origin_card);
 
-    DEFINE_STRUCT(add_cards_update,
-        (std::vector<card_backface>, card_ids)
-        (pocket_type, pocket)
-        (serial::opt_player, player)
-    )
+    inline std::vector<card_backface> to_card_backface_vector(auto &&range) {
+        return range | rv::transform(to_card_backface) | rn::to<std::vector>;
+    }
 
-    DEFINE_STRUCT(remove_cards_update,
-        (serial::card_list, cards)
-    )
+    struct add_cards_update {
+        std::vector<card_backface> card_ids;
+        pocket_type pocket;
+        serial::opt_player player;
+    };
 
-    DEFINE_STRUCT(move_card_update,
-        (serial::card, card)
-        (serial::opt_player, player)
-        (pocket_type, pocket)
-        (bool, front)
-        (game_duration, duration),
+    struct remove_cards_update {
+        serial::card_list cards;
+    };
 
-        move_card_update() = default;
-        move_card_update(serial::card card, serial::opt_player player, pocket_type pocket, bool instant = false, bool front = false)
-            : card{card}, player{player}, pocket{pocket}
-            , front{front}
-            , duration{instant ? 0ms : durations.move_card} {}
-    )
+    struct move_card_update {
+        serial::card card;
+        serial::opt_player player;
+        pocket_type pocket;
+        game_duration duration = durations.move_card;
+        bool front = false;
+    };
 
-    DEFINE_STRUCT(add_cubes_update,
-        (int, num_cubes)
-        (serial::opt_card, target_card)
-    )
+    struct add_cubes_update {
+        int num_cubes;
+        serial::opt_card target_card;
+    };
 
-    DEFINE_STRUCT(move_cubes_update,
-        (int, num_cubes)
-        (serial::opt_card, origin_card)
-        (serial::opt_card, target_card)
-        (game_duration, duration),
+    struct move_cubes_update {
+        int num_cubes;
+        serial::opt_card origin_card;
+        serial::opt_card target_card;
+        game_duration duration = durations.move_cubes;
+    };
 
-        move_cubes_update() = default;
-        move_cubes_update(int num_cubes, serial::opt_card origin_card, serial::opt_card target_card, bool instant = false)
-            : num_cubes{num_cubes}, origin_card{origin_card}, target_card{target_card}
-            , duration{instant ? 0ms : num_cubes == 1 ? durations.move_cube : durations.move_cubes} {}
-    )
+    struct move_train_update {
+        int position;
+        game_duration duration = durations.move_train;
+    };
 
-    DEFINE_STRUCT(move_train_update,
-        (int, position)
-        (game_duration, duration),
+    struct deck_shuffled_update {
+        pocket_type pocket;
+        game_duration duration = durations.deck_shuffle;
+    };
 
-        move_train_update() = default;
-        move_train_update(int position, bool instant = false)
-            : position{position}
-            , duration{instant ? 0ms : durations.move_train} {}
-    )
+    struct show_card_update {
+        serial::card card;
+        card_data info;
+        game_duration duration = durations.flip_card;
+    };
 
-    DEFINE_STRUCT(deck_shuffled_update,
-        (pocket_type, pocket)
-        (game_duration, duration),
+    struct hide_card_update {
+        serial::card card;
+        game_duration duration = durations.flip_card;
+    };
 
-        deck_shuffled_update() = default;
-        deck_shuffled_update(pocket_type pocket, game_duration duration = durations.deck_shuffle)
-            : pocket{pocket}, duration{duration} {}
-    )
+    struct tap_card_update {
+        serial::card card;
+        bool inactive;
+        game_duration duration = durations.tap_card;
+    };
 
-    DEFINE_STRUCT(show_card_update,
-        (serial::card, card)
-        (card_data, info)
-        (game_duration, duration),
+    struct flash_card_update {
+        serial::card card;
+        game_duration duration = durations.flash_card;
+    };
 
-        show_card_update() = default;
-        show_card_update(serial::card card, const card_data &info, bool instant = false)
-            : card{card}, info{info}
-            , duration{instant ? 0ms : durations.flip_card} {}
-    )
+    struct short_pause_update {
+        serial::opt_card card;
+        game_duration duration = durations.short_pause;
+    };
 
-    DEFINE_STRUCT(hide_card_update,
-        (serial::card, card)
-        (game_duration, duration),
+    struct player_user_pair {
+        int player_id;
+        int user_id;
+    };
 
-        hide_card_update() = default;
-        hide_card_update(serial::card card, bool instant = false)
-            : card{card}
-            , duration{instant ? 0ms : durations.flip_card} {}
-    )
+    player_user_pair to_player_user_pair(const player *p);
 
-    DEFINE_STRUCT(tap_card_update,
-        (serial::card, card)
-        (bool, inactive)
-        (game_duration, duration),
+    inline std::vector<player_user_pair> to_player_user_pair_vector(auto &&range) {
+        return range | rv::transform(to_player_user_pair) | rn::to<std::vector>;
+    }
 
-        tap_card_update() = default;
-        tap_card_update(serial::card card, bool inactive, bool instant = false)
-            : card{card}, inactive{inactive}
-            , duration{instant ? 0ms : durations.tap_card} {}
-    )
+    struct player_add_update {
+        std::vector<player_user_pair> players;
+    };
 
-    DEFINE_STRUCT(flash_card_update,
-        (serial::card, card)
-        (game_duration, duration),
+    struct player_order_update {
+        serial::player_list players;
+        game_duration duration = durations.move_player;
+    };
 
-        flash_card_update() = default;
-        flash_card_update(serial::card card, game_duration duration = durations.flash_card)
-            : card{card}, duration{duration} {}
-    )
+    struct player_hp_update {
+        serial::player player;
+        int hp;
+        game_duration duration = durations.player_hp;
+    };
 
-    DEFINE_STRUCT(short_pause_update,
-        (serial::opt_card, card)
-        (game_duration, duration),
+    struct player_gold_update {
+        serial::player player;
+        int gold;
+    };
 
-        short_pause_update() = default;
-        short_pause_update(serial::opt_card card, game_duration duration = durations.short_pause)
-            : card{card}, duration{duration} {}
-    )
+    struct player_show_role_update {
+        serial::player player;
+        player_role role;
+        game_duration duration = durations.flip_card;
+    };
 
-    DEFINE_STRUCT(player_user_pair,
-        (int, player_id)
-        (int, user_id),
+    struct player_flags_update {
+        serial::player player;
+        player_flags flags;
+    };
 
-        player_user_pair() = default;
-        player_user_pair(player *p);
-    )
-
-    DEFINE_STRUCT(player_add_update,
-        (std::vector<player_user_pair>, players)
-    )
-
-    DEFINE_STRUCT(player_order_update,
-        (serial::player_list, players)
-        (game_duration, duration),
-
-        player_order_update() = default;
-        player_order_update(const serial::player_list &players, bool instant = false)
-            : players{players}
-            , duration{instant ? 0ms : durations.move_player} {}
-    )
-
-    DEFINE_STRUCT(player_hp_update,
-        (serial::player, player)
-        (int, hp)
-        (game_duration, duration),
-
-        player_hp_update() = default;
-        player_hp_update(serial::player player, int hp, bool instant = false)
-            : player{player}, hp{hp}
-            , duration{instant ? 0ms : durations.player_hp} {}
-    )
-
-    DEFINE_STRUCT(player_gold_update,
-        (serial::player, player)
-        (int, gold)
-    )
-
-    DEFINE_STRUCT(player_show_role_update,
-        (serial::player, player)
-        (player_role, role)
-        (game_duration, duration),
-
-        player_show_role_update() = default;
-        player_show_role_update(serial::player player, player_role role, bool instant = false)
-            : player{player}, role{role}
-            , duration{instant ? 0ms : durations.flip_card} {}
-    )
-
-    DEFINE_STRUCT(player_flags_update,
-        (serial::player, player)
-        (player_flags, flags)
-    )
-
-    DEFINE_STRUCT(card_modifier_node,
-        (serial::card, card)
-        (std::vector<card_modifier_node>, branches)
-    )
+    struct card_modifier_node {
+        serial::card card;
+        std::vector<card_modifier_node> branches;
+    };
 
     using card_modifier_tree = std::vector<card_modifier_node>;
 
-    DEFINE_STRUCT(player_distance_item,
-        (serial::player, player)
-        (int, distance)
-    )
+    struct player_distance_item {
+        serial::player player;
+        int distance;
+    };
 
-    DEFINE_STRUCT(player_distances,
-        (std::vector<player_distance_item>, distances)
-        (int, range_mod)
-        (int, weapon_range)
-    )
+    struct player_distances {
+        std::vector<player_distance_item> distances;
+        int range_mod;
+        int weapon_range;
+    };
 
-    DEFINE_STRUCT(timer_status_args,
-        (timer_id_t, timer_id)
-        (game_duration, duration)
-    )
+    struct timer_status_args {
+        timer_id_t timer_id;
+        game_duration duration;
+    };
 
-    DEFINE_STRUCT(request_status_args,
-        (serial::opt_card, origin_card)
-        (serial::opt_player, origin)
-        (serial::opt_player, target)
-        (game_string, status_text)
-        (card_modifier_tree, respond_cards)
-        (serial::card_list, pick_cards)
-        (serial::card_list, highlight_cards)
-        (serial::player_list, target_set)
-        (player_distances, distances)
-        (std::optional<timer_status_args>, timer)
-    )
+    struct request_status_args {
+        serial::opt_card origin_card;
+        serial::opt_player origin;
+        serial::opt_player target;
+        game_string status_text;
+        card_modifier_tree respond_cards;
+        serial::card_list pick_cards;
+        serial::card_list highlight_cards;
+        serial::player_list target_set;
+        player_distances distances;
+        std::optional<timer_status_args> timer;
+    };
 
-    DEFINE_STRUCT(status_ready_args,
-        (card_modifier_tree, play_cards)
-        (player_distances, distances)
-    )
+    struct status_ready_args {
+        card_modifier_tree play_cards;
+        player_distances distances;
+    };
 
-    DEFINE_STRUCT(game_options,
-        (expansion_type, expansions)
-        (bool, enable_ghost_cards, false)
-        (bool, character_choice, true)
-        (bool, quick_discard_all, true)
-        (int, scenario_deck_size, 12)
-        (int, num_bots, 0)
-        (game_duration, damage_timer, 1500)
-        (game_duration, escape_timer, 3000)
-        (game_duration, bot_play_timer, 500)
-        (game_duration, tumbleweed_timer, 3000)
-        (unsigned int, game_seed)
-    )
+    struct game_options {
+        expansion_type expansions{};
+        bool enable_ghost_cards = false;
+        bool character_choice = true;
+        bool quick_discard_all = true;
+        int scenario_deck_size = 12;
+        int num_bots = 0;
+        game_duration damage_timer = 1500ms;
+        game_duration escape_timer = 3000ms;
+        game_duration bot_play_timer = 500ms;
+        game_duration tumbleweed_timer = 3000ms;
+        unsigned int game_seed = 0;
+    };
 
     DEFINE_ENUM_TYPES(game_update_type,
         (game_error, game_string)

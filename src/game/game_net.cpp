@@ -104,6 +104,15 @@ namespace json {
         }
     };
 
+    template<typename Context> struct serializer<banggame::game_string, Context> {
+        json operator()(const banggame::game_string &value) const {
+            return {
+                {"format_str", serialize(value.format_str)},
+                {"format_args", serialize(value.format_args)}
+            };
+        }
+    };
+
 }
 
 namespace banggame {

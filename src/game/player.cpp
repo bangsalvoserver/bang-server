@@ -173,7 +173,7 @@ namespace banggame {
     void player::set_hp(int value, bool instant) {
         if (value != m_hp) {
             m_hp = value;
-            m_game->add_update<game_update_type::player_hp>(this, value, instant);
+            m_game->add_update<game_update_type::player_hp>(this, value, instant ? 0ms : durations.player_hp);
         }
     }
 
@@ -298,11 +298,13 @@ namespace banggame {
     void player::set_role(player_role role, bool instant) {
         m_role = role;
 
+        game_duration duration = instant ? 0ms : durations.flip_card;
+
         if (role == player_role::sheriff || m_game->m_players.size() <= 3 || check_player_flags(player_flags::role_revealed)) {
-            m_game->add_update<game_update_type::player_show_role>(this, m_role, instant);
+            m_game->add_update<game_update_type::player_show_role>(this, m_role, duration);
             add_player_flags(player_flags::role_revealed);
         } else {
-            m_game->add_update<game_update_type::player_show_role>(update_target::includes(this), this, m_role, instant);
+            m_game->add_update<game_update_type::player_show_role>(update_target::includes(this), this, m_role, duration);
         }
     }
 
