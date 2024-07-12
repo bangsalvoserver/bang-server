@@ -12,13 +12,18 @@ namespace banggame {
         card_format(banggame::card *card) : card(card) {}
     };
 
-    DEFINE_ENUM_TYPES(game_format_arg_type,
-        (integer, int)
-        (card, card_format)
-        (player, banggame::player *)
-    )
+    enum class game_format_arg_type {
+        integer,
+        card,
+        player,
+    };
 
-    using game_format_arg = enums::enum_variant<game_format_arg_type>;
+    using game_format_arg = enums::enum_variant<game_format_arg_type,
+        enums::type_assoc<game_format_arg_type::integer, int>,
+        enums::type_assoc<game_format_arg_type::card, card_format>,
+        enums::type_assoc<game_format_arg_type::player, banggame::player *>
+    >;
+
     using format_str_type = small_string;
     using format_args_type = small_vector<game_format_arg>;
     

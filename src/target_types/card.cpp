@@ -20,7 +20,7 @@ namespace banggame {
     }
 
     template<> game_string visit_card::get_error(const effect_context &ctx, card *target) {
-        if (bool(effect.card_filter & target_card_filter::pick_card)) {
+        if (effect.card_filter.check(target_card_filter::pick_card)) {
             if (auto req = origin->m_game->top_request<interface_picking>(origin)) {
                 if (req->can_pick(target)) {
                     return {};
@@ -47,9 +47,9 @@ namespace banggame {
     }
 
     template<> void visit_card::play(const effect_context &ctx, card *target) {
-        auto flags = effect_flags::single_target;
+        effect_flags flags = effect_flag::single_target;
         if (origin_card->is_brown()) {
-            flags |= effect_flags::escapable;
+            flags.add(effect_flag::escapable);
         }
         if (target->owner != origin && target->pocket == pocket_type::player_hand) {
             effect.on_play(origin_card, origin, target->owner->random_hand_card(), flags, ctx);

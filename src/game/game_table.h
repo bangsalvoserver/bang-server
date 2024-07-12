@@ -44,7 +44,7 @@ namespace banggame {
         int8_t num_cubes = 0;
         int8_t train_position = 0;
 
-        game_flags m_game_flags{};
+        game_flags m_game_flags;
         game_options m_options;
 
         player *m_first_player = nullptr;
@@ -79,10 +79,9 @@ namespace banggame {
         void add_short_pause();
         void play_sound(std::string_view sound_id);
 
-        void add_game_flags(game_flags flags);
-        void remove_game_flags(game_flags flags);
-    
-        bool check_flags(game_flags type) const;
+        void add_game_flags(game_flag flags);
+        void remove_game_flags(game_flag flags);
+        bool check_flags(game_flag type) const;
 
         bool is_game_over() const;
     };

@@ -93,7 +93,7 @@ namespace banggame {
 
     void request_discard_pass::on_pick(card *target_card) {
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
-        if (target->m_game->check_flags(game_flags::phase_one_draw_discard)) {
+        if (target->m_game->check_flags(game_flag::phase_one_draw_discard)) {
             target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
         } else {
             target->discard_card(target_card);

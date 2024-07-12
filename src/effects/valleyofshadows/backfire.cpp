@@ -12,8 +12,8 @@ namespace banggame {
         player *target = origin->m_game->top_request()->origin;
         effect_missed::on_play(origin_card, origin);
         if (target) {
-            target->m_game->queue_request<request_bang>(origin_card, origin, target,
-                effect_flags::escapable | effect_flags::single_target, 20);
+            effect_flags flags { effect_flag::escapable, effect_flag::single_target };
+            target->m_game->queue_request<request_bang>(origin_card, origin, target, flags, 20);
         }
     }
 }

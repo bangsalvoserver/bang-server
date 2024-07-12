@@ -358,23 +358,23 @@ void game_manager::handle_chat_command(game_user &user, const std::string &messa
     auto &command = cmd_it->second;
     auto &lobby = *user.in_lobby;
 
-    if (bool(command.permissions() & command_permissions::lobby_owner) && &user != lobby.users.front().user) {
+    if (command.permissions().check(command_permissions::lobby_owner) && &user != lobby.users.front().user) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 
-    if (bool(command.permissions() & command_permissions::lobby_waiting) && lobby.state != lobby_state::waiting) {
+    if (command.permissions().check(command_permissions::lobby_waiting) && lobby.state != lobby_state::waiting) {
         throw lobby_error("ERROR_LOBBY_NOT_WAITING");
     }
 
-    if (bool(command.permissions() & command_permissions::lobby_playing) && lobby.state != lobby_state::playing) {
+    if (command.permissions().check(command_permissions::lobby_playing) && lobby.state != lobby_state::playing) {
         throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
     }
 
-    if (bool(command.permissions() & command_permissions::lobby_finished) && lobby.state != lobby_state::finished) {
+    if (command.permissions().check(command_permissions::lobby_finished) && lobby.state != lobby_state::finished) {
         throw lobby_error("ERROR_LOBBY_NOT_FINISHED");
     }
 
-    if (bool(command.permissions() & command_permissions::game_cheat)) {
+    if (command.permissions().check(command_permissions::game_cheat)) {
         if (lobby.state != lobby_state::playing) {
             throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
         } else if (!m_options.enable_cheats) {

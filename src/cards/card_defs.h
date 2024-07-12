@@ -5,32 +5,30 @@
 
 namespace banggame {
 
-    using namespace enums::flag_operators;
+    enum class card_suit {
+        none,
+        hearts,
+        diamonds,
+        clubs,
+        spades,
+    };
 
-    DEFINE_ENUM(card_suit,
-        (none)
-        (hearts)
-        (diamonds)
-        (clubs)
-        (spades)
-    )
-
-    DEFINE_ENUM(card_rank,
-        (none)
-        (rank_2)
-        (rank_3)
-        (rank_4)
-        (rank_5)
-        (rank_6)
-        (rank_7)
-        (rank_8)
-        (rank_9)
-        (rank_10)
-        (rank_J)
-        (rank_Q)
-        (rank_K)
-        (rank_A)
-    )
+    enum class card_rank {
+        none,
+        rank_2,
+        rank_3,
+        rank_4,
+        rank_5,
+        rank_6,
+        rank_7,
+        rank_8,
+        rank_9,
+        rank_10,
+        rank_J,
+        rank_Q,
+        rank_K,
+        rank_A,
+    };
 
     struct card_sign {
         card_suit suit;
@@ -58,67 +56,82 @@ namespace banggame {
         }
     };
 
-    DEFINE_ENUM_FLAGS(expansion_type,
-        (dodgecity)
-        (goldrush)
-        (armedanddangerous)
-        (greattrainrobbery)
-        (valleyofshadows)
-        (highnoon)
-        (fistfulofcards)
-        (wildwestshow)
-        (thebullet)
-        (canyondiablo)
-    )
+    enum class expansion_type {
+        dodgecity,
+        goldrush,
+        armedanddangerous,
+        greattrainrobbery,
+        valleyofshadows,
+        highnoon,
+        fistfulofcards,
+        wildwestshow,
+        thebullet,
+        canyondiablo,
+    };
 
-    DEFINE_ENUM(card_color_type,
-        (none)
-        (brown)
-        (blue)
-        (green)
-        (black)
-        (orange)
-        (train)
-    )
+    enum class card_color_type {
+        none,
+        brown,
+        blue,
+        green,
+        black,
+        orange,
+        train,
+    };
 
-    DEFINE_ENUM(player_role,
-        (unknown)
-        (sheriff)
-        (deputy)
-        (outlaw)
-        (renegade)
-        (deputy_3p)
-        (outlaw_3p)
-        (renegade_3p)
-    )
+    enum class player_role {
+        unknown,
+        sheriff,
+        deputy,
+        outlaw,
+        renegade,
+        deputy_3p,
+        outlaw_3p,
+        renegade_3p,
+    };
 
-    DEFINE_ENUM_TYPES(target_type,
-        (none)
-        (player,                serial::player)
-        (conditional_player,    serial::opt_player)
-        (adjacent_players,      serial::player_list)
-        (player_per_cube,       serial::player_list)
-        (card,                  serial::card)
-        (extra_card,            serial::opt_card)
-        (players)
-        (cards,                 serial::card_list)
-        (max_cards,             serial::card_list)
-        (card_per_player,       serial::card_list)
-        (move_cube_slot,        serial::card_list)
-        (select_cubes,          serial::card_list)
-        (select_cubes_optional, serial::card_list)
-        (select_cubes_repeat,   serial::card_list)
-        (select_cubes_players,  serial::card_list)
-        (self_cubes)
-    )
+    enum class target_type {
+        none,
+        player,
+        conditional_player,
+        adjacent_players,
+        player_per_cube,
+        card,
+        extra_card,
+        players,
+        cards,
+        max_cards,
+        card_per_player,
+        move_cube_slot,
+        select_cubes,
+        select_cubes_optional,
+        select_cubes_repeat,
+        select_cubes_players,
+        self_cubes,
+    };
 
-    using play_card_target = enums::enum_variant<target_type>;
+    using play_card_target = enums::enum_variant<target_type,
+        enums::type_assoc<target_type::player, serial::player>,
+        enums::type_assoc<target_type::conditional_player, serial::opt_player>,
+        enums::type_assoc<target_type::adjacent_players, serial::player_list>,
+        enums::type_assoc<target_type::player_per_cube, serial::player_list>,
+        enums::type_assoc<target_type::card, serial::card>,
+        enums::type_assoc<target_type::extra_card, serial::opt_card>,
+        enums::type_assoc<target_type::cards, serial::card_list>,
+        enums::type_assoc<target_type::max_cards, serial::card_list>,
+        enums::type_assoc<target_type::card_per_player, serial::card_list>,
+        enums::type_assoc<target_type::move_cube_slot, serial::card_list>,
+        enums::type_assoc<target_type::select_cubes, serial::card_list>,
+        enums::type_assoc<target_type::select_cubes_optional, serial::card_list>,
+        enums::type_assoc<target_type::select_cubes_repeat, serial::card_list>,
+        enums::type_assoc<target_type::select_cubes_players, serial::card_list>
+    >;
     using target_list = std::vector<play_card_target>;
 
     struct effect_holder {
         target_type target;
-        target_player_filter player_filter;
-        target_card_filter card_filter;
+        enums::bitset<target_player_filter> player_filter;
+        enums::bitset<target_card_filter> card_filter;
         short effect_value;
         short target_value;
         const effect_vtable *type;
@@ -187,42 +200,42 @@ namespace banggame {
     using equip_list = std::vector<equip_holder>;
     using tag_map = std::unordered_map<tag_type, short>;
 
-    DEFINE_ENUM(card_deck_type,
-        (none)
-        (main_deck)
-        (character)
-        (role)
-        (goldrush)
-        (highnoon)
-        (fistfulofcards)
-        (wildwestshow)
-        (station)
-        (locomotive)
-        (train)
-    )
+    enum class card_deck_type {
+        none,
+        main_deck,
+        character,
+        role,
+        goldrush,
+        highnoon,
+        fistfulofcards,
+        wildwestshow,
+        station,
+        locomotive,
+        train,
+    };
 
-    DEFINE_ENUM(pocket_type,
-        (none)
-        (player_hand)
-        (player_table)
-        (player_character)
-        (player_backup)
-        (main_deck)
-        (discard_pile)
-        (selection)
-        (shop_deck)
-        (shop_discard)
-        (shop_selection)
-        (hidden_deck)
-        (scenario_deck)
-        (scenario_card)
-        (wws_scenario_deck)
-        (wws_scenario_card)
-        (button_row)
-        (stations)
-        (train_deck)
-        (train)
-    )
+    enum class pocket_type {
+        none,
+        player_hand,
+        player_table,
+        player_character,
+        player_backup,
+        main_deck,
+        discard_pile,
+        selection,
+        shop_deck,
+        shop_discard,
+        shop_selection,
+        hidden_deck,
+        scenario_deck,
+        scenario_card,
+        wws_scenario_deck,
+        wws_scenario_card,
+        button_row,
+        stations,
+        train_deck,
+        train,
+    };
 
     class selected_cubes_count {
     private:

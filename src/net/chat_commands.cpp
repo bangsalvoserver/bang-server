@@ -27,7 +27,7 @@ namespace banggame {
         { "users",          { proxy<&game_manager::command_print_users>,        USERS_DESCRIPTION }},
         { "kick",           { proxy<&game_manager::command_kick_user>,          KICK_DESCRIPTION, command_permissions::lobby_owner }},
         { "options",        { proxy<&game_manager::command_get_game_options>,   GET_OPTIONS_DESCRIPTION }},
-        { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, command_permissions::lobby_owner | command_permissions::lobby_waiting }},
+        { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
         { "set-team",       { proxy<&game_manager::command_set_team>,           SET_TEAM_DESCRIPTION, command_permissions::lobby_waiting }},
         { "seed",           { proxy<&game_manager::command_get_rng_seed>,       GET_RNG_SEED_DESCRIPTION, command_permissions::lobby_finished }},
@@ -36,7 +36,7 @@ namespace banggame {
 
     void game_manager::command_print_help(game_user &user) {
         for (const auto &[cmd_name, command] : chat_command::commands) {
-            if (!bool(command.permissions() & command_permissions::game_cheat) || m_options.enable_cheats) {
+            if (!command.permissions().check(command_permissions::game_cheat) || m_options.enable_cheats) {
                 send_message<server_message_type::lobby_chat>(user.client, 0,
                     fmt::format("{}{} : {}", chat_command::start_char, cmd_name, command.description()));
             }

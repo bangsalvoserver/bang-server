@@ -117,7 +117,7 @@ namespace banggame {
             game_update update{enums::enum_tag<E>, FWD(args) ... };
             m_updates.emplace_back(target, serialize_update(update), [&]{
                 if constexpr (game_update::has_type<E>) {
-                    using value_type = enums::enum_type_t<E>;
+                    using value_type = game_update::value_type<E>;
                     if constexpr (requires { value_type::duration; }) {
                         return std::chrono::duration_cast<ticks>(update.get<E>().duration);
                     }

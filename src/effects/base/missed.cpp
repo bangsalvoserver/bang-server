@@ -34,7 +34,7 @@ namespace banggame {
 
     void effect_missedcard::on_play(card *origin_card, player *origin) {
         auto req = origin->m_game->top_request<missable_request>();
-        req->on_miss(origin_card, effect_flags::is_missed);
+        req->on_miss(origin_card, effect_flag::is_missed);
     }
 
     bool handler_play_as_missed::can_play(card *origin_card, player *origin, card *target_card) {

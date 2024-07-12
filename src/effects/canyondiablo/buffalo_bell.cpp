@@ -43,7 +43,7 @@ namespace banggame {
             effect_missed{}.on_play(origin_card, origin);
             if (sum >= 20) {
                 if (shooter) {
-                    origin->m_game->queue_request<request_bang>(origin_card, origin, shooter, effect_flags::single_target, 20);
+                    origin->m_game->queue_request<request_bang>(origin_card, origin, shooter, effect_flag::single_target, 20);
                 }
             } else if (sum >= 17) {
                 origin->draw_card(1, origin_card);

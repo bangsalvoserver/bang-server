@@ -7,7 +7,7 @@
 namespace banggame::bot_suggestion {
 
     bool target_enemy::on_check_target(card *origin_card, player *origin, player *target) {
-        if (origin->m_game->check_flags(game_flags::free_for_all)) {
+        if (origin->m_game->check_flags(game_flag::free_for_all)) {
             return origin != target;
         }
         switch (origin->m_role) {
@@ -60,7 +60,7 @@ namespace banggame::bot_suggestion {
     }
 
     bool target_friend::on_check_target(card *origin_card, player *origin, player *target) {
-        if (origin->m_game->check_flags(game_flags::free_for_all)) {
+        if (origin->m_game->check_flags(game_flag::free_for_all)) {
             return origin == target;
         }
         switch (origin->m_role) {

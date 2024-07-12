@@ -16,13 +16,12 @@ namespace banggame {
         void play(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
     }
 
-    DEFINE_ENUM_TYPES(message_type,
-        (ok)
-        (error, game_string)
-        (prompt, game_string)
-    )
+    enum class message_type { ok, error, prompt };
 
-    using game_message = enums::enum_variant<message_type>;
+    struct game_message {
+        message_type type;
+        game_string message;
+    };
 
     game_string get_play_card_error(player *origin, card *origin_card, const effect_context &ctx);
 

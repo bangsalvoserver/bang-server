@@ -38,7 +38,7 @@ namespace banggame {
     DEFINE_EFFECT(banglimit, effect_banglimit)
 
     struct equip_treat_as_bang {
-        player_flags flag;
+        player_flag flag;
         equip_treat_as_bang(int value);
         
         void on_enable(card *target_card, player *target);

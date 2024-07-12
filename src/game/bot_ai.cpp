@@ -95,7 +95,7 @@ namespace banggame {
                     auto args = generate_random_play(origin, *(selected_node.node), is_response);
                     args.bypass_prompt = bypass_prompt;
                     args.timer_id = timer_id;
-                    if (verify_and_play(origin, args).is(message_type::ok)) {
+                    if (verify_and_play(origin, args).type == message_type::ok) {
                         return true;
                     }
                 } catch (const random_element_error &error) {

@@ -23,10 +23,10 @@ struct critical_error : std::runtime_error {
     using std::runtime_error::runtime_error;
 };
 
-DEFINE_ENUM(lobby_team,
-    (game_player)
-    (game_spectator)
-)
+enum class lobby_team {
+    game_player,
+    game_spectator,
+};
 
 static constexpr ticks lobby_lifetime = 5min;
 static constexpr ticks user_lifetime = 10s;

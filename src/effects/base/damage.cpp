@@ -20,8 +20,14 @@ namespace banggame {
     request_damage::timer_damage::timer_damage(request_damage *request)
         : request_timer(request, request->target->m_game->m_options.damage_timer) {}
 
+    inline effect_flags remove_invalid_flags(effect_flags flags) {
+        flags.remove(effect_flag::escapable);
+        flags.remove(effect_flag::single_target);
+        return flags;
+    }
+
     request_damage::request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags)
-        : request_base(origin_card, origin, target, flags & ~(effect_flags::escapable | effect_flags::single_target), 200)
+        : request_base(origin_card, origin, target, remove_invalid_flags(flags), 200)
         , damage(damage) {}
     
     std::vector<card *> request_damage::get_highlights() const {
@@ -42,8 +48,8 @@ namespace banggame {
     }
 
     void request_damage::on_finished() {
-        if (bool(flags & effect_flags::play_as_bang)) {
-            if (bool(flags & effect_flags::multi_target)) {
+        if (flags.check(effect_flag::play_as_bang)) {
+            if (flags.check(effect_flag::multi_target)) {
                 target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_GATLING", origin_card, target);
             } else {
                 target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_BANG", origin_card, target, damage);
@@ -57,8 +63,8 @@ namespace banggame {
     }
 
     game_string request_damage::status_text(player *owner) const {
-        if (bool(flags & effect_flags::play_as_bang)) {
-            if (bool(flags & effect_flags::multi_target)) {
+        if (flags.check(effect_flag::play_as_bang)) {
+            if (flags.check(effect_flag::multi_target)) {
                 return {"STATUS_DAMAGING_AS_GATLING", target, origin_card};
             } else {
                 return {"STATUS_DAMAGING_AS_BANG", target, origin_card, damage};

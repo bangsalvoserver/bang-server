@@ -10,7 +10,7 @@ namespace banggame {
         std::array<card *, 2> base_characters;
         rn::sample(target->m_game->get_all_cards()
             | rv::filter([&](card *c) {
-                return c != target_card && c->expansion == expansion_type{}
+                return c != target_card && c->expansion.empty()
                     && (c->pocket == pocket_type::none
                     || (c->pocket == pocket_type::player_character && c->owner == target));
             }),

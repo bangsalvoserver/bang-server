@@ -73,7 +73,7 @@ namespace banggame {
         
         int distance_mod = to->get_distance_mod();
 
-        if (check_flags(game_flags::disable_player_distances)) {
+        if (check_flags(game_flag::disable_player_distances)) {
             return 1 + distance_mod;
         }
 
@@ -194,22 +194,22 @@ namespace banggame {
         add_update<game_update_type::play_sound>(std::string(sound_id));
     }
 
-    void game_table::add_game_flags(game_flags flags) {
-        m_game_flags |= flags;
+    void game_table::add_game_flags(game_flag flags) {
+        m_game_flags.add(flags);
         add_update<game_update_type::game_flags>(m_game_flags);
     }
 
-    void game_table::remove_game_flags(game_flags flags) {
-        m_game_flags &= ~flags;
+    void game_table::remove_game_flags(game_flag flags) {
+        m_game_flags.remove(flags);
         add_update<game_update_type::game_flags>(m_game_flags);
     }
 
-    bool game_table::check_flags(game_flags flags) const {
-        return bool(m_game_flags & flags);
+    bool game_table::check_flags(game_flag flags) const {
+        return m_game_flags.check(flags);
     }
 
     bool game_table::is_game_over() const {
-        return check_flags(game_flags::game_over);
+        return check_flags(game_flag::game_over);
     }
 
 }

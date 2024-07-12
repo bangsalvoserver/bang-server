@@ -9,7 +9,7 @@ namespace banggame {
 
     static player *get_next_player(player *origin) {
         player_iterator it{origin};
-        if (origin->m_game->check_flags(game_flags::invert_rotation)) {
+        if (origin->m_game->check_flags(game_flag::invert_rotation)) {
             ++it;
         } else {
             --it;
@@ -31,7 +31,7 @@ namespace banggame {
 
     void effect_ladyrosaoftexas::on_play(card *origin_card, player *origin) {
         player *target = get_next_player(origin);
-        target->add_player_flags(player_flags::skip_turn);
+        target->add_player_flags(player_flag::skip_turn);
         std::iter_swap(
             rn::find(origin->m_game->m_players, origin),
             rn::find(origin->m_game->m_players, target));

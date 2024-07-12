@@ -12,7 +12,7 @@ namespace banggame {
                 target_card->flash_card();
                 origin->m_game->add_log("LOG_REVIVE", target, target_card);
 
-                target->remove_player_flags(player_flags::dead);
+                target->remove_player_flags(player_flag::dead);
                 target->set_hp(2);
                 target->draw_card(2);
 

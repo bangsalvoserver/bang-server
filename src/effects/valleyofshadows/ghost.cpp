@@ -7,7 +7,7 @@
 namespace banggame {
 
     equip_ghost::equip_ghost(int value)
-        : flag(value == 1 ? player_flags::ghost_1 : player_flags::ghost_2) {}
+        : flag(value == 1 ? player_flag::ghost_1 : player_flag::ghost_2) {}
     
     void equip_ghost::on_enable(card *target_card, player *target) {
         if (!target->alive()) {

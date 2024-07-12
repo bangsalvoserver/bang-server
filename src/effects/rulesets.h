@@ -15,7 +15,7 @@ namespace banggame {
     template<expansion_type E>
     inline void do_apply_ruleset(game *game, enums::enum_tag_t<E>) {
         if constexpr (requires { ruleset_vtable_map<E>::value; }) {
-            if (bool(game->m_options.expansions & E)) {
+            if (game->m_options.expansions.check(E)) {
                 ruleset_vtable_map<E>::value.on_apply(game);
             }
         }

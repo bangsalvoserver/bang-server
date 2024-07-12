@@ -56,7 +56,7 @@ namespace banggame {
         auto req = origin->m_game->top_request<request_claus_the_saint>(origin);
         req->selected_targets.push_back(target_player);
         
-        if (!origin->m_game->check_flags(game_flags::hands_shown)) {
+        if (!origin->m_game->check_flags(game_flag::hands_shown)) {
             origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_GIFTED_CARD", origin, target_player, target_card);
             origin->m_game->add_log(update_target::excludes(origin, target_player), "LOG_GIFTED_A_CARD", origin, target_player);
         } else {

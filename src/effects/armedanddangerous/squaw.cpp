@@ -25,7 +25,7 @@ namespace banggame {
     }
 
     void effect_squaw::on_play(card *origin_card, player *origin, card *target_card, const effect_context &ctx) {
-        const auto flags = effect_flags::escapable | effect_flags::single_target;
+        const effect_flags flags { effect_flag::escapable, effect_flag::single_target };
         if (target_card->owner) {
             if (ctx.selected_cubes[origin_card].empty()) {
                 effect_destroy{}.on_play(origin_card, origin, target_card, flags);

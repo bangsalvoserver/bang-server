@@ -25,19 +25,17 @@ namespace banggame {
     }
 
     static bool has_ghost_tag(const player *origin) {
-        return bool(origin->m_player_flags & (
-            player_flags::ghost_1 |
-            player_flags::ghost_2 |
-            player_flags::temp_ghost
-        ));
+        return origin->check_player_flags(player_flag::ghost_1)
+            || origin->check_player_flags(player_flag::ghost_2)
+            || origin->check_player_flags(player_flag::temp_ghost);
     }
 
     bool player::is_ghost() const {
-        return check_player_flags(player_flags::dead) && has_ghost_tag(this);
+        return check_player_flags(player_flag::dead) && has_ghost_tag(this);
     }
 
     bool player::alive() const {
-        return !check_player_flags(player_flags::dead) || has_ghost_tag(this);
+        return !check_player_flags(player_flag::dead) || has_ghost_tag(this);
     }
 
     void player::equip_card(card *target) {
@@ -206,13 +204,13 @@ namespace banggame {
         if (target->deck == card_deck_type::train) {
             equip_card(target);
         } else {
-            target->move_to(pocket_type::player_hand, this, m_game->check_flags(game_flags::hands_shown)
+            target->move_to(pocket_type::player_hand, this, m_game->check_flags(game_flag::hands_shown)
                 ? card_visibility::shown : card_visibility::show_owner);
         }
     }
 
     void player::draw_card(int ncards, card *origin_card) {
-        if (!m_game->check_flags(game_flags::hands_shown)) {
+        if (!m_game->check_flags(game_flag::hands_shown)) {
             if (origin_card) {
                 m_game->add_log(update_target::excludes(this), "LOG_DRAWN_CARDS_FOR", this, ncards, origin_card);
             } else {
@@ -221,7 +219,7 @@ namespace banggame {
         }
         for (int i=0; i<ncards; ++i) {
             card *drawn_card = m_game->top_of_deck();
-            if (m_game->check_flags(game_flags::hands_shown)) {
+            if (m_game->check_flags(game_flag::hands_shown)) {
                 if (origin_card) {
                     m_game->add_log("LOG_DRAWN_CARD_FOR", this, drawn_card, origin_card);
                 } else {
@@ -265,11 +263,11 @@ namespace banggame {
             m_game->call_event(event_type::on_turn_end{ this, false });
             m_game->queue_action([this]{
                 if (m_extra_turns == 0) {
-                    remove_player_flags(player_flags::extra_turn);
+                    remove_player_flags(player_flag::extra_turn);
                     m_game->start_next_turn();
                 } else {
                     --m_extra_turns;
-                    add_player_flags(player_flags::extra_turn);
+                    add_player_flags(player_flag::extra_turn);
                     start_of_turn();
                 }
             }, -5);
@@ -277,7 +275,7 @@ namespace banggame {
     }
 
     void player::skip_turn() {
-        remove_player_flags(player_flags::extra_turn);
+        remove_player_flags(player_flag::extra_turn);
         m_game->call_event(event_type::on_turn_end{ this, true });
         m_game->start_next_turn();
     }
@@ -300,9 +298,9 @@ namespace banggame {
 
         game_duration duration = instant ? 0ms : durations.flip_card;
 
-        if (role == player_role::sheriff || m_game->m_players.size() <= 3 || check_player_flags(player_flags::role_revealed)) {
+        if (role == player_role::sheriff || m_game->m_players.size() <= 3 || check_player_flags(player_flag::role_revealed)) {
             m_game->add_update<game_update_type::player_show_role>(this, m_role, duration);
-            add_player_flags(player_flags::role_revealed);
+            add_player_flags(player_flag::role_revealed);
         } else {
             m_game->add_update<game_update_type::player_show_role>(update_target::includes(this), this, m_role, duration);
         }
@@ -312,26 +310,26 @@ namespace banggame {
         m_max_hp = first_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
     }
 
-    bool player::add_player_flags(player_flags flags) {
+    bool player::add_player_flags(player_flag flags) {
         if (!check_player_flags(flags)) {
-            m_player_flags |= flags;
+            m_player_flags.add(flags);
             m_game->add_update<game_update_type::player_flags>(this, m_player_flags);
             return true;
         }
         return false;
     }
 
-    bool player::remove_player_flags(player_flags flags) {
+    bool player::remove_player_flags(player_flag flags) {
         if (check_player_flags(flags)) {
-            m_player_flags &= ~flags;
+            m_player_flags.remove(flags);
             m_game->add_update<game_update_type::player_flags>(this, m_player_flags);
             return true;
         }
         return false;
     }
 
-    bool player::check_player_flags(player_flags flags) const {
-        return (m_player_flags & flags) == flags;
+    bool player::check_player_flags(player_flag flags) const {
+        return m_player_flags.check(flags);
     }
 
     int player::count_cubes() const {

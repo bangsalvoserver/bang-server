@@ -12,7 +12,7 @@ namespace banggame {
         return true;
     }
 
-    static auto cards_target_set(const player *origin, const card *origin_card, target_card_filter filter, player *target, const effect_context &ctx) {
+    static auto cards_target_set(const player *origin, const card *origin_card, enums::bitset<target_card_filter> filter, player *target, const effect_context &ctx) {
         return rv::concat(target->m_table, target->m_hand)
             | rv::filter([=, &ctx](const card *target_card) {
                 return !filters::check_card_filter(origin_card, origin, filter, target_card, ctx);
@@ -67,12 +67,12 @@ namespace banggame {
     }
 
     template<> void visit_cards::play(const effect_context &ctx, const serial::card_list &target_cards) {
-        auto flags = effect_flags::multi_target;
+        effect_flags flags = effect_flag::multi_target;
         if (origin_card->is_brown()) {
-            flags |= effect_flags::escapable;
+            flags.add(effect_flag::escapable);
         }
         if (target_cards.size() == 1) {
-            flags |= effect_flags::single_target;
+            flags.add(effect_flag::single_target);
         }
         for (card *target_card : target_cards) {
             if (target_card->pocket == pocket_type::player_hand) {

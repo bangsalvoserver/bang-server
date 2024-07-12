@@ -7,7 +7,7 @@
 namespace banggame {
     
     void equip_sacagaway::on_enable(card *target_card, player *target) {
-        target->m_game->add_game_flags(game_flags::hands_shown);
+        target->m_game->add_game_flags(game_flag::hands_shown);
 
         for (player *p : range_all_players(target)) {
             for (card *c : p->m_hand) {
@@ -23,6 +23,6 @@ namespace banggame {
             }
         }
 
-        target->m_game->remove_game_flags(game_flags::hands_shown);
+        target->m_game->remove_game_flags(game_flag::hands_shown);
     }
 }

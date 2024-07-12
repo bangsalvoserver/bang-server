@@ -22,7 +22,7 @@ namespace banggame {
         if (target->m_game->m_discards.empty()) {
             return "ERROR_DISCARD_PILE_EMPTY";
         }
-        if (target->m_game->check_flags(game_flags::phase_one_draw_discard)) {
+        if (target->m_game->check_flags(game_flag::phase_one_draw_discard)) {
             return "ERROR_INVALID_ACTION";
         }
         return {};
@@ -48,7 +48,7 @@ namespace banggame {
     
     void request_draw::on_update() {
         cards_from_selection = target->m_game->m_selection;
-        if (!target->m_game->check_flags(game_flags::phase_one_override)
+        if (!target->m_game->check_flags(game_flag::phase_one_override)
             && target->alive() && target->m_game->m_playing == target
             && num_drawn_cards < num_cards_to_draw)
         {
@@ -74,7 +74,7 @@ namespace banggame {
     }
 
     bool request_draw::can_pick(card *target_card) const {
-        if (target->m_game->m_deck.empty() || target->m_game->check_flags(game_flags::phase_one_draw_discard) && !target->m_game->m_discards.empty()) {
+        if (target->m_game->m_deck.empty() || target->m_game->check_flags(game_flag::phase_one_draw_discard) && !target->m_game->m_discards.empty()) {
             return target_card->pocket == pocket_type::discard_pile;
         } else {
             return target_card->pocket == pocket_type::main_deck;
@@ -82,7 +82,7 @@ namespace banggame {
     }
 
     card *request_draw::phase_one_drawn_card() {
-        if (!target->m_game->check_flags(game_flags::phase_one_draw_discard) || target->m_game->m_discards.empty()) {
+        if (!target->m_game->check_flags(game_flag::phase_one_draw_discard) || target->m_game->m_discards.empty()) {
             if (!cards_from_selection.empty()) {
                 card *target_card = cards_from_selection.front();
                 cards_from_selection.erase(cards_from_selection.begin());
@@ -101,7 +101,7 @@ namespace banggame {
         target->m_game->call_event(event_type::on_card_drawn{ target, drawn_card, shared_from_this(), reveal });
         if (drawn_card->pocket == pocket_type::discard_pile) {
             target->m_game->add_log("LOG_DRAWN_FROM_DISCARD", target, drawn_card);
-        } else if (target->m_game->check_flags(game_flags::hands_shown)) {
+        } else if (target->m_game->check_flags(game_flag::hands_shown)) {
             target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
         } else if (reveal) {
             target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);

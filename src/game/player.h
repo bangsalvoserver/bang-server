@@ -42,7 +42,7 @@ namespace banggame {
 
         std::vector<played_card_history> m_played_cards;
 
-        player_flags m_player_flags{};
+        player_flags m_player_flags;
 
         int8_t m_gold = 0;
 
@@ -116,9 +116,9 @@ namespace banggame {
         void pass_turn();
         void skip_turn();
 
-        bool add_player_flags(player_flags flags);
-        bool remove_player_flags(player_flags flags);
-        bool check_player_flags(player_flags flags) const;
+        bool add_player_flags(player_flag flags);
+        bool remove_player_flags(player_flag flags);
+        bool check_player_flags(player_flag flags) const;
 
         int count_cubes() const;
 

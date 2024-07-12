@@ -9,7 +9,7 @@ namespace banggame {
     struct equip_ghost : bot_suggestion::target_friend {
         struct nodisable {};
         
-        player_flags flag;
+        player_flag flag;
         equip_ghost(int value);
         
         void on_enable(card *target_card, player *target);

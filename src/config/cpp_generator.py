@@ -11,7 +11,7 @@ class CppEnum:
         self.values = values.split()
     
     def __str__(self):
-        return ' | '.join(f'{self.enum_name}::{value}' for value in self.values)
+        return ', '.join(f'{self.enum_name}::{value}' for value in self.values)
 
 class CppLiteral:
     def __init__(self, value):

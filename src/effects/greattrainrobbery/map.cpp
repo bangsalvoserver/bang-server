@@ -20,8 +20,8 @@ namespace banggame {
         }
 
         bool move_card_to_deck() const {
-            return target->m_game->check_flags(game_flags::phase_one_override)
-                || target->m_game->check_flags(game_flags::phase_one_draw_discard) && !target->m_game->m_discards.empty();
+            return target->m_game->check_flags(game_flag::phase_one_override)
+                || target->m_game->check_flags(game_flag::phase_one_draw_discard) && !target->m_game->m_discards.empty();
         }
 
         void on_resolve() override {

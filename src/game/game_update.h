@@ -168,7 +168,7 @@ namespace banggame {
     };
 
     struct game_options {
-        expansion_type expansions{};
+        enums::bitset<expansion_type> expansions;
         bool enable_ghost_cards = false;
         bool character_choice = true;
         bool quick_discard_all = true;
@@ -181,39 +181,65 @@ namespace banggame {
         unsigned int game_seed = 0;
     };
 
-    DEFINE_ENUM_TYPES(game_update_type,
-        (game_error, game_string)
-        (game_log, game_string)
-        (game_prompt, game_string)
-        (add_cards, add_cards_update)
-        (remove_cards, remove_cards_update)
-        (move_card, move_card_update)
-        (add_cubes, add_cubes_update)
-        (move_cubes, move_cubes_update)
-        (move_train, move_train_update)
-        (deck_shuffled, deck_shuffled_update)
-        (show_card, show_card_update)
-        (hide_card, hide_card_update)
-        (tap_card, tap_card_update)
-        (flash_card, flash_card_update)
-        (short_pause, short_pause_update)
-        (player_add, player_add_update)
-        (player_order, player_order_update)
-        (player_hp, player_hp_update)
-        (player_gold, player_gold_update)
-        (player_show_role, player_show_role_update)
-        (player_flags, player_flags_update)
-        (switch_turn, serial::player)
-        (request_status, request_status_args)
-        (status_ready, status_ready_args)
-        (game_flags, game_flags)
-        (play_sound, std::string)
-        (status_clear)
-        (clear_logs)
-    )
+    enum class game_update_type {
+        game_error,
+        game_log,
+        game_prompt,
+        add_cards,
+        remove_cards,
+        move_card,
+        add_cubes,
+        move_cubes,
+        move_train,
+        deck_shuffled,
+        show_card,
+        hide_card,
+        tap_card,
+        flash_card,
+        short_pause,
+        player_add,
+        player_order,
+        player_hp,
+        player_gold,
+        player_show_role,
+        player_flags,
+        switch_turn,
+        request_status,
+        status_ready,
+        game_flags,
+        play_sound,
+        status_clear,
+        clear_logs,
+    };
 
-    using game_update = enums::enum_variant<game_update_type>;
-    #define UPD_TAG(name) enums::enum_tag_t<game_update_type::name>
+    using game_update = enums::enum_variant<game_update_type,
+        enums::type_assoc<game_update_type::game_error, game_string>,
+        enums::type_assoc<game_update_type::game_log, game_string>,
+        enums::type_assoc<game_update_type::game_prompt, game_string>,
+        enums::type_assoc<game_update_type::add_cards, add_cards_update>,
+        enums::type_assoc<game_update_type::remove_cards, remove_cards_update>,
+        enums::type_assoc<game_update_type::move_card, move_card_update>,
+        enums::type_assoc<game_update_type::add_cubes, add_cubes_update>,
+        enums::type_assoc<game_update_type::move_cubes, move_cubes_update>,
+        enums::type_assoc<game_update_type::move_train, move_train_update>,
+        enums::type_assoc<game_update_type::deck_shuffled, deck_shuffled_update>,
+        enums::type_assoc<game_update_type::show_card, show_card_update>,
+        enums::type_assoc<game_update_type::hide_card, hide_card_update>,
+        enums::type_assoc<game_update_type::tap_card, tap_card_update>,
+        enums::type_assoc<game_update_type::flash_card, flash_card_update>,
+        enums::type_assoc<game_update_type::short_pause, short_pause_update>,
+        enums::type_assoc<game_update_type::player_add, player_add_update>,
+        enums::type_assoc<game_update_type::player_order, player_order_update>,
+        enums::type_assoc<game_update_type::player_hp, player_hp_update>,
+        enums::type_assoc<game_update_type::player_gold, player_gold_update>,
+        enums::type_assoc<game_update_type::player_show_role, player_show_role_update>,
+        enums::type_assoc<game_update_type::player_flags, player_flags_update>,
+        enums::type_assoc<game_update_type::switch_turn, serial::player>,
+        enums::type_assoc<game_update_type::request_status, request_status_args>,
+        enums::type_assoc<game_update_type::status_ready, status_ready_args>,
+        enums::type_assoc<game_update_type::game_flags, game_flags>,
+        enums::type_assoc<game_update_type::play_sound, std::string>
+    >;
 
     struct modifier_pair {
         serial::card card;

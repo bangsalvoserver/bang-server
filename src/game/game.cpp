@@ -27,7 +27,7 @@ namespace banggame {
     player_order_update game::make_player_order_update(bool instant) {
         return player_order_update{m_players
             | rv::filter([](player *p) {
-                return !p->check_player_flags(player_flags::removed);
+                return !p->check_player_flags(player_flag::removed);
             })
             | rn::to<serial::player_list>,
             instant ? 0ms : durations.move_player};
@@ -104,11 +104,11 @@ namespace banggame {
         }
 
         for (player *p : m_players) {
-            if (p->check_player_flags(player_flags::role_revealed)) {
+            if (p->check_player_flags(player_flag::role_revealed)) {
                 co_yield make_update<game_update_type::player_show_role>(p, p->m_role, 0ms);
             }
 
-            if (!p->check_player_flags(player_flags::removed)) {
+            if (!p->check_player_flags(player_flag::removed)) {
                 co_await add_cards(pocket_type::player_character, p);
                 co_await add_cards(pocket_type::player_backup, p);
 
@@ -144,7 +144,7 @@ namespace banggame {
     }
 
     util::generator<json::json> game::get_rejoin_updates(player *target) {
-        if (!target->check_player_flags(player_flags::role_revealed)) {
+        if (!target->check_player_flags(player_flag::role_revealed)) {
             co_yield make_update<game_update_type::player_show_role>(target, target->m_role, 0ms);
         }
 
@@ -200,7 +200,7 @@ namespace banggame {
 
             int count = 0;
             for (const card_data &c : cards) {
-                if ((c.expansion & m_options.expansions) != c.expansion) continue;
+                if (!c.expansion.check(m_options.expansions)) continue;
 
                 if (c.has_tag(tag_type::ghost_card)) {
                     if (m_options.enable_ghost_cards) {
@@ -310,7 +310,7 @@ namespace banggame {
 
         m_options.enable_ghost_cards = ghost_card_added;
 
-        add_game_flags(game_flags::hands_shown);
+        add_game_flags(game_flag::hands_shown);
 
         auto character_it = character_ptrs.rbegin();
         for (player *p : range_all_players(m_first_player)) {
@@ -330,7 +330,7 @@ namespace banggame {
         }
 
         queue_action([this] {
-            remove_game_flags(game_flags::hands_shown);
+            remove_game_flags(game_flag::hands_shown);
             add_log("LOG_GAME_START");
             play_sound("gamestart");
 
@@ -444,14 +444,14 @@ namespace banggame {
         if (m_playing) {
             auto it = rn::find(m_players, m_playing);
             while (true) {
-                if (check_flags(game_flags::invert_rotation)) {
+                if (check_flags(game_flag::invert_rotation)) {
                     if (it == m_players.begin()) it = m_players.end();
                     --it;
                 } else {
                     ++it;
                     if (it == m_players.end()) it = m_players.begin();
                 }
-                if (!(*it)->remove_player_flags(player_flags::skip_turn)) {
+                if (!(*it)->remove_player_flags(player_flag::skip_turn)) {
                     call_event(event_type::check_revivers{ *it });
                     if ((*it)->alive()) break;
                 }
@@ -478,7 +478,7 @@ namespace banggame {
                     add_log("LOG_PLAYER_DIED", target);
                 }
 
-                target->add_player_flags(player_flags::dead);
+                target->add_player_flags(player_flag::dead);
                 target->set_hp(0, true);
             }
 
@@ -490,7 +490,7 @@ namespace banggame {
                     target->disable_equip(c);
                 }
 
-                if (target->add_player_flags(player_flags::role_revealed)) {
+                if (target->add_player_flags(player_flag::role_revealed)) {
                     add_update<game_update_type::player_show_role>(update_target::excludes(target), target, target->m_role);
                 }
 
@@ -530,9 +530,9 @@ namespace banggame {
 
         if (!m_options.enable_ghost_cards) {
             queue_action([this]{
-                if (auto range = rv::filter(m_players, [](player *p) { return !p->alive() && !p->check_player_flags(player_flags::removed); })) {
+                if (auto range = rv::filter(m_players, [](player *p) { return !p->alive() && !p->check_player_flags(player_flag::removed); })) {
                     for (player *p : range) {
-                        p->add_player_flags(player_flags::removed);
+                        p->add_player_flags(player_flag::removed);
                     }
                     
                     add_update<game_update_type::player_order>(make_player_order_update());
@@ -547,20 +547,20 @@ namespace banggame {
 
             auto declare_winners = [this](auto &&winners) {
                 for (player *p : range_all_players_and_dead(m_playing)) {
-                    if (p->add_player_flags(player_flags::role_revealed)) {
+                    if (p->add_player_flags(player_flag::role_revealed)) {
                         add_update<game_update_type::player_show_role>(update_target::excludes(p), p, p->m_role);
                     }
                 }
                 add_log("LOG_GAME_OVER");
                 for (player *p : winners) {
-                    p->add_player_flags(player_flags::winner);
+                    p->add_player_flags(player_flag::winner);
                 }
-                add_game_flags(game_flags::game_over);
+                add_game_flags(game_flag::game_over);
             };
 
             auto alive_players = rv::filter(m_players, &player::alive);
 
-            if (check_flags(game_flags::free_for_all)) {
+            if (check_flags(game_flag::free_for_all)) {
                 if (rn::distance(alive_players) <= 1) {
                     declare_winners(alive_players);
                 }

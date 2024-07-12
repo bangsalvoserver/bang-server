@@ -12,7 +12,7 @@ namespace banggame {
     void equip_taxman::on_enable(card *target_card, player *target) {
         target->m_game->add_listener<event_type::get_predraw_checks>({target_card, 10},
             [=, priority=predraw_check_priority](player *origin, std::vector<event_card_key> &ret) {
-                if (origin == target && !target->m_game->check_flags(game_flags::phase_one_override)) {
+                if (origin == target && !target->m_game->check_flags(game_flag::phase_one_override)) {
                     ret.emplace_back(target_card, priority);
                 };
             });

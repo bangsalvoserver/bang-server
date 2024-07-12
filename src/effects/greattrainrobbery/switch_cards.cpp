@@ -35,7 +35,7 @@ namespace banggame {
 
     struct request_switch_cards : request_targeting {
         request_switch_cards(card *origin_card, player *origin, player *target, card *chosen_card, card *target_card)
-            : request_targeting(origin_card, origin, target, target_card, effect_flags::escapable)
+            : request_targeting(origin_card, origin, target, target_card, effect_flag::escapable)
             , chosen_card(chosen_card) {}
 
         card *chosen_card;

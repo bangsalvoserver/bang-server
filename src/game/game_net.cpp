@@ -128,17 +128,18 @@ namespace banggame {
         
         auto result = verify_and_play(origin, json::deserialize<game_action, game_context>(value, *this));
 
-        enums::visit_indexed(overloaded{
-            [&](enums::enum_tag_t<message_type::ok>) {
-                origin->m_game->commit_updates();
-            },
-            [&](enums::enum_tag_t<message_type::error>, game_string message) {
-                add_update<game_update_type::game_error>(update_target::includes_private(origin), std::move(message));
-            },
-            [&](enums::enum_tag_t<message_type::prompt>, game_string message) {
-                add_update<game_update_type::game_prompt>(update_target::includes_private(origin), std::move(message));
-            }
-        }, result);
+        switch (result.type) {
+        case message_type::ok:
+            origin->m_game->commit_updates();
+            break;
+        case message_type::error:
+            add_update<game_update_type::game_error>(update_target::includes_private(origin), result.message);
+            break;
+        case message_type::prompt:
+            add_update<game_update_type::game_prompt>(update_target::includes_private(origin), result.message);
+            break;
+        }
+        
         return {};
     }
 }

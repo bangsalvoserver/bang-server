@@ -55,12 +55,12 @@ namespace banggame {
             }
         }
 
-        auto flags = effect_flags::multi_target | effect_flags::skip_target_logs;
+        effect_flags flags { effect_flag::multi_target, effect_flag::skip_target_logs };
         if (targets.size() == 1) {
-            flags |= effect_flags::single_target;
+            flags.add(effect_flag::single_target);
         }
         if (origin_card->is_brown()) {
-            flags |= effect_flags::escapable;
+            flags.add(effect_flag::escapable);
         }
 
         for (player *target : targets) {

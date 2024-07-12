@@ -31,9 +31,9 @@ namespace banggame {
     }
 
     template<> void visit_player::play(const effect_context &ctx, player *target) {
-        auto flags = effect_flags::single_target;
+        effect_flags flags = effect_flag::single_target;
         if (origin_card->is_brown()) {
-            flags |= effect_flags::escapable;
+            flags.add(effect_flag::escapable);
         }
         effect.on_play(origin_card, origin, target, flags, ctx);
     }

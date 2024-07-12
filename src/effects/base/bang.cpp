@@ -11,24 +11,26 @@
 namespace banggame {
     
     void effect_bang::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
-        if (!bool(flags & effect_flags::skip_target_logs)) {
+        if (!flags.check(effect_flag::skip_target_logs)) {
             target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         }
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
     static void queue_request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {}) {
-        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags | effect_flags::is_bang | effect_flags::single_target);
+        flags.add(effect_flag::is_bang);
+        flags.add(effect_flag::single_target);
+        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags);
         req->origin->m_game->call_event(event_type::apply_bang_modifier{ req->origin, req });
         req->origin->m_game->queue_request(std::move(req));
     }
 
     game_string effect_bangcard::get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) {
-        if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flags::treat_any_as_bang)) {
+        if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flag::treat_any_as_bang)) {
             return "ERROR_CARD_INACTIVE";
         } else if (!ctx.disable_bang_checks) {
             game_string out_error;
-            origin->m_game->call_event(event_type::check_bang_target{ origin_card, origin, target, effect_flags::is_bang, out_error });
+            origin->m_game->call_event(event_type::check_bang_target{ origin_card, origin, target, effect_flag::is_bang, out_error });
             return out_error;
         } else {
             return {};
@@ -56,7 +58,7 @@ namespace banggame {
     void handler_play_as_bang::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
         origin->discard_used_card(chosen_card);
-        queue_request_bang(chosen_card, origin, target, effect_flags::play_as_bang);
+        queue_request_bang(chosen_card, origin, target, effect_flag::play_as_bang);
     }
     
     game_string effect_banglimit::get_error(card *origin_card, player *origin, const effect_context &ctx) {
@@ -84,7 +86,7 @@ namespace banggame {
     }
 
     equip_treat_as_bang::equip_treat_as_bang(int value)
-        : flag{value == 1 ? player_flags::treat_missed_as_bang : player_flags::treat_any_as_bang} {}
+        : flag{value == 1 ? player_flag::treat_missed_as_bang : player_flag::treat_any_as_bang} {}
 
     void equip_treat_as_bang::on_enable(card *origin_card, player *p) {
         p->add_player_flags(flag);
@@ -112,7 +114,8 @@ namespace banggame {
 
     void request_bang::on_miss(card *c, effect_flags missed_flags) {
         if (--bang_strength == 0) {
-            target->m_game->call_event(event_type::on_missed{ origin_card, origin, target, c, flags | missed_flags });
+            missed_flags.merge(flags);
+            target->m_game->call_event(event_type::on_missed{ origin_card, origin, target, c, missed_flags });
             target->m_game->pop_request();
         }
     }
@@ -127,7 +130,7 @@ namespace banggame {
             target->m_game->pop_request();
         } else {
             if (!live) {
-                if (bool(flags & effect_flags::multi_target)) {
+                if (flags.check(effect_flag::multi_target)) {
                     target->play_sound("gatling");
                 } else {
                     target->play_sound("bang");
@@ -140,8 +143,8 @@ namespace banggame {
     }
 
     game_string request_bang::status_text(player *owner) const {
-        if (bool(flags & effect_flags::play_as_bang)) {
-            if (bool(flags & effect_flags::multi_target)) {
+        if (flags.check(effect_flag::play_as_bang)) {
+            if (flags.check(effect_flag::multi_target)) {
                 if (target != owner) {
                     return {"STATUS_CARD_AS_GATLING_OTHER", target, origin_card};
                 } else {

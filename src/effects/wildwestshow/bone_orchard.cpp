@@ -19,7 +19,7 @@ namespace banggame {
                     
                     for (player *p : dead_players) {
                         p->set_role(player_role::unknown, false);
-                        p->remove_player_flags(player_flags::role_revealed);
+                        p->remove_player_flags(player_flag::role_revealed);
                     }
 
                     for (auto [p, role] : rv::zip(dead_players, roles)) {
@@ -27,7 +27,7 @@ namespace banggame {
                     }
                 }
 
-                target->remove_player_flags(player_flags::dead);
+                target->remove_player_flags(player_flag::dead);
                 target->set_hp(1);
 
                 for (auto *c : target->m_characters) {

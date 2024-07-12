@@ -22,10 +22,14 @@ namespace banggame {
     enum class target_card_filter;
     enum class tag_type;
     
-    enum class effect_flags;
-    enum class game_flags;
-    enum class player_flags;
+    enum class effect_flag;
+    enum class game_flag;
+    enum class player_flag;
     enum class discard_all_reason;
+
+    using effect_flags = enums::bitset<effect_flag>;
+    using game_flags = enums::bitset<game_flag>;
+    using player_flags = enums::bitset<player_flag>;
 
 }
 

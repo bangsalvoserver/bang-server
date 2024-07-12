@@ -211,7 +211,7 @@ namespace banggame {
     }
 
     game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx) {
-        if (origin->m_game->check_flags(game_flags::disable_equipping)) {
+        if (origin->m_game->check_flags(game_flag::disable_equipping)) {
             return "ERROR_CANT_EQUIP_CARDS";
         }
         if (origin_card->self_equippable()) {
@@ -419,16 +419,16 @@ namespace banggame {
         effect_context ctx { .playing_card = args.card };
 
         if (game_string error = verify_timer_response(origin, args.timer_id)) {
-            return {enums::enum_tag<message_type::error>, error};
+            return {message_type::error, error};
         }
 
         if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-            return {enums::enum_tag<message_type::error>, error};
+            return {message_type::error, error};
         }
 
         if (!args.bypass_prompt) {
             if (game_string prompt = get_prompt_message(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-                return {enums::enum_tag<message_type::prompt>, prompt};
+                return {message_type::prompt, prompt};
             }
         }
 

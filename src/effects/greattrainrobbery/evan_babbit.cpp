@@ -14,7 +14,7 @@ namespace banggame {
                 return "ERROR_INVALID_ACTION";
             }
             
-            if (!bool(req->flags & effect_flags::is_bang)) {
+            if (!req->flags.check(effect_flag::is_bang)) {
                 return "ERROR_INVALID_ACTION";
             }
 

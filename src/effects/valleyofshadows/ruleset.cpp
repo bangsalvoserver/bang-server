@@ -10,7 +10,7 @@ namespace banggame {
     void ruleset_valleyofshadows::on_apply(game *game) {
         game->add_listener<event_type::apply_escapable_modifier>(nullptr,
             [=](card *origin_card, player *origin, const player *target, effect_flags flags, int &value) {
-                if (!target->empty_hand() && bool(flags & effect_flags::escapable) && !rn::contains(game->m_discards, "ESCAPE", &card::name)) {
+                if (!target->empty_hand() && flags.check(effect_flag::escapable) && !rn::contains(game->m_discards, "ESCAPE", &card::name)) {
                     value = 1;
                 }
             });

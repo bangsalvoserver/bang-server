@@ -11,58 +11,58 @@ namespace banggame::filters {
         return origin->is_bot();
     }
 
-    game_string check_player_filter(const player *origin, target_player_filter filter, const player *target, const effect_context &ctx) {
-        if (bool(filter & target_player_filter::dead)) {
-            if (!bool(filter & target_player_filter::alive) && !target->check_player_flags(player_flags::dead)) {
+    game_string check_player_filter(const player *origin, enums::bitset<target_player_filter> filter, const player *target, const effect_context &ctx) {
+        if (filter.check(target_player_filter::dead)) {
+            if (!filter.check(target_player_filter::alive) && !target->check_player_flags(player_flag::dead)) {
                 return "ERROR_TARGET_NOT_DEAD";
             }
         } else if (!target->alive()) {
             return "ERROR_TARGET_DEAD";
         }
 
-        if (bool(filter & target_player_filter::self) && target != origin)
+        if (filter.check(target_player_filter::self) && target != origin)
             return "ERROR_TARGET_NOT_SELF";
 
-        if (bool(filter & target_player_filter::notself) && target == origin)
+        if (filter.check(target_player_filter::notself) && target == origin)
             return "ERROR_TARGET_SELF";
         
-        if (bool(filter & target_player_filter::notorigin)) {
+        if (filter.check(target_player_filter::notorigin)) {
             auto req = origin->m_game->top_request();
             if (!req || req->origin == target) {
                 return "ERROR_TARGET_ORIGIN";
             }
         }
 
-        if (bool(filter & target_player_filter::notsheriff) && target->m_role == player_role::sheriff)
+        if (filter.check(target_player_filter::notsheriff) && target->m_role == player_role::sheriff)
             return "ERROR_TARGET_SHERIFF";
 
-        if (bool(filter & target_player_filter::not_empty_hand) && target->empty_hand())
+        if (filter.check(target_player_filter::not_empty_hand) && target->empty_hand())
             return "ERROR_TARGET_EMPTY_HAND";
         
-        if (bool(filter & target_player_filter::not_empty_table) && target->empty_table())
+        if (filter.check(target_player_filter::not_empty_table) && target->empty_table())
             return "ERROR_TARGET_EMPTY_TABLE";
 
-        if (bool(filter & target_player_filter::not_empty_cubes) && target->count_cubes() == 0)
+        if (filter.check(target_player_filter::not_empty_cubes) && target->count_cubes() == 0)
             return "ERROR_TARGET_EMPTY_CUBES";
         
-        if (bool(filter & target_player_filter::target_set)) {
+        if (filter.check(target_player_filter::target_set)) {
             auto req = target->m_game->top_request<interface_target_set>(origin);
             if (!req || !req->in_target_set(target)) {
                 return "ERROR_TARGET_NOT_IN_TARGET_SET";
             }
         }
 
-        if (!ctx.ignore_distances && bool(filter & (target_player_filter::reachable | target_player_filter::range_1 | target_player_filter::range_2))) {
+        if (!ctx.ignore_distances && (filter.check(target_player_filter::reachable) || filter.check(target_player_filter::range_1) || filter.check(target_player_filter::range_2))) {
             int range = origin->get_range_mod();
-            if (bool(filter & target_player_filter::reachable)) {
+            if (filter.check(target_player_filter::reachable)) {
                 int weapon_range = origin->get_weapon_range();
                 if (weapon_range == 0) {
                     return "ERROR_TARGET_NOT_IN_RANGE";
                 }
                 range += weapon_range;
-            } else if (bool(filter & target_player_filter::range_1)) {
+            } else if (filter.check(target_player_filter::range_1)) {
                 ++range;
-            } else if (bool(filter & target_player_filter::range_2)) {
+            } else if (filter.check(target_player_filter::range_2)) {
                 range += 2;
             }
             if (origin->m_game->calc_distance(origin, target) > range) {
@@ -90,10 +90,10 @@ namespace banggame::filters {
     }
 
     bool is_bang_card(const player *origin, const card *target) {
-        return origin->m_game->check_flags(game_flags::treat_any_as_bang)
-            || origin->check_player_flags(player_flags::treat_any_as_bang)
+        return origin->m_game->check_flags(game_flag::treat_any_as_bang)
+            || origin->check_player_flags(player_flag::treat_any_as_bang)
             || target->has_tag(tag_type::bangcard)
-            || origin->check_player_flags(player_flags::treat_missed_as_bang)
+            || origin->check_player_flags(player_flag::treat_missed_as_bang)
             && target->has_tag(tag_type::missed);
     }
 
@@ -108,71 +108,71 @@ namespace banggame::filters {
         }
     }
 
-    game_string check_card_filter(const card *origin_card, const player *origin, target_card_filter filter, const card *target, const effect_context &ctx) {
-        if (!bool(filter & target_card_filter::can_target_self) && target == origin_card)
+    game_string check_card_filter(const card *origin_card, const player *origin, enums::bitset<target_card_filter> filter, const card *target, const effect_context &ctx) {
+        if (!filter.check(target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";
         
-        if (bool(filter & target_card_filter::cube_slot)) {
+        if (filter.check(target_card_filter::cube_slot)) {
             if (target != target->owner->first_character() && !(target->is_orange() && target->pocket == pocket_type::player_table))
                 return "ERROR_TARGET_NOT_CUBE_SLOT";
         } else if (target->deck == card_deck_type::character) {
             return "ERROR_TARGET_NOT_CARD";
         }
 
-        if (bool(filter & target_card_filter::beer) && !target->has_tag(tag_type::beer))
+        if (filter.check(target_card_filter::beer) && !target->has_tag(tag_type::beer))
             return "ERROR_TARGET_NOT_BEER";
 
-        if (bool(filter & target_card_filter::bang) && !is_bang_card(origin, target))
+        if (filter.check(target_card_filter::bang) && !is_bang_card(origin, target))
             return "ERROR_TARGET_NOT_BANG";
 
-        if (bool(filter & target_card_filter::bangcard) && !target->has_tag(tag_type::bangcard))
+        if (filter.check(target_card_filter::bangcard) && !target->has_tag(tag_type::bangcard))
             return "ERROR_TARGET_NOT_BANG";
 
-        if (bool(filter & target_card_filter::not_bangcard) && target->has_tag(tag_type::bangcard))
+        if (filter.check(target_card_filter::not_bangcard) && target->has_tag(tag_type::bangcard))
             return "ERROR_TARGET_BANG";
 
-        if (bool(filter & target_card_filter::missed) && !target->has_tag(tag_type::missed))
+        if (filter.check(target_card_filter::missed) && !target->has_tag(tag_type::missed))
             return "ERROR_TARGET_NOT_MISSED";
 
-        if (bool(filter & target_card_filter::missedcard) && !target->has_tag(tag_type::missedcard))
+        if (filter.check(target_card_filter::missedcard) && !target->has_tag(tag_type::missedcard))
             return "ERROR_TARGET_NOT_MISSED";
 
-        if (bool(filter & target_card_filter::not_missedcard) && target->has_tag(tag_type::missedcard))
+        if (filter.check(target_card_filter::not_missedcard) && target->has_tag(tag_type::missedcard))
             return "ERROR_TARGET_MISSED";
 
-        if (bool(filter & target_card_filter::bronco) && !target->has_tag(tag_type::bronco))
+        if (filter.check(target_card_filter::bronco) && !target->has_tag(tag_type::bronco))
             return "ERROR_TARGET_NOT_BRONCO";
 
-        if (bool(filter & target_card_filter::catbalou_panic)
+        if (filter.check(target_card_filter::catbalou_panic)
             && !target->has_tag(tag_type::cat_balou)
             && !target->has_tag(tag_type::panic))
             return "ERROR_TARGET_NOT_CATBALOU_PANIC";
 
-        if (bool(filter & target_card_filter::blue) && !target->is_blue())
+        if (filter.check(target_card_filter::blue) && !target->is_blue())
             return "ERROR_TARGET_NOT_BLUE_CARD";
 
-        if (bool(filter & target_card_filter::train) && !target->is_train())
+        if (filter.check(target_card_filter::train) && !target->is_train())
             return "ERROR_TARGET_NOT_TRAIN";
 
-        if (bool(filter & target_card_filter::blue_or_train) && !target->is_blue() && !target->is_train())
+        if (filter.check(target_card_filter::blue_or_train) && !target->is_blue() && !target->is_train())
             return "ERROR_TARGET_NOT_BLUE_OR_TRAIN";
 
-        if (bool(filter & target_card_filter::black) != target->is_black())
+        if (filter.check(target_card_filter::black) != target->is_black())
             return "ERROR_TARGET_BLACK_CARD";
 
-        if (bool(filter & target_card_filter::hearts) && !target->sign.is_hearts())
+        if (filter.check(target_card_filter::hearts) && !target->sign.is_hearts())
             return "ERROR_TARGET_NOT_HEARTS";
 
-        if (bool(filter & target_card_filter::diamonds) && !target->sign.is_diamonds())
+        if (filter.check(target_card_filter::diamonds) && !target->sign.is_diamonds())
             return "ERROR_TARGET_NOT_DIAMONDS";
 
-        if (bool(filter & target_card_filter::clubs) && !target->sign.is_clubs())
+        if (filter.check(target_card_filter::clubs) && !target->sign.is_clubs())
             return "ERROR_TARGET_NOT_CLUBS";
         
-        if (bool(filter & target_card_filter::spades) && !target->sign.is_spades())
+        if (filter.check(target_card_filter::spades) && !target->sign.is_spades())
             return "ERROR_TARGET_NOT_SPADES";
         
-        if (bool(filter & target_card_filter::origin_card_suit)) {
+        if (filter.check(target_card_filter::origin_card_suit)) {
             auto req = origin->m_game->top_request();
             card *req_origin_card = req ? req->origin_card : nullptr;
             if (!req_origin_card) return "ERROR_NO_ORIGIN_CARD_SUIT";
@@ -185,19 +185,19 @@ namespace banggame::filters {
             }
         }
         
-        if (bool(filter & target_card_filter::two_to_nine) && !target->sign.is_two_to_nine())
+        if (filter.check(target_card_filter::two_to_nine) && !target->sign.is_two_to_nine())
             return "ERROR_TARGET_NOT_TWO_TO_NINE";
         
-        if (bool(filter & target_card_filter::ten_to_ace) && !target->sign.is_ten_to_ace())
+        if (filter.check(target_card_filter::ten_to_ace) && !target->sign.is_ten_to_ace())
             return "ERROR_TARGET_NOT_TEN_TO_ACE";
 
-        if (bool(filter & target_card_filter::selection) && target->pocket != pocket_type::selection)
+        if (filter.check(target_card_filter::selection) && target->pocket != pocket_type::selection)
             return "ERROR_TARGET_NOT_SELECTION";
 
-        if (bool(filter & target_card_filter::table) && target->pocket != pocket_type::player_table)
+        if (filter.check(target_card_filter::table) && target->pocket != pocket_type::player_table)
             return "ERROR_TARGET_NOT_TABLE_CARD";
 
-        if (bool(filter & target_card_filter::hand) && target->pocket != pocket_type::player_hand)
+        if (filter.check(target_card_filter::hand) && target->pocket != pocket_type::player_hand)
             return "ERROR_TARGET_NOT_HAND_CARD";
 
         return {};

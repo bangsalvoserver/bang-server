@@ -5,13 +5,13 @@
 
 namespace banggame {
 
-    DEFINE_ENUM_FLAGS(command_permissions,
-        (lobby_owner)
-        (lobby_waiting)
-        (lobby_playing)
-        (lobby_finished)
-        (game_cheat)
-    )
+    enum class command_permissions {
+        lobby_owner,
+        lobby_waiting,
+        lobby_playing,
+        lobby_finished,
+        game_cheat,
+    };
 
     template<auto FnMemPtr> struct proxy_t {
         static constexpr auto value = FnMemPtr;
@@ -40,7 +40,7 @@ namespace banggame {
     private:
         manager_fn m_fun;
         std::string_view m_description;
-        command_permissions m_permissions;
+        enums::bitset<command_permissions> m_permissions;
 
         static std::string_view get_arg(std::span<std::string> args, size_t index) {
             if (index < args.size()) {
@@ -63,7 +63,7 @@ namespace banggame {
 
     public:
         template<typename Proxy>
-        chat_command(Proxy, std::string_view description, command_permissions permissions = {})
+        chat_command(Proxy, std::string_view description, enums::bitset<command_permissions> permissions = {})
             : m_fun(call_manager_fun<Proxy>)
             , m_description(description)
             , m_permissions(permissions) {}
@@ -76,7 +76,7 @@ namespace banggame {
             return m_description;
         }
 
-        command_permissions permissions() const {
+        enums::bitset<command_permissions> permissions() const {
             return m_permissions;
         }
     };

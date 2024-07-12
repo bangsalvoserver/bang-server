@@ -41,29 +41,39 @@ namespace banggame {
         std::string message;
     };
 
-    DEFINE_ENUM_TYPES(client_message_type,
-        (pong)
-        (connect, connect_args)
-        (user_edit, user_info)
-        (lobby_make, lobby_info)
-        (lobby_edit, lobby_info)
-        (lobby_join, lobby_id_args)
-        (lobby_leave)
-        (lobby_chat, lobby_chat_client_args)
-        (lobby_return)
-        (game_start)
-        (game_rejoin, int)
-        (game_action, json::json)
-    )
+    enum class client_message_type {
+        pong,
+        connect,
+        user_edit,
+        lobby_make,
+        lobby_edit,
+        lobby_join,
+        lobby_leave,
+        lobby_chat,
+        lobby_return,
+        game_start,
+        game_rejoin,
+        game_action,
+    };
 
-    using client_message = enums::enum_variant<client_message_type>;
+    using client_message = enums::enum_variant<client_message_type,
+        enums::type_assoc<client_message_type::connect, connect_args>,
+        enums::type_assoc<client_message_type::user_edit, user_info>,
+        enums::type_assoc<client_message_type::lobby_make, lobby_info>,
+        enums::type_assoc<client_message_type::lobby_edit, lobby_info>,
+        enums::type_assoc<client_message_type::lobby_join, lobby_id_args>,
+        enums::type_assoc<client_message_type::lobby_chat, lobby_chat_client_args>,
+        enums::type_assoc<client_message_type::game_rejoin, int>,
+        enums::type_assoc<client_message_type::game_action, json::json>
+    >;
+
     #define MSG_TAG(name) enums::enum_tag_t<banggame::client_message_type::name>
 
-    DEFINE_ENUM(lobby_state,
-        (waiting)
-        (playing)
-        (finished)
-    )
+    enum class lobby_state {
+        waiting,
+        playing,
+        finished,
+    };
 
     struct client_accepted_args {
         id_type session_id;
@@ -98,25 +108,36 @@ namespace banggame {
         bool is_read;
     };
 
-    DEFINE_ENUM_TYPES(server_message_type,
-        (ping)
-        (client_accepted, client_accepted_args)
-        (client_count, int)
-        (lobby_error, std::string)
-        (lobby_update, lobby_data)
-        (lobby_entered, lobby_entered_args)
-        (lobby_edited, lobby_info)
-        (lobby_removed, lobby_id_args)
-        (lobby_add_user, user_info_id_args)
-        (lobby_remove_user, int)
-        (lobby_kick)
-        (lobby_chat, lobby_chat_args)
-        (game_update, json::json)
-        (game_started)
-    )
+    enum class server_message_type {
+        ping,
+        client_accepted,
+        client_count,
+        lobby_error,
+        lobby_update,
+        lobby_entered,
+        lobby_edited,
+        lobby_removed,
+        lobby_add_user,
+        lobby_remove_user,
+        lobby_kick,
+        lobby_chat,
+        game_update,
+        game_started,
+    };
 
-    using server_message = enums::enum_variant<server_message_type>;
-    #define SRV_TAG(name) enums::enum_tag_t<banggame::server_message_type::name>
+    using server_message = enums::enum_variant<server_message_type,
+        enums::type_assoc<server_message_type::client_accepted, client_accepted_args>,
+        enums::type_assoc<server_message_type::client_count, int>,
+        enums::type_assoc<server_message_type::lobby_error, std::string>,
+        enums::type_assoc<server_message_type::lobby_update, lobby_data>,
+        enums::type_assoc<server_message_type::lobby_entered, lobby_entered_args>,
+        enums::type_assoc<server_message_type::lobby_edited, lobby_info>,
+        enums::type_assoc<server_message_type::lobby_removed, lobby_id_args>,
+        enums::type_assoc<server_message_type::lobby_add_user, user_info_id_args>,
+        enums::type_assoc<server_message_type::lobby_remove_user, int>,
+        enums::type_assoc<server_message_type::lobby_chat, lobby_chat_args>,
+        enums::type_assoc<server_message_type::game_update, json::json>
+    >;
 
 }
 
