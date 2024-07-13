@@ -189,7 +189,13 @@ namespace banggame {
     void game::start_game(const game_options &options) {
         m_options = options;
 
-        apply_rulesets(this);
+        for (expansion_type expansion : enums::enum_values<expansion_type>()) {
+            if (m_options.expansions.check(expansion)) {
+                if (const ruleset_vtable *vtable = get_ruleset_vtable(expansion)) {
+                    vtable->on_apply(this);
+                }
+            }
+        }
 
         add_update<"player_add">(to_player_user_pair_vector(m_players));
 

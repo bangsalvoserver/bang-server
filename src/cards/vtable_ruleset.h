@@ -24,6 +24,24 @@ namespace banggame {
         template<> struct ruleset_vtable_map<expansion_type::expansion> { \
             static constexpr ruleset_vtable value = build_ruleset_vtable<type>(); \
         };
+    
+    template<expansion_type E>
+    constexpr const ruleset_vtable *get_ruleset_vtable() {
+        if constexpr ( requires { ruleset_vtable_map<E>::value; }) {
+            return &ruleset_vtable_map<E>::value;
+        } else {
+            return nullptr;
+        }
+    }
+
+    inline const ruleset_vtable *get_ruleset_vtable(expansion_type expansion) {
+        static constexpr const auto &values = enums::enum_values<expansion_type>();
+        static constexpr auto lookup = []<size_t ... Is>(std::index_sequence<Is...>) {
+            return std::array { get_ruleset_vtable<values[Is]>() ... };
+        }(std::make_index_sequence<values.size()>());
+        
+        return lookup[enums::indexof(expansion)];
+    }
 
 }
 
