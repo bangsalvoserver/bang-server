@@ -11,13 +11,14 @@
 
 namespace banggame::play_dispatch {
     bool possible(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
-        return utils::visit_tagged([&]<utils::tstring E>(utils::tag<E>) {
-            return play_visitor<E>{origin, origin_card, effect}.possible(ctx);
+        return utils::visit_tagged([&](utils::tag_for<play_card_target> auto tag) {
+            return play_visitor<decltype(tag)::name>{origin, origin_card, effect}.possible(ctx);
         }, effect.target);
     }
 
     play_card_target random_target(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
-        return utils::visit_tagged([&]<utils::tstring E>(utils::tag<E> tag) -> play_card_target {
+        return utils::visit_tagged([&](utils::tag_for<play_card_target> auto tag) -> play_card_target {
+            static constexpr auto E = decltype(tag)::name;
             if constexpr (!std::is_void_v<target_type_value<E>>) {
                 return {tag, play_visitor<E>{origin, origin_card, effect}.random_target(ctx)};
             } else {
@@ -27,26 +28,26 @@ namespace banggame::play_dispatch {
     }
 
     game_string get_error(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
-        return utils::visit_tagged([&]<utils::tstring E>(utils::tag<E>, auto && ... args) -> game_string {
-            return play_visitor<E>{origin, origin_card, effect}.get_error(ctx, FWD(args) ...);
+        return utils::visit_tagged([&](utils::tag_for<play_card_target> auto tag, auto && ... args) -> game_string {
+            return play_visitor<decltype(tag)::name>{origin, origin_card, effect}.get_error(ctx, FWD(args) ...);
         }, target);
     }
 
     game_string prompt(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
-        return utils::visit_tagged([&]<utils::tstring E>(utils::tag<E>, auto && ... args) {
-            return play_visitor<E>{origin, origin_card, effect}.prompt(ctx, FWD(args) ... );
+        return utils::visit_tagged([&](utils::tag_for<play_card_target> auto tag, auto && ... args) {
+            return play_visitor<decltype(tag)::name>{origin, origin_card, effect}.prompt(ctx, FWD(args) ... );
         }, target);
     }
 
     void add_context(player *origin, card *origin_card, const effect_holder &effect, effect_context &ctx, const play_card_target &target) {
-        utils::visit_tagged([&]<utils::tstring E>(utils::tag<E>, auto && ... args) {
-            play_visitor<E>{origin, origin_card, effect}.add_context(ctx, FWD(args) ... );
+        utils::visit_tagged([&](utils::tag_for<play_card_target> auto tag, auto && ... args) {
+            play_visitor<decltype(tag)::name>{origin, origin_card, effect}.add_context(ctx, FWD(args) ... );
         }, target);
     }
 
     void play(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
-        utils::visit_tagged([&]<utils::tstring E>(utils::tag<E>, auto && ... args) {
-            play_visitor<E>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
+        utils::visit_tagged([&](utils::tag_for<play_card_target> auto tag, auto && ... args) {
+            play_visitor<decltype(tag)::name>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
         }, target);
     }
 }
