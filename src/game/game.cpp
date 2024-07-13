@@ -50,28 +50,28 @@ namespace banggame {
     }
 
     utils::generator<json::json> game::get_spectator_join_updates() {
-        co_yield make_update<game_update_type::player_add>(to_player_user_pair_vector(m_players));
+        co_yield make_update<"player_add">(to_player_user_pair_vector(m_players));
 
         for (player *p : m_players) {
-            co_yield make_update<game_update_type::player_flags>(p, p->m_player_flags);
+            co_yield make_update<"player_flags">(p, p->m_player_flags);
         }
 
-        co_yield make_update<game_update_type::player_order>(make_player_order_update(true));
+        co_yield make_update<"player_order">(make_player_order_update(true));
 
         auto add_cards = [&](pocket_type pocket, player *owner = nullptr) -> utils::generator<json::json> {
             auto &range = get_pocket(pocket, owner);
             if (!range.empty()) {
-                co_yield make_update<game_update_type::add_cards>(to_card_backface_vector(range), pocket, owner);
+                co_yield make_update<"add_cards">(to_card_backface_vector(range), pocket, owner);
             }
             for (card *c : range) {
                 if (c->visibility == card_visibility::shown) {
-                    co_yield make_update<game_update_type::show_card>(c, *c, 0ms);
+                    co_yield make_update<"show_card">(c, *c, 0ms);
                 }
                 if (c->num_cubes > 0) {
-                    co_yield make_update<game_update_type::add_cubes>(c->num_cubes, c);
+                    co_yield make_update<"add_cubes">(c->num_cubes, c);
                 }
                 if (c->inactive) {
-                    co_yield make_update<game_update_type::tap_card>(c, true, 0ms);
+                    co_yield make_update<"tap_card">(c, true, 0ms);
                 }
             }
         };
@@ -87,7 +87,7 @@ namespace banggame {
         co_await add_cards(pocket_type::hidden_deck);
 
         if (train_position != 0) {
-            co_yield make_update<game_update_type::move_train>(train_position, 0ms);
+            co_yield make_update<"move_train">(train_position, 0ms);
         }
 
         co_await add_cards(pocket_type::stations);
@@ -100,12 +100,12 @@ namespace banggame {
         co_await add_cards(pocket_type::wws_scenario_card);
         
         if (num_cubes > 0) {
-            co_yield make_update<game_update_type::add_cubes>(num_cubes);
+            co_yield make_update<"add_cubes">(num_cubes);
         }
 
         for (player *p : m_players) {
             if (p->check_player_flags(player_flag::role_revealed)) {
-                co_yield make_update<game_update_type::player_show_role>(p, p->m_role, 0ms);
+                co_yield make_update<"player_show_role">(p, p->m_role, 0ms);
             }
 
             if (!p->check_player_flags(player_flag::removed)) {
@@ -115,54 +115,54 @@ namespace banggame {
                 co_await add_cards(pocket_type::player_table, p);
                 co_await add_cards(pocket_type::player_hand, p);
 
-                co_yield make_update<game_update_type::player_hp>(p, p->m_hp, 0ms);
+                co_yield make_update<"player_hp">(p, p->m_hp, 0ms);
                 
                 if (p->m_gold != 0) {
-                    co_yield make_update<game_update_type::player_gold>(p, p->m_gold);
+                    co_yield make_update<"player_gold">(p, p->m_gold);
                 }
             }
         }
 
         if (m_playing) {
-            co_yield make_update<game_update_type::switch_turn>(m_playing);
+            co_yield make_update<"switch_turn">(m_playing);
         }
         if (!is_waiting() && pending_requests()) {
-            co_yield make_update<game_update_type::request_status>(make_request_update(nullptr));
+            co_yield make_update<"request_status">(make_request_update(nullptr));
         }
 
-        co_yield make_update<game_update_type::game_flags>(m_game_flags);
+        co_yield make_update<"game_flags">(m_game_flags);
     }
 
     utils::generator<json::json> game::get_game_log_updates(player *target) {
-        co_yield make_update<game_update_type::clear_logs>();
+        co_yield make_update<"clear_logs">();
         
         for (const auto &[upd_target, log] : m_saved_log) {
             if (upd_target.matches(target)) {
-                co_yield make_update<game_update_type::game_log>(log);
+                co_yield make_update<"game_log">(log);
             }
         }
     }
 
     utils::generator<json::json> game::get_rejoin_updates(player *target) {
         if (!target->check_player_flags(player_flag::role_revealed)) {
-            co_yield make_update<game_update_type::player_show_role>(target, target->m_role, 0ms);
+            co_yield make_update<"player_show_role">(target, target->m_role, 0ms);
         }
 
         for (card *c : target->m_hand) {
-            co_yield make_update<game_update_type::show_card>(c, *c, 0ms);
+            co_yield make_update<"show_card">(c, *c, 0ms);
         }
 
         for (card *c : m_selection) {
             if (c->owner == target) {
-                co_yield make_update<game_update_type::show_card>(c, *c, 0ms);
+                co_yield make_update<"show_card">(c, *c, 0ms);
             }
         }
 
         if (!is_game_over() && !is_waiting()) {
             if (pending_requests()) {
-                co_yield make_update<game_update_type::request_status>(make_request_update(target));
+                co_yield make_update<"request_status">(make_request_update(target));
             } else if (target == m_playing) {
-                co_yield make_update<game_update_type::status_ready>(make_status_ready_update(target));
+                co_yield make_update<"status_ready">(make_status_ready_update(target));
             }
         }
     }
@@ -191,7 +191,7 @@ namespace banggame {
 
         apply_rulesets(this);
 
-        add_update<game_update_type::player_add>(to_player_user_pair_vector(m_players));
+        add_update<"player_add">(to_player_user_pair_vector(m_players));
 
         bool ghost_card_added = false;
         
@@ -222,14 +222,14 @@ namespace banggame {
         };
 
         if (add_cards(all_cards.button_row, pocket_type::button_row)) {
-            add_update<game_update_type::add_cards>(to_card_backface_vector(m_button_row), pocket_type::button_row);
+            add_update<"add_cards">(to_card_backface_vector(m_button_row), pocket_type::button_row);
             for (card *c : m_button_row) {
                 c->set_visibility(card_visibility::shown, nullptr, true);
             }
         }
 
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
-            add_update<game_update_type::add_cards>(to_card_backface_vector(m_hidden_deck), pocket_type::hidden_deck);
+            add_update<"add_cards">(to_card_backface_vector(m_hidden_deck), pocket_type::hidden_deck);
             for (card *c : m_hidden_deck) {
                 c->set_visibility(card_visibility::shown, nullptr, true);
             }
@@ -237,17 +237,17 @@ namespace banggame {
 
         if (add_cards(all_cards.deck, pocket_type::main_deck)) {
             shuffle_cards_and_ids(m_deck);
-            add_update<game_update_type::add_cards>(to_card_backface_vector(m_deck), pocket_type::main_deck);
+            add_update<"add_cards">(to_card_backface_vector(m_deck), pocket_type::main_deck);
         }
 
         if (add_cards(all_cards.goldrush, pocket_type::shop_deck)) {
             shuffle_cards_and_ids(m_shop_deck);
-            add_update<game_update_type::add_cards>(to_card_backface_vector(m_shop_deck), pocket_type::shop_deck);
+            add_update<"add_cards">(to_card_backface_vector(m_shop_deck), pocket_type::shop_deck);
         }
 
         if (add_cards(all_cards.train, pocket_type::train_deck)) {
             shuffle_cards_and_ids(m_train_deck);
-            add_update<game_update_type::add_cards>(to_card_backface_vector(m_train_deck), pocket_type::train_deck);
+            add_update<"add_cards">(to_card_backface_vector(m_train_deck), pocket_type::train_deck);
         }
         
         player_role roles[] = {
@@ -291,13 +291,13 @@ namespace banggame {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
             }
 
-            add_update<game_update_type::add_cards>(to_card_backface_vector(m_scenario_deck), pocket_type::scenario_deck);
+            add_update<"add_cards">(to_card_backface_vector(m_scenario_deck), pocket_type::scenario_deck);
         }
 
         if (add_cards(all_cards.wildwestshow, pocket_type::wws_scenario_deck)) {
             shuffle_cards_and_ids(m_wws_scenario_deck);
             rn::partition(m_wws_scenario_deck, is_last_scenario_card);
-            add_update<game_update_type::add_cards>(to_card_backface_vector(m_wws_scenario_deck), pocket_type::wws_scenario_deck);
+            add_update<"add_cards">(to_card_backface_vector(m_wws_scenario_deck), pocket_type::wws_scenario_deck);
         }
 
         add_cards(all_cards.stations, pocket_type::none);
@@ -320,7 +320,7 @@ namespace banggame {
                 c->pocket = pocket_type::player_hand;
                 c->owner = p;
             }
-            add_update<game_update_type::add_cards>(to_card_backface_vector(p->m_hand), pocket_type::player_hand, p);
+            add_update<"add_cards">(to_card_backface_vector(p->m_hand), pocket_type::player_hand, p);
             if (m_options.character_choice) {
                 for (card *c : p->m_hand) {
                     c->set_visibility(card_visibility::shown, p, true);
@@ -403,7 +403,7 @@ namespace banggame {
     }
 
     void game::send_request_status_clear() {
-        add_update<game_update_type::status_clear>();
+        add_update<"status_clear">();
     }
 
     bool game::send_request_status_ready() {
@@ -420,7 +420,7 @@ namespace banggame {
             m_playing->pass_turn();
             return false;
         } else {
-            add_update<game_update_type::status_ready>(update_target::includes_private(m_playing), std::move(args));
+            add_update<"status_ready">(update_target::includes_private(m_playing), std::move(args));
             return true;
         }
     }
@@ -430,10 +430,10 @@ namespace banggame {
         for (player *p : m_players) {
             spectator_target.add(p);
             if (!p->is_bot()) {
-                add_update<game_update_type::request_status>(update_target::includes_private(p), make_request_update(p));
+                add_update<"request_status">(update_target::includes_private(p), make_request_update(p));
             }
         }
-        add_update<game_update_type::request_status>(std::move(spectator_target), make_request_update(nullptr));
+        add_update<"request_status">(std::move(spectator_target), make_request_update(nullptr));
     }
 
     void game::start_next_turn() {
@@ -491,7 +491,7 @@ namespace banggame {
                 }
 
                 if (target->add_player_flags(player_flag::role_revealed)) {
-                    add_update<game_update_type::player_show_role>(update_target::excludes(target), target, target->m_role);
+                    add_update<"player_show_role">(update_target::excludes(target), target, target->m_role);
                 }
 
                 if (reason != discard_all_reason::discard_ghost) {
@@ -535,7 +535,7 @@ namespace banggame {
                         p->add_player_flags(player_flag::removed);
                     }
                     
-                    add_update<game_update_type::player_order>(make_player_order_update());
+                    add_update<"player_order">(make_player_order_update());
                 }
             }, -3);
         }
@@ -548,7 +548,7 @@ namespace banggame {
             auto declare_winners = [this](auto &&winners) {
                 for (player *p : range_all_players_and_dead(m_playing)) {
                     if (p->add_player_flags(player_flag::role_revealed)) {
-                        add_update<game_update_type::player_show_role>(update_target::excludes(p), p, p->m_role);
+                        add_update<"player_show_role">(update_target::excludes(p), p, p->m_role);
                     }
                 }
                 add_log("LOG_GAME_OVER");

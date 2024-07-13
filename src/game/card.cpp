@@ -13,26 +13,26 @@ namespace banggame {
         game_duration duration = instant ? 0ms : durations.flip_card;
         if (new_visibility == card_visibility::hidden) {
             if (visibility == card_visibility::show_owner) {
-                m_game->add_update<game_update_type::hide_card>(update_target::includes(owner), this, duration);
+                m_game->add_update<"hide_card">(update_target::includes(owner), this, duration);
             } else if (visibility == card_visibility::shown) {
-                m_game->add_update<game_update_type::hide_card>(this, duration);
+                m_game->add_update<"hide_card">(this, duration);
             }
             visibility = card_visibility::hidden;
         } else if (!new_owner || new_visibility == card_visibility::shown) {
             if (visibility == card_visibility::show_owner) {
-                m_game->add_update<game_update_type::show_card>(update_target::excludes(owner), this, *this, duration);
+                m_game->add_update<"show_card">(update_target::excludes(owner), this, *this, duration);
             } else if (visibility == card_visibility::hidden) {
-                m_game->add_update<game_update_type::show_card>(this, *this, duration);
+                m_game->add_update<"show_card">(this, *this, duration);
             }
             visibility = card_visibility::shown;
         } else if (owner != new_owner || visibility != card_visibility::show_owner) {
             if (visibility == card_visibility::shown) {
-                m_game->add_update<game_update_type::hide_card>(update_target::excludes(new_owner), this, duration);
+                m_game->add_update<"hide_card">(update_target::excludes(new_owner), this, duration);
             } else {
                 if (visibility == card_visibility::show_owner) {
-                    m_game->add_update<game_update_type::hide_card>(update_target::includes(owner), this, duration);
+                    m_game->add_update<"hide_card">(update_target::includes(owner), this, duration);
                 }
-                m_game->add_update<game_update_type::show_card>(update_target::includes(new_owner), this, *this, duration);
+                m_game->add_update<"show_card">(update_target::includes(new_owner), this, *this, duration);
             }
             visibility = card_visibility::show_owner;
         }
@@ -56,22 +56,22 @@ namespace banggame {
             new_pile.push_back(this);
         }
         
-        m_game->add_update<game_update_type::move_card>(this, new_owner, new_pocket, instant ? 0ms : durations.move_card, front);
+        m_game->add_update<"move_card">(this, new_owner, new_pocket, instant ? 0ms : durations.move_card, front);
     }
 
     void card::set_inactive(bool new_inactive) {
         if (new_inactive != inactive) {
-            m_game->add_update<game_update_type::tap_card>(this, new_inactive);
+            m_game->add_update<"tap_card">(this, new_inactive);
             inactive = new_inactive;
         }
     }
 
     void card::flash_card() {
-        m_game->add_update<game_update_type::flash_card>(this);
+        m_game->add_update<"flash_card">(this);
     }
 
     void card::add_short_pause() {
-        m_game->add_update<game_update_type::short_pause>(this);
+        m_game->add_update<"short_pause">(this);
     }
     
     void card::add_cubes(int ncubes) {
@@ -80,7 +80,7 @@ namespace banggame {
             m_game->num_cubes -= ncubes;
             num_cubes += ncubes;
             m_game->add_log("LOG_ADD_CUBE", owner, this, ncubes);
-            m_game->add_update<game_update_type::move_cubes>(ncubes, nullptr, this, ncubes == 1 ? durations.move_cube : durations.move_cubes);
+            m_game->add_update<"move_cubes">(ncubes, nullptr, this, ncubes == 1 ? durations.move_cube : durations.move_cubes);
         }
     }
 
@@ -96,13 +96,13 @@ namespace banggame {
             } else {
                 m_game->add_log("LOG_MOVED_CUBE_FROM", target->owner, owner, this, target, added_cubes);
             }
-            m_game->add_update<game_update_type::move_cubes>(added_cubes, this, target, instant ? 0ms : added_cubes == 1 ? durations.move_cube : durations.move_cubes);
+            m_game->add_update<"move_cubes">(added_cubes, this, target, instant ? 0ms : added_cubes == 1 ? durations.move_cube : durations.move_cubes);
         }
         if (ncubes > 0) {
             num_cubes -= ncubes;
             m_game->num_cubes += ncubes;
             m_game->add_log("LOG_PAID_CUBE", owner, this, ncubes);
-            m_game->add_update<game_update_type::move_cubes>(ncubes, this, nullptr, instant ? 0ms : ncubes == 1 ? durations.move_cube : durations.move_cubes);
+            m_game->add_update<"move_cubes">(ncubes, this, nullptr, instant ? 0ms : ncubes == 1 ? durations.move_cube : durations.move_cubes);
         }
         if (sign && num_cubes == 0) {
             m_game->add_log("LOG_DISCARDED_ORANGE_CARD", owner, this);
@@ -116,7 +116,7 @@ namespace banggame {
         if (num_cubes > 0) {
             m_game->add_log("LOG_DROP_CUBE", owner, this, num_cubes);
             m_game->num_cubes += num_cubes;
-            m_game->add_update<game_update_type::move_cubes>(num_cubes, this, nullptr, num_cubes == 1 ? durations.move_cube : durations.move_cubes);
+            m_game->add_update<"move_cubes">(num_cubes, this, nullptr, num_cubes == 1 ? durations.move_cube : durations.move_cubes);
             num_cubes = 0;
         }
     }

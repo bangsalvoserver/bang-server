@@ -62,7 +62,7 @@ namespace banggame {
     }
 
     void player::play_sound(std::string_view sound_id) {
-        m_game->add_update<game_update_type::play_sound>(update_target::includes_private(this), std::string(sound_id));
+        m_game->add_update<"play_sound">(update_target::includes_private(this), std::string(sound_id));
     }
 
     int player::get_initial_cards() {
@@ -171,14 +171,14 @@ namespace banggame {
     void player::set_hp(int value, bool instant) {
         if (value != m_hp) {
             m_hp = value;
-            m_game->add_update<game_update_type::player_hp>(this, value, instant ? 0ms : durations.player_hp);
+            m_game->add_update<"player_hp">(this, value, instant ? 0ms : durations.player_hp);
         }
     }
 
     void player::add_gold(int amount) {
         if (amount) {
             m_gold += amount;
-            m_game->add_update<game_update_type::player_gold>(this, m_gold);
+            m_game->add_update<"player_gold">(this, m_gold);
         }
     }
 
@@ -241,7 +241,7 @@ namespace banggame {
         m_played_cards.clear();
 
         m_game->add_log("LOG_TURN_START", this);
-        m_game->add_update<game_update_type::switch_turn>(this);
+        m_game->add_update<"switch_turn">(this);
 
         m_game->queue_action([this]{
             m_game->call_event(event_type::pre_turn_start{ this });
@@ -282,7 +282,7 @@ namespace banggame {
 
     void player::remove_extra_characters() {
         if (auto range = m_characters | rv::drop(1)) {
-            m_game->add_update<game_update_type::remove_cards>(rn::to<serial::card_list>(range));
+            m_game->add_update<"remove_cards">(rn::to<serial::card_list>(range));
 
             for (card *character : range) {
                 disable_equip(character);
@@ -299,10 +299,10 @@ namespace banggame {
         game_duration duration = instant ? 0ms : durations.flip_card;
 
         if (role == player_role::sheriff || m_game->m_players.size() <= 3 || check_player_flags(player_flag::role_revealed)) {
-            m_game->add_update<game_update_type::player_show_role>(this, m_role, duration);
+            m_game->add_update<"player_show_role">(this, m_role, duration);
             add_player_flags(player_flag::role_revealed);
         } else {
-            m_game->add_update<game_update_type::player_show_role>(update_target::includes(this), this, m_role, duration);
+            m_game->add_update<"player_show_role">(update_target::includes(this), this, m_role, duration);
         }
     }
 
@@ -313,7 +313,7 @@ namespace banggame {
     bool player::add_player_flags(player_flag flags) {
         if (!check_player_flags(flags)) {
             m_player_flags.add(flags);
-            m_game->add_update<game_update_type::player_flags>(this, m_player_flags);
+            m_game->add_update<"player_flags">(this, m_player_flags);
             return true;
         }
         return false;
@@ -322,7 +322,7 @@ namespace banggame {
     bool player::remove_player_flags(player_flag flags) {
         if (check_player_flags(flags)) {
             m_player_flags.remove(flags);
-            m_game->add_update<game_update_type::player_flags>(this, m_player_flags);
+            m_game->add_update<"player_flags">(this, m_player_flags);
             return true;
         }
         return false;

@@ -126,7 +126,7 @@ namespace banggame {
             shuffle_cards_and_ids(m_deck);
             add_log("LOG_DECK_RESHUFFLED");
             play_sound("shuffle");
-            add_update<game_update_type::deck_shuffled>(pocket_type::main_deck);
+            add_update<"deck_shuffled">(pocket_type::main_deck);
         }
         return m_deck.back();
     }
@@ -146,7 +146,7 @@ namespace banggame {
             shuffle_cards_and_ids(m_shop_deck);
             add_log("LOG_SHOP_RESHUFFLED");
             play_sound("shuffle");
-            add_update<game_update_type::deck_shuffled>(pocket_type::shop_deck);
+            add_update<"deck_shuffled">(pocket_type::shop_deck);
         }
         card *drawn_card = m_shop_deck.back();
         add_log("LOG_DRAWN_SHOP_CARD", drawn_card);
@@ -180,28 +180,28 @@ namespace banggame {
 
     void game_table::advance_train(player *origin) {
         add_log("LOG_TRAIN_ADVANCE");
-        add_update<game_update_type::move_train>(++train_position);
+        add_update<"move_train">(++train_position);
 
         call_event(event_type::on_train_advance{ origin,
             std::make_shared<effect_context>(effect_context{ .locomotive_count = 1 }) });
     }
 
     void game_table::add_short_pause() {
-        add_update<game_update_type::short_pause>(nullptr);
+        add_update<"short_pause">(nullptr);
     }
 
     void game_table::play_sound(std::string_view sound_id) {
-        add_update<game_update_type::play_sound>(std::string(sound_id));
+        add_update<"play_sound">(std::string(sound_id));
     }
 
     void game_table::add_game_flags(game_flag flags) {
         m_game_flags.add(flags);
-        add_update<game_update_type::game_flags>(m_game_flags);
+        add_update<"game_flags">(m_game_flags);
     }
 
     void game_table::remove_game_flags(game_flag flags) {
         m_game_flags.remove(flags);
-        add_update<game_update_type::game_flags>(m_game_flags);
+        add_update<"game_flags">(m_game_flags);
     }
 
     bool game_table::check_flags(game_flag flags) const {

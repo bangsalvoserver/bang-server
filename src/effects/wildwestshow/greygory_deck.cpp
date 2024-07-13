@@ -16,7 +16,7 @@ namespace banggame {
             }),
             base_characters.begin(), base_characters.size(), target->m_game->rng);
 
-        target->m_game->add_update<game_update_type::add_cards>(to_card_backface_vector(base_characters), pocket_type::player_character, target);
+        target->m_game->add_update<"add_cards">(to_card_backface_vector(base_characters), pocket_type::player_character, target);
         for (card *c : base_characters) {
             target->m_characters.push_back(c);
             target->m_game->add_log("LOG_CHARACTER_CHOICE", target, c);

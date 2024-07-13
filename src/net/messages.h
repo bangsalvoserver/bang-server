@@ -3,8 +3,6 @@
 
 #include "game/game_update.h"
 
-#include "utils/tagged_variant.h"
-
 namespace sdl {
     struct image_pixels {
         int width;

@@ -32,7 +32,7 @@ namespace banggame {
                 origin->m_characters.emplace_back(target_card);
                 origin->enable_equip(target_card);
 
-                origin->m_game->add_update<game_update_type::add_cards>(std::vector{to_card_backface(target_card)}, pocket_type::player_character, origin);
+                origin->m_game->add_update<"add_cards">(std::vector{to_card_backface(target_card)}, pocket_type::player_character, origin);
                 target_card->set_visibility(card_visibility::shown, nullptr, true);
             }
         }

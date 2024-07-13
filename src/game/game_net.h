@@ -93,9 +93,9 @@ namespace banggame {
         json::json serialize_update(const game_update &update) const;
 
     protected:
-        template<game_update_type E>
+        template<utils::tstring E> requires game_update_type<E>
         json::json make_update(auto && ... args) {
-            return serialize_update(game_update{enums::tag<E>, FWD(args) ... });
+            return serialize_update(game_update{utils::tag<E>{}, FWD(args) ... });
         }
     
     public:
@@ -112,21 +112,24 @@ namespace banggame {
         std::string handle_game_action(int user_id, const json::json &value);
 
     public:
-        template<game_update_type E>
+        template<utils::tstring E> requires game_update_type<E>
         void add_update(update_target target, auto && ... args) {
-            game_update update{enums::tag<E>, FWD(args) ... };
+            static constexpr size_t I = utils::tagged_variant_index_of<E, game_update>::value;
+            using tag_type = typename utils::tagged_variant_tag_at<game_update, I>::type;
+            using value_type = typename tag_type::type;
+
+            game_update update{utils::tag<E>{}, FWD(args) ... };
             m_updates.emplace_back(target, serialize_update(update), [&]{
-                if constexpr (game_update::has_type<E>) {
-                    using value_type = game_update::value_type<E>;
+                if constexpr (!std::is_void_v<value_type>) {
                     if constexpr (requires { value_type::duration; }) {
-                        return std::chrono::duration_cast<ticks>(update.get<E>().duration);
+                        return std::chrono::duration_cast<ticks>(std::get<I>(update).duration);
                     }
                 }
                 return ticks{0};
             }());
         }
 
-        template<game_update_type E>
+        template<utils::tstring E> requires game_update_type<E>
         void add_update(auto && ... args) {
             add_update<E>(update_target::excludes(), FWD(args) ... );
         }
@@ -134,7 +137,7 @@ namespace banggame {
         template<size_t N, typename ... Ts>
         void add_log(update_target target, const char (&message)[N], Ts && ... args) {
             const auto &log = m_saved_log.emplace_back(target, game_string(message, FWD(args) ...));
-            add_update<game_update_type::game_log>(std::move(target), log.second);
+            add_update<"game_log">(std::move(target), log.second);
         }
 
         template<size_t N, typename ... Ts>

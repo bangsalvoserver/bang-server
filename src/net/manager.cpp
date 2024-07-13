@@ -514,7 +514,7 @@ void game_manager::handle_message(MSG_TAG(game_rejoin), game_user &user, int pla
     user_team = lobby_team::game_player;
     target->user_id = lobby.get_user_id(user);
 
-    lobby.m_game->add_update<game_update_type::player_add>(std::vector{to_player_user_pair(target)});
+    lobby.m_game->add_update<"player_add">(std::vector{to_player_user_pair(target)});
     
     for (const auto &msg : lobby.m_game->get_rejoin_updates(target)) {
         send_message<"game_update">(user.client, msg);

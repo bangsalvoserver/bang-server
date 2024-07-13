@@ -148,10 +148,10 @@ namespace banggame {
             origin->m_game->commit_updates();
             break;
         case message_type::error:
-            add_update<game_update_type::game_error>(update_target::includes_private(origin), result.message);
+            add_update<"game_error">(update_target::includes_private(origin), result.message);
             break;
         case message_type::prompt:
-            add_update<game_update_type::game_prompt>(update_target::includes_private(origin), result.message);
+            add_update<"game_prompt">(update_target::includes_private(origin), result.message);
             break;
         }
         
