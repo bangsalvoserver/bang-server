@@ -26,7 +26,7 @@ namespace banggame {
                     target_card->move_to(pocket_type::shop_discard);
                     
                     for (const effect_holder &effect : target_card->responses) {
-                        play_dispatch::play(target, target_card, effect, {}, enums::enum_tag<target_type::none>);
+                        play_dispatch::play(target, target_card, effect, {}, enums::tag<target_type::none>);
                     }
                 }
             } else {

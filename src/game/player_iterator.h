@@ -44,9 +44,9 @@ private:
     decltype(game_table::m_players)::iterator m_it;
 };
 
-util::generator<player *> range_all_players(const player *begin);
-util::generator<player *> range_all_players_and_dead(const player *begin);
-util::generator<player *> range_other_players(const player *begin);
+utils::generator<player *> range_all_players(const player *begin);
+utils::generator<player *> range_all_players_and_dead(const player *begin);
+utils::generator<player *> range_other_players(const player *begin);
 
 }
 

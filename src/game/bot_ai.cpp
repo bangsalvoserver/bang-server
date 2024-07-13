@@ -18,7 +18,7 @@ namespace banggame {
                 playing_card = cur_node->card;
                 if (filters::is_equip_card(playing_card)) {
                     if (!playing_card->self_equippable()) {
-                        ret.targets.emplace_back(enums::enum_tag<target_type::player>,
+                        ret.targets.emplace_back(enums::tag<target_type::player>,
                             random_element(make_equip_set(origin, playing_card, ctx), origin->m_game->bot_rng));
                     }
                 } else {

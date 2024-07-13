@@ -37,7 +37,7 @@ namespace banggame {
     void game_manager::command_print_help(game_user &user) {
         for (const auto &[cmd_name, command] : chat_command::commands) {
             if (!command.permissions().check(command_permissions::game_cheat) || m_options.enable_cheats) {
-                send_message<server_message_type::lobby_chat>(user.client, 0,
+                send_message<"lobby_chat">(user.client, 0,
                     fmt::format("{}{} : {}", chat_command::start_char, cmd_name, command.description()));
             }
         }
@@ -46,7 +46,7 @@ namespace banggame {
     void game_manager::command_print_users(game_user &user) {
         auto &lobby = *user.in_lobby;
         for (auto [team, user_id, u] : lobby.users) {
-            send_message<server_message_type::lobby_chat>(user.client, 0,
+            send_message<"lobby_chat">(user.client, 0,
                 fmt::format("{} : {} ({})", user_id, u->name, enums::to_string(team)));
         }
     }
@@ -72,7 +72,7 @@ namespace banggame {
 
     void game_manager::command_get_game_options(game_user &user) {
         [this, client = user.client, &options = user.in_lobby->options]<size_t ... Is>(std::index_sequence<Is ...>) {
-            (send_message<server_message_type::lobby_chat>(client, 0, get_field_string<Is>(options)), ...);
+            (send_message<"lobby_chat">(client, 0, get_field_string<Is>(options)), ...);
         }(std::make_index_sequence<reflect::size<game_options>()>());
     }
 
@@ -80,7 +80,7 @@ namespace banggame {
     constexpr auto gen_set_option_map(std::index_sequence<Is ...>) {
         using set_option_fn_ptr = bool (*)(game_options &options, std::string_view value_str);
 
-        return util::static_map<std::string_view, set_option_fn_ptr>({
+        return utils::static_map<std::string_view, set_option_fn_ptr>({
             { reflect::member_name<Is, game_options>(), [](game_options &options, std::string_view value_str) {
                 auto &field = reflect::get<Is>(options);
                 if (auto value = parse_string<std::remove_reference_t<decltype(field)>>(value_str)) {
@@ -99,7 +99,7 @@ namespace banggame {
             auto &lobby = *user.in_lobby;
 
             if (it->second(lobby.options, value)) {
-                broadcast_message_lobby<server_message_type::lobby_edited>(lobby, lobby);
+                broadcast_message_lobby<"lobby_edited">(lobby, lobby);
             } else {
                 throw lobby_error("INVALID_OPTION_VALUE");
             }
@@ -249,7 +249,7 @@ namespace banggame {
     }
 
     void game_manager::command_get_rng_seed(game_user &user) {
-        send_message<server_message_type::lobby_chat>(user.client, 0, std::to_string(user.in_lobby->m_game->rng_seed));
+        send_message<"lobby_chat">(user.client, 0, std::to_string(user.in_lobby->m_game->rng_seed));
     }
 
     void game_manager::command_quit(game_user &user) {

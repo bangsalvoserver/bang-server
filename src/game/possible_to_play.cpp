@@ -78,13 +78,13 @@ namespace banggame {
         case target_type::player:
             return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
                 auto targets_copy = targets;
-                targets_copy.emplace_back(enums::enum_tag<target_type::player>, target);
+                targets_copy.emplace_back(enums::tag<target_type::player>, target);
                 return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
             });
         case target_type::card:
             return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
                 auto targets_copy = targets;
-                targets_copy.emplace_back(enums::enum_tag<target_type::card>, target);
+                targets_copy.emplace_back(enums::tag<target_type::card>, target);
                 return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
             });
         default:

@@ -49,7 +49,7 @@ namespace banggame {
         return result;
     }
 
-    util::generator<json::json> game::get_spectator_join_updates() {
+    utils::generator<json::json> game::get_spectator_join_updates() {
         co_yield make_update<game_update_type::player_add>(to_player_user_pair_vector(m_players));
 
         for (player *p : m_players) {
@@ -58,7 +58,7 @@ namespace banggame {
 
         co_yield make_update<game_update_type::player_order>(make_player_order_update(true));
 
-        auto add_cards = [&](pocket_type pocket, player *owner = nullptr) -> util::generator<json::json> {
+        auto add_cards = [&](pocket_type pocket, player *owner = nullptr) -> utils::generator<json::json> {
             auto &range = get_pocket(pocket, owner);
             if (!range.empty()) {
                 co_yield make_update<game_update_type::add_cards>(to_card_backface_vector(range), pocket, owner);
@@ -133,7 +133,7 @@ namespace banggame {
         co_yield make_update<game_update_type::game_flags>(m_game_flags);
     }
 
-    util::generator<json::json> game::get_game_log_updates(player *target) {
+    utils::generator<json::json> game::get_game_log_updates(player *target) {
         co_yield make_update<game_update_type::clear_logs>();
         
         for (const auto &[upd_target, log] : m_saved_log) {
@@ -143,7 +143,7 @@ namespace banggame {
         }
     }
 
-    util::generator<json::json> game::get_rejoin_updates(player *target) {
+    utils::generator<json::json> game::get_rejoin_updates(player *target) {
         if (!target->check_player_flags(player_flag::role_revealed)) {
             co_yield make_update<game_update_type::player_show_role>(target, target->m_role, 0ms);
         }

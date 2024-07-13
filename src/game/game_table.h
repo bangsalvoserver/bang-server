@@ -17,8 +17,8 @@ namespace banggame {
         std::default_random_engine rng;
         std::default_random_engine bot_rng;
 
-        util::id_map<card> m_cards_storage;
-        util::id_map<player> m_players_storage;
+        utils::id_map<card> m_cards_storage;
+        utils::id_map<player> m_players_storage;
 
         std::vector<player *> m_players;
         

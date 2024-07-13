@@ -95,7 +95,7 @@ namespace banggame {
     protected:
         template<game_update_type E>
         json::json make_update(auto && ... args) {
-            return serialize_update(game_update{enums::enum_tag<E>, FWD(args) ... });
+            return serialize_update(game_update{enums::tag<E>, FWD(args) ... });
         }
     
     public:
@@ -114,7 +114,7 @@ namespace banggame {
     public:
         template<game_update_type E>
         void add_update(update_target target, auto && ... args) {
-            game_update update{enums::enum_tag<E>, FWD(args) ... };
+            game_update update{enums::tag<E>, FWD(args) ... };
             m_updates.emplace_back(target, serialize_update(update), [&]{
                 if constexpr (game_update::has_type<E>) {
                     using value_type = game_update::value_type<E>;

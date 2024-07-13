@@ -43,7 +43,7 @@ namespace banggame {
         return *this;
     }
 
-    util::generator<player *> range_all_players(const player *begin) {
+    utils::generator<player *> range_all_players(const player *begin) {
         auto &list = begin->m_game->m_players;
         auto it = rn::find(list, begin);
         while (true) {
@@ -59,7 +59,7 @@ namespace banggame {
         }
     }
 
-    util::generator<player *> range_all_players_and_dead(const player *begin) {
+    utils::generator<player *> range_all_players_and_dead(const player *begin) {
         auto &list = begin->m_game->m_players;
         auto it = rn::find(list, begin);
         while (true) {
@@ -73,7 +73,7 @@ namespace banggame {
         }
     }
 
-    util::generator<player *> range_other_players(const player *begin) {
+    utils::generator<player *> range_other_players(const player *begin) {
         auto &list = begin->m_game->m_players;
         auto it = rn::find(list, begin);
         while (true) {

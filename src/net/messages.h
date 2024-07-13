@@ -3,7 +3,7 @@
 
 #include "game/game_update.h"
 
-#include "utils/json_serial.h"
+#include "utils/tagged_variant.h"
 
 namespace sdl {
     struct image_pixels {
@@ -41,33 +41,20 @@ namespace banggame {
         std::string message;
     };
 
-    enum class client_message_type {
-        pong,
-        connect,
-        user_edit,
-        lobby_make,
-        lobby_edit,
-        lobby_join,
-        lobby_leave,
-        lobby_chat,
-        lobby_return,
-        game_start,
-        game_rejoin,
-        game_action,
-    };
-
-    using client_message = enums::enum_variant<client_message_type,
-        enums::type_assoc<client_message_type::connect, connect_args>,
-        enums::type_assoc<client_message_type::user_edit, user_info>,
-        enums::type_assoc<client_message_type::lobby_make, lobby_info>,
-        enums::type_assoc<client_message_type::lobby_edit, lobby_info>,
-        enums::type_assoc<client_message_type::lobby_join, lobby_id_args>,
-        enums::type_assoc<client_message_type::lobby_chat, lobby_chat_client_args>,
-        enums::type_assoc<client_message_type::game_rejoin, int>,
-        enums::type_assoc<client_message_type::game_action, json::json>
+    using client_message = utils::tagged_variant<
+        utils::tag<"pong">,
+        utils::tag<"connect", connect_args>,
+        utils::tag<"user_edit", user_info>,
+        utils::tag<"lobby_make", lobby_info>,
+        utils::tag<"lobby_edit", lobby_info>,
+        utils::tag<"lobby_join", lobby_id_args>,
+        utils::tag<"lobby_leave">,
+        utils::tag<"lobby_chat", lobby_chat_client_args>,
+        utils::tag<"lobby_return">,
+        utils::tag<"game_start">,
+        utils::tag<"game_rejoin", int>,
+        utils::tag<"game_action", json::json>
     >;
-
-    #define MSG_TAG(name) enums::enum_tag_t<banggame::client_message_type::name>
 
     enum class lobby_state {
         waiting,
@@ -108,36 +95,25 @@ namespace banggame {
         bool is_read;
     };
 
-    enum class server_message_type {
-        ping,
-        client_accepted,
-        client_count,
-        lobby_error,
-        lobby_update,
-        lobby_entered,
-        lobby_edited,
-        lobby_removed,
-        lobby_add_user,
-        lobby_remove_user,
-        lobby_kick,
-        lobby_chat,
-        game_update,
-        game_started,
-    };
-
-    using server_message = enums::enum_variant<server_message_type,
-        enums::type_assoc<server_message_type::client_accepted, client_accepted_args>,
-        enums::type_assoc<server_message_type::client_count, int>,
-        enums::type_assoc<server_message_type::lobby_error, std::string>,
-        enums::type_assoc<server_message_type::lobby_update, lobby_data>,
-        enums::type_assoc<server_message_type::lobby_entered, lobby_entered_args>,
-        enums::type_assoc<server_message_type::lobby_edited, lobby_info>,
-        enums::type_assoc<server_message_type::lobby_removed, lobby_id_args>,
-        enums::type_assoc<server_message_type::lobby_add_user, user_info_id_args>,
-        enums::type_assoc<server_message_type::lobby_remove_user, int>,
-        enums::type_assoc<server_message_type::lobby_chat, lobby_chat_args>,
-        enums::type_assoc<server_message_type::game_update, json::json>
+    using server_message = utils::tagged_variant<
+        utils::tag<"ping">,
+        utils::tag<"client_accepted", client_accepted_args>,
+        utils::tag<"client_count", int>,
+        utils::tag<"lobby_error", std::string>,
+        utils::tag<"lobby_update", lobby_data>,
+        utils::tag<"lobby_entered", lobby_entered_args>,
+        utils::tag<"lobby_edited", lobby_info>,
+        utils::tag<"lobby_removed", lobby_id_args>,
+        utils::tag<"lobby_add_user", user_info_id_args>,
+        utils::tag<"lobby_remove_user", int>,
+        utils::tag<"lobby_kick">,
+        utils::tag<"lobby_chat", lobby_chat_args>,
+        utils::tag<"game_update", json::json>,
+        utils::tag<"game_started">
     >;
+
+    template<utils::tstring Name>
+    concept server_message_type = utils::tag_for<utils::tag<Name>, server_message>;
 
 }
 

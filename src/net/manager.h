@@ -9,9 +9,9 @@
 
 namespace banggame {
 
-template<server_message_type E>
+template<utils::tstring E> requires server_message_type<E>
 std::string make_message(auto && ... args) {
-    return json::serialize(server_message{enums::enum_tag<E>, FWD(args) ...}).dump();
+    return json::serialize(server_message{utils::tag<E>{}, FWD(args) ...}).dump();
 }
 
 struct server_options {
@@ -19,6 +19,8 @@ struct server_options {
     bool verbose = false;
     int max_session_id_count = 10;
 };
+
+#define MSG_TAG(name) utils::tag<#name>
 
 class game_manager: public net::wsserver {
 public:
@@ -34,7 +36,7 @@ protected:
     void on_message(client_handle client, const std::string &message) override;
 
 private:
-    template<server_message_type E>
+    template<utils::tstring E> requires server_message_type<E>
     void send_message(client_handle client, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
@@ -44,7 +46,7 @@ private:
         push_message(client, message);
     }
 
-    template<server_message_type E>
+    template<utils::tstring E> requires server_message_type<E>
     void broadcast_message(auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
@@ -56,7 +58,7 @@ private:
         }
     }
 
-    template<server_message_type E>
+    template<utils::tstring E> requires server_message_type<E>
     void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
