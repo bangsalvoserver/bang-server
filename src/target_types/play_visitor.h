@@ -8,10 +8,9 @@ namespace banggame {
     template<utils::tstring Name>
     using target_type_value = typename utils::tagged_variant_value_type<Name, play_card_target>::type;
 
-    template<utils::tstring Name> struct play_visitor;
-
-    template<utils::tstring Name> requires std::is_void_v<target_type_value<Name>>
-    struct play_visitor<Name> {
+    template<utils::tstring Name> struct play_visitor {
+        static_assert(std::is_void_v<target_type_value<Name>>);
+        
         player *origin;
         card *origin_card;
         const effect_holder &effect;
