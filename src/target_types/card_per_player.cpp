@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    using visit_cards = play_visitor<target_type::card_per_player>;
+    using visit_cards = play_visitor<"card_per_player">;
 
     template<> bool visit_cards::possible(const effect_context &ctx) {
         return true;

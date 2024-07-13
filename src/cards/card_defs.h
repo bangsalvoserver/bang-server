@@ -2,6 +2,8 @@
 #define __CARD_DEFS_H__
 
 #include "game_string.h"
+#include "utils/tagged_variant.h"
+#include "utils/enum_bitset.h"
 
 namespace banggame {
 
@@ -90,42 +92,29 @@ namespace banggame {
         renegade_3p,
     };
 
-    enum class target_type {
-        none,
-        player,
-        conditional_player,
-        adjacent_players,
-        player_per_cube,
-        card,
-        extra_card,
-        players,
-        cards,
-        max_cards,
-        card_per_player,
-        move_cube_slot,
-        select_cubes,
-        select_cubes_optional,
-        select_cubes_repeat,
-        select_cubes_players,
-        self_cubes,
-    };
-
-    using play_card_target = enums::enum_variant<target_type,
-        enums::type_assoc<target_type::player, serial::player>,
-        enums::type_assoc<target_type::conditional_player, serial::opt_player>,
-        enums::type_assoc<target_type::adjacent_players, serial::player_list>,
-        enums::type_assoc<target_type::player_per_cube, serial::player_list>,
-        enums::type_assoc<target_type::card, serial::card>,
-        enums::type_assoc<target_type::extra_card, serial::opt_card>,
-        enums::type_assoc<target_type::cards, serial::card_list>,
-        enums::type_assoc<target_type::max_cards, serial::card_list>,
-        enums::type_assoc<target_type::card_per_player, serial::card_list>,
-        enums::type_assoc<target_type::move_cube_slot, serial::card_list>,
-        enums::type_assoc<target_type::select_cubes, serial::card_list>,
-        enums::type_assoc<target_type::select_cubes_optional, serial::card_list>,
-        enums::type_assoc<target_type::select_cubes_repeat, serial::card_list>,
-        enums::type_assoc<target_type::select_cubes_players, serial::card_list>
+    using play_card_target = utils::tagged_variant<
+        utils::tag<"none">,
+        utils::tag<"player", serial::player>,
+        utils::tag<"conditional_player", serial::opt_player>,
+        utils::tag<"adjacent_players", serial::player_list>,
+        utils::tag<"player_per_cube", serial::player_list>,
+        utils::tag<"card", serial::card>,
+        utils::tag<"extra_card", serial::opt_card>,
+        utils::tag<"players">,
+        utils::tag<"cards", serial::card_list>,
+        utils::tag<"max_cards", serial::card_list>,
+        utils::tag<"card_per_player", serial::card_list>,
+        utils::tag<"move_cube_slot", serial::card_list>,
+        utils::tag<"select_cubes", serial::card_list>,
+        utils::tag<"select_cubes_optional", serial::card_list>,
+        utils::tag<"select_cubes_repeat", serial::card_list>,
+        utils::tag<"select_cubes_players", serial::card_list>,
+        utils::tag<"self_cubes">
     >;
+
+    using target_type = utils::tagged_variant_index<play_card_target>;
+    #define TARGET_TYPE(name) target_type::of<#name>()
+
     using target_list = std::vector<play_card_target>;
 
     struct effect_holder {

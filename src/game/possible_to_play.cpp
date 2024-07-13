@@ -74,17 +74,17 @@ namespace banggame {
             }.get_error(origin_card, origin, targets, ctx);
         }
         const auto &effect = effects.at(mth.args[targets.size()]);
-        switch (effect.target) {
-        case target_type::player:
+        switch (effect.target.index) {
+        case TARGET_TYPE(player).index:
             return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
                 auto targets_copy = targets;
-                targets_copy.emplace_back(enums::tag<target_type::player>, target);
+                targets_copy.emplace_back(utils::tag<"player">{}, target);
                 return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
             });
-        case target_type::card:
+        case TARGET_TYPE(card).index:
             return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
                 auto targets_copy = targets;
-                targets_copy.emplace_back(enums::tag<target_type::card>, target);
+                targets_copy.emplace_back(utils::tag<"card">{}, target);
                 return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
             });
         default:

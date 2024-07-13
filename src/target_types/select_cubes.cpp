@@ -2,7 +2,7 @@
 
 namespace banggame {
 
-    using visit_cubes = play_visitor<target_type::select_cubes>;
+    using visit_cubes = play_visitor<"select_cubes">;
 
     template<> bool visit_cubes::possible(const effect_context &ctx) {
         return origin->count_cubes() >= effect.target_value;

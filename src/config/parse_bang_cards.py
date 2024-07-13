@@ -79,7 +79,7 @@ def parse_effects(effect_list):
         check_allowed_filters(effect, target_type, player_filter, card_filter)
 
         result.append(CppObject(
-            target =           CppEnum('target_type', target_type) if target_type else None,
+            target =           CppLiteral(f'TARGET_TYPE({target_type})') if target_type else None,
             player_filter =    [CppEnum('target_player_filter', f) for f in player_filter.split()] if player_filter else None,
             card_filter =      [CppEnum('target_card_filter', f) for f in card_filter.split()] if card_filter else None,
             effect_value =     int(effect_value) if effect_value else None,

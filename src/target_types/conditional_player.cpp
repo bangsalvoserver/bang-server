@@ -2,7 +2,7 @@
 
 namespace banggame {
 
-    using visit_player = play_visitor<target_type::conditional_player>;
+    using visit_player = play_visitor<"conditional_player">;
 
     template<> bool visit_player::possible(const effect_context &ctx) {
         return true;
@@ -19,7 +19,7 @@ namespace banggame {
 
     template<> game_string visit_player::get_error(const effect_context &ctx, player *target) {
         if (target) {
-            return defer<target_type::player>().get_error(ctx, target);
+            return defer<"player">().get_error(ctx, target);
         } else if (contains_at_least(make_player_target_set(origin, origin_card, effect), 1)) {
             return "ERROR_TARGET_SET_NOT_EMPTY";
         } else {
@@ -29,7 +29,7 @@ namespace banggame {
 
     template<> game_string visit_player::prompt(const effect_context &ctx, player *target) {
         if (target) {
-            return defer<target_type::player>().prompt(ctx, target);
+            return defer<"player">().prompt(ctx, target);
         } else {
             return {};
         }
@@ -37,13 +37,13 @@ namespace banggame {
 
     template<> void visit_player::add_context(effect_context &ctx, player *target) {
         if (target) {
-            defer<target_type::player>().add_context(ctx, target);
+            defer<"player">().add_context(ctx, target);
         }
     }
 
     template<> void visit_player::play(const effect_context &ctx, player *target) {
         if (target) {
-            defer<target_type::player>().play(ctx, target);
+            defer<"player">().play(ctx, target);
         }
     }
 

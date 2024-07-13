@@ -12,7 +12,7 @@ namespace banggame {
                 return holder.player_filter.check(target_player_filter::reachable)
                     || holder.player_filter.check(target_player_filter::range_1)
                     || holder.player_filter.check(target_player_filter::range_2)
-                    || holder.target == target_type::adjacent_players;
+                    || holder.target == TARGET_TYPE(adjacent_players);
             })
         ) {
             return {"ERROR_NO_RANGED_TARGET", origin_card, playing_card};

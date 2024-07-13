@@ -2,7 +2,7 @@
 
 namespace banggame {
 
-    using visit_none = play_visitor<target_type::none>;
+    using visit_none = play_visitor<"none">;
 
     template<> bool visit_none::possible(const effect_context &ctx) {
         return !effect.get_error(origin_card, origin, ctx);

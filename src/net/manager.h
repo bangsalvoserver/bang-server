@@ -20,8 +20,6 @@ struct server_options {
     int max_session_id_count = 10;
 };
 
-#define MSG_TAG(name) utils::tag<#name>
-
 class game_manager: public net::wsserver {
 public:
     game_manager();
@@ -75,18 +73,18 @@ private:
     void set_user_team(game_user &user, lobby_team team);
 
 private:
-    void handle_message(MSG_TAG(connect),        client_state &state, const connect_args &value);
-    void handle_message(MSG_TAG(pong),           client_state &state);
-    void handle_message(MSG_TAG(user_edit),      game_user &user, const user_info &value);
-    void handle_message(MSG_TAG(lobby_make),     game_user &user, const lobby_info &value);
-    void handle_message(MSG_TAG(lobby_edit),     game_user &user, const lobby_info &args);
-    void handle_message(MSG_TAG(lobby_join),     game_user &user, const lobby_id_args &value);
-    void handle_message(MSG_TAG(lobby_leave),    game_user &user);
-    void handle_message(MSG_TAG(lobby_chat),     game_user &user, const lobby_chat_client_args &value);
-    void handle_message(MSG_TAG(lobby_return),   game_user &user);
-    void handle_message(MSG_TAG(game_start),     game_user &user);
-    void handle_message(MSG_TAG(game_rejoin),    game_user &user, int player_id);
-    void handle_message(MSG_TAG(game_action),    game_user &user, const json::json &value);
+    void handle_message(utils::tag<"connect">,        client_state &state, const connect_args &value);
+    void handle_message(utils::tag<"pong">,           client_state &state);
+    void handle_message(utils::tag<"user_edit">,      game_user &user, const user_info &value);
+    void handle_message(utils::tag<"lobby_make">,     game_user &user, const lobby_info &value);
+    void handle_message(utils::tag<"lobby_edit">,     game_user &user, const lobby_info &args);
+    void handle_message(utils::tag<"lobby_join">,     game_user &user, const lobby_id_args &value);
+    void handle_message(utils::tag<"lobby_leave">,    game_user &user);
+    void handle_message(utils::tag<"lobby_chat">,     game_user &user, const lobby_chat_client_args &value);
+    void handle_message(utils::tag<"lobby_return">,   game_user &user);
+    void handle_message(utils::tag<"game_start">,     game_user &user);
+    void handle_message(utils::tag<"game_rejoin">,    game_user &user, int player_id);
+    void handle_message(utils::tag<"game_action">,    game_user &user, const json::json &value);
 
     void handle_chat_command(game_user &user, const std::string &command);
 

@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    using visit_card = play_visitor<target_type::card>;
+    using visit_card = play_visitor<"card">;
 
     template<> bool visit_card::possible(const effect_context &ctx) {
         return contains_at_least(make_card_target_set(origin, origin_card, effect, ctx), 1);

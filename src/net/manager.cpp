@@ -127,7 +127,7 @@ void game_manager::tick() {
     }
 }
 
-void game_manager::handle_message(MSG_TAG(connect), client_state &state, const connect_args &args) {
+void game_manager::handle_message(utils::tag<"connect">, client_state &state, const connect_args &args) {
     if (!net::validate_commit_hash(args.commit_hash)) {
         throw critical_error("INVALID_CLIENT_COMMIT_HASH");
     }
@@ -174,11 +174,11 @@ void game_manager::handle_message(MSG_TAG(connect), client_state &state, const c
     }
 }
 
-void game_manager::handle_message(MSG_TAG(pong), client_state &state) {
+void game_manager::handle_message(utils::tag<"pong">, client_state &state) {
     state.ping_count = 0;
 }
 
-void game_manager::handle_message(MSG_TAG(user_edit), game_user &user, const user_info &args) {
+void game_manager::handle_message(utils::tag<"user_edit">, game_user &user, const user_info &args) {
     static_cast<user_info &>(user) = args;
 
     if (auto *l = user.in_lobby) {
@@ -186,7 +186,7 @@ void game_manager::handle_message(MSG_TAG(user_edit), game_user &user, const use
     }
 }
 
-void game_manager::handle_message(MSG_TAG(lobby_make), game_user &user, const lobby_info &value) {
+void game_manager::handle_message(utils::tag<"lobby_make">, game_user &user, const lobby_info &value) {
     if (user.in_lobby) {
         throw lobby_error("ERROR_PLAYER_IN_LOBBY");
     }
@@ -203,7 +203,7 @@ void game_manager::handle_message(MSG_TAG(lobby_make), game_user &user, const lo
     send_message<"lobby_add_user">(user.client, user_id, user);
 }
 
-void game_manager::handle_message(MSG_TAG(lobby_edit), game_user &user, const lobby_info &args) {
+void game_manager::handle_message(utils::tag<"lobby_edit">, game_user &user, const lobby_info &args) {
     if (!user.in_lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -276,7 +276,7 @@ void game_manager::set_user_team(game_user &user, lobby_team team) {
     }
 }
 
-void game_manager::handle_message(MSG_TAG(lobby_join), game_user &user, const lobby_id_args &value) {
+void game_manager::handle_message(utils::tag<"lobby_join">, game_user &user, const lobby_id_args &value) {
     if (user.in_lobby) {
         throw lobby_error("ERROR_PLAYER_IN_LOBBY");
     }
@@ -324,7 +324,7 @@ void game_manager::on_disconnect(client_handle client) {
     }
 }
 
-void game_manager::handle_message(MSG_TAG(lobby_leave), game_user &user) {
+void game_manager::handle_message(utils::tag<"lobby_leave">, game_user &user) {
     if (!user.in_lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -332,7 +332,7 @@ void game_manager::handle_message(MSG_TAG(lobby_leave), game_user &user) {
     kick_user_from_lobby(user);
 }
 
-void game_manager::handle_message(MSG_TAG(lobby_chat), game_user &user, const lobby_chat_client_args &value) {
+void game_manager::handle_message(utils::tag<"lobby_chat">, game_user &user, const lobby_chat_client_args &value) {
     if (!user.in_lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -396,7 +396,7 @@ void game_manager::handle_chat_command(game_user &user, const std::string &messa
     command(this, user, args);
 }
 
-void game_manager::handle_message(MSG_TAG(lobby_return), game_user &user) {
+void game_manager::handle_message(utils::tag<"lobby_return">, game_user &user) {
     if (!user.in_lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -426,7 +426,7 @@ void game_manager::handle_message(MSG_TAG(lobby_return), game_user &user) {
     broadcast_message_lobby<"lobby_entered">(lobby, lobby.get_user_id(user), lobby.lobby_id, lobby.name, lobby.options);
 }
 
-void game_manager::handle_message(MSG_TAG(game_start), game_user &user) {
+void game_manager::handle_message(utils::tag<"game_start">, game_user &user) {
     if (!user.in_lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -489,7 +489,7 @@ void game_manager::handle_message(MSG_TAG(game_start), game_user &user) {
     lobby.m_game->commit_updates();
 }
 
-void game_manager::handle_message(MSG_TAG(game_rejoin), game_user &user, int player_id) {
+void game_manager::handle_message(utils::tag<"game_rejoin">, game_user &user, int player_id) {
     auto &lobby = *user.in_lobby;
 
     if (lobby.state != lobby_state::playing) {
@@ -524,7 +524,7 @@ void game_manager::handle_message(MSG_TAG(game_rejoin), game_user &user, int pla
     }
 }
 
-void game_manager::handle_message(MSG_TAG(game_action), game_user &user, const json::json &value) {
+void game_manager::handle_message(utils::tag<"game_action">, game_user &user, const json::json &value) {
     if (!user.in_lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }

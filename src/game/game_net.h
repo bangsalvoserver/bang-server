@@ -114,19 +114,17 @@ namespace banggame {
     public:
         template<utils::tstring E> requires game_update_type<E>
         void add_update(update_target target, auto && ... args) {
-            static constexpr size_t I = utils::tagged_variant_index_of<E, game_update>::value;
-            using tag_type = typename utils::tagged_variant_tag_at<game_update, I>::type;
-            using value_type = typename tag_type::type;
-
-            game_update update{utils::tag<E>{}, FWD(args) ... };
-            m_updates.emplace_back(target, serialize_update(update), [&]{
-                if constexpr (!std::is_void_v<value_type>) {
-                    if constexpr (requires { value_type::duration; }) {
-                        return std::chrono::duration_cast<ticks>(std::get<I>(update).duration);
-                    }
+            using value_type = typename utils::tagged_variant_value_type<E, game_update>::type;
+            ticks duration{};
+            if constexpr (std::is_void_v<value_type>) {
+                m_updates.emplace_back(target, serialize_update(game_update{utils::tag<E>{}}), duration);
+            } else {
+                value_type update{FWD(args) ...};
+                if constexpr (requires { value_type::duration; }) {
+                    duration = std::chrono::duration_cast<ticks>(update.duration);
                 }
-                return ticks{0};
-            }());
+                m_updates.emplace_back(target, serialize_update(game_update{utils::tag<E>{}, std::move(update)}), duration);
+            }
         }
 
         template<utils::tstring E> requires game_update_type<E>

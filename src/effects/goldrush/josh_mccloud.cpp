@@ -20,13 +20,13 @@ namespace banggame {
         void on_update() override {
             if (target_card == get_single_element(get_all_playable_cards(target, true))) {
                 if (!target_card->modifier_response
-                    && rn::all_of(target_card->responses, [](const effect_holder &holder) { return holder.target == target_type::none; })
+                    && rn::all_of(target_card->responses, [](const effect_holder &holder) { return holder.target == TARGET_TYPE(none); })
                 ) {
                     target->m_game->add_log("LOG_PLAYED_CARD", target_card, target);
                     target_card->move_to(pocket_type::shop_discard);
                     
                     for (const effect_holder &effect : target_card->responses) {
-                        play_dispatch::play(target, target_card, effect, {}, enums::tag<target_type::none>);
+                        play_dispatch::play(target, target_card, effect, {}, utils::tag<"none">{});
                     }
                 }
             } else {

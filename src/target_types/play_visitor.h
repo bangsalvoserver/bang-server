@@ -4,14 +4,20 @@
 #include "cards/card_defs.h"
 
 namespace banggame {
+    
+    template<utils::tstring Name>
+    using target_type_value = typename utils::tagged_variant_value_type<Name, play_card_target>::type;
 
-    template<target_type E> struct play_visitor {
+    template<utils::tstring Name> struct play_visitor;
+
+    template<utils::tstring Name> requires std::is_void_v<target_type_value<Name>>
+    struct play_visitor<Name> {
         player *origin;
         card *origin_card;
         const effect_holder &effect;
 
-        template<target_type T>
-        play_visitor<T> defer() const {
+        template<utils::tstring E>
+        play_visitor<E> defer() const {
             return {origin, origin_card, effect};
         }
 
@@ -22,17 +28,17 @@ namespace banggame {
         void play(const effect_context &ctx);
     };
 
-    template<target_type E> requires (play_card_target::has_type<E>)
-    struct play_visitor<E> {
-        using value_type = unwrap_not_null_t<typename play_card_target::value_type<E>>;
+    template<utils::tstring Name> requires (!std::is_void_v<target_type_value<Name>>)
+    struct play_visitor<Name> {
+        using value_type = unwrap_not_null_t<target_type_value<Name>>;
         using arg_type = same_if_trivial_t<value_type>;
 
         player *origin;
         card *origin_card;
         const effect_holder &effect;
 
-        template<target_type T>
-        play_visitor<T> defer() const {
+        template<utils::tstring E>
+        play_visitor<E> defer() const {
             return {origin, origin_card, effect};
         }
 

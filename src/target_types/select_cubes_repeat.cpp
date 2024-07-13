@@ -2,7 +2,7 @@
 
 namespace banggame {
 
-    using visit_cubes = play_visitor<target_type::select_cubes_repeat>;
+    using visit_cubes = play_visitor<"select_cubes_repeat">;
 
     template<> bool visit_cubes::possible(const effect_context &ctx) {
         return true;
@@ -34,15 +34,15 @@ namespace banggame {
     }
 
     template<> game_string visit_cubes::prompt(const effect_context &ctx, const serial::card_list &target_cards) {
-        return defer<target_type::select_cubes>().prompt(ctx, target_cards);
+        return defer<"select_cubes">().prompt(ctx, target_cards);
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const serial::card_list &target_cards) {
-        defer<target_type::select_cubes>().add_context(ctx, target_cards);
+        defer<"select_cubes">().add_context(ctx, target_cards);
     }
 
     template<> void visit_cubes::play(const effect_context &ctx, const serial::card_list &target_cards) {
-        defer<target_type::select_cubes>().play(ctx, target_cards);
+        defer<"select_cubes">().play(ctx, target_cards);
     }
 
 }

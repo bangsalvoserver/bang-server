@@ -11,14 +11,14 @@
 
 namespace banggame::play_dispatch {
     bool possible(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
-        return enums::visit_enum([&]<target_type E>(enums::tag_t<E>) {
+        return utils::visit_tagged([&]<utils::tstring E>(utils::tag<E>) {
             return play_visitor<E>{origin, origin_card, effect}.possible(ctx);
         }, effect.target);
     }
 
     play_card_target random_target(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
-        return enums::visit_enum([&]<target_type E>(enums::tag_t<E> tag) -> play_card_target {
-            if constexpr (play_card_target::has_type<E>) {
+        return utils::visit_tagged([&]<utils::tstring E>(utils::tag<E> tag) -> play_card_target {
+            if constexpr (!std::is_void_v<target_type_value<E>>) {
                 return {tag, play_visitor<E>{origin, origin_card, effect}.random_target(ctx)};
             } else {
                 return tag;
@@ -27,25 +27,25 @@ namespace banggame::play_dispatch {
     }
 
     game_string get_error(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
-        return enums::visit_indexed([&]<target_type E>(enums::tag_t<E>, auto && ... args) -> game_string {
+        return utils::visit_tagged([&]<utils::tstring E>(utils::tag<E>, auto && ... args) -> game_string {
             return play_visitor<E>{origin, origin_card, effect}.get_error(ctx, FWD(args) ...);
         }, target);
     }
 
     game_string prompt(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
-        return enums::visit_indexed([&]<target_type E>(enums::tag_t<E>, auto && ... args) {
+        return utils::visit_tagged([&]<utils::tstring E>(utils::tag<E>, auto && ... args) {
             return play_visitor<E>{origin, origin_card, effect}.prompt(ctx, FWD(args) ... );
         }, target);
     }
 
     void add_context(player *origin, card *origin_card, const effect_holder &effect, effect_context &ctx, const play_card_target &target) {
-        enums::visit_indexed([&]<target_type E>(enums::tag_t<E>, auto && ... args) {
+        utils::visit_tagged([&]<utils::tstring E>(utils::tag<E>, auto && ... args) {
             play_visitor<E>{origin, origin_card, effect}.add_context(ctx, FWD(args) ... );
         }, target);
     }
 
     void play(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
-        enums::visit_indexed([&]<target_type E>(enums::tag_t<E>, auto && ... args) {
+        utils::visit_tagged([&]<utils::tstring E>(utils::tag<E>, auto && ... args) {
             play_visitor<E>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
         }, target);
     }
@@ -101,7 +101,7 @@ namespace banggame {
         }
 
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
-            if (!target.is(effect.target)) {
+            if (target.index() != effect.target.index) {
                 return "ERROR_INVALID_TARGET_TYPE";
             }
 
@@ -189,10 +189,10 @@ namespace banggame {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
         } else {
-            if (targets.size() != 1 || !targets.front().is(target_type::player)) {
+            if (targets.size() != 1 || !utils::holds_alternative<"player">(targets.front())) {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
-            target = targets.front().get<target_type::player>();
+            target = utils::get<"player">(targets.front());
         }
         
         return get_equip_error(origin, origin_card, target, ctx);
@@ -276,7 +276,7 @@ namespace banggame {
         }
         if (filters::is_equip_card(origin_card)) {
             return get_equip_prompt(origin, origin_card,
-                origin_card->self_equippable() ? origin : targets.front().get<target_type::player>().get());
+                origin_card->self_equippable() ? origin : utils::get<"player">(targets.front()).get());
         } else {
             return get_play_prompt(origin, origin_card, is_response, targets, ctx);
         }
@@ -376,7 +376,7 @@ namespace banggame {
 
     static void apply_equip(player *origin, card *origin_card, const target_list &targets, const effect_context &ctx) {
         player *target = origin_card->self_equippable() ? origin
-            : targets.front().get<target_type::player>().get();
+            : utils::get<"player">(targets.front()).get();
             
         origin->m_game->queue_action([=]{ 
             if (!origin->alive()) return;
