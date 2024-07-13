@@ -113,7 +113,7 @@ namespace banggame {
     >;
 
     using target_type = utils::tagged_variant_index<play_card_target>;
-    #define TARGET_TYPE(name) target_type::of<#name>()
+    #define TARGET_TYPE(name) target_type{utils::tag<#name>{}}
 
     using target_list = std::vector<play_card_target>;
 

@@ -74,14 +74,14 @@ namespace banggame {
             }.get_error(origin_card, origin, targets, ctx);
         }
         const auto &effect = effects.at(mth.args[targets.size()]);
-        switch (effect.target.index) {
-        case TARGET_TYPE(player).index:
+        switch (effect.target.index()) {
+        case TARGET_TYPE(player).index():
             return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
                 auto targets_copy = targets;
                 targets_copy.emplace_back(utils::tag<"player">{}, target);
                 return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
             });
-        case TARGET_TYPE(card).index:
+        case TARGET_TYPE(card).index():
             return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
                 auto targets_copy = targets;
                 targets_copy.emplace_back(utils::tag<"card">{}, target);

@@ -101,7 +101,7 @@ namespace banggame {
         }
 
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
-            if (target.index() != effect.target.index) {
+            if (target.index() != effect.target.index()) {
                 return "ERROR_INVALID_TARGET_TYPE";
             }
 
