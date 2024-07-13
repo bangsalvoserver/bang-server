@@ -101,7 +101,7 @@ namespace banggame {
         }
 
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
-            if (target.index() != effect.target.index()) {
+            if (target_type(target) != effect.target) {
                 return "ERROR_INVALID_TARGET_TYPE";
             }
 
@@ -189,10 +189,10 @@ namespace banggame {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
         } else {
-            if (targets.size() != 1 || !utils::holds_alternative<"player">(targets.front())) {
+            if (targets.size() != 1 || target_type(targets.front()) != TARGET_TYPE(player)) {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
-            target = utils::get<"player">(targets.front());
+            target = get<"player">(targets.front());
         }
         
         return get_equip_error(origin, origin_card, target, ctx);
@@ -276,7 +276,7 @@ namespace banggame {
         }
         if (filters::is_equip_card(origin_card)) {
             return get_equip_prompt(origin, origin_card,
-                origin_card->self_equippable() ? origin : utils::get<"player">(targets.front()).get());
+                origin_card->self_equippable() ? origin : get<"player">(targets.front()).get());
         } else {
             return get_play_prompt(origin, origin_card, is_response, targets, ctx);
         }
@@ -375,8 +375,7 @@ namespace banggame {
     }
 
     static void apply_equip(player *origin, card *origin_card, const target_list &targets, const effect_context &ctx) {
-        player *target = origin_card->self_equippable() ? origin
-            : utils::get<"player">(targets.front()).get();
+        player *target = origin_card->self_equippable() ? origin : get<"player">(targets.front()).get();
             
         origin->m_game->queue_action([=]{ 
             if (!origin->alive()) return;
