@@ -8,6 +8,12 @@ namespace banggame {
     template<utils::tstring Name>
     using target_type_value = utils::tagged_variant_value_type<play_card_target, Name>;
 
+    template<typename T> struct same_if_trivial { using type = const T &; };
+    template<typename T> using same_if_trivial_t = typename same_if_trivial<T>::type;
+
+    template<typename T> requires (std::is_trivially_copyable_v<T>)
+    struct same_if_trivial<T> { using type = T; };
+
     template<utils::tstring Name> struct play_visitor {
         static_assert(std::is_void_v<target_type_value<Name>>);
         

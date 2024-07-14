@@ -2,12 +2,13 @@
 #define __MESSAGES_H__
 
 #include "game/game_update.h"
+#include "utils/base64.h"
 
 namespace sdl {
     struct image_pixels {
         int width;
         int height;
-        base64::encoded_bytes pixels;
+        std::vector<std::byte> pixels;
     };
 }
 

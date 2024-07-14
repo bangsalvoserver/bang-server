@@ -2,7 +2,7 @@ import sys
 import yaml_custom as yaml
 import base64
 from PIL import Image
-from cpp_generator import print_cpp_file, CppEnum, CppObject
+from cpp_generator import print_cpp_file, CppEnum, CppObject, CppLiteral
 
 PROPIC_SIZE = 50
 INCLUDE_FILENAMES = ['net/bot_info.h']
@@ -19,10 +19,13 @@ def sdl_image_pixels(filename):
         else:
             w = PROPIC_SIZE * w // h
             h = PROPIC_SIZE
+
+        pixels = base64.b64encode(image.resize((w, h)).convert('RGBA').tobytes('raw', 'RGBA', 0, 1)).decode('utf8')
         
         return CppObject(
-            width = w, height = h,
-            pixels = base64.b64encode(image.resize((w, h)).convert('RGBA').tobytes('raw', 'RGBA', 0, 1)).decode('utf8')
+            width = w,
+            height = h,
+            pixels = CppLiteral(f'base64::base64_decode("{pixels}")')
         )
 
 def parse_settings(settings):
