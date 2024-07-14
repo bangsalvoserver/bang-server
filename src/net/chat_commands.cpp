@@ -65,15 +65,13 @@ namespace banggame {
         kick_user_from_lobby(*(kicked->user));
     }
 
-    template<size_t I>
-    static std::string get_field_string(const game_options &options) {
-        return fmt::format("{} = {}", reflect::member_name<I>(options), reflect::get<I>(options));
-    }
-
     void game_manager::command_get_game_options(game_user &user) {
-        [this, client = user.client, &options = user.in_lobby->options]<size_t ... Is>(std::index_sequence<Is ...>) {
-            (send_message<"lobby_chat">(client, 0, get_field_string<Is>(options)), ...);
-        }(std::make_index_sequence<reflect::size<game_options>()>());
+        const game_options &options = user.in_lobby->options;
+        reflect::for_each<game_options>([&](auto I) {
+            send_message<"lobby_chat">(user.client, 0,
+                fmt::format("{} = {}", reflect::member_name<I>(options), reflect::get<I>(options))
+            );
+        });
     }
 
     template<size_t ... Is>
