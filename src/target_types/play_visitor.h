@@ -6,7 +6,7 @@
 namespace banggame {
     
     template<utils::tstring Name>
-    using target_type_value = typename utils::tagged_variant_value_type<Name, play_card_target>::type;
+    using target_type_value = utils::tagged_variant_value_type<play_card_target, Name>;
 
     template<utils::tstring Name> struct play_visitor {
         static_assert(std::is_void_v<target_type_value<Name>>);
