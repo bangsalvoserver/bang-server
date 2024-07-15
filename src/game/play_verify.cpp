@@ -174,6 +174,10 @@ namespace banggame {
         return {};
     }
 
+    static player *get_equip_target(player *origin, card *origin_card, const target_list &targets) {
+        return origin_card->self_equippable() ? origin : get<"player">(targets.front()).get();
+    }
+
     static game_string verify_equip_target(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         if (is_response) {
             return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
@@ -275,8 +279,7 @@ namespace banggame {
             MAYBE_RETURN(get_play_prompt(origin, mod_card, is_response, mod_targets, ctx));
         }
         if (filters::is_equip_card(origin_card)) {
-            return get_equip_prompt(origin, origin_card,
-                origin_card->self_equippable() ? origin : get<"player">(targets.front()).get());
+            return get_equip_prompt(origin, origin_card, get_equip_target(origin, origin_card, targets));
         } else {
             return get_play_prompt(origin, origin_card, is_response, targets, ctx);
         }
@@ -342,6 +345,16 @@ namespace banggame {
         }
     }
 
+    static void discard_shop_selection_card(card *origin_card) {
+        origin_card->move_to(pocket_type::shop_discard);
+        game *m_game = origin_card->m_game;
+        m_game->queue_action([m_game]{
+            if (m_game->m_shop_selection.size() < 3) {
+                m_game->draw_shop_card();
+            }
+        }, -1);
+    }
+
     static void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, is_response);
 
@@ -356,12 +369,7 @@ namespace banggame {
                 }
                 break;
             case pocket_type::shop_selection:
-                origin_card->move_to(pocket_type::shop_discard);
-                origin->m_game->queue_action([m_game=origin->m_game]{
-                    if (m_game->m_shop_selection.size() < 3) {
-                        m_game->draw_shop_card();
-                    }
-                }, -1);
+                discard_shop_selection_card(origin_card);
             }
         }
 
@@ -374,9 +382,7 @@ namespace banggame {
         }
     }
 
-    static void apply_equip(player *origin, card *origin_card, const target_list &targets, const effect_context &ctx) {
-        player *target = origin_card->self_equippable() ? origin : get<"player">(targets.front()).get();
-            
+    static void apply_equip(player *origin, card *origin_card, player *target, const effect_context &ctx) {
         origin->m_game->queue_action([=]{ 
             if (!origin->alive()) return;
 
@@ -444,7 +450,7 @@ namespace banggame {
         }
 
         if (filters::is_equip_card(args.card)) {
-            apply_equip(origin, args.card, args.targets, ctx);
+            apply_equip(origin, args.card, get_equip_target(origin, args.card, args.targets), ctx);
         } else {
             apply_target_list(origin, args.card, is_response, args.targets, ctx);
         }
