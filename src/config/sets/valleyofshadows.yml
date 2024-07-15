@@ -110,7 +110,7 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - bang adjacent_players
+      - bang adjacent_players(1) reachable notself
     tags:
       - skip_logs
       - banglimit

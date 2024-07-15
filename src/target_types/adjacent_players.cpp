@@ -8,23 +8,23 @@ namespace banggame {
 
     using visit_players = play_visitor<"adjacent_players">;
 
-    static auto make_adjacent_players_target_set(player *origin, card *origin_card, const effect_context &ctx) {
+    static auto make_adjacent_players_target_set(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
         return rv::cartesian_product(origin->m_game->m_players, origin->m_game->m_players)
-            | rv::filter([origin, ignore_distances=ctx.ignore_distances](const auto &pair) {
+            | rv::filter([=, &effect, &ctx](const auto &pair) {
                 auto [target1, target2] = pair;
                 return target1 != origin && target2 != origin && target1 != target2
                     && target1->alive() && target2->alive()
-                    && (ignore_distances || origin->m_game->calc_distance(origin, target1) <= origin->get_weapon_range() + origin->get_range_mod())
-                    && origin->m_game->calc_distance(target1, target2) == 1;
+                    && !filters::check_player_filter(origin, effect.player_filter, target1, ctx)
+                    && origin->m_game->calc_distance(target1, target2) <= effect.target_value;
             });
     }
 
     template<> bool visit_players::possible(const effect_context &ctx) {
-        return contains_at_least(make_adjacent_players_target_set(origin, origin_card, ctx), 1);
+        return contains_at_least(make_adjacent_players_target_set(origin, origin_card, effect, ctx), 1);
     }
 
     template<> serial::player_list visit_players::random_target(const effect_context &ctx) {
-        auto targets = make_adjacent_players_target_set(origin, origin_card, ctx) | rn::to_vector;
+        auto targets = make_adjacent_players_target_set(origin, origin_card, effect, ctx) | rn::to_vector;
         auto [target1, target2] = random_element(targets, origin->m_game->bot_rng);
         return {target1, target2};
     }
@@ -33,10 +33,11 @@ namespace banggame {
         if (targets.size() != 2) {
             return "ERROR_INVALID_TARGETS";
         }
-        if (!ctx.ignore_distances && origin->m_game->calc_distance(origin, targets[0]) > origin->get_weapon_range() + origin->get_range_mod()) {
-            return "ERROR_TARGET_NOT_IN_RANGE";
+        MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, targets[0], ctx));
+        if (!targets[1]->alive()) {
+            return "ERROR_TARGET_DEAD";
         }
-        if (targets[0] == targets[1] || origin->m_game->calc_distance(targets[0], targets[1]) != 1) {
+        if (targets[0] == targets[1] || origin->m_game->calc_distance(targets[0], targets[1]) > effect.target_value) {
             return "ERROR_TARGETS_NOT_ADJACENT";
         }
         for (player *target : targets) {

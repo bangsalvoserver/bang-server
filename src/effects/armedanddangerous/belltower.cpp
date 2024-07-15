@@ -11,8 +11,7 @@ namespace banggame {
             [](const effect_holder &holder) {
                 return holder.player_filter.check(target_player_filter::reachable)
                     || holder.player_filter.check(target_player_filter::range_1)
-                    || holder.player_filter.check(target_player_filter::range_2)
-                    || holder.target == TARGET_TYPE(adjacent_players);
+                    || holder.player_filter.check(target_player_filter::range_2);
             })
         ) {
             return {"ERROR_NO_RANGED_TARGET", origin_card, playing_card};
