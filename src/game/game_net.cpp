@@ -22,8 +22,10 @@ namespace json {
         banggame::card *operator()(const json &value) const {
             if (value.is_number_integer()) {
                 return context.find_card(value.get<int>());
-            } else {
+            } else if (value.is_null()) {
                 return nullptr;
+            } else {
+                throw std::runtime_error("Cannot deserialize card: value is not an integer");
             }
         }
     };
@@ -43,8 +45,10 @@ namespace json {
         banggame::player *operator()(const json &value) const {
             if (value.is_number_integer()) {
                 return context.find_player(value.get<int>());
-            } else {
+            } else if (value.is_null()) {
                 return nullptr;
+            } else {
+                throw std::runtime_error("Cannot deserialize player: value is not an integer");
             }
         }
     };

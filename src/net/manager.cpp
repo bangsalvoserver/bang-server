@@ -34,6 +34,9 @@ void game_manager::on_message(client_handle client, const std::string &msg) {
                 handle_message(tag, *state.user, FWD(args) ...);
             }
         }, client_msg);
+    } catch (const json::json_error &e) {
+        fmt::print(stderr, "Invalid message: {}\n{}\n", msg, e.what());
+        kick_client(client, "INVALID_MESSAGE");
     } catch (const critical_error &e) {
         kick_client(client, e.what());
     } catch (const lobby_error &e) {
