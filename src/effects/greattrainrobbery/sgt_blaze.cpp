@@ -12,19 +12,16 @@
 namespace banggame {
 
     game_string modifier_sgt_blaze::get_error(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) {
-        const auto &effects = playing_card->get_effect_list(origin->m_game->pending_requests());
-        if (auto it = rn::find(effects, TARGET_TYPE(players), &effect_holder::target); it != effects.end()) {
-            if (ctx.skipped_player && filters::check_player_filter(origin, it->player_filter, ctx.skipped_player, ctx)) {
-                return {"ERROR_CANNOT_SKIP_PLAYER", ctx.skipped_player};
+        for (const effect_holder &effect : playing_card->get_effect_list(origin->m_game->pending_requests())) {
+            if (effect.target == TARGET_TYPE(players) || effect.target == TARGET_TYPE(card_per_player)) {
+                if (ctx.skipped_player && filters::check_player_filter(origin, effect.player_filter, ctx.skipped_player, ctx)) {
+                    return {"ERROR_CANNOT_SKIP_PLAYER", ctx.skipped_player};
+                } else {
+                    return {};
+                }
             }
-        } else if (playing_card->has_tag(tag_type::multi_target)) {
-            if (ctx.skipped_player == origin) {
-                return {"ERROR_CANNOT_SKIP_PLAYER", origin};
-            }
-        } else {
-            return {"ERROR_NO_PLAYERS_TARGET", origin_card, playing_card};
         }
-        return {};
+        return {"ERROR_NO_PLAYERS_TARGET", origin_card, playing_card};
     }
 
     void effect_skip_player::add_context(card *origin_card, player *origin, player *target, effect_context &ctx) {

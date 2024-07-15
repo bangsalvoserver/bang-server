@@ -97,10 +97,10 @@ main_deck:
       - max_usages(1)
       - set_playing card self | hand bang
       - discard card self | hand
+      - none players notself
     mth_effect: bulldog(1, 2)
     tags:
       - weapon
-      - multi_target
   - name: LAST_WILL
     signs:
       - A spades
@@ -183,7 +183,6 @@ main_deck:
       - destroy card_per_player notself
     tags:
       - skip_logs
-      - multi_target
   - name: FLYING_BULLET
     signs:
       - 10 diamonds
