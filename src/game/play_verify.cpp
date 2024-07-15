@@ -18,11 +18,7 @@ namespace banggame::play_dispatch {
 
     play_card_target random_target(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
         return utils::visit_tagged([&](utils::tag_for<play_card_target> auto tag) {
-            if constexpr (!std::is_void_v<target_type_value<tag.name>>) {
-                return play_card_target{tag, play_visitor<tag.name>{origin, origin_card, effect}.random_target(ctx)};
-            } else {
-                return play_card_target{tag};
-            }
+            return play_card_target{tag, play_visitor<tag.name>{origin, origin_card, effect}.random_target(ctx)};
         }, effect.target);
     }
 
