@@ -8,7 +8,8 @@ namespace banggame {
 
     static constexpr size_t format_arg_list_max_size = 5;
 
-    struct format_arg_list {
+    class format_arg_list {
+    public:
         enum format_arg_type {
             format_number = 0,
             format_card = 1,
@@ -21,15 +22,28 @@ namespace banggame {
             player *player_value;
         };
 
-        std::array<format_arg, format_arg_list_max_size> args{};
-        uint8_t count = 0;
-        uint8_t types = 0;
-
         template<typename ... Ts>
         constexpr format_arg_list(Ts ... values) {
             static_assert(sizeof...(Ts) <= format_arg_list_max_size, "format_arg_list is too big");
             (add(values), ...);
         }
+
+        constexpr std::pair<format_arg_type, format_arg> operator[](std::size_t index) const {
+            uint8_t result = types;
+            for (std::size_t i=0; i<index; ++i) {
+                result /= 3;
+            }
+            return { static_cast<format_arg_type>(result % 3), args[index] };
+        }
+
+        uint8_t size() const {
+            return count;
+        }
+
+    private:
+        std::array<format_arg, format_arg_list_max_size> args{};
+        uint8_t count = 0;
+        uint8_t types = 0;
 
         constexpr void add(int value) {
             args[count].number_value = value;
@@ -56,14 +70,6 @@ namespace banggame {
                 --exp;
             }
             return n;
-        }
-
-        constexpr std::pair<format_arg_type, format_arg> operator[](std::size_t index) const {
-            uint8_t result = types;
-            for (std::size_t i=0; i<index; ++i) {
-                result /= 3;
-            }
-            return { static_cast<format_arg_type>(result % 3), args[index] };
         }
     };
     

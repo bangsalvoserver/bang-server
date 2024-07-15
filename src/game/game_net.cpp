@@ -94,7 +94,7 @@ namespace json {
     template<typename Context> struct serializer<banggame::format_arg_list, Context> {
         json operator()(const banggame::format_arg_list &list) const {
             auto ret = json::array();
-            for (size_t i=0; i<list.count; ++i) {
+            for (size_t i=0; i < list.size(); ++i) {
                 auto [type, value] = list[i];
                 switch (type) {
                 case banggame::format_arg_list::format_number:
