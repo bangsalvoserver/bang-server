@@ -76,12 +76,13 @@ namespace banggame {
         virtual card *find_card(int card_id) const = 0;
         virtual player *find_player(int player_id) const = 0;
         virtual player *find_player_by_userid(int user_id) const = 0;
+        virtual game_duration transform_duration(game_duration duration) const = 0;
     };
 
     struct game_update_tuple {
         update_target target;
         json::json content;
-        ticks duration;
+        game_duration duration;
     };
 
     class game_net_manager : public game_context {
@@ -115,13 +116,13 @@ namespace banggame {
         template<utils::tstring E> requires game_update_type<E>
         void add_update(update_target target, auto && ... args) {
             using value_type = utils::tagged_variant_value_type<game_update, utils::tag<E>>;
-            ticks duration{};
+            game_duration duration{};
             if constexpr (std::is_void_v<value_type>) {
                 m_updates.emplace_back(target, serialize_update(game_update{utils::tag<E>{}}), duration);
             } else {
                 value_type update{FWD(args) ...};
                 if constexpr (requires { value_type::duration; }) {
-                    duration = std::chrono::duration_cast<ticks>(update.duration);
+                    duration = update.duration.get();
                 }
                 m_updates.emplace_back(target, serialize_update(game_update{utils::tag<E>{}, std::move(update)}), duration);
             }

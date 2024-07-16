@@ -10,7 +10,7 @@ namespace banggame {
     }
 
     void card::set_visibility(card_visibility new_visibility, player *new_owner, bool instant) {
-        game_duration duration = instant ? 0ms : durations.flip_card;
+        animation_duration duration = instant ? 0ms : durations.flip_card;
         if (new_visibility == card_visibility::hidden) {
             if (visibility == card_visibility::show_owner) {
                 m_game->add_update<"hide_card">(update_target::includes(owner), this, duration);

@@ -7,19 +7,30 @@ namespace banggame {
 
     using game_duration = std::chrono::milliseconds;
 
+    class animation_duration {
+    private:
+        game_duration value;
+        
+    public:
+        animation_duration() = default;
+        animation_duration(game_duration value) : value{value} {}
+
+        game_duration get() const { return value; }
+    };
+
     extern const struct durations_t {
-        game_duration move_cube;
-        game_duration move_cubes;
-        game_duration move_card;
-        game_duration move_deck;
-        game_duration deck_shuffle;
-        game_duration flip_card;
-        game_duration tap_card;
-        game_duration flash_card;
-        game_duration short_pause;
-        game_duration move_player;
-        game_duration player_hp;
-        game_duration move_train;
+        animation_duration move_cube;
+        animation_duration move_cubes;
+        animation_duration move_card;
+        animation_duration move_deck;
+        animation_duration deck_shuffle;
+        animation_duration flip_card;
+        animation_duration tap_card;
+        animation_duration flash_card;
+        animation_duration short_pause;
+        animation_duration move_player;
+        animation_duration player_hp;
+        animation_duration move_train;
     } durations;
 
 }

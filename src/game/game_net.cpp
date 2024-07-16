@@ -134,6 +134,13 @@ namespace json {
         }
     };
 
+    template<> struct serializer<banggame::animation_duration, banggame::game_context> {
+        const banggame::game_context &context;
+        json operator()(const banggame::animation_duration &duration) const {
+            return serialize(context.transform_duration(duration.get()));
+        }
+    };
+
     template<typename Context>
     struct is_serializable<banggame::card_modifier_node, Context> : std::true_type{};
 
@@ -141,7 +148,7 @@ namespace json {
 
 namespace banggame {
     json::json game_net_manager::serialize_update(const game_update &update) const {
-        return json::serialize(update);
+        return json::serialize<game_update, game_context>(update, *this);
     }
 
     std::string game_net_manager::handle_game_action(int user_id, const json::json &value) {

@@ -56,6 +56,7 @@ namespace banggame {
         card *find_card(int card_id) const override;
         player *find_player(int player_id) const override;
         player *find_player_by_userid(int user_id) const override;
+        game_duration transform_duration(game_duration duration) const override;
 
         auto get_all_cards() const {
             return m_cards_storage | rv::transform([](card &c) { return &c; });

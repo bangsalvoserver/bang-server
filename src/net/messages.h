@@ -1,7 +1,7 @@
 #ifndef __MESSAGES_H__
 #define __MESSAGES_H__
 
-#include "game/game_update.h"
+#include "game/game_options.h"
 #include "utils/base64.h"
 
 namespace sdl {

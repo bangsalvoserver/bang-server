@@ -1,8 +1,9 @@
 #ifndef __GAME_UPDATE_H__
 #define __GAME_UPDATE_H__
 
+#include "game_options.h"
+
 #include "cards/card_data.h"
-#include "durations.h"
 
 #include "utils/tagged_variant.h"
 
@@ -33,7 +34,7 @@ namespace banggame {
         serial::card card;
         serial::opt_player player;
         pocket_type pocket;
-        game_duration duration = durations.move_card;
+        animation_duration duration = durations.move_card;
         bool front = false;
     };
 
@@ -46,44 +47,44 @@ namespace banggame {
         int num_cubes;
         serial::opt_card origin_card;
         serial::opt_card target_card;
-        game_duration duration = durations.move_cubes;
+        animation_duration duration = durations.move_cubes;
     };
 
     struct move_train_update {
         int position;
-        game_duration duration = durations.move_train;
+        animation_duration duration = durations.move_train;
     };
 
     struct deck_shuffled_update {
         pocket_type pocket;
-        game_duration duration = durations.deck_shuffle;
+        animation_duration duration = durations.deck_shuffle;
     };
 
     struct show_card_update {
         serial::card card;
         card_data info;
-        game_duration duration = durations.flip_card;
+        animation_duration duration = durations.flip_card;
     };
 
     struct hide_card_update {
         serial::card card;
-        game_duration duration = durations.flip_card;
+        animation_duration duration = durations.flip_card;
     };
 
     struct tap_card_update {
         serial::card card;
         bool inactive;
-        game_duration duration = durations.tap_card;
+        animation_duration duration = durations.tap_card;
     };
 
     struct flash_card_update {
         serial::card card;
-        game_duration duration = durations.flash_card;
+        animation_duration duration = durations.flash_card;
     };
 
     struct short_pause_update {
         serial::opt_card card;
-        game_duration duration = durations.short_pause;
+        animation_duration duration = durations.short_pause;
     };
 
     struct player_user_pair {
@@ -103,13 +104,13 @@ namespace banggame {
 
     struct player_order_update {
         serial::player_list players;
-        game_duration duration = durations.move_player;
+        animation_duration duration = durations.move_player;
     };
 
     struct player_hp_update {
         serial::player player;
         int hp;
-        game_duration duration = durations.player_hp;
+        animation_duration duration = durations.player_hp;
     };
 
     struct player_gold_update {
@@ -120,7 +121,7 @@ namespace banggame {
     struct player_show_role_update {
         serial::player player;
         player_role role;
-        game_duration duration = durations.flip_card;
+        animation_duration duration = durations.flip_card;
     };
 
     struct player_flags_update {
@@ -167,20 +168,6 @@ namespace banggame {
     struct status_ready_args {
         card_modifier_tree play_cards;
         player_distances distances;
-    };
-
-    struct game_options {
-        enums::bitset<expansion_type> expansions;
-        bool enable_ghost_cards = false;
-        bool character_choice = true;
-        bool quick_discard_all = true;
-        int scenario_deck_size = 12;
-        int num_bots = 0;
-        game_duration damage_timer = 1500ms;
-        game_duration escape_timer = 3000ms;
-        game_duration bot_play_timer = 500ms;
-        game_duration tumbleweed_timer = 3000ms;
-        unsigned int game_seed = 0;
     };
 
     using game_update = utils::tagged_variant<

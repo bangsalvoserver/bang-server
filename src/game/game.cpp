@@ -34,11 +34,11 @@ namespace banggame {
     }
     
     ticks game::get_total_update_time() const {
-        ticks result{0};
+        game_duration result{0};
         for (player *p : m_players) {
-            ticks player_result{0};
+            game_duration player_result{0};
             for (const auto &[target, content, duration] : m_updates) {
-                if (duration >= ticks{0} && target.matches(p)) {
+                if (duration >= game_duration{0} && target.matches(p)) {
                     player_result += duration;
                 }
             }
@@ -46,7 +46,7 @@ namespace banggame {
                 result = player_result;
             }
         }
-        return result;
+        return std::chrono::duration_cast<ticks>(transform_duration(result));
     }
 
     utils::generator<json::json> game::get_spectator_join_updates() {

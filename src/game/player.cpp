@@ -296,7 +296,7 @@ namespace banggame {
     void player::set_role(player_role role, bool instant) {
         m_role = role;
 
-        game_duration duration = instant ? 0ms : durations.flip_card;
+        animation_duration duration = instant ? 0ms : durations.flip_card;
 
         if (role == player_role::sheriff || m_game->m_players.size() <= 3 || check_player_flags(player_flag::role_revealed)) {
             m_game->add_update<"player_show_role">(this, m_role, duration);
