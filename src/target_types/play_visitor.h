@@ -4,19 +4,20 @@
 #include "cards/card_defs.h"
 
 namespace banggame {
-    
-    template<utils::tstring Name>
-    using target_type_value = utils::tagged_variant_value_type<play_card_target, Name>;
 
-    template<utils::tstring Name> struct play_visitor {
-        static_assert(std::is_void_v<target_type_value<Name>>);
-        
+    template<typename T>
+    concept target_type_tag = utils::tag_for<T, play_card_target>;
+    
+    template<target_type_tag Tag>
+    using target_type_value = utils::tagged_variant_value_type<play_card_target, Tag::name>;
+
+    template<target_type_tag Tag> struct play_visitor_t {
         player *origin;
         card *origin_card;
         const effect_holder &effect;
 
         template<utils::tstring E>
-        play_visitor<E> defer() const {
+        play_visitor_t<utils::tag<E>> defer() const {
             return {origin, origin_card, effect};
         }
 
@@ -28,9 +29,9 @@ namespace banggame {
         void play(const effect_context &ctx);
     };
 
-    template<utils::tstring Name> requires (!std::is_void_v<target_type_value<Name>>)
-    struct play_visitor<Name> {
-        using value_type = unwrap_not_null_t<target_type_value<Name>>;
+    template<target_type_tag Tag> requires (!std::is_void_v<target_type_value<Tag>>)
+    struct play_visitor_t<Tag> {
+        using value_type = unwrap_not_null_t<target_type_value<Tag>>;
         using arg_type = std::conditional_t<std::is_trivially_copyable_v<value_type>, value_type, const value_type &>;
 
         player *origin;
@@ -38,7 +39,7 @@ namespace banggame {
         const effect_holder &effect;
 
         template<utils::tstring E>
-        play_visitor<E> defer() const {
+        play_visitor_t<utils::tag<E>> defer() const {
             return {origin, origin_card, effect};
         }
 
@@ -49,6 +50,9 @@ namespace banggame {
         void add_context(effect_context &ctx, arg_type arg);
         void play(const effect_context &ctx, arg_type arg);
     };
+
+    template<utils::tstring Name>
+    using play_visitor = play_visitor_t<utils::tag<Name>>;
 }
 
 #endif
