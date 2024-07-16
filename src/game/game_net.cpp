@@ -5,6 +5,8 @@
 
 #include "play_verify.h"
 
+#include "utils/json_aggregate.h"
+
 namespace json {
 
     template<std::convertible_to<banggame::card *> Card, typename Context> struct serializer<Card, Context> {
@@ -131,6 +133,9 @@ namespace json {
             };
         }
     };
+
+    template<typename Context>
+    struct is_serializable<banggame::card_modifier_node, Context> : std::true_type{};
 
 }
 

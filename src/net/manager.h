@@ -5,6 +5,8 @@
 #include "chat_commands.h"
 #include "wsserver.h"
 
+#include "utils/json_aggregate.h"
+
 #include <random>
 
 namespace banggame {
