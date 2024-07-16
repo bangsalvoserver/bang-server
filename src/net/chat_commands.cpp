@@ -17,8 +17,9 @@ namespace banggame {
     static constexpr std::string_view KICK_DESCRIPTION = "[userid] : kick an user in this lobby";
     static constexpr std::string_view GET_OPTIONS_DESCRIPTION = "print game options";
     static constexpr std::string_view SET_OPTION_DESCRIPTION = "[name] [value] : set a game option";
+    static constexpr std::string_view RESET_OPTIONS_DESCRIPTION = "reset game options";
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
-    static constexpr std::string_view SET_TEAM_DESCRIPTION = "[game_player / game_spectator] : set team";
+    static constexpr std::string_view SPECTATE_DESCRIPTION = "spectate this game";
     static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed";
     static constexpr std::string_view QUIT_DESCRIPTION = "disconnect from server";
 
@@ -28,8 +29,9 @@ namespace banggame {
         { "kick",           { proxy<&game_manager::command_kick_user>,          KICK_DESCRIPTION, command_permissions::lobby_owner }},
         { "options",        { proxy<&game_manager::command_get_game_options>,   GET_OPTIONS_DESCRIPTION }},
         { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
+        { "reset-options",  { proxy<&game_manager::command_reset_game_options>, RESET_OPTIONS_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
-        { "set-team",       { proxy<&game_manager::command_set_team>,           SET_TEAM_DESCRIPTION, command_permissions::lobby_waiting }},
+        { "spectate",       { proxy<&game_manager::command_spectate>,           SPECTATE_DESCRIPTION, command_permissions::lobby_waiting }},
         { "seed",           { proxy<&game_manager::command_get_rng_seed>,       GET_RNG_SEED_DESCRIPTION, command_permissions::lobby_finished }},
         { "quit",           { proxy<&game_manager::command_quit>,               QUIT_DESCRIPTION }},
     };
@@ -104,6 +106,12 @@ namespace banggame {
         } else {
             throw lobby_error("INVALID_OPTION_NAME");
         }
+    }
+
+    void game_manager::command_reset_game_options(game_user &user) {
+        auto &lobby = *user.in_lobby;
+        lobby.options = banggame::game_options{};
+        broadcast_message_lobby<"lobby_edited">(lobby, lobby);
     }
 
     void game_manager::command_give_card(game_user &user, std::string_view name) {
@@ -238,12 +246,8 @@ namespace banggame {
         lobby.m_game->commit_updates();
     }
 
-    void game_manager::command_set_team(game_user &user, std::string_view value) {
-        if (auto team = enums::from_string<lobby_team>(value)) {
-            set_user_team(user, *team);
-        } else {
-            throw lobby_error("ERROR_INVALID_TEAM");
-        }
+    void game_manager::command_spectate(game_user &user) {
+        set_user_team(user, lobby_team::game_spectator);
     }
 
     void game_manager::command_get_rng_seed(game_user &user) {
