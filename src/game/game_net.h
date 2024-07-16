@@ -114,7 +114,7 @@ namespace banggame {
     public:
         template<utils::tstring E> requires game_update_type<E>
         void add_update(update_target target, auto && ... args) {
-            using value_type = utils::tagged_variant_value_type<game_update, E>;
+            using value_type = utils::tagged_variant_value_type<game_update, utils::tag<E>>;
             ticks duration{};
             if constexpr (std::is_void_v<value_type>) {
                 m_updates.emplace_back(target, serialize_update(game_update{utils::tag<E>{}}), duration);

@@ -9,7 +9,7 @@ namespace banggame {
     concept target_type_tag = utils::tag_for<T, play_card_target>;
     
     template<target_type_tag Tag>
-    using target_type_value = utils::tagged_variant_value_type<play_card_target, Tag::name>;
+    using target_type_value = utils::tagged_variant_value_type<play_card_target, Tag>;
 
     template<target_type_tag Tag> struct play_visitor_t {
         player *origin;
