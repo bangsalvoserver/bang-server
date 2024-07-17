@@ -8,20 +8,17 @@ namespace json {
 
     template<typename T>
     concept aggregate = std::is_aggregate_v<T>;
-    
-    template<aggregate T, size_t I>
-    using member_type = std::remove_cvref_t<decltype(reflect::get<I>(std::declval<T>()))>;
 
     template<typename T, typename Context>
     concept all_fields_serializable = aggregate<T> && 
         []<size_t ... Is>(std::index_sequence<Is ...>) {
-            return (serializable<member_type<T, Is>, Context> && ...);
+            return (serializable<reflect::member_type<Is, T>, Context> && ...);
         }(std::make_index_sequence<reflect::size<T>()>());
 
     template<typename T, typename Context>
     concept all_fields_deserializable = aggregate<T> &&
         []<size_t ... Is>(std::index_sequence<Is ...>) {
-            return (deserializable<member_type<T, Is>, Context> && ...);
+            return (deserializable<reflect::member_type<Is, T>, Context> && ...);
         }(std::make_index_sequence<reflect::size<T>()>());
 
     template<aggregate T, typename Context> requires all_fields_serializable<T, Context>
@@ -45,9 +42,9 @@ namespace json {
         using context_holder<Context>::context_holder;
 
         template<size_t I>
-        member_type<T, I> deserialize_field(const json &value) const {
+        reflect::member_type<I, T> deserialize_field(const json &value) const {
             static constexpr auto name = reflect::member_name<I, T>();
-            using value_type = member_type<T, I>;
+            using value_type = reflect::member_type<I, T>;
             if (value.contains(name)) {
                 return this->template deserialize_with_context<value_type>(value[name]);
             } else if constexpr (std::is_default_constructible_v<T>) {
