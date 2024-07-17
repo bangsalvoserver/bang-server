@@ -17,8 +17,7 @@ void game_manager::on_message(client_handle client, const std::string &msg) {
     try {
         auto client_msg = json::deserialize<client_message>(json::json::parse(msg));
         if (m_options.verbose) {
-            fmt::print("{}: Received {}\n", get_client_ip(client), msg);
-            fflush(stdout);
+            std::cout << std::format("{}: Received {}", get_client_ip(client), msg) << std::endl;
         }
         utils::visit_tagged([&](utils::tag_for<client_message> auto tag, auto && ... args) {
             auto it = m_clients.find(client);
@@ -35,14 +34,14 @@ void game_manager::on_message(client_handle client, const std::string &msg) {
             }
         }, client_msg);
     } catch (const json::json_error &e) {
-        fmt::print(stderr, "Invalid message: {}\n{}\n", msg, e.what());
+        std::cerr << std::format("Invalid message: {}\n{}\n", msg, e.what());
         kick_client(client, "INVALID_MESSAGE");
     } catch (const critical_error &e) {
         kick_client(client, e.what());
     } catch (const lobby_error &e) {
         send_message<"lobby_error">(client, e.what());
     } catch (const std::exception &e) {
-        fmt::print(stderr, "Error in on_message(): {}\n", e.what());
+        std::cerr << std::format("Error in on_message(): {}\n", e.what());
     }
 }
 
@@ -112,7 +111,7 @@ void game_manager::tick() {
                     broadcast_message<"lobby_update">(l);
                 }
             } catch (const std::exception &e) {
-                fmt::print(stderr, "Error in tick(): {}\n", e.what());
+                std::cerr << "Error in tick(): " << e.what() << '\n';
             }
         }
         if (l.users.empty()) {
@@ -306,8 +305,7 @@ void game_manager::kick_user_from_lobby(game_user &user) {
 
 void game_manager::on_connect(client_handle client) {
     if (m_options.verbose) {
-        fmt::print("{}: Connected\n", get_client_ip(client));
-        fflush(stdout);
+        std::cout << std::format("{}: Connected", get_client_ip(client)) << std::endl;
     }
     m_clients.emplace(client, client);
     broadcast_message<"client_count">(m_clients.size());
@@ -459,8 +457,7 @@ void game_manager::handle_message(utils::tag<"game_start">, game_user &user) {
     lobby.m_game = std::make_unique<banggame::game>(lobby.options.game_seed);
 
     if (m_options.verbose) {
-        fmt::print("Started game {} with seed {}\n", lobby.name, lobby.m_game->rng_seed);
-        fflush(stdout);
+        std::cout << std::format("Started game {} with seed {}", lobby.name, lobby.m_game->rng_seed) << std::endl;
     }
 
     std::vector<int> user_ids;
@@ -481,7 +478,7 @@ void game_manager::handle_message(utils::tag<"game_start">, game_user &user) {
 
     for (int i=0; i < lobby.options.num_bots; ++i) {
         int bot_id = -1-i;
-        auto &bot = lobby.bots.emplace_back(user_info{fmt::format("BOT {}", names[i % names.size()]), *propics[i % propics.size()] }, bot_id);
+        auto &bot = lobby.bots.emplace_back(user_info{std::format("BOT {}", names[i % names.size()]), *propics[i % propics.size()] }, bot_id);
         user_ids.push_back(bot_id);
 
         broadcast_message_lobby<"lobby_add_user">(lobby, bot_id, bot, true);

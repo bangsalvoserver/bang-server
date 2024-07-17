@@ -39,15 +39,6 @@ target_include_directories(banglibs INTERFACE external/websocketpp)
 target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_CPP11_STL_)
 target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
 
-# fmt
-
-find_package(fmt REQUIRED)
-if(TARGET fmt::fmt-header-only)
-    target_link_libraries(banglibs INTERFACE fmt::fmt-header-only)
-else()
-    target_link_libraries(banglibs INTERFACE fmt::fmt)
-endif()
-
 # range-v3
 
 find_package(range-v3 REQUIRED)

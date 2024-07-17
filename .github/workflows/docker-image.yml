@@ -26,7 +26,7 @@ jobs:
         sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         sudo apt-get -y update
         sudo apt-get -y install gcc-${{env.GCC_VERSION}} g++-${{env.GCC_VERSION}} cmake ninja-build
-        sudo apt-get -y install libfmt-dev libcxxopts-dev librange-v3-dev
+        sudo apt-get -y install libcxxopts-dev librange-v3-dev
     
     - name: Install python dependencies
       shell: bash

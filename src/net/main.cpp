@@ -38,24 +38,23 @@ int main(int argc, char **argv) {
         auto results = options.parse(argc, argv);
 
         if (results.count("help")) {
-            fmt::print("{}\n", options.help());
+            std::cout << options.help() << '\n';
             return 0;
         }
 #ifdef HAVE_GIT_VERSION
         else if (results.count("version")) {
-            fmt::print("{}\n", net::server_commit_hash);
+            std::cout << net::server_commit_hash << '\n';
             return 0;
         }
 #endif
     } catch (const std::exception &error) {
-        fmt::print("Invalid arguments: {}\n", error.what());
+        std::cerr << "Invalid arguments: " << error.what() << '\n';
         return 1;
     }
 
     try {
         server.start(port);
-        fmt::print("Server listening on port {}\n", port);
-        fflush(stdout);
+        std::cout << "Server listening on port " << port << std::endl;
 
         std::signal(SIGTERM, handle_stop);
         std::signal(SIGINT, handle_stop);
@@ -69,11 +68,11 @@ int main(int argc, char **argv) {
         }
 
         server.stop();
-        fmt::print("Server stopped\n");
+        std::cout << "Server stopped\n";
 
         return 0;
     } catch (const std::exception &error) {
-        fmt::print(stderr, "Unhandled exception: {}\n", error.what());
+        std::cerr << "Unhandled exception: " << error.what() << '\n';
         return 1;
     }
 }

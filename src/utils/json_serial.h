@@ -2,8 +2,8 @@
 #define __JSON_SERIAL_H__
 
 #include <nlohmann/json.hpp>
-#include <fmt/format.h>
 
+#include <format>
 #include <vector>
 #include <string>
 #include <chrono>

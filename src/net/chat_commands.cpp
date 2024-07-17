@@ -40,7 +40,7 @@ namespace banggame {
         for (const auto &[cmd_name, command] : chat_command::commands) {
             if (!command.permissions().check(command_permissions::game_cheat) || m_options.enable_cheats) {
                 send_message<"lobby_chat">(user.client, 0,
-                    fmt::format("{}{} : {}", chat_command::start_char, cmd_name, command.description()));
+                    std::format("{}{} : {}", chat_command::start_char, cmd_name, command.description()));
             }
         }
     }
@@ -49,7 +49,7 @@ namespace banggame {
         auto &lobby = *user.in_lobby;
         for (auto [team, user_id, u] : lobby.users) {
             send_message<"lobby_chat">(user.client, 0,
-                fmt::format("{} : {} ({})", user_id, u->name, enums::to_string(team)));
+                std::format("{} : {} ({})", user_id, u->name, enums::to_string(team)));
         }
     }
 
@@ -71,7 +71,7 @@ namespace banggame {
         const game_options &options = user.in_lobby->options;
         reflect::for_each<game_options>([&](auto I) {
             send_message<"lobby_chat">(user.client, 0,
-                fmt::format("{} = {}", reflect::member_name<I>(options), reflect::get<I>(options))
+                std::format("{} = {}", reflect::member_name<I>(options), reflect::get<I>(options))
             );
         });
     }

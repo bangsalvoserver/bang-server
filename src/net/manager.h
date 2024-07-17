@@ -40,8 +40,7 @@ private:
     void send_message(client_handle client, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
-            fmt::print("{}: Sent {}\n", get_client_ip(client), message);
-            fflush(stdout);
+            std::cout << std::format("{}: Sent {}", get_client_ip(client), message) << std::endl;
         }
         push_message(client, message);
     }
@@ -50,8 +49,7 @@ private:
     void broadcast_message(auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
-            fmt::print("All users: Sent {}\n", message);
-            fflush(stdout);
+            std::cout << std::format("All users: Sent {}", message) << std::endl;
         }
         for (game_user &user : m_users | rv::values) {
             push_message(user.client, message);
@@ -62,8 +60,7 @@ private:
     void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
-            fmt::print("Lobby {}: Sent {}\n", lobby.name, message);
-            fflush(stdout);
+            std::cout << std::format("Lobby {}: Sent {}", lobby.name, message) << std::endl;
         }
         for (auto &[team, user_id, u] : lobby.users) {
             push_message(u->client, message);

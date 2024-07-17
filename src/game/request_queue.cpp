@@ -11,8 +11,7 @@ namespace banggame {
             return state_done{};
         } else if (auto req = top_request()) {
 #ifndef NDEBUG
-            fmt::print("{: >5}: {}\n", req->priority, utils::demangle(typeid(*req).name()));
-            fflush(stdout);
+            std::cout << std::format("{: >5}: {}", req->priority, utils::demangle(typeid(*req).name())) << std::endl;
 #endif
 
             req->on_update();

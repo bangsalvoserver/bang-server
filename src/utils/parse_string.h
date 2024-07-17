@@ -1,9 +1,8 @@
 #ifndef __PARSE_STRING_H__
 #define __PARSE_STRING_H__
 
-#include <fmt/format.h>
-
 #include <string>
+#include <format>
 #include <charconv>
 #include <optional>
 #include <chrono>
@@ -90,44 +89,40 @@ struct string_parser<std::chrono::duration<Rep, Period>> {
 };
 
 template<typename Rep, typename Period>
-struct fmt::formatter<std::chrono::duration<Rep, Period>> {
-    template<typename Context>
-    constexpr auto parse(Context &ctx) {
+struct std::formatter<std::chrono::duration<Rep, Period>> {
+    constexpr auto parse(std::format_parse_context &ctx) {
         return ctx.begin();
     }
 
-    template<typename Context>
-    auto format(const std::chrono::duration<Rep, Period> &value, Context &ctx) {
-        return fmt::format_to(ctx.out(), "{} {}", value.count(), get_suffix(typename Period::type{}));
+    auto format(const std::chrono::duration<Rep, Period> &value, std::format_context &ctx) const {
+        return std::format_to(ctx.out(), "{} {}", value.count(), get_suffix(typename Period::type{}));
     }
 };
 
 template<enums::enumeral E>
-struct fmt::formatter<E> : fmt::formatter<std::string_view> {
-    template<typename Context>
-    auto format(E value, Context &ctx) {
-        return fmt::formatter<std::string_view>::format(::enums::to_string(value), ctx);
+struct std::formatter<E> : std::formatter<std::string_view> {
+    auto format(E value, std::format_context &ctx) const {
+        return std::formatter<std::string_view>::format(enums::to_string(value), ctx);
     }
 };
 
 template<enums::enumeral E>
-struct fmt::formatter<enums::bitset<E>> : fmt::formatter<std::string_view> {
-    static constexpr std::string bitset_to_string(::enums::bitset<E> value) {
+struct std::formatter<enums::bitset<E>> : std::formatter<std::string_view> {
+    static constexpr std::string bitset_to_string(enums::bitset<E> value) {
         std::string ret;
-        for (E v : ::enums::enum_values<E>()) {
+        for (E v : enums::enum_values<E>()) {
             if (value.check(v)) {
                 if (!ret.empty()) {
                     ret += ' ';
                 }
-                ret.append(::enums::to_string(v));
+                ret.append(enums::to_string(v));
             }
         }
         return ret;
     }
 
-    template<typename Context>
-    auto format(::enums::bitset<E> value, Context &ctx) {
-        return fmt::formatter<std::string_view>::format(bitset_to_string(value), ctx);
+    auto format(enums::bitset<E> value, std::format_context &ctx) const {
+        return std::formatter<std::string_view>::format(bitset_to_string(value), ctx);
     }
 };
 

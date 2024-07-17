@@ -105,7 +105,7 @@ namespace banggame {
         }
 
         // softlock
-        fmt::print(stderr, "BOT ERROR: could not find card in execute_random_play()\n");
+        std::cerr << "BOT ERROR: could not find card in execute_random_play()\n";
 
         return false;
     }

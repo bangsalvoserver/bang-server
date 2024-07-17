@@ -134,7 +134,7 @@ namespace utils {
                     return;
                 }
             }
-            throw std::runtime_error(fmt::format("Invalid variant type: {}", key));
+            throw std::runtime_error(std::format("Invalid variant type: {}", key));
         }
 
         constexpr bool operator == (const tagged_variant_index &other) const = default;
