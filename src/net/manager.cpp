@@ -474,8 +474,8 @@ void game_manager::handle_message(utils::tag<"game_start">, game_user &user) {
         | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
         | rn::to<std::vector<std::string_view>>;
 
-    std::vector<const sdl::image_pixels *> propics = bot_info.propics
-        | rv::transform([](const sdl::image_pixels &image) { return &image; })
+    std::vector<const utils::image_pixels *> propics = bot_info.propics
+        | rv::transform([](const utils::image_pixels &image) { return &image; })
         | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
         | rn::to_vector;
 

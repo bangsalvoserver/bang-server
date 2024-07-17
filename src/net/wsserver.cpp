@@ -33,6 +33,10 @@ void wsserver::start(uint16_t port) {
         on_message(con, msg->get_payload());
     });
 
+#ifndef NDEBUG
+    m_server.set_reuse_addr(true);
+#endif
+
     std::error_code ec;
     m_server.listen(port, ec);
     m_server.start_accept(ec);

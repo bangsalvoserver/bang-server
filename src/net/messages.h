@@ -2,15 +2,7 @@
 #define __MESSAGES_H__
 
 #include "game/game_options.h"
-#include "utils/base64.h"
-
-namespace sdl {
-    struct image_pixels {
-        int width;
-        int height;
-        std::vector<std::byte> pixels;
-    };
-}
+#include "utils/image_pixels.h"
 
 namespace banggame {
     
@@ -18,7 +10,7 @@ namespace banggame {
 
     struct user_info {
         std::string name;
-        sdl::image_pixels profile_image;
+        utils::image_pixels profile_image;
     };
 
     struct connect_args {
