@@ -1,9 +1,12 @@
-[submodule "external/cpputils"]
-	path = external/cpputils
-	url = https://github.com/salvoilmiosi/cpputils
 [submodule "external/websocketpp"]
 	path = external/websocketpp
 	url = http://github.com/zaphoyd/websocketpp
 [submodule "external/asio"]
 	path = external/asio
 	url = https://github.com/chriskohlhoff/asio
+[submodule "external/json"]
+	path = external/json
+	url = https://github.com/nlohmann/json
+[submodule "external/reflect"]
+	path = external/reflect
+	url = https://github.com/boost-ext/reflect

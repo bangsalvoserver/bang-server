@@ -2,7 +2,7 @@
 
 #include "manager.h"
 
-#include "utils/enum_format.h"
+#include "utils/parse_string.h"
 #include "utils/static_map.h"
 
 #include "cards/filter_enums.h"

@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-template<utils::tstring E> requires server_message_type<E>
+template<utils::fixed_string E> requires server_message_type<E>
 std::string make_message(auto && ... args) {
     return json::serialize(server_message{utils::tag<E>{}, FWD(args) ...}).dump();
 }
@@ -36,7 +36,7 @@ protected:
     void on_message(client_handle client, const std::string &message) override;
 
 private:
-    template<utils::tstring E> requires server_message_type<E>
+    template<utils::fixed_string E> requires server_message_type<E>
     void send_message(client_handle client, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
@@ -46,7 +46,7 @@ private:
         push_message(client, message);
     }
 
-    template<utils::tstring E> requires server_message_type<E>
+    template<utils::fixed_string E> requires server_message_type<E>
     void broadcast_message(auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {
@@ -58,7 +58,7 @@ private:
         }
     }
 
-    template<utils::tstring E> requires server_message_type<E>
+    template<utils::fixed_string E> requires server_message_type<E>
     void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         if (m_options.verbose) {

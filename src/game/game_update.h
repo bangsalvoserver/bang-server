@@ -201,7 +201,7 @@ namespace banggame {
         utils::tag<"clear_logs">
     >;
 
-    template<utils::tstring Name>
+    template<utils::fixed_string Name>
     concept game_update_type = utils::tag_for<utils::tag<Name>, game_update>;
 
     struct modifier_pair {

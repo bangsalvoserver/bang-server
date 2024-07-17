@@ -3,7 +3,7 @@
 
 #include "card_defs.h"
 
-#include "utils/tstring.h"
+#include "utils/fixed_string.h"
 
 #include "game/filters_simple.h"
 
@@ -79,7 +79,7 @@ namespace banggame {
         };
     }
     
-    template<utils::tstring Name> struct equip_vtable_map;
+    template<utils::fixed_string Name> struct equip_vtable_map;
 
     #define DEFINE_EQUIP(name, type) \
         template<> struct equip_vtable_map<#name> { \

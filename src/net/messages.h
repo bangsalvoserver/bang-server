@@ -111,7 +111,7 @@ namespace banggame {
         utils::tag<"game_started">
     >;
 
-    template<utils::tstring Name>
+    template<utils::fixed_string Name>
     concept server_message_type = utils::tag_for<utils::tag<Name>, server_message>;
 
 }

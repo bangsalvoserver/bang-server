@@ -1,9 +1,9 @@
 #ifndef __CARD_FWD_H__
 #define __CARD_FWD_H__
 
-#include "utils/small_pod.h"
-#include "utils/utils.h"
 #include "utils/enum_bitset.h"
+#include "utils/small_int_set.h"
+#include "utils/misc.h"
 
 namespace banggame {
     

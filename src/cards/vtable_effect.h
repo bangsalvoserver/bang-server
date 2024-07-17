@@ -3,7 +3,7 @@
 
 #include "card_defs.h"
 
-#include "utils/tstring.h"
+#include "utils/fixed_string.h"
 
 #include "game/filters_simple.h"
 
@@ -235,7 +235,7 @@ namespace banggame {
         };
     }
     
-    template<utils::tstring Name> struct effect_vtable_map;
+    template<utils::fixed_string Name> struct effect_vtable_map;
 
     #define DEFINE_EFFECT(name, type) \
         template<> struct effect_vtable_map<#name> { \

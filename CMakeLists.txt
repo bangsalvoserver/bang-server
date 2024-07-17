@@ -8,37 +8,67 @@ if(WIN32)
     if (MSVC)
         add_compile_options(/bigobj)
         add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+        add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
     elseif(MINGW)
         add_compile_options(-fno-ms-extensions)
     endif()
     add_compile_definitions(_WIN32_WINNT=0x0601)
 endif()
 
-add_subdirectory(external/cpputils)
+# external dependencies
+
+add_library(banglibs INTERFACE)
+
+# threads
 
 find_package(Threads REQUIRED)
-find_package(cxxopts REQUIRED)
+target_link_libraries(banglibs INTERFACE Threads::Threads)
 
-add_library(networking INTERFACE)
-target_link_libraries(networking INTERFACE Threads::Threads)
-target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_STL_)
-target_compile_definitions(networking INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
-target_compile_definitions(networking INTERFACE ASIO_STANDALONE)
-target_include_directories(networking INTERFACE external/websocketpp)
-target_include_directories(networking INTERFACE external/asio/asio/include)
+# asio
+
+target_include_directories(banglibs INTERFACE external/asio/asio/include)
+target_compile_definitions(banglibs INTERFACE ASIO_STANDALONE)
 
 if(MINGW)
-    target_link_libraries(networking INTERFACE wsock32 ws2_32)
+    target_link_libraries(banglibs INTERFACE wsock32 ws2_32)
 endif()
 
-add_library(bangcommon INTERFACE)
-target_include_directories(bangcommon INTERFACE src)
-target_link_libraries(bangcommon INTERFACE cpputils networking)
+# websocketpp
 
-add_executable(bangserver "")
-add_subdirectory(src)
+target_include_directories(banglibs INTERFACE external/websocketpp)
+target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_CPP11_STL_)
+target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
 
-target_link_libraries(bangserver PUBLIC bangcommon cxxopts::cxxopts)
+# fmt
+
+find_package(fmt REQUIRED)
+if(TARGET fmt::fmt-header-only)
+    target_link_libraries(banglibs INTERFACE fmt::fmt-header-only)
+else()
+    target_link_libraries(banglibs INTERFACE fmt::fmt)
+endif()
+
+# range-v3
+
+find_package(range-v3 REQUIRED)
+target_link_libraries(banglibs INTERFACE range-v3)
+
+# cxxopts
+
+find_package(cxxopts REQUIRED)
+target_link_libraries(banglibs INTERFACE cxxopts::cxxopts)
+
+# nlohmann-json
+
+add_subdirectory(external/json)
+target_link_libraries(banglibs INTERFACE nlohmann_json::nlohmann_json)
+
+# reflect
+
+target_include_directories(banglibs INTERFACE external/reflect)
+target_compile_definitions(banglibs INTERFACE NTEST)
+
+# git_version configuration file
 
 option(BUILD_GAME_RELEASE "Build Game Release" OFF)
 
@@ -54,6 +84,15 @@ if (BUILD_GAME_RELEASE)
     add_dependencies(git_version check_git_server)
     target_compile_definitions(git_version PUBLIC HAVE_GIT_VERSION)
 
-    target_link_libraries(bangcommon INTERFACE git_version)
+    target_link_libraries(banglibs INTERFACE git_version)
 
 endif()
+
+# bang server executable
+
+add_executable(bangserver "")
+
+target_include_directories(bangserver PRIVATE src)
+target_link_libraries(bangserver PRIVATE banglibs)
+
+add_subdirectory(src)

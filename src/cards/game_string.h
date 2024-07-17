@@ -1,8 +1,8 @@
 #ifndef __GAME_STRING_H__
 #define __GAME_STRING_H__
 
+#include "utils/small_string.h"
 #include "card_fwd.h"
-#include "utils/small_pod.h"
 
 namespace banggame {
 

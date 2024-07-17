@@ -94,7 +94,7 @@ namespace banggame {
         json::json serialize_update(const game_update &update) const;
 
     protected:
-        template<utils::tstring E> requires game_update_type<E>
+        template<utils::fixed_string E> requires game_update_type<E>
         json::json make_update(auto && ... args) {
             return serialize_update(game_update{utils::tag<E>{}, FWD(args) ... });
         }
@@ -113,7 +113,7 @@ namespace banggame {
         std::string handle_game_action(int user_id, const json::json &value);
 
     public:
-        template<utils::tstring E> requires game_update_type<E>
+        template<utils::fixed_string E> requires game_update_type<E>
         void add_update(update_target target, auto && ... args) {
             using value_type = utils::tagged_variant_value_type<game_update, utils::tag<E>>;
             game_duration duration{};
@@ -128,7 +128,7 @@ namespace banggame {
             }
         }
 
-        template<utils::tstring E> requires game_update_type<E>
+        template<utils::fixed_string E> requires game_update_type<E>
         void add_update(auto && ... args) {
             add_update<E>(update_target::excludes(), FWD(args) ... );
         }

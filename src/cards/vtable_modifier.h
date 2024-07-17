@@ -3,7 +3,7 @@
 
 #include "card_defs.h"
 
-#include "utils/tstring.h"
+#include "utils/fixed_string.h"
 
 #include "game/filters_simple.h"
 
@@ -82,7 +82,7 @@ namespace banggame {
         };
     };
 
-    template<utils::tstring Name> struct modifier_vtable_map;
+    template<utils::fixed_string Name> struct modifier_vtable_map;
 
     #define DEFINE_MODIFIER(name, type) \
         template<> struct modifier_vtable_map<#name> { \

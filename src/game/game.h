@@ -4,7 +4,6 @@
 #include "game_table.h"
 #include "request_queue.h"
 #include "player_iterator.h"
-#include "utils/utils.h"
 #include "utils/generator.h"
 
 namespace banggame {
