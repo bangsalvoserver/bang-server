@@ -19,18 +19,12 @@ namespace json {
     template<typename T, typename Context = void> struct serializer;
 
     template<typename T, typename Context = void>
-    struct is_serializable : std::bool_constant<is_complete<serializer<T, Context>>> {};
-
-    template<typename T, typename Context = void>
-    concept serializable = is_serializable<T, Context>::value;
+    concept serializable = is_complete<serializer<T, Context>>;
 
     template<typename T, typename Context = void> struct deserializer;
 
     template<typename T, typename Context = void>
-    struct is_deserializable : std::bool_constant<is_complete<deserializer<T, Context>>> {};
-
-    template<typename T, typename Context = void>
-    concept deserializable = is_deserializable<T, Context>::value;
+    concept deserializable = is_complete<deserializer<T, Context>>;
 
     using json_error = json::exception;
 

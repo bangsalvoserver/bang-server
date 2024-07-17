@@ -21,8 +21,8 @@ namespace json {
             return (deserializable<reflect::member_type<Is, T>, Context> && ...);
         }(std::make_index_sequence<reflect::size<T>()>());
 
-    template<aggregate T, typename Context> requires all_fields_serializable<T, Context>
-    struct serializer<T, Context> : context_holder<Context> {
+    template<aggregate T, typename Context>
+    struct aggregate_serializer_unchecked : context_holder<Context> {
         using context_holder<Context>::context_holder;
 
         json operator()(const T &value) const {
@@ -37,8 +37,11 @@ namespace json {
         }
     };
 
-    template<aggregate T, typename Context> requires all_fields_deserializable<T, Context>
-    struct deserializer<T, Context> : context_holder<Context> {
+    template<aggregate T, typename Context> requires all_fields_serializable<T, Context>
+    struct serializer<T, Context> : aggregate_serializer_unchecked<T, Context> {};
+
+    template<aggregate T, typename Context>
+    struct aggregate_deserializer_unchecked : context_holder<Context> {
         using context_holder<Context>::context_holder;
 
         template<size_t I>
@@ -66,6 +69,9 @@ namespace json {
             }(std::make_index_sequence<reflect::size<T>()>());
         }
     };
+    
+    template<aggregate T, typename Context> requires all_fields_deserializable<T, Context>
+    struct deserializer<T, Context> : aggregate_deserializer_unchecked<T, Context> {};
 
 }
 

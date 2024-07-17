@@ -141,8 +141,10 @@ namespace json {
         }
     };
 
-    template<typename Context>
-    struct is_serializable<banggame::card_modifier_node, Context> : std::true_type{};
+    // bypass recursive concepts check
+    template<>
+    struct serializer<banggame::card_modifier_node, banggame::game_context>
+        : aggregate_serializer_unchecked<banggame::card_modifier_node, banggame::game_context> {};
 
 }
 
