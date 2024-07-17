@@ -11,8 +11,6 @@ namespace banggame {
     using namespace std::chrono_literals;
     
     struct game_options {
-        struct keep_default_values{};
-
         enums::bitset<expansion_type> expansions;
         bool enable_ghost_cards = false;
         bool character_choice = true;
