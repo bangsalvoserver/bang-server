@@ -249,19 +249,22 @@ namespace banggame {
         }
     };
 
-    struct effect_context {
+    struct effect_context_base {
         card *playing_card;
+        card *repeat_card;
+        card *card_choice;
+        int8_t train_advance;
+        bool ignore_distances;
+    };
+
+    struct effect_context : effect_context_base {
         std::vector<player *> selected_players;
         std::vector<card *> selected_cards;
         selected_cubes_count selected_cubes;
-        card *card_choice;
         player *skipped_player;
-        card *repeat_card;
         card *traincost;
-        int8_t train_advance;
         int8_t locomotive_count;
         int8_t discount;
-        bool ignore_distances;
         bool disable_banglimit;
         bool disable_bang_checks;
     };

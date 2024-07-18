@@ -417,7 +417,9 @@ namespace banggame {
     game_message verify_and_play(player *origin, const game_action &args) {
         bool is_response = origin->m_game->pending_requests();
 
-        effect_context ctx { .playing_card = args.card };
+        effect_context ctx{};
+        
+        ctx.playing_card = args.card;
 
         if (game_string error = verify_timer_response(origin, args.timer_id)) {
             return {message_type::error, error};

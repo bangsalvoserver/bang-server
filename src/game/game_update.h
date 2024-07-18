@@ -129,12 +129,13 @@ namespace banggame {
         player_flags flags;
     };
 
-    struct card_modifiers_pair {
+    struct playable_card_info {
         serial::card card;
         serial::card_list modifiers;
+        std::optional<effect_context_base> context;
     };
 
-    using playable_cards_list = std::vector<card_modifiers_pair>;
+    using playable_cards_list = std::vector<playable_card_info>;
 
     struct player_distance_item {
         serial::player player;

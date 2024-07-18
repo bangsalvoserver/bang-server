@@ -7,11 +7,11 @@
 
 namespace banggame {
 
-    static game_action generate_random_play(player *origin, const card_modifiers_pair &pair, bool is_response) {
-        game_action ret { .card = pair.card };
+    static game_action generate_random_play(player *origin, const playable_card_info &args, bool is_response) {
+        game_action ret { .card = args.card };
         effect_context ctx;
         
-        for (card *mod_card : pair.modifiers) {
+        for (card *mod_card : args.modifiers) {
             auto &targets = ret.modifiers.emplace_back(mod_card).targets;
 
             mod_card->get_modifier(is_response).add_context(mod_card, origin, ctx);
@@ -21,15 +21,15 @@ namespace banggame {
             }
         }
 
-        if (filters::is_equip_card(pair.card)) {
-            if (!pair.card->self_equippable()) {
+        if (filters::is_equip_card(args.card)) {
+            if (!args.card->self_equippable()) {
                 ret.targets.emplace_back(utils::tag<"player">{},
-                    random_element(make_equip_set(origin, pair.card, ctx), origin->m_game->bot_rng));
+                    random_element(make_equip_set(origin, args.card, ctx), origin->m_game->bot_rng));
             }
         } else {
-            for (const effect_holder &holder : pair.card->get_effect_list(is_response)) {
-                const auto &target = ret.targets.emplace_back(play_dispatch::random_target(origin, pair.card, holder, ctx));
-                play_dispatch::add_context(origin, pair.card, holder, ctx, target);
+            for (const effect_holder &holder : args.card->get_effect_list(is_response)) {
+                const auto &target = ret.targets.emplace_back(play_dispatch::random_target(origin, args.card, holder, ctx));
+                play_dispatch::add_context(origin, args.card, holder, ctx, target);
             }
         }
 
@@ -39,7 +39,7 @@ namespace banggame {
     static bool execute_random_play(player *origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
         auto &pockets = is_response ? bot_info.settings.response_pockets : bot_info.settings.in_play_pockets;
 
-        using card_node = const card_modifiers_pair *;
+        using card_node = const playable_card_info *;
         std::set<card_node> play_card_set = play_cards | rv::addressof | rn::to<std::set>;
         
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {

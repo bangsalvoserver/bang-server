@@ -155,7 +155,11 @@ namespace banggame {
     ) {
         const modifier_holder &modifier = origin_card->get_modifier(is_response);
         if (filters::is_equip_card(origin_card) || !modifier) {
-            result.emplace_back(origin_card, modifiers | rn::to<serial::card_list>);
+            if (modifiers.empty()) {
+                result.emplace_back(origin_card);
+            } else {
+                result.emplace_back(origin_card, modifiers | rn::to<serial::card_list>, ctx);
+            }
         } else {
             auto ctx_copy = ctx;
             modifier.add_context(origin_card, origin, ctx_copy);
