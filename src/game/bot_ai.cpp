@@ -9,7 +9,7 @@ namespace banggame {
 
     static game_action generate_random_play(player *origin, const playable_card_info &args, bool is_response) {
         game_action ret { .card = args.card };
-        effect_context ctx;
+        effect_context ctx{};
         
         for (card *mod_card : args.modifiers) {
             auto &targets = ret.modifiers.emplace_back(mod_card).targets;
