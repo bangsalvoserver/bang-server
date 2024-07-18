@@ -149,34 +149,34 @@ namespace banggame {
     }
 
     static void collect_playable_cards(
-        playable_cards_list &result,
+        playable_cards_list &result, std::vector<card *> &current_path,
         player *origin, card *origin_card, bool is_response,
-        std::vector<card *> current_path = {}, const effect_context &ctx = {}
+        const effect_context &ctx = {}
     ) {
         current_path.push_back(origin_card);
 
-        if (!filters::is_equip_card(origin_card)) {
-            if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
-                auto ctx_copy = ctx;
-                modifier.add_context(origin_card, origin, ctx_copy);
+        const modifier_holder &modifier = origin_card->get_modifier(is_response);
+        if (filters::is_equip_card(origin_card) || !modifier) {
+            result.push_back(current_path | rn::to<serial::card_list>);
+        } else {
+            auto ctx_copy = ctx;
+            modifier.add_context(origin_card, origin, ctx_copy);
 
-                for (card *target_card : cards_playable_with_modifiers(origin, current_path, is_response, ctx_copy)) {
-                    collect_playable_cards(result, origin, target_card, is_response, current_path, ctx_copy);
-                }
-
-                return;
+            for (card *target_card : cards_playable_with_modifiers(origin, current_path, is_response, ctx_copy)) {
+                collect_playable_cards(result, current_path, origin, target_card, is_response, ctx_copy);
             }
         }
 
-        result.push_back(current_path | rn::to<serial::card_list>);
+        current_path.pop_back();
     }
 
     playable_cards_list generate_playable_cards_list(player *origin, bool is_response) {
         playable_cards_list result;
+        std::vector<card *> current_path;
 
         if (origin) {
             for (card *origin_card : get_all_playable_cards(origin, is_response)) {
-                collect_playable_cards(result, origin, origin_card, is_response);
+                collect_playable_cards(result, current_path, origin, origin_card, is_response);
             }
         }
 
