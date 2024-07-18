@@ -15,12 +15,8 @@ namespace banggame {
         if (train_index > origin->m_game->train_position) {
             return "ERROR_TRAIN_NOT_IN_ANY_STATION";
         }
-        if (origin_card->pocket == pocket_type::stations) {
-            size_t station_index = std::distance(origin->m_game->m_stations.begin(), rn::find(origin->m_game->m_stations, origin_card));
-
-            if (train_index != origin->m_game->train_position - station_index) {
-                return "ERROR_TRAIN_NOT_IN_THIS_STATION";
-            }
+        if (origin_card->pocket == pocket_type::stations && ctx.playing_card != target_card) {
+            return "ERROR_TRAIN_NOT_IN_THIS_STATION";
         }
 
         return {};
@@ -28,6 +24,14 @@ namespace banggame {
 
     void modifier_traincost::add_context(card *origin_card, player *origin, effect_context &ctx) {
         ctx.traincost = origin_card;
+
+        if (origin_card->pocket == pocket_type::stations) {
+            int station_index = std::distance(origin->m_game->m_stations.begin(), rn::find(origin->m_game->m_stations, origin_card));
+            int train_index = ctx.train_advance + origin->m_game->train_position - station_index;
+            if (train_index >= 0 && train_index < origin->m_game->m_train.size()) {
+                ctx.playing_card = origin->m_game->m_train[train_index];
+            }
+        }
     }
 
     bool modifier_locomotive::valid_with_modifier(card *origin_card, player *origin, card *target_card) {
