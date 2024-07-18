@@ -420,8 +420,8 @@ namespace banggame {
 
         auto args = make_status_ready_update(m_playing);
         
-        if (m_playing->empty_hand() && rn::all_of(args.play_cards, [](const serial::card_list &cards) {
-            return cards.front()->has_tag(tag_type::pass_turn);
+        if (m_playing->empty_hand() && rn::all_of(args.play_cards, [](const card_modifiers_pair &pair) {
+            return pair.card->has_tag(tag_type::pass_turn);
         })) {
             m_playing->pass_turn();
             return false;

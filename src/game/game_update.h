@@ -129,7 +129,12 @@ namespace banggame {
         player_flags flags;
     };
 
-    using playable_cards_list = std::vector<serial::card_list>;
+    struct card_modifiers_pair {
+        serial::card card;
+        serial::card_list modifiers;
+    };
+
+    using playable_cards_list = std::vector<card_modifiers_pair>;
 
     struct player_distance_item {
         serial::player player;

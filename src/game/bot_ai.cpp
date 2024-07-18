@@ -7,13 +7,11 @@
 
 namespace banggame {
 
-    static game_action generate_random_play(player *origin, const serial::card_list &cards, bool is_response) {
-        game_action ret;
+    static game_action generate_random_play(player *origin, const card_modifiers_pair &pair, bool is_response) {
+        game_action ret { .card = pair.card };
         effect_context ctx;
-
-        assert(!cards.empty());
         
-        for (card *mod_card : cards | rv::drop_last(1)) {
+        for (card *mod_card : pair.modifiers) {
             auto &targets = ret.modifiers.emplace_back(mod_card).targets;
 
             mod_card->get_modifier(is_response).add_context(mod_card, origin, ctx);
@@ -23,16 +21,15 @@ namespace banggame {
             }
         }
 
-        card *playing_card = ret.card = cards.back();
-        if (filters::is_equip_card(playing_card)) {
-            if (!playing_card->self_equippable()) {
+        if (filters::is_equip_card(pair.card)) {
+            if (!pair.card->self_equippable()) {
                 ret.targets.emplace_back(utils::tag<"player">{},
-                    random_element(make_equip_set(origin, playing_card, ctx), origin->m_game->bot_rng));
+                    random_element(make_equip_set(origin, pair.card, ctx), origin->m_game->bot_rng));
             }
         } else {
-            for (const effect_holder &holder : playing_card->get_effect_list(is_response)) {
-                const auto &target = ret.targets.emplace_back(play_dispatch::random_target(origin, playing_card, holder, ctx));
-                play_dispatch::add_context(origin, playing_card, holder, ctx, target);
+            for (const effect_holder &holder : pair.card->get_effect_list(is_response)) {
+                const auto &target = ret.targets.emplace_back(play_dispatch::random_target(origin, pair.card, holder, ctx));
+                play_dispatch::add_context(origin, pair.card, holder, ctx, target);
             }
         }
 
@@ -42,20 +39,18 @@ namespace banggame {
     static bool execute_random_play(player *origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
         auto &pockets = is_response ? bot_info.settings.response_pockets : bot_info.settings.in_play_pockets;
 
-        using card_list_ptr = const serial::card_list *;
-        std::set<card_list_ptr> play_card_set = play_cards | rv::addressof | rn::to<std::set>;
+        using card_node = const card_modifiers_pair *;
+        std::set<card_node> play_card_set = play_cards | rv::addressof | rn::to<std::set>;
         
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
             auto node_set = play_card_set;
             
             while (!node_set.empty()) {
-                card_list_ptr selected_node = [&]{
+                card_node selected_node = [&]{
                     for (pocket_type pocket : pockets) {
-                        if (auto filter = node_set
-                            | rv::filter([&](card_list_ptr node) {
-                                return node->front()->pocket == pocket;
-                            }))
-                        {
+                        if (auto filter = node_set | rv::filter([&](card_node node) {
+                            return node->card->pocket == pocket;
+                        })) {
                             return random_element(filter, origin->m_game->bot_rng);
                         }
                     }

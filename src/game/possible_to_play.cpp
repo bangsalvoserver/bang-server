@@ -149,34 +149,32 @@ namespace banggame {
     }
 
     static void collect_playable_cards(
-        playable_cards_list &result, std::vector<card *> &current_path,
+        playable_cards_list &result, std::vector<card *> &modifiers,
         player *origin, card *origin_card, bool is_response,
         const effect_context &ctx = {}
     ) {
-        current_path.push_back(origin_card);
-
         const modifier_holder &modifier = origin_card->get_modifier(is_response);
         if (filters::is_equip_card(origin_card) || !modifier) {
-            result.push_back(current_path | rn::to<serial::card_list>);
+            result.emplace_back(origin_card, modifiers | rn::to<serial::card_list>);
         } else {
             auto ctx_copy = ctx;
             modifier.add_context(origin_card, origin, ctx_copy);
 
-            for (card *target_card : cards_playable_with_modifiers(origin, current_path, is_response, ctx_copy)) {
-                collect_playable_cards(result, current_path, origin, target_card, is_response, ctx_copy);
+            modifiers.push_back(origin_card);
+            for (card *target_card : cards_playable_with_modifiers(origin, modifiers, is_response, ctx_copy)) {
+                collect_playable_cards(result, modifiers, origin, target_card, is_response, ctx_copy);
             }
+            modifiers.pop_back();
         }
-
-        current_path.pop_back();
     }
 
     playable_cards_list generate_playable_cards_list(player *origin, bool is_response) {
         playable_cards_list result;
-        std::vector<card *> current_path;
+        std::vector<card *> modifiers;
 
         if (origin) {
             for (card *origin_card : get_all_playable_cards(origin, is_response)) {
-                collect_playable_cards(result, current_path, origin, origin_card, is_response);
+                collect_playable_cards(result, modifiers, origin, origin_card, is_response);
             }
         }
 
