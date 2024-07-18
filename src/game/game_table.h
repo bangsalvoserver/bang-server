@@ -59,7 +59,7 @@ namespace banggame {
         game_duration transform_duration(game_duration duration) const override;
 
         auto get_all_cards() const {
-            return m_cards_storage | rv::transform([](card &c) { return &c; });
+            return m_cards_storage | rv::addressof;
         }
         
         std::vector<card *> &get_pocket(pocket_type pocket, player *owner = nullptr);

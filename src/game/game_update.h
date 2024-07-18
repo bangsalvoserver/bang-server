@@ -17,7 +17,7 @@ namespace banggame {
     card_backface to_card_backface(const card *origin_card);
 
     inline std::vector<card_backface> to_card_backface_vector(auto &&range) {
-        return range | rv::transform(to_card_backface) | rn::to<std::vector>;
+        return range | rv::transform(to_card_backface) | rn::to_vector;
     }
 
     struct add_cards_update {
@@ -95,7 +95,7 @@ namespace banggame {
     player_user_pair to_player_user_pair(const player *p);
 
     inline std::vector<player_user_pair> to_player_user_pair_vector(auto &&range) {
-        return range | rv::transform(to_player_user_pair) | rn::to<std::vector>;
+        return range | rv::transform(to_player_user_pair) | rn::to_vector;
     }
 
     struct player_add_update {

@@ -472,7 +472,7 @@ void game_manager::handle_message(utils::tag<"game_start">, game_user &user) {
         | rn::to<std::vector<std::string_view>>;
 
     std::vector<const utils::image_pixels *> propics = bot_info.propics
-        | rv::transform([](const utils::image_pixels &image) { return &image; })
+        | rv::addressof
         | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
         | rn::to_vector;
 
