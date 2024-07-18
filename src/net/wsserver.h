@@ -31,7 +31,7 @@ public:
 
     virtual ~wsserver() = default;
 
-    void start(uint16_t port);
+    void start(uint16_t port, bool reuse_addr = false);
 
     void stop();
 

@@ -11,7 +11,7 @@ wsserver::wsserver() {
         websocketpp::log::alevel::frame_header);
 }
 
-void wsserver::start(uint16_t port) {
+void wsserver::start(uint16_t port, bool reuse_addr) {
     m_server.set_open_handler([this](client_handle con) {
         std::scoped_lock lock(m_con_mutex);
         m_clients.emplace(con);
@@ -33,9 +33,7 @@ void wsserver::start(uint16_t port) {
         on_message(con, msg->get_payload());
     });
 
-#ifndef NDEBUG
-    m_server.set_reuse_addr(true);
-#endif
+    m_server.set_reuse_addr(reuse_addr);
 
     std::error_code ec;
     m_server.listen(port, ec);
