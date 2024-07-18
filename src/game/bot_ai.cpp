@@ -49,7 +49,11 @@ namespace banggame {
                 card_node selected_node = [&]{
                     for (pocket_type pocket : pockets) {
                         if (auto filter = node_set | rv::filter([&](card_node node) {
-                            return node->card->pocket == pocket;
+                            if (node->modifiers.empty()) {
+                                return node->card->pocket == pocket;
+                            } else {
+                                return node->modifiers.front()->pocket == pocket;
+                            }
                         })) {
                             return random_element(filter, origin->m_game->bot_rng);
                         }
