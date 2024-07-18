@@ -141,11 +141,6 @@ namespace json {
         }
     };
 
-    // bypass recursive concepts check
-    template<>
-    struct serializer<banggame::card_modifier_node, banggame::game_context>
-        : aggregate_serializer_unchecked<banggame::card_modifier_node, banggame::game_context> {};
-
 }
 
 namespace banggame {

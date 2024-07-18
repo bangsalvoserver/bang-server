@@ -148,31 +148,39 @@ namespace banggame {
         return origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
     }
 
-    static card_modifier_node generate_card_modifier_node(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
-        card_modifier_node node { .card = origin_card };
+    static void collect_playable_cards(
+        playable_cards_list &result,
+        player *origin, card *origin_card, bool is_response,
+        std::vector<card *> current_path = {}, const effect_context &ctx = {}
+    ) {
+        current_path.push_back(origin_card);
+
         if (!filters::is_equip_card(origin_card)) {
             if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
-                auto modifiers_copy = modifiers;
-                modifiers_copy.push_back(origin_card);
                 auto ctx_copy = ctx;
                 modifier.add_context(origin_card, origin, ctx_copy);
 
-                for (card *target_card : cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy)) {
-                    node.branches.push_back(generate_card_modifier_node(origin, target_card, is_response, modifiers_copy, ctx_copy));
+                for (card *target_card : cards_playable_with_modifiers(origin, current_path, is_response, ctx_copy)) {
+                    collect_playable_cards(result, origin, target_card, is_response, current_path, ctx_copy);
                 }
+
+                return;
             }
         }
-        return node;
+
+        result.push_back(current_path | rn::to<serial::card_list>);
     }
 
-    card_modifier_tree generate_card_modifier_tree(player *origin, bool is_response) {
-        card_modifier_tree tree;
+    playable_cards_list generate_playable_cards_list(player *origin, bool is_response) {
+        playable_cards_list result;
+
         if (origin) {
             for (card *origin_card : get_all_playable_cards(origin, is_response)) {
-                tree.push_back(generate_card_modifier_node(origin, origin_card, is_response, {}, {}));
+                collect_playable_cards(result, origin, origin_card, is_response);
             }
         }
-        return tree;
+
+        return result;
     }
 
     rn::any_view<card *> get_pick_cards(player *origin) {

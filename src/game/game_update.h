@@ -129,12 +129,7 @@ namespace banggame {
         player_flags flags;
     };
 
-    struct card_modifier_node {
-        serial::card card;
-        std::vector<card_modifier_node> branches;
-    };
-
-    using card_modifier_tree = std::vector<card_modifier_node>;
+    using playable_cards_list = std::vector<serial::card_list>;
 
     struct player_distance_item {
         serial::player player;
@@ -157,7 +152,7 @@ namespace banggame {
         serial::opt_player origin;
         serial::opt_player target;
         game_string status_text;
-        card_modifier_tree respond_cards;
+        playable_cards_list respond_cards;
         serial::card_list pick_cards;
         serial::card_list highlight_cards;
         serial::player_list target_set;
@@ -166,7 +161,7 @@ namespace banggame {
     };
 
     struct status_ready_args {
-        card_modifier_tree play_cards;
+        playable_cards_list play_cards;
         player_distances distances;
     };
 
