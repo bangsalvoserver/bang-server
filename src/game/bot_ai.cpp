@@ -36,31 +36,37 @@ namespace banggame {
         return ret;
     }
 
-    static bool execute_random_play(player *origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
-        auto &pockets = is_response ? bot_info.settings.response_pockets : bot_info.settings.in_play_pockets;
+    bot_rule rule_filter_by_pocket(pocket_type pocket) {
+        return [=](card_node node) {
+            if (card *choice_card = node->context.get().card_choice) {
+                return choice_card->pocket == pocket;
+            }
+            return node->card->pocket == pocket;
+        };
+    }
 
-        using card_node = const playable_card_info *;
-        std::set<card_node> play_card_set = play_cards | rv::addressof | rn::to<std::set>;
-        
+    bot_rule rule_repeat() {
+        return [](card_node node) {
+            return node->context.get().repeat_card != nullptr;
+        };
+    }
+    
+    static card_node get_selected_node(player *origin, bool is_response, const std::set<card_node> &node_set) {
+        auto &rules = is_response ? bot_info.settings.response_rules : bot_info.settings.in_play_rules;
+        for (const bot_rule &rule : rules) {
+            if (auto filter = rv::filter(node_set, rule)) {
+                return random_element(filter, origin->m_game->bot_rng);
+            }
+        }
+        return random_element(node_set, origin->m_game->bot_rng);
+    }
+
+    static bool execute_random_play(player *origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
-            auto node_set = play_card_set;
+            std::set<card_node> node_set = play_cards | rv::addressof | rn::to<std::set>;
             
             while (!node_set.empty()) {
-                card_node selected_node = [&]{
-                    for (pocket_type pocket : pockets) {
-                        if (auto filter = node_set | rv::filter([&](card_node node) {
-                            if (node->modifiers.empty()) {
-                                return node->card->pocket == pocket;
-                            } else {
-                                return node->modifiers.front()->pocket == pocket;
-                            }
-                        })) {
-                            return random_element(filter, origin->m_game->bot_rng);
-                        }
-                    }
-                    return random_element(node_set, origin->m_game->bot_rng);
-                }();
-
+                auto selected_node = get_selected_node(origin, is_response, node_set);
                 node_set.erase(selected_node);
 
                 // maybe add random variation?

@@ -1,3 +1,4 @@
+import re
 import sys
 import yaml_custom as yaml
 import base64
@@ -27,14 +28,30 @@ def sdl_image_pixels(filename):
             height = h,
             pixels = CppLiteral(f'base64::base64_decode("{pixels}")')
         )
+    
+def parse_bot_rule(value):
+    match = re.match(
+        r'^\s*(\w+)' # rule_name
+        r'(?:\s*\((.+)\))?\s*$', # rule_args
+        value
+    )
+    if not match:
+        raise RuntimeError(f'Invalid rule string: {value}')
+    
+    rule_name = match.group(1)
+    rule_args = match.group(2)
+    if rule_args:
+        return CppLiteral(f'BUILD_BOT_RULE({rule_name}, {rule_args})')
+    else:
+        return CppLiteral(f'BUILD_BOT_RULE({rule_name})')
 
 def parse_settings(settings):
     return CppObject(
         allow_timer_no_action = settings['allow_timer_no_action'],
         max_random_tries = settings['max_random_tries'],
         bypass_prompt_after = settings['bypass_prompt_after'],
-        response_pockets = [CppEnum('pocket_type', name) for name in settings['response_pockets']],
-        in_play_pockets = [CppEnum('pocket_type', name) for name in settings['in_play_pockets']]
+        response_rules = [parse_bot_rule(value) for value in settings['response_rules']],
+        in_play_rules = [parse_bot_rule(value) for value in settings['in_play_rules']]
     )
 
 def parse_file(data):

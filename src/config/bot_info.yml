@@ -4,17 +4,18 @@ bots:
     max_random_tries: 10
     bypass_prompt_after: 5
     
-    response_pockets:
-    - player_character
-    - player_table
-    - player_hand
+    response_rules:
+    - pocket(pocket_type::player_character)
+    - pocket(pocket_type::player_table)
+    - pocket(pocket_type::player_hand)
     
-    in_play_pockets:
-    - player_character
-    - player_table
-    - player_hand
-    - shop_selection
-    - train
+    in_play_rules:
+    - repeat
+    - pocket(pocket_type::player_table)
+    - pocket(pocket_type::player_hand)
+    - pocket(pocket_type::player_character)
+    - pocket(pocket_type::shop_selection)
+    - pocket(pocket_type::train)
   
   names:
   - Salvo
