@@ -1,0 +1,6 @@
+{
+  "dependencies": [
+    "range-v3",
+    "cxxopts"
+  ]
+}
