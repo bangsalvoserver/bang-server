@@ -6,6 +6,7 @@
 #include "cards/card_data.h"
 
 #include "utils/tagged_variant.h"
+#include "utils/remove_defaults.h"
 
 namespace banggame {
 
@@ -132,7 +133,7 @@ namespace banggame {
     struct playable_card_info {
         serial::card card;
         serial::card_list modifiers;
-        std::optional<effect_context_base> context;
+        utils::remove_defaults<effect_context_base> context;
     };
 
     using playable_cards_list = std::vector<playable_card_info>;
