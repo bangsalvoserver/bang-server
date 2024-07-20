@@ -78,7 +78,7 @@ namespace banggame {
                     if (verify_and_play(origin, args).type == message_type::ok) {
                         return true;
                     }
-                } catch (const random_element_error &error) {
+                } catch (const random_element_error &) {
                     // ignore
                 }
             }

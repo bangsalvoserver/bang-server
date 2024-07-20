@@ -58,7 +58,7 @@ namespace banggame {
 
     template<> void visit_cards::play(const effect_context &ctx, const serial::card_list &targets) {
         if (rn::all_of(targets, [first=targets.front()](card *target_card) { return target_card == first; })) {
-            origin->first_character()->move_cubes(targets.front(), targets.size());
+            origin->first_character()->move_cubes(targets.front(), static_cast<int>(targets.size()));
         } else {
             for (card *target_card : targets) {
                 origin->first_character()->move_cubes(target_card, 1);

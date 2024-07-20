@@ -26,8 +26,8 @@ namespace banggame {
         ctx.traincost = origin_card;
 
         if (origin_card->pocket == pocket_type::stations) {
-            int station_index = std::distance(origin->m_game->m_stations.begin(), rn::find(origin->m_game->m_stations, origin_card));
-            int train_index = ctx.train_advance + origin->m_game->train_position - station_index;
+            size_t station_index = std::distance(origin->m_game->m_stations.begin(), rn::find(origin->m_game->m_stations, origin_card));
+            int train_index = ctx.train_advance + origin->m_game->train_position - static_cast<int>(station_index);
             if (train_index >= 0 && train_index < origin->m_game->m_train.size()) {
                 ctx.playing_card = origin->m_game->m_train[train_index];
             }

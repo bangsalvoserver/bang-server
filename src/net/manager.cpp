@@ -308,7 +308,7 @@ void game_manager::on_connect(client_handle client) {
         std::cout << std::format("{}: Connected", get_client_ip(client)) << std::endl;
     }
     m_clients.emplace(client, client);
-    broadcast_message<"client_count">(m_clients.size());
+    broadcast_message<"client_count">(static_cast<int>(m_clients.size()));
 }
 
 void game_manager::on_disconnect(client_handle client) {
@@ -321,7 +321,7 @@ void game_manager::on_disconnect(client_handle client) {
             }
         }
         m_clients.erase(it);
-        broadcast_message<"client_count">(m_clients.size());
+        broadcast_message<"client_count">(static_cast<int>(m_clients.size()));
     }
 }
 

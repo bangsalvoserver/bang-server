@@ -49,7 +49,7 @@ namespace banggame {
             for (card *target : target_cards) {
                 effect_discard{}.on_play(origin_card, origin, target);
             }
-            origin->draw_card(target_cards.size(), origin_card);
+            origin->draw_card(static_cast<int>(target_cards.size()), origin_card);
         }
     }
 }
