@@ -26,14 +26,19 @@ namespace banggame {
         ticks duration;
 
     private:
+        timer_id_t timer_id;
+        static inline timer_id_t timer_id_counter = 0;
+
         ticks lifetime = max_timer_duration;
 
     public:
         request_timer(request_base *request, auto duration)
-            : request(request), duration(clamp_ticks(duration)) {}
+            : request{ request }
+            , duration{ clamp_ticks(duration) }
+            , timer_id{ timer_id_counter++ } {}
 
         timer_id_t get_timer_id() const {
-            return std::hash<const request_timer *>{}(this);
+            return timer_id;
         }
 
         ticks get_duration() const {
