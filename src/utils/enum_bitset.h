@@ -82,13 +82,13 @@ namespace json {
 
     template<enums::enumeral T, typename Context>
     struct deserializer<enums::bitset<T>, Context> {
-        enums::bitset<T> operator()(const json &value) const {
+        enums::bitset<T> operator()(const json &value, const Context &ctx) const {
             if (!value.is_array()) {
                 throw std::runtime_error(std::format("Cannot deserialize {} bitset: value is not an array", reflect::type_name<T>()));
             }
             enums::bitset<T> ret;
             for (const auto &elem : value) {
-                ret.add(deserialize_unchecked<T>(elem, no_context{}));
+                ret.add(deserialize_unchecked<T>(elem, ctx));
             }
             return ret;
         }

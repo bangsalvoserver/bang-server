@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include "json_serial.h"
+#include "static_map.h"
 
 namespace enums {
 
@@ -55,11 +56,18 @@ namespace enums {
     }
 
     template<enumeral T>
+    static constexpr auto names_to_values_map = []<size_t ... Is>(std::index_sequence<Is ...>) {
+        constexpr auto &values = enum_values<T>();
+        return utils::static_map<std::string_view, T>({
+            { to_string(values[Is]), values[Is] } ...
+        });
+    }(std::make_index_sequence<enum_values<T>().size()>());
+
+    template<enumeral T>
     constexpr std::optional<T> from_string(std::string_view str) {
-        for (const auto &[value, name] : reflect::enumerators<T>) {
-            if (name == str) {
-                return static_cast<T>(value);
-            }
+        const auto &names_map = names_to_values_map<T>;
+        if (auto it = names_map.find(str); it != names_map.end()) {
+            return it->second;
         }
         return std::nullopt;
     }

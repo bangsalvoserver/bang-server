@@ -5,6 +5,7 @@
 
 #include "fixed_string.h"
 #include "json_serial.h"
+#include "static_map.h"
 
 namespace utils {
     
@@ -93,6 +94,14 @@ namespace utils {
     };
 
     template<typename T>
+    static constexpr auto tagged_variant_name_index_map = []<size_t ... Is>(std::index_sequence<Is ...>) {
+        const auto &names = tagged_variant_tag_names<T>::value;
+        return utils::static_map<std::string_view, size_t>({
+            { names[Is], Is } ... }
+        );
+    }(std::make_index_sequence<tagged_variant_tag_names<T>::value.size()>());
+
+    template<typename T>
     concept is_tagged_variant = detail::is_tagged_variant<T>::value;
 
     template<typename Tag, typename Variant>
@@ -127,14 +136,12 @@ namespace utils {
             : m_index{detail::find_tag_name<Variant, decltype(tag)>::index} {}
         
         explicit constexpr tagged_variant_index(std::string_view key) {
-            const auto &tag_names = utils::tagged_variant_tag_names<Variant>::value;
-            for (size_t i=0; i<tag_names.size(); ++i) {
-                if (tag_names[i] == key) {
-                    m_index = i;
-                    return;
-                }
+            const auto &names_map = utils::tagged_variant_name_index_map<Variant>;
+            auto it = names_map.find(key);
+            if (it == names_map.end()) {
+                throw std::runtime_error(std::format("Invalid variant type: {}", key));
             }
-            throw std::runtime_error(std::format("Invalid variant type: {}", key));
+            m_index = it->second;
         }
 
         constexpr bool operator == (const tagged_variant_index &other) const = default;
