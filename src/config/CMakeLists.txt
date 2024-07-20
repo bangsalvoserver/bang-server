@@ -1,7 +1,10 @@
+include(FindPython3)
+find_package(Python3 COMPONENTS Interpreter)
+ 
 set(bang_cards_cpp "${CMAKE_CURRENT_BINARY_DIR}/bang_cards.cpp")
 add_custom_command(
     OUTPUT "${bang_cards_cpp}"
-    COMMAND python3 parse_bang_cards.py
+    COMMAND ${Python3_EXECUTABLE} parse_bang_cards.py
         bang_cards.yml
         "${bang_cards_cpp}"
     VERBATIM
@@ -34,7 +37,7 @@ target_link_libraries(bangserver PRIVATE bang_cards_obj)
 set(bot_info_cpp "${CMAKE_CURRENT_BINARY_DIR}/bot_info.cpp")
 add_custom_command(
     OUTPUT "${bot_info_cpp}"
-    COMMAND python3 parse_bots.py
+    COMMAND ${Python3_EXECUTABLE} parse_bots.py
         bot_info.yml
         "${bot_info_cpp}"
     VERBATIM
