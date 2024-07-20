@@ -162,7 +162,11 @@ namespace banggame::filters {
             }
         }
 
-        if (!detail::get_card_owner(target)) {
+        if (bool(filter & target_card_filter::selection)) {
+            if (detail::get_card_pocket(target) != pocket_type::selection) {
+                return "ERROR_TARGET_NOT_SELECTION";
+            }
+        } else if (!detail::get_card_owner(target)) {
             return "ERROR_CARD_HAS_NO_OWNER";
         }
 
@@ -253,9 +257,6 @@ namespace banggame::filters {
         
         if (bool(filter & target_card_filter::ten_to_ace) && !sign.is_ten_to_ace())
             return "ERROR_TARGET_NOT_TEN_TO_ACE";
-
-        if (bool(filter & target_card_filter::selection) && detail::get_card_pocket(target) != pocket_type::selection)
-            return "ERROR_TARGET_NOT_SELECTION";
 
         if (bool(filter & target_card_filter::table) && detail::get_card_pocket(target) != pocket_type::player_table)
             return "ERROR_TARGET_NOT_TABLE_CARD";
