@@ -20,8 +20,7 @@ namespace json {
     };
 
     template<std::convertible_to<banggame::card *> Card> struct deserializer<Card, banggame::game_context> {
-        const banggame::game_context &context;
-        banggame::card *operator()(const json &value) const {
+        banggame::card *operator()(const json &value, const banggame::game_context &context) const {
             if (value.is_number_integer()) {
                 return context.find_card(value.get<int>());
             } else if (value.is_null()) {
@@ -43,8 +42,7 @@ namespace json {
     };
 
     template<std::convertible_to<banggame::player *> Player> struct deserializer<Player, banggame::game_context> {
-        const banggame::game_context &context;
-        banggame::player *operator()(const json &value) const {
+        banggame::player *operator()(const json &value, const banggame::game_context &context) const {
             if (value.is_number_integer()) {
                 return context.find_player(value.get<int>());
             } else if (value.is_null()) {
@@ -135,8 +133,7 @@ namespace json {
     };
 
     template<> struct serializer<banggame::animation_duration, banggame::game_context> {
-        const banggame::game_context &context;
-        json operator()(const banggame::animation_duration &duration) const {
+        json operator()(const banggame::animation_duration &duration, const banggame::game_context &context) const {
             return serialize(context.transform_duration(duration.get()));
         }
     };

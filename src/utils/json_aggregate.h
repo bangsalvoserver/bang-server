@@ -22,15 +22,13 @@ namespace json {
         }(std::make_index_sequence<reflect::size<T>()>());
 
     template<aggregate T, typename Context>
-    struct aggregate_serializer_unchecked : context_holder<Context> {
-        using context_holder<Context>::context_holder;
-
-        json operator()(const T &value) const {
+    struct aggregate_serializer_unchecked {
+        json operator()(const T &value, const Context &ctx) const {
             return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
                 return json::object({
                     {
                         reflect::member_name<Is, T>(),
-                        this->template serialize_with_context(reflect::get<Is>(value))
+                        serialize_unchecked(reflect::get<Is>(value), ctx)
                     } ... 
                 });
             }(std::make_index_sequence<reflect::size<T>()>());
@@ -40,19 +38,19 @@ namespace json {
     template<aggregate T, typename Context> requires all_fields_serializable<T, Context>
     struct serializer<T, Context> : aggregate_serializer_unchecked<T, Context> {};
 
-    template<aggregate T, typename Context>
-    struct aggregate_deserializer_unchecked : context_holder<Context> {
-        using context_holder<Context>::context_holder;
+    template<typename T> requires std::is_default_constructible_v<T>
+    static const T default_value_v{};
 
+    template<aggregate T, typename Context>
+    struct aggregate_deserializer_unchecked {
         template<size_t I>
-        reflect::member_type<I, T> deserialize_field(const json &value) const {
+        reflect::member_type<I, T> deserialize_field(const json &value, const Context &ctx) const {
             static constexpr auto name = reflect::member_name<I, T>();
             using value_type = reflect::member_type<I, T>;
             if (value.contains(name)) {
-                return this->template deserialize_with_context<value_type>(value[name]);
+                return deserialize_unchecked<value_type>(value[name], ctx);
             } else if constexpr (std::is_default_constructible_v<T>) {
-                static constexpr T default_value{};
-                return reflect::get<I>(default_value);
+                return reflect::get<I>(default_value_v<T>);
             } else if constexpr (std::is_default_constructible_v<value_type>) {
                 return value_type{};
             } else {
@@ -60,12 +58,12 @@ namespace json {
             }
         }
 
-        T operator()(const json &value) const {
+        T operator()(const json &value, const Context &ctx) const {
             if (!value.is_object()) {
                 throw std::runtime_error(std::format("Cannot deserialize {}: value is not an object", reflect::type_name<T>()));
             }
             return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
-                return T{ deserialize_field<Is>(value) ... };
+                return T{ deserialize_field<Is>(value, ctx) ... };
             }(std::make_index_sequence<reflect::size<T>()>());
         }
     };

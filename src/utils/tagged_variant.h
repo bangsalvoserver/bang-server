@@ -215,25 +215,23 @@ namespace json {
     concept void_or_serializable = std::is_void_v<T> || serializable<T, Context>;
     
     template<typename Context, typename ... Ts> requires (void_or_serializable<typename Ts::type, Context> && ...)
-    struct serializer<utils::tagged_variant<Ts ...>, Context> : context_holder<Context> {
-        using context_holder<Context>::context_holder;
-
+    struct serializer<utils::tagged_variant<Ts ...>, Context> {
         using variant_type = utils::tagged_variant<Ts ...>;
 
         template<typename T>
-        json serialize_args(T &&arg) const {
-            return this->serialize_with_context(std::forward<T>(arg));
+        json serialize_args(const Context &ctx, T &&arg) const {
+            return serialize_unchecked(std::forward<T>(arg), ctx);
         }
 
-        json serialize_args() const {
+        json serialize_args(const Context &ctx) const {
             return json::object();
         }
         
-        json operator()(const variant_type &value) const {
-            return utils::visit_tagged([this](utils::tag_for<variant_type> auto tag, auto && ... args) {
+        json operator()(const variant_type &value, const Context &ctx) const {
+            return utils::visit_tagged([&](utils::tag_for<variant_type> auto tag, auto && ... args) {
                 return json{{
                     std::string_view{tag.name},
-                    serialize_args(std::forward<decltype(args)>(args) ... )
+                    serialize_args(ctx, std::forward<decltype(args)>(args) ... )
                 }};
             }, value);
         }
@@ -243,12 +241,10 @@ namespace json {
     concept void_or_deserializable = std::is_void_v<T> || deserializable<T, Context>;
 
     template<typename Context, typename ... Ts> requires (void_or_deserializable<typename Ts::type, Context> && ...)
-    struct deserializer<utils::tagged_variant<Ts ...>, Context> : context_holder<Context> {
-        using context_holder<Context>::context_holder;
-
+    struct deserializer<utils::tagged_variant<Ts ...>, Context> {
         using variant_type = utils::tagged_variant<Ts ...>;
         
-        variant_type operator()(const json &value) const {
+        variant_type operator()(const json &value, const Context &ctx) const {
             if (!value.is_object()) {
                 throw std::runtime_error("Cannot deserialize tagged variant: value is not an object");
             }
@@ -264,7 +260,7 @@ namespace json {
                 if constexpr (std::is_void_v<value_type>) {
                     return variant_type{tag};
                 } else {
-                    return variant_type{tag, this->template deserialize_with_context<value_type>(inner_value)};
+                    return variant_type{tag, deserialize_unchecked<value_type>(inner_value, ctx)};
                 }
             }, index);
         }

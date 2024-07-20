@@ -31,7 +31,7 @@ namespace enums {
 
     public:
         static constexpr bitset_int to_bit(T value) {
-            return static_cast<bitset_int>(1 << indexof(value));
+            return static_cast<bitset_int>(1) << indexof(value);
         }
 
         constexpr void merge(bitset value) {
@@ -88,7 +88,7 @@ namespace json {
             }
             enums::bitset<T> ret;
             for (const auto &elem : value) {
-                ret.add(deserializer<T, Context>{}(elem));
+                ret.add(deserialize_unchecked<T>(elem, no_context{}));
             }
             return ret;
         }

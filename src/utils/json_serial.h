@@ -16,14 +16,14 @@ namespace json {
     template<typename T>
     concept is_complete = requires(T self) { sizeof(self); };
 
-    template<typename T, typename Context = void> struct serializer;
+    template<typename T, typename Context> struct serializer;
 
-    template<typename T, typename Context = void>
+    template<typename T, typename Context>
     concept serializable = is_complete<serializer<T, Context>>;
 
-    template<typename T, typename Context = void> struct deserializer;
+    template<typename T, typename Context> struct deserializer;
 
-    template<typename T, typename Context = void>
+    template<typename T, typename Context>
     concept deserializable = is_complete<deserializer<T, Context>>;
 
     using json_error = json::exception;
@@ -32,69 +32,50 @@ namespace json {
         deserialize_error(const char *message): json_error(0, message) {}
     };
 
-    template<typename Context>
-    struct context_holder {
-        const Context &context;
+    struct no_context {};
 
-        context_holder(const Context &context) : context(context) {}
-
-        template<serializable<Context> T>
-        auto serialize_with_context(const T &value) const {
-            if constexpr (requires { serializer<T, Context>{context}; }) {
-                return serializer<T, Context>{context}(value);
-            } else {
-                return serializer<T, void>{}(value);
-            }
+    template<typename T, typename Context> requires serializable<T, Context>
+    json serialize_unchecked(const T &value, const Context &context) {
+        serializer<T, Context> obj{};
+        if constexpr (requires { obj(value, context); }) {
+            return obj(value, context);
+        } else {
+            return obj(value);
         }
-
-        template<deserializable<Context> T>
-        auto deserialize_with_context(const json &value) const {
-            if constexpr (requires { deserializer<T, Context>{context}; }) {
-                return deserializer<T, Context>{context}(value);
-            } else {
-                return deserializer<T, void>{}(value);
-            }
-        }
-    };
-
-    template<> struct context_holder<void> {
-        template<serializable T>
-        auto serialize_with_context(const T &value) const {
-            return serializer<T, void>{}(value);
-        }
-
-        template<deserializable T>
-        auto deserialize_with_context(const json &value) const {
-            return deserializer<T, void>{}(value);
-        }
-    };
-
-    template<typename T> requires serializable<T>
-    json serialize(const T &value) {
-        return serializer<T, void>{}(value);
     }
 
     template<typename T, typename Context> requires serializable<T, Context>
     json serialize(const T &value, const Context &context) {
-        return context_holder<Context>{context}.serialize_with_context(value);
+        return serialize_unchecked(value, context);
     }
 
-    template<typename T> requires deserializable<T>
-    T deserialize(const json &value) {
-        try {
-            return deserializer<T, void>{}(value);
-        } catch (const std::exception &e) {
-            throw deserialize_error(e.what());
+    template<typename T> requires serializable<T, no_context>
+    json serialize(const T &value) {
+        return serialize(value, no_context{});
+    }
+
+    template<typename T, typename Context> requires deserializable<T, Context>
+    auto deserialize_unchecked(const json &value, const Context &context) {
+        deserializer<T, Context> obj{};
+        if constexpr (requires { obj(value, context); }) {
+            return obj(value, context);
+        } else {
+            return obj(value);
         }
     }
 
     template<typename T, typename Context> requires deserializable<T, Context>
     T deserialize(const json &value, const Context &context) {
         try {
-            return context_holder<Context>{context}.template deserialize_with_context<T>(value);
+            return deserialize_unchecked<T>(value, context);
         } catch (const std::exception &e) {
             throw deserialize_error(e.what());
         }
+    }
+
+    template<typename T> requires deserializable<T, no_context>
+    T deserialize(const json &value) {
+        return deserialize<T>(value, no_context{});
     }
 
     template<typename Context>
@@ -119,14 +100,12 @@ namespace json {
     };
 
     template<typename T, typename Context> requires serializable<T, Context>
-    struct serializer<std::vector<T>, Context> : context_holder<Context> {
-        using context_holder<Context>::context_holder;
-        
-        json operator()(const std::vector<T> &value) const {
+    struct serializer<std::vector<T>, Context> {
+        json operator()(const std::vector<T> &value, const Context &ctx) const {
             auto ret = json::array();
             ret.get_ptr<json::array_t*>()->reserve(value.size());
             for (const T &obj : value) {
-                ret.push_back(this->serialize_with_context(obj));
+                ret.push_back(serialize_unchecked(obj, ctx));
             }
             return ret;
         }
@@ -140,12 +119,10 @@ namespace json {
     };
 
     template<typename T, typename Context> requires serializable<T, Context>
-    struct serializer<std::optional<T>, Context> : context_holder<Context> {
-        using context_holder<Context>::context_holder;
-
-        json operator()(const std::optional<T> &value) const {
+    struct serializer<std::optional<T>, Context> {
+        json operator()(const std::optional<T> &value, const Context &ctx) const {
             if (value) {
-                return this->serialize_with_context(*value);
+                return serialize_unchecked(*value, ctx);
             } else {
                 return json{};
             }
@@ -190,17 +167,15 @@ namespace json {
     };
     
     template<typename T, typename Context> requires deserializable<T, Context>
-    struct deserializer<std::vector<T>, Context> : context_holder<Context> {
-        using context_holder<Context>::context_holder;
-        
-        std::vector<T> operator()(const json &value) const {
+    struct deserializer<std::vector<T>, Context> {
+        std::vector<T> operator()(const json &value, const Context &ctx) const {
             if (!value.is_array()) {
                 throw std::runtime_error("Cannot deserialize vector");
             }
             std::vector<T> ret;
             ret.reserve(value.size());
             for (const auto &obj : value) {
-                ret.push_back(this->template deserialize_with_context<T>(obj));
+                ret.push_back(deserialize_unchecked<T>(obj, ctx));
             }
             return ret;
         }
@@ -217,14 +192,12 @@ namespace json {
     };
 
     template<typename T, typename Context> requires deserializable<T, Context>
-    struct deserializer<std::optional<T>, Context> : context_holder<Context> {
-        using context_holder<Context>::context_holder;
-
-        std::optional<T> operator()(const json &value) const {
+    struct deserializer<std::optional<T>, Context> {
+        std::optional<T> operator()(const json &value, const Context &ctx) const {
             if (value.is_null()) {
                 return std::nullopt;
             } else {
-                return this->template deserialize_with_context<T>(value);
+                return deserialize_unchecked<T>(value, ctx);
             }
         }
     };

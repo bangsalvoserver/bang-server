@@ -30,21 +30,18 @@ namespace utils {
 namespace json {
 
     template<typename T, typename Context> requires all_fields_serializable<T, Context>
-    struct serializer<utils::remove_defaults<T>, Context> : context_holder<Context> {
-        using context_holder<Context>::context_holder;
-
-        json operator()(const utils::remove_defaults<T> &value) const {
-            static constexpr T default_value{};
+    struct serializer<utils::remove_defaults<T>, Context>  {
+        json operator()(const utils::remove_defaults<T> &value, const Context &ctx) const {
             json result;
             reflect::for_each<T>([&](auto I) {
                 const auto &member_value = reflect::get<I>(value.get());
-                if (member_value != reflect::get<I>(default_value)) {
+                if (member_value != reflect::get<I>(default_value_v<T>)) {
                     if (result.is_null()) {
                         result = json::object();
                     }
                     result.push_back({
                         reflect::member_name<I, T>(),
-                        this->template serialize_with_context(member_value)
+                        serialize_unchecked(member_value, ctx)
                     });
                 }
             });
@@ -53,15 +50,14 @@ namespace json {
     };
 
     template<typename T, typename Context> requires all_fields_deserializable<T, Context>
-    struct deserializer<utils::remove_defaults<T>, Context> : context_holder<Context> {
-        using context_holder<Context>::context_holder;
+    struct deserializer<utils::remove_defaults<T>, Context> {
         using value_type = utils::remove_defaults<T>;
 
-        value_type operator()(const json &value) const {
+        value_type operator()(const json &value, const Context &ctx) const {
             if (value.is_null()) {
                 return value_type{};
             } else {
-                return value_type{aggregate_deserializer_unchecked<T, Context>{}(value)};
+                return value_type{aggregate_deserializer_unchecked<T, Context>{*this}(value)};
             }
         }
     };
