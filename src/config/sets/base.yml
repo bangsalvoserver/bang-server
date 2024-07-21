@@ -374,9 +374,16 @@ character:
 button_row:
   - name: GAME_CONFIRM
     responses:
-      - resolve
+      - resolve(0)
     tags:
       - resolve
+      - button_color(1)
+  - name: GAME_DISMISS
+    responses:
+      - resolve(1)
+    tags:
+      - resolve
+      - button_color(2)
   - name: GAME_PASS
     effects:
       - pass_turn

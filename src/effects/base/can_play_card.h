@@ -13,6 +13,10 @@ namespace banggame {
             auto_resolve();
         }
 
+        int resolve_type() const override {
+            return 1;
+        }
+
         void on_resolve() override;
         game_string status_text(player *owner) const override;
     };

@@ -11,6 +11,10 @@ namespace banggame {
         request_lastwill(card *origin_card, player *target)
             : request_resolvable(origin_card, nullptr, target) {}
 
+        int resolve_type() const override {
+            return 1;
+        }
+
         void on_resolve() override {
             target->m_game->pop_request();
         }

@@ -49,6 +49,10 @@ namespace banggame {
             }
         }
 
+        int resolve_type() const override {
+            return 1;
+        }
+
         void on_resolve() override {
             target->m_game->pop_request();
         }

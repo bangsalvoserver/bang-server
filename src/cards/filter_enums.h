@@ -53,6 +53,8 @@ namespace banggame {
     
     enum class tag_type {
         none,
+        preselect,
+        button_color,
         ghost_card,
         resolve,
         pass_turn,
@@ -72,7 +74,6 @@ namespace banggame {
         drawing,
         weapon,
         horse,
-        preselect,
         card_choice,
         last_scenario_card,
         peyote,

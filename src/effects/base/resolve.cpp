@@ -12,7 +12,10 @@ namespace banggame {
     }
 
     bool effect_resolve::can_play(card *origin_card, player *origin) {
-        return origin->m_game->top_request<interface_resolvable>(origin) != nullptr;
+        if (auto req = origin->m_game->top_request<interface_resolvable>(origin)) {
+            return req->resolve_type() == resolve_type;
+        }
+        return false;
     }
     
     void effect_resolve::on_play(card *origin_card, player *origin) {

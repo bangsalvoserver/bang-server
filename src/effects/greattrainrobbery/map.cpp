@@ -24,6 +24,10 @@ namespace banggame {
                 || target->m_game->check_flags(game_flag::phase_one_draw_discard) && !target->m_game->m_discards.empty();
         }
 
+        int resolve_type() const override {
+            return 1;
+        }
+
         void on_resolve() override {
             target->m_game->pop_request();
             if (move_card_to_deck()) {
