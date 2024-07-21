@@ -72,7 +72,7 @@ namespace banggame {
         drawing,
         weapon,
         horse,
-        auto_select,
+        preselect,
         card_choice,
         last_scenario_card,
         peyote,

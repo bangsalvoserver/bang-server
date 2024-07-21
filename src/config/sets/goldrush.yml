@@ -22,7 +22,7 @@ character:
     responses:
       - forced_equip player
     tags:
-      - auto_select
+      - preselect
   - name: MADAME_YTO
     image: 04_madame_yto
     equip:
@@ -55,7 +55,7 @@ goldrush:
       - heal player
     tags:
       - buy_cost(1)
-      - auto_select
+      - preselect
   - count: 3
     name: BOTTLE
     image: 04_bottiglia
@@ -69,7 +69,7 @@ goldrush:
     tags:
       - card_choice(1)
       - buy_cost(2)
-      - auto_select
+      - preselect
   - name: CALUMET
     image: 04_calumet
     color: black
@@ -97,7 +97,7 @@ goldrush:
     tags:
       - card_choice(2)
       - buy_cost(2)
-      - auto_select
+      - preselect
   - name: GOLD_RUSH
     image: 04_corsa_all_oro
     color: brown
@@ -110,7 +110,7 @@ goldrush:
       - pass_turn
     tags:
       - buy_cost(5)
-      - auto_select
+      - preselect
   - name: HORSESHOE
     image: 04_ferro_di_cavallo
     color: black
@@ -145,7 +145,7 @@ goldrush:
       - rum
     tags:
       - buy_cost(3)
-      - auto_select
+      - preselect
   - name: GOLD_PAN
     image: 04_setaccio
     color: black
@@ -181,7 +181,7 @@ goldrush:
       - changewws
     tags:
       - buy_cost(4)
-      - auto_select
+      - preselect
   - name: RUCKSACK
     image: 04_zaino
     color: black

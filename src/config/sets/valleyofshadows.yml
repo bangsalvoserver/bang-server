@@ -176,7 +176,7 @@ character:
       - discard card self | hand
       - heal_notfull
     tags:
-      - auto_select
+      - preselect
   - name: MICK_DEFENDER
     image: 07_mickdefender
     equip:

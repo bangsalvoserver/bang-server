@@ -56,7 +56,7 @@ fistfulofcards:
       - none max_cards self | hand
     mth_response: ranch(1)
     tags:
-      - auto_select
+      - preselect
   - name: RICOCHET
     image: 05_rimbalzo
     effects:

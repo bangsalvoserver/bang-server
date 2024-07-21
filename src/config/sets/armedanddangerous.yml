@@ -141,7 +141,7 @@ main_deck:
     responses:
       - move_bomb player
     tags:
-      - auto_select
+      - preselect
   - name: BUNTLINE_SPECIAL
     signs:
       - J spades
@@ -249,7 +249,7 @@ character:
       - pay_cube select_cubes(2)
       - draw
     tags:
-      - auto_select
+      - preselect
   - name: BASS_GREEVES
     image: 17_bassgreeves
     effects:

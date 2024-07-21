@@ -159,7 +159,7 @@ character:
     modifier: sgt_blaze
     tags:
       - max_hp(5)
-      - auto_select
+      - preselect
   - name: SHADE_OCONNOR
     image: 27_shadeoconnor
     equip:
@@ -169,7 +169,7 @@ character:
       - discard card self | hand
       - draw
     tags:
-      - auto_select
+      - preselect
   - name: ZIPPY_ROY
     image: 27_zippy_roy
     effects:
@@ -427,7 +427,7 @@ hidden:
       - none player notself target_set dead alive
     mth_response: lounge_car(1,2)
     tags:
-      - auto_select
+      - preselect
 
   - name: MAIL_CAR
     responses:
@@ -436,4 +436,4 @@ hidden:
       - none player notself
     mth_response: mail_car(1,2)
     tags:
-      - auto_select
+      - preselect

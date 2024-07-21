@@ -115,7 +115,7 @@ main_deck:
       - none player notself
     mth_response: lastwill(1,2)
     tags:
-      - auto_select
+      - preselect
   - name: INDIAN_GUIDE
     signs:
       - 8 clubs
@@ -263,7 +263,7 @@ character:
     responses:
       - clash_the_stampede player target_set
     tags:
-      - auto_select
+      - preselect
   - name: CRAZY_HOG
     image: 20_crazy_hog
     effects:
@@ -295,7 +295,7 @@ character:
   #   #   - discard card self | hand
   #   #   - laura_billion
   #   # tags:
-  #   #   - auto_select
+  #   #   - preselect
   - name: SID_CURRY
     image: 20_sid_curry
     equip:

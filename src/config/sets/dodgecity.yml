@@ -333,4 +333,4 @@ character:
       - vera_custer player notself
     tags:
       - max_hp(3)
-      - auto_select
+      - preselect

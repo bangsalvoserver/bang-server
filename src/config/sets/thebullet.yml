@@ -10,7 +10,7 @@ character:
     mth_response: claus_the_saint(1,2)
     tags:
       - max_hp(3)
-      - auto_select
+      - preselect
   - name: JOHNNY_KISCH
     image: 02_johnnykisch
     equip:

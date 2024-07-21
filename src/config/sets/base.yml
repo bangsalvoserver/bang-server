@@ -389,4 +389,4 @@ hidden:
       - pick card | pick_card
     tags:
       - pick
-      - auto_select
+      - preselect
