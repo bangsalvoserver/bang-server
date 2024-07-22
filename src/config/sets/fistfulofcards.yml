@@ -47,6 +47,12 @@ fistfulofcards:
     image: 05_peyote
     equip:
       - peyote
+    modifier_response: card_choice
+    responses:
+      - none
+    tags:
+      - card_choice(5)
+      - preselect
   - name: RANCH
     image: 05_ranch
     equip:
@@ -80,9 +86,15 @@ fistfulofcards:
 hidden:
   - name: PEYOTE_RED
     image: fistfulofcards/05_peyote_rosso
-    tags:
+    responses:
+      - card_choice
       - peyote(1)
+    tags:
+      - card_choice(5)
   - name: PEYOTE_BLACK
     image: fistfulofcards/05_peyote_nero
-    tags:
+    responses:
+      - card_choice
       - peyote(2)
+    tags:
+      - card_choice(5)

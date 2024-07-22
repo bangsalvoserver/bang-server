@@ -45,6 +45,12 @@ highnoon:
     expansion: highnoon
     equip:
       - handcuffs
+    modifier_response: card_choice
+    responses:
+      - none
+    tags:
+      - card_choice(6)
+      - preselect
   - name: NEW_IDENTITY
     image: 05_nuovaidentita
     expansion: highnoon
@@ -55,20 +61,32 @@ hidden:
   - name: HANDCUFFS_HEARTS
     image: highnoon/05_manette_hearts
     expansion: highnoon
-    tags:
+    responses:
+      - card_choice
       - handcuffs(1)
+    tags:
+      - card_choice(6)
   - name: HANDCUFFS_DIAMONDS
     image: highnoon/05_manette_diamonds
     expansion: highnoon
-    tags:
+    responses:
+      - card_choice
       - handcuffs(2)
+    tags:
+      - card_choice(6)
   - name: HANDCUFFS_CLUBS
     image: highnoon/05_manette_clubs
     expansion: highnoon
-    tags:
+    responses:
+      - card_choice
       - handcuffs(3)
+    tags:
+      - card_choice(6)
   - name: HANDCUFFS_SPADES
     image: highnoon/05_manette_spades
     expansion: highnoon
-    tags:
+    responses:
+      - card_choice
       - handcuffs(4)
+    tags:
+      - card_choice(6)

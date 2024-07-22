@@ -76,8 +76,6 @@ namespace banggame {
         horse,
         card_choice,
         last_scenario_card,
-        peyote,
-        handcuffs,
         buy_cost,
         traincost,
         max_hp,

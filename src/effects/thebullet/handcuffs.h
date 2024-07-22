@@ -10,6 +10,16 @@ namespace banggame {
     };
 
     DEFINE_EQUIP(handcuffs, equip_handcuffs)
+
+    struct effect_handcuffs {
+        card_suit suit;
+        effect_handcuffs(int value): suit{static_cast<card_suit>(value)} {}
+
+        bool can_play(card *origin_card, player *origin);
+        void on_play(card *origin_card, player *origin);
+    };
+
+    DEFINE_EFFECT(handcuffs, effect_handcuffs)
 }
 
 #endif
