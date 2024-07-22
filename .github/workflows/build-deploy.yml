@@ -55,7 +55,7 @@ jobs:
         path: build/bangserver
   
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: build
 
     steps:
@@ -64,7 +64,10 @@ jobs:
       id: download
       with:
         name: bangserver
-    
-    - name: Run Deploy Script
-      shell: bash
-      run: ${{ vars.DEPLOY_SCRIPT_PATH }} ${{ steps.download.outputs.download-path }}
+
+    - name: Deploy to Render
+      uses: johnbeynon/render-deploy-action@v0.0.8
+      with:
+        service-id: ${{ secrets.MY_RENDER_SERVICE_ID }}
+        api-key: ${{ secrets.MY_RENDER_API_KEY }}
+        wait-for-success: true
