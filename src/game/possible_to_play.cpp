@@ -185,18 +185,21 @@ namespace banggame {
         return result;
     }
 
+    static auto get_all_pickable_cards(player *origin) {
+        return rv::concat(
+            origin->m_game->m_players | rv::for_each([](player *p) {
+                return rv::concat(p->m_hand, p->m_table, p->m_characters);
+            }),
+            origin->m_game->m_selection,
+            origin->m_game->m_deck | rv::take(1),
+            origin->m_game->m_discards | rv::take(1)
+        );
+    }
+
     rn::any_view<card *> get_pick_cards(player *origin) {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_picking>(origin)) {
-                return rv::concat(
-                    origin->m_game->m_players | rv::for_each([](player *p) {
-                        return rv::concat(p->m_hand, p->m_table, p->m_characters);
-                    }),
-                    origin->m_game->m_selection,
-                    origin->m_game->m_deck | rv::take(1),
-                    origin->m_game->m_discards | rv::take(1)
-                )
-                | rv::filter([=](card *target_card) {
+                return get_all_pickable_cards(origin) | rv::filter([=](card *target_card) {
                     return req->can_pick(target_card);
                 });
             }
@@ -204,7 +207,7 @@ namespace banggame {
         return rv::empty<card *>;
     }
 
-    rn::any_view<player *> get_request_target_set(player *origin) {
+    rn::any_view<player *> get_request_target_set_players(player *origin) {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_target_set>(origin)) {
                 return origin->m_game->m_players | rv::filter([=](const player *p) {
@@ -213,5 +216,16 @@ namespace banggame {
             }
         }
         return rv::empty<player *>;
+    }
+
+    rn::any_view<card *> get_request_target_set_cards(player *origin) {
+        if (origin) {
+            if (auto req = origin->m_game->top_request<interface_target_set>(origin)) {
+                return get_all_pickable_cards(origin) | rv::filter([=](const card *target_card) {
+                    return req->in_target_set(target_card);
+                });
+            }
+        }
+        return rv::empty<card *>;
     }
 }

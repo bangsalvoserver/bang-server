@@ -83,7 +83,13 @@ namespace banggame {
     };
 
     struct interface_target_set {
-        virtual bool in_target_set(const player *target_player) const = 0;
+        virtual bool in_target_set(const player *target_player) const {
+            return false;
+        }
+        
+        virtual bool in_target_set(const card *target_card) const {
+            return false;
+        }
     };
 
 }

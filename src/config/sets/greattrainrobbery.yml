@@ -111,6 +111,7 @@ main_deck:
       - train_robbery player notself
     tags:
       - banglimit
+      - skip_logs
   - name: WATER_TOWER
     signs:
       - 8 hearts
@@ -437,3 +438,26 @@ hidden:
     mth_response: mail_car(1,2)
     tags:
       - preselect
+  
+  - name: TRAIN_ROBBERY
+    responses:
+      - train_robbery_response card self | table target_set
+    modifier_response: card_choice
+    tags:
+      - preselect
+      - card_choice(7)
+      - skip_logs
+  - name: TRAIN_ROBBERY_DISCARD
+    image: main_deck/27_train_robbery_discard
+    responses:
+      - card_choice
+      - train_robbery_discard
+    tags:
+      - card_choice(7)
+  - name: TRAIN_ROBBERY_BANG
+    image: main_deck/27_train_robbery_bang
+    responses:
+      - card_choice
+      - train_robbery_bang
+    tags:
+      - card_choice(7)

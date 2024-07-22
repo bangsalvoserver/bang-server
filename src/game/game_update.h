@@ -162,7 +162,8 @@ namespace banggame {
         playable_cards_list respond_cards;
         serial::card_list pick_cards;
         serial::card_list highlight_cards;
-        serial::player_list target_set;
+        serial::player_list target_set_players;
+        serial::card_list target_set_cards;
         player_distances distances;
         std::optional<timer_status_args> timer;
     };

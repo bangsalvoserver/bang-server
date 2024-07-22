@@ -36,6 +36,7 @@ namespace banggame {
         clubs,
         spades,
         origin_card_suit,
+        target_set,
         two_to_nine,
         ten_to_ace,
         bang,

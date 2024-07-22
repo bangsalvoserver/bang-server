@@ -54,7 +54,9 @@ namespace banggame {
 
     rn::any_view<card *> get_pick_cards(player *origin);
 
-    rn::any_view<player *> get_request_target_set(player *origin);
+    rn::any_view<player *> get_request_target_set_players(player *origin);
+
+    rn::any_view<card *> get_request_target_set_cards(player *origin);
     
 }
 
