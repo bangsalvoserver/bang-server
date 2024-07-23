@@ -68,6 +68,8 @@ int main(int argc, char **argv) {
             std::this_thread::sleep_until(next_tick);
         }
 
+        logging::status("Stopping server...");
+        
         server.stop();
         logging::status("Server stopped");
 
