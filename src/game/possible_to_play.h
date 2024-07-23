@@ -47,14 +47,14 @@ namespace banggame {
     rn::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {});
 
     rn::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {});
-    
-    bool is_possible_to_play(player *origin, card *origin_card, bool is_response = false, const std::vector<card *> &modifiers = {}, const effect_context &ctx = {});
-
-    playable_cards_list generate_playable_cards_list(player *origin, bool is_response = false);
 
     rn::any_view<player *> get_request_target_set_players(player *origin);
 
     rn::any_view<card *> get_request_target_set_cards(player *origin);
+    
+    bool is_possible_to_play(player *origin, card *origin_card, bool is_response = false, const std::vector<card *> &modifiers = {}, const effect_context &ctx = {});
+
+    playable_cards_list generate_playable_cards_list(player *origin, bool is_response = false);
     
 }
 

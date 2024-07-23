@@ -22,6 +22,17 @@ namespace banggame {
         );
     }
 
+    static auto get_all_targetable_cards(player *origin) {
+        return rv::concat(
+            origin->m_game->m_players | rv::for_each([](const player *p) {
+                return rv::concat(p->m_hand, p->m_table, p->m_characters);
+            }),
+            origin->m_game->m_selection,
+            origin->m_game->m_deck | rv::take(1),
+            origin->m_game->m_discards | rv::take(1)
+        );
+    }
+
     rn::any_view<card *> get_all_playable_cards(player *origin, bool is_response) {
         return get_all_active_cards(origin)
             | rv::filter([=](card *origin_card) {
@@ -45,26 +56,36 @@ namespace banggame {
     }
 
     rn::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
-        if (holder.card_filter.check(target_card_filter::target_set)) {
-            return get_request_target_set_cards(origin)
-                | rv::filter([=](card *target_card) {
-                    return !holder.get_error(origin_card, origin, target_card, ctx);
-                });
-        }
-        return rv::concat(
-            make_player_target_set(origin, origin_card, holder)
-            | rv::for_each([](player *target) {
-                return rv::concat(
-                    target->m_hand,
-                    target->m_table,
-                    target->m_characters | rv::take(1)
-                );
-            }),
-            origin->m_game->m_selection)
+        return get_all_targetable_cards(origin)
             | rv::filter([=](card *target_card) {
-                return !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
+                return (!target_card->owner || !filters::check_player_filter(origin, holder.player_filter, target_card->owner, ctx))
+                    && !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
                     && !holder.get_error(origin_card, origin, target_card, ctx);
             });
+    }
+
+    rn::any_view<player *> get_request_target_set_players(player *origin) {
+        if (origin) {
+            if (auto req = origin->m_game->top_request<interface_target_set_players>(origin)) {
+                return origin->m_game->m_players
+                    | rv::filter([=](const player *p) {
+                        return req->in_target_set(p);
+                    });
+            }
+        }
+        return rv::empty<player *>;
+    }
+
+    rn::any_view<card *> get_request_target_set_cards(player *origin) {
+        if (origin) {
+            if (auto req = origin->m_game->top_request<interface_target_set_cards>(origin)) {
+                return get_all_targetable_cards(origin)
+                    | rv::filter([=](const card *target_card) {
+                        return req->in_target_set(target_card);
+                    });
+            }
+        }
+        return rv::empty<card *>;
     }
 
     static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const target_list &targets) {
@@ -184,35 +205,5 @@ namespace banggame {
         }
 
         return result;
-    }
-
-    rn::any_view<player *> get_request_target_set_players(player *origin) {
-        if (origin) {
-            if (auto req = origin->m_game->top_request<interface_target_set_players>(origin)) {
-                return origin->m_game->m_players | rv::filter([=](const player *p) {
-                    return req->in_target_set(p);
-                });
-            }
-        }
-        return rv::empty<player *>;
-    }
-
-    rn::any_view<card *> get_request_target_set_cards(player *origin) {
-        if (origin) {
-            if (auto req = origin->m_game->top_request<interface_target_set_cards>(origin)) {
-                return rv::concat(
-                    origin->m_game->m_players | rv::for_each([](const player *p) {
-                        return rv::concat(p->m_hand, p->m_table, p->m_characters);
-                    }),
-                    origin->m_game->m_selection,
-                    origin->m_game->m_deck | rv::take(1),
-                    origin->m_game->m_discards | rv::take(1)
-                )
-                | rv::filter([=](const card *target_card) {
-                    return req->in_target_set(target_card);
-                });
-            }
-        }
-        return rv::empty<card *>;
     }
 }
