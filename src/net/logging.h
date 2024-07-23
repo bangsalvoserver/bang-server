@@ -46,9 +46,8 @@ namespace logging {
         if (enums::indexof(g_logging_level) <= enums::indexof(l)) {
             auto now = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now());
             get_level_ostream(l)
-                << std::format("[{:%Y-%m-%d %H:%M:%S}] [{}] {}", now, l,
-                    std::format(fmt, std::forward<Ts>(args) ...))
-                << std::endl;
+                << std::format("[{:%Y-%m-%d %H:%M:%S}] [{}] {}\n", now, l,
+                    std::format(fmt, std::forward<Ts>(args) ...));
         }
     }
 
