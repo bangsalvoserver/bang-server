@@ -361,13 +361,16 @@ namespace banggame {
         if (!owner) return {};
 
         return {
-            .distances = m_players
+            .distance_mods = m_players
                 | rv::filter([&](player *target) { return target != owner; })
                 | rv::transform([&](player *target) {
                     return player_distance_item {
                         .player = target,
-                        .distance = target->get_distance_mod()
+                        .value = target->get_distance_mod()
                     };
+                })
+                | rv::filter([](const player_distance_item &item) {
+                    return item.value != 0;
                 })
                 | rn::to_vector,
             .range_mod = owner->get_range_mod(),

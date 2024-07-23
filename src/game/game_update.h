@@ -140,11 +140,11 @@ namespace banggame {
 
     struct player_distance_item {
         serial::player player;
-        int distance;
+        int value;
     };
 
     struct player_distances {
-        std::vector<player_distance_item> distances;
+        std::vector<player_distance_item> distance_mods;
         int range_mod;
         int weapon_range;
     };
