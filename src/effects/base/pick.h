@@ -13,7 +13,7 @@ namespace banggame {
     
     DEFINE_EFFECT(pick, effect_pick)
 
-    struct interface_picking : interface_target_set {
+    struct interface_picking : interface_target_set_cards {
         bool in_target_set(const card *target_card) const final {
             return can_pick(target_card);
         }

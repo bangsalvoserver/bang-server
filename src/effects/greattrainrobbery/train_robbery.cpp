@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    struct request_train_robbery : request_base, interface_target_set {
+    struct request_train_robbery : request_base, interface_target_set_cards {
         using request_base::request_base;
 
         std::vector<card *> selected_cards;

@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    struct request_lounge_car : request_base, interface_target_set {
+    struct request_lounge_car : request_base, interface_target_set_players {
         request_lounge_car(card *origin_card, player *origin)
             : request_base(origin_card, nullptr, origin) {}
         

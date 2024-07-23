@@ -188,7 +188,7 @@ namespace banggame {
 
     rn::any_view<player *> get_request_target_set_players(player *origin) {
         if (origin) {
-            if (auto req = origin->m_game->top_request<interface_target_set>(origin)) {
+            if (auto req = origin->m_game->top_request<interface_target_set_players>(origin)) {
                 return origin->m_game->m_players | rv::filter([=](const player *p) {
                     return req->in_target_set(p);
                 });
@@ -199,7 +199,7 @@ namespace banggame {
 
     rn::any_view<card *> get_request_target_set_cards(player *origin) {
         if (origin) {
-            if (auto req = origin->m_game->top_request<interface_target_set>(origin)) {
+            if (auto req = origin->m_game->top_request<interface_target_set_cards>(origin)) {
                 return rv::concat(
                     origin->m_game->m_players | rv::for_each([](const player *p) {
                         return rv::concat(p->m_hand, p->m_table, p->m_characters);

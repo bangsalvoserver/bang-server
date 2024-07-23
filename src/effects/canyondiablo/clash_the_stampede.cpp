@@ -14,7 +14,7 @@ namespace banggame {
             }));
     }
 
-    struct request_clash_the_stampede : request_base, interface_target_set {
+    struct request_clash_the_stampede : request_base, interface_target_set_players {
         request_clash_the_stampede(card *origin_card, player *target)
             : request_base(origin_card, nullptr, target)
             , num_cards{get_max_num_cards(target)} {}

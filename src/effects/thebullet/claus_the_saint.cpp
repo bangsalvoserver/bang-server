@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    struct request_claus_the_saint : request_base, interface_target_set {
+    struct request_claus_the_saint : request_base, interface_target_set_players {
         request_claus_the_saint(card *origin_card, player *target, shared_request_draw &&req_draw)
             : request_base(origin_card, nullptr, target)
             , req_draw(std::move(req_draw)) {}

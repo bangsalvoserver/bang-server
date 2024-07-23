@@ -82,14 +82,12 @@ namespace banggame {
         virtual std::vector<card *> get_highlights() const { return {}; }
     };
 
-    struct interface_target_set {
-        virtual bool in_target_set(const player *target_player) const {
-            return false;
-        }
-        
-        virtual bool in_target_set(const card *target_card) const {
-            return false;
-        }
+    struct interface_target_set_players {
+        virtual bool in_target_set(const player *target_player) const = 0;
+    };
+
+    struct interface_target_set_cards {  
+        virtual bool in_target_set(const card *target_card) const = 0;
     };
 
 }
