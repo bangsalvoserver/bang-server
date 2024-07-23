@@ -1,5 +1,4 @@
 #include <charconv>
-#include <iostream>
 #include <csignal>
 
 #include <cxxopts.hpp>
@@ -25,11 +24,11 @@ int main(int argc, char **argv) {
     options.add_options()
         ("port",        "",                 cxxopts::value(port))
         ("cheats",      "Enable Cheats",    cxxopts::value(server.options().enable_cheats))
-        ("v,verbose",   "Verbose Logging",  cxxopts::value(server.options().verbose))
+        ("l,logging",   "Logging Level",    cxxopts::value(logging::g_logging_level))
         ("r,reuse-addr","Reuse Address",    cxxopts::value(reuse_addr))
         ("h,help",      "Print Help")
 #ifdef HAVE_GIT_VERSION
-        ("version",   "Print Version")
+        ("v,version",   "Print Version")
 #endif
     ;
 
@@ -40,7 +39,7 @@ int main(int argc, char **argv) {
         auto results = options.parse(argc, argv);
 
         if (results.count("help")) {
-            std::cout << options.help() << '\n';
+            std::cout << options.help();
             return 0;
         }
 #ifdef HAVE_GIT_VERSION
@@ -56,7 +55,7 @@ int main(int argc, char **argv) {
 
     try {
         server.start(port, reuse_addr);
-        std::cout << "Server listening on port " << port << std::endl;
+        logging::trace("Server listening on port {}", port);
 
         std::signal(SIGTERM, handle_stop);
         std::signal(SIGINT, handle_stop);
@@ -70,7 +69,7 @@ int main(int argc, char **argv) {
         }
 
         server.stop();
-        std::cout << "Server stopped\n";
+        logging::trace("Server stopped");
 
         return 0;
     } catch (const std::exception &error) {

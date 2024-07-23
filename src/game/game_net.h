@@ -3,7 +3,6 @@
 
 #include <deque>
 #include <numeric>
-#include <iostream>
 
 #include "player.h"
 #include "game_update.h"

@@ -2,6 +2,7 @@
 #include "play_verify.h"
 #include "possible_to_play.h"
 #include "net/bot_info.h"
+#include "net/logging.h"
 
 #include "game/filters.h"
 
@@ -85,7 +86,7 @@ namespace banggame {
         }
 
         // softlock
-        std::cerr << "BOT ERROR: could not find card in execute_random_play()\n";
+        logging::warn("BOT ERROR: could not find card in execute_random_play()");
 
         return false;
     }

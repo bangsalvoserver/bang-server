@@ -1,17 +1,20 @@
 #include "wsserver.h"
 
+#include "logging.h"
+
 namespace net {
 
-wsserver::wsserver() {
+void wsserver::start(uint16_t port, bool reuse_addr) {
     m_server.init_asio();
 
     m_server.set_access_channels(websocketpp::log::alevel::all);
-    m_server.clear_access_channels(
-        websocketpp::log::alevel::frame_payload |
-        websocketpp::log::alevel::frame_header);
-}
 
-void wsserver::start(uint16_t port, bool reuse_addr) {
+    if (logging::g_logging_level != logging::level::all) {
+        m_server.clear_access_channels(
+            websocketpp::log::alevel::frame_payload |
+            websocketpp::log::alevel::frame_header);
+    }
+
     m_server.set_open_handler([this](client_handle con) {
         std::scoped_lock lock(m_con_mutex);
         m_clients.emplace(con);

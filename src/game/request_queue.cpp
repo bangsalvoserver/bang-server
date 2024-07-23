@@ -4,15 +4,15 @@
 
 #include "utils/type_name.h"
 
+#include "net/logging.h"
+
 namespace banggame {
 
     request_queue::state_t request_queue::invoke_update() {
         if (m_game->is_game_over()) {
             return state_done{};
         } else if (auto req = top_request()) {
-#ifndef NDEBUG
-            std::cout << std::format("{: >5}: {}", req->priority, utils::demangle(typeid(*req).name())) << std::endl;
-#endif
+            logging::debug("on_update() on {: >5}: {}", req->priority, utils::demangle(typeid(*req).name()));
 
             req->on_update();
             req->live = true;

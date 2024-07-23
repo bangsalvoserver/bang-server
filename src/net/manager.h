@@ -4,6 +4,7 @@
 #include "lobby.h"
 #include "chat_commands.h"
 #include "wsserver.h"
+#include "logging.h"
 
 #include "utils/json_aggregate.h"
 
@@ -18,7 +19,6 @@ std::string make_message(auto && ... args) {
 
 struct server_options {
     bool enable_cheats = false;
-    bool verbose = false;
     int max_session_id_count = 10;
 };
 
@@ -39,18 +39,14 @@ private:
     template<utils::fixed_string E> requires server_message_type<E>
     void send_message(client_handle client, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
-        if (m_options.verbose) {
-            std::cout << std::format("{}: Sent {}", get_client_ip(client), message) << std::endl;
-        }
+        logging::info("{}: Sent {}", get_client_ip(client), message);
         push_message(client, message);
     }
 
     template<utils::fixed_string E> requires server_message_type<E>
     void broadcast_message(auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
-        if (m_options.verbose) {
-            std::cout << std::format("All users: Sent {}", message) << std::endl;
-        }
+        logging::info("All users: Sent {}", message);
         for (game_user &user : m_users | rv::values) {
             push_message(user.client, message);
         }
@@ -59,9 +55,7 @@ private:
     template<utils::fixed_string E> requires server_message_type<E>
     void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
-        if (m_options.verbose) {
-            std::cout << std::format("Lobby {}: Sent {}", lobby.name, message) << std::endl;
-        }
+        logging::info("Lobby {}: Sent {}", lobby.name, message);
         for (auto &[team, user_id, u] : lobby.users) {
             push_message(u->client, message);
         }

@@ -8,42 +8,109 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
+#include "logging.h"
+
 namespace net {
 
-class wsserver {
-public:
-    using server_type = websocketpp::server<websocketpp::config::asio>;
-    using client_handle = websocketpp::connection_hdl;
+    template<typename Derived>
+    struct logging_adapter {
+        const websocketpp::log::level m_static_channels;
+        websocketpp::log::level m_dynamic_channels;
 
-private:
-    server_type m_server;
+        logging_adapter(websocketpp::log::level channels, websocketpp::log::channel_type_hint::value)
+            : m_static_channels(channels)
+            , m_dynamic_channels(0) {}
+            
+        void set_channels(websocketpp::log::level channels) {
+            if (channels == 0) {
+                m_dynamic_channels = 0;
+            } else {
+                m_dynamic_channels |= (channels & m_static_channels);
+            }
+        }
 
-    std::set<client_handle, std::owner_less<client_handle>> m_clients;
-    std::mutex m_con_mutex;
+        void clear_channels(websocketpp::log::level channels) {
+            m_dynamic_channels &= ~channels;
+        }
 
-protected:
-    virtual void on_connect(client_handle handle) = 0;
-    virtual void on_disconnect(client_handle handle) = 0;
-    virtual void on_message(client_handle hdl, const std::string &message) = 0;
+        static logging::level get_logging_level(websocketpp::log::level channel) {
+            return Derived::get_logging_level(channel);
+        }
 
-public:
-    wsserver();
+        constexpr bool static_test(websocketpp::log::level channel) const {
+            return ((channel & m_static_channels) != 0);
+        }
 
-    virtual ~wsserver() = default;
+        bool dynamic_test(websocketpp::log::level channel) {
+            return ((channel & m_dynamic_channels) != 0);
+        }
+        
+        void write(websocketpp::log::level channel, const std::string &msg) {
+            if (dynamic_test(channel)) {
+                logging::log(get_logging_level(channel), "{}", msg);
+            }
+        }
+    };
 
-    void start(uint16_t port, bool reuse_addr = false);
+    struct access_logging_adapter : logging_adapter<access_logging_adapter> {
+        using logging_adapter<access_logging_adapter>::logging_adapter;
+        static logging::level get_logging_level(websocketpp::log::level channel) {
+            return logging::level::info;
+        }
+    };
 
-    void stop();
+    struct error_logging_adapter : logging_adapter<error_logging_adapter> {
+        using logging_adapter<error_logging_adapter>::logging_adapter;
+        static logging::level get_logging_level(websocketpp::log::level channel) {
+            return logging::level::error;
+        }
+    };
 
-    void tick();
+    using wsconfig_base = websocketpp::config::asio;
+    struct wsconfig : wsconfig_base {
+        using alog_type = access_logging_adapter;
+        using elog_type = error_logging_adapter;
 
-    void push_message(client_handle con, const std::string &message);
+        struct transport_config : wsconfig_base::transport_config {
+            using alog_type = access_logging_adapter;
+            using elog_type = error_logging_adapter;
+        };
 
-    void kick_client(client_handle con, const std::string &msg);
+        using transport_type = websocketpp::transport::asio::endpoint<transport_config>;
+    };
 
-    std::string get_client_ip(client_handle con);
+    class wsserver {
+    public:
+        using server_type = websocketpp::server<wsconfig>;
+        using client_handle = websocketpp::connection_hdl;
 
-};
+    private:
+        server_type m_server;
+
+        std::set<client_handle, std::owner_less<client_handle>> m_clients;
+        std::mutex m_con_mutex;
+
+    protected:
+        virtual void on_connect(client_handle handle) = 0;
+        virtual void on_disconnect(client_handle handle) = 0;
+        virtual void on_message(client_handle hdl, const std::string &message) = 0;
+
+    public:
+        virtual ~wsserver() = default;
+
+        void start(uint16_t port, bool reuse_addr = false);
+
+        void stop();
+
+        void tick();
+
+        void push_message(client_handle con, const std::string &message);
+
+        void kick_client(client_handle con, const std::string &msg);
+
+        std::string get_client_ip(client_handle con);
+
+    };
 
 }
 
