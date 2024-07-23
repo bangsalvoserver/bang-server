@@ -14,7 +14,7 @@ namespace banggame {
             auto_pick();
         }
 
-        bool can_pick(card *target_card) const override;
+        bool can_pick(const card *target_card) const override;
         void on_pick(card *target_card) override;
         game_string status_text(player *owner) const override;
     };

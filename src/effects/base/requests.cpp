@@ -12,7 +12,7 @@ namespace banggame {
         }
     }
 
-    bool request_characterchoice::can_pick(card *target_card) const {
+    bool request_characterchoice::can_pick(const card *target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
@@ -46,7 +46,7 @@ namespace banggame {
         }
     }
 
-    bool request_discard::can_pick(card *target_card) const {
+    bool request_discard::can_pick(const card *target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
     
@@ -87,7 +87,7 @@ namespace banggame {
         }
     }
 
-    bool request_discard_pass::can_pick(card *target_card) const {
+    bool request_discard_pass::can_pick(const card *target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
@@ -116,11 +116,11 @@ namespace banggame {
         }
     }
 
-    static bool is_valid_card(card *target_card) {
+    static bool is_valid_card(const card *target_card) {
         return !target_card->is_black() && !target_card->is_train();
     }
         
-    bool request_discard_all::can_pick(card *target_card) const {
+    bool request_discard_all::can_pick(const card *target_card) const {
         return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
             && target_card->owner == target && is_valid_card(target_card);
     }
@@ -179,7 +179,7 @@ namespace banggame {
         }
     }
         
-    bool request_discard_hand::can_pick(card *target_card) const {
+    bool request_discard_hand::can_pick(const card *target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 

@@ -8,7 +8,7 @@ namespace banggame {
         event_card_key key{origin_card, 1};
         p->m_game->add_listener<event_type::apply_bang_modifier>(key, [=](player *origin, shared_request_bang req) {
             if (origin == p) {
-                origin->m_game->add_disabler(key, [target = req->target](card *c) {
+                origin->m_game->add_disabler(key, [target = req->target](const card *c) {
                     return (c->pocket == pocket_type::player_table
                         || c->pocket == pocket_type::player_character)
                         && c->owner == target;

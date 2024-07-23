@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    bool request_youl_grinner::can_pick(card *target_card) const {
+    bool request_youl_grinner::can_pick(const card *target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 

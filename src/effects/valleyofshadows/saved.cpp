@@ -34,7 +34,7 @@ namespace banggame {
             }
         }
 
-        bool can_pick(card *target_card) const override {
+        bool can_pick(const card *target_card) const override {
             switch (target_card->pocket) {
             case pocket_type::player_hand:
                 return target_card->owner == saved;

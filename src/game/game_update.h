@@ -160,7 +160,6 @@ namespace banggame {
         serial::opt_player target;
         game_string status_text;
         playable_cards_list respond_cards;
-        serial::card_list pick_cards;
         serial::card_list highlight_cards;
         serial::player_list target_set_players;
         serial::card_list target_set_cards;

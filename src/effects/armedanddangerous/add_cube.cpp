@@ -31,7 +31,7 @@ namespace banggame {
             }
         }
         
-        bool can_pick(card *target_card) const override {
+        bool can_pick(const card *target_card) const override {
             if (target_card->owner == target) {
                 if (target_card->pocket == pocket_type::player_table && target_card->is_orange()) {
                     return target_card->num_cubes < max_cubes;

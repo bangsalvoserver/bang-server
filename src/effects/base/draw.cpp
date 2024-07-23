@@ -73,7 +73,7 @@ namespace banggame {
         }
     }
 
-    bool request_draw::can_pick(card *target_card) const {
+    bool request_draw::can_pick(const card *target_card) const {
         if (target->m_game->m_deck.empty() || target->m_game->check_flags(game_flag::phase_one_draw_discard) && !target->m_game->m_discards.empty()) {
             return target_card->pocket == pocket_type::discard_pile;
         } else {

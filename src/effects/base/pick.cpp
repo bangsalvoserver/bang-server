@@ -7,6 +7,13 @@
 
 namespace banggame {
 
+    game_string effect_pick::get_error(card *origin_card, player *origin, card *target) {
+        if (auto req = origin->m_game->top_request<interface_picking>(origin)) {
+            return {};
+        }
+        return "ERROR_INVALID_ACTION";
+    }
+
     game_string effect_pick::on_prompt(card *origin_card, player *origin, card *target) {
         return origin->m_game->top_request<interface_picking>()->pick_prompt(target);
     }
@@ -16,14 +23,14 @@ namespace banggame {
         req->on_pick(target);
     }
 
-    bool selection_picker::can_pick(card *target_card) const {
+    bool selection_picker::can_pick(const card *target_card) const {
         return target_card->pocket == pocket_type::selection;
     }
 
     void request_picking::auto_pick() {
         card *only_card = get_single_element(get_all_playable_cards(target, true));
         if (only_card && only_card->has_tag(tag_type::pick)) {
-            if (card *target_card = get_single_element(get_pick_cards(target))) {
+            if (card *target_card = get_single_element(get_request_target_set_cards(target))) {
                 on_pick(target_card);
             }
         }

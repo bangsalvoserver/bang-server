@@ -12,7 +12,7 @@ namespace banggame {
             : request_picking(nullptr, nullptr, target) {}
         
         void on_update() override;
-        bool can_pick(card *target_card) const override;
+        bool can_pick(const card *target_card) const override;
         void on_pick(card *target_card) override;
         game_string status_text(player *owner) const override;
     };
@@ -21,7 +21,7 @@ namespace banggame {
         using request_picking::request_picking;
         
         void on_update() override;
-        bool can_pick(card *target_card) const override;
+        bool can_pick(const card *target_card) const override;
         void on_pick(card *target_card) override;
         game_string status_text(player *owner) const override;
     };
@@ -46,7 +46,7 @@ namespace banggame {
 
         void on_update() override;
 
-        bool can_pick(card *target_card) const override;
+        bool can_pick(const card *target_card) const override;
         void on_pick(card *target_card) override;
         game_string status_text(player *owner) const override;
     };
@@ -58,7 +58,7 @@ namespace banggame {
             : request_picking(nullptr, nullptr, target, {}, priority)
             , reason(reason) {}
         
-        bool can_pick(card *target_card) const override;
+        bool can_pick(const card *target_card) const override;
         void on_pick(card *target_card) override;
         void on_update() override;
         void on_resolve() override;
@@ -69,7 +69,7 @@ namespace banggame {
         request_discard_hand(card *origin_card, player *target)
             : request_picking(origin_card, nullptr, target) {}
         
-        bool can_pick(card *target_card) const override;
+        bool can_pick(const card *target_card) const override;
         void on_pick(card *target_card) override;
         void on_update() override;
         void on_resolve() override;

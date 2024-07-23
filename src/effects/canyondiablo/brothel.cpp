@@ -17,7 +17,7 @@ namespace banggame {
                     if (!result) {
                         target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
                         event_card_key event_key{target_card, 1 + brothel_counter++ % 20};
-                        target->m_game->add_disabler(event_key, [=](card *c) {
+                        target->m_game->add_disabler(event_key, [=](const card *c) {
                             return c->pocket == pocket_type::player_character && c->owner == target;
                         });
                         auto clear_events = [target, event_key](player *p) {

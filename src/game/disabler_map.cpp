@@ -65,14 +65,14 @@ namespace banggame {
         m_disablers.erase(range.begin(), range.end());
     }
 
-    card *disabler_map::get_disabler(card *target_card) const {
+    card *disabler_map::get_disabler(const card *target_card) const {
         for (auto &[card_key, fun] : m_disablers) {
             if (std::invoke(fun, target_card)) return card_key.target_card;
         }
         return nullptr;
     }
 
-    bool disabler_map::is_disabled(card *target_card) const {
+    bool disabler_map::is_disabled(const card *target_card) const {
         return get_disabler(target_card) != nullptr;
     }
 

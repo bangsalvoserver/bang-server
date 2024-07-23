@@ -386,8 +386,6 @@ namespace banggame {
 
             .respond_cards = generate_playable_cards_list(owner, true),
 
-            .pick_cards = rn::to<serial::card_list>(get_pick_cards(owner)),
-
             .highlight_cards = rn::to<serial::card_list>(req->get_highlights()),
 
             .target_set_players = rn::to<serial::player_list>(get_request_target_set_players(owner)),

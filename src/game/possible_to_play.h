@@ -52,8 +52,6 @@ namespace banggame {
 
     playable_cards_list generate_playable_cards_list(player *origin, bool is_response = false);
 
-    rn::any_view<card *> get_pick_cards(player *origin);
-
     rn::any_view<player *> get_request_target_set_players(player *origin);
 
     rn::any_view<card *> get_request_target_set_cards(player *origin);

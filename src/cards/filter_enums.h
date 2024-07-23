@@ -23,7 +23,7 @@ namespace banggame {
     };
 
     enum class target_card_filter {
-        pick_card,
+        target_set,
         selection,
         table,
         hand,
@@ -36,7 +36,6 @@ namespace banggame {
         clubs,
         spades,
         origin_card_suit,
-        target_set,
         two_to_nine,
         ten_to_ace,
         bang,

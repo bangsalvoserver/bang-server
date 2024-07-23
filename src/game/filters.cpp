@@ -46,7 +46,7 @@ namespace banggame::filters {
             return "ERROR_TARGET_EMPTY_CUBES";
         
         if (filter.check(target_player_filter::target_set)) {
-            auto req = target->m_game->top_request<interface_target_set>(origin);
+            auto req = origin->m_game->top_request<interface_target_set>(origin);
             if (!req || !req->in_target_set(target)) {
                 return "ERROR_TARGET_NOT_IN_TARGET_SET";
             }
@@ -111,12 +111,29 @@ namespace banggame::filters {
     game_string check_card_filter(const card *origin_card, const player *origin, enums::bitset<target_card_filter> filter, const card *target, const effect_context &ctx) {
         if (!filter.check(target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";
-        
-        if (filter.check(target_card_filter::cube_slot)) {
+
+        if (filter.check(target_card_filter::target_set)) {
+            auto req = origin->m_game->top_request<interface_target_set>(origin);
+            if (!req || !req->in_target_set(target)) {
+                return "ERROR_TARGET_NOT_IN_TARGET_SET";
+            }
+        } else if (filter.check(target_card_filter::cube_slot)) {
+            if (!target->owner)
+                return "ERROR_CARD_HAS_NO_OWNER";
             if (target != target->owner->first_character() && !(target->is_orange() && target->pocket == pocket_type::player_table))
                 return "ERROR_TARGET_NOT_CUBE_SLOT";
-        } else if (target->deck == card_deck_type::character) {
-            return "ERROR_TARGET_NOT_CARD";
+        } else {
+            switch (target->pocket) {
+            case pocket_type::player_hand:
+            case pocket_type::player_table:
+                break;
+            case pocket_type::selection:
+                if (!filter.check(target_card_filter::selection))
+                    return "ERROR_TARGET_NOT_SELECTION";
+                break;
+            default:
+                return "ERROR_CARD_NOT_TARGETABLE";
+            }
         }
 
         if (filter.check(target_card_filter::beer) && !target->has_tag(tag_type::beer))
@@ -190,9 +207,6 @@ namespace banggame::filters {
         
         if (filter.check(target_card_filter::ten_to_ace) && !target->sign.is_ten_to_ace())
             return "ERROR_TARGET_NOT_TEN_TO_ACE";
-
-        if (filter.check(target_card_filter::selection) && target->pocket != pocket_type::selection)
-            return "ERROR_TARGET_NOT_SELECTION";
 
         if (filter.check(target_card_filter::table) && target->pocket != pocket_type::player_table)
             return "ERROR_TARGET_NOT_TABLE_CARD";

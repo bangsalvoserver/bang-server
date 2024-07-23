@@ -6,7 +6,7 @@
 namespace banggame {
 
     void equip_big_spencer::on_enable(card *target_card, player *target) {
-        target->m_game->add_disabler(target_card, [=](card *c) {
+        target->m_game->add_disabler(target_card, [=](const card *c) {
             return c->pocket == pocket_type::player_hand
                 && c->owner == target
                 && c->has_tag(tag_type::missedcard);

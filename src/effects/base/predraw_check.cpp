@@ -20,7 +20,7 @@ namespace banggame {
         }
     }
 
-    bool request_predraw::can_pick(card *target_card) const {
+    bool request_predraw::can_pick(const card *target_card) const {
         if (target_card->owner == target) {
             int top_priority = checks[0].priority;
             return rn::contains(checks | rv::take_while([=](const event_card_key &key) {

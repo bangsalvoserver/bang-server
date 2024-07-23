@@ -1,7 +1,5 @@
 #include "game/play_verify.h"
 
-#include "effects/base/pick.h"
-
 #include "game/filters.h"
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
@@ -20,19 +18,9 @@ namespace banggame {
     }
 
     template<> game_string visit_card::get_error(const effect_context &ctx, card *target) {
-        if (effect.card_filter.check(target_card_filter::pick_card)) {
-            if (auto req = origin->m_game->top_request<interface_picking>(origin)) {
-                if (req->can_pick(target)) {
-                    return {};
-                }
-            }
-            return "ERROR_INVALID_PICK";
+        if (target->owner) {
+            MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target->owner, ctx));
         }
-
-        if (!target->owner) {
-            return "ERROR_CARD_HAS_NO_OWNER";
-        }
-        MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target->owner, ctx));
         MAYBE_RETURN(filters::check_card_filter(origin_card, origin, effect.card_filter, target, ctx));
         return effect.get_error(origin_card, origin, target, ctx);
     }

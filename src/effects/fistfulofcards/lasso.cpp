@@ -5,7 +5,7 @@
 namespace banggame {
     
     void equip_lasso::on_enable(card *target_card, player *target) {
-        target->m_game->add_disabler(target_card, [](card *c) {
+        target->m_game->add_disabler(target_card, [](const card *c) {
             return c->pocket == pocket_type::player_table;
         });
     }

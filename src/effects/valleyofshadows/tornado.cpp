@@ -10,7 +10,7 @@ namespace banggame {
         request_tornado(card *origin_card, player *origin, player *target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags) {}
         
-        bool can_pick(card *target_card) const override {
+        bool can_pick(const card *target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
         }
 

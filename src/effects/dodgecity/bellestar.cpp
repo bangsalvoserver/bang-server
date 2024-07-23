@@ -7,7 +7,7 @@ namespace banggame {
     void equip_bellestar::on_enable(card *target_card, player *p) {
         p->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player *target) {
             if (p == target) {
-                p->m_game->add_disabler(target_card, [=](card *c) {
+                p->m_game->add_disabler(target_card, [=](const card *c) {
                     return c->pocket == pocket_type::player_table && c->owner != target;
                 });
             }
