@@ -123,13 +123,13 @@ namespace banggame::filters {
             if (target != target->owner->first_character() && !(target->is_orange() && target->pocket == pocket_type::player_table))
                 return "ERROR_TARGET_NOT_CUBE_SLOT";
         } else {
+            if (filter.check(target_card_filter::selection) != (target->pocket == pocket_type::selection))
+                return "ERROR_TARGET_NOT_SELECTION";
+            
             switch (target->pocket) {
             case pocket_type::player_hand:
             case pocket_type::player_table:
-                break;
             case pocket_type::selection:
-                if (!filter.check(target_card_filter::selection))
-                    return "ERROR_TARGET_NOT_SELECTION";
                 break;
             default:
                 return "ERROR_CARD_NOT_TARGETABLE";
