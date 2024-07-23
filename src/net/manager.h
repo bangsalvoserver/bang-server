@@ -19,7 +19,6 @@ std::string make_message(auto && ... args) {
 struct server_options {
     bool enable_cheats = false;
     bool verbose = false;
-    bool reuse_addr = false;
     int max_session_id_count = 10;
 };
 

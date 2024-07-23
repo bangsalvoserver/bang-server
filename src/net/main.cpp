@@ -20,12 +20,13 @@ int main(int argc, char **argv) {
     cxxopts::Options options(argv[0], "Bang! Server");
 
     uint16_t port = banggame::default_server_port;
+    bool reuse_addr = false;
 
     options.add_options()
         ("port",        "",                 cxxopts::value(port))
         ("cheats",      "Enable Cheats",    cxxopts::value(server.options().enable_cheats))
         ("v,verbose",   "Verbose Logging",  cxxopts::value(server.options().verbose))
-        ("reuse-addr",  "Reuse Address",   cxxopts::value(server.options().reuse_addr))
+        ("r,reuse-addr","Reuse Address",    cxxopts::value(reuse_addr))
         ("h,help",      "Print Help")
 #ifdef HAVE_GIT_VERSION
         ("version",   "Print Version")
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
     }
 
     try {
-        server.start(port, server.options().reuse_addr);
+        server.start(port, reuse_addr);
         std::cout << "Server listening on port " << port << std::endl;
 
         std::signal(SIGTERM, handle_stop);
