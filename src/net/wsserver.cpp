@@ -9,7 +9,7 @@ void wsserver::start(uint16_t port, bool reuse_addr) {
 
     m_server.set_access_channels(websocketpp::log::alevel::all);
 
-    if (logging::g_logging_level != logging::level::all) {
+    if (logging::log_function::global_level != logging::level::all) {
         m_server.clear_access_channels(
             websocketpp::log::alevel::frame_payload |
             websocketpp::log::alevel::frame_header);

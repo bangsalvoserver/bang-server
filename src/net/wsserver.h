@@ -33,10 +33,6 @@ namespace net {
             m_dynamic_channels &= ~channels;
         }
 
-        static logging::level get_logging_level(websocketpp::log::level channel) {
-            return Derived::get_logging_level(channel);
-        }
-
         constexpr bool static_test(websocketpp::log::level channel) const {
             return ((channel & m_static_channels) != 0);
         }
@@ -47,7 +43,7 @@ namespace net {
         
         void write(websocketpp::log::level channel, const std::string &msg) {
             if (dynamic_test(channel)) {
-                logging::log(get_logging_level(channel), "{}", msg);
+                logging::log_function(Derived::get_logging_level(channel))("{}", msg);
             }
         }
     };

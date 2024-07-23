@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     options.add_options()
         ("port",        "",                 cxxopts::value(port))
         ("cheats",      "Enable Cheats",    cxxopts::value(server.options().enable_cheats))
-        ("l,logging",   "Logging Level",    cxxopts::value(logging::g_logging_level))
+        ("l,logging",   "Logging Level",    cxxopts::value(logging::log_function::global_level))
         ("r,reuse-addr","Reuse Address",    cxxopts::value(reuse_addr))
         ("h,help",      "Print Help")
 #ifdef HAVE_GIT_VERSION
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 
     try {
         server.start(port, reuse_addr);
-        logging::trace("Server listening on port {}", port);
+        logging::status("Server listening on port {}", port);
 
         std::signal(SIGTERM, handle_stop);
         std::signal(SIGINT, handle_stop);
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
         }
 
         server.stop();
-        logging::trace("Server stopped");
+        logging::status("Server stopped");
 
         return 0;
     } catch (const std::exception &error) {
