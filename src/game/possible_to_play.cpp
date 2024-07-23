@@ -88,7 +88,7 @@ namespace banggame {
         return rv::empty<card *>;
     }
 
-    static bool is_possible_mth_impl(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const target_list &targets) {
+    static bool is_possible_mth(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const target_list &targets) {
         if (targets.size() == mth.args.size()) {
             return !mth_holder{
                 mth.type,
@@ -101,26 +101,18 @@ namespace banggame {
             return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
                 auto targets_copy = targets;
                 targets_copy.emplace_back(utils::tag<"player">{}, target);
-                return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
+                return is_possible_mth(origin, origin_card, mth, effects, ctx, targets_copy);
             });
         case TARGET_TYPE(card).index():
             return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
                 auto targets_copy = targets;
                 targets_copy.emplace_back(utils::tag<"card">{}, target);
-                return is_possible_mth_impl(origin, origin_card, mth, effects, ctx, targets_copy);
+                return is_possible_mth(origin, origin_card, mth, effects, ctx, targets_copy);
             });
         default:
             // ignore other target types
             return true;
         }
-    }
-
-    static bool is_possible_mth(player *origin, card *origin_card, bool is_response, const effect_context &ctx) {
-        const auto &effects = origin_card->get_effect_list(is_response);
-        const auto &mth = origin_card->get_mth(is_response);
-        return !effects.empty() && rn::all_of(effects, [&](const effect_holder &effect) {
-            return play_dispatch::possible(origin, origin_card, effect, ctx);
-        }) && (!mth || is_possible_mth_impl(origin, origin_card, mth, effects, ctx, {}));
     }
 
     static rn::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
@@ -153,7 +145,15 @@ namespace banggame {
                 return false;
             }
         } else {
-            if (!is_possible_mth(origin, origin_card, is_response, ctx)) {
+            const auto &effects = origin_card->get_effect_list(is_response);
+            if (effects.empty() || !rn::all_of(effects, [&](const effect_holder &effect) {
+                return play_dispatch::possible(origin, origin_card, effect, ctx);
+            })) {
+                return false;
+            }
+
+            const auto &mth = origin_card->get_mth(is_response);
+            if (mth && !is_possible_mth(origin, origin_card, mth, effects, ctx, {})) {
                 return false;
             }
 
