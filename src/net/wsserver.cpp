@@ -4,16 +4,48 @@
 
 namespace net {
 
+logging::level access_logging_adapter::get_logging_level(websocketpp::log::level channel) {
+    using alevel = websocketpp::log::alevel;
+    switch (channel) {
+    case alevel::message_header:
+    case alevel::message_payload:
+    case alevel::endpoint:
+    case alevel::devel:
+    case alevel::frame_payload:
+    case alevel::frame_header:
+        return logging::level::trace;
+    case alevel::debug_handshake:
+    case alevel::debug_close:
+        return logging::level::debug;
+    case alevel::connect:
+    case alevel::disconnect:
+    case alevel::http:
+        return logging::level::status;
+    case alevel::fail:
+        return logging::level::warning;
+    default:
+        return logging::level::info;
+    }
+}
+
+logging::level error_logging_adapter::get_logging_level(websocketpp::log::level channel) {
+    using elevel = websocketpp::log::elevel;
+    switch (channel) {
+    case elevel::devel:
+        return logging::level::trace;
+    case elevel::library:
+        return logging::level::debug;
+    case elevel::info:
+        return logging::level::info;
+    case elevel::warn:
+        return logging::level::warning;
+    default:
+        return logging::level::error;
+    }
+}
+
 void wsserver::start(uint16_t port, bool reuse_addr) {
     m_server.init_asio();
-
-    m_server.set_access_channels(websocketpp::log::alevel::all);
-
-    if (logging::log_function::global_level != logging::level::all) {
-        m_server.clear_access_channels(
-            websocketpp::log::alevel::frame_payload |
-            websocketpp::log::alevel::frame_header);
-    }
 
     m_server.set_open_handler([this](client_handle con) {
         std::scoped_lock lock(m_con_mutex);

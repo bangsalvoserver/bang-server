@@ -42,24 +42,18 @@ namespace net {
         }
         
         void write(websocketpp::log::level channel, const std::string &msg) {
-            if (dynamic_test(channel)) {
-                logging::log_function(Derived::get_logging_level(channel))("{}", msg);
-            }
+            logging::log_function(Derived::get_logging_level(channel))("{}", msg);
         }
     };
 
     struct access_logging_adapter : logging_adapter<access_logging_adapter> {
         using logging_adapter<access_logging_adapter>::logging_adapter;
-        static logging::level get_logging_level(websocketpp::log::level channel) {
-            return logging::level::info;
-        }
+        static logging::level get_logging_level(websocketpp::log::level channel);
     };
 
     struct error_logging_adapter : logging_adapter<error_logging_adapter> {
         using logging_adapter<error_logging_adapter>::logging_adapter;
-        static logging::level get_logging_level(websocketpp::log::level channel) {
-            return logging::level::error;
-        }
+        static logging::level get_logging_level(websocketpp::log::level channel);
     };
 
     using wsconfig_base = websocketpp::config::asio;

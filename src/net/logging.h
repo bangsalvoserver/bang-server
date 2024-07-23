@@ -10,6 +10,7 @@ namespace logging {
 
     enum class level {
         all,
+        trace,
         debug,
         info,
         status,
@@ -37,7 +38,7 @@ namespace logging {
             : local_level{local_level}
             , out{enums::indexof(local_level) >= enums::indexof(level::warning) ? std::cerr : std::cout}
         {
-            if (local_level == level::off) {
+            if (local_level == level::off || local_level == level::all) {
                 throw std::runtime_error("Invalid logging level");
             }
         }
@@ -56,6 +57,7 @@ namespace logging {
         void do_log(const std::string &message) const;
     };
 
+    constexpr auto trace = log_function(level::trace);
     constexpr auto debug = log_function(level::debug);
     constexpr auto info = log_function(level::info);
     constexpr auto status = log_function(level::status);
