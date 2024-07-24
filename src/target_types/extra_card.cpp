@@ -7,7 +7,7 @@ namespace banggame {
     using visit_card = play_visitor<"extra_card">;
 
     template<> bool visit_card::possible(const effect_context &ctx) {
-        return ctx.repeat_card || contains_at_least(make_card_target_set(origin, origin_card, effect, ctx), 1);
+        return ctx.repeat_card || !rn::empty(make_card_target_set(origin, origin_card, effect, ctx));
     }
 
     template<> card *visit_card::random_target(const effect_context &ctx) {

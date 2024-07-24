@@ -9,7 +9,7 @@ namespace banggame {
     }
 
     template<> player *visit_player::random_target(const effect_context &ctx) {
-        auto targets = make_player_target_set(origin, origin_card, effect, ctx) | rn::to_vector;
+        auto targets = make_player_target_set(origin, origin_card, effect, ctx);
         if (targets.empty()) {
             return nullptr;
         } else {
@@ -20,7 +20,7 @@ namespace banggame {
     template<> game_string visit_player::get_error(const effect_context &ctx, player *target) {
         if (target) {
             return defer<"player">().get_error(ctx, target);
-        } else if (contains_at_least(make_player_target_set(origin, origin_card, effect), 1)) {
+        } else if (!rn::empty(make_player_target_set(origin, origin_card, effect))) {
             return "ERROR_TARGET_SET_NOT_EMPTY";
         } else {
             return {};

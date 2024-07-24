@@ -33,6 +33,12 @@ namespace banggame {
         std::vector<card *> m_characters;
         std::vector<card *> m_backup_character;
 
+        rn::concat_view<
+            rn::ref_view<std::vector<card *>>,
+            rn::ref_view<std::vector<card *>>,
+            rn::ref_view<std::vector<card *>>
+        > m_targetable_cards_view;
+
         player_role m_role;
 
         int8_t m_hp = 0;
@@ -47,7 +53,8 @@ namespace banggame {
         int8_t m_gold = 0;
 
         player(game *game, int id, int user_id)
-            : m_game(game), id(id), user_id(user_id) {}
+            : m_game(game), id(id), user_id(user_id)
+            , m_targetable_cards_view(rv::concat(m_hand, m_table, m_characters)) {}
 
         void equip_card(card *card);
         card *find_equipped_card(card *card);

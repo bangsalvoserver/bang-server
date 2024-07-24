@@ -108,7 +108,7 @@ namespace banggame {
     void effect_josh_mccloud::on_play(card *origin_card, player *target) {
         card *target_card = target->m_game->draw_shop_card();
         if (target_card->is_black()) {
-            if (!contains_at_least(make_equip_set(target, target_card), 1)) {
+            if (rn::empty(make_equip_set(target, target_card))) {
                 target_card->add_short_pause();
                 target_card->move_to(pocket_type::shop_discard);
             } else if (target_card->self_equippable()) {

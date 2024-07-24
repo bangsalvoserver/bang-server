@@ -20,11 +20,11 @@ namespace banggame {
     }
 
     template<> bool visit_players::possible(const effect_context &ctx) {
-        return contains_at_least(make_adjacent_players_target_set(origin, origin_card, effect, ctx), 1);
+        return !rn::empty(make_adjacent_players_target_set(origin, origin_card, effect, ctx));
     }
 
     template<> serial::player_list visit_players::random_target(const effect_context &ctx) {
-        auto targets = make_adjacent_players_target_set(origin, origin_card, effect, ctx) | rn::to_vector;
+        auto targets = make_adjacent_players_target_set(origin, origin_card, effect, ctx);
         auto [target1, target2] = random_element(targets, origin->m_game->bot_rng);
         return {target1, target2};
     }

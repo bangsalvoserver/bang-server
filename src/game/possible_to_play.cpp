@@ -24,30 +24,28 @@ namespace banggame {
 
     static auto get_all_targetable_cards(player *origin) {
         return rv::concat(
-            origin->m_game->m_players | rv::for_each([](const player *p) {
-                return rv::concat(p->m_hand, p->m_table, p->m_characters);
-            }),
+            origin->m_game->m_players | rv::for_each(&player::m_targetable_cards_view),
             origin->m_game->m_selection,
             origin->m_game->m_deck | rv::take(1),
             origin->m_game->m_discards | rv::take(1)
         );
     }
 
-    rn::any_view<card *> get_all_playable_cards(player *origin, bool is_response) {
+    any_forward_view<card *> get_all_playable_cards(player *origin, bool is_response) {
         return get_all_active_cards(origin)
             | rv::filter([=](card *origin_card) {
                 return is_possible_to_play(origin, origin_card, is_response);
             });
     }
 
-    rn::any_view<player *> make_equip_set(player *origin, card *origin_card, const effect_context &ctx) {
+    any_forward_view<player *> make_equip_set(player *origin, card *origin_card, const effect_context &ctx) {
         return origin->m_game->m_players
             | rv::filter([=](player *target) {
                 return !get_equip_error(origin, origin_card, target, ctx);
             });
     }
 
-    rn::any_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
+    any_forward_view<player *> make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
         return origin->m_game->m_players
             | rv::filter([=](player *target) {
                 return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
@@ -55,7 +53,7 @@ namespace banggame {
             });
     }
 
-    rn::any_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
+    any_forward_view<card *> make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx) {
         return get_all_targetable_cards(origin)
             | rv::filter([=](card *target_card) {
                 return (!target_card->owner || !filters::check_player_filter(origin, holder.player_filter, target_card->owner, ctx))
@@ -64,7 +62,7 @@ namespace banggame {
             });
     }
 
-    rn::any_view<player *> get_request_target_set_players(player *origin) {
+    any_forward_view<player *> get_request_target_set_players(player *origin) {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_target_set_players>(origin)) {
                 return origin->m_game->m_players
@@ -76,7 +74,7 @@ namespace banggame {
         return rv::empty<player *>;
     }
 
-    rn::any_view<card *> get_request_target_set_cards(player *origin) {
+    any_forward_view<card *> get_request_target_set_cards(player *origin) {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_target_set_cards>(origin)) {
                 return get_all_targetable_cards(origin)
@@ -118,7 +116,7 @@ namespace banggame {
         }
     }
 
-    static rn::any_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
+    static any_forward_view<card *> cards_playable_with_modifiers(player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx) {
         auto filter = rv::filter([=](card *origin_card) {
             return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
         });
@@ -144,7 +142,7 @@ namespace banggame {
         }
 
         if (filters::is_equip_card(origin_card)) {
-            if (is_response || !contains_at_least(make_equip_set(origin, origin_card, ctx), 1)) {
+            if (is_response || rn::empty(make_equip_set(origin, origin_card, ctx))) {
                 return false;
             }
         } else {
@@ -169,7 +167,7 @@ namespace banggame {
                 auto ctx_copy = ctx;
                 modifier.add_context(origin_card, origin, ctx_copy);
                 
-                return contains_at_least(cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy), 1);
+                return !rn::empty(cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy));
             }
         }
         
