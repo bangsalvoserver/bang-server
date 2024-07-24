@@ -22,9 +22,12 @@ namespace banggame {
         return nullptr;
     }
 
-    template<typename Rng>
-    inline bool contains_at_least(Rng &&range, int size) {
-        return rn::distance(rn::take_view(FWD(range), size)) == size;
+    template<rn::range Rng>
+    bool contains_at_least(Rng &&range, int size) {
+        for (const auto &value : range) {
+            if (--size == 0) return true;
+        }
+        return false;
     }
 
     struct random_element_error : std::runtime_error {
