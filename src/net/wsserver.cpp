@@ -4,7 +4,7 @@
 
 namespace net {
 
-logging::level access_logging_adapter::get_logging_level(websocketpp::log::level channel) {
+logging::level get_access_logging_level(websocketpp::log::level channel) {
     using alevel = websocketpp::log::alevel;
     switch (channel) {
     case alevel::message_header:
@@ -28,7 +28,7 @@ logging::level access_logging_adapter::get_logging_level(websocketpp::log::level
     }
 }
 
-logging::level error_logging_adapter::get_logging_level(websocketpp::log::level channel) {
+logging::level get_error_logging_level(websocketpp::log::level channel) {
     using elevel = websocketpp::log::elevel;
     switch (channel) {
     case elevel::devel:

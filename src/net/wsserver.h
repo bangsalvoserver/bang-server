@@ -12,49 +12,27 @@
 
 namespace net {
 
-    template<typename Derived>
+    using log_level_fn_ptr = logging::level (*)(websocketpp::log::level);
+
+    template<log_level_fn_ptr LogLevelFunction>
     struct logging_adapter {
-        const websocketpp::log::level m_static_channels;
-        websocketpp::log::level m_dynamic_channels;
-
-        logging_adapter(websocketpp::log::level channels, websocketpp::log::channel_type_hint::value)
-            : m_static_channels(channels)
-            , m_dynamic_channels(0) {}
+        logging_adapter(websocketpp::log::level, websocketpp::log::channel_type_hint::value) {}
             
-        void set_channels(websocketpp::log::level channels) {
-            if (channels == 0) {
-                m_dynamic_channels = 0;
-            } else {
-                m_dynamic_channels |= (channels & m_static_channels);
-            }
-        }
-
-        void clear_channels(websocketpp::log::level channels) {
-            m_dynamic_channels &= ~channels;
-        }
-
-        constexpr bool static_test(websocketpp::log::level channel) const {
-            return ((channel & m_static_channels) != 0);
-        }
-
-        bool dynamic_test(websocketpp::log::level channel) {
-            return ((channel & m_dynamic_channels) != 0);
-        }
+        void set_channels(websocketpp::log::level) {}
+        void clear_channels(websocketpp::log::level) {}
+        constexpr bool static_test(websocketpp::log::level) const { return true; }
+        bool dynamic_test(websocketpp::log::level) { return true; }
         
-        void write(websocketpp::log::level channel, const std::string &msg) {
-            logging::log_function(Derived::get_logging_level(channel))("{}", msg);
+        void write(websocketpp::log::level channel, std::string_view msg) {
+            logging::log_function(LogLevelFunction(channel))(msg);
         }
     };
 
-    struct access_logging_adapter : logging_adapter<access_logging_adapter> {
-        using logging_adapter<access_logging_adapter>::logging_adapter;
-        static logging::level get_logging_level(websocketpp::log::level channel);
-    };
+    logging::level get_access_logging_level(websocketpp::log::level channel);
+    using access_logging_adapter = logging_adapter<get_access_logging_level>;
 
-    struct error_logging_adapter : logging_adapter<error_logging_adapter> {
-        using logging_adapter<error_logging_adapter>::logging_adapter;
-        static logging::level get_logging_level(websocketpp::log::level channel);
-    };
+    logging::level get_error_logging_level(websocketpp::log::level channel);
+    using error_logging_adapter = logging_adapter<get_error_logging_level>;
 
     using wsconfig_base = websocketpp::config::asio;
     struct wsconfig : wsconfig_base {

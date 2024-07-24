@@ -45,16 +45,14 @@ namespace logging {
 
         template<typename ... Ts>
         void operator()(std::format_string<Ts ...> fmt, Ts && ... args) const {
-            if (enums::indexof(global_level) <= enums::indexof(local_level)) {
-                do_log(std::format(fmt, std::forward<Ts>(args) ...));
-            }
+            (*this)(std::format(fmt, std::forward<Ts>(args) ...));
         }
+
+        void operator()(std::string_view message) const;
 
     private:
         level local_level;
         std::ostream &out;
-
-        void do_log(const std::string &message) const;
     };
 
     constexpr auto trace = log_function(level::trace);
