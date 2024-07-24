@@ -36,7 +36,6 @@ logging::level get_error_logging_level(websocketpp::log::level channel) {
     case elevel::library:
         return logging::level::debug;
     case elevel::info:
-        return logging::level::info;
     case elevel::warn:
         return logging::level::warning;
     default:
