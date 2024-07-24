@@ -38,8 +38,33 @@ namespace banggame {
                 return other.priority <=> priority;
             }
         }
-    }; 
+    };
 
+}
+
+namespace std {
+    template<> struct formatter<banggame::card *> {
+        constexpr auto parse(std::format_parse_context &ctx) {
+            return ctx.begin();
+        }
+
+        auto format(banggame::card *target_card, std::format_context &ctx) const {
+            return std::format_to(ctx.out(), "{}", target_card
+                ? std::string_view(target_card->name)
+                : std::string_view("(unknown card)")
+            );
+        }
+    };
+
+    template<> struct formatter<banggame::event_card_key> {
+        constexpr auto parse(std::format_parse_context &ctx) {
+            return ctx.begin();
+        }
+
+        auto format(const banggame::event_card_key &key, std::format_context &ctx) const {
+            return std::format_to(ctx.out(), "{: >5} - {}", key.priority, key.target_card);
+        }
+    };
 }
 
 #endif

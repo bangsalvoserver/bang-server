@@ -37,6 +37,7 @@ namespace banggame {
         std::type_index type;
         event_card_key key;
         event_listener_fun fun;
+        std::type_index fun_type;
         
         mutable bool active = true;
 
@@ -72,7 +73,7 @@ namespace banggame {
         int m_lock = 0;
 
     private:
-        iterator_map_iterator do_add_listener(std::type_index type, event_card_key key, event_listener_fun &&fun);
+        iterator_map_iterator do_add_listener(std::type_index type, event_card_key key, event_listener_fun &&fun, std::type_index fun_type);
         void do_remove_listeners(iterator_map_range range);
         void do_call_event(std::type_index type, const void *tuple);
 
@@ -81,7 +82,7 @@ namespace banggame {
         iterator_map_iterator add_listener(event_card_key key, Function &&fun) {
             return do_add_listener(typeid(T), key, [fun=std::move(fun)](const void *tuple) mutable {
                 std::apply(fun, *static_cast<const event_tuple<T> *>(tuple));
-            });
+            }, typeid(Function));
         }
 
         void remove_listener(iterator_map_iterator it) {

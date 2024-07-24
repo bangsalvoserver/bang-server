@@ -4,6 +4,9 @@
 
 #include "cards/card_effect.h"
 
+#include "net/logging.h"
+#include "utils/type_name.h"
+
 namespace banggame {
 
     static auto disableable_cards(game_table *table) {
@@ -39,6 +42,7 @@ namespace banggame {
             }
         }
 
+        logging::debug("add_disabler() on {}: {}", key, utils::demangle(fun.target_type().name()));
         return m_disablers.emplace(key, std::move(fun));
     }
 
@@ -46,8 +50,8 @@ namespace banggame {
         for (auto [owner, c] : disableable_cards(m_game)) {
             bool a = false;
             bool b = false;
-            for (const auto &[t, fun] : m_disablers) {
-                if (rn::none_of(range, [&](const auto &pair) { return pair.first == t; })) {
+            for (const auto &[key, fun] : m_disablers) {
+                if (rn::none_of(range, [&](const auto &pair) { return pair.first == key; })) {
                     a = a || std::invoke(fun, c);
                 } else {
                     b = b || std::invoke(fun, c);
@@ -60,6 +64,10 @@ namespace banggame {
                     }
                 }
             }
+        }
+
+        for (const auto &[key, fun] : range) {
+            logging::debug("remove_disabler() on {}: {}", key, utils::demangle(fun.target_type().name()));
         }
 
         m_disablers.erase(range.begin(), range.end());
