@@ -88,7 +88,7 @@ namespace banggame {
         return rv::empty<card *>;
     }
 
-    static bool is_possible_mth(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, const target_list &targets) {
+    static bool is_possible_mth(player *origin, card *origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, target_list &targets) {
         if (targets.size() == mth.args.size()) {
             return !mth_holder{
                 mth.type,
@@ -96,20 +96,23 @@ namespace banggame {
             }.get_error(origin_card, origin, targets, ctx);
         }
         const auto &effect = effects.at(mth.args[targets.size()]);
-        switch (effect.target.index()) {
-        case TARGET_TYPE(player).index():
-            return rn::any_of(make_player_target_set(origin, origin_card, effect, ctx), [&](player *target) {
-                auto targets_copy = targets;
-                targets_copy.emplace_back(utils::tag<"player">{}, target);
-                return is_possible_mth(origin, origin_card, mth, effects, ctx, targets_copy);
-            });
-        case TARGET_TYPE(card).index():
-            return rn::any_of(make_card_target_set(origin, origin_card, effect, ctx), [&](card *target) {
-                auto targets_copy = targets;
-                targets_copy.emplace_back(utils::tag<"card">{}, target);
-                return is_possible_mth(origin, origin_card, mth, effects, ctx, targets_copy);
-            });
-        default:
+        if (effect.target == TARGET_TYPE(player)) {
+            for (player *target : make_player_target_set(origin, origin_card, effect, ctx)) {
+                targets.emplace_back(utils::tag<"player">{}, target);
+                bool result = is_possible_mth(origin, origin_card, mth, effects, ctx, targets);
+                targets.pop_back();
+                if (result) return true;
+            }
+            return false;
+        } else if (effect.target == TARGET_TYPE(card)) {
+            for (card *target : make_card_target_set(origin, origin_card, effect, ctx)) {
+                targets.emplace_back(utils::tag<"card">{}, target);
+                bool result = is_possible_mth(origin, origin_card, mth, effects, ctx, targets);
+                targets.pop_back();
+                if (result) return true;
+            }
+            return false;
+        } else {
             // ignore other target types
             return true;
         }
@@ -152,9 +155,12 @@ namespace banggame {
                 return false;
             }
 
-            const auto &mth = origin_card->get_mth(is_response);
-            if (mth && !is_possible_mth(origin, origin_card, mth, effects, ctx, {})) {
-                return false;
+            if (const auto &mth = origin_card->get_mth(is_response)) {
+                target_list targets;
+                targets.reserve(mth.args.size());
+                if (!is_possible_mth(origin, origin_card, mth, effects, {}, targets)) {
+                    return false;
+                }
             }
 
             if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
