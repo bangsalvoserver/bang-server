@@ -13,13 +13,13 @@ namespace banggame {
             | rv::for_each([](card *slot) {
                 return rv::repeat_n(slot, slot->num_cubes);
             })
-            | rn::to_vector;
+            | rn::to<serial::card_list>;
+        rn::shuffle(cubes, origin->m_game->bot_rng);
+        
         size_t num_players = rn::distance(make_player_target_set(origin, origin_card, effect, ctx));
         size_t max_count = std::min(cubes.size(), num_players - 1);
-        size_t num_repeats = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng);
-        return cubes
-            | rv::sample(num_repeats, origin->m_game->bot_rng)
-            | rn::to<serial::card_list>;
+        cubes.resize(std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng));
+        return cubes;
     }
 
     template<> game_string visit_cubes::get_error(const effect_context &ctx, const serial::card_list &target_cards) {

@@ -20,11 +20,15 @@ namespace banggame {
     }
 
     template<> serial::card_list visit_cards::random_target(const effect_context &ctx) {
-        auto targets = make_move_cube_target_set(origin, origin_card, ctx) | rn::to_vector;
-        size_t num_cubes = std::min<size_t>(origin->first_character()->num_cubes, effect.target_value);
-        return targets
-            | rv::sample(num_cubes, origin->m_game->bot_rng)
-            | rn::to<serial::card_list>;
+        auto targets = make_move_cube_target_set(origin, origin_card, ctx) | rn::to<serial::card_list>;
+        rn::shuffle(targets, origin->m_game->bot_rng);
+        
+        targets.resize(std::min({
+            static_cast<size_t>(origin->first_character()->num_cubes),
+            static_cast<size_t>(effect.target_value),
+            targets.size()
+        }));
+        return targets;
     }
 
     template<> game_string visit_cards::get_error(const effect_context &ctx, const serial::card_list &targets) {
