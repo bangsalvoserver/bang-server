@@ -400,29 +400,29 @@ namespace banggame {
         return {};
     }
 
+    static std::optional<timer_status_args> get_request_timer_status(request_timer *timer) {
+        if (timer) {
+            return timer_status_args{
+                .timer_id = timer->get_timer_id(),
+                .duration = std::chrono::duration_cast<game_duration>(timer->get_duration())
+            };
+        }
+        return std::nullopt;
+    }
+
     request_status_args game::make_request_update(player *owner) {
         auto req = top_request();
-        auto *timer = req->timer();
-        return request_status_args {
+        return request_status_args{
             .origin_card = req->origin_card,
             .origin = req->origin,
             .target = req->target,
             .status_text = req->status_text(owner),
-
             .respond_cards = generate_playable_cards_list(owner, true),
-
-            .highlight_cards = rn::to<serial::card_list>(req->get_highlights()),
-
+            .highlight_cards = req->get_highlights() | rn::to<serial::card_list>,
             .target_set_players = get_request_target_set_players(owner),
-
             .target_set_cards = get_request_target_set_cards(owner),
-
             .distances = make_player_distances(owner),
-
-            .timer = timer ? std::optional{timer_status_args{
-                .timer_id = timer->get_timer_id(),
-                .duration = std::chrono::duration_cast<game_duration>(timer->get_duration())
-            }} : std::optional<timer_status_args>{}
+            .timer = get_request_timer_status(req->timer())
         };
     }
 
