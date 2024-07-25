@@ -144,6 +144,8 @@ namespace banggame {
     }
 
     utils::generator<json::json> game::get_rejoin_updates(player *target) {
+        co_yield make_update<"player_add">(std::vector{to_player_user_pair(target)});
+
         if (!target->check_player_flags(player_flag::role_revealed)) {
             co_yield make_update<"player_show_role">(target, target->m_role, 0ms);
         }
