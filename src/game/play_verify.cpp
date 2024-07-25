@@ -7,6 +7,8 @@
 
 #include "filters.h"
 
+#include "game.h"
+
 #include <unordered_set>
 
 namespace banggame::play_dispatch {

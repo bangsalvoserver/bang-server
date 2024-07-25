@@ -30,7 +30,7 @@ namespace banggame {
     void request_picking::auto_pick() {
         card *only_card = get_single_element(get_all_playable_cards(target, true));
         if (only_card && only_card->has_tag(tag_type::pick)) {
-            if (card *target_card = get_single_element(get_request_target_set_cards(target))) {
+            if (card *target_card = get_single_element(get_request_target_set_cards(target->m_game, target))) {
                 on_pick(target_card);
             }
         }

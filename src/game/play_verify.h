@@ -1,9 +1,9 @@
 #ifndef __PLAY_VERIFY_H__
 #define __PLAY_VERIFY_H__
 
-#include "possible_to_play.h"
-
 #include "target_types/play_visitor.h"
+
+#include "game_update.h"
 
 namespace banggame {
 
