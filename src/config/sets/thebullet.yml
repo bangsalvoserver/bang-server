@@ -51,6 +51,7 @@ highnoon:
     tags:
       - card_choice(6)
       - preselect
+      - skip_logs
   - name: NEW_IDENTITY
     image: 05_nuovaidentita
     expansion: highnoon

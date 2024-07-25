@@ -37,21 +37,6 @@ namespace banggame {
         card *origin_card = target->m_game->top_request<request_handcuffs>()->origin_card;
         target->m_game->pop_request();
 
-        switch (suit) {
-        case card_suit::clubs:
-            target->m_game->add_log("LOG_DECLARED_CLUBS", target, origin_card);
-            break;
-        case card_suit::diamonds:
-            target->m_game->add_log("LOG_DECLARED_DIAMONDS", target, origin_card);
-            break;
-        case card_suit::hearts:
-            target->m_game->add_log("LOG_DECLARED_HEARTS", target, origin_card);
-            break;
-        case card_suit::spades:
-            target->m_game->add_log("LOG_DECLARED_SPADES", target, origin_card);
-            break;
-        }
-
         target->m_game->add_listener<event_type::check_play_card>({origin_card, 1},
             [origin_card, target, suit=suit](player *origin, card *c, const effect_context &ctx, game_string &out_error) {
                 if (c->pocket == pocket_type::player_hand && c->owner == target && c->sign.suit != suit) {

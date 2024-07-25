@@ -53,6 +53,7 @@ fistfulofcards:
     tags:
       - card_choice(5)
       - preselect
+      - skip_logs
   - name: RANCH
     image: 05_ranch
     equip:
