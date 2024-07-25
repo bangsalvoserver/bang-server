@@ -9,4 +9,4 @@
 	url = https://github.com/nlohmann/json
 [submodule "external/reflect"]
 	path = external/reflect
-	url = https://github.com/boost-ext/reflect
+	url = https://github.com/qlibs/reflect
