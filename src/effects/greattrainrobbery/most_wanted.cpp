@@ -14,9 +14,9 @@ namespace banggame {
         });
     }
 
-    struct request_most_wanted : request_picking {
+    struct request_most_wanted : request_resolvable {
         request_most_wanted(card *origin_card, player *origin, player *target, effect_flags flags = {})
-            : request_picking(origin_card, origin, target, flags) {}
+            : request_resolvable(origin_card, origin, target, flags) {}
 
         struct most_wanted_timer : request_timer {
             explicit most_wanted_timer(request_most_wanted *request)
@@ -36,7 +36,7 @@ namespace banggame {
             } else {
                 switch (target->can_escape(origin, origin_card, flags)) {
                 case 0:
-                    auto_pick();
+                    auto_resolve();
                     break;
                 case 2:
                     m_timer.reset();
@@ -44,15 +44,7 @@ namespace banggame {
             }
         }
 
-        bool can_pick(const card *target_card) const override {
-            if (target->m_game->m_deck.empty()) {
-                return target_card->pocket == pocket_type::discard_pile;
-            } else {
-                return target_card->pocket == pocket_type::main_deck;
-            }
-        }
-
-        void on_pick(card *target_card) override {
+        void on_resolve() override {
             origin->m_game->pop_request();
             resolve_most_wanted(origin_card, origin, target);
         }
