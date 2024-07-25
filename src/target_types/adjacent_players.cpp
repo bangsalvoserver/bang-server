@@ -20,7 +20,7 @@ namespace banggame {
     }
 
     template<> bool visit_players::possible(const effect_context &ctx) {
-        return !rn::empty(make_adjacent_players_target_set(origin, origin_card, effect, ctx));
+        return bool(make_adjacent_players_target_set(origin, origin_card, effect, ctx));
     }
 
     template<> serial::player_list visit_players::random_target(const effect_context &ctx) {

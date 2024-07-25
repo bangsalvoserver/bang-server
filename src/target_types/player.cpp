@@ -9,7 +9,7 @@ namespace banggame {
     using visit_player = play_visitor<"player">;
 
     template<> bool visit_player::possible(const effect_context &ctx) {
-        return !rn::empty(make_player_target_set(origin, origin_card, effect, ctx));
+        return bool(make_player_target_set(origin, origin_card, effect, ctx));
     }
 
     template<> player *visit_player::random_target(const effect_context &ctx) {

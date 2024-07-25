@@ -26,9 +26,8 @@ namespace banggame {
         }
 
         void on_update() override {
-            auto target_set = target->m_game->m_players
-                | rv::filter([&](const player *p) { return in_target_set(p); });
-            if (num_cards == 0 || rn::empty(target_set)) {
+            auto target_set = get_request_target_set_players(origin);
+            if (num_cards == 0 || target_set.empty()) {
                 target->m_game->pop_request();
             } else if (player *target_player = get_single_element(target_set)) {
                 on_pick_player(target_player);

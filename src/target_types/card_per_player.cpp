@@ -35,7 +35,7 @@ namespace banggame {
         if (!rn::all_of(origin->m_game->m_players, [&](player *p) {
             size_t found = rn::count(target_cards, p, &card::owner);
             if (p == ctx.skipped_player || filters::check_player_filter(origin, effect.player_filter, p, ctx)) return found == 0;
-            if (rn::empty(cards_target_set(origin, origin_card, effect.card_filter, p, ctx))) return found == 0;
+            if (cards_target_set(origin, origin_card, effect.card_filter, p, ctx).empty()) return found == 0;
             return found == 1;
         })) {
             return "ERROR_INVALID_TARGETS";

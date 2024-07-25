@@ -20,7 +20,7 @@ namespace banggame {
     template<> game_string visit_player::get_error(const effect_context &ctx, player *target) {
         if (target) {
             return defer<"player">().get_error(ctx, target);
-        } else if (!rn::empty(make_player_target_set(origin, origin_card, effect))) {
+        } else if (bool(make_player_target_set(origin, origin_card, effect))) {
             return "ERROR_TARGET_SET_NOT_EMPTY";
         } else {
             return {};

@@ -9,12 +9,11 @@ namespace banggame {
     using visit_card = play_visitor<"card">;
 
     template<> bool visit_card::possible(const effect_context &ctx) {
-        return !rn::empty(make_card_target_set(origin, origin_card, effect, ctx));
+        return bool(make_card_target_set(origin, origin_card, effect, ctx));
     }
 
     template<> card *visit_card::random_target(const effect_context &ctx) {
-        auto targets = make_card_target_set(origin, origin_card, effect, ctx);
-        return random_element(targets, origin->m_game->bot_rng);
+        return random_element(make_card_target_set(origin, origin_card, effect, ctx), origin->m_game->bot_rng);
     }
 
     template<> game_string visit_card::get_error(const effect_context &ctx, card *target) {

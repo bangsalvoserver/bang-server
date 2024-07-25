@@ -11,10 +11,8 @@ namespace banggame {
     }
 
     template<> serial::player_list visit_players::random_target(const effect_context &ctx) {
-        int num_cubes = ctx.selected_cubes.count(origin_card);
-        auto targets = make_player_target_set(origin, origin_card, effect, ctx);
-        return targets
-            | rv::sample(num_cubes + 1)
+        return make_player_target_set(origin, origin_card, effect, ctx)
+            | rv::sample(ctx.selected_cubes.count(origin_card) + 1)
             | rn::to<serial::player_list>;
     }
 

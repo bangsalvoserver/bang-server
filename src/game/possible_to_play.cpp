@@ -142,7 +142,7 @@ namespace banggame {
         }
 
         if (filters::is_equip_card(origin_card)) {
-            if (is_response || rn::empty(make_equip_set(origin, origin_card, ctx))) {
+            if (is_response || make_equip_set(origin, origin_card, ctx).empty()) {
                 return false;
             }
         } else {
@@ -167,7 +167,7 @@ namespace banggame {
                 auto ctx_copy = ctx;
                 modifier.add_context(origin_card, origin, ctx_copy);
                 
-                return !rn::empty(cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy));
+                return bool(cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy));
             }
         }
         
