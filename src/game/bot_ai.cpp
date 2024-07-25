@@ -25,7 +25,7 @@ namespace banggame {
         if (filters::is_equip_card(args.card)) {
             if (!args.card->self_equippable()) {
                 ret.targets.emplace_back(utils::tag<"player">{},
-                    random_element(make_equip_set(origin, args.card, ctx), origin->m_game->bot_rng));
+                    random_element(get_all_equip_targets(origin, args.card, ctx), origin->m_game->bot_rng));
             }
         } else {
             for (const effect_holder &holder : args.card->get_effect_list(is_response)) {

@@ -7,11 +7,11 @@ namespace banggame {
     using visit_cards = play_visitor<"cards">;
 
     template<> bool visit_cards::possible(const effect_context &ctx) {
-        return contains_at_least(make_card_target_set(origin, origin_card, effect, ctx), std::max<int>(1, effect.target_value));
+        return contains_at_least(get_all_card_targets(origin, origin_card, effect, ctx), std::max<int>(1, effect.target_value));
     }
 
     template<> serial::card_list visit_cards::random_target(const effect_context &ctx) {
-        return make_card_target_set(origin, origin_card, effect, ctx)
+        return get_all_card_targets(origin, origin_card, effect, ctx)
             | rv::sample(effect.target_value, origin->m_game->bot_rng)
             | rn::to<serial::card_list>;
     }

@@ -16,7 +16,7 @@ namespace banggame {
             | rn::to<serial::card_list>;
         rn::shuffle(cubes, origin->m_game->bot_rng);
         
-        size_t num_players = rn::distance(make_player_target_set(origin, origin_card, effect, ctx));
+        size_t num_players = rn::distance(get_all_player_targets(origin, origin_card, effect, ctx));
         size_t max_count = std::min(cubes.size(), num_players - 1);
         cubes.resize(std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng));
         return cubes;

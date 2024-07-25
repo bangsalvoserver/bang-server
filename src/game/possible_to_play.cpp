@@ -11,7 +11,7 @@ namespace banggame {
         }
         const auto &effect = effects.at(mth.args[targets.size()]);
         if (effect.target == TARGET_TYPE(player)) {
-            for (player *target : make_player_target_set(origin, origin_card, effect, ctx)) {
+            for (player *target : get_all_player_targets(origin, origin_card, effect, ctx)) {
                 targets.emplace_back(utils::tag<"player">{}, target);
                 bool result = is_possible_mth(origin, origin_card, mth, effects, ctx, targets);
                 targets.pop_back();
@@ -19,7 +19,7 @@ namespace banggame {
             }
             return false;
         } else if (effect.target == TARGET_TYPE(card)) {
-            for (card *target : make_card_target_set(origin, origin_card, effect, ctx)) {
+            for (card *target : get_all_card_targets(origin, origin_card, effect, ctx)) {
                 targets.emplace_back(utils::tag<"card">{}, target);
                 bool result = is_possible_mth(origin, origin_card, mth, effects, ctx, targets);
                 targets.pop_back();
@@ -64,7 +64,7 @@ namespace banggame {
         }
 
         if (filters::is_equip_card(origin_card)) {
-            if (is_response || make_equip_set(origin, origin_card, ctx).empty()) {
+            if (is_response || get_all_equip_targets(origin, origin_card, ctx).empty()) {
                 return false;
             }
         } else {

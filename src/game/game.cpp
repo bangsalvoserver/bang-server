@@ -377,6 +377,28 @@ namespace banggame {
             .weapon_range = owner->get_weapon_range()
         };
     }
+    
+    static serial::player_list get_request_target_set_players(player *origin) {
+        if (origin) {
+            if (auto req = origin->m_game->top_request<interface_target_set_players>(origin)) {
+                return origin->m_game->m_players
+                    | rv::filter(std::bind_front(&interface_target_set_players::in_target_set, req))
+                    | rn::to<serial::player_list>;
+            }
+        }
+        return {};
+    }
+
+    static serial::card_list get_request_target_set_cards(player *origin) {
+        if (origin) {
+            if (auto req = origin->m_game->top_request<interface_target_set_cards>(origin)) {
+                return get_all_targetable_cards(origin)
+                    | rv::filter(std::bind_front(&interface_target_set_cards::in_target_set, req))
+                    | rn::to<serial::card_list>;
+            }
+        }
+        return {};
+    }
 
     request_status_args game::make_request_update(player *owner) {
         auto req = top_request();
@@ -391,9 +413,9 @@ namespace banggame {
 
             .highlight_cards = rn::to<serial::card_list>(req->get_highlights()),
 
-            .target_set_players = rn::to<serial::player_list>(get_request_target_set_players(this, owner)),
+            .target_set_players = get_request_target_set_players(owner),
 
-            .target_set_cards = rn::to<serial::card_list>(get_request_target_set_cards(this, owner)),
+            .target_set_cards = get_request_target_set_cards(owner),
 
             .distances = make_player_distances(owner),
 

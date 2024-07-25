@@ -29,12 +29,12 @@ namespace banggame {
         );
     }
 
-    inline auto get_all_targetable_cards(game *m_game) {
+    inline auto get_all_targetable_cards(player *origin) {
         return rv::concat(
-            m_game->m_players | rv::for_each(&player::m_targetable_cards_view),
-            m_game->m_selection,
-            m_game->m_deck | rv::take(1),
-            m_game->m_discards | rv::take(1)
+            origin->m_game->m_players | rv::for_each(&player::m_targetable_cards_view),
+            origin->m_game->m_selection,
+            origin->m_game->m_deck | rv::take(1),
+            origin->m_game->m_discards | rv::take(1)
         );
     }
 
@@ -44,46 +44,24 @@ namespace banggame {
         });
     }
 
-    inline auto make_equip_set(player *origin, card *origin_card, const effect_context &ctx = {}) {
+    inline auto get_all_equip_targets(player *origin, card *origin_card, const effect_context &ctx = {}) {
         return rv::filter(origin->m_game->m_players, [=](player *target) {
             return !get_equip_error(origin, origin_card, target, ctx);
         });
     }
 
-    inline auto make_player_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {}) {
+    inline auto get_all_player_targets(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {}) {
         return rv::filter(origin->m_game->m_players, [=](player *target) {
             return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
                 && !holder.get_error(origin_card, origin, target, ctx);
         });
     }
 
-    inline auto make_card_target_set(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {}) {
-        return rv::filter(get_all_targetable_cards(origin->m_game), [=](card *target_card) {
+    inline auto get_all_card_targets(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {}) {
+        return rv::filter(get_all_targetable_cards(origin), [=](card *target_card) {
             return (!target_card->owner || !filters::check_player_filter(origin, holder.player_filter, target_card->owner, ctx))
                 && !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
                 && !holder.get_error(origin_card, origin, target_card, ctx);
-        });
-    }
-
-    inline auto get_request_target_set_players(game *m_game, player *origin) {
-        return rv::filter(m_game->m_players, [=](const player *target_player) {
-            if (origin) {
-                if (auto req = m_game->top_request<interface_target_set_players>(origin)) {
-                    return req->in_target_set(target_player);
-                }
-            }
-            return false;
-        });
-    }
-
-    inline auto get_request_target_set_cards(game *m_game, player *origin) {
-        return rv::filter(get_all_targetable_cards(m_game), [=](const card *target_card) {
-            if (origin) {
-                if (auto req = m_game->top_request<interface_target_set_cards>(origin)) {
-                    return req->in_target_set(target_card);
-                }
-            }
-            return false;
         });
     }
 }
