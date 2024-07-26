@@ -76,7 +76,7 @@ private:
     void handle_message(utils::tag<"lobby_chat">,     game_user &user, const lobby_chat_client_args &value);
     void handle_message(utils::tag<"lobby_return">,   game_user &user);
     void handle_message(utils::tag<"game_start">,     game_user &user);
-    void handle_message(utils::tag<"game_rejoin">,    game_user &user, int player_id);
+    void handle_message(utils::tag<"game_rejoin">,    game_user &user, const game_rejoin_args &value);
     void handle_message(utils::tag<"game_action">,    game_user &user, const json::json &value);
 
     void handle_chat_command(game_user &user, const std::string &command);

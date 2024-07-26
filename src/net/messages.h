@@ -32,6 +32,10 @@ namespace banggame {
         std::string message;
     };
 
+    struct game_rejoin_args {
+        int user_id;
+    };
+
     using client_message = utils::tagged_variant<
         utils::tag<"pong">,
         utils::tag<"connect", connect_args>,
@@ -43,7 +47,7 @@ namespace banggame {
         utils::tag<"lobby_chat", lobby_chat_client_args>,
         utils::tag<"lobby_return">,
         utils::tag<"game_start">,
-        utils::tag<"game_rejoin", int>,
+        utils::tag<"game_rejoin", game_rejoin_args>,
         utils::tag<"game_action", json::json>
     >;
 

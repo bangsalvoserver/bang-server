@@ -146,13 +146,9 @@ namespace banggame {
         return json::serialize<game_update, game_context>(update, *this);
     }
 
-    std::string game_net_manager::handle_game_action(int user_id, const json::json &value) {
-        player_ptr origin = find_player_by_userid(user_id);
-        if (!origin) {
-            return "ERROR_USER_NOT_CONTROLLING_PLAYER";
-        }
-        
-        auto result = verify_and_play(origin, json::deserialize<game_action, game_context>(value, *this));
+    void game_net_manager::handle_game_action(player_ptr origin, const json::json &value) {
+        auto action = json::deserialize<game_action, game_context>(value, *this);
+        auto result = verify_and_play(origin, action);
 
         switch (result.type) {
         case message_type::ok:
@@ -165,7 +161,5 @@ namespace banggame {
             add_update<"game_prompt">(update_target::includes_private(origin), result.message);
             break;
         }
-        
-        return {};
     }
 }

@@ -109,7 +109,7 @@ namespace banggame {
             return update;
         }
 
-        std::string handle_game_action(int user_id, const json::json &value);
+        void handle_game_action(player_ptr origin, const json::json &value);
 
     public:
         template<utils::fixed_string E> requires game_update_type<E>

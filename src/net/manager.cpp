@@ -476,7 +476,7 @@ void game_manager::handle_message(utils::tag<"game_start">, game_user &user) {
     lobby.m_game->commit_updates();
 }
 
-void game_manager::handle_message(utils::tag<"game_rejoin">, game_user &user, int player_id) {
+void game_manager::handle_message(utils::tag<"game_rejoin">, game_user &user, const game_rejoin_args &value) {
     auto &lobby = *user.in_lobby;
 
     if (lobby.state != lobby_state::playing) {
@@ -488,14 +488,16 @@ void game_manager::handle_message(utils::tag<"game_rejoin">, game_user &user, in
         throw lobby_error("ERROR_USER_NOT_SPECTATOR");
     }
 
-    player_ptr target = lobby.m_game->find_player(player_id);
+    if (rn::contains(lobby.users, value.user_id, &lobby_user::user_id)) {
+        throw lobby_error("ERROR_PLAYER_NOT_REJOINABLE");
+    }
+
+    player_ptr target = lobby.m_game->find_player_by_userid(value.user_id);
+    if (!target) {
+        throw lobby_error("ERROR_CANNOT_FIND_PLAYER");
+    }
     if (target->is_bot()) {
         throw lobby_error("ERROR_CANNOT_REJOIN_ON_BOT");
-    }
-    for (const auto &[team, user_id, user]: lobby.users) {
-        if (user_id == target->user_id) {
-            throw lobby_error("ERROR_PLAYER_NOT_REJOINABLE");
-        }
     }
 
     user_team = lobby_team::game_player;
@@ -525,8 +527,10 @@ void game_manager::handle_message(utils::tag<"game_action">, game_user &user, co
         throw lobby_error("ERROR_GAME_STATE_WAITING");
     }
 
-    auto err = lobby.m_game->handle_game_action(lobby.get_user_id(user), value);
-    if (!err.empty()) {
-        throw lobby_error(err);
+    player_ptr origin = lobby.m_game->find_player_by_userid(lobby.get_user_id(user));
+    if (!origin) {
+        throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");
     }
+
+    lobby.m_game->handle_game_action(origin, value);
 }
