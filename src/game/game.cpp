@@ -20,10 +20,6 @@ namespace banggame {
         : game_table(seed)
         , request_queue(this) {}
 
-    player_user_pair to_player_user_pair(const_player_ptr p) {
-        return player_user_pair{p->id, p->user_id};
-    }
-
     player_order_update game::make_player_order_update(bool instant) {
         return player_order_update{m_players
             | rv::filter([](player_ptr p) {
@@ -50,7 +46,7 @@ namespace banggame {
     }
 
     utils::generator<json::json> game::get_spectator_join_updates() {
-        co_yield make_update<"player_add">(to_player_user_pair_vector(m_players));
+        co_yield make_update<"player_add">(m_players);
 
         for (player_ptr p : m_players) {
             co_yield make_update<"player_flags">(p, p->m_player_flags);
@@ -61,7 +57,7 @@ namespace banggame {
         auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) -> utils::generator<json::json> {
             auto &range = get_pocket(pocket, owner);
             if (!range.empty()) {
-                co_yield make_update<"add_cards">(to_card_backface_vector(range), pocket, owner);
+                co_yield make_update<"add_cards">(range, pocket, owner);
             }
             for (card_ptr c : range) {
                 if (c->visibility == card_visibility::shown) {
@@ -144,7 +140,7 @@ namespace banggame {
     }
 
     utils::generator<json::json> game::get_rejoin_updates(player_ptr target) {
-        co_yield make_update<"player_add">(std::vector{to_player_user_pair(target)});
+        co_yield make_update<"player_add">(target);
 
         if (!target->check_player_flags(player_flag::role_revealed)) {
             co_yield make_update<"player_show_role">(target, target->m_role, 0ms);
@@ -199,7 +195,7 @@ namespace banggame {
             }
         }
 
-        add_update<"player_add">(to_player_user_pair_vector(m_players));
+        add_update<"player_add">(m_players);
 
         bool ghost_card_added = false;
         
@@ -230,14 +226,14 @@ namespace banggame {
         };
 
         if (add_cards(all_cards.button_row, pocket_type::button_row)) {
-            add_update<"add_cards">(to_card_backface_vector(m_button_row), pocket_type::button_row);
+            add_update<"add_cards">(m_button_row, pocket_type::button_row);
             for (card_ptr c : m_button_row) {
                 c->set_visibility(card_visibility::shown, nullptr, true);
             }
         }
 
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
-            add_update<"add_cards">(to_card_backface_vector(m_hidden_deck), pocket_type::hidden_deck);
+            add_update<"add_cards">(m_hidden_deck, pocket_type::hidden_deck);
             for (card_ptr c : m_hidden_deck) {
                 c->set_visibility(card_visibility::shown, nullptr, true);
             }
@@ -245,17 +241,17 @@ namespace banggame {
 
         if (add_cards(all_cards.deck, pocket_type::main_deck)) {
             shuffle_cards_and_ids(m_deck);
-            add_update<"add_cards">(to_card_backface_vector(m_deck), pocket_type::main_deck);
+            add_update<"add_cards">(m_deck, pocket_type::main_deck);
         }
 
         if (add_cards(all_cards.goldrush, pocket_type::shop_deck)) {
             shuffle_cards_and_ids(m_shop_deck);
-            add_update<"add_cards">(to_card_backface_vector(m_shop_deck), pocket_type::shop_deck);
+            add_update<"add_cards">(m_shop_deck, pocket_type::shop_deck);
         }
 
         if (add_cards(all_cards.train, pocket_type::train_deck)) {
             shuffle_cards_and_ids(m_train_deck);
-            add_update<"add_cards">(to_card_backface_vector(m_train_deck), pocket_type::train_deck);
+            add_update<"add_cards">(m_train_deck, pocket_type::train_deck);
         }
         
         player_role roles[] = {
@@ -299,13 +295,13 @@ namespace banggame {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
             }
 
-            add_update<"add_cards">(to_card_backface_vector(m_scenario_deck), pocket_type::scenario_deck);
+            add_update<"add_cards">(m_scenario_deck, pocket_type::scenario_deck);
         }
 
         if (add_cards(all_cards.wildwestshow, pocket_type::wws_scenario_deck)) {
             shuffle_cards_and_ids(m_wws_scenario_deck);
             rn::partition(m_wws_scenario_deck, is_last_scenario_card);
-            add_update<"add_cards">(to_card_backface_vector(m_wws_scenario_deck), pocket_type::wws_scenario_deck);
+            add_update<"add_cards">(m_wws_scenario_deck, pocket_type::wws_scenario_deck);
         }
 
         add_cards(all_cards.stations, pocket_type::none);
@@ -328,7 +324,7 @@ namespace banggame {
                 c->pocket = pocket_type::player_hand;
                 c->owner = p;
             }
-            add_update<"add_cards">(to_card_backface_vector(p->m_hand), pocket_type::player_hand, p);
+            add_update<"add_cards">(p->m_hand, pocket_type::player_hand, p);
             if (m_options.character_choice) {
                 for (card_ptr c : p->m_hand) {
                     c->set_visibility(card_visibility::shown, p, true);

@@ -14,7 +14,7 @@ namespace banggame {
             | rv::sample(std::max(int(origin->m_game->m_players.size()), 4), origin->m_game->rng)
             | rn::to_vector;
             
-        origin->m_game->add_update<"add_cards">(to_card_backface_vector(origin->m_game->m_stations), pocket_type::stations);
+        origin->m_game->add_update<"add_cards">(origin->m_game->m_stations, pocket_type::stations);
         for (card_ptr c : origin->m_game->m_stations) {
             c->pocket = pocket_type::stations;
             c->set_visibility(card_visibility::shown, nullptr, true);
@@ -27,7 +27,7 @@ namespace banggame {
             | rv::sample(1, origin->m_game->rng)
             | rn::to_vector;
 
-        origin->m_game->add_update<"add_cards">(to_card_backface_vector(origin->m_game->m_train), pocket_type::train);
+        origin->m_game->add_update<"add_cards">(origin->m_game->m_train, pocket_type::train);
         for (card_ptr c : origin->m_game->m_train) {
             c->pocket = pocket_type::train;
             c->set_visibility(card_visibility::shown, nullptr, true);

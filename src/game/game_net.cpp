@@ -132,6 +132,32 @@ namespace json {
         }
     };
 
+    template<typename Context> struct serializer<banggame::card_backface_list, Context> {
+        struct card_backface {
+            int id;
+            banggame::card_deck_type deck;
+        };
+
+        json operator()(const banggame::card_backface_list &value, const Context &ctx) const {
+            return serialize_unchecked(value.cards | rv::transform([](banggame::const_card_ptr card) {
+                return card_backface{ card->id, card->deck };
+            }) | rn::to_vector, ctx);
+        }
+    };
+
+    template<typename Context> struct serializer<banggame::player_user_list, Context> {
+        struct player_user_pair {
+            int player_id;
+            int user_id;
+        };
+
+        json operator()(const banggame::player_user_list &value, const Context &ctx) const {
+            return serialize_unchecked(value.players | rv::transform([](banggame::const_player_ptr player) {
+                return player_user_pair{ player->id, player->user_id };
+            }) | rn::to_vector, ctx);
+        };
+    };
+
     template<typename Context> struct serializer<banggame::game_string, Context> {
         json operator()(const banggame::game_string &value, const Context &ctx) const {
             return {

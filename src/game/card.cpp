@@ -5,10 +5,6 @@
 
 namespace banggame {
 
-    card_backface to_card_backface(const_card_ptr c) {
-        return card_backface{c->id, c->deck};
-    }
-
     void card::set_visibility(card_visibility new_visibility, player_ptr new_owner, bool instant) {
         animation_duration duration = instant ? 0ms : durations.flip_card;
         if (new_visibility == card_visibility::hidden) {

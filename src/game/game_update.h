@@ -10,19 +10,16 @@
 
 namespace banggame {
 
-    struct card_backface {
-        int id;
-        card_deck_type deck;
+    struct card_backface_list {
+        card_list cards;
+
+        card_backface_list() = default;
+        card_backface_list(card_list cards): cards{std::move(cards)} {}
+        card_backface_list(card_ptr card): cards{card} {}
     };
 
-    card_backface to_card_backface(const_card_ptr origin_card);
-
-    inline std::vector<card_backface> to_card_backface_vector(auto &&range) {
-        return range | rv::transform(to_card_backface) | rn::to_vector;
-    }
-
     struct add_cards_update {
-        std::vector<card_backface> card_ids;
+        card_backface_list card_ids;
         pocket_type pocket;
         nullable_player player;
     };
@@ -88,19 +85,16 @@ namespace banggame {
         animation_duration duration = durations.short_pause;
     };
 
-    struct player_user_pair {
-        int player_id;
-        int user_id;
+    struct player_user_list {
+        player_list players;
+
+        player_user_list() = default;
+        player_user_list(player_list players): players{std::move(players)} {}
+        player_user_list(player_ptr player): players{player} {}
     };
 
-    player_user_pair to_player_user_pair(const_player_ptr p);
-
-    inline std::vector<player_user_pair> to_player_user_pair_vector(auto &&range) {
-        return range | rv::transform(to_player_user_pair) | rn::to_vector;
-    }
-
     struct player_add_update {
-        std::vector<player_user_pair> players;
+        player_user_list players;
     };
 
     struct player_order_update {
