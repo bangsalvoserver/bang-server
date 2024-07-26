@@ -141,7 +141,7 @@ namespace json {
         json operator()(const banggame::card_backface_list &value, const Context &ctx) const {
             return serialize_unchecked(value.cards | rv::transform([](banggame::const_card_ptr card) {
                 return card_backface{ card->id, card->deck };
-            }) | rn::to_vector, ctx);
+            }), ctx);
         }
     };
 
@@ -154,7 +154,7 @@ namespace json {
         json operator()(const banggame::player_user_list &value, const Context &ctx) const {
             return serialize_unchecked(value.players | rv::transform([](banggame::const_player_ptr player) {
                 return player_user_pair{ player->id, player->user_id };
-            }) | rn::to_vector, ctx);
+            }), ctx);
         };
     };
 

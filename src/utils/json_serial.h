@@ -3,11 +3,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include <format>
+#include <ranges>
 #include <vector>
-#include <string>
 #include <chrono>
-#include <map>
 
 namespace json {
 
@@ -113,12 +111,17 @@ namespace json {
         }
     };
 
-    template<typename T, typename Context> requires serializable<T, Context>
-    struct serializer<std::vector<T>, Context> {
-        json operator()(const std::vector<T> &value, const Context &ctx) const {
+    template<std::ranges::range Range, typename Context> requires (
+        !std::same_as<std::remove_cvref_t<Range>, json>
+        && serializable<std::ranges::range_value_t<Range>, Context>
+    )
+    struct serializer<Range, Context> {
+        json operator()(const Range &value, const Context &ctx) const {
             auto ret = json::array();
-            ret.get_ptr<json::array_t*>()->reserve(value.size());
-            for (const T &obj : value) {
+            if constexpr (std::ranges::sized_range<Range>) {
+                ret.get_ptr<json::array_t*>()->reserve(value.size());
+            }
+            for (const auto &obj : value) {
                 ret.push_back(serialize_unchecked(obj, ctx));
             }
             return ret;
