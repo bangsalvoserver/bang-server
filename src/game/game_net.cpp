@@ -28,7 +28,11 @@ namespace json {
             if (!value.is_number_integer()) {
                 throw deserialize_error("Cannot deserialize card: value is not an integer");
             }
-            return context.find_card(value.get<int>());
+            int card_id = value.get<int>();
+            if (banggame::card_ptr card = context.find_card(card_id)) {
+                return card;
+            }
+            throw deserialize_error(std::format("Cannot find card {}", card_id));
         }
     };
 
@@ -50,7 +54,11 @@ namespace json {
             if (!value.is_number_integer()) {
                 throw deserialize_error("Cannot deserialize player: value is not an integer");
             }
-            return context.find_player(value.get<int>());
+            int player_id = value.get<int>();
+            if (banggame::player_ptr player = context.find_player(player_id)) {
+                return player;
+            }
+            throw deserialize_error(std::format("Cannot find player {}", player_id));
         }
     };
 

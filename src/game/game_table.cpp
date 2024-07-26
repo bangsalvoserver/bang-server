@@ -26,14 +26,14 @@ namespace banggame {
         if (auto it = m_cards_storage.find(card_id); it != m_cards_storage.end()) {
             return &*it;
         }
-        throw game_error(std::format("Cannot find card {}", card_id));
+        return nullptr;
     }
 
     player_ptr game_table::find_player(int player_id) const {
         if (auto it = m_players_storage.find(player_id); it != m_players_storage.end()) {
             return &*it;
         }
-        throw game_error(std::format("Cannot find player {}", player_id));
+        return nullptr;
     }
     
     player_ptr game_table::find_player_by_userid(int user_id) const {
