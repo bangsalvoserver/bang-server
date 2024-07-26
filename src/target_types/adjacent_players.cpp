@@ -22,13 +22,13 @@ namespace banggame {
         return bool(make_adjacent_players_target_set(origin, origin_card, effect, ctx));
     }
 
-    template<> serial::player_list visit_players::random_target(const effect_context &ctx) {
+    template<> player_list visit_players::random_target(const effect_context &ctx) {
         auto targets = make_adjacent_players_target_set(origin, origin_card, effect, ctx);
         auto [target1, target2] = random_element(targets, origin->m_game->bot_rng);
         return {target1, target2};
     }
 
-    template<> game_string visit_players::get_error(const effect_context &ctx, const serial::player_list &targets) {
+    template<> game_string visit_players::get_error(const effect_context &ctx, const player_list &targets) {
         if (targets.size() != 2) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -45,7 +45,7 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_players::prompt(const effect_context &ctx, const serial::player_list &targets) {
+    template<> game_string visit_players::prompt(const effect_context &ctx, const player_list &targets) {
         game_string msg;
         for (player *target : targets) {
             msg = defer<"player">().prompt(ctx, target);
@@ -54,13 +54,13 @@ namespace banggame {
         return msg;
     }
 
-    template<> void visit_players::add_context(effect_context &ctx, const serial::player_list &targets) {
+    template<> void visit_players::add_context(effect_context &ctx, const player_list &targets) {
         for (player *target : targets) {
             defer<"player">().add_context(ctx, target);
         }
     }
 
-    template<> void visit_players::play(const effect_context &ctx, const serial::player_list &targets) {
+    template<> void visit_players::play(const effect_context &ctx, const player_list &targets) {
         effect_flags flags = effect_flag::multi_target;
         if (origin_card->is_brown()) {
             flags.add(effect_flag::escapable);

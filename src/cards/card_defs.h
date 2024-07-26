@@ -2,6 +2,7 @@
 #define __CARD_DEFS_H__
 
 #include "game_string.h"
+
 #include "utils/tagged_variant.h"
 #include "utils/enum_bitset.h"
 
@@ -94,21 +95,21 @@ namespace banggame {
 
     using play_card_target = utils::tagged_variant<
         utils::tag<"none">,
-        utils::tag<"player", serial::player>,
-        utils::tag<"conditional_player", serial::opt_player>,
-        utils::tag<"adjacent_players", serial::player_list>,
-        utils::tag<"player_per_cube", serial::player_list>,
-        utils::tag<"card", serial::card>,
-        utils::tag<"extra_card", serial::opt_card>,
+        utils::tag<"player", player_ptr>,
+        utils::tag<"conditional_player", nullable_player>,
+        utils::tag<"adjacent_players", player_list>,
+        utils::tag<"player_per_cube", player_list>,
+        utils::tag<"card", card_ptr>,
+        utils::tag<"extra_card", nullable_card>,
         utils::tag<"players">,
-        utils::tag<"cards", serial::card_list>,
-        utils::tag<"max_cards", serial::card_list>,
-        utils::tag<"card_per_player", serial::card_list>,
-        utils::tag<"move_cube_slot", serial::card_list>,
-        utils::tag<"select_cubes", serial::card_list>,
-        utils::tag<"select_cubes_optional", serial::card_list>,
-        utils::tag<"select_cubes_repeat", serial::card_list>,
-        utils::tag<"select_cubes_players", serial::card_list>,
+        utils::tag<"cards", card_list>,
+        utils::tag<"max_cards", card_list>,
+        utils::tag<"card_per_player", card_list>,
+        utils::tag<"move_cube_slot", card_list>,
+        utils::tag<"select_cubes", card_list>,
+        utils::tag<"select_cubes_optional", card_list>,
+        utils::tag<"select_cubes_repeat", card_list>,
+        utils::tag<"select_cubes_players", card_list>,
         utils::tag<"self_cubes">
     >;
 
@@ -174,7 +175,7 @@ namespace banggame {
 
     struct mth_holder {
         const mth_vtable *type;
-        serial::int_list args;
+        small_int_set args;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -250,19 +251,19 @@ namespace banggame {
     };
 
     struct effect_context_base {
-        card *playing_card;
-        card *repeat_card;
-        card *card_choice;
+        nullable_card playing_card;
+        nullable_card repeat_card;
+        nullable_card card_choice;
         int8_t train_advance;
         bool ignore_distances;
     };
 
     struct effect_context : effect_context_base {
-        std::vector<player *> selected_players;
-        std::vector<card *> selected_cards;
+        player_list selected_players;
+        card_list selected_cards;
         selected_cubes_count selected_cubes;
-        player *skipped_player;
-        card *traincost;
+        nullable_player skipped_player;
+        nullable_card traincost;
         int8_t locomotive_count;
         int8_t discount;
         bool disable_banglimit;

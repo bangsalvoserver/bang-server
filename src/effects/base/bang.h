@@ -74,7 +74,7 @@ namespace banggame {
         virtual void on_miss(card *c, effect_flags missed_flags = {}) = 0;
 
     private:
-        std::vector<card *> m_cards_used;
+        card_list m_cards_used;
     };
 
     struct request_bang : request_resolvable, missable_request {

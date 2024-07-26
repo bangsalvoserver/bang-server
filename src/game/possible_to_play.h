@@ -10,7 +10,7 @@
 
 namespace banggame {
     
-    bool is_possible_to_play(player *origin, card *origin_card, bool is_response = false, const std::vector<card *> &modifiers = {}, const effect_context &ctx = {});
+    bool is_possible_to_play(player *origin, card *origin_card, bool is_response = false, const card_list &modifiers = {}, const effect_context &ctx = {});
 
     playable_cards_list generate_playable_cards_list(player *origin, bool is_response = false);
     

@@ -3,6 +3,7 @@
 
 #include "utils/enum_bitset.h"
 #include "utils/small_int_set.h"
+#include "utils/nullable.h"
 #include "utils/misc.h"
 
 namespace banggame {
@@ -10,6 +11,15 @@ namespace banggame {
     struct game;
     struct card;
     struct player;
+
+    using card_ptr = card *;
+    using player_ptr = player *;
+
+    using card_list = std::vector<card_ptr>;
+    using player_list = std::vector<player_ptr>;
+
+    using nullable_card = utils::nullable<card_ptr>;
+    using nullable_player = utils::nullable<player_ptr>;
 
     struct effect_context;
     
@@ -31,19 +41,6 @@ namespace banggame {
     using game_flags = enums::bitset<game_flag>;
     using player_flags = enums::bitset<player_flag>;
 
-}
-
-namespace banggame::serial {
-
-    using opt_card = banggame::card *;
-    using card = not_null<opt_card>;
-    using opt_player = banggame::player *;
-    using player = not_null<opt_player>;
-    using int_list = small_int_set;
-    
-    using player_list = std::vector<player>;
-    using card_list = std::vector<card>;
-    
 }
 
 #endif

@@ -8,12 +8,12 @@ namespace banggame {
         return true;
     }
 
-    template<> serial::card_list visit_cubes::random_target(const effect_context &ctx) {
+    template<> card_list visit_cubes::random_target(const effect_context &ctx) {
         auto cubes = origin->cube_slots()
             | rv::for_each([](card *slot) {
                 return rv::repeat_n(slot, slot->num_cubes);
             })
-            | rn::to<serial::card_list>;
+            | rn::to_vector;
         rn::shuffle(cubes, origin->m_game->bot_rng);
         
         size_t num_players = rn::distance(get_all_player_targets(origin, origin_card, effect, ctx));
@@ -22,7 +22,7 @@ namespace banggame {
         return cubes;
     }
 
-    template<> game_string visit_cubes::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
+    template<> game_string visit_cubes::get_error(const effect_context &ctx, const card_list &target_cards) {
         for (card *c : target_cards) {
             if (c->owner != origin) {
                 return "ERROR_TARGET_NOT_SELF";
@@ -31,15 +31,15 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_cubes::prompt(const effect_context &ctx, const serial::card_list &target_cards) {
+    template<> game_string visit_cubes::prompt(const effect_context &ctx, const card_list &target_cards) {
         return defer<"select_cubes">().prompt(ctx, target_cards);
     }
 
-    template<> void visit_cubes::add_context(effect_context &ctx, const serial::card_list &target_cards) {
+    template<> void visit_cubes::add_context(effect_context &ctx, const card_list &target_cards) {
         defer<"select_cubes">().add_context(ctx, target_cards);
     }
 
-    template<> void visit_cubes::play(const effect_context &ctx, const serial::card_list &target_cards) {
+    template<> void visit_cubes::play(const effect_context &ctx, const card_list &target_cards) {
         defer<"select_cubes">().play(ctx, target_cards);
     }
 

@@ -40,7 +40,7 @@ namespace banggame {
 
         card *chosen_card;
 
-        std::vector<card *> get_highlights() const override {
+        card_list get_highlights() const override {
             return {target_card, chosen_card};
         }
 

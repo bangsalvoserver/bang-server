@@ -20,26 +20,26 @@ namespace banggame {
         utils::id_map<card> m_cards_storage;
         utils::id_map<player> m_players_storage;
 
-        std::vector<player *> m_players;
+        player_list m_players;
         
-        std::vector<card *> m_deck;
-        std::vector<card *> m_discards;
-        std::vector<card *> m_selection;
+        card_list m_deck;
+        card_list m_discards;
+        card_list m_selection;
 
-        std::vector<card *> m_shop_deck;
-        std::vector<card *> m_shop_discards;
-        std::vector<card *> m_hidden_deck;
-        std::vector<card *> m_shop_selection;
-        std::vector<card *> m_button_row;
+        card_list m_shop_deck;
+        card_list m_shop_discards;
+        card_list m_hidden_deck;
+        card_list m_shop_selection;
+        card_list m_button_row;
 
-        std::vector<card *> m_scenario_deck;
-        std::vector<card *> m_scenario_cards;
-        std::vector<card *> m_wws_scenario_deck;
-        std::vector<card *> m_wws_scenario_cards;
+        card_list m_scenario_deck;
+        card_list m_scenario_cards;
+        card_list m_wws_scenario_deck;
+        card_list m_wws_scenario_cards;
 
-        std::vector<card *> m_stations;
-        std::vector<card *> m_train_deck;
-        std::vector<card *> m_train;
+        card_list m_stations;
+        card_list m_train_deck;
+        card_list m_train;
         
         int8_t num_cubes = 0;
         int8_t train_position = 0;
@@ -62,7 +62,7 @@ namespace banggame {
             return m_cards_storage | rv::addressof;
         }
         
-        std::vector<card *> &get_pocket(pocket_type pocket, player *owner = nullptr);
+        card_list &get_pocket(pocket_type pocket, player *owner = nullptr);
 
         int calc_distance(const player *from, const player *to);
 

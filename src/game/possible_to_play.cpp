@@ -6,7 +6,7 @@ namespace banggame {
         if (targets.size() == mth.args.size()) {
             return !mth_holder{
                 mth.type,
-                serial::int_list(small_int_set_sized_tag, targets.size())
+                small_int_set(small_int_set_sized_tag, targets.size())
             }.get_error(origin_card, origin, targets, ctx);
         }
         const auto &effect = effects.at(mth.args[targets.size()]);
@@ -33,7 +33,7 @@ namespace banggame {
     }
 
     static auto map_cards_playable_with_modifiers(
-        player *origin, const std::vector<card *> &modifiers, bool is_response, const effect_context &ctx,
+        player *origin, const card_list &modifiers, bool is_response, const effect_context &ctx,
         auto function
     ) {
         auto map = [&](rn::forward_range auto &&range) {
@@ -53,7 +53,7 @@ namespace banggame {
         }
     }
 
-    bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const std::vector<card *> &modifiers, const effect_context &ctx) {
+    bool is_possible_to_play(player *origin, card *origin_card, bool is_response, const card_list &modifiers, const effect_context &ctx) {
         for (card *mod_card : modifiers) {
             if (mod_card == origin_card) return false;
             if (mod_card->get_modifier(is_response).get_error(mod_card, origin, origin_card, ctx)) return false;
@@ -97,7 +97,7 @@ namespace banggame {
     }
 
     static void collect_playable_cards(
-        playable_cards_list &result, std::vector<card *> &modifiers,
+        playable_cards_list &result, card_list &modifiers,
         player *origin, card *origin_card, bool is_response, effect_context ctx
     ) {
         const modifier_holder &modifier = origin_card->get_modifier(is_response);
@@ -105,7 +105,7 @@ namespace banggame {
             if (modifiers.empty()) {
                 result.emplace_back(origin_card);
             } else {
-                result.emplace_back(origin_card, modifiers | rn::to<serial::card_list>, ctx);
+                result.emplace_back(origin_card, modifiers, ctx);
             }
         } else {
             modifier.add_context(origin_card, origin, ctx);
@@ -122,7 +122,7 @@ namespace banggame {
 
     playable_cards_list generate_playable_cards_list(player *origin, bool is_response) {
         playable_cards_list result;
-        std::vector<card *> modifiers;
+        card_list modifiers;
 
         if (origin) {
             for (card *origin_card : get_all_playable_cards(origin, is_response)) {

@@ -30,7 +30,7 @@ namespace banggame {
         : request_base(origin_card, origin, target, remove_invalid_flags(flags), 200)
         , damage(damage) {}
     
-    std::vector<card *> request_damage::get_highlights() const {
+    card_list request_damage::get_highlights() const {
         return target->m_backup_character;
     }
 

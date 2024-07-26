@@ -55,13 +55,13 @@ namespace banggame {
             c->set_visibility(card_visibility::hidden);
             origin->disable_equip(c);
         }
-        origin->m_game->add_update<"remove_cards">(rn::to<serial::card_list>(origin->m_game->m_train));
+        origin->m_game->add_update<"remove_cards">(origin->m_game->m_train);
 
         if (!origin->m_game->m_train_deck.empty()) {
             origin->m_game->shuffle_cards_and_ids(origin->m_game->m_train_deck);
         }
         
-        origin->m_game->add_update<"remove_cards">(rn::to<serial::card_list>(origin->m_game->m_stations));
+        origin->m_game->add_update<"remove_cards">(origin->m_game->m_stations);
         for (card *c : origin->m_game->m_stations) {
             c->visibility = card_visibility::hidden;
         }

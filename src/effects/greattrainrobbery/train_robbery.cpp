@@ -11,7 +11,7 @@ namespace banggame {
     struct request_train_robbery : request_base, interface_target_set_cards {
         using request_base::request_base;
 
-        std::vector<card *> selected_cards;
+        card_list selected_cards;
 
         void on_update() override {
             if (!target->alive() || target->immune_to(origin_card, origin, flags)
@@ -80,7 +80,7 @@ namespace banggame {
         
         card *target_card;
 
-        std::vector<card *> get_highlights() const override {
+        card_list get_highlights() const override {
             return { target_card };
         }
     };

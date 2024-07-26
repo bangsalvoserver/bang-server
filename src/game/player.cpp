@@ -183,7 +183,7 @@ namespace banggame {
     }
 
     bool player::immune_to(card *origin_card, player *origin, effect_flags flags, bool quiet) {
-        std::vector<card *> cards;
+        card_list cards;
         m_game->call_event(event_type::apply_immunity_modifier{ origin_card, origin, this, flags, cards });
         if (!quiet) {
             for (card *target_card : cards) {
@@ -282,7 +282,7 @@ namespace banggame {
 
     void player::remove_extra_characters() {
         if (auto range = m_characters | rv::drop(1)) {
-            m_game->add_update<"remove_cards">(rn::to<serial::card_list>(range));
+            m_game->add_update<"remove_cards">(range | rn::to_vector);
 
             for (card *character : range) {
                 disable_equip(character);

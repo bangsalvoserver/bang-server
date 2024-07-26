@@ -10,47 +10,47 @@
 
 namespace json {
 
-    template<std::convertible_to<banggame::card *> Card, typename Context> struct serializer<Card, Context> {
+    template<typename Context> struct serializer<banggame::card *, Context> {
         json operator()(banggame::card *card) const {
-            if (card) {
-                return card->id;
-            } else {
-                return {};
+            if (!card) {
+                throw std::runtime_error("Cannot serialize card: value is null");
             }
+            return card->id;
         }
     };
 
-    template<std::convertible_to<banggame::card *> Card> struct deserializer<Card, banggame::game_context> {
+    template<> struct deserializer<banggame::card *, banggame::game_context> {
+        banggame::card *operator()(missing_field) const {
+            throw std::runtime_error("Missing card field");
+        }
+
         banggame::card *operator()(const json &value, const banggame::game_context &context) const {
-            if (value.is_number_integer()) {
-                return context.find_card(value.get<int>());
-            } else if (value.is_null()) {
-                return nullptr;
-            } else {
+            if (!value.is_number_integer()) {
                 throw std::runtime_error("Cannot deserialize card: value is not an integer");
             }
+            return context.find_card(value.get<int>());
         }
     };
 
-    template<std::convertible_to<banggame::player *> Player, typename Context> struct serializer<Player, Context> {
+    template<typename Context> struct serializer<banggame::player *, Context> {
         json operator()(banggame::player *player) const {
-            if (player) {
-                return player->id;
-            } else {
-                return {};
+            if (!player) {
+                throw std::runtime_error("Cannot serialize player: value is null");
             }
+            return player->id;
         }
     };
 
-    template<std::convertible_to<banggame::player *> Player> struct deserializer<Player, banggame::game_context> {
+    template<> struct deserializer<banggame::player *, banggame::game_context> {
+        banggame::player *operator()(missing_field) const {
+            throw std::runtime_error("Missing player field");
+        }
+
         banggame::player *operator()(const json &value, const banggame::game_context &context) const {
-            if (value.is_number_integer()) {
-                return context.find_player(value.get<int>());
-            } else if (value.is_null()) {
-                return nullptr;
-            } else {
+            if (!value.is_number_integer()) {
                 throw std::runtime_error("Cannot deserialize player: value is not an integer");
             }
+            return context.find_player(value.get<int>());
         }
     };
 
@@ -116,7 +116,7 @@ namespace json {
                     }
                     break;
                 case banggame::format_arg_list::format_player:
-                    ret.push_back({{ "player", serialize(value.player_value) }});
+                    ret.push_back({{ "player", serialize(utils::nullable{ value.player_value }) }});
                     break;
                 }
             }

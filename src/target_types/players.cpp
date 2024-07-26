@@ -21,7 +21,7 @@ namespace banggame {
     }
 
     template<> game_string visit_players::prompt(const effect_context &ctx) {
-        std::vector<player *> targets;
+        player_list targets;
         for (player *target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 targets.push_back(target);
@@ -47,7 +47,7 @@ namespace banggame {
     }
 
     template<> void visit_players::play(const effect_context &ctx) {
-        std::vector<player *> targets;
+        player_list targets;
         for (player *target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 targets.push_back(target);

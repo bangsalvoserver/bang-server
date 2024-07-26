@@ -23,7 +23,7 @@ namespace banggame::event_type {
         player *origin;
         const player *target;
         effect_flags flags;
-        nullable_ref<std::vector<card *>> cards;
+        nullable_ref<card_list> cards;
     };
 
     struct apply_escapable_modifier {

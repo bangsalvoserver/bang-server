@@ -32,7 +32,7 @@ namespace banggame {
             }
         }
 
-        std::vector<card *> get_drawn_cards() const override {
+        card_list get_drawn_cards() const override {
             return {drawn_card};
         }
 

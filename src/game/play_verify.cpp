@@ -173,7 +173,7 @@ namespace banggame {
     }
 
     static player *get_equip_target(player *origin, card *origin_card, const target_list &targets) {
-        return origin_card->self_equippable() ? origin : get<"player">(targets.front()).get();
+        return origin_card->self_equippable() ? origin : get<"player">(targets.front());
     }
 
     static game_string verify_equip_target(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {

@@ -8,7 +8,7 @@ namespace banggame {
         return bool(get_all_card_targets(origin, origin_card, effect, ctx));
     }
 
-    template<> serial::card_list visit_cards::random_target(const effect_context &ctx) {
+    template<> card_list visit_cards::random_target(const effect_context &ctx) {
         auto targets = get_all_card_targets(origin, origin_card, effect, ctx);
         size_t count = effect.target_value;
         if (count == 0) {
@@ -17,10 +17,10 @@ namespace banggame {
         }
         return targets
             | rv::sample(count, origin->m_game->bot_rng)
-            | rn::to<serial::card_list>;
+            | rn::to_vector;
     }
 
-    template<> game_string visit_cards::get_error(const effect_context &ctx, const serial::card_list &targets) {
+    template<> game_string visit_cards::get_error(const effect_context &ctx, const card_list &targets) {
         if (targets.empty() || effect.target_value != 0 && targets.size() > effect.target_value) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -30,15 +30,15 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_cards::prompt(const effect_context &ctx, const serial::card_list &targets) {
+    template<> game_string visit_cards::prompt(const effect_context &ctx, const card_list &targets) {
         return defer<"cards">().prompt(ctx, targets);
     }
 
-    template<> void visit_cards::add_context(effect_context &ctx, const serial::card_list &targets) {
+    template<> void visit_cards::add_context(effect_context &ctx, const card_list &targets) {
         defer<"cards">().add_context(ctx, targets);
     }
 
-    template<> void visit_cards::play(const effect_context &ctx, const serial::card_list &targets) {
+    template<> void visit_cards::play(const effect_context &ctx, const card_list &targets) {
         defer<"cards">().play(ctx, targets);
     }
 

@@ -19,37 +19,6 @@ namespace rv = ranges::views;
 
 #define FWD(x) std::forward<decltype(x)>(x)
 
-template<typename T> class not_null;
-template<typename T> class not_null<T *> {
-public:
-    not_null() = default;
-    not_null(std::nullptr_t) { check(); }
-    not_null(T *value) : value(value) { check(); }
-
-    operator T *() { check(); return value; }
-    operator T *() const { check(); return value; }
-
-    T *get() { check(); return value; }
-    T *get() const { check(); return value; }
-
-    T &operator *() { check(); return *value; }
-    T &operator *() const { check(); return *value; }
-
-    T *operator -> () { check(); return value; }
-    T *operator -> () const { check(); return value; }
-
-private:
-    void check() const {
-        if (!value) throw std::runtime_error("value can not be null");
-    }
-
-private:
-    T *value = nullptr;
-};
-
-template<typename T> not_null(T *) -> not_null<T *>;
-
-
 template<typename ... Ts> struct overloaded : Ts ... { using Ts::operator() ...; };
 template<typename ... Ts> overloaded(Ts ...) -> overloaded<Ts ...>;
 

@@ -173,7 +173,7 @@ namespace banggame {
             int ncubes = old_character->num_cubes;
 
             old_character->move_cubes(nullptr, ncubes);
-            target->m_game->add_update<"remove_cards">(std::vector{not_null{old_character}});
+            target->m_game->add_update<"remove_cards">(std::vector{old_character});
 
             old_character->pocket = pocket_type::none;
             old_character->owner = nullptr;

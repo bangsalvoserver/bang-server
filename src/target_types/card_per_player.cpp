@@ -17,8 +17,8 @@ namespace banggame {
             });
     }
 
-    template<> serial::card_list visit_cards::random_target(const effect_context &ctx) {
-        serial::card_list ret;
+    template<> card_list visit_cards::random_target(const effect_context &ctx) {
+        card_list ret;
         for (player *target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 if (auto targets = cards_target_set(origin, origin_card, effect.card_filter, target, ctx)) {
@@ -29,7 +29,7 @@ namespace banggame {
         return ret;
     }
 
-    template<> game_string visit_cards::get_error(const effect_context &ctx, const serial::card_list &target_cards) {
+    template<> game_string visit_cards::get_error(const effect_context &ctx, const card_list &target_cards) {
         if (!rn::all_of(origin->m_game->m_players, [&](player *p) {
             size_t found = rn::count(target_cards, p, &card::owner);
             if (p == ctx.skipped_player || filters::check_player_filter(origin, effect.player_filter, p, ctx)) return found == 0;
@@ -46,7 +46,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string visit_cards::prompt(const effect_context &ctx, const serial::card_list &target_cards) {
+    template<> game_string visit_cards::prompt(const effect_context &ctx, const card_list &target_cards) {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
@@ -58,13 +58,13 @@ namespace banggame {
         return msg;
     }
 
-    template<> void visit_cards::add_context(effect_context &ctx, const serial::card_list &target_cards) {
+    template<> void visit_cards::add_context(effect_context &ctx, const card_list &target_cards) {
         for (card *target_card : target_cards) {
             effect.add_context(origin_card, origin, target_card, ctx);
         }
     }
 
-    template<> void visit_cards::play(const effect_context &ctx, const serial::card_list &target_cards) {
+    template<> void visit_cards::play(const effect_context &ctx, const card_list &target_cards) {
         effect_flags flags = effect_flag::multi_target;
         if (origin_card->is_brown()) {
             flags.add(effect_flag::escapable);

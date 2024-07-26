@@ -14,7 +14,7 @@ namespace banggame {
     }
 
     game_string handler_play_as_gatling::on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card) {
-        std::vector<player *> targets;
+        player_list targets;
         for (player *target : range_all_players(origin)) {
             if (target != ctx.skipped_player && target != origin) {
                 targets.push_back(target);
@@ -36,7 +36,7 @@ namespace banggame {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
         origin->discard_used_card(chosen_card);
 
-        std::vector<player *> targets;
+        player_list targets;
         for (player *target : range_all_players(origin)) {
             if (target != ctx.skipped_player && target != origin) {
                 targets.push_back(target);

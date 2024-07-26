@@ -39,7 +39,7 @@ namespace banggame {
         
         shared_effect_context ctx;
 
-        std::vector<card *> get_highlights() const override {
+        card_list get_highlights() const override {
             return {target->m_game->m_train.front()};
         }
 

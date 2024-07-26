@@ -29,7 +29,7 @@ namespace banggame {
             | rv::filter([](player *p) {
                 return !p->check_player_flags(player_flag::removed);
             })
-            | rn::to<serial::player_list>,
+            | rn::to_vector,
             instant ? 0ms : durations.move_player};
     }
     
@@ -203,7 +203,7 @@ namespace banggame {
 
         bool ghost_card_added = false;
         
-        auto add_cards = [&](const std::vector<card_data> &cards, pocket_type pocket, std::vector<card *> *out_pocket = nullptr) {
+        auto add_cards = [&](const std::vector<card_data> &cards, pocket_type pocket, card_list *out_pocket = nullptr) {
             if (!out_pocket && pocket != pocket_type::none) out_pocket = &get_pocket(pocket);
 
             int count = 0;
@@ -311,7 +311,7 @@ namespace banggame {
         add_cards(all_cards.stations, pocket_type::none);
         add_cards(all_cards.locomotive, pocket_type::none);
 
-        std::vector<card *> character_ptrs;
+        card_list character_ptrs;
         if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
             rn::shuffle(character_ptrs, rng);
         }
@@ -380,23 +380,23 @@ namespace banggame {
         };
     }
     
-    static serial::player_list get_request_target_set_players(player *origin) {
+    static player_list get_request_target_set_players(player *origin) {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_target_set_players>(origin)) {
                 return origin->m_game->m_players
                     | rv::filter(std::bind_front(&interface_target_set_players::in_target_set, req))
-                    | rn::to<serial::player_list>;
+                    | rn::to_vector;
             }
         }
         return {};
     }
 
-    static serial::card_list get_request_target_set_cards(player *origin) {
+    static card_list get_request_target_set_cards(player *origin) {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_target_set_cards>(origin)) {
                 return get_all_targetable_cards(origin)
                     | rv::filter(std::bind_front(&interface_target_set_cards::in_target_set, req))
-                    | rn::to<serial::card_list>;
+                    | rn::to_vector;
             }
         }
         return {};
@@ -420,7 +420,7 @@ namespace banggame {
             .target = req->target,
             .status_text = req->status_text(owner),
             .respond_cards = generate_playable_cards_list(owner, true),
-            .highlight_cards = req->get_highlights() | rn::to<serial::card_list>,
+            .highlight_cards = req->get_highlights(),
             .target_set_players = get_request_target_set_players(owner),
             .target_set_cards = get_request_target_set_cards(owner),
             .distances = make_player_distances(owner),

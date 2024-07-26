@@ -28,15 +28,15 @@ namespace banggame {
         int id;
         int user_id;
 
-        std::vector<card *> m_hand;
-        std::vector<card *> m_table;
-        std::vector<card *> m_characters;
-        std::vector<card *> m_backup_character;
+        card_list m_hand;
+        card_list m_table;
+        card_list m_characters;
+        card_list m_backup_character;
 
         rn::concat_view<
-            rn::ref_view<std::vector<card *>>,
-            rn::ref_view<std::vector<card *>>,
-            rn::ref_view<std::vector<card *>>
+            rn::ref_view<card_list>,
+            rn::ref_view<card_list>,
+            rn::ref_view<card_list>
         > m_targetable_cards_view;
 
         player_role m_role;

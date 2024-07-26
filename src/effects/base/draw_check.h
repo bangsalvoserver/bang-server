@@ -8,7 +8,7 @@
 namespace banggame {
 
     struct draw_check_handler : std::enable_shared_from_this<draw_check_handler> {
-        virtual std::vector<card *> get_drawn_cards() const = 0;
+        virtual card_list get_drawn_cards() const = 0;
         virtual card *get_drawing_card() const = 0;
 
         virtual bool bot_check_redraw(card *target_card, player *owner) const = 0;
@@ -54,7 +54,7 @@ namespace banggame {
         void start();
         void select(card *target_card);
 
-        std::vector<card *> get_drawn_cards() const override {
+        card_list get_drawn_cards() const override {
             return {drawn_card};
         }
 

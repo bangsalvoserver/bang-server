@@ -13,7 +13,7 @@ namespace banggame {
             : request_base(origin_card, nullptr, target)
             , req_draw(std::move(req_draw)) {}
 
-        std::vector<player *> selected_targets;
+        player_list selected_targets;
 
         shared_request_draw req_draw;
 

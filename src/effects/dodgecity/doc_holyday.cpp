@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    void handler_doc_holyday::on_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target) {
+    void handler_doc_holyday::on_play(card *origin_card, player *origin, const card_list &target_cards, player *target) {
         for (card *c : target_cards) {
             effect_discard{}.on_play(origin_card, origin, c);
         }

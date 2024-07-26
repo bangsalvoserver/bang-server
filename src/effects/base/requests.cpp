@@ -147,7 +147,7 @@ namespace banggame {
     void request_discard_all::on_resolve() {
         target->m_game->pop_request();
 
-        std::vector<card *> cards_to_discard = rv::concat(target->m_table, target->m_hand) | rn::to_vector;
+        card_list cards_to_discard = rv::concat(target->m_table, target->m_hand) | rn::to_vector;
         rn::stable_partition(cards_to_discard, is_valid_card);
 
         for (card *target_card : cards_to_discard) {

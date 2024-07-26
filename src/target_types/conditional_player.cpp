@@ -8,7 +8,7 @@ namespace banggame {
         return true;
     }
 
-    template<> player *visit_player::random_target(const effect_context &ctx) {
+    template<> nullable_player visit_player::random_target(const effect_context &ctx) {
         auto targets = get_all_player_targets(origin, origin_card, effect, ctx);
         if (targets.empty()) {
             return nullptr;
@@ -17,7 +17,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string visit_player::get_error(const effect_context &ctx, player *target) {
+    template<> game_string visit_player::get_error(const effect_context &ctx, nullable_player target) {
         if (target) {
             return defer<"player">().get_error(ctx, target);
         } else if (bool(get_all_player_targets(origin, origin_card, effect))) {
@@ -27,7 +27,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string visit_player::prompt(const effect_context &ctx, player *target) {
+    template<> game_string visit_player::prompt(const effect_context &ctx, nullable_player target) {
         if (target) {
             return defer<"player">().prompt(ctx, target);
         } else {
@@ -35,13 +35,13 @@ namespace banggame {
         }
     }
 
-    template<> void visit_player::add_context(effect_context &ctx, player *target) {
+    template<> void visit_player::add_context(effect_context &ctx, nullable_player target) {
         if (target) {
             defer<"player">().add_context(ctx, target);
         }
     }
 
-    template<> void visit_player::play(const effect_context &ctx, player *target) {
+    template<> void visit_player::play(const effect_context &ctx, nullable_player target) {
         if (target) {
             defer<"player">().play(ctx, target);
         }

@@ -46,7 +46,7 @@ namespace banggame {
         return origin->m_game->top_request<request_ranch>(origin) != nullptr;
     }
 
-    void handler_ranch::on_play(card *origin_card, player *origin, const serial::card_list &target_cards) {
+    void handler_ranch::on_play(card *origin_card, player *origin, const card_list &target_cards) {
         origin->m_game->pop_request();
 
         if (!target_cards.empty()) {

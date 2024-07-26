@@ -47,7 +47,7 @@ namespace banggame {
         return std::chrono::duration_cast<game_duration>(duration * std::clamp(m_options.duration_coefficient, 0.f, 4.f));
     }
     
-    std::vector<card *> &game_table::get_pocket(pocket_type pocket, player *owner) {
+    card_list &game_table::get_pocket(pocket_type pocket, player *owner) {
         switch (pocket) {
         case pocket_type::player_hand:       return owner->m_hand;
         case pocket_type::player_table:      return owner->m_table;

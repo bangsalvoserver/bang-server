@@ -31,7 +31,7 @@ namespace banggame {
             }
         }
 
-        std::vector<card *> get_highlights() const override {
+        card_list get_highlights() const override {
             auto vec = handler->get_drawn_cards();
             vec.push_back(handler->get_drawing_card());
             return vec;

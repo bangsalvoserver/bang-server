@@ -18,7 +18,7 @@ namespace banggame {
     DEFINE_EFFECT(ranch, effect_ranch)
 
     struct handler_ranch {
-        void on_play(card *origin_card, player *origin, const serial::card_list &target_cards);
+        void on_play(card *origin_card, player *origin, const card_list &target_cards);
     };
 
     DEFINE_MTH(ranch, handler_ranch)

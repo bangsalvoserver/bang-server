@@ -20,11 +20,11 @@ namespace banggame {
     DEFINE_EFFECT(lastwill, effect_lastwill)
 
     struct handler_lastwill {
-        bool on_check_target(card *origin_card, player *origin, const serial::card_list &target_cards, player *target) {
+        bool on_check_target(card *origin_card, player *origin, const card_list &target_cards, player *target) {
             return !target || bot_suggestion::target_friend{}.on_check_target(origin_card, origin, target);
         }
         
-        void on_play(card *origin_card, player *origin, const serial::card_list &target_cards, player *target);
+        void on_play(card *origin_card, player *origin, const card_list &target_cards, player *target);
     };
 
     DEFINE_MTH(lastwill, handler_lastwill)

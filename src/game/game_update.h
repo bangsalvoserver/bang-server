@@ -24,16 +24,16 @@ namespace banggame {
     struct add_cards_update {
         std::vector<card_backface> card_ids;
         pocket_type pocket;
-        serial::opt_player player;
+        nullable_player player;
     };
 
     struct remove_cards_update {
-        serial::card_list cards;
+        card_list cards;
     };
 
     struct move_card_update {
-        serial::card card;
-        serial::opt_player player;
+        card_ptr card;
+        nullable_player player;
         pocket_type pocket;
         animation_duration duration = durations.move_card;
         bool front = false;
@@ -41,13 +41,13 @@ namespace banggame {
 
     struct add_cubes_update {
         int num_cubes;
-        serial::opt_card target_card;
+        nullable_card target_card;
     };
 
     struct move_cubes_update {
         int num_cubes;
-        serial::opt_card origin_card;
-        serial::opt_card target_card;
+        nullable_card origin_card;
+        nullable_card target_card;
         animation_duration duration = durations.move_cubes;
     };
 
@@ -62,29 +62,29 @@ namespace banggame {
     };
 
     struct show_card_update {
-        serial::card card;
+        card_ptr card;
         card_data info;
         animation_duration duration = durations.flip_card;
     };
 
     struct hide_card_update {
-        serial::card card;
+        card_ptr card;
         animation_duration duration = durations.flip_card;
     };
 
     struct tap_card_update {
-        serial::card card;
+        card_ptr card;
         bool inactive;
         animation_duration duration = durations.tap_card;
     };
 
     struct flash_card_update {
-        serial::card card;
+        card_ptr card;
         animation_duration duration = durations.flash_card;
     };
 
     struct short_pause_update {
-        serial::opt_card card;
+        nullable_card card;
         animation_duration duration = durations.short_pause;
     };
 
@@ -104,42 +104,42 @@ namespace banggame {
     };
 
     struct player_order_update {
-        serial::player_list players;
+        player_list players;
         animation_duration duration = durations.move_player;
     };
 
     struct player_hp_update {
-        serial::player player;
+        player_ptr player;
         int hp;
         animation_duration duration = durations.player_hp;
     };
 
     struct player_gold_update {
-        serial::player player;
+        player_ptr player;
         int gold;
     };
 
     struct player_show_role_update {
-        serial::player player;
+        player_ptr player;
         player_role role;
         animation_duration duration = durations.flip_card;
     };
 
     struct player_flags_update {
-        serial::player player;
+        player_ptr player;
         player_flags flags;
     };
 
     struct playable_card_info {
-        serial::card card;
-        serial::card_list modifiers;
+        card_ptr card;
+        card_list modifiers;
         utils::remove_defaults<effect_context_base> context;
     };
 
     using playable_cards_list = std::vector<playable_card_info>;
 
     struct player_distance_item {
-        serial::player player;
+        player_ptr player;
         int value;
     };
 
@@ -155,14 +155,14 @@ namespace banggame {
     };
 
     struct request_status_args {
-        serial::opt_card origin_card;
-        serial::opt_player origin;
-        serial::opt_player target;
+        nullable_card origin_card;
+        nullable_player origin;
+        nullable_player target;
         game_string status_text;
         playable_cards_list respond_cards;
-        serial::card_list highlight_cards;
-        serial::player_list target_set_players;
-        serial::card_list target_set_cards;
+        card_list highlight_cards;
+        player_list target_set_players;
+        card_list target_set_cards;
         player_distances distances;
         std::optional<timer_status_args> timer;
     };
@@ -194,7 +194,7 @@ namespace banggame {
         utils::tag<"player_gold", player_gold_update>,
         utils::tag<"player_show_role", player_show_role_update>,
         utils::tag<"player_flags", player_flags_update>,
-        utils::tag<"switch_turn", serial::player>,
+        utils::tag<"switch_turn", player_ptr>,
         utils::tag<"request_status", request_status_args>,
         utils::tag<"status_ready", status_ready_args>,
         utils::tag<"game_flags", game_flags>,
@@ -207,14 +207,14 @@ namespace banggame {
     concept game_update_type = utils::tag_for<utils::tag<Name>, game_update>;
 
     struct modifier_pair {
-        serial::card card;
+        card_ptr card;
         target_list targets;
     };
 
     using modifier_list = std::vector<modifier_pair>;
 
     struct game_action {
-        serial::card card;
+        card_ptr card;
         modifier_list modifiers;
         target_list targets;
         bool bypass_prompt;

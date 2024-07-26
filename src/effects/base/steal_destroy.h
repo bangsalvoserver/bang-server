@@ -65,7 +65,7 @@ namespace banggame {
         void on_resolve() final;
         virtual void on_resolve_target() = 0;
 
-        virtual std::vector<card *> get_highlights() const override;
+        virtual card_list get_highlights() const override;
     };
 }
 

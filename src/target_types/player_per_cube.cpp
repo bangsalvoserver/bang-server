@@ -8,13 +8,13 @@ namespace banggame {
         return defer<"player">().possible(ctx);
     }
 
-    template<> serial::player_list visit_players::random_target(const effect_context &ctx) {
+    template<> player_list visit_players::random_target(const effect_context &ctx) {
         return get_all_player_targets(origin, origin_card, effect, ctx)
             | rv::sample(ctx.selected_cubes.count(origin_card) + 1)
-            | rn::to<serial::player_list>;
+            | rn::to_vector;
     }
 
-    template<> game_string visit_players::get_error(const effect_context &ctx, const serial::player_list &targets) {
+    template<> game_string visit_players::get_error(const effect_context &ctx, const player_list &targets) {
         int num_cubes = ctx.selected_cubes.count(origin_card);
         if (targets.size() != num_cubes + 1) {
             return "ERROR_INVALID_TARGETS";
@@ -25,7 +25,7 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_players::prompt(const effect_context &ctx, const serial::player_list &targets) {
+    template<> game_string visit_players::prompt(const effect_context &ctx, const player_list &targets) {
         game_string msg;
         for (player *target : targets) {
             msg = defer<"player">().prompt(ctx, target);
@@ -34,13 +34,13 @@ namespace banggame {
         return msg;
     }
 
-    template<> void visit_players::add_context(effect_context &ctx, const serial::player_list &targets) {
+    template<> void visit_players::add_context(effect_context &ctx, const player_list &targets) {
         for (player *target : targets) {
             defer<"player">().add_context(ctx, target);
         }
     }
 
-    template<> void visit_players::play(const effect_context &ctx, const serial::player_list &targets) {
+    template<> void visit_players::play(const effect_context &ctx, const player_list &targets) {
         for (player *target : targets) {
             defer<"player">().play(ctx, target);
         }

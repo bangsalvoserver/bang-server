@@ -84,7 +84,7 @@ namespace banggame {
                 target_card->set_inactive(false);
             }
 
-            std::vector<player *> range_targets;
+            player_list range_targets;
             for (player *p : range_other_players(target)) {
                 if (get_vulture_sam(p)) {
                     range_targets.push_back(p);
