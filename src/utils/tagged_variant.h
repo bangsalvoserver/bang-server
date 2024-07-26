@@ -120,6 +120,11 @@ namespace utils {
     decltype(auto) get(Variant &&variant) {
         return std::get<detail::find_tag_name<std::remove_cvref_t<Variant>, tag<Name>>::index>(variant);
     }
+
+    template<fixed_string Name, typename Variant> requires tag_for<tag<Name>, std::remove_cvref_t<Variant>>
+    decltype(auto) get_unchecked(Variant &&variant) {
+        return *std::get_if<detail::find_tag_name<std::remove_cvref_t<Variant>, tag<Name>>::index>(&variant);
+    }
     
     template<typename Variant>
     class tagged_variant_index {
@@ -186,7 +191,7 @@ namespace utils {
             if constexpr (std::is_void_v<tagged_variant_value_type<variant_type, decltype(tag)>>) {
                 return std::invoke(std::forward<Visitor>(visitor), tag);
             } else {
-                return std::invoke(std::forward<Visitor>(visitor), tag, get<tag.name>(std::forward<Variant>(variant)));
+                return std::invoke(std::forward<Visitor>(visitor), tag, get_unchecked<tag.name>(std::forward<Variant>(variant)));
             }
         }, tagged_variant_index(variant));
     }
