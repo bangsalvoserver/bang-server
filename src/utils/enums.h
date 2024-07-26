@@ -2,7 +2,6 @@
 #define __ENUMS_H__
 
 #include <reflect>
-#include <stdexcept>
 
 #include "json_serial.h"
 #include "static_map.h"
@@ -84,13 +83,13 @@ namespace json {
     struct deserializer<T, Context> {
         T operator()(const json &value) const {
             if (!value.is_string()) {
-                throw std::runtime_error(std::format("Cannot deserialize {}: value is not a string", reflect::type_name<T>()));
+                throw deserialize_error(std::format("Cannot deserialize {}: value is not a string", reflect::type_name<T>()));
             }
             auto str = value.get<std::string>();
             if (auto ret = enums::from_string<T>(str)) {
                 return *ret;
             } else {
-                throw std::runtime_error(std::format("Invalid {} value: {}", reflect::type_name<T>(), str));
+                throw deserialize_error(std::format("Invalid {} value: {}", reflect::type_name<T>(), str));
             }
         }
     };

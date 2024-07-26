@@ -26,14 +26,14 @@ namespace banggame {
         if (auto it = m_cards_storage.find(card_id); it != m_cards_storage.end()) {
             return &*it;
         }
-        throw std::runtime_error(std::format("server.find_card: ID {} not found", card_id));
+        throw game_error(std::format("Cannot find card {}", card_id));
     }
 
     player_ptr game_table::find_player(int player_id) const {
         if (auto it = m_players_storage.find(player_id); it != m_players_storage.end()) {
             return &*it;
         }
-        throw std::runtime_error(std::format("server.find_player: ID {} not found", player_id));
+        throw game_error(std::format("Cannot find player {}", player_id));
     }
     
     player_ptr game_table::find_player_by_userid(int user_id) const {
@@ -68,7 +68,7 @@ namespace banggame {
         case pocket_type::stations:          return m_stations;
         case pocket_type::train:             return m_train;
         case pocket_type::train_deck:        return m_train_deck;
-        default: throw std::runtime_error("Invalid pocket");
+        default: throw game_error("Invalid pocket");
         }
     }
 
@@ -118,7 +118,7 @@ namespace banggame {
     card_ptr game_table::top_of_deck() {
         if (m_deck.empty()) {
             if (m_discards.empty()) {
-                throw std::runtime_error("Deck is empty. Cannot shuffle");
+                throw game_error("Deck is empty. Cannot shuffle");
             }
             m_deck = std::move(m_discards);
             m_discards.clear();
@@ -138,7 +138,7 @@ namespace banggame {
     card_ptr game_table::draw_shop_card() {
         if (m_shop_deck.empty()) {
             if (m_shop_discards.empty()) {
-                throw std::runtime_error("Shop deck is empty. Cannot reshuffle");
+                throw game_error("Shop deck is empty. Cannot reshuffle");
             }
             m_shop_deck = std::move(m_shop_discards);
             m_shop_discards.clear();

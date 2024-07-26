@@ -44,6 +44,10 @@ namespace banggame {
     using game_flags = enums::bitset<game_flag>;
     using player_flags = enums::bitset<player_flag>;
 
+    struct game_error : std::runtime_error {
+        using std::runtime_error::runtime_error;
+    };
+
 }
 
 #endif

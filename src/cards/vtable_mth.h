@@ -1,8 +1,6 @@
 #ifndef __VTABLE_MTH_H__
 #define __VTABLE_MTH_H__
 
-#include <stdexcept>
-
 #include "card_defs.h"
 
 #include "utils/fixed_string.h"
@@ -17,7 +15,7 @@ namespace banggame {
             if constexpr (std::is_convertible_v<std::remove_cvref_t<decltype(value)>, Ts>) {
                 return value;
             } else {
-                throw std::runtime_error("invalid access to mth: wrong target type");
+                throw game_error("invalid access to mth: wrong target type");
             }
         }, *targets[Is]) ...);
     }
@@ -27,7 +25,7 @@ namespace banggame {
         static constexpr size_t N = sizeof...(Ts);
 
         if (args.size() != N) {
-            throw std::runtime_error("invalid access to mth: invalid args size");
+            throw game_error("invalid access to mth: invalid args size");
         }
 
         std::array<target_list::const_iterator, N> target_array;
@@ -38,7 +36,7 @@ namespace banggame {
         for (int arg : args) {
             for (; prev != arg && it != targets.end(); ++prev, ++it);
             if (it == targets.end()) {
-                throw std::runtime_error("invalid access to mth: out of bounds");
+                throw game_error("invalid access to mth: out of bounds");
             }
             *out_it++ = it;
         }

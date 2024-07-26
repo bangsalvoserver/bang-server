@@ -13,7 +13,7 @@ namespace json {
     template<typename Context> struct serializer<banggame::card_ptr, Context> {
         json operator()(banggame::card_ptr card) const {
             if (!card) {
-                throw std::runtime_error("Cannot serialize card: value is null");
+                throw serialize_error("Cannot serialize card: value is null");
             }
             return card->id;
         }
@@ -21,12 +21,12 @@ namespace json {
 
     template<> struct deserializer<banggame::card_ptr, banggame::game_context> {
         banggame::card_ptr operator()(missing_field) const {
-            throw std::runtime_error("Missing card field");
+            throw deserialize_error("Missing card field");
         }
 
         banggame::card_ptr operator()(const json &value, const banggame::game_context &context) const {
             if (!value.is_number_integer()) {
-                throw std::runtime_error("Cannot deserialize card: value is not an integer");
+                throw deserialize_error("Cannot deserialize card: value is not an integer");
             }
             return context.find_card(value.get<int>());
         }
@@ -35,7 +35,7 @@ namespace json {
     template<typename Context> struct serializer<banggame::player_ptr, Context> {
         json operator()(banggame::player_ptr player) const {
             if (!player) {
-                throw std::runtime_error("Cannot serialize player: value is null");
+                throw serialize_error("Cannot serialize player: value is null");
             }
             return player->id;
         }
@@ -43,12 +43,12 @@ namespace json {
 
     template<> struct deserializer<banggame::player_ptr, banggame::game_context> {
         banggame::player_ptr operator()(missing_field) const {
-            throw std::runtime_error("Missing player field");
+            throw deserialize_error("Missing player field");
         }
 
         banggame::player_ptr operator()(const json &value, const banggame::game_context &context) const {
             if (!value.is_number_integer()) {
-                throw std::runtime_error("Cannot deserialize player: value is not an integer");
+                throw deserialize_error("Cannot deserialize player: value is not an integer");
             }
             return context.find_player(value.get<int>());
         }
@@ -97,7 +97,7 @@ namespace json {
     };
 
     template<typename Context> struct serializer<banggame::format_arg_list, Context> {
-        json operator()(const banggame::format_arg_list &list) const {
+        json operator()(const banggame::format_arg_list &list, const Context &ctx) const {
             auto ret = json::array();
             for (size_t i=0; i < list.size(); ++i) {
                 auto [type, value] = list[i];
@@ -109,14 +109,14 @@ namespace json {
                     if (value.card_value) {
                         ret.push_back({{ "card", {
                             {"name", value.card_value->name},
-                            {"sign", serialize(value.card_value->sign)}
+                            {"sign", serialize_unchecked(value.card_value->sign, ctx)}
                         }}});
                     } else {
                         ret.push_back({{ "card", json::object() }});
                     }
                     break;
                 case banggame::format_arg_list::format_player:
-                    ret.push_back({{ "player", serialize(utils::nullable{ value.player_value }) }});
+                    ret.push_back({{ "player", serialize_unchecked(utils::nullable{ value.player_value }, ctx) }});
                     break;
                 }
             }
@@ -125,17 +125,17 @@ namespace json {
     };
 
     template<typename Context> struct serializer<banggame::game_string, Context> {
-        json operator()(const banggame::game_string &value) const {
+        json operator()(const banggame::game_string &value, const Context &ctx) const {
             return {
-                {"format_str", serialize(value.format_str)},
-                {"format_args", serialize(value.format_args)}
+                {"format_str", serialize_unchecked(value.format_str, ctx)},
+                {"format_args", serialize_unchecked(value.format_args, ctx)}
             };
         }
     };
 
     template<> struct serializer<banggame::animation_duration, banggame::game_context> {
         json operator()(const banggame::animation_duration &duration, const banggame::game_context &context) const {
-            return serialize(context.transform_duration(duration.get()));
+            return serialize_unchecked(context.transform_duration(duration.get()), context);
         }
     };
 

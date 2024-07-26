@@ -74,8 +74,10 @@ int main(int argc, char **argv) {
         logging::status("Server stopped");
 
         return 0;
+    } catch (const std::system_error &error) {
+        std::cerr << "Could not start server: " << error.what() << '\n';
     } catch (const std::exception &error) {
         std::cerr << "Unhandled exception: " << error.what() << '\n';
-        return 1;
     }
+    return 1;
 }

@@ -33,7 +33,7 @@ namespace json {
     template<> struct deserializer<std::vector<std::byte>, image_pixels_tag> {
         std::vector<std::byte> operator()(const json &value) const {
             if (!value.is_string()) {
-                throw std::runtime_error("Cannot deserialize base64 encoded string");
+                throw deserialize_error("Cannot deserialize base64 encoded string");
             }
             return base64::base64_decode(value.get<std::string>());
         }
@@ -45,7 +45,7 @@ namespace json {
         utils::image_pixels operator()(const json &value) const {
             utils::image_pixels result = base_type{}(value, image_pixels_tag{});
             if (result.pixels.size() != result.width * result.height * 4) {
-                throw std::runtime_error("Invalid image");
+                throw deserialize_error("Invalid image");
             }
             return result;
         }

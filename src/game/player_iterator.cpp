@@ -19,7 +19,7 @@ namespace banggame {
                 break;
             }
             if (m_it == start) {
-                throw std::runtime_error("Infinite loop in player_iterator");
+                throw game_error("Infinite loop in player_iterator");
             }
         }
         return *this;
@@ -37,7 +37,7 @@ namespace banggame {
                 break;
             }
             if (m_it == start) {
-                throw std::runtime_error("Infinite loop in player_iterator");
+                throw game_error("Infinite loop in player_iterator");
             }
         }
         return *this;

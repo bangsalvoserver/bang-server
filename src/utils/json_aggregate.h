@@ -62,13 +62,13 @@ namespace json {
             } else if constexpr (std::is_default_constructible_v<value_type>) {
                 return value_type{};
             } else {
-                throw std::runtime_error(std::format("Cannot deserialize {}: missing field {}", reflect::type_name<T>(), name));
+                throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", reflect::type_name<T>(), name));
             }
         }
 
         T operator()(const json &value, const Context &ctx) const {
             if (!value.is_object()) {
-                throw std::runtime_error(std::format("Cannot deserialize {}: value is not an object", reflect::type_name<T>()));
+                throw deserialize_error(std::format("Cannot deserialize {}: value is not an object", reflect::type_name<T>()));
             }
             return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
                 return T{ deserialize_field<Is>(value, ctx) ... };
