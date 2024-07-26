@@ -1,6 +1,5 @@
 #include "manager.h"
 
-#include "git_version.h"
 #include "bot_info.h"
 
 using namespace banggame;
@@ -121,9 +120,6 @@ void game_manager::tick() {
 }
 
 void game_manager::handle_message(utils::tag<"connect">, client_state &state, const connect_args &args) {
-    if (!net::validate_commit_hash(args.commit_hash)) {
-        throw critical_error("INVALID_CLIENT_COMMIT_HASH");
-    }
     if (state.user) {
         throw lobby_error("USER_ALREADY_CONNECTED");
     }

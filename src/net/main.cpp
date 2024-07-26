@@ -5,8 +5,6 @@
 
 #include "manager.h"
 
-#include "git_version.h"
-
 volatile bool g_stop = false;
 
 void handle_stop(int signal) {
@@ -27,9 +25,6 @@ int main(int argc, char **argv) {
         ("l,logging",   "Logging Level",    cxxopts::value(logging::log_function::global_level))
         ("r,reuse-addr","Reuse Address",    cxxopts::value(reuse_addr))
         ("h,help",      "Print Help")
-#ifdef HAVE_GIT_VERSION
-        ("v,version",   "Print Version")
-#endif
     ;
 
     options.positional_help("Port Number");
@@ -42,12 +37,6 @@ int main(int argc, char **argv) {
             std::cout << options.help();
             return 0;
         }
-#ifdef HAVE_GIT_VERSION
-        else if (results.count("version")) {
-            std::cout << net::server_commit_hash << '\n';
-            return 0;
-        }
-#endif
     } catch (const std::exception &error) {
         std::cerr << "Invalid arguments: " << error.what() << '\n';
         return 1;

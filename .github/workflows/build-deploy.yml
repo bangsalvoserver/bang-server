@@ -40,7 +40,6 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         -DCMAKE_C_COMPILER=gcc-${{env.GCC_VERSION}}
         -DCMAKE_CXX_COMPILER=g++-${{env.GCC_VERSION}}
-        -DBUILD_GAME_RELEASE=ON
         -G Ninja
       
     - name: Build

@@ -1,7 +1,0 @@
-#include <string_view>
-
-namespace net {
-
-    extern const std::string_view server_commit_hash = "@GIT_HEAD_SHA1@";
-
-}

@@ -16,7 +16,6 @@ namespace banggame {
     struct connect_args {
         user_info user;
         id_type session_id;
-        std::string commit_hash;
     };
 
     struct lobby_info {
