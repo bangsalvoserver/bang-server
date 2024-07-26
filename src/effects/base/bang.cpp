@@ -10,14 +10,14 @@
 
 namespace banggame {
     
-    void effect_bang::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
+    void effect_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         if (!flags.check(effect_flag::skip_target_logs)) {
             target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         }
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
-    static void queue_request_bang(card *origin_card, player *origin, player *target, effect_flags flags = {}) {
+    static void queue_request_bang(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}) {
         flags.add(effect_flag::is_bang);
         flags.add(effect_flag::single_target);
         auto req = std::make_shared<request_bang>(origin_card, origin, target, flags);
@@ -25,7 +25,7 @@ namespace banggame {
         req->origin->m_game->queue_request(std::move(req));
     }
 
-    game_string effect_bangcard::get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) {
+    game_string effect_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
         if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flag::treat_any_as_bang)) {
             return "ERROR_CARD_INACTIVE";
         } else if (!ctx.disable_bang_checks) {
@@ -37,48 +37,48 @@ namespace banggame {
         }
     }
 
-    void effect_bangcard::on_play(card *origin_card, player *origin, player *target) {
+    void effect_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         queue_request_bang(origin_card, origin, target);
     }
 
-    bool handler_play_as_bang::on_check_target(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target) {
+    bool handler_play_as_bang::on_check_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target) {
         return effect_bangcard{}.on_check_target(chosen_card, origin, target);
     }
 
-    game_string handler_play_as_bang::get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target) {
+    game_string handler_play_as_bang::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target) {
         MAYBE_RETURN(get_play_card_error(origin, chosen_card, ctx));
         return effect_bangcard{}.get_error(chosen_card, origin, target, ctx);
     }
 
-    game_string handler_play_as_bang::on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target) {
+    game_string handler_play_as_bang::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target) {
         return effect_bangcard{}.on_prompt(chosen_card, origin, target);
     }
 
-    void handler_play_as_bang::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card, player *target) {
+    void handler_play_as_bang::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
         origin->discard_used_card(chosen_card);
         queue_request_bang(chosen_card, origin, target, effect_flag::play_as_bang);
     }
     
-    game_string effect_banglimit::get_error(card *origin_card, player *origin, const effect_context &ctx) {
+    game_string effect_banglimit::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         if (!ctx.disable_banglimit && origin->get_bangs_played() >= 1) {
             return "ERROR_ONE_BANG_PER_TURN";
         }
         return {};
     }
 
-    void effect_banglimit::on_play(card *origin_card, player *origin, const effect_context &ctx) {
+    void effect_banglimit::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         if (ctx.disable_banglimit) {
             return;
         }
         event_card_key key{origin_card, 4};
-        origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](player *p, int &value) {
+        origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](player_ptr p, int &value) {
             if (origin == p) {
                 ++value;
             }
         });
-        origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player *p, bool skipped) {
+        origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player_ptr p, bool skipped) {
             if (origin == p) {
                 origin->m_game->remove_listeners(key);
             }
@@ -88,19 +88,19 @@ namespace banggame {
     equip_treat_as_bang::equip_treat_as_bang(int value)
         : flag{value == 1 ? player_flag::treat_missed_as_bang : player_flag::treat_any_as_bang} {}
 
-    void equip_treat_as_bang::on_enable(card *origin_card, player *p) {
+    void equip_treat_as_bang::on_enable(card_ptr origin_card, player_ptr p) {
         p->add_player_flags(flag);
     }
 
-    void equip_treat_as_bang::on_disable(card *origin_card, player *p) {
+    void equip_treat_as_bang::on_disable(card_ptr origin_card, player_ptr p) {
         p->remove_player_flags(flag);
     }
 
-    bool modifier_bangmod::valid_with_modifier(card *origin_card, player *origin, card *target_card) {
+    bool modifier_bangmod::valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         return target_card->has_tag(tag_type::bangmod);
     }
 
-    bool modifier_bangmod::valid_with_card(card *origin_card, player *origin, card *target_card) {
+    bool modifier_bangmod::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         if (target_card->pocket == pocket_type::player_hand) {
             return target_card->has_tag(tag_type::bangcard);
         } else {
@@ -108,11 +108,11 @@ namespace banggame {
         }
     }
     
-    bool request_bang::can_miss(card *c) const {
+    bool request_bang::can_miss(card_ptr c) const {
         return !unavoidable && missable_request::can_miss(c);
     }
 
-    void request_bang::on_miss(card *c, effect_flags missed_flags) {
+    void request_bang::on_miss(card_ptr c, effect_flags missed_flags) {
         if (--bang_strength == 0) {
             missed_flags.merge(flags);
             target->m_game->call_event(event_type::on_missed{ origin_card, origin, target, c, missed_flags });
@@ -142,7 +142,7 @@ namespace banggame {
         }
     }
 
-    game_string request_bang::status_text(player *owner) const {
+    game_string request_bang::status_text(player_ptr owner) const {
         if (flags.check(effect_flag::play_as_bang)) {
             if (flags.check(effect_flag::multi_target)) {
                 if (target != owner) {
@@ -164,11 +164,11 @@ namespace banggame {
         }
     }
 
-    bool effect_bangresponse::can_play(card *origin_card, player *origin) {
+    bool effect_bangresponse::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<respondable_with_bang>(origin) != nullptr;
     }
 
-    void effect_bangresponse::on_play(card *origin_card, player *origin) {
+    void effect_bangresponse::on_play(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request<respondable_with_bang>();
         req->respond_with_bang();
     }

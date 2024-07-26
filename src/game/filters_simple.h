@@ -5,13 +5,13 @@
 
 namespace banggame::filters {
 
-    bool is_player_bot(const player *p);
+    bool is_player_bot(const_player_ptr p);
 
-    bool is_equip_card(const card *c);
+    bool is_equip_card(const_card_ptr c);
 
-    bool is_modifier_card(const player *origin, const card *c);
+    bool is_modifier_card(const_player_ptr origin, const_card_ptr c);
 
-    bool is_bang_card(const player *origin, const card *target);
+    bool is_bang_card(const_player_ptr origin, const_card_ptr target);
 
 }
 

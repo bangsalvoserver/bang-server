@@ -7,8 +7,8 @@
 
 namespace banggame {
     
-    void equip_manuelita::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_train_advance>({target_card, 2}, [=](player *target, shared_effect_context ctx) {
+    void equip_manuelita::on_enable(card_ptr target_card, player_ptr origin) {
+        origin->m_game->add_listener<event_type::on_train_advance>({target_card, 2}, [=](player_ptr target, shared_effect_context ctx) {
             if (origin->m_game->train_position == origin->m_game->m_stations.size()) {
                 origin->m_game->queue_action([=]{
                     target_card->flash_card();

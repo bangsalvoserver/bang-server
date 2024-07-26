@@ -5,14 +5,14 @@
 
 namespace banggame {
 
-    static void resolve_rust(card *origin_card, player *origin, player *target) {
-        for (card *c : target->cube_slots() | rn::to_vector) {
+    static void resolve_rust(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        for (card_ptr c : target->cube_slots() | rn::to_vector) {
             c->move_cubes(origin->first_character(), 1);
         }
     }
 
     struct request_rust : request_resolvable {
-        request_rust(card *origin_card, player *origin, player *target, effect_flags flags = {})
+        request_rust(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags, 0) {}
 
         struct rust_timer : request_timer {
@@ -46,7 +46,7 @@ namespace banggame {
             resolve_rust(origin_card, origin, target);
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (target == owner) {
                 return {"STATUS_RUST", origin_card};
             } else {
@@ -55,7 +55,7 @@ namespace banggame {
         }
     };
     
-    void effect_rust::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
+    void effect_rust::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         origin->m_game->queue_request<request_rust>(origin_card, origin, target, flags);
     }
 

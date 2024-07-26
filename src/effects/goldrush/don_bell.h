@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct equip_don_bell : event_equip {
-        void on_enable(card *target_card, player *origin);
+        void on_enable(card_ptr target_card, player_ptr origin);
     };
 
     DEFINE_EQUIP(don_bell, equip_don_bell)

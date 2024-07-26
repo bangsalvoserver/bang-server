@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct equip_molly_stark : event_equip {
-        void on_enable(card *target_card, player *target);
+        void on_enable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(molly_stark, equip_molly_stark)

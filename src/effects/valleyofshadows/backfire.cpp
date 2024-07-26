@@ -8,8 +8,8 @@
 
 namespace banggame {
 
-    void effect_backfire::on_play(card *origin_card, player *origin) {
-        player *target = origin->m_game->top_request()->origin;
+    void effect_backfire::on_play(card_ptr origin_card, player_ptr origin) {
+        player_ptr target = origin->m_game->top_request()->origin;
         effect_missed::on_play(origin_card, origin);
         if (target) {
             effect_flags flags { effect_flag::escapable, effect_flag::single_target };

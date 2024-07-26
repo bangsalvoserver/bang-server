@@ -94,7 +94,7 @@ namespace banggame {
             do_remove_listeners({low, high});
         }
 
-        void remove_listeners(card *key) {
+        void remove_listeners(card_ptr key) {
             auto [low, high] = m_map.equal_range(key);
             do_remove_listeners({low, high});
         }

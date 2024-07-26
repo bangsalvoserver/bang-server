@@ -7,10 +7,10 @@
 namespace banggame {
 
     struct request_tornado : request_picking {
-        request_tornado(card *origin_card, player *origin, player *target, effect_flags flags = {})
+        request_tornado(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags) {}
         
-        bool can_pick(const card *target_card) const override {
+        bool can_pick(const_card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
         }
 
@@ -25,14 +25,14 @@ namespace banggame {
             }
         }
         
-        void on_pick(card *target_card) override {
+        void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
             target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->discard_used_card(target_card);
             target->draw_card(2, origin_card);
         }
         
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (target == owner) {
                 return {"STATUS_TORNADO", origin_card};
             } else {
@@ -41,7 +41,7 @@ namespace banggame {
         }
     };
     
-    void effect_tornado::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
+    void effect_tornado::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         target->m_game->queue_request<request_tornado>(origin_card, origin, target, flags);
     }
 }

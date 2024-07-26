@@ -10,16 +10,16 @@ namespace banggame {
 
     namespace event_type {
         struct on_destroy_card {
-            player *origin;
-            card *target_card;
+            player_ptr origin;
+            card_ptr target_card;
             nullable_ref<bool> handled;
         };
     }
 
     struct effect_steal : prompt_target_self, bot_suggestion::target_enemy_card {
-        game_string get_error(card *origin_card, player *origin, card *target);
-        void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
-        void on_resolve(card *origin_card, player *origin, card *target);
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags = {});
+        void on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 
     DEFINE_EFFECT(steal, effect_steal)
@@ -28,26 +28,26 @@ namespace banggame {
         bool used;
         effect_discard(int value = 0) : used(value) {}
 
-        game_string on_prompt(card *origin_card, player *origin, card *target);
-        void on_play(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin, card *target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 
     DEFINE_EFFECT(discard, effect_discard)
 
     struct effect_destroy: prompt_target_self, bot_suggestion::target_enemy_card {
-        void on_play(card *origin_card, player *origin, card *target, effect_flags flags = {});
-        void on_resolve(card *origin_card, player *origin, card *target);
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags = {});
+        void on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 
     DEFINE_EFFECT(destroy, effect_destroy)
 
     struct request_targeting : request_resolvable {
-        request_targeting(card *origin_card, player *origin, player *target, card *target_card, effect_flags flags = {}, int priority = 40)
+        request_targeting(card_ptr origin_card, player_ptr origin, player_ptr target, card_ptr target_card, effect_flags flags = {}, int priority = 40)
             : request_resolvable(origin_card, origin, target, flags, priority)
             , target_card(target_card) {}
         
-        card *target_card;
+        card_ptr target_card;
 
         struct timer_targeting : request_timer {
             explicit timer_targeting(request_targeting *request);

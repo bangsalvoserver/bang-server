@@ -47,11 +47,11 @@ namespace banggame {
     }
 
     template<typename RetType, typename HandlerType, typename ... Args>
-    using fun_mem_ptr_t = RetType (HandlerType::*)(card *origin_card, player *origin, Args...);
+    using fun_mem_ptr_t = RetType (HandlerType::*)(card_ptr origin_card, player_ptr origin, Args...);
 
     template<typename RetType, typename HandlerType, typename CtxType, typename ... Args>
     requires std::same_as<std::remove_cvref_t<CtxType>, effect_context>
-    using ctx_fun_mem_ptr_t = RetType (HandlerType::*)(card *origin_card, player *origin, CtxType ctx, Args...);
+    using ctx_fun_mem_ptr_t = RetType (HandlerType::*)(card_ptr origin_card, player_ptr origin, CtxType ctx, Args...);
 
     template<typename T> struct mth_unwrapper;
 
@@ -59,7 +59,7 @@ namespace banggame {
     struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>> {
         fun_mem_ptr_t<RetType, HandlerType, Args...> m_value;
 
-        RetType operator()(card *origin_card, player *origin, const target_list &targets, small_int_set args, const effect_context &ctx) {
+        RetType operator()(card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) {
             return std::apply(m_value, std::tuple_cat(
                 std::tuple{HandlerType{}, origin_card, origin},
                 build_mth_args<Args...>(targets, args)
@@ -71,7 +71,7 @@ namespace banggame {
     struct mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>> {
         ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...> m_value;
 
-        RetType operator()(card *origin_card, player *origin, const target_list &targets, small_int_set args, CtxType ctx) {
+        RetType operator()(card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, CtxType ctx) {
             return std::apply(m_value, std::tuple_cat(
                 std::tuple{HandlerType{}, origin_card, origin, ctx},
                 build_mth_args<Args...>(targets, args)
@@ -88,20 +88,20 @@ namespace banggame {
     struct mth_vtable {
         std::string_view name;
         
-        game_string (*get_error)(card *origin_card, player *origin, const target_list &targets, small_int_set args, const effect_context &ctx);
-        game_string (*on_prompt)(card *origin_card, player *origin, const target_list &targets, small_int_set args, const effect_context &ctx);
-        void (*on_play)(card *origin_card, player *origin, const target_list &targets, small_int_set args, const effect_context &ctx);
+        game_string (*get_error)(card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx);
+        game_string (*on_prompt)(card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx);
+        void (*on_play)(card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx);
     };
 
-    inline game_string mth_holder::get_error(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
+    inline game_string mth_holder::get_error(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const {
         return type->get_error(origin_card, origin, targets, args, ctx);
     }
 
-    inline game_string mth_holder::on_prompt(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
+    inline game_string mth_holder::on_prompt(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const {
         return type->on_prompt(origin_card, origin, targets, args, ctx);
     }
 
-    inline void mth_holder::on_play(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const {
+    inline void mth_holder::on_play(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const {
         type->on_play(origin_card, origin, targets, args, ctx);
     }
 
@@ -110,7 +110,7 @@ namespace banggame {
         return {
             .name = name,
 
-            .get_error = [](card *origin_card, player *origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> game_string {
+            .get_error = [](card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> game_string {
                 if constexpr (requires { mth_unwrapper{&T::get_error}; }) {
                     return mth_unwrapper{&T::get_error}(origin_card, origin, targets, args, ctx);
                 } else  if constexpr (requires { mth_unwrapper{&T::can_play}; }) {
@@ -121,7 +121,7 @@ namespace banggame {
                 return {};
             },
 
-            .on_prompt = [](card *origin_card, player *origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> game_string {
+            .on_prompt = [](card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> game_string {
                 if constexpr (requires { mth_unwrapper{&T::on_check_target}; }) {
                     if (filters::is_player_bot(origin) && !mth_unwrapper{&T::on_check_target}(origin_card, origin, targets, args, ctx)) {
                         return "BOT_BAD_PLAY";
@@ -133,7 +133,7 @@ namespace banggame {
                 return {};
             },
 
-            .on_play = [](card *origin_card, player *origin, const target_list &targets, small_int_set args, const effect_context &ctx) {
+            .on_play = [](card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) {
                 if constexpr (requires { mth_unwrapper{&T::on_play}; }) {
                     mth_unwrapper{&T::on_play}(origin_card, origin, targets, args, ctx);
                 }

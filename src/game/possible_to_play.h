@@ -10,11 +10,11 @@
 
 namespace banggame {
     
-    bool is_possible_to_play(player *origin, card *origin_card, bool is_response = false, const card_list &modifiers = {}, const effect_context &ctx = {});
+    bool is_possible_to_play(player_ptr origin, card_ptr origin_card, bool is_response = false, const card_list &modifiers = {}, const effect_context &ctx = {});
 
-    playable_cards_list generate_playable_cards_list(player *origin, bool is_response = false);
+    playable_cards_list generate_playable_cards_list(player_ptr origin, bool is_response = false);
     
-    inline auto get_all_active_cards(player *origin) {
+    inline auto get_all_active_cards(player_ptr origin) {
         return rv::concat(
             origin->m_hand,
             origin->m_table,
@@ -29,7 +29,7 @@ namespace banggame {
         );
     }
 
-    inline auto get_all_targetable_cards(player *origin) {
+    inline auto get_all_targetable_cards(player_ptr origin) {
         return rv::concat(
             origin->m_game->m_players | rv::for_each(&player::m_targetable_cards_view),
             origin->m_game->m_selection,
@@ -38,27 +38,27 @@ namespace banggame {
         );
     }
 
-    inline auto get_all_playable_cards(player *origin, bool is_response = false) {
-        return rv::filter(get_all_active_cards(origin), [=](card *origin_card) {
+    inline auto get_all_playable_cards(player_ptr origin, bool is_response = false) {
+        return rv::filter(get_all_active_cards(origin), [=](card_ptr origin_card) {
             return is_possible_to_play(origin, origin_card, is_response);
         });
     }
 
-    inline auto get_all_equip_targets(player *origin, card *origin_card, const effect_context &ctx = {}) {
-        return rv::filter(origin->m_game->m_players, [=](player *target) {
+    inline auto get_all_equip_targets(player_ptr origin, card_ptr origin_card, const effect_context &ctx = {}) {
+        return rv::filter(origin->m_game->m_players, [=](player_ptr target) {
             return !get_equip_error(origin, origin_card, target, ctx);
         });
     }
 
-    inline auto get_all_player_targets(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {}) {
-        return rv::filter(origin->m_game->m_players, [=](player *target) {
+    inline auto get_all_player_targets(player_ptr origin, card_ptr origin_card, const effect_holder &holder, const effect_context &ctx = {}) {
+        return rv::filter(origin->m_game->m_players, [=](player_ptr target) {
             return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
                 && !holder.get_error(origin_card, origin, target, ctx);
         });
     }
 
-    inline auto get_all_card_targets(player *origin, card *origin_card, const effect_holder &holder, const effect_context &ctx = {}) {
-        return rv::filter(get_all_targetable_cards(origin), [=](card *target_card) {
+    inline auto get_all_card_targets(player_ptr origin, card_ptr origin_card, const effect_holder &holder, const effect_context &ctx = {}) {
+        return rv::filter(get_all_targetable_cards(origin), [=](card_ptr target_card) {
             return (!target_card->owner || !filters::check_player_filter(origin, holder.player_filter, target_card->owner, ctx))
                 && !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
                 && !holder.get_error(origin_card, origin, target_card, ctx);

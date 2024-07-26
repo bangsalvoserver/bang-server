@@ -6,14 +6,14 @@
 
 namespace banggame {
     
-    bool effect_escape::can_play(card *origin_card, player *origin) {
+    bool effect_escape::can_play(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request(origin)) {
             return req->flags.check(effect_flag::escapable);
         }
         return false;
     }
 
-    void effect_escape::on_play(card *origin_card, player *origin) {
+    void effect_escape::on_play(card_ptr origin_card, player_ptr origin) {
         origin->m_game->pop_request();
     }
 }

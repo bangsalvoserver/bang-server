@@ -6,19 +6,19 @@
 
 namespace banggame {
     
-    void equip_sacagaway::on_enable(card *target_card, player *target) {
+    void equip_sacagaway::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_game_flags(game_flag::hands_shown);
 
-        for (player *p : range_all_players(target)) {
-            for (card *c : p->m_hand) {
+        for (player_ptr p : range_all_players(target)) {
+            for (card_ptr c : p->m_hand) {
                 c->set_visibility(card_visibility::shown);
             }
         }
     }
 
-    void equip_sacagaway::on_disable(card *target_card, player *target) {
-        for (player *p : range_all_players(target)) {
-            for (card *c : p->m_hand) {
+    void equip_sacagaway::on_disable(card_ptr target_card, player_ptr target) {
+        for (player_ptr p : range_all_players(target)) {
+            for (card_ptr c : p->m_hand) {
                 c->set_visibility(card_visibility::show_owner, p);
             }
         }

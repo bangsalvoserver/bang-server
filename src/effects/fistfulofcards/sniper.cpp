@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    void effect_sniper::on_play(card *origin_card, player *origin, player *target) {
+    void effect_sniper::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
         target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         auto req = std::make_shared<request_bang>(origin_card, origin, target);
         req->bang_strength = 2;

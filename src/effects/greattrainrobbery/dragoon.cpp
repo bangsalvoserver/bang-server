@@ -6,8 +6,8 @@
 
 namespace banggame {
 
-    void equip_dragoon::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::count_bangs_played>(origin_card, [=](player *target, int &value) {
+    void equip_dragoon::on_enable(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->add_listener<event_type::count_bangs_played>(origin_card, [=](player_ptr target, int &value) {
             if (origin == target) {
                 --value;
             }

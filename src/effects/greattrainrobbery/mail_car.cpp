@@ -7,7 +7,7 @@
 namespace banggame {
 
     struct request_mail_car : request_base {
-        request_mail_car(card *origin_card, player *origin)
+        request_mail_car(card_ptr origin_card, player_ptr origin)
             : request_base(origin_card, nullptr, origin) {}
         
         void on_update() override {
@@ -18,7 +18,7 @@ namespace banggame {
             }
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_MAIL_CAR", origin_card};
             } else {
@@ -27,15 +27,15 @@ namespace banggame {
         }
     };
 
-    void effect_mail_car::on_play(card *origin_card, player *origin) {
+    void effect_mail_car::on_play(card_ptr origin_card, player_ptr origin) {
         origin->m_game->queue_request<request_mail_car>(origin_card, origin);
     }
 
-    bool effect_mail_car_response::can_play(card *origin_card, player *origin) {
+    bool effect_mail_car_response::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<request_mail_car>(origin) != nullptr;
     }
 
-    void handler_mail_car::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {
+    void handler_mail_car::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
         origin->m_game->pop_request();
 
         if (!origin->m_game->check_flags(game_flag::hands_shown)) {
@@ -47,7 +47,7 @@ namespace banggame {
         target_player->add_to_hand(target_card);
 
         while (!origin->m_game->m_selection.empty()) {
-            card *c = origin->m_game->m_selection.front();
+            card_ptr c = origin->m_game->m_selection.front();
             if (!origin->m_game->check_flags(game_flag::hands_shown)) {
                 origin->m_game->add_log(update_target::includes(origin), "LOG_DRAWN_CARD", origin, c);
                 origin->m_game->add_log(update_target::excludes(origin), "LOG_DRAWN_CARDS", origin, 1);

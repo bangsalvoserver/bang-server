@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    game_string equip_wanted::on_prompt(card *origin_card, player *origin, player *target) {
+    game_string equip_wanted::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
         MAYBE_RETURN(prompt_target_self::on_prompt(origin_card, origin, target));
         if (target->m_role == player_role::sheriff) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
@@ -15,8 +15,8 @@ namespace banggame {
         }
     }
 
-    void equip_wanted::on_enable(card *target_card, player *p) {
-        p->m_game->add_listener<event_type::on_player_death>({target_card, 3}, [p, target_card](player *origin, player *target) {
+    void equip_wanted::on_enable(card_ptr target_card, player_ptr p) {
+        p->m_game->add_listener<event_type::on_player_death>({target_card, 3}, [p, target_card](player_ptr origin, player_ptr target) {
             if (origin && origin->alive() && p == target && origin != target) {
                 target_card->flash_card();
                 origin->draw_card(2, target_card);

@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void effect_sell_beer::on_play(card *origin_card, player *origin, card *target_card) {
+    void effect_sell_beer::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         origin->m_game->add_log("LOG_SOLD_BEER", origin, target_card);
         origin->discard_card(target_card);
         origin->add_gold(1);

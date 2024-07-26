@@ -10,15 +10,15 @@ namespace banggame {
         int amount;
         effect_heal(int value) : amount(std::max(1, value)) {}
 
-        game_string on_prompt(card *origin_card, player *origin) {
+        game_string on_prompt(card_ptr origin_card, player_ptr origin) {
             return on_prompt(origin_card, origin, origin);
         }
-        game_string on_prompt(card *origin_card, player *origin, player *target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
 
-        void on_play(card *origin_card, player *origin) {
+        void on_play(card_ptr origin_card, player_ptr origin) {
             on_play(origin_card, origin, origin);
         }
-        void on_play(card *origin_card, player *origin, player *target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 
     DEFINE_EFFECT(heal, effect_heal)
@@ -26,10 +26,10 @@ namespace banggame {
     struct effect_heal_notfull : effect_heal {
         using effect_heal::effect_heal;
 
-        game_string get_error(card *origin_card, player *origin) {
+        game_string get_error(card_ptr origin_card, player_ptr origin) {
             return get_error(origin_card, origin, origin);
         }
-        game_string get_error(card *origin_card, player *origin, player *target);
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 
     DEFINE_EFFECT(heal_notfull, effect_heal_notfull)

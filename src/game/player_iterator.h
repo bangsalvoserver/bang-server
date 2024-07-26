@@ -12,12 +12,12 @@ struct player_iterator {
 public:
     using iterator_category = std::bidirectional_iterator_tag;
     using difference_type = int;
-    using value_type = player *;
+    using value_type = player_ptr;
     using pointer = value_type *;
     using reference = value_type &;
 
     player_iterator() = default;
-    explicit player_iterator(const player *p);
+    explicit player_iterator(const_player_ptr p);
 
     reference operator *() const { return *m_it; }
     pointer operator ->() { return &*m_it; }
@@ -44,9 +44,9 @@ private:
     decltype(game_table::m_players)::iterator m_it;
 };
 
-utils::generator<player *> range_all_players(const player *begin);
-utils::generator<player *> range_all_players_and_dead(const player *begin);
-utils::generator<player *> range_other_players(const player *begin);
+utils::generator<player_ptr> range_all_players(const_player_ptr begin);
+utils::generator<player_ptr> range_all_players_and_dead(const_player_ptr begin);
+utils::generator<player_ptr> range_other_players(const_player_ptr begin);
 
 }
 

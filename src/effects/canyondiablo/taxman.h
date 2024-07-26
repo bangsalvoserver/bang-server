@@ -11,7 +11,7 @@ namespace banggame {
         int predraw_check_priority;
         equip_taxman(int predraw_check_priority) : predraw_check_priority{predraw_check_priority} {}
         
-        void on_enable(card *target_card, player *target);
+        void on_enable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(taxman, equip_taxman)

@@ -4,7 +4,7 @@
 #include "player.h"
 
 namespace banggame {
-    player_iterator::player_iterator(const player *p)
+    player_iterator::player_iterator(const_player_ptr p)
         : m_it(rn::find(p->m_game->m_players, p)) {}
 
     player_iterator &player_iterator::operator++() {
@@ -43,7 +43,7 @@ namespace banggame {
         return *this;
     }
 
-    utils::generator<player *> range_all_players(const player *begin) {
+    utils::generator<player_ptr> range_all_players(const_player_ptr begin) {
         auto &list = begin->m_game->m_players;
         auto it = rn::find(list, begin);
         while (true) {
@@ -59,7 +59,7 @@ namespace banggame {
         }
     }
 
-    utils::generator<player *> range_all_players_and_dead(const player *begin) {
+    utils::generator<player_ptr> range_all_players_and_dead(const_player_ptr begin) {
         auto &list = begin->m_game->m_players;
         auto it = rn::find(list, begin);
         while (true) {
@@ -73,7 +73,7 @@ namespace banggame {
         }
     }
 
-    utils::generator<player *> range_other_players(const player *begin) {
+    utils::generator<player_ptr> range_other_players(const_player_ptr begin) {
         auto &list = begin->m_game->m_players;
         auto it = rn::find(list, begin);
         while (true) {

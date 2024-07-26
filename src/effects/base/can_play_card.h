@@ -18,12 +18,12 @@ namespace banggame {
         }
 
         void on_resolve() override;
-        game_string status_text(player *owner) const override;
+        game_string status_text(player_ptr owner) const override;
     };
 
     struct effect_can_play_card {
-        bool can_play(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+        bool can_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(can_play_card, effect_can_play_card)

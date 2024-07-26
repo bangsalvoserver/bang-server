@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    void effect_cactus::on_play(card *origin_card, player *origin) {
+    void effect_cactus::on_play(card_ptr origin_card, player_ptr origin) {
         origin->m_game->queue_request<request_check>(origin, origin_card, &card_sign::is_red, [=](bool result) {
             if (result) {
                 origin->heal(1);

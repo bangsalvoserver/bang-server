@@ -13,14 +13,14 @@ namespace banggame {
 
     namespace event_type {
         struct check_card_taker {
-            player *target;
+            player_ptr target;
             card_taker_type type;
-            nullable_ref<card *> value;
+            nullable_ref<card_ptr> value;
         };
     }
     
     struct equip_vulture_sam : event_equip {
-        void on_enable(card *target_card, player *target);
+        void on_enable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(vulture_sam, equip_vulture_sam)

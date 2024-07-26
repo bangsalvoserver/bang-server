@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_sell_beer {
-        void on_play(card *origin_card, player *origin, card *target);
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 
     DEFINE_EFFECT(sell_beer, effect_sell_beer)

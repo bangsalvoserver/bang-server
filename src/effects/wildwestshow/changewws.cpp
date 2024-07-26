@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    void effect_changewws::on_play(card *origin_card, player *origin, const effect_context &ctx) {
+    void effect_changewws::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         auto &scenario_deck = origin->m_game->m_wws_scenario_deck;
         auto &scenario_cards = origin->m_game->m_wws_scenario_cards;
 

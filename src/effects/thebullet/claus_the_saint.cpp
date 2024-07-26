@@ -9,7 +9,7 @@
 namespace banggame {
 
     struct request_claus_the_saint : request_base, interface_target_set_players {
-        request_claus_the_saint(card *origin_card, player *target, shared_request_draw &&req_draw)
+        request_claus_the_saint(card_ptr origin_card, player_ptr target, shared_request_draw &&req_draw)
             : request_base(origin_card, nullptr, target)
             , req_draw(std::move(req_draw)) {}
 
@@ -26,7 +26,7 @@ namespace banggame {
             }
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_CLAUS_THE_SAINT", origin_card};
             } else {
@@ -34,13 +34,13 @@ namespace banggame {
             }
         }
 
-        bool in_target_set(const player *target_player) const override {
+        bool in_target_set(const_player_ptr target_player) const override {
             return target_player != target && !rn::contains(selected_targets, target_player);
         }
     };
     
-    void equip_claus_the_saint::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, shared_request_draw req_draw, bool &handled) {
+    void equip_claus_the_saint::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player_ptr origin, shared_request_draw req_draw, bool &handled) {
             if (!handled && origin == target) {
                 target->m_game->queue_request<request_claus_the_saint>(target_card, target, std::move(req_draw));
                 handled = true;
@@ -48,11 +48,11 @@ namespace banggame {
         });
     }
 
-    bool effect_claus_the_saint::can_play(card *origin_card, player *origin) {
+    bool effect_claus_the_saint::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<request_claus_the_saint>(origin) != nullptr;
     }
 
-    void handler_claus_the_saint::on_play(card *origin_card, player *origin, card *target_card, player *target_player) {
+    void handler_claus_the_saint::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
         auto req = origin->m_game->top_request<request_claus_the_saint>(origin);
         req->selected_targets.push_back(target_player);
         

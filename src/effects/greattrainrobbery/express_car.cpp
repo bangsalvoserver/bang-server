@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    game_string effect_express_car::get_error(card *origin_card, player *origin) {
+    game_string effect_express_car::get_error(card_ptr origin_card, player_ptr origin) {
         int usages = 0;
         origin->m_game->call_event(event_type::count_usages{ origin, origin_card, usages });
         if (usages >= 1) {
@@ -18,9 +18,9 @@ namespace banggame {
         return {};
     }
 
-    game_string effect_express_car::on_prompt(card *origin_card, player *origin) {
+    game_string effect_express_car::on_prompt(card_ptr origin_card, player_ptr origin) {
         if (origin->is_bot()) {
-            if (rn::any_of(get_all_playable_cards(origin), [](card *c) { return c->pocket == pocket_type::player_hand; })) {
+            if (rn::any_of(get_all_playable_cards(origin), [](card_ptr c) { return c->pocket == pocket_type::player_hand; })) {
                 return "BOT_BAD_PLAY";
             }
         } else if (int ncards = int(origin->m_hand.size())) {
@@ -29,14 +29,14 @@ namespace banggame {
         return {};
     }
 
-    void effect_express_car::on_play(card *origin_card, player *origin) {
+    void effect_express_car::on_play(card_ptr origin_card, player_ptr origin) {
         event_card_key key{origin_card, 5};
-        origin->m_game->add_listener<event_type::count_usages>(key, [=](player *e_origin, card *e_card, int &usages) {
+        origin->m_game->add_listener<event_type::count_usages>(key, [=](player_ptr e_origin, card_ptr e_card, int &usages) {
             if (origin_card == e_card && origin == e_origin) {
                 ++usages;
             }
         });
-        origin->m_game->add_listener<event_type::pre_turn_start>(key, [=](player *p) {
+        origin->m_game->add_listener<event_type::pre_turn_start>(key, [=](player_ptr p) {
             if (p != origin) {
                 origin->m_game->remove_listeners(key);
             }

@@ -5,16 +5,16 @@
 
 namespace banggame {
 
-    bool effect_sacrifice::can_play(card *origin_card, player *origin) {
+    bool effect_sacrifice::can_play(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request<request_damage>()) {
             return req->target != origin && (!req->savior || req->savior == origin);
         }
         return false;
     }
 
-    void effect_sacrifice::on_play(card *origin_card, player *origin) {
+    void effect_sacrifice::on_play(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request<request_damage>();
-        player *saved = req->target;
+        player_ptr saved = req->target;
         req->savior = origin;
         bool fatal = saved->m_hp <= req->damage;
 

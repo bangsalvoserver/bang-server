@@ -6,15 +6,15 @@
 namespace banggame {
 
     struct equip_tumbleweed : event_equip {
-        void on_enable(card *target_card, player *target);
+        void on_enable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(tumbleweed, equip_tumbleweed)
 
     struct effect_tumbleweed {
-        bool on_check_target(card *origin_card, player *origin);
-        bool can_play(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+        bool on_check_target(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(tumbleweed, effect_tumbleweed)

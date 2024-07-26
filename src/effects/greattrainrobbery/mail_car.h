@@ -8,22 +8,22 @@
 namespace banggame {
 
     struct effect_mail_car {
-        void on_play(card *origin_card, player *origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(mail_car, effect_mail_car)
 
     struct effect_mail_car_response {
-        bool can_play(card *origin_card, player *origin);
+        bool can_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(mail_car_response, effect_mail_car_response)
 
     struct handler_mail_car {
-        bool on_check_target(card *origin_card, player *origin, card *target_card, player *target) {
+        bool on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target) {
             return bot_suggestion::target_friend{}.on_check_target(origin_card, origin, target);
         }
-        void on_play(card *origin_card, player *origin, card *target_card, player *target);  
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);  
     };
 
     DEFINE_MTH(mail_car, handler_mail_car)

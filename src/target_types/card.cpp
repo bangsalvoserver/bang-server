@@ -11,11 +11,11 @@ namespace banggame {
         return bool(get_all_card_targets(origin, origin_card, effect, ctx));
     }
 
-    template<> card *visit_card::random_target(const effect_context &ctx) {
+    template<> card_ptr visit_card::random_target(const effect_context &ctx) {
         return random_element(get_all_card_targets(origin, origin_card, effect, ctx), origin->m_game->bot_rng);
     }
 
-    template<> game_string visit_card::get_error(const effect_context &ctx, card *target) {
+    template<> game_string visit_card::get_error(const effect_context &ctx, card_ptr target) {
         if (target->owner) {
             MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target->owner, ctx));
         }
@@ -23,16 +23,16 @@ namespace banggame {
         return effect.get_error(origin_card, origin, target, ctx);
     }
 
-    template<> game_string visit_card::prompt(const effect_context &ctx, card *target) {
+    template<> game_string visit_card::prompt(const effect_context &ctx, card_ptr target) {
         return effect.on_prompt(origin_card, origin, target, ctx);
     }
 
-    template<> void visit_card::add_context(effect_context &ctx, card *target) {
+    template<> void visit_card::add_context(effect_context &ctx, card_ptr target) {
         ctx.selected_cards.push_back(target);
         effect.add_context(origin_card, origin, target, ctx);
     }
 
-    template<> void visit_card::play(const effect_context &ctx, card *target) {
+    template<> void visit_card::play(const effect_context &ctx, card_ptr target) {
         effect_flags flags = effect_flag::single_target;
         if (origin_card->is_brown()) {
             flags.add(effect_flag::escapable);

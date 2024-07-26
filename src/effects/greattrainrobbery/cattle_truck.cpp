@@ -7,7 +7,7 @@
 namespace banggame {
 
     struct request_cattle_truck : selection_picker {
-        request_cattle_truck(card *origin_card, player *target)
+        request_cattle_truck(card_ptr origin_card, player_ptr target)
             : selection_picker(origin_card, target, target) {}
 
         void on_update() override {
@@ -23,7 +23,7 @@ namespace banggame {
             }
         }
         
-        void on_pick(card *target_card) {
+        void on_pick(card_ptr target_card) {
             target->m_game->pop_request();
             target->add_to_hand(target_card);
 
@@ -32,7 +32,7 @@ namespace banggame {
             }
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_CATTLE_TRUCK", origin_card};
             } else {
@@ -41,7 +41,7 @@ namespace banggame {
         }
     };
 
-    game_string effect_cattle_truck::on_prompt(card *origin_card, player *origin) {
+    game_string effect_cattle_truck::on_prompt(card_ptr origin_card, player_ptr origin) {
         if (origin->m_game->m_discards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
@@ -49,7 +49,7 @@ namespace banggame {
         }
     }
 
-    void effect_cattle_truck::on_play(card *origin_card, player *origin) {
+    void effect_cattle_truck::on_play(card_ptr origin_card, player_ptr origin) {
         origin->m_game->queue_request<request_cattle_truck>(origin_card, origin);
     }
 }

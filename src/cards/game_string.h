@@ -18,8 +18,8 @@ namespace banggame {
 
         union format_arg {
             int number_value;
-            card *card_value;
-            player *player_value;
+            card_ptr card_value;
+            player_ptr player_value;
         };
 
         template<typename ... Ts>
@@ -51,13 +51,13 @@ namespace banggame {
             ++count;
         }
 
-        constexpr void add(card *value) {
+        constexpr void add(card_ptr value) {
             args[count].card_value = value;
             types += exp3(count) * format_card;
             ++count;
         }
 
-        constexpr void add(player *value) {
+        constexpr void add(player_ptr value) {
             args[count].player_value = value;
             types += exp3(count) * format_player;
             ++count;

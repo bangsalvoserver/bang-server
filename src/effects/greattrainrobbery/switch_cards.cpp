@@ -9,14 +9,14 @@
 
 namespace banggame {
 
-    static bool has_equipped_card(player *origin, card *target_card) {
+    static bool has_equipped_card(player_ptr origin, card_ptr target_card) {
         return rn::any_of(origin->m_played_cards, [&](const card_pocket_pair &pair) {
             return pair.origin_card == target_card && pair.pocket == pocket_type::player_hand;
         }, &played_card_history::origin_card);
     }
 
-    static void resolve_switch_cards(card *origin_card, player *origin, card *chosen_card, card *target_card) {
-        player *target = target_card->owner;
+    static void resolve_switch_cards(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
+        player_ptr target = target_card->owner;
         origin->m_game->add_log("LOG_SWAP_CARDS", origin, target, chosen_card, target_card);
 
         target->disable_equip(target_card);
@@ -34,11 +34,11 @@ namespace banggame {
     }
 
     struct request_switch_cards : request_targeting {
-        request_switch_cards(card *origin_card, player *origin, player *target, card *chosen_card, card *target_card)
+        request_switch_cards(card_ptr origin_card, player_ptr origin, player_ptr target, card_ptr chosen_card, card_ptr target_card)
             : request_targeting(origin_card, origin, target, target_card, effect_flag::escapable)
             , chosen_card(chosen_card) {}
 
-        card *chosen_card;
+        card_ptr chosen_card;
 
         card_list get_highlights() const override {
             return {target_card, chosen_card};
@@ -48,7 +48,7 @@ namespace banggame {
             resolve_switch_cards(origin_card, origin, chosen_card, target_card);
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (target == owner) {
                 return {"STATUS_SWITCH_CARDS", origin_card, target_card, chosen_card};
             } else {
@@ -57,8 +57,8 @@ namespace banggame {
         }
     };
 
-    game_string handler_switch_cards::get_error(card *origin_card, player *origin, card *chosen_card, card *target_card) {
-        player *target = target_card->owner;
+    game_string handler_switch_cards::get_error(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
+        player_ptr target = target_card->owner;
         MAYBE_RETURN(filters::check_player_filter(origin, target_card->equip_target, origin));
         if (auto *c = origin->find_equipped_card(target_card)) {
             return {"ERROR_DUPLICATED_CARD", c};
@@ -70,7 +70,7 @@ namespace banggame {
         return {};
     }
 
-    void handler_switch_cards::on_play(card *origin_card, player *origin, card *chosen_card, card *target_card) {
+    void handler_switch_cards::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
         origin->m_game->queue_request<request_switch_cards>(origin_card, origin, target_card->owner, chosen_card, target_card);
     }
 }

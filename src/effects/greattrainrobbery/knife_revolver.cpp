@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    void effect_knife_revolver::on_play(card *origin_card, player *origin) {
+    void effect_knife_revolver::on_play(card_ptr origin_card, player_ptr origin) {
         origin->m_game->queue_request<request_check>(origin, origin_card, [](card_sign sign) {
             switch (sign.rank) {
             case card_rank::rank_J:

@@ -7,19 +7,19 @@
 namespace banggame {
 
     struct request_generalstore : selection_picker {
-        request_generalstore(card *origin_card, player *origin, player *target)
+        request_generalstore(card_ptr origin_card, player_ptr origin, player_ptr target)
             : selection_picker(origin_card, origin, target) {}
 
         void on_update() override;
 
-        void on_pick(card *target_card) override;
+        void on_pick(card_ptr target_card) override;
 
-        game_string status_text(player *owner) const override;
+        game_string status_text(player_ptr owner) const override;
     };
 
     struct effect_generalstore {
-        void on_play(card *origin_card, player *origin, const effect_context &ctx);
-        void on_play(card *origin_card, player *origin, player *target);
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 
     DEFINE_EFFECT(generalstore, effect_generalstore)

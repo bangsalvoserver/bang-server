@@ -12,11 +12,11 @@ namespace banggame {
         }
     }
 
-    bool request_characterchoice::can_pick(const card *target_card) const {
+    bool request_characterchoice::can_pick(const_card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
-    void request_characterchoice::on_pick(card *target_card) {
+    void request_characterchoice::on_pick(card_ptr target_card) {
         bool instant = !target->m_game->m_options.character_choice;
 
         target->m_game->pop_request();
@@ -30,7 +30,7 @@ namespace banggame {
         target->enable_equip(target_card);
     }
 
-    game_string request_characterchoice::status_text(player *owner) const {
+    game_string request_characterchoice::status_text(player_ptr owner) const {
         if (owner == target) {
             return "STATUS_CHARACTERCHOICE";
         } else {
@@ -46,17 +46,17 @@ namespace banggame {
         }
     }
 
-    bool request_discard::can_pick(const card *target_card) const {
+    bool request_discard::can_pick(const_card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
     
-    void request_discard::on_pick(card *target_card) {
+    void request_discard::on_pick(card_ptr target_card) {
         target->m_game->pop_request();
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_used_card(target_card);
     }
 
-    game_string request_discard::status_text(player *owner) const {
+    game_string request_discard::status_text(player_ptr owner) const {
         if (target == owner) {
             return {"STATUS_DISCARD", origin_card};
         } else {
@@ -87,11 +87,11 @@ namespace banggame {
         }
     }
 
-    bool request_discard_pass::can_pick(const card *target_card) const {
+    bool request_discard_pass::can_pick(const_card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
-    void request_discard_pass::on_pick(card *target_card) {
+    void request_discard_pass::on_pick(card_ptr target_card) {
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
         if (target->m_game->check_flags(game_flag::phase_one_draw_discard)) {
             target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
@@ -107,7 +107,7 @@ namespace banggame {
         }
     }
 
-    game_string request_discard_pass::status_text(player *owner) const {
+    game_string request_discard_pass::status_text(player_ptr owner) const {
         int diff = int(target->m_hand.size()) - target->max_cards_end_of_turn();
         if (target == owner) {
             return {"STATUS_DISCARD_PASS", diff};
@@ -116,23 +116,23 @@ namespace banggame {
         }
     }
 
-    static bool is_valid_card(const card *target_card) {
+    static bool is_valid_card(const_card_ptr target_card) {
         return !target_card->is_black() && !target_card->is_train();
     }
         
-    bool request_discard_all::can_pick(const card *target_card) const {
+    bool request_discard_all::can_pick(const_card_ptr target_card) const {
         return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
             && target_card->owner == target && is_valid_card(target_card);
     }
 
-    void request_discard_all::on_pick(card *target_card) {
+    void request_discard_all::on_pick(card_ptr target_card) {
         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
         target->discard_card(target_card);
     }
 
     void request_discard_all::on_update() {
         if (!live) {
-            for (card *target_card : target->m_table) {
+            for (card_ptr target_card : target->m_table) {
                 target_card->set_inactive(false);
             }
         }
@@ -150,7 +150,7 @@ namespace banggame {
         card_list cards_to_discard = rv::concat(target->m_table, target->m_hand) | rn::to_vector;
         rn::stable_partition(cards_to_discard, is_valid_card);
 
-        for (card *target_card : cards_to_discard) {
+        for (card_ptr target_card : cards_to_discard) {
             on_pick(target_card);
         }
         
@@ -163,7 +163,7 @@ namespace banggame {
         }
     }
 
-    game_string request_discard_all::status_text(player *owner) const {
+    game_string request_discard_all::status_text(player_ptr owner) const {
         if (reason != discard_all_reason::sheriff_killed_deputy) {
             if (target == owner) {
                 return "STATUS_DISCARD_ALL";
@@ -179,11 +179,11 @@ namespace banggame {
         }
     }
         
-    bool request_discard_hand::can_pick(const card *target_card) const {
+    bool request_discard_hand::can_pick(const_card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
-    void request_discard_hand::on_pick(card *target_card) {
+    void request_discard_hand::on_pick(card_ptr target_card) {
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_card(target_card);
     }
@@ -201,7 +201,7 @@ namespace banggame {
         }
     }
 
-    game_string request_discard_hand::status_text(player *owner) const {
+    game_string request_discard_hand::status_text(player_ptr owner) const {
         if (target == owner) {
             return {"STATUS_DISCARD_HAND", origin_card};
         } else {

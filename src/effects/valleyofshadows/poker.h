@@ -6,8 +6,8 @@
 namespace banggame {
     
     struct effect_poker {
-        void on_play(card *origin_card, player *origin, player *target, effect_flags flags);
-        void on_play(card *origin_card, player *origin);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
+        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(poker, effect_poker)

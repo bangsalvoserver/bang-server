@@ -6,8 +6,8 @@
 
 namespace banggame {
 
-    void equip_refund::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_destroy_card>(origin_card, [=](player *e_origin, card *target_card, bool &handled) {
+    void equip_refund::on_enable(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->add_listener<event_type::on_destroy_card>(origin_card, [=](player_ptr e_origin, card_ptr target_card, bool &handled) {
             if (origin == target_card->owner && e_origin != origin && origin_card != target_card) {
                 origin->m_game->queue_action([=]{
                     if (origin->alive()) {

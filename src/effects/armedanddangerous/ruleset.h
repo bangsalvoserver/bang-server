@@ -7,8 +7,8 @@ namespace banggame {
 
     namespace event_type {
         struct on_discard_orange_card{
-            player *target;
-            card *target_card;
+            player_ptr target;
+            card_ptr target_card;
         };
     }
 

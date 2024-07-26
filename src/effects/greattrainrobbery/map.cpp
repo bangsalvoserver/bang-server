@@ -8,7 +8,7 @@
 namespace banggame {
 
     struct request_map : selection_picker, interface_resolvable {
-        request_map(card *origin_card, player *target)
+        request_map(card_ptr origin_card, player_ptr target)
             : selection_picker(origin_card, nullptr, target) {}
         
         void on_update() override {
@@ -37,21 +37,21 @@ namespace banggame {
             }
         }
 
-        void on_pick(card *target_card) override {
+        void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
             if (move_card_to_deck()) {
                 target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
             }
-            while (auto not_target = target->m_game->m_selection | rv::filter([&](card *selection_card) {
+            while (auto not_target = target->m_game->m_selection | rv::filter([&](card_ptr selection_card) {
                 return selection_card != target_card;
             })) {
-                card *discarded = *not_target.begin();
+                card_ptr discarded = *not_target.begin();
                 target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, discarded);
                 discarded->move_to(pocket_type::discard_pile);
             }
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_MAP", origin_card};
             } else {
@@ -60,8 +60,8 @@ namespace banggame {
         }
     };
 
-    void equip_map::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_turn_start>({origin_card, -2}, [=](player *target) {
+    void equip_map::on_enable(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->add_listener<event_type::on_turn_start>({origin_card, -2}, [=](player_ptr target) {
             if (origin == target) {
                 origin->m_game->queue_request<request_map>(origin_card, origin);
             }

@@ -6,11 +6,11 @@
 
 namespace banggame {
 
-    bool effect_deathsave::can_play(card *origin_card, player *origin) {
+    bool effect_deathsave::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<request_death>(origin) != nullptr;
     }
 
-    void effect_deathsave::on_play(card *origin_card, player *origin) {
+    void effect_deathsave::on_play(card_ptr origin_card, player_ptr origin) {
         origin->m_game->top_request<request_death>()->tried_save = true;
     }
 
@@ -28,7 +28,7 @@ namespace banggame {
         target->m_game->handle_player_death(origin, target, discard_all_reason::death);
     }
 
-    game_string request_death::status_text(player *owner) const {
+    game_string request_death::status_text(player_ptr owner) const {
         int nbeers = 1 - target->m_hp;
         if (target == owner) {
             return {"STATUS_DEATH", nbeers};

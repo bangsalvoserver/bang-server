@@ -8,32 +8,32 @@ namespace banggame {
 
     namespace event_type {
         struct on_player_death_resolve {
-            player *target;
+            player_ptr target;
             bool tried_save;
         };
         
         struct on_player_death {
-            player *origin;
-            player *target;
+            player_ptr origin;
+            player_ptr target;
         };
     }
 
     struct effect_deathsave {
-        bool can_play(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+        bool can_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(deathsave, effect_deathsave)
     
     struct request_death : request_resolvable {
-        request_death(card *origin_card, player *origin, player *target)
+        request_death(card_ptr origin_card, player_ptr origin, player_ptr target)
             : request_resolvable(origin_card, origin, target, {}, 50) {}
 
         bool tried_save = false;
 
         void on_update() override;
         void on_resolve() override;
-        game_string status_text(player *owner) const override;
+        game_string status_text(player_ptr owner) const override;
     };
 }
 

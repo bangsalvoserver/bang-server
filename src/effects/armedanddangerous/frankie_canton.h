@@ -7,8 +7,8 @@
 namespace banggame {
 
     struct effect_frankie_canton : prompt_target_self, bot_suggestion::target_enemy {
-        game_string get_error(card *origin_card, player *origin, card *target);
-        void on_play(card *origin_card, player *origin, card *target);
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 
     DEFINE_EFFECT(frankie_canton, effect_frankie_canton)

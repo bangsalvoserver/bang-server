@@ -15,7 +15,7 @@ namespace banggame {
         card_deck_type deck;
     };
 
-    card_backface to_card_backface(const card *origin_card);
+    card_backface to_card_backface(const_card_ptr origin_card);
 
     inline std::vector<card_backface> to_card_backface_vector(auto &&range) {
         return range | rv::transform(to_card_backface) | rn::to_vector;
@@ -93,7 +93,7 @@ namespace banggame {
         int user_id;
     };
 
-    player_user_pair to_player_user_pair(const player *p);
+    player_user_pair to_player_user_pair(const_player_ptr p);
 
     inline std::vector<player_user_pair> to_player_user_pair_vector(auto &&range) {
         return range | rv::transform(to_player_user_pair) | rn::to_vector;

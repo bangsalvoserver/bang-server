@@ -7,7 +7,7 @@
 namespace banggame {
 
     struct request_dutch_will : selection_picker {
-        request_dutch_will(card *origin_card, player *target, shared_request_draw &&req_draw)
+        request_dutch_will(card_ptr origin_card, player_ptr target, shared_request_draw &&req_draw)
             : selection_picker(origin_card, nullptr, target)
             , req_draw(std::move(req_draw)) {}
 
@@ -22,7 +22,7 @@ namespace banggame {
             }
         }
 
-        void on_pick(card *target_card) override {
+        void on_pick(card_ptr target_card) override {
             req_draw->add_to_hand_phase_one(target_card);
             if (target->m_game->m_selection.size() == 1) {
                 target->m_game->pop_request();
@@ -32,7 +32,7 @@ namespace banggame {
             }
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (target == owner) {
                 return {"STATUS_DUTCH_WILL", origin_card};
             } else {
@@ -41,8 +41,8 @@ namespace banggame {
         }
     };
 
-    void equip_dutch_will::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player *origin, shared_request_draw req_draw, bool &handled) {
+    void equip_dutch_will::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player_ptr origin, shared_request_draw req_draw, bool &handled) {
             if (!handled && origin == target && req_draw->num_cards_to_draw > 1) {
                 target->m_game->queue_request<request_dutch_will>(target_card, target, std::move(req_draw));
                 handled = true;

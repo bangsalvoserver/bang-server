@@ -24,7 +24,7 @@ namespace banggame {
         return user_id < 0;
     }
 
-    static bool has_ghost_tag(const player *origin) {
+    static bool has_ghost_tag(const_player_ptr origin) {
         return origin->check_player_flags(player_flag::ghost_1)
             || origin->check_player_flags(player_flag::ghost_2)
             || origin->check_player_flags(player_flag::temp_ghost);
@@ -38,12 +38,12 @@ namespace banggame {
         return !check_player_flags(player_flag::dead) || has_ghost_tag(this);
     }
 
-    void player::equip_card(card *target) {
+    void player::equip_card(card_ptr target) {
         target->move_to(pocket_type::player_table, this, card_visibility::shown);
         enable_equip(target);
     }
 
-    void player::enable_equip(card *target_card) {
+    void player::enable_equip(card_ptr target_card) {
         bool card_disabled = m_game->is_disabled(target_card);
         for (const equip_holder &holder : target_card->equips) {
             if (!card_disabled || holder.is_nodisable()) {
@@ -52,7 +52,7 @@ namespace banggame {
         }
     }
 
-    void player::disable_equip(card *target_card) {
+    void player::disable_equip(card_ptr target_card) {
         bool card_disabled = m_game->is_disabled(target_card);
         for (const equip_holder &holder : target_card->equips) {
             if (!card_disabled || holder.is_nodisable()) {
@@ -105,7 +105,7 @@ namespace banggame {
         return mod;
     }
 
-    card *player::find_equipped_card(card *card) {
+    card_ptr player::find_equipped_card(card_ptr card) {
         auto it = rn::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {
             return *it;
@@ -114,11 +114,11 @@ namespace banggame {
         }
     }
 
-    card *player::random_hand_card() {
+    card_ptr player::random_hand_card() {
         return m_hand[std::uniform_int_distribution(0, int(m_hand.size() - 1))(m_game->rng)];
     }
 
-    static bool move_owned_card(player *owner, card *target_card, bool used) {
+    static bool move_owned_card(player_ptr owner, card_ptr target_card, bool used) {
         if (target_card->owner == owner) {
             if (target_card->pocket == pocket_type::player_table) {
                 target_card->set_inactive(false);
@@ -133,7 +133,7 @@ namespace banggame {
         return false;
     }
 
-    void player::discard_card(card *target, bool used) {
+    void player::discard_card(card_ptr target, bool used) {
         if (move_owned_card(this, target, used)) {
             if (target->is_train()) {
                 if (m_game->m_train.size() < 4) {
@@ -150,7 +150,7 @@ namespace banggame {
         }
     }
 
-    void player::steal_card(card *target) {
+    void player::steal_card(card_ptr target) {
         if (target->owner != this || target->pocket != pocket_type::player_table || !target->is_train()) {
             if (move_owned_card(target->owner, target, false)) {
                 add_to_hand(target);
@@ -158,7 +158,7 @@ namespace banggame {
         }
     }
 
-    void player::damage(card *origin_card, player *origin, int value, effect_flags flags) {
+    void player::damage(card_ptr origin_card, player_ptr origin, int value, effect_flags flags) {
         m_game->queue_request<request_damage>(origin_card, origin, this, value, flags);
     }
 
@@ -182,11 +182,11 @@ namespace banggame {
         }
     }
 
-    bool player::immune_to(card *origin_card, player *origin, effect_flags flags, bool quiet) {
+    bool player::immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet) {
         card_list cards;
         m_game->call_event(event_type::apply_immunity_modifier{ origin_card, origin, this, flags, cards });
         if (!quiet) {
-            for (card *target_card : cards) {
+            for (card_ptr target_card : cards) {
                 m_game->add_log("LOG_PLAYER_IMMUNE_TO_CARD", this, origin_card, target_card);
                 target_card->flash_card();
             }
@@ -194,13 +194,13 @@ namespace banggame {
         return !cards.empty();
     }
 
-    int player::can_escape(player *origin, card *origin_card, effect_flags flags) const {
+    int player::can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) const {
         int result = 0;
         m_game->call_event(event_type::apply_escapable_modifier{ origin_card, origin, this, flags, result });
         return result;
     }
 
-    void player::add_to_hand(card *target) {
+    void player::add_to_hand(card_ptr target) {
         if (target->deck == card_deck_type::train) {
             equip_card(target);
         } else {
@@ -209,7 +209,7 @@ namespace banggame {
         }
     }
 
-    void player::draw_card(int ncards, card *origin_card) {
+    void player::draw_card(int ncards, card_ptr origin_card) {
         if (!m_game->check_flags(game_flag::hands_shown)) {
             if (origin_card) {
                 m_game->add_log(update_target::excludes(this), "LOG_DRAWN_CARDS_FOR", this, ncards, origin_card);
@@ -218,7 +218,7 @@ namespace banggame {
             }
         }
         for (int i=0; i<ncards; ++i) {
-            card *drawn_card = m_game->top_of_deck();
+            card_ptr drawn_card = m_game->top_of_deck();
             if (m_game->check_flags(game_flag::hands_shown)) {
                 if (origin_card) {
                     m_game->add_log("LOG_DRAWN_CARD_FOR", this, drawn_card, origin_card);
@@ -284,7 +284,7 @@ namespace banggame {
         if (auto range = m_characters | rv::drop(1)) {
             m_game->add_update<"remove_cards">(range | rn::to_vector);
 
-            for (card *character : range) {
+            for (card_ptr character : range) {
                 disable_equip(character);
                 character->visibility = card_visibility::hidden;
             }

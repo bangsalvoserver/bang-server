@@ -4,8 +4,8 @@
 
 namespace banggame {
 
-    void equip_molly_stark::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_discard_hand_card>(origin_card, [=](player *target, card *target_card, bool used) {
+    void equip_molly_stark::on_enable(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->add_listener<event_type::on_discard_hand_card>(origin_card, [=](player_ptr target, card_ptr target_card, bool used) {
             if (origin == target && used && origin->m_game->m_playing != origin) {
                 origin->m_game->queue_action([=]{
                     if (origin->alive()) {                        

@@ -10,17 +10,17 @@ namespace banggame {
     DEFINE_EFFECT(none, effect_none)
 
     struct effect_human {
-        bool can_play(card *origin_card, player *origin);
+        bool can_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(human, effect_human)
 
     struct effect_set_playing {
-        void add_context(card *origin_card, player *origin, effect_context &ctx) {
+        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
             add_context(origin_card, origin, origin_card, ctx);
         }
         
-        void add_context(card *origin_card, player *origin, card *target, effect_context &ctx);
+        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
     };
 
     DEFINE_EFFECT(set_playing, effect_set_playing)

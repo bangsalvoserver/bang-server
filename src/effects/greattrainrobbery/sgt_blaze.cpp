@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-    game_string modifier_sgt_blaze::get_error(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) {
+    game_string modifier_sgt_blaze::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
         for (const effect_holder &effect : playing_card->get_effect_list(origin->m_game->pending_requests())) {
             if (effect.target == TARGET_TYPE(players) || effect.target == TARGET_TYPE(card_per_player)) {
                 if (ctx.skipped_player && filters::check_player_filter(origin, effect.player_filter, ctx.skipped_player, ctx)) {
@@ -24,16 +24,16 @@ namespace banggame {
         return {"ERROR_NO_PLAYERS_TARGET", origin_card, playing_card};
     }
 
-    void effect_skip_player::add_context(card *origin_card, player *origin, player *target, effect_context &ctx) {
+    void effect_skip_player::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
         ctx.skipped_player = target;
     }
 
-    void effect_skip_player::on_play(card *origin_card, player *origin, player *target, const effect_context &ctx) {
+    void effect_skip_player::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
         origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, ctx.playing_card);
     }
 
     struct request_sgt_blaze : request_resolvable {
-        request_sgt_blaze(card *origin_card, player *target, shared_effect_context ctx)
+        request_sgt_blaze(card_ptr origin_card, player_ptr target, shared_effect_context ctx)
             : request_resolvable(origin_card, nullptr, target)
             , ctx(std::move(ctx)) {}
         
@@ -57,7 +57,7 @@ namespace banggame {
             target->m_game->pop_request();
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_SGT_BLAZE_LOCOMOTIVE", origin_card};
             } else {
@@ -66,22 +66,22 @@ namespace banggame {
         }
     };
 
-    void equip_sgt_blaze::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_locomotive_effect>({origin_card, 1}, [=](player *target, shared_effect_context ctx) {
+    void equip_sgt_blaze::on_enable(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->add_listener<event_type::on_locomotive_effect>({origin_card, 1}, [=](player_ptr target, shared_effect_context ctx) {
             if (origin == target) {
                 origin->m_game->queue_request<request_sgt_blaze>(origin_card, origin, ctx);
             }
         });
     }
 
-    game_string effect_skip_player_locomotive::get_error(card *origin_card, player *origin, player *target) {
+    game_string effect_skip_player_locomotive::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
         if (origin->m_game->top_request<request_sgt_blaze>(origin)) {
             return {};
         }
         return "ERROR_INVALID_ACTION";
     }
 
-    void effect_skip_player_locomotive::on_play(card *origin_card, player *origin, player *target) {
+    void effect_skip_player_locomotive::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
         auto req = origin->m_game->top_request<request_sgt_blaze>();
         req->ctx->skipped_player = target;
         origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, origin->m_game->m_train.front());

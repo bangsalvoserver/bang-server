@@ -6,8 +6,8 @@
 
 namespace banggame {
 
-    void equip_bone_orchard::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_listener<event_type::check_revivers>({target_card, -1}, [=](player *target) {
+    void equip_bone_orchard::on_enable(card_ptr target_card, player_ptr origin) {
+        origin->m_game->add_listener<event_type::check_revivers>({target_card, -1}, [=](player_ptr target) {
             if (!target->alive()) {
                 target_card->flash_card();
                 target->m_game->add_log("LOG_REVIVE", target, target_card);
@@ -17,7 +17,7 @@ namespace banggame {
                     auto roles = dead_players | rv::transform(&player::m_role) | rn::to_vector;
                     rn::shuffle(roles, origin->m_game->rng);
                     
-                    for (player *p : dead_players) {
+                    for (player_ptr p : dead_players) {
                         p->set_role(player_role::unknown, false);
                         p->remove_player_flags(player_flag::role_revealed);
                     }

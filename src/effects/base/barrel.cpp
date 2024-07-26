@@ -6,7 +6,7 @@
 
 namespace banggame {
     
-    void effect_barrel::on_play(card *origin_card, player *target) {
+    void effect_barrel::on_play(card_ptr origin_card, player_ptr target) {
         auto req = target->m_game->top_request<missable_request>();
         req->add_card(origin_card);
         target->m_game->queue_request<request_check>(target, origin_card, &card_sign::is_hearts, [=](bool result) {

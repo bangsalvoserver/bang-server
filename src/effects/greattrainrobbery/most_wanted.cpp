@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    static void resolve_most_wanted(card *origin_card, player *origin, player *target) {
+    static void resolve_most_wanted(card_ptr origin_card, player_ptr origin, player_ptr target) {
         target->m_game->queue_request<request_check>(target, origin_card, std::not_fn(&card_sign::is_spades), [=](bool result) {
             if (!result) {
                 target->damage(origin_card, origin, 1);
@@ -15,7 +15,7 @@ namespace banggame {
     }
 
     struct request_most_wanted : request_resolvable {
-        request_most_wanted(card *origin_card, player *origin, player *target, effect_flags flags = {})
+        request_most_wanted(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags) {}
 
         struct most_wanted_timer : request_timer {
@@ -49,7 +49,7 @@ namespace banggame {
             resolve_most_wanted(origin_card, origin, target);
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_MOST_WANTED", origin_card};
             } else {
@@ -58,7 +58,7 @@ namespace banggame {
         }
     };
 
-    void effect_most_wanted::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
+    void effect_most_wanted::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         origin->m_game->queue_request<request_most_wanted>(origin_card, origin, target, flags);
     }
 }

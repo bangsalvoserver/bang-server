@@ -5,8 +5,8 @@
 
 namespace banggame {
     
-    void equip_black_jack::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_card_drawn>(target_card, [target, target_card](player *origin, card *drawn_card, shared_request_draw req_draw, bool &reveal) {
+    void equip_black_jack::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::on_card_drawn>(target_card, [target, target_card](player_ptr origin, card_ptr drawn_card, shared_request_draw req_draw, bool &reveal) {
             if (origin == target && req_draw->num_drawn_cards == 2) {
                 reveal = true;
 

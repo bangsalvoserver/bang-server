@@ -7,24 +7,24 @@
 
 namespace banggame {
 
-    game_string effect_resolve::on_prompt(card *origin_card, player *origin) {
+    game_string effect_resolve::on_prompt(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<interface_resolvable>()->resolve_prompt();
     }
 
-    bool effect_resolve::can_play(card *origin_card, player *origin) {
+    bool effect_resolve::can_play(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request<interface_resolvable>(origin)) {
             return req->resolve_type() == resolve_type;
         }
         return false;
     }
     
-    void effect_resolve::on_play(card *origin_card, player *origin) {
+    void effect_resolve::on_play(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request<interface_resolvable>();
         req->on_resolve();
     }
     
     void request_resolvable::auto_resolve() {
-        card *only_card = get_single_element(get_all_playable_cards(target, true));
+        card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
         if (only_card && only_card->has_tag(tag_type::resolve)) {
             on_resolve();
         }

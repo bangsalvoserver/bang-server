@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    static bool ms_abigail_can_escape(player *origin, card *origin_card, effect_flags flags) {
+    static bool ms_abigail_can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) {
         if (!origin) return false;
         if (!flags.check(effect_flag::single_target)) return false;
         if (!origin_card->is_brown()) return false;
@@ -21,23 +21,23 @@ namespace banggame {
         }
     }
 
-    void equip_ms_abigail::on_enable(card *origin_card, player *origin) {
+    void equip_ms_abigail::on_enable(card_ptr origin_card, player_ptr origin) {
         origin->m_game->add_listener<event_type::apply_escapable_modifier>({origin_card, -1},
-            [=](card *e_origin_card, player *e_origin, const player *e_target, effect_flags e_flags, int &value) {
+            [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags e_flags, int &value) {
                 if (e_target == origin && ms_abigail_can_escape(e_origin, e_origin_card, e_flags)) {
                     value = 2;
                 }
             });
     }
 
-    bool effect_ms_abigail::can_play(card *origin_card, player *origin) {
+    bool effect_ms_abigail::can_play(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request(origin)) {
             return ms_abigail_can_escape(req->origin, req->origin_card, req->flags);
         }
         return false;
     }
 
-    void effect_ms_abigail::on_play(card *origin_card, player *origin) {
+    void effect_ms_abigail::on_play(card_ptr origin_card, player_ptr origin) {
         origin_card->flash_card();
         origin->m_game->pop_request();
     }

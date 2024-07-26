@@ -62,14 +62,14 @@ namespace banggame {
 
     class request_base {
     public:
-        request_base(card *origin_card, player *origin, player *target, effect_flags flags = {}, int priority = 100)
+        request_base(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}, int priority = 100)
             : origin_card(origin_card), origin(origin), target(target), flags(flags), priority(priority) {}
         
         virtual ~request_base() {}
 
-        card *origin_card;
-        player *origin;
-        player *target;
+        card_ptr origin_card;
+        player_ptr origin;
+        player_ptr target;
         effect_flags flags;
         int priority;
         bool live = false;
@@ -78,16 +78,16 @@ namespace banggame {
 
         virtual request_timer *timer() { return nullptr; }
 
-        virtual game_string status_text(player *owner) const { return {}; };
+        virtual game_string status_text(player_ptr owner) const { return {}; };
         virtual card_list get_highlights() const { return {}; }
     };
 
     struct interface_target_set_players {
-        virtual bool in_target_set(const player *target_player) const = 0;
+        virtual bool in_target_set(const_player_ptr target_player) const = 0;
     };
 
     struct interface_target_set_cards {  
-        virtual bool in_target_set(const card *target_card) const = 0;
+        virtual bool in_target_set(const_card_ptr target_card) const = 0;
     };
 
 }

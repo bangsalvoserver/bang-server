@@ -8,8 +8,8 @@
 namespace banggame {
 
     struct equip_wanted : event_equip, prompt_target_self, bot_suggestion::target_enemy {
-        game_string on_prompt(card *origin_card, player *origin, player *target);
-        void on_enable(card *target_card, player *target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_enable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(wanted, equip_wanted)

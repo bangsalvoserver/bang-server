@@ -10,8 +10,8 @@ namespace banggame {
             || pair.pocket == pocket_type::train && pair.origin_card->deck == card_deck_type::train;
     }
 
-    void equip_miss_susanna::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_turn_end>({target_card, 1}, [=](player *origin, bool skipped) {
+    void equip_miss_susanna::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::on_turn_end>({target_card, 1}, [=](player_ptr origin, bool skipped) {
             size_t count = 0;
             for (const played_card_history &history : origin->m_played_cards) {
                 count += rn::count_if(history.modifiers, is_playing_card_pair);

@@ -7,7 +7,7 @@ namespace banggame {
 
     using visit_players = play_visitor<"adjacent_players">;
 
-    static auto make_adjacent_players_target_set(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
+    static auto make_adjacent_players_target_set(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx) {
         return rv::cartesian_product(origin->m_game->m_players, origin->m_game->m_players)
             | rv::filter([=, &effect, &ctx](const auto &pair) {
                 auto [target1, target2] = pair;
@@ -39,7 +39,7 @@ namespace banggame {
         if (targets[0] == targets[1] || origin->m_game->calc_distance(targets[0], targets[1]) > effect.target_value) {
             return "ERROR_TARGETS_NOT_ADJACENT";
         }
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
         return {};
@@ -47,7 +47,7 @@ namespace banggame {
 
     template<> game_string visit_players::prompt(const effect_context &ctx, const player_list &targets) {
         game_string msg;
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             msg = defer<"player">().prompt(ctx, target);
             if (!msg) break;
         }
@@ -55,7 +55,7 @@ namespace banggame {
     }
 
     template<> void visit_players::add_context(effect_context &ctx, const player_list &targets) {
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             defer<"player">().add_context(ctx, target);
         }
     }
@@ -65,7 +65,7 @@ namespace banggame {
         if (origin_card->is_brown()) {
             flags.add(effect_flag::escapable);
         }
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             effect.on_play(origin_card, origin, target, flags, ctx);
         }
     }

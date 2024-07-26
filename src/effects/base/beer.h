@@ -7,19 +7,19 @@ namespace banggame {
 
     namespace event_type {
         struct apply_beer_modifier {
-            player *origin;
+            player_ptr origin;
             nullable_ref<int> value;
         };
 
         struct on_play_beer {
-            player *origin;
+            player_ptr origin;
         };
     }
 
     struct effect_beer {
-        game_string on_prompt(card *origin_card, player *target);
-        void on_play(card *origin_card, player *target);
-        bool can_play(card *origin_card, player *target);
+        game_string on_prompt(card_ptr origin_card, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr target);
+        bool can_play(card_ptr origin_card, player_ptr target);
     };
 
     DEFINE_EFFECT(beer, effect_beer)

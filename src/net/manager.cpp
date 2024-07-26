@@ -238,7 +238,7 @@ void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
     }
     
     if (lobby.state != lobby_state::waiting && lobby.m_game) {
-        player *target = lobby.m_game->find_player_by_userid(new_user_id);
+        player_ptr target = lobby.m_game->find_player_by_userid(new_user_id);
         if (!target) {
             set_user_team(user, lobby_team::game_spectator);
         }
@@ -488,7 +488,7 @@ void game_manager::handle_message(utils::tag<"game_rejoin">, game_user &user, in
         throw lobby_error("ERROR_USER_NOT_SPECTATOR");
     }
 
-    player *target = lobby.m_game->find_player(player_id);
+    player_ptr target = lobby.m_game->find_player(player_id);
     if (target->is_bot()) {
         throw lobby_error("ERROR_CANNOT_REJOIN_ON_BOT");
     }

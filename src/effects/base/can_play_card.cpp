@@ -8,7 +8,7 @@ namespace banggame {
         target->m_game->pop_request();
     }
     
-    game_string request_can_play_card::status_text(player *owner) const {
+    game_string request_can_play_card::status_text(player_ptr owner) const {
         if (target == owner) {
             return {"STATUS_CAN_PLAY_CARD", origin_card};
         } else {
@@ -16,12 +16,12 @@ namespace banggame {
         }
     }
 
-    bool effect_can_play_card::can_play(card *origin_card, player *origin) {
+    bool effect_can_play_card::can_play(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request<request_can_play_card>(origin);
         return req && req->origin_card == origin_card;
     }
 
-    void effect_can_play_card::on_play(card *origin_card, player *origin) {
+    void effect_can_play_card::on_play(card_ptr origin_card, player_ptr origin) {
         origin->m_game->pop_request();
     }
 }

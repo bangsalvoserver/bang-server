@@ -10,7 +10,7 @@
 namespace banggame {
 
     struct request_ranch : request_resolvable {
-        request_ranch(card *target_card, player *target)
+        request_ranch(card_ptr target_card, player_ptr target)
             : request_resolvable(target_card, nullptr, target, {}, -8) {}
         
         void on_update() override {
@@ -27,7 +27,7 @@ namespace banggame {
             target->m_game->pop_request();
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_RANCH", origin_card};
             } else {
@@ -36,21 +36,21 @@ namespace banggame {
         }
     };
 
-    void equip_ranch::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player *origin) {
+    void equip_ranch::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player_ptr origin) {
             origin->m_game->queue_request<request_ranch>(target_card, origin);
         });
     }
 
-    bool effect_ranch::can_play(card *origin_card, player *origin) {
+    bool effect_ranch::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<request_ranch>(origin) != nullptr;
     }
 
-    void handler_ranch::on_play(card *origin_card, player *origin, const card_list &target_cards) {
+    void handler_ranch::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {
         origin->m_game->pop_request();
 
         if (!target_cards.empty()) {
-            for (card *target : target_cards) {
+            for (card_ptr target : target_cards) {
                 effect_discard{}.on_play(origin_card, origin, target);
             }
             origin->draw_card(static_cast<int>(target_cards.size()), origin_card);

@@ -20,13 +20,13 @@ namespace banggame {
         : game_table(seed)
         , request_queue(this) {}
 
-    player_user_pair to_player_user_pair(const player *p) {
+    player_user_pair to_player_user_pair(const_player_ptr p) {
         return player_user_pair{p->id, p->user_id};
     }
 
     player_order_update game::make_player_order_update(bool instant) {
         return player_order_update{m_players
-            | rv::filter([](player *p) {
+            | rv::filter([](player_ptr p) {
                 return !p->check_player_flags(player_flag::removed);
             })
             | rn::to_vector,
@@ -35,7 +35,7 @@ namespace banggame {
     
     ticks game::get_total_update_time() const {
         game_duration result{0};
-        for (player *p : m_players) {
+        for (player_ptr p : m_players) {
             game_duration player_result{0};
             for (const auto &[target, content, duration] : m_updates) {
                 if (duration >= game_duration{0} && target.matches(p)) {
@@ -52,18 +52,18 @@ namespace banggame {
     utils::generator<json::json> game::get_spectator_join_updates() {
         co_yield make_update<"player_add">(to_player_user_pair_vector(m_players));
 
-        for (player *p : m_players) {
+        for (player_ptr p : m_players) {
             co_yield make_update<"player_flags">(p, p->m_player_flags);
         }
 
         co_yield make_update<"player_order">(make_player_order_update(true));
 
-        auto add_cards = [&](pocket_type pocket, player *owner = nullptr) -> utils::generator<json::json> {
+        auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) -> utils::generator<json::json> {
             auto &range = get_pocket(pocket, owner);
             if (!range.empty()) {
                 co_yield make_update<"add_cards">(to_card_backface_vector(range), pocket, owner);
             }
-            for (card *c : range) {
+            for (card_ptr c : range) {
                 if (c->visibility == card_visibility::shown) {
                     co_yield make_update<"show_card">(c, *c, 0ms);
                 }
@@ -103,7 +103,7 @@ namespace banggame {
             co_yield make_update<"add_cubes">(num_cubes);
         }
 
-        for (player *p : m_players) {
+        for (player_ptr p : m_players) {
             if (p->check_player_flags(player_flag::role_revealed)) {
                 co_yield make_update<"player_show_role">(p, p->m_role, 0ms);
             }
@@ -133,7 +133,7 @@ namespace banggame {
         co_yield make_update<"game_flags">(m_game_flags);
     }
 
-    utils::generator<json::json> game::get_game_log_updates(player *target) {
+    utils::generator<json::json> game::get_game_log_updates(player_ptr target) {
         co_yield make_update<"clear_logs">();
         
         for (const auto &[upd_target, log] : m_saved_log) {
@@ -143,18 +143,18 @@ namespace banggame {
         }
     }
 
-    utils::generator<json::json> game::get_rejoin_updates(player *target) {
+    utils::generator<json::json> game::get_rejoin_updates(player_ptr target) {
         co_yield make_update<"player_add">(std::vector{to_player_user_pair(target)});
 
         if (!target->check_player_flags(player_flag::role_revealed)) {
             co_yield make_update<"player_show_role">(target, target->m_role, 0ms);
         }
 
-        for (card *c : target->m_hand) {
+        for (card_ptr c : target->m_hand) {
             co_yield make_update<"show_card">(c, *c, 0ms);
         }
 
-        for (card *c : m_selection) {
+        for (card_ptr c : m_selection) {
             if (c->owner == target) {
                 co_yield make_update<"show_card">(c, *c, 0ms);
             }
@@ -169,7 +169,7 @@ namespace banggame {
         }
     }
 
-    card *game::add_card(const card_data &data) {
+    card_ptr game::add_card(const card_data &data) {
         return &m_cards_storage.emplace(this, int(m_cards_storage.first_available_id()), data);
     }
 
@@ -182,7 +182,7 @@ namespace banggame {
         }
     }
 
-    card_sign game::get_card_sign(card *target_card) {
+    card_sign game::get_card_sign(card_ptr target_card) {
         auto sign = target_card->sign;
         call_event(event_type::apply_sign_modifier{ sign });
         return sign;
@@ -218,7 +218,7 @@ namespace banggame {
                     }
                 }
 
-                card *new_card = add_card(c);
+                card_ptr new_card = add_card(c);
                 new_card->pocket = pocket;
                 
                 if (out_pocket) {
@@ -231,14 +231,14 @@ namespace banggame {
 
         if (add_cards(all_cards.button_row, pocket_type::button_row)) {
             add_update<"add_cards">(to_card_backface_vector(m_button_row), pocket_type::button_row);
-            for (card *c : m_button_row) {
+            for (card_ptr c : m_button_row) {
                 c->set_visibility(card_visibility::shown, nullptr, true);
             }
         }
 
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
             add_update<"add_cards">(to_card_backface_vector(m_hidden_deck), pocket_type::hidden_deck);
-            for (card *c : m_hidden_deck) {
+            for (card_ptr c : m_hidden_deck) {
                 c->set_visibility(card_visibility::shown, nullptr, true);
             }
         }
@@ -278,14 +278,14 @@ namespace banggame {
         auto role_ptr = m_players.size() > 3 ? roles : roles_3players;
 
         rn::shuffle(role_ptr, role_ptr + m_players.size(), rng);
-        for (player *p : m_players) {
+        for (player_ptr p : m_players) {
             p->set_role(*role_ptr++);
         }
 
         m_first_player = *rn::find(m_players,
             m_players.size() > 3 ? player_role::sheriff : player_role::deputy_3p, &player::m_role);
 
-        auto is_last_scenario_card = [](card *c) {
+        auto is_last_scenario_card = [](card_ptr c) {
             return c->has_tag(tag_type::last_scenario_card);
         };
 
@@ -321,16 +321,16 @@ namespace banggame {
         add_game_flags(game_flag::hands_shown);
 
         auto character_it = character_ptrs.rbegin();
-        for (player *p : range_all_players(m_first_player)) {
+        for (player_ptr p : range_all_players(m_first_player)) {
             for (int i=0; i<2; ++i) {
-                card *c = *character_it++;
+                card_ptr c = *character_it++;
                 p->m_hand.push_back(c);
                 c->pocket = pocket_type::player_hand;
                 c->owner = p;
             }
             add_update<"add_cards">(to_card_backface_vector(p->m_hand), pocket_type::player_hand, p);
             if (m_options.character_choice) {
-                for (card *c : p->m_hand) {
+                for (card_ptr c : p->m_hand) {
                     c->set_visibility(card_visibility::shown, p, true);
                 }
             }
@@ -344,7 +344,7 @@ namespace banggame {
 
             int cycles = rn::max(m_players | rv::transform(&player::get_initial_cards));
             for (int i=0; i<cycles; ++i) {
-                for (player *p : range_all_players(m_first_player)) {
+                for (player_ptr p : range_all_players(m_first_player)) {
                     if (p->m_hand.size() < p->get_initial_cards()) {
                         p->draw_card();
                     }
@@ -359,13 +359,13 @@ namespace banggame {
         });
     }
 
-    player_distances game::make_player_distances(player *owner) {
+    player_distances game::make_player_distances(player_ptr owner) {
         if (!owner) return {};
 
         return {
             .distance_mods = m_players
-                | rv::filter([&](player *target) { return target != owner; })
-                | rv::transform([&](player *target) {
+                | rv::filter([&](player_ptr target) { return target != owner; })
+                | rv::transform([&](player_ptr target) {
                     return player_distance_item {
                         .player = target,
                         .value = target->get_distance_mod()
@@ -380,7 +380,7 @@ namespace banggame {
         };
     }
     
-    static player_list get_request_target_set_players(player *origin) {
+    static player_list get_request_target_set_players(player_ptr origin) {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_target_set_players>(origin)) {
                 return origin->m_game->m_players
@@ -391,7 +391,7 @@ namespace banggame {
         return {};
     }
 
-    static card_list get_request_target_set_cards(player *origin) {
+    static card_list get_request_target_set_cards(player_ptr origin) {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_target_set_cards>(origin)) {
                 return get_all_targetable_cards(origin)
@@ -412,7 +412,7 @@ namespace banggame {
         return std::nullopt;
     }
 
-    request_status_args game::make_request_update(player *owner) {
+    request_status_args game::make_request_update(player_ptr owner) {
         auto req = top_request();
         return request_status_args{
             .origin_card = req->origin_card,
@@ -428,7 +428,7 @@ namespace banggame {
         };
     }
 
-    status_ready_args game::make_status_ready_update(player *owner) {
+    status_ready_args game::make_status_ready_update(player_ptr owner) {
         return {
             .play_cards = generate_playable_cards_list(owner),
             .distances = make_player_distances(owner)
@@ -460,7 +460,7 @@ namespace banggame {
 
     void game::send_request_update() {
         auto spectator_target = update_target::excludes_public();
-        for (player *p : m_players) {
+        for (player_ptr p : m_players) {
             spectator_target.add(p);
             if (!p->is_bot()) {
                 add_update<"request_status">(update_target::includes_private(p), make_request_update(p));
@@ -472,7 +472,7 @@ namespace banggame {
     void game::start_next_turn() {
         if (num_alive() == 0) return;
 
-        player *next_player;
+        player_ptr next_player;
 
         if (m_playing) {
             auto it = rn::find(m_players, m_playing);
@@ -500,7 +500,7 @@ namespace banggame {
         call_event(event_type::on_turn_switch{ next_player });
     }
 
-    void game::handle_player_death(player *killer, player *target, discard_all_reason reason) {
+    void game::handle_player_death(player_ptr killer, player_ptr target, discard_all_reason reason) {
         if (killer != m_playing) killer = nullptr;
         
         queue_action([this, killer, target, reason]{
@@ -519,7 +519,7 @@ namespace banggame {
                 if (!m_first_dead) m_first_dead = target;
 
                 target->remove_extra_characters();
-                for (card *c : target->m_characters) {
+                for (card_ptr c : target->m_characters) {
                     target->disable_equip(c);
                 }
 
@@ -563,8 +563,8 @@ namespace banggame {
 
         if (!m_options.enable_ghost_cards) {
             queue_action([this]{
-                if (auto range = rv::filter(m_players, [](player *p) { return !p->alive() && !p->check_player_flags(player_flag::removed); })) {
-                    for (player *p : range) {
+                if (auto range = rv::filter(m_players, [](player_ptr p) { return !p->alive() && !p->check_player_flags(player_flag::removed); })) {
+                    for (player_ptr p : range) {
                         p->add_player_flags(player_flag::removed);
                     }
                     
@@ -579,13 +579,13 @@ namespace banggame {
             }
 
             auto declare_winners = [this](auto &&winners) {
-                for (player *p : range_all_players_and_dead(m_playing)) {
+                for (player_ptr p : range_all_players_and_dead(m_playing)) {
                     if (p->add_player_flags(player_flag::role_revealed)) {
                         add_update<"player_show_role">(update_target::excludes(p), p, p->m_role);
                     }
                 }
                 add_log("LOG_GAME_OVER");
-                for (player *p : winners) {
+                for (player_ptr p : winners) {
                     p->add_player_flags(player_flag::winner);
                 }
                 add_game_flags(game_flag::game_over);
@@ -598,10 +598,10 @@ namespace banggame {
                     declare_winners(alive_players);
                 }
             } else if (m_players.size() > 3) {
-                auto is_outlaw = [](player *p) { return p->m_role == player_role::outlaw; };
-                auto is_renegade = [](player *p) { return p->m_role == player_role::renegade; };
-                auto is_sheriff = [](player *p) { return p->m_role == player_role::sheriff; };
-                auto is_sheriff_or_deputy = [](player *p) { return p->m_role == player_role::sheriff || p->m_role == player_role::deputy; };
+                auto is_outlaw = [](player_ptr p) { return p->m_role == player_role::outlaw; };
+                auto is_renegade = [](player_ptr p) { return p->m_role == player_role::renegade; };
+                auto is_sheriff = [](player_ptr p) { return p->m_role == player_role::sheriff; };
+                auto is_sheriff_or_deputy = [](player_ptr p) { return p->m_role == player_role::sheriff || p->m_role == player_role::deputy; };
 
                 if (rn::none_of(alive_players, is_sheriff)) {
                     if (rn::distance(alive_players) == 1 && is_renegade(alive_players.front())) {

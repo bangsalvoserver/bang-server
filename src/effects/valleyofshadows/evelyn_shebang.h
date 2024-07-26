@@ -7,8 +7,8 @@
 namespace banggame {
     
     struct effect_evelyn_shebang : bot_suggestion::target_enemy {
-        game_string get_error(card *origin_card, player *origin, player *target);
-        void on_play(card *origin_card, player *origin, player *target);
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 
     DEFINE_EFFECT(evelyn_shebang, effect_evelyn_shebang)

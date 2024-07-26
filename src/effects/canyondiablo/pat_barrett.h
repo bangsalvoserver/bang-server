@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct equip_pat_barrett : event_equip {
-        void on_enable(card *target_card, player *target);
+        void on_enable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(pat_barrett, equip_pat_barrett)

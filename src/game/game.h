@@ -12,18 +12,18 @@ namespace banggame {
         game(unsigned int seed = 0);
         
         utils::generator<json::json> get_spectator_join_updates();
-        utils::generator<json::json> get_game_log_updates(player *target);
-        utils::generator<json::json> get_rejoin_updates(player *target);
+        utils::generator<json::json> get_game_log_updates(player_ptr target);
+        utils::generator<json::json> get_rejoin_updates(player_ptr target);
 
-        card_sign get_card_sign(card *c);
+        card_sign get_card_sign(card_ptr c);
 
-        card *add_card(const card_data &data);
+        card_ptr add_card(const card_data &data);
         void add_players(std::span<int> user_ids);
         void start_game(const game_options &options);
 
-        player_distances make_player_distances(player *p);
-        request_status_args make_request_update(player *p);
-        status_ready_args make_status_ready_update(player *p);
+        player_distances make_player_distances(player_ptr p);
+        request_status_args make_request_update(player_ptr p);
+        status_ready_args make_status_ready_update(player_ptr p);
         player_order_update make_player_order_update(bool instant = false);
 
         ticks get_total_update_time() const;
@@ -36,7 +36,7 @@ namespace banggame {
 
         bool request_bot_play();
 
-        void handle_player_death(player *killer, player *target, discard_all_reason reason);
+        void handle_player_death(player_ptr killer, player_ptr target, discard_all_reason reason);
     };
 
 }

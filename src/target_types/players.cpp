@@ -12,7 +12,7 @@ namespace banggame {
     }
 
     template<> game_string visit_players::get_error(const effect_context &ctx) {
-        for (player *target : range_all_players(origin)) {
+        for (player_ptr target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
             }
@@ -22,7 +22,7 @@ namespace banggame {
 
     template<> game_string visit_players::prompt(const effect_context &ctx) {
         player_list targets;
-        for (player *target : range_all_players(origin)) {
+        for (player_ptr target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 targets.push_back(target);
             }
@@ -31,7 +31,7 @@ namespace banggame {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
         game_string msg;
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             msg = effect.on_prompt(origin_card, origin, target, ctx);
             if (!msg) break;
         }
@@ -39,7 +39,7 @@ namespace banggame {
     }
 
     template<> void visit_players::add_context(effect_context &ctx) {
-        for (player *target : range_all_players(origin)) {
+        for (player_ptr target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 defer<"player">().add_context(ctx, target);
             }
@@ -48,7 +48,7 @@ namespace banggame {
 
     template<> void visit_players::play(const effect_context &ctx) {
         player_list targets;
-        for (player *target : range_all_players(origin)) {
+        for (player_ptr target : range_all_players(origin)) {
             if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
                 targets.push_back(target);
             }
@@ -62,7 +62,7 @@ namespace banggame {
             flags.add(effect_flag::escapable);
         }
 
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             effect.on_play(origin_card, origin, target, flags, ctx);
         }
     }

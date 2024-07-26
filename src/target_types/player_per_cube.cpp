@@ -19,7 +19,7 @@ namespace banggame {
         if (targets.size() != num_cubes + 1) {
             return "ERROR_INVALID_TARGETS";
         }
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             MAYBE_RETURN(defer<"player">().get_error(ctx, target));
         }
         return {};
@@ -27,7 +27,7 @@ namespace banggame {
 
     template<> game_string visit_players::prompt(const effect_context &ctx, const player_list &targets) {
         game_string msg;
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             msg = defer<"player">().prompt(ctx, target);
             if (!msg) break;
         }
@@ -35,13 +35,13 @@ namespace banggame {
     }
 
     template<> void visit_players::add_context(effect_context &ctx, const player_list &targets) {
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             defer<"player">().add_context(ctx, target);
         }
     }
 
     template<> void visit_players::play(const effect_context &ctx, const player_list &targets) {
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             defer<"player">().play(ctx, target);
         }
     }

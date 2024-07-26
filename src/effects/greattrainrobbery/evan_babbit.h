@@ -8,8 +8,8 @@
 namespace banggame {
 
     struct effect_evan_babbit : bot_suggestion::target_enemy {
-        game_string get_error(card *origin_card, player *origin, player *target_player);
-        void on_play(card *origin_card, player *origin, player *target_player);
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target_player);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target_player);
     };
 
     DEFINE_EFFECT(evan_babbit, effect_evan_babbit)

@@ -6,8 +6,8 @@
 namespace banggame {
     
     struct effect_pay_cube {
-        void add_context(card *origin_card, player *origin, card *target, effect_context &ctx);
-        void on_play(card *origin_card, player *origin, const effect_context &ctx);
+        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
     };
 
     DEFINE_EFFECT(pay_cube, effect_pay_cube)

@@ -20,27 +20,27 @@ namespace banggame {
         if (targets.size() != std::max<size_t>(1, effect.target_value)) {
             return "ERROR_INVALID_TARGETS";
         }
-        for (card *c : targets) {
+        for (card_ptr c : targets) {
             MAYBE_RETURN(defer<"card">().get_error(ctx, c));
         }
         return {};
     }
 
     template<> game_string visit_cards::prompt(const effect_context &ctx, const card_list &targets) {
-        for (card *c : targets) {
+        for (card_ptr c : targets) {
             MAYBE_RETURN(defer<"card">().prompt(ctx, c));
         }
         return {};
     }
 
     template<> void visit_cards::add_context(effect_context &ctx, const card_list &targets) {
-        for (card *c : targets) {
+        for (card_ptr c : targets) {
             defer<"card">().add_context(ctx, c);
         }
     }
 
     template<> void visit_cards::play(const effect_context &ctx, const card_list &targets) {
-        for (card *c : targets) {
+        for (card_ptr c : targets) {
             defer<"card">().play(ctx, c);
         }
     }

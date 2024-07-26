@@ -24,7 +24,7 @@ namespace banggame {
         if (targets.empty() || effect.target_value != 0 && targets.size() > effect.target_value) {
             return "ERROR_INVALID_TARGETS";
         }
-        for (card *c : targets) {
+        for (card_ptr c : targets) {
             MAYBE_RETURN(defer<"card">().get_error(ctx, c));
         }
         return {};

@@ -6,12 +6,12 @@
 namespace banggame {
     
     struct prompt_target_self {
-        game_string on_prompt(card *origin_card, player *origin, player *target);
-        game_string on_prompt(card *origin_card, player *origin, card *target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 
     struct prompt_target_ghost {
-        game_string on_prompt(card *origin_card, player *origin, player *target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 }
 

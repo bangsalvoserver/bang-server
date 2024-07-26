@@ -6,17 +6,17 @@
 namespace banggame::bot_suggestion {
 
     struct target_enemy {
-        bool on_check_target(card *origin_card, player *origin, player *target);
-        bool on_check_target(card *origin_card, player *origin, card *target);
+        bool on_check_target(card_ptr origin_card, player_ptr origin, player_ptr target);
+        bool on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 
     struct target_friend {
-        bool on_check_target(card *origin_card, player *origin, player *target);
-        bool on_check_target(card *origin_card, player *origin, card *target);
+        bool on_check_target(card_ptr origin_card, player_ptr origin, player_ptr target);
+        bool on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 
     struct target_enemy_card {
-        bool on_check_target(card *origin_card, player *origin, card *target);
+        bool on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
     
 }

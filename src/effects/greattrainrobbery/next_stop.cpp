@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    void effect_next_stop::on_play(card *origin_card, player *origin) {
+    void effect_next_stop::on_play(card_ptr origin_card, player_ptr origin) {
         origin->m_game->advance_train(origin);
     }
 }

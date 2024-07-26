@@ -21,11 +21,11 @@ namespace banggame {
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
         }
 
-        void on_miss(card *c, effect_flags missed_flags = {}) override {
+        void on_miss(card_ptr c, effect_flags missed_flags = {}) override {
             target->m_game->pop_request();
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (target == owner) {
                 return {"STATUS_RICOCHET", origin_card, target_card};
             } else {
@@ -34,7 +34,7 @@ namespace banggame {
         }
     };
 
-    void effect_ricochet::on_play(card *origin_card, player *origin, card *target_card) {
+    void effect_ricochet::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         origin->m_game->queue_request<request_ricochet>(origin_card, origin, target_card->owner, target_card);
     }
 }

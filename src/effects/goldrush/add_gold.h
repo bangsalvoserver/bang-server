@@ -9,7 +9,7 @@ namespace banggame {
         int amount;
         effect_add_gold(int value) : amount(std::max(1, value)) {}
 
-        void on_play(card *origin_card, player *origin, player *target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 
     DEFINE_EFFECT(add_gold, effect_add_gold)

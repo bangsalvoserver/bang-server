@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    game_string modifier_moneybag::get_error(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) {
+    game_string modifier_moneybag::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
         if (!ctx.repeat_card) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
@@ -26,7 +26,7 @@ namespace banggame {
         return {};
     }
 
-    void modifier_moneybag::add_context(card *origin_card, player *origin, effect_context &ctx) {
+    void modifier_moneybag::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         ctx.disable_banglimit = true;
         if (!origin->m_game->m_discards.empty()) {
             ctx.repeat_card = origin->m_game->m_discards.back();

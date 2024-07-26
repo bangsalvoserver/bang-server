@@ -7,8 +7,8 @@
 
 namespace banggame {
     
-    void equip_lemonade_jim::on_enable(card *target_card, player *origin) {
-        origin->m_game->add_listener<event_type::on_play_beer>(target_card, [=](player *target) {
+    void equip_lemonade_jim::on_enable(card_ptr target_card, player_ptr origin) {
+        origin->m_game->add_listener<event_type::on_play_beer>(target_card, [=](player_ptr target) {
             if (origin != target) {
                 target->m_game->queue_request<request_can_play_card>(target_card, target, origin);
             }

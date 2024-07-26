@@ -13,7 +13,7 @@ namespace banggame {
 
     class update_target {
     private:
-        const player *m_targets[lobby_max_players];
+        const_player_ptr m_targets[lobby_max_players];
 
         struct {
             bool m_inclusive:1;
@@ -21,7 +21,7 @@ namespace banggame {
             int m_num_targets:6;
         };
 
-        update_target(bool inclusive, bool invert_public, std::convertible_to<const player *> auto ... targets)
+        update_target(bool inclusive, bool invert_public, std::convertible_to<const_player_ptr> auto ... targets)
             : m_targets{targets ...}
             , m_inclusive{inclusive}
             , m_invert_public{invert_public}
@@ -30,7 +30,7 @@ namespace banggame {
             static_assert(sizeof...(targets) <= lobby_max_players);
         }
 
-        update_target(bool inclusive, std::convertible_to<const player *> auto ... targets)
+        update_target(bool inclusive, std::convertible_to<const_player_ptr> auto ... targets)
             : update_target(inclusive, false, targets...) {}
 
         auto targets() const {
@@ -38,27 +38,27 @@ namespace banggame {
         }
 
     public:
-        static update_target includes(std::convertible_to<const player *> auto ... targets) {
+        static update_target includes(std::convertible_to<const_player_ptr> auto ... targets) {
             return update_target(true, targets...);
         }
 
-        static update_target excludes(std::convertible_to<const player *> auto ... targets) {
+        static update_target excludes(std::convertible_to<const_player_ptr> auto ... targets) {
             return update_target(false, targets...);
         }
 
-        static update_target includes_private(std::convertible_to<const player *> auto ... targets) {
+        static update_target includes_private(std::convertible_to<const_player_ptr> auto ... targets) {
             return update_target(true, true, targets...);
         }
 
-        static update_target excludes_public(std::convertible_to<const player *> auto ... targets) {
+        static update_target excludes_public(std::convertible_to<const_player_ptr> auto ... targets) {
             return update_target(false, true, targets...);
         }
 
-        void add(player *target) {
+        void add(player_ptr target) {
             m_targets[m_num_targets++] = target;
         }
 
-        bool matches(const player *target) const {
+        bool matches(const_player_ptr target) const {
             return rn::contains(targets(), target) == m_inclusive;
         }
 
@@ -72,9 +72,9 @@ namespace banggame {
     };
 
     struct game_context {
-        virtual card *find_card(int card_id) const = 0;
-        virtual player *find_player(int player_id) const = 0;
-        virtual player *find_player_by_userid(int user_id) const = 0;
+        virtual card_ptr find_card(int card_id) const = 0;
+        virtual player_ptr find_player(int player_id) const = 0;
+        virtual player_ptr find_player_by_userid(int user_id) const = 0;
         virtual game_duration transform_duration(game_duration duration) const = 0;
     };
 

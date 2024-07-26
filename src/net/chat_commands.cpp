@@ -117,7 +117,7 @@ namespace banggame {
     void game_manager::command_give_card(game_user &user, std::string_view name) {
         auto &lobby = *user.in_lobby;
 
-        player *target = lobby.m_game->find_player_by_userid(lobby.get_user_id(user));
+        player_ptr target = lobby.m_game->find_player_by_userid(lobby.get_user_id(user));
         if (!target) {
             throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");
         }
@@ -127,7 +127,7 @@ namespace banggame {
         }
 
         auto all_cards = lobby.m_game->get_all_cards();
-        auto card_it = rn::find_if(all_cards, [&](const card *target_card) {
+        auto card_it = rn::find_if(all_cards, [&](const_card_ptr target_card) {
             if (rn::equal(name, target_card->name, {}, toupper, toupper)) {
                 switch (target_card->deck) {
                 case card_deck_type::train:
@@ -150,7 +150,7 @@ namespace banggame {
         if (card_it == all_cards.end()) {
             throw lobby_error("ERROR_CANNOT_FIND_CARD");
         }
-        card *target_card = *card_it;
+        card_ptr target_card = *card_it;
         
         lobby.m_game->send_request_status_clear();
         
@@ -165,11 +165,11 @@ namespace banggame {
         }
         case card_deck_type::character: {
             target->remove_extra_characters();
-            for (card *c : target->m_characters) {
+            for (card_ptr c : target->m_characters) {
                 target->disable_equip(c);
             }
 
-            card *old_character = target->first_character();
+            card_ptr old_character = target->first_character();
             int ncubes = old_character->num_cubes;
 
             old_character->move_cubes(nullptr, ncubes);
@@ -235,7 +235,7 @@ namespace banggame {
             } else {
                 bool from_train = target_card->pocket == pocket_type::train;
                 target->equip_card(target_card);
-                if (card *drawn_card = target->m_game->top_train_card(); from_train && drawn_card) {
+                if (card_ptr drawn_card = target->m_game->top_train_card(); from_train && drawn_card) {
                     drawn_card->move_to(pocket_type::train);
                 }
             }

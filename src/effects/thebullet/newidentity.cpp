@@ -7,7 +7,7 @@
 namespace banggame {
 
     struct request_newidentity : request_picking {
-        request_newidentity(card *origin_card, player *target)
+        request_newidentity(card_ptr origin_card, player_ptr target)
             : request_picking(origin_card, nullptr, target, {}, -7) {}
 
         void on_update() override {
@@ -20,22 +20,22 @@ namespace banggame {
             }
         }
 
-        bool can_pick(const card *target_card) const override {
+        bool can_pick(const_card_ptr target_card) const override {
             return target_card->pocket == pocket_type::selection
                 || (target_card->pocket == pocket_type::player_character && target_card == target->first_character());
         }
 
-        void on_pick(card *target_card) override {
+        void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
             if (target_card->pocket == pocket_type::selection) {
                 target->remove_extra_characters();
-                for (card *c : target->m_characters) {
+                for (card_ptr c : target->m_characters) {
                     target->disable_equip(c);
                 }
 
                 target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
 
-                card *old_character = target->first_character();
+                card_ptr old_character = target->first_character();
                 old_character->set_visibility(card_visibility::hidden, target);
                 old_character->move_to(pocket_type::player_backup, target, card_visibility::hidden, true);
                 target_card->move_to(pocket_type::player_character, target, card_visibility::shown);
@@ -52,7 +52,7 @@ namespace banggame {
             }
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (target == owner) {
                 return {"STATUS_NEWIDENTITY", origin_card};
             } else {
@@ -61,8 +61,8 @@ namespace banggame {
         }
     };
 
-    void equip_newidentity::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_turn_switch>({target_card, -1}, [=](player *origin) {
+    void equip_newidentity::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::on_turn_switch>({target_card, -1}, [=](player_ptr origin) {
             target->m_game->queue_request<request_newidentity>(target_card, origin);
         });
     }

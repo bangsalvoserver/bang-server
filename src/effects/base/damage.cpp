@@ -6,14 +6,14 @@
 
 namespace banggame {
     
-    game_string effect_damage::get_error(card *origin_card, player *origin, effect_flags flags) {
+    game_string effect_damage::get_error(card_ptr origin_card, player_ptr origin, effect_flags flags) {
         if (origin->m_hp <= damage) {
             return "ERROR_CANT_SELF_DAMAGE";
         }
         return {};
     }
 
-    void effect_damage::on_play(card *origin_card, player *origin, player *target, effect_flags flags) {
+    void effect_damage::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         target->damage(origin_card, origin, damage, flags);
     }
 
@@ -26,7 +26,7 @@ namespace banggame {
         return flags;
     }
 
-    request_damage::request_damage(card *origin_card, player *origin, player *target, int damage, effect_flags flags)
+    request_damage::request_damage(card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags)
         : request_base(origin_card, origin, target, remove_invalid_flags(flags), 200)
         , damage(damage) {}
     
@@ -62,7 +62,7 @@ namespace banggame {
         target->m_game->call_event(event_type::on_hit{ origin_card, origin, target, damage, flags });
     }
 
-    game_string request_damage::status_text(player *owner) const {
+    game_string request_damage::status_text(player_ptr owner) const {
         if (flags.check(effect_flag::play_as_bang)) {
             if (flags.check(effect_flag::multi_target)) {
                 return {"STATUS_DAMAGING_AS_GATLING", target, origin_card};

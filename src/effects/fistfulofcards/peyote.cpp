@@ -10,10 +10,10 @@
 namespace banggame {
 
     struct request_peyote : request_base {
-        request_peyote(card *origin_card, player *target)
+        request_peyote(card_ptr origin_card, player_ptr target)
             : request_base(origin_card, nullptr, target) {}
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (target == owner) {
                 return {"STATUS_PEYOTE", origin_card};
             } else {
@@ -22,25 +22,25 @@ namespace banggame {
         }
     };
     
-    void equip_peyote::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_turn_start>({target_card, -10}, [=](player *p) {
+    void equip_peyote::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::on_turn_start>({target_card, -10}, [=](player_ptr p) {
             p->m_game->queue_request<request_peyote>(target_card, p);
         });
 
         target->m_game->add_game_flags(game_flag::phase_one_override);
     }
 
-    void equip_peyote::on_disable(card *target_card, player *target) {
+    void equip_peyote::on_disable(card_ptr target_card, player_ptr target) {
         target->m_game->remove_listeners(target_card);
         target->m_game->remove_game_flags(game_flag::phase_one_override);
     }
 
-    bool effect_peyote::can_play(card *target_card, player *target) {
+    bool effect_peyote::can_play(card_ptr target_card, player_ptr target) {
         return target->m_game->top_request<request_peyote>(target) != nullptr;
     }
 
-    void effect_peyote::on_play(card *target_card, player *target) {
-        card *origin_card = target->m_game->top_request<request_peyote>()->origin_card;
+    void effect_peyote::on_play(card_ptr target_card, player_ptr target) {
+        card_ptr origin_card = target->m_game->top_request<request_peyote>()->origin_card;
 
         auto *drawn_card = target->m_game->top_of_deck();
         drawn_card->set_visibility(card_visibility::shown);

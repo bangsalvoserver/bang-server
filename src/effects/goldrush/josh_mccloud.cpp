@@ -9,11 +9,11 @@
 namespace banggame {
 
     struct request_force_play_card : request_base {
-        request_force_play_card(card *origin_card, player *target, card *target_card)
+        request_force_play_card(card_ptr origin_card, player_ptr target, card_ptr target_card)
             : request_base(origin_card, nullptr, target)
             , target_card(target_card) {}
         
-        card *target_card;
+        card_ptr target_card;
 
         void on_update() override {
             if (target_card == get_single_element(get_all_playable_cards(target, true))) {
@@ -34,7 +34,7 @@ namespace banggame {
             }
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_FORCE_PLAY_CARD", target_card};
             } else {
@@ -43,29 +43,29 @@ namespace banggame {
         }
     };
 
-    bool effect_forced_play::can_play(card *origin_card, player *target) {
+    bool effect_forced_play::can_play(card_ptr origin_card, player_ptr target) {
         if (auto req = target->m_game->top_request<request_force_play_card>(target)) {
             return origin_card == req->target_card;
         }
         return false;
     }
 
-    void effect_forced_play::on_play(card *origin_card, player *target) {
+    void effect_forced_play::on_play(card_ptr origin_card, player_ptr target) {
         target->m_game->pop_request();
     }
 
     struct request_force_equip_card : request_base {
-        request_force_equip_card(card *origin_card, player *target, card *target_card)
+        request_force_equip_card(card_ptr origin_card, player_ptr target, card_ptr target_card)
             : request_base(origin_card, nullptr, target)
             , target_card(target_card) {}
         
-        card *target_card;
+        card_ptr target_card;
 
         card_list get_highlights() const override {
             return {target_card};
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_FORCE_EQUIP_CARD", target_card};
             } else {
@@ -74,11 +74,11 @@ namespace banggame {
         }
     };
 
-    game_string effect_forced_equip::get_error(card *origin_card, player *origin, player *target) {
+    game_string effect_forced_equip::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
         if (auto req = target->m_game->top_request<request_force_equip_card>(origin)) {
-            card *target_card = req->target_card;
+            card_ptr target_card = req->target_card;
             MAYBE_RETURN(filters::check_player_filter(origin, target_card->equip_target, target));
-            if (card *equipped = target->find_equipped_card(target_card)) {
+            if (card_ptr equipped = target->find_equipped_card(target_card)) {
                 return {"ERROR_DUPLICATED_CARD", equipped};
             } else {
                 return {};
@@ -87,12 +87,12 @@ namespace banggame {
         return "ERROR_INVALID_RESPONSE";
     }
 
-    game_string effect_forced_equip::on_prompt(card *origin_card, player *origin, player *target) {
+    game_string effect_forced_equip::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
         return get_equip_prompt(origin, origin->m_game->top_request<request_force_equip_card>()->target_card, target);
     }
     
-    void effect_forced_equip::on_play(card *origin_card, player *origin, player *target) {
-        card *target_card = origin->m_game->top_request<request_force_equip_card>()->target_card;
+    void effect_forced_equip::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        card_ptr target_card = origin->m_game->top_request<request_force_equip_card>()->target_card;
         origin->m_game->pop_request();
 
         if (origin == target) {
@@ -103,8 +103,8 @@ namespace banggame {
         target->equip_card(target_card);
     }
 
-    void effect_josh_mccloud::on_play(card *origin_card, player *target) {
-        card *target_card = target->m_game->draw_shop_card();
+    void effect_josh_mccloud::on_play(card_ptr origin_card, player_ptr target) {
+        card_ptr target_card = target->m_game->draw_shop_card();
         if (target_card->is_black()) {
             if (get_all_equip_targets(target, target_card).empty()) {
                 target_card->add_short_pause();

@@ -12,18 +12,18 @@ namespace banggame {
 
     namespace event_type {
         struct count_train_equips {
-            player *origin;
+            player_ptr origin;
             nullable_ref<int> num_cards;
             nullable_ref<int> num_advance;
         };
         
         struct on_train_advance {
-            player *origin;
+            player_ptr origin;
             shared_effect_context ctx;
         };
 
         struct on_locomotive_effect {
-            player *origin;
+            player_ptr origin;
             shared_effect_context ctx;
         };
     }

@@ -9,9 +9,9 @@ namespace banggame {
 
     struct draw_check_handler : std::enable_shared_from_this<draw_check_handler> {
         virtual card_list get_drawn_cards() const = 0;
-        virtual card *get_drawing_card() const = 0;
+        virtual card_ptr get_drawing_card() const = 0;
 
-        virtual bool bot_check_redraw(card *target_card, player *owner) const = 0;
+        virtual bool bot_check_redraw(card_ptr target_card, player_ptr owner) const = 0;
 
         virtual void resolve() = 0;
         virtual void restart() = 0;
@@ -21,50 +21,50 @@ namespace banggame {
     
     namespace event_type {
         struct count_num_checks {
-            player *origin;
+            player_ptr origin;
             nullable_ref<int> num_checks;
         };
 
         struct on_draw_check_resolve {
-            player *origin;
-            card *target_card;
+            player_ptr origin;
+            card_ptr target_card;
         };
         
         struct on_draw_check_select {
-            player *origin;
+            player_ptr origin;
             shared_request_check req;
             nullable_ref<bool> handled;
         };
     }
     
     struct request_check_base : selection_picker, draw_check_handler {
-        request_check_base(player *target, card *origin_card)
+        request_check_base(player_ptr target, card_ptr origin_card)
             : selection_picker(origin_card, nullptr, target, {}, 110) {}
 
-        card *drawn_card = nullptr;
+        card_ptr drawn_card = nullptr;
 
         void on_update() override;
 
-        game_string pick_prompt(card *target_card) const override;
+        game_string pick_prompt(card_ptr target_card) const override;
 
-        void on_pick(card *target_card) override;
+        void on_pick(card_ptr target_card) override;
 
-        game_string status_text(player *owner) const override;
+        game_string status_text(player_ptr owner) const override;
 
         void start();
-        void select(card *target_card);
+        void select(card_ptr target_card);
 
         card_list get_drawn_cards() const override {
             return {drawn_card};
         }
 
-        card *get_drawing_card() const override {
+        card_ptr get_drawing_card() const override {
             return origin_card;
         }
 
-        bool is_lucky(card *target_card) const;
+        bool is_lucky(card_ptr target_card) const;
 
-        bool bot_check_redraw(card *target_card, player *owner) const override;
+        bool bot_check_redraw(card_ptr target_card, player_ptr owner) const override;
         
         void resolve() override;
         void restart() override;
@@ -86,7 +86,7 @@ namespace banggame {
         Function m_function;
 
     public:
-        request_check(player *target, card *origin_card, Condition &&condition, Function &&function)
+        request_check(player_ptr target, card_ptr origin_card, Condition &&condition, Function &&function)
             : request_check_base(target, origin_card)
             , m_condition(FWD(condition))
             , m_function(FWD(function)) {}

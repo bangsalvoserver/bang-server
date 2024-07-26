@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    game_string modifier_belltower::get_error(card *origin_card, player *origin, card *playing_card) {
+    game_string modifier_belltower::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card) {
         if (rn::none_of(playing_card->get_effect_list(origin->m_game->pending_requests()),
             [](const effect_holder &holder) {
                 return holder.player_filter.check(target_player_filter::reachable)
@@ -19,7 +19,7 @@ namespace banggame {
         return {};
     }
 
-    void modifier_belltower::add_context(card *origin_card, player *origin, effect_context &ctx) {
+    void modifier_belltower::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         ctx.ignore_distances = true;
     }
 }

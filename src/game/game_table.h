@@ -47,35 +47,35 @@ namespace banggame {
         game_flags m_game_flags;
         game_options m_options;
 
-        player *m_first_player = nullptr;
-        player *m_first_dead = nullptr;
-        player *m_playing = nullptr;
+        player_ptr m_first_player = nullptr;
+        player_ptr m_first_dead = nullptr;
+        player_ptr m_playing = nullptr;
 
         game_table(unsigned int seed);
 
-        card *find_card(int card_id) const override;
-        player *find_player(int player_id) const override;
-        player *find_player_by_userid(int user_id) const override;
+        card_ptr find_card(int card_id) const override;
+        player_ptr find_player(int player_id) const override;
+        player_ptr find_player_by_userid(int user_id) const override;
         game_duration transform_duration(game_duration duration) const override;
 
         auto get_all_cards() const {
             return m_cards_storage | rv::addressof;
         }
         
-        card_list &get_pocket(pocket_type pocket, player *owner = nullptr);
+        card_list &get_pocket(pocket_type pocket, player_ptr owner = nullptr);
 
-        int calc_distance(const player *from, const player *to);
+        int calc_distance(const_player_ptr from, const_player_ptr to);
 
         int num_alive() const;
 
-        void shuffle_cards_and_ids(std::span<card *> vec);
+        void shuffle_cards_and_ids(std::span<card_ptr> vec);
 
-        card *top_of_deck();
-        card *top_train_card();
-        card *draw_shop_card();
+        card_ptr top_of_deck();
+        card_ptr top_train_card();
+        card_ptr draw_shop_card();
 
         void draw_scenario_card();
-        void advance_train(player *origin);
+        void advance_train(player_ptr origin);
 
         void add_short_pause();
         void play_sound(std::string_view sound_id);

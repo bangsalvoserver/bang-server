@@ -7,20 +7,20 @@
 namespace banggame {
 
     struct request_youl_grinner : request_picking {
-        request_youl_grinner(card *origin_card, player *origin, player *target)
+        request_youl_grinner(card_ptr origin_card, player_ptr origin, player_ptr target)
             : request_picking(origin_card, origin, target) {}
 
         void on_update() override {
             auto_pick();
         }
 
-        bool can_pick(const card *target_card) const override;
-        void on_pick(card *target_card) override;
-        game_string status_text(player *owner) const override;
+        bool can_pick(const_card_ptr target_card) const override;
+        void on_pick(card_ptr target_card) override;
+        game_string status_text(player_ptr owner) const override;
     };
 
     struct equip_youl_grinner : event_equip {
-        void on_enable(card *target_card, player *target);
+        void on_enable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(youl_grinner, equip_youl_grinner)

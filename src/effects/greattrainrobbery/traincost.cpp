@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    game_string modifier_traincost::get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx) {
+    game_string modifier_traincost::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) {
         if (target_card->pocket != pocket_type::train) {
             return "ERROR_NOT_ALLOWED_WITH_CARD";
         }
@@ -22,7 +22,7 @@ namespace banggame {
         return {};
     }
 
-    void modifier_traincost::add_context(card *origin_card, player *origin, effect_context &ctx) {
+    void modifier_traincost::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         ctx.traincost = origin_card;
 
         if (origin_card->pocket == pocket_type::stations) {
@@ -34,16 +34,16 @@ namespace banggame {
         }
     }
 
-    bool modifier_locomotive::valid_with_modifier(card *origin_card, player *origin, card *target_card) {
+    bool modifier_locomotive::valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         return target_card->deck == card_deck_type::station
             || target_card->deck != card_deck_type::main_deck && target_card->has_tag(tag_type::traincost);
     }
 
-    bool modifier_locomotive::valid_with_card(card *origin_card, player *origin, card *target_card) {
+    bool modifier_locomotive::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         return target_card->pocket == pocket_type::train;
     }
 
-    void modifier_locomotive::add_context(card *origin_card, player *origin, effect_context &ctx) {
+    void modifier_locomotive::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         ctx.train_advance = 1;
     }
 

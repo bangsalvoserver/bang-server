@@ -6,15 +6,15 @@
 
 namespace banggame {
 
-    inline effect_heal build_effect_heal(card *origin_card, const effect_context &ctx, int num_cubes) {
+    inline effect_heal build_effect_heal(card_ptr origin_card, const effect_context &ctx, int num_cubes) {
         return effect_heal{ctx.selected_cubes.count(origin_card) / num_cubes + 1};
     }
     
-    game_string effect_a_little_nip::on_prompt(card *origin_card, player *origin, const effect_context &ctx) {
+    game_string effect_a_little_nip::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         return build_effect_heal(origin_card, ctx, num_cubes).on_prompt(origin_card, origin);
     }
 
-    void effect_a_little_nip::on_play(card *origin_card, player *origin, const effect_context &ctx) {
+    void effect_a_little_nip::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         build_effect_heal(origin_card, ctx, num_cubes).on_play(origin_card, origin);
     }
 

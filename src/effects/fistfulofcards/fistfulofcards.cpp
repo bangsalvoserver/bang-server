@@ -5,8 +5,8 @@
 
 namespace banggame {
     
-    void equip_fistfulofcards::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player *p) {
+    void equip_fistfulofcards::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::pre_turn_start>(target_card, [=](player_ptr p) {
             if (!p->empty_hand()) {
                 p->m_game->add_log("LOG_RECEIVED_N_BANGS_FOR", p, target_card, int(p->m_hand.size()));
                 for (int i=0; i<p->m_hand.size(); ++i) {

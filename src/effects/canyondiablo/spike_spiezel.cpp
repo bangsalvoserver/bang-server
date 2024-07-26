@@ -8,7 +8,7 @@
 
 namespace banggame {
 
-    game_string modifier_spike_spiezel::get_error(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) {
+    game_string modifier_spike_spiezel::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
         if (!ctx.repeat_card) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
@@ -26,7 +26,7 @@ namespace banggame {
         return {};
     }
 
-    void modifier_spike_spiezel::add_context(card *origin_card, player *origin, effect_context &ctx) {
+    void modifier_spike_spiezel::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         if (auto range = origin->m_played_cards
             | rv::reverse
             | rv::transform([](const played_card_history &history) {

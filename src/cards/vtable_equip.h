@@ -12,21 +12,21 @@ namespace banggame {
     struct equip_vtable {
         std::string_view name;
 
-        game_string (*on_prompt)(int effect_value, card *origin_card, player *origin, player *target);
-        void (*on_enable)(int effect_value, card *target_card, player *target);
-        void (*on_disable)(int effect_value, card *target_card, player *target);
+        game_string (*on_prompt)(int effect_value, card_ptr origin_card, player_ptr origin, player_ptr target);
+        void (*on_enable)(int effect_value, card_ptr target_card, player_ptr target);
+        void (*on_disable)(int effect_value, card_ptr target_card, player_ptr target);
         bool is_nodisable;
     };
 
-    inline game_string equip_holder::on_prompt(card *origin_card, player *origin, player *target) const {
+    inline game_string equip_holder::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return type->on_prompt(effect_value, origin_card, origin, target);
     }
 
-    inline void equip_holder::on_enable(card *target_card, player *target) const {
+    inline void equip_holder::on_enable(card_ptr target_card, player_ptr target) const {
         type->on_enable(effect_value, target_card, target);
     }
 
-    inline void equip_holder::on_disable(card *target_card, player *target) const {
+    inline void equip_holder::on_disable(card_ptr target_card, player_ptr target) const {
         type->on_disable(effect_value, target_card, target);
     }
 
@@ -48,7 +48,7 @@ namespace banggame {
         return {
             .name = name,
 
-            .on_prompt = [](int effect_value, card *origin_card, player *origin, player *target) -> game_string {
+            .on_prompt = [](int effect_value, card_ptr origin_card, player_ptr origin, player_ptr target) -> game_string {
                 auto value = build_equip<T>(effect_value);
                 if constexpr (requires { value.on_check_target(origin_card, origin, target); }) {
                     if (filters::is_player_bot(origin) && !value.on_check_target(origin_card, origin, target)) {
@@ -61,14 +61,14 @@ namespace banggame {
                 return {};
             },
 
-            .on_enable = [](int effect_value, card *target_card, player *target) {
+            .on_enable = [](int effect_value, card_ptr target_card, player_ptr target) {
                 auto value = build_equip<T>(effect_value);
                 if constexpr (requires { value.on_enable(target_card, target); }) {
                     value.on_enable(target_card, target);
                 }
             },
 
-            .on_disable = [](int effect_value, card *target_card, player *target) {
+            .on_disable = [](int effect_value, card_ptr target_card, player_ptr target) {
                 auto value = build_equip<T>(effect_value);
                 if constexpr (requires { value.on_disable(target_card, target); }) {
                     value.on_disable(target_card, target);

@@ -10,7 +10,7 @@ namespace banggame {
 
     struct game_table;
 
-    using card_disabler_fun = std::function<bool(const card *)>;
+    using card_disabler_fun = std::function<bool(const_card_ptr)>;
 
     class disabler_map {
     public:
@@ -38,13 +38,13 @@ namespace banggame {
             do_remove_disablers({low, high});
         }
 
-        void remove_disablers(card *key) {
+        void remove_disablers(card_ptr key) {
             auto [low, high] = m_disablers.equal_range(key);
             do_remove_disablers({low, high});
         }
 
-        card *get_disabler(const card *target_card) const;
-        bool is_disabled(const card *target_card) const;
+        card_ptr get_disabler(const_card_ptr target_card) const;
+        bool is_disabled(const_card_ptr target_card) const;
     };
 }
 

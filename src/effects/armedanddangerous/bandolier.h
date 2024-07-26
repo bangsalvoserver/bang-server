@@ -7,9 +7,9 @@
 namespace banggame {
 
     struct modifier_bandolier : modifier_bangmod {
-        bool valid_with_card(card *origin_card, player *origin, card *playing_card);
-        game_string on_prompt(card *origin_card, player *origin, card *playing_card);
-        void add_context(card *origin_card, player *origin, effect_context &ctx);
+        bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr playing_card);
+        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
     };
 
     DEFINE_MODIFIER(bandolier, modifier_bandolier)

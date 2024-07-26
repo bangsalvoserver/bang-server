@@ -6,8 +6,8 @@
 
 namespace banggame {
     
-    void equip_colorado_bill::on_enable(card *target_card, player *p) {
-        p->m_game->add_listener<event_type::apply_bang_modifier>(target_card, [=](player *origin, shared_request_bang req) {
+    void equip_colorado_bill::on_enable(card_ptr target_card, player_ptr p) {
+        p->m_game->add_listener<event_type::apply_bang_modifier>(target_card, [=](player_ptr origin, shared_request_bang req) {
             if (p == origin) {
                 origin->m_game->queue_request<request_check>(origin, target_card, &card_sign::is_spades, [=](bool result) {
                     if (result) {

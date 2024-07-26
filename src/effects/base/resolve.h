@@ -8,9 +8,9 @@ namespace banggame {
         int resolve_type;
         effect_resolve(int resolve_type): resolve_type{resolve_type} {}
 
-        game_string on_prompt(card *origin_card, player *origin);
-        bool can_play(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin);
+        bool can_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(resolve, effect_resolve)

@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct equip_big_spencer {
-        void on_enable(card *target_card, player *target);
-        void on_disable(card *target_card, player *target);
+        void on_enable(card_ptr target_card, player_ptr target);
+        void on_disable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(big_spencer, equip_big_spencer)

@@ -6,14 +6,14 @@
 namespace banggame {
 
     struct equip_clash_the_stampede : event_equip {
-        void on_enable(card *target_card, player *target);
+        void on_enable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(clash_the_stampede, equip_clash_the_stampede)
 
     struct effect_clash_the_stampede {
-        game_string get_error(card *origin_card, player *origin, player *target);
-        void on_play(card *origin_card, player *origin, player *target);
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 
     DEFINE_EFFECT(clash_the_stampede, effect_clash_the_stampede)

@@ -7,8 +7,8 @@
 
 namespace banggame {
 
-    void equip_vendetta::on_enable(card *target_card, player *p) {
-        p->m_game->add_listener<event_type::on_turn_end>({target_card, -1}, [=](player *target, bool skipped) {
+    void equip_vendetta::on_enable(card_ptr target_card, player_ptr p) {
+        p->m_game->add_listener<event_type::on_turn_end>({target_card, -1}, [=](player_ptr target, bool skipped) {
             if (!skipped && !target->check_player_flags(player_flag::extra_turn)) {
                 target->m_game->queue_request<request_check>(target, target_card, &card_sign::is_hearts, [=](bool result) {
                     if (result) {

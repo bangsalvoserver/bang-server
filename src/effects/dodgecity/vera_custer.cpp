@@ -5,8 +5,8 @@
 
 namespace banggame {
 
-    static card *get_card_copy(card *target_card) {
-        for (card *c : target_card->m_game->get_all_cards()) {
+    static card_ptr get_card_copy(card_ptr target_card) {
+        for (card_ptr c : target_card->m_game->get_all_cards()) {
             if (c != target_card && c->deck == target_card->deck && c->name == target_card->name) {
                 return c;
             }
@@ -14,7 +14,7 @@ namespace banggame {
         return target_card->m_game->add_card(*target_card);
     }
 
-    static void copy_characters(player *origin, player *target) {
+    static void copy_characters(player_ptr origin, player_ptr target) {
         auto new_cards = target->m_characters
             | rv::take_last(2)
             | rv::transform(get_card_copy)
@@ -23,7 +23,7 @@ namespace banggame {
         if (!rn::equal(origin->m_characters | rv::drop(1), new_cards)) {
             origin->remove_extra_characters();
 
-            for (card *target_card : new_cards) {
+            for (card_ptr target_card : new_cards) {
                 origin->m_game->add_log("LOG_COPY_CHARACTER", origin, target_card);
 
                 target_card->pocket = pocket_type::player_character;
@@ -39,7 +39,7 @@ namespace banggame {
     }
 
     struct request_vera_custer : request_base {
-        request_vera_custer(card *origin_card, player *target)
+        request_vera_custer(card_ptr origin_card, player_ptr target)
             : request_base(origin_card, nullptr, target, {}, -8) {}
 
         void on_update() override {
@@ -54,7 +54,7 @@ namespace banggame {
             }
         }
 
-        game_string status_text(player *owner) const override {
+        game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_VERA_CUSTER", origin_card};
             } else {
@@ -63,22 +63,22 @@ namespace banggame {
         }
     };
 
-    void equip_vera_custer::on_enable(card *origin_card, player *origin) {
-        origin->m_game->add_listener<event_type::pre_turn_start>(origin_card, [=](player *target) {
+    void equip_vera_custer::on_enable(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->add_listener<event_type::pre_turn_start>(origin_card, [=](player_ptr target) {
             if (origin == target) {
                 origin->m_game->queue_request<request_vera_custer>(origin_card, target);
             }
         });
     }
 
-    game_string effect_vera_custer::get_error(card *origin_card, player *origin, player *target) {
+    game_string effect_vera_custer::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
         if (origin->m_game->top_request<request_vera_custer>(origin) == nullptr) {
             return "ERROR_INVALID_ACTION";
         }
         return {};
     }
 
-    void effect_vera_custer::on_play(card *origin_card, player *origin, player *target) {
+    void effect_vera_custer::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
         origin->m_game->pop_request();
         copy_characters(origin, target);
     }

@@ -14,7 +14,7 @@
 namespace banggame {
 
     struct event_equip {
-        void on_disable(card *target_card, player *target);
+        void on_disable(card_ptr target_card, player_ptr target);
     };
 
 }

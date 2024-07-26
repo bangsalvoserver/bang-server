@@ -9,19 +9,19 @@
 
 namespace banggame {
 
-    game_string handler_play_as_gatling::get_error(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card) {
+    game_string handler_play_as_gatling::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {
         return get_play_card_error(origin, chosen_card, ctx);
     }
 
-    game_string handler_play_as_gatling::on_prompt(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card) {
+    game_string handler_play_as_gatling::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {
         player_list targets;
-        for (player *target : range_all_players(origin)) {
+        for (player_ptr target : range_all_players(origin)) {
             if (target != ctx.skipped_player && target != origin) {
                 targets.push_back(target);
             }
         }
         game_string msg;
-        for (player *target : targets) {
+        for (player_ptr target : targets) {
             if (origin->is_bot() && !bot_suggestion::target_enemy{}.on_check_target(chosen_card, origin, target)) {
                 msg = "BOT_BAD_PLAY";
             } else {
@@ -32,12 +32,12 @@ namespace banggame {
         return msg;
     }
 
-    void handler_play_as_gatling::on_play(card *origin_card, player *origin, const effect_context &ctx, card *chosen_card) {
+    void handler_play_as_gatling::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", chosen_card, origin);
         origin->discard_used_card(chosen_card);
 
         player_list targets;
-        for (player *target : range_all_players(origin)) {
+        for (player_ptr target : range_all_players(origin)) {
             if (target != ctx.skipped_player && target != origin) {
                 targets.push_back(target);
             }
@@ -46,7 +46,7 @@ namespace banggame {
         if (targets.size() == 1) {
             flags.add(effect_flag::single_target);
         }
-        for (player *p : targets) {
+        for (player_ptr p : targets) {
             origin->m_game->queue_request<request_bang>(chosen_card, origin, p, flags);
         }
     }

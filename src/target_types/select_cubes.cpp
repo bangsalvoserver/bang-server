@@ -10,7 +10,7 @@ namespace banggame {
 
     template<> card_list visit_cubes::random_target(const effect_context &ctx) {
         auto cubes = origin->cube_slots()
-            | rv::for_each([](card *slot) {
+            | rv::for_each([](card_ptr slot) {
                 return rv::repeat_n(slot, slot->num_cubes);
             })
             | rn::to_vector;
@@ -24,7 +24,7 @@ namespace banggame {
         if (target_cards.size() != effect.target_value) {
             return "ERROR_INVALID_TARGETS";
         }
-        for (card *c : target_cards) {
+        for (card_ptr c : target_cards) {
             if (c->owner != origin) {
                 return "ERROR_TARGET_NOT_SELF";
             }
@@ -37,7 +37,7 @@ namespace banggame {
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const card_list &target_cards) {
-        for (card *target : target_cards) {
+        for (card_ptr target : target_cards) {
             effect.add_context(origin_card, origin, target, ctx);
         }
     }

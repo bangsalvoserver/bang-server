@@ -8,11 +8,11 @@
 
 namespace banggame {
 
-    static game_action generate_random_play(player *origin, const playable_card_info &args, bool is_response) {
+    static game_action generate_random_play(player_ptr origin, const playable_card_info &args, bool is_response) {
         game_action ret { .card = args.card };
         effect_context ctx{};
         
-        for (card *mod_card : args.modifiers) {
+        for (card_ptr mod_card : args.modifiers) {
             auto &targets = ret.modifiers.emplace_back(mod_card).targets;
 
             mod_card->get_modifier(is_response).add_context(mod_card, origin, ctx);
@@ -39,7 +39,7 @@ namespace banggame {
 
     bot_rule rule_filter_by_pocket(pocket_type pocket) {
         return [=](card_node node) {
-            if (card *choice_card = node->context.get().card_choice) {
+            if (card_ptr choice_card = node->context.get().card_choice) {
                 return choice_card->pocket == pocket;
             }
             return node->card->pocket == pocket;
@@ -52,7 +52,7 @@ namespace banggame {
         };
     }
     
-    static card_node get_selected_node(player *origin, bool is_response, const std::set<card_node> &node_set) {
+    static card_node get_selected_node(player_ptr origin, bool is_response, const std::set<card_node> &node_set) {
         auto &rules = is_response ? bot_info.settings.response_rules : bot_info.settings.in_play_rules;
         for (const bot_rule &rule : rules) {
             if (auto filter = rv::filter(node_set, rule)) {
@@ -62,7 +62,7 @@ namespace banggame {
         return random_element(node_set, origin->m_game->bot_rng);
     }
 
-    static bool execute_random_play(player *origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
+    static bool execute_random_play(player_ptr origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
             std::set<card_node> node_set = play_cards | rv::addressof | rn::to<std::set>;
             
@@ -93,7 +93,7 @@ namespace banggame {
 
     bool game::request_bot_play() {
         if (pending_requests()) {
-            for (player *origin : m_players | rv::filter(&player::is_bot)) {
+            for (player_ptr origin : m_players | rv::filter(&player::is_bot)) {
                 playable_cards_list play_cards = generate_playable_cards_list(origin, true);
                 
                 if (!play_cards.empty()) {

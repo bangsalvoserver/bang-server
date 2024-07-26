@@ -130,21 +130,21 @@ namespace banggame {
             return type != nullptr;
         }
 
-        game_string get_error(card *origin_card, player *origin, const effect_context &ctx) const;
-        game_string get_error(card *origin_card, player *origin, player *target, const effect_context &ctx) const;
-        game_string get_error(card *origin_card, player *origin, card *target, const effect_context &ctx) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
 
-        game_string on_prompt(card *origin_card, player *origin, const effect_context &ctx) const;
-        game_string on_prompt(card *origin_card, player *origin, player *target, const effect_context &ctx) const;
-        game_string on_prompt(card *origin_card, player *origin, card *target, const effect_context &ctx) const;
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
 
-        void add_context(card *origin_card, player *origin, effect_context &ctx) const;
-        void add_context(card *origin_card, player *origin, player *target, effect_context &ctx) const;
-        void add_context(card *origin_card, player *origin, card *target, effect_context &ctx) const;
+        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
+        void add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) const;
+        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) const;
 
-        void on_play(card *origin_card, player *origin, effect_flags flags, const effect_context &ctx) const;
-        void on_play(card *origin_card, player *origin, player *target, effect_flags flags, const effect_context &ctx) const;
-        void on_play(card *origin_card, player *origin, card *target, effect_flags flags, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) const;
     };
 
     struct equip_holder {
@@ -155,9 +155,9 @@ namespace banggame {
             return type != nullptr;
         }
 
-        game_string on_prompt(card *origin_card, player *origin, player *target) const;
-        void on_enable(card *target_card, player *target) const;
-        void on_disable(card *target_card, player *target) const;
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        void on_enable(card_ptr target_card, player_ptr target) const;
+        void on_disable(card_ptr target_card, player_ptr target) const;
         bool is_nodisable() const;
     };
 
@@ -168,9 +168,9 @@ namespace banggame {
             return type != nullptr;
         }
 
-        void add_context(card *origin_card, player *origin, effect_context &ctx) const;
-        game_string get_error(card *origin_card, player *origin, card *target_card, const effect_context &ctx) const;
-        game_string on_prompt(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) const;
+        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const;
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) const;
     };
 
     struct mth_holder {
@@ -181,9 +181,9 @@ namespace banggame {
             return type != nullptr;
         }
 
-        game_string get_error(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const;
-        game_string on_prompt(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const;
-        void on_play(card *origin_card, player *origin, const target_list &targets, const effect_context &ctx) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
     };
 
     using effect_list = std::vector<effect_holder>;
@@ -229,19 +229,19 @@ namespace banggame {
 
     class selected_cubes_count {
     private:
-        std::unordered_multimap<const card *, card *> m_value;
+        std::unordered_multimap<const_card_ptr, card_ptr> m_value;
 
     public:
-        void insert(const card *origin_card, card *cube) {
+        void insert(const_card_ptr origin_card, card_ptr cube) {
             m_value.emplace(origin_card, cube);
         }
 
-        auto operator[](const card *origin_card) const {
+        auto operator[](const_card_ptr origin_card) const {
             auto [low, high] = m_value.equal_range(origin_card);
             return rn::subrange(low, high) | rv::values;
         }
 
-        int count(const card *origin_card) const {
+        int count(const_card_ptr origin_card) const {
             return static_cast<int>(rn::distance((*this)[origin_card]));
         }
 

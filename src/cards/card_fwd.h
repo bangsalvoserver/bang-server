@@ -15,6 +15,9 @@ namespace banggame {
     using card_ptr = card *;
     using player_ptr = player *;
 
+    using const_card_ptr = const card *;
+    using const_player_ptr = const player *;
+
     using card_list = std::vector<card_ptr>;
     using player_list = std::vector<player_ptr>;
 

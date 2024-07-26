@@ -6,7 +6,7 @@
 namespace banggame {
     
     struct card_pocket_pair {
-        card *origin_card;
+        card_ptr origin_card;
         pocket_type pocket;
     };
 
@@ -56,26 +56,26 @@ namespace banggame {
             : m_game(game), id(id), user_id(user_id)
             , m_targetable_cards_view(rv::concat(m_hand, m_table, m_characters)) {}
 
-        void equip_card(card *card);
-        card *find_equipped_card(card *card);
+        void equip_card(card_ptr card);
+        card_ptr find_equipped_card(card_ptr card);
 
-        void enable_equip(card *target_card);
-        void disable_equip(card *target_card);
+        void enable_equip(card_ptr target_card);
+        void disable_equip(card_ptr target_card);
 
         void play_sound(std::string_view sound_id);
         
-        card *random_hand_card();
+        card_ptr random_hand_card();
 
-        int can_escape(player *origin, card *origin_card, effect_flags flags) const;
+        int can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) const;
         
-        void add_to_hand(card *card);
-        void draw_card(int ncards = 1, card *origin_card = nullptr);
+        void add_to_hand(card_ptr card);
+        void draw_card(int ncards = 1, card_ptr origin_card = nullptr);
 
-        void discard_card(card *target, bool used = false);
-        void discard_used_card(card *target) {
+        void discard_card(card_ptr target, bool used = false);
+        void discard_used_card(card_ptr target) {
             discard_card(target, true);
         }
-        void steal_card(card *target);
+        void steal_card(card_ptr target);
 
         int get_initial_cards();
 
@@ -91,14 +91,14 @@ namespace banggame {
         bool is_ghost() const;
         bool alive() const;
 
-        void damage(card *origin_card, player *source, int value, effect_flags flags = {});
+        void damage(card_ptr origin_card, player_ptr source, int value, effect_flags flags = {});
 
         void heal(int value);
         void set_hp(int value, bool instant = false);
 
         void add_gold(int amount);
 
-        bool immune_to(card *origin_card, player *origin, effect_flags flags, bool quiet = false);
+        bool immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet = false);
 
         bool empty_table() const {
             return rn::all_of(m_table, &card::is_black);
@@ -108,7 +108,7 @@ namespace banggame {
             return m_hand.empty();
         }
 
-        card *first_character() const {
+        card_ptr first_character() const {
             if (!m_characters.empty()) {
                 return m_characters.front();
             }

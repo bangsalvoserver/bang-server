@@ -12,8 +12,8 @@ namespace banggame {
     using target_type_value = utils::tagged_variant_value_type<play_card_target, Tag>;
 
     template<target_type_tag Tag> struct play_visitor_t {
-        player *origin;
-        card *origin_card;
+        player_ptr origin;
+        card_ptr origin_card;
         const effect_holder &effect;
 
         template<utils::fixed_string E>
@@ -34,8 +34,8 @@ namespace banggame {
         using value_type = target_type_value<Tag>;
         using arg_type = std::conditional_t<std::is_trivially_copyable_v<value_type>, value_type, const value_type &>;
 
-        player *origin;
-        card *origin_card;
+        player_ptr origin;
+        card_ptr origin_card;
         const effect_holder &effect;
 
         template<utils::fixed_string E>

@@ -6,9 +6,9 @@
 namespace banggame {
 
     struct effect_rum {
-        bool on_check_target(card *origin_card, player *origin);
-        game_string on_prompt(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+        bool on_check_target(card_ptr origin_card, player_ptr origin);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(rum, effect_rum)

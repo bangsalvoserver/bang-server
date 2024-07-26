@@ -5,15 +5,15 @@
 
 namespace banggame {
 
-    inline int get_card_order(const card *target_card) {
+    inline int get_card_order(const_card_ptr target_card) {
         return target_card ? target_card->order : 0;
     }
 
     struct event_card_key {
-        card *target_card;
+        card_ptr target_card;
         int priority;
 
-        event_card_key(card *target_card, int priority = 0)
+        event_card_key(card_ptr target_card, int priority = 0)
             : target_card(target_card)
             , priority(priority) {}
 
@@ -27,7 +27,7 @@ namespace banggame {
             }
         }
 
-        auto operator <=> (card *other) const {
+        auto operator <=> (card_ptr other) const {
             return get_card_order(target_card) <=> get_card_order(other);
         }
 
@@ -43,12 +43,12 @@ namespace banggame {
 }
 
 namespace std {
-    template<> struct formatter<banggame::card *> {
+    template<> struct formatter<banggame::card_ptr> {
         constexpr auto parse(std::format_parse_context &ctx) {
             return ctx.begin();
         }
 
-        auto format(banggame::card *target_card, std::format_context &ctx) const {
+        auto format(banggame::card_ptr target_card, std::format_context &ctx) const {
             return std::format_to(ctx.out(), "{}", target_card
                 ? std::string_view(target_card->name)
                 : std::string_view("(unknown card)")

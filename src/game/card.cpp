@@ -5,11 +5,11 @@
 
 namespace banggame {
 
-    card_backface to_card_backface(const card *c) {
+    card_backface to_card_backface(const_card_ptr c) {
         return card_backface{c->id, c->deck};
     }
 
-    void card::set_visibility(card_visibility new_visibility, player *new_owner, bool instant) {
+    void card::set_visibility(card_visibility new_visibility, player_ptr new_owner, bool instant) {
         animation_duration duration = instant ? 0ms : durations.flip_card;
         if (new_visibility == card_visibility::hidden) {
             if (visibility == card_visibility::show_owner) {
@@ -38,7 +38,7 @@ namespace banggame {
         }
     }
 
-    void card::move_to(pocket_type new_pocket, player *new_owner, card_visibility new_visibility, bool instant, bool front) {
+    void card::move_to(pocket_type new_pocket, player_ptr new_owner, card_visibility new_visibility, bool instant, bool front) {
         if (pocket == new_pocket && owner == new_owner) return;
         
         set_visibility(new_visibility, new_owner, instant);
@@ -84,7 +84,7 @@ namespace banggame {
         }
     }
 
-    void card::move_cubes(card *target, int ncubes, bool instant) {
+    void card::move_cubes(card_ptr target, int ncubes, bool instant) {
         ncubes = std::min<int>(ncubes, num_cubes);
         if (target && ncubes > 0 && target->num_cubes < max_cubes) {
             int added_cubes = std::min<int>(ncubes, max_cubes - target->num_cubes);

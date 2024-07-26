@@ -6,7 +6,7 @@
 namespace banggame::event_type {
 
     struct on_game_setup {
-        player *first_player;
+        player_ptr first_player;
     };
     
     struct apply_sign_modifier {
@@ -14,70 +14,70 @@ namespace banggame::event_type {
     };
 
     struct apply_maxcards_modifier {
-        player *origin;
+        player_ptr origin;
         nullable_ref<int> value;
     };
 
     struct apply_immunity_modifier {
-        card *origin_card;
-        player *origin;
-        const player *target;
+        card_ptr origin_card;
+        player_ptr origin;
+        const_player_ptr target;
         effect_flags flags;
         nullable_ref<card_list> cards;
     };
 
     struct apply_escapable_modifier {
-        card *origin_card;
-        player *origin;
-        const player *target;
+        card_ptr origin_card;
+        player_ptr origin;
+        const_player_ptr target;
         effect_flags flags;
         nullable_ref<int> value;
     };
     
     struct count_range_mod {
-        const player *origin;
+        const_player_ptr origin;
         range_mod_type type;
         nullable_ref<int> value;
     };
     
     struct check_play_card {
-        player *origin;
-        card *origin_card;
+        player_ptr origin;
+        card_ptr origin_card;
         const effect_context &ctx;
         nullable_ref<game_string> out_error;
     };
     
     struct check_revivers {
-        player *origin;
+        player_ptr origin;
     };
     
     struct on_equip_card {
-        player *origin;
-        player *target;
-        card *target_card;
+        player_ptr origin;
+        player_ptr target;
+        card_ptr target_card;
         const effect_context &ctx;
     };
 
     struct on_discard_hand_card {
-        player *origin;
-        card *target_card;
+        player_ptr origin;
+        card_ptr target_card;
         bool used;
     };
 
     struct on_turn_switch {
-        player *origin;
+        player_ptr origin;
     };
 
     struct pre_turn_start {
-        player *origin;
+        player_ptr origin;
     };
 
     struct on_turn_start {
-        player *origin;
+        player_ptr origin;
     };
     
     struct on_turn_end {
-        player *origin;
+        player_ptr origin;
         bool skipped;
     };
 }

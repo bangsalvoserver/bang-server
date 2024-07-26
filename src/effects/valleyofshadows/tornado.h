@@ -6,7 +6,7 @@
 namespace banggame {
     
     struct effect_tornado {
-        void on_play(card *origin_card, player *origin, player *target, effect_flags flags);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
     };
 
     DEFINE_EFFECT(tornado, effect_tornado)

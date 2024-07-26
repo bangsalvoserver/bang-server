@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct effect_cattle_truck {
-        game_string on_prompt(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(cattle_truck, effect_cattle_truck)

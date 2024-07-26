@@ -8,15 +8,15 @@
 namespace banggame {
 
     struct effect_move_bomb {
-        game_string on_prompt(card *origin_card, player *origin, player *target);
-        game_string get_error(card *origin_card, player *origin, player *target);
-        void on_play(card *origin_card, player *origin, player *target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 
     DEFINE_EFFECT(move_bomb, effect_move_bomb)
     
     struct equip_bomb : event_equip, prompt_target_self, bot_suggestion::target_enemy {
-        void on_enable(card *target_card, player *target);
+        void on_enable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(bomb, equip_bomb)

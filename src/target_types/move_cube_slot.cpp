@@ -6,10 +6,10 @@ namespace banggame {
 
     using visit_cards = play_visitor<"move_cube_slot">;
 
-    static auto make_move_cube_target_set(player *origin, card *origin_card, const effect_context &ctx) {
+    static auto make_move_cube_target_set(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
         return origin->m_table
             | rv::filter(&card::is_orange)
-            | rv::for_each([](card *slot) {
+            | rv::for_each([](card_ptr slot) {
                 return rv::repeat_n(slot, max_cubes - slot->num_cubes);
             });
     }
@@ -39,12 +39,12 @@ namespace banggame {
         if (origin_card->num_cubes < targets.size()) {
             return {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
         }
-        for (card *target_card : targets) {
+        for (card_ptr target_card : targets) {
             if (target_card->pocket != pocket_type::player_table || target_card->owner != origin || !target_card->is_orange()) {
                 return "ERROR_TARGET_NOT_SELF";
             }
             int count = target_card->num_cubes;
-            for (card *target : targets) {
+            for (card_ptr target : targets) {
                 if (target == target_card) ++count;
             }
             if (count > max_cubes) {
@@ -61,10 +61,10 @@ namespace banggame {
     template<> void visit_cards::add_context(effect_context &ctx, const card_list &targets) {}
 
     template<> void visit_cards::play(const effect_context &ctx, const card_list &targets) {
-        if (rn::all_of(targets, [first=targets.front()](card *target_card) { return target_card == first; })) {
+        if (rn::all_of(targets, [first=targets.front()](card_ptr target_card) { return target_card == first; })) {
             origin->first_character()->move_cubes(targets.front(), static_cast<int>(targets.size()));
         } else {
-            for (card *target_card : targets) {
+            for (card_ptr target_card : targets) {
                 origin->first_character()->move_cubes(target_card, 1);
             }
         }

@@ -8,17 +8,17 @@
 
 namespace banggame {
     
-    bool effect_missed::can_play(card *origin_card, player *origin) {
+    bool effect_missed::can_play(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request<missable_request>(origin)) {
             return req->can_miss(origin_card);
         }
         return false;
     }
 
-    game_string effect_missed::on_prompt(card *origin_card, player *origin) {
+    game_string effect_missed::on_prompt(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request<request_bang>(origin)) {
             if (req->bang_strength > 1 && !contains_at_least(get_all_playable_cards(origin, true)
-                | rv::filter([](card *c) { return c->pocket != pocket_type::button_row; }),
+                | rv::filter([](card_ptr c) { return c->pocket != pocket_type::button_row; }),
                 req->bang_strength))
             {
                 return {"PROMPT_BANG_STRENGTH", req->bang_strength};
@@ -27,25 +27,25 @@ namespace banggame {
         return {};
     }
 
-    void effect_missed::on_play(card *origin_card, player *origin) {
+    void effect_missed::on_play(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request<missable_request>();
         req->on_miss(origin_card);
     }
 
-    void effect_missedcard::on_play(card *origin_card, player *origin) {
+    void effect_missedcard::on_play(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request<missable_request>();
         req->on_miss(origin_card, effect_flag::is_missed);
     }
 
-    bool handler_play_as_missed::can_play(card *origin_card, player *origin, card *target_card) {
+    bool handler_play_as_missed::can_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         return effect_missedcard{}.can_play(target_card, origin);
     }
 
-    game_string handler_play_as_missed::on_prompt(card *origin_card, player *origin, card *target_card) {
+    game_string handler_play_as_missed::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         return effect_missedcard{}.on_prompt(target_card, origin);
     }
 
-    void handler_play_as_missed::on_play(card *origin_card, player *origin, card *target_card) {
+    void handler_play_as_missed::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         origin->m_game->add_log("LOG_PLAYED_CARD_AS_MISSED", target_card, origin);
         origin->discard_used_card(target_card);
         effect_missedcard{}.on_play(target_card, origin);

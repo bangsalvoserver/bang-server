@@ -6,7 +6,7 @@
 
 namespace banggame::bot_suggestion {
 
-    bool target_enemy::on_check_target(card *origin_card, player *origin, player *target) {
+    bool target_enemy::on_check_target(card_ptr origin_card, player_ptr origin, player_ptr target) {
         if (origin->m_game->check_flags(game_flag::free_for_all)) {
             return origin != target;
         }
@@ -19,7 +19,7 @@ namespace banggame::bot_suggestion {
             return target->m_role == player_role::outlaw
                 || target->m_role == player_role::renegade;
         case player_role::renegade: {
-            auto targets = origin->m_game->m_players | rv::filter([origin](player *p) {
+            auto targets = origin->m_game->m_players | rv::filter([origin](player_ptr p) {
                 return p != origin && p->alive();
             });
             auto num_outlaws = rn::count_if(targets, [](player_role role) {
@@ -55,11 +55,11 @@ namespace banggame::bot_suggestion {
         }
     }
     
-    bool target_enemy::on_check_target(card *origin_card, player *origin, card *target) {
+    bool target_enemy::on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target) {
         return on_check_target(origin_card, origin, target->owner);
     }
 
-    bool target_friend::on_check_target(card *origin_card, player *origin, player *target) {
+    bool target_friend::on_check_target(card_ptr origin_card, player_ptr origin, player_ptr target) {
         if (origin->m_game->check_flags(game_flag::free_for_all)) {
             return origin == target;
         }
@@ -76,11 +76,11 @@ namespace banggame::bot_suggestion {
         }
     }
     
-    bool target_friend::on_check_target(card *origin_card, player *origin, card *target) {
+    bool target_friend::on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target) {
         return on_check_target(origin_card, origin, target->owner);
     }
 
-    bool target_enemy_card::on_check_target(card *origin_card, player *origin, card *target) {
+    bool target_enemy_card::on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target) {
         if (target->pocket == pocket_type::player_table && !target->self_equippable() && !target->has_tag(tag_type::ghost_card)) {
             return target_friend{}.on_check_target(origin_card, origin, target);
         } else {

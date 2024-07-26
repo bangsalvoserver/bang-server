@@ -4,11 +4,11 @@
 
 namespace banggame {
 
-    bool request_youl_grinner::can_pick(const card *target_card) const {
+    bool request_youl_grinner::can_pick(const_card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
-    void request_youl_grinner::on_pick(card *target_card) {
+    void request_youl_grinner::on_pick(card_ptr target_card) {
         target->m_game->pop_request();
         if (target_card->visibility != card_visibility::shown) {
             target->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", target, origin, target_card);
@@ -19,7 +19,7 @@ namespace banggame {
         origin->steal_card(target_card);
     }
 
-    game_string request_youl_grinner::status_text(player *owner) const {
+    game_string request_youl_grinner::status_text(player_ptr owner) const {
         if (target == owner) {
             return {"STATUS_YOUL_GRINNER", origin_card, origin};
         } else {
@@ -27,10 +27,10 @@ namespace banggame {
         }
     }
 
-    void equip_youl_grinner::on_enable(card *target_card, player *target) {
-        target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player *origin) {
+    void equip_youl_grinner::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player_ptr origin) {
             if (target == origin) {
-                for (player *p : range_other_players(target)) {
+                for (player_ptr p : range_other_players(target)) {
                     if (p->m_hand.size() > target->m_hand.size()) {
                         target->m_game->queue_request<request_youl_grinner>(target_card, target, p);
                     }

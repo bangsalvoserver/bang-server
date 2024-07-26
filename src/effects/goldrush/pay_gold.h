@@ -9,8 +9,8 @@ namespace banggame {
         int amount;
         effect_pay_gold(int value) : amount(value) {}
 
-        game_string get_error(card *origin_card, player *origin);
-        void on_play(card *origin_card, player *origin);
+        game_string get_error(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(pay_gold, effect_pay_gold)

@@ -22,21 +22,21 @@ namespace banggame {
         bot_rng.seed(rd());
     }
 
-    card *game_table::find_card(int card_id) const {
+    card_ptr game_table::find_card(int card_id) const {
         if (auto it = m_cards_storage.find(card_id); it != m_cards_storage.end()) {
             return &*it;
         }
         throw std::runtime_error(std::format("server.find_card: ID {} not found", card_id));
     }
 
-    player *game_table::find_player(int player_id) const {
+    player_ptr game_table::find_player(int player_id) const {
         if (auto it = m_players_storage.find(player_id); it != m_players_storage.end()) {
             return &*it;
         }
         throw std::runtime_error(std::format("server.find_player: ID {} not found", player_id));
     }
     
-    player *game_table::find_player_by_userid(int user_id) const {
+    player_ptr game_table::find_player_by_userid(int user_id) const {
         if (auto it = rn::find(m_players, user_id, &player::user_id); it != m_players.end()) {
             return *it;
         }
@@ -47,7 +47,7 @@ namespace banggame {
         return std::chrono::duration_cast<game_duration>(duration * std::clamp(m_options.duration_coefficient, 0.f, 4.f));
     }
     
-    card_list &game_table::get_pocket(pocket_type pocket, player *owner) {
+    card_list &game_table::get_pocket(pocket_type pocket, player_ptr owner) {
         switch (pocket) {
         case pocket_type::player_hand:       return owner->m_hand;
         case pocket_type::player_table:      return owner->m_table;
@@ -72,7 +72,7 @@ namespace banggame {
         }
     }
 
-    int game_table::calc_distance(const player *from, const player *to) {
+    int game_table::calc_distance(const_player_ptr from, const_player_ptr to) {
         if (from == to || !from->alive()) return 0;
         
         int distance_mod = to->get_distance_mod();
@@ -101,7 +101,7 @@ namespace banggame {
         return int(rn::count_if(m_players, &player::alive));
     }
 
-    void game_table::shuffle_cards_and_ids(std::span<card *> vec) {
+    void game_table::shuffle_cards_and_ids(std::span<card_ptr> vec) {
         for (size_t i = vec.size() - 1; i > 0; --i) {
             size_t i2 = std::uniform_int_distribution<size_t>{0, i}(rng);
             if (i == i2) continue;
@@ -115,14 +115,14 @@ namespace banggame {
         }
     }
 
-    card *game_table::top_of_deck() {
+    card_ptr game_table::top_of_deck() {
         if (m_deck.empty()) {
             if (m_discards.empty()) {
                 throw std::runtime_error("Deck is empty. Cannot shuffle");
             }
             m_deck = std::move(m_discards);
             m_discards.clear();
-            for (card *c : m_deck) {
+            for (card_ptr c : m_deck) {
                 c->pocket = pocket_type::main_deck;
                 c->owner = nullptr;
                 c->visibility = card_visibility::hidden;
@@ -135,14 +135,14 @@ namespace banggame {
         return m_deck.back();
     }
 
-    card *game_table::draw_shop_card() {
+    card_ptr game_table::draw_shop_card() {
         if (m_shop_deck.empty()) {
             if (m_shop_discards.empty()) {
                 throw std::runtime_error("Shop deck is empty. Cannot reshuffle");
             }
             m_shop_deck = std::move(m_shop_discards);
             m_shop_discards.clear();
-            for (card *c : m_shop_deck) {
+            for (card_ptr c : m_shop_deck) {
                 c->pocket = pocket_type::shop_deck;
                 c->owner = nullptr;
                 c->visibility = card_visibility::hidden;
@@ -152,13 +152,13 @@ namespace banggame {
             play_sound("shuffle");
             add_update<"deck_shuffled">(pocket_type::shop_deck);
         }
-        card *drawn_card = m_shop_deck.back();
+        card_ptr drawn_card = m_shop_deck.back();
         add_log("LOG_DRAWN_SHOP_CARD", drawn_card);
         drawn_card->move_to(pocket_type::shop_selection);
         return drawn_card;
     }
 
-    card *game_table::top_train_card() {
+    card_ptr game_table::top_train_card() {
         if (!m_train_deck.empty()) {
             return m_train_deck.back();
         }
@@ -170,7 +170,7 @@ namespace banggame {
             m_scenario_deck.back()->set_visibility(card_visibility::shown);
         } else {
             if (m_scenario_deck.size() > 1) {
-                card *second_card = *(m_scenario_deck.rbegin() + 1);
+                card_ptr second_card = *(m_scenario_deck.rbegin() + 1);
                 second_card->set_visibility(card_visibility::shown, nullptr, true);
             }
             if (!m_scenario_cards.empty()) {
@@ -182,7 +182,7 @@ namespace banggame {
         }
     }
 
-    void game_table::advance_train(player *origin) {
+    void game_table::advance_train(player_ptr origin) {
         add_log("LOG_TRAIN_ADVANCE");
         add_update<"move_train">(++train_position);
 

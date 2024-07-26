@@ -7,11 +7,11 @@
 
 namespace banggame::filters {
 
-    bool is_player_bot(const player *origin) {
+    bool is_player_bot(const_player_ptr origin) {
         return origin->is_bot();
     }
 
-    game_string check_player_filter(const player *origin, enums::bitset<target_player_filter> filter, const player *target, const effect_context &ctx) {
+    game_string check_player_filter(const_player_ptr origin, enums::bitset<target_player_filter> filter, const_player_ptr target, const effect_context &ctx) {
         if (filter.check(target_player_filter::dead)) {
             if (!filter.check(target_player_filter::alive) && !target->check_player_flags(player_flag::dead)) {
                 return "ERROR_TARGET_NOT_DEAD";
@@ -73,7 +73,7 @@ namespace banggame::filters {
         return {};
     }
 
-    bool is_equip_card(const card *target) {
+    bool is_equip_card(const_card_ptr target) {
         switch (target->pocket) {
         case pocket_type::player_hand:
         case pocket_type::shop_selection:
@@ -85,11 +85,11 @@ namespace banggame::filters {
         }
     }
 
-    bool is_modifier_card(const player *origin, const card *origin_card) {
+    bool is_modifier_card(const_player_ptr origin, const_card_ptr origin_card) {
         return bool(origin_card->get_modifier(origin->m_game->pending_requests()));
     }
 
-    bool is_bang_card(const player *origin, const card *target) {
+    bool is_bang_card(const_player_ptr origin, const_card_ptr target) {
         return origin->m_game->check_flags(game_flag::treat_any_as_bang)
             || origin->check_player_flags(player_flag::treat_any_as_bang)
             || target->has_tag(tag_type::bangcard)
@@ -97,7 +97,7 @@ namespace banggame::filters {
             && target->has_tag(tag_type::missed);
     }
 
-    int get_card_cost(const card *target, bool is_response, const effect_context &ctx) {
+    int get_card_cost(const_card_ptr target, bool is_response, const effect_context &ctx) {
         if (!is_response && !ctx.repeat_card && target->pocket != pocket_type::player_table) {
             if (ctx.card_choice) {
                 target = ctx.card_choice;
@@ -108,7 +108,7 @@ namespace banggame::filters {
         }
     }
 
-    game_string check_card_filter(const card *origin_card, const player *origin, enums::bitset<target_card_filter> filter, const card *target, const effect_context &ctx) {
+    game_string check_card_filter(const_card_ptr origin_card, const_player_ptr origin, enums::bitset<target_card_filter> filter, const_card_ptr target, const effect_context &ctx) {
         if (!filter.check(target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";
 
@@ -191,7 +191,7 @@ namespace banggame::filters {
         
         if (filter.check(target_card_filter::origin_card_suit)) {
             auto req = origin->m_game->top_request();
-            card *req_origin_card = req ? req->origin_card : nullptr;
+            card_ptr req_origin_card = req ? req->origin_card : nullptr;
             if (!req_origin_card) return "ERROR_NO_ORIGIN_CARD_SUIT";
             switch (req_origin_card->sign.suit) {
                 case card_suit::hearts: if (!target->sign.is_hearts()) { return "ERROR_TARGET_NOT_HEARTS"; } break;

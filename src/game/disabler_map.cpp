@@ -11,8 +11,8 @@ namespace banggame {
 
     static auto disableable_cards(game_table *table) {
         struct to_player_card_pair {
-            player *p;
-            auto operator()(card *c) const { return std::pair{p, c}; }
+            player_ptr p;
+            auto operator()(card_ptr c) const { return std::pair{p, c}; }
         };
 
         return rv::concat(
@@ -24,7 +24,7 @@ namespace banggame {
                 | rv::transform(to_player_card_pair{table->m_first_player}),
             table->m_players
                 | rv::filter(&player::alive)
-                | rv::for_each([](player *p) {
+                | rv::for_each([](player_ptr p) {
                     return rv::concat(p->m_table, p->m_characters)
                         | rv::transform(to_player_card_pair{p});
                 })
@@ -73,14 +73,14 @@ namespace banggame {
         m_disablers.erase(range.begin(), range.end());
     }
 
-    card *disabler_map::get_disabler(const card *target_card) const {
+    card_ptr disabler_map::get_disabler(const_card_ptr target_card) const {
         for (auto &[card_key, fun] : m_disablers) {
             if (std::invoke(fun, target_card)) return card_key.target_card;
         }
         return nullptr;
     }
 
-    bool disabler_map::is_disabled(const card *target_card) const {
+    bool disabler_map::is_disabled(const_card_ptr target_card) const {
         return get_disabler(target_card) != nullptr;
     }
 

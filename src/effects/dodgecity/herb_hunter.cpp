@@ -6,8 +6,8 @@
 
 namespace banggame {
     
-    void equip_herb_hunter::on_enable(card *target_card, player *p) {
-        p->m_game->add_listener<event_type::on_player_death>({target_card, 2}, [p, target_card](player *origin, player *target) {
+    void equip_herb_hunter::on_enable(card_ptr target_card, player_ptr p) {
+        p->m_game->add_listener<event_type::on_player_death>({target_card, 2}, [p, target_card](player_ptr origin, player_ptr target) {
             if (p != target) {
                 p->m_game->queue_action([=]{
                     if (p->alive()) {

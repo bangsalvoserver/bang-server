@@ -12,37 +12,37 @@
 #include <unordered_set>
 
 namespace banggame::play_dispatch {
-    bool possible(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
+    bool possible(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx) {
         return utils::visit_tagged([&](target_type_tag auto tag) {
             return play_visitor<tag.name>{origin, origin_card, effect}.possible(ctx);
         }, effect.target);
     }
 
-    play_card_target random_target(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx) {
+    play_card_target random_target(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx) {
         return utils::visit_tagged([&](target_type_tag auto tag) {
             return play_card_target{tag, play_visitor<tag.name>{origin, origin_card, effect}.random_target(ctx)};
         }, effect.target);
     }
 
-    game_string get_error(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
+    game_string get_error(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
         return utils::visit_tagged([&](target_type_tag auto tag, auto && ... args) {
             return play_visitor<tag.name>{origin, origin_card, effect}.get_error(ctx, FWD(args) ...);
         }, target);
     }
 
-    game_string prompt(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
+    game_string prompt(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
         return utils::visit_tagged([&](target_type_tag auto tag, auto && ... args) {
             return play_visitor<tag.name>{origin, origin_card, effect}.prompt(ctx, FWD(args) ... );
         }, target);
     }
 
-    void add_context(player *origin, card *origin_card, const effect_holder &effect, effect_context &ctx, const play_card_target &target) {
+    void add_context(player_ptr origin, card_ptr origin_card, const effect_holder &effect, effect_context &ctx, const play_card_target &target) {
         utils::visit_tagged([&](target_type_tag auto tag, auto && ... args) {
             play_visitor<tag.name>{origin, origin_card, effect}.add_context(ctx, FWD(args) ... );
         }, target);
     }
 
-    void play(player *origin, card *origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
+    void play(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
         utils::visit_tagged([&](target_type_tag auto tag, auto && ... args) {
             play_visitor<tag.name>{origin, origin_card, effect}.play(ctx, FWD(args) ... );
         }, target);
@@ -52,22 +52,22 @@ namespace banggame::play_dispatch {
 namespace banggame {
 
     static game_string check_duplicates(const effect_context &ctx) {
-        std::unordered_set<player *> players;
-        for (player *p : ctx.selected_players) {
+        std::unordered_set<player_ptr> players;
+        for (player_ptr p : ctx.selected_players) {
             if (auto [it, inserted] = players.insert(p); !inserted) {
                 return {"ERROR_DUPLICATE_PLAYER", p};
             }
         }
 
-        std::unordered_set<card *> cards;
-        for (card *c : ctx.selected_cards) {
+        std::unordered_set<card_ptr> cards;
+        for (card_ptr c : ctx.selected_cards) {
             if (auto [it, inserted] = cards.insert(c); !inserted) {
                 return {"ERROR_DUPLICATE_CARD", c};
             }
         }
 
-        std::unordered_map<card *, int> cubes;
-        for (card *c : ctx.selected_cubes.all()) {
+        std::unordered_map<card_ptr, int> cubes;
+        for (card_ptr c : ctx.selected_cubes.all()) {
             if (++cubes[c] > c->num_cubes) {
                 return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
             }
@@ -75,7 +75,7 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_timer_response(player *origin, std::optional<timer_id_t> timer_id) {
+    static game_string verify_timer_response(player_ptr origin, std::optional<timer_id_t> timer_id) {
         std::optional<timer_id_t> current_timer_id;
         if (auto req = origin->m_game->top_request()) {
             if (auto *timer = req->timer()) {
@@ -88,7 +88,7 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
+    static game_string verify_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
         auto &effects = origin_card->get_effect_list(is_response);
 
         if (effects.empty()) {
@@ -147,7 +147,7 @@ namespace banggame {
         return {};
     }
     
-    static game_string verify_modifiers(player *origin, card *origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
+    static game_string verify_modifiers(player_ptr origin, card_ptr origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
         for (const auto &[mod_card, targets] : modifiers) {
             if (const modifier_holder &modifier = mod_card->get_modifier(is_response)) {
                 ctx.selected_cards.push_back(mod_card);
@@ -165,18 +165,18 @@ namespace banggame {
 
             MAYBE_RETURN(mod_card->get_modifier(is_response).get_error(mod_card, origin, origin_card, ctx));
             for (size_t j=0; j<i; ++j) {
-                card *mod_card_before = modifiers[j].card;
+                card_ptr mod_card_before = modifiers[j].card;
                 MAYBE_RETURN(mod_card_before->get_modifier(is_response).get_error(mod_card_before, origin, mod_card, ctx));
             }
         }
         return {};
     }
 
-    static player *get_equip_target(player *origin, card *origin_card, const target_list &targets) {
+    static player_ptr get_equip_target(player_ptr origin, card_ptr origin_card, const target_list &targets) {
         return origin_card->self_equippable() ? origin : get<"player">(targets.front());
     }
 
-    static game_string verify_equip_target(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+    static game_string verify_equip_target(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         if (is_response) {
             return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
         }
@@ -185,7 +185,7 @@ namespace banggame {
             return "ERROR_INVALID_CARD_OWNER";
         }
 
-        player *target = origin;
+        player_ptr target = origin;
         if (origin_card->self_equippable()) {
             if (!targets.empty()) {
                 return "ERROR_INVALID_EQUIP_TARGET";
@@ -200,8 +200,8 @@ namespace banggame {
         return get_equip_error(origin, origin_card, target, ctx);
     }
 
-    game_string get_play_card_error(player *origin, card *origin_card, const effect_context &ctx) {
-        if (card *disabler = origin->m_game->get_disabler(origin_card)) {
+    game_string get_play_card_error(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
+        if (card_ptr disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
         if (origin_card->inactive) {
@@ -212,7 +212,7 @@ namespace banggame {
         return out_error;
     }
 
-    game_string get_equip_error(player *origin, card *origin_card, player *target, const effect_context &ctx) {
+    game_string get_equip_error(player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &ctx) {
         if (origin->m_game->check_flags(game_flag::disable_equipping)) {
             return "ERROR_CANT_EQUIP_CARDS";
         }
@@ -223,13 +223,13 @@ namespace banggame {
         } else {
             MAYBE_RETURN(filters::check_player_filter(origin, origin_card->equip_target, target));
         }
-        if (card *equipped = target->find_equipped_card(origin_card)) {
+        if (card_ptr equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};
         }
         return {};
     }
 
-    static game_string verify_card_targets(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
+    static game_string verify_card_targets(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
         if (!is_response && origin->m_game->m_playing != origin) {
             return "ERROR_PLAYER_NOT_IN_TURN";
         }
@@ -253,14 +253,14 @@ namespace banggame {
         return {};
     }
 
-    game_string get_equip_prompt(player *origin, card *origin_card, player *target) {
+    game_string get_equip_prompt(player_ptr origin, card_ptr origin_card, player_ptr target) {
         for (const equip_holder &holder : origin_card->equips) {
             MAYBE_RETURN(holder.on_prompt(origin_card, origin, target));
         }
         return {};
     }
 
-    static game_string get_play_prompt(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+    static game_string get_play_prompt(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
             MAYBE_RETURN(play_dispatch::prompt(origin, origin_card, effect, ctx, target));
         }
@@ -271,7 +271,7 @@ namespace banggame {
         return {};
     }
 
-    static game_string get_prompt_message(player *origin, card *origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
+    static game_string get_prompt_message(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         for (const auto &[mod_card, mod_targets] : modifiers) {
             MAYBE_RETURN(mod_card->get_modifier(is_response).on_prompt(mod_card, origin, origin_card, ctx));
             MAYBE_RETURN(get_play_prompt(origin, mod_card, is_response, mod_targets, ctx));
@@ -283,7 +283,7 @@ namespace banggame {
         }
     }
 
-    static void log_played_card(card *origin_card, player *origin, bool is_response) {
+    static void log_played_card(card_ptr origin_card, player_ptr origin, bool is_response) {
         if (origin_card->has_tag(tag_type::skip_logs)) return;
         
         switch (origin_card->pocket) {
@@ -327,7 +327,7 @@ namespace banggame {
         }
     }
 
-    static void log_equipped_card(card *origin_card, player *origin, player *target) {
+    static void log_equipped_card(card_ptr origin_card, player_ptr origin, player_ptr target) {
         if (origin_card->pocket == pocket_type::shop_selection) {
             if (origin == target) {
                 origin->m_game->add_log("LOG_BOUGHT_EQUIP", origin_card, origin);
@@ -343,7 +343,7 @@ namespace banggame {
         }
     }
 
-    static void discard_shop_selection_card(card *origin_card) {
+    static void discard_shop_selection_card(card_ptr origin_card) {
         origin_card->move_to(pocket_type::shop_discard);
         game *m_game = origin_card->m_game;
         m_game->queue_action([m_game]{
@@ -353,7 +353,7 @@ namespace banggame {
         }, -1);
     }
 
-    static void apply_target_list(player *origin, card *origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+    static void apply_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, is_response);
 
         if (origin_card != ctx.repeat_card && !origin_card->has_tag(tag_type::no_auto_discard)) {
@@ -380,7 +380,7 @@ namespace banggame {
         }
     }
 
-    static void apply_equip(player *origin, card *origin_card, player *target, const effect_context &ctx) {
+    static void apply_equip(player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &ctx) {
         origin->m_game->queue_action([=]{ 
             if (!origin->alive()) return;
 
@@ -397,7 +397,7 @@ namespace banggame {
     }
 
     static played_card_history make_played_card_history(const game_action &args, bool is_response, const effect_context &ctx) {
-        auto to_card_pocket_pair = [&](card *c) {
+        auto to_card_pocket_pair = [&](card_ptr c) {
             if (ctx.repeat_card == c) {
                 return card_pocket_pair{c, pocket_type::none};
             } else {
@@ -416,7 +416,7 @@ namespace banggame {
         };
     }
 
-    game_message verify_and_play(player *origin, const game_action &args) {
+    game_message verify_and_play(player_ptr origin, const game_action &args) {
         bool is_response = origin->m_game->pending_requests();
 
         effect_context ctx{};

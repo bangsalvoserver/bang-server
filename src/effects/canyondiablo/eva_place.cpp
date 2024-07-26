@@ -6,8 +6,8 @@
 
 namespace banggame {
 
-    void effect_eva_place::on_play(card *origin_card, player *origin) {
-        card *drawn_card = origin->m_game->top_of_deck();
+    void effect_eva_place::on_play(card_ptr origin_card, player_ptr origin) {
+        card_ptr drawn_card = origin->m_game->top_of_deck();
         origin->m_game->add_log("LOG_DRAWN_CARD_FOR", origin, drawn_card, origin_card);
         drawn_card->set_visibility(card_visibility::shown);
         drawn_card->add_short_pause();

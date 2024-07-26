@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    card *get_repeat_playing_card(card *origin_card, const effect_context &ctx) {
+    card_ptr get_repeat_playing_card(card_ptr origin_card, const effect_context &ctx) {
         if (ctx.card_choice) {
             return ctx.card_choice;
         } else if (ctx.traincost) {
@@ -16,7 +16,7 @@ namespace banggame {
         }
     }
 
-    game_string modifier_leevankliff::get_error(card *origin_card, player *origin, card *playing_card, const effect_context &ctx) {
+    game_string modifier_leevankliff::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
         if (!ctx.repeat_card) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
@@ -34,7 +34,7 @@ namespace banggame {
         return {};
     }
 
-    void modifier_leevankliff::add_context(card *origin_card, player *origin, effect_context &ctx) {
+    void modifier_leevankliff::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         auto range = origin->m_played_cards | rv::reverse;
         if (auto it = rn::find_if(range,
             [](const played_card_history &history) {
@@ -43,7 +43,7 @@ namespace banggame {
             }); it != range.end())
         {
             const played_card_history &history = *it;
-            card *playing_card = get_repeat_playing_card(history.origin_card.origin_card, history.context);
+            card_ptr playing_card = get_repeat_playing_card(history.origin_card.origin_card, history.context);
             if (playing_card->is_brown() && !rn::contains(history.modifiers, origin_card, &card_pocket_pair::origin_card)) {
                 ctx.disable_banglimit = true;
                 ctx.repeat_card = playing_card;

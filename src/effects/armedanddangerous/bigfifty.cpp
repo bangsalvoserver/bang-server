@@ -4,11 +4,11 @@
 
 namespace banggame {
 
-    void effect_bigfifty::on_play(card *origin_card, player *p) {
+    void effect_bigfifty::on_play(card_ptr origin_card, player_ptr p) {
         event_card_key key{origin_card, 1};
-        p->m_game->add_listener<event_type::apply_bang_modifier>(key, [=](player *origin, shared_request_bang req) {
+        p->m_game->add_listener<event_type::apply_bang_modifier>(key, [=](player_ptr origin, shared_request_bang req) {
             if (origin == p) {
-                origin->m_game->add_disabler(key, [target = req->target](const card *c) {
+                origin->m_game->add_disabler(key, [target = req->target](const_card_ptr c) {
                     return (c->pocket == pocket_type::player_table
                         || c->pocket == pocket_type::player_character)
                         && c->owner == target;
@@ -21,7 +21,7 @@ namespace banggame {
         });
     }
 
-    void modifier_bigfifty::add_context(card *origin_card, player *origin, effect_context &ctx) {
+    void modifier_bigfifty::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         ctx.disable_bang_checks = true;
     }
 }

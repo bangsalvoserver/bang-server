@@ -10,8 +10,8 @@
 
 namespace json {
 
-    template<typename Context> struct serializer<banggame::card *, Context> {
-        json operator()(banggame::card *card) const {
+    template<typename Context> struct serializer<banggame::card_ptr, Context> {
+        json operator()(banggame::card_ptr card) const {
             if (!card) {
                 throw std::runtime_error("Cannot serialize card: value is null");
             }
@@ -19,12 +19,12 @@ namespace json {
         }
     };
 
-    template<> struct deserializer<banggame::card *, banggame::game_context> {
-        banggame::card *operator()(missing_field) const {
+    template<> struct deserializer<banggame::card_ptr, banggame::game_context> {
+        banggame::card_ptr operator()(missing_field) const {
             throw std::runtime_error("Missing card field");
         }
 
-        banggame::card *operator()(const json &value, const banggame::game_context &context) const {
+        banggame::card_ptr operator()(const json &value, const banggame::game_context &context) const {
             if (!value.is_number_integer()) {
                 throw std::runtime_error("Cannot deserialize card: value is not an integer");
             }
@@ -32,8 +32,8 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<banggame::player *, Context> {
-        json operator()(banggame::player *player) const {
+    template<typename Context> struct serializer<banggame::player_ptr, Context> {
+        json operator()(banggame::player_ptr player) const {
             if (!player) {
                 throw std::runtime_error("Cannot serialize player: value is null");
             }
@@ -41,12 +41,12 @@ namespace json {
         }
     };
 
-    template<> struct deserializer<banggame::player *, banggame::game_context> {
-        banggame::player *operator()(missing_field) const {
+    template<> struct deserializer<banggame::player_ptr, banggame::game_context> {
+        banggame::player_ptr operator()(missing_field) const {
             throw std::runtime_error("Missing player field");
         }
 
-        banggame::player *operator()(const json &value, const banggame::game_context &context) const {
+        banggame::player_ptr operator()(const json &value, const banggame::game_context &context) const {
             if (!value.is_number_integer()) {
                 throw std::runtime_error("Cannot deserialize player: value is not an integer");
             }
@@ -147,7 +147,7 @@ namespace banggame {
     }
 
     std::string game_net_manager::handle_game_action(int user_id, const json::json &value) {
-        player *origin = find_player_by_userid(user_id);
+        player_ptr origin = find_player_by_userid(user_id);
         if (!origin) {
             return "ERROR_USER_NOT_CONTROLLING_PLAYER";
         }
