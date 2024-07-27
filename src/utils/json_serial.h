@@ -90,29 +90,17 @@ namespace json {
         return deserialize<T>(value, no_context{});
     }
 
-    template<typename Context>
-    struct serializer<json, Context> {
-        json operator()(const json &value) const {
-            return value;
-        }
-    };
-
-    template<typename T, typename Context> requires std::is_arithmetic_v<T>
+    template<typename T, typename Context> requires (
+        !std::is_enum_v<T> && std::convertible_to<T, json>
+    )
     struct serializer<T, Context> {
         json operator()(const T &value) const {
             return value;
         }
     };
 
-    template<typename Context>
-    struct serializer<std::string, Context> {
-        json operator()(const std::string &value) const {
-            return value;
-        }
-    };
-
     template<std::ranges::range Range, typename Context> requires (
-        !std::same_as<std::remove_cvref_t<Range>, json>
+        !std::convertible_to<Range, json>
         && serializable<std::ranges::range_value_t<Range>, Context>
     )
     struct serializer<Range, Context> {
