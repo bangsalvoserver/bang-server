@@ -33,6 +33,16 @@ if(MINGW)
     target_link_libraries(banglibs INTERFACE wsock32 ws2_32)
 endif()
 
+# openssl
+
+find_package(OpenSSL)
+if (NOT OPENSSL_FOUND)
+    message(WARNING "Could not find OpenSSL")
+    target_compile_definitions(banglibs INTERFACE WSSERVER_NO_TLS)
+else()
+    target_link_libraries(banglibs INTERFACE OpenSSL::SSL OpenSSL::Crypto)
+endif()
+
 # websocketpp
 
 target_include_directories(banglibs INTERFACE external/websocketpp)

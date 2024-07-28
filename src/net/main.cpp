@@ -19,11 +19,22 @@ int main(int argc, char **argv) {
     uint16_t port = banggame::default_server_port;
     bool reuse_addr = false;
 
+#ifndef WSSERVER_NO_TLS
+    bool enable_tls = false;
+    std::string certificate_file;
+    std::string private_key_file;
+#endif
+
     options.add_options()
         ("port",        "",                 cxxopts::value(port))
         ("cheats",      "Enable Cheats",    cxxopts::value(server.options().enable_cheats))
         ("l,logging",   "Logging Level",    cxxopts::value(logging::log_function::global_level))
         ("r,reuse-addr","Reuse Address",    cxxopts::value(reuse_addr))
+#ifndef WSSERVER_NO_TLS
+        ("s,secure",    "Enable TLS",       cxxopts::value(enable_tls))
+        ("cert",        "Certificate File", cxxopts::value(certificate_file))
+        ("key",         "Private Key File", cxxopts::value(private_key_file))
+#endif
         ("h,help",      "Print Help")
     ;
 
@@ -43,6 +54,15 @@ int main(int argc, char **argv) {
     }
 
     try {
+#ifndef WSSERVER_NO_TLS
+        if (enable_tls) {
+            server.init_tls(certificate_file, private_key_file);
+        } else {
+            server.init();
+        }
+#else
+        server.init();
+#endif
         server.start(port, reuse_addr);
         logging::status("Server listening on port {}", port);
 

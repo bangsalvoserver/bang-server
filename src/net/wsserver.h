@@ -5,7 +5,13 @@
 #include <set>
 
 #include <asio.hpp>
+
+#ifdef WSSERVER_NO_TLS
 #include <websocketpp/config/asio_no_tls.hpp>
+#else
+#include <websocketpp/config/asio.hpp>
+#endif
+
 #include <websocketpp/server.hpp>
 
 #include "logging.h"
@@ -34,12 +40,12 @@ namespace net {
     logging::level get_error_logging_level(websocketpp::log::level channel);
     using error_logging_adapter = logging_adapter<get_error_logging_level>;
 
-    using wsconfig_base = websocketpp::config::asio;
-    struct wsconfig : wsconfig_base {
+    template<typename ConfigBase>
+    struct wsconfig : ConfigBase {
         using alog_type = access_logging_adapter;
         using elog_type = error_logging_adapter;
 
-        struct transport_config : wsconfig_base::transport_config {
+        struct transport_config : ConfigBase::transport_config {
             using alog_type = access_logging_adapter;
             using elog_type = error_logging_adapter;
         };
@@ -49,11 +55,21 @@ namespace net {
 
     class wsserver {
     public:
-        using server_type = websocketpp::server<wsconfig>;
+        using server_type = websocketpp::server<wsconfig<websocketpp::config::asio>>;
+#ifndef WSSERVER_NO_TLS
+        using server_type_tls = websocketpp::server<wsconfig<websocketpp::config::asio_tls>>;
+#endif
+
         using client_handle = websocketpp::connection_hdl;
 
     private:
-        server_type m_server;
+        std::variant<
+            std::monostate,
+            server_type
+#ifndef WSSERVER_NO_TLS
+            , server_type_tls
+#endif
+        > m_server;
 
         std::set<client_handle, std::owner_less<client_handle>> m_clients;
         std::mutex m_con_mutex;
@@ -65,6 +81,11 @@ namespace net {
 
     public:
         virtual ~wsserver() = default;
+
+        void init();
+#ifndef WSSERVER_NO_TLS
+        void init_tls(const std::string &certificate_file, const std::string &private_key_file);
+#endif
 
         void start(uint16_t port, bool reuse_addr = false);
 
