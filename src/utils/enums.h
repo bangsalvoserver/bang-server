@@ -97,7 +97,7 @@ namespace json {
     template<enums::enumeral T, typename Context>
     struct serializer<T, Context> {
         json operator()(const T &value) const {
-            return std::string(enums::to_string(value));
+            return enums::to_string(value);
         }
     };
 

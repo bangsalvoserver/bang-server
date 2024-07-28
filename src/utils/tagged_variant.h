@@ -208,7 +208,7 @@ namespace json {
     template<typename Context, typename ... Ts>
     struct serializer<utils::tagged_variant_index<utils::tagged_variant<Ts ...>>, Context> {
         json operator()(const utils::tagged_variant_index<utils::tagged_variant<Ts ...>> &value) const {
-            return std::string(value.to_string());
+            return value.to_string();
         }
     };
 

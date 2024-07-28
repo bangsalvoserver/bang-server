@@ -74,20 +74,20 @@ namespace json {
 
     template<typename Context> struct serializer<const banggame::effect_vtable *, Context> {
         json operator()(const banggame::effect_vtable *value) const {
-            return std::string(value->name);
+            return value->name;
         }
     };
 
     template<typename Context> struct serializer<const banggame::equip_vtable *, Context> {
         json operator()(const banggame::equip_vtable *value) const {
-            return std::string(value->name);
+            return value->name;
         }
     };
 
     template<typename Context> struct serializer<const banggame::modifier_vtable *, Context> {
         json operator()(const banggame::modifier_vtable *value) const {
             if (value) {
-                return std::string(value->name);
+                return value->name;
             } else {
                 return {};
             }
@@ -97,7 +97,7 @@ namespace json {
     template<typename Context> struct serializer<const banggame::mth_vtable *, Context> {
         json operator()(const banggame::mth_vtable *value) const {
             if (value) {
-                return std::string(value->name);
+                return value->name;
             } else {
                 return {};
             }
