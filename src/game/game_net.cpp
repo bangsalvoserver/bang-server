@@ -104,34 +104,6 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<banggame::format_arg_list, Context> {
-        json operator()(const banggame::format_arg_list &list, const Context &ctx) const {
-            auto ret = json::array();
-            for (size_t i=0; i < list.size(); ++i) {
-                auto [type, value] = list[i];
-                switch (type) {
-                case banggame::format_arg_list::format_number:
-                    ret.push_back({{ "integer", value.number_value }});
-                    break;
-                case banggame::format_arg_list::format_card:
-                    if (value.card_value) {
-                        ret.push_back({{ "card", {
-                            {"name", value.card_value->name},
-                            {"sign", serialize_unchecked(value.card_value->sign, ctx)}
-                        }}});
-                    } else {
-                        ret.push_back({{ "card", json::object() }});
-                    }
-                    break;
-                case banggame::format_arg_list::format_player:
-                    ret.push_back({{ "player", serialize_unchecked(utils::nullable{ value.player_value }, ctx) }});
-                    break;
-                }
-            }
-            return ret;
-        }
-    };
-
     template<typename Context> struct serializer<banggame::card_backface_list, Context> {
         struct card_backface {
             int id;
@@ -158,11 +130,28 @@ namespace json {
         };
     };
 
+    struct game_string_tag {};
+
+    template<> struct serializer<banggame::nullable_card, game_string_tag> {
+        struct format_card {
+            std::string_view name;
+            banggame::card_sign sign;
+        };
+
+        json operator()(banggame::nullable_card value, const game_string_tag &ctx) const {
+            if (value) {
+                return serialize_unchecked(format_card{ value->name, value->sign }, ctx);
+            } else {
+                return json::object();
+            }
+        }
+    };
+
     template<typename Context> struct serializer<banggame::game_string, Context> {
-        json operator()(const banggame::game_string &value, const Context &ctx) const {
+        json operator()(const banggame::game_string &value) const {
             return {
-                {"format_str", serialize_unchecked(value.format_str, ctx)},
-                {"format_args", serialize_unchecked(value.format_args, ctx)}
+                {"format_str", std::string_view(value.format_str)},
+                {"format_args", serialize_unchecked(value.format_args, game_string_tag{})}
             };
         }
     };

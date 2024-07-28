@@ -5,8 +5,6 @@
 #include <string_view>
 #include <algorithm>
 
-#include "json_serial.h"
-
 template<size_t MaxSize>
 class basic_small_string {
 private:
@@ -38,14 +36,5 @@ public:
 };
 
 using small_string = basic_small_string<32>;
-
-namespace json {
-    template<size_t MaxSize, typename Context>
-    struct serializer<basic_small_string<MaxSize>, Context> {
-        json operator()(const basic_small_string<MaxSize> &value) const {
-            return std::string(std::string_view(value));
-        }
-    };
-}
 
 #endif
