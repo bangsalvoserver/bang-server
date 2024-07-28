@@ -5,13 +5,14 @@
 #include "effects/base/bang.h"
 
 #include "cards/game_enums.h"
+#include "cards/filter_enums.h"
 
 namespace banggame {
 
     struct request_train_robbery : request_base, interface_target_set_cards {
         using request_base::request_base;
 
-        card_list selected_cards;
+        std::set<const_card_ptr> selected_cards;
 
         void on_update() override {
             if (!target->alive() || target->immune_to(origin_card, origin, flags)
@@ -25,7 +26,7 @@ namespace banggame {
 
         bool in_target_set(const_card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_table && target_card->owner == target
-                && !target_card->is_black() && !rn::contains(selected_cards, target_card);
+                && !target_card->is_black() && !selected_cards.contains(target_card);
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -57,17 +58,29 @@ namespace banggame {
         return "ERROR_INVALID_ACTION";
     }
 
+    void effect_train_robbery_response::add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) {
+        ctx.target_card = target_card;
+    }
+
     void effect_train_robbery_response::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         auto req = origin->m_game->top_request<request_train_robbery>();
-        req->selected_cards.push_back(target_card);
+        req->selected_cards.insert(target_card);
 
         req->flags.remove(effect_flag::escapable);
         req->flags.remove(effect_flag::single_target);
     }
 
-    void effect_train_robbery_discard::on_play(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<request_train_robbery>();
-        card_ptr target_card = req->selected_cards.back();
+    game_string effect_train_robbery_discard::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        if (origin->is_bot()) {
+            if (ctx.target_card->has_tag(tag_type::ghost_card)) {
+                return "BOT_BAD_PLAY";
+            }
+        }
+        return {};
+    }
+
+    void effect_train_robbery_discard::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        card_ptr target_card = ctx.target_card;
 
         origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", origin, target_card);
         origin->discard_card(target_card);
@@ -85,9 +98,18 @@ namespace banggame {
         }
     };
 
-    void effect_train_robbery_bang::on_play(card_ptr origin_card, player_ptr origin) {
+    game_string effect_train_robbery_bang::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        if (origin->is_bot()) {
+            if (!ctx.target_card->self_equippable() && !ctx.target_card->has_tag(tag_type::ghost_card)) {
+                return "BOT_BAD_PLAY";
+            }
+        }
+        return {};
+    }
+
+    void effect_train_robbery_bang::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         auto req = origin->m_game->top_request<request_train_robbery>();
-        card_ptr target_card = req->selected_cards.back();
+        card_ptr target_card = ctx.target_card;
 
         origin->m_game->add_log("LOG_RECEIVED_N_BANGS_FOR", origin, target_card, 1);
         origin->m_game->queue_request<request_train_robbery_bang>(req->origin_card, req->origin, origin, target_card);

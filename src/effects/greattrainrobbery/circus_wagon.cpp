@@ -4,6 +4,8 @@
 
 #include "game/game.h"
 
+#include "cards/filter_enums.h"
+
 namespace banggame {
 
     struct request_discard_table : request_picking {
@@ -21,6 +23,15 @@ namespace banggame {
             target->m_game->pop_request();
             target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->discard_card(target_card);
+        }
+
+        game_string pick_prompt(card_ptr target_card) const override {
+            if (target->is_bot()) {
+                if (target_card->has_tag(tag_type::ghost_card) || !target_card->self_equippable()) {
+                    return "BOT_BAD_PLAY";
+                }
+            }
+            return {};
         }
 
         game_string status_text(player_ptr owner) const override {
