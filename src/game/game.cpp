@@ -380,7 +380,7 @@ namespace banggame {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_target_set_players>(origin)) {
                 return origin->m_game->m_players
-                    | rv::filter(std::bind_front(&interface_target_set_players::in_target_set, req))
+                    | rv::filter([&](const_player_ptr p){ return req->in_target_set(p); })
                     | rn::to_vector;
             }
         }
@@ -391,7 +391,7 @@ namespace banggame {
         if (origin) {
             if (auto req = origin->m_game->top_request<interface_target_set_cards>(origin)) {
                 return get_all_targetable_cards(origin)
-                    | rv::filter(std::bind_front(&interface_target_set_cards::in_target_set, req))
+                    | rv::filter([&](const_card_ptr c){ return req->in_target_set(c); })
                     | rn::to_vector;
             }
         }

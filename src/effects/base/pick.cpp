@@ -30,7 +30,7 @@ namespace banggame {
     void request_picking::auto_pick() {
         card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
         if (only_card && only_card->has_tag(tag_type::pick)) {
-            auto pick_cards = get_all_targetable_cards(target) | rv::filter(std::bind_front(&request_picking::can_pick, this));
+            auto pick_cards = get_all_targetable_cards(target) | rv::filter([&](const_card_ptr c){ return can_pick(c); });
             if (card_ptr target_card = get_single_element(pick_cards)) {
                 on_pick(target_card);
             }

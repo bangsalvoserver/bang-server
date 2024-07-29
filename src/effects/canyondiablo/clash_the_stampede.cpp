@@ -26,7 +26,7 @@ namespace banggame {
         }
 
         void on_update() override {
-            auto target_set = origin->m_game->m_players | rv::filter(std::bind_front(&request_clash_the_stampede::in_target_set, this));
+            auto target_set = origin->m_game->m_players | rv::filter([&](const_player_ptr p){ return in_target_set(p); });
             if (num_cards == 0 || target_set.empty()) {
                 target->m_game->pop_request();
             } else if (player_ptr target_player = get_single_element(target_set)) {
