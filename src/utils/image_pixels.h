@@ -43,6 +43,9 @@ namespace json {
     struct deserializer<utils::image_pixels, Context> {
         using base_type = aggregate_deserializer_unchecked<utils::image_pixels, image_pixels_tag>;
         utils::image_pixels operator()(const json &value) const {
+            if (value.is_null()) {
+                return {};
+            }
             utils::image_pixels result = base_type{}(value, image_pixels_tag{});
             if (result.pixels.size() != result.width * result.height * 4) {
                 throw deserialize_error("Invalid image");

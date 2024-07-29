@@ -42,9 +42,6 @@ namespace json {
 
     struct missing_field {};
 
-    template<typename T> requires std::is_default_constructible_v<T>
-    static const T default_value_v{};
-
     template<aggregate T, typename Context>
     struct aggregate_deserializer_unchecked {
         template<size_t I>
@@ -53,16 +50,8 @@ namespace json {
             using value_type = reflect::member_type<I, T>;
             if (value.contains(name)) {
                 return deserialize_unchecked<value_type>(value[name], ctx);
-            } else if constexpr (requires (deserializer<value_type, Context> des) { des(missing_field{}, ctx); }) {
-                return deserializer<value_type, Context>{}(missing_field{}, ctx);
-            } else if constexpr (requires (deserializer<value_type, Context> des) { des(missing_field{}); }) {
-                return deserializer<value_type, Context>{}(missing_field{});
-            } else if constexpr (std::is_default_constructible_v<T>) {
-                return reflect::get<I>(default_value_v<T>);
-            } else if constexpr (std::is_default_constructible_v<value_type>) {
-                return value_type{};
             } else {
-                throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", reflect::type_name<T>(), name));
+                return deserialize_unchecked<value_type>(json{}, ctx);
             }
         }
 
@@ -85,7 +74,8 @@ namespace json {
             json result;
             reflect::for_each<T>([&](auto I) {
                 const auto &member_value = reflect::get<I>(value.get());
-                if (member_value != reflect::get<I>(default_value_v<T>)) {
+                using member_type = reflect::member_type<I, T>;
+                if (member_value != member_type{}) {
                     if (result.is_null()) {
                         result = json::object();
                     }

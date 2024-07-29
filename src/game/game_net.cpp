@@ -20,10 +20,6 @@ namespace json {
     };
 
     template<> struct deserializer<banggame::card_ptr, banggame::game_context> {
-        banggame::card_ptr operator()(missing_field) const {
-            throw deserialize_error("Missing card field");
-        }
-
         banggame::card_ptr operator()(const json &value, const banggame::game_context &context) const {
             if (!value.is_number_integer()) {
                 throw deserialize_error("Cannot deserialize card: value is not an integer");
@@ -46,10 +42,6 @@ namespace json {
     };
 
     template<> struct deserializer<banggame::player_ptr, banggame::game_context> {
-        banggame::player_ptr operator()(missing_field) const {
-            throw deserialize_error("Missing player field");
-        }
-
         banggame::player_ptr operator()(const json &value, const banggame::game_context &context) const {
             if (!value.is_number_integer()) {
                 throw deserialize_error("Cannot deserialize player: value is not an integer");
