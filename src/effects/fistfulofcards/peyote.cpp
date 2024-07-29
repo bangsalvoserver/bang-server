@@ -40,8 +40,6 @@ namespace banggame {
     }
 
     void effect_peyote::on_play(card_ptr target_card, player_ptr target) {
-        card_ptr origin_card = target->m_game->top_request<request_peyote>()->origin_card;
-
         auto *drawn_card = target->m_game->top_of_deck();
         drawn_card->set_visibility(card_visibility::shown);
         drawn_card->add_short_pause();

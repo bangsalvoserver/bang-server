@@ -234,14 +234,15 @@ main_deck:
     image: 20_schivata
 
 character:
-  # - name: ANNIE_OAKEY
-  #   image: 20_annie_oakey
-  #   # TODO
-  #   # prima di pescare request_annie_oakey
-  #   # mostra 6 carte in selection: colori + semi
-  #   # on_pick: match colore: +1 carta, match seme: +2 carte
-  #   # equip:
-  #   #   - annie_oakey
+  - name: ANNIE_OAKEY
+    image: 20_annie_oakey
+    equip:
+      - annie_oakey
+    modifier_response: card_choice
+    responses:
+      - none
+    tags:
+      - card_choice(-1)
   - name: PAT_BARRETT
     image: 20_pat_barrett
     equip:
@@ -327,3 +328,47 @@ button_row:
     effects:
       - discard cards(2) self | hand
       - destroy card | table bronco
+
+hidden:
+  - name: ANNIE_OAKEY_RED
+    image: character/20_annie_oakey_red
+    responses:
+      - card_choice
+      - annie_oakey(1)
+    tags:
+      - card_choice(-1)
+  - name: ANNIE_OAKEY_HEARTS
+    image: character/20_annie_oakey_hearts
+    responses:
+      - card_choice
+      - annie_oakey(2)
+    tags:
+      - card_choice(-1)
+  - name: ANNIE_OAKEY_DIAMONDS
+    image: character/20_annie_oakey_diamonds
+    responses:
+      - card_choice
+      - annie_oakey(3)
+    tags:
+      - card_choice(-1)
+  - name: ANNIE_OAKEY_BLACK
+    image: character/20_annie_oakey_black
+    responses:
+      - card_choice
+      - annie_oakey(4)
+    tags:
+      - card_choice(-1)
+  - name: ANNIE_OAKEY_CLUBS
+    image: character/20_annie_oakey_clubs
+    responses:
+      - card_choice
+      - annie_oakey(5)
+    tags:
+      - card_choice(-1)
+  - name: ANNIE_OAKEY_SPADES
+    image: character/20_annie_oakey_spades
+    responses:
+      - card_choice
+      - annie_oakey(6)
+    tags:
+      - card_choice(-1)

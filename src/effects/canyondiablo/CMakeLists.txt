@@ -1,4 +1,5 @@
 target_sources(bangserver PRIVATE
+    annie_oakey.cpp
     brothel.cpp
     buffalo_bell.cpp
     bulldog.cpp

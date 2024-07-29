@@ -71,6 +71,7 @@ namespace banggame {
         for (card_ptr target_card : cards_from_selection) {
             target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
         }
+        cards_from_selection.clear();
     }
 
     bool request_draw::can_pick(const_card_ptr target_card) const {

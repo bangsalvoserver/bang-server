@@ -1,6 +1,7 @@
 #ifndef __CANYONDIABLO_EFFECTS_H__
 #define __CANYONDIABLO_EFFECTS_H__
 
+#include "annie_oakey.h"
 #include "brothel.h"
 #include "buffalo_bell.h"
 #include "bullldog.h"
