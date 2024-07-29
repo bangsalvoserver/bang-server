@@ -51,7 +51,7 @@ namespace json {
             if (value.contains(name)) {
                 return deserialize_unchecked<value_type>(value[name], ctx);
             } else {
-                return deserialize_unchecked<value_type>(json{}, ctx);
+                throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", reflect::type_name<T>(), name));
             }
         }
 
