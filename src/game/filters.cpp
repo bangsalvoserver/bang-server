@@ -160,9 +160,7 @@ namespace banggame::filters {
         if (filter.check(target_card_filter::bronco) && !target->has_tag(tag_type::bronco))
             return "ERROR_TARGET_NOT_BRONCO";
 
-        if (filter.check(target_card_filter::catbalou_panic)
-            && !target->has_tag(tag_type::cat_balou)
-            && !target->has_tag(tag_type::panic))
+        if (filter.check(target_card_filter::catbalou_panic) && !target->has_tag(tag_type::catbalou_panic))
             return "ERROR_TARGET_NOT_CATBALOU_PANIC";
 
         if (filter.check(target_card_filter::blue) && !target->is_blue())

@@ -52,7 +52,6 @@ namespace banggame {
     };
     
     enum class tag_type {
-        none,
         preselect,
         button_color,
         ghost_card,
@@ -69,8 +68,7 @@ namespace banggame {
         bangmod,
         beer,
         indians,
-        panic,
-        cat_balou,
+        catbalou_panic,
         drawing,
         weapon,
         horse,

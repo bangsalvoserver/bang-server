@@ -171,7 +171,7 @@ main_deck:
       - destroy card
     tags:
       - skip_logs
-      - cat_balou
+      - catbalou_panic
   - &stagecoach
     name: STAGECOACH
     signs:
@@ -258,7 +258,7 @@ main_deck:
       - steal card range_1
     tags:
       - skip_logs
-      - panic
+      - catbalou_panic
   - &saloon
     name: SALOON
     signs:
