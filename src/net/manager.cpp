@@ -4,29 +4,6 @@
 
 using namespace banggame;
 
-namespace json {
-    template<typename Context>
-    struct deserializer<game_options, Context> {
-        game_options operator()(const json &value, const Context &ctx) {
-            game_options result{};
-            if (!value.is_null()) {
-                reflect::for_each<game_options>([&](auto I) {
-                    auto member_name = reflect::member_name<I, game_options>();
-                    if (value.contains(member_name)) {
-                        try {
-                            reflect::get<I>(result) = deserialize_unchecked<reflect::member_type<I, game_options>>(value[member_name], ctx);
-                        } catch (...) {
-                            // ignore errors.
-                            // game_options are stored in the clients' application storage and we don't want them kicked out if it's invalid.
-                        }
-                    }
-                });
-            }
-            return result;
-        }
-    };
-}
-
 void game_manager::on_message(client_handle client, const std::string &msg) {
     try {
         logging::info("{}: Received {}", get_client_ip(client), msg);

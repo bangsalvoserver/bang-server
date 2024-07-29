@@ -110,7 +110,7 @@ namespace banggame {
 
     void game_manager::command_reset_game_options(game_user &user) {
         auto &lobby = *user.in_lobby;
-        lobby.options = banggame::game_options{};
+        lobby.options = banggame::default_game_options;
         broadcast_message_lobby<"lobby_edited">(lobby, lobby);
     }
 

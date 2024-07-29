@@ -5,6 +5,7 @@ PRIVATE
     card.cpp
     game.cpp
     game_net.cpp
+    game_options.cpp
     game_table.cpp
     disabler_map.cpp
     durations.cpp
