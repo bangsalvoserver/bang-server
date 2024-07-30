@@ -9,6 +9,10 @@ namespace banggame {
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target);
         game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
+
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
     
     DEFINE_EFFECT(pick, effect_pick)
@@ -35,6 +39,22 @@ namespace banggame {
         using request_picking::request_picking;
 
         bool can_pick(const_card_ptr target_card) const override;
+    };
+
+    struct interface_picking_player : interface_target_set_players {
+        bool in_target_set(const_player_ptr target_player) const final;
+
+        virtual bool can_pick(const_player_ptr target_player) const = 0;
+        virtual void on_pick(player_ptr target_player) = 0;
+        virtual game_string pick_prompt(player_ptr target_player) const { return {}; }
+    };
+
+    class request_picking_player : public request_base, public interface_picking_player {
+    public:
+        using request_base::request_base;
+
+    protected:
+        void auto_pick();
     };
 
 }

@@ -10,9 +10,33 @@
 
 namespace banggame {
     
-    struct request_move_bomb : request_base {
+    struct request_move_bomb : request_picking_player {
         request_move_bomb(card_ptr origin_card, player_ptr target)
-            : request_base(origin_card, nullptr, target, {}, 110) {}
+            : request_picking_player(origin_card, nullptr, target, {}, 110) {}
+        
+        bool can_pick(const_player_ptr target_player) const override {
+            if (target_player != target) {
+                return !target_player->find_equipped_card(origin_card);
+            }
+            return true;
+        }
+
+        void on_pick(player_ptr target_player) override {
+            target->m_game->pop_request();
+            if (target != target_player) {
+                target->m_game->add_log("LOG_MOVE_BOMB_ON", origin_card, target, target_player);
+                target->disable_equip(origin_card);
+                target_player->equip_card(origin_card);
+            }
+        }
+
+        game_string pick_prompt(player_ptr target_player) const override {
+            if (target == target_player) {
+                return {"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
+            } else {
+                return {};
+            }
+        }
 
         game_string status_text(player_ptr owner) const override {
             if (target == owner) {
@@ -22,35 +46,6 @@ namespace banggame {
             }
         }
     };
-
-    game_string effect_move_bomb::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (origin == target) {
-            return {"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
-        } else {
-            return {};
-        }
-    }
-
-    game_string effect_move_bomb::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (!origin->m_game->top_request<request_move_bomb>(origin)) {
-            return "ERROR_INVALID_RESPONSE";
-        }
-        if (target != origin) {
-            if (auto c = target->find_equipped_card(origin_card)) {
-                return {"ERROR_DUPLICATED_CARD", c};
-            }
-        }
-        return {};
-    }
-
-    void effect_move_bomb::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        origin->m_game->pop_request();
-        if (target != origin) {
-            origin->m_game->add_log("LOG_MOVE_BOMB_ON", origin_card, origin, target);
-            origin->disable_equip(origin_card);
-            target->equip_card(origin_card);
-        }
-    }
 
     void equip_bomb::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_discard_orange_card>(target_card, [=](player_ptr e_target, card_ptr e_card) {

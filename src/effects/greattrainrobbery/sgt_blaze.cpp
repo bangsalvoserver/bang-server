@@ -5,6 +5,7 @@
 
 #include "game/game.h"
 
+#include "effects/base/pick.h"
 #include "effects/base/resolve.h"
 
 #include "ruleset.h"
@@ -32,7 +33,7 @@ namespace banggame {
         origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, ctx.playing_card);
     }
 
-    struct request_sgt_blaze : request_resolvable {
+    struct request_sgt_blaze : request_resolvable, interface_picking_player {
         request_sgt_blaze(card_ptr origin_card, player_ptr target, shared_effect_context ctx)
             : request_resolvable(origin_card, nullptr, target)
             , ctx(std::move(ctx)) {}
@@ -57,6 +58,16 @@ namespace banggame {
             target->m_game->pop_request();
         }
 
+        bool can_pick(const_player_ptr target_player) const override {
+            return true;
+        }
+
+        void on_pick(player_ptr target_player) override {
+            ctx->skipped_player = target_player;
+            target->m_game->add_log("LOG_SKIP_PLAYER", origin_card, target, target_player, target->m_game->m_train.front());
+            target->m_game->pop_request();
+        }
+
         game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_SGT_BLAZE_LOCOMOTIVE", origin_card};
@@ -72,20 +83,6 @@ namespace banggame {
                 origin->m_game->queue_request<request_sgt_blaze>(origin_card, origin, ctx);
             }
         });
-    }
-
-    game_string effect_skip_player_locomotive::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (origin->m_game->top_request<request_sgt_blaze>(origin)) {
-            return {};
-        }
-        return "ERROR_INVALID_ACTION";
-    }
-
-    void effect_skip_player_locomotive::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        auto req = origin->m_game->top_request<request_sgt_blaze>();
-        req->ctx->skipped_player = target;
-        origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, origin->m_game->m_train.front());
-        origin->m_game->pop_request();
     }
 
 }

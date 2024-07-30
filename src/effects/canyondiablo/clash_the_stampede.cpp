@@ -14,27 +14,26 @@ namespace banggame {
             }));
     }
 
-    struct request_clash_the_stampede : request_base, interface_target_set_players {
+    struct request_clash_the_stampede : request_picking_player {
         request_clash_the_stampede(card_ptr origin_card, player_ptr target)
-            : request_base(origin_card, nullptr, target)
+            : request_picking_player(origin_card, nullptr, target)
             , num_cards{get_max_num_cards(target)} {}
         
         int num_cards;
 
-        bool in_target_set(const_player_ptr target_player) const override {
+        bool can_pick(const_player_ptr target_player) const override {
             return target_player != target && target_player->m_hand.size() == num_cards;
         }
 
         void on_update() override {
-            auto target_set = origin->m_game->m_players | rv::filter([&](const_player_ptr p){ return in_target_set(p); });
-            if (num_cards == 0 || target_set.empty()) {
+            if (num_cards == 0 || rn::none_of(target->m_game->m_players, [&](const_player_ptr p) { return can_pick(p); })) {
                 target->m_game->pop_request();
-            } else if (player_ptr target_player = get_single_element(target_set)) {
-                on_pick_player(target_player);
+            } else {
+                auto_pick();
             }
         }
 
-        void on_pick_player(player_ptr target_player) {
+        void on_pick(player_ptr target_player) override {
             target->m_game->pop_request();
             target->m_game->queue_request<request_youl_grinner>(origin_card, target, target_player);
         }
@@ -56,15 +55,4 @@ namespace banggame {
         });
     }
 
-    game_string effect_clash_the_stampede::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (origin->m_game->top_request<request_clash_the_stampede>(origin) == nullptr) {
-            return "ERROR_INVALID_ACTION";
-        }
-        return {};
-    }
-
-    void effect_clash_the_stampede::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        auto req = origin->m_game->top_request<request_clash_the_stampede>();
-        req->on_pick_player(target);
-    }
 }

@@ -29,13 +29,7 @@ namespace banggame {
     };
 
     DEFINE_EQUIP(sgt_blaze, equip_sgt_blaze)
-
-    struct effect_skip_player_locomotive {
-        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
-    };
-
-    DEFINE_EFFECT(skip_player_locomotive, effect_skip_player_locomotive)
+    
 }
 
 #endif

@@ -105,7 +105,7 @@ namespace banggame {
         return mod;
     }
 
-    card_ptr player::find_equipped_card(card_ptr card) {
+    card_ptr player::find_equipped_card(const_card_ptr card) const {
         auto it = rn::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {
             return *it;

@@ -155,12 +155,9 @@ character:
       - sgt_blaze
     effects:
       - skip_player player
-    responses:
-      - skip_player_locomotive player
     modifier: sgt_blaze
     tags:
       - max_hp(5)
-      - preselect
   - name: SHADE_OCONNOR
     image: 27_shadeoconnor
     equip:

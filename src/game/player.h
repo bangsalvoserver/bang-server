@@ -57,7 +57,7 @@ namespace banggame {
             , m_targetable_cards_view(rv::concat(m_hand, m_table, m_characters)) {}
 
         void equip_card(card_ptr card);
-        card_ptr find_equipped_card(card_ptr card);
+        card_ptr find_equipped_card(const_card_ptr card) const;
 
         void enable_equip(card_ptr target_card);
         void disable_equip(card_ptr target_card);

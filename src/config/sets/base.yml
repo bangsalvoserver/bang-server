@@ -397,3 +397,9 @@ hidden:
     tags:
       - pick
       - preselect
+  - name: PICK
+    responses:
+      - pick player target_set
+    tags:
+      - pick
+      - preselect

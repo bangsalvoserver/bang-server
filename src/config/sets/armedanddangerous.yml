@@ -138,10 +138,6 @@ main_deck:
     equip:
       - predraw_check(0)
       - bomb
-    responses:
-      - move_bomb player
-    tags:
-      - preselect
   - name: BUNTLINE_SPECIAL
     signs:
       - J spades
