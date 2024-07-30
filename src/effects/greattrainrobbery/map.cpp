@@ -1,9 +1,12 @@
 #include "map.h"
 
-#include "game/game.h"
+#include "cards/game_enums.h"
+
+#include "effects/base/draw.h"
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"
-#include "cards/game_enums.h"
+
+#include "game/game.h"
 
 namespace banggame {
 
@@ -61,8 +64,9 @@ namespace banggame {
     };
 
     void equip_map::on_enable(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::on_turn_start>({origin_card, -2}, [=](player_ptr target) {
-            if (origin == target) {
+        origin->m_game->add_listener<event_type::pre_draw_from_deck>(origin_card, [=](player_ptr target, shared_request_draw req_draw, bool &handled) {
+            if (origin == target && !handled) {
+                handled = true;
                 origin->m_game->queue_request<request_map>(origin_card, origin);
             }
         });

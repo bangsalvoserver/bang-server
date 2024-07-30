@@ -15,10 +15,7 @@ namespace banggame {
         shared_request_draw req_draw;
 
         void on_update() override {
-            if (!live) {
-                req_draw->cleanup_selection();
-            }
-            if (!target->alive() || req_draw->num_drawn_cards >= req_draw->num_cards_to_draw) {
+            if (!target->alive() || req_draw->get_drawn_cards() >= req_draw->get_cards_to_draw()) {
                 target->m_game->pop_request();
             }
         }
@@ -42,7 +39,7 @@ namespace banggame {
     
     void equip_annie_oakey::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player_ptr origin, shared_request_draw req_draw, bool &handled) {
-            if (!handled && origin == target && req_draw->num_cards_to_draw < 3) {
+            if (!handled && origin == target) {
                 target->m_game->queue_request<request_annie_oakey>(target_card, target, std::move(req_draw));
                 handled = true;
             }
@@ -76,7 +73,7 @@ namespace banggame {
         drawn_card->set_visibility(card_visibility::shown);
         drawn_card->add_short_pause();
 
-        req_draw->num_cards_to_draw += get_ncards(choice, drawn_card->sign);
+        req_draw->add_cards_to_draw(get_ncards(choice, drawn_card->sign));
         req_draw->add_to_hand_phase_one(drawn_card);
     }
 }

@@ -77,30 +77,61 @@ namespace banggame {
 
     DEFINE_EFFECT(skip_drawing, effect_skip_drawing)
 
-    struct request_draw : request_picking, std::enable_shared_from_this<request_draw> {
-        request_draw(player_ptr target);
-
-        card_list cards_from_selection;
+    struct interface_drawing : std::enable_shared_from_this<interface_drawing> {
+        virtual int get_drawn_cards() const = 0;
+        virtual int get_cards_to_draw() const = 0;
+        virtual void add_drawn_cards(int ncards) = 0;
+        virtual void add_cards_to_draw(int ncards) = 0;
         
+        virtual card_ptr phase_one_drawn_card() = 0;
+        virtual void add_to_hand_phase_one(card *target_card) = 0;
+    };
+    
+    using shared_request_draw = std::shared_ptr<interface_drawing>;
+
+    class request_draw : public request_picking, public interface_drawing {
+    private:
         int num_drawn_cards = 0;
         int num_cards_to_draw = 2;
+
+    public:
+        request_draw(player_ptr target);
+
+        int get_drawn_cards() const override {
+            return num_drawn_cards;
+        }
+
+        int get_cards_to_draw() const override {
+            return num_cards_to_draw;
+        }
+
+        void add_drawn_cards(int ncards) override {
+            num_drawn_cards += ncards;
+        }
+
+        void add_cards_to_draw(int ncards) override {
+            num_cards_to_draw += ncards;
+        }
         
-        card_ptr phase_one_drawn_card();
-        void add_to_hand_phase_one(card_ptr target_card);
-        void cleanup_selection();
+        card_ptr phase_one_drawn_card() override;
+        void add_to_hand_phase_one(card_ptr target_card) override;
 
         void on_update() override;
         bool can_pick(const_card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
         game_string status_text(player_ptr owner) const override;
     };
-    
-    using shared_request_draw = std::shared_ptr<request_draw>;
 
     namespace event_type {
         struct count_cards_to_draw {
             player_ptr origin;
             nullable_ref<int> cards_to_draw;
+        };
+
+        struct pre_draw_from_deck {
+            player_ptr origin;
+            shared_request_draw req;
+            nullable_ref<bool> handled;
         };
         
         struct on_draw_from_deck {

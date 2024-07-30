@@ -19,7 +19,7 @@ namespace banggame {
 
         void on_update() override {
             if (!live) {
-                int ncards = target->m_game->num_alive() + req_draw->num_cards_to_draw - 1;
+                int ncards = target->m_game->num_alive() + req_draw->get_cards_to_draw() - 1;
                 for (int i=0; i<ncards; ++i) {
                     req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
                 }
@@ -64,7 +64,7 @@ namespace banggame {
         }
         target_player->add_to_hand(target_card);
 
-        if (origin->m_game->m_selection.size() <= req->req_draw->num_cards_to_draw) {
+        if (origin->m_game->m_selection.size() <= req->req_draw->get_cards_to_draw()) {
             while (!origin->m_game->m_selection.empty()) {
                 req->req_draw->add_to_hand_phase_one(origin->m_game->m_selection.front());
             }

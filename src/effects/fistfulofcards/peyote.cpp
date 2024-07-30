@@ -1,6 +1,7 @@
 #include "peyote.h"
 
 #include "effects/base/pick.h"
+#include "effects/base/draw.h"
 
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
@@ -23,8 +24,10 @@ namespace banggame {
     };
     
     void equip_peyote::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::on_turn_start>({target_card, -10}, [=](player_ptr p) {
-            p->m_game->queue_request<request_peyote>(target_card, p);
+        target->m_game->add_listener<event_type::pre_draw_from_deck>({target_card, 2}, [=](player_ptr origin, shared_request_draw req_draw, bool &handled) {
+            handled = true;
+            origin->m_game->pop_request();
+            origin->m_game->queue_request<request_peyote>(target_card, origin);
         });
 
         target->m_game->add_game_flags(game_flag::phase_one_override);
@@ -40,7 +43,7 @@ namespace banggame {
     }
 
     void effect_peyote::on_play(card_ptr target_card, player_ptr target) {
-        auto *drawn_card = target->m_game->top_of_deck();
+        card_ptr drawn_card = target->m_game->top_of_deck();
         drawn_card->set_visibility(card_visibility::shown);
         drawn_card->add_short_pause();
 

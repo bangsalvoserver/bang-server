@@ -47,31 +47,23 @@ namespace banggame {
     }
     
     void request_draw::on_update() {
-        cards_from_selection = target->m_game->m_selection;
-        if (!target->m_game->check_flags(game_flag::phase_one_override)
-            && target->alive() && target->m_game->m_playing == target
-            && num_drawn_cards < num_cards_to_draw)
-        {
-            if (!live) {
-                target->play_sound("draw");
-            }
-            card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
-            if (only_card && only_card->has_tag(tag_type::pick)) {
-                on_pick(nullptr);
+        bool handled = false;
+        target->m_game->call_event(event_type::pre_draw_from_deck{ target, shared_from_this(), handled });
+        if (!handled) {
+            if (target->alive() && target->m_game->m_playing == target
+                && num_drawn_cards < num_cards_to_draw)
+            {
+                if (!live) {
+                    target->play_sound("draw");
+                }
+                card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
+                if (only_card && only_card->has_tag(tag_type::pick)) {
+                    on_pick(nullptr);
+                }
             } else {
-                cleanup_selection();
+                target->m_game->pop_request();
             }
-        } else {
-            target->m_game->pop_request();
-            cleanup_selection();
         }
-    }
-
-    void request_draw::cleanup_selection() {
-        for (card_ptr target_card : cards_from_selection) {
-            target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
-        }
-        cards_from_selection.clear();
     }
 
     bool request_draw::can_pick(const_card_ptr target_card) const {
@@ -84,11 +76,6 @@ namespace banggame {
 
     card_ptr request_draw::phase_one_drawn_card() {
         if (!target->m_game->check_flags(game_flag::phase_one_draw_discard) || target->m_game->m_discards.empty()) {
-            if (!cards_from_selection.empty()) {
-                card_ptr target_card = cards_from_selection.front();
-                cards_from_selection.erase(cards_from_selection.begin());
-                return target_card;
-            }
             return target->m_game->top_of_deck();
         } else {
             return target->m_game->m_discards.back();
@@ -123,7 +110,6 @@ namespace banggame {
             while (num_drawn_cards < num_cards_to_draw) {
                 add_to_hand_phase_one(phase_one_drawn_card());
             }
-            cleanup_selection();
         }
     }
 
@@ -136,20 +122,19 @@ namespace banggame {
     }
     
     bool effect_while_drawing::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_draw>(origin) != nullptr;
+        return origin->m_game->top_request<interface_drawing>(origin) != nullptr;
     }
     
     bool effect_no_cards_drawn::can_play(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<request_draw>(origin);
-        return req && req->num_drawn_cards == 0;
+        auto req = origin->m_game->top_request<interface_drawing>(origin);
+        return req && req->get_drawn_cards() == 0;
     }
 
     void effect_add_draw_card::on_play(card_ptr origin_card, player_ptr origin) {
-        ++origin->m_game->top_request<request_draw>()->num_drawn_cards;
+        origin->m_game->top_request<interface_drawing>()->add_drawn_cards(1);
     }
 
     void effect_skip_drawing::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->top_request<request_draw>()->cleanup_selection();
         origin->m_game->pop_request();
     }
 }

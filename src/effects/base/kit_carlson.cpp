@@ -24,7 +24,7 @@ namespace banggame {
 
         void on_pick(card_ptr target_card) override {
             req_draw->add_to_hand_phase_one(target_card);
-            if (req_draw->num_drawn_cards >= req_draw->num_cards_to_draw) {
+            if (req_draw->get_drawn_cards() >= req_draw->get_cards_to_draw()) {
                 target->m_game->pop_request();
                 while (!target->m_game->m_selection.empty()) {
                     target->m_game->m_selection.front()->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
@@ -43,7 +43,7 @@ namespace banggame {
 
     void equip_kit_carlson::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_draw_from_deck>(target_card, [=](player_ptr origin, shared_request_draw req_draw, bool &handled) {
-            if (!handled && origin == target && req_draw->num_cards_to_draw < 3) {
+            if (!handled && origin == target && req_draw->get_cards_to_draw() < 3) {
                 target->m_game->queue_request<request_kit_carlson>(target_card, target, std::move(req_draw));
                 handled = true;
             }

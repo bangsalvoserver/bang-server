@@ -10,7 +10,7 @@ namespace banggame {
     
     void equip_lawofthewest::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_card_drawn>(target_card, [=](player_ptr origin, card_ptr drawn_card, shared_request_draw req_draw, bool &reveal) {
-            if (req_draw->num_drawn_cards == 2) {
+            if (req_draw->get_drawn_cards() == 2) {
                 reveal = true;
                 event_card_key key{target_card, 1};
 
