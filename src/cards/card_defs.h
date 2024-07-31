@@ -265,7 +265,6 @@ namespace banggame {
         nullable_player skipped_player;
         nullable_card traincost;
         nullable_card target_card;
-        int8_t locomotive_count;
         int8_t discount;
         bool disable_banglimit;
         bool disable_bang_checks;

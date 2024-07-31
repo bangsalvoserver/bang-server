@@ -34,11 +34,11 @@ namespace banggame {
     }
 
     struct request_sgt_blaze : request_resolvable, interface_picking_player {
-        request_sgt_blaze(card_ptr origin_card, player_ptr target, shared_effect_context ctx)
+        request_sgt_blaze(card_ptr origin_card, player_ptr target, shared_locomotive_context ctx)
             : request_resolvable(origin_card, nullptr, target)
             , ctx(std::move(ctx)) {}
         
-        shared_effect_context ctx;
+        shared_locomotive_context ctx;
 
         card_list get_highlights() const override {
             return {target->m_game->m_train.front()};
@@ -78,7 +78,7 @@ namespace banggame {
     };
 
     void equip_sgt_blaze::on_enable(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::on_locomotive_effect>({origin_card, 1}, [=](player_ptr target, shared_effect_context ctx) {
+        origin->m_game->add_listener<event_type::on_locomotive_effect>({origin_card, 1}, [=](player_ptr target, shared_locomotive_context ctx) {
             if (origin == target) {
                 origin->m_game->queue_request<request_sgt_blaze>(origin_card, origin, ctx);
             }

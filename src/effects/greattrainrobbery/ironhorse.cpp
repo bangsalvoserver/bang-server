@@ -11,7 +11,7 @@
 namespace banggame {
 
     void equip_ironhorse::on_enable(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::on_locomotive_effect>(origin_card, [=](player_ptr target, shared_effect_context ctx) {
+        origin->m_game->add_listener<event_type::on_locomotive_effect>(origin_card, [=](player_ptr target, shared_locomotive_context ctx) {
             origin->m_game->queue_action([=]{
                 for (player_ptr p : range_all_players(target)) {
                     if (p != ctx->skipped_player) {

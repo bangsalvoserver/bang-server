@@ -186,8 +186,7 @@ namespace banggame {
         add_log("LOG_TRAIN_ADVANCE");
         add_update<"move_train">(++train_position);
 
-        call_event(event_type::on_train_advance{ origin,
-            std::make_shared<effect_context>(effect_context{ .locomotive_count = 1 }) });
+        call_event(event_type::on_train_advance{ origin, std::make_shared<locomotive_context>(1) });
     }
 
     void game_table::add_short_pause() {

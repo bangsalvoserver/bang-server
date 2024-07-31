@@ -114,7 +114,7 @@ namespace banggame {
             }
         });
 
-        game->add_listener<event_type::on_train_advance>(nullptr, [](player_ptr origin, shared_effect_context ctx) {
+        game->add_listener<event_type::on_train_advance>(nullptr, [](player_ptr origin, shared_locomotive_context ctx) {
             if (origin->m_game->train_position == origin->m_game->m_stations.size()) {
                 for (int i=0; i < ctx->locomotive_count; ++i) {
                     origin->m_game->queue_action([=]{

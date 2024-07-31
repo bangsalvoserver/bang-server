@@ -9,7 +9,7 @@
 namespace banggame {
 
     void equip_leland::on_enable(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::on_locomotive_effect>(origin_card, [=](player_ptr target, shared_effect_context ctx) {
+        origin->m_game->add_listener<event_type::on_locomotive_effect>(origin_card, [=](player_ptr target, shared_locomotive_context ctx) {
             origin->m_game->queue_action([=]{
                 player_list targets = range_all_players(target) | rn::to_vector;
                 for (player_ptr p : targets) {
