@@ -9,7 +9,7 @@ namespace banggame {
             | rv::filter(&player::alive)
             | rv::transform(&player::m_hp));
         
-        for (player_ptr p : range_all_players(target)) {
+        for (player_ptr p : range_alive_players(target)) {
             if (p->m_hp == min_hp) {
                 p->heal(1);
             }

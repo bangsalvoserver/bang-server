@@ -317,7 +317,7 @@ namespace banggame {
         add_game_flags(game_flag::hands_shown);
 
         auto character_it = character_ptrs.rbegin();
-        for (player_ptr p : range_all_players(m_first_player)) {
+        for (player_ptr p : range_alive_players(m_first_player)) {
             for (int i=0; i<2; ++i) {
                 card_ptr c = *character_it++;
                 p->m_hand.push_back(c);
@@ -340,7 +340,7 @@ namespace banggame {
 
             int cycles = rn::max(m_players | rv::transform(&player::get_initial_cards));
             for (int i=0; i<cycles; ++i) {
-                for (player_ptr p : range_all_players(m_first_player)) {
+                for (player_ptr p : range_alive_players(m_first_player)) {
                     if (p->m_hand.size() < p->get_initial_cards()) {
                         p->draw_card();
                     }
@@ -575,7 +575,7 @@ namespace banggame {
             }
 
             auto declare_winners = [this](auto &&winners) {
-                for (player_ptr p : range_all_players_and_dead(m_playing)) {
+                for (player_ptr p : range_all_players(m_playing)) {
                     if (p->add_player_flags(player_flag::role_revealed)) {
                         add_update<"player_show_role">(update_target::excludes(p), p, p->m_role);
                     }

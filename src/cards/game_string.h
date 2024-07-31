@@ -48,7 +48,7 @@ namespace banggame {
             return copy;
         }
 
-        format_arg_iterator operator --() {
+        format_arg_iterator &operator --() {
             --index;
             return *this;
         }

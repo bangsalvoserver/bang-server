@@ -11,22 +11,21 @@ namespace banggame {
         return true;
     }
 
+    static auto get_player_targets_range(player_ptr origin, enums::bitset<target_player_filter> player_filter, const effect_context &ctx) {
+        return range_alive_players(origin) | rv::filter([=, &ctx](const_player_ptr target) {
+            return target != ctx.skipped_player && !filters::check_player_filter(origin, player_filter, target, ctx);
+        });
+    }
+
     template<> game_string visit_players::get_error(const effect_context &ctx) {
-        for (player_ptr target : range_all_players(origin)) {
-            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
-                MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
-            }
+        for (player_ptr target : get_player_targets_range(origin, effect.player_filter, ctx)) {
+            MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
         return {};
     }
 
     template<> game_string visit_players::prompt(const effect_context &ctx) {
-        player_list targets;
-        for (player_ptr target : range_all_players(origin)) {
-            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
-                targets.push_back(target);
-            }
-        }
+        auto targets = get_player_targets_range(origin, effect.player_filter, ctx);
         if (targets.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
@@ -39,23 +38,16 @@ namespace banggame {
     }
 
     template<> void visit_players::add_context(effect_context &ctx) {
-        for (player_ptr target : range_all_players(origin)) {
-            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
-                defer<"player">().add_context(ctx, target);
-            }
+        for (player_ptr target : get_player_targets_range(origin, effect.player_filter, ctx)) {
+            defer<"player">().add_context(ctx, target);
         }
     }
 
     template<> void visit_players::play(const effect_context &ctx) {
-        player_list targets;
-        for (player_ptr target : range_all_players(origin)) {
-            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
-                targets.push_back(target);
-            }
-        }
+        auto targets = get_player_targets_range(origin, effect.player_filter, ctx);
 
         effect_flags flags { effect_flag::multi_target, effect_flag::skip_target_logs };
-        if (targets.size() == 1) {
+        if (get_single_element(targets)) {
             flags.add(effect_flag::single_target);
         }
         if (origin_card->is_brown()) {

@@ -336,4 +336,8 @@ namespace banggame {
         return rn::accumulate(cube_slots()
             | rv::transform(&card::num_cubes), 0);
     }
+
+    player_list &player::get_all_players() const {
+        return m_game->m_players;
+    }
 }

@@ -137,6 +137,8 @@ namespace banggame {
         }
 
         void remove_extra_characters();
+
+        player_list &get_all_players() const;
     };
 
 }
