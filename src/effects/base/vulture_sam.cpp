@@ -5,6 +5,8 @@
 
 #include "game/game.h"
 
+#include "utils/range_utils.h"
+
 namespace banggame {
 
     inline void steal_card(player_ptr origin, player_ptr target, card_ptr target_card) {
@@ -84,13 +86,8 @@ namespace banggame {
                 target_card->set_inactive(false);
             }
 
-            player_list range_targets;
-            for (player_ptr p : range_other_players(target)) {
-                if (get_vulture_sam(p)) {
-                    range_targets.push_back(p);
-                }
-            }
-            if (range_targets.size() == 1) {
+            auto range_targets = range_other_players(target) | rv::filter(get_vulture_sam);
+            if (get_single_element(range_targets)) {
                 for (card_ptr target_card : target->m_table
                     | rv::remove_if(&card::is_black)
                     | rn::to_vector

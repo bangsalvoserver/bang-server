@@ -13,7 +13,7 @@ namespace banggame {
             : request_base(origin_card, nullptr, target)
             , req_draw(std::move(req_draw)) {}
 
-        player_list selected_targets;
+        std::set<const_player_ptr> selected_targets;
 
         shared_request_draw req_draw;
 
@@ -35,7 +35,7 @@ namespace banggame {
         }
 
         bool in_target_set(const_player_ptr target_player) const override {
-            return target_player != target && !rn::contains(selected_targets, target_player);
+            return target_player != target && !selected_targets.contains(target_player);
         }
     };
     
@@ -54,7 +54,7 @@ namespace banggame {
 
     void handler_claus_the_saint::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
         auto req = origin->m_game->top_request<request_claus_the_saint>(origin);
-        req->selected_targets.push_back(target_player);
+        req->selected_targets.insert(target_player);
         
         if (!origin->m_game->check_flags(game_flag::hands_shown)) {
             origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_GIFTED_CARD", origin, target_player, target_card);
