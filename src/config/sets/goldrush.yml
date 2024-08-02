@@ -106,7 +106,6 @@ goldrush:
       - pass_turn
     tags:
       - buy_cost(5)
-      - preselect
   - name: HORSESHOE
     image: 04_ferro_di_cavallo
     color: black
@@ -141,7 +140,6 @@ goldrush:
       - rum
     tags:
       - buy_cost(3)
-      - preselect
   - name: GOLD_PAN
     image: 04_setaccio
     color: black
@@ -177,7 +175,6 @@ goldrush:
       - changewws
     tags:
       - buy_cost(4)
-      - preselect
   - name: RUCKSACK
     image: 04_zaino
     color: black
