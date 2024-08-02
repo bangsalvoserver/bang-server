@@ -44,7 +44,7 @@ namespace banggame {
 
     game_string effect_steal::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         if (target_card->pocket == pocket_type::player_table && target_card->is_train()) {
-            MAYBE_RETURN(filters::check_player_filter(origin_card, origin, target_card->equip_target, origin));
+            MAYBE_RETURN(filters::check_player_filter(target_card, origin, target_card->equip_target, origin));
         }
         return {};
     }
