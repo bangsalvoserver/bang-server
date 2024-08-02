@@ -11,8 +11,8 @@ namespace banggame {
 
     using format_arg_variant = utils::tagged_variant<
         utils::tag<"integer", int>,
-        utils::tag<"card", banggame::nullable_card>,
-        utils::tag<"player", banggame::nullable_player>
+        utils::tag<"card", utils::nullable<banggame::const_card_ptr>>,
+        utils::tag<"player", utils::nullable<banggame::const_player_ptr>>
     >;
 
     class format_arg_list;
@@ -98,8 +98,8 @@ namespace banggame {
 
         union format_arg {
             int number_value;
-            card_ptr card_value;
-            player_ptr player_value;
+            const_card_ptr card_value;
+            const_player_ptr player_value;
         };
 
         std::array<format_arg, format_arg_list_max_size> args{};
@@ -112,13 +112,13 @@ namespace banggame {
             ++count;
         }
 
-        constexpr void add(card_ptr value) {
+        constexpr void add(const_card_ptr value) {
             args[count].card_value = value;
             types += exp3(count) * format_card;
             ++count;
         }
 
-        constexpr void add(player_ptr value) {
+        constexpr void add(const_player_ptr value) {
             args[count].player_value = value;
             types += exp3(count) * format_player;
             ++count;

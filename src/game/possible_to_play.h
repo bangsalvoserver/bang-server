@@ -52,14 +52,14 @@ namespace banggame {
 
     inline auto get_all_player_targets(player_ptr origin, card_ptr origin_card, const effect_holder &holder, const effect_context &ctx = {}) {
         return rv::filter(origin->m_game->m_players, [=](player_ptr target) {
-            return !filters::check_player_filter(origin, holder.player_filter, target, ctx)
+            return !filters::check_player_filter(origin_card, origin, holder.player_filter, target, ctx)
                 && !holder.get_error(origin_card, origin, target, ctx);
         });
     }
 
     inline auto get_all_card_targets(player_ptr origin, card_ptr origin_card, const effect_holder &holder, const effect_context &ctx = {}) {
         return rv::filter(get_all_targetable_cards(origin), [=](card_ptr target_card) {
-            return (!target_card->owner || !filters::check_player_filter(origin, holder.player_filter, target_card->owner, ctx))
+            return (!target_card->owner || !filters::check_player_filter(origin_card, origin, holder.player_filter, target_card->owner, ctx))
                 && !filters::check_card_filter(origin_card, origin, holder.card_filter, target_card, ctx)
                 && !holder.get_error(origin_card, origin, target_card, ctx);
         });

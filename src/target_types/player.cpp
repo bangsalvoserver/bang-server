@@ -16,7 +16,7 @@ namespace banggame {
     }
 
     template<> game_string visit_player::get_error(const effect_context &ctx, player_ptr target) {
-        MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, target, ctx));
+        MAYBE_RETURN(filters::check_player_filter(origin_card, origin, effect.player_filter, target, ctx));
         return effect.get_error(origin_card, origin, target, ctx);
     }
 

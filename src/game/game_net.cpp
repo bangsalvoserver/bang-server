@@ -10,8 +10,15 @@
 
 namespace json {
 
-    template<typename Context> struct serializer<banggame::card_ptr, Context> {
-        json operator()(banggame::card_ptr card) const {
+    template<typename T, typename U>
+    concept maybe_const = std::is_same_v<
+        std::remove_const_t<std::remove_pointer_t<T>>,
+        std::remove_pointer_t<U>
+    >;
+
+    template<maybe_const<banggame::card_ptr> Card, typename Context>
+    struct serializer<Card, Context> {
+        json operator()(Card card) const {
             if (!card) {
                 throw serialize_error("Cannot serialize card: value is null");
             }
@@ -32,8 +39,9 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<banggame::player_ptr, Context> {
-        json operator()(banggame::player_ptr player) const {
+    template<maybe_const<banggame::player_ptr> Player, typename Context>
+    struct serializer<Player, Context> {
+        json operator()(Player player) const {
             if (!player) {
                 throw serialize_error("Cannot serialize player: value is null");
             }
@@ -124,13 +132,13 @@ namespace json {
 
     struct game_string_tag {};
 
-    template<> struct serializer<banggame::nullable_card, game_string_tag> {
+    template<> struct serializer<utils::nullable<banggame::const_card_ptr>, game_string_tag> {
         struct format_card {
             std::string_view name;
             banggame::card_sign sign;
         };
 
-        json operator()(banggame::nullable_card value, const game_string_tag &ctx) const {
+        json operator()(utils::nullable<banggame::const_card_ptr> value, const game_string_tag &ctx) const {
             if (value) {
                 return serialize_unchecked(format_card{ value->name, value->sign }, ctx);
             } else {

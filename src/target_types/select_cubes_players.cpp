@@ -25,7 +25,7 @@ namespace banggame {
     template<> game_string visit_cubes::get_error(const effect_context &ctx, const card_list &target_cards) {
         for (card_ptr c : target_cards) {
             if (c->owner != origin) {
-                return "ERROR_TARGET_NOT_SELF";
+                return {"ERROR_TARGET_NOT_SELF", origin_card};
             }
         }
         return {};

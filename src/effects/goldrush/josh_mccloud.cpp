@@ -77,7 +77,7 @@ namespace banggame {
     game_string effect_forced_equip::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
         if (auto req = target->m_game->top_request<request_force_equip_card>(origin)) {
             card_ptr target_card = req->target_card;
-            MAYBE_RETURN(filters::check_player_filter(origin, target_card->equip_target, target));
+            MAYBE_RETURN(filters::check_player_filter(target_card, origin, target_card->equip_target, target));
             if (card_ptr equipped = target->find_equipped_card(target_card)) {
                 return {"ERROR_DUPLICATED_CARD", equipped};
             } else {

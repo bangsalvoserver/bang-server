@@ -11,68 +11,6 @@ namespace banggame::filters {
         return origin->is_bot();
     }
 
-    game_string check_player_filter(const_player_ptr origin, enums::bitset<target_player_filter> filter, const_player_ptr target, const effect_context &ctx) {
-        if (filter.check(target_player_filter::dead)) {
-            if (!filter.check(target_player_filter::alive) && !target->check_player_flags(player_flag::dead)) {
-                return "ERROR_TARGET_NOT_DEAD";
-            }
-        } else if (!target->alive()) {
-            return "ERROR_TARGET_DEAD";
-        }
-
-        if (filter.check(target_player_filter::self) && target != origin)
-            return "ERROR_TARGET_NOT_SELF";
-
-        if (filter.check(target_player_filter::notself) && target == origin)
-            return "ERROR_TARGET_SELF";
-        
-        if (filter.check(target_player_filter::notorigin)) {
-            auto req = origin->m_game->top_request();
-            if (!req || req->origin == target) {
-                return "ERROR_TARGET_ORIGIN";
-            }
-        }
-
-        if (filter.check(target_player_filter::notsheriff) && target->m_role == player_role::sheriff)
-            return "ERROR_TARGET_SHERIFF";
-
-        if (filter.check(target_player_filter::not_empty_hand) && target->empty_hand())
-            return "ERROR_TARGET_EMPTY_HAND";
-        
-        if (filter.check(target_player_filter::not_empty_table) && target->empty_table())
-            return "ERROR_TARGET_EMPTY_TABLE";
-
-        if (filter.check(target_player_filter::not_empty_cubes) && target->count_cubes() == 0)
-            return "ERROR_TARGET_EMPTY_CUBES";
-        
-        if (filter.check(target_player_filter::target_set)) {
-            auto req = origin->m_game->top_request<interface_target_set_players>(origin);
-            if (!req || !req->in_target_set(target)) {
-                return "ERROR_TARGET_NOT_IN_TARGET_SET";
-            }
-        }
-
-        if (!ctx.ignore_distances && (filter.check(target_player_filter::reachable) || filter.check(target_player_filter::range_1) || filter.check(target_player_filter::range_2))) {
-            int range = origin->get_range_mod();
-            if (filter.check(target_player_filter::reachable)) {
-                int weapon_range = origin->get_weapon_range();
-                if (weapon_range == 0) {
-                    return "ERROR_TARGET_NOT_IN_RANGE";
-                }
-                range += weapon_range;
-            } else if (filter.check(target_player_filter::range_1)) {
-                ++range;
-            } else if (filter.check(target_player_filter::range_2)) {
-                range += 2;
-            }
-            if (origin->m_game->calc_distance(origin, target) > range) {
-                return "ERROR_TARGET_NOT_IN_RANGE";
-            }
-        }
-
-        return {};
-    }
-
     bool is_equip_card(const_card_ptr target) {
         switch (target->pocket) {
         case pocket_type::player_hand:
@@ -108,6 +46,68 @@ namespace banggame::filters {
         }
     }
 
+    game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, enums::bitset<target_player_filter> filter, const_player_ptr target, const effect_context &ctx) {
+        if (filter.check(target_player_filter::dead)) {
+            if (!filter.check(target_player_filter::alive) && !target->check_player_flags(player_flag::dead)) {
+                return {"ERROR_TARGET_NOT_DEAD", origin_card, target};
+            }
+        } else if (!target->alive()) {
+            return {"ERROR_TARGET_DEAD", origin_card, target};
+        }
+
+        if (filter.check(target_player_filter::self) && target != origin)
+            return {"ERROR_TARGET_NOT_SELF", origin_card};
+
+        if (filter.check(target_player_filter::notself) && target == origin)
+            return {"ERROR_TARGET_SELF", origin_card};
+        
+        if (filter.check(target_player_filter::notorigin)) {
+            auto req = origin->m_game->top_request();
+            if (!req || req->origin == target) {
+                return {"ERROR_TARGET_ORIGIN", origin_card};
+            }
+        }
+
+        if (filter.check(target_player_filter::notsheriff) && target->m_role == player_role::sheriff)
+            return {"ERROR_TARGET_SHERIFF", origin_card, target};
+
+        if (filter.check(target_player_filter::not_empty_hand) && target->empty_hand())
+            return {"ERROR_TARGET_EMPTY_HAND", origin_card, target};
+        
+        if (filter.check(target_player_filter::not_empty_table) && target->empty_table())
+            return {"ERROR_TARGET_EMPTY_TABLE", origin_card, target};
+
+        if (filter.check(target_player_filter::not_empty_cubes) && target->count_cubes() == 0)
+            return {"ERROR_TARGET_EMPTY_CUBES", origin_card, target};
+        
+        if (filter.check(target_player_filter::target_set)) {
+            auto req = origin->m_game->top_request<interface_target_set_players>(origin);
+            if (!req || !req->in_target_set(target)) {
+                return {"ERROR_TARGET_NOT_IN_TARGET_SET", origin_card, target};
+            }
+        }
+
+        if (!ctx.ignore_distances && (filter.check(target_player_filter::reachable) || filter.check(target_player_filter::range_1) || filter.check(target_player_filter::range_2))) {
+            int range = origin->get_range_mod();
+            if (filter.check(target_player_filter::reachable)) {
+                int weapon_range = origin->get_weapon_range();
+                if (weapon_range == 0) {
+                    return {"ERROR_TARGET_NOT_IN_RANGE", origin_card, target};
+                }
+                range += weapon_range;
+            } else if (filter.check(target_player_filter::range_1)) {
+                ++range;
+            } else if (filter.check(target_player_filter::range_2)) {
+                range += 2;
+            }
+            if (origin->m_game->calc_distance(origin, target) > range) {
+                return {"ERROR_TARGET_NOT_IN_RANGE", origin_card, target};
+            }
+        }
+
+        return {};
+    }
+
     game_string check_card_filter(const_card_ptr origin_card, const_player_ptr origin, enums::bitset<target_card_filter> filter, const_card_ptr target, const effect_context &ctx) {
         if (!filter.check(target_card_filter::can_target_self) && target == origin_card)
             return "ERROR_TARGET_PLAYING_CARD";
@@ -115,7 +115,7 @@ namespace banggame::filters {
         if (filter.check(target_card_filter::target_set)) {
             auto req = origin->m_game->top_request<interface_target_set_cards>(origin);
             if (!req || !req->in_target_set(target)) {
-                return "ERROR_TARGET_NOT_IN_TARGET_SET";
+                return {"ERROR_TARGET_NOT_IN_TARGET_SET", origin_card, target};
             }
         } else if (filter.check(target_card_filter::cube_slot)) {
             if (!target->owner)

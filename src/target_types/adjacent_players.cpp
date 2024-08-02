@@ -13,7 +13,7 @@ namespace banggame {
                 auto [target1, target2] = pair;
                 return target1 != origin && target2 != origin && target1 != target2
                     && target1->alive() && target2->alive()
-                    && !filters::check_player_filter(origin, effect.player_filter, target1, ctx)
+                    && !filters::check_player_filter(origin_card, origin, effect.player_filter, target1, ctx)
                     && origin->m_game->calc_distance(target1, target2) <= effect.target_value;
             });
     }
@@ -32,9 +32,9 @@ namespace banggame {
         if (targets.size() != 2) {
             return "ERROR_INVALID_TARGETS";
         }
-        MAYBE_RETURN(filters::check_player_filter(origin, effect.player_filter, targets[0], ctx));
+        MAYBE_RETURN(filters::check_player_filter(origin_card, origin, effect.player_filter, targets[0], ctx));
         if (!targets[1]->alive()) {
-            return "ERROR_TARGET_DEAD";
+            return {"ERROR_TARGET_DEAD", origin_card, targets[1]};
         }
         if (targets[0] == targets[1] || origin->m_game->calc_distance(targets[0], targets[1]) > effect.target_value) {
             return "ERROR_TARGETS_NOT_ADJACENT";

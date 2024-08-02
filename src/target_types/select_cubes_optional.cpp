@@ -22,7 +22,7 @@ namespace banggame {
         }
         for (card_ptr c : target_cards) {
             if (c->owner != origin) {
-                return "ERROR_TARGET_NOT_SELF";
+                return {"ERROR_TARGET_NOT_SELF", origin_card};
             }
         }
         return {};

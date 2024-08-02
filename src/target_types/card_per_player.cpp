@@ -20,7 +20,7 @@ namespace banggame {
     template<> card_list visit_cards::random_target(const effect_context &ctx) {
         card_list ret;
         for (player_ptr target : range_alive_players(origin)) {
-            if (target != ctx.skipped_player && !filters::check_player_filter(origin, effect.player_filter, target, ctx)) {
+            if (target != ctx.skipped_player && !filters::check_player_filter(origin_card, origin, effect.player_filter, target, ctx)) {
                 if (auto targets = cards_target_set(origin, origin_card, effect.card_filter, target, ctx)) {
                     ret.push_back(random_element(targets, origin->m_game->bot_rng));
                 }
@@ -32,7 +32,7 @@ namespace banggame {
     template<> game_string visit_cards::get_error(const effect_context &ctx, const card_list &target_cards) {
         if (!rn::all_of(origin->m_game->m_players, [&](player_ptr p) {
             size_t found = rn::count(target_cards, p, &card::owner);
-            if (p == ctx.skipped_player || filters::check_player_filter(origin, effect.player_filter, p, ctx)) return found == 0;
+            if (p == ctx.skipped_player || filters::check_player_filter(origin_card, origin, effect.player_filter, p, ctx)) return found == 0;
             if (cards_target_set(origin, origin_card, effect.card_filter, p, ctx).empty()) return found == 0;
             return found == 1;
         })) {

@@ -221,7 +221,7 @@ namespace banggame {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
         } else {
-            MAYBE_RETURN(filters::check_player_filter(origin, origin_card->equip_target, target));
+            MAYBE_RETURN(filters::check_player_filter(origin_card, origin, origin_card->equip_target, target));
         }
         if (card_ptr equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};

@@ -41,7 +41,7 @@ namespace banggame {
         }
         for (card_ptr target_card : targets) {
             if (target_card->pocket != pocket_type::player_table || target_card->owner != origin || !target_card->is_orange()) {
-                return "ERROR_TARGET_NOT_SELF";
+                return {"ERROR_TARGET_NOT_SELF", origin_card};
             }
             int count = target_card->num_cubes;
             for (card_ptr target : targets) {
