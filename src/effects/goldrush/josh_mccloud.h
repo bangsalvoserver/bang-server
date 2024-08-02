@@ -12,14 +12,6 @@ namespace banggame {
 
     DEFINE_EFFECT(forced_play, effect_forced_play)
 
-    struct effect_forced_equip {
-        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
-    };
-
-    DEFINE_EFFECT(forced_equip, effect_forced_equip)
-
     struct effect_josh_mccloud {
         void on_play(card_ptr origin_card, player_ptr origin);
     };

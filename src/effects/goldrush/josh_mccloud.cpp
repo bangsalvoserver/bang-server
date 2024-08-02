@@ -54,15 +54,43 @@ namespace banggame {
         target->m_game->pop_request();
     }
 
-    struct request_force_equip_card : request_base {
+    struct request_force_equip_card : request_picking_player {
         request_force_equip_card(card_ptr origin_card, player_ptr target, card_ptr target_card)
-            : request_base(origin_card, nullptr, target)
+            : request_picking_player(origin_card, nullptr, target)
             , target_card(target_card) {}
         
         card_ptr target_card;
 
         card_list get_highlights() const override {
             return {target_card};
+        }
+
+        void on_update() override {
+            if (get_all_equip_targets(target, target_card).empty()) {
+                target->m_game->pop_request();
+                target_card->add_short_pause();
+                target_card->move_to(pocket_type::shop_discard);
+            } else if (target_card->self_equippable()) {
+                on_pick(target);
+            }
+        }
+
+        bool can_pick(const_player_ptr target_player) const override {
+            return !get_equip_error(target, target_card, target_player, {});
+        }
+
+        game_string pick_prompt(player_ptr target_player) const override {
+            return get_equip_prompt(target, target_card, target_player);
+        }
+
+        void on_pick(player_ptr target_player) {
+            target->m_game->pop_request();
+            if (target_player == target) {
+                target->m_game->add_log("LOG_EQUIPPED_CARD", target_card, target);
+            } else {
+                target->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, target, target_player);
+            }
+            target_player->equip_card(target_card);
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -74,46 +102,10 @@ namespace banggame {
         }
     };
 
-    game_string effect_forced_equip::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (auto req = target->m_game->top_request<request_force_equip_card>(origin)) {
-            card_ptr target_card = req->target_card;
-            MAYBE_RETURN(filters::check_player_filter(target_card, origin, target_card->equip_target, target));
-            if (card_ptr equipped = target->find_equipped_card(target_card)) {
-                return {"ERROR_DUPLICATED_CARD", equipped};
-            } else {
-                return {};
-            }
-        }
-        return "ERROR_INVALID_RESPONSE";
-    }
-
-    game_string effect_forced_equip::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        return get_equip_prompt(origin, origin->m_game->top_request<request_force_equip_card>()->target_card, target);
-    }
-    
-    void effect_forced_equip::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        card_ptr target_card = origin->m_game->top_request<request_force_equip_card>()->target_card;
-        origin->m_game->pop_request();
-
-        if (origin == target) {
-            origin->m_game->add_log("LOG_EQUIPPED_CARD", target_card, origin);
-        } else {
-            origin->m_game->add_log("LOG_EQUIPPED_CARD_TO", target_card, origin, target);
-        }
-        target->equip_card(target_card);
-    }
-
     void effect_josh_mccloud::on_play(card_ptr origin_card, player_ptr target) {
         card_ptr target_card = target->m_game->draw_shop_card();
         if (target_card->is_black()) {
-            if (get_all_equip_targets(target, target_card).empty()) {
-                target_card->add_short_pause();
-                target_card->move_to(pocket_type::shop_discard);
-            } else if (target_card->self_equippable()) {
-                target->equip_card(target_card);
-            } else {
-                target->m_game->queue_request<request_force_equip_card>(origin_card, target, target_card);
-            }
+            target->m_game->queue_request<request_force_equip_card>(origin_card, target, target_card);
         } else {
             target->m_game->queue_request<request_force_play_card>(origin_card, target, target_card);
         }

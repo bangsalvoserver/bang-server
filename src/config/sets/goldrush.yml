@@ -19,10 +19,6 @@ character:
     effects:
       - pay_gold(2)
       - josh_mccloud
-    responses:
-      - forced_equip player
-    tags:
-      - preselect
   - name: MADAME_YTO
     image: 04_madame_yto
     equip:

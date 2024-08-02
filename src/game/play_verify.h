@@ -25,7 +25,7 @@ namespace banggame {
 
     game_string get_play_card_error(player_ptr origin, card_ptr origin_card, const effect_context &ctx);
 
-    game_string get_equip_error(player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &ctx);
+    game_string get_equip_error(player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx);
 
     game_string get_equip_prompt(player_ptr origin, card_ptr origin_card, player_ptr target);
 

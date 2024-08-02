@@ -212,7 +212,7 @@ namespace banggame {
         return out_error;
     }
 
-    game_string get_equip_error(player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &ctx) {
+    game_string get_equip_error(player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx) {
         if (origin->m_game->check_flags(game_flag::disable_equipping)) {
             return "ERROR_CANT_EQUIP_CARDS";
         }
