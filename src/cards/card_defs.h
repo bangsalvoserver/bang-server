@@ -93,12 +93,14 @@ namespace banggame {
         renegade_3p,
     };
 
+    using cubes_and_players = std::pair<card_list, player_list>;
+
     using play_card_target = utils::tagged_variant<
         utils::tag<"none">,
         utils::tag<"player", player_ptr>,
         utils::tag<"conditional_player", nullable_player>,
         utils::tag<"adjacent_players", player_list>,
-        utils::tag<"player_per_cube", player_list>,
+        utils::tag<"player_per_cube", cubes_and_players>,
         utils::tag<"card", card_ptr>,
         utils::tag<"extra_card", nullable_card>,
         utils::tag<"players">,
@@ -109,7 +111,6 @@ namespace banggame {
         utils::tag<"select_cubes", card_list>,
         utils::tag<"select_cubes_optional", card_list>,
         utils::tag<"select_cubes_repeat", card_list>,
-        utils::tag<"select_cubes_players", card_list>,
         utils::tag<"self_cubes">
     >;
 

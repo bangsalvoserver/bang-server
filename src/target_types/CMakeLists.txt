@@ -13,7 +13,6 @@ PRIVATE
     player.cpp
     players.cpp
     select_cubes_optional.cpp
-    select_cubes_players.cpp
     select_cubes_repeat.cpp
     select_cubes.cpp
     self_cubes.cpp

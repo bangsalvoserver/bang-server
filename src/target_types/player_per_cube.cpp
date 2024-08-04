@@ -1,47 +1,72 @@
 #include "game/possible_to_play.h"
 
+#include "effects/armedanddangerous/pay_cube.h"
+
 namespace banggame {
 
-    using visit_players = play_visitor<"player_per_cube">;
+    using visit_cubes = play_visitor<"player_per_cube">;
 
-    template<> bool visit_players::possible(const effect_context &ctx) {
+    template<> bool visit_cubes::possible(const effect_context &ctx) {
         return defer<"player">().possible(ctx);
     }
 
-    template<> player_list visit_players::random_target(const effect_context &ctx) {
-        return get_all_player_targets(origin, origin_card, effect, ctx)
-            | rv::sample(ctx.selected_cubes.count(origin_card) + 1)
+    template<> cubes_and_players visit_cubes::random_target(const effect_context &ctx) {
+        auto cubes = origin->cube_slots()
+            | rv::for_each([](card_ptr slot) {
+                return rv::repeat_n(slot, slot->num_cubes);
+            })
             | rn::to_vector;
+        rn::shuffle(cubes, origin->m_game->bot_rng);
+        
+        size_t num_players = rn::distance(get_all_player_targets(origin, origin_card, effect, ctx));
+        size_t max_count = std::min(cubes.size(), num_players - 1);
+        size_t ncubes = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng);
+        cubes.resize(ncubes);
+
+        auto players = get_all_player_targets(origin, origin_card, effect, ctx)
+            | rv::sample(ncubes + 1)
+            | rn::to_vector;
+
+        return { std::move(cubes), std::move(players) };
     }
 
-    template<> game_string visit_players::get_error(const effect_context &ctx, const player_list &targets) {
-        int num_cubes = ctx.selected_cubes.count(origin_card);
-        if (targets.size() != num_cubes + 1) {
+    template<> game_string visit_cubes::get_error(const effect_context &ctx, const cubes_and_players &target) {
+        for (card_ptr c : target.first) {
+            if (c->owner != origin) {
+                return {"ERROR_TARGET_NOT_SELF", origin_card};
+            }
+        }
+        if (target.first.size() + 1 != target.second.size()) {
             return "ERROR_INVALID_TARGETS";
         }
-        for (player_ptr target : targets) {
+        for (player_ptr target : target.second) {
             MAYBE_RETURN(defer<"player">().get_error(ctx, target));
         }
         return {};
     }
 
-    template<> game_string visit_players::prompt(const effect_context &ctx, const player_list &targets) {
+    template<> game_string visit_cubes::prompt(const effect_context &ctx, const cubes_and_players &target) {
+        MAYBE_RETURN(defer<"select_cubes">().prompt(ctx, target.first));
         game_string msg;
-        for (player_ptr target : targets) {
+        for (player_ptr target : target.second) {
             msg = defer<"player">().prompt(ctx, target);
             if (!msg) break;
         }
         return msg;
     }
 
-    template<> void visit_players::add_context(effect_context &ctx, const player_list &targets) {
-        for (player_ptr target : targets) {
+    template<> void visit_cubes::add_context(effect_context &ctx, const cubes_and_players &target) {
+        for (card_ptr target : target.first) {
+            effect_pay_cube{}.add_context(origin_card, origin, target, ctx);
+        }
+        for (player_ptr target : target.second) {
             defer<"player">().add_context(ctx, target);
         }
     }
 
-    template<> void visit_players::play(const effect_context &ctx, const player_list &targets) {
-        for (player_ptr target : targets) {
+    template<> void visit_cubes::play(const effect_context &ctx, const cubes_and_players &target) {
+        effect_pay_cube{}.on_play(origin_card, origin, ctx);
+        for (player_ptr target : target.second) {
             defer<"player">().play(ctx, target);
         }
     }

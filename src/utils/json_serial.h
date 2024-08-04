@@ -133,6 +133,17 @@ namespace json {
             }
         }
     };
+
+    template<typename First, typename Second, typename Context>
+    requires (serializable<First, Context> && serializable<Second, Context>)
+    struct serializer<std::pair<First, Second>, Context> {
+        json operator()(const std::pair<First, Second> &value, const Context &ctx) const {
+            return json::array({
+                serialize_unchecked(value.first, ctx),
+                serialize_unchecked(value.second, ctx)
+            });
+        }
+    };
     
     template<typename Context>
     struct deserializer<json, Context> {
@@ -204,6 +215,20 @@ namespace json {
             } else {
                 return deserialize_unchecked<T>(value, ctx);
             }
+        }
+    };
+
+    template<typename First, typename Second, typename Context>
+    requires (deserializable<First, Context> && deserializable<Second, Context>)
+    struct deserializer<std::pair<First, Second>, Context> {
+        std::pair<First, Second> operator()(const json &value, const Context &ctx) const {
+            if (!value.is_array() || value.size() != 2) {
+                throw deserialize_error("Cannot deserialize pair: value is not an array of two elements");
+            }
+            return {
+                deserialize_unchecked<First>(value[0], ctx),
+                deserialize_unchecked<Second>(value[1], ctx)
+            };
         }
     };
 }
