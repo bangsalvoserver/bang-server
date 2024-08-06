@@ -21,6 +21,7 @@ rn::range_value_t<R> get_single_element(R &&range) {
 
 template<rn::input_range R>
 bool contains_at_least(R &&range, int size) {
+    if (size == 0) return true;
     for (const auto &value : range) {
         if (--size == 0) return true;
     }

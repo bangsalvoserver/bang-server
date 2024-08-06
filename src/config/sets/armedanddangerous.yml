@@ -33,7 +33,7 @@ main_deck:
     image: 17_colporapido
     color: brown
     effects:
-      - bang player_per_cube reachable notself
+      - bang player_per_cube(1) reachable notself
     tags:
       - skip_logs
   - name: FLINTLOCK
@@ -53,7 +53,7 @@ main_deck:
     image: 17_freccia
     color: brown
     effects:
-      - indians player_per_cube notself
+      - indians player_per_cube(1) notself
     tags:
       - indians
       - skip_logs

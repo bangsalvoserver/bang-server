@@ -7,7 +7,7 @@ namespace banggame {
     using visit_cubes = play_visitor<"player_per_cube">;
 
     template<> bool visit_cubes::possible(const effect_context &ctx) {
-        return defer<"player">().possible(ctx);
+        return contains_at_least(get_all_player_targets(origin, origin_card, effect, ctx), effect.target_value);
     }
 
     template<> cubes_and_players visit_cubes::random_target(const effect_context &ctx) {
@@ -19,12 +19,12 @@ namespace banggame {
         rn::shuffle(cubes, origin->m_game->bot_rng);
         
         size_t num_players = rn::distance(get_all_player_targets(origin, origin_card, effect, ctx));
-        size_t max_count = std::min(cubes.size(), num_players - 1);
+        size_t max_count = std::min(cubes.size(), num_players - effect.target_value);
         size_t ncubes = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng);
         cubes.resize(ncubes);
 
         auto players = get_all_player_targets(origin, origin_card, effect, ctx)
-            | rv::sample(ncubes + 1)
+            | rv::sample(ncubes + effect.target_value)
             | rn::to_vector;
 
         return { std::move(cubes), std::move(players) };
@@ -36,7 +36,7 @@ namespace banggame {
                 return {"ERROR_TARGET_NOT_SELF", origin_card};
             }
         }
-        if (target.first.size() + 1 != target.second.size()) {
+        if (target.first.size() + effect.target_value != target.second.size()) {
             return "ERROR_INVALID_TARGETS";
         }
         for (player_ptr target : target.second) {
