@@ -39,7 +39,7 @@ namespace banggame {
     void game_manager::command_print_help(game_user &user) {
         for (const auto &[cmd_name, command] : chat_command::commands) {
             if (!command.permissions().check(command_permissions::game_cheat) || m_options.enable_cheats) {
-                send_message<"lobby_chat">(user.client, 0,
+                send_message<"lobby_message">(user.client,
                     std::format("{}{} : {}", chat_command::start_char, cmd_name, command.description()));
             }
         }
@@ -48,7 +48,7 @@ namespace banggame {
     void game_manager::command_print_users(game_user &user) {
         auto &lobby = *user.in_lobby;
         for (auto [team, user_id, u] : lobby.users) {
-            send_message<"lobby_chat">(user.client, 0,
+            send_message<"lobby_message">(user.client,
                 std::format("{} : {} ({})", user_id, u->name, enums::to_string(team)));
         }
     }
@@ -70,7 +70,7 @@ namespace banggame {
     void game_manager::command_get_game_options(game_user &user) {
         const game_options &options = user.in_lobby->options;
         reflect::for_each<game_options>([&](auto I) {
-            send_message<"lobby_chat">(user.client, 0,
+            send_message<"lobby_message">(user.client,
                 std::format("{} = {}", reflect::member_name<I>(options), reflect::get<I>(options))
             );
         });
@@ -251,7 +251,7 @@ namespace banggame {
     }
 
     void game_manager::command_get_rng_seed(game_user &user) {
-        send_message<"lobby_chat">(user.client, 0, std::to_string(user.in_lobby->m_game->rng_seed));
+        send_message<"lobby_message">(user.client, std::to_string(user.in_lobby->m_game->rng_seed));
     }
 
     void game_manager::command_quit(game_user &user) {

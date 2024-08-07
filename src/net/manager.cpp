@@ -224,10 +224,10 @@ void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
         if (p != &user) {
             send_message<"lobby_add_user">(p->client, new_user_id, user);
         }
-        send_message<"lobby_add_user">(user.client, user_id, *p, true, p->get_disconnect_lifetime());
+        send_message<"lobby_add_user">(user.client, user_id, *p, lobby_chat_flag::is_read, p->get_disconnect_lifetime());
     }
     for (auto &bot : lobby.bots) {
-        send_message<"lobby_add_user">(user.client, bot.user_id, bot, true);
+        send_message<"lobby_add_user">(user.client, bot.user_id, bot, lobby_chat_flag::is_read);
     }
     for (const auto &message: lobby.chat_messages) {
         send_message<"lobby_chat">(user.client, message);
@@ -302,7 +302,7 @@ void game_manager::on_disconnect(client_handle client) {
             user->client.reset();
             if (user->in_lobby) {
                 lobby &lobby = *user->in_lobby;
-                broadcast_message_lobby<"lobby_add_user">(lobby, lobby.get_user_id(*user), *user, true, user->get_disconnect_lifetime());
+                broadcast_message_lobby<"lobby_add_user">(lobby, lobby.get_user_id(*user), *user, lobby_chat_flag::is_read, user->get_disconnect_lifetime());
             }
         }
         m_clients.erase(it);
@@ -325,8 +325,8 @@ void game_manager::handle_message(utils::tag<"lobby_chat">, game_user &user, con
     if (!value.message.empty()) {
         auto &lobby = *user.in_lobby;
         int user_id = lobby.get_user_id(user);
-        lobby.chat_messages.emplace_back(user_id, value.message, true);
-        broadcast_message_lobby<"lobby_chat">(lobby, user_id, value.message);
+        lobby.chat_messages.emplace_back(user_id, user.name, value.message, lobby_chat_flag::is_read);
+        broadcast_message_lobby<"lobby_chat">(lobby, user_id, user.name, value.message);
         if (value.message[0] == chat_command::start_char) {
             handle_chat_command(user, value.message.substr(1));
         }
@@ -464,7 +464,7 @@ void game_manager::handle_message(utils::tag<"game_start">, game_user &user) {
         auto &bot = lobby.bots.emplace_back(user_info{std::format("BOT {}", names[i % names.size()]), *propics[i % propics.size()] }, bot_id);
         user_ids.push_back(bot_id);
 
-        broadcast_message_lobby<"lobby_add_user">(lobby, bot_id, bot, true);
+        broadcast_message_lobby<"lobby_add_user">(lobby, bot_id, bot, lobby_chat_flag::is_read);
     }
 
     lobby.m_game->add_players(user_ids);

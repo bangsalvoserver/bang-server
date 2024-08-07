@@ -2,7 +2,9 @@
 #define __MESSAGES_H__
 
 #include "game/game_options.h"
+
 #include "utils/image_pixels.h"
+#include "utils/enum_bitset.h"
 
 namespace banggame {
     
@@ -76,17 +78,22 @@ namespace banggame {
         game_options options;
     };
 
+    enum class lobby_chat_flag {
+        is_read
+    };
+
     struct user_info_id_args {
         int user_id;
         user_info user;
-        bool is_read;
+        enums::bitset<lobby_chat_flag> flags;
         std::chrono::milliseconds lifetime;
     };
 
     struct lobby_chat_args {
         int user_id;
+        std::string username;
         std::string message;
-        bool is_read;
+        enums::bitset<lobby_chat_flag> flags;
     };
 
     using server_message = utils::tagged_variant<
@@ -102,6 +109,7 @@ namespace banggame {
         utils::tag<"lobby_remove_user", int>,
         utils::tag<"lobby_kick">,
         utils::tag<"lobby_chat", lobby_chat_args>,
+        utils::tag<"lobby_message", std::string>,
         utils::tag<"game_update", json::json>,
         utils::tag<"game_started">
     >;
