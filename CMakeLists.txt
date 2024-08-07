@@ -26,7 +26,6 @@ target_link_libraries(banglibs INTERFACE Threads::Threads)
 
 # asio
 
-target_include_directories(banglibs INTERFACE external/asio/asio/include)
 target_compile_definitions(banglibs INTERFACE ASIO_STANDALONE)
 
 if(MINGW)
@@ -61,7 +60,7 @@ target_link_libraries(banglibs INTERFACE cxxopts::cxxopts)
 
 # nlohmann-json
 
-add_subdirectory(external/json)
+find_package(nlohmann_json REQUIRED)
 target_link_libraries(banglibs INTERFACE nlohmann_json::nlohmann_json)
 
 # reflect
