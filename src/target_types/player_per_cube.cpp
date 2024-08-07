@@ -16,18 +16,16 @@ namespace banggame {
                 return rv::repeat_n(slot, slot->num_cubes);
             })
             | rn::to_vector;
-        rn::shuffle(cubes, origin->m_game->bot_rng);
+
+        auto players = get_all_player_targets(origin, origin_card, effect, ctx);
         
-        size_t num_players = rn::distance(get_all_player_targets(origin, origin_card, effect, ctx));
-        size_t max_count = std::min(cubes.size(), num_players - effect.target_value);
+        size_t max_count = std::min(cubes.size(), rn::distance(players) - static_cast<size_t>(effect.target_value));
         size_t ncubes = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng);
-        cubes.resize(ncubes);
-
-        auto players = get_all_player_targets(origin, origin_card, effect, ctx)
-            | rv::sample(ncubes + effect.target_value)
-            | rn::to_vector;
-
-        return { std::move(cubes), std::move(players) };
+        
+        return {
+            cubes | rv::sample(ncubes) | rn::to_vector,
+            players | rv::sample(ncubes + effect.target_value) | rn::to_vector
+        };
     }
 
     template<> game_string visit_cubes::get_error(const effect_context &ctx, const cubes_and_players &target) {
