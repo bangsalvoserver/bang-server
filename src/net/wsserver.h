@@ -1,6 +1,7 @@
 #ifndef __WSSERVER_H__
 #define __WSSERVER_H__
 
+#include <utility>
 #include <sstream>
 #include <set>
 
