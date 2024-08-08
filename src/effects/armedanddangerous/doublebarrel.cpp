@@ -17,8 +17,8 @@ namespace banggame {
         });
     }
 
-    game_string modifier_doublebarrel::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr playing_card) {
-        card_sign sign = origin->m_game->get_card_sign(playing_card);
+    game_string effect_doublebarrel::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        card_sign sign = origin->m_game->get_card_sign(ctx.playing_card);
         if (sign && !sign.is_diamonds()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {

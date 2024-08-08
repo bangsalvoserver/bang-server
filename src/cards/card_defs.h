@@ -171,7 +171,6 @@ namespace banggame {
 
         void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const;
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) const;
     };
 
     struct mth_holder {

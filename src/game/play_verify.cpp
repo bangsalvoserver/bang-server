@@ -273,7 +273,6 @@ namespace banggame {
 
     static game_string get_prompt_message(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         for (const auto &[mod_card, mod_targets] : modifiers) {
-            MAYBE_RETURN(mod_card->get_modifier(is_response).on_prompt(mod_card, origin, origin_card, ctx));
             MAYBE_RETURN(get_play_prompt(origin, mod_card, is_response, mod_targets, ctx));
         }
         if (filters::is_equip_card(origin_card)) {

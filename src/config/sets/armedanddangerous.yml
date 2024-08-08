@@ -111,6 +111,7 @@ main_deck:
     effects:
       - max_usages(1)
       - none self_cubes(1)
+      - bandolier
     tags:
       - bangmod
   - name: BIG_FIFTY
@@ -181,7 +182,7 @@ main_deck:
       - 6 clubs
     image: 17_doppiacanna
     color: orange
-    modifier: doublebarrel
+    modifier: bangmod
     equip:
       - weapon(1)
     effects:

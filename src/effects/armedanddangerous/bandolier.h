@@ -8,11 +8,16 @@ namespace banggame {
 
     struct modifier_bandolier : modifier_bangmod {
         bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card);
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr playing_card);
         void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
     };
 
     DEFINE_MODIFIER(bandolier, modifier_bandolier)
+
+    struct effect_bandolier {
+        game_string on_prompt(card_ptr origin_card, player_ptr origin);
+    };
+
+    DEFINE_EFFECT(bandolier, effect_bandolier)
 }
 
 #endif

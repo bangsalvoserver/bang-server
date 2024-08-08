@@ -14,7 +14,6 @@ namespace banggame {
 
         void (*add_context)(card_ptr origin_card, player_ptr origin, effect_context &ctx);
         game_string (*get_error)(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx);
-        game_string (*on_prompt)(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx);
     };
 
     inline void modifier_holder::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
@@ -23,10 +22,6 @@ namespace banggame {
 
     inline game_string modifier_holder::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
         return type->get_error(origin_card, origin, target_card, ctx);
-    }
-
-    inline game_string modifier_holder::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) const {
-        return type->on_prompt(origin_card, origin, playing_card, ctx);
     }
 
     template<typename T>
@@ -67,15 +62,6 @@ namespace banggame {
                     return T{}.get_error(origin_card, origin, target_card, ctx);
                 } else if constexpr (requires (T handler) { handler.get_error(origin_card, origin, target_card); }) {
                     return T{}.get_error(origin_card, origin, target_card);
-                }
-                return {};
-            },
-
-            .on_prompt = [](card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) -> game_string {
-                if constexpr (requires (T handler) { handler.on_prompt(origin_card, origin, playing_card, ctx); }) {
-                    return T{}.on_prompt(origin_card, origin, playing_card);
-                } else if constexpr (requires (T handler) { handler.on_prompt(origin_card, origin, playing_card); }) {
-                    return T{}.on_prompt(origin_card, origin, playing_card);
                 }
                 return {};
             }
