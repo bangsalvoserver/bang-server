@@ -46,8 +46,8 @@ namespace json {
         reflect::member_type<I, T> deserialize_field(const json &value, const Context &ctx) const {
             static constexpr auto name = reflect::member_name<I, T>();
             using value_type = reflect::member_type<I, T>;
-            if (value.contains(name)) {
-                return deserialize_unchecked<value_type>(value[name], ctx);
+            if (auto it = value.find(std::string(name)); it != value.end()) {
+                return deserialize_unchecked<value_type>(*it, ctx);
             } else {
                 throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", reflect::type_name<T>(), name));
             }

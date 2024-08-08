@@ -28,9 +28,9 @@ namespace json {
         if (value.is_object()) {
             reflect::for_each<banggame::game_options>([&](auto I) {
                 auto member_name = reflect::member_name<I, banggame::game_options>();
-                if (value.contains(member_name)) {
+                if (auto it = value.find(std::string(member_name)); it != value.end()) {
                     try {
-                        reflect::get<I>(result) = deserialize<reflect::member_type<I, banggame::game_options>>(value[member_name]);
+                        reflect::get<I>(result) = deserialize<reflect::member_type<I, banggame::game_options>>(*it);
                     } catch (const deserialize_error &error) {
                         // ignore errors.
                         // game_options are stored in the clients' application storage and we don't want them kicked out if it's invalid.
