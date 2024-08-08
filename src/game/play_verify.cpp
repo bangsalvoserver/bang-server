@@ -67,7 +67,7 @@ namespace banggame {
         }
 
         std::unordered_map<card_ptr, int> cubes;
-        for (card_ptr c : ctx.selected_cubes.all()) {
+        for (card_ptr c : ctx.selected_cubes.all_cubes()) {
             if (++cubes[c] > c->num_cubes) {
                 return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
             }

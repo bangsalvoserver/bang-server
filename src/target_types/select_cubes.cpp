@@ -37,13 +37,25 @@ namespace banggame {
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const card_list &target_cards) {
-        for (card_ptr target : target_cards) {
-            effect.add_context(origin_card, origin, target, ctx);
-        }
+        ctx.selected_cubes.insert(origin_card, target_cards, effect.target_value);
     }
 
     template<> void visit_cubes::play(const effect_context &ctx, const card_list &target_cards) {
-        effect.on_play(origin_card, origin, {}, ctx);
+        using cube_count_pair = std::pair<card_ptr, int>;
+        std::vector<cube_count_pair> card_cube_count;
+
+        for (card_ptr cube : target_cards) {
+            auto it = rn::find(card_cube_count, cube, &cube_count_pair::first);
+            if (it == card_cube_count.end()) {
+                card_cube_count.emplace_back(cube, 1);
+            } else {
+                ++it->second;
+            }
+        }
+
+        for (const auto &[cube, ncubes] : card_cube_count) {
+            cube->move_cubes(nullptr, ncubes);
+        }
     }
 
 }

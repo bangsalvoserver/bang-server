@@ -40,8 +40,6 @@ namespace json {
     template<aggregate T, typename Context> requires all_fields_serializable<T, Context>
     struct serializer<T, Context> : aggregate_serializer_unchecked<T, Context> {};
 
-    struct missing_field {};
-
     template<aggregate T, typename Context>
     struct aggregate_deserializer_unchecked {
         template<size_t I>

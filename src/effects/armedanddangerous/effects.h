@@ -17,7 +17,6 @@
 #include "frankie_canton.h"
 #include "julie_cutter.h"
 #include "ms_abigail.h"
-#include "pay_cube.h"
 #include "red_ringo.h"
 #include "rust.h"
 #include "squaw.h"

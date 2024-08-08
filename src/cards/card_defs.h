@@ -230,24 +230,25 @@ namespace banggame {
 
     class selected_cubes_count {
     private:
-        std::unordered_multimap<const_card_ptr, card_ptr> m_value;
+        using cubes_max_pair = std::pair<card_list, int>;
+        std::unordered_map<const_card_ptr, cubes_max_pair> m_value;
 
     public:
-        void insert(const_card_ptr origin_card, card_ptr cube) {
-            m_value.emplace(origin_card, cube);
-        }
-
-        auto operator[](const_card_ptr origin_card) const {
-            auto [low, high] = m_value.equal_range(origin_card);
-            return rn::subrange(low, high) | rv::values;
+        void insert(const_card_ptr origin_card, card_list cubes, int max) {
+            assert(max != 0);
+            m_value.emplace(origin_card, std::pair{std::move(cubes), max});
         }
 
         int count(const_card_ptr origin_card) const {
-            return static_cast<int>(rn::distance((*this)[origin_card]));
+            auto it = m_value.find(origin_card);
+            if (it == m_value.end()) return 0;
+
+            const auto &[cubes, max] = it->second;
+            return cubes.size() / max;
         }
 
-        auto all() const {
-            return m_value | rv::values;
+        auto all_cubes() const {
+            return m_value | rv::values | rv::for_each(&cubes_max_pair::first);
         }
     };
 

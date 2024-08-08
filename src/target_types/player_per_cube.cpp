@@ -1,6 +1,6 @@
 #include "game/possible_to_play.h"
 
-#include "effects/armedanddangerous/pay_cube.h"
+#include "cards/game_enums.h"
 
 namespace banggame {
 
@@ -54,18 +54,24 @@ namespace banggame {
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const cubes_and_players &target) {
-        for (card_ptr target : target.first) {
-            effect_pay_cube{}.add_context(origin_card, origin, target, ctx);
-        }
+        ctx.selected_cubes.insert(origin_card, target.first, 1);
         for (player_ptr target : target.second) {
             defer<"player">().add_context(ctx, target);
         }
     }
 
     template<> void visit_cubes::play(const effect_context &ctx, const cubes_and_players &target) {
-        effect_pay_cube{}.on_play(origin_card, origin, ctx);
+        defer<"select_cubes">().play(ctx, target.first);
+        
+        effect_flags flags;
+        if (target.second.size() == 1) {
+            flags.add(effect_flag::single_target);
+        }
+        if (origin_card->is_brown()) {
+            flags.add(effect_flag::escapable);
+        }
         for (player_ptr target : target.second) {
-            defer<"player">().play(ctx, target);
+            effect.on_play(origin_card, origin, target, flags, ctx);
         }
     }
 

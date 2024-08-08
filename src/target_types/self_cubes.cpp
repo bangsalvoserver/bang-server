@@ -17,13 +17,13 @@ namespace banggame {
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx) {
-        for (int i=0; i < effect.target_value; ++i) {
-            effect.add_context(origin_card, origin, origin_card, ctx);
-        }
+        ctx.selected_cubes.insert(origin_card,
+            card_list{static_cast<size_t>(effect.target_value), origin_card},
+            effect.target_value);
     }
 
     template<> void visit_cubes::play(const effect_context &ctx) {
-        effect.on_play(origin_card, origin, {}, ctx);
+        origin_card->move_cubes(nullptr, effect.target_value);
     }
 
 }

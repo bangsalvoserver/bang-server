@@ -12,8 +12,8 @@ main_deck:
     image: 17_carovana
     color: brown
     effects:
-      - pay_cube select_cubes_repeat(2)
-      - caravan(2)
+      - none select_cubes_repeat(2)
+      - caravan
       - changewws
   - <<: *cat_balou
     signs:
@@ -25,8 +25,8 @@ main_deck:
     image: 17_cicchetto
     color: brown
     effects:
-      - pay_cube select_cubes_repeat(3)
-      - a_little_nip(3)
+      - none select_cubes_repeat(3)
+      - a_little_nip
   - name: QUICK_SHOT
     signs:
       - 3 spades
@@ -42,7 +42,7 @@ main_deck:
     image: 17_flintlock
     color: brown
     effects:
-      - pay_cube select_cubes_optional(2)
+      - none select_cubes_optional(2)
       - bang player reachable notself
       - flintlock
     tags:
@@ -63,7 +63,7 @@ main_deck:
     image: 17_giulatesta
     color: brown
     responses:
-      - pay_cube select_cubes_optional(2)
+      - none select_cubes_optional(2)
       - missed
       - duck
   - <<: *missed
@@ -90,7 +90,7 @@ main_deck:
     image: 17_squaw
     color: brown
     effects:
-      - pay_cube select_cubes_optional(2)
+      - none select_cubes_optional(2)
       - squaw card | table
     tags:
       - skip_logs
@@ -100,7 +100,7 @@ main_deck:
     image: 17_assonellamanica
     color: orange
     effects:
-      - pay_cube self_cubes(2)
+      - none self_cubes(2)
       - draw
   - name: BANDOLIER
     signs:
@@ -110,7 +110,7 @@ main_deck:
     modifier: bandolier
     effects:
       - max_usages(1)
-      - pay_cube self_cubes(1)
+      - none self_cubes(1)
     tags:
       - bangmod
   - name: BIG_FIFTY
@@ -122,7 +122,7 @@ main_deck:
     equip:
       - weapon(6)
     effects:
-      - pay_cube self_cubes(1)
+      - none self_cubes(1)
       - bigfifty
     tags:
       - weapon
@@ -145,7 +145,7 @@ main_deck:
     equip:
       - weapon(2)
     effects:
-      - pay_cube self_cubes(1)
+      - none self_cubes(1)
       - buntlinespecial
     tags:
       - weapon
@@ -157,14 +157,14 @@ main_deck:
     color: orange
     modifier: belltower
     effects:
-      - pay_cube self_cubes(1)
+      - none self_cubes(1)
   - name: CRATE
     signs:
       - 3 hearts
     image: 17_cassa
     color: orange
     responses:
-      - pay_cube self_cubes(2)
+      - none self_cubes(2)
       - missed
   - name: TUMBLEWEED
     signs:
@@ -174,7 +174,7 @@ main_deck:
     equip:
       - tumbleweed
     responses:
-      - pay_cube self_cubes(1)
+      - none self_cubes(1)
       - tumbleweed
   - name: DOUBLE_BARREL
     signs:
@@ -185,7 +185,7 @@ main_deck:
     equip:
       - weapon(1)
     effects:
-      - pay_cube self_cubes(1)
+      - none self_cubes(1)
       - doublebarrel
     tags:
       - weapon
@@ -196,7 +196,7 @@ main_deck:
     image: 17_frusta
     color: orange
     effects:
-      - pay_cube self_cubes(3)
+      - none self_cubes(3)
       - destroy card | table
     tags:
       - skip_logs
@@ -206,7 +206,7 @@ main_deck:
     image: 17_fustodibirra
     color: orange
     effects:
-      - pay_cube self_cubes(3)
+      - none self_cubes(3)
       - heal
   - name: LOCKPICK
     signs:
@@ -214,7 +214,7 @@ main_deck:
     image: 17_grimaldello
     color: orange
     effects:
-      - pay_cube self_cubes(3)
+      - none self_cubes(3)
       - steal card notself | hand
     tags:
       - skip_logs
@@ -227,7 +227,7 @@ main_deck:
     equip:
       - weapon(3)
     effects:
-      - pay_cube self_cubes(1)
+      - none self_cubes(1)
       - thunderer
     tags:
       - weapon
@@ -240,7 +240,7 @@ character:
       - al_preacher
     responses:
       - can_play_card
-      - pay_cube select_cubes(2)
+      - none select_cubes(2)
       - draw
     tags:
       - preselect
@@ -267,7 +267,7 @@ character:
     image: 17_mexicalikid
     effects:
       - max_usages(1)
-      - pay_cube select_cubes(2)
+      - none select_cubes(2)
       - bang player reachable notself
     tags:
       - skip_logs

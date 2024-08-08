@@ -15,7 +15,6 @@ target_sources(bangserver PRIVATE
     frankie_canton.cpp
     julie_cutter.cpp
     ms_abigail.cpp
-    pay_cube.cpp
     red_ringo.cpp
     ruleset.cpp
     rust.cpp

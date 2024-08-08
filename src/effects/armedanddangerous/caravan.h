@@ -6,9 +6,6 @@
 namespace banggame {
 
     struct effect_caravan {
-        int num_cubes;
-        effect_caravan(int num_cubes) : num_cubes{num_cubes} {}
-        
         void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
     };
 
