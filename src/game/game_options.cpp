@@ -28,7 +28,7 @@ namespace json {
         if (value.is_object()) {
             reflect::for_each<banggame::game_options>([&](auto I) {
                 auto member_name = reflect::member_name<I, banggame::game_options>();
-                if (auto it = value.find(std::string(member_name)); it != value.end()) {
+                if (auto it = value.find(member_name); it != value.end()) {
                     try {
                         reflect::get<I>(result) = deserialize<reflect::member_type<I, banggame::game_options>>(*it);
                     } catch (const deserialize_error &error) {
