@@ -30,12 +30,9 @@ jobs:
       shell: bash
       run: |
         sudo apt-get -y update
-        sudo apt-get -y install gcc-${{env.GCC_VERSION}} g++-${{env.GCC_VERSION}} cmake ninja-build libcxxopts-dev librange-v3-dev nlohmann-json3-dev libasio-dev
-    
-    - name: Install python dependencies
-      shell: bash
-      run: |
-        pip install pyyaml pillow
+        sudo apt-get -y install gcc-${{env.GCC_VERSION}} g++-${{env.GCC_VERSION}} cmake ninja-build
+        sudo apt-get -y install libcxxopts-dev librange-v3-dev nlohmann-json3-dev libasio-dev
+        sudo apt-get -y install python3-yaml python3-pillow
 
     - name: Configure CMake
       shell: bash
