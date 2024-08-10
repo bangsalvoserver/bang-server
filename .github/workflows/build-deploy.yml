@@ -5,6 +5,12 @@ on:
     branches:
       - release
   workflow_dispatch:
+    inputs:
+      skip-deploy:
+        description: Skip Deploy
+        type: boolean
+        required: false
+        default: false
 
 env:
   BUILD_TYPE: Release
@@ -24,6 +30,7 @@ jobs:
       shell: bash
       run: |
         sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        sudo add-apt-repository ppa:ppa-verse/xeus-cling
         sudo apt-get -y update
         sudo apt-get -y install gcc-${{env.GCC_VERSION}} g++-${{env.GCC_VERSION}} cmake ninja-build libcxxopts-dev librange-v3-dev nlohmann-json3-dev libasio-dev
     
@@ -54,6 +61,7 @@ jobs:
         path: build/bangserver
   
   deploy:
+    if: ${{ ! inputs.skip-deploy }}
     runs-on: self-hosted
     needs: build
 
