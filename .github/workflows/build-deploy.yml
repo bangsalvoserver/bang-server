@@ -5,6 +5,12 @@ on:
     branches:
       - release
   workflow_dispatch:
+    inputs:
+      skip-deploy:
+        description: Skip Deploy
+        type: boolean
+        required: false
+        default: false
 
 env:
   BUILD_TYPE: Release
@@ -54,6 +60,7 @@ jobs:
         path: build/bangserver
   
   deploy:
+    if: ${{ ! inputs.skip-deploy }}
     runs-on: self-hosted
     needs: build
 
