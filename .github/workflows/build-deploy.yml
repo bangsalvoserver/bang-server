@@ -19,7 +19,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v4
@@ -29,15 +29,10 @@ jobs:
     - name: Install packages
       shell: bash
       run: |
-        sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-        sudo add-apt-repository ppa:ppa-verse/xeus-cling
         sudo apt-get -y update
-        sudo apt-get -y install gcc-${{env.GCC_VERSION}} g++-${{env.GCC_VERSION}} cmake ninja-build libcxxopts-dev librange-v3-dev nlohmann-json3-dev libasio-dev
-    
-    - name: Install python dependencies
-      shell: bash
-      run: |
-        pip install pyyaml pillow
+        sudo apt-get -y install gcc-${{env.GCC_VERSION}} g++-${{env.GCC_VERSION}} cmake ninja-build
+        sudo apt-get -y install libcxxopts-dev librange-v3-dev nlohmann-json3-dev libasio-dev
+        sudo apt-get -y install python3-yaml python3-pillow
 
     - name: Configure CMake
       shell: bash
