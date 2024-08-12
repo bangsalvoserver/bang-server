@@ -4,24 +4,6 @@
 #include "card.h"
 
 namespace banggame {
-    
-    struct card_pocket_pair {
-        card_ptr origin_card;
-        pocket_type pocket;
-    };
-
-    struct played_card_history {
-        card_pocket_pair origin_card;
-        std::vector<card_pocket_pair> modifiers;
-        bool is_response;
-        effect_context context;
-    };
-
-    enum class range_mod_type {
-        range_mod,
-        weapon_range,
-        distance_mod
-    };
 
     struct player {
         game *m_game;
@@ -37,7 +19,7 @@ namespace banggame {
             rn::ref_view<card_list>,
             rn::ref_view<card_list>,
             rn::ref_view<card_list>
-        > m_targetable_cards_view;
+        > m_targetable_cards_view = rv::concat(m_hand, m_table, m_characters);
 
         player_role m_role;
 
@@ -53,8 +35,7 @@ namespace banggame {
         int8_t m_gold = 0;
 
         player(game *game, int id, int user_id)
-            : m_game(game), id(id), user_id(user_id)
-            , m_targetable_cards_view(rv::concat(m_hand, m_table, m_characters)) {}
+            : m_game(game), id(id), user_id(user_id) {}
 
         void equip_card(card_ptr card);
         card_ptr find_equipped_card(const_card_ptr card) const;
@@ -64,7 +45,7 @@ namespace banggame {
 
         void play_sound(std::string_view sound_id);
         
-        card_ptr random_hand_card();
+        card_ptr random_hand_card() const;
 
         int can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) const;
         
@@ -77,12 +58,12 @@ namespace banggame {
         }
         void steal_card(card_ptr target);
 
-        int get_initial_cards();
+        int get_initial_cards() const;
 
-        int max_cards_end_of_turn();
+        int max_cards_end_of_turn() const;
 
-        int get_num_checks();
-        int get_bangs_played();
+        int get_num_checks() const;
+        int get_bangs_played() const;
         int get_range_mod() const;
         int get_weapon_range() const;
         int get_distance_mod() const;
@@ -98,7 +79,7 @@ namespace banggame {
 
         void add_gold(int amount);
 
-        bool immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet = false);
+        bool immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet = false) const;
 
         bool empty_table() const {
             return rn::all_of(m_table, &card::is_black);
@@ -131,14 +112,12 @@ namespace banggame {
 
         auto cube_slots() const {
             return rv::concat(
-                m_table | rv::filter(&card::is_orange),
-                rv::single(first_character())
+                m_characters | rv::take(1),
+                m_table | rv::filter(&card::is_orange)
             );
         }
 
         void remove_extra_characters();
-
-        player_list &get_all_players() const;
     };
 
 }

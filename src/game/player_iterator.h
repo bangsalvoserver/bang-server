@@ -5,6 +5,8 @@
 
 namespace banggame {
 
+    player_list &get_all_players(const_player_ptr p);
+
     struct player_iterator {
     public:
         using iterator_category = std::bidirectional_iterator_tag;
@@ -16,7 +18,7 @@ namespace banggame {
         player_iterator() = default;
 
         explicit player_iterator(const_player_ptr p)
-            : m_list{&p->get_all_players()}
+            : m_list{&get_all_players(p)}
             , m_it{rn::find(*m_list, p)}
         {
             if (m_it == m_list->end()) {
@@ -81,7 +83,7 @@ namespace banggame {
     };
 
     inline auto range_all_players(player_ptr begin) {
-        auto &list = begin->get_all_players();
+        auto &list = get_all_players(begin);
         auto it = rn::find(list, begin);
         return rv::concat(rn::subrange(it, list.end()), rn::subrange(list.begin(), it));
     }

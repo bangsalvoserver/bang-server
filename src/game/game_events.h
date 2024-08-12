@@ -3,6 +3,14 @@
 
 #include "cards/card_fwd.h"
 
+namespace banggame {
+    enum class range_mod_type {
+        range_mod,
+        weapon_range,
+        distance_mod
+    };
+}
+
 namespace banggame::event_type {
 
     struct on_game_setup {
@@ -14,7 +22,7 @@ namespace banggame::event_type {
     };
 
     struct apply_maxcards_modifier {
-        player_ptr origin;
+        const_player_ptr origin;
         nullable_ref<int> value;
     };
 

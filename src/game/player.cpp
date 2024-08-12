@@ -65,23 +65,23 @@ namespace banggame {
         m_game->add_update<"play_sound">(update_target::includes_private(this), std::string(sound_id));
     }
 
-    int player::get_initial_cards() {
+    int player::get_initial_cards() const {
         return first_character()->get_tag_value(tag_type::initial_cards).value_or(m_hp);
     }
 
-    int player::max_cards_end_of_turn() {
+    int player::max_cards_end_of_turn() const {
         int ncards = m_hp;
         m_game->call_event(event_type::apply_maxcards_modifier{ this, ncards });
         return ncards;
     }
 
-    int player::get_num_checks() {
+    int player::get_num_checks() const {
         int nchecks = 1;
         m_game->call_event(event_type::count_num_checks{ this, nchecks });
         return nchecks;
     }
 
-    int player::get_bangs_played() {
+    int player::get_bangs_played() const {
         int nbangs = 0;
         m_game->call_event(event_type::count_bangs_played{ this, nbangs });
         return nbangs;
@@ -114,7 +114,7 @@ namespace banggame {
         }
     }
 
-    card_ptr player::random_hand_card() {
+    card_ptr player::random_hand_card() const {
         return m_hand[std::uniform_int_distribution(0, int(m_hand.size() - 1))(m_game->rng)];
     }
 
@@ -182,7 +182,7 @@ namespace banggame {
         }
     }
 
-    bool player::immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet) {
+    bool player::immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet) const {
         card_list cards;
         m_game->call_event(event_type::apply_immunity_modifier{ origin_card, origin, this, flags, cards });
         if (!quiet) {
@@ -337,7 +337,7 @@ namespace banggame {
             | rv::transform(&card::num_cubes), 0);
     }
 
-    player_list &player::get_all_players() const {
-        return m_game->m_players;
+    player_list &get_all_players(const_player_ptr begin) {
+        return begin->m_game->m_players;
     }
 }

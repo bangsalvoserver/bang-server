@@ -45,6 +45,18 @@ namespace banggame {
         void move_cubes(card_ptr target, int ncubes, bool instant = false);
         void drop_cubes();
     };
+    
+    struct card_pocket_pair {
+        card_ptr origin_card;
+        pocket_type pocket;
+    };
+
+    struct played_card_history {
+        card_pocket_pair origin_card;
+        std::vector<card_pocket_pair> modifiers;
+        bool is_response;
+        effect_context context;
+    };
 
 }
 
