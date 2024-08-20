@@ -295,7 +295,7 @@ train:
   - name: GHOST_CAR
     image: 27_ghost_car
     color: train
-    equip_target: notsheriff dead alive
+    equip_target: notsheriff dead_or_alive
     equip:
       - ghost(2)
     tags:
@@ -422,7 +422,7 @@ hidden:
     responses:
       - lounge_car_response
       - none card | selection
-      - none player notself target_set dead alive
+      - none player notself target_set dead_or_alive
     mth_response: lounge_car(1,2)
     tags:
       - preselect

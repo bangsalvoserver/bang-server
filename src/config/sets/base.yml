@@ -393,7 +393,7 @@ button_row:
 hidden:
   - name: PICK
     responses:
-      - pick card | target_set
+      - pick card dead_or_alive | target_set
     tags:
       - pick
       - preselect

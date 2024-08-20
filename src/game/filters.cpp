@@ -47,12 +47,14 @@ namespace banggame::filters {
     }
 
     game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, enums::bitset<target_player_filter> filter, const_player_ptr target, const effect_context &ctx) {
-        if (filter.check(target_player_filter::dead)) {
-            if (!filter.check(target_player_filter::alive) && !target->check_player_flags(player_flag::dead)) {
-                return {"ERROR_TARGET_NOT_DEAD", origin_card, target};
+        if (!filter.check(target_player_filter::dead_or_alive)) {
+            if (filter.check(target_player_filter::dead)) {
+                if (!target->check_player_flags(player_flag::dead))
+                    return {"ERROR_TARGET_NOT_DEAD", origin_card, target};
+            } else {
+                if (!target->alive())
+                    return {"ERROR_TARGET_DEAD", origin_card, target};
             }
-        } else if (!target->alive()) {
-            return {"ERROR_TARGET_DEAD", origin_card, target};
         }
 
         if (filter.check(target_player_filter::self) && target != origin)
