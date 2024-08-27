@@ -44,9 +44,11 @@ struct client_state {
     int ping_count = 0;
 };
 
+static constexpr size_t max_username_size = 50;
+
 struct game_user: user_info {
-    game_user(const user_info &info, id_type session_id)
-        : user_info{info}, session_id{session_id} {}
+    game_user(id_type session_id)
+        : session_id{session_id} {}
     
     id_type session_id = 0;
     lobby *in_lobby = nullptr;
@@ -59,6 +61,15 @@ struct game_user: user_info {
             return std::chrono::duration_cast<std::chrono::milliseconds>(lifetime);
         }
         return {};
+    }
+
+    void update_user_info(const user_info &info) {
+        if (info.name.size() > max_username_size) {
+            name = info.name.substr(0, max_username_size);
+        } else {
+            name = info.name;
+        }
+        profile_image = info.profile_image;
     }
 };
 

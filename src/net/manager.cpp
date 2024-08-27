@@ -142,15 +142,13 @@ void game_manager::handle_message(utils::tag<"connect">, client_state &state, co
     if (auto it = m_users.find(session_id); it != m_users.end()) {
         state.user = &it->second;
         kick_client(state.user->client, "RECONNECT_WITH_SAME_SESSION_ID");
-        static_cast<user_info &>(*state.user) = args.user;
     } else {
-        state.user = &m_users.emplace_hint(it, std::piecewise_construct,
-            std::make_tuple(session_id),
-            std::make_tuple(args.user, session_id)
-        )->second;
+        state.user = &m_users.emplace_hint(it, session_id, session_id)->second;
     }
 
+    state.user->update_user_info(args.user);
     state.user->client = state.client;
+
     state.ping_timer = ticks{};
     
     send_message<"client_accepted">(state.client, session_id);
@@ -168,7 +166,7 @@ void game_manager::handle_message(utils::tag<"pong">, client_state &state) {
 }
 
 void game_manager::handle_message(utils::tag<"user_edit">, game_user &user, const user_info &args) {
-    static_cast<user_info &>(user) = args;
+    user.update_user_info(args);
 
     if (auto *l = user.in_lobby) {
         broadcast_message_lobby<"lobby_add_user">(*l, l->get_user_id(user), args);
