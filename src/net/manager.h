@@ -14,7 +14,8 @@ namespace banggame {
 
 template<utils::fixed_string E> requires server_message_type<E>
 std::string make_message(auto && ... args) {
-    return json::serialize(server_message{utils::tag<E>{}, FWD(args) ...}).dump();
+    return json::serialize(server_message{utils::tag<E>{}, FWD(args) ...})
+        .dump(-1, ' ', true, nlohmann::json::error_handler_t::replace);
 }
 
 struct server_options {
