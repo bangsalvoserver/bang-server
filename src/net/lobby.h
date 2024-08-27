@@ -46,9 +46,8 @@ struct client_state {
 
 static constexpr size_t max_username_size = 50;
 
-struct game_user: user_info {
-    game_user(id_type session_id)
-        : session_id{session_id} {}
+struct game_user : user_info {
+    explicit game_user(id_type session_id): session_id{session_id} {}
     
     id_type session_id = 0;
     lobby *in_lobby = nullptr;
