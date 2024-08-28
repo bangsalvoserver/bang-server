@@ -1,5 +1,7 @@
 #include "game_options.h"
 
+#include "cards/card_data.h"
+
 namespace banggame {
     
     using namespace std::chrono_literals;
@@ -22,6 +24,22 @@ namespace banggame {
 }
 
 namespace json {
+
+    template<typename Context> struct deserializer<banggame::expansion_set, Context> {
+        banggame::expansion_set operator()(const json &value) const {
+            if (!value.is_array()) {
+                throw deserialize_error("Cannot deserialize expansion_set");
+            }
+
+            banggame::expansion_set result;
+            for (const banggame::ruleset_vtable *ruleset : banggame::all_cards.expansions) {
+                if (rn::contains(value, ruleset->name, [](const json &name) { return name.get<std::string_view>(); })) {
+                    result.insert(ruleset);
+                }
+            }
+            return result;
+        }
+    };
     
     banggame::game_options deserialize_game_options(const json &value) {
         banggame::game_options result = banggame::default_game_options;

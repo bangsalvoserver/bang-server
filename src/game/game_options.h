@@ -2,14 +2,12 @@
 #define __GAME_OPTIONS_H__
 
 #include "durations.h"
-#include "cards/card_defs.h"
-
-#include "utils/enum_bitset.h"
+#include "cards/card_fwd.h"
 
 namespace banggame {
     
     struct game_options {
-        enums::bitset<expansion_type> expansions;
+        expansion_set expansions;
         bool enable_ghost_cards;
         bool character_choice;
         bool quick_discard_all;

@@ -9,6 +9,7 @@
 #include "herb_hunter.h"
 #include "molly_stark.h"
 #include "pixie_pete.h"
+#include "ruleset.h"
 #include "tequila_joe.h"
 #include "molly_stark.h"
 #include "tequila_joe.h"

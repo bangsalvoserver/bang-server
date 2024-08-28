@@ -104,6 +104,12 @@ namespace json {
         }
     };
 
+    template<typename Context> struct serializer<const banggame::ruleset_vtable *, Context> {
+        json operator()(const banggame::ruleset_vtable *value) const {
+            return value->name;
+        }
+    };
+
     template<typename Context> struct serializer<banggame::card_backface_list, Context> {
         struct card_backface {
             int id;

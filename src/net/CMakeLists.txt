@@ -3,5 +3,6 @@ target_sources(bangserver PRIVATE
     logging.cpp
     main.cpp
     manager.cpp
+    messages.cpp
     wsserver.cpp
 )

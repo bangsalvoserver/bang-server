@@ -6,15 +6,13 @@
 #include "wsserver.h"
 #include "logging.h"
 
-#include "utils/json_aggregate.h"
-
 #include <random>
 
 namespace banggame {
 
 template<utils::fixed_string E> requires server_message_type<E>
 std::string make_message(auto && ... args) {
-    return json::serialize(server_message{utils::tag<E>{}, FWD(args) ...})
+    return serialize_message(server_message{utils::tag<E>{}, FWD(args) ...})
         .dump(-1, ' ', true, nlohmann::json::error_handler_t::replace);
 }
 

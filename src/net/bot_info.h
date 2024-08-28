@@ -3,6 +3,8 @@
 
 #include "messages.h"
 
+#include "cards/card_defs.h"
+
 #include "utils/fixed_string.h"
 
 namespace banggame {

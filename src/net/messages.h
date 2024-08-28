@@ -5,6 +5,7 @@
 
 #include "utils/image_pixels.h"
 #include "utils/enum_bitset.h"
+#include "utils/tagged_variant.h"
 
 namespace banggame {
     
@@ -51,6 +52,8 @@ namespace banggame {
         utils::tag<"game_rejoin", game_rejoin_args>,
         utils::tag<"game_action", json::json>
     >;
+
+    client_message deserialize_message(const json::json &value);
 
     enum class lobby_state {
         waiting,
@@ -116,6 +119,8 @@ namespace banggame {
 
     template<utils::fixed_string Name>
     concept server_message_type = utils::tag_for<utils::tag<Name>, server_message>;
+    
+    json::json serialize_message(const server_message &message);
 
 }
 

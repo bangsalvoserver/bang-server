@@ -8,7 +8,7 @@ void game_manager::on_message(client_handle client, const std::string &msg) {
     try {
         logging::info("{}: Received {}", get_client_ip(client), msg);
 
-        auto client_msg = json::deserialize<client_message>(json::json::parse(msg));
+        auto client_msg = deserialize_message(json::json::parse(msg));
         utils::visit_tagged([&](utils::tag_for<client_message> auto tag, auto && ... args) {
             auto it = m_clients.find(client);
             if (it == m_clients.end()) {

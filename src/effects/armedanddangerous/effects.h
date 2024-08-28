@@ -18,6 +18,7 @@
 #include "julie_cutter.h"
 #include "ms_abigail.h"
 #include "red_ringo.h"
+#include "ruleset.h"
 #include "rust.h"
 #include "squaw.h"
 #include "thunderer.h"

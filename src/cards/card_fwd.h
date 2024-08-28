@@ -6,6 +6,8 @@
 #include "utils/nullable.h"
 #include "utils/misc.h"
 
+#include <set>
+
 namespace banggame {
     
     struct game;
@@ -30,6 +32,10 @@ namespace banggame {
     struct equip_vtable;
     struct modifier_vtable;
     struct mth_vtable;
+
+    struct ruleset_vtable;
+
+    using expansion_set = std::set<const ruleset_vtable *>;
 
     enum class target_player_filter;
     enum class target_card_filter;

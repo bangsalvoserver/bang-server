@@ -22,6 +22,7 @@ add_custom_command(
         sets/thebullet.yml
         sets/canyondiablo.yml
         parse_bang_cards.py
+        cpp_generator.py
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 add_library(bang_cards_obj OBJECT "${bang_cards_cpp}")
@@ -56,6 +57,7 @@ add_custom_command(
         bot_propics/bot_icon_11.png
         bot_propics/bot_icon_12.png
         parse_bots.py
+        cpp_generator.py
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 add_library(bot_info_obj OBJECT "${bot_info_cpp}")

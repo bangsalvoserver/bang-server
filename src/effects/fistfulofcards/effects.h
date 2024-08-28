@@ -11,6 +11,7 @@
 #include "lawofthewest.h"
 #include "peyote.h"
 #include "ranch.h"
+#include "ruleset.h"
 #include "ricochet.h"
 #include "russianroulette.h"
 #include "sniper.h"

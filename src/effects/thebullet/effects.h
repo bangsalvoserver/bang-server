@@ -6,5 +6,6 @@
 #include "handcuffs.h"
 #include "johnny_kisch.h"
 #include "newidentity.h"
+#include "ruleset.h"
 
 #endif

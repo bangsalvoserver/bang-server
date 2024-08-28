@@ -17,7 +17,7 @@ namespace banggame {
         equip_list equips;
         tag_map tags;
 
-        enums::bitset<expansion_type> expansion;
+        expansion_set expansion;
         card_deck_type deck;
 
         modifier_holder modifier;
@@ -77,6 +77,8 @@ namespace banggame {
         std::vector<card_data> train;
         std::vector<card_data> locomotive;
         std::vector<card_data> hidden;
+
+        expansion_set expansions;
     };
 
     extern const all_cards_t all_cards;

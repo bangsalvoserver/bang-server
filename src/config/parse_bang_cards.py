@@ -157,7 +157,7 @@ def parse_all_effects(card):
             responses =    parse_effects(card['responses']) if 'responses' in card else None,
             equips =       parse_equips(card['equip']) if 'equip' in card else None,
             tags =         parse_tags(card['tags']) if 'tags' in card else None,
-            expansion =    [CppEnum('expansion_type', f) for f in card['expansion'].split()] if 'expansion' in card else None,
+            expansion =    [CppLiteral(f"GET_RULESET({f})") for f in card['expansion'].split()] if 'expansion' in card else None,
             deck =         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
             modifier =     CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier']})")) if 'modifier' in card else None,
             modifier_response = CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier_response']})")) if 'modifier_response' in card else None,
@@ -172,9 +172,12 @@ def parse_all_effects(card):
 
 def merge_cards(card_sets):
     result = {}
+    expansions = []
     if not isinstance(card_sets, dict):
         raise RuntimeError(f'Error in merge_cards: Expected dict, got {card_sets}')
     for expansion, card_set in card_sets.items():
+        if expansion != 'base':
+            expansions.append(expansion)
         for deck, cards in card_set.items():
             if not isinstance(cards, list):
                 raise RuntimeError(f'Error in merge_cards: Expected list, got {cards}')
@@ -188,9 +191,9 @@ def merge_cards(card_sets):
                 result[deck].extend(cards)
             else:
                 result[deck] = cards
-    return result
+    return result, expansions
 
-def parse_file(data):
+def parse_file(data, expansions):
     def get_main_deck_cards(card):
         for sign in card['signs']:
             card['sign'] = sign
@@ -231,7 +234,12 @@ def parse_file(data):
             return card
         return deck.key or key, list(parse_all_effects(card) for c in cards for card in deck.strategy(add_deck(c)))
 
-    return CppObject(**dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order)))
+    return CppObject(
+        **dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order)),
+        expansions = [
+            CppLiteral(f"GET_RULESET({expansion})") for expansion in expansions
+        ]
+    )
 
 INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/filter_enums.h', 'effects/effects.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
@@ -242,7 +250,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     with open(sys.argv[1], 'r', encoding='utf8') as file:
-        bang_cards = parse_file(merge_cards(yaml.safe_load(file)))
+        bang_cards = parse_file(*merge_cards(yaml.safe_load(file)))
     
     if sys.argv[2] == '-':
         print_cpp_file(bang_cards, OBJECT_DECLARATION,

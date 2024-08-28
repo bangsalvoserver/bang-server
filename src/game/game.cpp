@@ -5,7 +5,6 @@
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
-#include "effects/rulesets.h"
 #include "effects/base/requests.h"
 #include "effects/base/deathsave.h"
 
@@ -184,15 +183,20 @@ namespace banggame {
         return sign;
     }
 
+    static bool matches_expansions(const expansion_set &lhs, const expansion_set &rhs) {
+        for (const ruleset_vtable *ruleset : lhs) {
+            if (!rhs.contains(ruleset)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     void game::start_game(const game_options &options) {
         m_options = options;
 
-        for (expansion_type expansion : enums::enum_values<expansion_type>()) {
-            if (m_options.expansions.check(expansion)) {
-                if (const ruleset_vtable *vtable = get_ruleset_vtable(expansion)) {
-                    vtable->on_apply(this);
-                }
-            }
+        for (const ruleset_vtable *ruleset : m_options.expansions) {
+            ruleset->on_apply(this);
         }
 
         add_update<"player_add">(m_players);
@@ -204,7 +208,9 @@ namespace banggame {
 
             int count = 0;
             for (const card_data &c : cards) {
-                if (!c.expansion.check(m_options.expansions)) continue;
+                if (!matches_expansions(c.expansion, m_options.expansions)) {
+                    continue;
+                }
 
                 if (c.has_tag(tag_type::ghost_card)) {
                     if (m_options.enable_ghost_cards) {

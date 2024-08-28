@@ -59,19 +59,6 @@ namespace banggame {
         }
     };
 
-    enum class expansion_type {
-        dodgecity,
-        goldrush,
-        armedanddangerous,
-        greattrainrobbery,
-        valleyofshadows,
-        highnoon,
-        fistfulofcards,
-        wildwestshow,
-        thebullet,
-        canyondiablo,
-    };
-
     enum class card_color_type {
         none,
         brown,

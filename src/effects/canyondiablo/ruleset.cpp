@@ -15,7 +15,7 @@ namespace banggame {
             }
         });
 
-        if (!game->m_options.expansions.check(expansion_type::dodgecity)) {
+        if (!game->m_options.expansions.contains(GET_RULESET(dodgecity))) {
             ruleset_dodgecity{}.on_apply(game);
         }
     }

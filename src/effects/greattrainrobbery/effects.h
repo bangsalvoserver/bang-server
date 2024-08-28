@@ -25,6 +25,7 @@
 #include "prisoner_car.h"
 #include "private_car.h"
 #include "refund.h"
+#include "ruleset.h"
 #include "shade_oconnor.h"
 #include "sgt_blaze.h"
 #include "strongbox.h"
