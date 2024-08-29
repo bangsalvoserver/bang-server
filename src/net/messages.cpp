@@ -1,7 +1,7 @@
 #include "messages.h"
 
 #include "utils/json_aggregate.h"
-#include "cards/vtable_ruleset.h"
+#include "cards/vtables.h"
 
 namespace json {
 

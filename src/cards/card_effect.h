@@ -5,11 +5,7 @@
 
 #include "game/request_base.h"
 
-#include "vtable_effect.h"
-#include "vtable_equip.h"
-#include "vtable_modifier.h"
-#include "vtable_mth.h"
-#include "vtable_ruleset.h"
+#include "vtables.h"
 
 namespace banggame {
 

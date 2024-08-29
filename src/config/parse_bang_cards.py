@@ -241,7 +241,7 @@ def parse_file(data, expansions):
         ]
     )
 
-INCLUDE_FILENAMES = ['cards/card_data.h', 'cards/filter_enums.h', 'effects/effects.h']
+INCLUDE_FILENAMES = ['cards/vtable_build.h', 'cards/filter_enums.h', 'effects/effects.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':

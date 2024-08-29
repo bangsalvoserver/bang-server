@@ -7,10 +7,6 @@
 
 namespace banggame::filters {
 
-    bool is_player_bot(const_player_ptr origin) {
-        return origin->is_bot();
-    }
-
     bool is_equip_card(const_card_ptr target) {
         switch (target->pocket) {
         case pocket_type::player_hand:
@@ -21,10 +17,6 @@ namespace banggame::filters {
         default:
             return false;
         }
-    }
-
-    bool is_modifier_card(const_player_ptr origin, const_card_ptr origin_card) {
-        return bool(origin_card->get_modifier(origin->m_game->pending_requests()));
     }
 
     bool is_bang_card(const_player_ptr origin, const_card_ptr target) {
