@@ -5,9 +5,7 @@
 
 namespace banggame {
 
-    struct ruleset_wildwestshow {
-        void on_apply(game *game) {}
-    };
+    struct ruleset_wildwestshow {};
 
     DEFINE_RULESET(wildwestshow, ruleset_wildwestshow)
 

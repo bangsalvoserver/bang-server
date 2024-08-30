@@ -5,9 +5,7 @@
 
 namespace banggame {
 
-    struct ruleset_thebullet {
-        void on_apply(game *game) {}
-    };
+    struct ruleset_thebullet {};
 
     DEFINE_RULESET(thebullet, ruleset_thebullet)
 
