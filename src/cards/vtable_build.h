@@ -24,13 +24,13 @@ namespace banggame {
                 T value = build_effect<T>(effect_value);
                 if constexpr (requires { value.get_error(origin_card, origin, ctx); }) {
                     return value.get_error(origin_card, origin, ctx);
-                } else if constexpr (requires (T value) { value.get_error(origin_card, origin); }) {
+                } else if constexpr (requires { value.get_error(origin_card, origin); }) {
                     return value.get_error(origin_card, origin);
-                } else if constexpr (requires (T value) { value.can_play(origin_card, origin, ctx); }) {
+                } else if constexpr (requires { value.can_play(origin_card, origin, ctx); }) {
                     if (!value.can_play(origin_card, origin, ctx)) {
                         return "ERROR_INVALID_ACTION";
                     }
-                } else if constexpr (requires (T value) { value.can_play(origin_card, origin); }) {
+                } else if constexpr (requires { value.can_play(origin_card, origin); }) {
                     if (!value.can_play(origin_card, origin)) {
                         return "ERROR_INVALID_ACTION";
                     }
@@ -53,7 +53,7 @@ namespace banggame {
                 return {};
             },
 
-            .add_context = [](int effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx){
+            .add_context = [](int effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx) {
                 T value = build_effect<T>(effect_value);
                 if constexpr (requires { value.add_context(origin_card, origin, ctx); }) {
                     value.add_context(origin_card, origin, ctx);
@@ -219,38 +219,40 @@ namespace banggame {
             .name = name,
 
             .add_context = [](card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-                if constexpr (requires (T value) { value.add_context(origin_card, origin, ctx); }) {
-                    T{}.add_context(origin_card, origin, ctx);
+                T handler{};
+                if constexpr (requires { handler.add_context(origin_card, origin, ctx); }) {
+                    handler.add_context(origin_card, origin, ctx);
                 }
             },
 
             .get_error = [](card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) -> game_string {
+                T handler{};
                 if (filters::is_equip_card(target_card)) {
-                    if constexpr (requires (T handler) { handler.valid_with_equip(origin_card, origin, target_card); }) {
-                        if (T{}.valid_with_equip(origin_card, origin, target_card)) {
+                    if constexpr (requires { handler.valid_with_equip(origin_card, origin, target_card); }) {
+                        if (handler.valid_with_equip(origin_card, origin, target_card)) {
                             return {};
                         } else {
                             return {"ERROR_CANT_PLAY_WHILE_EQUIPPING", origin_card, target_card};
                         }
                     }
                 } else if (target_card->get_modifier(origin->m_game->pending_requests())) {
-                    if constexpr (requires (T handler) { handler.valid_with_modifier(origin_card, origin, target_card); }) {
-                        if (T{}.valid_with_modifier(origin_card, origin, target_card)) {
+                    if constexpr (requires { handler.valid_with_modifier(origin_card, origin, target_card); }) {
+                        if (handler.valid_with_modifier(origin_card, origin, target_card)) {
                             return {};
                         } else {
                             return {"ERROR_NOT_ALLOWED_WITH_MODIFIER", origin_card, target_card};
                         }
                     }
                 }
-                if constexpr (requires (T handler) { handler.valid_with_card(origin_card, origin, target_card); }) {
-                    if (!T{}.valid_with_card(origin_card, origin, target_card)) {
+                if constexpr (requires { handler.valid_with_card(origin_card, origin, target_card); }) {
+                    if (!handler.valid_with_card(origin_card, origin, target_card)) {
                         return {"ERROR_NOT_ALLOWED_WITH_CARD", origin_card, target_card};
                     }
                 }
-                if constexpr (requires (T handler) { handler.get_error(origin_card, origin, target_card, ctx); }) {
-                    return T{}.get_error(origin_card, origin, target_card, ctx);
-                } else if constexpr (requires (T handler) { handler.get_error(origin_card, origin, target_card); }) {
-                    return T{}.get_error(origin_card, origin, target_card);
+                if constexpr (requires { handler.get_error(origin_card, origin, target_card, ctx); }) {
+                    return handler.get_error(origin_card, origin, target_card, ctx);
+                } else if constexpr (requires { handler.get_error(origin_card, origin, target_card); }) {
+                    return handler.get_error(origin_card, origin, target_card);
                 }
                 return {};
             }
@@ -385,8 +387,9 @@ namespace banggame {
             .name = name,
 
             .on_apply = [](game *game) {
-                if constexpr (requires (T value) { value.on_apply(game); }) {
-                    T{}.on_apply(game);
+                T value{};
+                if constexpr (requires { value.on_apply(game); }) {
+                    value.on_apply(game);
                 }
             }
         };
