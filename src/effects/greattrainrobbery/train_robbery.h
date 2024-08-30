@@ -15,7 +15,7 @@ namespace banggame {
     DEFINE_EFFECT(train_robbery, effect_train_robbery)
 
     struct effect_train_robbery_response {
-        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target);
+        bool can_play(card_ptr origin_card, player_ptr origin);
         void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
     };

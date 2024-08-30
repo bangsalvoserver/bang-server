@@ -8,7 +8,7 @@
 namespace banggame {
 
     struct effect_evan_babbit : bot_suggestion::target_enemy {
-        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target_player);
+        bool can_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target_player);
     };
 

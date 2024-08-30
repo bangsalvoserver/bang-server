@@ -79,6 +79,14 @@ namespace banggame {
                     return value.get_error(origin_card, origin, target, ctx);
                 } else if constexpr (requires { value.get_error(origin_card, origin, target); }) {
                     return value.get_error(origin_card, origin, target);
+                } else if constexpr (requires { value.can_play(origin_card, origin, ctx); }) {
+                    if (!value.can_play(origin_card, origin, ctx)) {
+                        return "ERROR_INVALID_ACTION";
+                    }
+                } else if constexpr (requires { value.can_play(origin_card, origin); }) {
+                    if (!value.can_play(origin_card, origin)) {
+                        return "ERROR_INVALID_ACTION";
+                    }
                 }
                 return {};
             },
@@ -124,6 +132,14 @@ namespace banggame {
                     return value.get_error(origin_card, origin, target, ctx);
                 } else if constexpr (requires { value.get_error(origin_card, origin, target); }) {
                     return value.get_error(origin_card, origin, target);
+                } else if constexpr (requires { value.can_play(origin_card, origin, ctx); }) {
+                    if (!value.can_play(origin_card, origin, ctx)) {
+                        return "ERROR_INVALID_ACTION";
+                    }
+                } else if constexpr (requires { value.can_play(origin_card, origin); }) {
+                    if (!value.can_play(origin_card, origin)) {
+                        return "ERROR_INVALID_ACTION";
+                    }
                 }
                 return {};
             },

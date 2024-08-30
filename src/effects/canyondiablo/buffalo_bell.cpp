@@ -10,11 +10,8 @@
 
 namespace banggame {
 
-    game_string effect_buffalo_bell::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        if (!effect_missed{}.can_play(origin_card, origin)) {
-            return "ERROR_INVALID_ACTION";
-        }
-        return {};
+    bool effect_buffalo_bell::can_play(card_ptr origin_card, player_ptr origin) {
+        return effect_missed{}.can_play(origin_card, origin);
     }
 
     static int get_card_suit_sum(player_ptr origin, card_ptr target_card) {

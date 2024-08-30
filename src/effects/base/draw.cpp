@@ -18,14 +18,9 @@ namespace banggame {
         });
     }
 
-    game_string effect_draw_discard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (target->m_game->m_discards.empty()) {
-            return "ERROR_DISCARD_PILE_EMPTY";
-        }
-        if (target->m_game->check_flags(game_flag::phase_one_draw_discard)) {
-            return "ERROR_INVALID_ACTION";
-        }
-        return {};
+    bool effect_draw_discard::can_play(card_ptr origin_card, player_ptr origin) {
+        return !origin->m_game->m_discards.empty()
+            && !origin->m_game->check_flags(game_flag::phase_one_draw_discard);
     }
     
     void effect_draw_discard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {

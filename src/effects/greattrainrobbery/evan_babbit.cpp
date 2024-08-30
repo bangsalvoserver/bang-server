@@ -8,19 +8,12 @@
 
 namespace banggame {
 
-    game_string effect_evan_babbit::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    bool effect_evan_babbit::can_play(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request<request_bang>(origin)) {
-            if (req->num_cards_used()) {
-                return "ERROR_INVALID_ACTION";
-            }
-            
-            if (!req->flags.check(effect_flag::is_bang)) {
-                return "ERROR_INVALID_ACTION";
-            }
-
-            return {};
+            return req->num_cards_used() == 0
+                && req->flags.check(effect_flag::is_bang);
         } else {
-            return "ERROR_INVALID_ACTION";
+            return false;
         }
     }
 

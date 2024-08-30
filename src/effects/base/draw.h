@@ -31,10 +31,7 @@ namespace banggame {
     DEFINE_EFFECT(queue_draw, effect_queue_draw)
 
     struct effect_draw_discard {
-        game_string get_error(card_ptr origin_card, player_ptr origin) {
-            return get_error(origin_card, origin, origin);
-        }
-        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
+        bool can_play(card_ptr origin_card, player_ptr origin);
 
         void on_play(card_ptr origin_card, player_ptr origin) {
             return on_play(origin_card, origin, origin);

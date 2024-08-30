@@ -51,11 +51,8 @@ namespace banggame {
         origin->m_game->queue_request<request_train_robbery>(origin_card, origin, target, flags, 20);
     }
 
-    game_string effect_train_robbery_response::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        if (auto req = origin->m_game->top_request<request_train_robbery>(origin)) {
-            return {};
-        }
-        return "ERROR_INVALID_ACTION";
+    bool effect_train_robbery_response::can_play(card_ptr origin_card, player_ptr origin) {
+        return origin->m_game->top_request<request_train_robbery>(origin) != nullptr;
     }
 
     void effect_train_robbery_response::add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) {
