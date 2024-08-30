@@ -7,11 +7,8 @@
 
 namespace banggame {
 
-    game_string effect_pick::get_error(card_ptr origin_card, player_ptr origin, card_ptr target) {
-        if (auto req = origin->m_game->top_request<interface_picking>(origin)) {
-            return {};
-        }
-        return "ERROR_INVALID_ACTION";
+    bool effect_pick::can_play(card_ptr origin_card, player_ptr origin) {
+        return origin->m_game->top_request<interface_picking>(origin) != nullptr;
     }
 
     game_string effect_pick::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) {
@@ -31,18 +28,15 @@ namespace banggame {
         return target_player->alive() && can_pick(target_player);
     }
 
-    game_string effect_pick::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (auto req = origin->m_game->top_request<interface_picking_player>(origin)) {
-            return {};
-        }
-        return "ERROR_INVALID_ACTION";
+    bool effect_pick_player::can_play(card_ptr origin_card, player_ptr origin) {
+        return origin->m_game->top_request<interface_picking_player>(origin) != nullptr;
     }
 
-    game_string effect_pick::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    game_string effect_pick_player::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
         return origin->m_game->top_request<interface_picking_player>()->pick_prompt(target);
     }
 
-    void effect_pick::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_pick_player::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
         auto req = origin->m_game->top_request<interface_picking_player>();
         req->on_pick(target);
     }

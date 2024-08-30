@@ -363,7 +363,7 @@ namespace banggame {
             .get_error = [](card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> game_string {
                 if constexpr (requires { mth_unwrapper{&T::get_error}; }) {
                     return mth_unwrapper{&T::get_error}(origin_card, origin, targets, args, ctx);
-                } else  if constexpr (requires { mth_unwrapper{&T::can_play}; }) {
+                } else if constexpr (requires { mth_unwrapper{&T::can_play}; }) {
                     if (!mth_unwrapper{&T::can_play}(origin_card, origin, targets, args, ctx)) {
                         return "ERROR_INVALID_ACTION";
                     }
