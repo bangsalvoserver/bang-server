@@ -17,8 +17,10 @@ namespace banggame {
     }
 
     bool effect_can_play_card::can_play(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<request_can_play_card>(origin);
-        return req && req->origin_card == origin_card;
+        if (auto req = origin->m_game->top_request<request_can_play_card>(origin)) {
+            return req->origin_card == origin_card;
+        }
+        return false;
     }
 
     void effect_can_play_card::on_play(card_ptr origin_card, player_ptr origin) {

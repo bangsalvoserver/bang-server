@@ -135,8 +135,10 @@ namespace banggame {
     }
     
     bool effect_no_cards_drawn::can_play(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<request_draw>(origin);
-        return req && req->num_drawn_cards == 0;
+        if (auto req = origin->m_game->top_request<request_draw>(origin)) {
+            return req->num_drawn_cards == 0;
+        }
+        return false;
     }
 
     void effect_add_draw_card::on_play(card_ptr origin_card, player_ptr origin) {
