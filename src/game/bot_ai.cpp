@@ -22,7 +22,7 @@ namespace banggame {
             }
         }
 
-        if (filters::is_equip_card(args.card)) {
+        if (args.card->is_equip_card()) {
             if (!args.card->self_equippable()) {
                 ret.targets.emplace_back(utils::tag<"player">{},
                     random_element(get_all_equip_targets(origin, args.card, ctx), origin->m_game->bot_rng));

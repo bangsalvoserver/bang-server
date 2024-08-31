@@ -63,7 +63,7 @@ namespace banggame {
             return false;
         }
 
-        if (filters::is_equip_card(origin_card)) {
+        if (origin_card->is_equip_card()) {
             if (is_response || get_all_equip_targets(origin, origin_card, ctx).empty()) {
                 return false;
             }
@@ -94,7 +94,7 @@ namespace banggame {
             }
         }
         
-        return origin->m_gold >= filters::get_card_cost(origin_card, is_response, ctx);
+        return origin->m_gold >= origin_card->get_card_cost(is_response, ctx);
     }
 
     static void collect_playable_cards(
@@ -102,7 +102,7 @@ namespace banggame {
         player_ptr origin, card_ptr origin_card, bool is_response, effect_context ctx
     ) {
         const modifier_holder &modifier = origin_card->get_modifier(is_response);
-        if (filters::is_equip_card(origin_card) || !modifier) {
+        if (origin_card->is_equip_card() || !modifier) {
             if (modifiers.empty()) {
                 result.emplace_back(origin_card);
             } else {

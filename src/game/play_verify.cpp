@@ -193,7 +193,7 @@ namespace banggame {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
         } else {
-            MAYBE_RETURN(filters::check_player_filter(origin_card, origin, origin_card->equip_target, target));
+            MAYBE_RETURN(check_player_filter(origin_card, origin, origin_card->equip_target, target));
         }
         if (card_ptr equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};
@@ -208,7 +208,7 @@ namespace banggame {
 
         MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
 
-        if (filters::is_equip_card(origin_card)) {
+        if (origin_card->is_equip_card()) {
             MAYBE_RETURN(verify_equip_target(origin, origin_card, is_response, targets, ctx));
         } else if (origin_card->get_modifier(is_response)) {
             return "ERROR_CARD_IS_MODIFIER";
@@ -218,7 +218,7 @@ namespace banggame {
 
         MAYBE_RETURN(get_play_card_error(origin, origin_card, ctx));
         
-        if (origin->m_gold < filters::get_card_cost(origin_card, is_response, ctx)) {
+        if (origin->m_gold < origin_card->get_card_cost(is_response, ctx)) {
             return "ERROR_NOT_ENOUGH_GOLD";
         }
 
@@ -247,7 +247,7 @@ namespace banggame {
         for (const auto &[mod_card, mod_targets] : modifiers) {
             MAYBE_RETURN(get_play_prompt(origin, mod_card, is_response, mod_targets, ctx));
         }
-        if (filters::is_equip_card(origin_card)) {
+        if (origin_card->is_equip_card()) {
             return get_equip_prompt(origin, origin_card, get_equip_target(origin, origin_card, targets));
         } else {
             return get_play_prompt(origin, origin_card, is_response, targets, ctx);
@@ -414,13 +414,13 @@ namespace banggame {
             origin->m_played_cards.push_back(make_played_card_history(args, is_response, ctx));
         }
 
-        origin->add_gold(-filters::get_card_cost(args.card, is_response, ctx));
+        origin->add_gold(-args.card->get_card_cost(is_response, ctx));
 
         for (const auto &[mod_card, mod_targets] : args.modifiers) {
             apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
         }
 
-        if (filters::is_equip_card(args.card)) {
+        if (args.card->is_equip_card()) {
             apply_equip(origin, args.card, get_equip_target(origin, args.card, args.targets), ctx);
         } else {
             apply_target_list(origin, args.card, is_response, args.targets, ctx);

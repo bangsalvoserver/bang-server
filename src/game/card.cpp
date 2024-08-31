@@ -1,9 +1,44 @@
 #include "card.h"
 #include "game.h"
 
+#include "cards/filter_enums.h"
+#include "cards/game_enums.h"
+
 #include "effects/armedanddangerous/ruleset.h"
 
 namespace banggame {
+
+    bool card::is_equip_card() const {
+        switch (pocket) {
+        case pocket_type::player_hand:
+        case pocket_type::shop_selection:
+            return !is_brown();
+        case pocket_type::train:
+            return deck != card_deck_type::locomotive;
+        default:
+            return false;
+        }
+    }
+
+    bool card::is_bang_card(const_player_ptr origin) const {
+        return m_game->check_flags(game_flag::treat_any_as_bang)
+            || origin->check_player_flags(player_flag::treat_any_as_bang)
+            || has_tag(tag_type::bangcard)
+            || origin->check_player_flags(player_flag::treat_missed_as_bang)
+            && has_tag(tag_type::missed);
+    }
+
+    int card::get_card_cost(bool is_response, const effect_context &ctx) const {
+        const_card_ptr target = this;
+        if (!is_response && !ctx.repeat_card && target->pocket != pocket_type::player_table) {
+            if (ctx.card_choice) {
+                target = ctx.card_choice;
+            }
+            return target->get_tag_value(tag_type::buy_cost).value_or(0) - ctx.discount;
+        } else {
+            return 0;
+        }
+    }
     
     card_sign card::get_modified_sign() const {
         auto value = sign;

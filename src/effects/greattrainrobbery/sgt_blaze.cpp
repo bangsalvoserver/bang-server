@@ -15,7 +15,7 @@ namespace banggame {
     game_string modifier_sgt_blaze::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
         for (const effect_holder &effect : playing_card->get_effect_list(origin->m_game->pending_requests())) {
             if (effect.target == TARGET_TYPE(players) || effect.target == TARGET_TYPE(card_per_player)) {
-                if (ctx.skipped_player && filters::check_player_filter(playing_card, origin, effect.player_filter, ctx.skipped_player, ctx)) {
+                if (ctx.skipped_player && check_player_filter(playing_card, origin, effect.player_filter, ctx.skipped_player, ctx)) {
                     return {"ERROR_CANNOT_SKIP_PLAYER", ctx.skipped_player};
                 } else {
                     return {};

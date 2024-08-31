@@ -5,38 +5,7 @@
 
 #include "game.h"
 
-namespace banggame::filters {
-
-    bool is_equip_card(const_card_ptr target) {
-        switch (target->pocket) {
-        case pocket_type::player_hand:
-        case pocket_type::shop_selection:
-            return !target->is_brown();
-        case pocket_type::train:
-            return target->deck != card_deck_type::locomotive;
-        default:
-            return false;
-        }
-    }
-
-    bool is_bang_card(const_player_ptr origin, const_card_ptr target) {
-        return origin->m_game->check_flags(game_flag::treat_any_as_bang)
-            || origin->check_player_flags(player_flag::treat_any_as_bang)
-            || target->has_tag(tag_type::bangcard)
-            || origin->check_player_flags(player_flag::treat_missed_as_bang)
-            && target->has_tag(tag_type::missed);
-    }
-
-    int get_card_cost(const_card_ptr target, bool is_response, const effect_context &ctx) {
-        if (!is_response && !ctx.repeat_card && target->pocket != pocket_type::player_table) {
-            if (ctx.card_choice) {
-                target = ctx.card_choice;
-            }
-            return target->get_tag_value(tag_type::buy_cost).value_or(0) - ctx.discount;
-        } else {
-            return 0;
-        }
-    }
+namespace banggame {
 
     game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, enums::bitset<target_player_filter> filter, const_player_ptr target, const effect_context &ctx) {
         if (!filter.check(target_player_filter::dead_or_alive)) {
@@ -133,7 +102,7 @@ namespace banggame::filters {
         if (filter.check(target_card_filter::beer) && !target->has_tag(tag_type::beer))
             return "ERROR_TARGET_NOT_BEER";
 
-        if (filter.check(target_card_filter::bang) && !is_bang_card(origin, target))
+        if (filter.check(target_card_filter::bang) && !target->is_bang_card(origin))
             return "ERROR_TARGET_NOT_BANG";
 
         if (filter.check(target_card_filter::bangcard) && !target->has_tag(tag_type::bangcard))
