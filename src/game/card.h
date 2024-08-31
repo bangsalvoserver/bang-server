@@ -34,6 +34,8 @@ namespace banggame {
         bool inactive = false;
         int8_t num_cubes = 0;
 
+        card_sign get_modified_sign() const;
+
         void set_visibility(card_visibility visibility, player_ptr owner = nullptr, bool instant = false);
         void move_to(pocket_type pocket, player_ptr owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false, bool front = false);
         void set_inactive(bool inactive);

@@ -50,7 +50,7 @@ namespace banggame {
             }
             
             if (auto aces = rv::filter(target->m_game->m_selection, [this](card_ptr c) {
-                return target->m_game->get_card_sign(c).rank == card_rank::rank_A;
+                return c->get_modified_sign().rank == card_rank::rank_A;
             })) {
                 for (card_ptr c : aces) {
                     c->flash_card();

@@ -4,6 +4,12 @@
 #include "effects/armedanddangerous/ruleset.h"
 
 namespace banggame {
+    
+    card_sign card::get_modified_sign() const {
+        auto value = sign;
+        m_game->call_event(event_type::apply_sign_modifier{ value });
+        return value;
+    }
 
     void card::set_visibility(card_visibility new_visibility, player_ptr new_owner, bool instant) {
         animation_duration duration = instant ? 0ms : durations.flip_card;

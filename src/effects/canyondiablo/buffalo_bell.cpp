@@ -15,10 +15,10 @@ namespace banggame {
     }
 
     static int get_card_suit_sum(player_ptr origin, card_ptr target_card) {
-        int sum = static_cast<int>(origin->m_game->get_card_sign(target_card).rank) + 1;
+        int sum = static_cast<int>(target_card->get_modified_sign().rank) + 1;
         card_ptr origin_card = origin->m_game->top_request()->origin_card;
         if (origin_card) {
-            sum += static_cast<int>(origin->m_game->get_card_sign(origin_card).rank) + 1;
+            sum += static_cast<int>(origin_card->get_modified_sign().rank) + 1;
         }
         return sum;
     }

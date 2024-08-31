@@ -10,7 +10,7 @@ namespace banggame {
             if (origin == target && req_draw->num_drawn_cards == 2) {
                 reveal = true;
 
-                if (target->m_game->get_card_sign(drawn_card).is_red()) {
+                if (drawn_card->get_modified_sign().is_red()) {
                     ++req_draw->num_cards_to_draw;
                 }
             }

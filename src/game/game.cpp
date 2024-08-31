@@ -177,12 +177,6 @@ namespace banggame {
         }
     }
 
-    card_sign game::get_card_sign(card_ptr target_card) {
-        auto sign = target_card->sign;
-        call_event(event_type::apply_sign_modifier{ sign });
-        return sign;
-    }
-
     static bool matches_expansions(const expansion_set &lhs, const expansion_set &rhs) {
         for (const ruleset_vtable *ruleset : lhs) {
             if (!rhs.contains(ruleset)) {

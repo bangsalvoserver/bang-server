@@ -41,7 +41,7 @@ namespace banggame {
         }
 
         bool is_lucky() const {
-            return origin->m_game->get_card_sign(drawn_card).is_red();
+            return drawn_card->get_modified_sign().is_red();
         }
 
         bool bot_check_redraw(card_ptr target_card, player_ptr owner) const override {

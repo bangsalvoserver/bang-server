@@ -67,7 +67,7 @@ namespace banggame {
     }
 
     bool request_check_base::is_lucky(card_ptr target_card) const {
-        return check_condition(target->m_game->get_card_sign(target_card));
+        return check_condition(target_card->get_modified_sign());
     }
 
     bool request_check_base::bot_check_redraw(card_ptr target_card, player_ptr owner) const {

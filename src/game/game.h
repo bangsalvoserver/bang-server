@@ -15,8 +15,6 @@ namespace banggame {
         utils::generator<json::json> get_game_log_updates(player_ptr target);
         utils::generator<json::json> get_rejoin_updates(player_ptr target);
 
-        card_sign get_card_sign(card_ptr c);
-
         card_ptr add_card(const card_data &data);
         void add_players(std::span<int> user_ids);
         void start_game(const game_options &options);
