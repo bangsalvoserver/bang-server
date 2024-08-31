@@ -37,8 +37,11 @@ namespace banggame {
         req->on_miss(origin_card, effect_flag::is_missed);
     }
 
-    bool handler_play_as_missed::can_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        return effect_missedcard{}.can_play(target_card, origin);
+    game_string handler_play_as_missed::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        if (!effect_missedcard{}.can_play(target_card, origin)) {
+            return {"ERROR_CANT_PLAY_CARD", target_card};
+        }
+        return {};
     }
 
     game_string handler_play_as_missed::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {

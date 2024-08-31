@@ -20,7 +20,7 @@ namespace banggame {
     DEFINE_EFFECT(missedcard, effect_missedcard)
 
     struct handler_play_as_missed {
-        bool can_play(card_ptr origin_card, player_ptr origin, card_ptr target_card);
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card);
         game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card);
     };

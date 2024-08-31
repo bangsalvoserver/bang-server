@@ -12,6 +12,7 @@ PRIVATE
     event_map.cpp
     filters.cpp
     player.cpp
+    play_dispatch.cpp
     play_verify.cpp
     possible_to_play.cpp
     request_queue.cpp

@@ -118,6 +118,8 @@ namespace banggame {
             return type != nullptr;
         }
 
+        bool can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;

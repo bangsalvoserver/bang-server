@@ -9,6 +9,8 @@ namespace banggame {
 
     struct effect_vtable {
         std::string_view name;
+
+        bool (*can_play)(int effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx);
         
         game_string (*get_error)(int effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx);
         game_string (*on_prompt)(int effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx);
@@ -25,6 +27,10 @@ namespace banggame {
         void (*add_context_card)(int effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
         void (*on_play_card)(int effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx);
     };
+    
+    inline bool effect_holder::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+        return type->can_play(effect_value, origin_card, origin, ctx);
+    }
     
     inline game_string effect_holder::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
         return type->get_error(effect_value, origin_card, origin, ctx);

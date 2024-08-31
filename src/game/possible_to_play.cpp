@@ -70,7 +70,8 @@ namespace banggame {
         } else {
             const auto &effects = origin_card->get_effect_list(is_response);
             if (effects.empty() || !rn::all_of(effects, [&](const effect_holder &effect) {
-                return play_dispatch::possible(origin, origin_card, effect, ctx);
+                return effect.can_play(origin_card, origin, ctx)
+                    && play_dispatch::possible(origin, origin_card, effect, ctx);
             })) {
                 return false;
             }

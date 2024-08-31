@@ -20,20 +20,22 @@ namespace banggame {
         return {
             .name = name,
 
+            .can_play = [](int effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> bool {
+                T value = build_effect<T>(effect_value);
+                if constexpr (requires { value.can_play(origin_card, origin, ctx); }) {
+                    return value.can_play(origin_card, origin, ctx);
+                } else if constexpr (requires { value.can_play(origin_card, origin); }) {
+                    return value.can_play(origin_card, origin);
+                }
+                return true;
+            },
+
             .get_error = [](int effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> game_string {
                 T value = build_effect<T>(effect_value);
                 if constexpr (requires { value.get_error(origin_card, origin, ctx); }) {
                     return value.get_error(origin_card, origin, ctx);
                 } else if constexpr (requires { value.get_error(origin_card, origin); }) {
                     return value.get_error(origin_card, origin);
-                } else if constexpr (requires { value.can_play(origin_card, origin, ctx); }) {
-                    if (!value.can_play(origin_card, origin, ctx)) {
-                        return "ERROR_INVALID_ACTION";
-                    }
-                } else if constexpr (requires { value.can_play(origin_card, origin); }) {
-                    if (!value.can_play(origin_card, origin)) {
-                        return "ERROR_INVALID_ACTION";
-                    }
                 }
                 return {};
             },
@@ -79,14 +81,6 @@ namespace banggame {
                     return value.get_error(origin_card, origin, target, ctx);
                 } else if constexpr (requires { value.get_error(origin_card, origin, target); }) {
                     return value.get_error(origin_card, origin, target);
-                } else if constexpr (requires { value.can_play(origin_card, origin, ctx); }) {
-                    if (!value.can_play(origin_card, origin, ctx)) {
-                        return "ERROR_INVALID_ACTION";
-                    }
-                } else if constexpr (requires { value.can_play(origin_card, origin); }) {
-                    if (!value.can_play(origin_card, origin)) {
-                        return "ERROR_INVALID_ACTION";
-                    }
                 }
                 return {};
             },
@@ -132,14 +126,6 @@ namespace banggame {
                     return value.get_error(origin_card, origin, target, ctx);
                 } else if constexpr (requires { value.get_error(origin_card, origin, target); }) {
                     return value.get_error(origin_card, origin, target);
-                } else if constexpr (requires { value.can_play(origin_card, origin, ctx); }) {
-                    if (!value.can_play(origin_card, origin, ctx)) {
-                        return "ERROR_INVALID_ACTION";
-                    }
-                } else if constexpr (requires { value.can_play(origin_card, origin); }) {
-                    if (!value.can_play(origin_card, origin)) {
-                        return "ERROR_INVALID_ACTION";
-                    }
                 }
                 return {};
             },
@@ -363,10 +349,6 @@ namespace banggame {
             .get_error = [](card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> game_string {
                 if constexpr (requires { mth_unwrapper{&T::get_error}; }) {
                     return mth_unwrapper{&T::get_error}(origin_card, origin, targets, args, ctx);
-                } else if constexpr (requires { mth_unwrapper{&T::can_play}; }) {
-                    if (!mth_unwrapper{&T::can_play}(origin_card, origin, targets, args, ctx)) {
-                        return "ERROR_INVALID_ACTION";
-                    }
                 }
                 return {};
             },
