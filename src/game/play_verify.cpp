@@ -218,7 +218,7 @@ namespace banggame {
 
         MAYBE_RETURN(get_play_card_error(origin, origin_card, ctx));
         
-        if (origin->m_gold < origin_card->get_card_cost(is_response, ctx)) {
+        if (!is_response && origin->m_gold < origin_card->get_card_cost(ctx)) {
             return "ERROR_NOT_ENOUGH_GOLD";
         }
 
@@ -414,7 +414,9 @@ namespace banggame {
             origin->m_played_cards.push_back(make_played_card_history(args, is_response, ctx));
         }
 
-        origin->add_gold(-args.card->get_card_cost(is_response, ctx));
+        if (!is_response) {
+            origin->add_gold(-args.card->get_card_cost(ctx));
+        }
 
         for (const auto &[mod_card, mod_targets] : args.modifiers) {
             apply_target_list(origin, mod_card, is_response, mod_targets, ctx);

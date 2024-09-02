@@ -94,7 +94,11 @@ namespace banggame {
             }
         }
         
-        return origin->m_gold >= origin_card->get_card_cost(is_response, ctx);
+        if (!is_response && origin->m_gold < origin_card->get_card_cost(ctx)) {
+            return false;
+        }
+        
+        return true;
     }
 
     static void collect_playable_cards(
