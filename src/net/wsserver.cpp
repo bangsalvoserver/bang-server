@@ -156,13 +156,8 @@ std::string wsserver::get_client_ip(client_handle con) {
             if (!con.expired()) {
                 std::error_code ec;
                 auto client_con = server.get_con_from_hdl(con, ec);
-                if (client_con) {
-                    std::string header_ip = client_con->get_request_header("X-Real-IP");
-                    if (!header_ip.empty()) {
-                        return header_ip;
-                    } else {
-                        return client_con->get_remote_endpoint();
-                    }
+                if (!ec && client_con) {
+                    return client_con->get_remote_endpoint();
                 }
             }
         }
