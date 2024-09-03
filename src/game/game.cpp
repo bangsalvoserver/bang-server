@@ -559,11 +559,14 @@ namespace banggame {
 
         if (!m_options.enable_ghost_cards) {
             queue_action([this]{
-                if (auto range = rv::filter(m_players, [](player_ptr p) { return !p->alive() && !p->check_player_flags(player_flag::removed); })) {
-                    for (player_ptr p : range) {
-                        p->add_player_flags(player_flag::removed);
+                bool any_player_removed = false;
+                for (player_ptr p : m_players) {
+                    if (!p->alive() && p->add_player_flags(player_flag::removed)) {
+                        any_player_removed = true;
                     }
-                    
+                }
+                
+                if (any_player_removed) {
                     add_update<"player_order">(make_player_order_update());
                 }
             }, -3);
