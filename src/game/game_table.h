@@ -9,6 +9,7 @@
 #include "event_map.h"
 #include "game_events.h"
 #include "disabler_map.h"
+#include "utils/range_utils.h"
 
 namespace banggame {
 
@@ -65,8 +66,7 @@ namespace banggame {
         card_list &get_pocket(pocket_type pocket, player_ptr owner = nullptr);
 
         auto range_all_players(const_player_ptr begin) const {
-            auto it = rn::find(m_players, begin);
-            return rv::concat(rn::subrange(it, m_players.end()), rn::subrange(m_players.begin(), it));
+            return rotate_range(m_players, rn::find(m_players, begin));
         }
 
         auto range_alive_players(const_player_ptr begin) const {

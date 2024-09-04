@@ -81,10 +81,9 @@ namespace banggame {
 
         auto take_until_to = rv::take_while([=](const_player_ptr current) { return current != to; });
         auto it = rn::find(m_players, from);
-        auto next = std::next(it);
 
-        int count_cw = rn::count_if(rv::concat(rn::subrange(it, m_players.end()), rn::subrange(m_players.begin(), it)) | take_until_to, &player::alive);
-        int count_ccw = rn::count_if(rv::concat(rn::subrange(next, m_players.end()), rn::subrange(m_players.begin(), next)) | rv::reverse | take_until_to, &player::alive);
+        int count_cw = rn::count_if(rotate_range(m_players, it) | take_until_to, &player::alive);
+        int count_ccw = rn::count_if(rotate_range(m_players, rn::next(it)) | rv::reverse | take_until_to, &player::alive);
 
         return std::min(count_cw, count_ccw) + distance_mod;
     }

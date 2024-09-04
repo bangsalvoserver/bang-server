@@ -41,4 +41,9 @@ decltype(auto) random_element(R &&range, Rng &rng) {
     return ret;
 }
 
+template<rn::range Rng>
+inline auto rotate_range(Rng &&rng, rn::iterator_t<Rng> it) {
+    return rv::concat(rn::subrange(it, rn::end(rng)), rn::subrange(rn::begin(rng), it));
+}
+
 #endif
