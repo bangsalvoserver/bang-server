@@ -21,7 +21,7 @@ namespace banggame {
         });
         player_end->m_game->add_listener<event_type::on_draw_check_resolve>(target_card, [=](player_ptr player_begin, card_ptr drawn_card) {
             player_end->m_game->queue_action([=]{
-                if (drawn_card->pocket != pocket_type::player_hand
+                if (player_end->alive() && drawn_card->pocket != pocket_type::player_hand
                     && std::none_of(player_iterator(player_begin), player_iterator(player_end), get_john_pain)
                     && get_john_pain(player_end))
                 {
