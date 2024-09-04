@@ -43,7 +43,7 @@ namespace banggame {
             steal_card(target, origin, target_card);
 
             if (!origin->empty_hand() || !origin->empty_table()) {
-                for (player_ptr next_target : range_other_players(target)) {
+                for (player_ptr next_target : target->m_game->range_other_players(target)) {
                     if (next_target == origin) continue;
 
                     if (card_ptr next_origin_card = get_vulture_sam(next_target)) {
@@ -86,7 +86,7 @@ namespace banggame {
                 target_card->set_inactive(false);
             }
 
-            auto range_targets = range_other_players(target) | rv::filter(get_vulture_sam);
+            auto range_targets = target->m_game->range_other_players(target) | rv::filter(get_vulture_sam);
             if (get_single_element(range_targets)) {
                 for (card_ptr target_card : target->m_table
                     | rv::remove_if(&card::is_black)

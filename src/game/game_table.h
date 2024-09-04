@@ -64,7 +64,20 @@ namespace banggame {
         
         card_list &get_pocket(pocket_type pocket, player_ptr owner = nullptr);
 
-        int calc_distance(const_player_ptr from, const_player_ptr to);
+        auto range_all_players(const_player_ptr begin) const {
+            auto it = rn::find(m_players, begin);
+            return rv::concat(rn::subrange(it, m_players.end()), rn::subrange(m_players.begin(), it));
+        }
+
+        auto range_alive_players(const_player_ptr begin) const {
+            return range_all_players(begin) | rv::filter(&player::alive);
+        }
+
+        auto range_other_players(const_player_ptr begin) const {
+            return range_all_players(begin) | rv::drop(1) | rv::filter(&player::alive);
+        }
+
+        int calc_distance(const_player_ptr from, const_player_ptr to) const;
 
         int num_alive() const;
 

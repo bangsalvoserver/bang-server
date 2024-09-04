@@ -105,6 +105,42 @@ namespace banggame {
         return mod;
     }
 
+    player_ptr player::get_next_player() const {
+        auto start = rn::find(m_game->m_players, this);
+        auto it = start;
+        while (true) {
+            ++it;
+            if (it == m_game->m_players.end()) {
+                it = m_game->m_players.begin();
+            }
+            if ((*it)->alive()) {
+                break;
+            }
+            if (it == start) {
+                throw game_error("Infinite loop in get_next_player");
+            }
+        }
+        return *it;
+    }
+
+    player_ptr player::get_prev_player() const {
+        auto start = rn::find(m_game->m_players, this);
+        auto it = start;
+        while (true) {
+            if (it == m_game->m_players.begin()) {
+                it = m_game->m_players.end();
+            }
+            --it;
+            if ((*it)->alive()) {
+                break;
+            }
+            if (it == start) {
+                throw game_error("Infinite loop in get_prev_player");
+            }
+        }
+        return *it;
+    }
+
     card_ptr player::find_equipped_card(const_card_ptr card) const {
         auto it = rn::find(m_table, card->name, &card::name);
         if (it != m_table.end()) {
@@ -335,9 +371,5 @@ namespace banggame {
     int player::count_cubes() const {
         return rn::accumulate(cube_slots()
             | rv::transform(&card::num_cubes), 0);
-    }
-
-    player_list &get_all_players(const_player_ptr begin) {
-        return begin->m_game->m_players;
     }
 }

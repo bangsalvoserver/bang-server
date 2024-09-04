@@ -12,7 +12,7 @@ namespace banggame {
     }
 
     static auto get_player_targets_range(const_card_ptr origin_card, player_ptr origin, enums::bitset<target_player_filter> player_filter, const effect_context &ctx) {
-        return range_alive_players(origin) | rv::filter([=, &ctx](const_player_ptr target) {
+        return origin->m_game->range_alive_players(origin) | rv::filter([=, &ctx](const_player_ptr target) {
             return target != ctx.skipped_player && !check_player_filter(origin_card, origin, player_filter, target, ctx);
         });
     }

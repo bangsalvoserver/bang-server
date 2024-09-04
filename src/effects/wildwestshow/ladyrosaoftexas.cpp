@@ -7,18 +7,16 @@
 
 namespace banggame {
 
-    static player_ptr get_next_player(player_ptr origin) {
-        player_iterator it{origin};
+    static player_ptr get_swapping_player(player_ptr origin) {
         if (origin->m_game->check_flags(game_flag::invert_rotation)) {
-            ++it;
+            return origin->get_next_player();
         } else {
-            --it;
+            return origin->get_prev_player();
         }
-        return *it;
     }
 
     bool effect_ladyrosaoftexas::on_check_target(card_ptr origin_card, player_ptr origin) {
-        return bot_suggestion::target_enemy{}.on_check_target(origin_card, origin, get_next_player(origin));
+        return bot_suggestion::target_enemy{}.on_check_target(origin_card, origin, get_swapping_player(origin));
     }
 
     game_string effect_ladyrosaoftexas::get_error(card_ptr origin_card, player_ptr origin) {
@@ -30,7 +28,7 @@ namespace banggame {
     }
 
     void effect_ladyrosaoftexas::on_play(card_ptr origin_card, player_ptr origin) {
-        player_ptr target = get_next_player(origin);
+        player_ptr target = get_swapping_player(origin);
         target->add_player_flags(player_flag::skip_turn);
         std::iter_swap(
             rn::find(origin->m_game->m_players, origin),

@@ -16,7 +16,7 @@ namespace banggame {
     }
     
     static auto get_player_targets_range(player_ptr origin, const effect_context &ctx) {
-        return range_other_players(origin) | rv::remove(ctx.skipped_player.get());
+        return origin->m_game->range_other_players(origin) | rv::remove(ctx.skipped_player.get());
     }
 
     game_string handler_play_as_gatling::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {

@@ -17,7 +17,7 @@ namespace banggame {
                         target->discard_card(target_card);
                         target->damage(target_card, nullptr, 3);
                     } else {
-                        for (player_ptr dest : range_other_players(target)) {
+                        for (player_ptr dest : target->m_game->range_other_players(target)) {
                             if (!dest->find_equipped_card(target_card)) {
                                 target->disable_equip(target_card);
                                 dest->equip_card(target_card);

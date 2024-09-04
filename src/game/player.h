@@ -67,6 +67,9 @@ namespace banggame {
         int get_range_mod() const;
         int get_weapon_range() const;
         int get_distance_mod() const;
+        
+        player_ptr get_next_player() const;
+        player_ptr get_prev_player() const;
 
         bool is_bot() const;
         bool is_ghost() const;

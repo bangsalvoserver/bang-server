@@ -574,7 +574,7 @@ namespace banggame {
 
         queue_action([this, killer, target] {
             if (target == m_first_player && !target->alive() && num_alive() > 1) {
-                m_first_player = *std::next(player_iterator(target));
+                m_first_player = target->get_next_player();
             }
 
             auto declare_winners = [this](auto &&winners) {

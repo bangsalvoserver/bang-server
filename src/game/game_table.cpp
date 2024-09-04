@@ -5,8 +5,6 @@
 
 #include "effects/greattrainrobbery/ruleset.h"
 
-#include "player_iterator.h"
-
 namespace banggame {
 
     game_table::game_table(unsigned int seed)
@@ -72,7 +70,7 @@ namespace banggame {
         }
     }
 
-    int game_table::calc_distance(const_player_ptr from, const_player_ptr to) {
+    int game_table::calc_distance(const_player_ptr from, const_player_ptr to) const {
         if (from == to || !from->alive()) return 0;
         
         int distance_mod = to->get_distance_mod();
@@ -81,20 +79,12 @@ namespace banggame {
             return 1 + distance_mod;
         }
 
-        player_iterator from_it{from};
-        player_iterator to_it{to};
+        auto range = range_all_players(from);
+        auto take_until_to = rv::take_while([=](const_player_ptr current) { return current != to; });
+        int count_cw = rn::count_if(range | take_until_to, &player::alive);
+        int count_ccw = rn::count_if(range | rv::reverse | take_until_to, &player::alive);
 
-        if (to->alive()) {
-            return std::min(
-                std::distance(from_it, to_it),
-                std::distance(std::reverse_iterator(from_it), std::reverse_iterator(to_it))
-            ) + distance_mod;
-        } else {
-            return std::min(
-                std::distance(from_it, std::prev(to_it)),
-                std::distance(std::reverse_iterator(from_it), std::reverse_iterator(std::next(to_it)))
-            ) + 1 + distance_mod;
-        }
+        return std::min(count_cw, count_ccw) + distance_mod;
     }
 
     int game_table::num_alive() const {
