@@ -176,9 +176,6 @@ namespace banggame {
         if (card_ptr disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
-        if (origin_card->inactive) {
-            return {"ERROR_CARD_INACTIVE", origin_card};
-        }
         game_string out_error;
         origin->m_game->call_event(event_type::check_play_card{ origin, origin_card, ctx, out_error });
         return out_error;
