@@ -174,6 +174,8 @@ namespace banggame {
     }
 
     void game_table::advance_train(player_ptr origin) {
+        play_sound("train");
+        
         add_log("LOG_TRAIN_ADVANCE");
         add_update<"move_train">(++train_position);
 
