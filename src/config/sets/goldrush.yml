@@ -117,7 +117,7 @@ goldrush:
     image: 04_piccone
     color: black
     equip:
-      - pixie_pete
+      - pickaxe
     tags:
       - buy_cost(4)
   - count: 3

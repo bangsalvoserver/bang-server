@@ -10,6 +10,7 @@ target_sources(bangserver PRIVATE
     luckycharm.cpp
     madam_yto.cpp
     pay_gold.cpp
+    pickaxe.cpp
     ruleset.cpp
     rum.cpp
     sell_beer.cpp

@@ -1,5 +1,5 @@
-#ifndef __GOLDRUSH_PIXIE_PETE_H__
-#define __GOLDRUSH_PIXIE_PETE_H__
+#ifndef __DODGECITY_PIXIE_PETE_H__
+#define __DODGECITY_PIXIE_PETE_H__
 
 #include "cards/card_effect.h"
 
