@@ -159,6 +159,12 @@ namespace utils {
             return utils::tagged_variant_tag_names<Variant>::value[index()];
         }
     };
+
+    template<fixed_string Name, typename Variant> requires tag_for<tag<Name>, std::remove_cvref_t<Variant>>
+    bool holds_alternative(Variant &&variant) {
+        using index_type = tagged_variant_index<std::remove_cvref_t<Variant>>;
+        return index_type(variant) == index_type(tag<Name>{});
+    }
     
     template<typename Visitor, typename Variant> struct visit_return_type;
 

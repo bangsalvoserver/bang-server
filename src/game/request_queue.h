@@ -7,6 +7,7 @@
 
 #include "cards/card_effect.h"
 
+#include "utils/tagged_variant.h"
 #include "utils/stable_queue.h"
 
 namespace banggame {
@@ -33,27 +34,32 @@ namespace banggame {
         void on_update() override;
     };
 
+    using request_state = utils::tagged_variant<
+        utils::tag<"done">,
+        utils::tag<"next">,
+        utils::tag<"waiting", ticks>,
+        utils::tag<"bot_play", ticks>
+    >;
+
+    using request_state_index = utils::tagged_variant_index<request_state>;
+
     class request_queue {
     private:
-        struct state_done {};
-        struct state_next {};
-        struct state_waiting { ticks timer; };
-        struct state_bot_play { ticks timer; };
-
-        using state_t = std::variant<state_done, state_next, state_waiting, state_bot_play>;
-
-    private:
-        game *m_game;
-
         utils::stable_priority_queue<std::shared_ptr<request_base>, request_priority_ordering> m_requests;
-        state_t m_state;
+        request_state m_state;
 
-        state_t invoke_update();
-        state_t invoke_tick_update();
+        request_state invoke_update();
+        request_state invoke_tick_update();
+    
+    protected:
+        virtual bool is_game_over() const = 0;
+        virtual ticks get_total_update_time() const = 0;
+        virtual void send_request_update() = 0;
+        virtual void send_request_status_clear() = 0;
+        virtual request_state send_request_status_ready() = 0;
+        virtual request_state request_bot_play(bool instant) = 0;
 
     public:
-        request_queue(game *m_game) : m_game(m_game) {}
-        
         void tick();
         void commit_updates();
 
@@ -63,7 +69,7 @@ namespace banggame {
         }
 
         bool is_waiting() const {
-            return std::holds_alternative<state_waiting>(m_state);
+            return holds_alternative<"waiting">(m_state);
         }
 
         template<typename T = request_base>

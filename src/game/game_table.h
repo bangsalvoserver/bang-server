@@ -9,11 +9,12 @@
 #include "event_map.h"
 #include "game_events.h"
 #include "disabler_map.h"
+#include "request_queue.h"
 #include "utils/range_utils.h"
 
 namespace banggame {
 
-    struct game_table : game_net_manager, listener_map, disabler_map {
+    struct game_table : game_net_manager, listener_map, disabler_map, request_queue {
         unsigned int rng_seed;
         std::default_random_engine rng;
         std::default_random_engine bot_rng;
@@ -97,7 +98,7 @@ namespace banggame {
         void remove_game_flags(game_flag flags);
         bool check_flags(game_flag type) const;
 
-        bool is_game_over() const;
+        bool is_game_over() const override;
     };
 
 }

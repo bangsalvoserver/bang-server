@@ -8,9 +8,9 @@
 
 namespace banggame {
 
-    request_queue::state_t request_queue::invoke_update() {
-        if (m_game->is_game_over()) {
-            return state_done{};
+    request_state request_queue::invoke_update() {
+        if (is_game_over()) {
+            return utils::tag<"done">{};
         } else if (auto req = top_request()) {
             logging::debug("on_update() on {: >5}: {}", req->priority, utils::demangle(typeid(*req).name()));
 
@@ -18,61 +18,52 @@ namespace banggame {
             req->live = true;
             
             if (top_request() != req) {
-                return state_next{};
+                return utils::tag<"next">{};
             }
             if (auto *timer = req->timer()) {
                 if (timer->get_duration() <= ticks{0}) {
                     pop_request();
                     timer->on_finished();
-                    return state_next{};
+                    return utils::tag<"next">{};
                 }
-                timer->start(m_game->get_total_update_time());
+                timer->start(get_total_update_time());
             }
-            m_game->send_request_update();
-        } else if (m_game->m_playing && !m_game->send_request_status_ready()) {
-            return state_next{};
+            send_request_update();
+        } else if (holds_alternative<"next">(send_request_status_ready())) {
+            return utils::tag<"next">{};
         }
-        if (rn::any_of(m_game->m_players, &player::is_bot)) {
-            if (m_game->m_options.bot_play_timer > game_duration{0}) {
-                return state_bot_play{ m_game->get_total_update_time() + clamp_ticks(m_game->m_options.bot_play_timer) };
-            } else if (m_game->request_bot_play()) {
-                return state_next{};
-            }
-        }
-        return state_done{};
+        return request_bot_play(false);
     }
 
-    request_queue::state_t request_queue::invoke_tick_update() {
-        if (m_game->is_game_over()) {
-            return state_done{};
+    request_state request_queue::invoke_tick_update() {
+        if (is_game_over()) {
+            return utils::tag<"done">{};
         } else if (auto req = top_request()) {
             if (auto *timer = req->timer()) {
                 timer->tick();
                 if (timer->finished()) {
-                    m_game->send_request_status_clear();
+                    send_request_status_clear();
                     pop_request();
                     timer->on_finished();
-                    return state_next{};
+                    return utils::tag<"next">{};
                 }
             }
         }
 
-        return std::visit(overloaded{
-            [](const auto &state) -> state_t { return state; },
-            [](const state_waiting &state) -> state_t {
-                if (state.timer > ticks{}) {
-                    return state_waiting{ state.timer - ticks{1} };
+        return utils::visit_tagged(overloaded{
+            [](const auto &state) -> request_state { return state; },
+            [](utils::tag<"waiting">, ticks timer) -> request_state {
+                if (timer > ticks{}) {
+                    return {utils::tag<"waiting">{}, timer - ticks{1} };
                 } else {
-                    return state_next{};
+                    return utils::tag<"next">{};
                 }
             },
-            [&](const state_bot_play &state) -> state_t {
-                if (state.timer > ticks{}) {
-                    return state_bot_play{ state.timer - ticks{1} };
-                } else if (m_game->request_bot_play()) {
-                    return state_next{};
+            [&](utils::tag<"bot_play">, ticks timer) -> request_state {
+                if (timer > ticks{}) {
+                    return {utils::tag<"bot_play">{}, timer - ticks{1} };
                 } else {
-                    return state_done{};
+                    return request_bot_play(true);
                 }
             }
         }, m_state);
@@ -81,7 +72,7 @@ namespace banggame {
     void request_queue::tick() {
         m_state = invoke_tick_update();
 
-        if (std::holds_alternative<state_next>(m_state)) {
+        if (holds_alternative<"next">(m_state)) {
             commit_updates();
         }
     }
@@ -92,13 +83,13 @@ namespace banggame {
     void request_queue::commit_updates() {
         int count = 0;
         do {
-            auto timer = m_game->get_total_update_time();
+            auto timer = get_total_update_time();
             if (timer > max_update_timer_duration || count > max_update_count) {
-                m_state = state_waiting{ timer };
+                m_state = { utils::tag<"waiting">{}, timer };
             } else {
                 m_state = invoke_update();
                 ++count;
             }
-        } while (std::holds_alternative<state_next>(m_state));
+        } while (holds_alternative<"next">(m_state));
     }
 }

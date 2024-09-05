@@ -62,7 +62,7 @@ namespace banggame {
         return random_element(node_set, origin->m_game->bot_rng);
     }
 
-    static bool execute_random_play(player_ptr origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
+    static request_state execute_random_play(player_ptr origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
             std::set<card_node> node_set = play_cards | rv::addressof | rn::to<std::set>;
             
@@ -77,7 +77,7 @@ namespace banggame {
                     args.bypass_prompt = bypass_prompt;
                     args.timer_id = timer_id;
                     if (verify_and_play(origin, args).type == message_type::ok) {
-                        return true;
+                        return utils::tag<"next">{};
                     }
                 } catch (const random_element_error &) {
                     // ignore
@@ -88,10 +88,16 @@ namespace banggame {
         // softlock
         logging::warn("BOT ERROR: could not find card in execute_random_play()");
 
-        return false;
+        return utils::tag<"done">{};
     }
 
-    bool game::request_bot_play() {
+    request_state game::request_bot_play(bool instant) {
+        if (m_options.num_bots == 0) {
+            return utils::tag<"done">{};
+        } else if (!instant && m_options.bot_play_timer > game_duration{0}) {
+            return { utils::tag<"bot_play">{}, get_total_update_time() + clamp_ticks(m_options.bot_play_timer) };
+        }
+
         if (pending_requests()) {
             for (player_ptr origin : m_players | rv::filter(&player::is_bot)) {
                 playable_cards_list play_cards = generate_playable_cards_list(origin, true);
@@ -102,8 +108,8 @@ namespace banggame {
                         timer_id = timer->get_timer_id();
                     }
 
-                    if (execute_random_play(origin, true, timer_id, play_cards)) {
-                        return true;
+                    if (holds_alternative<"next">(execute_random_play(origin, true, timer_id, play_cards))) {
+                        return utils::tag<"next">{};
                     }
                 }
             }
@@ -111,7 +117,7 @@ namespace banggame {
             playable_cards_list play_cards = generate_playable_cards_list(m_playing);
             return execute_random_play(m_playing, false, std::nullopt, play_cards);
         }
-        return false;
+        return utils::tag<"done">{};
     }
 
     

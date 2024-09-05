@@ -2,13 +2,12 @@
 #define __GAME_H__
 
 #include "game_table.h"
-#include "request_queue.h"
 #include "utils/generator.h"
 
 namespace banggame {
 
-    struct game : game_table, request_queue {
-        game(unsigned int seed = 0);
+    struct game : game_table {
+        using game_table::game_table;
         
         utils::generator<json::json> get_spectator_join_updates();
         utils::generator<json::json> get_game_log_updates(player_ptr target);
@@ -23,15 +22,13 @@ namespace banggame {
         status_ready_args make_status_ready_update(player_ptr p);
         player_order_update make_player_order_update(bool instant = false);
 
-        ticks get_total_update_time() const;
-
-        void send_request_status_clear();
-        bool send_request_status_ready();
-        void send_request_update();
+        ticks get_total_update_time() const override;
+        void send_request_update() override;
+        void send_request_status_clear() override;
+        request_state send_request_status_ready() override;
+        request_state request_bot_play(bool instant) override;
 
         void start_next_turn();
-
-        bool request_bot_play();
 
         void handle_player_death(player_ptr killer, player_ptr target, discard_all_reason reason);
     };

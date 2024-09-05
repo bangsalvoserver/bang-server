@@ -15,10 +15,6 @@
 
 namespace banggame {
 
-    game::game(unsigned int seed)
-        : game_table(seed)
-        , request_queue(this) {}
-
     player_order_update game::make_player_order_update(bool instant) {
         return player_order_update{m_players
             | rv::filter([](player_ptr p) {
@@ -435,10 +431,13 @@ namespace banggame {
         add_update<"status_clear">();
     }
 
-    bool game::send_request_status_ready() {
+    request_state game::send_request_status_ready() {
+        if (!m_playing) {
+            return utils::tag<"done">{};
+        }
         if (!m_playing->alive()) {
             start_next_turn();
-            return false;
+            return utils::tag<"next">{};
         }
 
         auto args = make_status_ready_update(m_playing);
@@ -447,10 +446,10 @@ namespace banggame {
             return args.card->has_tag(tag_type::pass_turn);
         })) {
             m_playing->pass_turn();
-            return false;
+            return utils::tag<"next">{};
         } else {
             add_update<"status_ready">(update_target::includes_private(m_playing), std::move(args));
-            return true;
+            return utils::tag<"done">{};
         }
     }
 
