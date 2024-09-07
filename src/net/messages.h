@@ -21,6 +21,11 @@ namespace banggame {
         id_type session_id;
     };
 
+    enum class lobby_team {
+        game_player,
+        game_spectator,
+    };
+
     struct lobby_info {
         std::string name;
         game_options options;
@@ -48,6 +53,7 @@ namespace banggame {
         utils::tag<"lobby_leave">,
         utils::tag<"lobby_chat", lobby_chat_client_args>,
         utils::tag<"lobby_return">,
+        utils::tag<"user_set_team", lobby_team>,
         utils::tag<"game_start">,
         utils::tag<"game_rejoin", game_rejoin_args>,
         utils::tag<"game_action", json::json>
@@ -88,6 +94,7 @@ namespace banggame {
     struct user_info_id_args {
         int user_id;
         user_info user;
+        lobby_team team;
         enums::bitset<lobby_chat_flag> flags;
         std::chrono::milliseconds lifetime;
     };

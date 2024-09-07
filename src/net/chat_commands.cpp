@@ -61,7 +61,6 @@ namespace banggame {
     static constexpr std::string_view SET_OPTION_DESCRIPTION = "[name] [value] : set a game option";
     static constexpr std::string_view RESET_OPTIONS_DESCRIPTION = "reset game options";
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
-    static constexpr std::string_view SPECTATE_DESCRIPTION = "spectate this game";
     static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed";
     static constexpr std::string_view QUIT_DESCRIPTION = "disconnect from server";
 
@@ -73,7 +72,6 @@ namespace banggame {
         { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "reset-options",  { proxy<&game_manager::command_reset_game_options>, RESET_OPTIONS_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
-        { "spectate",       { proxy<&game_manager::command_spectate>,           SPECTATE_DESCRIPTION, command_permissions::lobby_waiting }},
         { "seed",           { proxy<&game_manager::command_get_rng_seed>,       GET_RNG_SEED_DESCRIPTION, command_permissions::lobby_finished }},
         { "quit",           { proxy<&game_manager::command_quit>,               QUIT_DESCRIPTION }},
     };
@@ -286,10 +284,6 @@ namespace banggame {
         }
 
         lobby.m_game->commit_updates();
-    }
-
-    void game_manager::command_spectate(game_user &user) {
-        set_user_team(user, lobby_team::game_spectator);
     }
 
     void game_manager::command_get_rng_seed(game_user &user) {

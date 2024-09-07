@@ -62,6 +62,8 @@ private:
 
     void kick_user_from_lobby(game_user &user);
     void handle_join_lobby(game_user &user, lobby &lobby);
+
+    lobby_team get_user_team(game_user &user) const;
     void set_user_team(game_user &user, lobby_team team);
 
 private:
@@ -74,6 +76,7 @@ private:
     void handle_message(utils::tag<"lobby_leave">,    game_user &user);
     void handle_message(utils::tag<"lobby_chat">,     game_user &user, const lobby_chat_client_args &value);
     void handle_message(utils::tag<"lobby_return">,   game_user &user);
+    void handle_message(utils::tag<"user_set_team">,  game_user &user, lobby_team team);
     void handle_message(utils::tag<"game_start">,     game_user &user);
     void handle_message(utils::tag<"game_rejoin">,    game_user &user, const game_rejoin_args &value);
     void handle_message(utils::tag<"game_action">,    game_user &user, const json::json &value);
@@ -87,7 +90,6 @@ private:
     void command_set_game_option(game_user &user, std::string_view name, std::string_view value);
     void command_reset_game_options(game_user &user);
     void command_give_card(game_user &user, std::string_view name);
-    void command_spectate(game_user &user);
     void command_get_rng_seed(game_user &user);
     void command_quit(game_user &user);
 
