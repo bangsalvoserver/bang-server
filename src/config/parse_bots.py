@@ -5,7 +5,7 @@ import base64
 from PIL import Image
 from cpp_generator import print_cpp_file, CppEnum, CppObject, CppLiteral
 
-PROPIC_SIZE = 50
+PROPIC_SIZE = 100
 INCLUDE_FILENAMES = ['net/bot_info.h']
 OBJECT_DECLARATION = 'bot_info_t banggame::bot_info'
 
