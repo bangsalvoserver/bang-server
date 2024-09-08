@@ -270,7 +270,7 @@ void game_manager::set_user_team(game_user &user, lobby_team team) {
         if (it != lobby.users.end()) {
             it->team = team;
             broadcast_message<"lobby_update">(lobby);
-            broadcast_message_lobby<"lobby_add_user">(lobby, it->user_id, *(it->user), it->team);
+            broadcast_message_lobby<"lobby_add_user">(lobby, it->user_id, user, team);
         }
     }
 }
@@ -406,19 +406,15 @@ void game_manager::handle_message(utils::tag<"lobby_return">, game_user &user) {
         throw lobby_error("ERROR_LOBBY_WAITING");
     }
 
-    for (const auto &bot : lobby.bots) {
-        broadcast_message_lobby<"lobby_remove_user">(lobby, bot.user_id);
-    }
+    broadcast_message_lobby<"lobby_entered">(lobby, lobby.get_user_id(user), lobby.lobby_id, lobby.name, lobby.options);
+
     lobby.bots.clear();
     lobby.m_game.reset();
-    
     lobby.state = lobby_state::waiting;
 
     for (const lobby_user &user : lobby.users) {
         set_user_team(*(user.user), lobby_team::game_player);
     }
-
-    broadcast_message_lobby<"lobby_entered">(lobby, lobby.get_user_id(user), lobby.lobby_id, lobby.name, lobby.options);
 }
 
 void game_manager::handle_message(utils::tag<"user_set_team">, game_user &user, lobby_team team) {
