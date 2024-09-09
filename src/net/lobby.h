@@ -41,8 +41,11 @@ struct client_state {
 
 static constexpr size_t max_username_size = 50;
 
-struct game_user : user_info {
+struct game_user {
     explicit game_user(id_type session_id): session_id{session_id} {}
+
+    std::string username;
+    utils::image_pixels propic;
     
     id_type session_id = 0;
     lobby *in_lobby = nullptr;
@@ -57,13 +60,12 @@ struct game_user : user_info {
         return {};
     }
 
-    void update_user_info(const user_info &info) {
-        if (info.name.size() > max_username_size) {
-            name = info.name.substr(0, max_username_size);
+    void set_username(std::string new_username) {
+        if (new_username.size() > max_username_size) {
+            username = new_username.substr(0, max_username_size);
         } else {
-            name = info.name;
+            username = std::move(new_username);
         }
-        profile_image = info.profile_image;
     }
 };
 
@@ -73,11 +75,10 @@ struct lobby_user {
     game_user *user;
 };
 
-struct lobby_bot: user_info {
-    lobby_bot(const user_info &info, int user_id)
-        : user_info{info}, user_id{user_id} {}
-
+struct lobby_bot {
     int user_id;
+    std::string username;
+    const utils::image_pixels *propic;
 };
 
 struct lobby : lobby_info {

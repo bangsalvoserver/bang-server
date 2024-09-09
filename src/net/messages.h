@@ -11,13 +11,9 @@ namespace banggame {
     
     using id_type = unsigned int;
 
-    struct user_info {
-        std::string name;
-        utils::image_pixels profile_image;
-    };
-
     struct connect_args {
-        user_info user;
+        std::string username;
+        utils::image_pixels propic;
         id_type session_id;
     };
 
@@ -46,7 +42,8 @@ namespace banggame {
     using client_message = utils::tagged_variant<
         utils::tag<"pong">,
         utils::tag<"connect", connect_args>,
-        utils::tag<"user_edit", user_info>,
+        utils::tag<"user_set_name", std::string>,
+        utils::tag<"user_set_propic", utils::image_pixels>,
         utils::tag<"lobby_make", lobby_info>,
         utils::tag<"lobby_edit", lobby_info>,
         utils::tag<"lobby_join", lobby_id_args>,
@@ -91,12 +88,17 @@ namespace banggame {
         is_read
     };
 
-    struct user_info_id_args {
+    struct lobby_user_args {
         int user_id;
-        user_info user;
+        std::string username;
         lobby_team team;
         enums::bitset<lobby_chat_flag> flags;
         std::chrono::milliseconds lifetime;
+    };
+
+    struct user_propic_args {
+        int user_id;
+        utils::image_pixels propic;
     };
 
     struct lobby_chat_args {
@@ -115,7 +117,8 @@ namespace banggame {
         utils::tag<"lobby_entered", lobby_entered_args>,
         utils::tag<"lobby_edited", lobby_info>,
         utils::tag<"lobby_removed", lobby_id_args>,
-        utils::tag<"lobby_add_user", user_info_id_args>,
+        utils::tag<"lobby_add_user", lobby_user_args>,
+        utils::tag<"lobby_user_propic", user_propic_args>,
         utils::tag<"lobby_remove_user", int>,
         utils::tag<"lobby_kick">,
         utils::tag<"lobby_chat", lobby_chat_args>,

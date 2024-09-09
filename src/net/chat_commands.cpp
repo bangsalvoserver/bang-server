@@ -89,7 +89,7 @@ namespace banggame {
         auto &lobby = *user.in_lobby;
         for (auto [team, user_id, u] : lobby.users) {
             send_message<"lobby_message">(user.client,
-                std::format("{} : {} ({})", user_id, u->name, enums::to_string(team)));
+                std::format("{} : {} ({})", user_id, u->username, enums::to_string(team)));
         }
     }
 
