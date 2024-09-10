@@ -154,7 +154,8 @@ void wsserver::kick_client(client_handle con, const std::string &msg) {
         if constexpr (!std::is_same_v<ServerType, std::monostate>) {
             if (!con.expired()) {
                 on_disconnect(con);
-                server.close(con, websocketpp::close::status::normal, msg);
+                std::error_code ec;
+                server.close(con, websocketpp::close::status::normal, msg, ec);
             }
         }
     }, m_server);
