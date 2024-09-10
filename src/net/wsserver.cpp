@@ -46,14 +46,24 @@ logging::level get_error_logging_level(websocketpp::log::level channel) {
 void wsserver::init() {
     server_type &server = m_server.emplace<server_type>();
     
-    server.init_asio();
+    std::error_code ec;
+    server.init_asio(ec);
+
+    if (ec) {
+        throw std::system_error(ec);
+    }
 }
 
 #ifndef WSSERVER_NO_TLS
 void wsserver::init_tls(const std::string &certificate_file, const std::string &private_key_file) {
     server_type_tls &server = m_server.emplace<server_type_tls>();
 
-    server.init_asio();
+    std::error_code ec;
+    server.init_asio(ec);
+
+    if (ec) {
+        throw std::system_error(ec);
+    }
     
     server.set_tls_init_handler([&](client_handle con) {
         auto ctx = std::make_shared<asio::ssl::context>(asio::ssl::context::tls_server);

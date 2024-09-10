@@ -47,6 +47,7 @@ endif()
 target_include_directories(banglibs INTERFACE external/websocketpp)
 target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_CPP11_STL_)
 target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
+target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_NO_EXCEPTIONS_)
 
 # range-v3
 
