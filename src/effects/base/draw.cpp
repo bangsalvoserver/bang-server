@@ -36,12 +36,13 @@ namespace banggame {
     }
 
     request_draw::request_draw(player_ptr target)
-        : request_picking(nullptr, nullptr, target, {}, -7)
-    {
-        target->m_game->call_event(event_type::count_cards_to_draw{ target, num_cards_to_draw });
-    }
+        : request_picking(nullptr, nullptr, target, {}, -7) {}
     
     void request_draw::on_update() {
+        if (!live) {
+            target->m_game->call_event(event_type::count_cards_to_draw{ target, num_cards_to_draw });
+        }
+
         cards_from_selection = target->m_game->m_selection;
         if (!target->m_game->check_flags(game_flag::phase_one_override)
             && target->alive() && target->m_game->m_playing == target
