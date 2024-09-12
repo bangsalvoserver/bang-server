@@ -63,7 +63,7 @@ namespace banggame {
     template<> void visit_cubes::play(const effect_context &ctx, const cubes_and_players &target) {
         defer<"select_cubes">().play(ctx, target.first);
         
-        effect_flags flags;
+        effect_flags flags = effect_flag::multi_target;
         if (target.second.size() == 1) {
             flags.add(effect_flag::single_target);
         }
