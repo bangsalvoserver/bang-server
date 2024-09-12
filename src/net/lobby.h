@@ -39,8 +39,6 @@ struct client_state {
     int ping_count = 0;
 };
 
-static constexpr size_t max_username_size = 50;
-
 struct game_user {
     explicit game_user(id_type session_id): session_id{session_id} {}
 
@@ -53,20 +51,10 @@ struct game_user {
     client_handle client;
     ticks lifetime = user_lifetime;
 
-    std::chrono::milliseconds get_disconnect_lifetime() const {
-        if (client.expired()) {
-            return std::chrono::duration_cast<std::chrono::milliseconds>(lifetime);
-        }
-        return {};
-    }
+    std::chrono::milliseconds get_disconnect_lifetime() const;
 
-    void set_username(std::string new_username) {
-        if (new_username.size() > max_username_size) {
-            username = new_username.substr(0, max_username_size);
-        } else {
-            username = std::move(new_username);
-        }
-    }
+    void set_username(const std::string &new_username);
+    void set_propic(const utils::image_pixels &new_propic);
 };
 
 struct lobby_user {
@@ -97,32 +85,11 @@ struct lobby : lobby_info {
 
     std::unique_ptr<banggame::game> m_game;
 
-    lobby_user &add_user(game_user &user) {
-        if (auto it = rn::find(users, &user, &lobby_user::user); it != users.end()) {
-            return *it;
-        } else {
-            user.in_lobby = this;
-            return users.emplace_back(lobby_team::game_player, ++user_id_count, &user);
-        }
-    }
+    lobby_user &add_user(game_user &user);
 
-    int get_user_id(const game_user &user) const {
-        if (auto it = rn::find(users, &user, &lobby_user::user); it != users.end()) {
-            return it->user_id;
-        }
-        return 0;
-    }
+    int get_user_id(const game_user &user) const;
 
-    explicit operator lobby_data() const {
-        return {
-            .lobby_id = lobby_id,
-            .name = name,
-            .num_players = int(rn::count(users, lobby_team::game_player, &lobby_user::team)),
-            .num_spectators = int(rn::count(users, lobby_team::game_spectator, &lobby_user::team)),
-            .max_players = lobby_max_players,
-            .state = state
-        };
-    }
+    explicit operator lobby_data() const;
 };
 
 using user_map = std::unordered_map<id_type, game_user>;

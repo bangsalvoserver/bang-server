@@ -51,6 +51,10 @@ namespace net {
             using elog_type = error_logging_adapter;
         };
 
+        // max message size 1 MB
+        static const size_t max_message_size = 1 * 1024 * 1024;
+        static const size_t max_http_body_size = 1 * 1024 * 1024;
+
         using transport_type = websocketpp::transport::asio::endpoint<transport_config>;
     };
 

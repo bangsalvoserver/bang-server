@@ -147,7 +147,7 @@ void game_manager::handle_message(utils::tag<"connect">, client_state &state, co
     }
 
     state.user->set_username(args.username);
-    state.user->propic = args.propic;
+    state.user->set_propic(args.propic);
     state.user->client = state.client;
 
     state.ping_timer = ticks{};
@@ -175,7 +175,7 @@ void game_manager::handle_message(utils::tag<"user_set_name">, game_user &user, 
 }
 
 void game_manager::handle_message(utils::tag<"user_set_propic">, game_user &user, const utils::image_pixels &propic) {
-    user.propic = propic;
+    user.set_propic(propic);
 
     if (auto *l = user.in_lobby) {
         broadcast_message_lobby<"lobby_user_propic">(*l, l->get_user_id(user), propic);
