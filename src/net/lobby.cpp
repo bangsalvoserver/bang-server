@@ -1,5 +1,7 @@
 #include "lobby.h"
 
+#include "utils/range_utils.h"
+
 namespace banggame {
 
     std::chrono::milliseconds game_user::get_disconnect_lifetime() const {
@@ -67,11 +69,34 @@ namespace banggame {
         }
     }
 
-    int lobby::get_user_id(const game_user &user) const {
+    lobby_user &lobby::find_user(const game_user &user) {
         if (auto it = rn::find(users, &user, &lobby_user::user); it != users.end()) {
-            return it->user_id;
+            return *it;
         }
-        return 0;
+        throw lobby_error("CANNOT_FIND_USER");
+    }
+
+    lobby_user &lobby::find_user(std::string_view name_or_id) {
+        int user_id;
+        if (auto [end, ec] = std::from_chars(name_or_id.data(), name_or_id.data() + name_or_id.size(), user_id); ec == std::errc{}) {
+            if (auto it = rn::find(users, user_id, &lobby_user::user_id); it != users.end()) {
+                return *it;
+            }
+        }
+
+        if (lobby_user *lu = get_single_element(users
+            | rv::filter([&](const lobby_user &user) {
+                return rn::equal(user.user->username, name_or_id,
+                    [](char a, char b) {
+                        return std::tolower(a) == std::tolower(b);
+                    });
+            })
+            | rv::addressof))
+        {
+            return *lu;
+        }
+        
+        throw lobby_error("CANNOT_FIND_USER");
     }
 
     lobby::operator lobby_data() const {

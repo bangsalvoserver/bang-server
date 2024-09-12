@@ -55,15 +55,14 @@ private:
     void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         logging::info("Lobby {}: Sent {}", lobby.name, message);
-        for (auto &[team, user_id, u] : lobby.users) {
-            push_message(u->client, message);
+        for (const lobby_user &user : lobby.users) {
+            push_message(user.user->client, message);
         }
     }
 
     void kick_user_from_lobby(game_user &user);
     void handle_join_lobby(game_user &user, lobby &lobby);
 
-    lobby_team get_user_team(game_user &user) const;
     void set_user_team(game_user &user, lobby_team team);
 
 private:
@@ -86,7 +85,9 @@ private:
 
     void command_print_help(game_user &user);
     void command_print_users(game_user &user);
-    void command_kick_user(game_user &user, std::string_view user_id_str);
+    void command_kick_user(game_user &user, std::string_view target_user);
+    void command_mute_user(game_user &user, std::string_view target_user);
+    void command_unmute_user(game_user &user, std::string_view target_user);
     void command_get_game_options(game_user &user);
     void command_set_game_option(game_user &user, std::string_view name, std::string_view value);
     void command_reset_game_options(game_user &user);

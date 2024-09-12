@@ -57,10 +57,15 @@ struct game_user {
     void set_propic(const utils::image_pixels &new_propic);
 };
 
+enum class lobby_user_flag {
+    muted
+};
+
 struct lobby_user {
     lobby_team team;
     int user_id;
     game_user *user;
+    enums::bitset<lobby_user_flag> flags;
 };
 
 struct lobby_bot {
@@ -87,7 +92,8 @@ struct lobby : lobby_info {
 
     lobby_user &add_user(game_user &user);
 
-    int get_user_id(const game_user &user) const;
+    lobby_user &find_user(const game_user &user);
+    lobby_user &find_user(std::string_view name_or_id);
 
     explicit operator lobby_data() const;
 };
