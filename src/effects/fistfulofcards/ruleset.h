@@ -11,6 +11,12 @@ namespace banggame {
 
     DEFINE_RULESET(fistfulofcards, ruleset_fistfulofcards)
 
+    namespace event_type {
+        struct get_first_dead_player {
+            nullable_ref<player_ptr> result;
+        };
+    }
+
 }
 
 #endif

@@ -511,8 +511,6 @@ namespace banggame {
             }
 
             if (!target->alive()) {
-                if (!m_first_dead) m_first_dead = target;
-
                 target->remove_extra_characters();
                 for (card_ptr c : target->m_characters) {
                     target->disable_equip(c);

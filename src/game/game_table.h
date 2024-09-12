@@ -50,7 +50,6 @@ namespace banggame {
         game_options m_options;
 
         player_ptr m_first_player = nullptr;
-        player_ptr m_first_dead = nullptr;
         player_ptr m_playing = nullptr;
 
         game_table(unsigned int seed);
