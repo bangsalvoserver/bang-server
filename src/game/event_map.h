@@ -55,7 +55,7 @@ namespace banggame {
     };
 
     class listener_map {
-    public:
+    private:
         using listener_set = std::multiset<event_listener, std::less<>>;
         using listener_iterator = listener_set::const_iterator;
 
@@ -73,20 +73,16 @@ namespace banggame {
         int m_lock = 0;
 
     private:
-        iterator_map_iterator do_add_listener(std::type_index type, event_card_key key, event_listener_fun &&fun, std::type_index fun_type);
+        void do_add_listener(std::type_index type, event_card_key key, event_listener_fun &&fun, std::type_index fun_type);
         void do_remove_listeners(iterator_map_range range);
         void do_call_event(std::type_index type, const void *tuple);
 
     public:
         template<event T, typename Function> requires applicable<Function, event_tuple<T>>
-        iterator_map_iterator add_listener(event_card_key key, Function &&fun) {
-            return do_add_listener(typeid(T), key, [fun=std::move(fun)](const void *tuple) mutable {
+        void add_listener(event_card_key key, Function &&fun) {
+            do_add_listener(typeid(T), key, [fun=std::move(fun)](const void *tuple) mutable {
                 std::apply(fun, *static_cast<const event_tuple<T> *>(tuple));
             }, typeid(Function));
-        }
-
-        void remove_listener(iterator_map_iterator it) {
-            do_remove_listeners({it, std::next(it)});
         }
 
         void remove_listeners(event_card_key key) {

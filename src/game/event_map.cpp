@@ -21,10 +21,10 @@ namespace std {
 
 namespace banggame {
     
-    listener_map::iterator_map_iterator listener_map::do_add_listener(std::type_index type, event_card_key key, event_listener_fun &&fun, std::type_index fun_type) {
+    void listener_map::do_add_listener(std::type_index type, event_card_key key, event_listener_fun &&fun, std::type_index fun_type) {
         auto listener = m_listeners.emplace(type, key, std::move(fun), fun_type);
         logging::debug("add_listener() on {}", *listener);
-        return m_map.emplace(key, listener);
+        m_map.emplace(key, listener);
     }
 
     void listener_map::do_remove_listeners(iterator_map_range range) {

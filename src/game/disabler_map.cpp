@@ -31,7 +31,7 @@ namespace banggame {
         );
     }
 
-    disabler_map::disabler_map_iterator disabler_map::add_disabler(event_card_key key, card_disabler_fun &&fun) {
+    void disabler_map::add_disabler(event_card_key key, card_disabler_fun &&fun) {
         for (auto [owner, c] : disableable_cards(m_game)) {
             if (!is_disabled(c) && std::invoke(fun, c)) {
                 for (const equip_holder &holder : c->equips) {
@@ -43,7 +43,7 @@ namespace banggame {
         }
 
         logging::debug("add_disabler() on {}: {}", key, utils::demangle(fun.target_type().name()));
-        return m_disablers.emplace(key, std::move(fun));
+        m_disablers.emplace(key, std::move(fun));
     }
 
     void disabler_map::do_remove_disablers(disabler_map_range range) {

@@ -13,7 +13,7 @@ namespace banggame {
     using card_disabler_fun = std::function<bool(const_card_ptr)>;
 
     class disabler_map {
-    public:
+    private:
         using disabler_map_t = std::multimap<event_card_key, card_disabler_fun, std::less<>>;
         using disabler_map_iterator = disabler_map_t::const_iterator;
         using disabler_map_range = rn::subrange<disabler_map_iterator>;
@@ -27,11 +27,7 @@ namespace banggame {
     public:
         disabler_map(game_table *game): m_game(game) {}
 
-        disabler_map_iterator add_disabler(event_card_key key, card_disabler_fun &&fun);
-
-        void remove_disabler(disabler_map_iterator it) {
-            do_remove_disablers(disabler_map_range{it, std::next(it)});
-        }
+        void add_disabler(event_card_key key, card_disabler_fun &&fun);
 
         void remove_disablers(event_card_key key) {
             auto [low, high] = m_disablers.equal_range(key);
