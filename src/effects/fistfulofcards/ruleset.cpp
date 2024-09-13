@@ -16,12 +16,12 @@ namespace banggame {
             });
         }
 
-        game->add_listener<event_type::on_player_death>(nullptr, [priority = 50](player_ptr origin, player_ptr target) mutable {
-            target->m_game->add_listener<event_type::get_first_dead_player>({nullptr, priority--}, [=](player_ptr &result) {
-                if (!target->alive() && !result) {
+        game->add_listener<event_type::on_player_death>(nullptr, [first = true](player_ptr origin, player_ptr target) mutable {
+            if (std::exchange(first, false)) {
+                target->m_game->add_listener<event_type::get_first_dead_player>(nullptr, [=](player_ptr &result) {
                     result = target;
-                }
-            });
+                });
+            }
         });
     }
 }
