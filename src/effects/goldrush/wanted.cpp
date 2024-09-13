@@ -16,7 +16,7 @@ namespace banggame {
     }
 
     void equip_wanted::on_enable(card_ptr target_card, player_ptr p) {
-        p->m_game->add_listener<event_type::on_player_death>({target_card, 3}, [p, target_card](player_ptr origin, player_ptr target) {
+        p->m_game->add_listener<event_type::on_player_eliminated>({target_card, 3}, [p, target_card](player_ptr origin, player_ptr target) {
             if (origin && origin->alive() && p == target && origin != target) {
                 target_card->flash_card();
                 origin->draw_card(2, target_card);

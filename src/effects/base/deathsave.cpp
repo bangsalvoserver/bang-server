@@ -24,7 +24,7 @@ namespace banggame {
     
     void request_death::on_resolve() {
         target->m_game->pop_request();
-        target->m_game->call_event(event_type::on_player_death_resolve{ target, tried_save });
+        target->m_game->call_event(event_type::on_player_death{ target, tried_save });
         target->m_game->handle_player_death(origin, target, discard_all_reason::death);
     }
 

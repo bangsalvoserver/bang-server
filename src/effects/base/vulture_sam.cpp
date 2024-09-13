@@ -79,7 +79,7 @@ namespace banggame {
                 value = target_card;
             }
         });
-        origin->m_game->add_listener<event_type::on_player_death>(target_card, [=](player_ptr killer, player_ptr target) {
+        origin->m_game->add_listener<event_type::on_player_eliminated>(target_card, [=](player_ptr killer, player_ptr target) {
             if (target->empty_hand() && target->empty_table()) return;
             
             for (card_ptr target_card : target->m_table) {

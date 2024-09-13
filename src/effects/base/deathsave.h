@@ -7,12 +7,12 @@
 namespace banggame {
 
     namespace event_type {
-        struct on_player_death_resolve {
+        struct on_player_death {
             player_ptr target;
             bool tried_save;
         };
         
-        struct on_player_death {
+        struct on_player_eliminated {
             player_ptr origin;
             player_ptr target;
         };

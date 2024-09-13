@@ -521,7 +521,7 @@ namespace banggame {
                 }
 
                 if (reason != discard_all_reason::discard_ghost) {
-                    call_event(event_type::on_player_death{ killer, target });
+                    call_event(event_type::on_player_eliminated{ killer, target });
                 }
             }
         }, 50);

@@ -45,7 +45,7 @@ namespace banggame {
     }
 
     void equip_lastwill::on_enable(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::on_player_death_resolve>({origin_card, -1}, [=](player_ptr target, bool tried_save) {
+        origin->m_game->add_listener<event_type::on_player_death>({origin_card, -1}, [=](player_ptr target, bool tried_save) {
             if (origin == target) {
                 origin->m_game->queue_request<request_lastwill>(origin_card, origin);
             }

@@ -27,7 +27,7 @@ namespace banggame {
                             }
                         };
                         target->m_game->add_listener<event_type::pre_turn_start>(event_key, clear_events);
-                        target->m_game->add_listener<event_type::on_player_death>(event_key, [=](player_ptr killer, player_ptr p) {
+                        target->m_game->add_listener<event_type::on_player_eliminated>(event_key, [=](player_ptr killer, player_ptr p) {
                             clear_events(p);
                         });
                     }
