@@ -10,7 +10,7 @@ namespace banggame {
     static uint8_t brothel_counter = 0;
 
     void equip_brothel::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player_ptr p, card_ptr e_card) {
+        target->m_game->add_listener<event_type::on_predraw_check>({target_card, 0}, [=](player_ptr p, card_ptr e_card) {
             if (p == target && e_card == target_card) {
                 target->m_game->queue_request<request_check>(target, target_card, &card_sign::is_red, [=](bool result) {
                     target->discard_card(target_card);
@@ -34,5 +34,9 @@ namespace banggame {
                 });
             }
         });
+    }
+
+    void equip_brothel::on_disable(card_ptr target_card, player_ptr target) {
+        target->m_game->remove_listeners(event_card_key{target_card, 0});
     }
 }
