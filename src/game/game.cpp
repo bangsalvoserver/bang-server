@@ -520,9 +520,7 @@ namespace banggame {
                     add_update<"player_show_role">(update_target::excludes(target), target, target->m_role);
                 }
 
-                if (reason != discard_all_reason::discard_ghost) {
-                    call_event(event_type::on_player_eliminated{ killer, target });
-                }
+                call_event(event_type::on_player_eliminated{ killer, target });
             }
         }, 50);
 
