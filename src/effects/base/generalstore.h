@@ -7,8 +7,7 @@
 namespace banggame {
 
     struct request_generalstore : selection_picker {
-        request_generalstore(card_ptr origin_card, player_ptr origin, player_ptr target)
-            : selection_picker(origin_card, origin, target) {}
+        using selection_picker::selection_picker;
 
         void on_update() override;
 
@@ -19,7 +18,7 @@ namespace banggame {
 
     struct effect_generalstore {
         void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
     };
 
     DEFINE_EFFECT(generalstore, effect_generalstore)

@@ -15,10 +15,10 @@ namespace banggame {
         }
         game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
 
-        void on_play(card_ptr origin_card, player_ptr origin) {
-            on_play(origin_card, origin, origin);
+        void on_play(card_ptr origin_card, player_ptr origin, effect_flags flags = {}) {
+            on_play(origin_card, origin, origin, flags);
         }
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
     };
 
     DEFINE_EFFECT(heal, effect_heal)

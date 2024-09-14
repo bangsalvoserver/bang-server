@@ -15,8 +15,10 @@ namespace banggame {
         return {};
     }
 
-    void effect_heal::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        target->heal(amount);
+    void effect_heal::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        if (!target->immune_to(origin_card, origin, flags)) {
+            target->heal(amount);
+        }
     }
 
     game_string effect_heal_notfull::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {

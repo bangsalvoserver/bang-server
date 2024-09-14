@@ -5,10 +5,17 @@
 namespace banggame {
 
     void request_generalstore::on_update() {
-        if (!live) {
-            target->play_sound("generalstore");
+        if (target->immune_to(origin_card, origin, flags)) {
+            target->m_game->pop_request();
+            target->m_game->queue_action([target=target]{
+                target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
+            });
+        } else {
+            if (!live) {
+                target->play_sound("generalstore");
+            }
+            auto_pick();
         }
-        auto_pick();
     }
 
     void request_generalstore::on_pick(card_ptr target_card) {
@@ -32,7 +39,7 @@ namespace banggame {
         }
     }
 
-    void effect_generalstore::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        origin->m_game->queue_request<request_generalstore>(origin_card, origin, target);
+    void effect_generalstore::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        origin->m_game->queue_request<request_generalstore>(origin_card, origin, target, flags);
     }
 }
