@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
     try {
         if (!tracking_file.empty()) {
             tracking::init_tracking(tracking_file);
-            tracking::track_client_count(0);
+            tracking::track_zero();
         }
 
 #ifndef WSSERVER_NO_TLS
@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
         logging::status("Stopping server...");
         
         server.stop();
-        tracking::track_client_count(0);
+        tracking::track_zero();
         
         logging::status("Server stopped");
 

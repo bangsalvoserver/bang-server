@@ -26,6 +26,11 @@ namespace tracking {
         }
     }
 
+    void track_zero() {
+        track_client_count(0);
+        track_lobby_count(0);
+    }
+
     void track_client_count(int client_count) {
         if (s_connection) {
             try {
