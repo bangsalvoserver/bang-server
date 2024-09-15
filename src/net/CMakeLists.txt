@@ -5,5 +5,6 @@ target_sources(bangserver PRIVATE
     main.cpp
     manager.cpp
     messages.cpp
+    tracking.cpp
     wsserver.cpp
 )

@@ -111,7 +111,6 @@ namespace banggame {
     using server_message = utils::tagged_variant<
         utils::tag<"ping">,
         utils::tag<"client_accepted", client_accepted_args>,
-        utils::tag<"client_count", int>,
         utils::tag<"lobby_error", std::string>,
         utils::tag<"lobby_update", lobby_data>,
         utils::tag<"lobby_entered", lobby_entered_args>,

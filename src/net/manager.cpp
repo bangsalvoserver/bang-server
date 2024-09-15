@@ -1,6 +1,7 @@
 #include "manager.h"
 
 #include "bot_info.h"
+#include "tracking.h"
 
 using namespace banggame;
 
@@ -307,7 +308,7 @@ void game_manager::kick_user_from_lobby(game_user &user) {
 void game_manager::on_connect(client_handle client) {
     logging::info("{}: Connected", get_client_ip(client));
     m_clients.emplace(client, client);
-    broadcast_message<"client_count">(static_cast<int>(m_clients.size()));
+    tracking::track_client_count(static_cast<int>(m_clients.size()));
 }
 
 void game_manager::on_disconnect(client_handle client) {
@@ -320,7 +321,7 @@ void game_manager::on_disconnect(client_handle client) {
             }
         }
         m_clients.erase(it);
-        broadcast_message<"client_count">(static_cast<int>(m_clients.size()));
+        tracking::track_client_count(static_cast<int>(m_clients.size()));
     }
 }
 

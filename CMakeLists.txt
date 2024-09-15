@@ -49,6 +49,11 @@ target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_CPP11_STL_)
 target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
 target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_NO_EXCEPTIONS_)
 
+# sqlite
+
+find_package(SQLite3 REQUIRED)
+target_link_libraries(banglibs INTERFACE SQLite::SQLite3)
+
 # range-v3
 
 find_package(range-v3 REQUIRED)

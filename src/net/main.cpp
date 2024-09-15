@@ -4,6 +4,7 @@
 #include <cxxopts.hpp>
 
 #include "manager.h"
+#include "tracking.h"
 
 volatile bool g_stop = false;
 
@@ -19,6 +20,8 @@ int main(int argc, char **argv) {
     uint16_t port = banggame::default_server_port;
     bool reuse_addr = false;
 
+    std::string tracking_file;
+
 #ifndef WSSERVER_NO_TLS
     bool enable_tls = false;
     std::string certificate_file;
@@ -30,6 +33,7 @@ int main(int argc, char **argv) {
         ("cheats",      "Enable Cheats",    cxxopts::value(server.options().enable_cheats))
         ("l,logging",   "Logging Level",    cxxopts::value(logging::log_function::global_level))
         ("r,reuse-addr","Reuse Address",    cxxopts::value(reuse_addr))
+        ("t,tracking-db","Tracking Database File", cxxopts::value(tracking_file))
 #ifndef WSSERVER_NO_TLS
         ("s,secure",    "Enable TLS",       cxxopts::value(enable_tls))
         ("cert",        "Certificate File", cxxopts::value(certificate_file))
@@ -54,6 +58,10 @@ int main(int argc, char **argv) {
     }
 
     try {
+        if (!tracking_file.empty()) {
+            tracking::init_tracking(tracking_file);
+        }
+
 #ifndef WSSERVER_NO_TLS
         if (enable_tls) {
             server.init_tls(certificate_file, private_key_file);
