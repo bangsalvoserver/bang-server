@@ -113,6 +113,7 @@ void game_manager::tick() {
         if (l.lifetime <= ticks{0}) {
             broadcast_message<"lobby_removed">(l.lobby_id);
             m_lobbies.erase(*it);
+            tracking::track_lobby_count(static_cast<int>(m_lobbies.size()));
             it = m_lobby_order.erase(it);
             continue;
         }
@@ -192,6 +193,7 @@ void game_manager::handle_message(utils::tag<"lobby_make">, game_user &user, con
 
     id_type lobby_id = ++m_lobby_count;
     auto &l = m_lobby_order.emplace_back(m_lobbies.try_emplace(lobby_id, value, lobby_id).first)->second;
+    tracking::track_lobby_count(static_cast<int>(m_lobbies.size()));
 
     int user_id = l.add_user(user).user_id;
 
