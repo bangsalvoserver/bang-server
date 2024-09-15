@@ -60,7 +60,6 @@ namespace banggame {
     static constexpr std::string_view MUTE_DESCRIPTION = "[user] : mute an user in this lobby";
     static constexpr std::string_view UNMUTE_DESCRIPTION = "[user] : unmute an user in this lobby";
     static constexpr std::string_view GET_OPTIONS_DESCRIPTION = "print game options";
-    static constexpr std::string_view SET_OPTION_DESCRIPTION = "[name] [value] : set a game option";
     static constexpr std::string_view RESET_OPTIONS_DESCRIPTION = "reset game options";
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
     static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed (only during game over screen)";
@@ -73,7 +72,6 @@ namespace banggame {
         { "mute",           { proxy<&game_manager::command_mute_user>,          MUTE_DESCRIPTION, command_permissions::lobby_owner }},
         { "unmute",         { proxy<&game_manager::command_unmute_user>,        UNMUTE_DESCRIPTION, command_permissions::lobby_owner }},
         { "options",        { proxy<&game_manager::command_get_game_options>,   GET_OPTIONS_DESCRIPTION }},
-        { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "reset-options",  { proxy<&game_manager::command_reset_game_options>, RESET_OPTIONS_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
         { "seed",           { proxy<&game_manager::command_get_rng_seed>,       GET_RNG_SEED_DESCRIPTION, command_permissions::lobby_finished }},
@@ -119,38 +117,6 @@ namespace banggame {
                 std::format("{} = {}", reflect::member_name<I>(options), reflect::get<I>(options))
             );
         });
-    }
-
-    template<size_t ... Is>
-    constexpr auto gen_set_option_map(std::index_sequence<Is ...>) {
-        using set_option_fn_ptr = bool (*)(game_options &options, std::string_view value_str);
-
-        return utils::static_map<std::string_view, set_option_fn_ptr>({
-            { reflect::member_name<Is, game_options>(), [](game_options &options, std::string_view value_str) {
-                auto &field = reflect::get<Is>(options);
-                if (auto value = parse_string<std::remove_reference_t<decltype(field)>>(value_str)) {
-                    field = *value;
-                    return true;
-                } else {
-                    return false;
-                }
-            }} ... });
-    }
-
-    void game_manager::command_set_game_option(game_user &user, std::string_view name, std::string_view value) {
-        static constexpr auto set_option_map = gen_set_option_map(std::make_index_sequence<reflect::size<game_options>()>());
-        
-        if (auto it = set_option_map.find(name); it != set_option_map.end()) {
-            auto &lobby = *user.in_lobby;
-
-            if (it->second(lobby.options, value)) {
-                broadcast_message_lobby<"lobby_edited">(lobby, lobby);
-            } else {
-                throw lobby_error("INVALID_OPTION_VALUE");
-            }
-        } else {
-            throw lobby_error("INVALID_OPTION_NAME");
-        }
     }
 
     void game_manager::command_reset_game_options(game_user &user) {

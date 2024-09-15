@@ -95,7 +95,7 @@ namespace banggame {
         if (m_options.num_bots == 0) {
             return utils::tag<"done">{};
         } else if (!instant && m_options.bot_play_timer > game_duration{0}) {
-            return { utils::tag<"bot_play">{}, get_total_update_time() + clamp_ticks(m_options.bot_play_timer) };
+            return { utils::tag<"bot_play">{}, get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
         }
 
         if (pending_requests()) {

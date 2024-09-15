@@ -42,7 +42,7 @@ namespace banggame {
     }
 
     game_duration game_table::transform_duration(game_duration duration) const {
-        return std::chrono::duration_cast<game_duration>(duration * std::clamp(m_options.duration_coefficient, 0.f, 4.f));
+        return std::chrono::duration_cast<game_duration>(duration * m_options.duration_coefficient);
     }
     
     card_list &game_table::get_pocket(pocket_type pocket, player_ptr owner) {
