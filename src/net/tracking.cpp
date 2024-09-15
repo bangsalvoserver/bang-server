@@ -1,36 +1,27 @@
 #include "tracking.h"
 
-#include <sqlite3.h>
-#include <stdexcept>
+#include "utils/sqlite3_wrapper.h"
 
 namespace tracking {
 
-    struct sqlite3_connection {
-        sqlite3 *value = nullptr;
-
-        ~sqlite3_connection() {
-            if (value) {
-                sqlite3_close(value);
-            }
-        }
-    };
-
-    static sqlite3_connection s_connection;
-
-    static void throw_if_sqlite3_error(int result) {
-        if (result != SQLITE_OK) {
-            throw std::runtime_error(sqlite3_errstr(result));
-        }
-    }
+    static sql::sqlite3_connection s_connection;
 
     void init_tracking(const std::string &tracking_file) {
-        throw_if_sqlite3_error(sqlite3_open(tracking_file.c_str(), &s_connection.value));
-        // TODO create tables
+        s_connection.init(tracking_file);
+        s_connection.exec_sql(
+            "CREATE TABLE IF NOT EXISTS client_count("
+            "timestamp INT NOT NULL,"
+            "count INT NOT NULL"
+            ");");
     }
 
     void track_client_count(int client_count) {
-        if (s_connection.value) {
-            // TODO insert into client_count (timestamp, client_count)
+        if (s_connection) {
+            auto stmt = s_connection.prepare(
+                "INSERT INTO client_count (timestamp, count) VALUES (strftime('%s', 'now'), ?)"
+            );
+            stmt.bind(1, client_count);
+            stmt.step();
         }
     }
 
