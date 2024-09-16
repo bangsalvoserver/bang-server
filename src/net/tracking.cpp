@@ -37,40 +37,29 @@ namespace tracking {
         track_lobby_count(0);
     }
 
-    void track_client_count(size_t client_count) {
+    static void track_simple(std::string_view table_name, size_t count) {
         if (s_connection) {
             try {
-                auto stmt = s_connection.prepare("INSERT INTO client_count (timestamp, count) VALUES (strftime('%s', 'now'), ?)");
-                stmt.bind(1, client_count);
-                stmt.step();
+                s_connection.exec_sql(std::format(
+                    "INSERT INTO {} (timestamp, count) VALUES (strftime('%s', 'now'), {})",
+                    table_name, count
+                ));
             } catch (const std::exception &error) {
                 logging::error("SQL error: {}", error.what());
             }
         }
+    }
+
+    void track_client_count(size_t client_count) {
+        track_simple("client_count", client_count);
     }
 
     void track_user_count(size_t user_count) {
-        if (s_connection) {
-            try {
-                auto stmt = s_connection.prepare("INSERT INTO user_count (timestamp, count) VALUES (strftime('%s', 'now'), ?)");
-                stmt.bind(1, user_count);
-                stmt.step();
-            } catch (const std::exception &error) {
-                logging::error("SQL error: {}", error.what());
-            }
-        }
+        track_simple("user_count", user_count);
     }
 
     void track_lobby_count(size_t lobby_count) {
-        if (s_connection) {
-            try {
-                auto stmt = s_connection.prepare("INSERT INTO lobby_count (timestamp, count) VALUES (strftime('%s', 'now'), ?)");
-                stmt.bind(1, lobby_count);
-                stmt.step();
-            } catch (const std::exception &error) {
-                logging::error("SQL error: {}", error.what());
-            }
-        }
+        track_simple("lobby_count", lobby_count);
     }
 
 }

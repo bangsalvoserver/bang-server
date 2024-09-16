@@ -56,6 +56,10 @@ namespace sql {
             }
         }
 
+        void bind(int index, std::string_view value) {
+            throw_if_sqlite3_error(sqlite3_bind_text(stmt, index, value.data(), value.size(), nullptr));
+        }
+
         void bind(int index, int value) {
             throw_if_sqlite3_error(sqlite3_bind_int(stmt, index, value));
         }
@@ -109,9 +113,9 @@ namespace sql {
             }
         }
 
-        sqlite3_statement prepare(const std::string &sql) {
+        sqlite3_statement prepare(std::string_view sql) {
             sqlite3_statement result;
-            throw_if_sqlite3_error(sqlite3_prepare_v2(db, sql.c_str(), sql.size(), &result.stmt, nullptr));
+            throw_if_sqlite3_error(sqlite3_prepare_v2(db, sql.data(), sql.size(), &result.stmt, nullptr));
             return result;
         }
     };
