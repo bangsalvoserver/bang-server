@@ -31,7 +31,7 @@ namespace tracking {
         track_lobby_count(0);
     }
 
-    void track_client_count(int client_count) {
+    void track_client_count(size_t client_count) {
         if (s_connection) {
             try {
                 auto stmt = s_connection.prepare("INSERT INTO client_count (timestamp, count) VALUES (strftime('%s', 'now'), ?)");
@@ -43,7 +43,7 @@ namespace tracking {
         }
     }
 
-    void track_lobby_count(int lobby_count) {
+    void track_lobby_count(size_t lobby_count) {
         if (s_connection) {
             try {
                 auto stmt = s_connection.prepare("INSERT INTO lobby_count (timestamp, count) VALUES (strftime('%s', 'now'), ?)");

@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include <sqlite3.h>
 
@@ -15,56 +16,93 @@ namespace sql {
     }
 
     struct sqlite3_string {
-        char *value = nullptr;
+        char *str = nullptr;
+
+        sqlite3_string() = default;
+
+        sqlite3_string(const sqlite3_string &) = delete;
+        sqlite3_string &operator = (const sqlite3_string &) = delete;
+
+        sqlite3_string(sqlite3_string &&other) noexcept : str{std::exchange(other.str, nullptr)} {}
+        sqlite3_string &operator = (sqlite3_string &&other) noexcept {
+            std::swap(str, other.str);
+            return *this;
+        }
 
         ~sqlite3_string() {
-            if (value) {
-                sqlite3_free(value);
+            if (str) {
+                sqlite3_free(str);
             }
         }
     };
 
     struct sqlite3_statement {
-        sqlite3_stmt *value = nullptr;
+        sqlite3_stmt *stmt = nullptr;
+
+        sqlite3_statement() = default;
+
+        sqlite3_statement(const sqlite3_statement &) = delete;
+        sqlite3_statement &operator = (const sqlite3_statement &) = delete;
+
+        sqlite3_statement(sqlite3_statement &&other) noexcept : stmt{std::exchange(other.stmt, nullptr)} {}
+        sqlite3_statement &operator = (sqlite3_statement &&other) noexcept {
+            std::swap(stmt, other.stmt);
+            return *this;
+        }
 
         ~sqlite3_statement() {
-            if (value) {
-                sqlite3_finalize(value);
+            if (stmt) {
+                sqlite3_finalize(stmt);
             }
         }
 
-        void bind(int index, int num) {
-            throw_if_sqlite3_error(sqlite3_bind_int(value, index, num));
+        void bind(int index, int value) {
+            throw_if_sqlite3_error(sqlite3_bind_int(stmt, index, value));
+        }
+
+        void bind(int index, size_t value) {
+            throw_if_sqlite3_error(sqlite3_bind_int64(stmt, index, value));
         }
 
         int step() {
-            return sqlite3_step(value);
+            return sqlite3_step(stmt);
         }
     };
 
     struct sqlite3_connection {
-        sqlite3 *value = nullptr;
+        sqlite3 *db = nullptr;
+
+        sqlite3_connection() = default;
+
+        sqlite3_connection(const sqlite3_connection &) = delete;
+        sqlite3_connection &operator = (const sqlite3_connection &) = delete;
+
+        sqlite3_connection(sqlite3_connection &&other) noexcept : db{std::exchange(other.db, nullptr)} {}
+        sqlite3_connection &operator = (sqlite3_connection &&other) noexcept {
+            std::swap(db, other.db);
+            return *this;
+        }
 
         ~sqlite3_connection() {
-            if (value) {
-                sqlite3_close(value);
+            if (db) {
+                sqlite3_close(db);
             }
         }
 
         explicit operator bool() const {
-            return value != nullptr;
+            return db != nullptr;
         }
 
         void init(const std::string &filename) {
-            throw_if_sqlite3_error(sqlite3_open(filename.c_str(), &value));
+            throw_if_sqlite3_error(sqlite3_open(filename.c_str(), &db));
         }
 
         void exec_sql(const std::string &sql) {
             sqlite3_string errmsg;
-            int result = sqlite3_exec(value, sql.c_str(), nullptr, nullptr, &errmsg.value);
+            int result = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errmsg.str);
             if (result != SQLITE_OK) {
-                if (errmsg.value) {
-                    throw std::runtime_error(errmsg.value);
+                if (errmsg.str) {
+                    throw std::runtime_error(errmsg.str);
                 } else {
                     throw std::runtime_error(sqlite3_errstr(result));
                 }
@@ -73,7 +111,7 @@ namespace sql {
 
         sqlite3_statement prepare(const std::string &sql) {
             sqlite3_statement result;
-            throw_if_sqlite3_error(sqlite3_prepare(value, sql.c_str(), sql.size(), &result.value, nullptr));
+            throw_if_sqlite3_error(sqlite3_prepare_v2(db, sql.c_str(), sql.size(), &result.stmt, nullptr));
             return result;
         }
     };

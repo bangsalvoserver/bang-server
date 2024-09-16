@@ -8,8 +8,8 @@ namespace tracking {
     void init_tracking(const std::string &tracking_file);
 
     void track_zero();
-    void track_client_count(int client_count);
-    void track_lobby_count(int lobby_count);
+    void track_client_count(size_t client_count);
+    void track_lobby_count(size_t lobby_count);
 
 }
 
