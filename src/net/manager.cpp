@@ -74,6 +74,7 @@ void game_manager::tick() {
                     kick_user_from_lobby(user);
                 }
                 it = m_users.erase(it);
+                tracking::track_user_count(m_users.size());
                 continue;
             }
         } else {
@@ -146,6 +147,7 @@ void game_manager::handle_message(utils::tag<"connect">, client_state &state, co
         kick_client(state.user->client, "RECONNECT_WITH_SAME_SESSION_ID");
     } else {
         state.user = &m_users.emplace_hint(it, session_id, session_id)->second;
+        tracking::track_user_count(m_users.size());
     }
 
     state.user->set_username(args.username);

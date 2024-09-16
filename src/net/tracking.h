@@ -9,6 +9,7 @@ namespace tracking {
 
     void track_zero();
     void track_client_count(size_t client_count);
+    void track_user_count(size_t user_count);
     void track_lobby_count(size_t lobby_count);
 
 }
