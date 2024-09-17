@@ -2,55 +2,8 @@
 
 #include "manager.h"
 
-#include "utils/parse_string.h"
-#include "utils/static_map.h"
-
 #include "cards/filter_enums.h"
 #include "cards/card_data.h"
-
-#include <charconv>
-#include <reflect>
-
-template<> struct std::formatter<banggame::expansion_set> : std::formatter<std::string_view> {
-    static std::string expansions_to_string(banggame::expansion_set value) {
-        std::string ret;
-        for (const banggame::ruleset_vtable *ruleset : banggame::all_cards.expansions) {
-            if (value.contains(ruleset)) {
-                if (!ret.empty()) {
-                    ret += ' ';
-                }
-                ret.append(ruleset->name);
-            }
-        }
-        return ret;
-    }
-
-    auto format(banggame::expansion_set value, std::format_context &ctx) const {
-        return std::formatter<std::string_view>::format(expansions_to_string(value), ctx);
-    }
-};
-
-template<> struct string_parser<banggame::expansion_set> {
-    std::optional<banggame::expansion_set> operator()(std::string_view str) {
-        constexpr std::string_view whitespace = " \t";
-        banggame::expansion_set result;
-        while (true) {
-            size_t pos = str.find_first_not_of(whitespace);
-            if (pos == std::string_view::npos) break;
-            str = str.substr(pos);
-            pos = str.find_first_of(whitespace);
-            auto it = rn::find(banggame::all_cards.expansions, str.substr(0, pos), &banggame::ruleset_vtable::name);
-            if (it != banggame::all_cards.expansions.end()) {
-                result.insert(*it);
-            } else {
-                return std::nullopt;
-            }
-            if (pos == std::string_view::npos) break;
-            str = str.substr(pos);
-        }
-        return result;
-    }
-};
 
 namespace banggame {
 
@@ -60,6 +13,7 @@ namespace banggame {
     static constexpr std::string_view MUTE_DESCRIPTION = "[user] : mute an user in this lobby";
     static constexpr std::string_view UNMUTE_DESCRIPTION = "[user] : unmute an user in this lobby";
     static constexpr std::string_view GET_OPTIONS_DESCRIPTION = "print game options";
+    static constexpr std::string_view SET_OPTION_DESCRIPTION = "[name] [value] : set a game option";
     static constexpr std::string_view RESET_OPTIONS_DESCRIPTION = "reset game options";
     static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
     static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed (only during game over screen)";
@@ -72,6 +26,7 @@ namespace banggame {
         { "mute",           { proxy<&game_manager::command_mute_user>,          MUTE_DESCRIPTION, command_permissions::lobby_owner }},
         { "unmute",         { proxy<&game_manager::command_unmute_user>,        UNMUTE_DESCRIPTION, command_permissions::lobby_owner }},
         { "options",        { proxy<&game_manager::command_get_game_options>,   GET_OPTIONS_DESCRIPTION }},
+        { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "reset-options",  { proxy<&game_manager::command_reset_game_options>, RESET_OPTIONS_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
         { "seed",           { proxy<&game_manager::command_get_rng_seed>,       GET_RNG_SEED_DESCRIPTION, command_permissions::lobby_finished }},
@@ -108,21 +63,6 @@ namespace banggame {
     void game_manager::command_unmute_user(game_user &user, std::string_view name_or_id) {
         lobby_user &lu = user.in_lobby->find_user(name_or_id);
         lu.flags.remove(lobby_user_flag::muted);
-    }
-
-    void game_manager::command_get_game_options(game_user &user) {
-        const game_options &options = user.in_lobby->options;
-        reflect::for_each<game_options>([&](auto I) {
-            send_message<"lobby_message">(user.client,
-                std::format("{} = {}", reflect::member_name<I>(options), reflect::get<I>(options))
-            );
-        });
-    }
-
-    void game_manager::command_reset_game_options(game_user &user) {
-        auto &lobby = *user.in_lobby;
-        lobby.options = banggame::default_game_options;
-        broadcast_message_lobby<"lobby_edited">(lobby, lobby);
     }
 
     void game_manager::command_give_card(game_user &user, std::string_view name) {
