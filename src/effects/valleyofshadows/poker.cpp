@@ -20,10 +20,12 @@ namespace banggame {
 
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
-            target->m_game->add_log(update_target::includes(origin, target), "LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
-            target->m_game->add_log(update_target::excludes(origin, target), "LOG_DISCARDED_A_CARD_FOR", origin_card, target);
-            target_card->move_to(pocket_type::selection, origin);
-            target->m_game->call_event(event_type::on_discard_hand_card{ target, target_card, true });
+            if (!target->immune_to(origin_card, origin, flags)) {
+                target->m_game->add_log(update_target::includes(origin, target), "LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
+                target->m_game->add_log(update_target::excludes(origin, target), "LOG_DISCARDED_A_CARD_FOR", origin_card, target);
+                target_card->move_to(pocket_type::selection, origin);
+                target->m_game->call_event(event_type::on_discard_hand_card{ target, target_card, true });
+            }
         }
 
         game_string status_text(player_ptr owner) const override {
