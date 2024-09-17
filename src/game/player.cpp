@@ -54,7 +54,7 @@ namespace banggame {
 
     void player::disable_equip(card_ptr target_card) {
         bool card_disabled = m_game->is_disabled(target_card);
-        for (const equip_holder &holder : target_card->equips) {
+        for (const equip_holder &holder : target_card->equips | rv::reverse) {
             if (!card_disabled || holder.is_nodisable()) {
                 holder.on_disable(target_card, this);
             }

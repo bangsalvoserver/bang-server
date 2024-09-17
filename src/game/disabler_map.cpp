@@ -34,7 +34,7 @@ namespace banggame {
     void disabler_map::add_disabler(event_card_key key, card_disabler_fun &&fun) {
         for (auto [owner, c] : disableable_cards(m_game)) {
             if (!is_disabled(c) && std::invoke(fun, c)) {
-                for (const equip_holder &holder : c->equips) {
+                for (const equip_holder &holder : c->equips | rv::reverse) {
                     if (!holder.is_nodisable()) {
                         holder.on_disable(c, owner);
                     }
