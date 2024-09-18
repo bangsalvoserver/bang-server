@@ -89,7 +89,7 @@ private:
     void command_mute_user(game_user &user, std::string_view target_user);
     void command_unmute_user(game_user &user, std::string_view target_user);
     void command_get_game_options(game_user &user);
-    void command_set_game_option(game_user &user, std::string_view name, std::string_view value);
+    void command_set_game_option(game_user &user, std::string_view key, std::string_view value);
     void command_reset_game_options(game_user &user);
     void command_give_card(game_user &user, std::string_view name);
     void command_get_rng_seed(game_user &user);

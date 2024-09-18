@@ -64,6 +64,33 @@ namespace banggame {
         lobby_user &lu = user.in_lobby->find_user(name_or_id);
         lu.flags.remove(lobby_user_flag::muted);
     }
+    
+    void game_manager::command_get_game_options(game_user &user) {
+        std::string options = user.in_lobby->options.to_string();
+        
+        std::string::size_type pos = 0;
+        std::string::size_type prev = 0;
+        while ((pos = options.find('\n', prev)) != std::string::npos) {
+            send_message<"lobby_message">(user.client, options.substr(prev, pos - prev));
+            prev = pos + 1;
+        }
+    }
+
+    void game_manager::command_set_game_option(game_user &user, std::string_view key, std::string_view value) {
+        try {
+            lobby &lobby = *user.in_lobby;
+            lobby.options.set_option(key, value);
+            broadcast_message_lobby<"lobby_edited">(lobby, lobby);
+        } catch (const std::exception &e) {
+            throw lobby_error(e.what());
+        }
+    }
+
+    void game_manager::command_reset_game_options(game_user &user) {
+        auto &lobby = *user.in_lobby;
+        lobby.options = game_options::default_game_options;
+        broadcast_message_lobby<"lobby_edited">(lobby, lobby);
+    }
 
     void game_manager::command_give_card(game_user &user, std::string_view name) {
         auto &lobby = *user.in_lobby;

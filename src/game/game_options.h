@@ -19,19 +19,22 @@ namespace banggame {
         game_duration tumbleweed_timer;
         float duration_coefficient;
         unsigned int game_seed;
-    };
 
-    extern const game_options default_game_options;
+        static const game_options default_game_options;
+        static game_options deserialize_json(const json::json &value);
+
+        std::string to_string() const;
+        void set_option(std::string_view key, std::string_view value);
+    };
 
 }
 
 namespace json {
-    banggame::game_options deserialize_game_options(const json &value);
 
     template<typename Context>
     struct deserializer<banggame::game_options, Context> {
         banggame::game_options operator()(const json &value, const Context &ctx) const {
-            return deserialize_game_options(value);
+            return banggame::game_options::deserialize_json(value);
         }
     };
 }
