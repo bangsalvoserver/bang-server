@@ -91,7 +91,7 @@ private:
     void command_get_game_options(game_user &user);
     void command_set_game_option(game_user &user, std::string_view key, std::string_view value);
     void command_reset_game_options(game_user &user);
-    void command_give_card(game_user &user, std::string_view name);
+    void command_give_card(game_user &user, std::string_view card_name);
     void command_get_rng_seed(game_user &user);
     void command_quit(game_user &user);
 

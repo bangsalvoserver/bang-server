@@ -7,6 +7,7 @@ PRIVATE
     game_net.cpp
     game_options.cpp
     game_table.cpp
+    give_card.cpp
     disabler_map.cpp
     durations.cpp
     event_map.cpp
