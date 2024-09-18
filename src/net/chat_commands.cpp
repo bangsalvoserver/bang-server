@@ -65,14 +65,7 @@ namespace banggame {
     }
     
     void game_manager::command_get_game_options(game_user &user) {
-        std::string options = user.in_lobby->options.to_string();
-        
-        std::string::size_type pos = 0;
-        std::string::size_type prev = 0;
-        while ((pos = options.find('\n', prev)) != std::string::npos) {
-            send_message<"lobby_message">(user.client, options.substr(prev, pos - prev));
-            prev = pos + 1;
-        }
+        send_message<"lobby_message">(user.client, user.in_lobby->options.to_string());
     }
 
     void game_manager::command_set_game_option(game_user &user, std::string_view key, std::string_view value) {
