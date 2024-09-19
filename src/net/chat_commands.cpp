@@ -97,7 +97,7 @@ namespace banggame {
             throw lobby_error("ERROR_PLAYER_NOT_IN_TURN");
         }
 
-        if (!give_card(lobby.m_game.get(), target, card_name)) {
+        if (!give_card(target, card_name)) {
             throw lobby_error("ERROR_CANNOT_FIND_CARD");
         }
     }

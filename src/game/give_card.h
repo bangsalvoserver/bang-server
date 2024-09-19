@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    bool give_card(game *game, player_ptr target, std::string_view card_name);
+    bool give_card(player_ptr target, std::string_view card_name);
 
 }
 

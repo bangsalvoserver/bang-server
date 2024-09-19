@@ -4,8 +4,8 @@
 
 namespace banggame {
 
-    bool give_card(game *game, player_ptr target, std::string_view card_name) {
-        auto all_cards = game->get_all_cards();
+    bool give_card(player_ptr target, std::string_view card_name) {
+        auto all_cards = target->m_game->get_all_cards();
         auto card_it = rn::find_if(all_cards, [&](const_card_ptr target_card) {
             if (rn::equal(card_name, target_card->name, {}, toupper, toupper)) {
                 switch (target_card->deck) {
@@ -19,9 +19,9 @@ namespace banggame {
                         && (target_card->pocket != pocket_type::player_table || target_card->owner != target);
                 case card_deck_type::highnoon:
                 case card_deck_type::fistfulofcards:
-                    return game->m_scenario_cards.empty() || target_card != game->m_scenario_cards.back();
+                    return target->m_game->m_scenario_cards.empty() || target_card != target->m_game->m_scenario_cards.back();
                 case card_deck_type::wildwestshow:
-                    return game->m_wws_scenario_cards.empty() || target_card != game->m_wws_scenario_cards.back();
+                    return target->m_game->m_wws_scenario_cards.empty() || target_card != target->m_game->m_wws_scenario_cards.back();
                 }
             }
             return false;
@@ -31,7 +31,7 @@ namespace banggame {
         }
         card_ptr target_card = *card_it;
         
-        game->send_request_status_clear();
+        target->m_game->send_request_status_clear();
         
         switch (target_card->deck) {
         case card_deck_type::main_deck: {
@@ -52,7 +52,7 @@ namespace banggame {
             int ncubes = old_character->num_cubes;
 
             old_character->move_cubes(nullptr, ncubes);
-            game->add_update<"remove_cards">(std::vector{old_character});
+            target->m_game->add_update<"remove_cards">(std::vector{old_character});
 
             old_character->pocket = pocket_type::none;
             old_character->owner = nullptr;
@@ -64,7 +64,7 @@ namespace banggame {
             target_card->pocket = pocket_type::player_character;
             target_card->owner = target;
 
-            game->add_update<"add_cards">(target_card, pocket_type::player_character, target);
+            target->m_game->add_update<"add_cards">(target_card, pocket_type::player_character, target);
             target_card->set_visibility(card_visibility::shown, nullptr, true);
 
             target->reset_max_hp();
@@ -73,21 +73,21 @@ namespace banggame {
             break;
         }
         case card_deck_type::goldrush: {
-            game->m_shop_selection.front()->move_to(pocket_type::shop_discard);
+            target->m_game->m_shop_selection.front()->move_to(pocket_type::shop_discard);
             target_card->move_to(pocket_type::shop_selection);
             break;
         }
         case card_deck_type::highnoon:
         case card_deck_type::fistfulofcards: {
             if (target_card->pocket == pocket_type::scenario_deck) {
-                if (auto it = rn::find(game->m_scenario_deck, target_card); it != game->m_scenario_deck.end()) {
-                    game->m_scenario_deck.erase(it);
+                if (auto it = rn::find(target->m_game->m_scenario_deck, target_card); it != target->m_game->m_scenario_deck.end()) {
+                    target->m_game->m_scenario_deck.erase(it);
                 } else {
-                    game->add_update<"add_cards">(target_card, pocket_type::scenario_deck);
+                    target->m_game->add_update<"add_cards">(target_card, pocket_type::scenario_deck);
                 }
-                game->m_scenario_deck.push_back(target_card);
+                target->m_game->m_scenario_deck.push_back(target_card);
                 target_card->set_visibility(card_visibility::shown, nullptr, true);
-                game->add_update<"move_card">(target_card, nullptr, pocket_type::scenario_deck, 0ms);
+                target->m_game->add_update<"move_card">(target_card, nullptr, pocket_type::scenario_deck, 0ms);
             } else {
                 target_card->move_to(pocket_type::scenario_deck);
             }
@@ -95,14 +95,14 @@ namespace banggame {
         }
         case card_deck_type::wildwestshow: {
             if (target_card->pocket == pocket_type::wws_scenario_deck) {
-                if (auto it = rn::find(game->m_wws_scenario_deck, target_card); it != game->m_wws_scenario_deck.end()) {
-                    game->m_wws_scenario_deck.erase(it);
+                if (auto it = rn::find(target->m_game->m_wws_scenario_deck, target_card); it != target->m_game->m_wws_scenario_deck.end()) {
+                    target->m_game->m_wws_scenario_deck.erase(it);
                 } else {
-                    game->add_update<"add_cards">(target_card, pocket_type::wws_scenario_deck);
+                    target->m_game->add_update<"add_cards">(target_card, pocket_type::wws_scenario_deck);
                 }
-                game->m_wws_scenario_deck.push_back(target_card);
+                target->m_game->m_wws_scenario_deck.push_back(target_card);
                 target_card->set_visibility(card_visibility::shown, nullptr, true);
-                game->add_update<"move_card">(target_card, nullptr, pocket_type::wws_scenario_deck, 0ms);
+                target->m_game->add_update<"move_card">(target_card, nullptr, pocket_type::wws_scenario_deck, 0ms);
             } else {
                 target_card->move_to(pocket_type::wws_scenario_deck);
             }
@@ -114,7 +114,7 @@ namespace banggame {
             } else {
                 bool from_train = target_card->pocket == pocket_type::train;
                 target->equip_card(target_card);
-                if (card_ptr drawn_card = game->top_train_card(); from_train && drawn_card) {
+                if (card_ptr drawn_card = target->m_game->top_train_card(); from_train && drawn_card) {
                     drawn_card->move_to(pocket_type::train);
                 }
             }
@@ -122,7 +122,7 @@ namespace banggame {
         }
         }
 
-        game->commit_updates();
+        target->m_game->commit_updates();
         return true;
     }
 }
