@@ -193,7 +193,7 @@ def merge_cards(card_sets):
                 result[deck] = cards
     return result, expansions
 
-def parse_file(data, expansions):
+def parse_file(data):
     def get_main_deck_cards(card):
         for sign in card['signs']:
             card['sign'] = sign
@@ -234,12 +234,12 @@ def parse_file(data, expansions):
             return card
         return deck.key or key, list(parse_all_effects(card) for c in cards for card in deck.strategy(add_deck(c)))
 
-    return CppObject(
-        **dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order)),
-        expansions = [
-            CppLiteral(f"GET_RULESET({expansion})") for expansion in expansions
-        ]
-    )
+    return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
+
+def parse_expansions(expansions):
+    return { 'expansions': [
+        CppLiteral(f"GET_RULESET({expansion})") for expansion in expansions
+    ] }
 
 INCLUDE_FILENAMES = ['cards/vtable_build.h', 'cards/filter_enums.h', 'effects/effects.h']
 OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
@@ -250,7 +250,11 @@ if __name__ == '__main__':
         sys.exit(1)
 
     with open(sys.argv[1], 'r', encoding='utf8') as file:
-        bang_cards = parse_file(*merge_cards(yaml.safe_load(file)))
+        data, expansions = merge_cards(yaml.safe_load(file))
+        bang_cards = CppObject(
+            **parse_file(data),
+            **parse_expansions(expansions)
+        )
     
     if sys.argv[2] == '-':
         print_cpp_file(bang_cards, OBJECT_DECLARATION,
