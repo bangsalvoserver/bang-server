@@ -1,8 +1,7 @@
 #include "game_options.h"
 
+#include "cards/expansion_set.h"
 #include "utils/static_map.h"
-
-#include "expansion_set.h"
 
 namespace banggame {
     
@@ -81,7 +80,10 @@ namespace banggame {
     std::string game_options::to_string() const {
         std::string result;
         reflect::for_each<game_options>([&](auto I) {
-            result += std::format("{} = {}\n", reflect::member_name<I>(*this), reflect::get<I>(*this));
+            if (!result.empty()) {
+                result += '\n';
+            }
+            result += std::format("{} = {}", reflect::member_name<I>(*this), reflect::get<I>(*this));
         });
         return result;
     }
@@ -93,7 +95,7 @@ namespace banggame {
             return utils::static_map<std::string_view, set_option_fn_ptr>({
                 { reflect::member_name<Is, game_options>(), [](game_options &options, std::string_view value_str) {
                     auto &field = reflect::get<Is>(options);
-                    if (auto value = parse_string<std::remove_reference_t<decltype(field)>>(value_str)) {
+                    if (auto value = utils::parse_string<std::remove_reference_t<decltype(field)>>(value_str)) {
                         field = transform_field<Is>(*value);
                     } else {
                         throw std::runtime_error("INVALID_OPTION_VALUE");

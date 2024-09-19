@@ -1,5 +1,6 @@
 #include "game/game_net.h"
 
+#include "cards/expansion_set.h"
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
@@ -101,12 +102,6 @@ namespace json {
             } else {
                 return {};
             }
-        }
-    };
-
-    template<typename Context> struct serializer<const banggame::ruleset_vtable *, Context> {
-        json operator()(const banggame::ruleset_vtable *value) const {
-            return value->name;
         }
     };
 

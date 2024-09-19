@@ -1,17 +1,9 @@
 #include "messages.h"
 
-#include "utils/json_aggregate.h"
+#include "cards/expansion_set.h"
 #include "cards/vtables.h"
 
-namespace json {
-
-    template<typename Context> struct serializer<const banggame::ruleset_vtable *, Context> {
-        json operator()(const banggame::ruleset_vtable *value) const {
-            return value->name;
-        }
-    };
-
-}
+#include "utils/json_aggregate.h"
 
 namespace banggame {
     

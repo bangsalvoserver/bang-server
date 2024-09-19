@@ -3,9 +3,10 @@
 
 #include <nlohmann/json.hpp>
 
-#include <ranges>
 #include <vector>
 #include <chrono>
+
+#include "range_utils.h"
 
 namespace json {
 
@@ -99,14 +100,14 @@ namespace json {
         }
     };
 
-    template<std::ranges::range Range, typename Context> requires (
+    template<rn::range Range, typename Context> requires (
         !std::convertible_to<Range, json>
-        && serializable<std::ranges::range_value_t<Range>, Context>
+        && serializable<rn::range_value_t<Range>, Context>
     )
     struct serializer<Range, Context> {
         json operator()(const Range &value, const Context &ctx) const {
             auto ret = json::array();
-            if constexpr (std::ranges::sized_range<Range>) {
+            if constexpr (rn::sized_range<Range>) {
                 ret.get_ptr<json::array_t*>()->reserve(value.size());
             }
             for (const auto &obj : value) {
@@ -182,18 +183,19 @@ namespace json {
         }
     };
     
-    template<typename T, typename Context> requires deserializable<T, Context>
-    struct deserializer<std::vector<T>, Context> {
-        std::vector<T> operator()(const json &value, const Context &ctx) const {
+    template<rn::range Range, typename Context> requires (
+        !std::convertible_to<Range, json>
+        && deserializable<rn::range_value_t<Range>, Context>
+    ) struct deserializer<Range, Context> {
+        Range operator()(const json &value, const Context &ctx) const {
             if (!value.is_array()) {
-                throw deserialize_error("Cannot deserialize vector");
+                throw deserialize_error("Cannot deserialize range");
             }
-            std::vector<T> ret;
-            ret.reserve(value.size());
-            for (const auto &obj : value) {
-                ret.push_back(deserialize_unchecked<T>(obj, ctx));
-            }
-            return ret;
+            return value
+                | rv::transform([&](const json &obj) {
+                    return deserialize_unchecked<rn::range_value_t<Range>>(obj, ctx);
+                })
+                | rn::to<Range>;
         }
     };
 
