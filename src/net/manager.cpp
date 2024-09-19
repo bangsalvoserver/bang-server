@@ -204,7 +204,9 @@ void game_manager::handle_message(utils::tag<"lobby_make">, game_user &user, con
 
     send_message<"lobby_entered">(user.client, user_id, l.lobby_id, l.name, l.options);
     send_message<"lobby_add_user">(user.client, user_id, user.username, lobby_team::game_player);
-    send_message<"lobby_user_propic">(user.client, user_id, user.propic);
+    if (user.propic) {
+        send_message<"lobby_user_propic">(user.client, user_id, user.propic);
+    }
 }
 
 void game_manager::handle_message(utils::tag<"lobby_edit">, game_user &user, const lobby_info &args) {
@@ -238,10 +240,14 @@ void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
     for (const lobby_user &lu : lobby.users) {
         if (lu.user != &user) {
             send_message<"lobby_add_user">(lu.user->client, new_user.user_id, user.username, new_user.team);
-            send_message<"lobby_user_propic">(lu.user->client, new_user.user_id, user.propic);
+            if (user.propic) {
+                send_message<"lobby_user_propic">(lu.user->client, new_user.user_id, user.propic);
+            }
         }
         send_message<"lobby_add_user">(user.client, lu.user_id, lu.user->username, lu.team, lobby_chat_flag::is_read, lu.user->get_disconnect_lifetime());
-        send_message<"lobby_user_propic">(user.client, lu.user_id, lu.user->propic);
+        if (lu.user->propic) {
+            send_message<"lobby_user_propic">(user.client, lu.user_id, lu.user->propic);
+        }
     }
     for (auto &bot : lobby.bots) {
         send_message<"lobby_add_user">(user.client, bot.user_id, bot.username, lobby_team::game_player, lobby_chat_flag::is_read);

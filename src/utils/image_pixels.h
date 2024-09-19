@@ -10,6 +10,10 @@ namespace utils {
         int height;
         std::vector<std::byte> pixels;
 
+        explicit operator bool () const {
+            return width != 0 && height != 0;
+        }
+
         uint32_t get_pixel(size_t x, size_t y) const {
             if (x >= width || y >= height) {
                 return 0;
