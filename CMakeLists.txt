@@ -19,35 +19,15 @@ endif()
 
 add_library(banglibs INTERFACE)
 
-# threads
-
-find_package(Threads REQUIRED)
-target_link_libraries(banglibs INTERFACE Threads::Threads)
-
-# asio
-
-target_compile_definitions(banglibs INTERFACE ASIO_STANDALONE)
-
-if(MINGW)
-    target_link_libraries(banglibs INTERFACE wsock32 ws2_32)
-endif()
-
-# openssl
-
-find_package(OpenSSL)
-if (NOT OPENSSL_FOUND)
-    message(WARNING "Could not find OpenSSL")
-    target_compile_definitions(banglibs INTERFACE WSSERVER_NO_TLS)
-else()
-    target_link_libraries(banglibs INTERFACE OpenSSL::SSL OpenSSL::Crypto)
-endif()
-
 # websocketpp
 
-target_include_directories(banglibs INTERFACE external/websocketpp)
-target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_CPP11_STL_)
-target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_CPP11_THREAD_)
-target_compile_definitions(banglibs INTERFACE _WEBSOCKETPP_NO_EXCEPTIONS_)
+add_subdirectory(external/websocketpp)
+target_link_libraries(banglibs INTERFACE websocketpp)
+
+# reflect
+
+add_subdirectory(external/reflect)
+target_link_libraries(banglibs INTERFACE reflect)
 
 # sqlite
 
@@ -68,11 +48,6 @@ target_link_libraries(banglibs INTERFACE cxxopts::cxxopts)
 
 find_package(nlohmann_json 3.11.0 REQUIRED)
 target_link_libraries(banglibs INTERFACE nlohmann_json::nlohmann_json)
-
-# reflect
-
-target_include_directories(banglibs INTERFACE external/reflect)
-target_compile_definitions(banglibs INTERFACE NTEST)
 
 # bang server executable
 

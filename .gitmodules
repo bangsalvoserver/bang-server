@@ -1,6 +1,0 @@
-[submodule "external/websocketpp"]
-	path = external/websocketpp
-	url = http://github.com/zaphoyd/websocketpp
-[submodule "external/reflect"]
-	path = external/reflect
-	url = https://github.com/qlibs/reflect
