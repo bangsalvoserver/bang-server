@@ -5,7 +5,7 @@
 
 using namespace banggame;
 
-void game_manager::on_message(client_handle client, const std::string &msg) {
+void game_manager::on_message(client_handle client, std::string_view msg) {
     try {
         logging::info("{}: Received {}", get_client_ip(client), msg);
 

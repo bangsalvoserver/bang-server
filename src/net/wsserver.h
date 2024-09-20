@@ -82,7 +82,7 @@ namespace net {
     protected:
         virtual void on_connect(client_handle handle) = 0;
         virtual void on_disconnect(client_handle handle) = 0;
-        virtual void on_message(client_handle hdl, const std::string &message) = 0;
+        virtual void on_message(client_handle hdl, std::string_view message) = 0;
 
     public:
         virtual ~wsserver() = default;

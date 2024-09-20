@@ -108,6 +108,8 @@ void wsserver::start(uint16_t port, bool reuse_addr) {
             if (ec) {
                 throw std::system_error(ec);
             }
+            
+            logging::status("Server listening on port {}", port);
         }
     }, m_server);
 }

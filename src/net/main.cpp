@@ -73,7 +73,6 @@ int main(int argc, char **argv) {
         server.init();
 #endif
         server.start(port, reuse_addr);
-        logging::status("Server listening on port {}", port);
 
         std::signal(SIGTERM, handle_stop);
         std::signal(SIGINT, handle_stop);

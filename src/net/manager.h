@@ -32,7 +32,7 @@ public:
 protected:
     void on_connect(client_handle client) override;
     void on_disconnect(client_handle client) override;
-    void on_message(client_handle client, const std::string &message) override;
+    void on_message(client_handle client, std::string_view message) override;
 
 private:
     template<utils::fixed_string E> requires server_message_type<E>
