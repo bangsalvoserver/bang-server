@@ -19,10 +19,10 @@ endif()
 
 add_library(banglibs INTERFACE)
 
-# websocketpp
+# uwebsockets
 
-add_subdirectory(external/websocketpp)
-target_link_libraries(banglibs INTERFACE websocketpp)
+add_subdirectory(external/uwebsockets)
+target_link_libraries(banglibs INTERFACE uwebsockets)
 
 # reflect
 

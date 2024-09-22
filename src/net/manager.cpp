@@ -7,8 +7,6 @@ using namespace banggame;
 
 void game_manager::on_message(client_handle client, std::string_view msg) {
     try {
-        logging::info("{}: Received {}", get_client_ip(client), msg);
-
         auto client_msg = deserialize_message(json::json::parse(msg));
         utils::visit_tagged([&](utils::tag_for<client_message> auto tag, auto && ... args) {
             auto it = m_clients.find(client);
@@ -316,7 +314,6 @@ void game_manager::kick_user_from_lobby(game_user &user) {
 }
 
 void game_manager::on_connect(client_handle client) {
-    logging::info("{}: Connected", get_client_ip(client));
     m_clients.emplace(client, client);
     tracking::track_client_count(m_clients.size());
 }
@@ -332,6 +329,14 @@ void game_manager::on_disconnect(client_handle client) {
         }
         m_clients.erase(it);
         tracking::track_client_count(m_clients.size());
+    }
+}
+
+void game_manager::kick_all_clients() {
+    for (auto it = m_clients.begin(); it != m_clients.end(); ) {
+        auto &[client, state] = *it;
+        ++it;
+        kick_client(client, "SERVER_STOP");
     }
 }
 

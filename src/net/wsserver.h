@@ -1,94 +1,45 @@
 #ifndef __WSSERVER_H__
 #define __WSSERVER_H__
 
-#include <utility>
-#include <sstream>
-#include <set>
+#include <memory>
+#include <variant>
+#include <stdexcept>
+#include <deque>
 
-#include <asio.hpp>
-
-#ifdef WSSERVER_NO_TLS
-#include <websocketpp/config/asio_no_tls.hpp>
-#else
-#include <websocketpp/config/asio.hpp>
-#endif
-
-#include <websocketpp/server.hpp>
-
-#include "logging.h"
+#include <App.h>
 
 namespace net {
 
-    using log_level_fn_ptr = logging::level (*)(websocketpp::log::level);
-
-    template<log_level_fn_ptr LogLevelFunction>
-    struct logging_adapter {
-        logging_adapter(websocketpp::log::level, websocketpp::log::channel_type_hint::value) {}
-            
-        void set_channels(websocketpp::log::level) {}
-        void clear_channels(websocketpp::log::level) {}
-        constexpr bool static_test(websocketpp::log::level) const { return true; }
-        bool dynamic_test(websocketpp::log::level) { return true; }
-        
-        void write(websocketpp::log::level channel, std::string_view msg) {
-            logging::log_function(LogLevelFunction(channel))(msg);
-        }
-    };
-
-    logging::level get_access_logging_level(websocketpp::log::level channel);
-    using access_logging_adapter = logging_adapter<get_access_logging_level>;
-
-    logging::level get_error_logging_level(websocketpp::log::level channel);
-    using error_logging_adapter = logging_adapter<get_error_logging_level>;
-
-    template<typename ConfigBase>
-    struct wsconfig : ConfigBase {
-        using alog_type = access_logging_adapter;
-        using elog_type = error_logging_adapter;
-
-        struct transport_config : ConfigBase::transport_config {
-            using alog_type = access_logging_adapter;
-            using elog_type = error_logging_adapter;
-        };
-
-        // max message size 1 MB
-        static const size_t max_message_size = 1 * 1024 * 1024;
-        static const size_t max_http_body_size = 1 * 1024 * 1024;
-
-        using transport_type = websocketpp::transport::asio::endpoint<transport_config>;
-    };
-
     class wsserver {
     public:
-        using server_type = websocketpp::server<wsconfig<websocketpp::config::asio>>;
-#ifndef WSSERVER_NO_TLS
-        using server_type_tls = websocketpp::server<wsconfig<websocketpp::config::asio_tls>>;
-#endif
-
-        using client_handle = websocketpp::connection_hdl;
+        using client_handle = std::weak_ptr<void>;
 
     private:
         std::variant<
             std::monostate,
-            server_type
-#ifndef WSSERVER_NO_TLS
-            , server_type_tls
+            uWS::App
+#ifndef LIBUS_NO_SSL
+            , uWS::SSLApp
 #endif
         > m_server;
 
-        std::set<client_handle, std::owner_less<client_handle>> m_clients;
-        std::mutex m_con_mutex;
+        std::deque<std::pair<client_handle, std::variant<std::string, bool>>> m_message_queue;
+        std::mutex m_message_mutex;
+
+        uWS::Loop *m_loop = nullptr;
+        us_listen_socket_t *m_listen_socket = nullptr;
 
     protected:
         virtual void on_connect(client_handle handle) = 0;
         virtual void on_disconnect(client_handle handle) = 0;
         virtual void on_message(client_handle hdl, std::string_view message) = 0;
+        virtual void kick_all_clients() = 0;
 
     public:
         virtual ~wsserver() = default;
 
         void init();
-#ifndef WSSERVER_NO_TLS
+#ifndef LIBUS_NO_SSL
         void init_tls(const std::string &certificate_file, const std::string &private_key_file);
 #endif
 
@@ -103,7 +54,6 @@ namespace net {
         void kick_client(client_handle con, const std::string &msg);
 
         std::string get_client_ip(client_handle con);
-
     };
 
 }
