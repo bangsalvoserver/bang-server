@@ -37,9 +37,10 @@ namespace sql {
     };
 
     struct sqlite3_statement {
+        sqlite3 *db = nullptr;
         sqlite3_stmt *stmt = nullptr;
 
-        sqlite3_statement() = default;
+        sqlite3_statement(sqlite3 *db): db{db} {}
 
         sqlite3_statement(const sqlite3_statement &) = delete;
         sqlite3_statement &operator = (const sqlite3_statement &) = delete;
@@ -64,12 +65,32 @@ namespace sql {
             throw_if_sqlite3_error(sqlite3_bind_int(stmt, index, value));
         }
 
-        void bind(int index, size_t value) {
+        void bind(int index, int64_t value) {
             throw_if_sqlite3_error(sqlite3_bind_int64(stmt, index, value));
         }
 
-        int step() {
-            return sqlite3_step(stmt);
+        void bind(int index, uint64_t value) {
+            throw_if_sqlite3_error(sqlite3_bind_int64(stmt, index, value));
+        }
+
+        bool step() {
+            int result = sqlite3_step(stmt);
+            if (result != SQLITE_DONE && result != SQLITE_ROW) {
+                throw std::runtime_error(sqlite3_errmsg(db));
+            }
+            return result != SQLITE_DONE;
+        }
+
+        int column_int(int index) {
+            return sqlite3_column_int(stmt, index);
+        }
+
+        int64_t column_int64(int index) {
+            return sqlite3_column_int64(stmt, index);
+        }
+
+        uint64_t column_uint64(int index) {
+            return sqlite3_column_int64(stmt, index);
         }
     };
 
@@ -114,7 +135,7 @@ namespace sql {
         }
 
         sqlite3_statement prepare(std::string_view sql) {
-            sqlite3_statement result;
+            sqlite3_statement result{db};
             throw_if_sqlite3_error(sqlite3_prepare_v2(db, sql.data(), sql.size(), &result.stmt, nullptr));
             return result;
         }

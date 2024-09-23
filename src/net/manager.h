@@ -34,6 +34,7 @@ protected:
     void on_disconnect(client_handle client) override;
     void on_message(client_handle client, std::string_view message) override;
     void kick_all_clients() override;
+    std::string get_tracking_response(std::string_view since_date) const override;
 
 private:
     template<utils::fixed_string E> requires server_message_type<E>

@@ -64,7 +64,11 @@ namespace net {
                     logging::status("{}: Disconnected", data->address);
                     m_message_queue.emplace(data->client, false);
                 }
-            }).listen(port, listen_options, [=, this](us_listen_socket_t *listen_socket) {
+            })
+            .get("/tracking", [this](auto *res, auto *req) {
+                res->end(get_tracking_response(req->getQuery("since_date")));
+            })
+            .listen(port, listen_options, [=, this](us_listen_socket_t *listen_socket) {
                 m_listen_socket = listen_socket;
                 if (listen_socket) {
                     logging::status("Server listening on port {}", port);

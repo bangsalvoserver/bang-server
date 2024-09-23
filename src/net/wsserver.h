@@ -35,6 +35,7 @@ namespace net {
         virtual void on_disconnect(client_handle handle) = 0;
         virtual void on_message(client_handle hdl, std::string_view message) = 0;
         virtual void kick_all_clients() = 0;
+        virtual std::string get_tracking_response(std::string_view since_date) const = 0;
 
     public:
         virtual ~wsserver() = default;

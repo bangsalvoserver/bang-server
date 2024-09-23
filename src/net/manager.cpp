@@ -340,6 +340,10 @@ void game_manager::kick_all_clients() {
     }
 }
 
+std::string game_manager::get_tracking_response(std::string_view since_date) const {
+    return json::serialize(tracking::get_tracking_since(since_date)).dump();
+}
+
 void game_manager::handle_message(utils::tag<"lobby_leave">, game_user &user) {
     if (!user.in_lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");

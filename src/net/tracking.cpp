@@ -62,4 +62,50 @@ namespace tracking {
         track_simple("lobby_count", lobby_count);
     }
 
+    static timestamp_counts read_tracking_simple(std::string_view table_name, timestamp since_date) {
+        timestamp_counts result;
+        if (s_connection) {
+            try {
+                auto stmt = s_connection.prepare(std::format(
+                    "SELECT timestamp, count FROM {} WHERE timestamp >= {}",
+                    table_name, since_date.time_since_epoch().count()
+                ));
+                while (stmt.step()) {
+                    timestamp time{std::chrono::seconds{stmt.column_int64(0)}};
+                    size_t count = stmt.column_uint64(1);
+                    result.emplace_back(time, count);
+                }
+            } catch (const std::exception &error) {
+                logging::error("SQL error: {}", error.what());
+            }
+        }
+        return result;
+    }
+
+    static std::optional<tracking::timestamp> parse_date(std::string_view date) {
+        if (date.empty()) {
+            return tracking::timestamp{};
+        }
+        std::tm tm = {};
+        std::stringstream ss{std::string(date)};
+        ss >> std::get_time(&tm, "%Y-%m-%d");
+        if (ss.fail()) {
+            return std::nullopt;
+        }
+        auto timestamp = tracking::clock::from_time_t(std::mktime(&tm));
+        return tracking::timestamp{ std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()) };
+    }
+
+    tracking_response get_tracking_since(std::string_view since_date) {
+        if (auto timestamp = parse_date(since_date)) {
+            return {
+                read_tracking_simple("client_count", *timestamp),
+                read_tracking_simple("user_count", *timestamp),
+                read_tracking_simple("lobby_count", *timestamp)
+            };
+        } else {
+            return {};
+        }
+    }
+
 }
