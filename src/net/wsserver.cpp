@@ -50,22 +50,19 @@ namespace net {
                 .maxBackpressure = 16 * 1024 * 1024,
 
                 .open = [this](auto *ws) {
-                    std::scoped_lock lock{m_message_mutex};
                     wsclient_data *data = ws->getUserData();
                     logging::status("{}: Connected", data->address = ws->getRemoteAddressAsText());
-                    m_message_queue.emplace_back(data->client = std::make_shared<void *>(ws), true);
+                    m_message_queue.emplace(data->client = std::make_shared<void *>(ws), true);
                 },
                 .message = [this](auto *ws, std::string_view message, uWS::OpCode opCode) {
-                    std::scoped_lock lock{m_message_mutex};
                     wsclient_data *data = ws->getUserData();
                     logging::info("{}: Received {}", data->address, message);
-                    m_message_queue.emplace_back(data->client, std::string(message));
+                    m_message_queue.emplace(data->client, std::string(message));
                 },
                 .close = [this](auto *ws, int code, std::string_view message) {
-                    std::scoped_lock lock{m_message_mutex};
                     wsclient_data *data = ws->getUserData();
                     logging::status("{}: Disconnected", data->address);
-                    m_message_queue.emplace_back(data->client, false);
+                    m_message_queue.emplace(data->client, false);
                 }
             }).listen(port, listen_options, [=, this](us_listen_socket_t *listen_socket) {
                 m_listen_socket = listen_socket;
@@ -89,19 +86,8 @@ namespace net {
         }, m_server);
     }
 
-    template<typename T>
-    static std::optional<T> threadsafe_pop(std::deque<T> &queue, std::mutex &mutex) {
-        std::scoped_lock lock{mutex};
-        if (queue.empty()) {
-            return std::nullopt;
-        }
-        std::optional<T> result{std::move(queue.front())};
-        queue.pop_front();
-        return result;
-    }
-
     void wsserver::tick() {
-        while (auto elem = threadsafe_pop(m_message_queue, m_message_mutex)) {
+        while (auto elem = m_message_queue.pop()) {
             auto [client, message] = *elem;
 
             std::visit([&](const auto &value){

@@ -8,6 +8,8 @@
 
 #include <App.h>
 
+#include "utils/tsqueue.h"
+
 namespace net {
 
     class wsserver {
@@ -23,8 +25,7 @@ namespace net {
 #endif
         > m_server;
 
-        std::deque<std::pair<client_handle, std::variant<std::string, bool>>> m_message_queue;
-        std::mutex m_message_mutex;
+        utils::tsqueue<std::pair<client_handle, std::variant<std::string, bool>>> m_message_queue;
 
         uWS::Loop *m_loop = nullptr;
         us_listen_socket_t *m_listen_socket = nullptr;
