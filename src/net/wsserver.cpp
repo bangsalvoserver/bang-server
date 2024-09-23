@@ -66,6 +66,7 @@ namespace net {
                 }
             })
             .get("/tracking", [this](auto *res, auto *req) {
+                res->writeHeader("Access-Control-Allow-Origin","*");
                 res->end(get_tracking_response(req->getQuery("since_date")));
             })
             .listen(port, listen_options, [=, this](us_listen_socket_t *listen_socket) {
