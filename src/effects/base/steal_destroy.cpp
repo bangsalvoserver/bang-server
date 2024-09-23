@@ -49,6 +49,17 @@ namespace banggame {
         return {};
     }
 
+    game_string effect_steal::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        if (origin == target_card->owner) {
+            if (target_card->is_train() || target_card->pocket == pocket_type::player_hand) {
+                return {"PROMPT_CARD_NO_EFFECT", origin_card};
+            } else {
+                return {"PROMPT_TARGET_SELF", origin_card};
+            }
+        }
+        return {};
+    }
+
     void effect_steal::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         bool handled = false;
         origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, handled });
