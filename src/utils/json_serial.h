@@ -124,6 +124,13 @@ namespace json {
         }
     };
 
+    template<typename Clock, typename Duration, typename Context>
+    struct serializer<std::chrono::time_point<Clock, Duration>, Context> {
+        json operator()(const std::chrono::time_point<Clock, Duration> &value, const Context &ctx) const {
+            return serialize_unchecked(value.time_since_epoch(), ctx);
+        }
+    };
+
     template<typename T, typename Context> requires serializable<T, Context>
     struct serializer<std::optional<T>, Context> {
         json operator()(const std::optional<T> &value, const Context &ctx) const {
@@ -206,6 +213,13 @@ namespace json {
                 throw deserialize_error("Cannot deserialize duration: value is not a number");
             }
             return std::chrono::duration<Rep, Period>{value.get<Rep>()};
+        }
+    };
+    
+    template<typename Clock, typename Duration, typename Context>
+    struct deserializer<std::chrono::time_point<Clock, Duration>, Context> {
+        std::chrono::time_point<Clock, Duration> operator()(const json &value, const Context &ctx) const {
+            return std::chrono::time_point<Clock, Duration>{ deserialize_unchecked<Duration>(value, ctx) };
         }
     };
 
