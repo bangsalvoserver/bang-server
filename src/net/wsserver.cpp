@@ -121,7 +121,6 @@ namespace net {
     }
 
     void wsserver::kick_client(client_handle con, const std::string &msg) {
-        on_disconnect(con);
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
             if (auto *ws = websocket_cast<SSL>(con)) {
                 server.getLoop()->defer([=]{

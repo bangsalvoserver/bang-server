@@ -40,9 +40,7 @@ game_manager::game_manager() {
 }
 
 void game_manager::stop() {
-    for (auto it = m_clients.begin(); it != m_clients.end(); ) {
-        auto &[client, state] = *it;
-        ++it;
+    for (const auto &[client, state] : m_clients) {
         kick_client(client, "SERVER_STOP");
     }
     
@@ -52,9 +50,7 @@ void game_manager::stop() {
 void game_manager::tick() {
     net::wsserver::tick();
 
-    for (auto it = m_clients.begin(); it != m_clients.end(); ) {
-        auto &[client, state] = *it;
-        ++it;
+    for (auto &[client, state] : m_clients) {
         if (state.user) {
             if (++state.ping_timer > ping_interval) {
                 state.ping_timer = ticks{};
