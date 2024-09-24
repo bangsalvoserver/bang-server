@@ -26,8 +26,8 @@ namespace net {
 
         struct connected {};
         struct disconnected {};
-        using message = std::variant<std::string, connected, disconnected>;
-        utils::tsqueue<std::pair<client_handle, message>> m_message_queue;
+        using message_type = std::variant<std::string, connected, disconnected>;
+        utils::tsqueue<std::pair<client_handle, message_type>> m_message_queue;
 
     protected:
         virtual void on_connect(client_handle handle) = 0;

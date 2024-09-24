@@ -43,6 +43,15 @@ namespace net {
         return nullptr;
     }
 
+    inline std::string_view crop_message_log(std::string_view message) {
+        static constexpr size_t max_message_log_size = 1000;
+        if (message.size() > max_message_log_size) {
+            return message.substr(0, max_message_log_size);
+        } else {
+            return message;
+        }
+    }
+
     void wsserver::start(uint16_t port, bool reuse_addr) {
         int listen_options = reuse_addr ? LIBUS_LISTEN_DEFAULT : LIBUS_LISTEN_EXCLUSIVE_PORT;
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
@@ -57,7 +66,7 @@ namespace net {
                 },
                 .message = [this](auto *ws, std::string_view message, uWS::OpCode opCode) {
                     wsclient_data *data = ws->getUserData();
-                    logging::info("[{}] ==> {}", data->address, message);
+                    logging::info("[{}] ==> {}", data->address, crop_message_log(message));
                     m_message_queue.emplace(data->client, std::string(message));
                 },
                 .close = [this](auto *ws, int code, std::string_view message) {
@@ -113,7 +122,7 @@ namespace net {
             if (auto *ws = websocket_cast<SSL>(con)) {
                 server.getLoop()->defer([=]{
                     auto *data = ws->getUserData();
-                    logging::info("[{}] <== {}", data->address, message);
+                    logging::info("[{}] <== {}", data->address, crop_message_log(message));
                     ws->send(message, uWS::TEXT);
                 });
             }
