@@ -25,6 +25,7 @@ class game_manager: public net::wsserver {
 public:
     game_manager();
 
+    void stop();
     void tick();
 
     server_options &options() { return m_options; }
@@ -33,21 +34,16 @@ protected:
     void on_connect(client_handle client) override;
     void on_disconnect(client_handle client) override;
     void on_message(client_handle client, std::string_view message) override;
-    void kick_all_clients() override;
-    std::string get_tracking_response(std::string_view since_date) const override;
 
 private:
     template<utils::fixed_string E> requires server_message_type<E>
     void send_message(client_handle client, auto && ... args) {
-        std::string message = make_message<E>(FWD(args) ... );
-        logging::info("{}: Sent {}", get_client_ip(client), message);
-        push_message(client, message);
+        push_message(client, make_message<E>(FWD(args) ... ));
     }
 
     template<utils::fixed_string E> requires server_message_type<E>
     void broadcast_message(auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
-        logging::info("All users: Sent {}", message);
         for (game_user &user : m_users | rv::values) {
             push_message(user.client, message);
         }
@@ -56,7 +52,6 @@ private:
     template<utils::fixed_string E> requires server_message_type<E>
     void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
-        logging::info("Lobby {}: Sent {}", lobby.name, message);
         for (const lobby_user &user : lobby.users) {
             push_message(user.user->client, message);
         }

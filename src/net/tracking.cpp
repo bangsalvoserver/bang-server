@@ -82,30 +82,26 @@ namespace tracking {
         return result;
     }
 
-    static std::optional<tracking::timestamp> parse_date(std::string_view date) {
+    timestamp parse_date(std::string_view date) {
         if (date.empty()) {
-            return tracking::timestamp{};
+            return timestamp{};
         }
         std::tm tm = {};
         std::stringstream ss{std::string(date)};
         ss >> std::get_time(&tm, "%Y-%m-%d");
         if (ss.fail()) {
-            return std::nullopt;
+            throw std::runtime_error(std::format("Invalid date format: {}", date));
         }
-        auto timestamp = tracking::clock::from_time_t(std::mktime(&tm));
-        return tracking::timestamp{ std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()) };
+        auto time = clock::from_time_t(std::mktime(&tm));
+        return timestamp{ std::chrono::duration_cast<std::chrono::seconds>(time.time_since_epoch()) };
     }
 
-    tracking_response get_tracking_since(std::string_view since_date) {
-        if (auto timestamp = parse_date(since_date)) {
-            return {
-                read_tracking_simple("client_count", *timestamp),
-                read_tracking_simple("user_count", *timestamp),
-                read_tracking_simple("lobby_count", *timestamp)
-            };
-        } else {
-            return {};
-        }
+    tracking_response get_tracking_since(timestamp since_date) {
+        return {
+            read_tracking_simple("client_count", since_date),
+            read_tracking_simple("user_count", since_date),
+            read_tracking_simple("lobby_count", since_date)
+        };
     }
 
 }

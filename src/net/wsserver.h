@@ -4,7 +4,6 @@
 #include <memory>
 #include <variant>
 #include <stdexcept>
-#include <deque>
 
 #include <App.h>
 
@@ -25,17 +24,15 @@ namespace net {
 #endif
         > m_server;
 
-        utils::tsqueue<std::pair<client_handle, std::variant<std::string, bool>>> m_message_queue;
-
-        uWS::Loop *m_loop = nullptr;
-        us_listen_socket_t *m_listen_socket = nullptr;
+        struct connected {};
+        struct disconnected {};
+        using message = std::variant<std::string, connected, disconnected>;
+        utils::tsqueue<std::pair<client_handle, message>> m_message_queue;
 
     protected:
         virtual void on_connect(client_handle handle) = 0;
         virtual void on_disconnect(client_handle handle) = 0;
         virtual void on_message(client_handle hdl, std::string_view message) = 0;
-        virtual void kick_all_clients() = 0;
-        virtual std::string get_tracking_response(std::string_view since_date) const = 0;
 
     public:
         virtual ~wsserver() = default;
@@ -54,8 +51,6 @@ namespace net {
         void push_message(client_handle con, const std::string &message);
 
         void kick_client(client_handle con, const std::string &msg);
-
-        std::string get_client_ip(client_handle con);
     };
 
 }

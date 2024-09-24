@@ -74,11 +74,7 @@ int main(int argc, char **argv) {
     server.init();
 #endif
 
-    std::atomic_bool server_error = false;
-
     std::jthread main_loop{[&](std::stop_token stop) {
-        tracking::track_zero();
-
         try {
             auto next_tick = std::chrono::steady_clock::now() + banggame::ticks64{0};
 
@@ -91,13 +87,8 @@ int main(int argc, char **argv) {
             std::cerr << "Unhandled exception: " << error.what() << '\n';
         }
 
-        if (!server_error) {
-            logging::status("Stopping server...");
-            server.stop();
-            logging::status("Server stopped");
-        }
-
-        tracking::track_zero();
+        logging::status("Stopping server...");
+        server.stop();
     }};
 
     g_stop = main_loop.get_stop_source();
@@ -105,13 +96,15 @@ int main(int argc, char **argv) {
     std::signal(SIGTERM, handle_stop);
     std::signal(SIGINT, handle_stop);
     
+    tracking::track_zero();
     try {
         server.start(port, reuse_addr);
+        logging::status("Server stopped");
     } catch (const std::exception &error) {
         std::cerr << "Could not start server: " << error.what() << '\n';
-        server_error = true;
         handle_stop();
     }
+    tracking::track_zero();
 
     return 0;
 }

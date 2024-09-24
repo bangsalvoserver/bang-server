@@ -1,6 +1,9 @@
 #include "wsserver.h"
 
 #include "logging.h"
+#include "tracking.h"
+
+#include "utils/json_aggregate.h"
 
 namespace net {
 
@@ -41,8 +44,6 @@ namespace net {
     }
 
     void wsserver::start(uint16_t port, bool reuse_addr) {
-        m_loop = uWS::Loop::get();
-
         int listen_options = reuse_addr ? LIBUS_LISTEN_DEFAULT : LIBUS_LISTEN_EXCLUSIVE_PORT;
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
             server.template ws<wsclient_data>("/", {
@@ -51,26 +52,33 @@ namespace net {
 
                 .open = [this](auto *ws) {
                     wsclient_data *data = ws->getUserData();
-                    logging::status("{}: Connected", data->address = ws->getRemoteAddressAsText());
-                    m_message_queue.emplace(data->client = std::make_shared<void *>(ws), true);
+                    logging::status("[{}] Connected", data->address = ws->getRemoteAddressAsText());
+                    m_message_queue.emplace(data->client = std::make_shared<void *>(ws), connected{});
                 },
                 .message = [this](auto *ws, std::string_view message, uWS::OpCode opCode) {
                     wsclient_data *data = ws->getUserData();
-                    logging::info("{}: Received {}", data->address, message);
+                    logging::info("[{}] ==> {}", data->address, message);
                     m_message_queue.emplace(data->client, std::string(message));
                 },
                 .close = [this](auto *ws, int code, std::string_view message) {
                     wsclient_data *data = ws->getUserData();
-                    logging::status("{}: Disconnected", data->address);
-                    m_message_queue.emplace(data->client, false);
+                    logging::status("[{}] Disconnected", data->address);
+                    m_message_queue.emplace(data->client, disconnected{});
                 }
             })
             .get("/tracking", [this](auto *res, auto *req) {
-                res->writeHeader("Access-Control-Allow-Origin","*");
-                res->end(get_tracking_response(req->getQuery("since_date")));
+                try {
+                    auto since_date = tracking::parse_date(req->getQuery("since_date"));
+
+                    res->writeHeader("Access-Control-Allow-Origin","*");
+                    res->end(json::serialize(tracking::get_tracking_since(since_date)).dump());
+                } catch (const std::exception &e) {
+                    res->writeStatus("400 Bad Request");
+                    res->writeHeader("Access-Control-Allow-Origin","*");
+                    res->end(e.what());
+                }
             })
             .listen(port, listen_options, [=, this](us_listen_socket_t *listen_socket) {
-                m_listen_socket = listen_socket;
                 if (listen_socket) {
                     logging::status("Server listening on port {}", port);
                 } else {
@@ -81,11 +89,8 @@ namespace net {
     }
 
     void wsserver::stop() {
-        kick_all_clients();
-        
-        us_listen_socket_close(0, m_listen_socket);
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
-            m_loop->defer([&]{
+            server.getLoop()->defer([&]{
                 server.close();
             });
         }, m_server);
@@ -93,18 +98,12 @@ namespace net {
 
     void wsserver::tick() {
         while (auto elem = m_message_queue.pop()) {
-            auto [client, message] = *elem;
+            const auto &[client, message] = *elem;
 
-            std::visit([&](const auto &value){
-                if constexpr (std::is_convertible_v<decltype(value), std::string_view>) {
-                    on_message(client, value);
-                } else {
-                    if (value) {
-                        on_connect(client);
-                    } else {
-                        on_disconnect(client);
-                    }
-                }
+            std::visit(overloaded {
+                [&](std::string_view str) { on_message(client, str); },
+                [&](connected) { on_connect(client); },
+                [&](disconnected) { on_disconnect(client); }
             }, message);
         }
     }
@@ -112,7 +111,9 @@ namespace net {
     void wsserver::push_message(client_handle con, const std::string &message) {
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
             if (auto *ws = websocket_cast<SSL>(con)) {
-                m_loop->defer([=]{
+                server.getLoop()->defer([=]{
+                    auto *data = ws->getUserData();
+                    logging::info("[{}] <== {}", data->address, message);
                     ws->send(message, uWS::TEXT);
                 });
             }
@@ -123,21 +124,11 @@ namespace net {
         on_disconnect(con);
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
             if (auto *ws = websocket_cast<SSL>(con)) {
-                m_loop->defer([=]{
+                server.getLoop()->defer([=]{
                     ws->end(1, msg);
                 });
             }
         }, m_server);
-    }
-
-    std::string wsserver::get_client_ip(client_handle con) {
-        std::string result = "(unknown host)";
-        visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
-            if (auto *ws = websocket_cast<SSL>(con)) {
-                result = ws->getUserData()->address;
-            }
-        }, m_server);
-        return result;
     }
 
 }

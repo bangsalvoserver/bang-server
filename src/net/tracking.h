@@ -23,7 +23,8 @@ namespace tracking {
         timestamp_counts lobby_count;
     };
 
-    tracking_response get_tracking_since(std::string_view since_date);
+    timestamp parse_date(std::string_view date);
+    tracking_response get_tracking_since(timestamp since_date);
 
 }
 

@@ -14,6 +14,11 @@ namespace utils {
         std::mutex m_mutex;
 
     public:
+        void push(const T &value) {
+            std::scoped_lock lock{m_mutex};
+            m_queue.push_back(value);
+        }
+
         void push(T &&value) {
             std::scoped_lock lock{m_mutex};
             m_queue.push_back(std::move(value));

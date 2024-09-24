@@ -39,6 +39,16 @@ game_manager::game_manager() {
     session_rng.seed(rd());
 }
 
+void game_manager::stop() {
+    for (auto it = m_clients.begin(); it != m_clients.end(); ) {
+        auto &[client, state] = *it;
+        ++it;
+        kick_client(client, "SERVER_STOP");
+    }
+    
+    net::wsserver::stop();
+}
+
 void game_manager::tick() {
     net::wsserver::tick();
 
@@ -330,18 +340,6 @@ void game_manager::on_disconnect(client_handle client) {
         m_clients.erase(it);
         tracking::track_client_count(m_clients.size());
     }
-}
-
-void game_manager::kick_all_clients() {
-    for (auto it = m_clients.begin(); it != m_clients.end(); ) {
-        auto &[client, state] = *it;
-        ++it;
-        kick_client(client, "SERVER_STOP");
-    }
-}
-
-std::string game_manager::get_tracking_response(std::string_view since_date) const {
-    return json::serialize(tracking::get_tracking_since(since_date)).dump();
 }
 
 void game_manager::handle_message(utils::tag<"lobby_leave">, game_user &user) {
