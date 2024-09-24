@@ -38,7 +38,7 @@ namespace net {
     template<bool SSL>
     uWS::WebSocket<SSL, true, wsclient_data> *websocket_cast(wsserver::client_handle con) {
         if (auto ptr = con.lock()) {
-            return *std::static_pointer_cast<uWS::WebSocket<SSL, true, wsclient_data> *>(ptr);
+            return *static_cast<uWS::WebSocket<SSL, true, wsclient_data> **>(ptr.get());
         }
         return nullptr;
     }
