@@ -31,12 +31,23 @@ static constexpr ticks ping_interval = 10s;
 static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
 struct client_state {
-    client_state(client_handle client) : client{client} {}
+    client_state(client_handle client)
+        : client{client}
+        , state{not_validated{}} {}
     
     client_handle client;
-    game_user *user = nullptr;
-    ticks ping_timer = ticks{0};
-    int ping_count = 0;
+
+    struct not_validated {
+        ticks timeout = ticks{0};
+    };
+    struct connected {
+        game_user *user = nullptr;
+        ticks ping_timer = ticks{0};
+        int ping_count = 0;
+    };
+    struct invalid {};
+    
+    std::variant<not_validated, connected, invalid> state;
 };
 
 struct game_user {
