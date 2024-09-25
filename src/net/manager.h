@@ -27,7 +27,7 @@ public:
 
     void stop();
     void tick();
-    void kick_client(client_handle con, const std::string &msg);
+    void kick_client(client_handle client, std::string message);
 
     server_options &options() { return m_options; }
 
@@ -58,7 +58,7 @@ private:
         }
     }
 
-    void invalidate_client_state(client_handle con);
+    void invalidate_client_state(client_handle client);
     void kick_user_from_lobby(game_user &user);
     void handle_join_lobby(game_user &user, lobby &lobby);
 

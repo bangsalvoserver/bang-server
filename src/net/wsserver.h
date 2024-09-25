@@ -48,9 +48,9 @@ namespace net {
 
         void tick();
 
-        void push_message(client_handle con, const std::string &message);
+        void push_message(client_handle client, std::string message);
 
-        void kick_client(client_handle con, const std::string &msg);
+        void kick_client(client_handle client, std::string message);
     };
 
 }

@@ -36,8 +36,8 @@ namespace net {
     }
 
     template<bool SSL>
-    uWS::WebSocket<SSL, true, wsclient_data> *websocket_cast(wsserver::client_handle con) {
-        if (auto ptr = con.lock()) {
+    uWS::WebSocket<SSL, true, wsclient_data> *websocket_cast(wsserver::client_handle client) {
+        if (auto ptr = client.lock()) {
             return *static_cast<uWS::WebSocket<SSL, true, wsclient_data> **>(ptr.get());
         }
         return nullptr;
@@ -117,10 +117,10 @@ namespace net {
         }
     }
 
-    void wsserver::push_message(client_handle con, const std::string &message) {
+    void wsserver::push_message(client_handle client, std::string message) {
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
-            if (auto *ws = websocket_cast<SSL>(con)) {
-                server.getLoop()->defer([=]{
+            if (auto *ws = websocket_cast<SSL>(client)) {
+                server.getLoop()->defer([ws, message = std::move(message)]{
                     auto *data = ws->getUserData();
                     logging::info("[{}] <== {}", data->address, crop_message_log(message));
                     ws->send(message, uWS::TEXT);
@@ -129,11 +129,11 @@ namespace net {
         }, m_server);
     }
 
-    void wsserver::kick_client(client_handle con, const std::string &msg) {
+    void wsserver::kick_client(client_handle client, std::string message) {
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
-            if (auto *ws = websocket_cast<SSL>(con)) {
-                server.getLoop()->defer([=]{
-                    ws->end(1, msg);
+            if (auto *ws = websocket_cast<SSL>(client)) {
+                server.getLoop()->defer([ws, message = std::move(message)]{
+                    ws->end(1, message);
                 });
             }
         }, m_server);
