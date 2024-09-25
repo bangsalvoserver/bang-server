@@ -61,9 +61,6 @@ void game_manager::tick() {
                 if (++value.ping_timer > ping_interval) {
                     value.ping_timer = ticks{};
                     if (++value.ping_count >= pings_until_disconnect) {
-                        if (value.user->in_lobby) {
-                            kick_user_from_lobby(*(value.user));
-                        }
                         kick_client(client, "INACTIVITY");
                     } else {
                         send_message<"ping">(client);
