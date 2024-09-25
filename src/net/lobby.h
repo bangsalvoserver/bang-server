@@ -116,8 +116,7 @@ struct lobby : lobby_info {
 
 using user_map = std::unordered_map<id_type, game_user>;
 using client_map = std::map<client_handle, client_state, std::owner_less<>>;
-using lobby_map = std::unordered_map<id_type, lobby>;
-using lobby_list = std::vector<lobby_map::iterator>;
+using lobby_map = std::map<id_type, lobby>;
 
 }
 

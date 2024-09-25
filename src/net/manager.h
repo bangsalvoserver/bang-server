@@ -98,12 +98,9 @@ private:
 
     user_map m_users;
     lobby_map m_lobbies;
-    lobby_list m_lobby_order;
     client_map m_clients;
 
     server_options m_options;
-
-    id_type m_lobby_count = 0;
 
     friend class chat_command;
 };

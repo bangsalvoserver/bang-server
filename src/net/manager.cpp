@@ -91,8 +91,8 @@ void game_manager::tick() {
         tracking::track_user_count(m_users.size());
     }
 
-    if (std::erase_if(m_lobby_order, [&](auto lobby_it) {
-        lobby &lobby = lobby_it->second;
+    if (std::erase_if(m_lobbies, [&](auto &pair) {
+        lobby &lobby = pair.second;
         if (lobby.state == lobby_state::playing && lobby.m_game) {
             try {
                 lobby.m_game->tick();
@@ -117,7 +117,6 @@ void game_manager::tick() {
         if (lobby.users.empty()) {
             if (--lobby.lifetime <= ticks{0}) {
                 broadcast_message<"lobby_removed">(lobby.lobby_id);
-                m_lobbies.erase(lobby_it);
                 return true;
             }
         } else {
@@ -171,8 +170,8 @@ void game_manager::handle_message(utils::tag<"connect">, client_state &client, c
     state.user->client = client.client;
     
     send_message<"client_accepted">(client.client, session_id);
-    for (const auto it : m_lobby_order) {
-        send_message<"lobby_update">(client.client, it->second);
+    for (const auto &[id, lobby] : m_lobbies) {
+        send_message<"lobby_update">(client.client, lobby);
     }
 
     if (state.user->in_lobby) {
@@ -211,16 +210,16 @@ void game_manager::handle_message(utils::tag<"lobby_make">, game_user &user, con
         throw lobby_error("ERROR_PLAYER_IN_LOBBY");
     }
 
-    id_type lobby_id = ++m_lobby_count;
-    auto &l = m_lobby_order.emplace_back(m_lobbies.try_emplace(lobby_id, value, lobby_id).first)->second;
+    id_type lobby_id = m_lobbies.empty() ? 1 : m_lobbies.rbegin()->first + 1;
+    lobby &lobby = m_lobbies.try_emplace(lobby_id, value, lobby_id).first->second;
     tracking::track_lobby_count(m_lobbies.size());
 
-    int user_id = l.add_user(user).user_id;
+    int user_id = lobby.add_user(user).user_id;
 
-    l.state = lobby_state::waiting;
-    broadcast_message<"lobby_update">(l);
+    lobby.state = lobby_state::waiting;
+    broadcast_message<"lobby_update">(lobby);
 
-    send_message<"lobby_entered">(user.client, user_id, l.lobby_id, l.name, l.options);
+    send_message<"lobby_entered">(user.client, user_id, lobby.lobby_id, lobby.name, lobby.options);
     send_message<"lobby_add_user">(user.client, user_id, user.username, lobby_team::game_player);
     if (user.propic) {
         send_message<"lobby_user_propic">(user.client, user_id, user.propic);
