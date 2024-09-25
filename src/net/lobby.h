@@ -87,7 +87,10 @@ struct lobby_bot {
 
 struct lobby : lobby_info {
     lobby(const lobby_info &info, id_type lobby_id)
-        : lobby_info{info}, lobby_id{lobby_id} {}
+        : lobby_id{lobby_id}
+    {
+        update_lobby_info(info);
+    }
 
     id_type lobby_id;
     int user_id_count = 0;
@@ -105,6 +108,8 @@ struct lobby : lobby_info {
 
     lobby_user &find_user(const game_user &user);
     lobby_user &find_user(std::string_view name_or_id);
+
+    void update_lobby_info(const lobby_info &info);
 
     explicit operator lobby_data() const;
 };

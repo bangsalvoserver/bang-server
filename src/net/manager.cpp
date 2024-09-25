@@ -241,7 +241,8 @@ void game_manager::handle_message(utils::tag<"lobby_edit">, game_user &user, con
         throw lobby_error("ERROR_LOBBY_NOT_WAITING");
     }
 
-    static_cast<lobby_info &>(lobby) = args;
+    lobby.update_lobby_info(args);
+    
     for (const lobby_user &lu : lobby.users) {
         if (lu.user != &user) {
             send_message<"lobby_edited">(lu.user->client, args);
