@@ -74,65 +74,64 @@ void game_manager::tick() {
         }, state.state);
     }
 
-    for (auto it = m_users.begin(); it != m_users.end(); ) {
-        game_user &user = it->second;
+    if (std::erase_if(m_users, [&](auto &pair) {
+        game_user &user = pair.second;
         if (user.client.expired()) {
             if (--user.lifetime <= ticks{0}) {
                 if (user.in_lobby) {
                     kick_user_from_lobby(user);
                 }
-                it = m_users.erase(it);
-                tracking::track_user_count(m_users.size());
-                continue;
+                return true;
             }
         } else {
             user.lifetime = user_lifetime;
         }
-        ++it;
+        return false;
+    })) {
+        tracking::track_user_count(m_users.size());
     }
 
-    for (auto it = m_lobby_order.begin(); it != m_lobby_order.end(); ) {
-        lobby &l = (*it)->second;
-        if (l.state == lobby_state::playing && l.m_game) {
+    if (std::erase_if(m_lobby_order, [&](auto lobby_it) {
+        lobby &lobby = lobby_it->second;
+        if (lobby.state == lobby_state::playing && lobby.m_game) {
             try {
-                l.m_game->tick();
+                lobby.m_game->tick();
                 
-                while (l.state == lobby_state::playing && l.m_game && l.m_game->pending_updates()) {
-                    auto [target, update, update_time] = l.m_game->get_next_update();
-                    for (const lobby_user &user : l.users) {
+                while (lobby.m_game->pending_updates()) {
+                    auto [target, update, update_time] = lobby.m_game->get_next_update();
+                    for (const lobby_user &user : lobby.users) {
                         if (target.matches(user.user_id)) {
                             send_message<"game_update">(user.user->client, update);
                         }
                     }
                 }
 
-                if (l.m_game->is_game_over()) {
-                    l.state = lobby_state::finished;
-                    broadcast_message<"lobby_update">(l);
+                if (lobby.m_game->is_game_over()) {
+                    lobby.state = lobby_state::finished;
+                    broadcast_message<"lobby_update">(lobby);
                 }
             } catch (const std::exception &e) {
                 logging::warn("Error in tick(): {}", e.what());
             }
         }
-        if (l.users.empty()) {
-            --l.lifetime;
+        if (lobby.users.empty()) {
+            if (--lobby.lifetime <= ticks{0}) {
+                broadcast_message<"lobby_removed">(lobby.lobby_id);
+                m_lobbies.erase(lobby_it);
+                return true;
+            }
         } else {
-            l.lifetime = lobby_lifetime;
+            lobby.lifetime = lobby_lifetime;
         }
-        if (l.lifetime <= ticks{0}) {
-            broadcast_message<"lobby_removed">(l.lobby_id);
-            m_lobbies.erase(*it);
-            tracking::track_lobby_count(m_lobbies.size());
-            it = m_lobby_order.erase(it);
-            continue;
-        }
-        ++it;
+        return false;
+    })) {
+        tracking::track_lobby_count(m_lobbies.size());
     }
 }
 
 void game_manager::kick_client(client_handle con, const std::string &msg) {
-    if (auto jt = m_clients.find(con); jt != m_clients.end()) {
-        jt->second.state.emplace<client_state::invalid>();
+    if (auto it = m_clients.find(con); it != m_clients.end()) {
+        it->second.state.emplace<client_state::invalid>();
     }
     net::wsserver::kick_client(con, msg);
 }
