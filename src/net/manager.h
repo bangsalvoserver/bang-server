@@ -58,6 +58,7 @@ private:
         }
     }
 
+    void invalidate_client_state(client_handle con);
     void kick_user_from_lobby(game_user &user);
     void handle_join_lobby(game_user &user, lobby &lobby);
 

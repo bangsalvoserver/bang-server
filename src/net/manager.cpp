@@ -125,13 +125,6 @@ void game_manager::tick() {
     }
 }
 
-void game_manager::kick_client(client_handle con, const std::string &msg) {
-    if (auto it = m_clients.find(con); it != m_clients.end()) {
-        it->second.state.emplace<client_state::invalid>();
-    }
-    net::wsserver::kick_client(con, msg);
-}
-
 void game_manager::handle_message(utils::tag<"connect">, client_state &client, const connect_args &args) {
     if (!std::holds_alternative<client_state::not_validated>(client.state)) {
         throw lobby_error("USER_ALREADY_CONNECTED");
@@ -335,9 +328,10 @@ void game_manager::on_connect(client_handle client) {
     tracking::track_client_count(m_clients.size());
 }
 
-void game_manager::on_disconnect(client_handle client) {
+void game_manager::invalidate_client_state(client_handle client) {
     if (auto it = m_clients.find(client); it != m_clients.end()) {
-        if (auto *connected = std::get_if<client_state::connected>(&it->second.state)) {
+        auto &state = it->second.state;
+        if (auto *connected = std::get_if<client_state::connected>(&state)) {
             game_user *user = connected->user;
 
             user->client.reset();
@@ -346,9 +340,20 @@ void game_manager::on_disconnect(client_handle client) {
                 broadcast_message_lobby<"lobby_add_user">(*l, lu.user_id, user->username, lu.team, lobby_chat_flag::is_read, user->get_disconnect_lifetime());
             }
         }
-        m_clients.erase(it);
-        tracking::track_client_count(m_clients.size());
+
+        state.emplace<client_state::invalid>();
     }
+}
+
+void game_manager::kick_client(client_handle con, const std::string &msg) {
+    invalidate_client_state(con);
+    net::wsserver::kick_client(con, msg);
+}
+
+void game_manager::on_disconnect(client_handle client) {
+    invalidate_client_state(client);
+    m_clients.erase(client);
+    tracking::track_client_count(m_clients.size());
 }
 
 void game_manager::handle_message(utils::tag<"lobby_leave">, game_user &user) {
