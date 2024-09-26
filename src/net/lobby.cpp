@@ -86,10 +86,7 @@ namespace banggame {
 
         if (lobby_user *lu = get_single_element(users
             | rv::filter([&](const lobby_user &user) {
-                return rn::equal(user.user->username, name_or_id,
-                    [](char a, char b) {
-                        return std::tolower(a) == std::tolower(b);
-                    });
+                return string_equal_icase(user.user->username, name_or_id);
             })
             | rv::addressof))
         {

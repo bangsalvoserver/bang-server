@@ -46,4 +46,8 @@ inline auto rotate_range(Rng &&rng, rn::iterator_t<Rng> it) {
     return rv::concat(rn::subrange(it, rn::end(rng)), rn::subrange(rn::begin(rng), it));
 }
 
+inline bool string_equal_icase(std::string_view lhs, std::string_view rhs) {
+    return rn::equal(lhs, rhs, {}, toupper, toupper);
+}
+
 #endif
