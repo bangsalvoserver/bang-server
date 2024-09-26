@@ -84,7 +84,7 @@ namespace tracking {
 
     timestamp parse_date(std::string_view date) {
         if (date.empty()) {
-            return timestamp{};
+            return std::chrono::floor<std::chrono::days>(clock::now());
         }
         std::tm tm = {};
         std::stringstream ss{std::string(date)};
