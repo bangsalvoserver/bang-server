@@ -71,7 +71,7 @@ namespace net {
                 },
                 .close = [this](auto *ws, int code, std::string_view message) {
                     wsclient_data *data = ws->getUserData();
-                    logging::status("[{}] Disconnected", data->address);
+                    logging::status("[{}] Disconnected (code={} message={})", data->address, code, message);
                     m_message_queue.emplace(data->client, disconnected{});
                 }
             })
@@ -133,7 +133,7 @@ namespace net {
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
             if (auto *ws = websocket_cast<SSL>(client)) {
                 server.getLoop()->defer([ws, message = std::move(message)]{
-                    ws->end(1, message);
+                    ws->end(1000, message);
                 });
             }
         }, m_server);
