@@ -26,7 +26,7 @@ struct critical_error : std::runtime_error {
 static constexpr ticks lobby_lifetime = 5min;
 static constexpr ticks user_lifetime = 10s;
 
-static constexpr ticks client_accept_timer = 5s;
+static constexpr ticks client_accept_timer = 30s;
 static constexpr ticks ping_interval = 10s;
 static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
