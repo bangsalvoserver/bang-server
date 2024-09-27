@@ -14,7 +14,8 @@ namespace tracking {
     void track_lobby_count(size_t lobby_count);
 
     using clock = std::chrono::system_clock;
-    using timestamp = std::chrono::time_point<clock, std::chrono::seconds>;
+    using duration = std::chrono::seconds;
+    using timestamp = std::chrono::time_point<clock, duration>;
     using timestamp_counts = std::vector<std::pair<timestamp, size_t>>;
 
     struct tracking_response {
@@ -23,8 +24,8 @@ namespace tracking {
         timestamp_counts lobby_count;
     };
 
-    timestamp parse_date(std::string_view date);
-    tracking_response get_tracking_since(timestamp since_date);
+    duration parse_length(std::string_view length);
+    tracking_response get_tracking_for(duration length);
 
 }
 

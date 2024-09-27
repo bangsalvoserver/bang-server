@@ -47,9 +47,14 @@ namespace utils {
     };
 
     static constexpr ratio_suffix_pair suffixes[] = {
-        {std::milli{},      "ms"},
-        {std::ratio<1>{},   "s"},
-        {std::ratio<60>{},  "min"}
+        {std::chrono::milliseconds::period{}, "ms"},
+        {std::chrono::seconds::period{}, "s"},
+        {std::chrono::minutes::period{}, "min"},
+        {std::chrono::hours::period{}, "h"},
+        {std::chrono::days::period{}, "d"},
+        {std::chrono::weeks::period{}, "w"},
+        {std::chrono::months::period{}, "mon"},
+        {std::chrono::years::period{}, "y"}
     };
 
     template<std::integral auto Num, std::integral auto Den>

@@ -77,10 +77,10 @@ namespace net {
             })
             .get("/tracking", [this](auto *res, auto *req) {
                 try {
-                    auto since_date = tracking::parse_date(req->getQuery("since_date"));
+                    auto length = tracking::parse_length(req->getQuery("length"));
 
                     res->writeHeader("Access-Control-Allow-Origin","*");
-                    res->end(json::serialize(tracking::get_tracking_since(since_date)).dump());
+                    res->end(json::serialize(tracking::get_tracking_for(length)).dump());
                 } catch (const std::exception &e) {
                     res->writeStatus("400 Bad Request");
                     res->writeHeader("Access-Control-Allow-Origin","*");

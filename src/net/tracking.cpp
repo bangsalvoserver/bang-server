@@ -1,6 +1,7 @@
 #include "tracking.h"
 
 #include "utils/sqlite3_wrapper.h"
+#include "utils/parse_string.h"
 #include "logging.h"
 
 namespace tracking {
@@ -62,13 +63,13 @@ namespace tracking {
         track_simple("lobby_count", lobby_count);
     }
 
-    static timestamp_counts read_tracking_simple(std::string_view table_name, timestamp since_date) {
+    static timestamp_counts read_tracking_simple(std::string_view table_name, timestamp start_date) {
         timestamp_counts result;
         if (s_connection) {
             try {
                 auto stmt = s_connection.prepare(std::format(
                     "SELECT timestamp, count FROM {} WHERE timestamp >= {}",
-                    table_name, since_date.time_since_epoch().count()
+                    table_name, start_date.time_since_epoch().count()
                 ));
                 while (stmt.step()) {
                     timestamp time{std::chrono::seconds{stmt.column_int64(0)}};
@@ -82,25 +83,22 @@ namespace tracking {
         return result;
     }
 
-    timestamp parse_date(std::string_view date) {
-        if (date.empty()) {
-            return std::chrono::floor<std::chrono::days>(clock::now());
+    duration parse_length(std::string_view length) {
+        if (length.empty()) {
+            return std::chrono::days{1};
+        } else if (auto value = utils::parse_string<duration>(length)) {
+            return *value;
+        } else {
+            throw std::runtime_error(std::format("Invalid length format: {}", length));
         }
-        std::tm tm = {};
-        std::stringstream ss{std::string(date)};
-        ss >> std::get_time(&tm, "%Y-%m-%d");
-        if (ss.fail()) {
-            throw std::runtime_error(std::format("Invalid date format: {}", date));
-        }
-        auto time = clock::from_time_t(std::mktime(&tm));
-        return timestamp{ std::chrono::duration_cast<std::chrono::seconds>(time.time_since_epoch()) };
     }
 
-    tracking_response get_tracking_since(timestamp since_date) {
+    tracking_response get_tracking_for(duration length) {
+        timestamp start_date = std::chrono::time_point_cast<duration>(clock::now() - length);
         return {
-            read_tracking_simple("client_count", since_date),
-            read_tracking_simple("user_count", since_date),
-            read_tracking_simple("lobby_count", since_date)
+            read_tracking_simple("client_count", start_date),
+            read_tracking_simple("user_count", start_date),
+            read_tracking_simple("lobby_count", start_date)
         };
     }
 
