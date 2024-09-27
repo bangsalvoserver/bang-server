@@ -11,8 +11,6 @@
 namespace banggame {
 
 class game_manager;
-struct connection;
-struct game_session;
 struct game_lobby;
 
 using client_handle = std::weak_ptr<void>;
@@ -32,26 +30,6 @@ static constexpr ticks client_accept_timer = 30s;
 static constexpr ticks ping_interval = 10s;
 static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
-struct connection {
-    connection(client_handle client) : client{client} {}
-    
-    client_handle client;
-
-    struct not_validated {
-        ticks timeout = ticks{0};
-    };
-    struct connected {
-        connected(game_session &session): session{session} {}
-
-        game_session &session;
-        ticks ping_timer = ticks{0};
-        int ping_count = 0;
-    };
-    struct invalid {};
-    
-    std::variant<not_validated, connected, invalid> state = not_validated{};
-};
-
 struct game_session {
     std::string username;
     utils::image_pixels propic;
@@ -67,7 +45,29 @@ struct game_session {
     void set_propic(const utils::image_pixels &new_propic);
 };
 
-enum class lobby_user_flag {
+namespace connection_state {
+    struct not_validated {
+        ticks timeout = ticks{0};
+    };
+    
+    struct connected {
+        connected(game_session &session): session{session} {}
+
+        game_session &session;
+        ticks ping_timer = ticks{0};
+        int ping_count = 0;
+    };
+
+    struct invalid {};
+}
+
+using connection = std::variant<
+    connection_state::not_validated,
+    connection_state::connected,
+    connection_state::invalid
+>;
+
+enum class game_user_flag {
     muted
 };
 
@@ -78,7 +78,7 @@ struct game_user {
     int user_id;
     game_session &session;
     lobby_team team = lobby_team::game_player;
-    enums::bitset<lobby_user_flag> flags;
+    enums::bitset<game_user_flag> flags;
 };
 
 struct lobby_bot {

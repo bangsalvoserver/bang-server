@@ -56,12 +56,12 @@ namespace banggame {
 
     void game_manager::command_mute_user(game_session &session, std::string_view name_or_id) {
         game_user &user = session.lobby->find_user(name_or_id);
-        user.flags.add(lobby_user_flag::muted);
+        user.flags.add(game_user_flag::muted);
     }
 
     void game_manager::command_unmute_user(game_session &session, std::string_view name_or_id) {
         game_user &user = session.lobby->find_user(name_or_id);
-        user.flags.remove(lobby_user_flag::muted);
+        user.flags.remove(game_user_flag::muted);
     }
     
     void game_manager::command_get_game_options(game_session &session) {

@@ -14,9 +14,9 @@ void game_manager::on_message(client_handle client, std::string_view msg) {
                 throw critical_error("CLIENT_NOT_FOUND");
             }
             connection &con = it->second;
-            if constexpr (requires { handle_message(tag, con, args ...); }) {
-                handle_message(tag, con, FWD(args) ...);
-            } else if (auto *value = std::get_if<connection::connected>(&con.state)) {
+            if constexpr (requires { handle_message(tag, client, con, args ...); }) {
+                handle_message(tag, client, con, FWD(args) ...);
+            } else if (auto *value = std::get_if<connection_state::connected>(&con)) {
                 handle_message(tag, value->session, FWD(args) ...);
             } else {
                 throw critical_error("CLIENT_NOT_VALIDATED");
@@ -52,12 +52,12 @@ void game_manager::tick() {
 
     for (auto &[client, con] : m_connections) {
         std::visit(overloaded{
-            [&](connection::not_validated &value) {
+            [&](connection_state::not_validated &value) {
                 if (++value.timeout > client_accept_timer) {
                     kick_client(client, "HANDSHAKE_FAIL");
                 }
             },
-            [&](connection::connected &value) {
+            [&](connection_state::connected &value) {
                 if (++value.ping_timer > ping_interval) {
                     value.ping_timer = ticks{};
                     if (++value.ping_count >= pings_until_disconnect) {
@@ -67,8 +67,8 @@ void game_manager::tick() {
                     }
                 }
             },
-            [](connection::invalid) {}
-        }, con.state);
+            [](connection_state::invalid) {}
+        }, con);
     }
 
     if (std::erase_if(m_sessions, [&](auto &pair) {
@@ -136,8 +136,8 @@ static id_type generate_session_id(auto &rng, auto &map, int max_iters) {
     throw critical_error("CANNOT_GENERATE_SESSION_ID");
 }
 
-void game_manager::handle_message(utils::tag<"connect">, connection &con, const connect_args &args) {
-    if (!std::holds_alternative<connection::not_validated>(con.state)) {
+void game_manager::handle_message(utils::tag<"connect">, client_handle client, connection &con, const connect_args &args) {
+    if (!std::holds_alternative<connection_state::not_validated>(con)) {
         throw lobby_error("USER_ALREADY_CONNECTED");
     }
 
@@ -156,13 +156,13 @@ void game_manager::handle_message(utils::tag<"connect">, connection &con, const 
 
     session.set_username(args.username);
     session.set_propic(args.propic);
-    session.client = con.client;
+    session.client = client;
     
-    con.state.emplace<connection::connected>(session);
+    con.emplace<connection_state::connected>(session);
     
-    send_message<"client_accepted">(con.client, session_id);
+    send_message<"client_accepted">(client, session_id);
     for (const auto &[id, lobby] : m_lobbies) {
-        send_message<"lobby_update">(con.client, lobby);
+        send_message<"lobby_update">(client, lobby);
     }
 
     if (game_lobby *lobby = session.lobby) {
@@ -170,8 +170,8 @@ void game_manager::handle_message(utils::tag<"connect">, connection &con, const 
     }
 }
 
-void game_manager::handle_message(utils::tag<"pong">, connection &con) {
-    if (auto *value = std::get_if<connection::connected>(&con.state)) {
+void game_manager::handle_message(utils::tag<"pong">, client_handle client, connection &con) {
+    if (auto *value = std::get_if<connection_state::connected>(&con)) {
         value->ping_count = 0;
     } else {
         throw critical_error("CLIENT_NOT_VALIDATED");
@@ -320,14 +320,14 @@ void game_manager::kick_user_from_lobby(game_session &session) {
 }
 
 void game_manager::on_connect(client_handle client) {
-    m_connections.emplace(client, client);
+    m_connections.emplace(client, connection_state::not_validated{});
     tracking::track_client_count(m_connections.size());
 }
 
 void game_manager::invalidate_connection(client_handle client) {
     if (auto it = m_connections.find(client); it != m_connections.end()) {
-        auto &state = it->second.state;
-        if (auto *connected = std::get_if<connection::connected>(&state)) {
+        auto &con = it->second;
+        if (auto *connected = std::get_if<connection_state::connected>(&con)) {
             game_session &session = connected->session;
 
             session.client.reset();
@@ -337,7 +337,7 @@ void game_manager::invalidate_connection(client_handle client) {
             }
         }
 
-        state.emplace<connection::invalid>();
+        con.emplace<connection_state::invalid>();
     }
 }
 
@@ -367,7 +367,7 @@ void game_manager::handle_message(utils::tag<"lobby_chat">, game_session &sessio
     if (!value.message.empty()) {
         game_lobby &lobby = *session.lobby;
         game_user &user = lobby.find_user(session);
-        if (!user.flags.check(lobby_user_flag::muted)) {
+        if (!user.flags.check(game_user_flag::muted)) {
             lobby.chat_messages.emplace_back(user.user_id, session.username, value.message, lobby_chat_flag::is_read);
             broadcast_message_lobby<"lobby_chat">(lobby, user.user_id, session.username, value.message);
         }
