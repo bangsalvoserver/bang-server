@@ -11,9 +11,9 @@
 namespace banggame {
 
 class game_manager;
-struct client_state;
-struct game_user;
-struct lobby;
+struct connection;
+struct game_session;
+struct game_lobby;
 
 using client_handle = std::weak_ptr<void>;
 
@@ -32,8 +32,8 @@ static constexpr ticks client_accept_timer = 30s;
 static constexpr ticks ping_interval = 10s;
 static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
-struct client_state {
-    client_state(client_handle client) : client{client} {}
+struct connection {
+    connection(client_handle client) : client{client} {}
     
     client_handle client;
 
@@ -41,9 +41,9 @@ struct client_state {
         ticks timeout = ticks{0};
     };
     struct connected {
-        connected(game_user &user): user{user} {}
+        connected(game_session &session): session{session} {}
 
-        game_user &user;
+        game_session &session;
         ticks ping_timer = ticks{0};
         int ping_count = 0;
     };
@@ -52,11 +52,11 @@ struct client_state {
     std::variant<not_validated, connected, invalid> state = not_validated{};
 };
 
-struct game_user {
+struct game_session {
     std::string username;
     utils::image_pixels propic;
     
-    lobby *in_lobby = nullptr;
+    game_lobby *lobby = nullptr;
 
     client_handle client;
     ticks lifetime = user_lifetime;
@@ -71,12 +71,12 @@ enum class lobby_user_flag {
     muted
 };
 
-struct lobby_user {
-    lobby_user(int user_id, game_user &user)
-        : user_id{user_id}, user{user} {}
+struct game_user {
+    game_user(int user_id, game_session &session)
+        : user_id{user_id}, session{session} {}
     
     int user_id;
-    game_user &user;
+    game_session &session;
     lobby_team team = lobby_team::game_player;
     enums::bitset<lobby_user_flag> flags;
 };
@@ -87,8 +87,8 @@ struct lobby_bot {
     const utils::image_pixels *propic;
 };
 
-struct lobby : lobby_info {
-    lobby(const lobby_info &info, id_type lobby_id)
+struct game_lobby : lobby_info {
+    game_lobby(const lobby_info &info, id_type lobby_id)
         : lobby_id{lobby_id}
     {
         update_lobby_info(info);
@@ -97,7 +97,7 @@ struct lobby : lobby_info {
     id_type lobby_id;
     int user_id_count = 0;
 
-    std::list<lobby_user> users;
+    std::list<game_user> users;
     std::vector<lobby_bot> bots;
     std::vector<lobby_chat_args> chat_messages;
     
@@ -106,20 +106,20 @@ struct lobby : lobby_info {
 
     std::unique_ptr<banggame::game> m_game;
 
-    lobby_user &add_user(game_user &user);
-    lobby_user remove_user(const game_user &user);
+    game_user &add_user(game_session &session);
+    game_user remove_user(const game_session &session);
 
-    lobby_user &find_user(const game_user &user);
-    lobby_user &find_user(std::string_view name_or_id);
+    game_user &find_user(const game_session &session);
+    game_user &find_user(std::string_view name_or_id);
 
     void update_lobby_info(const lobby_info &info);
 
     explicit operator lobby_data() const;
 };
 
-using user_map = std::unordered_map<id_type, game_user>;
-using client_map = std::map<client_handle, client_state, std::owner_less<>>;
-using lobby_map = std::map<id_type, lobby>;
+using user_map = std::unordered_map<id_type, game_session>;
+using client_map = std::map<client_handle, connection, std::owner_less<>>;
+using lobby_map = std::map<id_type, game_lobby>;
 
 }
 

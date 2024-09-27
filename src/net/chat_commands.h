@@ -22,11 +22,11 @@ namespace banggame {
     template<typename FnMemPtr> struct argument_number;
 
     template<typename ... Args>
-    struct argument_number<void (game_manager::* const)(game_user &, Args...)> {
+    struct argument_number<void (game_manager::* const)(game_session &, Args...)> {
         static constexpr size_t value = sizeof...(Args);
     };
 
-    using manager_fn = void (*)(game_manager *, game_user &, std::span<std::string>);
+    using manager_fn = void (*)(game_manager *, game_session &, std::span<std::string>);
 
     class chat_command;
 
@@ -51,13 +51,13 @@ namespace banggame {
         }
 
         template<typename Proxy, size_t ... Is>
-        static void call_manager_fun_impl(game_manager *mgr, game_user &user, std::span<std::string> args, std::index_sequence<Is...>) {
-            (mgr->*Proxy::value)(user, get_arg(args, Is) ...);
+        static void call_manager_fun_impl(game_manager *mgr, game_session &session, std::span<std::string> args, std::index_sequence<Is...>) {
+            (mgr->*Proxy::value)(session, get_arg(args, Is) ...);
         }
 
         template<typename Proxy>
-        static void call_manager_fun(game_manager *mgr, game_user &user, std::span<std::string> args) {
-            call_manager_fun_impl<Proxy>(mgr, user, args,
+        static void call_manager_fun(game_manager *mgr, game_session &session, std::span<std::string> args) {
+            call_manager_fun_impl<Proxy>(mgr, session, args,
                 std::make_index_sequence<argument_number<decltype(Proxy::value)>::value>());
         }
 
@@ -68,8 +68,8 @@ namespace banggame {
             , m_description(description)
             , m_permissions(permissions) {}
 
-        void operator()(game_manager *mgr, game_user &user, std::span<std::string> args) const {
-            (*m_fun)(mgr, user, args);
+        void operator()(game_manager *mgr, game_session &session, std::span<std::string> args) const {
+            (*m_fun)(mgr, session, args);
         }
 
         std::string_view description() const {

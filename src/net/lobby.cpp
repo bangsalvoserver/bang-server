@@ -4,14 +4,14 @@
 
 namespace banggame {
 
-    std::chrono::milliseconds game_user::get_disconnect_lifetime() const {
+    std::chrono::milliseconds game_session::get_disconnect_lifetime() const {
         if (client.expired()) {
             return std::chrono::duration_cast<std::chrono::milliseconds>(lifetime);
         }
         return {};
     }
 
-    void game_user::set_username(const std::string &new_username) {
+    void game_session::set_username(const std::string &new_username) {
         static constexpr size_t max_username_size = 50;
 
         if (new_username.size() > max_username_size) {
@@ -54,60 +54,60 @@ namespace banggame {
         return result;
     }
 
-    void game_user::set_propic(const utils::image_pixels &new_propic) {
+    void game_session::set_propic(const utils::image_pixels &new_propic) {
         static constexpr int propic_size = 200;
 
         propic = scale_image(new_propic, propic_size);
     }
 
-    static auto find_user_it(auto &list, const game_user &user) {
-        return rn::find(list, &user, [](const lobby_user &lu) { return &lu.user; });
+    static auto find_user_it(auto &list, const game_session &session) {
+        return rn::find(list, &session, [](const game_user &user) { return &user.session; });
     }
 
-    lobby_user &lobby::add_user(game_user &user) {
-        if (auto it = find_user_it(users, user); it != users.end()) {
+    game_user &game_lobby::add_user(game_session &session) {
+        if (auto it = find_user_it(users, session); it != users.end()) {
             return *it;
         } else {
-            user.in_lobby = this;
-            return users.emplace_back(++user_id_count, user);
+            session.lobby = this;
+            return users.emplace_back(++user_id_count, session);
         }
     }
 
-    lobby_user lobby::remove_user(const game_user &user) {
-        auto it = find_user_it(users, user);
-        lobby_user lu = std::move(*it);
+    game_user game_lobby::remove_user(const game_session &session) {
+        auto it = find_user_it(users, session);
+        game_user user = std::move(*it);
         users.erase(it);
-        return lu;
+        return user;
     }
 
-    lobby_user &lobby::find_user(const game_user &user) {
-        if (auto it = find_user_it(users, user); it != users.end()) {
+    game_user &game_lobby::find_user(const game_session &session) {
+        if (auto it = find_user_it(users, session); it != users.end()) {
             return *it;
         }
         throw lobby_error("CANNOT_FIND_USER");
     }
 
-    lobby_user &lobby::find_user(std::string_view name_or_id) {
+    game_user &game_lobby::find_user(std::string_view name_or_id) {
         int user_id;
         if (auto [end, ec] = std::from_chars(name_or_id.data(), name_or_id.data() + name_or_id.size(), user_id); ec == std::errc{}) {
-            if (auto it = rn::find(users, user_id, &lobby_user::user_id); it != users.end()) {
+            if (auto it = rn::find(users, user_id, &game_user::user_id); it != users.end()) {
                 return *it;
             }
         }
 
-        if (lobby_user *lu = get_single_element(users
-            | rv::filter([&](const lobby_user &lu) {
-                return string_equal_icase(lu.user.username, name_or_id);
+        if (game_user *user = get_single_element(users
+            | rv::filter([&](const game_user &user) {
+                return string_equal_icase(user.session.username, name_or_id);
             })
             | rv::addressof))
         {
-            return *lu;
+            return *user;
         }
         
         throw lobby_error("CANNOT_FIND_USER");
     }
 
-    void lobby::update_lobby_info(const lobby_info &info) {
+    void game_lobby::update_lobby_info(const lobby_info &info) {
         static constexpr size_t max_lobby_name_size = 50;
 
         if (info.name.size() > max_lobby_name_size) {
@@ -119,12 +119,12 @@ namespace banggame {
         options = info.options;   
     }
 
-    lobby::operator lobby_data() const {
+    game_lobby::operator lobby_data() const {
         return {
             .lobby_id = lobby_id,
             .name = name,
-            .num_players = int(rn::count(users, lobby_team::game_player, &lobby_user::team)),
-            .num_spectators = int(rn::count(users, lobby_team::game_spectator, &lobby_user::team)),
+            .num_players = int(rn::count(users, lobby_team::game_player, &game_user::team)),
+            .num_spectators = int(rn::count(users, lobby_team::game_spectator, &game_user::team)),
             .max_players = lobby_max_players,
             .state = state
         };

@@ -32,45 +32,45 @@ namespace banggame {
         { "quit",           { proxy<&game_manager::command_quit>,               QUIT_DESCRIPTION }},
     };
 
-    void game_manager::command_print_help(game_user &user) {
+    void game_manager::command_print_help(game_session &session) {
         for (const auto &[cmd_name, command] : chat_command::commands) {
             if (!command.permissions().check(command_permissions::game_cheat) || m_options.enable_cheats) {
-                send_message<"lobby_message">(user.client,
+                send_message<"lobby_message">(session.client,
                     std::format("{}{} : {}", chat_command::start_char, cmd_name, command.description()));
             }
         }
     }
 
-    void game_manager::command_print_users(game_user &user) {
-        auto &lobby = *user.in_lobby;
-        for (const lobby_user &lu : lobby.users) {
-            send_message<"lobby_message">(user.client,
-                std::format("{} : {} ({})", lu.user_id, lu.user.username, enums::to_string(lu.team)));
+    void game_manager::command_print_users(game_session &session) {
+        game_lobby &lobby = *session.lobby;
+        for (const game_user &user : lobby.users) {
+            send_message<"lobby_message">(session.client,
+                std::format("{} : {} ({})", user.user_id, user.session.username, enums::to_string(user.team)));
         }
     }
 
-    void game_manager::command_kick_user(game_user &user, std::string_view name_or_id) {
-        lobby_user &lu = user.in_lobby->find_user(name_or_id);
-        kick_user_from_lobby(lu.user);
+    void game_manager::command_kick_user(game_session &session, std::string_view name_or_id) {
+        game_user &user = session.lobby->find_user(name_or_id);
+        kick_user_from_lobby(user.session);
     }
 
-    void game_manager::command_mute_user(game_user &user, std::string_view name_or_id) {
-        lobby_user &lu = user.in_lobby->find_user(name_or_id);
-        lu.flags.add(lobby_user_flag::muted);
+    void game_manager::command_mute_user(game_session &session, std::string_view name_or_id) {
+        game_user &user = session.lobby->find_user(name_or_id);
+        user.flags.add(lobby_user_flag::muted);
     }
 
-    void game_manager::command_unmute_user(game_user &user, std::string_view name_or_id) {
-        lobby_user &lu = user.in_lobby->find_user(name_or_id);
-        lu.flags.remove(lobby_user_flag::muted);
+    void game_manager::command_unmute_user(game_session &session, std::string_view name_or_id) {
+        game_user &user = session.lobby->find_user(name_or_id);
+        user.flags.remove(lobby_user_flag::muted);
     }
     
-    void game_manager::command_get_game_options(game_user &user) {
-        send_message<"lobby_message">(user.client, user.in_lobby->options.to_string());
+    void game_manager::command_get_game_options(game_session &session) {
+        send_message<"lobby_message">(session.client, session.lobby->options.to_string());
     }
 
-    void game_manager::command_set_game_option(game_user &user, std::string_view key, std::string_view value) {
+    void game_manager::command_set_game_option(game_session &session, std::string_view key, std::string_view value) {
         try {
-            lobby &lobby = *user.in_lobby;
+            game_lobby &lobby = *session.lobby;
             lobby.options.set_option(key, value);
             broadcast_message_lobby<"lobby_edited">(lobby, lobby);
         } catch (const std::exception &e) {
@@ -78,17 +78,17 @@ namespace banggame {
         }
     }
 
-    void game_manager::command_reset_game_options(game_user &user) {
-        auto &lobby = *user.in_lobby;
+    void game_manager::command_reset_game_options(game_session &session) {
+        game_lobby &lobby = *session.lobby;
         lobby.options = game_options::default_game_options;
         broadcast_message_lobby<"lobby_edited">(lobby, lobby);
     }
 
-    void game_manager::command_give_card(game_user &user, std::string_view card_name) {
-        auto &lobby = *user.in_lobby;
-        lobby_user &lu = lobby.find_user(user);
+    void game_manager::command_give_card(game_session &session, std::string_view card_name) {
+        game_lobby &lobby = *session.lobby;
+        game_user &user = lobby.find_user(session);
 
-        player_ptr target = lobby.m_game->find_player_by_userid(lu.user_id);
+        player_ptr target = lobby.m_game->find_player_by_userid(user.user_id);
         if (!target) {
             throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");
         }
@@ -102,12 +102,12 @@ namespace banggame {
         }
     }
 
-    void game_manager::command_get_rng_seed(game_user &user) {
-        send_message<"lobby_message">(user.client, std::to_string(user.in_lobby->m_game->rng_seed));
+    void game_manager::command_get_rng_seed(game_session &session) {
+        send_message<"lobby_message">(session.client, std::to_string(session.lobby->m_game->rng_seed));
     }
 
-    void game_manager::command_quit(game_user &user) {
-        kick_client(user.client, "QUIT");
+    void game_manager::command_quit(game_session &session) {
+        kick_client(session.client, "QUIT");
     }
 
 }
