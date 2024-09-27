@@ -125,27 +125,28 @@ void game_manager::tick() {
     }
 }
 
+static id_type generate_session_id(auto &rng, auto &map, int max_iters) {
+    for (int i = 0; i < max_iters; ++i) {
+        id_type value = std::uniform_int_distribution<id_type>{1}(rng);
+        if (!map.contains(value)) {
+            return value;
+        }
+    }
+    // this is astronomically rare
+    throw critical_error("CANNOT_GENERATE_SESSION_ID");
+}
+
 void game_manager::handle_message(utils::tag<"connect">, client_state &client, const connect_args &args) {
     if (!std::holds_alternative<client_state::not_validated>(client.state)) {
         throw lobby_error("USER_ALREADY_CONNECTED");
     }
     
+    auto &state = client.state.emplace<client_state::connected>();
+
     id_type session_id = args.session_id;
     if (session_id == 0) {
-        int i = 0;
-        while (i < m_options.max_session_id_count) {
-            session_id = std::uniform_int_distribution<id_type>{1}(session_rng);
-            if (m_users.find(session_id) == m_users.end()) {
-                break;
-            }
-        }
-        if (i >= m_options.max_session_id_count) {
-            // this is astronomically rare
-            throw critical_error("CANNOT_GENERATE_SESSION_ID");
-        }
+        session_id = generate_session_id(session_rng, m_users, m_options.max_session_id_count);
     }
-
-    auto &state = client.state.emplace<client_state::connected>();
     
     if (auto it = m_users.find(session_id); it != m_users.end()) {
         state.user = &it->second;
