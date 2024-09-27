@@ -45,13 +45,13 @@ namespace banggame {
         auto &lobby = *user.in_lobby;
         for (const lobby_user &lu : lobby.users) {
             send_message<"lobby_message">(user.client,
-                std::format("{} : {} ({})", lu.user_id, lu.user->username, enums::to_string(lu.team)));
+                std::format("{} : {} ({})", lu.user_id, lu.user.username, enums::to_string(lu.team)));
         }
     }
 
     void game_manager::command_kick_user(game_user &user, std::string_view name_or_id) {
         lobby_user &lu = user.in_lobby->find_user(name_or_id);
-        kick_user_from_lobby(*lu.user);
+        kick_user_from_lobby(lu.user);
     }
 
     void game_manager::command_mute_user(game_user &user, std::string_view name_or_id) {

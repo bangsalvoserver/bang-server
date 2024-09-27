@@ -53,8 +53,8 @@ private:
     template<utils::fixed_string E> requires server_message_type<E>
     void broadcast_message_lobby(const lobby &lobby, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
-        for (const lobby_user &user : lobby.users) {
-            push_message(user.user->client, message);
+        for (const lobby_user &lu : lobby.users) {
+            push_message(lu.user.client, message);
         }
     }
 

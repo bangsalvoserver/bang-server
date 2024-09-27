@@ -96,9 +96,9 @@ void game_manager::tick() {
                 
                 while (lobby.m_game->pending_updates()) {
                     auto [target, update, update_time] = lobby.m_game->get_next_update();
-                    for (const lobby_user &user : lobby.users) {
-                        if (target.matches(user.user_id)) {
-                            send_message<"game_update">(user.user->client, update);
+                    for (const lobby_user &lu : lobby.users) {
+                        if (target.matches(lu.user_id)) {
+                            send_message<"game_update">(lu.user.client, update);
                         }
                     }
                 }
@@ -223,7 +223,7 @@ void game_manager::handle_message(utils::tag<"lobby_edit">, game_user &user, con
     }
     auto &lobby = *user.in_lobby;
 
-    if (lobby.users.front().user != &user) {
+    if (&lobby.users.front().user != &user) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 
@@ -234,8 +234,8 @@ void game_manager::handle_message(utils::tag<"lobby_edit">, game_user &user, con
     lobby.update_lobby_info(args);
     
     for (const lobby_user &lu : lobby.users) {
-        if (lu.user != &user) {
-            send_message<"lobby_edited">(lu.user->client, args);
+        if (&lu.user != &user) {
+            send_message<"lobby_edited">(lu.user.client, args);
         }
     }
 }
@@ -247,15 +247,15 @@ void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
 
     send_message<"lobby_entered">(user.client, new_user.user_id, lobby.lobby_id, lobby.name, lobby.options);
     for (const lobby_user &lu : lobby.users) {
-        if (lu.user != &user) {
-            send_message<"lobby_add_user">(lu.user->client, new_user.user_id, user.username, new_user.team);
+        if (&lu.user != &user) {
+            send_message<"lobby_add_user">(lu.user.client, new_user.user_id, user.username, new_user.team);
             if (user.propic) {
-                send_message<"lobby_user_propic">(lu.user->client, new_user.user_id, user.propic);
+                send_message<"lobby_user_propic">(lu.user.client, new_user.user_id, user.propic);
             }
         }
-        send_message<"lobby_add_user">(user.client, lu.user_id, lu.user->username, lu.team, lobby_chat_flag::is_read, lu.user->get_disconnect_lifetime());
-        if (lu.user->propic) {
-            send_message<"lobby_user_propic">(user.client, lu.user_id, lu.user->propic);
+        send_message<"lobby_add_user">(user.client, lu.user_id, lu.user.username, lu.team, lobby_chat_flag::is_read, lu.user.get_disconnect_lifetime());
+        if (const auto &propic = lu.user.propic) {
+            send_message<"lobby_user_propic">(user.client, lu.user_id, propic);
         }
     }
     for (auto &bot : lobby.bots) {
@@ -288,14 +288,11 @@ void game_manager::handle_join_lobby(game_user &user, lobby &lobby) {
 }
 
 void game_manager::set_user_team(game_user &user, lobby_team team) {
-    if (user.in_lobby) {
-        lobby &lobby = *user.in_lobby;
-        auto it = rn::find(lobby.users, &user, &lobby_user::user);
-        if (it != lobby.users.end()) {
-            it->team = team;
-            broadcast_message<"lobby_update">(lobby);
-            broadcast_message_lobby<"lobby_add_user">(lobby, it->user_id, user.username, team);
-        }
+    if (auto *l = user.in_lobby) {
+        lobby_user &lu = l->find_user(user);
+        lu.team = team;
+        broadcast_message<"lobby_update">(*l);
+        broadcast_message_lobby<"lobby_add_user">(*l, lu.user_id, user.username, team);
     }
 }
 
@@ -315,9 +312,7 @@ void game_manager::handle_message(utils::tag<"lobby_join">, game_user &user, con
 void game_manager::kick_user_from_lobby(game_user &user) {
     auto &lobby = *std::exchange(user.in_lobby, nullptr);
 
-    auto it = rn::find(lobby.users, &user, &lobby_user::user);
-    int user_id = it->user_id;
-    lobby.users.erase(it);
+    int user_id = lobby.remove_user(user).user_id;
 
     broadcast_message<"lobby_update">(lobby);
     broadcast_message_lobby<"lobby_remove_user">(lobby, user_id);
@@ -393,7 +388,7 @@ void game_manager::handle_chat_command(game_user &user, const std::string &messa
     auto &command = cmd_it->second;
     auto &lobby = *user.in_lobby;
 
-    if (command.permissions().check(command_permissions::lobby_owner) && &user != lobby.users.front().user) {
+    if (command.permissions().check(command_permissions::lobby_owner) && &user != &lobby.users.front().user) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 
@@ -438,7 +433,7 @@ void game_manager::handle_message(utils::tag<"lobby_return">, game_user &user) {
     auto &lobby = *user.in_lobby;
     lobby_user &lu = lobby.find_user(user);
 
-    if (&user != lobby.users.front().user) {
+    if (&user != &lobby.users.front().user) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 
@@ -452,8 +447,8 @@ void game_manager::handle_message(utils::tag<"lobby_return">, game_user &user) {
     lobby.m_game.reset();
     lobby.state = lobby_state::waiting;
 
-    for (const lobby_user &user : lobby.users) {
-        set_user_team(*(user.user), lobby_team::game_player);
+    for (const lobby_user &lu : lobby.users) {
+        set_user_team(lu.user, lobby_team::game_player);
     }
 }
 
@@ -473,7 +468,7 @@ void game_manager::handle_message(utils::tag<"game_start">, game_user &user) {
     }
     auto &lobby = *user.in_lobby;
 
-    if (&user != lobby.users.front().user) {
+    if (&user != &lobby.users.front().user) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 

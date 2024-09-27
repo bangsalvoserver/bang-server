@@ -60,17 +60,28 @@ namespace banggame {
         propic = scale_image(new_propic, propic_size);
     }
 
+    static auto find_user_it(auto &list, const game_user &user) {
+        return rn::find(list, &user, [](const lobby_user &lu) { return &lu.user; });
+    }
+
     lobby_user &lobby::add_user(game_user &user) {
-        if (auto it = rn::find(users, &user, &lobby_user::user); it != users.end()) {
+        if (auto it = find_user_it(users, user); it != users.end()) {
             return *it;
         } else {
             user.in_lobby = this;
-            return users.emplace_back(lobby_team::game_player, ++user_id_count, &user);
+            return users.emplace_back(++user_id_count, user);
         }
     }
 
+    lobby_user lobby::remove_user(const game_user &user) {
+        auto it = find_user_it(users, user);
+        lobby_user lu = std::move(*it);
+        users.erase(it);
+        return lu;
+    }
+
     lobby_user &lobby::find_user(const game_user &user) {
-        if (auto it = rn::find(users, &user, &lobby_user::user); it != users.end()) {
+        if (auto it = find_user_it(users, user); it != users.end()) {
             return *it;
         }
         throw lobby_error("CANNOT_FIND_USER");
@@ -85,8 +96,8 @@ namespace banggame {
         }
 
         if (lobby_user *lu = get_single_element(users
-            | rv::filter([&](const lobby_user &user) {
-                return string_equal_icase(user.user->username, name_or_id);
+            | rv::filter([&](const lobby_user &lu) {
+                return string_equal_icase(lu.user.username, name_or_id);
             })
             | rv::addressof))
         {

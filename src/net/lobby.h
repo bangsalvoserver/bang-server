@@ -6,6 +6,8 @@
 
 #include "game/game.h"
 
+#include <list>
+
 namespace banggame {
 
 class game_manager;
@@ -70,9 +72,12 @@ enum class lobby_user_flag {
 };
 
 struct lobby_user {
-    lobby_team team;
+    lobby_user(int user_id, game_user &user)
+        : user_id{user_id}, user{user} {}
+    
     int user_id;
-    game_user *user;
+    game_user &user;
+    lobby_team team = lobby_team::game_player;
     enums::bitset<lobby_user_flag> flags;
 };
 
@@ -92,7 +97,7 @@ struct lobby : lobby_info {
     id_type lobby_id;
     int user_id_count = 0;
 
-    std::vector<lobby_user> users;
+    std::list<lobby_user> users;
     std::vector<lobby_bot> bots;
     std::vector<lobby_chat_args> chat_messages;
     
@@ -102,6 +107,7 @@ struct lobby : lobby_info {
     std::unique_ptr<banggame::game> m_game;
 
     lobby_user &add_user(game_user &user);
+    lobby_user remove_user(const game_user &user);
 
     lobby_user &find_user(const game_user &user);
     lobby_user &find_user(std::string_view name_or_id);
