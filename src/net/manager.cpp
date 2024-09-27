@@ -17,7 +17,7 @@ void game_manager::on_message(client_handle client, std::string_view msg) {
             if constexpr (requires { handle_message(tag, state, args ...); }) {
                 handle_message(tag, state, FWD(args) ...);
             } else if (auto *value = std::get_if<client_state::connected>(&state.state)) {
-                handle_message(tag, *(value->user), FWD(args) ...);
+                handle_message(tag, value->user, FWD(args) ...);
             } else {
                 throw critical_error("CLIENT_NOT_VALIDATED");
             }
@@ -140,33 +140,33 @@ void game_manager::handle_message(utils::tag<"connect">, client_state &client, c
     if (!std::holds_alternative<client_state::not_validated>(client.state)) {
         throw lobby_error("USER_ALREADY_CONNECTED");
     }
-    
-    auto &state = client.state.emplace<client_state::connected>();
 
     id_type session_id = args.session_id;
     if (session_id == 0) {
         session_id = generate_session_id(session_rng, m_users, m_options.max_session_id_count);
     }
-    
-    if (auto it = m_users.find(session_id); it != m_users.end()) {
-        state.user = &it->second;
-        kick_client(state.user->client, "RECONNECT_WITH_SAME_SESSION_ID");
-    } else {
-        state.user = &m_users.emplace_hint(it, session_id, session_id)->second;
+
+    auto [it, inserted] = m_users.try_emplace(session_id);
+    game_user &user = it->second;
+    if (inserted) {
         tracking::track_user_count(m_users.size());
+    } else {
+        kick_client(user.client, "RECONNECT_WITH_SAME_SESSION_ID");
     }
 
-    state.user->set_username(args.username);
-    state.user->set_propic(args.propic);
-    state.user->client = client.client;
+    user.set_username(args.username);
+    user.set_propic(args.propic);
+    user.client = client.client;
+    
+    client.state.emplace<client_state::connected>(user);
     
     send_message<"client_accepted">(client.client, session_id);
     for (const auto &[id, lobby] : m_lobbies) {
         send_message<"lobby_update">(client.client, lobby);
     }
 
-    if (state.user->in_lobby) {
-        handle_join_lobby(*state.user, *state.user->in_lobby);
+    if (auto *l = user.in_lobby) {
+        handle_join_lobby(user, *l);
     }
 }
 
@@ -333,12 +333,12 @@ void game_manager::invalidate_client_state(client_handle client) {
     if (auto it = m_clients.find(client); it != m_clients.end()) {
         auto &state = it->second.state;
         if (auto *connected = std::get_if<client_state::connected>(&state)) {
-            game_user *user = connected->user;
+            game_user &user = connected->user;
 
-            user->client.reset();
-            if (lobby *l = user->in_lobby) {
-                lobby_user &lu = l->find_user(*user);
-                broadcast_message_lobby<"lobby_add_user">(*l, lu.user_id, user->username, lu.team, lobby_chat_flag::is_read, user->get_disconnect_lifetime());
+            user.client.reset();
+            if (lobby *l = user.in_lobby) {
+                lobby_user &lu = l->find_user(user);
+                broadcast_message_lobby<"lobby_add_user">(*l, lu.user_id, user.username, lu.team, lobby_chat_flag::is_read, user.get_disconnect_lifetime());
             }
         }
 

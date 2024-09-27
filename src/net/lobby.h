@@ -39,7 +39,9 @@ struct client_state {
         ticks timeout = ticks{0};
     };
     struct connected {
-        game_user *user = nullptr;
+        connected(game_user &user): user{user} {}
+
+        game_user &user;
         ticks ping_timer = ticks{0};
         int ping_count = 0;
     };
@@ -49,12 +51,9 @@ struct client_state {
 };
 
 struct game_user {
-    explicit game_user(id_type session_id): session_id{session_id} {}
-
     std::string username;
     utils::image_pixels propic;
     
-    id_type session_id = 0;
     lobby *in_lobby = nullptr;
 
     client_handle client;
