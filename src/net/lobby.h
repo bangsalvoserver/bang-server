@@ -106,7 +106,7 @@ struct game_lobby : lobby_info {
 
     std::unique_ptr<banggame::game> m_game;
 
-    game_user &add_user(game_session &session);
+    std::pair<game_user &, bool> add_user(game_session &session);
     game_user remove_user(const game_session &session);
 
     game_user &find_user(const game_session &session);

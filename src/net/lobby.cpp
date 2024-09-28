@@ -64,12 +64,12 @@ namespace banggame {
         return rn::find(list, &session, [](const game_user &user) { return &user.session; });
     }
 
-    game_user &game_lobby::add_user(game_session &session) {
+    std::pair<game_user &, bool> game_lobby::add_user(game_session &session) {
         if (auto it = find_user_it(users, session); it != users.end()) {
-            return *it;
+            return {*it, false};
         } else {
             session.lobby = this;
-            return users.emplace_back(++user_id_count, session);
+            return {users.emplace_back(++user_id_count, session), true};
         }
     }
 

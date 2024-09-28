@@ -84,15 +84,10 @@ namespace banggame {
         game_options options;
     };
 
-    enum class lobby_chat_flag {
-        is_read
-    };
-
     struct lobby_user_args {
         int user_id;
         std::string username;
         lobby_team team;
-        enums::bitset<lobby_chat_flag> flags;
         std::chrono::milliseconds lifetime;
     };
 
@@ -101,11 +96,20 @@ namespace banggame {
         utils::image_pixels propic;
     };
 
+    enum class lobby_chat_flag {
+        is_read,
+        server_message,
+        translated,
+    };
+
+    using lobby_chat_flags = enums::bitset<lobby_chat_flag>;
+
     struct lobby_chat_args {
         int user_id;
         std::string username;
         std::string message;
-        enums::bitset<lobby_chat_flag> flags;
+        std::vector<std::string> args;
+        lobby_chat_flags flags;
     };
 
     using server_message = utils::tagged_variant<
@@ -121,7 +125,6 @@ namespace banggame {
         utils::tag<"lobby_remove_user", int>,
         utils::tag<"lobby_kick">,
         utils::tag<"lobby_chat", lobby_chat_args>,
-        utils::tag<"lobby_message", std::string>,
         utils::tag<"game_update", json::json>,
         utils::tag<"game_started">
     >;

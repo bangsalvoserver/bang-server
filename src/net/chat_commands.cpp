@@ -6,37 +6,28 @@
 
 namespace banggame {
 
-    static constexpr std::string_view HELP_DESCRIPTION = "print this message";
-    static constexpr std::string_view USERS_DESCRIPTION = "print list of users in this lobby";
-    static constexpr std::string_view KICK_DESCRIPTION = "[user] : kick an user in this lobby";
-    static constexpr std::string_view MUTE_DESCRIPTION = "[user] : mute an user in this lobby";
-    static constexpr std::string_view UNMUTE_DESCRIPTION = "[user] : unmute an user in this lobby";
-    static constexpr std::string_view GET_OPTIONS_DESCRIPTION = "print game options";
-    static constexpr std::string_view SET_OPTION_DESCRIPTION = "[name] [value] : set a game option";
-    static constexpr std::string_view RESET_OPTIONS_DESCRIPTION = "reset game options";
-    static constexpr std::string_view GIVE_CARD_DESCRIPTION = "[name] : give yourself a card";
-    static constexpr std::string_view GET_RNG_SEED_DESCRIPTION = "print rng seed (only during game over screen)";
-    static constexpr std::string_view QUIT_DESCRIPTION = "disconnect from server";
-
     const string_command_map chat_command::commands {
-        { "help",           { proxy<&game_manager::command_print_help>,         HELP_DESCRIPTION }},
-        { "users",          { proxy<&game_manager::command_print_users>,        USERS_DESCRIPTION }},
-        { "kick",           { proxy<&game_manager::command_kick_user>,          KICK_DESCRIPTION, command_permissions::lobby_owner }},
-        { "mute",           { proxy<&game_manager::command_mute_user>,          MUTE_DESCRIPTION, command_permissions::lobby_owner }},
-        { "unmute",         { proxy<&game_manager::command_unmute_user>,        UNMUTE_DESCRIPTION, command_permissions::lobby_owner }},
-        { "options",        { proxy<&game_manager::command_get_game_options>,   GET_OPTIONS_DESCRIPTION }},
-        { "set-option",     { proxy<&game_manager::command_set_game_option>,    SET_OPTION_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
-        { "reset-options",  { proxy<&game_manager::command_reset_game_options>, RESET_OPTIONS_DESCRIPTION, { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
-        { "give",           { proxy<&game_manager::command_give_card>,          GIVE_CARD_DESCRIPTION, command_permissions::game_cheat }},
-        { "seed",           { proxy<&game_manager::command_get_rng_seed>,       GET_RNG_SEED_DESCRIPTION, command_permissions::lobby_finished }},
-        { "quit",           { proxy<&game_manager::command_quit>,               QUIT_DESCRIPTION }},
+        { "help",           { proxy<&game_manager::command_print_help>,         "HELP_DESCRIPTION" }},
+        { "users",          { proxy<&game_manager::command_print_users>,        "USERS_DESCRIPTION" }},
+        { "kick",           { proxy<&game_manager::command_kick_user>,          "KICK_DESCRIPTION", command_permissions::lobby_owner }},
+        { "mute",           { proxy<&game_manager::command_mute_user>,          "MUTE_DESCRIPTION", command_permissions::lobby_owner }},
+        { "unmute",         { proxy<&game_manager::command_unmute_user>,        "UNMUTE_DESCRIPTION", command_permissions::lobby_owner }},
+        { "options",        { proxy<&game_manager::command_get_game_options>,   "GET_OPTIONS_DESCRIPTION" }},
+        { "set-option",     { proxy<&game_manager::command_set_game_option>,    "SET_OPTION_DESCRIPTION", { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
+        { "reset-options",  { proxy<&game_manager::command_reset_game_options>, "RESET_OPTIONS_DESCRIPTION", { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
+        { "give",           { proxy<&game_manager::command_give_card>,          "GIVE_CARD_DESCRIPTION", command_permissions::game_cheat }},
+        { "seed",           { proxy<&game_manager::command_get_rng_seed>,       "GET_RNG_SEED_DESCRIPTION", command_permissions::lobby_finished }},
+        { "quit",           { proxy<&game_manager::command_quit>,               "QUIT_DESCRIPTION" }},
     };
 
     void game_manager::command_print_help(game_session &session) {
         for (const auto &[cmd_name, command] : chat_command::commands) {
             if (!command.permissions().check(command_permissions::game_cheat) || m_options.enable_cheats) {
-                send_message<"lobby_message">(session.client,
-                    std::format("{}{} : {}", chat_command::start_char, cmd_name, command.description()));
+                send_message<"lobby_chat">(session.client, 0, "",
+                    std::string{command.description()},
+                    std::vector{std::format("{}{}", chat_command::start_char, cmd_name)},
+                    lobby_chat_flags{lobby_chat_flag::server_message, lobby_chat_flag::translated}
+                );
             }
         }
     }
@@ -44,8 +35,10 @@ namespace banggame {
     void game_manager::command_print_users(game_session &session) {
         game_lobby &lobby = *session.lobby;
         for (const game_user &user : lobby.users) {
-            send_message<"lobby_message">(session.client,
-                std::format("{} : {} ({})", user.user_id, user.session.username, enums::to_string(user.team)));
+            send_message<"lobby_chat">(session.client, 0, "",
+                std::format("{} : {} ({})", user.user_id, user.session.username, enums::to_string(user.team)),
+                std::vector<std::string>{}, lobby_chat_flag::server_message
+            );
         }
     }
 
@@ -65,7 +58,10 @@ namespace banggame {
     }
     
     void game_manager::command_get_game_options(game_session &session) {
-        send_message<"lobby_message">(session.client, session.lobby->options.to_string());
+        send_message<"lobby_chat">(session.client, 0, "",
+            session.lobby->options.to_string(), std::vector<std::string>{},
+            lobby_chat_flag::server_message
+        );
     }
 
     void game_manager::command_set_game_option(game_session &session, std::string_view key, std::string_view value) {
@@ -103,7 +99,10 @@ namespace banggame {
     }
 
     void game_manager::command_get_rng_seed(game_session &session) {
-        send_message<"lobby_message">(session.client, std::to_string(session.lobby->m_game->rng_seed));
+        send_message<"lobby_chat">(session.client, 0, "",
+            "GAME_SEED", std::vector{std::to_string(session.lobby->m_game->rng_seed)},
+            lobby_chat_flags{lobby_chat_flag::server_message, lobby_chat_flag::translated}
+        );
     }
 
     void game_manager::command_quit(game_session &session) {
