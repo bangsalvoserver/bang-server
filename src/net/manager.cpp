@@ -205,21 +205,21 @@ void game_manager::handle_message(utils::tag<"lobby_make">, game_session &sessio
     game_lobby &lobby = m_lobbies.try_emplace(lobby_id, value, lobby_id).first->second;
     tracking::track_lobby_count(m_lobbies.size());
 
-    int user_id = lobby.add_user(session).first.user_id;
+    game_user &user = lobby.add_user(session).first;
 
     lobby.state = lobby_state::waiting;
     broadcast_message<"lobby_update">(lobby);
 
-    send_message<"lobby_entered">(session.client, user_id, lobby.lobby_id, lobby.name, lobby.options);
-    send_message<"lobby_add_user">(session.client, user_id, session.username, lobby_team::game_player);
+    send_message<"lobby_entered">(session.client, user.user_id, lobby.lobby_id, lobby.name, lobby.options);
+    send_message<"lobby_add_user">(session.client, user.user_id, session.username, lobby_team::game_player);
 
-    add_lobby_chat_message(lobby, {
+    add_lobby_chat_message(lobby, &user, {
         0, "", "USER_JOINED_LOBBY", { session.username },
         { lobby_chat_flag::server_message, lobby_chat_flag::translated } }
     );
     
     if (session.propic) {
-        send_message<"lobby_user_propic">(session.client, user_id, session.propic);
+        send_message<"lobby_user_propic">(session.client, user.user_id, session.propic);
     }
 }
 
@@ -272,7 +272,7 @@ void game_manager::handle_join_lobby(game_session &session, game_lobby &lobby) {
         send_message<"lobby_chat">(session.client, message);
     }
     if (inserted) {
-        add_lobby_chat_message(lobby, {
+        add_lobby_chat_message(lobby, &new_user, {
             0, "", "USER_JOINED_LOBBY", { session.username },
             { lobby_chat_flag::server_message, lobby_chat_flag::translated } }
         );
@@ -324,13 +324,13 @@ void game_manager::handle_message(utils::tag<"lobby_join">, game_session &sessio
 void game_manager::kick_user_from_lobby(game_session &session) {
     game_lobby &lobby = *std::exchange(session.lobby, nullptr);
 
-    int user_id = lobby.remove_user(session).user_id;
+    auto user_id = lobby.remove_user(session).user_id;
 
     broadcast_message<"lobby_update">(lobby);
     broadcast_message_lobby<"lobby_remove_user">(lobby, user_id);
     send_message<"lobby_kick">(session.client);
 
-    add_lobby_chat_message(lobby, {
+    add_lobby_chat_message(lobby, nullptr, {
         0, "", "USER_LEFT_LOBBY", { session.username },
         { lobby_chat_flag::server_message, lobby_chat_flag::translated } }
     );
@@ -377,10 +377,17 @@ void game_manager::handle_message(utils::tag<"lobby_leave">, game_session &sessi
     kick_user_from_lobby(session);
 }
 
-void game_manager::add_lobby_chat_message(game_lobby &lobby, lobby_chat_args message) {
-    broadcast_message_lobby<"lobby_chat">(lobby, message);
-    message.flags.add(lobby_chat_flag::is_read);
-    lobby.chat_messages.emplace_back(std::move(message));
+void game_manager::add_lobby_chat_message(game_lobby &lobby, game_user *is_read_for, lobby_chat_args message) {
+    lobby_chat_args with_is_read = message;
+    with_is_read.flags.add(lobby_chat_flag::is_read);
+    for (const game_user &user : lobby.users) {
+        if (&user == is_read_for) {
+            send_message<"lobby_chat">(user.session.client, with_is_read);
+        } else {
+            send_message<"lobby_chat">(user.session.client, message);
+        }
+    }
+    lobby.chat_messages.emplace_back(std::move(with_is_read));
 }
 
 void game_manager::handle_message(utils::tag<"lobby_chat">, game_session &session, const lobby_chat_client_args &value) {
@@ -391,7 +398,7 @@ void game_manager::handle_message(utils::tag<"lobby_chat">, game_session &sessio
         game_lobby &lobby = *session.lobby;
         game_user &user = lobby.find_user(session);
         if (!user.flags.check(game_user_flag::muted)) {
-            add_lobby_chat_message(lobby, { user.user_id, session.username, value.message });
+            add_lobby_chat_message(lobby, nullptr, { user.user_id, session.username, value.message });
         }
         if (value.message[0] == chat_command::start_char) {
             handle_chat_command(session, value.message.substr(1));

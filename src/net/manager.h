@@ -60,7 +60,7 @@ private:
 
     void invalidate_connection(client_handle client);
     void kick_user_from_lobby(game_session &session);
-    void add_lobby_chat_message(game_lobby &lobby, lobby_chat_args message);
+    void add_lobby_chat_message(game_lobby &lobby, game_user *is_read_for, lobby_chat_args message);
     void handle_join_lobby(game_session &session, game_lobby &lobby);
     void set_user_team(game_session &session, lobby_team team);
 
