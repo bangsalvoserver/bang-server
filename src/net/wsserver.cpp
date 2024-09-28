@@ -75,6 +75,11 @@ namespace net {
                     m_message_queue.emplace(data->client, disconnected{});
                 }
             })
+            .get("/.env", [this](auto *res, auto *req) {
+                res->writeStatus("418 I'm a teapot");
+                res->end("nice try :p");
+                logging::warn("[{}] is trying to hack the server", res->getRemoteAddressAsText());
+            })
             .get("/tracking", [this](auto *res, auto *req) {
                 try {
                     auto length = tracking::parse_length(req->getQuery("length"));
