@@ -129,11 +129,11 @@ namespace net {
         }, m_server);
     }
 
-    void wsserver::kick_client(client_handle client, std::string message) {
+    void wsserver::kick_client(client_handle client, std::string message, int code) {
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
             if (auto *ws = websocket_cast<SSL>(client)) {
-                server.getLoop()->defer([ws, message = std::move(message)]{
-                    ws->end(1000, message);
+                server.getLoop()->defer([ws, code, message = std::move(message)]{
+                    ws->end(code, message);
                 });
             }
         }, m_server);

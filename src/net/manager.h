@@ -27,7 +27,7 @@ public:
 
     void stop();
     void tick();
-    void kick_client(client_handle client, std::string message);
+    void kick_client(client_handle client, std::string message, int code = kick_opcode);
 
     server_options &options() { return m_options; }
 

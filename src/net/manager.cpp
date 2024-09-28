@@ -358,9 +358,9 @@ void game_manager::invalidate_connection(client_handle client) {
     }
 }
 
-void game_manager::kick_client(client_handle client, std::string message) {
+void game_manager::kick_client(client_handle client, std::string message, int code) {
     invalidate_connection(client);
-    net::wsserver::kick_client(client, std::move(message));
+    net::wsserver::kick_client(client, std::move(message), code);
 }
 
 void game_manager::on_disconnect(client_handle client) {

@@ -15,6 +15,8 @@ namespace net {
     public:
         using client_handle = std::weak_ptr<void>;
 
+        static constexpr int kick_opcode = 1000;
+
     private:
         std::variant<
             std::monostate,
@@ -50,7 +52,7 @@ namespace net {
 
         void push_message(client_handle client, std::string message);
 
-        void kick_client(client_handle client, std::string message);
+        void kick_client(client_handle client, std::string message, int code = kick_opcode);
     };
 
 }
