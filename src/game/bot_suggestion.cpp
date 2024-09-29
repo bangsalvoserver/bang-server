@@ -37,7 +37,7 @@ namespace banggame::bot_suggestion {
             } else if (num_sheriff_or_deputy > 1) {
                 return target->m_role == player_role::deputy;
             } else if (target->m_role == player_role::sheriff && num_outlaws > 0) {
-                return target->m_hp >= 2;
+                return target->m_hp > 2;
             } else {
                 return true;
             }
