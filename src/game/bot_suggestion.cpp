@@ -34,12 +34,10 @@ namespace banggame::bot_suggestion {
                 return target->m_role == player_role::outlaw
                     || target->m_role == player_role::renegade
                     && origin != target;
-            } else if (num_outlaws < num_sheriff_or_deputy) {
-                if (num_outlaws == 0) {
-                    return target->m_role == player_role::sheriff;
-                } else {
-                    return target->m_role == player_role::deputy;
-                }
+            } else if (num_sheriff_or_deputy > 1) {
+                return target->m_role == player_role::deputy;
+            } else if (target->m_role == player_role::sheriff && num_outlaws > 0) {
+                return target->m_hp >= 2;
             } else {
                 return true;
             }
