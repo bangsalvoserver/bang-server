@@ -39,8 +39,6 @@ struct game_session {
     client_handle client;
     ticks lifetime = user_lifetime;
 
-    std::chrono::milliseconds get_disconnect_lifetime() const;
-
     void set_username(const std::string &new_username);
     void set_propic(const utils::image_pixels &new_propic);
 };

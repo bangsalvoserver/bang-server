@@ -4,13 +4,6 @@
 
 namespace banggame {
 
-    std::chrono::milliseconds game_session::get_disconnect_lifetime() const {
-        if (client.expired()) {
-            return std::chrono::duration_cast<std::chrono::milliseconds>(lifetime);
-        }
-        return {};
-    }
-
     void game_session::set_username(const std::string &new_username) {
         static constexpr size_t max_username_size = 50;
 

@@ -259,7 +259,9 @@ void game_manager::handle_join_lobby(game_session &session, game_lobby &lobby) {
                 send_message<"lobby_user_propic">(user.session.client, new_user.user_id, session.propic);
             }
         }
-        send_message<"lobby_add_user">(session.client, user.user_id, user.session.username, user.team, user.session.get_disconnect_lifetime());
+        send_message<"lobby_add_user">(session.client, user.user_id, user.session.username, user.team,
+            std::chrono::duration_cast<std::chrono::milliseconds>(user.session.client.expired() ? user.session.lifetime : ticks{})
+        );
         if (const auto &propic = user.session.propic) {
             send_message<"lobby_user_propic">(session.client, user.user_id, propic);
         }
@@ -350,7 +352,9 @@ void game_manager::invalidate_connection(client_handle client) {
             session.client.reset();
             if (game_lobby *lobby = session.lobby) {
                 game_user &user = lobby->find_user(session);
-                broadcast_message_lobby<"lobby_add_user">(*lobby, user.user_id, session.username, user.team, session.get_disconnect_lifetime());
+                broadcast_message_lobby<"lobby_add_user">(*lobby, user.user_id, session.username, user.team,
+                    std::chrono::duration_cast<std::chrono::milliseconds>(user.session.lifetime)
+                );
             }
         }
 
