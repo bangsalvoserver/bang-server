@@ -196,18 +196,20 @@ void game_manager::handle_message(utils::tag<"user_set_propic">, game_session &s
     }
 }
 
-void game_manager::handle_message(utils::tag<"lobby_make">, game_session &session, const lobby_info &value) {
+void game_manager::handle_message(utils::tag<"lobby_make">, game_session &session, const lobby_make_args &value) {
     if (session.lobby) {
         throw lobby_error("ERROR_PLAYER_IN_LOBBY");
     }
 
     id_type lobby_id = m_lobbies.empty() ? 1 : m_lobbies.rbegin()->first + 1;
-    game_lobby &lobby = m_lobbies.try_emplace(lobby_id, value, lobby_id).first->second;
+    game_lobby &lobby = m_lobbies.try_emplace(lobby_id, lobby_id, value.name, value.options).first->second;
     tracking::track_lobby_count(m_lobbies.size());
 
     game_user &user = lobby.add_user(session).first;
 
     lobby.state = lobby_state::waiting;
+    lobby.password = value.password;
+
     broadcast_message<"lobby_update">(lobby);
 
     send_message<"lobby_entered">(session.client, user.user_id, lobby.lobby_id, lobby.name, lobby.options);
@@ -310,7 +312,7 @@ void game_manager::set_user_team(game_session &session, lobby_team team) {
     }
 }
 
-void game_manager::handle_message(utils::tag<"lobby_join">, game_session &session, const lobby_id_args &value) {
+void game_manager::handle_message(utils::tag<"lobby_join">, game_session &session, const lobby_join_args &value) {
     if (session.lobby) {
         throw lobby_error("ERROR_PLAYER_IN_LOBBY");
     }
@@ -320,7 +322,12 @@ void game_manager::handle_message(utils::tag<"lobby_join">, game_session &sessio
         throw lobby_error("ERROR_INVALID_LOBBY");
     }
 
-    handle_join_lobby(session, lobby_it->second);
+    game_lobby &lobby = lobby_it->second;
+    if (!lobby.password.empty() && lobby.password != value.password) {
+        throw lobby_error("ERROR_PASSWORD_INCORRECT");
+    }
+
+    handle_join_lobby(session, lobby);
 }
 
 void game_manager::kick_user_from_lobby(game_session &session) {

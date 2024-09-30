@@ -22,13 +22,20 @@ namespace banggame {
         game_spectator,
     };
 
+    struct lobby_make_args {
+        std::string name;
+        std::string password;
+        game_options options;
+    };
+
     struct lobby_info {
         std::string name;
         game_options options;
     };
 
-    struct lobby_id_args {
+    struct lobby_join_args {
         id_type lobby_id;
+        std::string password;
     };
 
     struct lobby_chat_client_args {
@@ -44,9 +51,9 @@ namespace banggame {
         utils::tag<"connect", connect_args>,
         utils::tag<"user_set_name", std::string>,
         utils::tag<"user_set_propic", utils::image_pixels>,
-        utils::tag<"lobby_make", lobby_info>,
+        utils::tag<"lobby_make", lobby_make_args>,
         utils::tag<"lobby_edit", lobby_info>,
-        utils::tag<"lobby_join", lobby_id_args>,
+        utils::tag<"lobby_join", lobby_join_args>,
         utils::tag<"lobby_leave">,
         utils::tag<"lobby_chat", lobby_chat_client_args>,
         utils::tag<"lobby_return">,
@@ -74,6 +81,7 @@ namespace banggame {
         int num_players;
         int num_spectators;
         int max_players;
+        bool secure;
         lobby_state state;
     };
 
@@ -82,6 +90,10 @@ namespace banggame {
         id_type lobby_id;
         std::string name;
         game_options options;
+    };
+
+    struct lobby_removed_args {
+        id_type lobby_id;
     };
 
     struct lobby_user_args {
@@ -119,7 +131,7 @@ namespace banggame {
         utils::tag<"lobby_update", lobby_data>,
         utils::tag<"lobby_entered", lobby_entered_args>,
         utils::tag<"lobby_edited", lobby_info>,
-        utils::tag<"lobby_removed", lobby_id_args>,
+        utils::tag<"lobby_removed", lobby_removed_args>,
         utils::tag<"lobby_add_user", lobby_user_args>,
         utils::tag<"lobby_user_propic", user_propic_args>,
         utils::tag<"lobby_remove_user", int>,

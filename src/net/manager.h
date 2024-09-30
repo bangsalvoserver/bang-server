@@ -69,9 +69,9 @@ private:
     void handle_message(utils::tag<"pong">,           client_handle client, connection &con);
     void handle_message(utils::tag<"user_set_name">,  game_session &session, const std::string &username);
     void handle_message(utils::tag<"user_set_propic">, game_session &session, const utils::image_pixels &propic);
-    void handle_message(utils::tag<"lobby_make">,     game_session &session, const lobby_info &value);
+    void handle_message(utils::tag<"lobby_make">,     game_session &session, const lobby_make_args &value);
     void handle_message(utils::tag<"lobby_edit">,     game_session &session, const lobby_info &args);
-    void handle_message(utils::tag<"lobby_join">,     game_session &session, const lobby_id_args &value);
+    void handle_message(utils::tag<"lobby_join">,     game_session &session, const lobby_join_args &value);
     void handle_message(utils::tag<"lobby_leave">,    game_session &session);
     void handle_message(utils::tag<"lobby_chat">,     game_session &session, const lobby_chat_client_args &value);
     void handle_message(utils::tag<"lobby_return">,   game_session &session);

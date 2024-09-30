@@ -119,6 +119,7 @@ namespace banggame {
             .num_players = int(rn::count(users, lobby_team::game_player, &game_user::team)),
             .num_spectators = int(rn::count(users, lobby_team::game_spectator, &game_user::team)),
             .max_players = lobby_max_players,
+            .secure = !password.empty(),
             .state = state
         };
     }

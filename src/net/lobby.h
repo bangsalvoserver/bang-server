@@ -86,14 +86,16 @@ struct lobby_bot {
 };
 
 struct game_lobby : lobby_info {
-    game_lobby(const lobby_info &info, id_type lobby_id)
+    game_lobby(id_type lobby_id, const std::string &name, const game_options &options)
         : lobby_id{lobby_id}
     {
-        update_lobby_info(info);
+        update_lobby_info({ name, options });
     }
 
     id_type lobby_id;
     int user_id_count = 0;
+
+    std::string password;
 
     std::list<game_user> users;
     std::vector<lobby_bot> bots;
