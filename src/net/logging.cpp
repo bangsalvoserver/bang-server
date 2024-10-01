@@ -15,9 +15,7 @@ namespace logging {
                 std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now()),
                 enums::to_string(local_level), message);
             
-            if (enums::indexof(local_level) <= enums::indexof(level::debug)) {
-                out.flush();
-            }
+            out.flush();
         }
     }
 }
