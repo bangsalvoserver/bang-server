@@ -4,6 +4,8 @@
 #include "utils/base64.h"
 #include "utils/json_aggregate.h"
 
+#include "compression.h"
+
 namespace utils {
     struct image_pixels {
         int width;
@@ -40,7 +42,7 @@ namespace json {
 
     template<> struct serializer<std::vector<std::byte>, image_pixels_tag> {
         json operator()(const std::vector<std::byte> &value) const {
-            return base64::base64_encode(value);
+            return base64::base64_encode(compression::compress_bytes(value));
         }
     };
 
@@ -69,9 +71,7 @@ namespace json {
                 return {};
             }
             utils::image_pixels result = base_type{}(value, image_pixels_tag{});
-            if (result.pixels.size() != result.width * result.height * 4) {
-                throw deserialize_error("Invalid image");
-            }
+            result.pixels = compression::decompress_bytes(result.pixels, result.width * result.height * 4);
             return result;
         }
     };
