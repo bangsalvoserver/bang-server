@@ -10,35 +10,36 @@
 namespace compression {
     
     inline std::vector<std::byte> compress_bytes(const std::vector<std::byte> &bytes) {
-        size_t compressed_size = compressBound(bytes.size());
-        std::vector<std::byte> buffer{compressed_size};
+        uLong bufsize = compressBound(bytes.size());
+        std::vector<std::byte> buffer{bufsize};
 
         int result = compress(
-            reinterpret_cast<unsigned char *>(buffer.data()), &compressed_size,
-            reinterpret_cast<const unsigned char *>(bytes.data()), bytes.size()
+            reinterpret_cast<Bytef *>(buffer.data()), &bufsize,
+            reinterpret_cast<const Bytef *>(bytes.data()), bytes.size()
         );
 
         if (result != Z_OK) {
             throw std::runtime_error("Could not compress bytes");
         }
 
-        buffer.resize(compressed_size);
+        buffer.resize(bufsize);
         return buffer;
     }
 
     inline std::vector<std::byte> decompress_bytes(const std::vector<std::byte> &bytes, size_t uncompressed_size) {
         std::vector<std::byte> buffer{uncompressed_size};
+        uLong bufsize = uncompressed_size;
 
         int result = uncompress(
-            reinterpret_cast<unsigned char *>(buffer.data()), &uncompressed_size,
-            reinterpret_cast<const unsigned char *>(bytes.data()), bytes.size()
+            reinterpret_cast<Bytef *>(buffer.data()), &bufsize,
+            reinterpret_cast<const Bytef *>(bytes.data()), bytes.size()
         );
 
         if (result != Z_OK) {
             throw std::runtime_error("Could not decompress bytes");
         }
 
-        buffer.resize(uncompressed_size);
+        buffer.resize(bufsize);
         return buffer;
     }
     
