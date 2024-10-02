@@ -5,6 +5,8 @@
 
 namespace banggame {
 
+    int count_missed_cards(player_ptr origin);
+
     struct effect_missed {
         bool can_play(card_ptr origin_card, player_ptr origin);
         game_string on_prompt(card_ptr origin_card, player_ptr origin);

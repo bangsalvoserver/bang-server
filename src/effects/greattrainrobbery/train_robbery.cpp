@@ -3,6 +3,7 @@
 #include "game/game.h"
 
 #include "effects/base/bang.h"
+#include "effects/base/missed.h"
 
 #include "cards/game_enums.h"
 #include "cards/filter_enums.h"
@@ -98,6 +99,9 @@ namespace banggame {
     game_string effect_train_robbery_bang::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         if (origin->is_bot()) {
             if (!ctx.target_card->self_equippable() && !ctx.target_card->has_tag(tag_type::ghost_card)) {
+                return "BOT_BAD_PLAY";
+            }
+            if (origin->m_hp <= 1 && count_missed_cards(origin) == 0) {
                 return "BOT_BAD_PLAY";
             }
         }

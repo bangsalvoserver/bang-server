@@ -7,6 +7,21 @@
 #include "cards/game_enums.h"
 
 namespace banggame {
+
+    int count_missed_cards(player_ptr target) {
+        // TODO count all possible cards that can respond to missable_request without it being the top_request
+        // needed for:
+        // - slab the killer + calamity janet / elena fuente interaction (right now they count as 1)
+        // - bot prompt for train_robbery_bang
+        
+        if (auto req = target->m_game->top_request<missable_request>(target)) {
+            return static_cast<int>(rn::count_if(
+                get_all_playable_cards(target, true),
+                [](card_ptr c) { return c->pocket != pocket_type::button_row; }
+            ));
+        }
+        return 0;
+    }
     
     bool effect_missed::can_play(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request<missable_request>(origin)) {
@@ -17,10 +32,7 @@ namespace banggame {
 
     game_string effect_missed::on_prompt(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request<request_bang>(origin)) {
-            if (req->bang_strength > 1 && !contains_at_least(get_all_playable_cards(origin, true)
-                | rv::filter([](card_ptr c) { return c->pocket != pocket_type::button_row; }),
-                req->bang_strength))
-            {
+            if (req->bang_strength > 1 && count_missed_cards(origin) < req->bang_strength) {
                 return {"PROMPT_BANG_STRENGTH", req->bang_strength};
             }
         }
