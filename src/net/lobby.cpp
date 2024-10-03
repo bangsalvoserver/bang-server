@@ -1,4 +1,5 @@
 #include "lobby.h"
+#include "bot_info.h"
 
 #include "utils/range_utils.h"
 
@@ -48,9 +49,7 @@ namespace banggame {
     }
 
     void game_session::set_propic(const utils::image_pixels &new_propic) {
-        static constexpr int propic_size = 200;
-
-        propic = scale_image(new_propic, propic_size);
+        propic = scale_image(new_propic, bot_info.propic_size);
     }
 
     static auto find_user_it(auto &list, const game_session &session) {

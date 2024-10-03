@@ -1,4 +1,6 @@
 bots:
+  propic_size: 300
+  
   settings:
     allow_timer_no_action: false
     max_random_tries: 10

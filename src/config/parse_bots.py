@@ -5,21 +5,20 @@ import base64
 from PIL import Image
 from cpp_generator import print_cpp_file, CppEnum, CppObject, CppLiteral
 
-PROPIC_SIZE = 200
 INCLUDE_FILENAMES = ['net/bot_info.h']
 OBJECT_DECLARATION = 'bot_info_t banggame::bot_info'
 
-def sdl_image_pixels(filename):
+def sdl_image_pixels(filename, propic_size):
     with Image.open(filename) as image:
         w = image.width
         h = image.height
 
         if w > h:
-            h = PROPIC_SIZE * h // w
-            w = PROPIC_SIZE
+            h = propic_size * h // w
+            w = propic_size
         else:
-            w = PROPIC_SIZE * w // h
-            h = PROPIC_SIZE
+            w = propic_size * w // h
+            h = propic_size
 
         pixels = base64.b64encode(image.resize((w, h)).convert('RGBA').tobytes('raw', 'RGBA', 0, 1)).decode('utf8')
         
@@ -55,9 +54,11 @@ def parse_settings(settings):
     )
 
 def parse_file(data):
+    propic_size = data['propic_size']
     return CppObject(
+        propic_size = propic_size,
         names = data['names'],
-        propics = [sdl_image_pixels(filename) for filename in data['propics']],
+        propics = [sdl_image_pixels(filename, propic_size) for filename in data['propics']],
         settings = parse_settings(data['settings'])
     )
 
