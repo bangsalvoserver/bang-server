@@ -258,6 +258,7 @@ namespace banggame {
         int8_t discount;
         bool disable_banglimit;
         bool disable_bang_checks;
+        bool temp_missable;
     };
 
 }

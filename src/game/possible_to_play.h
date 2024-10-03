@@ -38,9 +38,9 @@ namespace banggame {
         );
     }
 
-    inline auto get_all_playable_cards(player_ptr origin, bool is_response = false) {
+    inline auto get_all_playable_cards(player_ptr origin, bool is_response = false, const effect_context &ctx = {}) {
         return rv::filter(get_all_active_cards(origin), [=](card_ptr origin_card) {
-            return is_possible_to_play(origin, origin_card, is_response);
+            return is_possible_to_play(origin, origin_card, is_response, {}, ctx);
         });
     }
 

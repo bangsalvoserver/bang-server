@@ -9,25 +9,21 @@
 namespace banggame {
 
     int count_missed_cards(player_ptr target) {
-        // TODO count all possible cards that can respond to missable_request without it being the top_request
-        // needed for:
-        // - slab the killer + calamity janet / elena fuente interaction (right now they count as 1)
-        // - bot prompt for train_robbery_bang
-        
-        if (auto req = target->m_game->top_request<missable_request>(target)) {
-            return static_cast<int>(rn::count_if(
-                get_all_playable_cards(target, true),
-                [](card_ptr c) { return c->pocket != pocket_type::button_row; }
-            ));
+        // this doesn't account for calamity janet, elena fuente, caboose
+        int count = 0;
+        for (card_ptr c : get_all_playable_cards(target, true, effect_context{ .temp_missable = true })) {
+            if (c->pocket != pocket_type::button_row && c->pocket != pocket_type::hidden_deck) {
+                ++count;
+            }
         }
-        return 0;
+        return count;
     }
     
-    bool effect_missed::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_missed::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         if (auto req = origin->m_game->top_request<missable_request>(origin)) {
             return req->can_miss(origin_card);
         }
-        return false;
+        return ctx.temp_missable;
     }
 
     game_string effect_missed::on_prompt(card_ptr origin_card, player_ptr origin) {
@@ -49,8 +45,8 @@ namespace banggame {
         req->on_miss(origin_card, effect_flag::is_missed);
     }
 
-    game_string handler_play_as_missed::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        if (!effect_missedcard{}.can_play(target_card, origin)) {
+    game_string handler_play_as_missed::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr target_card) {
+        if (!effect_missedcard{}.can_play(target_card, origin, ctx)) {
             return {"ERROR_CANT_PLAY_CARD", target_card};
         }
         return {};
