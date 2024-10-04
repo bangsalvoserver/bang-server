@@ -9,7 +9,7 @@ namespace banggame {
 
     const game_options game_options::default_game_options {
         .expansions { },
-        .enable_ghost_cards { false },
+        .enable_ghost_cards { true },
         .character_choice { true },
         .quick_discard_all { true },
         .scenario_deck_size { 12 },
