@@ -3,9 +3,10 @@
 
 #include "game/game_options.h"
 
-#include "utils/image_pixels.h"
 #include "utils/enum_bitset.h"
 #include "utils/tagged_variant.h"
+
+#include "image_pixels.h"
 
 namespace banggame {
     
@@ -13,7 +14,7 @@ namespace banggame {
 
     struct connect_args {
         std::string username;
-        utils::image_pixels propic;
+        image_pixels propic;
         id_type session_id;
     };
 
@@ -50,7 +51,7 @@ namespace banggame {
         utils::tag<"pong">,
         utils::tag<"connect", connect_args>,
         utils::tag<"user_set_name", std::string>,
-        utils::tag<"user_set_propic", utils::image_pixels>,
+        utils::tag<"user_set_propic", image_pixels>,
         utils::tag<"lobby_make", lobby_make_args>,
         utils::tag<"lobby_edit", lobby_info>,
         utils::tag<"lobby_join", lobby_join_args>,
@@ -105,7 +106,7 @@ namespace banggame {
 
     struct user_propic_args {
         int user_id;
-        utils::image_pixels propic;
+        image_pixels propic;
     };
 
     enum class lobby_chat_flag {

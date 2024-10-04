@@ -187,7 +187,7 @@ void game_manager::handle_message(utils::tag<"user_set_name">, game_session &ses
     }
 }
 
-void game_manager::handle_message(utils::tag<"user_set_propic">, game_session &session, const utils::image_pixels &propic) {
+void game_manager::handle_message(utils::tag<"user_set_propic">, game_session &session, const image_pixels &propic) {
     session.set_propic(propic);
 
     if (game_lobby *lobby = session.lobby) {
@@ -544,7 +544,7 @@ void game_manager::handle_message(utils::tag<"game_start">, game_session &sessio
         | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
         | rn::to<std::vector<std::string_view>>;
 
-    std::vector<const utils::image_pixels *> propics = bot_info.propics
+    std::vector<const image_pixels *> propics = bot_info.propics
         | rv::addressof
         | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
         | rn::to_vector;

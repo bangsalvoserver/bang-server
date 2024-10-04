@@ -32,7 +32,7 @@ static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
 struct game_session {
     std::string username;
-    utils::image_pixels propic;
+    image_pixels propic;
     
     game_lobby *lobby = nullptr;
 
@@ -40,7 +40,7 @@ struct game_session {
     ticks lifetime = user_lifetime;
 
     void set_username(const std::string &new_username);
-    void set_propic(const utils::image_pixels &new_propic);
+    void set_propic(const image_pixels &new_propic);
 };
 
 namespace connection_state {
@@ -82,7 +82,7 @@ struct game_user {
 struct lobby_bot {
     int user_id;
     std::string username;
-    const utils::image_pixels *propic;
+    const image_pixels *propic;
 };
 
 struct game_lobby : lobby_info {

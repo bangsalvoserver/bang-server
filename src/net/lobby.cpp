@@ -15,41 +15,8 @@ namespace banggame {
         }
     }
 
-    static utils::image_pixels scale_image(const utils::image_pixels &image, int new_size) {
-        int width = image.width;
-        int height = image.height;
-
-        if (width <= 0 || height <= 0 || new_size <= 0) {
-            return utils::image_pixels{};
-        }
-
-        if (width > height) {
-            height = new_size * height / width;
-            width = new_size;
-        } else {
-            width = new_size * width / height;
-            height = new_size;
-        }
-
-        if (width == image.width && height == image.height) {
-            return image;
-        }
-
-        utils::image_pixels result { width, height };
-        result.pixels.resize(width * height * 4);
-        for (size_t y = 0; y < height; ++y) {
-            for (size_t x = 0; x < width; ++x) {
-                size_t scaled_x = x * image.width / width;
-                size_t scaled_y = y * image.height / height;
-
-                result.set_pixel(x, y, image.get_pixel(scaled_x, scaled_y));
-            }
-        }
-        return result;
-    }
-
-    void game_session::set_propic(const utils::image_pixels &new_propic) {
-        propic = scale_image(new_propic, bot_info.propic_size);
+    void game_session::set_propic(const image_pixels &new_propic) {
+        propic = new_propic.scale_to(bot_info.propic_size);
     }
 
     static auto find_user_it(auto &list, const game_session &session) {
