@@ -23,14 +23,14 @@ namespace banggame {
     };
 
     constexpr size_t game_option_field_index(std::string_view name) {
-        size_t result = -1;
-        reflect::for_each<game_options>([&](auto I) {
-            if (reflect::member_name<I, game_options>() == name) {
-                result = I;
-            }
-        });
-        if (result != -1) {
-            return result;
+        constexpr auto member_names = []<size_t ... Is>(std::index_sequence<Is ...>) {
+            return std::array{
+                reflect::member_name<Is, game_options>() ...
+            };
+        }(std::make_index_sequence<reflect::size<game_options>()>());
+        auto it = rn::find(member_names, name);
+        if (it != member_names.end()) {
+            return rn::distance(member_names.begin(), it);
         }
         throw std::out_of_range("Cannot find game_option_field_index");
     }
@@ -80,7 +80,7 @@ namespace banggame {
     std::string game_options::to_string() const {
         std::string result;
         reflect::for_each<game_options>([&](auto I) {
-            if (!result.empty()) {
+            if constexpr (I != 0) {
                 result += '\n';
             }
             result += std::format("{} = {}", reflect::member_name<I>(*this), reflect::get<I>(*this));
