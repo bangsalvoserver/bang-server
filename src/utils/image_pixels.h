@@ -22,14 +22,14 @@ namespace utils {
             }
 
             uint32_t result;
-            size_t index = (y * height + x) * 4;
+            size_t index = (y * width + x) * 4;
             std::memcpy(&result, pixels.data() + index, 4);
             return result;
         }
 
         void set_pixel(size_t x, size_t y, uint32_t value) {
             if (x < width && y < height) {
-                size_t index = (y * height + x) * 4;
+                size_t index = (y * width + x) * 4;
                 std::memcpy(pixels.data() + index, &value, 4);
             }
         }
