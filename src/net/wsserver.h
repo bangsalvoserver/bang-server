@@ -11,6 +11,8 @@
 
 namespace net {
 
+    static constexpr size_t max_message_log_size = 1000;
+
     class wsserver {
     public:
         using client_handle = std::weak_ptr<void>;

@@ -23,7 +23,7 @@ void game_manager::on_message(client_handle client, std::string_view msg) {
             }
         }, client_msg);
     } catch (const json::json_error &e) {
-        logging::warn("Invalid message: {}\n{}", msg, e.what());
+        logging::warn("Invalid message: {:.{}}\n{}", msg, net::max_message_log_size, e.what());
         kick_client(client, "INVALID_MESSAGE");
     } catch (const critical_error &e) {
         kick_client(client, e.what());
