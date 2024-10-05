@@ -8,7 +8,7 @@
 
 namespace compression {
 
-    static constexpr size_t buffer_size = 4096;
+    static constexpr size_t initial_buffer_size = 4096;
     
     std::vector<std::byte> compress_bytes(const std::vector<std::byte> &bytes) {
         z_stream strm{};
@@ -22,13 +22,18 @@ namespace compression {
         strm.avail_in = static_cast<uInt>(bytes.size());
         strm.next_in = reinterpret_cast<Bytef*>(const_cast<std::byte*>(bytes.data()));
 
-        std::vector<std::byte> output_bytes{buffer_size};
+        std::vector<std::byte> output_bytes{initial_buffer_size};
 
         size_t bytes_written = 0;
 
         int result;
         do {
-            strm.avail_out = buffer_size;
+            if (bytes_written >= output_bytes.size()) {
+                output_bytes.resize(output_bytes.size() * 2);
+            }
+            size_t bytes_to_write = output_bytes.size() - bytes_written;
+
+            strm.avail_out = static_cast<uInt>(bytes_to_write);
             strm.next_out = reinterpret_cast<Bytef*>(output_bytes.data() + bytes_written);
 
             result = deflate(&strm, Z_FINISH);
@@ -37,10 +42,7 @@ namespace compression {
                 throw std::runtime_error("Compression failed");
             }
 
-            bytes_written += buffer_size - strm.avail_out;
-            if (bytes_written + buffer_size > output_bytes.size()) {
-                output_bytes.resize(output_bytes.size() * 2);
-            }
+            bytes_written += bytes_to_write - strm.avail_out;
         } while (result != Z_STREAM_END);
 
         output_bytes.resize(bytes_written);
@@ -59,13 +61,18 @@ namespace compression {
         strm.avail_in = static_cast<uInt>(bytes.size());
         strm.next_in = reinterpret_cast<Bytef*>(const_cast<std::byte*>(bytes.data()));
 
-        std::vector<std::byte> output_bytes{buffer_size};
+        std::vector<std::byte> output_bytes{initial_buffer_size};
 
         size_t bytes_written = 0;
 
         int result;
         do {
-            strm.avail_out = buffer_size;
+            if (bytes_written >= output_bytes.size()) {
+                output_bytes.resize(output_bytes.size() * 2);
+            }
+            size_t bytes_to_write = output_bytes.size() - bytes_written;
+
+            strm.avail_out = static_cast<uInt>(bytes_to_write);
             strm.next_out = reinterpret_cast<Bytef*>(output_bytes.data() + bytes_written);
 
             result = inflate(&strm, Z_NO_FLUSH);
@@ -74,10 +81,7 @@ namespace compression {
                 throw std::runtime_error("Decompression failed");
             }
 
-            bytes_written += buffer_size - strm.avail_out;
-            if (bytes_written + buffer_size > output_bytes.size()) {
-                output_bytes.resize(output_bytes.size() * 2);
-            }
+            bytes_written += bytes_to_write - strm.avail_out;
         } while (result != Z_STREAM_END);
 
         output_bytes.resize(bytes_written);
