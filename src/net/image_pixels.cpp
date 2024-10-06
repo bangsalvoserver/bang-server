@@ -36,7 +36,7 @@ namespace banggame {
             new_height = new_size;
         }
 
-        if (new_width == width && new_height == height) {
+        if (new_width >= width && new_height >= height) {
             return *this;
         }
 
