@@ -41,6 +41,10 @@ else()
     target_compile_definitions(uSockets PUBLIC LIBUS_USE_OPENSSL)
 endif()
 
+# zlib
+
+find_package(ZLIB REQUIRED)
+
 # uWebSockets
 
 FetchContent_Declare(
@@ -53,6 +57,4 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(uWebSockets_content)
 add_library(uwebsockets INTERFACE)
 target_include_directories(uwebsockets INTERFACE ${uwebsockets_content_SOURCE_DIR}/src/)
-target_link_libraries(uwebsockets INTERFACE uSockets)
-
-target_compile_definitions(uwebsockets INTERFACE UWS_NO_ZLIB)
+target_link_libraries(uwebsockets INTERFACE uSockets ZLIB::ZLIB)

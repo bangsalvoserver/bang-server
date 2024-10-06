@@ -49,11 +49,6 @@ target_link_libraries(banglibs INTERFACE cxxopts::cxxopts)
 find_package(nlohmann_json 3.11.0 REQUIRED)
 target_link_libraries(banglibs INTERFACE nlohmann_json::nlohmann_json)
 
-# zlib
-
-find_package(ZLIB REQUIRED)
-target_link_libraries(banglibs INTERFACE ZLIB::ZLIB)
-
 # bang server executable
 
 add_executable(bangserver "")

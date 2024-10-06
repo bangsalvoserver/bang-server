@@ -47,6 +47,8 @@ namespace net {
         int listen_options = reuse_addr ? LIBUS_LISTEN_DEFAULT : LIBUS_LISTEN_EXCLUSIVE_PORT;
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
             server.template ws<wsclient_data>("/", {
+                .compression = uWS::CompressOptions(uWS::DEDICATED_COMPRESSOR_4KB | uWS::DEDICATED_DECOMPRESSOR),
+                
                 .maxPayloadLength = 1 * 1024 * 1024,
                 .maxBackpressure = 16 * 1024 * 1024,
 
