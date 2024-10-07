@@ -1,5 +1,5 @@
 bots:
-  propic_size: 500
+  propic_size: 512
   
   settings:
     allow_timer_no_action: false
