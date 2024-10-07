@@ -3,7 +3,7 @@ include(FetchContent)
 FetchContent_Declare(
     reflect_content
     GIT_REPOSITORY https://github.com/qlibs/reflect
-    GIT_TAG v1.2.3
+    GIT_TAG v1.2.4
 )
 FetchContent_MakeAvailable(reflect_content)
 add_library(reflect INTERFACE)
