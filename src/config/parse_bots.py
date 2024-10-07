@@ -14,11 +14,13 @@ def sdl_image_pixels(filename, propic_size):
         h = image.height
 
         if w > h:
-            h = propic_size * h // w
-            w = propic_size
+            if propic_size < w:
+                h = propic_size * h // w
+                w = propic_size
         else:
-            w = propic_size * w // h
-            h = propic_size
+            if propic_size < h:
+                w = propic_size * w // h
+                h = propic_size
 
         pixels = base64.b64encode(image.resize((w, h)).convert('RGBA').tobytes('raw', 'RGBA', 0, 1)).decode('utf8')
         
