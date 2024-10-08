@@ -65,18 +65,20 @@ namespace banggame {
         bool is_train() const { return color == card_color_type::train; }
     };
 
+    using card_initializer_list = std::initializer_list<card_data>;
+
     struct all_cards_t {
-        std::vector<card_data> deck;
-        std::vector<card_data> characters;
-        std::vector<card_data> goldrush;
-        std::vector<card_data> highnoon;
-        std::vector<card_data> fistfulofcards;
-        std::vector<card_data> wildwestshow;
-        std::vector<card_data> button_row;
-        std::vector<card_data> stations;
-        std::vector<card_data> train;
-        std::vector<card_data> locomotive;
-        std::vector<card_data> hidden;
+        card_initializer_list deck;
+        card_initializer_list characters;
+        card_initializer_list goldrush;
+        card_initializer_list highnoon;
+        card_initializer_list fistfulofcards;
+        card_initializer_list wildwestshow;
+        card_initializer_list button_row;
+        card_initializer_list stations;
+        card_initializer_list train;
+        card_initializer_list locomotive;
+        card_initializer_list hidden;
 
         expansion_set expansions;
     };

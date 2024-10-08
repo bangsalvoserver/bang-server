@@ -13,7 +13,7 @@
 
 namespace banggame {
 
-    using event_listener_fun = std::function<void(const void *tuple)>;
+    using event_listener_fun = std::move_only_function<void(const void *tuple)>;
 
     template<typename T>
     auto to_event_tuple(const T &value) {
@@ -36,7 +36,7 @@ namespace banggame {
     struct event_listener {
         std::type_index type;
         event_card_key key;
-        event_listener_fun fun;
+        mutable event_listener_fun fun;
         std::type_index fun_type;
         
         mutable bool active = true;

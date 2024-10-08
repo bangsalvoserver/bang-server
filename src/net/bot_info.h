@@ -12,7 +12,7 @@ namespace banggame {
     struct playable_card_info;
     using card_node = const playable_card_info *;
 
-    using bot_rule = std::function<bool(card_node)>;
+    using bot_rule = std::move_only_function<bool(card_node) const>;
 
     template<utils::fixed_string Name>
     struct bot_rule_function_map;
@@ -30,8 +30,8 @@ namespace banggame {
         bool allow_timer_no_action;
         int max_random_tries;
         int bypass_prompt_after;
-        std::vector<bot_rule> response_rules;
-        std::vector<bot_rule> in_play_rules;
+        std::initializer_list<bot_rule> response_rules;
+        std::initializer_list<bot_rule> in_play_rules;
     };
 
     struct bot_info_t {
