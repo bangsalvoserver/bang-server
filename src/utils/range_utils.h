@@ -1,7 +1,21 @@
 #ifndef __RANGE_UTILS_H__
 #define __RANGE_UTILS_H__
 
-#include "misc.h"
+#ifdef USE_STD_RANGES
+
+#include <ranges>
+
+namespace rn = std::ranges;
+namespace rv = std::views;
+
+#else
+
+#include <range/v3/all.hpp>
+
+namespace rn = ranges;
+namespace rv = ranges::views;
+
+#endif
 
 #include <stdexcept>
 

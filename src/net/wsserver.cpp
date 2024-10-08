@@ -4,6 +4,7 @@
 #include "tracking.h"
 
 #include "utils/json_aggregate.h"
+#include "utils/misc.h"
 
 namespace net {
 
