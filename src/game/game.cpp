@@ -193,7 +193,7 @@ namespace banggame {
 
         bool ghost_card_added = false;
         
-        auto add_cards = [&](const std::vector<card_data> &cards, pocket_type pocket, card_list *out_pocket = nullptr) {
+        auto add_cards = [&](std::span<const card_data> cards, pocket_type pocket, card_list *out_pocket = nullptr) {
             if (!out_pocket && pocket != pocket_type::none) out_pocket = &get_pocket(pocket);
 
             int count = 0;
