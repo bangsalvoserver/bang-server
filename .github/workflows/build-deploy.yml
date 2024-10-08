@@ -15,7 +15,7 @@ on:
 env:
   BUILD_TYPE: Release
   BUILD_PARALLEL_JOBS: 6
-  GCC_VERSION: 13
+  GCC_VERSION: 14
 
 jobs:
   build:

@@ -40,7 +40,7 @@ namespace banggame {
         return std::chrono::duration_cast<ticks>(transform_duration(result));
     }
 
-    utils::generator<json::json> game::get_spectator_join_updates() {
+    std::generator<json::json> game::get_spectator_join_updates() {
         co_yield make_update<"player_add">(m_players);
 
         for (player_ptr p : m_players) {
@@ -49,7 +49,7 @@ namespace banggame {
 
         co_yield make_update<"player_order">(make_player_order_update(true));
 
-        auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) -> utils::generator<json::json> {
+        auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) -> std::generator<json::json> {
             auto &range = get_pocket(pocket, owner);
             if (!range.empty()) {
                 co_yield make_update<"add_cards">(range, pocket, owner);
@@ -67,28 +67,28 @@ namespace banggame {
             }
         };
 
-        co_await add_cards(pocket_type::button_row);
-        co_await add_cards(pocket_type::main_deck);
-        co_await add_cards(pocket_type::shop_deck);
+        co_yield std::ranges::elements_of(add_cards(pocket_type::button_row));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::main_deck));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::shop_deck));
 
-        co_await add_cards(pocket_type::discard_pile);
-        co_await add_cards(pocket_type::selection);
-        co_await add_cards(pocket_type::shop_discard);
-        co_await add_cards(pocket_type::shop_selection);
-        co_await add_cards(pocket_type::hidden_deck);
+        co_yield std::ranges::elements_of(add_cards(pocket_type::discard_pile));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::selection));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::shop_discard));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::shop_selection));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::hidden_deck));
 
         if (train_position != 0) {
             co_yield make_update<"move_train">(train_position, 0ms);
         }
 
-        co_await add_cards(pocket_type::stations);
-        co_await add_cards(pocket_type::train_deck);
-        co_await add_cards(pocket_type::train);
+        co_yield std::ranges::elements_of(add_cards(pocket_type::stations));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::train_deck));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::train));
 
-        co_await add_cards(pocket_type::scenario_deck);
-        co_await add_cards(pocket_type::scenario_card);
-        co_await add_cards(pocket_type::wws_scenario_deck);
-        co_await add_cards(pocket_type::wws_scenario_card);
+        co_yield std::ranges::elements_of(add_cards(pocket_type::scenario_deck));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::scenario_card));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::wws_scenario_deck));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::wws_scenario_card));
         
         if (num_cubes > 0) {
             co_yield make_update<"add_cubes">(num_cubes);
@@ -100,11 +100,11 @@ namespace banggame {
             }
 
             if (!p->check_player_flags(player_flag::removed)) {
-                co_await add_cards(pocket_type::player_character, p);
-                co_await add_cards(pocket_type::player_backup, p);
+                co_yield std::ranges::elements_of(add_cards(pocket_type::player_character, p));
+                co_yield std::ranges::elements_of(add_cards(pocket_type::player_backup, p));
 
-                co_await add_cards(pocket_type::player_table, p);
-                co_await add_cards(pocket_type::player_hand, p);
+                co_yield std::ranges::elements_of(add_cards(pocket_type::player_table, p));
+                co_yield std::ranges::elements_of(add_cards(pocket_type::player_hand, p));
 
                 co_yield make_update<"player_hp">(p, p->m_hp, 0ms);
                 
@@ -124,7 +124,7 @@ namespace banggame {
         co_yield make_update<"game_flags">(m_game_flags);
     }
 
-    utils::generator<json::json> game::get_game_log_updates(player_ptr target) {
+    std::generator<json::json> game::get_game_log_updates(player_ptr target) {
         co_yield make_update<"clear_logs">();
         
         for (const auto &[upd_target, log] : m_saved_log) {
@@ -134,7 +134,7 @@ namespace banggame {
         }
     }
 
-    utils::generator<json::json> game::get_rejoin_updates(player_ptr target) {
+    std::generator<json::json> game::get_rejoin_updates(player_ptr target) {
         co_yield make_update<"player_add">(target);
 
         if (!target->check_player_flags(player_flag::role_revealed)) {

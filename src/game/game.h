@@ -2,16 +2,17 @@
 #define __GAME_H__
 
 #include "game_table.h"
-#include "utils/generator.h"
+
+#include <generator>
 
 namespace banggame {
 
     struct game : game_table {
         using game_table::game_table;
         
-        utils::generator<json::json> get_spectator_join_updates();
-        utils::generator<json::json> get_game_log_updates(player_ptr target);
-        utils::generator<json::json> get_rejoin_updates(player_ptr target);
+        std::generator<json::json> get_spectator_join_updates();
+        std::generator<json::json> get_game_log_updates(player_ptr target);
+        std::generator<json::json> get_rejoin_updates(player_ptr target);
 
         card_ptr add_card(const card_data &data);
         void add_players(std::span<int> user_ids);
