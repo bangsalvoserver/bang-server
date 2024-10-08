@@ -2,16 +2,18 @@
 #define __WSSERVER_H__
 
 #include <memory>
-#include <variant>
-#include <stdexcept>
-
-#include <App.h>
 
 #include "utils/tsqueue.h"
 
 namespace net {
 
     static constexpr size_t max_message_log_size = 1000;
+
+    class wsserver_impl;
+
+    struct wsserver_impl_deleter {
+        void operator()(wsserver_impl *ptr) const;
+    };
 
     class wsserver {
     public:
@@ -20,13 +22,7 @@ namespace net {
         static constexpr int kick_opcode = 1000;
 
     private:
-        std::variant<
-            std::monostate,
-            uWS::App
-#ifndef LIBUS_NO_SSL
-            , uWS::SSLApp
-#endif
-        > m_server;
+        std::unique_ptr<wsserver_impl, wsserver_impl_deleter> m_server;
 
         struct connected {};
         struct disconnected {};

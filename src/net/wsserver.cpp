@@ -6,35 +6,55 @@
 #include "utils/json_aggregate.h"
 #include "utils/misc.h"
 
+#include <variant>
+#include <stdexcept>
+
+#include <App.h>
+
 namespace net {
+
+    class wsserver_impl {
+    public:
+        std::variant<
+            uWS::App
+#ifndef LIBUS_NO_SSL
+            , uWS::SSLApp
+#endif
+        > app;
+
+        template<typename T, typename ... Ts>
+        wsserver_impl(std::in_place_type_t<T> tag, Ts && ... args)
+            : app{tag, std::forward<Ts>(args) ... } {}
+    };
+
+    void wsserver_impl_deleter::operator()(wsserver_impl *ptr) const {
+        delete ptr;
+    }
+
+    template<typename Function>
+    void visit_server(Function &&fn, std::unique_ptr<wsserver_impl, wsserver_impl_deleter> &server) {
+        if (server) {
+            std::visit(std::forward<Function>(fn), server->app);
+        }
+    }
+
+    void wsserver::init() {
+        m_server.reset(new wsserver_impl(std::in_place_type<uWS::App>));
+    }
+
+#ifndef LIBUS_NO_SSL
+    void wsserver::init_tls(const std::string &certificate_file, const std::string &private_key_file) {
+        m_server.reset(new wsserver_impl(std::in_place_type<uWS::SSLApp>, uWS::SocketContextOptions{
+            .key_file_name = private_key_file.c_str(),
+            .cert_file_name = certificate_file.c_str()
+        }));
+    }
+#endif
 
     struct wsclient_data {
         std::shared_ptr<void *> client;
         std::string address;
     };
-
-    void wsserver::init() {
-        m_server.emplace<uWS::App>();
-    }
-
-#ifndef LIBUS_NO_SSL
-    void wsserver::init_tls(const std::string &certificate_file, const std::string &private_key_file) {
-        m_server.emplace<uWS::SSLApp>(uWS::SocketContextOptions{
-            .key_file_name = private_key_file.c_str(),
-            .cert_file_name = certificate_file.c_str()
-        });
-    }
-#endif
-
-    template<typename Function, typename Server>
-    void visit_server(Function &&fn, Server &&server) {
-        struct server_visitor : Function {
-            using Function::operator();
-            void operator()(std::monostate) {};
-        };
-
-        std::visit(server_visitor{std::forward<Function>(fn)}, std::forward<Server>(server));
-    }
 
     template<bool SSL>
     uWS::WebSocket<SSL, true, wsclient_data> *websocket_cast(wsserver::client_handle client) {

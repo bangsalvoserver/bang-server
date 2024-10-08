@@ -4,6 +4,7 @@
 #include <deque>
 #include <optional>
 #include <thread>
+#include <mutex>
 
 namespace utils {
 
