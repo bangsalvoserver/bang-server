@@ -13,6 +13,7 @@ namespace banggame {
 
         struct on_play_beer {
             player_ptr origin;
+            bool is_sold;
         };
     }
 

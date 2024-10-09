@@ -25,7 +25,7 @@ namespace banggame {
         if (target->m_game->num_alive() > 2) {
             target->heal(get_beer_heal_amount(target));
         }
-        target->m_game->call_event(event_type::on_play_beer{ target });
+        target->m_game->call_event(event_type::on_play_beer{ target, false });
     }
 
     bool effect_beer::can_play(card_ptr origin_card, player_ptr target) {
