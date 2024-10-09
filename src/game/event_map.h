@@ -13,8 +13,6 @@
 
 namespace banggame {
 
-    using event_listener_fun = std::move_only_function<void(const void *tuple)>;
-
     template<typename T>
     auto to_event_tuple(const T &value) {
         return reflect::to<std::tuple>(value);
@@ -33,15 +31,11 @@ namespace banggame {
         std::apply(fun, tup);
     };
 
-    struct event_listener {
+    struct event_listener_key {
         std::type_index type;
         event_card_key key;
-        mutable event_listener_fun fun;
-        std::type_index fun_type;
-        
-        mutable bool active = true;
 
-        auto operator <=> (const event_listener &other) const {
+        auto operator <=> (const event_listener_key &other) const {
             if (type == other.type) {
                 return key.priority_compare(other.key);
             } else {
@@ -54,10 +48,41 @@ namespace banggame {
         }
     };
 
+    class event_listener {
+    private:
+        std::move_only_function<void(const void *tuple)> m_fun;
+        std::type_index m_type;
+        bool m_active = true;
+    
+    public:
+        template<event T, typename Function> requires applicable<Function, event_tuple<T>>
+        event_listener(std::in_place_type_t<T>, Function &&fun)
+            : m_fun{[fun=std::move(fun)](const void *tuple) mutable {
+                std::apply(fun, *static_cast<const event_tuple<T> *>(tuple));
+            }},
+            m_type{typeid(Function)} {}
+        
+        void operator()(const void *tuple) {
+            m_fun(tuple);
+        }
+
+        const std::type_index &target_type() const {
+            return m_type;
+        }
+
+        bool is_active() const {
+            return m_active;
+        }
+
+        void deactivate() {
+            m_active = false;
+        }
+    };
+
     class listener_map {
     private:
-        using listener_set = std::multiset<event_listener, std::less<>>;
-        using listener_iterator = listener_set::const_iterator;
+        using listener_set = std::multimap<event_listener_key, event_listener, std::less<>>;
+        using listener_iterator = listener_set::iterator;
 
         using iterator_map = std::multimap<event_card_key, listener_iterator, std::less<>>;
         using iterator_map_iterator = iterator_map::const_iterator;
@@ -73,16 +98,14 @@ namespace banggame {
         int m_lock = 0;
 
     private:
-        void do_add_listener(std::type_index type, event_card_key key, event_listener_fun &&fun, std::type_index fun_type);
+        void do_add_listener(event_listener_key key, event_listener &&listener);
         void do_remove_listeners(iterator_map_range range);
         void do_call_event(std::type_index type, const void *tuple);
 
     public:
         template<event T, typename Function> requires applicable<Function, event_tuple<T>>
         void add_listener(event_card_key key, Function &&fun) {
-            do_add_listener(typeid(T), key, [fun=std::move(fun)](const void *tuple) mutable {
-                std::apply(fun, *static_cast<const event_tuple<T> *>(tuple));
-            }, typeid(Function));
+            do_add_listener({ typeid(T), key }, { std::in_place_type<T>, std::forward<Function>(fun) });
         }
 
         void remove_listeners(event_card_key key) {

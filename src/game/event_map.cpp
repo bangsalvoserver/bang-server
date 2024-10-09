@@ -4,40 +4,43 @@
 #include "utils/type_name.h"
 
 namespace std {
-    template<> struct formatter<banggame::event_listener> {
+    template<> struct formatter<banggame::event_listener_key> {
         constexpr auto parse(std::format_parse_context &ctx) {
             return ctx.begin();
         }
 
-        auto format(const banggame::event_listener &listener, std::format_context &ctx) const {
-            return std::format_to(ctx.out(), "{}: [{}] {}",
-                listener.key,
-                utils::demangle(listener.type.name()),
-                utils::demangle(listener.fun_type.name())
-            );
+        auto format(const banggame::event_listener_key &value, std::format_context &ctx) const {
+            return std::format_to(ctx.out(), "{}: [{}]", value.key, utils::demangle(value.type.name()));
+        }
+    };
+
+    template<> struct formatter<banggame::event_listener> : formatter<std::string_view> {
+        auto format(const banggame::event_listener &value, std::format_context &ctx) const {
+            return formatter<std::string_view>::format(utils::demangle(value.target_type().name()), ctx);
         }
     };
 }
 
 namespace banggame {
     
-    void listener_map::do_add_listener(std::type_index type, event_card_key key, event_listener_fun &&fun, std::type_index fun_type) {
-        auto listener = m_listeners.emplace(type, key, std::move(fun), fun_type);
-        logging::debug("add_listener() on {}", *listener);
-        m_map.emplace(key, listener);
+    void listener_map::do_add_listener(event_listener_key key, event_listener &&listener) {
+        auto it = m_listeners.emplace(key, std::move(listener));
+        logging::debug("add_listener() on {} {}", it->first, it->second);
+        m_map.emplace(key.key, it);
     }
 
     void listener_map::do_remove_listeners(iterator_map_range range) {
         if (range.empty()) return;
 
-        for (auto &[key, listener] : range) {
-            if (listener->active) {
-                logging::debug("remove_listener() on {}", *listener);
+        for (auto it : range | rv::values) {
+            auto &[key, listener] = *it;
+            if (listener.is_active()) {
+                logging::debug("remove_listener() on {} {}", key, listener);
                 if (m_lock) {
-                    m_to_remove.push_back(listener);
-                    listener->active = false;
+                    m_to_remove.push_back(it);
+                    listener.deactivate();
                 } else {
-                    m_listeners.erase(listener);
+                    m_listeners.erase(it);
                 }
             }
         }
@@ -50,10 +53,10 @@ namespace banggame {
         if (range.empty()) return;
 
         ++m_lock;
-        for (const event_listener &listener : range) {
-            if (listener.type == type && listener.active) {
-                logging::trace("call_event() on {}", listener);
-                std::invoke(listener.fun, tuple);
+        for (auto &[key, listener] : range) {
+            if (key.type == type && listener.is_active()) {
+                logging::trace("call_event() on {} {}", key, listener);
+                std::invoke(listener, tuple);
             }
         }
         --m_lock;
