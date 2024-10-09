@@ -37,7 +37,7 @@ namespace banggame {
     struct bot_info_t {
         int propic_size;
         std::initializer_list<std::string> names;
-        std::initializer_list<image_pixels> propics;
+        std::initializer_list<image_pixels_view> propics;
         bot_settings settings;
     };
 

@@ -82,7 +82,7 @@ struct game_user {
 struct lobby_bot {
     int user_id;
     std::string username;
-    const image_pixels *propic;
+    image_pixels_view propic;
 };
 
 struct game_lobby : lobby_info {

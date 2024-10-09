@@ -7,6 +7,12 @@
 #include "compression.h"
 
 namespace banggame {
+    struct image_pixels_view {
+        int width;
+        int height;
+        std::span<const uint8_t> pixels;
+    };
+
     struct image_pixels {
         int width;
         int height;
@@ -14,6 +20,10 @@ namespace banggame {
 
         explicit operator bool () const {
             return width != 0 && height != 0;
+        }
+
+        operator image_pixels_view() const {
+            return { width, height, pixels };
         }
 
         uint32_t get_pixel(size_t x, size_t y) const;
@@ -27,17 +37,25 @@ namespace json {
 
     struct image_pixels_tag {};
 
-    template<> struct serializer<std::vector<uint8_t>, image_pixels_tag> {
-        json operator()(const std::vector<uint8_t> &value) const {
+    template<std::convertible_to<std::span<const uint8_t>> Bytes>
+    struct serializer<Bytes, image_pixels_tag> {
+        json operator()(const Bytes &value) const {
             return base64::base64_encode(compression::compress_bytes(value));
         }
     };
 
     template<typename Context>
-    struct serializer<banggame::image_pixels, Context> {
-        using base_type = aggregate_serializer_unchecked<banggame::image_pixels, image_pixels_tag>;
-        json operator()(const banggame::image_pixels &value) const {
+    struct serializer<banggame::image_pixels_view, Context> {
+        using base_type = aggregate_serializer_unchecked<banggame::image_pixels_view, image_pixels_tag>;
+        json operator()(const banggame::image_pixels_view &value) const {
             return base_type{}(value, image_pixels_tag{});
+        }
+    };
+
+    template<typename Context>
+    struct serializer<banggame::image_pixels, Context> {
+        json operator()(const banggame::image_pixels &value) const {
+            return serialize_unchecked(banggame::image_pixels_view(value), image_pixels_tag{});
         }
     };
 

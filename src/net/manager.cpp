@@ -270,7 +270,7 @@ void game_manager::handle_join_lobby(game_session &session, game_lobby &lobby) {
     }
     for (auto &bot : lobby.bots) {
         send_message<"lobby_add_user">(session.client, bot.user_id, bot.username, lobby_team::game_player);
-        send_message<"lobby_user_propic">(session.client, bot.user_id, *bot.propic);
+        send_message<"lobby_user_propic">(session.client, bot.user_id, bot.propic);
     }
     for (const auto &message: lobby.chat_messages) {
         send_message<"lobby_chat">(session.client, message);
@@ -544,8 +544,7 @@ void game_manager::handle_message(utils::tag<"game_start">, game_session &sessio
         | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
         | rn::to<std::vector<std::string_view>>;
 
-    std::vector<const image_pixels *> propics = bot_info.propics
-        | rv::addressof
+    std::vector<image_pixels_view> propics = bot_info.propics
         | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
         | rn::to_vector;
 
@@ -555,7 +554,7 @@ void game_manager::handle_message(utils::tag<"game_start">, game_session &sessio
         user_ids.push_back(bot_id);
 
         broadcast_message_lobby<"lobby_add_user">(lobby, bot_id, bot.username, lobby_team::game_player);
-        broadcast_message_lobby<"lobby_user_propic">(lobby, bot_id, *bot.propic);
+        broadcast_message_lobby<"lobby_user_propic">(lobby, bot_id, bot.propic);
     }
 
     lobby.m_game->add_players(user_ids);

@@ -106,7 +106,7 @@ namespace banggame {
 
     struct user_propic_args {
         int user_id;
-        image_pixels propic;
+        image_pixels_view propic;
     };
 
     enum class lobby_chat_flag {

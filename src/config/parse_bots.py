@@ -69,11 +69,10 @@ def parse_file(data):
     for filename in data['propics']:
         propic = sdl_image_pixels(filename, propic_size)
         declarations.append(propic['declaration'])
-        decl_name = propic['name']
         propics.append(CppObject(
             width = propic['width'],
             height = propic['height'],
-            pixels = CppLiteral(f'std::begin({decl_name}), std::end({decl_name})')
+            pixels = CppLiteral(propic['name'])
         ))
     
     return CppObject(
