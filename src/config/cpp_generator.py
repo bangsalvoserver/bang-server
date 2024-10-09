@@ -49,15 +49,25 @@ def print_cpp_file(object_value, object_declaration, include_filenames = None, d
     print("// AUTO GENERATED FILE\n", file=file)
     if isinstance(include_filenames, list):
         for filename in include_filenames:
-            print(f"#include \"{filename}\"\n", file=file)
+            if filename.startswith('<'):
+                print(f"#include {filename}\n", file=file)
+            else:
+                print(f"#include \"{filename}\"\n", file=file)
     elif isinstance(include_filenames, str):
-        print(f"#include \"{include_filenames}\"\n", file=file)
+        if include_filenames.startswith('<'):
+            print(f"#include {include_filenames}\n", file=file)
+        else:
+            print(f"#include \"{include_filenames}\"\n", file=file)
     indent = 0
     if namespace_name:
         print(f"namespace {namespace_name} {{\n", file=file)
         indent += 1
     if declarations:
-        print(SPACE * indent + declarations + '\n', file=file)
+        if isinstance(declarations, list):
+            for decl in declarations:
+                print(SPACE * indent + decl + '\n', file=file)
+        elif isinstance(declarations, str):
+            print(SPACE * indent + declarations + '\n', file=file)
     print(f"{SPACE * indent}const {object_type} {object_name} {object_to_string(object_value, indent)};", file=file)
 
     if namespace_name:

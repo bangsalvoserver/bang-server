@@ -10,7 +10,7 @@ namespace compression {
 
     static constexpr size_t initial_buffer_size = 4096;
     
-    std::vector<std::byte> compress_bytes(const std::vector<std::byte> &bytes) {
+    std::vector<uint8_t> compress_bytes(std::span<const uint8_t> bytes) {
         z_stream strm{};
 
         if (deflateInit(&strm, Z_BEST_COMPRESSION) != Z_OK) {
@@ -19,10 +19,11 @@ namespace compression {
 
         defer { deflateEnd(&strm); };
 
-        strm.avail_in = static_cast<uInt>(bytes.size());
-        strm.next_in = reinterpret_cast<Bytef*>(const_cast<std::byte*>(bytes.data()));
+        strm.avail_in = bytes.size();
+        strm.next_in = const_cast<uint8_t*>(bytes.data());
 
-        std::vector<std::byte> output_bytes{initial_buffer_size};
+        std::vector<uint8_t> output_bytes;
+        output_bytes.resize(initial_buffer_size);
 
         size_t bytes_written = 0;
 
@@ -33,8 +34,8 @@ namespace compression {
             }
             size_t bytes_to_write = output_bytes.size() - bytes_written;
 
-            strm.avail_out = static_cast<uInt>(bytes_to_write);
-            strm.next_out = reinterpret_cast<Bytef*>(output_bytes.data() + bytes_written);
+            strm.avail_out = bytes_to_write;
+            strm.next_out = output_bytes.data() + bytes_written;
 
             result = deflate(&strm, Z_FINISH);
 
@@ -49,7 +50,7 @@ namespace compression {
         return output_bytes;
     }
 
-    std::vector<std::byte> decompress_bytes(const std::vector<std::byte> &bytes) {
+    std::vector<uint8_t> decompress_bytes(std::span<const uint8_t> bytes) {
         z_stream strm{};
 
         if (inflateInit(&strm) != Z_OK) {
@@ -58,10 +59,11 @@ namespace compression {
 
         defer { inflateEnd(&strm); };
 
-        strm.avail_in = static_cast<uInt>(bytes.size());
-        strm.next_in = reinterpret_cast<Bytef*>(const_cast<std::byte*>(bytes.data()));
+        strm.avail_in = bytes.size();
+        strm.next_in = const_cast<uint8_t*>(bytes.data());
 
-        std::vector<std::byte> output_bytes{initial_buffer_size};
+        std::vector<uint8_t> output_bytes;
+        output_bytes.resize(initial_buffer_size);
 
         size_t bytes_written = 0;
 
@@ -72,8 +74,8 @@ namespace compression {
             }
             size_t bytes_to_write = output_bytes.size() - bytes_written;
 
-            strm.avail_out = static_cast<uInt>(bytes_to_write);
-            strm.next_out = reinterpret_cast<Bytef*>(output_bytes.data() + bytes_written);
+            strm.avail_out = bytes_to_write;
+            strm.next_out = output_bytes.data() + bytes_written;
 
             result = inflate(&strm, Z_NO_FLUSH);
 

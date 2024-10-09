@@ -1,14 +1,15 @@
 #ifndef __COMPRESSION_H__
 #define __COMPRESSION_H__
 
+#include <span>
 #include <vector>
-#include <cstddef>
+#include <cstdint>
 
 namespace compression {
     
-    std::vector<std::byte> compress_bytes(const std::vector<std::byte> &inputData);
+    std::vector<uint8_t> compress_bytes(std::span<const uint8_t> bytes);
 
-    std::vector<std::byte> decompress_bytes(const std::vector<std::byte> &compressedData);
+    std::vector<uint8_t> decompress_bytes(std::span<const uint8_t> bytes);
     
 }
 

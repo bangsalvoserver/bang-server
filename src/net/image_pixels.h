@@ -10,7 +10,7 @@ namespace banggame {
     struct image_pixels {
         int width;
         int height;
-        std::vector<std::byte> pixels;
+        std::vector<uint8_t> pixels;
 
         explicit operator bool () const {
             return width != 0 && height != 0;
@@ -27,8 +27,8 @@ namespace json {
 
     struct image_pixels_tag {};
 
-    template<> struct serializer<std::vector<std::byte>, image_pixels_tag> {
-        json operator()(const std::vector<std::byte> &value) const {
+    template<> struct serializer<std::vector<uint8_t>, image_pixels_tag> {
+        json operator()(const std::vector<uint8_t> &value) const {
             return base64::base64_encode(compression::compress_bytes(value));
         }
     };
@@ -41,8 +41,8 @@ namespace json {
         }
     };
 
-    template<> struct deserializer<std::vector<std::byte>, image_pixels_tag> {
-        std::vector<std::byte> operator()(const json &value) const {
+    template<> struct deserializer<std::vector<uint8_t>, image_pixels_tag> {
+        std::vector<uint8_t> operator()(const json &value) const {
             if (!value.is_string()) {
                 throw deserialize_error("Cannot deserialize base64 encoded string");
             }
