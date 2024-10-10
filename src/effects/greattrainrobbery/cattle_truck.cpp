@@ -25,6 +25,7 @@ namespace banggame {
         
         void on_pick(card_ptr target_card) {
             target->m_game->pop_request();
+            target->m_game->add_log("LOG_DRAWN_CARD_FOR", target, target_card, origin_card);
             target->add_to_hand(target_card);
 
             while (!target->m_game->m_selection.empty()) {
