@@ -1,5 +1,10 @@
 import sys
-import re
+
+class CppDeclaration:
+    def __init__(self, object_name, object_value, namespace_name = None):
+        self.object_name = object_name
+        self.object_value = object_value
+        self.namespace_name = namespace_name
 
 class CppObject:
     def __init__(self, **value):
@@ -22,6 +27,17 @@ class CppLiteral:
 
 SPACE = '  '
 
+def chunks(lst, n):
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+def as_list(value):
+    if isinstance(value, list):
+        for elem in value:
+            yield elem
+    else:
+        yield value
+
 def object_to_string(object_value, indent = 0):
     if isinstance(object_value, CppObject):
         if not object_value: return '{}'
@@ -36,39 +52,27 @@ def object_to_string(object_value, indent = 0):
         return f'{{\"{object_value}\"}}'
     elif isinstance(object_value, bool):
         return f"{{{'true' if object_value else 'false'}}}"
+    elif isinstance(object_value, bytes):
+        if not object_value: return '{}'
+        return '{\n' + ',\n'.join(SPACE * (indent + 1) + ','.join(f'0x{byte:02x}' for byte in line) for line in chunks(object_value, 32)) + '\n' + (SPACE * indent) + '}'
     else:
         return f'{{{object_value}}}'
 
-def print_cpp_file(object_value, object_declaration, include_filenames = None, declarations=None, file=sys.stdout):
-    match = re.match(r'^(\w+) (?:(\w+)::)?(\w+)$', object_declaration)
-
-    object_type = match.group(1)
-    namespace_name = match.group(2)
-    object_name = match.group(3)
-
+def print_cpp_file(object_values, include_filenames = None, file=sys.stdout):
     print("// AUTO GENERATED FILE\n", file=file)
-    if isinstance(include_filenames, list):
-        for filename in include_filenames:
-            if filename.startswith('<'):
-                print(f"#include {filename}\n", file=file)
-            else:
-                print(f"#include \"{filename}\"\n", file=file)
-    elif isinstance(include_filenames, str):
-        if include_filenames.startswith('<'):
-            print(f"#include {include_filenames}\n", file=file)
+    for filename in as_list(include_filenames):
+        if filename.startswith('<'):
+            print(f"#include {filename}\n", file=file)
         else:
-            print(f"#include \"{include_filenames}\"\n", file=file)
+            print(f"#include \"{filename}\"\n", file=file)
+    
     indent = 0
-    if namespace_name:
-        print(f"namespace {namespace_name} {{\n", file=file)
-        indent += 1
-    if declarations:
-        if isinstance(declarations, list):
-            for decl in declarations:
-                print(SPACE * indent + decl + '\n', file=file)
-        elif isinstance(declarations, str):
-            print(SPACE * indent + declarations + '\n', file=file)
-    print(f"{SPACE * indent}const {object_type} {object_name} {object_to_string(object_value, indent)};", file=file)
+    for declaration in as_list(object_values):
+        if declaration.namespace_name:
+            print(f"namespace {declaration.namespace_name} {{\n", file=file)
+            indent += 1
+        print(f"{SPACE * indent}{declaration.object_name} {object_to_string(declaration.object_value, indent)};\n", file=file)
 
-    if namespace_name:
-        print('}', file=file)
+        if declaration.namespace_name:
+            print('}', file=file)
+            indent -= 1

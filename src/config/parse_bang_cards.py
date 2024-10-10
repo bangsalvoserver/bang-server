@@ -3,7 +3,7 @@
 import re
 import sys
 import yaml_custom as yaml
-from cpp_generator import CppObject, CppEnum, CppLiteral, print_cpp_file
+from cpp_generator import CppDeclaration, CppObject, CppEnum, CppLiteral, print_cpp_file
 
 def parse_sign(sign):
     match = re.match(r'^\s*([\w\d]+)\s*(\w+)\s*$', sign)
@@ -242,7 +242,6 @@ def parse_expansions(expansions):
     ] }
 
 INCLUDE_FILENAMES = ['cards/vtable_build.h', 'cards/filter_enums.h', 'effects/effects.h']
-OBJECT_DECLARATION = 'all_cards_t banggame::all_cards'
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
@@ -251,17 +250,17 @@ if __name__ == '__main__':
 
     with open(sys.argv[1], 'r', encoding='utf8') as file:
         data, expansions = merge_cards(yaml.safe_load(file))
-        bang_cards = CppObject(
-            **parse_file(data),
-            **parse_expansions(expansions)
+        bang_cards = CppDeclaration(
+            object_name='const all_cards_t all_cards',
+            object_value=CppObject(
+                **parse_file(data),
+                **parse_expansions(expansions)
+            ),
+            namespace_name='banggame'
         )
     
     if sys.argv[2] == '-':
-        print_cpp_file(bang_cards, OBJECT_DECLARATION,
-            include_filenames=INCLUDE_FILENAMES,
-            file=sys.stdout)
+        print_cpp_file(bang_cards, include_filenames=INCLUDE_FILENAMES, file=sys.stdout)
     else:
         with open(sys.argv[2], 'w', encoding='utf8') as file:
-            print_cpp_file(bang_cards, OBJECT_DECLARATION,
-                include_filenames=INCLUDE_FILENAMES,
-                file=file)
+            print_cpp_file(bang_cards, include_filenames=INCLUDE_FILENAMES, file=file)
