@@ -15,12 +15,14 @@ namespace banggame {
     private:
         std::move_only_function<bool(const_card_ptr) const> m_fun;
         std::type_index m_type;
+        bool m_disable_use;
     
     public:
         template<typename Function>
-        card_disabler_fun(Function &&fun)
+        card_disabler_fun(Function &&fun, bool disable_use = false)
             : m_fun{std::forward<Function>(fun)}
-            , m_type{typeid(Function)} {}
+            , m_type{typeid(Function)}
+            , m_disable_use(disable_use) {}
 
         bool operator()(const_card_ptr target_card) const {
             return m_fun(target_card);
@@ -28,6 +30,10 @@ namespace banggame {
         
         const std::type_index &target_type() const {
             return m_type;
+        }
+
+        bool is_disable_use() const {
+            return m_disable_use;
         }
     };
 
@@ -58,8 +64,8 @@ namespace banggame {
             do_remove_disablers({low, high});
         }
 
-        card_ptr get_disabler(const_card_ptr target_card) const;
-        bool is_disabled(const_card_ptr target_card) const;
+        card_ptr get_disabler(const_card_ptr target_card, bool check_disable_use = false) const;
+        bool is_disabled(const_card_ptr target_card, bool check_disable_use = false) const;
     };
 }
 

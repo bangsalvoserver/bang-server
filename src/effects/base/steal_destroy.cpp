@@ -122,6 +122,13 @@ namespace banggame {
         origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
     }
 
+    game_string effect_discard::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        if (card_ptr disabler = origin->m_game->get_disabler(target_card, true)) {
+            return {"ERROR_CARD_DISABLED_BY", target_card, disabler};
+        }
+        return {};
+    }
+
     game_string effect_discard::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         if (target_card->pocket == pocket_type::player_table
             && target_card->owner == origin
