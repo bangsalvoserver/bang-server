@@ -138,23 +138,23 @@ namespace net {
 
     void wsserver::push_message(client_handle client, std::string message) {
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
-            if (auto *ws = websocket_cast<SSL>(client)) {
-                server.getLoop()->defer([ws, message = std::move(message)]{
+            server.getLoop()->defer([client, message = std::move(message)]{
+                if (auto *ws = websocket_cast<SSL>(client)) {
                     auto *data = ws->getUserData();
                     logging::info("[{}] <== {:.{}}", data->address, message, max_message_log_size);
                     ws->send(message, uWS::TEXT);
-                });
-            }
+                }
+            });
         }, m_server);
     }
 
     void wsserver::kick_client(client_handle client, std::string message, int code) {
         visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
-            if (auto *ws = websocket_cast<SSL>(client)) {
-                server.getLoop()->defer([ws, code, message = std::move(message)]{
+            server.getLoop()->defer([client, code, message = std::move(message)]{
+                if (auto *ws = websocket_cast<SSL>(client)) {
                     ws->end(code, message);
-                });
-            }
+                }
+            });
         }, m_server);
     }
 
