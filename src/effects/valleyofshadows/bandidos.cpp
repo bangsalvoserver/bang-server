@@ -16,12 +16,17 @@ namespace banggame {
                 if (!live) {
                     target->play_sound("bandidos");
                 }
-                auto_resolve();
+                if (target->empty_hand()) {
+                    auto_resolve();
+                }
             }
         }
 
         void on_resolve() override {
             target->m_game->pop_request();
+            if (rn::none_of(target->m_hand, [&](const_card_ptr c) { return can_pick(c); })) {
+                target->reveal_hand();
+            }
             target->damage(origin_card, origin, 1);
         }
 
@@ -33,14 +38,18 @@ namespace banggame {
         }
         
         bool can_pick(const_card_ptr target_card) const override {
-            return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
+            return target_card->pocket == pocket_type::player_hand && target_card->owner == target
+                && !target->m_game->is_disabled(target_card, true);
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
             target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->discard_used_card(target_card);
-            if (!target->empty_hand()) {
+            
+            if (target->empty_hand()) {
+                target->m_game->pop_request();
+            } else if (rn::any_of(target->m_hand, [&](const_card_ptr c) { return can_pick(c); })) {
+                target->m_game->pop_request();
                 target->m_game->queue_request<request_discard>(origin_card, origin, target, effect_flags{}, 110);
             }
         }

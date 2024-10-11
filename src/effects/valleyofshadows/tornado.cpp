@@ -1,6 +1,7 @@
 #include "tornado.h"
 
 #include "effects/base/pick.h"
+#include "cards/game_enums.h"
 
 #include "game/game.h"
 
@@ -11,16 +12,18 @@ namespace banggame {
             : request_picking(origin_card, origin, target, flags) {}
         
         bool can_pick(const_card_ptr target_card) const override {
-            return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
+            return target_card->pocket == pocket_type::player_hand && target_card->owner == target
+                && !target->m_game->is_disabled(target_card, true);
         }
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
                 target->m_game->pop_request();
-            } else if (target->empty_hand()) {
+            } else if (rn::none_of(target->m_hand, [&](const_card_ptr c) { return can_pick(c); })) {
                 target->m_game->pop_request();
+                target->reveal_hand();
                 target->draw_card(2, origin_card);
-            } else {
+            } else if (target->m_hand.size() == 1) {
                 auto_pick();
             }
         }

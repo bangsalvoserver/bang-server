@@ -39,15 +39,19 @@ namespace banggame {
     }
 
     void request_discard::on_update() {
-        if (!target->alive() || target->empty_hand()) {
+        if (!target->alive()) {
             target->m_game->pop_request();
-        } else {
+        } else if (rn::none_of(target->m_hand, [&](const_card_ptr c) { return can_pick(c); })) {
+            target->m_game->pop_request();
+            target->reveal_hand();
+        } else if (target->m_hand.size() == 1) {
             auto_pick();
         }
     }
 
     bool request_discard::can_pick(const_card_ptr target_card) const {
-        return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
+        return target_card->pocket == pocket_type::player_hand && target_card->owner == target
+            && !target->m_game->is_disabled(target_card, true);
     }
     
     void request_discard::on_pick(card_ptr target_card) {

@@ -121,6 +121,7 @@ namespace banggame {
         }
 
         void remove_extra_characters();
+        void reveal_hand();
     };
 
 }
