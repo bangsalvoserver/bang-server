@@ -9,6 +9,8 @@ namespace banggame {
         request_bandidos(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags) {}
 
+        int ncards = 0;
+
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
                 target->m_game->pop_request();
@@ -24,7 +26,7 @@ namespace banggame {
 
         void on_resolve() override {
             target->m_game->pop_request();
-            if (rn::none_of(target->m_hand, [&](const_card_ptr c) { return can_pick(c); })) {
+            if (ncards > 0) {
                 target->reveal_hand();
             }
             target->damage(origin_card, origin, 1);
@@ -43,6 +45,8 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
+            ++ncards;
+            
             target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->discard_used_card(target_card);
             
