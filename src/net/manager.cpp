@@ -217,7 +217,7 @@ void game_manager::handle_message(utils::tag<"lobby_make">, session_ptr session,
     send_message<"lobby_user_update">(session->client, user.user_id, session->username);
 
     add_lobby_chat_message(lobby, &user, {
-        0, "USER_JOINED_LOBBY", { session->username },
+        0, "USER_JOINED_LOBBY", {{ utils::tag<"user">{}, user.user_id }},
         { lobby_chat_flag::server_message, lobby_chat_flag::translated } }
     );
     
@@ -284,7 +284,7 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
     }
     if (inserted) {
         add_lobby_chat_message(lobby, &new_user, {
-            0, "USER_JOINED_LOBBY", { session->username },
+            0, "USER_JOINED_LOBBY", {{ utils::tag<"user">{}, new_user.user_id }},
             { lobby_chat_flag::server_message, lobby_chat_flag::translated } }
         );
     }
@@ -361,7 +361,7 @@ void game_manager::kick_user_from_lobby(session_ptr session) {
     send_message<"lobby_kick">(session->client);
 
     add_lobby_chat_message(lobby, nullptr, {
-        0, "USER_LEFT_LOBBY", { session->username },
+        0, "USER_LEFT_LOBBY", {{ utils::tag<"user">{}, lobby.find_user(session).user_id }},
         { lobby_chat_flag::server_message, lobby_chat_flag::translated } }
     );
 }

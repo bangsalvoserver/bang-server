@@ -120,10 +120,18 @@ namespace banggame {
 
     using lobby_chat_flags = enums::bitset<lobby_chat_flag>;
 
+    using chat_format_arg = utils::tagged_variant<
+        utils::tag<"user", int>,
+        utils::tag<"integer", int>,
+        utils::tag<"string", std::string>
+    >;
+
+    using chat_format_arg_list = std::vector<chat_format_arg>;
+
     struct lobby_chat_args {
         int user_id;
         std::string message;
-        std::vector<std::string> args;
+        chat_format_arg_list args;
         lobby_chat_flags flags;
     };
 

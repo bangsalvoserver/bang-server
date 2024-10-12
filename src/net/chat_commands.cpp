@@ -27,7 +27,7 @@ namespace banggame {
             if (!command.permissions().check(command_permissions::game_cheat) || m_options.enable_cheats) {
                 send_message<"lobby_chat">(session->client, 0,
                     std::string{command.description()},
-                    std::vector{std::format("{}{}", chat_command::start_char, cmd_name)},
+                    chat_format_arg_list{{utils::tag<"string">{}, std::format("{}{}", chat_command::start_char, cmd_name)}},
                     lobby_chat_flags{lobby_chat_flag::server_message, lobby_chat_flag::translated}
                 );
             }
@@ -39,7 +39,7 @@ namespace banggame {
         for (const game_user &user : lobby.connected_users()) {
             send_message<"lobby_chat">(session->client, 0,
                 std::format("{} : {} ({})", user.user_id, user.session->username, user.flags),
-                std::vector<std::string>{}, lobby_chat_flag::server_message
+                chat_format_arg_list{}, lobby_chat_flag::server_message
             );
         }
     }
@@ -61,7 +61,7 @@ namespace banggame {
     
     void game_manager::command_get_game_options(session_ptr session) {
         send_message<"lobby_chat">(session->client, 0,
-            session->lobby->options.to_string(), std::vector<std::string>{},
+            session->lobby->options.to_string(), chat_format_arg_list{},
             lobby_chat_flag::server_message
         );
     }
@@ -102,7 +102,7 @@ namespace banggame {
 
     void game_manager::command_get_rng_seed(session_ptr session) {
         send_message<"lobby_chat">(session->client, 0,
-            "GAME_SEED", std::vector{std::to_string(session->lobby->m_game->rng_seed)},
+            "GAME_SEED", chat_format_arg_list{{utils::tag<"integer">{}, session->lobby->m_game->rng_seed}},
             lobby_chat_flags{lobby_chat_flag::server_message, lobby_chat_flag::translated}
         );
     }
