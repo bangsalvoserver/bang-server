@@ -254,7 +254,9 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
 
     send_message<"lobby_entered">(session->client, new_user.user_id, lobby.lobby_id, lobby.name, lobby.options);
     
-    remove_user_flag(session, game_user_flag::disconnected);
+    if (remove_user_flag(session, game_user_flag::disconnected)) {
+        inserted = true;
+    }
     broadcast_message<"lobby_update">(lobby);
 
     for (const game_user &user : lobby.users) {
@@ -308,26 +310,30 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
     }
 }
 
-void game_manager::add_user_flag(session_ptr session, game_user_flag flag) {
+bool game_manager::add_user_flag(session_ptr session, game_user_flag flag) {
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
         if (!user.flags.check(flag)) {
             user.flags.add(flag);
             broadcast_message<"lobby_update">(*lobby);
             broadcast_message_lobby<"lobby_user_update">(*lobby, user.user_id, session->username, user.flags);
+            return true;
         }
     }
+    return false;
 }
 
-void game_manager::remove_user_flag(session_ptr session, game_user_flag flag) {
+bool game_manager::remove_user_flag(session_ptr session, game_user_flag flag) {
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
         if (user.flags.check(flag)) {
             user.flags.remove(flag);
             broadcast_message<"lobby_update">(*lobby);
             broadcast_message_lobby<"lobby_user_update">(*lobby, user.user_id, session->username, user.flags);
+            return true;
         }
     }
+    return false;
 }
 
 void game_manager::handle_message(utils::tag<"lobby_join">, session_ptr session, const lobby_join_args &value) {

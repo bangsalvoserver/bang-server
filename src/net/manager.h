@@ -63,8 +63,8 @@ private:
     void add_lobby_chat_message(game_lobby &lobby, game_user *is_read_for, lobby_chat_args message);
     void handle_join_lobby(session_ptr session, game_lobby &lobby);
 
-    void add_user_flag(session_ptr session, game_user_flag flag);
-    void remove_user_flag(session_ptr session, game_user_flag flag);
+    bool add_user_flag(session_ptr session, game_user_flag flag);
+    bool remove_user_flag(session_ptr session, game_user_flag flag);
 
 private:
     void handle_message(utils::tag<"connect">,        client_handle client, connection &con, const connect_args &value);
