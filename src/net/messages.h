@@ -18,11 +18,6 @@ namespace banggame {
         id_type session_id;
     };
 
-    enum class lobby_team {
-        game_player,
-        game_spectator,
-    };
-
     struct lobby_make_args {
         std::string name;
         std::string password;
@@ -58,7 +53,7 @@ namespace banggame {
         utils::tag<"lobby_leave">,
         utils::tag<"lobby_chat", lobby_chat_client_args>,
         utils::tag<"lobby_return">,
-        utils::tag<"user_set_team", lobby_team>,
+        utils::tag<"user_spectate", bool>,
         utils::tag<"game_start">,
         utils::tag<"game_rejoin", game_rejoin_args>,
         utils::tag<"game_action", json::json>
@@ -97,10 +92,18 @@ namespace banggame {
         id_type lobby_id;
     };
 
+    enum class game_user_flag {
+        disconnected,
+        spectator,
+        muted
+    };
+
+    using game_user_flags = enums::bitset<game_user_flag>;
+
     struct lobby_user_args {
         int user_id;
         std::string username;
-        lobby_team team;
+        game_user_flags flags;
         std::chrono::milliseconds lifetime;
     };
 
@@ -119,7 +122,6 @@ namespace banggame {
 
     struct lobby_chat_args {
         int user_id;
-        std::string username;
         std::string message;
         std::vector<std::string> args;
         lobby_chat_flags flags;
@@ -133,9 +135,8 @@ namespace banggame {
         utils::tag<"lobby_entered", lobby_entered_args>,
         utils::tag<"lobby_edited", lobby_info>,
         utils::tag<"lobby_removed", lobby_removed_args>,
-        utils::tag<"lobby_add_user", lobby_user_args>,
+        utils::tag<"lobby_user_update", lobby_user_args>,
         utils::tag<"lobby_user_propic", user_propic_args>,
-        utils::tag<"lobby_remove_user", int>,
         utils::tag<"lobby_kick">,
         utils::tag<"lobby_chat", lobby_chat_args>,
         utils::tag<"game_update", json::json>,

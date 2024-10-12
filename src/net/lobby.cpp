@@ -19,27 +19,20 @@ namespace banggame {
         propic = new_propic.scale_to(bot_info.propic_size);
     }
 
-    static auto find_user_it(auto &list, const game_session &session) {
-        return rn::find(list, &session, [](const game_user &user) { return &user.session; });
+    static auto find_user_it(auto &list, session_ptr session) {
+        return rn::find(list, session, &game_user::session);
     }
-
-    std::pair<game_user &, bool> game_lobby::add_user(game_session &session) {
+    
+    std::pair<game_user &, bool> game_lobby::add_user(session_ptr session) {
+        session->lobby = this;
         if (auto it = find_user_it(users, session); it != users.end()) {
             return {*it, false};
         } else {
-            session.lobby = this;
             return {users.emplace_back(++user_id_count, session), true};
         }
     }
 
-    game_user game_lobby::remove_user(const game_session &session) {
-        auto it = find_user_it(users, session);
-        game_user user = std::move(*it);
-        users.erase(it);
-        return user;
-    }
-
-    game_user &game_lobby::find_user(const game_session &session) {
+    game_user &game_lobby::find_user(session_ptr session) {
         if (auto it = find_user_it(users, session); it != users.end()) {
             return *it;
         }
@@ -56,7 +49,7 @@ namespace banggame {
 
         if (game_user *user = get_single_element(users
             | rv::filter([&](const game_user &user) {
-                return string_equal_icase(user.session.username, name_or_id);
+                return string_equal_icase(user.session->username, name_or_id);
             })
             | rv::addressof))
         {
@@ -82,8 +75,8 @@ namespace banggame {
         return {
             .lobby_id = lobby_id,
             .name = name,
-            .num_players = int(rn::count(users, lobby_team::game_player, &game_user::team)),
-            .num_spectators = int(rn::count(users, lobby_team::game_spectator, &game_user::team)),
+            .num_players = int(rn::count_if(connected_users(), std::not_fn(&game_user::is_spectator))),
+            .num_spectators = int(rn::count_if(connected_users(), &game_user::is_spectator)),
             .max_players = lobby_max_players,
             .secure = !password.empty(),
             .state = state

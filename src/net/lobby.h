@@ -6,8 +6,6 @@
 
 #include "game/game.h"
 
-#include <list>
-
 namespace banggame {
 
 class game_manager;
@@ -43,15 +41,17 @@ struct game_session {
     void set_propic(const image_pixels &new_propic);
 };
 
+using session_ptr = std::shared_ptr<game_session>;
+
 namespace connection_state {
     struct not_validated {
         ticks timeout = ticks{0};
     };
     
     struct connected {
-        connected(game_session &session): session{session} {}
+        connected(session_ptr session): session{session} {}
 
-        game_session &session;
+        session_ptr session;
         ticks ping_timer = ticks{0};
         int ping_count = 0;
     };
@@ -65,18 +65,25 @@ using connection = std::variant<
     connection_state::invalid
 >;
 
-enum class game_user_flag {
-    muted
-};
-
 struct game_user {
-    game_user(int user_id, game_session &session)
+    game_user(int user_id, session_ptr session)
         : user_id{user_id}, session{session} {}
     
     int user_id;
-    game_session &session;
-    lobby_team team = lobby_team::game_player;
-    enums::bitset<game_user_flag> flags;
+    session_ptr session;
+    game_user_flags flags;
+
+    bool is_disconnected() const {
+        return flags.check(game_user_flag::disconnected);
+    }
+
+    bool is_spectator() const {
+        return flags.check(game_user_flag::spectator);
+    }
+
+    bool is_muted() const {
+        return flags.check(game_user_flag::muted);
+    }
 };
 
 struct lobby_bot {
@@ -97,7 +104,7 @@ struct game_lobby : lobby_info {
 
     std::string password;
 
-    std::list<game_user> users;
+    std::vector<game_user> users;
     std::vector<lobby_bot> bots;
     std::vector<lobby_chat_args> chat_messages;
     
@@ -106,10 +113,20 @@ struct game_lobby : lobby_info {
 
     std::unique_ptr<banggame::game> m_game;
 
-    std::pair<game_user &, bool> add_user(game_session &session);
-    game_user remove_user(const game_session &session);
+    auto connected_users() const {
+        return rv::remove_if(users, &game_user::is_disconnected);
+    }
 
-    game_user &find_user(const game_session &session);
+    bool is_owner(session_ptr session) const {
+        if (auto range = connected_users()) {
+            return range.front().session == session;
+        }
+        return false;
+    }
+
+    std::pair<game_user &, bool> add_user(session_ptr session);
+
+    game_user &find_user(session_ptr session);
     game_user &find_user(std::string_view name_or_id);
 
     void update_lobby_info(const lobby_info &info);
@@ -117,7 +134,7 @@ struct game_lobby : lobby_info {
     explicit operator lobby_data() const;
 };
 
-using user_map = std::unordered_map<id_type, game_session>;
+using user_map = std::unordered_map<id_type, session_ptr>;
 using client_map = std::map<client_handle, connection, std::owner_less<>>;
 using lobby_map = std::map<id_type, game_lobby>;
 
