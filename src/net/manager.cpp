@@ -264,9 +264,11 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
                 send_message<"lobby_user_propic">(user.session->client, new_user.user_id, session->propic);
             }
         }
-        send_message<"lobby_user_update">(session->client, user.user_id, user.session->username, user.flags,
-            std::chrono::duration_cast<std::chrono::milliseconds>(user.session->client.expired() ? user.session->lifetime : ticks{})
-        );
+        std::chrono::milliseconds lifetime{};
+        if (!user.is_disconnected() && user.session->client.expired()) {
+            lifetime = std::chrono::duration_cast<std::chrono::milliseconds>(user.session->lifetime);
+        }
+        send_message<"lobby_user_update">(session->client, user.user_id, user.session->username, user.flags, lifetime);
         if (const auto &propic = user.session->propic) {
             send_message<"lobby_user_propic">(session->client, user.user_id, propic);
         }
