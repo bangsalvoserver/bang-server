@@ -40,14 +40,16 @@ namespace banggame {
     }
 
     game_user &game_lobby::find_user(std::string_view name_or_id) {
+        auto range = connected_users();
+
         int user_id;
         if (auto [end, ec] = std::from_chars(name_or_id.data(), name_or_id.data() + name_or_id.size(), user_id); ec == std::errc{}) {
-            if (auto it = rn::find(users, user_id, &game_user::user_id); it != users.end()) {
+            if (auto it = rn::find(range, user_id, &game_user::user_id); it != range.end()) {
                 return *it;
             }
         }
 
-        if (game_user *user = get_single_element(users
+        if (game_user *user = get_single_element(range
             | rv::filter([&](const game_user &user) {
                 return string_equal_icase(user.session->username, name_or_id);
             })

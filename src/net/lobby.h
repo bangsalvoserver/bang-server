@@ -113,8 +113,8 @@ struct game_lobby : lobby_info {
 
     std::unique_ptr<banggame::game> m_game;
 
-    auto connected_users() const {
-        return rv::remove_if(users, &game_user::is_disconnected);
+    auto connected_users(this auto &&self) {
+        return rv::remove_if(std::forward_like<decltype(self)>(self.users), &game_user::is_disconnected);
     }
 
     bool is_owner(session_ptr session) const {
