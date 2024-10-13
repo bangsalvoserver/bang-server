@@ -28,7 +28,7 @@ namespace banggame {
                 send_message<"lobby_chat">(session->client, 0,
                     std::string{command.description()},
                     chat_format_arg_list{{utils::tag<"string">{}, std::format("{}{}", chat_command::start_char, cmd_name)}},
-                    lobby_chat_flags{lobby_chat_flag::server_message, lobby_chat_flag::translated}
+                    lobby_chat_flag::translated
                 );
             }
         }
@@ -37,10 +37,15 @@ namespace banggame {
     void game_manager::command_print_users(session_ptr session) {
         game_lobby &lobby = *session->lobby;
         for (const game_user &user : lobby.connected_users()) {
-            send_message<"lobby_chat">(session->client, 0,
-                std::format("{} : {} ({})", user.user_id, user.session->username, user.flags),
-                chat_format_arg_list{}, lobby_chat_flag::server_message
-            );
+            if (user.flags.empty()) {
+                send_message<"lobby_chat">(session->client, 0,
+                    std::format("{} : {}", user.user_id, user.session->username)
+                );
+            } else {
+                send_message<"lobby_chat">(session->client, 0,
+                    std::format("{} : {} ({})", user.user_id, user.session->username, user.flags)
+                );
+            }
         }
     }
 
@@ -60,10 +65,7 @@ namespace banggame {
     }
     
     void game_manager::command_get_game_options(session_ptr session) {
-        send_message<"lobby_chat">(session->client, 0,
-            session->lobby->options.to_string(), chat_format_arg_list{},
-            lobby_chat_flag::server_message
-        );
+        send_message<"lobby_chat">(session->client, 0, session->lobby->options.to_string());
     }
 
     void game_manager::command_set_game_option(session_ptr session, std::string_view key, std::string_view value) {
@@ -102,8 +104,7 @@ namespace banggame {
 
     void game_manager::command_get_rng_seed(session_ptr session) {
         send_message<"lobby_chat">(session->client, 0,
-            "GAME_SEED", chat_format_arg_list{{utils::tag<"integer">{}, session->lobby->m_game->rng_seed}},
-            lobby_chat_flags{lobby_chat_flag::server_message, lobby_chat_flag::translated}
+            "GAME_SEED", chat_format_arg_list{{utils::tag<"integer">{}, session->lobby->m_game->rng_seed}}, lobby_chat_flag::translated
         );
     }
 

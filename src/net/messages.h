@@ -114,7 +114,6 @@ namespace banggame {
 
     enum class lobby_chat_flag {
         is_read,
-        server_message,
         translated,
     };
 
