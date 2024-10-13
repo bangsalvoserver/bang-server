@@ -123,7 +123,7 @@ namespace banggame {
     }
 
     game_string effect_discard::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        if (card_ptr disabler = origin->m_game->get_disabler(target_card, true)) {
+        if (card_ptr disabler = origin->m_game->get_usage_disabler(target_card)) {
             return {"ERROR_CARD_DISABLED_BY", target_card, disabler};
         }
         return {};

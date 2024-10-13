@@ -65,7 +65,18 @@ namespace banggame {
         }
 
         card_ptr get_disabler(const_card_ptr target_card, bool check_disable_use = false) const;
-        bool is_disabled(const_card_ptr target_card, bool check_disable_use = false) const;
+
+        bool is_disabled(const_card_ptr target_card, bool check_disable_use = false) const {
+            return get_disabler(target_card, check_disable_use) != nullptr;
+        }
+
+        card_ptr get_usage_disabler(const_card_ptr target_card) const {
+            return get_disabler(target_card, true);
+        }
+
+        bool is_usage_disabled(const_card_ptr target_card) const {
+            return is_disabled(target_card, true);
+        }
     };
 }
 

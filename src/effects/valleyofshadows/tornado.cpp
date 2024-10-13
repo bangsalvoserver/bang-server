@@ -13,7 +13,7 @@ namespace banggame {
         
         bool can_pick(const_card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
-                && !target->m_game->is_disabled(target_card, true);
+                && !target->m_game->is_usage_disabled(target_card);
         }
 
         void on_update() override {

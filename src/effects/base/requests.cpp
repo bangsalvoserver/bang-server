@@ -51,7 +51,7 @@ namespace banggame {
 
     bool request_discard::can_pick(const_card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target
-            && !target->m_game->is_disabled(target_card, true);
+            && !target->m_game->is_usage_disabled(target_card);
     }
     
     void request_discard::on_pick(card_ptr target_card) {

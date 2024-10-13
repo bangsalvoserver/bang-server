@@ -82,8 +82,4 @@ namespace banggame {
         return nullptr;
     }
 
-    bool disabler_map::is_disabled(const_card_ptr target_card, bool check_disable_use) const {
-        return get_disabler(target_card, check_disable_use) != nullptr;
-    }
-
 }
