@@ -43,10 +43,12 @@ private:
     }
 
     template<utils::fixed_string E> requires server_message_type<E>
-    void broadcast_message(auto && ... args) {
+    void broadcast_message_no_lobby(auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         for (session_ptr session : m_sessions | rv::values) {
-            push_message(session->client, message);
+            if (!session->lobby) {
+                push_message(session->client, message);
+            }
         }
     }
 
