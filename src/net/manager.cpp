@@ -259,7 +259,7 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
     broadcast_message_no_lobby<"lobby_update">(lobby);
 
     for (const game_user &user : lobby.users) {
-        if (user.session != session) {
+        if (!user.is_disconnected() && user.session != session) {
             send_message<"lobby_user_update">(user.session->client, new_user.user_id, session->username, new_user.flags);
             if (session->propic) {
                 send_message<"lobby_user_propic">(user.session->client, new_user.user_id, session->propic);
