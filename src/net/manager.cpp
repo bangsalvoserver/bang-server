@@ -225,7 +225,7 @@ void game_manager::handle_message(utils::tag<"lobby_make">, session_ptr session,
     }
 }
 
-void game_manager::handle_message(utils::tag<"lobby_edit">, session_ptr session, const lobby_edit_args &args) {
+void game_manager::handle_message(utils::tag<"lobby_edit">, session_ptr session, const game_options &options) {
     if (!session->lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -239,12 +239,11 @@ void game_manager::handle_message(utils::tag<"lobby_edit">, session_ptr session,
         throw lobby_error("ERROR_LOBBY_NOT_WAITING");
     }
 
-    lobby.name = game_lobby::crop_lobby_name(args.name);
-    lobby.options = args.options;
+    lobby.options = options;
     
     for (const game_user &user : lobby.connected_users()) {
         if (user.session != session) {
-            send_message<"lobby_edited">(user.session->client, args);
+            send_message<"lobby_edited">(user.session->client, options);
         }
     }
 }
