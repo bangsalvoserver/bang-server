@@ -24,7 +24,7 @@ namespace banggame {
         game_options options;
     };
 
-    struct lobby_info {
+    struct lobby_edit_args {
         std::string name;
         game_options options;
     };
@@ -48,7 +48,7 @@ namespace banggame {
         utils::tag<"user_set_name", std::string>,
         utils::tag<"user_set_propic", image_pixels>,
         utils::tag<"lobby_make", lobby_make_args>,
-        utils::tag<"lobby_edit", lobby_info>,
+        utils::tag<"lobby_edit", lobby_edit_args>,
         utils::tag<"lobby_join", lobby_join_args>,
         utils::tag<"lobby_leave">,
         utils::tag<"lobby_chat", lobby_chat_client_args>,
@@ -140,7 +140,7 @@ namespace banggame {
         utils::tag<"lobby_error", std::string>,
         utils::tag<"lobby_update", lobby_data>,
         utils::tag<"lobby_entered", lobby_entered_args>,
-        utils::tag<"lobby_edited", lobby_info>,
+        utils::tag<"lobby_edited", lobby_edit_args>,
         utils::tag<"lobby_removed", lobby_removed_args>,
         utils::tag<"lobby_user_update", lobby_user_args>,
         utils::tag<"lobby_user_propic", user_propic_args>,

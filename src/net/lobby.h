@@ -92,15 +92,17 @@ struct lobby_bot {
     image_pixels_view propic;
 };
 
-struct game_lobby : lobby_info {
+struct game_lobby {
     game_lobby(id_type lobby_id, const std::string &name, const game_options &options)
         : lobby_id{lobby_id}
-    {
-        update_lobby_info({ name, options });
-    }
+        , name{crop_lobby_name(name)}
+        , options{options} {}
 
     id_type lobby_id;
     int user_id_count = 0;
+
+    std::string name;
+    game_options options;
 
     std::string password;
 
@@ -129,7 +131,7 @@ struct game_lobby : lobby_info {
     game_user &find_user(session_ptr session);
     game_user &find_user(std::string_view name_or_id);
 
-    void update_lobby_info(const lobby_info &info);
+    static std::string crop_lobby_name(const std::string &name);
 
     explicit operator lobby_data() const;
 };

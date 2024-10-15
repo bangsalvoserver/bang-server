@@ -61,16 +61,14 @@ namespace banggame {
         throw lobby_error("CANNOT_FIND_USER");
     }
 
-    void game_lobby::update_lobby_info(const lobby_info &info) {
+    std::string game_lobby::crop_lobby_name(const std::string &name) {
         static constexpr size_t max_lobby_name_size = 50;
 
-        if (info.name.size() > max_lobby_name_size) {
-            name = info.name.substr(0, max_lobby_name_size);
+        if (name.size() > max_lobby_name_size) {
+            return name.substr(0, max_lobby_name_size);
         } else {
-            name = info.name;
+            return name;
         }
-
-        options = info.options;   
     }
 
     game_lobby::operator lobby_data() const {
