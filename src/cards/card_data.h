@@ -78,6 +78,8 @@ namespace banggame {
         card_initializer_list stations;
         card_initializer_list train;
         card_initializer_list locomotive;
+        card_initializer_list legends;
+        card_initializer_list feats;
         card_initializer_list hidden;
 
         expansion_set expansions;

@@ -8,4 +8,5 @@ highnoon: !include sets/highnoon.yml
 fistfulofcards: !include sets/fistfulofcards.yml
 wildwestshow: !include sets/wildwestshow.yml
 thebullet: !include sets/thebullet.yml
+legends: !include sets/legends.yml
 canyondiablo: !include sets/canyondiablo.yml

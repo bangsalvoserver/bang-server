@@ -191,6 +191,8 @@ namespace banggame {
         station,
         locomotive,
         train,
+        legends,
+        feats
     };
 
     enum class pocket_type {

@@ -223,7 +223,9 @@ def parse_file(data):
         'station': Deck(key='stations', order=7),
         'train': Deck(order=8),
         'locomotive': Deck(order=9),
-        'hidden': Deck(deck='none', order=10),
+        'legends': Deck(order=10),
+        'feats': Deck(order=11),
+        'hidden': Deck(deck='none', order=12),
     }
 
     def get_cards_for_deck(key, cards):

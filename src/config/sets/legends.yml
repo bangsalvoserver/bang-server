@@ -1,0 +1,67 @@
+legends:
+  - name: BART_CASSIDY
+    image: 23_bart_cassidy
+  - name: BLACK_JACK
+    image: 23_black_jack
+  - name: CALAMITY_JANET
+    image: 23_calamity_janet
+  - name: EL_GRINGO
+    image: 23_el_gringo
+  - name: JESSE_JONES
+    image: 23_jesse_jones
+  - name: JOURDONNAIS
+    image: 23_jourdonnais
+  - name: KIT_CARLSON
+    image: 23_kit_carlson
+  - name: LUCKY_DUKE
+    image: 23_lucky_duke
+  - name: PAUL_REGRET
+    image: 23_paul_regret
+  - name: PEDRO_RAMIREZ
+    image: 23_pedro_ramirez
+  - name: ROSE_DOOLAN
+    image: 23_rose_doolan
+  - name: SID_KETCHUM
+    image: 23_sid_ketchum
+  - name: SLAB_THE_KILLER
+    image: 23_slab_the_killer
+  - name: SUZY_LAFAYETTE
+    image: 23_suzy_lafayette
+  - name: VULTURE_SAM
+    image: 23_vulture_sam
+  - name: WILLY_THE_KID
+    image: 23_willy_the_kid
+
+feats:
+  - name: FIFTY_GUNS
+    image: 23_cinquanta_pistole
+  - name: WOUNDED_PRIDE
+    image: 23_ferito_nell_orgoglio
+  - name: OLD_WEST_GANG
+    image: 23_gang_del_vecchio_west
+  - name: BOTTLENECK
+    image: 23_il_collo_di_bottiglia
+  - name: THE_CHUCK_A_LUCK
+    image: 23_il_mulino_d_oro
+  - name: '3_15_TO_YOOMA'
+    image: 23_il_treno_per_yooma
+  - name: IN_GOOD_COMPANY
+    image: 23_in_buona_compagnia
+  - name: THE_LAST_HERO
+    image: 23_l_ultimo_eroe
+  - name: THE_MAN_WITH_NO_NAME
+    image: 23_l_uomo_senza_nome
+  - name: WILHELM_SCREAM
+    image: 23_l_urlo_di_wilhelm
+  - name: SCRUGS_BALLAD
+    image: 23_la_ballata_di_scrugs
+  - name: BORDERLANDS
+    image: 23_la_frontiera
+  - name: THE_OREGON_TRAIN
+    image: 23_la_pista_dell_oregon
+  - name: A_THOUSAND_WAYS_TO_DIE
+    image: 23_mille_modi_per_morire
+  - name: FOR_A_FEW_CARDS_MORE
+    image: 23_per_qualche_carta_in_piu
+  - name: A_QUICK_DEATH
+    image: 23_una_morte_veloce
