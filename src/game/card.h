@@ -33,6 +33,7 @@ namespace banggame {
         
         bool inactive = false;
         int8_t num_cubes = 0;
+        int8_t num_fame = 0;
 
         bool is_equip_card() const;
         bool is_bang_card(const_player_ptr origin) const;
@@ -49,6 +50,9 @@ namespace banggame {
         void add_cubes(int ncubes);
         void move_cubes(card_ptr target, int ncubes, bool instant = false);
         void drop_cubes();
+
+        void add_fame(int fame);
+        void move_fame(card_ptr target, int fame, bool instant = false);
     };
     
     struct card_pocket_pair {

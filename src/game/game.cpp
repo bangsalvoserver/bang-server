@@ -61,6 +61,9 @@ namespace banggame {
                 if (c->num_cubes > 0) {
                     co_yield make_update<"add_cubes">(c->num_cubes, c);
                 }
+                if (c->num_fame > 0) {
+                    co_yield make_update<"add_fame">(c->num_fame, c);
+                }
                 if (c->inactive) {
                     co_yield make_update<"tap_card">(c, true, 0ms);
                 }

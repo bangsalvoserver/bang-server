@@ -145,6 +145,24 @@ namespace banggame {
         }
     }
 
+    void card::add_fame(int fame) {
+        if (fame > 0) {
+            num_fame += fame;
+            m_game->add_update<"add_fame">(fame, this);
+        }
+    }
+
+    void card::move_fame(card_ptr target, int fame, bool instant) {
+        fame = std::min<int>(num_fame, fame);
+        if (fame > 0) {
+            num_fame -= fame;
+            if (target) {
+                target->num_fame += fame;
+            }
+            m_game->add_update<"move_fame">(fame, this, target, instant ? 0ms : durations.move_fame);
+        }
+    }
+
     void card::drop_cubes() {
         if (num_cubes > 0) {
             m_game->add_log("LOG_DROP_CUBE", owner, this, num_cubes);

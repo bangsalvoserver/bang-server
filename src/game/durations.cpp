@@ -16,7 +16,8 @@ namespace banggame {
         .short_pause =     333ms,
         .move_player =     1000ms,
         .player_hp =       333ms,
-        .move_train =      500ms
+        .move_train =      500ms,
+        .move_fame =       250ms
     };
 
 }
