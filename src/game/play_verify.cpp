@@ -51,6 +51,7 @@ namespace banggame {
         case pocket_type::hidden_deck:
         case pocket_type::stations:
         case pocket_type::train:
+        case pocket_type::feats:
             break;
         case pocket_type::scenario_card:
             if (origin_card != origin->m_game->m_scenario_cards.back()) {
