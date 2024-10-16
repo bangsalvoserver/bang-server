@@ -89,6 +89,10 @@ namespace banggame {
         co_yield std::ranges::elements_of(add_cards(pocket_type::scenario_card));
         co_yield std::ranges::elements_of(add_cards(pocket_type::wws_scenario_deck));
         co_yield std::ranges::elements_of(add_cards(pocket_type::wws_scenario_card));
+
+        co_yield std::ranges::elements_of(add_cards(pocket_type::feats_deck));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::feats_discard));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::feats));
         
         if (num_cubes > 0) {
             co_yield make_update<"add_cubes">(num_cubes);

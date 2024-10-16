@@ -216,6 +216,9 @@ namespace banggame {
         stations,
         train_deck,
         train,
+        feats_deck,
+        feats_discard,
+        feats
     };
 
     class selected_cubes_count {

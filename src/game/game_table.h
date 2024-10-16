@@ -42,6 +42,10 @@ namespace banggame {
         card_list m_stations;
         card_list m_train_deck;
         card_list m_train;
+
+        card_list m_feats_deck;
+        card_list m_feats_discard;
+        card_list m_feats;
         
         int8_t num_cubes = 0;
         int8_t train_position = 0;

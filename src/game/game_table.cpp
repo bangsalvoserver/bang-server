@@ -66,6 +66,9 @@ namespace banggame {
         case pocket_type::stations:          return m_stations;
         case pocket_type::train:             return m_train;
         case pocket_type::train_deck:        return m_train_deck;
+        case pocket_type::feats_deck:        return m_feats_deck;
+        case pocket_type::feats_discard:     return m_feats_discard;
+        case pocket_type::feats:             return m_feats;
         default: throw game_error("Invalid pocket");
         }
     }
