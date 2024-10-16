@@ -72,7 +72,7 @@ namespace banggame {
         try {
             game_lobby &lobby = *session->lobby;
             lobby.options.set_option(key, value);
-            broadcast_message_lobby<"lobby_edited">(lobby, lobby.options);
+            broadcast_message_lobby<"lobby_game_options">(lobby, lobby.options);
         } catch (const std::exception &e) {
             throw lobby_error(e.what());
         }
@@ -81,7 +81,7 @@ namespace banggame {
     void game_manager::command_reset_game_options(session_ptr session) {
         game_lobby &lobby = *session->lobby;
         lobby.options = game_options::default_game_options;
-        broadcast_message_lobby<"lobby_edited">(lobby, lobby.options);
+        broadcast_message_lobby<"lobby_game_options">(lobby, lobby.options);
     }
 
     void game_manager::command_give_card(session_ptr session, std::string_view card_name) {

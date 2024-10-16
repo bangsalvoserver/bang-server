@@ -74,7 +74,7 @@ private:
     void handle_message(utils::tag<"user_set_name">,  session_ptr session, const std::string &username);
     void handle_message(utils::tag<"user_set_propic">, session_ptr session, const image_pixels &propic);
     void handle_message(utils::tag<"lobby_make">,     session_ptr session, const lobby_make_args &value);
-    void handle_message(utils::tag<"lobby_edit">,     session_ptr session, const game_options &options);
+    void handle_message(utils::tag<"lobby_game_options">, session_ptr session, const game_options &options);
     void handle_message(utils::tag<"lobby_join">,     session_ptr session, const lobby_join_args &value);
     void handle_message(utils::tag<"lobby_leave">,    session_ptr session);
     void handle_message(utils::tag<"lobby_chat">,     session_ptr session, const lobby_chat_client_args &value);
