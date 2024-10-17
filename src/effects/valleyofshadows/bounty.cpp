@@ -3,15 +3,15 @@
 #include "cards/game_enums.h"
 
 #include "game/game.h"
+#include "game/prompts.h"
 
 #include "effects/base/damage.h"
-#include "effects/base/prompts.h"
 
 namespace banggame {
 
     game_string equip_bounty::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(bot_check_target_enemy(origin, target));
-        MAYBE_RETURN(prompt_target_self(origin_card, origin, target));
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
         return {};
     }
     

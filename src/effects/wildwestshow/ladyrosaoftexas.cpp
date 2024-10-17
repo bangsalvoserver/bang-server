@@ -3,8 +3,7 @@
 #include "cards/game_enums.h"
 
 #include "game/game.h"
-
-#include "effects/base/prompts.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
@@ -25,7 +24,7 @@ namespace banggame {
     }
 
     game_string effect_ladyrosaoftexas::on_prompt(card_ptr origin_card, player_ptr origin) {
-        MAYBE_RETURN(bot_check_target_enemy(origin, get_swapping_player(origin)));
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, get_swapping_player(origin)));
         return {};
     }
 

@@ -3,7 +3,7 @@
 
 #include "cards/card_effect.h"
 
-namespace banggame {
+namespace banggame::prompts {
     
     game_string prompt_target_self(card_ptr origin_card, player_ptr origin, player_ptr target);
 

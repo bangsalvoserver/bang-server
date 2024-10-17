@@ -1,10 +1,10 @@
 #include "train_robbery.h"
 
 #include "game/game.h"
+#include "game/prompts.h"
 
 #include "effects/base/bang.h"
 #include "effects/base/missed.h"
-#include "effects/base/prompts.h"
 
 #include "cards/game_enums.h"
 #include "cards/filter_enums.h"
@@ -41,7 +41,7 @@ namespace banggame {
     };
 
     game_string effect_train_robbery::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         if (rn::all_of(target->m_table, &card::is_black)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {

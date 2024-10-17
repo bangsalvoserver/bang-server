@@ -1,11 +1,11 @@
 #include "prompts.h"
 
-#include "game/game.h"
-#include "game/bot_suggestion.h"
+#include "game.h"
+#include "bot_suggestion.h"
 
 #include "cards/filter_enums.h"
 
-namespace banggame {
+namespace banggame::prompts {
 
     game_string prompt_target_self(card_ptr origin_card, player_ptr origin, player_ptr target) {
         if (origin == target) {

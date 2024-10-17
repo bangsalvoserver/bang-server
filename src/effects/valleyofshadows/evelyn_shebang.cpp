@@ -1,9 +1,9 @@
 #include "evelyn_shebang.h"
 
 #include "game/game.h"
+#include "game/prompts.h"
 
 #include "effects/base/bang.h"
-#include "effects/base/prompts.h"
 
 namespace banggame {
 
@@ -14,8 +14,8 @@ namespace banggame {
     }
 
     game_string effect_evelyn_shebang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(bot_check_target_enemy(origin, target));
-        MAYBE_RETURN(prompt_target_ghost(origin_card, origin, target));
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         return {};
     }
 

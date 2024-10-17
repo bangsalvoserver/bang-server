@@ -1,16 +1,16 @@
 #include "discard_black.h"
 
 #include "game/game.h"
+#include "game/prompts.h"
 
 #include "effects/base/steal_destroy.h"
-#include "effects/base/prompts.h"
 
 #include "cards/filter_enums.h"
 
 namespace banggame {
 
     game_string effect_discard_black::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        MAYBE_RETURN(bot_check_target_enemy_card(origin, target_card));
+        MAYBE_RETURN(prompts::bot_check_target_enemy_card(origin, target_card));
         return {};
     }
 

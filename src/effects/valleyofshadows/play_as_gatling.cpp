@@ -1,12 +1,12 @@
 #include "play_as_gatling.h"
 
 #include "effects/base/bang.h"
-#include "effects/base/prompts.h"
 
 #include "cards/game_enums.h"
 
 #include "game/game.h"
 #include "game/play_verify.h"
+#include "game/prompts.h"
 
 #include "utils/range_utils.h"
 

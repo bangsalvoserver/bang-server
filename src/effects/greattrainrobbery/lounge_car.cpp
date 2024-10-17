@@ -1,9 +1,8 @@
 #include "lounge_car.h"
 
-#include "effects/base/prompts.h"
-
 #include "game/game.h"
 #include "game/filters.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
@@ -77,7 +76,7 @@ namespace banggame {
     }
 
     game_string handler_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
-        MAYBE_RETURN(bot_check_target_friend(origin, target_player));
+        MAYBE_RETURN(prompts::bot_check_target_friend(origin, target_player));
         return {};
     }
 

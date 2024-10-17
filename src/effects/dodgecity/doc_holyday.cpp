@@ -2,15 +2,14 @@
 
 #include "effects/base/bang.h"
 #include "effects/base/steal_destroy.h"
-#include "effects/base/prompts.h"
-
 
 #include "game/game.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
     game_string handler_doc_holyday::on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
-        MAYBE_RETURN(bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         return {};
     }
 
