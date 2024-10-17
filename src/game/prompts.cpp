@@ -36,7 +36,7 @@ namespace banggame::prompts {
         return {};
     }
 
-    game_string bot_check_target_enemy_card(player_ptr origin, card_ptr target) {
+    game_string bot_check_target_card(player_ptr origin, card_ptr target) {
         if (target->pocket == pocket_type::player_table && !target->self_equippable() && !target->has_tag(tag_type::ghost_card)) {
             return bot_check_target_friend(origin, target->owner);
         } else {
