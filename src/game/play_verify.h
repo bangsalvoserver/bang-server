@@ -20,6 +20,8 @@ namespace banggame {
 
     game_message verify_and_play(player_ptr origin, const game_action &action);
 
+    prompt_string merge_prompts(std::span<const prompt_string> promts);
+
 }
 
 #endif

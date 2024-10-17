@@ -21,14 +21,10 @@ namespace banggame {
     }
 
     prompt_string handler_play_as_gatling::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {
-        auto targets = get_player_targets_range(origin, ctx);
-
-        prompt_string msg;
-        for (player_ptr target : targets) {
-            msg = effect_bang{}.on_prompt(chosen_card, origin, target);
-            if (!msg) break;
-        }
-        return msg;
+        return merge_prompts(get_player_targets_range(origin, ctx)
+            | rv::transform([&](player_ptr target) -> prompt_string { return effect_bang{}.on_prompt(chosen_card, origin, target); })
+            | rn::to_vector
+        );
     }
 
     void handler_play_as_gatling::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {

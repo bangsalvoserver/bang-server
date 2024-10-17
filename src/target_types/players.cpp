@@ -29,12 +29,10 @@ namespace banggame {
         if (targets.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
-        prompt_string msg;
-        for (player_ptr target : targets) {
-            msg = effect.on_prompt(origin_card, origin, target, ctx);
-            if (!msg) break;
-        }
-        return msg;
+        return merge_prompts(targets
+            | rv::transform([&](player_ptr target) { return effect.on_prompt(origin_card, origin, target, ctx); })
+            | rn::to_vector
+        );
     }
 
     template<> void visit_players::add_context(effect_context &ctx) {
