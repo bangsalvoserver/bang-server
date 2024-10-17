@@ -2,6 +2,8 @@
 
 #include "game/game.h"
 
+#include "effects/base/prompts.h"
+
 namespace banggame {
 
     game_string effect_frankie_canton::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
@@ -11,6 +13,12 @@ namespace banggame {
         if (target_card->num_cubes == 0) {
             return {"ERROR_NOT_ENOUGH_CUBES_ON", target_card};
         }
+        return {};
+    }
+
+    game_string effect_frankie_canton::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        MAYBE_RETURN(bot_check_target_enemy(origin, target_card->owner));
+        MAYBE_RETURN(prompt_target_self(origin_card, origin, target_card->owner));
         return {};
     }
 

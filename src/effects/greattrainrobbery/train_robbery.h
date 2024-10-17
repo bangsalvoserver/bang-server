@@ -3,11 +3,9 @@
 
 #include "cards/card_effect.h"
 
-#include "game/bot_suggestion.h"
-
 namespace banggame {
 
-    struct effect_train_robbery : bot_suggestion::target_enemy {
+    struct effect_train_robbery {
         game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
     };

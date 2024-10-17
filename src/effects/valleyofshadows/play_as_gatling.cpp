@@ -1,6 +1,7 @@
 #include "play_as_gatling.h"
 
 #include "effects/base/bang.h"
+#include "effects/base/prompts.h"
 
 #include "cards/game_enums.h"
 
@@ -24,11 +25,7 @@ namespace banggame {
 
         game_string msg;
         for (player_ptr target : targets) {
-            if (origin->is_bot() && !bot_suggestion::target_enemy{}.on_check_target(chosen_card, origin, target)) {
-                msg = "BOT_BAD_PLAY";
-            } else {
-                msg = effect_bang{}.on_prompt(chosen_card, origin, target);
-            }
+            msg = effect_bang{}.on_prompt(chosen_card, origin, target);
             if (!msg) break;
         }
         return msg;

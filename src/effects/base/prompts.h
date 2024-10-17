@@ -5,14 +5,15 @@
 
 namespace banggame {
     
-    struct prompt_target_self {
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
-    };
+    game_string prompt_target_self(card_ptr origin_card, player_ptr origin, player_ptr target);
 
-    struct prompt_target_ghost {
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
-    };
+    game_string prompt_target_ghost(card_ptr origin_card, player_ptr origin, player_ptr target);
+
+    game_string bot_check_target_enemy(player_ptr origin, player_ptr target);
+    
+    game_string bot_check_target_friend(player_ptr origin, player_ptr target);
+
+    game_string bot_check_target_enemy_card(player_ptr origin, card_ptr target);
 }
 
 #endif

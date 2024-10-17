@@ -1,7 +1,9 @@
 #include "evelyn_shebang.h"
 
 #include "game/game.h"
+
 #include "effects/base/bang.h"
+#include "effects/base/prompts.h"
 
 namespace banggame {
 
@@ -9,6 +11,12 @@ namespace banggame {
         game_string out_error;
         origin->m_game->call_event(event_type::check_bang_target{ origin_card, origin, target, effect_flags{}, out_error });
         return out_error;
+    }
+
+    game_string effect_evelyn_shebang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        MAYBE_RETURN(bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompt_target_ghost(origin_card, origin, target));
+        return {};
     }
 
     void effect_evelyn_shebang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {

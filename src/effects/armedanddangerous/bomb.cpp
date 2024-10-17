@@ -7,6 +7,7 @@
 #include "ruleset.h"
 
 #include "effects/base/predraw_check.h"
+#include "effects/base/prompts.h"
 
 namespace banggame {
     
@@ -46,6 +47,12 @@ namespace banggame {
             }
         }
     };
+
+    game_string equip_bomb::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        MAYBE_RETURN(bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompt_target_self(origin_card, origin, target));
+        return {};
+    }
 
     void equip_bomb::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_discard_orange_card>(target_card, [=](player_ptr e_target, card_ptr e_card) {

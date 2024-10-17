@@ -25,7 +25,7 @@ namespace banggame {
 
         game_string pick_prompt(card_ptr target_card) const override {
             if (target->is_bot()
-                && (bot_suggestion::target_enemy{}.on_check_target(origin_card, target, saved)
+                && (bot_suggestion::is_target_enemy(target, saved)
                 != (target_card->pocket == pocket_type::player_hand)))
             {
                 return "BOT_BAD_PICK";

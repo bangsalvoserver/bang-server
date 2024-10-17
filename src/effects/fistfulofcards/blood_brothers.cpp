@@ -3,6 +3,7 @@
 #include "game/game.h"
 
 #include "effects/base/can_play_card.h"
+#include "effects/base/prompts.h"
 
 namespace banggame {
 
@@ -19,6 +20,12 @@ namespace banggame {
         if (target->m_hp == target->m_max_hp) {
             return {"ERROR_PLAYER_IS_FULL_HP", target};
         }
+        return {};
+    }
+
+    game_string effect_blood_brothers::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        MAYBE_RETURN(bot_check_target_friend(origin, target));
+        MAYBE_RETURN(prompt_target_ghost(origin_card, origin, target));
         return {};
     }
 

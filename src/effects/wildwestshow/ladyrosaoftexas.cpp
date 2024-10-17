@@ -3,7 +3,8 @@
 #include "cards/game_enums.h"
 
 #include "game/game.h"
-#include "game/bot_suggestion.h"
+
+#include "effects/base/prompts.h"
 
 namespace banggame {
 
@@ -15,16 +16,17 @@ namespace banggame {
         }
     }
 
-    bool effect_ladyrosaoftexas::on_check_target(card_ptr origin_card, player_ptr origin) {
-        return bot_suggestion::target_enemy{}.on_check_target(origin_card, origin, get_swapping_player(origin));
-    }
-
     game_string effect_ladyrosaoftexas::get_error(card_ptr origin_card, player_ptr origin) {
         if (origin->m_game->num_alive() <= 2) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         } else {
             return {};
         }
+    }
+
+    game_string effect_ladyrosaoftexas::on_prompt(card_ptr origin_card, player_ptr origin) {
+        MAYBE_RETURN(bot_check_target_enemy(origin, get_swapping_player(origin)));
+        return {};
     }
 
     void effect_ladyrosaoftexas::on_play(card_ptr origin_card, player_ptr origin) {

@@ -1,11 +1,12 @@
 #include "switch_cards.h"
 
 #include "effects/base/steal_destroy.h"
-
-#include "cards/game_enums.h"
-#include "game/filters.h"
+#include "effects/base/prompts.h"
 
 #include "game/game.h"
+#include "game/filters.h"
+
+#include "cards/game_enums.h"
 
 namespace banggame {
 
@@ -67,6 +68,11 @@ namespace banggame {
         if (auto *c = target->find_equipped_card(chosen_card)) {
             return {"ERROR_DUPLICATED_CARD", c};
         }
+        return {};
+    }
+
+    game_string handler_switch_cards::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
+        MAYBE_RETURN(bot_check_target_enemy_card(origin, target_card));
         return {};
     }
 

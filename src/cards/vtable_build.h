@@ -42,11 +42,6 @@ namespace banggame {
 
             .on_prompt = [](int effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> game_string {
                 T value = build_effect<T>(effect_value);
-                if constexpr (requires { value.on_check_target(origin_card, origin); }) {
-                    if (origin->is_bot() && !value.on_check_target(origin_card, origin)) {
-                        return "BOT_BAD_PLAY";
-                    }
-                }
                 if constexpr (requires { value.on_prompt(origin_card, origin, ctx); }) {
                     return value.on_prompt(origin_card, origin, ctx);
                 } else if constexpr (requires { value.on_prompt(origin_card, origin); }) {
@@ -87,11 +82,6 @@ namespace banggame {
             
             .on_prompt_player = [](int effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> game_string {
                 T value = build_effect<T>(effect_value);
-                if constexpr (requires { value.on_check_target(origin_card, origin, target); }) {
-                    if (origin->is_bot() && !value.on_check_target(origin_card, origin, target)) {
-                        return "BOT_BAD_PLAY";
-                    }
-                }
                 if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
                     return value.on_prompt(origin_card, origin, target, ctx);
                 } else if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
@@ -132,11 +122,6 @@ namespace banggame {
 
             .on_prompt_card = [](int effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) -> game_string {
                 T value = build_effect<T>(effect_value);
-                if constexpr (requires { value.on_check_target(origin_card, origin, target); }) {
-                    if (origin->is_bot() && !value.on_check_target(origin_card, origin, target)) {
-                        return "BOT_BAD_PLAY";
-                    }
-                }
                 if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
                     return value.on_prompt(origin_card, origin, target, ctx);
                 } else if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
@@ -180,11 +165,6 @@ namespace banggame {
 
             .on_prompt = [](int effect_value, card_ptr origin_card, player_ptr origin, player_ptr target) -> game_string {
                 auto value = build_effect<T>(effect_value);
-                if constexpr (requires { value.on_check_target(origin_card, origin, target); }) {
-                    if (origin->is_bot() && !value.on_check_target(origin_card, origin, target)) {
-                        return "BOT_BAD_PLAY";
-                    }
-                }
                 if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                     return value.on_prompt(origin_card, origin, target);
                 }
@@ -354,11 +334,6 @@ namespace banggame {
             },
 
             .on_prompt = [](card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> game_string {
-                if constexpr (requires { mth_unwrapper{&T::on_check_target}; }) {
-                    if (origin->is_bot() && !mth_unwrapper{&T::on_check_target}(origin_card, origin, targets, args, ctx)) {
-                        return "BOT_BAD_PLAY";
-                    }
-                }
                 if constexpr (requires { mth_unwrapper{&T::on_prompt}; }) {
                     return mth_unwrapper{&T::on_prompt}(origin_card, origin, targets, args, ctx);
                 }

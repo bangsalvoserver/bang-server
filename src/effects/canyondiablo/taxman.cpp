@@ -2,12 +2,19 @@
 
 #include "effects/base/draw.h"
 #include "effects/base/predraw_check.h"
+#include "effects/base/prompts.h"
 
 #include "cards/game_enums.h"
 
 #include "game/game.h"
 
 namespace banggame {
+
+    game_string equip_taxman::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        MAYBE_RETURN(bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompt_target_self(origin_card, origin, target));
+        return {};
+    }
 
     void equip_taxman::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::get_predraw_checks>({target_card, 10},

@@ -1,6 +1,7 @@
 #include "squaw.h"
 
 #include "effects/base/steal_destroy.h"
+#include "effects/base/prompts.h"
 
 #include "cards/game_enums.h"
 
@@ -17,6 +18,7 @@ namespace banggame {
     }
 
     game_string effect_squaw::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) {
+        MAYBE_RETURN(bot_check_target_enemy_card(origin, target_card));
         if (target_card->owner == origin) {
             return {"PROMPT_TARGET_SELF", origin_card};
         } else {
