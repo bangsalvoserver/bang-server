@@ -222,14 +222,14 @@ namespace banggame {
         return {};
     }
 
-    game_string get_equip_prompt(player_ptr origin, card_ptr origin_card, player_ptr target) {
+    prompt_string get_equip_prompt(player_ptr origin, card_ptr origin_card, player_ptr target) {
         for (const equip_holder &holder : origin_card->equips) {
             MAYBE_RETURN(holder.on_prompt(origin_card, origin, target));
         }
         return {};
     }
 
-    static game_string get_play_prompt(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+    static prompt_string get_play_prompt(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
             MAYBE_RETURN(play_dispatch::prompt(origin, origin_card, effect, ctx, target));
         }
@@ -240,7 +240,7 @@ namespace banggame {
         return {};
     }
 
-    static game_string get_prompt_message(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
+    static prompt_string get_prompt_message(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         for (const auto &[mod_card, mod_targets] : modifiers) {
             MAYBE_RETURN(get_play_prompt(origin, mod_card, is_response, mod_targets, ctx));
         }
@@ -392,16 +392,16 @@ namespace banggame {
         ctx.playing_card = args.card;
 
         if (game_string error = verify_timer_response(origin, args.timer_id)) {
-            return {message_type::error, error};
+            return {utils::tag<"error">{}, error};
         }
 
         if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-            return {message_type::error, error};
+            return {utils::tag<"error">{}, error};
         }
 
         if (!args.bypass_prompt) {
-            if (game_string prompt = get_prompt_message(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-                return {message_type::prompt, prompt};
+            if (prompt_string prompt = get_prompt_message(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
+                return {utils::tag<"prompt">{}, prompt};
             }
         }
 

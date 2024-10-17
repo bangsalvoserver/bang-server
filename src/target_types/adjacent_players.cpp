@@ -45,8 +45,8 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_players::prompt(const effect_context &ctx, const player_list &targets) {
-        game_string msg;
+    template<> prompt_string visit_players::prompt(const effect_context &ctx, const player_list &targets) {
+        prompt_string msg;
         for (player_ptr target : targets) {
             msg = defer<"player">().prompt(ctx, target);
             if (!msg) break;

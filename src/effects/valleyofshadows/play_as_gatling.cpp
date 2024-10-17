@@ -20,10 +20,10 @@ namespace banggame {
         return origin->m_game->range_other_players(origin) | rv::remove(ctx.skipped_player.get());
     }
 
-    game_string handler_play_as_gatling::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {
+    prompt_string handler_play_as_gatling::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {
         auto targets = get_player_targets_range(origin, ctx);
 
-        game_string msg;
+        prompt_string msg;
         for (player_ptr target : targets) {
             msg = effect_bang{}.on_prompt(chosen_card, origin, target);
             if (!msg) break;

@@ -31,7 +31,7 @@ namespace banggame {
             }
         }
 
-        game_string pick_prompt(player_ptr target_player) const override {
+        prompt_string pick_prompt(player_ptr target_player) const override {
             if (target == target_player) {
                 return {"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
             } else {

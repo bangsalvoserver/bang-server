@@ -24,12 +24,12 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_players::prompt(const effect_context &ctx) {
+    template<> prompt_string visit_players::prompt(const effect_context &ctx) {
         auto targets = get_player_targets_range(origin_card, origin, effect.player_filter, ctx);
         if (targets.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
-        game_string msg;
+        prompt_string msg;
         for (player_ptr target : targets) {
             msg = effect.on_prompt(origin_card, origin, target, ctx);
             if (!msg) break;

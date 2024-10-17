@@ -12,7 +12,7 @@ namespace banggame {
         }
     }
 
-    game_string request_check_base::pick_prompt(card_ptr target_card) const {
+    prompt_string request_check_base::pick_prompt(card_ptr target_card) const {
         if (target->is_bot() && !is_lucky(target_card)) {
             return "PROMPT_BAD_DRAW";
         } else {
@@ -70,7 +70,7 @@ namespace banggame {
         return check_condition(target_card->get_modified_sign());
     }
 
-    game_string request_check_base::redraw_prompt(card_ptr target_card, player_ptr owner) const {
+    prompt_string request_check_base::redraw_prompt(card_ptr target_card, player_ptr owner) const {
         if (owner->is_bot()) {
             if (bot_suggestion::is_target_friend(owner, target) == is_lucky(drawn_card)) {
                 return "BOT_BAD_PLAY";

@@ -55,7 +55,7 @@ namespace banggame {
             return int(std::unique(suits.begin(), suits.end()) - suits.begin());
         }
 
-        game_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
+        prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
             if (owner->is_bot()) {
                 return "BOT_BAD_PLAY";
             }

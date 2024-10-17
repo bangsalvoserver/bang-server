@@ -43,9 +43,9 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_cubes::prompt(const effect_context &ctx, const cubes_and_players &target) {
+    template<> prompt_string visit_cubes::prompt(const effect_context &ctx, const cubes_and_players &target) {
         MAYBE_RETURN(defer<"select_cubes">().prompt(ctx, target.first));
-        game_string msg;
+        prompt_string msg;
         for (player_ptr target : target.second) {
             msg = defer<"player">().prompt(ctx, target);
             if (!msg) break;

@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    game_string effect_resolve::on_prompt(card_ptr origin_card, player_ptr origin) {
+    prompt_string effect_resolve::on_prompt(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<interface_resolvable>()->resolve_prompt();
     }
 

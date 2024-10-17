@@ -27,7 +27,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string visit_player::prompt(const effect_context &ctx, nullable_player target) {
+    template<> prompt_string visit_player::prompt(const effect_context &ctx, nullable_player target) {
         if (target) {
             return defer<"player">().prompt(ctx, target);
         } else {

@@ -46,11 +46,11 @@ namespace banggame {
         }
     }
 
-    template<> game_string visit_cards::prompt(const effect_context &ctx, const card_list &target_cards) {
+    template<> prompt_string visit_cards::prompt(const effect_context &ctx, const card_list &target_cards) {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
-        game_string msg;
+        prompt_string msg;
         for (card_ptr target_card : target_cards) {
             msg = effect.on_prompt(origin_card, origin, target_card, ctx);
             if (!msg) break;
