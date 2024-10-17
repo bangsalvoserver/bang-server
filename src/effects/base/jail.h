@@ -2,12 +2,11 @@
 #define __BASE_JAIL_H__
 
 #include "cards/card_effect.h"
-#include "game/bot_suggestion.h"
-#include "prompts.h"
 
 namespace banggame {
     
-    struct equip_jail : event_equip, prompt_target_self, bot_suggestion::target_enemy {
+    struct equip_jail : event_equip {
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_enable(card_ptr target_card, player_ptr target);
     };
 

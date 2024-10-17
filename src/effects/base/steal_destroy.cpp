@@ -1,8 +1,9 @@
 #include "steal_destroy.h"
 
 #include "game/game.h"
-
 #include "game/filters.h"
+#include "game/prompts.h"
+
 #include "cards/filter_enums.h"
 
 namespace banggame {
@@ -50,6 +51,7 @@ namespace banggame {
     }
 
     game_string effect_steal::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        MAYBE_RETURN(prompts::bot_check_target_enemy_card(origin, target_card));
         if (origin == target_card->owner) {
             if (target_card->is_train() || target_card->pocket == pocket_type::player_hand) {
                 return {"PROMPT_CARD_NO_EFFECT", origin_card};
@@ -151,6 +153,12 @@ namespace banggame {
             origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_player, target_card);
         }
         target_player->discard_card(target_card, used);
+    }
+
+    game_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        MAYBE_RETURN(prompts::bot_check_target_enemy_card(origin, target_card));
+        MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target_card->owner));
+        return {};
     }
 
     void effect_destroy::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {

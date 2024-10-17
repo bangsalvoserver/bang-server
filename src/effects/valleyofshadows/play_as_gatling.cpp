@@ -6,6 +6,7 @@
 
 #include "game/game.h"
 #include "game/play_verify.h"
+#include "game/prompts.h"
 
 #include "utils/range_utils.h"
 
@@ -24,11 +25,7 @@ namespace banggame {
 
         game_string msg;
         for (player_ptr target : targets) {
-            if (origin->is_bot() && !bot_suggestion::target_enemy{}.on_check_target(chosen_card, origin, target)) {
-                msg = "BOT_BAD_PLAY";
-            } else {
-                msg = effect_bang{}.on_prompt(chosen_card, origin, target);
-            }
+            msg = effect_bang{}.on_prompt(chosen_card, origin, target);
             if (!msg) break;
         }
         return msg;

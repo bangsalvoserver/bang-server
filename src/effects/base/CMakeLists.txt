@@ -25,7 +25,6 @@ target_sources(bangserver PRIVATE
     pass_turn.cpp
     pick.cpp
     predraw_check.cpp
-    prompts.cpp
     requests.cpp
     resolve.cpp
     scope.cpp

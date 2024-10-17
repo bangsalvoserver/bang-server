@@ -1,8 +1,14 @@
 #include "flint_westwood.h"
 
 #include "game/game.h"
+#include "game/prompts.h"
 
 namespace banggame {
+
+    game_string handler_flint_westwood::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target_card->owner));
+        return {};
+    }
 
     void handler_flint_westwood::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
         auto target = target_card->owner;

@@ -70,8 +70,13 @@ namespace banggame {
         return check_condition(target_card->get_modified_sign());
     }
 
-    bool request_check_base::bot_check_redraw(card_ptr target_card, player_ptr owner) const {
-        return bot_suggestion::target_friend{}.on_check_target(target_card, owner, target) != is_lucky(drawn_card);
+    game_string request_check_base::redraw_prompt(card_ptr target_card, player_ptr owner) const {
+        if (owner->is_bot()) {
+            if (bot_suggestion::is_target_friend(owner, target) == is_lucky(drawn_card)) {
+                return "BOT_BAD_PLAY";
+            }
+        }
+        return {};
     }
 
     void request_check_base::resolve() {

@@ -1,8 +1,8 @@
 #include "lounge_car.h"
 
 #include "game/game.h"
-
 #include "game/filters.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
@@ -72,6 +72,11 @@ namespace banggame {
             MAYBE_RETURN(check_player_filter(selection_card, origin, selection_card->equip_target,
                 selection_card == target_card ? target_player : origin));
         }
+        return {};
+    }
+
+    game_string handler_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+        MAYBE_RETURN(prompts::bot_check_target_friend(origin, target_player));
         return {};
     }
 
