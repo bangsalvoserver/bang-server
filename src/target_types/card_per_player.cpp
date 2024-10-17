@@ -46,16 +46,14 @@ namespace banggame {
         }
     }
 
-    template<> game_string visit_cards::prompt(const effect_context &ctx, const card_list &target_cards) {
+    template<> prompt_string visit_cards::prompt(const effect_context &ctx, const card_list &target_cards) {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
-        game_string msg;
-        for (card_ptr target_card : target_cards) {
-            msg = effect.on_prompt(origin_card, origin, target_card, ctx);
-            if (!msg) break;
-        }
-        return msg;
+        return merge_prompts(target_cards
+            | rv::transform([&](card_ptr target_card) { return effect.on_prompt(origin_card, origin, target_card, ctx); })
+            | rn::to_vector
+        );
     }
 
     template<> void visit_cards::add_context(effect_context &ctx, const card_list &target_cards) {

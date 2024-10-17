@@ -19,7 +19,7 @@ namespace banggame::play_dispatch {
         }, target);
     }
 
-    game_string prompt(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
+    prompt_string prompt(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
         return utils::visit_tagged([&](target_type_tag auto tag, auto && ... args) {
             return play_visitor<tag.name>{origin, origin_card, effect}.prompt(ctx, FWD(args) ... );
         }, target);

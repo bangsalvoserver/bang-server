@@ -3,12 +3,11 @@
 
 #include "cards/card_effect.h"
 
-#include "game/bot_suggestion.h"
-
 namespace banggame {
 
-    struct effect_evan_babbit : bot_suggestion::target_enemy {
+    struct effect_evan_babbit {
         bool can_play(card_ptr origin_card, player_ptr origin);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target_player);
     };
 

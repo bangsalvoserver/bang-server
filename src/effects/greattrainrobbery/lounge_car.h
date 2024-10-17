@@ -3,8 +3,6 @@
 
 #include "cards/card_effect.h"
 
-#include "game/bot_suggestion.h"
-
 namespace banggame {
 
     struct effect_lounge_car {
@@ -21,10 +19,8 @@ namespace banggame {
     DEFINE_EFFECT(lounge_car_response, effect_lounge_car_response)
 
     struct handler_lounge_car {
-        bool on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target) {
-            return bot_suggestion::target_friend{}.on_check_target(origin_card, origin, target);
-        }
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);
     };
 

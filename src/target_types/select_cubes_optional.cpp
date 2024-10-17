@@ -28,7 +28,7 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_cubes::prompt(const effect_context &ctx, const card_list &target_cards) {
+    template<> prompt_string visit_cubes::prompt(const effect_context &ctx, const card_list &target_cards) {
         return defer<"select_cubes">().prompt(ctx, target_cards);
     }
 

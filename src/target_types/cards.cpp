@@ -26,7 +26,7 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_cards::prompt(const effect_context &ctx, const card_list &targets) {
+    template<> prompt_string visit_cards::prompt(const effect_context &ctx, const card_list &targets) {
         for (card_ptr c : targets) {
             MAYBE_RETURN(defer<"card">().prompt(ctx, c));
         }

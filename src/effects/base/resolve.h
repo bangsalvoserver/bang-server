@@ -8,7 +8,7 @@ namespace banggame {
         int resolve_type;
         effect_resolve(int resolve_type): resolve_type{resolve_type} {}
 
-        game_string on_prompt(card_ptr origin_card, player_ptr origin);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin);
         bool can_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin);
     };
@@ -18,7 +18,7 @@ namespace banggame {
     struct interface_resolvable {
         virtual void on_resolve() = 0;
         virtual int resolve_type() const { return 0; }
-        virtual game_string resolve_prompt() const { return {}; }
+        virtual prompt_string resolve_prompt() const { return {}; }
     };
 
     class request_resolvable: public request_base, public interface_resolvable {

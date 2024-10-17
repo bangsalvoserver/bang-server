@@ -12,7 +12,7 @@ namespace banggame {
     DEFINE_EQUIP(tumbleweed, equip_tumbleweed)
 
     struct effect_tumbleweed {
-        bool on_check_target(card_ptr origin_card, player_ptr origin);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin);
         bool can_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin);
     };

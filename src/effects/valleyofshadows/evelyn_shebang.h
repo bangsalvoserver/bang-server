@@ -2,12 +2,12 @@
 #define __VALLEYOFSHADOWS_EVELYN_SHEBANG_H__
 
 #include "cards/card_effect.h"
-#include "game/bot_suggestion.h"
 
 namespace banggame {
     
-    struct effect_evelyn_shebang : bot_suggestion::target_enemy {
+    struct effect_evelyn_shebang {
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 

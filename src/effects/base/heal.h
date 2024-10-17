@@ -2,11 +2,10 @@
 #define __EFFECT_HEAL_H__
 
 #include "cards/card_effect.h"
-#include "game/bot_suggestion.h"
 
 namespace banggame {
 
-    struct effect_heal : bot_suggestion::target_friend {
+    struct effect_heal {
         int amount;
         effect_heal(int value) : amount(std::max(1, value)) {}
 

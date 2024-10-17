@@ -25,7 +25,7 @@ namespace banggame {
             target->discard_card(target_card);
         }
 
-        game_string pick_prompt(card_ptr target_card) const override {
+        prompt_string pick_prompt(card_ptr target_card) const override {
             if (target->is_bot()) {
                 if (target_card->has_tag(tag_type::ghost_card) || target_card->self_equippable()) {
                     return "BOT_BAD_PLAY";

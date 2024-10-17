@@ -2,8 +2,6 @@
 #define __FISTFULOFCARDS_BLOOD_BROTHERS_H__
 
 #include "cards/card_effect.h"
-#include "game/bot_suggestion.h"
-#include "effects/base/prompts.h"
 
 namespace banggame {
 
@@ -13,8 +11,9 @@ namespace banggame {
 
     DEFINE_EQUIP(blood_brothers, equip_blood_brothers)
 
-    struct effect_blood_brothers : bot_suggestion::target_friend, prompt_target_ghost {
+    struct effect_blood_brothers {
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 

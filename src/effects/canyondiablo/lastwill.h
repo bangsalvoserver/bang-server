@@ -2,11 +2,10 @@
 #define __CANYONDIABLO_LASTWILL_H__
 
 #include "cards/card_effect.h"
-#include "game/bot_suggestion.h"
 
 namespace banggame {
 
-    struct equip_lastwill : event_equip, bot_suggestion::target_friend {
+    struct equip_lastwill : event_equip {
         game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_enable(card_ptr origin_card, player_ptr origin);
     };
@@ -20,10 +19,7 @@ namespace banggame {
     DEFINE_EFFECT(lastwill, effect_lastwill)
 
     struct handler_lastwill {
-        bool on_check_target(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
-            return !target || bot_suggestion::target_friend{}.on_check_target(origin_card, origin, target);
-        }
-        
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target);
     };
 

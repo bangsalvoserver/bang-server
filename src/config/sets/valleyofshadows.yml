@@ -60,7 +60,6 @@ main_deck:
     image: 07_bandidos
     color: brown
     effects:
-      - bandidos
       - bandidos players
   - name: ESCAPE
     signs:

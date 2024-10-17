@@ -1,6 +1,8 @@
 #include "ricochet.h"
 
 #include "game/game.h"
+#include "game/prompts.h"
+
 #include "effects/base/bang.h"
 #include "effects/base/steal_destroy.h"
 
@@ -33,6 +35,11 @@ namespace banggame {
             }
         }
     };
+
+    game_string effect_ricochet::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        MAYBE_RETURN(prompts::bot_check_target_enemy_card(origin, target_card));
+        return {};
+    }
 
     void effect_ricochet::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         origin->m_game->queue_request<request_ricochet>(origin_card, origin, target_card->owner, target_card);

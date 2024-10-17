@@ -11,7 +11,7 @@ namespace banggame::play_dispatch {
 
     game_string get_error(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
 
-    game_string prompt(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
+    prompt_string prompt(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
 
     void add_context(player_ptr origin, card_ptr origin_card, const effect_holder &effect, effect_context &ctx, const play_card_target &target);
 
@@ -40,7 +40,7 @@ namespace banggame {
         bool possible(const effect_context &ctx);
         std::monostate random_target(const effect_context &ctx) { return {}; }
         game_string get_error(const effect_context &ctx);
-        game_string prompt(const effect_context &ctx);
+        prompt_string prompt(const effect_context &ctx);
         void add_context(effect_context &ctx);
         void play(const effect_context &ctx);
     };
@@ -62,7 +62,7 @@ namespace banggame {
         bool possible(const effect_context &ctx);
         value_type random_target(const effect_context &ctx);
         game_string get_error(const effect_context &ctx, arg_type arg);
-        game_string prompt(const effect_context &ctx, arg_type arg);
+        prompt_string prompt(const effect_context &ctx, arg_type arg);
         void add_context(effect_context &ctx, arg_type arg);
         void play(const effect_context &ctx, arg_type arg);
     };

@@ -170,6 +170,36 @@ namespace banggame {
             return !format_str.empty();
         }
     };
+
+    enum class prompt_type {
+        normal,
+        priority
+    };
+
+    struct prompt_string {
+        game_string message;
+        prompt_type type = prompt_type::normal;
+
+        prompt_string() = default;
+
+        prompt_string(game_string message)
+            : message{message} {}
+
+        prompt_string(
+                std::convertible_to<small_string> auto &&message,
+                auto && ... args)
+            : message{message, FWD(args) ...} {}
+        
+        prompt_string(prompt_type type,
+                std::convertible_to<small_string> auto &&message,
+                auto && ... args)
+            : message{message, FWD(args) ...}
+            , type{type} {}
+
+        explicit operator bool() const {
+            return bool(message);
+        }
+    };
     
     #define MAYBE_RETURN(...) if (auto value_ = __VA_ARGS__) return value_
 }

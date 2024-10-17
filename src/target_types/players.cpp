@@ -24,17 +24,15 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_players::prompt(const effect_context &ctx) {
+    template<> prompt_string visit_players::prompt(const effect_context &ctx) {
         auto targets = get_player_targets_range(origin_card, origin, effect.player_filter, ctx);
         if (targets.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
-        game_string msg;
-        for (player_ptr target : targets) {
-            msg = effect.on_prompt(origin_card, origin, target, ctx);
-            if (!msg) break;
-        }
-        return msg;
+        return merge_prompts(targets
+            | rv::transform([&](player_ptr target) { return effect.on_prompt(origin_card, origin, target, ctx); })
+            | rn::to_vector
+        );
     }
 
     template<> void visit_players::add_context(effect_context &ctx) {

@@ -2,12 +2,12 @@
 #define __ARMEDANDDANGEROUS_FRANKIE_CANTON_H__
 
 #include "effects/base/steal_destroy.h"
-#include "game/bot_suggestion.h"
 
 namespace banggame {
 
-    struct effect_frankie_canton : prompt_target_self, bot_suggestion::target_enemy {
+    struct effect_frankie_canton {
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 

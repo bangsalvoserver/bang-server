@@ -77,9 +77,9 @@ namespace banggame {
         });
     }
 
-    bool effect_tumbleweed::on_check_target(card_ptr origin_card, player_ptr origin) {
+    prompt_string effect_tumbleweed::on_prompt(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request<request_tumbleweed>();
-        return req->handler->bot_check_redraw(origin_card, origin);
+        return req->handler->redraw_prompt(origin_card, origin);
     }
 
     bool effect_tumbleweed::can_play(card_ptr origin_card, player_ptr origin) {

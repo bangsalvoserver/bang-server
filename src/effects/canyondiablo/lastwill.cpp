@@ -1,6 +1,7 @@
 #include "lastwill.h"
 
 #include "game/game.h"
+#include "game/prompts.h"
 
 #include "effects/base/deathsave.h"
 #include "effects/base/resolve.h"
@@ -37,6 +38,7 @@ namespace banggame {
     };
 
     game_string equip_lastwill::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
         if (target->m_role == player_role::sheriff) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
@@ -54,6 +56,11 @@ namespace banggame {
 
     bool effect_lastwill::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<request_lastwill>(origin) != nullptr;
+    }
+
+    game_string handler_lastwill::on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
+        MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
+        return {};
     }
 
     void handler_lastwill::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {

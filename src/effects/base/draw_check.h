@@ -11,7 +11,7 @@ namespace banggame {
         virtual card_list get_drawn_cards() const = 0;
         virtual card_ptr get_drawing_card() const = 0;
 
-        virtual bool bot_check_redraw(card_ptr target_card, player_ptr owner) const = 0;
+        virtual prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const = 0;
 
         virtual void resolve() = 0;
         virtual void restart() = 0;
@@ -45,7 +45,7 @@ namespace banggame {
 
         void on_update() override;
 
-        game_string pick_prompt(card_ptr target_card) const override;
+        prompt_string pick_prompt(card_ptr target_card) const override;
 
         void on_pick(card_ptr target_card) override;
 
@@ -64,7 +64,7 @@ namespace banggame {
 
         bool is_lucky(card_ptr target_card) const;
 
-        bool bot_check_redraw(card_ptr target_card, player_ptr owner) const override;
+        prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override;
         
         void resolve() override;
         void restart() override;
