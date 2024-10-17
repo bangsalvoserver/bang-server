@@ -16,5 +16,6 @@ PRIVATE
     play_dispatch.cpp
     play_verify.cpp
     possible_to_play.cpp
+    prompts.cpp
     request_queue.cpp
 )

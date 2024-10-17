@@ -3,6 +3,7 @@
 #include "cards/game_enums.h"
 
 #include "game/game.h"
+#include "game/prompts.h"
 
 #include "ruleset.h"
 
@@ -30,7 +31,7 @@ namespace banggame {
             }
         }
 
-        game_string pick_prompt(player_ptr target_player) const override {
+        prompt_string pick_prompt(player_ptr target_player) const override {
             if (target == target_player) {
                 return {"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
             } else {
@@ -46,6 +47,12 @@ namespace banggame {
             }
         }
     };
+
+    game_string equip_bomb::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
+        return {};
+    }
 
     void equip_bomb::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_discard_orange_card>(target_card, [=](player_ptr e_target, card_ptr e_card) {

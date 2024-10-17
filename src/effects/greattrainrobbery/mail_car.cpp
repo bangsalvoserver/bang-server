@@ -1,6 +1,7 @@
 #include "mail_car.h"
 
 #include "game/game.h"
+#include "game/prompts.h"
 
 #include "cards/game_enums.h"
 
@@ -33,6 +34,11 @@ namespace banggame {
 
     bool effect_mail_car_response::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<request_mail_car>(origin) != nullptr;
+    }
+
+    game_string handler_mail_car::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+        MAYBE_RETURN(prompts::bot_check_target_friend(origin, target_player));
+        return {};
     }
 
     void handler_mail_car::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {

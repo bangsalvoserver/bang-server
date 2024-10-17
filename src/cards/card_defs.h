@@ -124,9 +124,9 @@ namespace banggame {
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
 
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
 
         void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
         void add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) const;
@@ -145,7 +145,7 @@ namespace banggame {
             return type != nullptr;
         }
 
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const;
         void on_enable(card_ptr target_card, player_ptr target) const;
         void on_disable(card_ptr target_card, player_ptr target) const;
         bool is_nodisable() const;
@@ -171,7 +171,7 @@ namespace banggame {
         }
 
         game_string get_error(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
         void on_play(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
     };
 

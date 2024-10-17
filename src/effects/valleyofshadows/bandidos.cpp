@@ -32,7 +32,7 @@ namespace banggame {
             target->damage(origin_card, origin, 1);
         }
 
-        game_string resolve_prompt() const override {
+        prompt_string resolve_prompt() const override {
             if (target->is_bot() && target->m_hp <= 1 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
                 return "BOT_BAD_PLAY";
             }
@@ -67,9 +67,9 @@ namespace banggame {
         }
     };
 
-    game_string effect_bandidos::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (origin->m_hp <= 1 && origin->m_hand.size() <= 1) {
-            return {"PROMPT_SUICIDE", origin_card};
+    prompt_string effect_bandidos::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+        if (origin == target && target->m_hp <= 1 && target->m_hand.size() <= 1) {
+            return { prompt_type::priority, "PROMPT_SUICIDE", origin_card };
         }
         return {};
     }

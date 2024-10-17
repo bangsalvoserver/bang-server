@@ -28,7 +28,7 @@ namespace banggame {
         target->m_game->handle_player_death(origin, target, discard_all_reason::death);
     }
 
-    game_string request_death::resolve_prompt() const {
+    prompt_string request_death::resolve_prompt() const {
         return "PROMPT_DEATH";
     }
 

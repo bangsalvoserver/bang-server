@@ -55,8 +55,11 @@ namespace banggame {
             return int(std::unique(suits.begin(), suits.end()) - suits.begin());
         }
 
-        bool bot_check_redraw(card_ptr target_card, player_ptr owner) const override {
-            return false;
+        prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
+            if (owner->is_bot()) {
+                return "BOT_BAD_PLAY";
+            }
+            return {};
         }
 
         void resolve() override {
@@ -74,11 +77,10 @@ namespace banggame {
         }
     };
 
-    bool effect_rum::on_check_target(card_ptr origin_card, player_ptr origin) {
-        return origin->m_max_hp - origin->m_hp >= 2;
-    }
-
     game_string effect_rum::on_prompt(card_ptr origin_card, player_ptr origin) {
+        if (origin->is_bot() && origin->m_max_hp - origin->m_hp < 2) {
+            return "BOT_BAD_PLAY";
+        }
         if (origin->m_hp == origin->m_max_hp) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }

@@ -2,27 +2,26 @@
 #define __BASE_BANG_H__
 
 #include "cards/card_effect.h"
-#include "game/bot_suggestion.h"
 #include "resolve.h"
-#include "prompts.h"
 
 namespace banggame {
     
-    struct effect_bang : prompt_target_ghost, bot_suggestion::target_enemy {
+    struct effect_bang {
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
     };
 
     DEFINE_EFFECT(bang, effect_bang)
 
-    struct effect_bangcard : prompt_target_ghost, bot_suggestion::target_enemy {
+    struct effect_bangcard {
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
 
     DEFINE_EFFECT(bangcard, effect_bangcard)
 
     struct handler_play_as_bang {
-        bool on_check_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target);
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target);
         game_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target);
