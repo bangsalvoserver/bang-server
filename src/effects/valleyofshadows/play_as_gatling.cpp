@@ -22,7 +22,7 @@ namespace banggame {
 
     prompt_string handler_play_as_gatling::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {
         return merge_prompts(get_player_targets_range(origin, ctx)
-            | rv::transform([&](player_ptr target) -> prompt_string { return effect_bang{}.on_prompt(chosen_card, origin, target); })
+            | rv::transform([&](player_ptr target) { return effect_bang{}.on_prompt(chosen_card, origin, target); })
             | rn::to_vector
         );
     }

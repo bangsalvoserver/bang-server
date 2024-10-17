@@ -22,6 +22,16 @@ namespace banggame::prompts {
         }
     }
 
+    prompt_string bot_check_kill_sheriff(player_ptr origin, player_ptr target) {
+        if (origin->is_bot()
+            && !(origin->m_role == player_role::outlaw || origin->m_role == player_role::renegade && origin->m_game->num_alive() <= 2)
+            && (target->m_hp <= 1 && target->m_role == player_role::sheriff)
+        ) {
+            return { prompt_type::priority, "BOT_BAD_PLAY" };
+        }
+        return {};
+    }
+
     game_string bot_check_target_enemy(player_ptr origin, player_ptr target) {
         if (origin->is_bot() && !bot_suggestion::is_target_enemy(origin, target)) {
             return "BOT_BAD_PLAY";
