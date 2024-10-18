@@ -1,6 +1,7 @@
 #include "beer.h"
 
 #include "game/game.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
@@ -11,9 +12,7 @@ namespace banggame {
     }
     
     game_string effect_beer::on_prompt(card_ptr origin_card, player_ptr target) {
-        if (target->is_ghost()) {
-            return {"PROMPT_TARGET_GHOST", origin_card, target};
-        }
+        MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, target, target));
         if (target->m_game->num_alive() <= 2 || (target->m_hp == target->m_max_hp)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }

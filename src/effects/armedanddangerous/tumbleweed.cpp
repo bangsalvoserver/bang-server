@@ -77,7 +77,7 @@ namespace banggame {
         });
     }
 
-    game_string effect_tumbleweed::on_prompt(card_ptr origin_card, player_ptr origin) {
+    prompt_string effect_tumbleweed::on_prompt(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request<request_tumbleweed>();
         return req->handler->redraw_prompt(origin_card, origin);
     }

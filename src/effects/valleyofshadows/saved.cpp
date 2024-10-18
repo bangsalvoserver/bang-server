@@ -23,7 +23,7 @@ namespace banggame {
             }
         }
 
-        game_string pick_prompt(card_ptr target_card) const override {
+        prompt_string pick_prompt(card_ptr target_card) const override {
             if (target->is_bot()
                 && (bot_suggestion::is_target_enemy(target, saved)
                 != (target_card->pocket == pocket_type::player_hand)))

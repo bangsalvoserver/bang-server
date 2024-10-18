@@ -28,7 +28,7 @@ namespace banggame {
             }
         }
 
-        game_string resolve_prompt() const override {
+        prompt_string resolve_prompt() const override {
             if (target->is_bot() && target->m_hp <= 1 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
                 return "BOT_BAD_PLAY";
             }
@@ -64,7 +64,8 @@ namespace banggame {
         }
     };
 
-    game_string effect_indians::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    prompt_string effect_indians::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         return {};

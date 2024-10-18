@@ -7,7 +7,7 @@ namespace banggame {
 
     struct effect_pick {
         bool can_play(card_ptr origin_card, player_ptr origin);
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
     
@@ -15,7 +15,7 @@ namespace banggame {
 
     struct effect_pick_player {
         bool can_play(card_ptr origin_card, player_ptr origin);
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
     
@@ -28,7 +28,7 @@ namespace banggame {
 
         virtual bool can_pick(const_card_ptr target_card) const = 0;
         virtual void on_pick(card_ptr target_card) = 0;
-        virtual game_string pick_prompt(card_ptr target_card) const { return {}; }
+        virtual prompt_string pick_prompt(card_ptr target_card) const { return {}; }
     };
 
     class request_picking : public request_base, public interface_picking {
@@ -50,7 +50,7 @@ namespace banggame {
 
         virtual bool can_pick(const_player_ptr target_player) const = 0;
         virtual void on_pick(player_ptr target_player) = 0;
-        virtual game_string pick_prompt(player_ptr target_player) const { return {}; }
+        virtual prompt_string pick_prompt(player_ptr target_player) const { return {}; }
     };
 
     class request_picking_player : public request_base, public interface_picking_player {
