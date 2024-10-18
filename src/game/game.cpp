@@ -256,6 +256,11 @@ namespace banggame {
             shuffle_cards_and_ids(m_train_deck);
             add_update<"add_cards">(m_train_deck, pocket_type::train_deck);
         }
+
+        if (add_cards(all_cards.feats, pocket_type::feats_deck)) {
+            shuffle_cards_and_ids(m_feats_deck);
+            add_update<"add_cards">(m_feats_deck, pocket_type::feats_deck);
+        }
         
         player_role roles[] = {
             player_role::sheriff,
@@ -309,6 +314,8 @@ namespace banggame {
 
         add_cards(all_cards.stations, pocket_type::none);
         add_cards(all_cards.locomotive, pocket_type::none);
+
+        add_cards(all_cards.legends, pocket_type::none);
 
         card_list character_ptrs;
         if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
