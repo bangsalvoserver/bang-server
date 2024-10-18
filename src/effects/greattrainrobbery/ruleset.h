@@ -30,6 +30,12 @@ namespace banggame {
             player_ptr origin;
             shared_locomotive_context ctx;
         };
+
+        struct get_locomotive_prompt {
+            player_ptr origin;
+            int locomotive_count;
+            nullable_ref<prompt_string> out_prompt;
+        };
     }
     
     struct ruleset_greattrainrobbery {
