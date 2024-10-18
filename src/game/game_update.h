@@ -169,7 +169,7 @@ namespace banggame {
     using game_update = utils::tagged_variant<
         utils::tag<"game_error", game_string>,
         utils::tag<"game_log", game_string>,
-        utils::tag<"game_prompt", prompt_string>,
+        utils::tag<"game_prompt", game_string>,
         utils::tag<"add_cards", add_cards_update>,
         utils::tag<"remove_cards", remove_cards_update>,
         utils::tag<"move_card", move_card_update>,

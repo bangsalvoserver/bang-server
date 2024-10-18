@@ -157,12 +157,6 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<banggame::prompt_string, Context> {
-        json operator()(const banggame::prompt_string &value, const Context &ctx) const {
-            return serialize_unchecked(value.message, ctx);
-        }
-    };
-
     template<> struct serializer<banggame::animation_duration, banggame::game_context> {
         json operator()(const banggame::animation_duration &duration, const banggame::game_context &context) const {
             return serialize_unchecked(context.transform_duration(duration.get()), context);
@@ -188,7 +182,7 @@ namespace banggame {
                 add_update<"game_error">(update_target::includes_private(origin), error);
             },
             [&](utils::tag<"prompt">, prompt_string prompt) {
-                add_update<"game_prompt">(update_target::includes_private(origin), prompt);
+                add_update<"game_prompt">(update_target::includes_private(origin), prompt.message);
             }
         }, result);
     }
