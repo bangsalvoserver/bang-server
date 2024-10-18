@@ -83,9 +83,9 @@ jobs:
 
     - name: Download and install zlib
       run: |
-        Invoke-WebRequest -Uri "https://zlib.net/zlib1211.zip" -OutFile "zlib1211.zip"
-        Expand-Archive -Path "zlib1211.zip" -DestinationPath "C:/zlib"
-        Remove-Item -Path "zlib1211.zip"
+        Invoke-WebRequest -Uri "https://github.com/madler/zlib/releases/download/v1.3.1/zlib131.zip" -OutFile "zlib131.zip"
+        Expand-Archive -Path "zlib131.zip" -DestinationPath "C:/zlib"
+        Remove-Item -Path "zlib131.zip"
     
     - name: Configure CMake
       run: |
