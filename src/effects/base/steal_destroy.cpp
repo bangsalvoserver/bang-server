@@ -51,7 +51,7 @@ namespace banggame {
     }
 
     game_string effect_steal::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy_card(origin, target_card));
+        MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         if (origin == target_card->owner) {
             if (target_card->is_train() || target_card->pocket == pocket_type::player_hand) {
                 return {"PROMPT_CARD_NO_EFFECT", origin_card};
@@ -156,7 +156,7 @@ namespace banggame {
     }
 
     game_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy_card(origin, target_card));
+        MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target_card->owner));
         return {};
     }

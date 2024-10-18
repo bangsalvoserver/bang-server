@@ -79,7 +79,7 @@ namespace banggame {
             return !get_equip_error(target, target_card, target_player, {});
         }
 
-        game_string pick_prompt(player_ptr target_player) const override {
+        prompt_string pick_prompt(player_ptr target_player) const override {
             return get_equip_prompt(target, target_card, target_player);
         }
 

@@ -13,7 +13,7 @@ namespace banggame {
         return handler_play_as_gatling{}.get_error(origin_card, origin, ctx, chosen_card);
     }
 
-    game_string handler_bulldog::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, card_ptr discarded_card) {
+    prompt_string handler_bulldog::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, card_ptr discarded_card) {
         return handler_play_as_gatling{}.on_prompt(origin_card, origin, ctx, chosen_card);
     }
 

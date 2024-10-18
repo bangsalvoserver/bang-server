@@ -44,7 +44,7 @@ namespace banggame {
             return drawn_card->get_modified_sign().is_red();
         }
 
-        game_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
+        prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
             if (owner->is_bot() && !is_lucky()) {
                 return "BOT_BAD_PLAY";
             }
