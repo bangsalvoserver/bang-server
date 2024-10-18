@@ -275,7 +275,9 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
     }
     for (const game_user &user : lobby.users) {
         if (const auto &propic = user.session->propic) {
-            send_message<"lobby_user_propic">(session->client, user.user_id, propic);
+            if (!user.is_disconnected() || (lobby.m_game && lobby.m_game->find_player_by_userid(user.user_id))) {
+                send_message<"lobby_user_propic">(session->client, user.user_id, propic);
+            }
         }
     }
     for (auto &bot : lobby.bots) {
