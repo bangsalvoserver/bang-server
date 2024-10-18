@@ -6,6 +6,16 @@ on:
       - release
   workflow_dispatch:
     inputs:
+      skip-build:
+        description: Skip Build
+        type: boolean
+        required: false
+        default: false
+      skip-build-windows:
+        description: Skip Build-Windows
+        type: boolean
+        required: false
+        default: false
       skip-deploy:
         description: Skip Deploy
         type: boolean
@@ -19,6 +29,7 @@ env:
 
 jobs:
   build:
+    if: ${{ ! inputs.skip-build }}
     runs-on: ubuntu-24.04
 
     steps:
@@ -54,6 +65,7 @@ jobs:
         path: build/bangserver
 
   build-windows:
+    if: ${{ ! inputs.skip-build-windows }}
     runs-on: windows-2022
     steps:
     - uses: actions/checkout@v4
