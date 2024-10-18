@@ -1,8 +1,0 @@
-{
-  "dependencies": [
-    "cxxopts",
-    "nlohmann-json",
-    "range-v3",
-    "asio"
-  ]
-}
