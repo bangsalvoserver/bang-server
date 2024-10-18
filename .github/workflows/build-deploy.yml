@@ -58,22 +58,26 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install dependencies
+    - name: Install Chocolatey
       run: |
-        choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-        choco install ninja
-        choco install python3
-
+        Set-ExecutionPolicy Bypass -Scope Process -Force; `
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
+        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    
+    - name: Install packages
+      run: |
+        choco install -y cmake ninja visualstudio2019buildtools
+        choco install -y vcredist140
+    
     - name: Configure CMake
-      shell: bash
-      working-directory: ${{github.workspace}}
       run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -G Ninja
-
+        cmake -B build -G Ninja ^
+        -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ^
+        -DCMAKE_C_COMPILER=cl ^
+        -DCMAKE_CXX_COMPILER=cl
+    
     - name: Build
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: cmake --build build -j ${{ env.BUILD_PARALLEL_JOBS }} --config ${{env.BUILD_TYPE}}
+      run: cmake --build build --config ${{env.BUILD_TYPE}} -- /m:${{env.BUILD_PARALLEL_JOBS}}
     
     - name: Upload Server Artifact
       uses: actions/upload-artifact@v4
