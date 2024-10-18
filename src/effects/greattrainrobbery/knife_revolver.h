@@ -3,11 +3,9 @@
 
 #include "cards/card_effect.h"
 
-#include "game/bot_suggestion.h"
-
 namespace banggame {
 
-    struct effect_knife_revolver : bot_suggestion::target_enemy {
+    struct effect_knife_revolver {
         void on_play(card_ptr origin_card, player_ptr origin);
     };
 

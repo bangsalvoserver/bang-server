@@ -34,7 +34,7 @@ namespace banggame {
         }
     }
 
-    template<> game_string visit_card::prompt(const effect_context &ctx, nullable_card target) {
+    template<> prompt_string visit_card::prompt(const effect_context &ctx, nullable_card target) {
         if (target) {
             return defer<"card">().prompt(ctx, target);
         } else {

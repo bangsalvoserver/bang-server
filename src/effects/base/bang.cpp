@@ -2,13 +2,22 @@
 
 #include "cards/game_enums.h"
 #include "cards/filter_enums.h"
-#include "game/filters.h"
 
 #include "game/game.h"
+#include "game/filters.h"
 #include "game/play_verify.h"
+#include "game/prompts.h"
+
 #include "damage.h"
 
 namespace banggame {
+
+    prompt_string effect_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
+        return {};
+    }
     
     void effect_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         if (!flags.check(effect_flag::skip_target_logs)) {
@@ -37,13 +46,15 @@ namespace banggame {
         }
     }
 
+    game_string effect_bangcard::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
+        return {};
+    }
+
     void effect_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         queue_request_bang(origin_card, origin, target);
-    }
-
-    bool handler_play_as_bang::on_check_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target) {
-        return effect_bangcard{}.on_check_target(chosen_card, origin, target);
     }
 
     game_string handler_play_as_bang::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target) {

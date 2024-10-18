@@ -2,16 +2,16 @@
 #define __VALLEYOFSHADOWS_GHOST_H__
 
 #include "cards/card_effect.h"
-#include "game/bot_suggestion.h"
 
 namespace banggame {
 
-    struct equip_ghost : bot_suggestion::target_friend {
+    struct equip_ghost {
         struct nodisable {};
         
         player_flag flag;
         equip_ghost(int value);
         
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_enable(card_ptr target_card, player_ptr target);
         void on_disable(card_ptr target_card, player_ptr target);
     };

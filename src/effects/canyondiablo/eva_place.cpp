@@ -36,7 +36,7 @@ namespace banggame {
             return 1;
         }
 
-        game_string resolve_prompt() const override {
+        prompt_string resolve_prompt() const override {
             if (target->is_bot() && drawn_card->sign.is_diamonds()) {
                 return "BOT_BAD_PLAY";
             }

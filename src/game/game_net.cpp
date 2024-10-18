@@ -174,16 +174,16 @@ namespace banggame {
         auto action = json::deserialize<game_action, game_context>(value, *this);
         auto result = verify_and_play(origin, action);
 
-        switch (result.type) {
-        case message_type::ok:
-            origin->m_game->commit_updates();
-            break;
-        case message_type::error:
-            add_update<"game_error">(update_target::includes_private(origin), result.message);
-            break;
-        case message_type::prompt:
-            add_update<"game_prompt">(update_target::includes_private(origin), result.message);
-            break;
-        }
+        utils::visit_tagged(overloaded{
+            [&](utils::tag<"ok">) {
+                origin->m_game->commit_updates();
+            },
+            [&](utils::tag<"error">, game_string error) {
+                add_update<"game_error">(update_target::includes_private(origin), error);
+            },
+            [&](utils::tag<"prompt">, prompt_string prompt) {
+                add_update<"game_prompt">(update_target::includes_private(origin), prompt.message);
+            }
+        }, result);
     }
 }

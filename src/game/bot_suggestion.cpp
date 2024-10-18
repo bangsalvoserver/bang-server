@@ -1,12 +1,11 @@
 #include "bot_suggestion.h"
 #include "game.h"
 
-#include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
 namespace banggame::bot_suggestion {
 
-    bool target_enemy::on_check_target(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    bool is_target_enemy(player_ptr origin, player_ptr target) {
         if (origin->m_game->check_flags(game_flag::free_for_all)) {
             return origin != target;
         }
@@ -52,12 +51,8 @@ namespace banggame::bot_suggestion {
             return true;
         }
     }
-    
-    bool target_enemy::on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target) {
-        return on_check_target(origin_card, origin, target->owner);
-    }
 
-    bool target_friend::on_check_target(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    bool is_target_friend(player_ptr origin, player_ptr target) {
         if (origin->m_game->check_flags(game_flag::free_for_all)) {
             return origin == target;
         }
@@ -71,18 +66,6 @@ namespace banggame::bot_suggestion {
         case player_role::renegade:
         default:
             return origin == target;
-        }
-    }
-    
-    bool target_friend::on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target) {
-        return on_check_target(origin_card, origin, target->owner);
-    }
-
-    bool target_enemy_card::on_check_target(card_ptr origin_card, player_ptr origin, card_ptr target) {
-        if (target->pocket == pocket_type::player_table && !target->self_equippable() && !target->has_tag(tag_type::ghost_card)) {
-            return target_friend{}.on_check_target(origin_card, origin, target);
-        } else {
-            return target_enemy{}.on_check_target(origin_card, origin, target);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace banggame {
         return {};
     }
 
-    template<> game_string visit_cubes::prompt(const effect_context &ctx) {
+    template<> prompt_string visit_cubes::prompt(const effect_context &ctx) {
         return {};
     }
 

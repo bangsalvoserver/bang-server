@@ -12,7 +12,7 @@ namespace banggame {
         return effect.get_error(origin_card, origin, ctx);
     }
 
-    template<> game_string visit_none::prompt(const effect_context &ctx) {
+    template<> prompt_string visit_none::prompt(const effect_context &ctx) {
         return effect.on_prompt(origin_card, origin, ctx);
     }
 
