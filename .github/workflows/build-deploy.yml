@@ -79,7 +79,13 @@ jobs:
     - name: Install packages
       run: |
         choco install -y cmake ninja visualstudio2019buildtools
-        choco install -y vcredist140 openssl zlib
+        choco install -y vcredist140 openssl
+
+    - name: Download and install zlib
+      run: |
+        Invoke-WebRequest -Uri "https://zlib.net/zlib1211.zip" -OutFile "zlib1211.zip"
+        Expand-Archive -Path "zlib1211.zip" -DestinationPath "C:/zlib"
+        Remove-Item -Path "zlib1211.zip"
     
     - name: Configure CMake
       run: |
@@ -88,7 +94,7 @@ jobs:
         -DCMAKE_C_COMPILER=cl `
         -DCMAKE_CXX_COMPILER=cl `
         -DOPENSSL_ROOT_DIR="C:/Program Files/OpenSSL-Win64" `
-        -DZLIB_ROOT="C:/Program Files/zlib"
+        -DZLIB_ROOT="C:/zlib"
     
     - name: Build
       run: cmake --build build --config ${{env.BUILD_TYPE}} -- /m:${{env.BUILD_PARALLEL_JOBS}}
