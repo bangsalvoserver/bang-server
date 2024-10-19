@@ -64,10 +64,10 @@ main_deck:
   - name: ESCAPE
     signs:
       - 3 hearts
-    image: 07_fuga
+    image: 07_fuga2
     color: brown
     responses:
-      - escape
+      - escape2
   - name: AIM
     signs:
       - 6 clubs
@@ -178,11 +178,11 @@ character:
     tags:
       - preselect
   - name: MICK_DEFENDER
-    image: 07_mickdefender
+    image: 07_mickdefender2
     equip:
       - mick_defender
     responses:
-      - escape
+      - escape2
       - discard card self | hand missed
   - name: TUCO_FRANZISKANER
     image: 07_tucofranziskaner
