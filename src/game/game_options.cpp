@@ -42,6 +42,15 @@ namespace banggame {
         }
     };
 
+    template<> struct game_option_transformer<game_option_field_index("expansions")> {
+        expansion_set operator()(const expansion_set &value) const {
+            if (!validate_expansions(value)) {
+                throw std::runtime_error("INVALID_EXPANSIONS");
+            }
+            return value;
+        }
+    };
+
     template<> struct game_option_transformer<game_option_field_index("damage_timer")> {
         game_duration operator()(game_duration value) const {
             return std::clamp(value, game_duration{}, game_duration{5s});
@@ -122,7 +131,7 @@ namespace banggame {
 
                         using option_type = reflect::member_type<I, game_options>;
                         field = transform_field<I>(json::deserialize<option_type>(*it));
-                    } catch (const json::deserialize_error &error) {
+                    } catch (const std::exception &error) {
                         // ignore errors.
                         // game_options are stored in the clients' application storage and we don't want them kicked out if it's invalid.
                     }
