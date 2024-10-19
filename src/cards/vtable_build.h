@@ -364,7 +364,16 @@ namespace banggame {
                 if constexpr (requires { value.on_apply(game); }) {
                     value.on_apply(game);
                 }
-            }
+            },
+
+            .is_valid_with = [](const expansion_set &set) -> bool {
+                T value{};
+                if constexpr (requires { value.is_valid_with(set); }) {
+                    return value.is_valid_with(set);
+                } else {
+                    return true;
+                }
+            },
         };
     }
 

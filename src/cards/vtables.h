@@ -180,6 +180,7 @@ namespace banggame {
         std::string_view name;
 
         void (*on_apply)(game *game);
+        bool (*is_valid_with)(const expansion_set &set);
     };
 
     template<utils::fixed_string Name>

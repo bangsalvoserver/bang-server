@@ -5,6 +5,16 @@
 
 #include "utils/parse_string.h"
 
+namespace banggame {
+
+    inline bool validate_expansions(const expansion_set &expansions) {
+        return rn::all_of(expansions, [&](const banggame::ruleset_vtable *ruleset) {
+            return ruleset->is_valid_with(expansions);
+        });
+    }
+
+}
+
 namespace json {
 
     template<typename Context> struct serializer<const banggame::ruleset_vtable *, Context> {
@@ -74,7 +84,10 @@ namespace utils {
                 if (pos == std::string_view::npos) break;
                 str = str.substr(pos);
             }
-            return result;
+            if (banggame::validate_expansions(result)) {
+                return result;
+            }
+            return std::nullopt;
         }
     };
 
