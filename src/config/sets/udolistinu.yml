@@ -54,14 +54,13 @@ main_deck:
     equip_target: any
     equip:
       - bounty
-  # - name: BANDIDOS
-  #   signs:
-  #     - Q diamonds
-  #   image: 07_bandidos # TODO cambia immagine
-  #   color: brown
-  #   effects:
-  #     # TODO scarta un bang oppure scarta due carte o una se ne hai una. no danno.
-  #     - bandidos players
+  - name: BANDIDOS
+    signs:
+      - Q diamonds
+    image: 07_bandidos # TODO cambia immagine
+    color: brown
+    effects:
+      - bandidos2 players not_empty_hand
   - name: ESCAPE
     signs:
       - 3 hearts

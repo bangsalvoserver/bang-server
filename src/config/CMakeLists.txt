@@ -13,6 +13,7 @@ add_custom_command(
         sets/base.yml
         sets/dodgecity.yml
         sets/valleyofshadows.yml
+        sets/udolistinu.yml
         sets/goldrush.yml
         sets/armedanddangerous.yml
         sets/greattrainrobbery.yml

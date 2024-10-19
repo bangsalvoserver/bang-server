@@ -11,6 +11,12 @@ namespace banggame {
     };
 
     DEFINE_EFFECT(bandidos, effect_bandidos)
+
+    struct effect_bandidos2 {
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
+    };
+
+    DEFINE_EFFECT(bandidos2, effect_bandidos2)
 }
 
 #endif

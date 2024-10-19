@@ -2,6 +2,9 @@
 
 #include "game/game.h"
 #include "game/prompts.h"
+#include "game/possible_to_play.h"
+
+#include "cards/game_enums.h"
 
 #include "effects/base/requests.h"
 
@@ -79,5 +82,58 @@ namespace banggame {
 
     void effect_bandidos::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         target->m_game->queue_request<request_bandidos>(origin_card, origin, target, flags);
+    }
+
+    struct request_bandidos2 : request_picking {
+        using request_picking::request_picking;
+
+        int ncards = 2;
+
+        void on_update() override {
+            if (target->immune_to(origin_card, origin, flags)) {
+                target->m_game->pop_request();
+            } else {
+                if (!live) {
+                    target->play_sound("bandidos");
+                }
+                if (rn::empty(get_all_playable_cards(target, true))) {
+                    target->reveal_hand();
+                    target->m_game->pop_request();
+                } else {
+                    auto_pick();
+                }
+            }
+        }
+        
+        bool can_pick(const_card_ptr target_card) const override {
+            return target_card->pocket == pocket_type::player_hand && target_card->owner == target
+                && !target->m_game->is_usage_disabled(target_card);
+        }
+
+        void on_pick(card_ptr target_card) override {
+            target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
+            target->discard_used_card(target_card);
+
+            flags.remove(effect_flag::escapable);
+            flags.remove(effect_flag::single_target);
+
+            --ncards;
+            
+            if (ncards <= 0 || target->empty_hand() || target_card->is_bang_card(target)) {
+                target->m_game->pop_request();
+            }
+        }
+
+        game_string status_text(player_ptr owner) const override {
+            if (target == owner) {
+                return {"STATUS_BANDIDOS2", origin_card};
+            } else {
+                return {"STATUS_BANDIDOS2_OTHER", target, origin_card};
+            }
+        }
+    };
+
+    void effect_bandidos2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        target->m_game->queue_request<request_bandidos2>(origin_card, origin, target, flags);
     }
 }
