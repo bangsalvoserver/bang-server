@@ -60,7 +60,7 @@ main_deck:
     image: 07_bandidos # TODO cambia immagine
     color: brown
     effects:
-      - bandidos2 players not_empty_hand
+      - bandidos2 players notself not_empty_hand
   - name: ESCAPE
     signs:
       - 3 hearts
