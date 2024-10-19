@@ -13,7 +13,7 @@ main_deck:
   - name: LEMAT
     signs:
       - 4 diamonds
-    image: 07_lemat # TODO cambia immagine
+    image: 07_lemat2
     color: blue
     equip:
       - weapon(1)
@@ -57,7 +57,7 @@ main_deck:
   - name: BANDIDOS
     signs:
       - Q diamonds
-    image: 07_bandidos # TODO cambia immagine
+    image: 07_bandidos2
     color: brown
     effects:
       - bandidos2 players notself not_empty_hand
@@ -98,7 +98,7 @@ main_deck:
   - name: SAVED
     signs:
       - 5 hearts
-    image: 07_salvo # TODO cambia immagine
+    image: 07_salvo2
     color: brown
     responses:
       - saved2
@@ -125,7 +125,7 @@ main_deck:
   - name: TORNADO
     signs:
       - A clubs
-    image: 07_tornado # TODO cambia immagine
+    image: 07_tornado2
     color: brown
     effects:
       - tornado2 players not_empty_hand
@@ -158,7 +158,7 @@ character:
       - none players notself
     mth_effect: play_as_gatling(1)
   - name: EVELYN_SHEBANG
-    image: 07_evelynshebang # TODO cambia immagine
+    image: 07_evelynshebang2
     responses:
       - add_draw_card
       - max_usages(1)
