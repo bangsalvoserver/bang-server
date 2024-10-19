@@ -95,15 +95,15 @@ main_deck:
       - backfire
     tags:
       - missed
-  # - name: SAVED
-  #   signs:
-  #     - 5 hearts
-  #   image: 07_salvo # TODO cambia immagine
-  #   color: brown
-  #   responses:
-  #     # TODO solo fuori turno
-  #     # pesca due carte dalla mano solo se si salva dalla morte
-  #     - saved
+  - name: SAVED
+    signs:
+      - 5 hearts
+    image: 07_salvo # TODO cambia immagine
+    color: brown
+    responses:
+      # TODO solo fuori turno
+      # pesca due carte dalla mano solo se si salva dalla morte
+      - saved2
   - name: FANNING
     signs:
       - 2 spades
