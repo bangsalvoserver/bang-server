@@ -1,6 +1,7 @@
 base: !include sets/base.yml
 dodgecity: !include sets/dodgecity.yml
 valleyofshadows: !include sets/valleyofshadows.yml
+udolistinu: !include sets/udolistinu.yml
 goldrush: !include sets/goldrush.yml
 armedanddangerous: !include sets/armedanddangerous.yml
 greattrainrobbery: !include sets/greattrainrobbery.yml

@@ -23,4 +23,12 @@ namespace banggame {
             }
         });
     }
+
+    void ruleset_udolistinu::on_apply(game *game) {
+        ruleset_valleyofshadows{}.on_apply(game);
+    }
+
+    bool ruleset_udolistinu::is_valid_with(const expansion_set &set) {
+        return !set.contains(GET_RULESET(valleyofshadows));
+    }
 }

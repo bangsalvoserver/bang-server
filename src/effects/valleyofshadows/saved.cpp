@@ -7,6 +7,19 @@
 #include "game/bot_suggestion.h"
 
 namespace banggame {
+
+    static void saved_steal_cards(player_ptr target, player_ptr saved) {
+        for (int i=0; i<2 && !saved->empty_hand(); ++i) {
+            card_ptr stolen_card = saved->random_hand_card();
+            if (stolen_card->visibility != card_visibility::shown) {
+                target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
+                target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
+            } else {
+                target->m_game->add_log("LOG_STOLEN_CARD", target, saved, stolen_card);
+            }
+            target->steal_card(stolen_card);
+        }
+    }
     
     struct request_saved : request_picking {
         request_saved(card_ptr origin_card, player_ptr target, player_ptr saved)
@@ -52,16 +65,7 @@ namespace banggame {
             if (target_card->pocket != pocket_type::player_hand) {
                 target->draw_card(2, origin_card);
             } else {
-                for (int i=0; i<2 && !saved->empty_hand(); ++i) {
-                    card_ptr stolen_card = saved->random_hand_card();
-                    if (stolen_card->visibility != card_visibility::shown) {
-                        target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
-                        target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
-                    } else {
-                        target->m_game->add_log("LOG_STOLEN_CARD", target, saved, stolen_card);
-                    }
-                    target->steal_card(stolen_card);
-                }
+                saved_steal_cards(target, saved);
             }
         }
 
@@ -91,5 +95,29 @@ namespace banggame {
         }
 
         origin->m_game->queue_request<request_saved>(origin_card, origin, saved);
+    }
+
+    bool effect_saved2::can_play(card_ptr origin_card, player_ptr origin) {
+        return origin != origin->m_game->m_playing
+            && effect_saved{}.can_play(origin_card, origin);
+    }
+
+    void effect_saved2::on_play(card_ptr origin_card, player_ptr origin) {
+        auto req = origin->m_game->top_request<request_damage>();
+        player_ptr saved = req->target;
+        req->savior = origin;
+        bool fatal = saved->m_hp <= req->damage;
+        
+        if (--req->damage == 0) {
+            origin->m_game->pop_request();
+        }
+
+        if (fatal) {
+            origin->m_game->queue_action([=]{
+                if (origin->alive() && saved->alive()) {
+                    saved_steal_cards(origin, saved);
+                }
+            });
+        }
     }
 }
