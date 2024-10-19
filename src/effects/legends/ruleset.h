@@ -7,6 +7,7 @@ namespace banggame {
 
     struct ruleset_legends {
         void on_apply(game *game);
+        bool is_valid_with(const expansion_set &set);
     };
 
     DEFINE_RULESET(legends, ruleset_legends)
