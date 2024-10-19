@@ -119,6 +119,7 @@ namespace banggame {
 
             --ncards;
             
+            // TODO let a player discard two bangs
             if (ncards <= 0 || target->empty_hand() || target_card->is_bang_card(target)) {
                 target->m_game->pop_request();
             }
