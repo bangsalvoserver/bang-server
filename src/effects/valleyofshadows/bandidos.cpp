@@ -88,26 +88,20 @@ namespace banggame {
         using request_base::request_base;
 
         void on_update() override {
-            if (target->immune_to(origin_card, origin, flags)) {
+            if (target->immune_to(origin_card, origin, flags) || target->empty_hand()) {
                 target->m_game->pop_request();
             } else {
                 if (!live) {
                     target->play_sound("bandidos");
                 }
-                auto is_disabled = [&](const_card_ptr c) { return target->m_game->is_usage_disabled(c); };
-                size_t count_disabled = rn::all_of(target->m_hand, is_disabled);
-                if (count_disabled == target->m_hand.size()) {
+                auto not_disabled = target->m_hand
+                    | rv::remove_if([&](const_card_ptr c) {
+                        return target->m_game->is_usage_disabled(c);
+                    })
+                    | rn::to_vector;
+                if (not_disabled.size() <= 1) {
+                    handler_bandidos2_response{}.on_play(origin_card, target, not_disabled);
                     target->reveal_hand();
-                    target->m_game->pop_request();
-                } else if (target->m_hand.size() - count_disabled <= 2) {
-                    if (count_disabled == 0) {
-                        handler_bandidos2_response{}.on_play(origin_card, target, target->m_hand);
-                    } else {
-                        handler_bandidos2_response{}.on_play(origin_card, target,
-                            target->m_hand | rv::remove_if(is_disabled) | rn::to_vector
-                        );
-                        target->reveal_hand();
-                    }
                 }
             }
         }
