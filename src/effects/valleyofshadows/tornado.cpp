@@ -53,10 +53,9 @@ namespace banggame {
         using request_base::request_base;
 
         void on_update() override {
-            // TODO does sermon apply?
             if (target->immune_to(origin_card, origin, flags) || target->empty_hand()) {
                 target->m_game->pop_request();
-            } else if (target->m_hand.size() <= 2 && rn::distance(get_all_playable_cards(target, true)) <= 1) {
+            } else if (target->m_hand.size() <= 2) {
                 handler_tornado2_response{}.on_play(origin_card, target, target->m_hand);
             }
         }
