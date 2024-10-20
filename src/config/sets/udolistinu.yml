@@ -199,3 +199,10 @@ hidden:
     mth_response: tornado2_response(1)
     tags:
       - preselect
+  - name: BANDIDOS
+    responses:
+      - bandidos2_response
+      - none max_cards(2) self | hand
+    mth_response: bandidos2_response(1)
+    tags:
+      - preselect

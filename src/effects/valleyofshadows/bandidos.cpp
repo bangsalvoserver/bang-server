@@ -84,10 +84,8 @@ namespace banggame {
         target->m_game->queue_request<request_bandidos>(origin_card, origin, target, flags);
     }
 
-    struct request_bandidos2 : request_picking {
-        using request_picking::request_picking;
-
-        int ncards = 2;
+    struct request_bandidos2 : request_base {
+        using request_base::request_base;
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
@@ -96,32 +94,21 @@ namespace banggame {
                 if (!live) {
                     target->play_sound("bandidos");
                 }
-                if (rn::empty(get_all_playable_cards(target, true))) {
+                auto is_disabled = [&](const_card_ptr c) { return target->m_game->is_usage_disabled(c); };
+                size_t count_disabled = rn::all_of(target->m_hand, is_disabled);
+                if (count_disabled == target->m_hand.size()) {
                     target->reveal_hand();
                     target->m_game->pop_request();
-                } else {
-                    auto_pick();
+                } else if (target->m_hand.size() - count_disabled <= 2) {
+                    if (count_disabled == 0) {
+                        handler_bandidos2_response{}.on_play(origin_card, target, target->m_hand);
+                    } else {
+                        handler_bandidos2_response{}.on_play(origin_card, target,
+                            target->m_hand | rv::remove_if(is_disabled) | rn::to_vector
+                        );
+                        target->reveal_hand();
+                    }
                 }
-            }
-        }
-        
-        bool can_pick(const_card_ptr target_card) const override {
-            return target_card->pocket == pocket_type::player_hand && target_card->owner == target
-                && !target->m_game->is_usage_disabled(target_card);
-        }
-
-        void on_pick(card_ptr target_card) override {
-            target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
-            target->discard_used_card(target_card);
-
-            flags.remove(effect_flag::escapable);
-            flags.remove(effect_flag::single_target);
-
-            --ncards;
-            
-            // TODO let a player discard two bangs
-            if (ncards <= 0 || target->empty_hand() || target_card->is_bang_card(target)) {
-                target->m_game->pop_request();
             }
         }
 
@@ -136,5 +123,30 @@ namespace banggame {
 
     void effect_bandidos2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         target->m_game->queue_request<request_bandidos2>(origin_card, origin, target, flags);
+    }
+
+    bool effect_bandidos2_response::can_play(card_ptr origin_card, player_ptr origin) {
+        return origin->m_game->top_request<request_bandidos2>(origin) != nullptr;
+    }
+
+    game_string handler_bandidos2_response::get_error(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {
+        for (card_ptr target_card : target_cards) {
+            if (card_ptr disabler = origin->m_game->get_usage_disabler(target_card)) {
+                return {"ERROR_CARD_DISABLED_BY", target_card, disabler};
+            }
+        }
+        if (target_cards.size() == 1 && !target_cards.front()->is_bang_card(origin)) {
+            return "ERROR_TARGET_NOT_BANG";
+        }
+        return {};
+    }
+
+    void handler_bandidos2_response::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {
+        origin->m_game->pop_request();
+
+        for (card_ptr target_card : target_cards) {
+            origin->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, origin, target_card);
+            origin->discard_used_card(target_card);
+        }
     }
 }
