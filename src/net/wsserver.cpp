@@ -66,7 +66,7 @@ namespace net {
 
     void wsserver::start(uint16_t port, bool reuse_addr) {
         int listen_options = reuse_addr ? LIBUS_LISTEN_DEFAULT : LIBUS_LISTEN_EXCLUSIVE_PORT;
-        visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
+        visit_server([&]<bool SSL>(uWS::TemplatedApp<SSL> &server) {
             server.template ws<wsclient_data>("/", {
                 .compression = uWS::CompressOptions(uWS::DEDICATED_COMPRESSOR_4KB | uWS::DEDICATED_DECOMPRESSOR),
                 
@@ -117,7 +117,7 @@ namespace net {
     }
 
     void wsserver::stop() {
-        visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
+        visit_server([&]<bool SSL>(uWS::TemplatedApp<SSL> &server) {
             server.getLoop()->defer([&]{
                 server.close();
             });
@@ -137,7 +137,7 @@ namespace net {
     }
 
     void wsserver::push_message(client_handle client, std::string message) {
-        visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
+        visit_server([&]<bool SSL>(uWS::TemplatedApp<SSL> &server) {
             server.getLoop()->defer([client, message = std::move(message)]{
                 if (auto *ws = websocket_cast<SSL>(client)) {
                     auto *data = ws->getUserData();
@@ -149,7 +149,7 @@ namespace net {
     }
 
     void wsserver::kick_client(client_handle client, std::string message, int code) {
-        visit_server([&]<bool SSL>(uWS::CachingApp<SSL> &server) {
+        visit_server([&]<bool SSL>(uWS::TemplatedApp<SSL> &server) {
             server.getLoop()->defer([client, code, message = std::move(message)]{
                 if (auto *ws = websocket_cast<SSL>(client)) {
                     ws->end(code, message);
