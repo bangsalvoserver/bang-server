@@ -11,6 +11,13 @@ namespace banggame {
 
     DEFINE_RULESET(valleyofshadows, ruleset_valleyofshadows)
 
+    struct ruleset_udolistinu {
+        void on_apply(game *game);
+        bool is_valid_with(const expansion_set &set);
+    };
+
+    DEFINE_RULESET(udolistinu, ruleset_udolistinu)
+
 }
 
 #endif

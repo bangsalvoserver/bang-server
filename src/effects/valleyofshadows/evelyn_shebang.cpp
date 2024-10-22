@@ -32,6 +32,6 @@ namespace banggame {
             }
         });
 
-        effect_bang().on_play(origin_card, origin, target);
+        effect_bang{}.on_play(origin_card, origin, target);
     }
 }

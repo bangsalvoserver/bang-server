@@ -1,0 +1,208 @@
+main_deck:
+  - name: GHOST
+    signs:
+      - 9 spades
+      - 10 spades
+    image: 07_fantasma
+    color: blue
+    equip_target: dead
+    equip:
+      - ghost(1)
+    tags:
+      - ghost_card
+  - name: LEMAT
+    signs:
+      - 4 diamonds
+    image: 07_lemat2
+    color: blue
+    equip:
+      - weapon(1)
+    effects:
+      - banglimit
+      - set_playing card self | hand not_bangcard not_missedcard
+      - none player reachable notself
+    mth_effect: play_as_bang(1,2)
+    tags:
+      - weapon
+      - play_as_bang
+      - banglimit
+      - skip_logs
+  - name: RATTLESNAKE
+    signs:
+      - 7 hearts
+    image: 07_serpenteasonagli
+    color: blue
+    equip_target: any
+    equip:
+      - predraw_check(0)
+      - snake
+  - name: SHOTGUN
+    signs:
+      - K spades
+    image: 07_shotgun
+    color: blue
+    equip:
+      - weapon(1)
+      - shotgun
+    tags:
+      - weapon
+  - name: BOUNTY
+    signs:
+      - 9 clubs
+    image: 07_taglia
+    color: blue
+    equip_target: any
+    equip:
+      - bounty
+  - name: BANDIDOS
+    signs:
+      - Q diamonds
+    image: 07_bandidos2
+    color: brown
+    effects:
+      - bandidos2 players notself not_empty_hand
+  - name: ESCAPE
+    signs:
+      - 3 hearts
+    image: 07_fuga2
+    color: brown
+    responses:
+      - escape2
+  - name: AIM
+    signs:
+      - 6 clubs
+    image: 07_mira
+    color: brown
+    modifier: bangmod
+    effects:
+      - aim
+    tags:
+      - bangmod
+  - name: POKER
+    signs:
+      - J hearts
+    image: 07_poker
+    color: brown
+    effects:
+      - poker players notself not_empty_hand
+      - poker
+  - name: BACKFIRE
+    signs:
+      - Q clubs
+    image: 07_ritornodifiamma
+    color: brown
+    responses:
+      - backfire
+    tags:
+      - missed
+  - name: SAVED
+    signs:
+      - 5 hearts
+    image: 07_salvo2
+    color: brown
+    responses:
+      - saved2
+  - name: FANNING
+    signs:
+      - 2 spades
+    image: 07_sventagliata
+    color: brown
+    effects:
+      - banglimit
+      - bang adjacent_players(1) reachable notself
+    tags:
+      - skip_logs
+      - banglimit
+  - name: TOMAHAWK
+    signs:
+      - A diamonds
+    image: 07_tomahawk
+    color: brown
+    effects:
+      - bang player notself range_2
+    tags:
+      - skip_logs
+  - name: TORNADO
+    signs:
+      - A clubs
+    image: 07_tornado2
+    color: brown
+    effects:
+      - tornado2 players not_empty_hand
+  - name: LAST_CALL
+    signs:
+      - 8 diamonds
+    image: 07_ultimogiro
+    color: brown
+    effects:
+      - heal
+
+character:
+  - name: BLACK_FLOWER
+    image: 07_blackflower
+    effects:
+      - max_usages(1)
+      - discard card self | hand clubs
+      - bang player reachable notself
+    tags:
+      - skip_logs
+  - name: COLORADO_BILL
+    image: 07_coloradobill
+    equip:
+      - colorado_bill
+  - name: DER_SPOT_BURST_RINGER
+    image: 07_derspot
+    effects:
+      - max_usages(1)
+      - set_playing card self | hand bang
+      - none players notself
+    mth_effect: play_as_gatling(1)
+  - name: EVELYN_SHEBANG
+    image: 07_evelynshebang2
+    responses:
+      - add_draw_card
+      - max_usages(1)
+      - bang player notself range_1
+  - name: HENRY_BLOCK
+    image: 07_henryblock
+    equip:
+      - henry_block
+  - name: LEMONADE_JIM
+    image: 07_lemonadejim
+    equip:
+      - lemonade_jim
+    responses:
+      - can_play_card
+      - discard card self | hand
+      - heal_notfull
+    tags:
+      - preselect
+  - name: MICK_DEFENDER
+    image: 07_mickdefender2
+    equip:
+      - mick_defender
+    responses:
+      - escape2
+      - discard card self | hand missed
+  - name: TUCO_FRANZISKANER
+    image: 07_tucofranziskaner
+    equip:
+      - tuco_franziskaner
+    tags:
+      - max_hp(5)
+
+hidden:
+  - name: TORNADO
+    responses:
+      - tornado2_response
+      - none cards(2) self | hand
+    mth_response: tornado2_response(1)
+    tags:
+      - preselect
+  - name: BANDIDOS
+    responses:
+      - bandidos2_response
+      - none max_cards(2) self | hand
+    mth_response: bandidos2_response(1)
+    tags:
+      - preselect

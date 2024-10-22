@@ -2,6 +2,9 @@
 
 #include "game/game.h"
 #include "game/prompts.h"
+#include "game/possible_to_play.h"
+
+#include "cards/game_enums.h"
 
 #include "effects/base/requests.h"
 
@@ -79,5 +82,65 @@ namespace banggame {
 
     void effect_bandidos::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         target->m_game->queue_request<request_bandidos>(origin_card, origin, target, flags);
+    }
+
+    struct request_bandidos2 : request_base {
+        using request_base::request_base;
+
+        void on_update() override {
+            if (target->immune_to(origin_card, origin, flags) || target->empty_hand()) {
+                target->m_game->pop_request();
+            } else {
+                if (!live) {
+                    target->play_sound("bandidos");
+                }
+                auto not_disabled = target->m_hand
+                    | rv::remove_if([&](const_card_ptr c) {
+                        return target->m_game->is_usage_disabled(c);
+                    })
+                    | rn::to_vector;
+                if (not_disabled.size() <= 1) {
+                    handler_bandidos2_response{}.on_play(origin_card, target, not_disabled);
+                    target->reveal_hand();
+                }
+            }
+        }
+
+        game_string status_text(player_ptr owner) const override {
+            if (target == owner) {
+                return {"STATUS_BANDIDOS2", origin_card};
+            } else {
+                return {"STATUS_BANDIDOS2_OTHER", target, origin_card};
+            }
+        }
+    };
+
+    void effect_bandidos2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        target->m_game->queue_request<request_bandidos2>(origin_card, origin, target, flags);
+    }
+
+    bool effect_bandidos2_response::can_play(card_ptr origin_card, player_ptr origin) {
+        return origin->m_game->top_request<request_bandidos2>(origin) != nullptr;
+    }
+
+    game_string handler_bandidos2_response::get_error(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {
+        for (card_ptr target_card : target_cards) {
+            if (card_ptr disabler = origin->m_game->get_usage_disabler(target_card)) {
+                return {"ERROR_CARD_DISABLED_BY", target_card, disabler};
+            }
+        }
+        if (target_cards.size() == 1 && !target_cards.front()->is_bang_card(origin)) {
+            return "ERROR_TARGET_NOT_BANG";
+        }
+        return {};
+    }
+
+    void handler_bandidos2_response::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {
+        origin->m_game->pop_request();
+
+        for (card_ptr target_card : target_cards) {
+            origin->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, origin, target_card);
+            origin->discard_used_card(target_card);
+        }
     }
 }

@@ -50,7 +50,7 @@ find_package(ZLIB REQUIRED)
 FetchContent_Declare(
     uWebSockets_content
     GIT_REPOSITORY https://github.com/uNetworking/uWebSockets
-    GIT_TAG v20.66.0
+    GIT_TAG v20.68.0
     GIT_SHALLOW ON
     GIT_SUBMODULES ""
 )

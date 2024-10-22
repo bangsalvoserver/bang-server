@@ -12,7 +12,7 @@ namespace banggame {
         target->m_game->queue_request<request_check>(target, origin_card, &card_sign::is_hearts, [=](bool result) {
             if (result) {
                 target->m_game->add_log("LOG_CARD_HAS_EFFECT", origin_card);
-                effect_missed().on_play(origin_card, target);
+                effect_missed{}.on_play(origin_card, target);
             }
         });
     }

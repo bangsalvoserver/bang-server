@@ -11,6 +11,13 @@ namespace banggame {
     };
 
     DEFINE_EFFECT(saved, effect_saved)
+
+    struct effect_saved2 {
+        bool can_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
+    };
+
+    DEFINE_EFFECT(saved2, effect_saved2)
 }
 
 #endif
