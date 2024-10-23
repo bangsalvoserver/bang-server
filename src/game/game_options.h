@@ -11,6 +11,7 @@ namespace banggame {
         bool enable_ghost_cards;
         bool character_choice;
         bool quick_discard_all;
+        bool auto_pick_predraw;
         int scenario_deck_size;
         int num_bots;
         game_duration damage_timer;

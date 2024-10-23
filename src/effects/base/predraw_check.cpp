@@ -12,7 +12,7 @@ namespace banggame {
             }
             if (checks.empty()) {
                 target->m_game->pop_request();
-            } else {
+            } else if (target->m_game->m_options.auto_pick_predraw) {
                 auto_pick();
             }
         } else {

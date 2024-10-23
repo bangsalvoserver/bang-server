@@ -12,6 +12,7 @@ namespace banggame {
         .enable_ghost_cards { true },
         .character_choice { true },
         .quick_discard_all { true },
+        .auto_pick_predraw { true },
         .scenario_deck_size { 12 },
         .num_bots { 0 },
         .damage_timer { 1500ms },
