@@ -1,6 +1,7 @@
 #include "ruleset.h"
 
 #include "game/game.h"
+#include "game/game_options.h"
 
 #include "effects/base/damage.h"
 #include "effects/dodgecity/ruleset.h"

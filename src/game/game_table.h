@@ -15,6 +15,8 @@
 namespace banggame {
 
     struct game_table : game_net_manager, listener_map, disabler_map, request_queue {
+        const game_options &m_options;
+        
         unsigned int rng_seed;
         std::default_random_engine rng;
         std::default_random_engine bot_rng;
@@ -47,12 +49,11 @@ namespace banggame {
         int8_t train_position = 0;
 
         game_flags m_game_flags;
-        game_options m_options;
 
         player_ptr m_first_player = nullptr;
         player_ptr m_playing = nullptr;
 
-        game_table(unsigned int seed);
+        game_table(const game_options &options);
 
         card_ptr find_card(int card_id) const override;
         player_ptr find_player(int player_id) const override;

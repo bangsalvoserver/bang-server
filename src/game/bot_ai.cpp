@@ -1,10 +1,11 @@
 #include "game.h"
+#include "filters.h"
+#include "game_options.h"
 #include "play_verify.h"
 #include "possible_to_play.h"
+
 #include "net/bot_info.h"
 #include "net/logging.h"
-
-#include "game/filters.h"
 
 namespace banggame {
 

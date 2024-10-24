@@ -1,5 +1,7 @@
 #include "game_table.h"
 
+#include "game_options.h"
+
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
@@ -7,14 +9,15 @@
 
 namespace banggame {
 
-    game_table::game_table(unsigned int seed)
-        : disabler_map(this)
+    game_table::game_table(const game_options &options)
+        : disabler_map{this}
+        , m_options{options}
     {
         std::random_device rd;
-        if (seed == 0) {
+        if (options.game_seed == 0) {
             rng_seed = rd();
         } else {
-            rng_seed = seed;
+            rng_seed = options.game_seed;
         }
         rng.seed(rng_seed);
         bot_rng.seed(rd());

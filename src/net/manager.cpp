@@ -562,7 +562,7 @@ void game_manager::handle_message(utils::tag<"game_start">, session_ptr session)
 
     broadcast_message_lobby<"game_started">(lobby);
 
-    lobby.m_game = std::make_unique<banggame::game>(lobby.options.game_seed);
+    lobby.m_game = std::make_unique<banggame::game>(lobby.options);
 
     logging::info("Started game {} with seed {}", lobby.name, lobby.m_game->rng_seed);
 
@@ -591,7 +591,7 @@ void game_manager::handle_message(utils::tag<"game_start">, session_ptr session)
     }
 
     lobby.m_game->add_players(user_ids);
-    lobby.m_game->start_game(lobby.options);
+    lobby.m_game->start_game();
     lobby.m_game->commit_updates();
 }
 

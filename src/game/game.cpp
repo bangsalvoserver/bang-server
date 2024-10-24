@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include "game_update.h"
+#include "game_options.h"
 
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
@@ -182,16 +183,12 @@ namespace banggame {
         return true;
     }
 
-    void game::start_game(const game_options &options) {
-        m_options = options;
-
+    void game::start_game() {
         for (const ruleset_vtable *ruleset : m_options.expansions) {
             ruleset->on_apply(this);
         }
 
         add_update<"player_add">(m_players);
-
-        bool ghost_card_added = false;
         
         auto add_cards = [&](std::span<const card_data> cards, pocket_type pocket, card_list *out_pocket = nullptr) {
             if (!out_pocket && pocket != pocket_type::none) out_pocket = &get_pocket(pocket);
@@ -202,12 +199,8 @@ namespace banggame {
                     continue;
                 }
 
-                if (c.has_tag(tag_type::ghost_card)) {
-                    if (m_options.enable_ghost_cards) {
-                        ghost_card_added = true;
-                    } else {
-                        continue;
-                    }
+                if (c.has_tag(tag_type::ghost_card) && !m_options.enable_ghost_cards) {
+                    continue;
                 }
 
                 card_ptr new_card = add_card(c);
@@ -307,8 +300,6 @@ namespace banggame {
         if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
             rn::shuffle(character_ptrs, rng);
         }
-
-        m_options.enable_ghost_cards = ghost_card_added;
 
         add_game_flags(game_flag::hands_shown);
 
@@ -552,7 +543,7 @@ namespace banggame {
             }
         }, 50);
 
-        if (!m_options.enable_ghost_cards) {
+        if (rn::none_of(get_all_cards(), [](const_card_ptr c) { return c->has_tag(tag_type::ghost_card); })) {
             queue_action([this]{
                 bool any_player_removed = false;
                 for (player_ptr p : m_players) {

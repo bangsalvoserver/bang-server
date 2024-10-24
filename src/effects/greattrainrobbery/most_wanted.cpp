@@ -1,6 +1,8 @@
 #include "most_wanted.h"
 
 #include "game/game.h"
+#include "game/game_options.h"
+
 #include "effects/base/resolve.h"
 #include "effects/base/draw_check.h"
 

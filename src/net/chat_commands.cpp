@@ -80,7 +80,7 @@ namespace banggame {
 
     void game_manager::command_reset_game_options(session_ptr session) {
         game_lobby &lobby = *session->lobby;
-        lobby.options = game_options::default_game_options;
+        lobby.options = game_options{};
         broadcast_message_lobby<"lobby_game_options">(lobby, lobby.options);
     }
 

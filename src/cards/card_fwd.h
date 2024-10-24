@@ -27,6 +27,7 @@ namespace banggame {
     using nullable_player = utils::nullable<player_ptr>;
 
     struct effect_context;
+    struct game_options;
     
     struct effect_vtable;
     struct equip_vtable;
