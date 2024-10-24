@@ -180,7 +180,7 @@ character:
   - name: MICK_DEFENDER
     image: 07_mickdefender2
     equip:
-      - mick_defender
+      - mick_defender2
     responses:
       - escape2
       - discard card self | hand missed
