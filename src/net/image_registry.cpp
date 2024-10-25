@@ -35,30 +35,52 @@ namespace banggame::image_registry {
         }
     };
 
-    static std::unordered_multiset<banggame::image_pixels_view, image_pixels_hasher, image_pixels_equal> m_registry;
-    static std::mutex m_registry_mutex;
+    struct registry {
+    private:
+        std::unordered_multiset<banggame::image_pixels_view, image_pixels_hasher, image_pixels_equal> m_registry;
+        mutable std::mutex m_mutex;
+
+        registry() = default;
+
+    public:
+        static registry &get() {
+            static registry instance;
+            return instance;
+        }
+
+        void register_image(banggame::image_pixels_view image) {
+            if (image) {
+                std::scoped_lock guard{m_mutex};
+                m_registry.emplace(image);
+            }
+        }
+
+        void deregister_image(banggame::image_pixels_view image) {
+            if (image) {
+                std::scoped_lock guard{m_mutex};
+                m_registry.erase(image);
+            }
+        }
+
+        banggame::image_pixels_view get_image(size_t hash) const {
+            std::scoped_lock guard{m_mutex};
+            auto it = m_registry.find(hash);
+            if (it == m_registry.end()) {
+                return {};
+            }
+            return *it;
+        }
+    };
     
     void register_image(banggame::image_pixels_view image) {
-        if (image) {
-            std::scoped_lock guard{m_registry_mutex};
-            m_registry.emplace(image);
-        }
+        registry::get().register_image(image);
     }
 
     void deregister_image(banggame::image_pixels_view image) {
-        if (image) {
-            std::scoped_lock guard{m_registry_mutex};
-            m_registry.erase(image);
-        }
+        registry::get().deregister_image(image);
     }
 
-    std::optional<banggame::image_pixels_view> get_image(size_t hash) {
-        std::scoped_lock guard{m_registry_mutex};
-        
-        auto it = m_registry.find(hash);
-        if (it == m_registry.end()) {
-            return std::nullopt;
-        }
-        return *it;
+    banggame::image_pixels_view get_image(size_t hash) {
+        return registry::get().get_image(hash);
     }
 }

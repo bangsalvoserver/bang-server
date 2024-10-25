@@ -125,7 +125,7 @@ namespace net {
                 }
 
                 bool status_written = false;
-                bool result = image->write_png([&](std::string_view bytes) {
+                bool result = image.write_png([&](std::string_view bytes) {
                     if (!status_written) {
                         status_written = true;
                         res->writeStatus("200 OK");
