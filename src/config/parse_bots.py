@@ -62,11 +62,11 @@ def parse_file(data):
             object_value=propic.pixels
         )
 
-        propics.append(CppObject(
+        propics.append([CppObject(
             width = propic.width,
             height = propic.height,
             pixels = CppLiteral(propic.name)
-        ))
+        )])
 
     yield CppDeclaration(
         object_name='const bot_info_t bot_info',

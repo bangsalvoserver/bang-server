@@ -1,16 +1,24 @@
 #ifndef __IMAGE_PIXELS_H__
 #define __IMAGE_PIXELS_H__
 
-#include "utils/base64.h"
-#include "utils/json_aggregate.h"
-
-#include "compression.h"
+#include "utils/json_serial.h"
 
 namespace banggame {
+
+    using write_bytes_fun = std::function<void(std::string_view)>;
+
     struct image_pixels_view {
         int width;
         int height;
         std::span<const uint8_t> pixels;
+
+        explicit operator bool () const {
+            return width != 0 && height != 0 && !pixels.empty();
+        }
+        
+        size_t get_hash() const;
+
+        bool write_png(write_bytes_fun write_fn) const;
     };
 
     struct image_pixels {
@@ -19,7 +27,7 @@ namespace banggame {
         std::vector<uint8_t> pixels;
 
         explicit operator bool () const {
-            return width != 0 && height != 0;
+            return width != 0 && height != 0 && !pixels.empty();
         }
 
         operator image_pixels_view() const {
@@ -30,56 +38,33 @@ namespace banggame {
         void set_pixel(size_t x, size_t y, uint32_t value);
 
         image_pixels scale_to(int new_size) const;
+
+        static image_pixels from_png_data_url(std::string_view data_url);
     };
 }
 
 namespace json {
 
-    struct image_pixels_tag {};
-
-    template<std::convertible_to<std::span<const uint8_t>> Bytes>
-    struct serializer<Bytes, image_pixels_tag> {
-        json operator()(const Bytes &value) const {
-            return base64::base64_encode(compression::compress_bytes(value));
-        }
-    };
-
     template<typename Context>
     struct serializer<banggame::image_pixels_view, Context> {
-        using base_type = aggregate_serializer_unchecked<banggame::image_pixels_view, image_pixels_tag>;
         json operator()(const banggame::image_pixels_view &value) const {
-            return base_type{}(value, image_pixels_tag{});
-        }
-    };
-
-    template<typename Context>
-    struct serializer<banggame::image_pixels, Context> {
-        json operator()(const banggame::image_pixels &value) const {
-            return serialize_unchecked(banggame::image_pixels_view(value), image_pixels_tag{});
-        }
-    };
-
-    template<> struct deserializer<std::vector<uint8_t>, image_pixels_tag> {
-        std::vector<uint8_t> operator()(const json &value) const {
-            if (!value.is_string()) {
-                throw deserialize_error("Cannot deserialize base64 encoded string");
+            if (value) {
+                return std::to_string(value.get_hash());
             }
-            return compression::decompress_bytes(base64::base64_decode(value.get<std::string>()));
+            return {};
         }
     };
 
     template<typename Context>
     struct deserializer<banggame::image_pixels, Context> {
-        using base_type = aggregate_deserializer_unchecked<banggame::image_pixels, image_pixels_tag>;
         banggame::image_pixels operator()(const json &value) const {
             if (value.is_null()) {
                 return {};
             }
-            banggame::image_pixels result = base_type{}(value, image_pixels_tag{});
-            if (result.pixels.size() != result.width * result.height * 4) {
-                throw deserialize_error("Invalid image");
+            if (!value.is_string()) {
+                throw deserialize_error("Cannot deserialize image_pixels");
             }
-            return result;
+            return banggame::image_pixels::from_png_data_url(value.get<std::string_view>());
         }
     };
 }

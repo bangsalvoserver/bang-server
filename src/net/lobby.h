@@ -3,6 +3,7 @@
 
 #include "options.h"
 #include "messages.h"
+#include "image_registry.h"
 
 #include "game/game.h"
 
@@ -30,7 +31,7 @@ static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
 struct game_session {
     std::string username;
-    image_pixels propic;
+    image_registry::image_pixels propic;
     
     game_lobby *lobby = nullptr;
 

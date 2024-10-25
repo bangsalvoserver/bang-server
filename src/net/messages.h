@@ -98,13 +98,9 @@ namespace banggame {
     struct lobby_user_args {
         int user_id;
         std::string username;
+        image_pixels_view propic;
         game_user_flags flags;
         std::chrono::milliseconds lifetime;
-    };
-
-    struct user_propic_args {
-        int user_id;
-        image_pixels_view propic;
     };
 
     enum class lobby_chat_flag {
@@ -138,7 +134,6 @@ namespace banggame {
         utils::tag<"lobby_game_options", game_options>,
         utils::tag<"lobby_removed", lobby_removed_args>,
         utils::tag<"lobby_user_update", lobby_user_args>,
-        utils::tag<"lobby_user_propic", user_propic_args>,
         utils::tag<"lobby_kick">,
         utils::tag<"lobby_chat", lobby_chat_args>,
         utils::tag<"game_update", json::json>,

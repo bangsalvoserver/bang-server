@@ -49,6 +49,11 @@ target_link_libraries(banglibs INTERFACE cxxopts::cxxopts)
 find_package(nlohmann_json 3.11.0 REQUIRED)
 target_link_libraries(banglibs INTERFACE nlohmann_json::nlohmann_json)
 
+# libpng
+
+find_package(PNG REQUIRED)
+target_link_libraries(banglibs INTERFACE PNG::PNG)
+
 # bang server executable
 
 add_executable(bangserver "")

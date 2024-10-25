@@ -2,8 +2,10 @@
 
 #include "logging.h"
 #include "tracking.h"
+#include "image_registry.h"
 
 #include "utils/json_aggregate.h"
+#include "utils/parse_string.h"
 #include "utils/misc.h"
 
 #include <variant>
@@ -68,8 +70,9 @@ namespace net {
         int listen_options = reuse_addr ? LIBUS_LISTEN_DEFAULT : LIBUS_LISTEN_EXCLUSIVE_PORT;
         visit_server([&]<bool SSL>(uWS::TemplatedApp<SSL> &server) {
             server.template ws<wsclient_data>("/", {
+#ifndef UWS_NO_ZLIB
                 .compression = uWS::CompressOptions(uWS::DEDICATED_COMPRESSOR_4KB | uWS::DEDICATED_DECOMPRESSOR),
-                
+#endif
                 .maxPayloadLength = 1 * 1024 * 1024,
                 .maxBackpressure = 16 * 1024 * 1024,
 
@@ -105,6 +108,35 @@ namespace net {
                     res->writeHeader("Access-Control-Allow-Origin","*");
                     res->end(e.what());
                 }
+            })
+            .get("/image/:hash", [this](auto *res, auto *req) {
+                auto hash = utils::parse_string<size_t>(req->getParameter("hash"));
+                if (!hash) {
+                    res->writeStatus("400 Bad request");
+                    res->end();
+                    return;
+                }
+
+                auto image = banggame::image_registry::get_image(*hash);
+                if (!image) {
+                    res->writeStatus("404 File Not Found");
+                    res->end();
+                    return;
+                }
+
+                bool status_written = false;
+                bool result = image->write_png([&](std::string_view bytes) {
+                    if (!status_written) {
+                        status_written = true;
+                        res->writeStatus("200 OK");
+                        res->writeHeader("Content-Type", "image/png");
+                    }
+                    res->write(bytes);
+                });
+                if (!result) {
+                    res->writeStatus("500 Internal Server Error");
+                }
+                res->end();
             })
             .listen(port, listen_options, [=, this](us_listen_socket_t *listen_socket) {
                 if (listen_socket) {
