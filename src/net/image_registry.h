@@ -8,7 +8,7 @@ namespace banggame::image_registry {
     void register_image(banggame::image_pixels_view image);
     void deregister_image(banggame::image_pixels_view image);
 
-    using write_png_function = tl::function_ref<void(std::string_view)>;
+    using write_png_function = tl::function_ref<void(byte_slice)>;
     bool write_image_png(size_t hash, const write_png_function &fun);
 
     template<std::convertible_to<banggame::image_pixels_view> T>

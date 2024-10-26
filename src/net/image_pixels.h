@@ -5,10 +5,15 @@
 
 namespace banggame {
 
+    using byte_slice = std::span<const uint8_t>;
+    using byte_vector = std::vector<uint8_t>;
+
+    static constexpr int bytes_per_pixel = 4;
+
     struct image_pixels_view {
-        int width;
-        int height;
-        std::span<const uint8_t> pixels;
+        uint32_t width;
+        uint32_t height;
+        byte_slice pixels;
 
         explicit operator bool () const {
             return width != 0 && height != 0 && !pixels.empty();
@@ -18,9 +23,9 @@ namespace banggame {
     };
 
     struct image_pixels {
-        int width;
-        int height;
-        std::vector<uint8_t> pixels;
+        uint32_t width;
+        uint32_t height;
+        byte_vector pixels;
 
         explicit operator bool () const {
             return width != 0 && height != 0 && !pixels.empty();
@@ -30,13 +35,13 @@ namespace banggame {
             return { width, height, pixels };
         }
 
-        uint32_t get_pixel(size_t x, size_t y) const;
-        void set_pixel(size_t x, size_t y, uint32_t value);
+        uint32_t get_pixel(uint32_t x, uint32_t y) const;
+        void set_pixel(uint32_t x, uint32_t y, uint32_t value);
 
-        image_pixels scale_to(int new_size) const;
+        image_pixels scale_to(uint32_t new_size) const;
     };
 
-    std::string image_to_png(image_pixels_view image);
+    byte_vector image_to_png(image_pixels_view image);
 
     image_pixels image_from_png_data_url(std::string_view data_url);
 }

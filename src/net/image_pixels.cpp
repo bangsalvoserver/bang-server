@@ -9,34 +9,34 @@ namespace banggame {
     size_t image_pixels_view::get_hash() const {
         size_t seed = 0;
 
-        seed ^= std::hash<int>{}(width) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-        seed ^= std::hash<int>{}(height) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= std::hash<uint32_t>{}(width) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= std::hash<uint32_t>{}(height) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         seed ^= std::hash<const uint8_t *>{}(pixels.data()) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 
         return seed;
     }
 
-    uint32_t image_pixels::get_pixel(size_t x, size_t y) const {
+    uint32_t image_pixels::get_pixel(uint32_t x, uint32_t y) const {
         if (x >= width || y >= height) {
             return 0;
         }
 
         uint32_t result;
-        size_t index = (y * width + x) * 4;
-        std::memcpy(&result, pixels.data() + index, 4);
+        uint32_t index = (y * width + x) * bytes_per_pixel;
+        std::memcpy(&result, pixels.data() + index, bytes_per_pixel);
         return result;
     }
 
-    void image_pixels::set_pixel(size_t x, size_t y, uint32_t value) {
+    void image_pixels::set_pixel(uint32_t x, uint32_t y, uint32_t value) {
         if (x < width && y < height) {
-            size_t index = (y * width + x) * 4;
-            std::memcpy(pixels.data() + index, &value, 4);
+            uint32_t index = (y * width + x) * bytes_per_pixel;
+            std::memcpy(pixels.data() + index, &value, bytes_per_pixel);
         }
     }
     
-    image_pixels image_pixels::scale_to(int new_size) const {
-        int new_width = width;
-        int new_height = height;
+    image_pixels image_pixels::scale_to(uint32_t new_size) const {
+        uint32_t new_width = width;
+        uint32_t new_height = height;
 
         if (new_width <= 0 || new_height <= 0 || new_size <= 0) {
             return image_pixels{};
@@ -55,11 +55,11 @@ namespace banggame {
         }
 
         image_pixels result { new_width, new_height };
-        result.pixels.resize(new_width * new_height * 4);
-        for (size_t y = 0; y < new_height; ++y) {
-            for (size_t x = 0; x < new_width; ++x) {
-                size_t scaled_x = x * width / new_width;
-                size_t scaled_y = y * height / new_height;
+        result.pixels.resize(new_width * new_height * bytes_per_pixel);
+        for (uint32_t y = 0; y < new_height; ++y) {
+            for (uint32_t x = 0; x < new_width; ++x) {
+                uint32_t scaled_x = x * width / new_width;
+                uint32_t scaled_y = y * height / new_height;
 
                 result.set_pixel(x, y, get_pixel(scaled_x, scaled_y));
             }
@@ -67,7 +67,7 @@ namespace banggame {
         return result;
     }
 
-    std::string image_to_png(image_pixels_view image) {
+    byte_vector image_to_png(image_pixels_view image) {
         png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
         if (!png) {
             return {};
@@ -84,30 +84,25 @@ namespace banggame {
             return {};
         }
 
-        std::string result;
+        byte_vector result;
 
         // Set up custom write function to write
         png_set_write_fn(png, &result, [](png_structp png_ptr, png_bytep data, png_size_t length) {
-            auto* str = static_cast<std::string*>(png_get_io_ptr(png_ptr));
-            str->insert(str->end(), data, data + length);
+            auto* vec = static_cast<byte_vector*>(png_get_io_ptr(png_ptr));
+            vec->insert(vec->end(), data, data + length);
         }, nullptr);
 
         // Set image attributes
-        int color_type = PNG_COLOR_TYPE_RGBA;
-        png_set_IHDR(png, info, image.width, image.height, 8, color_type,
+        png_set_IHDR(png, info, image.width, image.height, 8, PNG_COLOR_TYPE_RGBA,
                     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
         png_write_info(png, info);
 
         // Write image data row by row
-        const int bytes_per_pixel = 4; // RGBA has 4 bytes per pixel
-        std::vector<png_bytep> row_pointers(image.height);
-
-        for (int y = 0; y < image.height; ++y) {
-            row_pointers[y] = (png_bytep)(image.pixels.data() + y * image.width * bytes_per_pixel);
+        for (uint32_t y = 0; y < image.height; ++y) {
+            png_write_row(png, static_cast<png_const_bytep>(image.pixels.data() + y * image.width * bytes_per_pixel));
         }
 
-        png_write_image(png, row_pointers.data());
         png_write_end(png, nullptr);
 
         png_destroy_write_struct(&png, &info);
@@ -120,7 +115,7 @@ namespace banggame {
         if (!data_url.starts_with(prefix)) {
             throw std::runtime_error("Invalid data URL format");
         }
-        std::vector<uint8_t> png_data = base64::base64_decode(data_url.substr(prefix.size()));
+        byte_vector png_data = base64::base64_decode(data_url.substr(prefix.size()));
 
         // Initialize libpng structures
         png_image image{};
@@ -133,18 +128,15 @@ namespace banggame {
 
         // Allocate memory for the image buffer
         image.format = PNG_FORMAT_RGBA;
-        std::vector<uint8_t> pixels;
-        pixels.resize(PNG_IMAGE_SIZE(image));
-        if (!png_image_finish_read(&image, nullptr, pixels.data(), 0, nullptr)) {
+
+        image_pixels result{image.width, image.height};
+        result.pixels.resize(PNG_IMAGE_SIZE(image));
+        if (!png_image_finish_read(&image, nullptr, result.pixels.data(), 0, nullptr)) {
             png_image_free(&image);
             throw std::runtime_error("Failed to finish reading PNG image");
         }
 
-        return {
-            static_cast<int>(image.width),
-            static_cast<int>(image.height),
-            std::move(pixels)
-        };
+        return result;
     }
 
 }

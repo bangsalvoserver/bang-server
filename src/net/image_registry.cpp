@@ -38,7 +38,7 @@ namespace banggame::image_registry {
 
     class registry {
     private:
-        std::unordered_multimap<banggame::image_pixels_view, std::string, image_pixels_hasher, image_pixels_equal> m_registry;
+        std::unordered_multimap<banggame::image_pixels_view, byte_vector, image_pixels_hasher, image_pixels_equal> m_registry;
         mutable std::shared_mutex m_mutex;
 
         registry() = default;

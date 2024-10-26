@@ -111,10 +111,10 @@ namespace net {
             })
             .get("/image/:hash", [this](auto *res, auto *req) {
                 if (auto hash = utils::parse_string<size_t>(req->getParameter("hash"), 16)) {
-                    if (!banggame::image_registry::write_image_png(*hash, [&](std::string_view image) {
+                    if (!banggame::image_registry::write_image_png(*hash, [&](std::span<const uint8_t> bytes) {
                         res->writeStatus("200 OK");
                         res->writeHeader("Content-Type", "image/png");
-                        res->end(image);
+                        res->end({ reinterpret_cast<const char*>(bytes.data()), bytes.size() });
                     })) {
                         res->writeStatus("404 File Not Found");
                         res->end();
