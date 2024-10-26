@@ -49,7 +49,7 @@ namespace json {
     struct serializer<banggame::image_pixels_view, Context> {
         json operator()(const banggame::image_pixels_view &value) const {
             if (value) {
-                return std::to_string(value.get_hash());
+                return std::format("{:x}", value.get_hash());
             }
             return {};
         }

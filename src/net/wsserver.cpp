@@ -110,7 +110,7 @@ namespace net {
                 }
             })
             .get("/image/:hash", [this](auto *res, auto *req) {
-                auto hash = utils::parse_string<size_t>(req->getParameter("hash"));
+                auto hash = utils::parse_string<size_t>(req->getParameter("hash"), 16);
                 if (!hash) {
                     res->writeStatus("400 Bad request");
                     res->end();
