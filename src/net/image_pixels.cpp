@@ -67,45 +67,44 @@ namespace banggame {
         return result;
     }
 
-    bool image_pixels_view::write_png(write_bytes_fun write_fn) const {
+    std::string image_to_png(image_pixels_view image) {
         png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
         if (!png) {
-            return false;
+            return {};
         }
 
         png_infop info = png_create_info_struct(png);
         if (!info) {
             png_destroy_write_struct(&png, nullptr);
-            return false;
+            return {};
         }
 
         if (setjmp(png_jmpbuf(png))) {
             png_destroy_write_struct(&png, &info);
-            return false;
+            return {};
         }
 
+        std::string result;
+
         // Set up custom write function to write
-        png_set_write_fn(png, &write_fn, [](png_structp png_ptr, png_bytep data, png_size_t length) {
-            auto* fun = static_cast<write_bytes_fun*>(png_get_io_ptr(png_ptr));
-            (*fun)(std::string_view{
-                reinterpret_cast<const char *>(data),
-                static_cast<size_t>(length)
-            });
+        png_set_write_fn(png, &result, [](png_structp png_ptr, png_bytep data, png_size_t length) {
+            auto* str = static_cast<std::string*>(png_get_io_ptr(png_ptr));
+            str->insert(str->end(), data, data + length);
         }, nullptr);
 
         // Set image attributes
         int color_type = PNG_COLOR_TYPE_RGBA;
-        png_set_IHDR(png, info, width, height, 8, color_type,
+        png_set_IHDR(png, info, image.width, image.height, 8, color_type,
                     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
         png_write_info(png, info);
 
         // Write image data row by row
         const int bytes_per_pixel = 4; // RGBA has 4 bytes per pixel
-        std::vector<png_bytep> row_pointers(height);
+        std::vector<png_bytep> row_pointers(image.height);
 
-        for (int y = 0; y < height; ++y) {
-            row_pointers[y] = (png_bytep)(pixels.data() + y * width * bytes_per_pixel);
+        for (int y = 0; y < image.height; ++y) {
+            row_pointers[y] = (png_bytep)(image.pixels.data() + y * image.width * bytes_per_pixel);
         }
 
         png_write_image(png, row_pointers.data());
@@ -113,10 +112,10 @@ namespace banggame {
 
         png_destroy_write_struct(&png, &info);
 
-        return true;
+        return result;
     }
 
-    image_pixels image_pixels::from_png_data_url(std::string_view data_url) {
+    image_pixels image_from_png_data_url(std::string_view data_url) {
         static constexpr std::string_view prefix = "data:image/png;base64,";
         if (!data_url.starts_with(prefix)) {
             throw std::runtime_error("Invalid data URL format");

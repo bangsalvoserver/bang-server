@@ -1,7 +1,8 @@
-#include "image_pixels.h"
+#include "image_registry.h"
 
-#include <mutex>
 #include <unordered_set>
+#include <shared_mutex>
+#include <mutex>
 
 namespace banggame::image_registry {
 
@@ -37,8 +38,8 @@ namespace banggame::image_registry {
 
     struct registry {
     private:
-        std::unordered_multiset<banggame::image_pixels_view, image_pixels_hasher, image_pixels_equal> m_registry;
-        mutable std::mutex m_mutex;
+        std::unordered_multimap<banggame::image_pixels_view, std::string, image_pixels_hasher, image_pixels_equal> m_registry;
+        mutable std::shared_mutex m_mutex;
 
         registry() = default;
 
@@ -50,8 +51,11 @@ namespace banggame::image_registry {
 
         void register_image(banggame::image_pixels_view image) {
             if (image) {
-                std::scoped_lock guard{m_mutex};
-                m_registry.emplace(image);
+                auto png_string = image_to_png(image);
+                if (!png_string.empty()) {
+                    std::scoped_lock guard{m_mutex};
+                    m_registry.emplace(image, std::move(png_string));
+                }
             }
         }
 
@@ -62,13 +66,14 @@ namespace banggame::image_registry {
             }
         }
 
-        banggame::image_pixels_view get_image(size_t hash) const {
-            std::scoped_lock guard{m_mutex};
+        bool write_image_png(size_t hash, const write_png_function &fun) const {
+            std::shared_lock guard{m_mutex};
             auto it = m_registry.find(hash);
             if (it == m_registry.end()) {
-                return {};
+                return false;
             }
-            return *it;
+            fun(it->second);
+            return true;
         }
     };
     
@@ -80,7 +85,7 @@ namespace banggame::image_registry {
         registry::get().deregister_image(image);
     }
 
-    banggame::image_pixels_view get_image(size_t hash) {
-        return registry::get().get_image(hash);
+    bool write_image_png(size_t hash, const write_png_function &fun) {
+        return registry::get().write_image_png(hash, fun);
     }
 }

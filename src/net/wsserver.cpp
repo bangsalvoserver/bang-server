@@ -117,26 +117,14 @@ namespace net {
                     return;
                 }
 
-                auto image = banggame::image_registry::get_image(*hash);
-                if (!image) {
+                if (!banggame::image_registry::write_image_png(*hash, [&](std::string_view image) {
+                    res->writeStatus("200 OK");
+                    res->writeHeader("Content-Type", "image/png");
+                    res->end(image);
+                })) {
                     res->writeStatus("404 File Not Found");
                     res->end();
-                    return;
-                }
-
-                bool status_written = false;
-                bool result = image.write_png([&](std::string_view bytes) {
-                    if (!status_written) {
-                        status_written = true;
-                        res->writeStatus("200 OK");
-                        res->writeHeader("Content-Type", "image/png");
-                    }
-                    res->write(bytes);
-                });
-                if (!result) {
-                    res->writeStatus("500 Internal Server Error");
-                }
-                res->end();
+                }                
             })
             .listen(port, listen_options, [=, this](us_listen_socket_t *listen_socket) {
                 if (listen_socket) {

@@ -5,8 +5,6 @@
 
 namespace banggame {
 
-    using write_bytes_fun = std::function<void(std::string_view)>;
-
     struct image_pixels_view {
         int width;
         int height;
@@ -17,8 +15,6 @@ namespace banggame {
         }
         
         size_t get_hash() const;
-
-        bool write_png(write_bytes_fun write_fn) const;
     };
 
     struct image_pixels {
@@ -38,9 +34,11 @@ namespace banggame {
         void set_pixel(size_t x, size_t y, uint32_t value);
 
         image_pixels scale_to(int new_size) const;
-
-        static image_pixels from_png_data_url(std::string_view data_url);
     };
+
+    std::string image_to_png(image_pixels_view image);
+
+    image_pixels image_from_png_data_url(std::string_view data_url);
 }
 
 namespace json {
@@ -64,7 +62,7 @@ namespace json {
             if (!value.is_string()) {
                 throw deserialize_error("Cannot deserialize image_pixels");
             }
-            return banggame::image_pixels::from_png_data_url(value.get<std::string_view>());
+            return banggame::image_from_png_data_url(value.get<std::string_view>());
         }
     };
 }

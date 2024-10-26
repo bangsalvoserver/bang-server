@@ -6,7 +6,9 @@
 namespace banggame::image_registry {
     void register_image(banggame::image_pixels_view image);
     void deregister_image(banggame::image_pixels_view image);
-    banggame::image_pixels_view get_image(size_t hash);
+
+    using write_png_function = std::move_only_function<void(std::string_view) const>;
+    bool write_image_png(size_t hash, const write_png_function &fun);
 
     template<std::convertible_to<banggame::image_pixels_view> T>
     class registered_image {
