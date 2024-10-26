@@ -110,21 +110,19 @@ namespace net {
                 }
             })
             .get("/image/:hash", [this](auto *res, auto *req) {
-                auto hash = utils::parse_string<size_t>(req->getParameter("hash"), 16);
-                if (!hash) {
-                    res->writeStatus("400 Bad request");
+                if (auto hash = utils::parse_string<size_t>(req->getParameter("hash"), 16)) {
+                    if (!banggame::image_registry::write_image_png(*hash, [&](std::string_view image) {
+                        res->writeStatus("200 OK");
+                        res->writeHeader("Content-Type", "image/png");
+                        res->end(image);
+                    })) {
+                        res->writeStatus("404 File Not Found");
+                        res->end();
+                    }
+                } else {
+                    res->writeStatus("400 Bad Request");
                     res->end();
-                    return;
                 }
-
-                if (!banggame::image_registry::write_image_png(*hash, [&](std::string_view image) {
-                    res->writeStatus("200 OK");
-                    res->writeHeader("Content-Type", "image/png");
-                    res->end(image);
-                })) {
-                    res->writeStatus("404 File Not Found");
-                    res->end();
-                }                
             })
             .listen(port, listen_options, [=, this](us_listen_socket_t *listen_socket) {
                 if (listen_socket) {

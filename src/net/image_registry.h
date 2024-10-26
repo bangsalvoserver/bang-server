@@ -2,12 +2,13 @@
 #define __IMAGE_REGISTRY_H__
 
 #include "image_pixels.h"
+#include "utils/function_ref.h"
 
 namespace banggame::image_registry {
     void register_image(banggame::image_pixels_view image);
     void deregister_image(banggame::image_pixels_view image);
 
-    using write_png_function = std::move_only_function<void(std::string_view) const>;
+    using write_png_function = tl::function_ref<void(std::string_view)>;
     bool write_image_png(size_t hash, const write_png_function &fun);
 
     template<std::convertible_to<banggame::image_pixels_view> T>
