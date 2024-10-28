@@ -1,44 +1,32 @@
 #include "image_registry.h"
 
-#include <unordered_set>
+#include <unordered_map>
 #include <shared_mutex>
 #include <mutex>
 
-namespace banggame::image_registry {
+#include "logging.h"
 
-    struct image_pixels_hasher {
-        using is_transparent = void;
-
-        size_t operator()(const banggame::image_pixels_view &image) const {
-            return image.get_hash();
-        }
-
-        size_t operator()(size_t hash) const {
-            return hash;
+namespace std {
+    template<> struct hash<banggame::image_pixels_hash> {
+        size_t operator()(const banggame::image_pixels_hash &value) const {
+            return value.value;
         }
     };
+}
 
-    struct image_pixels_equal {
-        using is_transparent = void;
+namespace banggame::image_registry {
 
-        bool operator()(const banggame::image_pixels_view &lhs, const banggame::image_pixels_view &rhs) const {
-            return lhs.width == rhs.width
-                && lhs.height == rhs.height
-                && lhs.pixels.data() == rhs.pixels.data();
-        }
-        
-        bool operator()(const banggame::image_pixels_view &lhs, size_t hash) const {
-            return lhs.get_hash() == hash;
-        }
-        
-        bool operator()(size_t hash, const banggame::image_pixels_view &rhs) const {
-            return rhs.get_hash() == hash;
-        }
+    struct registry_entry {
+        byte_vector png_bytes;
+        size_t refcount = 0;
+
+        registry_entry(image_pixels_view image)
+            : png_bytes{image_to_png(image)} {}
     };
 
     class registry {
     private:
-        std::unordered_multimap<banggame::image_pixels_view, byte_vector, image_pixels_hasher, image_pixels_equal> m_registry;
+        std::unordered_map<image_pixels_hash, registry_entry> m_registry;
         mutable std::shared_mutex m_mutex;
 
         registry() = default;
@@ -49,43 +37,62 @@ namespace banggame::image_registry {
             return instance;
         }
 
-        void register_image(banggame::image_pixels_view image) {
-            if (image) {
-                auto png_string = image_to_png(image);
-                if (!png_string.empty()) {
+        void register_image(image_pixels_hash hash, image_pixels_view image) {
+            if (hash) {
+                try {
                     std::scoped_lock guard{m_mutex};
-                    m_registry.emplace(image, std::move(png_string));
+                    auto [it, inserted] = m_registry.try_emplace(hash, image);
+                    ++it->second.refcount;
+                } catch (const std::exception &e) {
+                    logging::error("Error while registering image: {}", e.what());
                 }
             }
         }
 
-        void deregister_image(banggame::image_pixels_view image) {
-            if (image) {
+        void register_image(image_pixels_hash hash) {
+            if (hash) {
                 std::scoped_lock guard{m_mutex};
-                m_registry.erase(image);
+                auto it = m_registry.find(hash);
+                if (it != m_registry.end()) {
+                    ++it->second.refcount;
+                }
             }
         }
 
-        bool write_image_png(size_t hash, const write_png_function &fun) const {
+        void deregister_image(image_pixels_hash hash) {
+            if (hash) {
+                std::scoped_lock guard{m_mutex};
+                auto it = m_registry.find(hash);
+                if (it != m_registry.end() && --it->second.refcount == 0) {
+                    m_registry.erase(it);
+                }
+            }
+        }
+
+        bool write_image_png(image_pixels_hash hash, const write_png_function &fun) const {
             std::shared_lock guard{m_mutex};
             auto it = m_registry.find(hash);
             if (it == m_registry.end()) {
                 return false;
             }
-            fun(it->second);
+            fun(it->second.png_bytes);
             return true;
         }
     };
     
-    void register_image(banggame::image_pixels_view image) {
-        registry::get().register_image(image);
+    void register_image(image_pixels_hash hash, image_pixels_view image) {
+        registry::get().register_image(hash, image);
+    }
+    
+    void register_image(image_pixels_hash hash) {
+        registry::get().register_image(hash);
     }
 
-    void deregister_image(banggame::image_pixels_view image) {
-        registry::get().deregister_image(image);
+    void deregister_image(image_pixels_hash hash) {
+        registry::get().deregister_image(hash);
     }
 
-    bool write_image_png(size_t hash, const write_png_function &fun) {
+    bool write_image_png(image_pixels_hash hash, const write_png_function &fun) {
         return registry::get().write_image_png(hash, fun);
     }
 }

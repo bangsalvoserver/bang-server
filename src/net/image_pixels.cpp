@@ -6,16 +6,6 @@
 
 namespace banggame {
 
-    size_t image_pixels_view::get_hash() const {
-        size_t seed = 0;
-
-        seed ^= std::hash<uint32_t>{}(width) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-        seed ^= std::hash<uint32_t>{}(height) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-        seed ^= std::hash<const uint8_t *>{}(pixels.data()) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-
-        return seed;
-    }
-
     uint32_t image_pixels::get_pixel(uint32_t x, uint32_t y) const {
         if (x >= width || y >= height) {
             return 0;
@@ -70,18 +60,18 @@ namespace banggame {
     byte_vector image_to_png(image_pixels_view image) {
         png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
         if (!png) {
-            return {};
+            throw std::runtime_error("Cannot create png write struct");
         }
 
         png_infop info = png_create_info_struct(png);
         if (!info) {
             png_destroy_write_struct(&png, nullptr);
-            return {};
+            throw std::runtime_error("Cannot create png info struct");
         }
 
         if (setjmp(png_jmpbuf(png))) {
             png_destroy_write_struct(&png, &info);
-            return {};
+            throw std::runtime_error("Error while writing png");
         }
 
         byte_vector result;

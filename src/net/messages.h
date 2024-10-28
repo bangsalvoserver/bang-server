@@ -98,7 +98,7 @@ namespace banggame {
     struct lobby_user_args {
         int user_id;
         std::string username;
-        image_pixels_view propic;
+        image_pixels_hash propic;
         game_user_flags flags;
         std::chrono::milliseconds lifetime;
     };

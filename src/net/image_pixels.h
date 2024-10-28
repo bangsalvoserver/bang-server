@@ -14,12 +14,28 @@ namespace banggame {
         uint32_t width;
         uint32_t height;
         byte_slice pixels;
+    };
 
-        explicit operator bool () const {
-            return width != 0 && height != 0 && !pixels.empty();
+    struct image_pixels_hash {
+        size_t value = 0;
+
+        constexpr image_pixels_hash(size_t value): value{value} {}
+
+        constexpr image_pixels_hash(image_pixels_view image = {}) {
+            value ^= static_cast<size_t>(image.width) + 0x9e3779b9 + (value << 6) + (value >> 2);
+            value ^= static_cast<size_t>(image.height) + 0x9e3779b9 + (value << 6) + (value >> 2);
+
+            for (uint8_t byte : image.pixels) {
+                value ^= static_cast<size_t>(byte) + 0x9e3779b9 + (value << 6) + (value >> 2);
+            }
         }
-        
-        size_t get_hash() const;
+
+        explicit constexpr operator bool() const {
+            static constexpr image_pixels_view empty_hash{}; 
+            return *this != empty_hash;
+        }
+
+        constexpr bool operator == (const image_pixels_hash &other) const = default;
     };
 
     struct image_pixels {
@@ -49,10 +65,10 @@ namespace banggame {
 namespace json {
 
     template<typename Context>
-    struct serializer<banggame::image_pixels_view, Context> {
-        json operator()(const banggame::image_pixels_view &value) const {
+    struct serializer<banggame::image_pixels_hash, Context> {
+        json operator()(banggame::image_pixels_hash value) const {
             if (value) {
-                return std::format("{:x}", value.get_hash());
+                return std::format("{:x}", value.value);
             }
             return {};
         }

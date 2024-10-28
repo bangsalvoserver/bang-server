@@ -31,7 +31,7 @@ static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
 struct game_session {
     std::string username;
-    image_registry::image_pixels propic;
+    image_registry::registered_image propic;
     
     game_lobby *lobby = nullptr;
 
@@ -90,7 +90,7 @@ struct game_user {
 struct lobby_bot {
     int user_id;
     std::string username;
-    image_pixels_view propic;
+    image_pixels_hash propic;
 };
 
 struct game_lobby {

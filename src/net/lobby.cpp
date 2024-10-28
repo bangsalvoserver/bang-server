@@ -16,7 +16,7 @@ namespace banggame {
     }
 
     void game_session::set_propic(const image_pixels &new_propic) {
-        propic = new_propic.scale_to(bot_info.propic_size);
+        propic.reset(new_propic.scale_to(bot_info.propic_size));
     }
 
     static auto find_user_it(auto &list, session_ptr session) {

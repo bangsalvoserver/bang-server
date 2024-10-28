@@ -562,7 +562,7 @@ void game_manager::handle_message(utils::tag<"game_start">, session_ptr session)
 
     auto propics = bot_info.propics
         | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
-        | rn::to<std::vector<image_pixels_view>>;
+        | rn::to<std::vector<image_pixels_hash>>;
 
     for (int i=0; i < lobby.options.num_bots; ++i) {
         int bot_id = -1-i;
