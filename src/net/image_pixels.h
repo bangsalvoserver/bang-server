@@ -38,13 +38,18 @@ namespace banggame {
         constexpr bool operator == (const image_pixels_hash &other) const = default;
     };
 
-    struct image_pixels {
+    class image_pixels {
+    private:
         uint32_t width;
         uint32_t height;
         byte_vector pixels;
 
-        explicit operator bool () const {
-            return width != 0 && height != 0 && !pixels.empty();
+    public:
+        image_pixels() = default;
+        image_pixels(uint32_t width, uint32_t height)
+            : width{width}, height{height}
+        {
+            pixels.resize(width * height * bytes_per_pixel);
         }
 
         operator image_pixels_view() const {
@@ -54,7 +59,9 @@ namespace banggame {
         uint32_t get_pixel(uint32_t x, uint32_t y) const;
         void set_pixel(uint32_t x, uint32_t y, uint32_t value);
 
-        image_pixels scale_to(uint32_t new_size) const;
+        image_pixels scale_to(uint32_t new_size) &&;
+
+        friend image_pixels image_from_png_data_url(std::string_view data_url);
     };
 
     byte_vector image_to_png(image_pixels_view image);

@@ -69,10 +69,10 @@ private:
     bool remove_user_flag(session_ptr session, game_user_flag flag);
 
 private:
-    void handle_message(utils::tag<"connect">,        client_handle client, connection &con, const connect_args &value);
+    void handle_message(utils::tag<"connect">,        client_handle client, connection &con, connect_args value);
     void handle_message(utils::tag<"pong">,           client_handle client, connection &con);
-    void handle_message(utils::tag<"user_set_name">,  session_ptr session, const std::string &username);
-    void handle_message(utils::tag<"user_set_propic">, session_ptr session, const image_pixels &propic);
+    void handle_message(utils::tag<"user_set_name">,  session_ptr session, std::string username);
+    void handle_message(utils::tag<"user_set_propic">, session_ptr session, image_pixels propic);
     void handle_message(utils::tag<"lobby_make">,     session_ptr session, const lobby_make_args &value);
     void handle_message(utils::tag<"lobby_game_options">, session_ptr session, const game_options &options);
     void handle_message(utils::tag<"lobby_join">,     session_ptr session, const lobby_join_args &value);

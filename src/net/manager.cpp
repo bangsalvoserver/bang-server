@@ -136,7 +136,7 @@ static id_type generate_session_id(auto &rng, auto &map, int max_iters) {
     throw critical_error("CANNOT_GENERATE_SESSION_ID");
 }
 
-void game_manager::handle_message(utils::tag<"connect">, client_handle client, connection &con, const connect_args &args) {
+void game_manager::handle_message(utils::tag<"connect">, client_handle client, connection &con, connect_args args) {
     if (!std::holds_alternative<connection_state::not_validated>(con)) {
         throw lobby_error("USER_ALREADY_CONNECTED");
     }
@@ -155,8 +155,8 @@ void game_manager::handle_message(utils::tag<"connect">, client_handle client, c
         kick_client(session->client, "RECONNECT_WITH_SAME_SESSION_ID");
     }
 
-    session->set_username(args.username);
-    session->set_propic(args.propic);
+    session->set_username(std::move(args.username));
+    session->set_propic(std::move(args.propic));
     session->client = client;
     
     con.emplace<connection_state::connected>(session);
@@ -179,8 +179,8 @@ void game_manager::handle_message(utils::tag<"pong">, client_handle client, conn
     }
 }
 
-void game_manager::handle_message(utils::tag<"user_set_name">, session_ptr session, const std::string &username) {
-    session->set_username(username);
+void game_manager::handle_message(utils::tag<"user_set_name">, session_ptr session, std::string username) {
+    session->set_username(std::move(username));
 
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
@@ -188,8 +188,8 @@ void game_manager::handle_message(utils::tag<"user_set_name">, session_ptr sessi
     }
 }
 
-void game_manager::handle_message(utils::tag<"user_set_propic">, session_ptr session, const image_pixels &propic) {
-    session->set_propic(propic);
+void game_manager::handle_message(utils::tag<"user_set_propic">, session_ptr session, image_pixels propic) {
+    session->set_propic(std::move(propic));
 
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);

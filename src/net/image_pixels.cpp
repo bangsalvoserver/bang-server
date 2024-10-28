@@ -24,7 +24,7 @@ namespace banggame {
         }
     }
     
-    image_pixels image_pixels::scale_to(uint32_t new_size) const {
+    image_pixels image_pixels::scale_to(uint32_t new_size) && {
         uint32_t new_width = width;
         uint32_t new_height = height;
 
@@ -41,11 +41,10 @@ namespace banggame {
         }
 
         if (new_width >= width && new_height >= height) {
-            return *this;
+            return std::move(*this);
         }
 
         image_pixels result { new_width, new_height };
-        result.pixels.resize(new_width * new_height * bytes_per_pixel);
         for (uint32_t y = 0; y < new_height; ++y) {
             for (uint32_t x = 0; x < new_width; ++x) {
                 uint32_t scaled_x = x * width / new_width;
@@ -119,8 +118,7 @@ namespace banggame {
         // Allocate memory for the image buffer
         image.format = PNG_FORMAT_RGBA;
 
-        image_pixels result{image.width, image.height};
-        result.pixels.resize(PNG_IMAGE_SIZE(image));
+        image_pixels result{ image.width, image.height };
         if (!png_image_finish_read(&image, nullptr, result.pixels.data(), 0, nullptr)) {
             png_image_free(&image);
             throw std::runtime_error("Failed to finish reading PNG image");

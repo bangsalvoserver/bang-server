@@ -38,8 +38,8 @@ struct game_session {
     client_handle client;
     ticks lifetime = user_lifetime;
 
-    void set_username(const std::string &new_username);
-    void set_propic(const image_pixels &new_propic);
+    void set_username(std::string new_username);
+    void set_propic(image_pixels new_propic);
 };
 
 using session_ptr = std::shared_ptr<game_session>;

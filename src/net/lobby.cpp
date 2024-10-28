@@ -5,18 +5,18 @@
 
 namespace banggame {
 
-    void game_session::set_username(const std::string &new_username) {
+    void game_session::set_username(std::string new_username) {
         static constexpr size_t max_username_size = 50;
 
         if (new_username.size() > max_username_size) {
             username = new_username.substr(0, max_username_size);
         } else {
-            username = new_username;
+            username = std::move(new_username);
         }
     }
 
-    void game_session::set_propic(const image_pixels &new_propic) {
-        propic.reset(new_propic.scale_to(bot_info.propic_size));
+    void game_session::set_propic(image_pixels new_propic) {
+        propic.reset(std::move(new_propic).scale_to(bot_info.propic_size));
     }
 
     static auto find_user_it(auto &list, session_ptr session) {
