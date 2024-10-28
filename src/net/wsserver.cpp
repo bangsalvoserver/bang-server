@@ -74,7 +74,6 @@ namespace net {
                 .compression = uWS::CompressOptions(uWS::DEDICATED_COMPRESSOR_4KB | uWS::DEDICATED_DECOMPRESSOR),
 #endif
                 .maxPayloadLength = 1 * 1024 * 1024,
-                .maxBackpressure = 16 * 1024 * 1024,
 
                 .open = [this](auto *ws) {
                     wsclient_data *data = ws->getUserData();
