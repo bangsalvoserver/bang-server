@@ -2,15 +2,16 @@
 #define __IMAGE_REGISTRY_H__
 
 #include "image_pixels.h"
-#include "utils/function_ref.h"
+
+#include <shared_mutex>
 
 namespace banggame::image_registry {
     void register_image(image_pixels_hash hash, image_pixels_view image);
     void register_image(image_pixels_hash hash);
     void deregister_image(image_pixels_hash hash);
 
-    using write_png_function = tl::function_ref<void(byte_slice)>;
-    bool write_image_png(image_pixels_hash hash, const write_png_function &fun);
+    using lock_bytes = std::pair<std::shared_lock<std::shared_mutex>, byte_slice>;
+    lock_bytes get_png_image_data(image_pixels_hash hash);
 
     class registered_image {
     private:

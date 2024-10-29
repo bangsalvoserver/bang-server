@@ -1,7 +1,6 @@
 #include "image_registry.h"
 
 #include <unordered_map>
-#include <shared_mutex>
 #include <mutex>
 
 #include "logging.h"
@@ -69,14 +68,13 @@ namespace banggame::image_registry {
             }
         }
 
-        bool write_image_png(image_pixels_hash hash, const write_png_function &fun) const {
+        lock_bytes get_png_image_data(image_pixels_hash hash) const {
             std::shared_lock guard{m_mutex};
             auto it = m_registry.find(hash);
             if (it == m_registry.end()) {
-                return false;
+                return {};
             }
-            fun(it->second.png_bytes);
-            return true;
+            return { std::move(guard), it->second.png_bytes };
         }
     };
     
@@ -92,7 +90,7 @@ namespace banggame::image_registry {
         registry::get().deregister_image(hash);
     }
 
-    bool write_image_png(image_pixels_hash hash, const write_png_function &fun) {
-        return registry::get().write_image_png(hash, fun);
+    lock_bytes get_png_image_data(image_pixels_hash hash) {
+        return registry::get().get_png_image_data(hash);
     }
 }
