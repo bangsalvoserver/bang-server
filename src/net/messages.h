@@ -89,6 +89,7 @@ namespace banggame {
 
     enum class game_user_flag {
         disconnected,
+        lobby_owner,
         spectator,
         muted
     };

@@ -184,7 +184,7 @@ void game_manager::handle_message(utils::tag<"user_set_name">, session_ptr sessi
 
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
-        broadcast_message_lobby<"lobby_user_update">(*lobby, user.user_id, session->username, session->propic, user.flags);
+        broadcast_message_lobby<"lobby_user_update">(*lobby, user);
     }
 }
 
@@ -193,7 +193,7 @@ void game_manager::handle_message(utils::tag<"user_set_propic">, session_ptr ses
 
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
-        broadcast_message_lobby<"lobby_user_update">(*lobby, user.user_id, session->username, session->propic, user.flags);
+        broadcast_message_lobby<"lobby_user_update">(*lobby, user);
     }
 }
 
@@ -207,6 +207,7 @@ void game_manager::handle_message(utils::tag<"lobby_make">, session_ptr session,
     tracking::track_lobby_count(m_lobbies.size());
 
     game_user &user = lobby.add_user(session).first;
+    user.flags.add(game_user_flag::lobby_owner);
 
     lobby.state = lobby_state::waiting;
     lobby.password = value.password;
@@ -214,7 +215,7 @@ void game_manager::handle_message(utils::tag<"lobby_make">, session_ptr session,
     broadcast_message_no_lobby<"lobby_update">(lobby);
 
     send_message<"lobby_entered">(session->client, user.user_id, lobby.lobby_id, lobby.name, lobby.options);
-    send_message<"lobby_user_update">(session->client, user.user_id, session->username, session->propic);
+    send_message<"lobby_user_update">(session->client, user);
 
     add_lobby_chat_message(lobby, &user, {
         0, "USER_JOINED_LOBBY", {{ utils::tag<"user">{}, user.user_id }}, lobby_chat_flag::translated
@@ -226,8 +227,9 @@ void game_manager::handle_message(utils::tag<"lobby_game_options">, session_ptr 
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
     game_lobby &lobby = *session->lobby;
+    game_user &user = lobby.find_user(session);
 
-    if (!lobby.is_owner(session)) {
+    if (!user.is_lobby_owner()) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 
@@ -249,20 +251,19 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
 
     send_message<"lobby_entered">(session->client, new_user.user_id, lobby.lobby_id, lobby.name, lobby.options);
     
-    if (remove_user_flag(session, game_user_flag::disconnected)) {
+    if (remove_user_flag(lobby, new_user, game_user_flag::disconnected)) {
         inserted = true;
     }
-    broadcast_message_no_lobby<"lobby_update">(lobby);
+
+    if (rn::none_of(lobby.connected_users(), &game_user::is_lobby_owner)) {
+        add_user_flag(lobby, new_user, game_user_flag::lobby_owner);
+    }
 
     for (const game_user &user : lobby.users) {
         if (!user.is_disconnected() && user.session != session) {
-            send_message<"lobby_user_update">(user.session->client, new_user.user_id, session->username, session->propic, new_user.flags);
+            send_message<"lobby_user_update">(user.session->client, new_user);
         }
-        std::chrono::milliseconds lifetime{};
-        if (!user.is_disconnected() && user.session->client.expired()) {
-            lifetime = std::chrono::duration_cast<std::chrono::milliseconds>(user.session->lifetime);
-        }
-        send_message<"lobby_user_update">(session->client, user.user_id, user.session->username, user.session->propic, user.flags, lifetime);
+        send_message<"lobby_user_update">(session->client, user);
     }
     for (auto &bot : lobby.bots) {
         send_message<"lobby_user_update">(session->client, bot.user_id, bot.username, bot.propic);
@@ -279,7 +280,7 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
     if (lobby.state != lobby_state::waiting && lobby.m_game) {
         player_ptr target = lobby.m_game->find_player_by_userid(new_user.user_id);
         if (!target) {
-            add_user_flag(session, game_user_flag::spectator);
+            add_user_flag(lobby, new_user, game_user_flag::spectator);
         }
         send_message<"game_started">(session->client);
 
@@ -295,30 +296,24 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
             send_message<"game_update">(session->client, msg);
         }
     }
+
+    broadcast_message_no_lobby<"lobby_update">(lobby);
 }
 
-bool game_manager::add_user_flag(session_ptr session, game_user_flag flag) {
-    if (game_lobby *lobby = session->lobby) {
-        game_user &user = lobby->find_user(session);
-        if (!user.flags.check(flag)) {
-            user.flags.add(flag);
-            broadcast_message_no_lobby<"lobby_update">(*lobby);
-            broadcast_message_lobby<"lobby_user_update">(*lobby, user.user_id, session->username, session->propic, user.flags);
-            return true;
-        }
+bool game_manager::add_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag) {
+    if (!user.flags.check(flag)) {
+        user.flags.add(flag);
+        broadcast_message_lobby<"lobby_user_update">(lobby, user);
+        return true;
     }
     return false;
 }
 
-bool game_manager::remove_user_flag(session_ptr session, game_user_flag flag) {
-    if (game_lobby *lobby = session->lobby) {
-        game_user &user = lobby->find_user(session);
-        if (user.flags.check(flag)) {
-            user.flags.remove(flag);
-            broadcast_message_no_lobby<"lobby_update">(*lobby);
-            broadcast_message_lobby<"lobby_user_update">(*lobby, user.user_id, session->username, session->propic, user.flags);
-            return true;
-        }
+bool game_manager::remove_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag) {
+    if (user.flags.check(flag)) {
+        user.flags.remove(flag);
+        broadcast_message_lobby<"lobby_user_update">(lobby, user);
+        return true;
     }
     return false;
 }
@@ -342,10 +337,22 @@ void game_manager::handle_message(utils::tag<"lobby_join">, session_ptr session,
 }
 
 void game_manager::kick_user_from_lobby(session_ptr session) {
-    add_user_flag(session, game_user_flag::disconnected);
-    game_lobby &lobby = *std::exchange(session->lobby, nullptr);
+    game_lobby &lobby = *session->lobby;
+    game_user &user = lobby.find_user(session);
 
+    add_user_flag(lobby, user, game_user_flag::disconnected);
+
+    if (remove_user_flag(lobby, user, game_user_flag::lobby_owner)) {
+        if (auto range = lobby.connected_users()) {
+            add_user_flag(lobby, range.front(), game_user_flag::lobby_owner);
+        }
+    }
+
+    broadcast_message_no_lobby<"lobby_update">(lobby);
+
+    session->lobby = nullptr;
     send_message<"lobby_kick">(session->client);
+
     for (const auto &[id, lobby] : m_lobbies) {
         send_message<"lobby_update">(session->client, lobby);
     }
@@ -369,9 +376,7 @@ void game_manager::invalidate_connection(client_handle client) {
             session->client.reset();
             if (game_lobby *lobby = session->lobby) {
                 game_user &user = lobby->find_user(session);
-                broadcast_message_lobby<"lobby_user_update">(*lobby, user.user_id, session->username, session->propic, user.flags,
-                    std::chrono::duration_cast<std::chrono::milliseconds>(user.session->lifetime)
-                );
+                broadcast_message_lobby<"lobby_user_update">(*lobby, user);
             }
         }
 
@@ -437,8 +442,9 @@ void game_manager::handle_chat_command(session_ptr session, const std::string &m
 
     auto &command = cmd_it->second;
     game_lobby &lobby = *session->lobby;
+    game_user &user = lobby.find_user(session);
 
-    if (command.permissions().check(command_permissions::lobby_owner) && !lobby.is_owner(session)) {
+    if (command.permissions().check(command_permissions::lobby_owner) && !user.is_lobby_owner()) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 
@@ -483,7 +489,7 @@ void game_manager::handle_message(utils::tag<"lobby_return">, session_ptr sessio
     game_lobby &lobby = *session->lobby;
     game_user &user = lobby.find_user(session);
 
-    if (!lobby.is_owner(session)) {
+    if (!user.is_lobby_owner()) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 
@@ -497,8 +503,8 @@ void game_manager::handle_message(utils::tag<"lobby_return">, session_ptr sessio
     lobby.m_game.reset();
     lobby.state = lobby_state::waiting;
 
-    for (const game_user &user : lobby.connected_users()) {
-        remove_user_flag(user.session, game_user_flag::spectator);
+    for (game_user &user : lobby.connected_users()) {
+        remove_user_flag(lobby, user, game_user_flag::spectator);
     }
 
     broadcast_message_no_lobby<"lobby_update">(lobby);
@@ -508,14 +514,17 @@ void game_manager::handle_message(utils::tag<"user_spectate">, session_ptr sessi
     if (!session->lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
-    if (session->lobby->state != lobby_state::waiting) {
+    game_lobby &lobby = *session->lobby;
+    if (lobby.state != lobby_state::waiting) {
         throw lobby_error("ERROR_LOBBY_NOT_WAITING");
     }
+    game_user &user = lobby.find_user(session);
     if (spectator) {
-        add_user_flag(session, game_user_flag::spectator);
+        add_user_flag(lobby, user, game_user_flag::spectator);
     } else {
-        remove_user_flag(session, game_user_flag::spectator);
+        remove_user_flag(lobby, user, game_user_flag::spectator);
     }
+    broadcast_message_no_lobby<"lobby_update">(lobby);
 }
 
 void game_manager::handle_message(utils::tag<"game_start">, session_ptr session) {
@@ -523,8 +532,9 @@ void game_manager::handle_message(utils::tag<"game_start">, session_ptr session)
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
     game_lobby &lobby = *session->lobby;
+    game_user &user = lobby.find_user(session);
 
-    if (!lobby.is_owner(session)) {
+    if (!user.is_lobby_owner()) {
         throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
     }
 
@@ -601,7 +611,7 @@ void game_manager::handle_message(utils::tag<"game_rejoin">, session_ptr session
         throw lobby_error("ERROR_CANNOT_REJOIN_ON_BOT");
     }
 
-    remove_user_flag(session, game_user_flag::spectator);
+    remove_user_flag(lobby, user, game_user_flag::spectator);
     target->user_id = user.user_id;
 
     lobby.m_game->add_update<"player_add">(target);
@@ -612,6 +622,8 @@ void game_manager::handle_message(utils::tag<"game_rejoin">, session_ptr session
     for (const auto &msg : lobby.m_game->get_game_log_updates(target)) {
         send_message<"game_update">(session->client, msg);
     }
+
+    broadcast_message_no_lobby<"lobby_update">(lobby);
 }
 
 void game_manager::handle_message(utils::tag<"game_action">, session_ptr session, const json::json &value) {

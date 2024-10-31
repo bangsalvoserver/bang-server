@@ -78,6 +78,10 @@ struct game_user {
         return flags.check(game_user_flag::disconnected);
     }
 
+    bool is_lobby_owner() const {
+        return flags.check(game_user_flag::lobby_owner);
+    }
+
     bool is_spectator() const {
         return flags.check(game_user_flag::spectator);
     }
@@ -85,6 +89,8 @@ struct game_user {
     bool is_muted() const {
         return flags.check(game_user_flag::muted);
     }
+
+    explicit operator lobby_user_args() const;
 };
 
 struct lobby_bot {
@@ -118,13 +124,6 @@ struct game_lobby {
 
     auto connected_users(this auto &&self) {
         return rv::remove_if(std::forward_like<decltype(self)>(self.users), &game_user::is_disconnected);
-    }
-
-    bool is_owner(session_ptr session) const {
-        if (auto range = connected_users()) {
-            return range.front().session == session;
-        }
-        return false;
     }
 
     std::pair<game_user &, bool> add_user(session_ptr session);

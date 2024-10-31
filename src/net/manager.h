@@ -65,8 +65,8 @@ private:
     void add_lobby_chat_message(game_lobby &lobby, game_user *is_read_for, lobby_chat_args message);
     void handle_join_lobby(session_ptr session, game_lobby &lobby);
 
-    bool add_user_flag(session_ptr session, game_user_flag flag);
-    bool remove_user_flag(session_ptr session, game_user_flag flag);
+    bool add_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag);
+    bool remove_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag);
 
 private:
     void handle_message(utils::tag<"connect">,        client_handle client, connection &con, connect_args value);
@@ -91,6 +91,7 @@ private:
     void command_kick_user(session_ptr session, std::string_view target_user);
     void command_mute_user(session_ptr session, std::string_view target_user);
     void command_unmute_user(session_ptr session, std::string_view target_user);
+    void command_appoint_user(session_ptr session, std::string_view target_user);
     void command_get_game_options(session_ptr session);
     void command_set_game_option(session_ptr session, std::string_view key, std::string_view value);
     void command_reset_game_options(session_ptr session);

@@ -19,6 +19,18 @@ namespace banggame {
         propic.reset(std::move(new_propic).scale_to(bot_info.propic_size));
     }
 
+    game_user::operator lobby_user_args() const {
+        return {
+            .user_id = user_id,
+            .username = session->username,
+            .propic = session->propic,
+            .flags = flags,
+            .lifetime = (!is_disconnected() && session->client.expired())
+                ? std::chrono::duration_cast<std::chrono::milliseconds>(session->lifetime)
+                : 0ms
+        };
+    }
+
     static auto find_user_it(auto &list, session_ptr session) {
         return rn::find(list, session, &game_user::session);
     }
