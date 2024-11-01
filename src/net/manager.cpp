@@ -265,8 +265,8 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
         }
         send_message<"lobby_user_update">(session->client, user);
     }
-    for (auto &bot : lobby.bots) {
-        send_message<"lobby_user_update">(session->client, bot.user_id, bot.username, bot.propic);
+    for (const lobby_bot &bot : lobby.bots) {
+        send_message<"lobby_user_update">(session->client, bot);
     }
     for (const auto &message: lobby.chat_messages) {
         send_message<"lobby_chat">(session->client, message);
@@ -579,7 +579,7 @@ void game_manager::handle_message(utils::tag<"game_start">, session_ptr session)
         auto &bot = lobby.bots.emplace_back(bot_id, std::format("BOT {}", names[i % names.size()]), propics[i % propics.size()]);
         user_ids.push_back(bot_id);
 
-        broadcast_message_lobby<"lobby_user_update">(lobby, bot_id, bot.username, bot.propic);
+        broadcast_message_lobby<"lobby_user_update">(lobby, bot);
     }
 
     lobby.m_game->add_players(user_ids);

@@ -31,6 +31,14 @@ namespace banggame {
         };
     }
 
+    lobby_bot::operator lobby_user_args() const {
+        return {
+            .user_id = user_id,
+            .username = username,
+            .propic = propic
+        };
+    }
+
     static auto find_user_it(auto &list, session_ptr session) {
         return rn::find(list, session, &game_user::session);
     }

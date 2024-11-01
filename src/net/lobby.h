@@ -97,6 +97,8 @@ struct lobby_bot {
     int user_id;
     std::string username;
     image_pixels_hash propic;
+
+    explicit operator lobby_user_args() const;
 };
 
 struct game_lobby {
