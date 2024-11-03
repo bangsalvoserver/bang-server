@@ -13,10 +13,8 @@ namespace banggame {
         return out_error;
     }
 
-    game_string effect_evelyn_shebang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
-        MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
-        return {};
+    prompt_string effect_evelyn_shebang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        return effect_bang{}.on_prompt(origin_card, origin, target);
     }
 
     void effect_evelyn_shebang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
