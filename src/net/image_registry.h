@@ -6,8 +6,7 @@
 #include <shared_mutex>
 
 namespace banggame::image_registry {
-    void register_image(image_pixels_hash hash, image_pixels_view image);
-    void register_image(image_pixels_hash hash);
+    void register_image(image_pixels_hash hash, image_pixels_view image = {});
     void deregister_image(image_pixels_hash hash);
 
     using lock_bytes = std::pair<std::shared_lock<std::shared_mutex>, byte_slice>;

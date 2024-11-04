@@ -48,16 +48,6 @@ namespace banggame::image_registry {
             }
         }
 
-        void register_image(image_pixels_hash hash) {
-            if (hash) {
-                std::scoped_lock guard{m_mutex};
-                auto it = m_registry.find(hash);
-                if (it != m_registry.end()) {
-                    ++it->second.refcount;
-                }
-            }
-        }
-
         void deregister_image(image_pixels_hash hash) {
             if (hash) {
                 std::scoped_lock guard{m_mutex};
@@ -80,10 +70,6 @@ namespace banggame::image_registry {
     
     void register_image(image_pixels_hash hash, image_pixels_view image) {
         registry::get().register_image(hash, image);
-    }
-    
-    void register_image(image_pixels_hash hash) {
-        registry::get().register_image(hash);
     }
 
     void deregister_image(image_pixels_hash hash) {
