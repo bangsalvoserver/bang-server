@@ -101,6 +101,9 @@ namespace banggame {
         if (filter.check(target_card_filter::bang) && !target->is_bang_card(origin))
             return "ERROR_TARGET_NOT_BANG";
 
+        if (filter.check(target_card_filter::used_bang) && !(origin->m_game->check_flags(game_flag::showdown) || target->is_bang_card(origin)))
+            return "ERROR_TARGET_NOT_BANG";
+
         if (filter.check(target_card_filter::bangcard) && !target->has_tag(tag_type::bangcard))
             return "ERROR_TARGET_NOT_BANG";
 

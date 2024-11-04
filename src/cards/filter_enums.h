@@ -39,6 +39,7 @@ namespace banggame {
         two_to_nine,
         ten_to_ace,
         bang,
+        used_bang,
         bangcard,
         not_bangcard,
         missed,
