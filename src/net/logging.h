@@ -34,10 +34,7 @@ namespace logging {
     public:
         static inline level global_level = level::status;
         
-        constexpr log_function(level local_level)
-            : local_level{local_level}
-            , out{enums::indexof(local_level) >= enums::indexof(level::warning) ? std::cerr : std::cout}
-        {
+        constexpr log_function(level local_level): local_level{local_level} {
             if (local_level == level::off || local_level == level::all) {
                 throw std::runtime_error("Invalid logging level");
             }
@@ -52,7 +49,6 @@ namespace logging {
 
     private:
         level local_level;
-        std::ostream &out;
     };
 
     constexpr auto trace = log_function(level::trace);

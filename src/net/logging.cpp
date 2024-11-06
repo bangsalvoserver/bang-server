@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <mutex>
+#include <print>
 
 namespace logging {
     std::mutex lock;
@@ -10,12 +11,14 @@ namespace logging {
         if (enums::indexof(global_level) <= enums::indexof(local_level)) {
             std::scoped_lock guard{lock};
 
-            std::format_to(std::ostream_iterator<char>{out},
-                "[{:%Y-%m-%d %H:%M:%S}] [{}] {}\n",
+            FILE *out = enums::indexof(local_level) >= enums::indexof(level::warning) ? stderr : stdout;
+
+            std::println(out,
+                "[{:%Y-%m-%d %H:%M:%S}] [{}] {}",
                 std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now()),
                 enums::to_string(local_level), message);
             
-            out.flush();
+            fflush(out);
         }
     }
 }
