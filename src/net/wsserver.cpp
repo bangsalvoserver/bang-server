@@ -97,16 +97,14 @@ namespace net {
                 logging::warn("[{}] is trying to hack the server", res->getRemoteAddressAsText());
             })
             .get("/tracking", [this](auto *res, auto *req) {
-                try {
-                    auto length = tracking::parse_length(req->getQuery("length"));
-
+                if (auto length = tracking::parse_length(req->getQuery("length"))) {
                     res->writeHeader("Access-Control-Allow-Origin","*");
                     res->writeHeader("Content-Type", "application/json");
-                    res->end(json::serialize(tracking::get_tracking_for(length)).dump());
-                } catch (const std::exception &e) {
+                    res->end(json::serialize(tracking::get_tracking_for(*length)).dump());
+                } else {
                     res->writeStatus("400 Bad Request");
                     res->writeHeader("Access-Control-Allow-Origin","*");
-                    res->end(e.what());
+                    res->end(length.error());
                 }
             })
             .get("/image/:hash", [this](auto *res, auto *req) {

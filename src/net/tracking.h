@@ -3,6 +3,7 @@
 
 #include <string>
 #include <chrono>
+#include <expected>
 
 namespace tracking {
 
@@ -24,7 +25,7 @@ namespace tracking {
         timestamp_counts lobby_count;
     };
 
-    duration parse_length(std::string_view length);
+    std::expected<duration, std::string> parse_length(std::string_view length);
     tracking_response get_tracking_for(duration length);
 
 }
