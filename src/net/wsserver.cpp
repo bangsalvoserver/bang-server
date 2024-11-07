@@ -128,14 +128,17 @@ namespace net {
                 if (listen_socket) {
                     logging::status("Server listening on port {}", port);
                 } else {
+                    m_server.reset();
                     throw std::runtime_error(std::format("Failed to listen on port {}", port));
                 }
             }).run();
         }, m_server);
+        logging::status("Server stopped");
     }
 
     void wsserver::stop() {
         visit_server([&]<bool SSL>(uWS::TemplatedApp<SSL> &server) {
+            logging::status("Stopping server...");
             server.getLoop()->defer([&]{
                 server.close();
             });

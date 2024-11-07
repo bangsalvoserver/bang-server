@@ -88,7 +88,6 @@ int main(int argc, char **argv) {
             std::println(stderr, "Unhandled exception: {}", error.what());
         }
 
-        logging::status("Stopping server...");
         server.stop();
     }};
 
@@ -100,7 +99,6 @@ int main(int argc, char **argv) {
     tracking::track_zero();
     try {
         server.start(port, reuse_addr);
-        logging::status("Server stopped");
     } catch (const std::exception &error) {
         std::println(stderr, "Could not start server: {}", error.what());
         handle_stop();
