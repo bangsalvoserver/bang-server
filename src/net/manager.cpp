@@ -251,12 +251,13 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
 
     send_message<"lobby_entered">(session->client, new_user.user_id, lobby.lobby_id, lobby.name, lobby.options);
     
-    if (remove_user_flag(lobby, new_user, game_user_flag::disconnected)) {
+    if (new_user.flags.check(game_user_flag::disconnected)) {
+        new_user.flags.remove(game_user_flag::disconnected);
         inserted = true;
     }
 
     if (rn::none_of(lobby.connected_users(), &game_user::is_lobby_owner)) {
-        add_user_flag(lobby, new_user, game_user_flag::lobby_owner);
+        new_user.flags.add(game_user_flag::lobby_owner);
     }
 
     for (const game_user &user : lobby.users) {
