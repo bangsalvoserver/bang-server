@@ -1,8 +1,7 @@
 #ifndef __GAME_UPDATE_H__
 #define __GAME_UPDATE_H__
 
-#include "game_options.h"
-
+#include "durations.h"
 #include "cards/card_data.h"
 
 #include "utils/tagged_variant.h"

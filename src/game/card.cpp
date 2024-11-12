@@ -21,8 +21,7 @@ namespace banggame {
     }
 
     bool card::is_bang_card(const_player_ptr origin) const {
-        return m_game->check_flags(game_flag::treat_any_as_bang)
-            || origin->check_player_flags(player_flag::treat_any_as_bang)
+        return origin->check_player_flags(player_flag::treat_any_as_bang)
             || has_tag(tag_type::bangcard)
             || origin->check_player_flags(player_flag::treat_missed_as_bang)
             && has_tag(tag_type::missed);

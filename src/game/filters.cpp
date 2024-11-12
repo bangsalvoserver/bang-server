@@ -8,14 +8,10 @@
 namespace banggame {
 
     game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, enums::bitset<target_player_filter> filter, const_player_ptr target, const effect_context &ctx) {
-        if (!filter.check(target_player_filter::dead_or_alive)) {
-            if (filter.check(target_player_filter::dead)) {
-                if (!target->check_player_flags(player_flag::dead))
-                    return {"ERROR_TARGET_NOT_DEAD", origin_card, target};
-            } else {
-                if (!target->alive())
-                    return {"ERROR_TARGET_DEAD", origin_card, target};
-            }
+        if (!filter.check(target_player_filter::dead_or_alive)
+            && filter.check(target_player_filter::dead) == target->alive()
+        ) {
+            return {"ERROR_TARGET_DEAD", origin_card, target};
         }
 
         if (filter.check(target_player_filter::self) && target != origin)
@@ -103,6 +99,9 @@ namespace banggame {
             return "ERROR_TARGET_NOT_BEER";
 
         if (filter.check(target_card_filter::bang) && !target->is_bang_card(origin))
+            return "ERROR_TARGET_NOT_BANG";
+
+        if (filter.check(target_card_filter::used_bang) && !(origin->m_game->check_flags(game_flag::showdown) || target->is_bang_card(origin)))
             return "ERROR_TARGET_NOT_BANG";
 
         if (filter.check(target_card_filter::bangcard) && !target->has_tag(tag_type::bangcard))

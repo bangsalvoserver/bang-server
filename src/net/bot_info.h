@@ -7,6 +7,8 @@
 
 #include "utils/fixed_string.h"
 
+#include "image_registry.h"
+
 namespace banggame {
     
     struct playable_card_info;
@@ -35,9 +37,9 @@ namespace banggame {
     };
 
     struct bot_info_t {
-        int propic_size;
+        uint32_t propic_size;
         std::initializer_list<std::string> names;
-        std::initializer_list<image_pixels_view> propics;
+        std::initializer_list<image_registry::registered_image> propics;
         bot_settings settings;
     };
 

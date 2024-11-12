@@ -1,6 +1,7 @@
 #include "predraw_check.h"
 
 #include "game/game.h"
+#include "game/game_options.h"
 
 namespace banggame {
 
@@ -12,7 +13,7 @@ namespace banggame {
             }
             if (checks.empty()) {
                 target->m_game->pop_request();
-            } else {
+            } else if (target->m_game->m_options.auto_pick_predraw) {
                 auto_pick();
             }
         } else {

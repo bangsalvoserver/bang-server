@@ -41,20 +41,17 @@ else()
     target_compile_definitions(uSockets PUBLIC LIBUS_USE_OPENSSL)
 endif()
 
-# zlib
-
-find_package(ZLIB REQUIRED)
-
 # uWebSockets
 
 FetchContent_Declare(
     uWebSockets_content
     GIT_REPOSITORY https://github.com/uNetworking/uWebSockets
-    GIT_TAG v20.68.0
+    GIT_TAG v20.70.0
     GIT_SHALLOW ON
     GIT_SUBMODULES ""
 )
 FetchContent_MakeAvailable(uWebSockets_content)
 add_library(uwebsockets INTERFACE)
 target_include_directories(uwebsockets INTERFACE ${uwebsockets_content_SOURCE_DIR}/src/)
-target_link_libraries(uwebsockets INTERFACE uSockets ZLIB::ZLIB)
+target_link_libraries(uwebsockets INTERFACE uSockets)
+target_compile_definitions(uwebsockets INTERFACE UWS_NO_ZLIB)

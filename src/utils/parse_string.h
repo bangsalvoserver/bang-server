@@ -13,14 +13,31 @@ namespace utils {
 
     template<typename T> struct string_parser;
 
-    template<typename T> requires (std::is_arithmetic_v<T>)
+    template<typename T> requires (std::is_integral_v<T>)
+    struct string_parser<T> {
+        std::optional<T> operator()(std::string_view str, int base = 10) {
+            auto str_begin = str.data();
+            auto str_end = str_begin + str.size();
+            T result;
+            auto [end, ec] = std::from_chars(str_begin, str_end, result, base);
+            if (ec == std::errc{} && end == str_end) {
+                return result;
+            }
+            return std::nullopt;
+        }
+    };
+
+    template<typename T> requires (std::is_floating_point_v<T>)
     struct string_parser<T> {
         std::optional<T> operator()(std::string_view str) {
-            T value;
-            if (auto [end, ec] = std::from_chars(str.data(), str.data() + str.size(), value); ec != std::errc{}) {
-                return std::nullopt;
+            auto str_begin = str.data();
+            auto str_end = str_begin + str.size();
+            T result;
+            auto [end, ec] = std::from_chars(str_begin, str_end, result);
+            if (ec == std::errc{} && end == str_end) {
+                return result;
             }
-            return value;
+            return std::nullopt;
         }
     };
 
@@ -117,9 +134,9 @@ namespace utils {
         }
     };
 
-    template<typename T>
-    std::optional<T> parse_string(std::string_view str) {
-        return string_parser<T>{}(str);
+    template<typename T, typename ... Ts>
+    std::optional<T> parse_string(std::string_view str, Ts && ... args) {
+        return string_parser<T>{}(str, std::forward<Ts>(args) ...);
     }
 
 }

@@ -8,9 +8,8 @@
 
 namespace banggame {
 
-    game_string handler_doc_holyday::on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
-        return {};
+    prompt_string handler_doc_holyday::on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
+        return effect_bang{}.on_prompt(origin_card, origin, target);
     }
 
     void handler_doc_holyday::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {

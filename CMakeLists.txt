@@ -11,6 +11,7 @@ if(WIN32)
         add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
     elseif(MINGW)
         add_compile_options(-fno-ms-extensions)
+        link_libraries(stdc++exp)
     endif()
     add_compile_definitions(_WIN32_WINNT=0x0601)
 endif()
@@ -48,6 +49,11 @@ target_link_libraries(banglibs INTERFACE cxxopts::cxxopts)
 
 find_package(nlohmann_json 3.11.0 REQUIRED)
 target_link_libraries(banglibs INTERFACE nlohmann_json::nlohmann_json)
+
+# libpng
+
+find_package(PNG REQUIRED)
+target_link_libraries(banglibs INTERFACE PNG::PNG)
 
 # bang server executable
 

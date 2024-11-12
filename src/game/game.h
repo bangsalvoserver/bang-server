@@ -16,7 +16,7 @@ namespace banggame {
 
         card_ptr add_card(const card_data &data);
         void add_players(std::span<int> user_ids);
-        void start_game(const game_options &options);
+        void start_game();
 
         player_distances make_player_distances(player_ptr p);
         request_status_args make_request_update(player_ptr p);

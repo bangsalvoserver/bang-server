@@ -154,7 +154,7 @@ character:
     image: 07_derspot
     effects:
       - max_usages(1)
-      - set_playing card self | hand bang
+      - set_playing card self | hand used_bang
       - none players notself
     mth_effect: play_as_gatling(1)
   - name: EVELYN_SHEBANG
@@ -180,7 +180,7 @@ character:
   - name: MICK_DEFENDER
     image: 07_mickdefender2
     equip:
-      - mick_defender
+      - mick_defender2
     responses:
       - escape2
       - discard card self | hand missed

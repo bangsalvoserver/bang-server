@@ -35,7 +35,7 @@ namespace banggame {
     }
 
     game_string effect_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
-        if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flag::treat_any_as_bang)) {
+        if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flag::showdown)) {
             return "ERROR_CARD_INACTIVE";
         } else if (!ctx.disable_bang_checks) {
             game_string out_error;

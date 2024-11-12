@@ -83,13 +83,13 @@ namespace tracking {
         return result;
     }
 
-    duration parse_length(std::string_view length) {
+    std::expected<duration, std::string> parse_length(std::string_view length) {
         if (length.empty()) {
             return std::chrono::days{1};
         } else if (auto value = utils::parse_string<duration>(length)) {
             return *value;
         } else {
-            throw std::runtime_error(std::format("Invalid length format: {}", length));
+            return std::unexpected(std::format("Invalid length format: {}", length));
         }
     }
 

@@ -32,23 +32,15 @@ namespace banggame {
         }
         
         bool can_pick(const_card_ptr target_card) const override {
-            if (target_card->owner == target) {
-                if (target_card->pocket == pocket_type::player_table && target_card->is_orange()) {
-                    return target_card->num_cubes < max_cubes;
-                } else if (target_card->pocket == pocket_type::player_character) {
-                    return target->first_character()->num_cubes < max_cubes;
-                }
-            }
-            return false;
+            return target_card->owner == target
+                && (target_card->pocket == pocket_type::player_table && target_card->is_orange()
+                || target_card->pocket == pocket_type::player_character && target_card == target->first_character())
+                && target_card->num_cubes < max_cubes;
         }
 
         void on_pick(card_ptr target_card) override {
             if (--ncubes == 0) {
                 target->m_game->pop_request();
-            }
-
-            if (target_card->pocket == pocket_type::player_character) {
-                target_card = target->first_character();
             }
         
             target_card->add_cubes(1);

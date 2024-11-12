@@ -1,6 +1,8 @@
 #include "rust.h"
 
 #include "game/game.h"
+#include "game/game_options.h"
+
 #include "effects/base/resolve.h"
 
 namespace banggame {

@@ -5,18 +5,38 @@
 
 namespace banggame {
 
-    void game_session::set_username(const std::string &new_username) {
+    void game_session::set_username(std::string new_username) {
         static constexpr size_t max_username_size = 50;
 
         if (new_username.size() > max_username_size) {
             username = new_username.substr(0, max_username_size);
         } else {
-            username = new_username;
+            username = std::move(new_username);
         }
     }
 
-    void game_session::set_propic(const image_pixels &new_propic) {
-        propic = new_propic.scale_to(bot_info.propic_size);
+    void game_session::set_propic(image_pixels new_propic) {
+        propic.reset(std::move(new_propic).scale_to(bot_info.propic_size));
+    }
+
+    game_user::operator lobby_user_args() const {
+        return {
+            .user_id = user_id,
+            .username = session->username,
+            .propic = session->propic,
+            .flags = flags,
+            .lifetime = (!is_disconnected() && session->client.expired())
+                ? std::chrono::duration_cast<std::chrono::milliseconds>(session->lifetime)
+                : 0ms
+        };
+    }
+
+    lobby_bot::operator lobby_user_args() const {
+        return {
+            .user_id = user_id,
+            .username = username,
+            .propic = propic
+        };
     }
 
     static auto find_user_it(auto &list, session_ptr session) {

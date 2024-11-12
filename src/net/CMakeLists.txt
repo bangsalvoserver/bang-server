@@ -1,7 +1,7 @@
 target_sources(bangserver PRIVATE
     chat_commands.cpp
-    compression.cpp
     image_pixels.cpp
+    image_registry.cpp
     lobby.cpp
     logging.cpp
     main.cpp

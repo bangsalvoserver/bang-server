@@ -4,23 +4,6 @@
 #include "utils/static_map.h"
 
 namespace banggame {
-    
-    using namespace std::chrono_literals;
-
-    const game_options game_options::default_game_options {
-        .expansions { },
-        .enable_ghost_cards { true },
-        .character_choice { true },
-        .quick_discard_all { true },
-        .scenario_deck_size { 12 },
-        .num_bots { 0 },
-        .damage_timer { 1500ms },
-        .escape_timer { 3000ms },
-        .bot_play_timer { 500ms },
-        .tumbleweed_timer { },
-        .duration_coefficient { 1.f },
-        .game_seed { 0 }
-    };
 
     constexpr size_t game_option_field_index(std::string_view name) {
         constexpr auto member_names = []<size_t ... Is>(std::index_sequence<Is ...>) {
@@ -121,7 +104,7 @@ namespace banggame {
     }
     
     game_options game_options::deserialize_json(const json::json &value) {
-        game_options result = default_game_options;
+        game_options result{};
         if (value.is_object()) {
             reflect::for_each<game_options>([&](auto I) {
                 auto member_name = reflect::member_name<I, game_options>();

@@ -14,6 +14,7 @@ namespace banggame {
         { "kick",           { proxy<&game_manager::command_kick_user>,          "KICK_DESCRIPTION", command_permissions::lobby_owner }},
         { "mute",           { proxy<&game_manager::command_mute_user>,          "MUTE_DESCRIPTION", command_permissions::lobby_owner }},
         { "unmute",         { proxy<&game_manager::command_unmute_user>,        "UNMUTE_DESCRIPTION", command_permissions::lobby_owner }},
+        { "appoint",        { proxy<&game_manager::command_appoint_user>,       "APPOINT_DESCRIPTION", command_permissions::lobby_owner }},
         { "options",        { proxy<&game_manager::command_get_game_options>,   "GET_OPTIONS_DESCRIPTION" }},
         { "set-option",     { proxy<&game_manager::command_set_game_option>,    "SET_OPTION_DESCRIPTION", { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "reset-options",  { proxy<&game_manager::command_reset_game_options>, "RESET_OPTIONS_DESCRIPTION", { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
@@ -55,13 +56,20 @@ namespace banggame {
     }
 
     void game_manager::command_mute_user(session_ptr session, std::string_view name_or_id) {
-        game_user &user = session->lobby->find_user(name_or_id);
-        add_user_flag(session, game_user_flag::muted);
+        game_lobby &lobby = *session->lobby;
+        add_user_flag(lobby, lobby.find_user(name_or_id), game_user_flag::muted);
     }
 
     void game_manager::command_unmute_user(session_ptr session, std::string_view name_or_id) {
-        game_user &user = session->lobby->find_user(name_or_id);
-        remove_user_flag(session, game_user_flag::muted);
+        game_lobby &lobby = *session->lobby;
+        remove_user_flag(lobby, lobby.find_user(name_or_id), game_user_flag::muted);
+    }
+
+    void game_manager::command_appoint_user(session_ptr session, std::string_view name_or_id) {
+        game_lobby &lobby = *session->lobby;
+        if (add_user_flag(lobby, lobby.find_user(name_or_id), game_user_flag::lobby_owner)) {
+            remove_user_flag(lobby, lobby.find_user(session), game_user_flag::lobby_owner);
+        }
     }
     
     void game_manager::command_get_game_options(session_ptr session) {
@@ -80,7 +88,7 @@ namespace banggame {
 
     void game_manager::command_reset_game_options(session_ptr session) {
         game_lobby &lobby = *session->lobby;
-        lobby.options = game_options::default_game_options;
+        lobby.options = game_options{};
         broadcast_message_lobby<"lobby_game_options">(lobby, lobby.options);
     }
 

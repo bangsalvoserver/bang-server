@@ -1,85 +1,96 @@
 #ifndef __IMAGE_PIXELS_H__
 #define __IMAGE_PIXELS_H__
 
-#include "utils/base64.h"
-#include "utils/json_aggregate.h"
-
-#include "compression.h"
+#include "utils/json_serial.h"
 
 namespace banggame {
+
+    using byte_slice = std::span<const uint8_t>;
+    using byte_vector = std::vector<uint8_t>;
+
+    static constexpr int bytes_per_pixel = 4;
+
     struct image_pixels_view {
-        int width;
-        int height;
-        std::span<const uint8_t> pixels;
+        uint32_t width;
+        uint32_t height;
+        byte_slice pixels;
     };
 
-    struct image_pixels {
-        int width;
-        int height;
-        std::vector<uint8_t> pixels;
+    struct image_pixels_hash {
+        size_t value = 0;
 
-        explicit operator bool () const {
-            return width != 0 && height != 0;
+        constexpr image_pixels_hash(size_t value): value{value} {}
+
+        constexpr image_pixels_hash(image_pixels_view image = {}) {
+            value ^= static_cast<size_t>(image.width) + 0x9e3779b9 + (value << 6) + (value >> 2);
+            value ^= static_cast<size_t>(image.height) + 0x9e3779b9 + (value << 6) + (value >> 2);
+
+            for (uint8_t byte : image.pixels) {
+                value ^= static_cast<size_t>(byte) + 0x9e3779b9 + (value << 6) + (value >> 2);
+            }
+        }
+
+        explicit constexpr operator bool() const {
+            static constexpr image_pixels_view empty_hash{}; 
+            return *this != empty_hash;
+        }
+
+        constexpr bool operator == (const image_pixels_hash &other) const = default;
+    };
+
+    class image_pixels {
+    private:
+        uint32_t width;
+        uint32_t height;
+        byte_vector pixels;
+
+    public:
+        image_pixels() = default;
+        image_pixels(uint32_t width, uint32_t height)
+            : width{width}, height{height}
+        {
+            pixels.resize(width * height * bytes_per_pixel);
         }
 
         operator image_pixels_view() const {
             return { width, height, pixels };
         }
 
-        uint32_t get_pixel(size_t x, size_t y) const;
-        void set_pixel(size_t x, size_t y, uint32_t value);
+        uint32_t get_pixel(uint32_t x, uint32_t y) const;
+        void set_pixel(uint32_t x, uint32_t y, uint32_t value);
 
-        image_pixels scale_to(int new_size) const;
+        image_pixels scale_to(uint32_t new_size) &&;
+
+        friend image_pixels image_from_png_data_url(std::string_view data_url);
     };
+
+    byte_vector image_to_png(image_pixels_view image);
+
+    image_pixels image_from_png_data_url(std::string_view data_url);
 }
 
 namespace json {
 
-    struct image_pixels_tag {};
-
-    template<std::convertible_to<std::span<const uint8_t>> Bytes>
-    struct serializer<Bytes, image_pixels_tag> {
-        json operator()(const Bytes &value) const {
-            return base64::base64_encode(compression::compress_bytes(value));
-        }
-    };
-
     template<typename Context>
-    struct serializer<banggame::image_pixels_view, Context> {
-        using base_type = aggregate_serializer_unchecked<banggame::image_pixels_view, image_pixels_tag>;
-        json operator()(const banggame::image_pixels_view &value) const {
-            return base_type{}(value, image_pixels_tag{});
-        }
-    };
-
-    template<typename Context>
-    struct serializer<banggame::image_pixels, Context> {
-        json operator()(const banggame::image_pixels &value) const {
-            return serialize_unchecked(banggame::image_pixels_view(value), image_pixels_tag{});
-        }
-    };
-
-    template<> struct deserializer<std::vector<uint8_t>, image_pixels_tag> {
-        std::vector<uint8_t> operator()(const json &value) const {
-            if (!value.is_string()) {
-                throw deserialize_error("Cannot deserialize base64 encoded string");
+    struct serializer<banggame::image_pixels_hash, Context> {
+        json operator()(banggame::image_pixels_hash value) const {
+            if (value) {
+                return std::format("{:x}", value.value);
             }
-            return compression::decompress_bytes(base64::base64_decode(value.get<std::string>()));
+            return {};
         }
     };
 
     template<typename Context>
     struct deserializer<banggame::image_pixels, Context> {
-        using base_type = aggregate_deserializer_unchecked<banggame::image_pixels, image_pixels_tag>;
         banggame::image_pixels operator()(const json &value) const {
             if (value.is_null()) {
                 return {};
             }
-            banggame::image_pixels result = base_type{}(value, image_pixels_tag{});
-            if (result.pixels.size() != result.width * result.height * 4) {
-                throw deserialize_error("Invalid image");
+            if (!value.is_string()) {
+                throw deserialize_error("Cannot deserialize image_pixels");
             }
-            return result;
+            return banggame::image_from_png_data_url(value.get<std::string_view>());
         }
     };
 }

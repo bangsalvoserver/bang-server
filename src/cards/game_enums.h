@@ -22,7 +22,7 @@ namespace banggame {
         phase_one_draw_discard,
         phase_one_override,
         disable_player_distances,
-        treat_any_as_bang,
+        showdown,
         hands_shown,
         free_for_all,
     };

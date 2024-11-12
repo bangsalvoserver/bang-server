@@ -1,6 +1,7 @@
 #include <charconv>
 #include <csignal>
 #include <thread>
+#include <print>
 
 #include <cxxopts.hpp>
 
@@ -52,11 +53,11 @@ int main(int argc, char **argv) {
         auto results = options.parse(argc, argv);
 
         if (results.count("help")) {
-            std::cout << options.help();
+            std::print("{}", options.help());
             return 0;
         }
     } catch (const std::exception &error) {
-        std::cerr << "Invalid arguments: " << error.what() << '\n';
+        std::println(stderr, "Invalid arguments: {}", error.what());
         return 1;
     }
 
@@ -84,10 +85,9 @@ int main(int argc, char **argv) {
                 std::this_thread::sleep_until(next_tick);
             }
         } catch (const std::exception &error) {
-            std::cerr << "Unhandled exception: " << error.what() << '\n';
+            std::println(stderr, "Unhandled exception: {}", error.what());
         }
 
-        logging::status("Stopping server...");
         server.stop();
     }};
 
@@ -99,9 +99,8 @@ int main(int argc, char **argv) {
     tracking::track_zero();
     try {
         server.start(port, reuse_addr);
-        logging::status("Server stopped");
     } catch (const std::exception &error) {
-        std::cerr << "Could not start server: " << error.what() << '\n';
+        std::println(stderr, "Could not start server: {}", error.what());
         handle_stop();
     }
     tracking::track_zero();

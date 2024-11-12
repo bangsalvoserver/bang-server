@@ -3,6 +3,7 @@
 
 #include "options.h"
 #include "messages.h"
+#include "image_registry.h"
 
 #include "game/game.h"
 
@@ -30,15 +31,15 @@ static constexpr auto pings_until_disconnect = 2min / ping_interval;
 
 struct game_session {
     std::string username;
-    image_pixels propic;
+    image_registry::registered_image propic;
     
     game_lobby *lobby = nullptr;
 
     client_handle client;
     ticks lifetime = user_lifetime;
 
-    void set_username(const std::string &new_username);
-    void set_propic(const image_pixels &new_propic);
+    void set_username(std::string new_username);
+    void set_propic(image_pixels new_propic);
 };
 
 using session_ptr = std::shared_ptr<game_session>;
@@ -77,6 +78,10 @@ struct game_user {
         return flags.check(game_user_flag::disconnected);
     }
 
+    bool is_lobby_owner() const {
+        return flags.check(game_user_flag::lobby_owner);
+    }
+
     bool is_spectator() const {
         return flags.check(game_user_flag::spectator);
     }
@@ -84,12 +89,16 @@ struct game_user {
     bool is_muted() const {
         return flags.check(game_user_flag::muted);
     }
+
+    explicit operator lobby_user_args() const;
 };
 
 struct lobby_bot {
     int user_id;
     std::string username;
-    image_pixels_view propic;
+    image_pixels_hash propic;
+
+    explicit operator lobby_user_args() const;
 };
 
 struct game_lobby {
@@ -117,13 +126,6 @@ struct game_lobby {
 
     auto connected_users(this auto &&self) {
         return rv::remove_if(std::forward_like<decltype(self)>(self.users), &game_user::is_disconnected);
-    }
-
-    bool is_owner(session_ptr session) const {
-        if (auto range = connected_users()) {
-            return range.front().session == session;
-        }
-        return false;
     }
 
     std::pair<game_user &, bool> add_user(session_ptr session);

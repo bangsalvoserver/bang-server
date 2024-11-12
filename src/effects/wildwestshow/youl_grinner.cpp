@@ -28,7 +28,7 @@ namespace banggame {
     }
 
     void equip_youl_grinner::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player_ptr origin) {
+        target->m_game->add_listener<event_type::on_turn_start>({target_card, -2}, [=](player_ptr origin) {
             if (target == origin) {
                 for (player_ptr p : target->m_game->range_other_players(target)) {
                     if (p->m_hand.size() > target->m_hand.size()) {
