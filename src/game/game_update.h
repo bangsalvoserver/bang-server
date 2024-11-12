@@ -35,28 +35,18 @@ namespace banggame {
         bool front = false;
     };
 
-    struct add_cubes_update {
-        int num_cubes;
+    struct add_tokens_update {
+        card_token_type token_type;
+        int num_tokens;
         nullable_card target_card;
     };
 
-    struct move_cubes_update {
-        int num_cubes;
+    struct move_tokens_update {
+        card_token_type token_type;
+        int num_tokens;
         nullable_card origin_card;
         nullable_card target_card;
-        animation_duration duration = durations.move_cubes;
-    };
-
-    struct add_fame_update {
-        int num_fame;
-        card_ptr target_card;
-    };
-
-    struct move_fame_update {
-        int num_fame;
-        card_ptr origin_card;
-        nullable_card target_card;
-        animation_duration duration = durations.move_fame;
+        animation_duration duration = durations.move_tokens;
     };
 
     struct move_train_update {
@@ -184,11 +174,9 @@ namespace banggame {
         utils::tag<"add_cards", add_cards_update>,
         utils::tag<"remove_cards", remove_cards_update>,
         utils::tag<"move_card", move_card_update>,
-        utils::tag<"add_cubes", add_cubes_update>,
-        utils::tag<"move_cubes", move_cubes_update>,
+        utils::tag<"add_tokens", add_tokens_update>,
+        utils::tag<"move_tokens", move_tokens_update>,
         utils::tag<"move_train", move_train_update>,
-        utils::tag<"add_fame", add_fame_update>,
-        utils::tag<"move_fame", move_fame_update>,
         utils::tag<"deck_shuffled", deck_shuffled_update>,
         utils::tag<"show_card", show_card_update>,
         utils::tag<"hide_card", hide_card_update>,

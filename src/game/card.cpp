@@ -105,38 +105,73 @@ namespace banggame {
     void card::add_short_pause() {
         m_game->add_update<"short_pause">(this);
     }
-    
-    void card::add_cubes(int ncubes) {
-        ncubes = std::min<int>({ncubes, m_game->num_cubes, max_cubes - num_cubes});
-        if (ncubes > 0) {
-            m_game->num_cubes -= ncubes;
-            num_cubes += ncubes;
-            m_game->add_log("LOG_ADD_CUBE", owner, this, ncubes);
-            m_game->add_update<"move_cubes">(ncubes, nullptr, this, ncubes == 1 ? durations.move_cube : durations.move_cubes);
+
+    int card::get_max_tokens(card_token_type token_type) {
+        switch (token_type) {
+        case card_token_type::cube: return 4;
+        case card_token_type::fame: return 100;
+        default: throw std::runtime_error("Invalid token_type");
         }
     }
 
-    void card::move_cubes(card_ptr target, int ncubes, bool instant) {
-        ncubes = std::min<int>(ncubes, num_cubes);
-        if (target && ncubes > 0 && target->num_cubes < max_cubes) {
-            int added_cubes = std::min<int>(ncubes, max_cubes - target->num_cubes);
-            target->num_cubes += added_cubes;
-            num_cubes -= added_cubes;
-            ncubes -= added_cubes;
-            if (owner == target->owner) {
-                m_game->add_log("LOG_MOVED_CUBE", target->owner, this, target, added_cubes);
-            } else {
-                m_game->add_log("LOG_MOVED_CUBE_FROM", target->owner, owner, this, target, added_cubes);
+    int card::num_tokens(card_token_type token_type) const {
+        auto it = tokens.find(token_type); 
+        if (it != tokens.end()) return it->second;
+        return 0;
+    }
+    
+    void card::add_tokens(card_token_type token_type, int num_tokens) {
+        auto &table_tokens = m_game->tokens[token_type];
+        auto &card_tokens = tokens[token_type];
+
+        num_tokens = std::min<int>({ num_tokens, table_tokens, get_max_tokens(token_type) - card_tokens });
+        if (num_tokens > 0) {
+            table_tokens -= num_tokens;
+            card_tokens += num_tokens;
+            switch (token_type) {
+            case card_token_type::cube:
+                m_game->add_log("LOG_ADD_CUBE", owner, this, num_tokens);
+                break;
             }
-            m_game->add_update<"move_cubes">(added_cubes, this, target, instant ? 0ms : added_cubes == 1 ? durations.move_cube : durations.move_cubes);
+            m_game->add_update<"move_tokens">(token_type, num_tokens, nullptr, this, num_tokens == 1 ? durations.move_token : durations.move_tokens);
         }
-        if (ncubes > 0) {
-            num_cubes -= ncubes;
-            m_game->num_cubes += ncubes;
-            m_game->add_log("LOG_PAID_CUBE", owner, this, ncubes);
-            m_game->add_update<"move_cubes">(ncubes, this, nullptr, instant ? 0ms : ncubes == 1 ? durations.move_cube : durations.move_cubes);
+    }
+
+    void card::move_tokens(card_token_type token_type, card_ptr target, int num_tokens, bool instant) {
+        auto &table_tokens = m_game->tokens[token_type];
+        auto &target_tokens = target ? target->tokens[token_type] : table_tokens;
+        auto &card_tokens = tokens[token_type];
+
+        int max_tokens = get_max_tokens(token_type);
+
+        num_tokens = std::min<int>(num_tokens, card_tokens);
+        if (target && num_tokens > 0 && target_tokens < max_tokens) {
+            int added_tokens = std::min<int>(num_tokens, max_tokens - target_tokens);
+            target_tokens += added_tokens;
+            card_tokens -= added_tokens;
+            num_tokens -= added_tokens;
+            switch (token_type) {
+            case card_token_type::cube:
+                if (owner == target->owner) {
+                    m_game->add_log("LOG_MOVED_CUBE", target->owner, this, target, added_tokens);
+                } else {
+                    m_game->add_log("LOG_MOVED_CUBE_FROM", target->owner, owner, this, target, added_tokens);
+                }
+                break;
+            }
+            m_game->add_update<"move_tokens">(token_type, added_tokens, this, target, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens);
         }
-        if (sign && num_cubes == 0) {
+        if (num_tokens > 0) {
+            card_tokens -= num_tokens;
+            table_tokens += num_tokens;
+            switch (token_type) {
+            case card_token_type::cube:
+                m_game->add_log("LOG_PAID_CUBE", owner, this, num_tokens);
+                break;
+            }
+            m_game->add_update<"move_tokens">(token_type, num_tokens, this, nullptr, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens);
+        }
+        if (sign && card_tokens == 0) {
             m_game->add_log("LOG_DISCARDED_ORANGE_CARD", owner, this);
             m_game->call_event(event_type::on_discard_orange_card{ owner, this });
             owner->disable_equip(this);
@@ -144,30 +179,18 @@ namespace banggame {
         }
     }
 
-    void card::add_fame(int fame) {
-        if (fame > 0) {
-            num_fame += fame;
-            m_game->add_update<"add_fame">(fame, this);
-        }
-    }
-
-    void card::move_fame(card_ptr target, int fame, bool instant) {
-        fame = std::min<int>(num_fame, fame);
-        if (fame > 0) {
-            num_fame -= fame;
-            if (target) {
-                target->num_fame += fame;
+    void card::drop_all_tokens() {
+        for (const auto &[token, count] : tokens) {
+            if (count > 0) {
+                switch (token) {
+                case card_token_type::cube:
+                    m_game->add_log("LOG_DROP_CUBE", owner, this, count);
+                    break;
+                }
+                m_game->tokens[token] += count;
+                m_game->add_update<"move_tokens">(token, count, this, nullptr, count == 1 ? durations.move_token : durations.move_tokens);
             }
-            m_game->add_update<"move_fame">(fame, this, target, instant ? 0ms : durations.move_fame);
         }
-    }
-
-    void card::drop_cubes() {
-        if (num_cubes > 0) {
-            m_game->add_log("LOG_DROP_CUBE", owner, this, num_cubes);
-            m_game->num_cubes += num_cubes;
-            m_game->add_update<"move_cubes">(num_cubes, this, nullptr, num_cubes == 1 ? durations.move_cube : durations.move_cubes);
-            num_cubes = 0;
-        }
+        tokens.clear();
     }
 }

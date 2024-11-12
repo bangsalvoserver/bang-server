@@ -112,6 +112,17 @@ namespace banggame {
         }
     }
 
+    int game_table::num_tokens(card_token_type token_type) const {
+        auto it = tokens.find(token_type); 
+        if (it != tokens.end()) return it->second;
+        return 0;
+    }
+
+    void game_table::add_tokens(card_token_type token_type, int num_tokens) {
+        tokens[token_type] += num_tokens;
+        add_update<"add_tokens">(token_type, num_tokens);
+    }
+
     card_ptr game_table::top_of_deck() {
         if (m_deck.empty()) {
             if (m_discards.empty()) {

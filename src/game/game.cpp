@@ -59,11 +59,10 @@ namespace banggame {
                 if (c->visibility == card_visibility::shown) {
                     co_yield make_update<"show_card">(c, *c, 0ms);
                 }
-                if (c->num_cubes > 0) {
-                    co_yield make_update<"add_cubes">(c->num_cubes, c);
-                }
-                if (c->num_fame > 0) {
-                    co_yield make_update<"add_fame">(c->num_fame, c);
+                for (const auto &[token, count] : c->tokens) {
+                    if (count > 0) {
+                        co_yield make_update<"add_tokens">(token, count, c);
+                    }
                 }
                 if (c->inactive) {
                     co_yield make_update<"tap_card">(c, true, 0ms);
@@ -98,8 +97,10 @@ namespace banggame {
         co_yield std::ranges::elements_of(add_cards(pocket_type::feats_discard));
         co_yield std::ranges::elements_of(add_cards(pocket_type::feats));
         
-        if (num_cubes > 0) {
-            co_yield make_update<"add_cubes">(num_cubes);
+        for (const auto &[token, count] : tokens) {
+            if (count > 0) {
+                co_yield make_update<"add_tokens">(token, count);
+            }
         }
 
         for (player_ptr p : m_players) {

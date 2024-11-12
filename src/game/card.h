@@ -10,8 +10,6 @@
 #include "game_update.h"
 
 namespace banggame {
-    
-    constexpr int max_cubes = 4;
 
     enum class card_visibility : uint8_t {
         hidden,
@@ -32,8 +30,7 @@ namespace banggame {
         card_visibility visibility = card_visibility::hidden;
         
         bool inactive = false;
-        int8_t num_cubes = 0;
-        int8_t num_fame = 0;
+        std::unordered_map<card_token_type, int8_t> tokens;
 
         bool is_equip_card() const;
         bool is_bang_card(const_player_ptr origin) const;
@@ -46,13 +43,25 @@ namespace banggame {
 
         void flash_card();
         void add_short_pause();
+        
+        static int get_max_tokens(card_token_type token_type);
 
-        void add_cubes(int ncubes);
-        void move_cubes(card_ptr target, int ncubes, bool instant = false);
-        void drop_cubes();
+        int num_tokens(card_token_type token_type) const;
+        void add_tokens(card_token_type token_type, int num_tokens);
+        void move_tokens(card_token_type token_type, card_ptr target, int num_tokens, bool instant = false);
+        void drop_all_tokens();
 
-        void add_fame(int fame);
-        void move_fame(card_ptr target, int fame, bool instant = false);
+        int num_cubes() const {
+            return num_tokens(card_token_type::cube);
+        }
+
+        void add_cubes(int ncubes) {
+            add_tokens(card_token_type::cube, ncubes);
+        }
+
+        void move_cubes(card_ptr target, int ncubes, bool instant = false) {
+            move_tokens(card_token_type::cube, target, ncubes, instant);
+        }
     };
     
     struct card_pocket_pair {

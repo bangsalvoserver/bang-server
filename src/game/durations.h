@@ -19,8 +19,8 @@ namespace banggame {
     };
 
     extern const struct durations_t {
-        animation_duration move_cube;
-        animation_duration move_cubes;
+        animation_duration move_token;
+        animation_duration move_tokens;
         animation_duration move_card;
         animation_duration move_deck;
         animation_duration deck_shuffle;
@@ -31,7 +31,6 @@ namespace banggame {
         animation_duration move_player;
         animation_duration player_hp;
         animation_duration move_train;
-        animation_duration move_fame;
     } durations;
 
 }

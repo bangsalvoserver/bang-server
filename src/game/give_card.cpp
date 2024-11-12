@@ -49,9 +49,12 @@ namespace banggame {
             }
 
             card_ptr old_character = target->first_character();
-            int ncubes = old_character->num_cubes;
+            auto tokens = old_character->tokens;
 
-            old_character->move_cubes(nullptr, ncubes);
+            for (const auto &[token, count] : tokens) {
+                old_character->move_tokens(token, nullptr, count);
+            }
+
             target->m_game->add_update<"remove_cards">(std::vector{old_character});
 
             old_character->pocket = pocket_type::none;
@@ -69,7 +72,10 @@ namespace banggame {
 
             target->reset_max_hp();
             target->enable_equip(target_card);
-            target_card->add_cubes(ncubes);
+
+            for (const auto &[token, count] : tokens) {
+                target_card->add_tokens(token, count);
+            }
             break;
         }
         case card_deck_type::goldrush: {

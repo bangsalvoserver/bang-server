@@ -49,7 +49,7 @@ namespace banggame {
         card_list m_feats_discard;
         card_list m_feats;
         
-        int8_t num_cubes = 0;
+        std::unordered_map<card_token_type, int8_t> tokens;
         int8_t train_position = 0;
 
         game_flags m_game_flags;
@@ -87,6 +87,13 @@ namespace banggame {
         int num_alive() const;
 
         void shuffle_cards_and_ids(std::span<card_ptr> vec);
+
+        int num_tokens(card_token_type token_type) const;
+        void add_tokens(card_token_type token_type, int num_tokens);
+
+        int num_cubes() const {
+            return num_tokens(card_token_type::cube);
+        }
 
         card_ptr top_of_deck();
         card_ptr top_train_card();

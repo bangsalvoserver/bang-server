@@ -5,8 +5,8 @@ namespace banggame {
     using namespace std::chrono_literals;
 
     const durations_t durations {
-        .move_cube =       133ms,
-        .move_cubes =      250ms,
+        .move_token =      133ms,
+        .move_tokens =     250ms,
         .move_card =       333ms,
         .move_deck =       333ms,
         .deck_shuffle =    1333ms,
@@ -17,7 +17,6 @@ namespace banggame {
         .move_player =     1000ms,
         .player_hp =       333ms,
         .move_train =      500ms,
-        .move_fame =       250ms
     };
 
 }

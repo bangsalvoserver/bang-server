@@ -69,6 +69,11 @@ namespace banggame {
         train,
     };
 
+    enum class card_token_type {
+        cube,
+        fame
+    };
+
     enum class player_role {
         unknown,
         sheriff,
