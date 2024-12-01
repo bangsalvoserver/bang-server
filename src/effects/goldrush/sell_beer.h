@@ -6,6 +6,7 @@
 namespace banggame {
 
     struct effect_sell_beer {
+        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 

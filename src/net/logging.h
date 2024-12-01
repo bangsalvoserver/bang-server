@@ -2,7 +2,6 @@
 #define __LOGGING_H__
 
 #include <format>
-#include <iostream>
 
 #include "utils/enums.h"
 
@@ -19,21 +18,8 @@ namespace logging {
         off
     };
 
-    inline std::istream &operator >> (std::istream &input, logging::level &result) {
-        std::string text;
-        input >> text;
-        if (auto value = enums::from_string<logging::level>(text)) {
-            result = *value;
-        } else {
-            throw std::runtime_error(std::format("Invalid logging level: {}", text));
-        }
-        return input;
-    };
-
     class log_function {
     public:
-        static inline level global_level = level::status;
-        
         constexpr log_function(level local_level): local_level{local_level} {
             if (local_level == level::off || local_level == level::all) {
                 throw std::runtime_error("Invalid logging level");
@@ -49,7 +35,12 @@ namespace logging {
 
     private:
         level local_level;
+        static level global_level;
+
+        friend void set_logging_level(level global_level);
     };
+
+    void set_logging_level(level global_level);
 
     constexpr auto trace = log_function(level::trace);
     constexpr auto debug = log_function(level::debug);

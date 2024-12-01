@@ -7,6 +7,12 @@
 namespace logging {
     std::mutex lock;
 
+    level log_function::global_level = level::status;
+
+    void set_logging_level(level global_level) {
+        log_function::global_level = global_level;
+    }
+
     void log_function::operator()(std::string_view message) const {
         if (enums::indexof(global_level) <= enums::indexof(local_level)) {
             std::scoped_lock guard{lock};

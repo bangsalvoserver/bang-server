@@ -5,9 +5,8 @@
 
 namespace banggame {
 
-    struct equip_reverend {
+    struct equip_reverend : event_equip {
         void on_enable(card_ptr target_card, player_ptr target);
-        void on_disable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(reverend, equip_reverend)

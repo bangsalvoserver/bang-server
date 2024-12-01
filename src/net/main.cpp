@@ -24,7 +24,11 @@ int main(int argc, char **argv) {
     uint16_t port = banggame::default_server_port;
     bool reuse_addr = false;
 
+    std::string logging_level;
+
     std::string tracking_file;
+
+    bool display_help = false;
 
 #ifndef LIBUS_NO_SSL
     bool enable_tls = false;
@@ -35,7 +39,7 @@ int main(int argc, char **argv) {
     options.add_options()
         ("port",        "",                 cxxopts::value(port))
         ("cheats",      "Enable Cheats",    cxxopts::value(server.options().enable_cheats))
-        ("l,logging",   "Logging Level",    cxxopts::value(logging::log_function::global_level))
+        ("l,logging",   "Logging Level",    cxxopts::value(logging_level))
         ("r,reuse-addr","Reuse Address",    cxxopts::value(reuse_addr))
         ("t,tracking-db","Tracking Database File", cxxopts::value(tracking_file))
 #ifndef LIBUS_NO_SSL
@@ -43,7 +47,7 @@ int main(int argc, char **argv) {
         ("cert",        "Certificate File", cxxopts::value(certificate_file))
         ("key",         "Private Key File", cxxopts::value(private_key_file))
 #endif
-        ("h,help",      "Print Help")
+        ("h,help",      "Print Help",       cxxopts::value(display_help))
     ;
 
     options.positional_help("Port Number");
@@ -52,7 +56,15 @@ int main(int argc, char **argv) {
     try {
         auto results = options.parse(argc, argv);
 
-        if (results.count("help")) {
+        if (!logging_level.empty()) {
+            if (auto level = enums::from_string<logging::level>(logging_level)) {
+                logging::set_logging_level(*level);
+            } else {
+                throw std::runtime_error(std::format("Invalid logging level: {}", logging_level));
+            }
+        }
+
+        if (display_help) {
             std::print("{}", options.help());
             return 0;
         }

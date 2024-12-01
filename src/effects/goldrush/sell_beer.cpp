@@ -6,6 +6,10 @@
 
 namespace banggame {
 
+    void effect_sell_beer::add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) {
+        ctx.playing_card = target;
+    }
+
     void effect_sell_beer::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         origin->m_game->add_log("LOG_SOLD_BEER", origin, target_card);
         origin->discard_card(target_card);
