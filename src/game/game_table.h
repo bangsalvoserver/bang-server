@@ -49,7 +49,7 @@ namespace banggame {
         card_list m_feats_discard;
         card_list m_feats;
         
-        std::unordered_map<card_token_type, int8_t> tokens;
+        token_map tokens;
         int8_t train_position = 0;
 
         game_flags m_game_flags;

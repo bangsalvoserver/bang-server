@@ -5,6 +5,7 @@
 
 #include "utils/tagged_variant.h"
 #include "utils/enum_bitset.h"
+#include "utils/enum_map.h"
 
 namespace banggame {
 
@@ -73,6 +74,8 @@ namespace banggame {
         cube,
         fame
     };
+
+    using token_map = enums::enum_map<card_token_type, uint8_t>;
 
     enum class player_role {
         unknown,

@@ -30,7 +30,7 @@ namespace banggame {
         card_visibility visibility = card_visibility::hidden;
         
         bool inactive = false;
-        std::unordered_map<card_token_type, int8_t> tokens;
+        token_map tokens;
 
         bool is_equip_card() const;
         bool is_bang_card(const_player_ptr origin) const;

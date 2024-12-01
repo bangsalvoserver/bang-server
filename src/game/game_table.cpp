@@ -113,9 +113,7 @@ namespace banggame {
     }
 
     int game_table::num_tokens(card_token_type token_type) const {
-        auto it = tokens.find(token_type); 
-        if (it != tokens.end()) return it->second;
-        return 0;
+        return tokens[token_type];
     }
 
     void game_table::add_tokens(card_token_type token_type, int num_tokens) {
