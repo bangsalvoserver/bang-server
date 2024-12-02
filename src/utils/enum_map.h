@@ -14,10 +14,9 @@ namespace enums {
         template<bool is_const>
         class enum_map_iterator {
         public:
-            using iterator_category = std::bidirectional_iterator_tag;
+            using iterator_category = std::random_access_iterator_tag;
             using difference_type = ptrdiff_t;
             using value_type = std::pair<E, std::conditional_t<is_const, const T &, T &>>;
-            using pointer = value_type *;
             using reference = value_type;
 
             using array_pointer = std::conditional_t<is_const, const array_type *, array_type *>;
@@ -30,38 +29,42 @@ namespace enums {
             
             bool operator == (const enum_map_iterator &other) const = default;
 
-            enum_map_iterator &operator ++ () {
-                ++m_index;
-                return *this;
+            auto operator <=> (const enum_map_iterator &other) const {
+                return m_index <=> other.m_index;
             }
 
-            enum_map_iterator operator ++ (int) {
-                auto copy = *this;
-                ++m_index;
-                return copy;
+            difference_type operator - (const enum_map_iterator &other) const {
+                return m_index - other.m_index;
             }
 
-            enum_map_iterator &operator --() {
-                --m_index;
-                return *this;
-            }
+            enum_map_iterator &operator ++ () { ++m_index; return *this; }
+            enum_map_iterator operator ++ (int) { auto copy = *this; ++m_index; return copy; }
 
-            enum_map_iterator operator -- (int) {
-                auto copy = *this;
-                --m_index;
-                return copy;
-            }
+            enum_map_iterator &operator --() { --m_index; return *this; }
+            enum_map_iterator operator -- (int) { auto copy = *this; --m_index; return copy; }
+
+            enum_map_iterator &operator += (difference_type n) { m_index += n; return *this; }
+            enum_map_iterator operator + (difference_type n) const { return { m_index + n, m_array }; }
+
+            friend enum_map_iterator operator + (difference_type n, const enum_map_iterator &i) { return i + n; }
+
+            enum_map_iterator &operator -= (difference_type n) { m_index -= n; return *this; }
+            enum_map_iterator operator - (difference_type n) const { return { m_index - n, m_array }; }
 
             value_type operator *() const {
                 return { enum_values<E>()[m_index], (*m_array)[m_index] };
+            }
+
+            value_type operator[] (difference_type n) const {
+                return *(*this + n);
             }
         
         private:
             size_t m_index;
             array_pointer m_array;
         };
-        
-        using value_type = std::pair<E, T &>;
+    
+    public:
         using iterator = enum_map_iterator<false>;
         using const_iterator = enum_map_iterator<true>;
         using reverse_iterator = std::reverse_iterator<iterator>;
