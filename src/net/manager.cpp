@@ -608,7 +608,7 @@ void game_manager::handle_message(utils::tag<"game_rejoin">, session_ptr session
     if (!target) {
         throw lobby_error("ERROR_CANNOT_FIND_PLAYER");
     }
-    if (target->is_bot()) {
+    if (!lobby.options.allow_bot_rejoin && target->is_bot()) {
         throw lobby_error("ERROR_CANNOT_REJOIN_ON_BOT");
     }
 
