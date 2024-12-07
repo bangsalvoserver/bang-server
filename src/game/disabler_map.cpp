@@ -33,7 +33,7 @@ namespace banggame {
 
     void disabler_map::add_disabler(event_card_key key, card_disabler_fun &&fun) {
         for (auto [owner, c] : disableable_cards(m_game)) {
-            if (!is_disabled(c) && std::invoke(fun, c)) {
+            if (std::invoke(fun, c) && !is_disabled(c)) {
                 for (const equip_holder &holder : c->equips | rv::reverse) {
                     if (!holder.is_nodisable()) {
                         holder.on_disable(c, owner);
@@ -48,16 +48,15 @@ namespace banggame {
 
     void disabler_map::do_remove_disablers(disabler_map_range range) {
         for (auto [owner, c] : disableable_cards(m_game)) {
-            bool a = false;
-            bool b = false;
-            for (const auto &[key, fun] : m_disablers) {
-                if (rn::none_of(range, [&](const auto &pair) { return pair.first == key; })) {
-                    a = a || std::invoke(fun, c);
-                } else {
-                    b = b || std::invoke(fun, c);
-                }
-            }
-            if (!a && b) {
+            auto disables_c = [c](const auto &pair) { return std::invoke(pair.second, c); };
+            auto outside_range = rv::concat(
+                rn::subrange(m_disablers.begin(), range.begin()),
+                rn::subrange(range.end(), m_disablers.end())
+            );
+            
+            // enables the card only if there are no disablers left after the removal of `range`
+            // AND the card is already disabled by at least one disabler in `range`
+            if (rn::any_of(range, disables_c) && rn::none_of(outside_range, disables_c)) {
                 for (const equip_holder &holder : c->equips) {
                     if (!holder.is_nodisable()) {
                         holder.on_enable(c, owner);
