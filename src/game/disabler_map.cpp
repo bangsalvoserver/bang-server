@@ -35,9 +35,7 @@ namespace banggame {
         for (auto [owner, c] : disableable_cards(m_game)) {
             if (std::invoke(fun, c) && !is_disabled(c)) {
                 for (const equip_holder &holder : c->equips | rv::reverse) {
-                    if (!holder.is_nodisable()) {
-                        holder.on_disable(c, owner);
-                    }
+                    holder.on_disable(c, owner, equip_flag::disabler);
                 }
             }
         }
@@ -58,9 +56,7 @@ namespace banggame {
             // AND the card is already disabled by at least one disabler in `range`
             if (rn::any_of(range, disables_c) && rn::none_of(outside_range, disables_c)) {
                 for (const equip_holder &holder : c->equips) {
-                    if (!holder.is_nodisable()) {
-                        holder.on_enable(c, owner);
-                    }
+                    holder.on_enable(c, owner, equip_flag::disabler);
                 }
             }
         }

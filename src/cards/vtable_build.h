@@ -171,21 +171,23 @@ namespace banggame {
                 return {};
             },
 
-            .on_enable = [](int effect_value, card_ptr target_card, player_ptr target) {
+            .on_enable = [](int effect_value, card_ptr target_card, player_ptr target, equip_flags flags) {
                 auto value = build_effect<T>(effect_value);
-                if constexpr (requires { value.on_enable(target_card, target); }) {
+                if constexpr (requires { value.on_enable(target_card, target, flags); }) {
+                    value.on_enable(target_card, target, flags);
+                } else if constexpr (requires { value.on_enable(target_card, target); }) {
                     value.on_enable(target_card, target);
                 }
             },
 
-            .on_disable = [](int effect_value, card_ptr target_card, player_ptr target) {
+            .on_disable = [](int effect_value, card_ptr target_card, player_ptr target, equip_flags flags) {
                 auto value = build_effect<T>(effect_value);
-                if constexpr (requires { value.on_disable(target_card, target); }) {
+                if constexpr (requires { value.on_disable(target_card, target, flags); }) {
+                    value.on_disable(target_card, target, flags);
+                } else if constexpr (requires { value.on_disable(target_card, target); }) {
                     value.on_disable(target_card, target);
                 }
-            },
-
-            .is_nodisable = requires { typename T::nodisable; }
+            }
         };
     }
 

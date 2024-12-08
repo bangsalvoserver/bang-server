@@ -40,8 +40,8 @@ namespace banggame {
         void equip_card(card_ptr card);
         card_ptr find_equipped_card(const_card_ptr card) const;
 
-        void enable_equip(card_ptr target_card);
-        void disable_equip(card_ptr target_card);
+        void enable_equip(card_ptr target_card, equip_flags flags = {});
+        void disable_equip(card_ptr target_card, equip_flags flags = {});
 
         void play_sound(std::string_view sound_id);
         

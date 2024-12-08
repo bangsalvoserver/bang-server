@@ -1,7 +1,9 @@
 #include "mustang.h"
 
 #include "game/game.h"
+
 #include "cards/filter_enums.h"
+#include "cards/game_enums.h"
 
 namespace banggame {
     
@@ -20,9 +22,11 @@ namespace banggame {
         }
     }
 
-    void equip_horse::on_enable(card_ptr target_card, player_ptr target) {
-        if (auto it = rn::find_if(target->m_table, is_horse{target_card}); it != target->m_table.end()) {
-            target->discard_card(*it);
+    void equip_horse::on_enable(card_ptr target_card, player_ptr target, equip_flags flags) {
+        if (!flags.check(equip_flag::disabler)) {
+            if (auto it = rn::find_if(target->m_table, is_horse{target_card}); it != target->m_table.end()) {
+                target->discard_card(*it);
+            }
         }
     }
 

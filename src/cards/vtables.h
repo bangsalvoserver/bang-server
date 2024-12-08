@@ -93,25 +93,20 @@ namespace banggame {
         std::string_view name;
 
         prompt_string (*on_prompt)(int effect_value, card_ptr origin_card, player_ptr origin, player_ptr target);
-        void (*on_enable)(int effect_value, card_ptr target_card, player_ptr target);
-        void (*on_disable)(int effect_value, card_ptr target_card, player_ptr target);
-        bool is_nodisable;
+        void (*on_enable)(int effect_value, card_ptr target_card, player_ptr target, equip_flags flags);
+        void (*on_disable)(int effect_value, card_ptr target_card, player_ptr target, equip_flags flags);
     };
 
     inline prompt_string equip_holder::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
         return type->on_prompt(effect_value, origin_card, origin, target);
     }
 
-    inline void equip_holder::on_enable(card_ptr target_card, player_ptr target) const {
-        type->on_enable(effect_value, target_card, target);
+    inline void equip_holder::on_enable(card_ptr target_card, player_ptr target, equip_flags flags) const {
+        type->on_enable(effect_value, target_card, target, flags);
     }
 
-    inline void equip_holder::on_disable(card_ptr target_card, player_ptr target) const {
-        type->on_disable(effect_value, target_card, target);
-    }
-
-    inline bool equip_holder::is_nodisable() const {
-        return type->is_nodisable;
+    inline void equip_holder::on_disable(card_ptr target_card, player_ptr target, equip_flags flags) const {
+        type->on_disable(effect_value, target_card, target, flags);
     }
     
     template<utils::fixed_string Name> struct equip_vtable_map;

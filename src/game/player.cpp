@@ -43,20 +43,18 @@ namespace banggame {
         enable_equip(target);
     }
 
-    void player::enable_equip(card_ptr target_card) {
-        bool card_disabled = m_game->is_disabled(target_card);
-        for (const equip_holder &holder : target_card->equips) {
-            if (!card_disabled || holder.is_nodisable()) {
-                holder.on_enable(target_card, this);
+    void player::enable_equip(card_ptr target_card, equip_flags flags) {
+        if (!m_game->is_disabled(target_card)) {
+            for (const equip_holder &holder : target_card->equips) {
+                holder.on_enable(target_card, this, flags);
             }
         }
     }
 
-    void player::disable_equip(card_ptr target_card) {
-        bool card_disabled = m_game->is_disabled(target_card);
-        for (const equip_holder &holder : target_card->equips | rv::reverse) {
-            if (!card_disabled || holder.is_nodisable()) {
-                holder.on_disable(target_card, this);
+    void player::disable_equip(card_ptr target_card, equip_flag flags) {
+        if (!m_game->is_disabled(target_card)) {
+            for (const equip_holder &holder : target_card->equips | rv::reverse) {
+                holder.on_disable(target_card, this, flags);
             }
         }
     }

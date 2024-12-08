@@ -14,6 +14,10 @@ namespace banggame {
         multi_target,
         skip_target_logs,
     };
+
+    enum class equip_flag {
+        disabler
+    };
     
     enum class game_flag {
         game_over,

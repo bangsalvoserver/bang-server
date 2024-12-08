@@ -15,19 +15,23 @@ namespace banggame {
         return {};
     }
     
-    void equip_ghost::on_enable(card_ptr target_card, player_ptr target) {
-        if (!target->alive()) {
-            for (card_ptr c : target->m_characters) {
-                target->enable_equip(c);
+    void equip_ghost::on_enable(card_ptr target_card, player_ptr target, equip_flags flags) {
+        if (!flags.check(equip_flag::disabler)) {
+            if (!target->alive()) {
+                for (card_ptr c : target->m_characters) {
+                    target->enable_equip(c);
+                }
             }
+            target->add_player_flags(flag);
         }
-        target->add_player_flags(flag);
     }
     
-    void equip_ghost::on_disable(card_ptr target_card, player_ptr target) {
-        target->remove_player_flags(flag);
-        if (!target->alive()) {
-            target->m_game->handle_player_death(nullptr, target, discard_all_reason::discard_ghost);
+    void equip_ghost::on_disable(card_ptr target_card, player_ptr target, equip_flags flags) {
+        if (!flags.check(equip_flag::disabler)) {
+            target->remove_player_flags(flag);
+            if (!target->alive()) {
+                target->m_game->handle_player_death(nullptr, target, discard_all_reason::discard_ghost);
+            }
         }
     }
 }
