@@ -50,10 +50,9 @@ namespace banggame {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
-        return merge_prompts(target_cards
-            | rv::transform([&](card_ptr target_card) { return effect.on_prompt(origin_card, origin, target_card, ctx); })
-            | rn::to_vector
-        );
+        return merge_prompts(target_cards | rv::transform([&](card_ptr target_card) {
+            return effect.on_prompt(origin_card, origin, target_card, ctx);
+        }));
     }
 
     template<> void visit_cards::add_context(effect_context &ctx, const card_list &target_cards) {

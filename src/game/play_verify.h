@@ -20,7 +20,21 @@ namespace banggame {
 
     game_message verify_and_play(player_ptr origin, const game_action &action);
 
-    prompt_string merge_prompts(std::span<const prompt_string> promts);
+    template<rn::forward_range R> requires std::convertible_to<rn::range_value_t<R>, prompt_string>
+    inline prompt_string merge_prompts(R &&prompts) {
+        bool empty = false;
+        for (const prompt_string &str : prompts) {
+            if (str.type == prompt_type::priority) {
+                return str;
+            } else if (!str) {
+                empty = true;
+            }
+        }
+        if (empty || prompts.empty()) {
+            return {};
+        }
+        return prompts.front();
+    }
 
 }
 
