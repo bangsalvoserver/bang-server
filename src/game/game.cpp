@@ -369,6 +369,7 @@ namespace banggame {
                         .value = target->get_distance_mod()
                     };
                 })
+                | rv::cache1
                 | rv::filter([](const player_distance_item &item) {
                     return item.value != 0;
                 })
