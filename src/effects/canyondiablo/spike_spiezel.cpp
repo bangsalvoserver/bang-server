@@ -27,15 +27,16 @@ namespace banggame {
     }
 
     void modifier_spike_spiezel::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        if (auto range = origin->m_played_cards
+        auto range = origin->m_played_cards
             | rv::reverse
             | rv::transform([](const played_card_history &history) {
                 return get_repeat_playing_card(history.origin_card.origin_card, history.context);
             })
-            | rv::filter(&card::is_brown))
-        {
+            | rv::cache1
+            | rv::filter(&card::is_brown);
+        if (auto it = range.begin(); it != range.end()) {
             ctx.disable_banglimit = true;
-            ctx.repeat_card = *range.begin();
+            ctx.repeat_card = *it;
         }
     }
 }
