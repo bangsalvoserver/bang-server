@@ -504,10 +504,6 @@ void game_manager::handle_message(utils::tag<"lobby_return">, session_ptr sessio
     lobby.m_game.reset();
     lobby.state = lobby_state::waiting;
 
-    for (game_user &user : lobby.connected_users()) {
-        remove_user_flag(lobby, user, game_user_flag::spectator);
-    }
-
     broadcast_message_no_lobby<"lobby_update">(lobby);
 }
 
