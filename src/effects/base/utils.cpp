@@ -1,6 +1,7 @@
 #include "utils.h"
 
 #include "game/game.h"
+#include "game/play_verify.h"
 
 namespace banggame {
     
@@ -14,6 +15,10 @@ namespace banggame {
 
     void effect_set_playing::add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) {
         ctx.playing_card = target;
+    }
+    
+    game_string effect_set_playing::get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) {
+        return get_play_card_error(origin, target, ctx);
     }
 
 }

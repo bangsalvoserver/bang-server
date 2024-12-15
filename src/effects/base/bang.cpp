@@ -58,7 +58,6 @@ namespace banggame {
     }
 
     game_string handler_play_as_bang::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target) {
-        MAYBE_RETURN(get_play_card_error(origin, chosen_card, ctx));
         return effect_bangcard{}.get_error(chosen_card, origin, target, ctx);
     }
 
