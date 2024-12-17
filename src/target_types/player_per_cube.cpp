@@ -45,10 +45,9 @@ namespace banggame {
 
     template<> prompt_string visit_cubes::prompt(const effect_context &ctx, const cubes_and_players &target) {
         MAYBE_RETURN(defer<"select_cubes">().prompt(ctx, target.first));
-        return merge_prompts(target.second
-            | rv::transform([&](player_ptr target) { return defer<"player">().prompt(ctx, target); })
-            | rn::to_vector
-        );
+        return merge_prompts(target.second | rv::transform([&](player_ptr target) {
+            return defer<"player">().prompt(ctx, target);
+        }));
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const cubes_and_players &target) {

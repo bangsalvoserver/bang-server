@@ -33,10 +33,9 @@ namespace banggame {
         });
 
         origin->m_game->add_listener<event_type::get_locomotive_prompt>(origin_card, [](player_ptr target, int locomotive_count, prompt_string &out_prompt) {
-            out_prompt = merge_prompts(target->m_game->range_alive_players(target)
-                | rv::transform([&](player_ptr p){ return get_ironhorse_prompt(target, p, locomotive_count); })
-                | rn::to_vector
-            );
+            out_prompt = merge_prompts(target->m_game->range_alive_players(target) | rv::transform([&](player_ptr p){
+                return get_ironhorse_prompt(target, p, locomotive_count);
+            }));
         });
     }
 }
