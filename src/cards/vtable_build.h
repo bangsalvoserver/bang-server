@@ -247,17 +247,6 @@ namespace banggame {
 
     #define BUILD_MODIFIER_VTABLE(name, type) template<> const modifier_vtable modifier_vtable_map<#name>::value = build_modifier_vtable<type>(#name);
 
-    template<typename ... Ts, size_t ... Is>
-    auto build_mth_args_helper(const auto &targets, std::index_sequence<Is...>) {
-        return std::make_tuple(std::visit([](const auto &value) -> Ts {
-            if constexpr (std::is_convertible_v<std::remove_cvref_t<decltype(value)>, Ts>) {
-                return value;
-            } else {
-                throw game_error("invalid access to mth: wrong target type");
-            }
-        }, *targets[Is]) ...);
-    }
-
     template<typename ... Ts>
     auto build_mth_args(const target_list &targets, small_int_set args) {
         static constexpr size_t N = sizeof...(Ts);
@@ -279,7 +268,15 @@ namespace banggame {
             *out_it++ = it;
         }
 
-        return build_mth_args_helper<Ts...>(target_array, std::make_index_sequence<N>());
+        return [&]<size_t ... Is>(std::index_sequence<Is...>) {
+            return std::make_tuple(std::visit([](const auto &value) -> Ts {
+                if constexpr (std::is_convertible_v<std::remove_cvref_t<decltype(value)>, Ts>) {
+                    return value;
+                } else {
+                    throw game_error("invalid access to mth: wrong target type");
+                }
+            }, *target_array[Is]) ...);
+        }(std::make_index_sequence<N>());
     }
 
     template<typename RetType, typename HandlerType, typename ... Args>
