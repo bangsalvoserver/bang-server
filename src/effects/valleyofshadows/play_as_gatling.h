@@ -6,7 +6,6 @@
 namespace banggame {
 
     struct handler_play_as_gatling {
-        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card);
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card);
         void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card);
     };

@@ -38,4 +38,8 @@ namespace banggame {
             }
         });
     }
+
+    void equip_weapon::on_disable(card_ptr target_card, player_ptr target) {
+        target->m_game->remove_listeners(event_card_key{target_card, 0});
+    }
 }

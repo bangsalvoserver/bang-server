@@ -46,10 +46,9 @@ namespace banggame {
     }
 
     template<> prompt_string visit_players::prompt(const effect_context &ctx, const player_list &targets) {
-        return merge_prompts(targets
-            | rv::transform([&](player_ptr target) { return defer<"player">().prompt(ctx, target); })
-            | rn::to_vector
-        );
+        return merge_prompts(targets | rv::transform([&](player_ptr target) {
+            return defer<"player">().prompt(ctx, target);
+        }));
     }
 
     template<> void visit_players::add_context(effect_context &ctx, const player_list &targets) {

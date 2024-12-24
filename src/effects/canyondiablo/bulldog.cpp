@@ -10,7 +10,7 @@ namespace banggame {
         if (chosen_card == discarded_card) {
             return {"ERROR_DUPLICATE_CARD", discarded_card};
         }
-        return handler_play_as_gatling{}.get_error(origin_card, origin, ctx, chosen_card);
+        return {};
     }
 
     prompt_string handler_bulldog::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, card_ptr discarded_card) {

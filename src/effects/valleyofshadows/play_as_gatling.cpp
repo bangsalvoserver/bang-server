@@ -11,20 +11,15 @@
 #include "utils/range_utils.h"
 
 namespace banggame {
-
-    game_string handler_play_as_gatling::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {
-        return get_play_card_error(origin, chosen_card, ctx);
-    }
     
     static auto get_player_targets_range(player_ptr origin, const effect_context &ctx) {
         return origin->m_game->range_other_players(origin) | rv::remove(ctx.skipped_player.get());
     }
 
     prompt_string handler_play_as_gatling::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {
-        return merge_prompts(get_player_targets_range(origin, ctx)
-            | rv::transform([&](player_ptr target) { return effect_bang{}.on_prompt(chosen_card, origin, target); })
-            | rn::to_vector
-        );
+        return merge_prompts(get_player_targets_range(origin, ctx) | rv::transform([&](player_ptr target) {
+            return effect_bang{}.on_prompt(chosen_card, origin, target);
+        }));
     }
 
     void handler_play_as_gatling::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card) {

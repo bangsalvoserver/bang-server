@@ -230,21 +230,6 @@ namespace banggame {
         return {};
     }
 
-    prompt_string merge_prompts(std::span<const prompt_string> prompts) {
-        bool empty = false;
-        for (const prompt_string &str : prompts) {
-            if (str.type == prompt_type::priority) {
-                return str;
-            } else if (!str) {
-                empty = true;
-            }
-        }
-        if (empty || prompts.empty()) {
-            return {};
-        }
-        return prompts.front();
-    }
-
     static prompt_string get_play_prompt(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
             MAYBE_RETURN(play_dispatch::prompt(origin, origin_card, effect, ctx, target));
