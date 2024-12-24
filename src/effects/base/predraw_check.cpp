@@ -31,10 +31,14 @@ namespace banggame {
         return false;
     }
 
-    void request_predraw::on_pick(card_ptr target_card) {
+    void request_predraw::remove_check(card_ptr target_card) {
         std::erase_if(checks, [&](const event_card_key &key) {
             return key.target_card == target_card;
         });
+    }
+
+    void request_predraw::on_pick(card_ptr target_card) {
+        remove_check(target_card);
         target->m_game->call_event(event_type::on_predraw_check{ target, target_card });
     }
 

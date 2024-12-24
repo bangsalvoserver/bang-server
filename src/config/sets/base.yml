@@ -49,6 +49,8 @@ main_deck:
     equip:
       - predraw_check(1)
       - jail
+    tags:
+      - jail
   - &remington
     name: REMINGTON
     signs:

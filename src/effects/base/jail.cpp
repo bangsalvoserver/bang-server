@@ -1,5 +1,7 @@
 #include "jail.h"
 
+#include "cards/filter_enums.h"
+
 #include "predraw_check.h"
 #include "draw_check.h"
 
@@ -28,5 +30,22 @@ namespace banggame {
                 });
             }
         });
+    }
+
+    bool effect_escape_jail::can_play(card_ptr origin_card, player_ptr origin) {
+        if (auto req = origin->m_game->top_request<request_predraw>(origin)) {
+            card_ptr jail_card = req->checks[0].target_card;
+            return jail_card->has_tag(tag_type::jail);
+        }
+        return false;
+    }
+
+    void effect_escape_jail::on_play(card_ptr origin_card, player_ptr origin) {
+        auto req = origin->m_game->top_request<request_predraw>(origin);
+        card_ptr jail_card = req->checks[0].target_card;
+        req->remove_check(jail_card);
+
+        origin->discard_card(jail_card);
+        origin->m_game->add_log("LOG_JAIL_BREAK", origin);
     }
 }

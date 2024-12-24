@@ -73,6 +73,7 @@ namespace banggame {
         drawing,
         weapon,
         horse,
+        jail,
         card_choice,
         last_scenario_card,
         buy_cost,

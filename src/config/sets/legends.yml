@@ -65,3 +65,9 @@ feats:
     image: 23_per_qualche_carta_in_piu
   - name: A_QUICK_DEATH
     image: 23_una_morte_veloce
+
+button_row:
+  - name: ESCAPE_JAIL
+    responses:
+      - discard card self | hand hearts
+      - escape_jail

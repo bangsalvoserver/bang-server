@@ -25,6 +25,8 @@ namespace banggame {
 
         std::vector<event_card_key> checks;
 
+        void remove_check(card_ptr target_card);
+        
         void on_update() override;
         bool can_pick(const_card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;

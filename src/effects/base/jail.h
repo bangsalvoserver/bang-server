@@ -11,6 +11,13 @@ namespace banggame {
     };
 
     DEFINE_EQUIP(jail, equip_jail)
+
+    struct effect_escape_jail {
+        bool can_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
+    };
+
+    DEFINE_EFFECT(escape_jail, effect_escape_jail)
 }
 
 #endif
