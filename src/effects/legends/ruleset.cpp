@@ -24,6 +24,19 @@ namespace banggame {
         game->add_listener<event_type::on_game_setup>({nullptr, 0}, [](player_ptr origin) {
             draw_next_feat(origin);
         });
+
+        game->add_listener<event_type::count_initial_cards>({nullptr, -1}, [](const_player_ptr origin, int &value) {
+            int count = 0;
+            for (player_ptr p : origin->m_game->range_all_players(origin->m_game->m_first_player)) {
+                ++count;
+                if (p == origin) break;
+            }
+            if (count >= 6) {
+                value = 5;
+            } else {
+                value = 4;
+            }
+        });
     }
 
     bool ruleset_legends::is_valid_with(const expansion_set &set) {

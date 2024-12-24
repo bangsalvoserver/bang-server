@@ -340,10 +340,19 @@ namespace banggame {
             add_log("LOG_GAME_START");
             play_sound("gamestart");
 
-            int cycles = rn::max(m_players | rv::transform(&player::get_initial_cards));
+            auto players = range_alive_players(m_first_player);
+            auto initial_cards = players
+                | rv::transform([this](const_player_ptr p) {
+                    int ncards = p->m_hp;
+                    call_event(event_type::count_initial_cards{ p, ncards });
+                    return ncards;
+                })
+                | rn::to_vector;
+
+            int cycles = rn::max(initial_cards);
             for (int i=0; i<cycles; ++i) {
-                for (player_ptr p : range_alive_players(m_first_player)) {
-                    if (p->m_hand.size() < p->get_initial_cards()) {
+                for (const auto &[p, ncards] : rv::zip(players, initial_cards)) {
+                    if (p->m_hand.size() < ncards) {
                         p->draw_card();
                     }
                 }

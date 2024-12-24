@@ -78,7 +78,6 @@ namespace banggame {
         buy_cost,
         traincost,
         max_hp,
-        initial_cards,
         bronco,
     };
 }

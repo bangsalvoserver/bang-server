@@ -47,6 +47,11 @@ namespace banggame::event_type {
         range_mod_type type;
         nullable_ref<int> value;
     };
+
+    struct count_initial_cards {
+        const_player_ptr origin;
+        nullable_ref<int> value;
+    };
     
     struct check_play_card {
         player_ptr origin;

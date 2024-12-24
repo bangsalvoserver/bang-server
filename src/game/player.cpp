@@ -65,10 +65,6 @@ namespace banggame {
         m_game->add_update<"play_sound">(update_target::includes_private(this), std::string(sound_id));
     }
 
-    int player::get_initial_cards() const {
-        return first_character()->get_tag_value(tag_type::initial_cards).value_or(m_hp);
-    }
-
     int player::max_cards_end_of_turn() const {
         int ncards = m_hp;
         m_game->call_event(event_type::apply_maxcards_modifier{ this, ncards });
