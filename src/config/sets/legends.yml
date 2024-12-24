@@ -35,36 +35,70 @@ legends:
 feats:
   - name: FIFTY_GUNS
     image: 23_cinquanta_pistole
+    # TODO on_destroy_card se target_card ha tag weapon -> attiva feat
   - name: WOUNDED_PRIDE
     image: 23_ferito_nell_orgoglio
+    # TODO on_missed se flag is_bang e origin == p -> attiva feat
   - name: OLD_WEST_GANG
     image: 23_gang_del_vecchio_west
+    # TODO on_hit se origin == p && target != p
+    #  add_listener (target_card, 5) track_damaged_player first_target ->
+    #    se first_target == null -> set first_target
+    #    se first_target != target -> attiva feat
+    # on_turn_end: clear listener (target_card, 5)
   - name: BOTTLENECK
     image: 23_il_collo_di_bottiglia
+    # TODO on_destroy_card se target_card ha tag beer -> attiva feat
+    # crocevia: discard card self | hand beer -> attiva feat
   - name: THE_CHUCK_A_LUCK
     image: 23_il_mulino_d_oro
+    # TODO on_destroy_card se target_card ha tag bangcard -> attiva feat
+    # crocevia: discard card self | hand bangcard -> attiva feat
   - name: '3_15_TO_YOOMA'
     image: 23_il_treno_per_yooma
+    # TODO on_draw_check_start (nuovo evento) -> attiva feat
   - name: IN_GOOD_COMPANY
     image: 23_in_buona_compagnia
+    # TODO da capire come tenere traccia
+    # on_destroy_card se scarti una carta con stesso nome di ultima carta giocata in history
+    # on_play_card (nuovo evento?) se giochi una carta con stesso nome di ultima carta scartata
+    # crocevia: in_good_company card self | hand -> feat
+    #  effect_in_good_company (discard): error se target_card non ha stesso nome di ultima carta scartata
   - name: THE_LAST_HERO
     image: 23_l_ultimo_eroe
+    # TODO on_destroy_card se target_card blue -> attiva feat
+    # crocevia: discard card self | hand blue -> attiva feat
   - name: THE_MAN_WITH_NO_NAME
     image: 23_l_uomo_senza_nome
+    # TODO on_hit se hp > 0 -> attiva feat
+    # crocevia: damage -> attiva feat
   - name: WILHELM_SCREAM
     image: 23_l_urlo_di_wilhelm
+    # TODO on_play_bang (nuovo evento) se count_distance(origin, target) >= 2 -> feat
   - name: SCRUGS_BALLAD
     image: 23_la_ballata_di_scrugs
+    # TODO on_duel_hit (nuovo evento) se p == target -> feat
   - name: BORDERLANDS
     image: 23_la_frontiera
+    # TODO crocevia: borderlands
+    # effect_borderlands: scarta tutto dalla mano -> feat
   - name: THE_OREGON_TRAIN
     image: 23_la_pista_dell_oregon
+    # TODO crocevia: - add_draw_card -> feat
   - name: A_THOUSAND_WAYS_TO_DIE
     image: 23_mille_modi_per_morire
+    # TODO crocevia: - thousand_ways cards(2) self
+    # effect_thousand_ways: get_error = una delle carte e' mancato
+    # on_play: rivela carte -> feat
   - name: FOR_A_FEW_CARDS_MORE
     image: 23_per_qualche_carta_in_piu
+    # TODO on_turn_end:
+    # request_few_cards_more: pickable and resolvable
+    # on_pick -> scarta carta -> feat
+    # on_resolve -> dismiss
   - name: A_QUICK_DEATH
     image: 23_una_morte_veloce
+    # TODO on_hit se hp == max_hp e flags is_bang -> feat
 
 button_row:
   - name: ESCAPE_JAIL
