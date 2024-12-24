@@ -7,6 +7,19 @@ legends:
     image: 23_black_jack
   - name: CALAMITY_JANET
     image: 23_calamity_janet
+    equip:
+      - treat_as_bang(2)
+    effects:
+      - banglimit
+      - set_playing card self | hand not_bangcard
+      - none player reachable notself
+    mth_effect: play_as_bang(1,2)
+    responses:
+      - set_playing card self | hand not_missedcard
+    mth_response: play_as_missed(0)
+    tags:
+      - play_as_bang
+      - banglimit
   - name: EL_GRINGO
     image: 23_el_gringo
   - name: JESSE_JONES
