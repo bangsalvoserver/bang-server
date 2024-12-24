@@ -1,6 +1,8 @@
 legends:
   - name: BART_CASSIDY
     image: 23_bart_cassidy
+    equip:
+      - bart_cassidy(2)
   - name: BLACK_JACK
     image: 23_black_jack
   - name: CALAMITY_JANET
