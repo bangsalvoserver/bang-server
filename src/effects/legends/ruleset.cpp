@@ -23,6 +23,10 @@ namespace banggame {
     void ruleset_legends::on_apply(game *game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 0}, [](player_ptr origin) {
             draw_next_feat(origin);
+
+            for (player_ptr p : origin->m_game->range_all_players(origin)) {
+                p->first_character()->add_tokens(card_token_type::fame, 5);
+            }
         });
 
         game->add_listener<event_type::count_initial_cards>({nullptr, -1}, [](const_player_ptr origin, int &value) {
