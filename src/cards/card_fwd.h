@@ -36,7 +36,8 @@ namespace banggame {
 
     struct ruleset_vtable;
 
-    using expansion_set = std::set<const ruleset_vtable *>;
+    using ruleset_ptr = const ruleset_vtable *;
+    using expansion_set = std::set<ruleset_ptr>;
 
     enum class target_player_filter;
     enum class target_card_filter;

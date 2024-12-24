@@ -183,7 +183,7 @@ namespace banggame {
     }
 
     static bool matches_expansions(const expansion_set &lhs, const expansion_set &rhs) {
-        for (const ruleset_vtable *ruleset : lhs) {
+        for (ruleset_ptr ruleset : lhs) {
             if (!rhs.contains(ruleset)) {
                 return false;
             }
@@ -192,7 +192,7 @@ namespace banggame {
     }
 
     void game::start_game() {
-        for (const ruleset_vtable *ruleset : m_options.expansions) {
+        for (ruleset_ptr ruleset : m_options.expansions) {
             ruleset->on_apply(this);
         }
 

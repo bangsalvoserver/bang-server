@@ -82,7 +82,7 @@ namespace banggame {
         card_initializer_list feats;
         card_initializer_list hidden;
 
-        expansion_set expansions;
+        std::initializer_list<ruleset_ptr> expansions;
     };
 
     extern const all_cards_t all_cards;

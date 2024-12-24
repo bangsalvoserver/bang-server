@@ -8,7 +8,7 @@
 namespace banggame {
 
     inline bool validate_expansions(const expansion_set &expansions) {
-        return rn::all_of(expansions, [&](const banggame::ruleset_vtable *ruleset) {
+        return rn::all_of(expansions, [&](banggame::ruleset_ptr ruleset) {
             return ruleset->is_valid_with(expansions);
         });
     }
@@ -17,14 +17,14 @@ namespace banggame {
 
 namespace json {
 
-    template<typename Context> struct serializer<const banggame::ruleset_vtable *, Context> {
-        json operator()(const banggame::ruleset_vtable *value) const {
+    template<typename Context> struct serializer<banggame::ruleset_ptr, Context> {
+        json operator()(banggame::ruleset_ptr value) const {
             return value->name;
         }
     };
 
-    template<typename Context> struct deserializer<const banggame::ruleset_vtable *, Context> {
-        const banggame::ruleset_vtable *operator ()(const json &value) const {
+    template<typename Context> struct deserializer<banggame::ruleset_ptr, Context> {
+        banggame::ruleset_ptr operator ()(const json &value) const {
             if (!value.is_string()) {
                 throw deserialize_error("Cannot deserialize ruleset_vtable");
             }
@@ -46,7 +46,7 @@ namespace std {
     template<> struct formatter<banggame::expansion_set> : formatter<std::string_view> {
         static string expansions_to_string(banggame::expansion_set value) {
             std::string ret;
-            for (const banggame::ruleset_vtable *ruleset : banggame::all_cards.expansions) {
+            for (banggame::ruleset_ptr ruleset : banggame::all_cards.expansions) {
                 if (value.contains(ruleset)) {
                     if (!ret.empty()) {
                         ret += ' ';
