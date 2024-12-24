@@ -41,6 +41,12 @@ namespace banggame {
                 value = 4;
             }
         });
+
+        game->add_listener<event_type::apply_maxcards_modifier>({nullptr, 20}, [](const_player_ptr origin, int &value) {
+            if (origin->m_hp <= 1) {
+                ++value;
+            }
+        });
     }
 
     bool ruleset_legends::is_valid_with(const expansion_set &set) {
