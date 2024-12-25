@@ -5,6 +5,7 @@ legends:
       - bart_cassidy(2)
   - name: BLACK_JACK
     image: 23_black_jack
+    # TODO - on_draw_from_deck: rivela in loop finche' il "valore" non e' piu' di 21
   - name: CALAMITY_JANET
     image: 23_calamity_janet
     equip:
@@ -22,30 +23,72 @@ legends:
       - banglimit
   - name: EL_GRINGO
     image: 23_el_gringo
+    # TODO - equip_el_gringo + equip_el_grindo_legend
+    # equip_el_gringo_legend: on_hit -> pesca la origin_card
+    tags:
+      - max_hp(3)
   - name: JESSE_JONES
     image: 23_jesse_jones
+    # TODO - effect_jesse_jones_legend player not_empty_hand:
+    # sposta carte di target in selection (owner = origin)
+    # request_jesse_jones_legend: pickable - on_pick -> draw target_card, ridai carte a owner, draw
   - name: JOURDONNAIS
     image: 23_jourdonnais
+    # TODO - equip_jourdonnais_legend
+    # add_listener apply_escapable_modifier -> value = 2
+    # effect_jourdonnais (can_play: request_bang || escapable)
+    # draw_check (j, q, k, a -> pop_request)
   - name: KIT_CARLSON
     image: 23_kit_carlson
+    equip:
+    # - kit_carlson_legend
+    # TODO on_draw_from_deck: if req_draw->num_cards_to_draw < 3: effect_mail_car{}.on_play()
+    responses:
+      - mail_car_response
+      - none card | selection
+      - none player notself
+    mth_response: mail_car(1,2)
+    tags:
+      - preselect
   - name: LUCKY_DUKE
     image: 23_lucky_duke
+    # TODO modificare request_check: target diventa lucky_duke sempre (da capire)
   - name: PAUL_REGRET
     image: 23_paul_regret
+    # TODO - mustang + equip_paul_regret_legend
+    # equip_paul_regret_legend: get_error quando si gioca bang, errore se non ha altre carte in mano
+    # on_play_bang (nuovo evento) request_discard
   - name: PEDRO_RAMIREZ
     image: 23_pedro_ramirez
+    # TODO equip_pedro_ramirez_legend: on_draw_from_deck: draw one from discards
+    # (add_action con priority=-8 -- da diminuire altre azioni da -8 a -9)
   - name: ROSE_DOOLAN
     image: 23_rose_doolan
+    equip:
+      # - rose_doolan_legend # TODO vedi tutti a distanza 1
+    effects:
+      - max_usages(1)
+      - discard card self | blue
+      - steal card range_1
   - name: SID_KETCHUM
     image: 23_sid_ketchum
+    # TODO effetto base + equip_sid_ketchum_legend
+    # on_heal (nuovo evento) attiva request: pickable_player -> bang (una volta per turno) 
   - name: SLAB_THE_KILLER
     image: 23_slab_the_killer
+    # TODO apply_bang_modifier : unavoidable = true
+    # puo' rimuovere l'ultimo punto vita quando rivendica un'impresa (da capire)
   - name: SUZY_LAFAYETTE
     image: 23_suzy_lafayette
+    # TODO equip_suzy_lafayette_legend: condizione ncards < 2
   - name: VULTURE_SAM
     image: 23_vulture_sam
+    # TODO equip_vulture_sam + equip_vulture_sam_legend
+    # on_player_death: cambia personaggio a versione base + set_hp(4)
   - name: WILLY_THE_KID
     image: 23_willy_the_kid
+    # TODO volcanic + bang gratis da personaggio se non ha rivendicato impresa
+    # conta come feat attivata per il check di "vantare impresa"
 
 feats:
   - name: FIFTY_GUNS
