@@ -1,5 +1,7 @@
 #include "flint_westwood.h"
 
+#include "effects/base/gift_card.h"
+
 #include "game/game.h"
 #include "game/prompts.h"
 
@@ -23,12 +25,6 @@ namespace banggame {
             }
             origin->steal_card(stolen_card);
         }
-        if (chosen_card->visibility != card_visibility::shown) {
-            target->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, chosen_card);
-            target->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", origin, target);
-        } else {
-            target->m_game->add_log("LOG_GIFTED_CARD", origin, target, chosen_card);
-        }
-        target->steal_card(chosen_card);
+        handler_gift_card{}.on_play(origin_card, origin, chosen_card, target);
     }
 }

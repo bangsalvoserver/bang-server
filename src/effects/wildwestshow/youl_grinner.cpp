@@ -1,5 +1,7 @@
 #include "youl_grinner.h"
 
+#include "effects/base/gift_card.h"
+
 #include "game/game.h"
 
 namespace banggame {
@@ -10,13 +12,7 @@ namespace banggame {
 
     void request_youl_grinner::on_pick(card_ptr target_card) {
         target->m_game->pop_request();
-        if (target_card->visibility != card_visibility::shown) {
-            target->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", target, origin, target_card);
-            target->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", target, origin);
-        } else {
-            target->m_game->add_log("LOG_GIFTED_CARD", target, origin, target_card);
-        }
-        origin->steal_card(target_card);
+        handler_gift_card{}.on_play(origin_card, target, target_card, origin);
     }
 
     game_string request_youl_grinner::status_text(player_ptr owner) const {

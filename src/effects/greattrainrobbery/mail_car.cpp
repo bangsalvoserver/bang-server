@@ -36,31 +36,7 @@ namespace banggame {
         return origin->m_game->top_request<request_mail_car>(origin) != nullptr;
     }
 
-    game_string handler_mail_car::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
-        MAYBE_RETURN(prompts::bot_check_target_friend(origin, target_player));
-        return {};
-    }
-
-    void handler_mail_car::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+    void effect_mail_car_response::on_play(card_ptr origin_card, player_ptr origin) {
         origin->m_game->pop_request();
-
-        if (!origin->m_game->check_flags(game_flag::hands_shown)) {
-            origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_GIFTED_CARD", origin, target_player, target_card);
-            origin->m_game->add_log(update_target::excludes(origin, target_player), "LOG_GIFTED_A_CARD", origin, target_player);
-        } else {
-            origin->m_game->add_log("LOG_GIFTED_CARD", origin, target_player, target_card);
-        }
-        target_player->add_to_hand(target_card);
-
-        while (!origin->m_game->m_selection.empty()) {
-            card_ptr c = origin->m_game->m_selection.front();
-            if (!origin->m_game->check_flags(game_flag::hands_shown)) {
-                origin->m_game->add_log(update_target::includes(origin), "LOG_DRAWN_CARD", origin, c);
-                origin->m_game->add_log(update_target::excludes(origin), "LOG_DRAWN_CARDS", origin, 1);
-            } else {
-                origin->m_game->add_log("LOG_DRAWN_CARD", origin, c);
-            }
-            origin->add_to_hand(c);
-        }
     }
 }

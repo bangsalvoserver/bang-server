@@ -40,14 +40,13 @@ legends:
     # draw_check (j, q, k, a -> pop_request)
   - name: KIT_CARLSON
     image: 23_kit_carlson
-    # equip:
-    # - kit_carlson_legend
-    # TODO on_draw_from_deck: if req_draw->num_cards_to_draw < 3: effect_mail_car{}.on_play()
+    equip:
+    - kit_carlson_legend
     responses:
-      - mail_car_response
+      - kit_carlson_legend_response
       - none card | selection
       - none player notself
-    mth_response: mail_car(1,2)
+    mth_response: gift_card_selection(1,2)
     tags:
       - preselect
   - name: LUCKY_DUKE
