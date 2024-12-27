@@ -25,9 +25,16 @@ namespace banggame {
             nullable_ref<int> num_checks;
         };
 
+        struct on_draw_check_start {
+            player_ptr origin;
+            shared_request_check req;
+            nullable_ref<bool> handled;
+        };
+
         struct on_draw_check_resolve {
             player_ptr origin;
             card_ptr target_card;
+            card_ptr drawn_card;
         };
         
         struct on_draw_check_select {

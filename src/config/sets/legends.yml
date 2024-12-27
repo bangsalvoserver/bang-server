@@ -40,7 +40,7 @@ legends:
     # draw_check (j, q, k, a -> pop_request)
   - name: KIT_CARLSON
     image: 23_kit_carlson
-    equip:
+    # equip:
     # - kit_carlson_legend
     # TODO on_draw_from_deck: if req_draw->num_cards_to_draw < 3: effect_mail_car{}.on_play()
     responses:
@@ -52,7 +52,8 @@ legends:
       - preselect
   - name: LUCKY_DUKE
     image: 23_lucky_duke
-    # TODO modificare request_check: target diventa lucky_duke sempre (da capire)
+    equip:
+      - lucky_duke_legend
   - name: PAUL_REGRET
     image: 23_paul_regret
     # TODO - mustang + equip_paul_regret_legend
@@ -64,7 +65,7 @@ legends:
     # (add_action con priority=-8 -- da diminuire altre azioni da -8 a -9)
   - name: ROSE_DOOLAN
     image: 23_rose_doolan
-    equip:
+    # equip:
       # - rose_doolan_legend # TODO vedi tutti a distanza 1
     effects:
       - max_usages(1)
