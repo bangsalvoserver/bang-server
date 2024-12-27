@@ -163,3 +163,43 @@ button_row:
     responses:
       - discard card self | hand hearts
       - escape_jail
+    
+# TODO ruleset di legends
+#
+# attiva feat:
+#  NOTE da tenere traccia, deve succedere max una volta per turno
+#  request_perform_feat: pickable su carta feat "attivata" e resolvable (2 - dismiss)
+#    on_resolve -> pop_request
+#    on_pick: effect_perform_feat
+#
+#  effect_perform_feat:
+#  can_play: se nessuna impresa compiuta
+#  on_play:
+#   se NON sei leggenda - compiere impresa:
+#     -> sposta max 2 fame da character a carta feat
+#     -> track feat compiuta
+#   se SEI leggenda e c'e' almeno un'altra leggenda - rivendicare impresa:
+#     -> pop_request, request_claim_feat: pickable su player leggenda e hp > 1
+#     on_pick:
+#      -> pop_request
+#      -> damage target
+#      -> discard feat (rimuovi fame)
+#      -> draw feat (shuffle se necessario)
+#      -> track feat compiuta
+#
+# vantare impresa:
+#  on_turn_end (da capire priority) -> se nessuna impresa compiuta e personaggio non leggenda:
+#   -> request_boast_feat: pickable su mazzo feat + resolvable (2 - dismiss)
+#    on_resolve -> pop_request
+#    on_pick -> draw feat (shuffle se necessario)
+#      -> se n feats > 4: request_discard_feat: pickable su feats con max fame (auto_pick)
+#         on_pick -> discard feat (rimuovi fame)
+#   -> request_boast_add_fame: pickable su feat con 0 fame "del tuo tipo"
+#     TODO N tipi diversi di token
+#      on_pick -> move fame
+#
+# diventare leggenda:
+#  button_row effect_become_legend -> can_play = se hai 0 fame e personaggio non leggenda
+#    (note: check vulture sam)
+#   on_play: swap personaggio con equivalente in lista legends con stesso nome
+#   se hp < 3 -> set_hp 3
