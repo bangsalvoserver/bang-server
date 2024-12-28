@@ -45,6 +45,10 @@ namespace banggame {
             return !m_cards_used.contains(c);
         }
 
+        virtual prompt_string escape_prompt(player_ptr owner) const {
+            return {};
+        }
+
     private:
         std::set<card_ptr> m_cards_used;
     };

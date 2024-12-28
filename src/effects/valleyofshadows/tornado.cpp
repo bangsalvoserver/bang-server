@@ -14,6 +14,13 @@ namespace banggame {
         request_tornado(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags) {}
         
+        prompt_string escape_prompt(player_ptr owner) const override {
+            if (owner->is_bot()) {
+                return "BOT_BAD_PLAY";
+            }
+            return {};
+        }
+        
         bool can_pick(const_card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
                 && !target->m_game->is_usage_disabled(target_card);
