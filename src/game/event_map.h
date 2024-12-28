@@ -36,10 +36,12 @@ namespace banggame {
         event_card_key key;
 
         auto operator <=> (const event_listener_key &other) const {
-            if (type == other.type) {
-                return key.priority_compare(other.key);
-            } else {
+            if (type != other.type) {
                 return type <=> other.type;
+            } else if (key.priority != other.key.priority) {
+                return key.priority <=> other.key.priority;
+            } else {
+                return get_card_order(key.target_card) <=> get_card_order(other.key.target_card);
             }
         }
 

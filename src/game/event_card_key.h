@@ -30,14 +30,6 @@ namespace banggame {
         auto operator <=> (card_ptr other) const {
             return get_card_order(target_card) <=> get_card_order(other);
         }
-
-        auto priority_compare(const event_card_key &other) const {
-            if (priority == other.priority) {
-                return get_card_order(target_card) <=> get_card_order(other.target_card);
-            } else {
-                return other.priority <=> priority;
-            }
-        }
     };
 
 }
