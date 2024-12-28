@@ -7,7 +7,6 @@
 #include "player.h"
 #include "game_net.h"
 #include "event_map.h"
-#include "game_events.h"
 #include "disabler_map.h"
 #include "request_queue.h"
 #include "utils/range_utils.h"

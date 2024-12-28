@@ -9,6 +9,12 @@ namespace banggame {
         weapon_range,
         distance_mod
     };
+
+    enum class escape_type {
+        no_escape,
+        escape_timer,
+        escape_no_timer
+    };
 }
 
 namespace banggame::event_type {
@@ -39,7 +45,7 @@ namespace banggame::event_type {
         player_ptr origin;
         const_player_ptr target;
         effect_flags flags;
-        nullable_ref<int> value;
+        nullable_ref<escape_type> value;
     };
     
     struct count_range_mod {

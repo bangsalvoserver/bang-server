@@ -8,11 +8,11 @@
 namespace banggame {
 
     void ruleset_valleyofshadows::on_apply(game *game) {
-        game->add_listener<event_type::apply_escapable_modifier>(nullptr, [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, int &value) {
+        game->add_listener<event_type::apply_escapable_modifier>(nullptr, [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, escape_type &value) {
             if (!target->empty_hand() && origin_card && origin_card->is_brown()
                 && !rn::contains(target->m_game->m_discards, "ESCAPE", &card::name)
             ) {
-                value = 1;
+                value = escape_type::escape_timer;
             }
         });
 
@@ -26,13 +26,13 @@ namespace banggame {
     }
 
     void ruleset_udolistinu::on_apply(game *game) {
-        game->add_listener<event_type::apply_escapable_modifier>(nullptr, [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, int &value) {
+        game->add_listener<event_type::apply_escapable_modifier>(nullptr, [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, escape_type &value) {
             if (!target->empty_hand() && origin_card && origin_card->is_brown()
                 && flags.check(effect_flag::single_target)
                 && !flags.check(effect_flag::multi_target)
                 && !rn::contains(target->m_game->m_discards, "ESCAPE", &card::name)
             ) {
-                value = 1;
+                value = escape_type::escape_timer;
             }
         });
         
