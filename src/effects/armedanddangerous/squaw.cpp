@@ -24,12 +24,11 @@ namespace banggame {
     }
 
     void effect_squaw::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) {
-        const effect_flags flags { effect_flag::escapable, effect_flag::single_target };
         if (target_card->owner) {
             if (ctx.selected_cubes.count(origin_card) == 0) {
-                effect_destroy{}.on_play(origin_card, origin, target_card, flags);
+                effect_destroy{}.on_play(origin_card, origin, target_card, effect_flag::single_target);
             } else {
-                effect_steal{}.on_play(origin_card, origin, target_card, flags);
+                effect_steal{}.on_play(origin_card, origin, target_card, effect_flag::single_target);
             }
         }
     }

@@ -9,7 +9,6 @@ namespace banggame {
         is_bang,
         is_missed,
         play_as_bang,
-        escapable,
         single_target,
         multi_target,
         skip_target_logs,

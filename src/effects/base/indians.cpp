@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-    struct request_indians : request_resolvable, interface_picking, respondable_with_bang {
+    struct request_indians : request_resolvable, escapable_request, interface_picking, respondable_with_bang {
         request_indians(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags) {}
 

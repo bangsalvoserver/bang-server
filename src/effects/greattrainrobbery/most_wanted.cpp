@@ -16,7 +16,7 @@ namespace banggame {
         });
     }
 
-    struct request_most_wanted : request_resolvable {
+    struct request_most_wanted : request_resolvable, escapable_request {
         request_most_wanted(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags) {}
 

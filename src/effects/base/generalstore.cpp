@@ -42,8 +42,6 @@ namespace banggame {
     }
 
     void effect_generalstore::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
-        flags.remove(effect_flag::escapable);
-        flags.remove(effect_flag::single_target);
         origin->m_game->queue_request<request_generalstore>(origin_card, origin, target, flags);
     }
 }

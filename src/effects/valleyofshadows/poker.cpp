@@ -1,12 +1,13 @@
 #include "poker.h"
 
 #include "effects/base/pick.h"
+#include "effects/base/resolve.h"
 
 #include "game/game.h"
 
 namespace banggame {
 
-    struct request_poker : request_picking {
+    struct request_poker : request_picking, escapable_request {
         request_poker(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags) {}
 

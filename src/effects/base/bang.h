@@ -56,24 +56,12 @@ namespace banggame {
 
     DEFINE_MODIFIER(bangmod, modifier_bangmod)
 
-    class missable_request {
-    public:
-        size_t num_cards_used() const {
-            return m_cards_used.size();
-        }
-        
-        void add_card(card_ptr c) {
-            m_cards_used.push_back(c);
-        }
-
+    struct missable_request : escapable_request {
         virtual bool can_miss(card_ptr c) const {
-            return rn::find(m_cards_used, c) == m_cards_used.end();
+            return can_escape(c);
         }
 
         virtual void on_miss(card_ptr c, effect_flags missed_flags = {}) = 0;
-
-    private:
-        card_list m_cards_used;
     };
 
     struct request_bang : request_resolvable, missable_request {

@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-    struct request_train_robbery : request_base, interface_target_set_cards {
+    struct request_train_robbery : request_base, interface_target_set_cards, escapable_request {
         using request_base::request_base;
 
         std::set<const_card_ptr> selected_cards;
@@ -65,9 +65,6 @@ namespace banggame {
     void effect_train_robbery_response::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         auto req = origin->m_game->top_request<request_train_robbery>();
         req->selected_cards.insert(target_card);
-
-        req->flags.remove(effect_flag::escapable);
-        req->flags.remove(effect_flag::single_target);
     }
 
     game_string effect_train_robbery_discard::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {

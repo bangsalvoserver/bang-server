@@ -33,14 +33,10 @@ namespace banggame {
     }
 
     template<> void visit_card::play(const effect_context &ctx, card_ptr target) {
-        effect_flags flags = effect_flag::single_target;
-        if (origin_card->is_brown()) {
-            flags.add(effect_flag::escapable);
-        }
         if (target->owner != origin && target->pocket == pocket_type::player_hand) {
-            effect.on_play(origin_card, origin, target->owner->random_hand_card(), flags, ctx);
+            effect.on_play(origin_card, origin, target->owner->random_hand_card(), effect_flag::single_target, ctx);
         } else {
-            effect.on_play(origin_card, origin, target, flags, ctx);
+            effect.on_play(origin_card, origin, target, effect_flag::single_target, ctx);
         }
     }
 

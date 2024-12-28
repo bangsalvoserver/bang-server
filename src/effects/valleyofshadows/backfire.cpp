@@ -12,8 +12,7 @@ namespace banggame {
         player_ptr target = origin->m_game->top_request()->origin;
         effect_missed::on_play(origin_card, origin);
         if (target) {
-            effect_flags flags { effect_flag::escapable, effect_flag::single_target };
-            target->m_game->queue_request<request_bang>(origin_card, origin, target, flags, 20);
+            target->m_game->queue_request<request_bang>(origin_card, origin, target, effect_flag::single_target, 20);
         }
     }
 }
