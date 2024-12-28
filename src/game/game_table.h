@@ -99,7 +99,6 @@ namespace banggame {
         card_ptr top_train_card();
         card_ptr draw_shop_card();
 
-        void draw_scenario_card();
         void advance_train(player_ptr origin);
 
         void add_short_pause();

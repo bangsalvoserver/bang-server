@@ -5,6 +5,8 @@
 
 namespace banggame {
 
+    void draw_scenario_card(game *game);
+
     struct ruleset_highnoon {
         void on_apply(game *game);
     };
