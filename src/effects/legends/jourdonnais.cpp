@@ -15,9 +15,9 @@ namespace banggame {
 
     void equip_jourdonnais_legend::on_enable(card_ptr origin_card, player_ptr origin) {
         origin->m_game->add_listener<event_type::apply_escapable_modifier>({origin_card, -1},
-            [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags e_flags, int &value) {
+            [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags e_flags, escape_type &value) {
                 if (e_target == origin && jourdonnais_can_escape(e_origin, e_origin_card, e_flags)) {
-                    value = 2;
+                    value = escape_type::escape_no_timer;
                 }
             });
     }
