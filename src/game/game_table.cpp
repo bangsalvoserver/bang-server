@@ -159,23 +159,6 @@ namespace banggame {
         return nullptr;
     }
 
-    void game_table::draw_scenario_card() {
-        if (!m_scenario_deck.empty() && m_scenario_deck.back()->visibility == card_visibility::hidden) {
-            m_scenario_deck.back()->set_visibility(card_visibility::shown);
-        } else {
-            if (m_scenario_deck.size() > 1) {
-                card_ptr second_card = *(m_scenario_deck.rbegin() + 1);
-                second_card->set_visibility(card_visibility::shown, nullptr, true);
-            }
-            if (!m_scenario_cards.empty()) {
-                m_first_player->disable_equip(m_scenario_cards.back());
-            }
-            add_log("LOG_DRAWN_SCENARIO_CARD", m_scenario_deck.back());
-            m_scenario_deck.back()->move_to(pocket_type::scenario_card);
-            m_first_player->enable_equip(m_scenario_cards.back());
-        }
-    }
-
     void game_table::advance_train(player_ptr origin) {
         play_sound("train");
         
