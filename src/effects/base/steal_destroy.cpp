@@ -77,7 +77,7 @@ namespace banggame {
         }, 42);
     }
 
-    struct request_steal : request_targeting {
+    struct request_steal : request_targeting, escapable_request {
         using request_targeting::request_targeting;
 
         void on_update() override {
@@ -176,7 +176,7 @@ namespace banggame {
         }, 42);
     }
     
-    struct request_destroy : request_targeting {
+    struct request_destroy : request_targeting, escapable_request {
         using request_targeting::request_targeting;
 
         void on_update() override {

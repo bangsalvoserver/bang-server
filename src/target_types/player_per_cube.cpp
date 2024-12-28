@@ -64,9 +64,6 @@ namespace banggame {
         if (target.second.size() == 1) {
             flags.add(effect_flag::single_target);
         }
-        if (origin_card->is_brown()) {
-            flags.add(effect_flag::escapable);
-        }
         for (player_ptr target : target.second) {
             effect.on_play(origin_card, origin, target, flags, ctx);
         }

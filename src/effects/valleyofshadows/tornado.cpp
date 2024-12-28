@@ -1,6 +1,8 @@
 #include "tornado.h"
 
 #include "effects/base/pick.h"
+#include "effects/base/resolve.h"
+
 #include "cards/game_enums.h"
 
 #include "game/game.h"
@@ -8,7 +10,7 @@
 
 namespace banggame {
 
-    struct request_tornado : request_picking {
+    struct request_tornado : request_picking, escapable_request {
         request_tornado(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags) {}
         

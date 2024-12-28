@@ -30,14 +30,8 @@ namespace banggame {
     request_damage::timer_damage::timer_damage(request_damage *request)
         : request_timer(request, request->target->m_game->m_options.damage_timer) {}
 
-    inline effect_flags remove_invalid_flags(effect_flags flags) {
-        flags.remove(effect_flag::escapable);
-        flags.remove(effect_flag::single_target);
-        return flags;
-    }
-
     request_damage::request_damage(card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags)
-        : request_base(origin_card, origin, target, remove_invalid_flags(flags), 200)
+        : request_base(origin_card, origin, target, flags, 200)
         , damage(damage) {}
     
     card_list request_damage::get_highlights() const {

@@ -13,7 +13,7 @@ namespace banggame {
         }
     }
 
-    struct request_rust : request_resolvable {
+    struct request_rust : request_resolvable, escapable_request {
         request_rust(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags, 0) {}
 

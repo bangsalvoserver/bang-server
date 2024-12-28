@@ -63,9 +63,6 @@ namespace banggame {
 
     template<> void visit_cards::play(const effect_context &ctx, const card_list &target_cards) {
         effect_flags flags = effect_flag::multi_target;
-        if (origin_card->is_brown()) {
-            flags.add(effect_flag::escapable);
-        }
         if (target_cards.size() == 1) {
             flags.add(effect_flag::single_target);
         }

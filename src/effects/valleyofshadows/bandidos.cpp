@@ -10,7 +10,7 @@
 
 namespace banggame {
 
-    struct request_bandidos : request_resolvable, interface_picking {
+    struct request_bandidos : request_resolvable, interface_picking, escapable_request {
         request_bandidos(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags) {}
 

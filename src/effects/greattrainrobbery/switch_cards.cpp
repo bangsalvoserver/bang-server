@@ -34,9 +34,9 @@ namespace banggame {
         target->enable_equip(chosen_card);
     }
 
-    struct request_switch_cards : request_targeting {
+    struct request_switch_cards : request_targeting, escapable_request {
         request_switch_cards(card_ptr origin_card, player_ptr origin, player_ptr target, card_ptr chosen_card, card_ptr target_card)
-            : request_targeting(origin_card, origin, target, target_card, { effect_flag::escapable, effect_flag::single_target })
+            : request_targeting(origin_card, origin, target, target_card, effect_flag::single_target)
             , chosen_card(chosen_card) {}
 
         card_ptr chosen_card;

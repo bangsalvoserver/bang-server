@@ -28,6 +28,24 @@ namespace banggame {
     protected:
         void auto_resolve();
     };
+    
+    class escapable_request {
+    public:
+        size_t num_cards_used() const {
+            return m_cards_used.size();
+        }
+        
+        void add_card(card_ptr c) {
+            m_cards_used.insert(c);
+        }
+
+        bool can_escape(card_ptr c) const {
+            return !m_cards_used.contains(c);
+        }
+
+    private:
+        std::set<card_ptr> m_cards_used;
+    };
 }
 
 #endif
