@@ -16,6 +16,10 @@ namespace banggame {
 
         std::set<const_card_ptr> selected_cards;
 
+        bool can_escape(card_ptr c) const override {
+            return selected_cards.empty() && escapable_request::can_escape(c);
+        }
+
         void on_update() override {
             if (!target->alive() || target->immune_to(origin_card, origin, flags)
                 || rn::none_of(target->m_table, [&](card_ptr target_card) {
