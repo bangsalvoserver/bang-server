@@ -226,8 +226,8 @@ namespace banggame {
         return !cards.empty();
     }
 
-    int player::can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) const {
-        int result = 0;
+    escape_type player::get_escape_type(player_ptr origin, card_ptr origin_card, effect_flags flags) const {
+        escape_type result = escape_type::no_escape;
         m_game->call_event(event_type::apply_escapable_modifier{ origin_card, origin, this, flags, result });
         return result;
     }

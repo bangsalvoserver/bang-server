@@ -16,16 +16,16 @@ namespace banggame {
         if (target->immune_to(origin_card, origin, flags)) {
             target->m_game->pop_request();
         } else {
-            switch (target->can_escape(origin, origin_card, flags)) {
-            case 1:
+            switch (target->get_escape_type(origin, origin_card, flags)) {
+            case escape_type::escape_timer:
                 if (origin != target_card->owner) {
                     break;
                 }
                 [[fallthrough]];
-            case 0:
+            case escape_type::no_escape:
                 auto_resolve();
                 break;
-            case 2:
+            case escape_type::escape_no_timer:
                 m_timer.reset();
             }
         }

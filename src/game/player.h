@@ -2,6 +2,7 @@
 #define __PLAYER_H__
 
 #include "card.h"
+#include "game_events.h"
 
 namespace banggame {
 
@@ -47,7 +48,7 @@ namespace banggame {
         
         card_ptr random_hand_card() const;
 
-        int can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) const;
+        escape_type get_escape_type(player_ptr origin, card_ptr origin_card, effect_flags flags) const;
         
         void add_to_hand(card_ptr card);
         void draw_card(int ncards = 1, card_ptr origin_card = nullptr);
