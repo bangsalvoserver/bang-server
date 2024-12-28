@@ -31,6 +31,8 @@ namespace banggame {
     
     class escapable_request {
     public:
+        virtual ~escapable_request() = default;
+        
         size_t num_cards_used() const {
             return m_cards_used.size();
         }
@@ -39,7 +41,7 @@ namespace banggame {
             m_cards_used.insert(c);
         }
 
-        bool can_escape(card_ptr c) const {
+        virtual bool can_escape(card_ptr c) const {
             return !m_cards_used.contains(c);
         }
 
