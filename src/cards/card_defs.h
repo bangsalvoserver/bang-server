@@ -72,7 +72,14 @@ namespace banggame {
 
     enum class card_token_type {
         cube,
-        fame
+        fame1,
+        fame2,
+        fame3,
+        fame4,
+        fame5,
+        fame6,
+        fame7,
+        fame8
     };
 
     using token_map = enums::enum_map<card_token_type, uint8_t>;

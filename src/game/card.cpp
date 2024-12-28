@@ -107,10 +107,10 @@ namespace banggame {
     }
 
     int card::get_max_tokens(card_token_type token_type) {
-        switch (token_type) {
-        case card_token_type::cube: return 4;
-        case card_token_type::fame: return 100;
-        default: throw std::runtime_error("Invalid token_type");
+        if (token_type == card_token_type::cube) {
+            return 4;
+        } else {
+            return 5;
         }
     }
 

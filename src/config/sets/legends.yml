@@ -195,7 +195,6 @@ button_row:
 #      -> se n feats > 4: request_discard_feat: pickable su feats con max fame (auto_pick)
 #         on_pick -> discard feat (rimuovi fame)
 #   -> request_boast_add_fame: pickable su feat con 0 fame "del tuo tipo"
-#     TODO N tipi diversi di token
 #      on_pick -> move fame
 #
 # diventare leggenda:
