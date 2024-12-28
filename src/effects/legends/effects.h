@@ -4,5 +4,6 @@
 #include "lucky_duke.h"
 #include "ruleset.h"
 #include "kit_carlson.h"
+#include "jourdonnais.h"
 
 #endif

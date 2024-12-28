@@ -34,10 +34,10 @@ legends:
     # request_jesse_jones_legend: pickable - on_pick -> draw target_card, ridai carte a owner, draw
   - name: JOURDONNAIS
     image: 23_jourdonnais
-    # TODO - equip_jourdonnais_legend
-    # add_listener apply_escapable_modifier -> value = 2
-    # effect_jourdonnais (can_play: request_bang || escapable)
-    # draw_check (j, q, k, a -> pop_request)
+    equip:
+      - jourdonnais_legend
+    responses:
+      - jourdonnais_legend
   - name: KIT_CARLSON
     image: 23_kit_carlson
     equip:
