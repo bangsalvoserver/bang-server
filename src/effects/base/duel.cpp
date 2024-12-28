@@ -10,11 +10,13 @@
 namespace banggame {
 
     struct request_duel : request_resolvable, escapable_request, interface_picking, respondable_with_bang {
-        request_duel(card_ptr origin_card, player_ptr origin, player_ptr target, player_ptr respond_to, effect_flags flags = {})
+        request_duel(card_ptr origin_card, player_ptr origin, player_ptr target, player_ptr respond_to, effect_flags flags = {}, bool is_response = false)
             : request_resolvable(origin_card, origin, target, flags)
-            , respond_to(respond_to) {}
+            , respond_to{respond_to}
+            , is_response{is_response} {}
 
         player_ptr respond_to = nullptr;
+        bool is_response = false;
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
@@ -36,6 +38,10 @@ namespace banggame {
             return {};
         }
 
+        bool can_escape(card_ptr c) const override {
+            return !is_response && escapable_request::can_escape(c);
+        }
+
         bool can_pick(const_card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
                 && target_card->is_bang_card(target)
@@ -44,7 +50,7 @@ namespace banggame {
 
         void respond_with_bang() override {
             target->m_game->pop_request();
-            target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target);
+            target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target, effect_flags{}, true);
         }
 
         void on_pick(card_ptr target_card) override {
