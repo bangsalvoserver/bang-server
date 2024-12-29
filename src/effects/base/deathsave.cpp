@@ -7,7 +7,7 @@
 namespace banggame {
 
     bool effect_deathsave::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_death>(origin) != nullptr;
+        return origin->m_game->top_request<request_death>(target_is{origin}) != nullptr;
     }
 
     void effect_deathsave::on_play(card_ptr origin_card, player_ptr origin) {

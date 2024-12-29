@@ -86,7 +86,7 @@ namespace banggame {
     }
 
     bool effect_tornado2_response::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_tornado2>(origin) != nullptr;
+        return origin->m_game->top_request<request_tornado2>(target_is{origin}) != nullptr;
     }
 
     void handler_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {

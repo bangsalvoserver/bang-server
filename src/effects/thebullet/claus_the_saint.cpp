@@ -61,7 +61,7 @@ namespace banggame {
     }
 
     bool effect_claus_the_saint_response::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_claus_the_saint>(origin) != nullptr;
+        return origin->m_game->top_request<request_claus_the_saint>(target_is{origin}) != nullptr;
     }
 
     void effect_claus_the_saint_response::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {

@@ -132,11 +132,11 @@ namespace banggame {
     }
     
     bool effect_while_drawing::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_draw>(origin) != nullptr;
+        return origin->m_game->top_request<request_draw>(target_is{origin}) != nullptr;
     }
     
     bool effect_no_cards_drawn::can_play(card_ptr origin_card, player_ptr origin) {
-        if (auto req = origin->m_game->top_request<request_draw>(origin)) {
+        if (auto req = origin->m_game->top_request<request_draw>(target_is{origin})) {
             return req->num_drawn_cards == 0;
         }
         return false;

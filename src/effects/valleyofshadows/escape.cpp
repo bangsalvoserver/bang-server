@@ -9,12 +9,12 @@
 namespace banggame {
     
     bool effect_escape::can_play(card_ptr origin_card, player_ptr origin) {
-        if (auto req = origin->m_game->top_request(origin)) {
-            if (auto req2 = std::dynamic_pointer_cast<escapable_request>(req)) {
-                return req->origin_card && req->origin_card->is_brown()
-                    && !req->flags.check(effect_flag::is_bang)
-                    && req2->can_escape(origin_card);
-            }
+        if (auto req = origin->m_game->top_request<escapable_request>([&](const request_base &base) {
+            return base.target == origin
+                && base.origin_card && base.origin_card->is_brown()
+                && !base.flags.check(effect_flag::is_bang);
+        })) {
+            return req->can_escape(origin_card);
         }
         return false;
     }
@@ -32,14 +32,14 @@ namespace banggame {
     }
     
     bool effect_escape2::can_play(card_ptr origin_card, player_ptr origin) {
-        if (auto req = origin->m_game->top_request(origin)) {
-            if (auto req2 = std::dynamic_pointer_cast<escapable_request>(req)) {
-                return req->origin_card && req->origin_card->is_brown()
-                    && !req->flags.check(effect_flag::is_bang)
-                    && req2->can_escape(origin_card)
-                    && req->flags.check(effect_flag::single_target)
-                    && !req->flags.check(effect_flag::multi_target);
-            }
+        if (auto req = origin->m_game->top_request<escapable_request>([&](const request_base &base) {
+            return base.target == origin
+                && base.origin_card && base.origin_card->is_brown()
+                && !base.flags.check(effect_flag::is_bang)
+                && base.flags.check(effect_flag::single_target)
+                && !base.flags.check(effect_flag::multi_target);
+        })) {
+            return req->can_escape(origin_card);
         }
         return false;
     }

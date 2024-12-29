@@ -85,7 +85,7 @@ namespace banggame {
     }
 
     bool effect_tumbleweed::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_tumbleweed>(origin) != nullptr;
+        return origin->m_game->top_request<request_tumbleweed>(target_is{origin}) != nullptr;
     }
 
     void effect_tumbleweed::on_play(card_ptr origin_card, player_ptr origin) {

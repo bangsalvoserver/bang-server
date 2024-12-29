@@ -44,7 +44,7 @@ namespace banggame {
     };
 
     bool effect_forced_play::can_play(card_ptr origin_card, player_ptr target) {
-        if (auto req = target->m_game->top_request<request_force_play_card>(target)) {
+        if (auto req = target->m_game->top_request<request_force_play_card>(target_is{target})) {
             return origin_card == req->target_card;
         }
         return false;

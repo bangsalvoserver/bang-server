@@ -56,7 +56,7 @@ namespace banggame {
     }
 
     bool effect_lastwill::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_lastwill>(origin) != nullptr;
+        return origin->m_game->top_request<request_lastwill>(target_is{origin}) != nullptr;
     }
 
     game_string handler_lastwill::on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {

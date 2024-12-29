@@ -120,7 +120,7 @@ namespace banggame {
     }
 
     bool effect_bandidos2_response::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_bandidos2>(origin) != nullptr;
+        return origin->m_game->top_request<request_bandidos2>(target_is{origin}) != nullptr;
     }
 
     game_string handler_bandidos2_response::get_error(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {

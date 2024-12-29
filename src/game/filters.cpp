@@ -40,7 +40,7 @@ namespace banggame {
             return {"ERROR_TARGET_EMPTY_CUBES", origin_card, target};
         
         if (filter.check(target_player_filter::target_set)) {
-            auto req = origin->m_game->top_request<interface_target_set_players>(origin);
+            auto req = origin->m_game->top_request<interface_target_set_players>(target_is{origin});
             if (!req || !req->in_target_set(target)) {
                 return {"ERROR_TARGET_NOT_IN_TARGET_SET", origin_card, target};
             }
@@ -72,7 +72,7 @@ namespace banggame {
             return "ERROR_TARGET_PLAYING_CARD";
 
         if (filter.check(target_card_filter::target_set)) {
-            auto req = origin->m_game->top_request<interface_target_set_cards>(origin);
+            auto req = origin->m_game->top_request<interface_target_set_cards>(target_is{origin});
             if (!req || !req->in_target_set(target)) {
                 return {"ERROR_TARGET_NOT_IN_TARGET_SET", origin_card, target};
             }

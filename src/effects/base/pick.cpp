@@ -8,7 +8,7 @@
 namespace banggame {
 
     bool effect_pick::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<interface_picking>(origin) != nullptr;
+        return origin->m_game->top_request<interface_picking>(target_is{origin}) != nullptr;
     }
 
     prompt_string effect_pick::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) {
@@ -29,7 +29,7 @@ namespace banggame {
     }
 
     bool effect_pick_player::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<interface_picking_player>(origin) != nullptr;
+        return origin->m_game->top_request<interface_picking_player>(target_is{origin}) != nullptr;
     }
 
     prompt_string effect_pick_player::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
