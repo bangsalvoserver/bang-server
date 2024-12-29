@@ -20,14 +20,14 @@ namespace banggame {
     }
     
     bool effect_missed::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (auto req = origin->m_game->top_request<missable_request>(origin)) {
+        if (auto req = origin->m_game->top_request<missable_request>(target_is{origin})) {
             return req->can_miss(origin_card);
         }
         return ctx.temp_missable;
     }
 
     game_string effect_missed::on_prompt(card_ptr origin_card, player_ptr origin) {
-        if (auto req = origin->m_game->top_request<request_bang>(origin)) {
+        if (auto req = origin->m_game->top_request<request_bang>(target_is{origin})) {
             if (req->bang_strength > 1 && count_missed_cards(origin) < req->bang_strength) {
                 return {"PROMPT_BANG_STRENGTH", req->bang_strength};
             }

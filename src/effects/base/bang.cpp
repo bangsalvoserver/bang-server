@@ -175,7 +175,7 @@ namespace banggame {
     }
 
     bool effect_bangresponse::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<respondable_with_bang>(origin) != nullptr;
+        return origin->m_game->top_request<respondable_with_bang>(target_is{origin}) != nullptr;
     }
 
     void effect_bangresponse::on_play(card_ptr origin_card, player_ptr origin) {

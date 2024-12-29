@@ -43,6 +43,21 @@ namespace banggame {
 
     using request_state_index = utils::tagged_variant_index<request_state>;
 
+    struct any_request {
+        bool operator()(const request_base &) const {
+            return true;
+        }
+    };
+
+    struct target_is {
+        const_player_ptr target;
+        target_is(const_player_ptr target): target{target} {}
+
+        bool operator()(const request_base &req) const {
+            return req.target == target;
+        }
+    };
+
     class request_queue {
     private:
         utils::stable_priority_queue<std::shared_ptr<request_base>, request_priority_ordering> m_requests;
@@ -72,11 +87,11 @@ namespace banggame {
             return holds_alternative<"waiting">(m_state);
         }
 
-        template<typename T = request_base>
-        std::shared_ptr<T> top_request(const_player_ptr target = nullptr) {
+        template<typename T = request_base, std::predicate<const request_base &> Function = any_request>
+        std::shared_ptr<T> top_request(Function &&fn = {}) {
             if (!m_requests.empty()) {
                 auto req = m_requests.top();
-                if (!target || req->target == target) {
+                if (std::invoke(FWD(fn), *req)) {
                     return std::dynamic_pointer_cast<T>(req);
                 }
             }

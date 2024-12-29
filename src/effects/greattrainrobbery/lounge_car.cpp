@@ -64,7 +64,7 @@ namespace banggame {
     }
 
     bool effect_lounge_car_response::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_lounge_car>(origin) != nullptr;
+        return origin->m_game->top_request<request_lounge_car>(target_is{origin}) != nullptr;
     }
 
     game_string handler_lounge_car::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {

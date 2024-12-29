@@ -49,11 +49,11 @@ namespace banggame {
     }
 
     bool effect_claus_the_saint::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_claus_the_saint>(origin) != nullptr;
+        return origin->m_game->top_request<request_claus_the_saint>(target_is{origin}) != nullptr;
     }
 
     void handler_claus_the_saint::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
-        auto req = origin->m_game->top_request<request_claus_the_saint>(origin);
+        auto req = origin->m_game->top_request<request_claus_the_saint>(target_is{origin});
         req->selected_targets.insert(target_player);
         
         if (!origin->m_game->check_flags(game_flag::hands_shown)) {

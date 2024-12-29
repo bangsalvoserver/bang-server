@@ -43,7 +43,7 @@ namespace banggame {
     }
 
     bool effect_ranch::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_ranch>(origin) != nullptr;
+        return origin->m_game->top_request<request_ranch>(target_is{origin}) != nullptr;
     }
 
     void handler_ranch::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {

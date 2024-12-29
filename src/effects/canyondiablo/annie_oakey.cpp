@@ -50,7 +50,7 @@ namespace banggame {
     }
 
     bool effect_annie_oakey::can_play(card_ptr origin_card, player_ptr target) {
-        return target->m_game->top_request<request_annie_oakey>(target) != nullptr;
+        return target->m_game->top_request<request_annie_oakey>(target_is{target}) != nullptr;
     }
 
     static int get_ncards(int choice, card_sign sign) {

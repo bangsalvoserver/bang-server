@@ -59,7 +59,7 @@ namespace banggame {
     }
 
     bool effect_train_robbery_response::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_train_robbery>(origin) != nullptr;
+        return origin->m_game->top_request<request_train_robbery>(target_is{origin}) != nullptr;
     }
 
     void effect_train_robbery_response::add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) {

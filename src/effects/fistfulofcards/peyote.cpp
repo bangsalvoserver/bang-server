@@ -36,7 +36,7 @@ namespace banggame {
     }
 
     bool effect_peyote::can_play(card_ptr target_card, player_ptr target) {
-        return target->m_game->top_request<request_peyote>(target) != nullptr;
+        return target->m_game->top_request<request_peyote>(target_is{target}) != nullptr;
     }
 
     void effect_peyote::on_play(card_ptr target_card, player_ptr target) {

@@ -6,7 +6,7 @@
 namespace banggame {
 
     static int get_bang_damage(player_ptr origin) {
-        if (auto req = origin->m_game->top_request<request_bang>(origin)) {
+        if (auto req = origin->m_game->top_request<request_bang>(target_is{origin})) {
             return req->bang_damage;
         }
         return 1;

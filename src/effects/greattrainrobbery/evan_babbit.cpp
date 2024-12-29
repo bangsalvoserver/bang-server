@@ -10,7 +10,7 @@
 namespace banggame {
 
     bool effect_evan_babbit::can_play(card_ptr origin_card, player_ptr origin) {
-        if (auto req = origin->m_game->top_request<request_bang>(origin)) {
+        if (auto req = origin->m_game->top_request<request_bang>(target_is{origin})) {
             return req->num_cards_used() == 0
                 && req->flags.check(effect_flag::is_bang);
         } else {
