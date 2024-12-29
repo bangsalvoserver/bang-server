@@ -60,7 +60,7 @@ namespace banggame {
     }
 
     bool effect_kit_carlson_legend_response::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_kit_carlson_legend>(origin) != nullptr;
+        return origin->m_game->top_request<request_kit_carlson_legend>(target_is{origin}) != nullptr;
     }
 
     void effect_kit_carlson_legend_response::on_play(card_ptr origin_card, player_ptr origin) {

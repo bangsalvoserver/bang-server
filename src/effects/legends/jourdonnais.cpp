@@ -23,11 +23,11 @@ namespace banggame {
     }
 
     bool effect_jourdonnais_legend::can_play(card_ptr origin_card, player_ptr origin) {
-        if (auto req = origin->m_game->top_request(origin)) {
-            if (auto req2 = std::dynamic_pointer_cast<escapable_request>(req)) {
-                return req2->can_escape(origin_card)
-                    && jourdonnais_can_escape(req->origin, req->origin_card, req->flags);
-            }
+        if (auto req = origin->m_game->top_request<escapable_request>([&](const request_base &base) {
+            return base.target == origin
+                && jourdonnais_can_escape(base.origin, base.origin_card, base.flags);
+        })) {
+            return req->can_escape(origin_card);
         }
         return false;
     }
