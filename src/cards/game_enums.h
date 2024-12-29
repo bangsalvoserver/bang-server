@@ -34,6 +34,7 @@ namespace banggame {
         extra_turn,
         treat_missed_as_bang,
         treat_any_as_bang,
+        ignore_distances,
         role_revealed,
         skip_turn,
         removed,
