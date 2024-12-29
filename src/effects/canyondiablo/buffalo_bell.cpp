@@ -4,6 +4,8 @@
 #include "effects/base/missed.h"
 #include "effects/base/steal_destroy.h"
 
+#include "effects/legends/black_jack.h"
+
 #include "cards/game_enums.h"
 
 #include "game/game.h"
@@ -15,10 +17,10 @@ namespace banggame {
     }
 
     static int get_card_suit_sum(player_ptr origin, card_ptr target_card) {
-        int sum = static_cast<int>(target_card->get_modified_sign().rank) + 1;
+        int sum = effect_black_jack_legend::get_card_rank_value(target_card->get_modified_sign().rank);
         card_ptr origin_card = origin->m_game->top_request()->origin_card;
         if (origin_card) {
-            sum += static_cast<int>(origin_card->get_modified_sign().rank) + 1;
+            sum += effect_black_jack_legend::get_card_rank_value(origin_card->get_modified_sign().rank);
         }
         return sum;
     }

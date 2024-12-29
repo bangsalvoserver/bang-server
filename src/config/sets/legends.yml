@@ -5,7 +5,11 @@ legends:
       - bart_cassidy(2)
   - name: BLACK_JACK
     image: 23_black_jack
-    # TODO - on_draw_from_deck: rivela in loop finche' il "valore" non e' piu' di 21
+    responses:
+      - skip_drawing
+      - black_jack_legend
+    tags:
+      - drawing
   - name: CALAMITY_JANET
     image: 23_calamity_janet
     equip:
