@@ -12,6 +12,8 @@ namespace banggame {
     DEFINE_EQUIP(ms_abigail, equip_ms_abigail)
 
     struct effect_ms_abigail {
+        static bool can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags);
+        
         bool can_play(card_ptr origin_card, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin);
     };
