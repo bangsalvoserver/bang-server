@@ -35,17 +35,11 @@ namespace banggame {
         auto req = origin->m_game->top_request<escapable_request>();
         req->add_card(origin_card);
 
-        origin->m_game->queue_request<request_check>(origin, origin_card,
-            [](card_sign sign) {
-                return enums::indexof(sign.rank) >= enums::indexof(card_rank::rank_J)
-                    && enums::indexof(sign.rank) <= enums::indexof(card_rank::rank_A);
-            },
-            [=](bool result) {
-                if (result) {
-                    origin->m_game->add_log("LOG_CARD_HAS_EFFECT", origin_card);
-                    origin->m_game->pop_request();
-                }
+        origin->m_game->queue_request<request_check>(origin, origin_card, &card_sign::is_jack_to_ace, [=](bool result) {
+            if (result) {
+                origin->m_game->add_log("LOG_CARD_HAS_EFFECT", origin_card);
+                origin->m_game->pop_request();
             }
-        );
+        });
     }
 }

@@ -55,6 +55,11 @@ namespace banggame {
                 && enums::indexof(rank) <= enums::indexof(card_rank::rank_A);
         }
 
+        bool is_jack_to_ace() const {
+            return enums::indexof(rank) >= enums::indexof(card_rank::rank_J)
+                && enums::indexof(rank) <= enums::indexof(card_rank::rank_A);
+        }
+
         explicit operator bool () const {
             return suit != card_suit::none && rank != card_rank::none;
         }
