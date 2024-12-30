@@ -22,6 +22,15 @@ namespace banggame::event_type {
     struct on_game_setup {
         player_ptr first_player;
     };
+
+    struct on_drawn_any_card {
+        nullable_ref<card_ptr> drawn_card;
+    };
+
+    struct on_discard_any_card {
+        player_ptr origin;
+        card_ptr target_card;
+    };
     
     struct apply_sign_modifier {
         nullable_ref<card_sign> value;
