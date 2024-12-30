@@ -84,7 +84,8 @@ legends:
     # puo' rimuovere l'ultimo punto vita quando rivendica un'impresa (da capire)
   - name: SUZY_LAFAYETTE
     image: 23_suzy_lafayette
-    # TODO equip_suzy_lafayette_legend: condizione ncards < 2
+    equip:
+      - suzy_lafayette(2)
   - name: VULTURE_SAM
     image: 23_vulture_sam
     # TODO equip_vulture_sam + equip_vulture_sam_legend
