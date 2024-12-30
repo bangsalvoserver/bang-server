@@ -32,6 +32,7 @@ namespace banggame {
         };
 
         struct on_draw_check_resolve {
+            card_ptr origin_card;
             player_ptr origin;
             card_ptr target_card;
             card_ptr drawn_card;

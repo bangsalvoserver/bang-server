@@ -58,14 +58,16 @@ namespace banggame {
         target->m_game->add_listener<event_type::on_draw_check_start>(target_card, [=](player_ptr origin, shared_request_check req, bool &handled) {
             if (!handled) {
                 if (auto req_base = std::dynamic_pointer_cast<request_check_base>(req)) {
-                    handled = true;
-                    target->m_game->queue_request<request_lucky_duke_legend>(target_card, origin, target, std::move(req_base));
+                    if (req_base->origin_card && req_base->origin_card->deck == card_deck_type::main_deck) {
+                        handled = true;
+                        target->m_game->queue_request<request_lucky_duke_legend>(target_card, origin, target, std::move(req_base));
+                    }
                 }
             }
         });
 
-        target->m_game->add_listener<event_type::on_draw_check_resolve>(target_card, [=](player_ptr origin, card_ptr target_card, card_ptr drawn_card) {
-            if (origin == target && target_card == drawn_card) {
+        target->m_game->add_listener<event_type::on_draw_check_resolve>(target_card, [=](card_ptr origin_card, player_ptr origin, card_ptr target_card, card_ptr drawn_card) {
+            if (target == target->m_game->m_playing && target_card == drawn_card && origin_card && origin_card->deck == card_deck_type::main_deck) {
                 target->m_game->add_log("LOG_DRAWN_CARD", target, target_card);
                 target->add_to_hand(target_card);
             }

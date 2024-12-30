@@ -88,13 +88,13 @@ namespace banggame {
         if (!target->m_game->m_selection.empty()) {
             while (!target->m_game->m_selection.empty()) {
                 card_ptr c = target->m_game->m_selection.front();
-                target->m_game->call_event(event_type::on_draw_check_resolve{ target, c, drawn_card });
+                target->m_game->call_event(event_type::on_draw_check_resolve{ origin_card, target, c, drawn_card });
                 if (c->pocket == pocket_type::selection) {
                     c->move_to(pocket_type::discard_pile);
                 }
             }
         } else {
-            target->m_game->call_event(event_type::on_draw_check_resolve{ target, drawn_card, drawn_card });
+            target->m_game->call_event(event_type::on_draw_check_resolve{origin_card, target, drawn_card, drawn_card });
         }
         on_resolve(is_lucky(drawn_card));
     }

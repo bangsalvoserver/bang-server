@@ -19,7 +19,7 @@ namespace banggame {
                 value = target_card;
             }
         });
-        player_end->m_game->add_listener<event_type::on_draw_check_resolve>(target_card, [=](player_ptr player_begin, card_ptr target_card, card_ptr drawn_card) {
+        player_end->m_game->add_listener<event_type::on_draw_check_resolve>(target_card, [=](card_ptr origin_card, player_ptr player_begin, card_ptr target_card, card_ptr drawn_card) {
             player_end->m_game->queue_action([=]{
                 if (player_end->alive() && target_card->pocket != pocket_type::player_hand && get_john_pain(player_end)) {
                     if (rn::none_of(player_begin->m_game->range_all_players(player_begin)
