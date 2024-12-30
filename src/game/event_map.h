@@ -39,7 +39,7 @@ namespace banggame {
             if (type != other.type) {
                 return type <=> other.type;
             } else if (key.priority != other.key.priority) {
-                return key.priority <=> other.key.priority;
+                return other.key.priority <=> key.priority;
             } else {
                 return get_card_order(key.target_card) <=> get_card_order(other.key.target_card);
             }
