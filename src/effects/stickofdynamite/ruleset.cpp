@@ -4,6 +4,7 @@
 #include "cards/filter_enums.h"
 
 #include "effects/base/damage.h"
+#include "effects/base/deathsave.h"
 
 #include "game/game.h"
 
@@ -65,6 +66,12 @@ namespace banggame {
                 }
                 
                 target->add_player_flags(player_flag::stick_of_dynamite);
+            }
+        });
+
+        game->add_listener<event_type::on_player_eliminated>({nullptr, 20}, [=](player_ptr killer, player_ptr target) {
+            if (target->remove_player_flags(player_flag::stick_of_dynamite) && game->m_first_player->alive()) {
+                game->m_first_player->add_player_flags(player_flag::stick_of_dynamite);
             }
         });
 
