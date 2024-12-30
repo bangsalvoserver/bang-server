@@ -32,6 +32,7 @@ namespace banggame {
         ghost_2,
         temp_ghost,
         extra_turn,
+        stick_of_dynamite,
         treat_missed_as_bang,
         treat_any_as_bang,
         role_revealed,

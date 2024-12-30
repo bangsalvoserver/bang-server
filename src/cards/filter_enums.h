@@ -80,6 +80,7 @@ namespace banggame {
         max_hp,
         initial_cards,
         bronco,
+        dynamite,
     };
 }
 

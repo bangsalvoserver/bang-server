@@ -70,8 +70,8 @@ namespace banggame {
         }
     }
 
-    void card::move_to(pocket_type new_pocket, player_ptr new_owner, card_visibility new_visibility, bool instant, bool front) {
-        if (pocket == new_pocket && owner == new_owner) return;
+    void card::move_to(pocket_type new_pocket, player_ptr new_owner, card_visibility new_visibility, bool instant, move_card_destination dest) {
+        if (pocket == new_pocket && owner == new_owner && dest != move_card_destination::random) return;
         
         set_visibility(new_visibility, new_owner, instant);
 
@@ -82,13 +82,25 @@ namespace banggame {
         owner = new_owner;
 
         auto &new_pile = m_game->get_pocket(new_pocket, new_owner);
-        if (front) {
+        switch (dest) {
+        case move_card_destination::begin:
             new_pile.insert(new_pile.begin(), this);
-        } else {
+            break;
+        case move_card_destination::end:
             new_pile.push_back(this);
+            break;
+        case move_card_destination::random: {
+            if (new_pile.empty()) {
+                new_pile.push_back(this);
+            } else {
+                std::uniform_int_distribution<size_t> dist{0, new_pile.size() - 1};
+                new_pile.insert(new_pile.begin() + dist(m_game->rng), this);
+            }
+            break;
+        }
         }
         
-        m_game->add_update<"move_card">(this, new_owner, new_pocket, instant ? 0ms : durations.move_card, front);
+        m_game->add_update<"move_card">(this, new_owner, new_pocket, instant ? 0ms : durations.move_card, dest);
     }
 
     void card::set_inactive(bool new_inactive) {

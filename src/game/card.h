@@ -40,7 +40,7 @@ namespace banggame {
         card_sign get_modified_sign() const;
 
         void set_visibility(card_visibility visibility, player_ptr owner = nullptr, bool instant = false);
-        void move_to(pocket_type pocket, player_ptr owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false, bool front = false);
+        void move_to(pocket_type pocket, player_ptr owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false, move_card_destination dest = move_card_destination::end);
         void set_inactive(bool inactive);
 
         void flash_card();
