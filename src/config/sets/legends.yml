@@ -64,8 +64,8 @@ legends:
     # on_play_bang (nuovo evento) request_discard
   - name: PEDRO_RAMIREZ
     image: 23_pedro_ramirez
-    # TODO equip_pedro_ramirez_legend: on_draw_from_deck: draw one from discards
-    # (add_action con priority=-8 -- da diminuire altre azioni da -8 a -9)
+    equip:
+      - pedro_ramirez_legend
   - name: ROSE_DOOLAN
     image: 23_rose_doolan
     equip:

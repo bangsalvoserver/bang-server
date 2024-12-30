@@ -3,6 +3,7 @@
 
 #include "black_jack.h"
 #include "lucky_duke.h"
+#include "pedro_ramirez.h"
 #include "rose_doolan.h"
 #include "ruleset.h"
 #include "kit_carlson.h"
