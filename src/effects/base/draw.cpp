@@ -36,7 +36,7 @@ namespace banggame {
     }
 
     request_draw::request_draw(player_ptr target)
-        : request_picking(nullptr, nullptr, target, {}, -7) {}
+        : request_picking(nullptr, nullptr, target, {}, -20) {}
     
     void request_draw::on_update() {
         if (!live) {

@@ -278,14 +278,14 @@ namespace banggame {
         m_game->queue_action([this]{
             m_game->call_event(event_type::pre_turn_start{ this });
             m_game->queue_request<request_predraw>(this);
-        }, -10);
+        }, -30);
 
         m_game->queue_action([this]{
             if (alive() && m_game->m_playing == this) {
                 m_game->call_event(event_type::on_turn_start{ this });
                 m_game->queue_request<request_draw>(this);
             }
-        }, -10);
+        }, -30);
     }
 
     void player::pass_turn() {
@@ -302,7 +302,7 @@ namespace banggame {
                     add_player_flags(player_flag::extra_turn);
                     start_of_turn();
                 }
-            }, -5);
+            }, -10);
         }
     }
 

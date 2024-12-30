@@ -549,7 +549,7 @@ namespace banggame {
                             killer->draw_card(3);
                         } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
                             target->m_game->add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                            queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy, -2);
+                            queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy, -4);
                         }
                     } else if (m_players.size() == 3 && (
                         (target->m_role == player_role::deputy_3p && killer->m_role == player_role::renegade_3p) ||
@@ -580,7 +580,7 @@ namespace banggame {
                 if (any_player_removed) {
                     add_update<"player_order">(make_player_order_update());
                 }
-            }, -3);
+            }, -6);
         }
 
         queue_action([this, killer, target] {
@@ -633,7 +633,7 @@ namespace banggame {
                     declare_winners(rv::single(killer));
                 }
             }
-        }, -4);
+        }, -8);
     }
 
 }

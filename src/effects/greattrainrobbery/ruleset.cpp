@@ -122,7 +122,7 @@ namespace banggame {
                 }
                 origin->m_game->queue_action([=]{
                     shuffle_stations_and_trains(origin);
-                }, -6);
+                }, -15);
             }
         });
 
@@ -130,7 +130,7 @@ namespace banggame {
             if (origin == origin->m_game->m_first_player) {
                 origin->m_game->queue_action([=]{
                     origin->m_game->advance_train(origin);
-                }, -5);
+                }, -10);
             }
         });
     }
