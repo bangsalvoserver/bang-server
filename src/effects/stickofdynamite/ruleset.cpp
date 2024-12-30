@@ -58,14 +58,14 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_hit>({nullptr, 20}, [=](card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags) { 
-            if (flags.check(effect_flag::is_bang)) {
+            if (origin && flags.check(effect_flag::is_bang)) {
                 player_ptr found = find_dynamite_stick(game);
 
-                if (found && found != target) {
+                if (found && found != origin) {
                     found->remove_player_flags(player_flag::stick_of_dynamite);
                 }
                 
-                target->add_player_flags(player_flag::stick_of_dynamite);
+                origin->add_player_flags(player_flag::stick_of_dynamite);
             }
         });
 
