@@ -27,12 +27,18 @@ namespace banggame {
         card_list cards;
     };
 
+    enum class pocket_position {
+        begin,
+        random,
+        end,
+    };
+
     struct move_card_update {
         card_ptr card;
         nullable_player player;
         pocket_type pocket;
         animation_duration duration = durations.move_card;
-        bool front = false;
+        pocket_position position = pocket_position::end;
     };
 
     struct add_tokens_update {

@@ -138,7 +138,9 @@ namespace banggame {
             play_sound("shuffle");
             add_update<"deck_shuffled">(pocket_type::main_deck);
         }
-        return m_deck.back();
+        card_ptr drawn_card = m_deck.back();
+        call_event(event_type::on_drawn_any_card{ drawn_card });
+        return drawn_card;
     }
 
     card_ptr game_table::draw_shop_card() {

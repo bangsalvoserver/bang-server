@@ -171,13 +171,14 @@ namespace banggame {
                 if (m_game->m_train.size() < 4) {
                     target->move_to(pocket_type::train);
                 } else {
-                    target->move_to(pocket_type::train_deck, nullptr, card_visibility::shown, false, true);
+                    target->move_to(pocket_type::train_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
                     target->set_visibility(card_visibility::hidden, nullptr, true);
                 }
             } else if (target->is_black()) {
                 target->move_to(pocket_type::shop_discard);
             } else {
                 target->move_to(pocket_type::discard_pile);
+                m_game->call_event(event_type::on_discard_any_card{ this, target });
             }
         }
     }
@@ -239,6 +240,7 @@ namespace banggame {
             target->move_to(pocket_type::player_hand, this, m_game->check_flags(game_flag::hands_shown)
                 ? card_visibility::shown : card_visibility::show_owner);
         }
+        m_game->call_event(event_type::on_drawn_any_card{ target });
     }
 
     void player::draw_card(int ncards, card_ptr origin_card) {

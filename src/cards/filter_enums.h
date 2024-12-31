@@ -80,6 +80,7 @@ namespace banggame {
         traincost,
         max_hp,
         bronco,
+        dynamite,
     };
 }
 

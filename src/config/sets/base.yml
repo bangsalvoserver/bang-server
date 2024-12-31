@@ -17,6 +17,8 @@ main_deck:
     equip:
       - predraw_check(2)
       - dynamite
+    tags:
+      - dynamite
   - &scope
     name: SCOPE
     signs:
