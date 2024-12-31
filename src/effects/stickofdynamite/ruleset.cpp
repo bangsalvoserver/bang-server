@@ -34,13 +34,24 @@ namespace banggame {
 
             for (player_ptr p : origin->m_game->range_alive_players(origin)) {
                 while (auto filter = p->m_hand | rv::filter(is_dynamite)) {
-                    shuffle_card_back(rn::front(filter));
+                    card_ptr target_card = rn::front(filter);
+
+                    game->add_log("LOG_REVEALED_CARD", p, target_card);
+                    target_card->set_visibility(card_visibility::shown);
+                    target_card->add_short_pause();
+
+                    shuffle_card_back(target_card);
                     p->draw_card();
                 }
             }
             
-            game->add_listener<event_type::on_drawn_any_card>(nullptr, [=](card_ptr &drawn_card) {
+            game->add_listener<event_type::on_drawn_any_card>(nullptr, [=, recurse_count = 0](card_ptr &drawn_card) mutable {
                 if (is_dynamite(drawn_card)) {
+                    ++recurse_count;
+                    if (recurse_count > 10) {
+                        throw game_error("recursion limit hit in stickofdynamite on_drawn_any_card");
+                    }
+
                     game->add_log("LOG_REVEALED_CARD", static_cast<player_ptr>(nullptr), drawn_card);
                     drawn_card->set_visibility(card_visibility::shown);
                     drawn_card->add_short_pause();
@@ -48,11 +59,15 @@ namespace banggame {
                     player_ptr target = find_dynamite_stick(game); 
                     if (target && target->alive() && !target->find_equipped_card(drawn_card)) {
                         target->equip_card(drawn_card);
+                    } else if (game->m_deck.size() <= 1) {
+                        drawn_card->move_to(pocket_type::discard_pile);
                     } else {
                         shuffle_card_back(drawn_card);
                     }
 
                     drawn_card = game->top_of_deck();
+
+                    --recurse_count;
                 }
             });
         });
