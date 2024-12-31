@@ -27,7 +27,7 @@ namespace banggame {
         card_list cards;
     };
 
-    enum class move_card_destination {
+    enum class pocket_position {
         begin,
         random,
         end,
@@ -38,7 +38,7 @@ namespace banggame {
         nullable_player player;
         pocket_type pocket;
         animation_duration duration = durations.move_card;
-        move_card_destination destination = move_card_destination::end;
+        pocket_position position = pocket_position::end;
     };
 
     struct add_cubes_update {

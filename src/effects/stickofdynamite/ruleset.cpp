@@ -15,7 +15,7 @@ namespace banggame {
     }
 
     static void shuffle_card_back(card_ptr origin_card) {
-        origin_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden, false, move_card_destination::random);
+        origin_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden, false, pocket_position::random);
     }
 
     static player_ptr find_dynamite_stick(game *game) {
@@ -34,7 +34,9 @@ namespace banggame {
 
             for (player_ptr p : origin->m_game->range_alive_players(origin)) {
                 while (auto filter = p->m_hand | rv::filter(is_dynamite)) {
-                    shuffle_card_back(rn::front(filter));
+                    card_ptr target_card = rn::front(filter);
+                    target_card->add_short_pause();
+                    shuffle_card_back(target_card);
                     p->draw_card();
                 }
             }

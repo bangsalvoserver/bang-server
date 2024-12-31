@@ -175,7 +175,7 @@ namespace banggame {
                 if (m_game->m_train.size() < 4) {
                     target->move_to(pocket_type::train);
                 } else {
-                    target->move_to(pocket_type::train_deck, nullptr, card_visibility::shown, false, move_card_destination::begin);
+                    target->move_to(pocket_type::train_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
                     target->set_visibility(card_visibility::hidden, nullptr, true);
                 }
             } else if (target->is_black()) {
