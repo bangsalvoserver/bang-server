@@ -28,14 +28,26 @@ namespace logging {
 
         template<typename ... Ts>
         void operator()(std::format_string<Ts ...> fmt, Ts && ... args) const {
-            (*this)(std::format(fmt, std::forward<Ts>(args) ...));
+            if (check_logging_level()) {
+                do_log(std::format(fmt, std::forward<Ts>(args) ...));
+            }
         }
 
-        void operator()(std::string_view message) const;
+        void operator()(std::string_view message) const {
+            if (check_logging_level()) {
+                do_log(message);
+            }
+        }
 
     private:
         level local_level;
         static level global_level;
+
+        bool check_logging_level() const {
+            return enums::indexof(global_level) <= enums::indexof(local_level);
+        }
+
+        void do_log(std::string_view message) const;
 
         friend void set_logging_level(level global_level);
     };
