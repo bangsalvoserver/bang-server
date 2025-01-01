@@ -29,8 +29,6 @@ void game_manager::on_message(client_handle client, std::string_view msg) {
         kick_client(client, e.what());
     } catch (const lobby_error &e) {
         send_message<"lobby_error">(client, e.what());
-    } catch (const std::exception &e) {
-        logging::warn("Error in on_message(): {}", e.what());
     }
 }
 
@@ -107,8 +105,10 @@ void game_manager::tick() {
                     lobby.state = lobby_state::finished;
                     broadcast_message_no_lobby<"lobby_update">(lobby);
                 }
-            } catch (const std::exception &e) {
-                logging::warn("Error in tick(): {}", e.what());
+            } catch (const game_error &e) {
+                lobby.state = lobby_state::finished;
+                add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", { utils::tag<"string">{}, e.what() }, lobby_chat_flag::translated });
+                broadcast_message_no_lobby<"lobby_update">(lobby);
             }
         }
         if (lobby.connected_users().empty()) {
@@ -647,5 +647,11 @@ void game_manager::handle_message(utils::tag<"game_action">, session_ptr session
         throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");
     }
 
-    lobby.m_game->handle_game_action(origin, value);
+    try {
+        lobby.m_game->handle_game_action(origin, value);
+    } catch (const game_error &e) {
+        lobby.state = lobby_state::finished;
+        add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", { utils::tag<"string">{}, e.what() }, lobby_chat_flag::translated });
+        broadcast_message_no_lobby<"lobby_update">(lobby);
+    }
 }
