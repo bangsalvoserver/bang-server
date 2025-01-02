@@ -88,16 +88,16 @@ int main(int argc, char **argv) {
 #endif
 
     std::jthread main_loop{[&](std::stop_token stop) {
-        try {
-            auto next_tick = std::chrono::steady_clock::now() + banggame::ticks64{0};
+        auto next_tick = std::chrono::steady_clock::now() + banggame::ticks64{0};
 
-            while (!stop.stop_requested()) {
-                next_tick += banggame::ticks64{1};
+        while (!stop.stop_requested()) {
+            next_tick += banggame::ticks64{1};
+            try {
                 server.tick();
-                std::this_thread::sleep_until(next_tick);
+            } catch (const std::exception &error) {
+                logging::error("Unhandled exception: {}", error.what());
             }
-        } catch (const std::exception &error) {
-            std::println(stderr, "Unhandled exception: {}", error.what());
+            std::this_thread::sleep_until(next_tick);
         }
 
         server.stop();
