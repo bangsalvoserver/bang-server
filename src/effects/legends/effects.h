@@ -3,6 +3,7 @@
 
 #include "black_jack.h"
 #include "el_gringo.h"
+#include "jesse_jones.h"
 #include "jourdonnais.h"
 #include "kit_carlson.h"
 #include "lucky_duke.h"

@@ -33,9 +33,12 @@ legends:
       - max_hp(3)
   - name: JESSE_JONES
     image: 23_jesse_jones
-    # TODO - effect_jesse_jones_legend player not_empty_hand:
-    # sposta carte di target in selection (owner = origin)
-    # request_jesse_jones_legend: pickable - on_pick -> draw target_card, ridai carte a owner, draw
+    responses:
+      - add_draw_card
+      - no_cards_drawn
+      - jesse_jones_legend player notself not_empty_hand
+    tags:
+      - drawing
   - name: JOURDONNAIS
     image: 23_jourdonnais
     equip:
