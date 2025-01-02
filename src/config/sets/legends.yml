@@ -27,8 +27,8 @@ legends:
       - banglimit
   - name: EL_GRINGO
     image: 23_el_gringo
-    # TODO - equip_el_gringo + equip_el_grindo_legend
-    # equip_el_gringo_legend: on_hit -> pesca la origin_card
+    equip:
+      - el_gringo_legend
     tags:
       - max_hp(3)
   - name: JESSE_JONES
