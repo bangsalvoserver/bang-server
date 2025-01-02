@@ -8,4 +8,5 @@ target_sources(bangserver PRIVATE
     pedro_ramirez.cpp
     rose_doolan.cpp
     ruleset.cpp
+    sid_ketchum.cpp
 )

@@ -10,5 +10,6 @@
 #include "pedro_ramirez.h"
 #include "rose_doolan.h"
 #include "ruleset.h"
+#include "sid_ketchum.h"
 
 #endif

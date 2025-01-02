@@ -12,6 +12,7 @@
 #include "effects/base/bang.h"
 #include "effects/base/damage.h"
 #include "effects/base/draw.h"
+#include "effects/base/heal.h"
 #include "effects/base/predraw_check.h"
 #include "effects/base/requests.h"
 
@@ -199,6 +200,7 @@ namespace banggame {
         if (is_ghost() || m_hp == m_max_hp) return;
         m_game->add_log("LOG_HEALED", this, value);
         set_hp(std::min<int>(m_hp + value, m_max_hp));
+        m_game->call_event(event_type::on_heal{ this });
     }
 
     void player::set_hp(int value, bool instant) {

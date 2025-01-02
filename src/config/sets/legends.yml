@@ -79,8 +79,15 @@ legends:
       - steal card range_1
   - name: SID_KETCHUM
     image: 23_sid_ketchum
-    # TODO effetto base + equip_sid_ketchum_legend
-    # on_heal (nuovo evento) attiva request: pickable_player -> bang (una volta per turno) 
+    equip:
+      - sid_ketchum_legend
+    effects:
+      - discard cards(2) self | hand
+      - heal
+    responses:
+      - deathsave
+      - discard cards(2) self | hand
+      - heal
   - name: SLAB_THE_KILLER
     image: 23_slab_the_killer
     # TODO apply_bang_modifier : unavoidable = true
