@@ -34,6 +34,7 @@ namespace banggame {
                             }
 
                             target->m_game->add_log("LOG_STOLEN_SELF_CARD", target, origin_card);
+                            origin_card->add_short_pause();
                             target->add_to_hand(origin_card);
                         }
                     }
