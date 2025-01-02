@@ -13,7 +13,9 @@ namespace banggame {
         void on_update() override {
             if (!live) {
                 while (!origin->empty_hand()) {
-                    origin->m_hand.front()->move_to(pocket_type::selection, target);
+                    card_ptr target_card = origin->m_hand.front();
+                    target->m_game->add_log(update_target::includes(origin, target), "LOG_REVEALED_CARD", origin, target_card);
+                    target_card->move_to(pocket_type::selection, target);
                 }
             }
             auto_pick();
@@ -22,6 +24,7 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
 
+            target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", target, origin, target_card);
             target->add_to_hand(target_card);
 
             while (!target->m_game->m_selection.empty()) {
