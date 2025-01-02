@@ -6,6 +6,7 @@ target_sources(bangserver PRIVATE
     kit_carlson.cpp
     lucky_duke.cpp
     pedro_ramirez.cpp
+    perform_feat.cpp
     rose_doolan.cpp
     ruleset.cpp
     sid_ketchum.cpp

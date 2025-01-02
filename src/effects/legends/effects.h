@@ -8,6 +8,7 @@
 #include "kit_carlson.h"
 #include "lucky_duke.h"
 #include "pedro_ramirez.h"
+#include "perform_feat.h"
 #include "rose_doolan.h"
 #include "ruleset.h"
 #include "sid_ketchum.h"

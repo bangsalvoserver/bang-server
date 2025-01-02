@@ -102,8 +102,11 @@ legends:
     # on_player_death: cambia personaggio a versione base + set_hp(4)
   - name: WILLY_THE_KID
     image: 23_willy_the_kid
-    # TODO volcanic + bang gratis da personaggio se non ha rivendicato impresa
-    # conta come feat attivata per il check di "vantare impresa"
+    equip:
+      - volcanic
+    effects:
+      - perform_feat
+      - bang player reachable notself
 
 feats:
   - name: FIFTY_GUNS
@@ -186,21 +189,6 @@ button_row:
 #  request_perform_feat: pickable su carta feat "attivata" e resolvable (2 - dismiss)
 #    on_resolve -> pop_request
 #    on_pick: effect_perform_feat
-#
-#  effect_perform_feat:
-#  can_play: se nessuna impresa compiuta
-#  on_play:
-#   se NON sei leggenda - compiere impresa:
-#     -> sposta max 2 fame da character a carta feat
-#     -> track feat compiuta
-#   se SEI leggenda e c'e' almeno un'altra leggenda - rivendicare impresa:
-#     -> pop_request, request_claim_feat: pickable su player leggenda e hp > 1
-#     on_pick:
-#      -> pop_request
-#      -> damage target
-#      -> discard feat (rimuovi fame)
-#      -> draw feat (shuffle se necessario)
-#      -> track feat compiuta
 #
 # vantare impresa:
 #  on_turn_end (da capire priority) -> se nessuna impresa compiuta e personaggio non leggenda:
