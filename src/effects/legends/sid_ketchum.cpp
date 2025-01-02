@@ -9,8 +9,16 @@
 
 namespace banggame {
 
-    struct request_sid_ketchum_legend : request_picking_player {
+    struct request_sid_ketchum_legend : request_picking_player, interface_resolvable {
         using request_picking_player::request_picking_player;
+
+        int resolve_type() const override {
+            return 1;
+        }
+
+        void on_resolve() override {
+            target->m_game->pop_request();
+        }
 
         void on_update() override {
             if (rn::none_of(target->m_game->m_players, [&](const_player_ptr p) { return can_pick(p); })) {
