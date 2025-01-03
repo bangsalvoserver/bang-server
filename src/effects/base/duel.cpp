@@ -9,14 +9,12 @@
 
 namespace banggame {
 
-    struct request_duel : request_resolvable, escapable_request, interface_picking, respondable_with_bang {
-        request_duel(card_ptr origin_card, player_ptr origin, player_ptr target, player_ptr respond_to, effect_flags flags = {}, bool is_response = false)
+    struct request_duel_base : request_resolvable, interface_picking, respondable_with_bang {
+        request_duel_base(card_ptr origin_card, player_ptr origin, player_ptr target, player_ptr respond_to, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags)
-            , respond_to{respond_to}
-            , is_response{is_response} {}
+            , respond_to{respond_to} {}
 
         player_ptr respond_to = nullptr;
-        bool is_response = false;
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
@@ -38,10 +36,6 @@ namespace banggame {
             return {};
         }
 
-        bool can_escape(card_ptr c) const override {
-            return !is_response && escapable_request::can_escape(c);
-        }
-
         bool can_pick(const_card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
                 && target_card->is_bang_card(target)
@@ -50,7 +44,7 @@ namespace banggame {
 
         void respond_with_bang() override {
             target->m_game->pop_request();
-            target->m_game->queue_request<request_duel>(origin_card, origin, respond_to, target, effect_flags{}, true);
+            target->m_game->queue_request<request_duel_base>(origin_card, origin, respond_to, target);
         }
 
         void on_pick(card_ptr target_card) override {
@@ -71,6 +65,10 @@ namespace banggame {
                 return {"STATUS_DUEL_OTHER", target, origin_card};
             }
         }
+    };
+
+    struct request_duel : request_duel_base, escapable_request {
+        using request_duel_base::request_duel_base;
     };
 
     game_string effect_duel::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
