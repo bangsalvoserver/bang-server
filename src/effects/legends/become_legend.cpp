@@ -25,6 +25,7 @@ namespace banggame {
         origin->remove_extra_characters();
         for (card_ptr c : origin->m_characters) {
             origin->disable_equip(c);
+            c->visibility = card_visibility::hidden;
         }
 
         card_ptr old_character = origin->first_character();
