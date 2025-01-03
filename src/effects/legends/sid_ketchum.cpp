@@ -10,6 +10,13 @@ namespace banggame {
     struct request_sid_ketchum_legend : request_can_play_card {
         using request_can_play_card::request_can_play_card;
 
+        prompt_string resolve_prompt() const override {
+            if (target->is_bot()) {
+                return "BOT_BAD_PLAY";
+            }
+            return {};
+        }
+
         game_string status_text(player_ptr owner) const override {
             if (owner == target) {
                 return {"STATUS_SID_KETCHUM_LEGEND", origin_card};
