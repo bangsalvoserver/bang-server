@@ -183,6 +183,15 @@ button_row:
     responses:
       - discard card self | hand hearts
       - escape_jail
+
+hidden:
+  - name: SID_KETCHUM
+    effects:
+      - sid_ketchum_legend_free_bang
+      - max_usages(1)
+      - bang player reachable notself
+    tags:
+      - preselect
     
 # TODO ruleset di legends
 #
