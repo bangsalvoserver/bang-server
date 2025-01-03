@@ -62,9 +62,11 @@ legends:
       - lucky_duke_legend
   - name: PAUL_REGRET
     image: 23_paul_regret
-    # TODO - mustang + equip_paul_regret_legend
-    # equip_paul_regret_legend: get_error quando si gioca bang, errore se non ha altre carte in mano
-    # on_play_bang (nuovo evento) request_discard
+    equip:
+      - mustang
+      - paul_regret_legend
+    tags:
+      - max_hp(3)
   - name: PEDRO_RAMIREZ
     image: 23_pedro_ramirez
     equip:

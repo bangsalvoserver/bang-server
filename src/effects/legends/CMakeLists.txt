@@ -5,6 +5,7 @@ target_sources(bangserver PRIVATE
     jourdonnais.cpp
     kit_carlson.cpp
     lucky_duke.cpp
+    paul_regret.cpp
     pedro_ramirez.cpp
     perform_feat.cpp
     rose_doolan.cpp

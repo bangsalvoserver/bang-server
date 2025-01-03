@@ -7,6 +7,7 @@
 #include "jourdonnais.h"
 #include "kit_carlson.h"
 #include "lucky_duke.h"
+#include "paul_regret.h"
 #include "pedro_ramirez.h"
 #include "perform_feat.h"
 #include "rose_doolan.h"
