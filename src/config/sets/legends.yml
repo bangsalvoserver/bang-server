@@ -100,8 +100,9 @@ legends:
       - suzy_lafayette(2)
   - name: VULTURE_SAM
     image: 23_vulture_sam
-    # TODO equip_vulture_sam + equip_vulture_sam_legend
-    # on_player_death: cambia personaggio a versione base + set_hp(4)
+    equip:
+      - vulture_sam
+      - vulture_sam_legend
   - name: WILLY_THE_KID
     image: 23_willy_the_kid
     equip:

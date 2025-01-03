@@ -13,4 +13,5 @@ target_sources(bangserver PRIVATE
     ruleset.cpp
     sid_ketchum.cpp
     slab_the_killer.cpp
+    vulture_sam.cpp
 )

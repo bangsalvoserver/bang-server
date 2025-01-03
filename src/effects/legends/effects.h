@@ -15,5 +15,6 @@
 #include "ruleset.h"
 #include "sid_ketchum.h"
 #include "slab_the_killer.h"
+#include "vulture_sam.h"
 
 #endif
