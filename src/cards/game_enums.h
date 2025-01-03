@@ -38,6 +38,7 @@ namespace banggame {
         ignore_distances,
         role_revealed,
         skip_turn,
+        legend,
         removed,
         winner,
     };

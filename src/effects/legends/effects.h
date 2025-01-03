@@ -1,6 +1,7 @@
 #ifndef __LEGENDS_EFFECTS_H__
 #define __LEGENDS_EFFECTS_H__
 
+#include "become_legend.h"
 #include "black_jack.h"
 #include "el_gringo.h"
 #include "jesse_jones.h"

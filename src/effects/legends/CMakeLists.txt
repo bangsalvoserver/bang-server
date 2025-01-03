@@ -1,4 +1,5 @@
 target_sources(bangserver PRIVATE
+    become_legend.cpp
     black_jack.cpp
     el_gringo.cpp
     jesse_jones.cpp
