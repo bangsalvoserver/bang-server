@@ -6,8 +6,15 @@
 namespace banggame {
 
     bool effect_become_legend::can_play(card_ptr origin_card, player_ptr origin) {
-        // TODO quando non hai piu' fame tokens
-        return !origin->check_player_flags(player_flag::legend);
+        if (!origin->check_player_flags(player_flag::legend)) {
+            for (const auto &[token, count] : origin->first_character()->tokens) {
+                if (token != card_token_type::cube && count != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     static card_ptr find_legend_character(card_ptr origin_card) {
