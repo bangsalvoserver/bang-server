@@ -22,8 +22,6 @@ namespace banggame {
 
     void ruleset_legends::on_apply(game *game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 0}, [](player_ptr origin) {
-            draw_next_feat(origin);
-
             card_token_type tokens[] = {
                 card_token_type::fame1,
                 card_token_type::fame2,
@@ -40,6 +38,8 @@ namespace banggame {
             for (auto [token_type, target] : rv::zip(tokens, origin->m_game->range_all_players(origin))) {
                 origin->m_game->add_tokens(token_type, card::get_max_tokens(token_type), target->first_character());
             }
+            
+            draw_next_feat(origin);
         });
 
         game->add_listener<event_type::count_initial_cards>({nullptr, -1}, [](const_player_ptr origin, int &value) {
