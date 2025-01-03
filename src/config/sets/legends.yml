@@ -190,7 +190,7 @@ button_row:
 
 hidden:
   - name: SID_KETCHUM
-    effects:
+    responses:
       - sid_ketchum_legend_free_bang
       - max_usages(1)
       - bang player reachable notself
