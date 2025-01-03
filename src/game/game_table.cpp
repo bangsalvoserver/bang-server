@@ -116,9 +116,13 @@ namespace banggame {
         return tokens[token_type];
     }
 
-    void game_table::add_tokens(card_token_type token_type, int num_tokens) {
-        tokens[token_type] += num_tokens;
-        add_update<"add_tokens">(token_type, num_tokens);
+    void game_table::add_tokens(card_token_type token_type, int num_tokens, card_ptr target_card) {
+        if (target_card) {
+            target_card->tokens[token_type] += num_tokens;
+        } else {
+            tokens[token_type] += num_tokens;
+        }
+        add_update<"add_tokens">(token_type, num_tokens, target_card);
     }
 
     card_ptr game_table::top_of_deck() {

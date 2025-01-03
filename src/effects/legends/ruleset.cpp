@@ -24,9 +24,21 @@ namespace banggame {
         game->add_listener<event_type::on_game_setup>({nullptr, 0}, [](player_ptr origin) {
             draw_next_feat(origin);
 
-            for (auto [index, p] : rv::enumerate(origin->m_game->range_all_players(origin))) {
-                auto fame_type = static_cast<card_token_type>(std::to_underlying(card_token_type::fame1) + index);
-                p->first_character()->add_tokens(fame_type, card::get_max_tokens(fame_type));
+            card_token_type tokens[] = {
+                card_token_type::fame1,
+                card_token_type::fame2,
+                card_token_type::fame3,
+                card_token_type::fame4,
+                card_token_type::fame5,
+                card_token_type::fame6,
+                card_token_type::fame7,
+                card_token_type::fame8,
+            };
+
+            rn::shuffle(tokens, origin->m_game->rng);
+
+            for (auto [token_type, target] : rv::zip(tokens, origin->m_game->range_all_players(origin))) {
+                origin->m_game->add_tokens(token_type, card::get_max_tokens(token_type), target->first_character());
             }
         });
 
