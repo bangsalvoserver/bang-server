@@ -13,5 +13,6 @@
 #include "rose_doolan.h"
 #include "ruleset.h"
 #include "sid_ketchum.h"
+#include "slab_the_killer.h"
 
 #endif

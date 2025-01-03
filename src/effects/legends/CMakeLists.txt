@@ -11,4 +11,5 @@ target_sources(bangserver PRIVATE
     rose_doolan.cpp
     ruleset.cpp
     sid_ketchum.cpp
+    slab_the_killer.cpp
 )

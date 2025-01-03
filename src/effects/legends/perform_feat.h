@@ -10,6 +10,11 @@ namespace banggame {
             player_ptr origin;
             nullable_ref<int> num_feats;
         };
+
+        struct check_claim_feat_kill {
+            player_ptr origin;
+            nullable_ref<bool> value;
+        };
     }
 
     struct effect_perform_feat {

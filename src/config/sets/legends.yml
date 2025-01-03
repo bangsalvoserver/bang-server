@@ -92,8 +92,8 @@ legends:
       - heal
   - name: SLAB_THE_KILLER
     image: 23_slab_the_killer
-    # TODO apply_bang_modifier : unavoidable = true
-    # puo' rimuovere l'ultimo punto vita quando rivendica un'impresa (da capire)
+    equip:
+      - slab_the_killer_legend
   - name: SUZY_LAFAYETTE
     image: 23_suzy_lafayette
     equip:
