@@ -9,11 +9,11 @@
 namespace banggame {
 
     struct request_tumbleweed : request_resolvable {
-        request_tumbleweed(card_ptr origin_card, player_ptr origin, player_ptr target, shared_request_check &&handler)
+        request_tumbleweed(card_ptr origin_card, player_ptr origin, player_ptr target, shared_draw_check_handler &&handler)
             : request_resolvable(origin_card, origin, target, {}, 120)
             , handler(std::move(handler)) {}
 
-        shared_request_check handler;
+        shared_draw_check_handler handler;
 
         struct timer_tumbleweed : request_timer {
             explicit timer_tumbleweed(request_tumbleweed *request)
@@ -73,7 +73,7 @@ namespace banggame {
     };
 
     void equip_tumbleweed::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player_ptr origin, shared_request_check req, bool &handled) {
+        target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player_ptr origin, shared_draw_check_handler req, bool &handled) {
             target->m_game->queue_request<request_tumbleweed>(target_card, origin, target, std::move(req));
             handled = true;
         });

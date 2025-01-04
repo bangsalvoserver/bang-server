@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    struct request_rum : request_base, draw_check_handler {
+    struct request_rum : request_base, draw_check_handler, std::enable_shared_from_this<request_rum> {
         request_rum(card_ptr origin_card, player_ptr target)
             : request_base(origin_card, nullptr, target) {}
 

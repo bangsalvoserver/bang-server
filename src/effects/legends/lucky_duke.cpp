@@ -8,14 +8,12 @@
 
 namespace banggame {
 
-    using shared_request_check_base = std::shared_ptr<request_check_base>;
-
     struct request_lucky_duke_legend : selection_picker {
-        request_lucky_duke_legend(card_ptr origin_card, player_ptr origin, player_ptr target, shared_request_check_base &&req)
+        request_lucky_duke_legend(card_ptr origin_card, player_ptr origin, player_ptr target, shared_request_check &&req)
             : selection_picker(origin_card, origin, target, {}, 115)
             , req{std::move(req)} {}
         
-        shared_request_check_base req;
+        shared_request_check req;
 
         card_list get_highlights() const override {
             return { req->origin_card };
@@ -56,13 +54,9 @@ namespace banggame {
     
     void equip_lucky_duke_legend::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_draw_check_start>(target_card, [=](player_ptr origin, shared_request_check req, bool &handled) {
-            if (!handled) {
-                if (auto req_base = std::dynamic_pointer_cast<request_check_base>(req)) {
-                    if (req_base->origin_card && req_base->origin_card->deck == card_deck_type::main_deck) {
-                        handled = true;
-                        target->m_game->queue_request<request_lucky_duke_legend>(target_card, origin, target, std::move(req_base));
-                    }
-                }
+            if (!handled && req->origin_card && req->origin_card->deck == card_deck_type::main_deck) {
+                handled = true;
+                target->m_game->queue_request<request_lucky_duke_legend>(target_card, origin, target, std::move(req));
             }
         });
 

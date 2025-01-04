@@ -135,7 +135,7 @@ feats:
     # crocevia: discard card self | hand bangcard -> attiva feat
   - name: '3_15_TO_YOOMA'
     image: 23_il_treno_per_yooma
-    # TODO on_draw_check_start (nuovo evento) -> attiva feat
+    # TODO on_draw_check_start -> attiva feat
   - name: IN_GOOD_COMPANY
     image: 23_in_buona_compagnia
     # TODO da capire come tenere traccia
@@ -171,9 +171,7 @@ feats:
     # on_play: rivela carte -> feat
   - name: FOR_A_FEW_CARDS_MORE
     image: 23_per_qualche_carta_in_piu
-    # TODO on_turn_end:
-    # request_few_cards_more: pickable and resolvable
-    # on_pick -> scarta carta -> feat
+    # TODO post_discard_pass -> feat
     # on_resolve -> dismiss
   - name: A_QUICK_DEATH
     image: 23_una_morte_veloce

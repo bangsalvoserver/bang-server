@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    struct request_helena_zontero_check : request_base, draw_check_handler {
+    struct request_helena_zontero_check : request_base, draw_check_handler, std::enable_shared_from_this<request_helena_zontero_check> {
         request_helena_zontero_check(card_ptr origin_card, player_ptr origin)
             : request_base(origin_card, origin, nullptr) {}
 

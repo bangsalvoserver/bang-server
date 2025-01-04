@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    struct draw_check_handler : std::enable_shared_from_this<draw_check_handler> {
+    struct draw_check_handler {
         virtual card_list get_drawn_cards() const = 0;
         virtual card_ptr get_drawing_card() const = 0;
 
@@ -16,8 +16,11 @@ namespace banggame {
         virtual void resolve() = 0;
         virtual void restart() = 0;
     };
+
+    struct request_check_base;
     
-    using shared_request_check = std::shared_ptr<draw_check_handler>;
+    using shared_request_check = std::shared_ptr<request_check_base>;
+    using shared_draw_check_handler = std::shared_ptr<draw_check_handler>;
     
     namespace event_type {
         struct count_num_checks {
@@ -40,12 +43,12 @@ namespace banggame {
         
         struct on_draw_check_select {
             player_ptr origin;
-            shared_request_check req;
+            shared_draw_check_handler req;
             nullable_ref<bool> handled;
         };
     }
     
-    struct request_check_base : selection_picker, draw_check_handler {
+    struct request_check_base : selection_picker, draw_check_handler, std::enable_shared_from_this<request_check_base> {
         request_check_base(player_ptr target, card_ptr origin_card)
             : selection_picker(origin_card, nullptr, target, {}, 110) {}
 
