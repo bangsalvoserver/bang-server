@@ -59,6 +59,7 @@ legends:
   - name: LUCKY_DUKE
     image: 23_lucky_duke
     equip:
+      - lucky_duke
       - lucky_duke_legend
   - name: PAUL_REGRET
     image: 23_paul_regret

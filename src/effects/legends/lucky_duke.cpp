@@ -22,7 +22,8 @@ namespace banggame {
 
         void on_update() override {
             if (!live) {
-                for (int i = 0; i < 2; ++i) {
+                int num_checks = target->get_num_checks();
+                for (int i = 0; i < num_checks; ++i) {
                     card_ptr target_card = target->m_game->top_of_deck();
                     target->m_game->add_log("LOG_REVEALED_CARD", target, target_card);
                     target_card->move_to(pocket_type::selection);
