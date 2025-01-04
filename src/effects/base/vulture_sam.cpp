@@ -74,7 +74,7 @@ namespace banggame {
     };
     
     void equip_vulture_sam::on_enable(card_ptr target_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type, card* &value){
+        origin->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type, card_ptr &value){
             if (type == card_taker_type::dead_players && e_target == origin) {
                 value = target_card;
             }

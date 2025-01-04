@@ -14,7 +14,7 @@ namespace banggame {
     }
     
     void equip_john_pain::on_enable(card_ptr target_card, player_ptr player_end) {
-        player_end->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type, card* &value) {
+        player_end->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type, card_ptr &value) {
             if (type == card_taker_type::draw_check_select && e_target == player_end && e_target->m_hand.size() < 6) {
                 value = target_card;
             }
