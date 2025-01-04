@@ -23,6 +23,7 @@ namespace banggame {
                     origin->disable_equip(c);
                 }
 
+                card_ptr old_character = origin->first_character();
                 card_ptr base_character = find_base_character(origin_card);
 
                 origin->m_game->add_update<"remove_cards">(origin->m_characters);
@@ -32,9 +33,9 @@ namespace banggame {
                 base_character->pocket = pocket_type::player_character;
                 base_character->owner = origin;
                 base_character->set_visibility(card_visibility::shown, origin, true);
-                        
-                for (const auto &[token, count] : origin_card->tokens) {
-                    origin_card->move_tokens(token, base_character, count, true);
+                
+                for (const auto &[token, count] : old_character->tokens) {
+                    old_character->move_tokens(token, base_character, count, true);
                 }
 
                 origin->reset_max_hp();
