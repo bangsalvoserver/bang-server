@@ -36,7 +36,7 @@ namespace banggame {
             rn::shuffle(tokens, origin->m_game->rng);
 
             for (auto [token_type, target] : rv::zip(tokens, origin->m_game->range_all_players(origin))) {
-                origin->m_game->add_tokens(token_type, card::get_max_tokens(token_type), target->first_character());
+                origin->m_game->add_tokens(token_type, 5, target->first_character());
             }
             
             draw_next_feat(origin);

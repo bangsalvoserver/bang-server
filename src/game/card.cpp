@@ -118,14 +118,6 @@ namespace banggame {
         m_game->add_update<"short_pause">(this);
     }
 
-    int card::get_max_tokens(card_token_type token_type) {
-        if (token_type == card_token_type::cube) {
-            return 4;
-        } else {
-            return 5;
-        }
-    }
-
     int card::num_tokens(card_token_type token_type) const {
         return tokens[token_type];
     }
@@ -134,14 +126,18 @@ namespace banggame {
         auto &table_tokens = m_game->tokens[token_type];
         auto &card_tokens = tokens[token_type];
 
-        num_tokens = std::min<int>({ num_tokens, table_tokens, get_max_tokens(token_type) - card_tokens });
+        if (table_tokens < num_tokens) {
+            num_tokens = table_tokens;
+        }
+        if (token_type == card_token_type::cube) {
+            num_tokens = std::min<int>(num_tokens, max_cubes - card_tokens);
+        }
+
         if (num_tokens > 0) {
             table_tokens -= num_tokens;
             card_tokens += num_tokens;
-            switch (token_type) {
-            case card_token_type::cube:
+            if (token_type == card_token_type::cube) {
                 m_game->add_log("LOG_ADD_CUBE", owner, this, num_tokens);
-                break;
             }
             m_game->add_update<"move_tokens">(token_type, num_tokens, nullptr, this, num_tokens == 1 ? durations.move_token : durations.move_tokens);
         }
@@ -152,32 +148,30 @@ namespace banggame {
         auto &target_tokens = target ? target->tokens[token_type] : table_tokens;
         auto &card_tokens = tokens[token_type];
 
-        int max_tokens = get_max_tokens(token_type);
-
-        num_tokens = std::min<int>(num_tokens, card_tokens);
-        if (target && num_tokens > 0 && target_tokens < max_tokens) {
-            int added_tokens = std::min<int>(num_tokens, max_tokens - target_tokens);
+        if (card_tokens < num_tokens) {
+            num_tokens = card_tokens;
+        }
+        if (target && num_tokens > 0 && (token_type != card_token_type::cube || target_tokens < max_cubes)) {
+            int added_tokens = token_type == card_token_type::cube
+                ? std::min<int>(num_tokens, max_cubes - target_tokens)
+                : num_tokens;
             target_tokens += added_tokens;
             card_tokens -= added_tokens;
             num_tokens -= added_tokens;
-            switch (token_type) {
-            case card_token_type::cube:
+            if (token_type == card_token_type::cube) {
                 if (owner == target->owner) {
                     m_game->add_log("LOG_MOVED_CUBE", target->owner, this, target, added_tokens);
                 } else {
                     m_game->add_log("LOG_MOVED_CUBE_FROM", target->owner, owner, this, target, added_tokens);
                 }
-                break;
             }
             m_game->add_update<"move_tokens">(token_type, added_tokens, this, target, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens);
         }
         if (num_tokens > 0) {
             card_tokens -= num_tokens;
             table_tokens += num_tokens;
-            switch (token_type) {
-            case card_token_type::cube:
+            if (token_type == card_token_type::cube) {
                 m_game->add_log("LOG_PAID_CUBE", owner, this, num_tokens);
-                break;
             }
             m_game->add_update<"move_tokens">(token_type, num_tokens, this, nullptr, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens);
         }

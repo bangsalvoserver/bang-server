@@ -6,8 +6,6 @@
 
 namespace banggame {
 
-    static const int max_cubes = card::get_max_tokens(card_token_type::cube);
-    
     struct request_add_cube : request_picking {
         request_add_cube(card_ptr origin_card, player_ptr target, int ncubes = 1)
             : request_picking(origin_card, nullptr, target)

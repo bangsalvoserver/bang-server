@@ -17,6 +17,8 @@ namespace banggame {
         show_owner
     };
     
+    static constexpr int max_cubes = 4;
+    
     struct card : card_data {
         card(game *game, int id, const card_data &data)
             : card_data(data), m_game(game), order(id), id(id) {}
@@ -43,8 +45,6 @@ namespace banggame {
 
         void flash_card();
         void add_short_pause();
-        
-        static int get_max_tokens(card_token_type token_type);
 
         int num_tokens(card_token_type token_type) const;
         void add_tokens(card_token_type token_type, int num_tokens);

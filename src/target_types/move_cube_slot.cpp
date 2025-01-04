@@ -10,7 +10,7 @@ namespace banggame {
         return origin->m_table
             | rv::filter(&card::is_orange)
             | rv::for_each([](card_ptr slot) {
-                return rv::repeat_n(slot, card::get_max_tokens(card_token_type::cube) - slot->num_cubes());
+                return rv::repeat_n(slot, max_cubes - slot->num_cubes());
             });
     }
 
@@ -47,7 +47,7 @@ namespace banggame {
             for (card_ptr target : targets) {
                 if (target == target_card) ++count;
             }
-            if (count > card::get_max_tokens(card_token_type::cube)) {
+            if (count > max_cubes) {
                 return {"ERROR_CARD_HAS_FULL_CUBES", target_card};
             }
         }
