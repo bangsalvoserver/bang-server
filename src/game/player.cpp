@@ -176,7 +176,9 @@ namespace banggame {
                     target->move_to(pocket_type::train);
                 } else {
                     target->move_to(pocket_type::train_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
-                    target->set_visibility(card_visibility::hidden, nullptr, true);
+                    m_game->queue_action([target]{
+                        target->set_visibility(card_visibility::hidden, nullptr, true);
+                    }, -1);
                 }
             } else if (target->is_black()) {
                 target->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
