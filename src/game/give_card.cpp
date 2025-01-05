@@ -79,7 +79,7 @@ namespace banggame {
             break;
         }
         case card_deck_type::goldrush: {
-            target->m_game->m_shop_selection.front()->move_to(pocket_type::shop_discard);
+            target->m_game->m_shop_selection.front()->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
             target_card->move_to(pocket_type::shop_selection);
             break;
         }

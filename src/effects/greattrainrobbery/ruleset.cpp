@@ -59,6 +59,9 @@ namespace banggame {
 
         if (!origin->m_game->m_train_deck.empty()) {
             origin->m_game->shuffle_cards_and_ids(origin->m_game->m_train_deck);
+            origin->m_game->add_log("LOG_TRAIN_RESHUFFLED");
+            origin->m_game->play_sound("shuffle");
+            origin->m_game->add_update<"deck_shuffled">(pocket_type::train_deck);
         }
         
         origin->m_game->add_update<"remove_cards">(origin->m_game->m_stations);

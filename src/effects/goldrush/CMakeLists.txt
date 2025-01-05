@@ -1,5 +1,4 @@
 target_sources(bangserver PRIVATE
-    add_gold.cpp
     discard_black.cpp
     discount.cpp
     don_bell.cpp

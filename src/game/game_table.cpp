@@ -59,7 +59,6 @@ namespace banggame {
         case pocket_type::selection:         return m_selection;
         case pocket_type::shop_deck:         return m_shop_deck;
         case pocket_type::shop_selection:    return m_shop_selection;
-        case pocket_type::shop_discard:      return m_shop_discards;
         case pocket_type::hidden_deck:       return m_hidden_deck;
         case pocket_type::scenario_deck:     return m_scenario_deck;
         case pocket_type::scenario_card:     return m_scenario_cards;
@@ -149,14 +148,10 @@ namespace banggame {
 
     card_ptr game_table::draw_shop_card() {
         if (m_shop_deck.empty()) {
-            if (m_shop_discards.empty()) {
-                throw game_error("Shop deck is empty. Cannot reshuffle");
-            }
-            m_shop_deck = std::move(m_shop_discards);
-            m_shop_discards.clear();
+            throw game_error("Shop deck is empty. Cannot reshuffle");
+        }
+        if (m_shop_deck.back()->visibility == card_visibility::shown) {
             for (card_ptr c : m_shop_deck) {
-                c->pocket = pocket_type::shop_deck;
-                c->owner = nullptr;
                 c->visibility = card_visibility::hidden;
             }
             shuffle_cards_and_ids(m_shop_deck);
