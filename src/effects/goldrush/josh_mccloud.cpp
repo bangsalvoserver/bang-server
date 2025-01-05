@@ -21,7 +21,7 @@ namespace banggame {
                     && rn::all_of(target_card->responses, [](const effect_holder &holder) { return holder.target == TARGET_TYPE(none); })
                 ) {
                     target->m_game->add_log("LOG_PLAYED_CARD", target_card, target);
-                    target_card->move_to(pocket_type::shop_discard);
+                    target_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
                     
                     for (const effect_holder &effect : target_card->responses) {
                         play_dispatch::play(target, target_card, effect, {}, utils::tag<"none">{});
@@ -30,7 +30,7 @@ namespace banggame {
             } else {
                 target->m_game->pop_request();
                 target_card->add_short_pause();
-                target_card->move_to(pocket_type::shop_discard);
+                target_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
             }
         }
 
@@ -69,7 +69,7 @@ namespace banggame {
             if (get_all_equip_targets(target, target_card).empty()) {
                 target->m_game->pop_request();
                 target_card->add_short_pause();
-                target_card->move_to(pocket_type::shop_discard);
+                target_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
             } else if (target_card->self_equippable()) {
                 on_pick(target);
             }

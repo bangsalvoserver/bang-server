@@ -203,7 +203,6 @@ namespace banggame {
         discard_pile,
         selection,
         shop_deck,
-        shop_discard,
         shop_selection,
         hidden_deck,
         scenario_deck,

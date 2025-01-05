@@ -5,6 +5,7 @@
 #include "effects/base/damage.h"
 
 namespace banggame {
+    
     void ruleset_goldrush::on_apply(game *game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 2}, [](player_ptr origin){
             for (int i=0; i<3; ++i) {
@@ -23,5 +24,9 @@ namespace banggame {
                 origin->m_game->draw_shop_card();
             }
         });
+    }
+
+    void effect_add_gold::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        target->add_gold(amount);
     }
 }

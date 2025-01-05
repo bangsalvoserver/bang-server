@@ -1,7 +1,6 @@
 #ifndef __GOLDRUSH_EFFECTS_H__
 #define __GOLDRUSH_EFFECTS_H__
 
-#include "add_gold.h"
 #include "discard_black.h"
 #include "discount.h"
 #include "don_bell.h"

@@ -179,7 +179,7 @@ namespace banggame {
                     target->set_visibility(card_visibility::hidden, nullptr, true);
                 }
             } else if (target->is_black()) {
-                target->move_to(pocket_type::shop_discard);
+                target->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
             } else {
                 target->move_to(pocket_type::discard_pile);
                 m_game->call_event(event_type::on_discard_any_card{ this, target });

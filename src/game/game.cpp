@@ -74,7 +74,6 @@ namespace banggame {
 
         co_yield std::ranges::elements_of(add_cards(pocket_type::discard_pile));
         co_yield std::ranges::elements_of(add_cards(pocket_type::selection));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::shop_discard));
         co_yield std::ranges::elements_of(add_cards(pocket_type::shop_selection));
         co_yield std::ranges::elements_of(add_cards(pocket_type::hidden_deck));
 

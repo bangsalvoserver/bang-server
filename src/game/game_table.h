@@ -30,7 +30,6 @@ namespace banggame {
         card_list m_selection;
 
         card_list m_shop_deck;
-        card_list m_shop_discards;
         card_list m_hidden_deck;
         card_list m_shop_selection;
         card_list m_button_row;
