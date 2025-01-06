@@ -133,6 +133,13 @@ namespace banggame {
             target->m_game->pop_request();
         }
 
+        prompt_string resolve_prompt() const override {
+            if (target->is_bot()) {
+                return "BOT_BAD_PLAY";
+            }
+            return {};
+        }
+
         bool can_pick(const_card_ptr target_card) const override {
             if (target->m_game->m_feats_deck.empty()) {
                 return target_card->pocket == pocket_type::feats_discard;
