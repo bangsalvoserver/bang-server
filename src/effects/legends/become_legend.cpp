@@ -48,6 +48,8 @@ namespace banggame {
         card_ptr old_character = origin->first_character();
         card_ptr legend_character = find_legend_character(old_character);
 
+        origin->m_game->add_log("LOG_BECOME_LEGEND", origin, legend_character);
+
         origin->m_game->add_update<"remove_cards">(origin->m_characters);
         origin->m_characters = std::vector{ legend_character };
         origin->m_game->add_update<"add_cards">(origin->m_characters, pocket_type::player_character, origin);
