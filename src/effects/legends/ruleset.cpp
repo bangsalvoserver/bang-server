@@ -114,9 +114,9 @@ namespace banggame {
 
         game_string status_text(player_ptr owner) const override {
             if (owner == target) {
-                return {"STATUS_BOAST_ADD_FAME", origin_card};
+                return "STATUS_BOAST_ADD_FAME";
             } else {
-                return {"STATUS_BOAST_ADD_FAME_OTHER", origin_card, target};
+                return {"STATUS_BOAST_ADD_FAME_OTHER", target};
             }
         }
     };
@@ -152,9 +152,9 @@ namespace banggame {
 
         game_string status_text(player_ptr owner) const override {
             if (owner == target) {
-                return {"STATUS_BOAST_FEAT", origin_card};
+                return "STATUS_BOAST_FEAT";
             } else {
-                return {"STATUS_BOAST_FEAT_OTHER", origin_card, target};
+                return {"STATUS_BOAST_FEAT_OTHER", target};
             }
         }
     };
