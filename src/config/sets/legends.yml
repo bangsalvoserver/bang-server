@@ -213,8 +213,7 @@ feats:
 button_row:
   - name: ESCAPE_JAIL
     responses:
-      - discard card self | hand hearts
-      - escape_jail
+      - escape_jail card self | hand hearts
   - name: BECOME_LEGEND
     effects:
       - become_legend
