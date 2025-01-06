@@ -102,6 +102,7 @@ namespace banggame {
 
         if (origin_card->deck == card_deck_type::feats) {
             if (origin->first_character()->deck == card_deck_type::legends) {
+                origin->m_game->add_log("LOG_FEAT_CLAIMED", origin, origin_card);
                 origin->m_game->queue_request<request_damage_legend>(origin);
                 origin->m_game->queue_action([=]{
                     origin_card->drop_all_tokens();
