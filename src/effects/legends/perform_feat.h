@@ -17,6 +17,10 @@ namespace banggame {
         };
     }
 
+    int get_count_performed_feats(player_ptr origin);
+    bool is_legend(const_player_ptr origin);
+    std::pair<card_token_type, int> get_card_fame_token_type(const_card_ptr origin_card);
+
     struct effect_perform_feat {
         bool can_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin);
