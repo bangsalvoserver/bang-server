@@ -84,7 +84,7 @@ namespace banggame {
     void effect_damage_legend::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
         origin->m_game->pop_request();
         target->m_game->add_log("LOG_DAMAGED_LEGEND", origin, target);
-        target->damage(nullptr, origin, 1);
+        target->damage(origin_card, origin, 1);
     }
 
     void effect_perform_feat::on_play(card_ptr origin_card, player_ptr origin) {

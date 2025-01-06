@@ -227,7 +227,7 @@ hidden:
       - bang player reachable notself
     tags:
       - preselect
-  - name: DAMAGE_LEGEND
+  - name: CLAIM_FEAT
     responses:
       - damage_legend player legend notself
     tags:
