@@ -2,6 +2,7 @@
 
 #include "ruleset.h"
 
+#include "effects/base/can_play_card.h"
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"
 
@@ -36,21 +37,9 @@ namespace banggame {
         return get_count_performed_feats(origin) == 0;
     }
 
-    struct request_damage_legend : request_resolvable {
+    struct request_damage_legend : request_can_play_card {
         request_damage_legend(player_ptr target)
-            : request_resolvable{nullptr, nullptr, target} {}
-
-        void on_update() override {
-            auto_resolve();
-        }
-
-        int resolve_type() const override {
-            return 1;
-        }
-
-        void on_resolve() override {
-            target->m_game->pop_request();
-        }
+            : request_can_play_card{nullptr, nullptr, target} {}
 
         game_string status_text(player_ptr owner) const override {
             if (owner == target) {
