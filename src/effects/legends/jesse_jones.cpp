@@ -30,6 +30,8 @@ namespace banggame {
             while (!target->m_game->m_selection.empty()) {
                 origin->add_to_hand(target->m_game->m_selection.front());
             }
+
+            target->m_game->call_event(event_type::on_discard_hand_card{ origin, target_card, false });
         }
 
         game_string status_text(player_ptr owner) const override {
