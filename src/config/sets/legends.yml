@@ -231,11 +231,3 @@ hidden:
       - damage_legend player legend notself
     tags:
       - preselect
-    
-# TODO ruleset di legends
-#
-# attiva feat:
-#  NOTE da tenere traccia, deve succedere max una volta per turno
-#  request_perform_feat: pickable su carta feat "attivata" e resolvable (2 - dismiss)
-#    on_resolve -> pop_request
-#    on_pick: effect_perform_feat

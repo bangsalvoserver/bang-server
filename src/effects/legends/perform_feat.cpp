@@ -76,6 +76,50 @@ namespace banggame {
         target->damage(origin_card, origin, 1);
     }
 
+    struct request_perform_feat : request_resolvable, interface_picking {
+        request_perform_feat(card_ptr origin_card, player_ptr target)
+            : request_resolvable{origin_card, nullptr, target} {}
+
+        int resolve_type() const override {
+            return 1;
+        }
+
+        void on_resolve() override {
+            target->m_game->pop_request();
+        }
+
+        bool can_pick(const_card_ptr target_card) const override {
+            return target_card == origin_card;
+        }
+
+        void on_pick(card_ptr target_card) override {
+            target->m_game->pop_request();
+            effect_perform_feat{}.on_play(origin_card, target);
+        }
+
+        game_string status_text(player_ptr owner) const override {
+            if (target->first_character()->deck == card_deck_type::legends) {
+                if (owner == target) {
+                    return {"STATUS_CLAIM_FEAT", origin_card};
+                } else {
+                    return {"STATUS_CLAIM_FEAT_OTHER", origin_card, target};
+                }
+            } else {
+                if (owner == target) {
+                    return {"STATUS_PERFORM_FEAT", origin_card};
+                } else {
+                    return {"STATUS_PERFORM_FEAT_OTHER", origin_card, target};
+                }
+            }
+        }
+    };
+
+    void queue_request_perform_feat(card_ptr origin_card, player_ptr target) {
+        if (effect_perform_feat{}.can_play(origin_card, target)) {
+            target->m_game->queue_request<request_perform_feat>(origin_card, target);
+        }
+    }
+
     void effect_perform_feat::on_play(card_ptr origin_card, player_ptr origin) {
         event_card_key key{origin_card, 5};
         origin->m_game->add_listener<event_type::count_performed_feats>(key, [=](player_ptr p, int &num_feats) {
