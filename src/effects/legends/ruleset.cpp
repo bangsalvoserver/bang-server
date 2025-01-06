@@ -201,8 +201,12 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_turn_end>({nullptr, 20}, [](player_ptr origin, bool skipped) {
-            if (origin->first_character()->deck != card_deck_type::legends && get_count_performed_feats(origin) == 0) {
-                origin->m_game->queue_request<request_boast_feat>(origin);
+            card_ptr character_card = origin->first_character();
+            if (character_card->deck != card_deck_type::legends && get_count_performed_feats(origin) == 0) {
+                auto [token, count] = get_card_fame_token_type(character_card);
+                if (count != 0) {
+                    origin->m_game->queue_request<request_boast_feat>(origin);
+                }
             }
         });
     }
