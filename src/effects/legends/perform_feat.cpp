@@ -27,8 +27,9 @@ namespace banggame {
     }
 
     bool effect_perform_feat::can_play(card_ptr origin_card, player_ptr origin) {
-        if (origin_card->deck == card_deck_type::feats && origin->first_character()->deck != card_deck_type::legends) {
-            auto [token, count] = get_card_fame_token_type(origin->first_character());
+        card_ptr character_card = origin->first_character();
+        if (origin_card->deck == card_deck_type::feats && character_card->deck != card_deck_type::legends) {
+            auto [token, count] = get_card_fame_token_type(character_card);
             if (count == 0) {
                 return false;
             }
@@ -134,7 +135,8 @@ namespace banggame {
         });
 
         if (origin_card->deck == card_deck_type::feats) {
-            if (origin->first_character()->deck == card_deck_type::legends) {
+            card_ptr character_card = origin->first_character();
+            if (character_card->deck == card_deck_type::legends) {
                 origin->m_game->add_log("LOG_FEAT_CLAIMED", origin, origin_card);
                 origin->m_game->queue_request<request_damage_legend>(origin);
                 origin->m_game->queue_action([=]{
@@ -143,10 +145,11 @@ namespace banggame {
                     draw_next_feat(origin);
                 });
             } else {
-                card_ptr character_card = origin->first_character();
-                auto [token, count] = get_card_fame_token_type(character_card);
                 origin->m_game->add_log("LOG_FEAT_PERFORMED", origin, origin_card);
-                character_card->move_tokens(token, origin_card, std::min<int>(count, 2));
+                origin->m_game->queue_action([=]{
+                    auto [token, count] = get_card_fame_token_type(character_card);
+                    character_card->move_tokens(token, origin_card, std::min<int>(count, 2));
+                });
             }
         }
     }
