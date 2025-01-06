@@ -188,8 +188,9 @@ feats:
       - perform_feat
   - name: THE_OREGON_TRAIN
     image: 23_la_pista_dell_oregon
-    # TODO crocevia: - add_draw_card -> feat
-    effects:
+    responses:
+      - add_draw_card
+      - no_cards_drawn
       - perform_feat
   - name: A_THOUSAND_WAYS_TO_DIE
     image: 23_mille_modi_per_morire
