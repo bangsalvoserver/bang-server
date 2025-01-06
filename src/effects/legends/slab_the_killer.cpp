@@ -15,7 +15,7 @@ namespace banggame {
             }
         });
 
-        origin->m_game->add_listener<event_type::check_claim_feat_kill>(origin_card, [=](player_ptr target, bool &value) {
+        origin->m_game->add_listener<event_type::check_damage_legend_kill>(origin_card, [=](player_ptr target, bool &value) {
             if (origin == target) {
                 value = true;
             }

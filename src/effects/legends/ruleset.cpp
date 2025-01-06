@@ -201,7 +201,7 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_turn_end>({nullptr, 20}, [](player_ptr origin, bool skipped) {
-            if (!is_legend(origin) && get_count_performed_feats(origin) == 0) {
+            if (origin->first_character()->deck != card_deck_type::legends && get_count_performed_feats(origin) == 0) {
                 origin->m_game->queue_request<request_boast_feat>(origin);
             }
         });

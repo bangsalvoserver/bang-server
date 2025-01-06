@@ -3,6 +3,7 @@
 #include "ruleset.h"
 
 #include "effects/base/pick.h"
+#include "effects/base/resolve.h"
 
 #include "game/game.h"
 #include "game/prompts.h"
@@ -14,10 +15,6 @@ namespace banggame {
         origin->m_game->call_event(event_type::count_performed_feats{origin, num_feats});
         return num_feats;
     }
-    
-    bool is_legend(const_player_ptr origin) {
-        return origin->first_character()->deck == card_deck_type::legends;
-    }
 
     std::pair<card_token_type, int> get_card_fame_token_type(const_card_ptr origin_card) {
         for (const auto &[token, count] : origin_card->tokens) {
@@ -28,69 +25,67 @@ namespace banggame {
         return {card_token_type::cube, 0};
     }
 
-    static bool can_claim_feat_on(player_ptr origin, const_player_ptr target) {
-        if (target != origin && is_legend(target)) {
-            if (target->m_hp > 1) {
-                return true;
-            } else {
-                bool can_kill = false;
-                origin->m_game->call_event(event_type::check_claim_feat_kill{origin, can_kill});
-                return can_kill;
-            }
-        }
-        return false;
-    }
-
     bool effect_perform_feat::can_play(card_ptr origin_card, player_ptr origin) {
-        if (origin_card->deck == card_deck_type::feats) {
-            if (is_legend(origin)) {
-                if (rn::none_of(origin->m_game->m_players, [&](const_player_ptr target) {
-                    return can_claim_feat_on(origin, target);
-                })) {
-                    return false;
-                }
-            } else {
-                auto [token, count] = get_card_fame_token_type(origin->first_character());
-                if (count == 0) {
-                    return false;
-                }
+        if (origin_card->deck == card_deck_type::feats && origin->first_character()->deck != card_deck_type::legends) {
+            auto [token, count] = get_card_fame_token_type(origin->first_character());
+            if (count == 0) {
+                return false;
             }
         }
 
         return get_count_performed_feats(origin) == 0;
     }
 
-    struct request_claim_feat : request_picking_player {
-        using request_picking_player::request_picking_player;
+    struct request_damage_legend : request_resolvable {
+        request_damage_legend(player_ptr target)
+            : request_resolvable{nullptr, nullptr, target} {}
 
-        bool can_pick(const_player_ptr target_player) const override {
-            return can_claim_feat_on(target, target_player);
+        void on_update() override {
+            auto_resolve();
         }
 
-        void on_pick(player_ptr target_player) override {
+        int resolve_type() const override {
+            return 1;
+        }
+
+        void on_resolve() override {
             target->m_game->pop_request();
-            target->m_game->add_log("LOG_FEAT_CLAIMED", target, target_player);
-            target_player->damage(origin_card, target, 1);
-            target->m_game->queue_action([origin_card=origin_card, target=target]{
-                origin_card->drop_all_tokens();
-                origin_card->move_to(pocket_type::feats_discard);
-                draw_next_feat(target);
-            });
-        }
-        
-        prompt_string pick_prompt(player_ptr target_player) const override {
-            MAYBE_RETURN(prompts::bot_check_target_enemy(target, target_player));
-            return {};
         }
 
         game_string status_text(player_ptr owner) const override {
             if (owner == target) {
-                return {"STATUS_CLAIM_FEAT", origin_card};
+                return "STATUS_DAMAGE_LEGEND";
             } else {
-                return {"STATUS_CLAIM_FEAT_OTHER", origin_card, target};
+                return {"STATUS_DAMAGE_LEGEND_OTHER", target};
             }
         }
     };
+
+    bool effect_damage_legend::can_play(card_ptr origin_card, player_ptr origin) {
+        return origin->m_game->top_request<request_damage_legend>(target_is{origin}) != nullptr;
+    }
+
+    game_string effect_damage_legend::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        if (target->m_hp <= 1) {
+            bool can_kill = false;
+            target->m_game->call_event(event_type::check_damage_legend_kill{target, can_kill});
+            if (!can_kill) {
+                return "ERROR_DAMAGE_LEGEND_KILL";
+            }
+        }
+        return {};
+    }
+
+    game_string effect_damage_legend::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+        return {};
+    }
+
+    void effect_damage_legend::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        origin->m_game->pop_request();
+        target->m_game->add_log("LOG_DAMAGED_LEGEND", origin, target);
+        target->damage(nullptr, origin, 1);
+    }
 
     void effect_perform_feat::on_play(card_ptr origin_card, player_ptr origin) {
         event_card_key key{origin_card, 5};
@@ -106,8 +101,13 @@ namespace banggame {
         });
 
         if (origin_card->deck == card_deck_type::feats) {
-            if (is_legend(origin)) {
-                origin->m_game->queue_request<request_claim_feat>(origin_card, origin, origin);
+            if (origin->first_character()->deck == card_deck_type::legends) {
+                origin->m_game->queue_request<request_damage_legend>(origin);
+                origin->m_game->queue_action([=]{
+                    origin_card->drop_all_tokens();
+                    origin_card->move_to(pocket_type::feats_discard);
+                    draw_next_feat(origin);
+                });
             } else {
                 card_ptr character_card = origin->first_character();
                 auto [token, count] = get_card_fame_token_type(character_card);

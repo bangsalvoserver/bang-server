@@ -227,6 +227,11 @@ hidden:
       - bang player reachable notself
     tags:
       - preselect
+  - name: DAMAGE_LEGEND
+    responses:
+      - damage_legend player legend notself
+    tags:
+      - preselect
     
 # TODO ruleset di legends
 #

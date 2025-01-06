@@ -11,14 +11,13 @@ namespace banggame {
             nullable_ref<int> num_feats;
         };
 
-        struct check_claim_feat_kill {
+        struct check_damage_legend_kill {
             player_ptr origin;
             nullable_ref<bool> value;
         };
     }
 
     int get_count_performed_feats(player_ptr origin);
-    bool is_legend(const_player_ptr origin);
     std::pair<card_token_type, int> get_card_fame_token_type(const_card_ptr origin_card);
 
     struct effect_perform_feat {
@@ -27,6 +26,15 @@ namespace banggame {
     };
     
     DEFINE_EFFECT(perform_feat, effect_perform_feat)
+
+    struct effect_damage_legend {
+        bool can_play(card_ptr origin_card, player_ptr origin);
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+    };
+
+    DEFINE_EFFECT(damage_legend, effect_damage_legend)
 
 }
 
