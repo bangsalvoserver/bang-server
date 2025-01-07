@@ -48,6 +48,7 @@ legends:
   - name: KIT_CARLSON
     image: 23_kit_carlson
     equip:
+      - pickaxe
       - kit_carlson_legend
     responses:
       - kit_carlson_legend_response
