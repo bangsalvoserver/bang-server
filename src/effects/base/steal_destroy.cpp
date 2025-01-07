@@ -1,5 +1,7 @@
 #include "steal_destroy.h"
 
+#include "requests.h"
+
 #include "game/game.h"
 #include "game/filters.h"
 #include "game/prompts.h"
@@ -157,6 +159,10 @@ namespace banggame {
             origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_player, target_card);
         }
         target_player->discard_card(target_card, used);
+    }
+    
+    void effect_discard_hand::on_play(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->queue_request<request_discard_hand>(origin_card, origin);
     }
 
     game_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {

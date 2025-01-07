@@ -175,7 +175,7 @@ feats:
   - name: BORDERLANDS
     image: 23_la_frontiera
     effects:
-      - borderlands
+      - discard_hand
       - perform_feat
   - name: THE_OREGON_TRAIL
     image: 23_la_pista_dell_oregon
