@@ -15,6 +15,7 @@
 #include "dynamite.h"
 #include "el_gringo.h"
 #include "generalstore.h"
+#include "gift_card.h"
 #include "heal.h"
 #include "lucky_duke.h"
 #include "indians.h"

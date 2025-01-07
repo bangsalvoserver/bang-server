@@ -8,7 +8,8 @@ namespace banggame {
     enum class card_taker_type {
         dead_players,
         discards,
-        draw_checks
+        draw_check_start,
+        draw_check_select
     };
 
     namespace event_type {

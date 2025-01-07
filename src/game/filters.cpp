@@ -29,6 +29,9 @@ namespace banggame {
 
         if (filter.check(target_player_filter::notsheriff) && target->m_role == player_role::sheriff)
             return {"ERROR_TARGET_SHERIFF", origin_card, target};
+        
+        if (filter.check(target_player_filter::legend) && target->first_character()->deck != card_deck_type::legends)
+            return {"ERROR_TARGET_NOT_LEGEND", origin_card, target};
 
         if (filter.check(target_player_filter::not_empty_hand) && target->empty_hand())
             return {"ERROR_TARGET_EMPTY_HAND", origin_card, target};
@@ -46,7 +49,9 @@ namespace banggame {
             }
         }
 
-        if (!ctx.ignore_distances && (filter.check(target_player_filter::reachable) || filter.check(target_player_filter::range_1) || filter.check(target_player_filter::range_2))) {
+        if (!ctx.ignore_distances && !origin->check_player_flags(player_flag::ignore_distances)
+            && (filter.check(target_player_filter::reachable) || filter.check(target_player_filter::range_1) || filter.check(target_player_filter::range_2))
+        ) {
             int range = origin->get_range_mod();
             if (filter.check(target_player_filter::reachable)) {
                 int weapon_range = origin->get_weapon_range();

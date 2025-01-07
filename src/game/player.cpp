@@ -12,6 +12,7 @@
 #include "effects/base/bang.h"
 #include "effects/base/damage.h"
 #include "effects/base/draw.h"
+#include "effects/base/heal.h"
 #include "effects/base/predraw_check.h"
 #include "effects/base/requests.h"
 
@@ -63,10 +64,6 @@ namespace banggame {
 
     void player::play_sound(std::string_view sound_id) {
         m_game->add_update<"play_sound">(update_target::includes_private(this), std::string(sound_id));
-    }
-
-    int player::get_initial_cards() const {
-        return first_character()->get_tag_value(tag_type::initial_cards).value_or(m_hp);
     }
 
     int player::max_cards_end_of_turn() const {
@@ -159,7 +156,7 @@ namespace banggame {
             if (target_card->pocket == pocket_type::player_table) {
                 target_card->set_inactive(false);
                 owner->disable_equip(target_card);
-                target_card->drop_cubes();
+                target_card->drop_all_cubes();
                 return true;
             } else if (target_card->pocket == pocket_type::player_hand) {
                 owner->m_game->call_event(event_type::on_discard_hand_card{ owner, target_card, used });
@@ -205,6 +202,7 @@ namespace banggame {
         if (is_ghost() || m_hp == m_max_hp) return;
         m_game->add_log("LOG_HEALED", this, value);
         set_hp(std::min<int>(m_hp + value, m_max_hp));
+        m_game->call_event(event_type::on_heal{ this });
     }
 
     void player::set_hp(int value, bool instant) {
@@ -286,14 +284,14 @@ namespace banggame {
         m_game->queue_action([this]{
             m_game->call_event(event_type::pre_turn_start{ this });
             m_game->queue_request<request_predraw>(this);
-        }, -10);
+        }, -30);
 
         m_game->queue_action([this]{
             if (alive() && m_game->m_playing == this) {
                 m_game->call_event(event_type::on_turn_start{ this });
                 m_game->queue_request<request_draw>(this);
             }
-        }, -10);
+        }, -30);
     }
 
     void player::pass_turn() {
@@ -310,14 +308,19 @@ namespace banggame {
                     add_player_flags(player_flag::extra_turn);
                     start_of_turn();
                 }
-            }, -5);
+            }, -10);
         }
     }
 
     void player::skip_turn() {
-        remove_player_flags(player_flag::extra_turn);
-        m_game->call_event(event_type::on_turn_end{ this, true });
-        m_game->start_next_turn();
+        m_game->queue_action([this]{
+            m_game->add_log("LOG_SKIP_TURN", this);
+            remove_player_flags(player_flag::extra_turn);
+            m_game->call_event(event_type::on_turn_end{ this, true });
+        });
+        m_game->queue_action([this]{
+            m_game->start_next_turn();
+        });
     }
 
     void player::remove_extra_characters() {

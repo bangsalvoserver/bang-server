@@ -9,15 +9,10 @@
 namespace banggame {
 
     bool effect_ms_abigail::can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) {
-        if (origin && origin_card
+        return origin && origin_card
             && origin_card->is_brown()
             && flags.check(effect_flag::single_target)
-        ) {
-            auto rank = origin_card->get_modified_sign().rank;
-            return enums::indexof(rank) >= enums::indexof(card_rank::rank_J)
-                && enums::indexof(rank) <= enums::indexof(card_rank::rank_A);
-        }
-        return false;
+            && origin_card->get_modified_sign().is_jack_to_ace();
     }
 
     void equip_ms_abigail::on_enable(card_ptr origin_card, player_ptr origin) {

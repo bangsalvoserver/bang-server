@@ -59,8 +59,6 @@ namespace banggame {
         }
         void steal_card(card_ptr target);
 
-        int get_initial_cards() const;
-
         int max_cards_end_of_turn() const;
 
         int get_num_checks() const;

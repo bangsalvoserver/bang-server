@@ -32,8 +32,8 @@ namespace banggame {
             }
         }
 
-        int resolve_type() const override {
-            return 1;
+        resolve_type get_resolve_type() const override {
+            return resolve_type::dismiss;
         }
 
         prompt_string resolve_prompt() const override {

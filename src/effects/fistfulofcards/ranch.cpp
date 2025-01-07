@@ -11,16 +11,15 @@ namespace banggame {
 
     struct request_ranch : request_resolvable {
         request_ranch(card_ptr target_card, player_ptr target)
-            : request_resolvable(target_card, nullptr, target, {}, -8) {}
-        
+            : request_resolvable(target_card, nullptr, target, {}, -25) {}        
         void on_update() override {
             if (!target->alive() || target->empty_hand() || target->m_game->m_playing != target) {
                 target->m_game->pop_request();
             }
         }
 
-        int resolve_type() const override {
-            return 1;
+        resolve_type get_resolve_type() const override {
+            return resolve_type::dismiss;
         }
 
         void on_resolve() override {

@@ -21,10 +21,12 @@ namespace banggame {
 
     struct request_predraw : request_picking {
         request_predraw(player_ptr target)
-            : request_picking(nullptr, nullptr, target, {}, -7) {}
+            : request_picking(nullptr, nullptr, target, {}, -20) {}
 
         std::vector<event_card_key> checks;
 
+        void remove_check(card_ptr target_card);
+        
         void on_update() override;
         bool can_pick(const_card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;

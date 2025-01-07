@@ -22,6 +22,7 @@ add_custom_command(
         sets/wildwestshow.yml
         sets/thebullet.yml
         sets/canyondiablo.yml
+        sets/legends.yml
         parse_bang_cards.py
         cpp_generator.py
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"

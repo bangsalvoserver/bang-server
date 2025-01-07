@@ -8,7 +8,7 @@ namespace banggame {
 
     struct request_newidentity : request_picking {
         request_newidentity(card_ptr origin_card, player_ptr target)
-            : request_picking(origin_card, nullptr, target, {}, -7) {}
+            : request_picking(origin_card, nullptr, target, {}, -20) {}
 
         void on_update() override {
             if (target->alive() && target->m_game->m_playing == target) {
@@ -39,7 +39,10 @@ namespace banggame {
                 old_character->set_visibility(card_visibility::hidden, target);
                 old_character->move_to(pocket_type::player_backup, target, card_visibility::hidden, true);
                 target_card->move_to(pocket_type::player_character, target, card_visibility::shown);
-                old_character->move_cubes(target_card, old_character->num_cubes, true);
+                
+                for (const auto &[token, count] : old_character->tokens) {
+                    old_character->move_tokens(token, target_card, count, true);
+                }
 
                 target->reset_max_hp();
                 target->enable_equip(target_card);

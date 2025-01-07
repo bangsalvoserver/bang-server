@@ -59,8 +59,10 @@ namespace banggame {
                 if (c->visibility == card_visibility::shown) {
                     co_yield make_update<"show_card">(c, *c, 0ms);
                 }
-                if (c->num_cubes > 0) {
-                    co_yield make_update<"add_cubes">(c->num_cubes, c);
+                for (const auto &[token, count] : c->tokens) {
+                    if (count > 0) {
+                        co_yield make_update<"add_tokens">(token, count, c);
+                    }
                 }
                 if (c->inactive) {
                     co_yield make_update<"tap_card">(c, true, 0ms);
@@ -89,9 +91,15 @@ namespace banggame {
         co_yield std::ranges::elements_of(add_cards(pocket_type::scenario_card));
         co_yield std::ranges::elements_of(add_cards(pocket_type::wws_scenario_deck));
         co_yield std::ranges::elements_of(add_cards(pocket_type::wws_scenario_card));
+
+        co_yield std::ranges::elements_of(add_cards(pocket_type::feats_deck));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::feats_discard));
+        co_yield std::ranges::elements_of(add_cards(pocket_type::feats));
         
-        if (num_cubes > 0) {
-            co_yield make_update<"add_cubes">(num_cubes);
+        for (const auto &[token, count] : tokens) {
+            if (count > 0) {
+                co_yield make_update<"add_tokens">(token, count);
+            }
         }
 
         for (player_ptr p : m_players) {
@@ -241,6 +249,11 @@ namespace banggame {
             shuffle_cards_and_ids(m_train_deck);
             add_update<"add_cards">(m_train_deck, pocket_type::train_deck);
         }
+
+        if (add_cards(all_cards.feats, pocket_type::feats_deck)) {
+            shuffle_cards_and_ids(m_feats_deck);
+            add_update<"add_cards">(m_feats_deck, pocket_type::feats_deck);
+        }
         
         player_role roles[] = {
             player_role::sheriff,
@@ -295,6 +308,8 @@ namespace banggame {
         add_cards(all_cards.stations, pocket_type::none);
         add_cards(all_cards.locomotive, pocket_type::none);
 
+        add_cards(all_cards.legends, pocket_type::none);
+
         card_list character_ptrs;
         if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
             rn::shuffle(character_ptrs, rng);
@@ -324,10 +339,19 @@ namespace banggame {
             add_log("LOG_GAME_START");
             play_sound("gamestart");
 
-            int cycles = rn::max(m_players | rv::transform(&player::get_initial_cards));
+            auto players = range_alive_players(m_first_player);
+            auto initial_cards = players
+                | rv::transform([this](const_player_ptr p) {
+                    int ncards = p->m_hp;
+                    call_event(event_type::count_initial_cards{ p, ncards });
+                    return ncards;
+                })
+                | rn::to_vector;
+
+            int cycles = rn::max(initial_cards);
             for (int i=0; i<cycles; ++i) {
-                for (player_ptr p : range_alive_players(m_first_player)) {
-                    if (p->m_hand.size() < p->get_initial_cards()) {
+                for (const auto &[p, ncards] : rv::zip(players, initial_cards)) {
+                    if (p->m_hand.size() < ncards) {
                         p->draw_card();
                     }
                 }
@@ -524,7 +548,7 @@ namespace banggame {
                             killer->draw_card(3);
                         } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
                             target->m_game->add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                            queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy, -2);
+                            queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy, -4);
                         }
                     } else if (m_players.size() == 3 && (
                         (target->m_role == player_role::deputy_3p && killer->m_role == player_role::renegade_3p) ||
@@ -555,7 +579,7 @@ namespace banggame {
                 if (any_player_removed) {
                     add_update<"player_order">(make_player_order_update());
                 }
-            }, -3);
+            }, -6);
         }
 
         queue_action([this, killer, target] {
@@ -608,7 +632,7 @@ namespace banggame {
                     declare_winners(rv::single(killer));
                 }
             }
-        }, -4);
+        }, -8);
     }
 
 }

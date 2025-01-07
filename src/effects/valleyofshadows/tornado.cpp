@@ -5,6 +5,9 @@
 
 #include "cards/game_enums.h"
 
+#include "effects/base/pick.h"
+#include "effects/base/gift_card.h"
+
 #include "game/game.h"
 #include "game/possible_to_play.h"
 
@@ -89,15 +92,9 @@ namespace banggame {
     void handler_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {
         origin->m_game->pop_request();
         origin->m_game->queue_action([=]{
+            player_ptr target = origin->get_next_player();
             for (card_ptr target_card : target_cards) {
-                player_ptr target = origin->get_next_player();
-                if (target_card->visibility != card_visibility::shown) {
-                    origin->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, target_card);
-                    origin->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", origin, target);
-                } else {
-                    origin->m_game->add_log("LOG_GIFTED_CARD", origin, target, target_card);
-                }
-                target->steal_card(target_card);
+                handler_gift_card{}.on_play(origin_card, origin, target_card, target);
             }
         });
     }

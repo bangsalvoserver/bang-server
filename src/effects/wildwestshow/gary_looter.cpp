@@ -14,7 +14,7 @@ namespace banggame {
     }
 
     void equip_gary_looter::on_enable(card_ptr target_card, player_ptr player_end) {
-        player_end->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type, card* &value) {
+        player_end->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type, card_ptr &value) {
             if (type == card_taker_type::discards && e_target == player_end) {
                 value = target_card;
             }

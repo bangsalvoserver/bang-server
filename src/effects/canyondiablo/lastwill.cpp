@@ -5,6 +5,7 @@
 
 #include "effects/base/deathsave.h"
 #include "effects/base/resolve.h"
+#include "effects/base/gift_card.h"
 
 namespace banggame {
 
@@ -12,8 +13,8 @@ namespace banggame {
         request_lastwill(card_ptr origin_card, player_ptr target)
             : request_resolvable(origin_card, nullptr, target) {}
 
-        int resolve_type() const override {
-            return 1;
+        resolve_type get_resolve_type() const override {
+            return resolve_type::dismiss;
         }
 
         void on_resolve() override {
@@ -66,13 +67,7 @@ namespace banggame {
     void handler_lastwill::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
         origin->m_game->pop_request();
         for (card_ptr chosen_card : target_cards) {
-            if (chosen_card->visibility != card_visibility::shown) {
-                origin->m_game->add_log(update_target::includes(origin, target), "LOG_GIFTED_CARD", origin, target, chosen_card);
-                origin->m_game->add_log(update_target::excludes(origin, target), "LOG_GIFTED_A_CARD", origin, target);
-            } else {
-                origin->m_game->add_log("LOG_GIFTED_CARD", origin, target, chosen_card);
-            }
-            target->steal_card(chosen_card);
+            handler_gift_card{}.on_play(origin_card, origin, chosen_card, target);
         }
     }
 }

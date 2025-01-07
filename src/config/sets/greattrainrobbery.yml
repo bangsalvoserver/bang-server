@@ -291,6 +291,7 @@ train:
     color: train
     effects:
       - discard
+      - discard_hand
       - express_car
   - name: GHOST_CAR
     image: 27_ghost_car
@@ -432,7 +433,7 @@ hidden:
       - mail_car_response
       - none card | selection
       - none player notself
-    mth_response: mail_car(1,2)
+    mth_response: gift_card_selection(1,2)
     tags:
       - preselect
   

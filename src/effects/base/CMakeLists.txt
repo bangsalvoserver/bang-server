@@ -14,6 +14,7 @@ target_sources(bangserver PRIVATE
     dynamite.cpp
     el_gringo.cpp
     generalstore.cpp
+    gift_card.cpp
     heal.cpp
     lucky_duke.cpp
     indians.cpp

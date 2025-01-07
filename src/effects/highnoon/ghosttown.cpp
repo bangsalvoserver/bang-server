@@ -23,7 +23,7 @@ namespace banggame {
                 if (target->m_extra_turns == 0 && target->remove_player_flags(player_flag::temp_ghost) && !target->alive()) {
                     target->m_game->handle_player_death(nullptr, target, discard_all_reason::disable_temp_ghost);
                 }
-            }, -5);
+            }, -10);
         });
         origin->m_game->add_listener<event_type::count_cards_to_draw>({target_card, 2}, [](player_ptr target, int &value) {
             if (target->check_player_flags(player_flag::temp_ghost) && value == 2) {

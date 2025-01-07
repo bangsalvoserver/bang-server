@@ -3,9 +3,9 @@ character:
     image: 06_bigspencer
     equip:
       - big_spencer
+      - initial_cards(5)
     tags:
       - max_hp(9)
-      - initial_cards(5)
   - name: FLINT_WESTWOOD
     image: 06_flintwestwood
     effects:

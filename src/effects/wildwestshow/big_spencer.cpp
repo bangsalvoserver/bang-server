@@ -15,4 +15,12 @@ namespace banggame {
             }
         });
     }
+
+    void equip_initial_cards::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::count_initial_cards>(target_card, [=, ncards=ncards](const_player_ptr origin, int &value) {
+            if (origin == target) {
+                value = ncards;
+            }
+        });
+    }
 }

@@ -8,10 +8,7 @@ namespace banggame {
         player_ptr target = origin->m_game->top_request()->origin;
         effect_missed::on_play(origin_card, origin);
         if (target && target == origin->m_game->m_playing) {
-            origin->m_game->queue_action([=]{
-                target->m_game->add_log("LOG_SKIP_TURN", target);
-                target->skip_turn();
-            });
+            target->skip_turn();
         }
     }
 }

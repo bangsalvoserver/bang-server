@@ -5,6 +5,12 @@
 
 namespace banggame {
 
+    namespace event_type {
+        struct on_heal {
+            player_ptr origin;
+        };
+    }
+
     struct effect_heal {
         int amount;
         effect_heal(int value) : amount(std::max(1, value)) {}

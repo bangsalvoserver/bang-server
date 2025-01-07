@@ -9,7 +9,7 @@ namespace banggame {
         if (target_card == origin->first_character()) {
             return "ERROR_TARGET_PLAYING_CARD";
         }
-        if (target_card->num_cubes == 0) {
+        if (target_card->num_cubes() == 0) {
             return {"ERROR_NOT_ENOUGH_CUBES_ON", target_card};
         }
         return {};

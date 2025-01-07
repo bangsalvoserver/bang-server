@@ -6,7 +6,7 @@
 
 namespace banggame {
 
-    struct request_rum : request_base, draw_check_handler {
+    struct request_rum : request_base, draw_check_handler, std::enable_shared_from_this<request_rum> {
         request_rum(card_ptr origin_card, player_ptr target)
             : request_base(origin_card, nullptr, target) {}
 
@@ -68,7 +68,7 @@ namespace banggame {
 
             while (!target->m_game->m_selection.empty()) {
                 card_ptr drawn_card = target->m_game->m_selection.front();
-                target->m_game->call_event(event_type::on_draw_check_resolve{ target, drawn_card });
+                target->m_game->call_event(event_type::on_draw_check_resolve{ origin_card, target, drawn_card, nullptr });
                 if (drawn_card->pocket == pocket_type::selection) {
                     drawn_card->move_to(pocket_type::discard_pile);
                 }

@@ -1,0 +1,227 @@
+legends:
+  - name: BART_CASSIDY
+    image: 23_bart_cassidy
+    equip:
+      - bart_cassidy(2)
+  - name: BLACK_JACK
+    image: 23_black_jack
+    responses:
+      - skip_drawing
+      - black_jack_legend
+    tags:
+      - drawing
+  - name: CALAMITY_JANET
+    image: 23_calamity_janet
+    equip:
+      - treat_as_bang(2)
+    effects:
+      - banglimit
+      - set_playing card self | hand not_bangcard
+      - none player reachable notself
+    mth_effect: play_as_bang(1,2)
+    responses:
+      - set_playing card self | hand not_missedcard
+    mth_response: play_as_missed(0)
+    tags:
+      - play_as_bang
+      - banglimit
+  - name: EL_GRINGO
+    image: 23_el_gringo
+    equip:
+      - el_gringo_legend
+    tags:
+      - max_hp(3)
+  - name: JESSE_JONES
+    image: 23_jesse_jones
+    responses:
+      - add_draw_card
+      - no_cards_drawn
+      - jesse_jones_legend player notself not_empty_hand
+    tags:
+      - drawing
+  - name: JOURDONNAIS
+    image: 23_jourdonnais
+    equip:
+      - jourdonnais_legend
+    responses:
+      - jourdonnais_legend
+  - name: KIT_CARLSON
+    image: 23_kit_carlson
+    equip:
+      - pickaxe
+      - kit_carlson_legend
+    responses:
+      - kit_carlson_legend_response
+      - none card | selection
+      - none player notself
+    mth_response: gift_card_selection(1,2)
+    tags:
+      - preselect
+  - name: LUCKY_DUKE
+    image: 23_lucky_duke
+    equip:
+      - lucky_duke
+      - lucky_duke_legend
+  - name: PAUL_REGRET
+    image: 23_paul_regret
+    equip:
+      - mustang
+      - paul_regret_legend
+    tags:
+      - max_hp(3)
+  - name: PEDRO_RAMIREZ
+    image: 23_pedro_ramirez
+    equip:
+      - pedro_ramirez_legend
+  - name: ROSE_DOOLAN
+    image: 23_rose_doolan
+    equip:
+      - rose_doolan_legend
+    effects:
+      - max_usages(1)
+      - discard card self | blue
+      - steal card range_1
+  - name: SID_KETCHUM
+    image: 23_sid_ketchum
+    equip:
+      - sid_ketchum_legend
+    effects:
+      - discard cards(2) self | hand
+      - heal
+    responses:
+      - deathsave
+      - discard cards(2) self | hand
+      - heal
+  - name: SLAB_THE_KILLER
+    image: 23_slab_the_killer
+    equip:
+      - slab_the_killer_legend
+  - name: SUZY_LAFAYETTE
+    image: 23_suzy_lafayette
+    equip:
+      - suzy_lafayette(2)
+  - name: VULTURE_SAM
+    image: 23_vulture_sam
+    equip:
+      - vulture_sam
+      - vulture_sam_legend
+  - name: WILLY_THE_KID
+    image: 23_willy_the_kid
+    equip:
+      - volcanic
+    effects:
+      - perform_feat
+      - bang player reachable notself
+
+feats:
+  - name: FIFTY_GUNS
+    image: 23_cinquanta_pistole
+    equip:
+      - fifty_guns
+  - name: WOUNDED_PRIDE
+    image: 23_ferito_nell_orgoglio
+    equip:
+      - wounded_pride
+  - name: OLD_WEST_GANG
+    image: 23_gang_del_vecchio_west
+    equip:
+      - old_west_gang
+  - name: BOTTLENECK
+    image: 23_il_collo_di_bottiglia
+    equip:
+      - bottleneck
+    effects:
+      - discard card self | hand beer
+      - perform_feat
+  - name: THE_CHUCK_A_LUCK
+    image: 23_il_mulino_d_oro
+    equip:
+      - chuck_a_luck
+    effects:
+      - discard card self | hand bang
+      - perform_feat
+  - name: '3_15_TO_YOOMA'
+    image: 23_il_treno_per_yooma
+    equip:
+      - train_to_yooma
+  - name: IN_GOOD_COMPANY
+    image: 23_in_buona_compagnia
+    equip:
+      - in_good_company
+    effects:
+      - in_good_company card self | hand
+      - perform_feat
+  - name: THE_LAST_HERO
+    image: 23_l_ultimo_eroe
+    equip:
+      - last_hero
+    effects:
+      - discard card self | table blue
+      - perform_feat
+  - name: THE_MAN_WITH_NO_NAME
+    image: 23_l_uomo_senza_nome
+    equip:
+      - man_with_no_name
+    effects:
+      - damage
+      - perform_feat
+  - name: WILHELM_SCREAM
+    image: 23_l_urlo_di_wilhelm
+    equip:
+      - wilhelm_scream
+  - name: SCRUGS_BALLAD
+    image: 23_la_ballata_di_scrugs
+    equip:
+      - scrugs_ballad
+  - name: BORDERLANDS
+    image: 23_la_frontiera
+    effects:
+      - discard_hand
+      - perform_feat
+  - name: THE_OREGON_TRAIL
+    image: 23_la_pista_dell_oregon
+    responses:
+      - add_draw_card
+      - no_cards_drawn
+      - perform_feat
+  - name: A_THOUSAND_WAYS_TO_DIE
+    image: 23_mille_modi_per_morire
+    effects:
+      - none card self | hand missedcard
+      - none card self | hand
+      - perform_feat
+    mth_effect: thousand_ways_to_die(0,1)
+  - name: FOR_A_FEW_CARDS_MORE
+    image: 23_per_qualche_carta_in_piu
+    equip:
+      - for_a_few_cards_more
+  - name: A_QUICK_DEATH
+    image: 23_una_morte_veloce
+    equip:
+      - quick_death
+
+button_row:
+  - name: ESCAPE_JAIL
+    responses:
+      - escape_jail card self | hand hearts
+    tags:
+      - button_color(2)
+  - name: BECOME_LEGEND
+    effects:
+      - become_legend
+    tags:
+      - button_color(2)
+
+hidden:
+  - name: SID_KETCHUM
+    responses:
+      - sid_ketchum_legend_free_bang
+      - max_usages(1)
+      - bang player reachable notself
+    tags:
+      - preselect
+  - name: CLAIM_FEAT
+    responses:
+      - damage_legend player legend notself
+    tags:
+      - preselect

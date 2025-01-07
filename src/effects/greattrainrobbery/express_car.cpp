@@ -5,8 +5,6 @@
 #include "effects/base/requests.h"
 #include "effects/base/max_usages.h"
 
-#include "game/possible_to_play.h"
-
 namespace banggame {
 
     game_string effect_express_car::get_error(card_ptr origin_card, player_ptr origin) {
@@ -14,17 +12,6 @@ namespace banggame {
         origin->m_game->call_event(event_type::count_usages{ origin, origin_card, usages });
         if (usages >= 1) {
             return {"ERROR_MAX_USAGES", origin_card, 1};
-        }
-        return {};
-    }
-
-    game_string effect_express_car::on_prompt(card_ptr origin_card, player_ptr origin) {
-        if (origin->is_bot()) {
-            if (rn::any_of(get_all_playable_cards(origin), [](card_ptr c) { return c->pocket == pocket_type::player_hand; })) {
-                return "BOT_BAD_PLAY";
-            }
-        } else if (int ncards = int(origin->m_hand.size())) {
-            return {"PROMPT_PASS_DISCARD", ncards};
         }
         return {};
     }
@@ -43,7 +30,6 @@ namespace banggame {
         });
 
         ++origin->m_extra_turns;
-        origin->m_game->queue_request<request_discard_hand>(origin_card, origin);
         origin->m_game->queue_action([=]{
             origin->pass_turn();
         });

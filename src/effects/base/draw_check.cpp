@@ -34,17 +34,21 @@ namespace banggame {
     }
 
     void request_check_base::start() {
-        int num_checks = target->get_num_checks();
-        if (num_checks > 1) {
-            for (int i=0; i<num_checks; ++i) {
+        bool handled = false;
+        target->m_game->call_event(event_type::on_draw_check_start{ target, shared_from_this(), handled });
+        if (!handled) {
+            int num_checks = target->get_num_checks();
+            if (num_checks > 1) {
+                for (int i=0; i<num_checks; ++i) {
+                    card_ptr target_card = target->m_game->top_of_deck();
+                    target->m_game->add_log("LOG_REVEALED_CARD", target, target_card);
+                    target_card->move_to(pocket_type::selection);
+                }
+            } else {
                 card_ptr target_card = target->m_game->top_of_deck();
-                target->m_game->add_log("LOG_REVEALED_CARD", target, target_card);
-                target_card->move_to(pocket_type::selection);
+                target_card->move_to(pocket_type::discard_pile);
+                select(target_card);
             }
-        } else {
-            card_ptr target_card = target->m_game->top_of_deck();
-            target_card->move_to(pocket_type::discard_pile);
-            select(target_card);
         }
     }
 
@@ -84,13 +88,13 @@ namespace banggame {
         if (!target->m_game->m_selection.empty()) {
             while (!target->m_game->m_selection.empty()) {
                 card_ptr c = target->m_game->m_selection.front();
-                target->m_game->call_event(event_type::on_draw_check_resolve{ target, c });
+                target->m_game->call_event(event_type::on_draw_check_resolve{ origin_card, target, c, drawn_card });
                 if (c->pocket == pocket_type::selection) {
                     c->move_to(pocket_type::discard_pile);
                 }
             }
         } else {
-            target->m_game->call_event(event_type::on_draw_check_resolve{ target, drawn_card });
+            target->m_game->call_event(event_type::on_draw_check_resolve{origin_card, target, drawn_card, drawn_card });
         }
         on_resolve(is_lucky(drawn_card));
     }

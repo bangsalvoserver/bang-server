@@ -30,7 +30,7 @@ namespace banggame {
 
         std::unordered_map<card_ptr, int> cubes;
         for (card_ptr c : ctx.selected_cubes.all_cubes()) {
-            if (++cubes[c] > c->num_cubes) {
+            if (++cubes[c] > c->num_cubes()) {
                 return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
             }
         }
@@ -51,6 +51,7 @@ namespace banggame {
         case pocket_type::hidden_deck:
         case pocket_type::stations:
         case pocket_type::train:
+        case pocket_type::feats:
             break;
         case pocket_type::scenario_card:
             if (origin_card != origin->m_game->m_scenario_cards.back()) {
@@ -409,6 +410,7 @@ namespace banggame {
 
         if (args.card->pocket != pocket_type::button_row) {
             origin->m_played_cards.push_back(make_played_card_history(args, is_response, ctx));
+            origin->m_game->call_event(event_type::on_play_card{ origin, args.card });
         }
 
         if (!is_response) {

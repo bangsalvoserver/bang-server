@@ -1,9 +1,12 @@
 #include "steal_destroy.h"
 
+#include "requests.h"
+
 #include "game/game.h"
 #include "game/filters.h"
 #include "game/prompts.h"
 #include "game/game_options.h"
+#include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"
 
@@ -65,7 +68,7 @@ namespace banggame {
 
     void effect_steal::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         bool handled = false;
-        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, handled });
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, false, handled });
         origin->m_game->queue_action([=]{
             player_ptr target_player = target_card->owner;
             if ((!handled || origin->alive()) && target_player) {
@@ -159,6 +162,21 @@ namespace banggame {
         target_player->discard_card(target_card, used);
     }
 
+    game_string effect_discard_hand::on_prompt(card_ptr origin_card, player_ptr origin) {
+        if (origin->is_bot()) {
+            if (rn::any_of(get_all_playable_cards(origin), [](card_ptr c) { return c->pocket == pocket_type::player_hand; })) {
+                return "BOT_BAD_PLAY";
+            }
+        } else if (int ncards = int(origin->m_hand.size())) {
+            return {"PROMPT_PASS_DISCARD", ncards};
+        }
+        return {};
+    }
+    
+    void effect_discard_hand::on_play(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->queue_request<request_discard_hand>(origin_card, origin);
+    }
+
     game_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target_card->owner));
@@ -167,7 +185,7 @@ namespace banggame {
 
     void effect_destroy::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         bool handled = false;
-        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, handled });
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, true, handled });
         origin->m_game->queue_action([=]{
             player_ptr target_player = target_card->owner;
             if ((!handled || origin->alive()) && target_player) {

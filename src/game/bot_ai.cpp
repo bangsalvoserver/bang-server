@@ -4,6 +4,8 @@
 #include "play_verify.h"
 #include "possible_to_play.h"
 
+#include "cards/filter_enums.h"
+
 #include "net/bot_info.h"
 #include "net/logging.h"
 
@@ -50,6 +52,12 @@ namespace banggame {
     bot_rule rule_repeat() {
         return [](card_node node) {
             return node->context.get().repeat_card != nullptr;
+        };
+    }
+
+    bot_rule rule_blue_buttons() {
+        return [](card_node node) {
+            return node->card->get_tag_value(tag_type::button_color) == std::optional{2};
         };
     }
     

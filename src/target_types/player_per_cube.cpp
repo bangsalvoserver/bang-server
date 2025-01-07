@@ -13,7 +13,7 @@ namespace banggame {
     template<> cubes_and_players visit_cubes::random_target(const effect_context &ctx) {
         auto cubes = origin->cube_slots()
             | rv::for_each([](card_ptr slot) {
-                return rv::repeat_n(slot, slot->num_cubes);
+                return rv::repeat_n(slot, slot->num_cubes());
             })
             | rn::to_vector;
 

@@ -68,6 +68,9 @@ namespace banggame {
         case pocket_type::stations:          return m_stations;
         case pocket_type::train:             return m_train;
         case pocket_type::train_deck:        return m_train_deck;
+        case pocket_type::feats_deck:        return m_feats_deck;
+        case pocket_type::feats_discard:     return m_feats_discard;
+        case pocket_type::feats:             return m_feats;
         default: throw game_error("Invalid pocket");
         }
     }
@@ -106,6 +109,19 @@ namespace banggame {
             m_cards_storage.insert(std::move(a));
             m_cards_storage.insert(std::move(b));
         }
+    }
+
+    int game_table::num_tokens(card_token_type token_type) const {
+        return tokens[token_type];
+    }
+
+    void game_table::add_tokens(card_token_type token_type, int num_tokens, card_ptr target_card) {
+        if (target_card) {
+            target_card->tokens[token_type] += num_tokens;
+        } else {
+            tokens[token_type] += num_tokens;
+        }
+        add_update<"add_tokens">(token_type, num_tokens, target_card);
     }
 
     card_ptr game_table::top_of_deck() {

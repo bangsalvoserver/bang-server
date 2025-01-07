@@ -5,6 +5,7 @@
 
 #include "utils/tagged_variant.h"
 #include "utils/enum_bitset.h"
+#include "utils/enum_map.h"
 
 namespace banggame {
 
@@ -54,6 +55,11 @@ namespace banggame {
                 && enums::indexof(rank) <= enums::indexof(card_rank::rank_A);
         }
 
+        bool is_jack_to_ace() const {
+            return enums::indexof(rank) >= enums::indexof(card_rank::rank_J)
+                && enums::indexof(rank) <= enums::indexof(card_rank::rank_A);
+        }
+
         explicit operator bool () const {
             return suit != card_suit::none && rank != card_rank::none;
         }
@@ -68,6 +74,20 @@ namespace banggame {
         orange,
         train,
     };
+
+    enum class card_token_type {
+        cube,
+        fame1,
+        fame2,
+        fame3,
+        fame4,
+        fame5,
+        fame6,
+        fame7,
+        fame8
+    };
+
+    using token_map = enums::enum_map<card_token_type, uint8_t>;
 
     enum class player_role {
         unknown,
@@ -191,6 +211,8 @@ namespace banggame {
         station,
         locomotive,
         train,
+        legends,
+        feats
     };
 
     enum class pocket_type {
@@ -213,6 +235,9 @@ namespace banggame {
         stations,
         train_deck,
         train,
+        feats_deck,
+        feats_discard,
+        feats
     };
 
     class selected_cubes_count {

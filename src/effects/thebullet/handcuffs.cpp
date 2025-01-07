@@ -9,7 +9,7 @@ namespace banggame {
     
     struct request_handcuffs : request_base {
         request_handcuffs(card_ptr origin_card, player_ptr target)
-            : request_base(origin_card, nullptr, target, {}, -8) {}
+            : request_base(origin_card, nullptr, target, {}, -25) {}
 
         game_string status_text(player_ptr owner) const override {
             if (target == owner) {

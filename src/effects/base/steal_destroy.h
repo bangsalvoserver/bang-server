@@ -11,6 +11,7 @@ namespace banggame {
         struct on_destroy_card {
             player_ptr origin;
             card_ptr target_card;
+            bool is_destroyed;
             nullable_ref<bool> handled;
         };
     }
@@ -35,6 +36,13 @@ namespace banggame {
     };
 
     DEFINE_EFFECT(discard, effect_discard)
+    
+    struct effect_discard_hand {
+        game_string on_prompt(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin);
+    };
+
+    DEFINE_EFFECT(discard_hand, effect_discard_hand)
 
     struct effect_destroy {
         game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);

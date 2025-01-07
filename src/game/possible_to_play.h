@@ -24,6 +24,7 @@ namespace banggame {
             origin->m_game->m_shop_selection,
             origin->m_game->m_stations,
             origin->m_game->m_train,
+            origin->m_game->m_feats,
             origin->m_game->m_scenario_cards | rv::take_last(1),
             origin->m_game->m_wws_scenario_cards | rv::take_last(1)
         );
@@ -33,8 +34,11 @@ namespace banggame {
         return rv::concat(
             origin->m_game->m_players | rv::for_each(&player::m_targetable_cards_view),
             origin->m_game->m_selection,
-            origin->m_game->m_deck | rv::take(1),
-            origin->m_game->m_discards | rv::take(1)
+            origin->m_game->m_feats,
+            origin->m_game->m_deck | rv::take_last(1),
+            origin->m_game->m_discards | rv::take_last(1),
+            origin->m_game->m_feats_deck | rv::take_last(1),
+            origin->m_game->m_feats_discard | rv::take_last(1)
         );
     }
 

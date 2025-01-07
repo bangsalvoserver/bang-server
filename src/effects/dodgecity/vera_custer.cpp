@@ -10,7 +10,7 @@ namespace banggame {
 
     struct request_vera_custer : request_picking_player {
         request_vera_custer(card_ptr origin_card, player_ptr target)
-            : request_picking_player(origin_card, nullptr, target, {}, -8) {}
+            : request_picking_player(origin_card, nullptr, target, {}, -25) {}
 
         void on_update() override {
             if (target->alive() && target->m_game->m_playing == target && !target->m_game->is_disabled(origin_card)) {
