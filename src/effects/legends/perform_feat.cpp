@@ -78,8 +78,8 @@ namespace banggame {
     }
 
     struct request_perform_feat : request_resolvable, interface_picking {
-        request_perform_feat(card_ptr origin_card, player_ptr target)
-            : request_resolvable{origin_card, nullptr, target, {}, 30} {}
+        request_perform_feat(card_ptr origin_card, player_ptr target, int priority)
+            : request_resolvable{origin_card, nullptr, target, {}, priority} {}
         
         void on_update() override {
             if (!target->alive() || !effect_perform_feat{}.can_play(origin_card, target)) {
@@ -128,8 +128,8 @@ namespace banggame {
         }
     };
 
-    void queue_request_perform_feat(card_ptr origin_card, player_ptr target) {
-        target->m_game->queue_request<request_perform_feat>(origin_card, target);
+    void queue_request_perform_feat(card_ptr origin_card, player_ptr target, int priority) {
+        target->m_game->queue_request<request_perform_feat>(origin_card, target, priority);
     }
 
     void effect_perform_feat::on_play(card_ptr origin_card, player_ptr origin) {
