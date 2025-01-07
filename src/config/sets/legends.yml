@@ -139,7 +139,8 @@ feats:
       - perform_feat
   - name: THE_CHUCK_A_LUCK
     image: 23_il_mulino_d_oro
-    # TODO on_destroy_card se target_card ha tag bangcard -> attiva feat
+    equip:
+      - chuck_a_luck
     effects:
       - discard card self | hand bangcard
       - perform_feat
