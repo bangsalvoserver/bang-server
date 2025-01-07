@@ -22,6 +22,8 @@ namespace banggame {
                     return target->m_game->m_scenario_cards.empty() || target_card != target->m_game->m_scenario_cards.back();
                 case card_deck_type::wildwestshow:
                     return target->m_game->m_wws_scenario_cards.empty() || target_card != target->m_game->m_wws_scenario_cards.back();
+                case card_deck_type::feats:
+                    return target_card->pocket != pocket_type::feats;
                 }
             }
             return false;
@@ -124,6 +126,17 @@ namespace banggame {
                     drawn_card->move_to(pocket_type::train);
                 }
             }
+            break;
+        }
+        case card_deck_type::feats: {
+            if (target->m_game->m_feats.size() >= 4) {
+                card_ptr last_feat = target->m_game->m_feats.back();
+                target->m_game->m_first_player->disable_equip(last_feat);
+                last_feat->drop_all_fame();
+                last_feat->move_to(pocket_type::feats_discard);
+            }
+            target_card->move_to(pocket_type::feats);
+            target->m_game->m_first_player->enable_equip(target_card);
             break;
         }
         }
