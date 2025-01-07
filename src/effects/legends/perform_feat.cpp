@@ -82,7 +82,7 @@ namespace banggame {
             : request_resolvable{origin_card, nullptr, target, {}, 30} {}
         
         void on_update() override {
-            if (!(target->alive() && target == target->m_game->m_playing && effect_perform_feat{}.can_play(origin_card, target))) {
+            if (!target->alive() || !effect_perform_feat{}.can_play(origin_card, target)) {
                 target->m_game->pop_request();
             }
         }
