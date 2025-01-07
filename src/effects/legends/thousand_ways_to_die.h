@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct handler_thousand_ways_to_die {
-        game_string get_error(card_ptr origin_card, player_ptr origin, const card_list &target_cards);
-        void on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards);
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card1, card_ptr target_card2);
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card1, card_ptr target_card2);
     };
 
     DEFINE_MTH(thousand_ways_to_die, handler_thousand_ways_to_die)
