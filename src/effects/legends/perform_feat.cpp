@@ -165,4 +165,8 @@ namespace banggame {
             }
         }
     }
+
+    void feat_equip::on_disable(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->remove_listeners(event_card_key{origin_card, 0});
+    }
 }

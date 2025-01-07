@@ -1,7 +1,5 @@
 #include "wilhelm_scream.h"
 
-#include "perform_feat.h"
-
 #include "effects/base/bang.h"
 
 #include "game/game.h"

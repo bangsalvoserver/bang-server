@@ -1,7 +1,5 @@
 #include "for_a_few_cards_more.h"
 
-#include "perform_feat.h"
-
 #include "effects/base/requests.h"
 
 #include "game/game.h"

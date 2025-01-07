@@ -40,7 +40,7 @@ namespace banggame {
         target->m_game->add_listener<event_type::on_turn_start>(origin_card, [=, last_discarded = static_cast<card_ptr>(nullptr)](player_ptr origin) mutable {
             last_discarded = nullptr;
 
-            event_card_key key{origin_card, 5};
+            event_card_key key{origin_card, 10};
 
             target->m_game->add_listener<event_type::get_last_discarded_card>(key, [&last_discarded](card_ptr &value) {
                 value = last_discarded;
@@ -71,7 +71,11 @@ namespace banggame {
                 target->m_game->remove_listeners(key);
             });
         });
+    }
 
+    void equip_in_good_company::on_disable(card_ptr origin_card, player_ptr target) {
+        target->m_game->remove_listeners(event_card_key{ origin_card, 10 });
+        target->m_game->remove_listeners(event_card_key{ origin_card, 0 });
     }
 
     game_string effect_in_good_company::get_error(card_ptr origin_card, player_ptr origin, card_ptr target) {

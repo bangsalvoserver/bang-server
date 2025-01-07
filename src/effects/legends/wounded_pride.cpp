@@ -1,7 +1,5 @@
 #include "wounded_pride.h"
 
-#include "perform_feat.h"
-
 #include "cards/game_enums.h"
 
 #include "effects/base/bang.h"

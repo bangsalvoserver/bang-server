@@ -1,7 +1,5 @@
 #include "man_with_no_name.h"
 
-#include "perform_feat.h"
-
 #include "effects/base/damage.h"
 
 #include "game/game.h"

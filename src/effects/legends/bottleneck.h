@@ -3,9 +3,11 @@
 
 #include "cards/card_effect.h"
 
+#include "perform_feat.h"
+
 namespace banggame {
 
-    struct equip_bottleneck : event_equip {
+    struct equip_bottleneck : feat_equip {
         void on_enable(card_ptr target_card, player_ptr target);
     };
 

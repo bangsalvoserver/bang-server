@@ -1,7 +1,5 @@
 #include "scrugs_ballad.h"
 
-#include "perform_feat.h"
-
 #include "effects/base/damage.h"
 
 #include "game/game.h"

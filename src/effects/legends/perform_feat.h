@@ -37,6 +37,10 @@ namespace banggame {
 
     DEFINE_EFFECT(damage_legend, effect_damage_legend)
 
+    struct feat_equip {
+        void on_disable(card_ptr origin_card, player_ptr origin);
+    };
+
 }
 
 #endif

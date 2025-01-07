@@ -1,7 +1,5 @@
 #include "chuck_a_luck.h"
 
-#include "perform_feat.h"
-
 #include "effects/base/steal_destroy.h"
 
 #include "cards/filter_enums.h"

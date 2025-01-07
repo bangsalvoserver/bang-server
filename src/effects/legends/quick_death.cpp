@@ -1,7 +1,4 @@
 #include "quick_death.h"
-
-#include "perform_feat.h"
-
 #include "cards/game_enums.h"
 
 #include "effects/base/damage.h"

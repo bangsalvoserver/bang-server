@@ -1,7 +1,5 @@
 #include "last_hero.h"
 
-#include "perform_feat.h"
-
 #include "effects/base/steal_destroy.h"
 
 #include "game/game.h"
