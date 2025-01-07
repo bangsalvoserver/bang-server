@@ -156,7 +156,7 @@ namespace banggame {
             if (target_card->pocket == pocket_type::player_table) {
                 target_card->set_inactive(false);
                 owner->disable_equip(target_card);
-                target_card->drop_all_tokens();
+                target_card->drop_all_cubes();
                 return true;
             } else if (target_card->pocket == pocket_type::player_hand) {
                 owner->m_game->call_event(event_type::on_discard_hand_card{ owner, target_card, used });

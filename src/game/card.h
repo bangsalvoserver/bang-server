@@ -49,7 +49,8 @@ namespace banggame {
         int num_tokens(card_token_type token_type) const;
         void add_tokens(card_token_type token_type, int num_tokens);
         void move_tokens(card_token_type token_type, card_ptr target, int num_tokens, bool instant = false);
-        void drop_all_tokens();
+        void drop_all_cubes();
+        void drop_all_fame();
 
         int num_cubes() const {
             return num_tokens(card_token_type::cube);

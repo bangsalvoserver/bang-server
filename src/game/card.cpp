@@ -183,18 +183,21 @@ namespace banggame {
         }
     }
 
-    void card::drop_all_tokens() {
-        for (const auto &[token, count] : tokens) {
-            if (count > 0) {
-                if (token == card_token_type::cube) {
-                    m_game->add_log("LOG_DROP_CUBE", owner, this, count);
-                    m_game->tokens[token] += count;
-                    m_game->add_update<"move_tokens">(token, count, this, nullptr, count == 1 ? durations.move_token : durations.move_tokens);
-                } else {
-                    m_game->add_update<"add_tokens">(token, -count, this);
-                }
+    void card::drop_all_cubes() {
+        if (auto &count = tokens[card_token_type::cube]) {
+            m_game->add_log("LOG_DROP_CUBE", owner, this, count);
+            m_game->tokens[card_token_type::cube] += count;
+            m_game->add_update<"move_tokens">(card_token_type::cube, count, this, nullptr, count == 1 ? durations.move_token : durations.move_tokens);
+            count = 0;
+        }
+    }
+
+    void card::drop_all_fame() {
+        for (auto [token, count] : tokens) {
+            if (token != card_token_type::cube && count > 0) {
+                m_game->add_update<"add_tokens">(token, -count, this);
+                count = 0;
             }
         }
-        tokens.clear();
     }
 }

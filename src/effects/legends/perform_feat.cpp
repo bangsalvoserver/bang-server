@@ -151,7 +151,7 @@ namespace banggame {
                 origin->m_game->add_log("LOG_FEAT_CLAIMED", origin, origin_card);
                 origin->m_game->queue_request<request_damage_legend>(origin);
                 origin->m_game->queue_action([=]{
-                    origin_card->drop_all_tokens();
+                    origin_card->drop_all_fame();
                     origin_card->m_game->m_first_player->disable_equip(origin_card);
                     origin_card->move_to(pocket_type::feats_discard);
                     draw_next_feat(origin);

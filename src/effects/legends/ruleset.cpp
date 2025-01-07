@@ -73,7 +73,7 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
             target->m_game->add_log("LOG_DISCARDED_FEAT", target, target_card);
-            target_card->drop_all_tokens();
+            target_card->drop_all_fame();
             target->m_game->m_first_player->disable_equip(target_card);
             target_card->move_to(pocket_type::feats_discard);
             target->m_game->m_feats_deck.back()->move_to(pocket_type::feats);
