@@ -159,12 +159,15 @@ namespace banggame {
             on_pick(target_card);
         }
         
-        target->first_character()->drop_all_cubes();
-        
         if (reason != discard_all_reason::sheriff_killed_deputy) {
             target->add_gold(-target->m_gold);
         }
+
+        card_ptr character_card = target->first_character();
+        character_card->drop_all_cubes();
+
         if (reason == discard_all_reason::death) {
+            character_card->drop_all_fame();
             target->m_game->play_sound("death");
         }
     }
