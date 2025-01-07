@@ -15,10 +15,12 @@ namespace banggame {
         };
     }
 
-    static card_ptr get_last_played_card(player_ptr origin) {
+    static card_ptr get_last_played_card(player_ptr origin, card_ptr origin_card) {
         for (const played_card_history &history : origin->m_played_cards | rv::reverse) {
             if (history.origin_card.pocket == pocket_type::player_hand) {
-                return history.origin_card.origin_card;
+                if (origin_card != history.origin_card.origin_card) {
+                    return history.origin_card.origin_card;
+                }
             }
         }
         return nullptr;
@@ -49,7 +51,7 @@ namespace banggame {
             target->m_game->add_listener<event_type::on_destroy_card>(key, [=, &last_discarded](player_ptr e_origin, card_ptr target_card, bool is_destroyed, bool &handled) {
                 if (e_origin == origin && is_destroyed) {
                     last_discarded = target_card;
-                    if (card_ptr last_played = get_last_played_card(origin)) {
+                    if (card_ptr last_played = get_last_played_card(origin, origin_card)) {
                         if (is_same_name(origin, last_discarded, last_played)) {
                             queue_request_perform_feat(origin_card, origin);
                         }
@@ -81,7 +83,7 @@ namespace banggame {
     game_string effect_in_good_company::get_error(card_ptr origin_card, player_ptr origin, card_ptr target) {
         MAYBE_RETURN(effect_discard::get_error(origin_card, origin, target));
 
-        if (card_ptr last_played = get_last_played_card(origin)) {
+        if (card_ptr last_played = get_last_played_card(origin, origin_card)) {
             if (is_same_name(origin, last_played, target)) {
                 return {};
             }
