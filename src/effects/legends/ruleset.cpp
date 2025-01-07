@@ -125,8 +125,8 @@ namespace banggame {
         request_boast_feat(player_ptr target)
             : request_picking{nullptr, nullptr, target} {}
 
-        int resolve_type() const override {
-            return 1;
+        resolve_type get_resolve_type() const override {
+            return resolve_type::dismiss;
         }
 
         void on_resolve() override {

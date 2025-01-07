@@ -43,8 +43,8 @@ namespace banggame {
             handler->resolve();
         }
 
-        int resolve_type() const override {
-            return 1;
+        resolve_type get_resolve_type() const override {
+            return resolve_type::dismiss;
         }
 
         void on_resolve() override {

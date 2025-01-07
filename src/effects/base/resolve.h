@@ -4,9 +4,15 @@
 #include "cards/card_effect.h"
 
 namespace banggame {
+
+    enum class resolve_type {
+        resolve,
+        dismiss
+    };
+
     struct effect_resolve {
-        int resolve_type;
-        effect_resolve(int resolve_type): resolve_type{resolve_type} {}
+        resolve_type type;
+        effect_resolve(int type): type{static_cast<resolve_type>(type)} {}
 
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin);
         bool can_play(card_ptr origin_card, player_ptr origin);
@@ -17,7 +23,7 @@ namespace banggame {
 
     struct interface_resolvable {
         virtual void on_resolve() = 0;
-        virtual int resolve_type() const { return 0; }
+        virtual resolve_type get_resolve_type() const { return resolve_type::resolve; }
         virtual prompt_string resolve_prompt() const { return {}; }
     };
 
