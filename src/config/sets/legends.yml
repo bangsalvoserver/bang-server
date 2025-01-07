@@ -115,9 +115,8 @@ legends:
 feats:
   - name: FIFTY_GUNS
     image: 23_cinquanta_pistole
-    # TODO on_destroy_card se target_card ha tag weapon -> attiva feat
-    effects:
-      - perform_feat # temp
+    equip:
+      - fifty_guns
   - name: WOUNDED_PRIDE
     image: 23_ferito_nell_orgoglio
     # TODO on_missed se flag is_bang e origin == p -> attiva feat

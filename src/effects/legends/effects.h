@@ -4,6 +4,7 @@
 #include "become_legend.h"
 #include "black_jack.h"
 #include "el_gringo.h"
+#include "fifty_guns.h"
 #include "jesse_jones.h"
 #include "jourdonnais.h"
 #include "kit_carlson.h"
