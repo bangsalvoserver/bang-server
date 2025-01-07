@@ -291,6 +291,7 @@ train:
     color: train
     effects:
       - discard
+      - discard_hand
       - express_car
   - name: GHOST_CAR
     image: 27_ghost_car

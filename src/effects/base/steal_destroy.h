@@ -38,6 +38,7 @@ namespace banggame {
     DEFINE_EFFECT(discard, effect_discard)
     
     struct effect_discard_hand {
+        game_string on_prompt(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin);
     };
 
