@@ -174,9 +174,8 @@ feats:
       - perform_feat
   - name: WILHELM_SCREAM
     image: 23_l_urlo_di_wilhelm
-    # TODO on_play_bang (nuovo evento) se count_distance(origin, target) >= 2 -> feat
-    effects:
-      - perform_feat # temp
+    equip:
+      - wilhelm_scream
   - name: SCRUGS_BALLAD
     image: 23_la_ballata_di_scrugs
     equip:

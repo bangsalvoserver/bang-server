@@ -23,4 +23,5 @@ target_sources(bangserver PRIVATE
     slab_the_killer.cpp
     vulture_sam.cpp
     wounded_pride.cpp
+    wilhelm_scream.cpp
 )
