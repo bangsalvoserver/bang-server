@@ -119,9 +119,8 @@ feats:
       - fifty_guns
   - name: WOUNDED_PRIDE
     image: 23_ferito_nell_orgoglio
-    # TODO on_missed se flag is_bang e origin == p -> attiva feat
-    effects:
-      - perform_feat # temp
+    equip:
+      - wounded_pride
   - name: OLD_WEST_GANG
     image: 23_gang_del_vecchio_west
     # TODO on_hit se origin == p && target != p

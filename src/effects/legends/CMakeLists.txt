@@ -15,4 +15,5 @@ target_sources(bangserver PRIVATE
     sid_ketchum.cpp
     slab_the_killer.cpp
     vulture_sam.cpp
+    wounded_pride.cpp
 )
