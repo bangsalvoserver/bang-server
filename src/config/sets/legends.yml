@@ -138,7 +138,7 @@ feats:
     equip:
       - chuck_a_luck
     effects:
-      - discard card self | hand bangcard
+      - discard card self | hand bang
       - perform_feat
   - name: '3_15_TO_YOOMA'
     image: 23_il_treno_per_yooma
