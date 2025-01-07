@@ -132,7 +132,8 @@ feats:
       - perform_feat # temp
   - name: BOTTLENECK
     image: 23_il_collo_di_bottiglia
-    # TODO on_destroy_card se target_card ha tag beer -> attiva feat
+    equip:
+      - bottleneck
     effects:
       - discard card self | hand beer
       - perform_feat
