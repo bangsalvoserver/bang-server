@@ -208,9 +208,8 @@ feats:
       - perform_feat # temp
   - name: A_QUICK_DEATH
     image: 23_una_morte_veloce
-    # TODO on_hit se hp == max_hp e flags is_bang -> feat
-    effects:
-      - perform_feat # temp
+    equip:
+      - quick_death
 
 button_row:
   - name: ESCAPE_JAIL

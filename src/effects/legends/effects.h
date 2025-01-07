@@ -16,6 +16,7 @@
 #include "paul_regret.h"
 #include "pedro_ramirez.h"
 #include "perform_feat.h"
+#include "quick_death.h"
 #include "rose_doolan.h"
 #include "ruleset.h"
 #include "scrugs_ballad.h"

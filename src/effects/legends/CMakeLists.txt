@@ -14,6 +14,7 @@ target_sources(bangserver PRIVATE
     paul_regret.cpp
     pedro_ramirez.cpp
     perform_feat.cpp
+    quick_death.cpp
     rose_doolan.cpp
     ruleset.cpp
     scrugs_ballad.cpp
