@@ -13,6 +13,7 @@ target_sources(bangserver PRIVATE
     last_hero.cpp
     lucky_duke.cpp
     man_with_no_name.cpp
+    old_west_gang.cpp
     paul_regret.cpp
     pedro_ramirez.cpp
     perform_feat.cpp

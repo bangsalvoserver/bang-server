@@ -15,6 +15,7 @@
 #include "last_hero.h"
 #include "lucky_duke.h"
 #include "man_with_no_name.h"
+#include "old_west_gang.h"
 #include "paul_regret.h"
 #include "pedro_ramirez.h"
 #include "perform_feat.h"

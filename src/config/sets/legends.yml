@@ -123,13 +123,8 @@ feats:
       - wounded_pride
   - name: OLD_WEST_GANG
     image: 23_gang_del_vecchio_west
-    # TODO on_hit se origin == p && target != p
-    #  add_listener (target_card, 5) track_damaged_player first_target ->
-    #    se first_target == null -> set first_target
-    #    se first_target != target -> attiva feat
-    # on_turn_end: clear listener (target_card, 5)
-    effects:
-      - perform_feat # temp
+    equip:
+      - old_west_gang
   - name: BOTTLENECK
     image: 23_il_collo_di_bottiglia
     equip:
