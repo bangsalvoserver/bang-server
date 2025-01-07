@@ -13,6 +13,7 @@ bots:
     
     in_play_rules:
     - repeat
+    - blue_buttons
     - pocket(pocket_type::player_table)
     - pocket(pocket_type::player_hand)
     - pocket(pocket_type::player_character)
