@@ -8,7 +8,7 @@
 namespace banggame {
 
     void equip_henry_block::on_enable(card_ptr target_card, player_ptr p) {
-        p->m_game->add_listener<event_type::on_destroy_card>(target_card, [=](player_ptr origin, card_ptr discarded_card, bool &handled) {
+        p->m_game->add_listener<event_type::on_destroy_card>(target_card, [=](player_ptr origin, card_ptr discarded_card, bool is_destroyed, bool &handled) {
             player_ptr target = discarded_card->owner;
             if (p == target && p != origin) {
                 handled = true;

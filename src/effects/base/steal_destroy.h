@@ -11,6 +11,7 @@ namespace banggame {
         struct on_destroy_card {
             player_ptr origin;
             card_ptr target_card;
+            bool is_destroyed;
             nullable_ref<bool> handled;
         };
     }
