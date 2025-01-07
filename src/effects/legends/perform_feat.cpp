@@ -79,7 +79,7 @@ namespace banggame {
 
     struct request_perform_feat : request_resolvable, interface_picking {
         request_perform_feat(card_ptr origin_card, player_ptr target)
-            : request_resolvable{origin_card, nullptr, target, {}, 50} {}
+            : request_resolvable{origin_card, nullptr, target, {}, 30} {}
         
         void on_update() override {
             if (!(target->alive() && target == target->m_game->m_playing && effect_perform_feat{}.can_play(origin_card, target))) {
