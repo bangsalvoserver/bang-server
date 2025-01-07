@@ -200,10 +200,8 @@ feats:
       - perform_feat # temp
   - name: FOR_A_FEW_CARDS_MORE
     image: 23_per_qualche_carta_in_piu
-    # TODO post_discard_pass -> feat
-    # on_resolve -> dismiss
-    effects:
-      - perform_feat # temp
+    equip:
+      - for_a_few_cards_more
   - name: A_QUICK_DEATH
     image: 23_una_morte_veloce
     equip:

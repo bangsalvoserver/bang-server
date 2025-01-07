@@ -8,6 +8,7 @@
 #include "chuck_a_luck.h"
 #include "el_gringo.h"
 #include "fifty_guns.h"
+#include "for_a_few_cards_more.h"
 #include "jesse_jones.h"
 #include "jourdonnais.h"
 #include "kit_carlson.h"

@@ -6,6 +6,7 @@ target_sources(bangserver PRIVATE
     chuck_a_luck.cpp
     el_gringo.cpp
     fifty_guns.cpp
+    for_a_few_cards_more.cpp
     jesse_jones.cpp
     jourdonnais.cpp
     kit_carlson.cpp
