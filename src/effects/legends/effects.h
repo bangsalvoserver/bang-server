@@ -10,6 +10,7 @@
 #include "jesse_jones.h"
 #include "jourdonnais.h"
 #include "kit_carlson.h"
+#include "last_hero.h"
 #include "lucky_duke.h"
 #include "paul_regret.h"
 #include "pedro_ramirez.h"

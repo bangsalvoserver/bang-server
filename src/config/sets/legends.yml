@@ -160,9 +160,10 @@ feats:
       - perform_feat # temp
   - name: THE_LAST_HERO
     image: 23_l_ultimo_eroe
-    # TODO on_destroy_card se target_card blue -> attiva feat
+    equip:
+      - last_hero
     effects:
-      - discard card self | hand blue
+      - discard card self | table blue
       - perform_feat
   - name: THE_MAN_WITH_NO_NAME
     image: 23_l_uomo_senza_nome

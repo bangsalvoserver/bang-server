@@ -8,6 +8,7 @@ target_sources(bangserver PRIVATE
     jesse_jones.cpp
     jourdonnais.cpp
     kit_carlson.cpp
+    last_hero.cpp
     lucky_duke.cpp
     paul_regret.cpp
     pedro_ramirez.cpp
