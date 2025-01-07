@@ -179,9 +179,8 @@ feats:
       - perform_feat # temp
   - name: SCRUGS_BALLAD
     image: 23_la_ballata_di_scrugs
-    # TODO on_duel_hit (nuovo evento) se p == target -> feat
-    effects:
-      - perform_feat # temp
+    equip:
+      - scrugs_ballad
   - name: BORDERLANDS
     image: 23_la_frontiera
     # TODO crocevia: borderlands

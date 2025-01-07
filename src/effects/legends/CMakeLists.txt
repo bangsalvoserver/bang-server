@@ -16,6 +16,7 @@ target_sources(bangserver PRIVATE
     perform_feat.cpp
     rose_doolan.cpp
     ruleset.cpp
+    scrugs_ballad.cpp
     sid_ketchum.cpp
     slab_the_killer.cpp
     vulture_sam.cpp
