@@ -1,6 +1,7 @@
 target_sources(bangserver PRIVATE
     become_legend.cpp
     black_jack.cpp
+    borderlands.cpp
     bottleneck.cpp
     chuck_a_luck.cpp
     el_gringo.cpp
