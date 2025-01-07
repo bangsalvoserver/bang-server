@@ -186,7 +186,7 @@ feats:
     # effect_borderlands: scarta tutto dalla mano -> feat
     effects:
       - perform_feat # temp
-  - name: THE_OREGON_TRAIN
+  - name: THE_OREGON_TRAIL
     image: 23_la_pista_dell_oregon
     responses:
       - add_draw_card
