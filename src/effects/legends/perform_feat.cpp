@@ -95,6 +95,13 @@ namespace banggame {
             target->m_game->pop_request();
         }
 
+        prompt_string resolve_prompt() const override {
+            if (target->is_bot()) {
+                return "BOT_BAD_PLAY";
+            }
+            return {};
+        }
+
         bool can_pick(const_card_ptr target_card) const override {
             return target_card == origin_card;
         }
