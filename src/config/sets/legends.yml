@@ -167,7 +167,8 @@ feats:
       - perform_feat
   - name: THE_MAN_WITH_NO_NAME
     image: 23_l_uomo_senza_nome
-    # TODO on_hit se hp > 0 -> attiva feat
+    equip:
+      - man_with_no_name
     effects:
       - damage
       - perform_feat

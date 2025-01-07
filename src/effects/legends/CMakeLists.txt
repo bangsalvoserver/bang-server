@@ -10,6 +10,7 @@ target_sources(bangserver PRIVATE
     kit_carlson.cpp
     last_hero.cpp
     lucky_duke.cpp
+    man_with_no_name.cpp
     paul_regret.cpp
     pedro_ramirez.cpp
     perform_feat.cpp

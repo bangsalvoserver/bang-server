@@ -12,6 +12,7 @@
 #include "kit_carlson.h"
 #include "last_hero.h"
 #include "lucky_duke.h"
+#include "man_with_no_name.h"
 #include "paul_regret.h"
 #include "pedro_ramirez.h"
 #include "perform_feat.h"
