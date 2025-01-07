@@ -410,6 +410,7 @@ namespace banggame {
 
         if (args.card->pocket != pocket_type::button_row) {
             origin->m_played_cards.push_back(make_played_card_history(args, is_response, ctx));
+            origin->m_game->call_event(event_type::on_play_card{ origin, args.card });
         }
 
         if (!is_response) {

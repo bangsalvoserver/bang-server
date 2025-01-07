@@ -9,6 +9,7 @@
 #include "el_gringo.h"
 #include "fifty_guns.h"
 #include "for_a_few_cards_more.h"
+#include "in_good_company.h"
 #include "jesse_jones.h"
 #include "jourdonnais.h"
 #include "kit_carlson.h"

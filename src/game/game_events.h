@@ -27,6 +27,11 @@ namespace banggame::event_type {
         nullable_ref<card_ptr> drawn_card;
     };
 
+    struct on_play_card {
+        player_ptr origin;
+        card_ptr origin_card;
+    };
+
     struct on_discard_any_card {
         player_ptr origin;
         card_ptr target_card;

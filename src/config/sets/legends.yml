@@ -145,13 +145,11 @@ feats:
       - train_to_yooma
   - name: IN_GOOD_COMPANY
     image: 23_in_buona_compagnia
-    # TODO da capire come tenere traccia
-    # on_destroy_card se scarti una carta con stesso nome di ultima carta giocata in history
-    # on_play_card (nuovo evento?) se giochi una carta con stesso nome di ultima carta scartata
-    # crocevia: in_good_company card self | hand -> feat
-    #  effect_in_good_company (discard): error se target_card non ha stesso nome di ultima carta scartata
+    equip:
+      - in_good_company
     effects:
-      - perform_feat # temp
+      - in_good_company card self | hand
+      - perform_feat
   - name: THE_LAST_HERO
     image: 23_l_ultimo_eroe
     equip:
