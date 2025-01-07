@@ -313,9 +313,14 @@ namespace banggame {
     }
 
     void player::skip_turn() {
-        remove_player_flags(player_flag::extra_turn);
-        m_game->call_event(event_type::on_turn_end{ this, true });
-        m_game->start_next_turn();
+        m_game->queue_action([this]{
+            m_game->add_log("LOG_SKIP_TURN", this);
+            remove_player_flags(player_flag::extra_turn);
+            m_game->call_event(event_type::on_turn_end{ this, true });
+        });
+        m_game->queue_action([this]{
+            m_game->start_next_turn();
+        });
     }
 
     void player::remove_extra_characters() {
