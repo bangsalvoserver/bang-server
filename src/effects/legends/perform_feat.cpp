@@ -58,7 +58,7 @@ namespace banggame {
     game_string effect_damage_legend::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
         if (target->m_hp <= 1) {
             bool can_kill = false;
-            target->m_game->call_event(event_type::check_damage_legend_kill{target, can_kill});
+            target->m_game->call_event(event_type::check_damage_legend_kill{origin, can_kill});
             if (!can_kill) {
                 return "ERROR_DAMAGE_LEGEND_KILL";
             }
