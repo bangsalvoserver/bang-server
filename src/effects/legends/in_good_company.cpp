@@ -50,7 +50,9 @@ namespace banggame {
                 if (e_origin == origin && is_destroyed) {
                     last_discarded = target_card;
                     if (card_ptr last_played = get_last_played_card(origin)) {
-                        queue_request_perform_feat(origin_card, origin);
+                        if (is_same_name(origin, last_discarded, last_played)) {
+                            queue_request_perform_feat(origin_card, origin);
+                        }
                     }
                 }
             });
