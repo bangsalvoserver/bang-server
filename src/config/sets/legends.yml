@@ -146,9 +146,8 @@ feats:
       - perform_feat
   - name: '3_15_TO_YOOMA'
     image: 23_il_treno_per_yooma
-    # TODO on_draw_check_start -> attiva feat
-    effects:
-      - perform_feat # temp
+    equip:
+      - train_to_yooma
   - name: IN_GOOD_COMPANY
     image: 23_in_buona_compagnia
     # TODO da capire come tenere traccia
