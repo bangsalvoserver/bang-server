@@ -7,6 +7,9 @@
 namespace banggame {
 
     game_string handler_thousand_ways_to_die::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card1, card_ptr target_card2) {
+        if (target_card1 == target_card2) {
+            return {"ERROR_DUPLICATE_CARD", target_card2};
+        }
         if (target_card1->sign.suit != target_card2->sign.suit) {
             return "ERROR_DIFFERENT_SUITS";
         }
