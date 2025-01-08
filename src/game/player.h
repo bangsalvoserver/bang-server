@@ -29,8 +29,6 @@ namespace banggame {
         
         int8_t m_extra_turns = 0;
 
-        std::vector<played_card_history> m_played_cards;
-
         player_flags m_player_flags;
 
         int8_t m_gold = 0;

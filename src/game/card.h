@@ -64,18 +64,6 @@ namespace banggame {
             move_tokens(card_token_type::cube, target, ncubes, instant);
         }
     };
-    
-    struct card_pocket_pair {
-        card_ptr origin_card;
-        pocket_type pocket;
-    };
-
-    struct played_card_history {
-        card_pocket_pair origin_card;
-        std::vector<card_pocket_pair> modifiers;
-        bool is_response;
-        effect_context context;
-    };
 
 }
 

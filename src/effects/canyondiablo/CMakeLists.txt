@@ -15,7 +15,6 @@ target_sources(bangserver PRIVATE
     ruleset.cpp
     sacrifice.cpp
     soundance_kid.cpp
-    spike_spiezel.cpp
     taxman.cpp
     update_max_hp.cpp
     wyatt_earl.cpp

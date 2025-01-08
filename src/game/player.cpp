@@ -275,11 +275,8 @@ namespace banggame {
     }
 
     void player::start_of_turn() {
-        m_game->m_playing = this;
-        m_played_cards.clear();
-
         m_game->add_log("LOG_TURN_START", this);
-        m_game->add_update<"switch_turn">(this);
+        m_game->add_update<"switch_turn">(m_game->m_playing = this);
 
         m_game->queue_action([this]{
             m_game->call_event(event_type::pre_turn_start{ this });

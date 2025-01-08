@@ -5,7 +5,16 @@
 
 namespace banggame {
 
-    struct ruleset_wildwestshow {};
+    namespace event_type {
+        struct get_count_played_cards {
+            player_ptr origin;
+            nullable_ref<int> value;
+        };
+    }
+
+    struct ruleset_wildwestshow {
+        void on_apply(game *game);
+    };
 
     DEFINE_RULESET(wildwestshow, ruleset_wildwestshow)
 

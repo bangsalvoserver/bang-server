@@ -5,6 +5,14 @@
 
 namespace banggame {
 
+    namespace event_type {
+        struct check_equipped_green_card {
+            player_ptr origin;
+            card_ptr origin_card;
+            nullable_ref<bool> value;
+        };
+    };
+
     struct ruleset_dodgecity {
         void on_apply(game *game);
     };

@@ -1,7 +1,5 @@
 #include "good_company.h"
 
-#include "perform_feat.h"
-
 #include "cards/game_enums.h"
 #include "cards/filter_enums.h"
 
@@ -9,13 +7,11 @@
 
 namespace banggame {
 
-    static card_ptr get_last_played_card(player_ptr origin) {
-        for (const played_card_history &history : origin->m_played_cards | rv::reverse) {
-            if (history.origin_card.pocket == pocket_type::player_hand) {
-                return history.origin_card.origin_card;
-            }
-        }
-        return nullptr;
+    namespace event_type {
+        struct get_last_played_card {
+            player_ptr origin;
+            nullable_ref<card_ptr> value;
+        };
     }
 
     static bool is_same_name(player_ptr origin, card_ptr target_card1, card_ptr target_card2) {
@@ -30,47 +26,53 @@ namespace banggame {
         return target_card1->name == target_card2->name;
     }
 
-    void equip_good_company::on_enable(card_ptr origin_card, player_ptr target) {
-        target->m_game->add_listener<event_type::on_turn_start>(origin_card, [=, last_discarded = static_cast<card_ptr>(nullptr)](player_ptr origin) mutable {
-            last_discarded = nullptr;
+    void equip_good_company::on_enable(card_ptr origin_card, player_ptr origin) {
+        struct card_tracking {
+            card_ptr last_played = nullptr;
+            card_ptr last_discarded = nullptr;
+        };
 
-            event_card_key key{origin_card, 10};
+        auto tracking = std::make_shared<card_tracking>();
 
-            target->m_game->add_listener<event_type::on_destroy_card>(key, [=, &last_discarded](player_ptr e_origin, card_ptr target_card, bool is_destroyed, bool &handled) {
-                if (e_origin == origin && is_destroyed) {
-                    last_discarded = target_card;
-                }
-            });
-
-            target->m_game->add_listener<event_type::on_play_card>(key, [=, &last_discarded](player_ptr e_origin, card_ptr e_origin_card) {
-                if (e_origin == origin && e_origin_card->deck == card_deck_type::main_deck) {
-                    if (last_discarded && is_same_name(origin, last_discarded, e_origin_card)) {
-                        queue_request_perform_feat(origin_card, origin);
-                    } else {
-                        last_discarded = nullptr;
-                    }
-                }
-            });
-
-            target->m_game->add_listener<event_type::on_turn_end>(origin_card, [=](player_ptr origin, bool skipped) {
-                target->m_game->remove_listeners(key);
-            });
+        origin->m_game->add_listener<event_type::on_turn_start>(origin_card, [=](player_ptr e_origin) {
+            *tracking = {};
         });
-    }
 
-    void equip_good_company::on_disable(card_ptr origin_card, player_ptr target) {
-        target->m_game->remove_listeners(event_card_key{ origin_card, 10 });
-        target->m_game->remove_listeners(event_card_key{ origin_card, 0 });
+        origin->m_game->add_listener<event_type::get_last_played_card>(origin_card, [=](player_ptr e_origin, card_ptr &value) {
+            if (e_origin == origin->m_game->m_playing) {
+                value = tracking->last_played;
+            }
+        });
+
+        origin->m_game->add_listener<event_type::on_destroy_card>(origin_card, [=](player_ptr e_origin, card_ptr target_card, bool is_destroyed, bool &handled) {
+            if (e_origin == origin->m_game->m_playing && is_destroyed) {
+                tracking->last_discarded = target_card;
+            }
+        });
+
+        origin->m_game->add_listener<event_type::on_play_card>(origin_card, [=](player_ptr e_origin, card_ptr e_origin_card, const card_list &modifiers, const effect_context &ctx) {
+            if (e_origin == origin->m_game->m_playing && e_origin_card->deck == card_deck_type::main_deck) {
+                tracking->last_played = e_origin_card;
+                
+                if (tracking->last_discarded && is_same_name(e_origin, tracking->last_discarded, tracking->last_played)) {
+                    queue_request_perform_feat(origin_card, e_origin);
+                } else {
+                    tracking->last_discarded = nullptr;
+                }
+            }
+        });
     }
 
     game_string effect_good_company::get_error(card_ptr origin_card, player_ptr origin, card_ptr target) {
         MAYBE_RETURN(effect_discard::get_error(origin_card, origin, target));
 
-        if (card_ptr last_played = get_last_played_card(origin)) {
-            if (is_same_name(origin, last_played, target)) {
-                return {};
-            }
+        card_ptr last_played = nullptr;
+        origin->m_game->call_event(event_type::get_last_played_card{ origin, last_played });
+        if (!last_played) {
+            return {"ERROR_CANT_PLAY_CARD", origin_card};
+        } else if (!is_same_name(origin, last_played, target)) {
+            return {"ERROR_CARDS_NOT_SAME_NAME", last_played, target};
         }
-        return {"ERROR_CANT_PLAY_CARD", origin_card};
+        return {};
     }
 }

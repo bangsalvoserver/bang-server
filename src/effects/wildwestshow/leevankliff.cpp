@@ -6,6 +6,13 @@
 
 namespace banggame {
 
+    namespace event_type {
+        struct get_last_played_brown_card {
+            player_ptr origin;
+            nullable_ref<card_ptr> value;
+        };
+    }
+
     card_ptr get_repeat_playing_card(card_ptr origin_card, const effect_context &ctx) {
         if (ctx.card_choice) {
             return ctx.card_choice;
@@ -14,6 +21,37 @@ namespace banggame {
         } else {
             return origin_card;
         }
+    }
+    
+    void equip_leevankliff::on_enable(card_ptr origin_card, player_ptr origin) {
+        auto last_played = std::make_shared<card_ptr>(nullptr);
+
+        origin->m_game->add_listener<event_type::on_turn_start>(origin_card, [=](player_ptr e_origin) {
+            if (origin == e_origin) {
+                *last_played = nullptr;
+            }
+        });
+
+        origin->m_game->add_listener<event_type::get_last_played_brown_card>(origin_card, [=](player_ptr e_origin, card_ptr &value) {
+            if (origin == e_origin) {
+                value = *last_played;
+            }
+        });
+
+        origin->m_game->add_listener<event_type::on_play_card>(origin_card, [=](player_ptr e_origin, card_ptr e_origin_card, const card_list &modifiers, const effect_context &ctx) {
+            if (origin == e_origin) {
+                if (e_origin_card == ctx.repeat_card || rn::contains(modifiers, origin_card)) {
+                    *last_played = nullptr;
+                } else if (e_origin_card->pocket == pocket_type::player_hand || e_origin_card->pocket == pocket_type::hidden_deck) {
+                    card_ptr target_card = get_repeat_playing_card(e_origin_card, ctx);
+                    if (target_card->is_brown()) {
+                        *last_played = target_card;
+                    } else {
+                        *last_played = nullptr;
+                    }
+                }
+            }
+        });
     }
 
     game_string modifier_leevankliff::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
@@ -35,19 +73,11 @@ namespace banggame {
     }
 
     void modifier_leevankliff::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        auto range = origin->m_played_cards | rv::reverse;
-        if (auto it = rn::find_if(range,
-            [](const played_card_history &history) {
-                return history.origin_card.pocket == pocket_type::player_hand
-                    || history.origin_card.pocket == pocket_type::none;
-            }); it != range.end())
-        {
-            const played_card_history &history = *it;
-            card_ptr playing_card = get_repeat_playing_card(history.origin_card.origin_card, history.context);
-            if (playing_card->is_brown() && !rn::contains(history.modifiers, origin_card, &card_pocket_pair::origin_card)) {
-                ctx.disable_banglimit = true;
-                ctx.repeat_card = playing_card;
-            }
+        card_ptr last_played = nullptr;
+        origin->m_game->call_event(event_type::get_last_played_brown_card{ origin, last_played });
+        if (last_played) {
+            ctx.disable_banglimit = true;
+            ctx.repeat_card = last_played;
         }
     }
 }

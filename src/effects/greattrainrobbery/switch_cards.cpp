@@ -2,6 +2,8 @@
 
 #include "effects/base/steal_destroy.h"
 
+#include "effects/dodgecity/ruleset.h"
+
 #include "game/game.h"
 #include "game/filters.h"
 #include "game/prompts.h"
@@ -11,9 +13,9 @@
 namespace banggame {
 
     static bool has_equipped_card(player_ptr origin, card_ptr target_card) {
-        return rn::any_of(origin->m_played_cards, [&](const card_pocket_pair &pair) {
-            return pair.origin_card == target_card && pair.pocket == pocket_type::player_hand;
-        }, &played_card_history::origin_card);
+        bool value = false;
+        origin->m_game->call_event(event_type::check_equipped_green_card{ origin, target_card, value });
+        return value;
     }
 
     static void resolve_switch_cards(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {

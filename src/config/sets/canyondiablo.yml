@@ -303,7 +303,9 @@ character:
       - soundance_kid
   - name: SPIKE_SPIEZEL
     image: 20_spike_spiezel
-    modifier: spike_spiezel
+    equip:
+      - leevankliff
+    modifier: leevankliff
     effects:
       - max_usages(1)
       - discard card self | hand used_bang

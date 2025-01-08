@@ -362,27 +362,7 @@ namespace banggame {
             target->equip_card(origin_card);
 
             origin->m_game->call_event(event_type::on_equip_card{ origin, target, origin_card, ctx });
-        });
-    }
-
-    static played_card_history make_played_card_history(const game_action &args, bool is_response, const effect_context &ctx) {
-        auto to_card_pocket_pair = [&](card_ptr c) {
-            if (ctx.repeat_card == c) {
-                return card_pocket_pair{c, pocket_type::none};
-            } else {
-                return card_pocket_pair{c, c->pocket};
-            }
-        };
-
-        return {
-            .origin_card{to_card_pocket_pair(args.card)},
-            .modifiers{args.modifiers
-                | rv::transform(&modifier_pair::card)
-                | rv::transform(to_card_pocket_pair)
-                | rn::to_vector},
-            .is_response{is_response},
-            .context{ctx}
-        };
+        }, 45);
     }
 
     game_message verify_and_play(player_ptr origin, const game_action &args) {
@@ -408,10 +388,12 @@ namespace banggame {
 
         origin->m_game->send_request_status_clear();
 
-        if (args.card->pocket != pocket_type::button_row) {
-            origin->m_played_cards.push_back(make_played_card_history(args, is_response, ctx));
-            origin->m_game->call_event(event_type::on_play_card{ origin, args.card });
-        }
+        origin->m_game->call_event(event_type::on_play_card{
+            origin,
+            args.card,
+            args.modifiers | rv::transform(&modifier_pair::card) | rn::to_vector,
+            ctx
+        });
 
         if (!is_response) {
             origin->add_gold(-args.card->get_card_cost(ctx));

@@ -30,6 +30,8 @@ namespace banggame::event_type {
     struct on_play_card {
         player_ptr origin;
         card_ptr origin_card;
+        card_list modifiers;
+        effect_context ctx;
     };
 
     struct on_discard_any_card {

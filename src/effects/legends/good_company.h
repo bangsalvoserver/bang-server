@@ -3,13 +3,14 @@
 
 #include "cards/card_effect.h"
 
+#include "perform_feat.h"
+
 #include "effects/base/steal_destroy.h"
 
 namespace banggame {
     
-    struct equip_good_company : event_equip {
+    struct equip_good_company : feat_equip {
         void on_enable(card_ptr target_card, player_ptr target);
-        void on_disable(card_ptr target_card, player_ptr target);
     };
 
     DEFINE_EQUIP(good_company, equip_good_company)
