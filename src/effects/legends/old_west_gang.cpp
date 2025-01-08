@@ -18,7 +18,7 @@ namespace banggame {
         });
 
         target->m_game->add_listener<event_type::on_hit>(origin_card, [=](card_ptr e_origin_card, player_ptr origin, player_ptr e_target, int damage, effect_flags flags) {
-            if (origin == origin->m_game->m_playing && e_target != origin) {
+            if (origin && origin == target->m_game->m_playing && e_target != origin) {
                 if (!(*first_target)) {
                     *first_target = e_target;
                 } else if (*first_target != e_target) {
