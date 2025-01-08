@@ -18,7 +18,7 @@ namespace banggame {
         origin_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden, false, pocket_position::random);
     }
 
-    static player_ptr find_dynamite_stick(game *game) {
+    static player_ptr find_dynamite_stick(game_ptr game) {
         auto it = rn::find_if(game->m_players, [](player_ptr p) {
             return p->check_player_flags(player_flag::stick_of_dynamite);
         });
@@ -28,7 +28,7 @@ namespace banggame {
         return nullptr;
     }
 
-    void ruleset_stickofdynamite::on_apply(game *game) {
+    void ruleset_stickofdynamite::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 20}, [=](player_ptr origin){
             origin->add_player_flags(player_flag::stick_of_dynamite);
 

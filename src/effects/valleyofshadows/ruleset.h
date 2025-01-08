@@ -6,13 +6,13 @@
 namespace banggame {
 
     struct ruleset_valleyofshadows {
-        void on_apply(game *game);
+        void on_apply(game_ptr game);
     };
 
     DEFINE_RULESET(valleyofshadows, ruleset_valleyofshadows)
 
     struct ruleset_udolistinu {
-        void on_apply(game *game);
+        void on_apply(game_ptr game);
         bool is_valid_with(const expansion_set &set);
     };
 

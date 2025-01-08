@@ -5,10 +5,10 @@
 
 namespace banggame {
 
-    void draw_scenario_card(game *game);
+    void draw_scenario_card(game_ptr game);
 
     struct ruleset_highnoon {
-        void on_apply(game *game);
+        void on_apply(game_ptr game);
     };
 
     DEFINE_RULESET(highnoon, ruleset_highnoon)

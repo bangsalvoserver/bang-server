@@ -356,7 +356,7 @@ namespace banggame {
         return {
             .name = name,
 
-            .on_apply = [](game *game) {
+            .on_apply = [](game_ptr game) {
                 T value{};
                 if constexpr (requires { value.on_apply(game); }) {
                     value.on_apply(game);

@@ -314,7 +314,7 @@ namespace banggame {
 
     static void discard_shop_selection_card(card_ptr origin_card) {
         origin_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
-        game *m_game = origin_card->m_game;
+        game_ptr m_game = origin_card->m_game;
         m_game->queue_action([m_game]{
             if (m_game->m_shop_selection.size() < 3) {
                 m_game->draw_shop_card();

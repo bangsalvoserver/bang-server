@@ -166,7 +166,7 @@ namespace banggame {
         }
     };
 
-    void ruleset_legends::on_apply(game *game) {
+    void ruleset_legends::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 0}, [](player_ptr origin) {
             card_token_type tokens[] = {
                 card_token_type::fame1,

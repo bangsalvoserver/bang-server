@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct ruleset_canyondiablo {
-        void on_apply(game *game);
+        void on_apply(game_ptr game);
     };
 
     DEFINE_RULESET(canyondiablo, ruleset_canyondiablo)

@@ -13,7 +13,7 @@ namespace banggame {
     }
 
     struct ruleset_wildwestshow {
-        void on_apply(game *game);
+        void on_apply(game_ptr game);
     };
 
     DEFINE_RULESET(wildwestshow, ruleset_wildwestshow)

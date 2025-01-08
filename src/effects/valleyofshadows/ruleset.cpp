@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    void ruleset_valleyofshadows::on_apply(game *game) {
+    void ruleset_valleyofshadows::on_apply(game_ptr game) {
         game->add_listener<event_type::apply_escapable_modifier>(nullptr, [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, escape_type &value) {
             if (!target->empty_hand()
                 && effect_escape::can_escape(origin, origin_card, flags)
@@ -28,7 +28,7 @@ namespace banggame {
         });
     }
 
-    void ruleset_udolistinu::on_apply(game *game) {
+    void ruleset_udolistinu::on_apply(game_ptr game) {
         game->add_listener<event_type::apply_escapable_modifier>(nullptr, [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, escape_type &value) {
             if (!target->empty_hand()
                 && effect_escape2::can_escape(origin, origin_card, flags)

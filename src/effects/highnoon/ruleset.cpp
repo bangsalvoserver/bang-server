@@ -4,7 +4,7 @@
 
 namespace banggame {
     
-    void draw_scenario_card(game *game) {
+    void draw_scenario_card(game_ptr game) {
         if (!game->m_scenario_deck.empty() && game->m_scenario_deck.back()->visibility == card_visibility::hidden) {
             game->m_scenario_deck.back()->set_visibility(card_visibility::shown);
         } else {
@@ -21,7 +21,7 @@ namespace banggame {
         }
     }
 
-    void ruleset_highnoon::on_apply(game *game) {
+    void ruleset_highnoon::on_apply(game_ptr game) {
         game->add_listener<event_type::on_turn_switch>({nullptr, 2}, [](player_ptr origin) {
             if (origin == origin->m_game->m_first_player && !origin->m_game->m_scenario_deck.empty()) {
                 draw_scenario_card(origin->m_game);

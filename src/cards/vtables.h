@@ -179,7 +179,7 @@ namespace banggame {
     struct ruleset_vtable {
         std::string_view name;
 
-        void (*on_apply)(game *game);
+        void (*on_apply)(game_ptr game);
         bool (*is_valid_with)(const expansion_set &set);
     };
 

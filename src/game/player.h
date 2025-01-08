@@ -7,7 +7,7 @@
 namespace banggame {
 
     struct player {
-        game *m_game;
+        game_ptr m_game;
         int id;
         int user_id;
 
@@ -33,7 +33,7 @@ namespace banggame {
 
         int8_t m_gold = 0;
 
-        player(game *game, int id, int user_id)
+        player(game_ptr game, int id, int user_id)
             : m_game(game), id(id), user_id(user_id) {}
 
         void equip_card(card_ptr card);

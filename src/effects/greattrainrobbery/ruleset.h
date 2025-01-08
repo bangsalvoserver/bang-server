@@ -39,7 +39,7 @@ namespace banggame {
     }
     
     struct ruleset_greattrainrobbery {
-        void on_apply(game *game);
+        void on_apply(game_ptr game);
     };
 
     DEFINE_RULESET(greattrainrobbery, ruleset_greattrainrobbery)

@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    void ruleset_dodgecity::on_apply(game *game) {
+    void ruleset_dodgecity::on_apply(game_ptr game) {
         event_card_key key{nullptr, 25};
 
         game->add_listener<event_type::on_equip_card>({nullptr, 5}, [=](player_ptr origin, player_ptr target, card_ptr target_card, const effect_context &ctx) {

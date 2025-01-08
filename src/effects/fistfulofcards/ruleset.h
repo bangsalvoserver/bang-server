@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct ruleset_fistfulofcards {
-        void on_apply(game *game);
+        void on_apply(game_ptr game);
     };
 
     DEFINE_RULESET(fistfulofcards, ruleset_fistfulofcards)

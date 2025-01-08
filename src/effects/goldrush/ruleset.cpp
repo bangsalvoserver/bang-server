@@ -6,7 +6,7 @@
 
 namespace banggame {
     
-    void ruleset_goldrush::on_apply(game *game) {
+    void ruleset_goldrush::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 2}, [](player_ptr origin){
             for (int i=0; i<3; ++i) {
                 origin->m_game->draw_shop_card();

@@ -14,6 +14,7 @@ namespace banggame {
     struct card;
     struct player;
 
+    using game_ptr = game *;
     using card_ptr = card *;
     using player_ptr = player *;
 

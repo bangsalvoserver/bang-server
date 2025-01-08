@@ -20,13 +20,13 @@ namespace banggame {
     static constexpr int max_cubes = 4;
     
     struct card : card_data {
-        card(game *game, int id, const card_data &data)
+        card(game_ptr game, int id, const card_data &data)
             : card_data(data), m_game(game), order(id), id(id) {}
         
         const int order;
         int id;
 
-        game *m_game = nullptr;
+        game_ptr m_game = nullptr;
         player_ptr owner = nullptr;
         pocket_type pocket = pocket_type::none;
         card_visibility visibility = card_visibility::hidden;

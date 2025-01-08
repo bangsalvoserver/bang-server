@@ -13,7 +13,7 @@ namespace banggame {
     }
 
     struct ruleset_armedanddangerous {
-        void on_apply(game *game);
+        void on_apply(game_ptr game);
     };
 
     DEFINE_RULESET(armedanddangerous, ruleset_armedanddangerous)

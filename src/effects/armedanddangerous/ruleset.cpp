@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    void ruleset_armedanddangerous::on_apply(game *game) {
+    void ruleset_armedanddangerous::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 4}, [](player_ptr origin){
             origin->m_game->add_tokens(card_token_type::cube, 32);
         });

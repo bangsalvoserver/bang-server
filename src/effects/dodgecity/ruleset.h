@@ -14,7 +14,7 @@ namespace banggame {
     };
 
     struct ruleset_dodgecity {
-        void on_apply(game *game);
+        void on_apply(game_ptr game);
     };
 
     DEFINE_RULESET(dodgecity, ruleset_dodgecity)

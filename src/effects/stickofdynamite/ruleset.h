@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct ruleset_stickofdynamite {
-        void on_apply(game *game);
+        void on_apply(game_ptr game);
     };
 
     DEFINE_RULESET(stickofdynamite, ruleset_stickofdynamite)

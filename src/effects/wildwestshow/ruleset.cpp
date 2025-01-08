@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    void ruleset_wildwestshow::on_apply(game *game) {
+    void ruleset_wildwestshow::on_apply(game_ptr game) {
         event_card_key key{nullptr, -15};
 
         game->add_listener<event_type::on_turn_start>(nullptr, [=](player_ptr origin) {
