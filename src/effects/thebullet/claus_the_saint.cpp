@@ -32,8 +32,8 @@ namespace banggame {
             
             if (remaining_targets.empty()) {
                 target->m_game->pop_request();
-                while (!origin->m_game->m_selection.empty()) {
-                    req_draw->add_to_hand_phase_one(origin->m_game->m_selection.front());
+                while (!target->m_game->m_selection.empty()) {
+                    req_draw->add_to_hand_phase_one(target->m_game->m_selection.front());
                 }
             }
         }
