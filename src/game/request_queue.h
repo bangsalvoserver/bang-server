@@ -120,6 +120,9 @@ namespace banggame {
         }
 
         void pop_request() {
+            if (m_requests.empty()) {
+                throw game_error("Request queue is empty. Cannot pop");
+            }
             m_requests.pop();
         }
     };
