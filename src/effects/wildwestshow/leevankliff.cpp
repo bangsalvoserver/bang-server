@@ -40,13 +40,16 @@ namespace banggame {
 
         origin->m_game->add_listener<event_type::on_play_card>(origin_card, [=](player_ptr e_origin, card_ptr e_origin_card, const card_list &modifiers, const effect_context &ctx) {
             if (origin == e_origin) {
-                if (e_origin_card == ctx.repeat_card || rn::contains(modifiers, origin_card)) {
+                if (rn::contains(modifiers, origin_card)) {
                     *last_played = nullptr;
-                } else if (e_origin_card->pocket == pocket_type::player_hand || e_origin_card->pocket == pocket_type::hidden_deck) {
-                    card_ptr target_card = get_repeat_playing_card(e_origin_card, ctx);
+                } else if (card_ptr target_card = get_repeat_playing_card(e_origin_card, ctx);
+                    target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::shop_selection
+                ) {
                     if (target_card->is_brown()) {
                         *last_played = target_card;
                     } else {
+                        // does "the brown-bordered card he just played" mean "the latest brown card he played"
+                        // or "the latest card he played if it is brown"?
                         *last_played = nullptr;
                     }
                 }
