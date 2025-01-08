@@ -144,12 +144,12 @@ feats:
     image: 23_il_treno_per_yooma
     equip:
       - train_to_yooma
-  - name: IN_GOOD_COMPANY
+  - name: GOOD_COMPANY
     image: 23_in_buona_compagnia
     equip:
-      - in_good_company
+      - good_company
     effects:
-      - in_good_company card self | hand
+      - good_company card self | hand
       - perform_feat
   - name: THE_LAST_HERO
     image: 23_l_ultimo_eroe

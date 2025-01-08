@@ -1,4 +1,4 @@
-#include "in_good_company.h"
+#include "good_company.h"
 
 #include "perform_feat.h"
 
@@ -9,18 +9,10 @@
 
 namespace banggame {
 
-    namespace event_type {
-        struct get_last_discarded_card {
-            nullable_ref<card_ptr> value;
-        };
-    }
-
-    static card_ptr get_last_played_card(player_ptr origin, card_ptr origin_card) {
+    static card_ptr get_last_played_card(player_ptr origin) {
         for (const played_card_history &history : origin->m_played_cards | rv::reverse) {
             if (history.origin_card.pocket == pocket_type::player_hand) {
-                if (origin_card != history.origin_card.origin_card) {
-                    return history.origin_card.origin_card;
-                }
+                return history.origin_card.origin_card;
             }
         }
         return nullptr;
@@ -38,24 +30,15 @@ namespace banggame {
         return target_card1->name == target_card2->name;
     }
 
-    void equip_in_good_company::on_enable(card_ptr origin_card, player_ptr target) {
+    void equip_good_company::on_enable(card_ptr origin_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_turn_start>(origin_card, [=, last_discarded = static_cast<card_ptr>(nullptr)](player_ptr origin) mutable {
             last_discarded = nullptr;
 
             event_card_key key{origin_card, 10};
 
-            target->m_game->add_listener<event_type::get_last_discarded_card>(key, [&last_discarded](card_ptr &value) {
-                value = last_discarded;
-            });
-
             target->m_game->add_listener<event_type::on_destroy_card>(key, [=, &last_discarded](player_ptr e_origin, card_ptr target_card, bool is_destroyed, bool &handled) {
                 if (e_origin == origin && is_destroyed) {
                     last_discarded = target_card;
-                    if (card_ptr last_played = get_last_played_card(origin, origin_card)) {
-                        if (is_same_name(origin, last_discarded, last_played)) {
-                            queue_request_perform_feat(origin_card, origin);
-                        }
-                    }
                 }
             });
 
@@ -75,15 +58,15 @@ namespace banggame {
         });
     }
 
-    void equip_in_good_company::on_disable(card_ptr origin_card, player_ptr target) {
+    void equip_good_company::on_disable(card_ptr origin_card, player_ptr target) {
         target->m_game->remove_listeners(event_card_key{ origin_card, 10 });
         target->m_game->remove_listeners(event_card_key{ origin_card, 0 });
     }
 
-    game_string effect_in_good_company::get_error(card_ptr origin_card, player_ptr origin, card_ptr target) {
+    game_string effect_good_company::get_error(card_ptr origin_card, player_ptr origin, card_ptr target) {
         MAYBE_RETURN(effect_discard::get_error(origin_card, origin, target));
 
-        if (card_ptr last_played = get_last_played_card(origin, origin_card)) {
+        if (card_ptr last_played = get_last_played_card(origin)) {
             if (is_same_name(origin, last_played, target)) {
                 return {};
             }
