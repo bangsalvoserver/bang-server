@@ -9,7 +9,7 @@
 #include "can_play_card.h"
 #include "card_choice.h"
 #include "damage.h"
-#include "deathsave.h"
+#include "death.h"
 #include "draw.h"
 #include "duel.h"
 #include "dynamite.h"

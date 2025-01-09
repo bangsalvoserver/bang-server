@@ -357,7 +357,7 @@ namespace banggame {
     }
 
     void player::reset_max_hp() {
-        m_max_hp = first_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
+        m_max_hp = get_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
     }
 
     bool player::add_player_flags(player_flag flags) {

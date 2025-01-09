@@ -92,23 +92,14 @@ namespace banggame {
         int num_tokens(card_token_type token_type) const;
         void add_tokens(card_token_type token_type, int num_tokens, card_ptr target_card = nullptr);
 
-        int num_cubes() const {
-            return num_tokens(card_token_type::cube);
-        }
-
         void clear_request_status();
 
         card_ptr top_of_deck();
-        card_ptr top_train_card();
-        card_ptr draw_shop_card();
-
-        void advance_train(player_ptr origin);
 
         void add_short_pause();
         void play_sound(std::string_view sound_id);
         
         void start_next_turn();
-        void handle_player_death(player_ptr killer, player_ptr target, discard_all_reason reason);
 
         void add_game_flags(game_flag flags);
         void remove_game_flags(game_flag flags);

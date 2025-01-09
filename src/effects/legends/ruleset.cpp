@@ -98,7 +98,7 @@ namespace banggame {
 
         bool can_pick(const_card_ptr target_card) const override {
             if (target_card->pocket == pocket_type::feats) {
-                auto [token, count] = get_card_fame_token_type(target->first_character());
+                auto [token, count] = get_card_fame_token_type(target->get_character());
                 return target_card->tokens[token] == 0;
             }
             return false;
@@ -107,7 +107,7 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
             target->m_game->add_log("LOG_FEAT_BOASTED", target, target_card);
-            card_ptr character_card = target->first_character();
+            card_ptr character_card = target->get_character();
             auto [token, count] = get_card_fame_token_type(character_card);
             character_card->move_tokens(token, target_card, 1);
         }
@@ -182,7 +182,7 @@ namespace banggame {
             rn::shuffle(tokens, origin->m_game->rng);
 
             for (auto [token_type, target] : rv::zip(tokens, origin->m_game->range_all_players(origin))) {
-                origin->m_game->add_tokens(token_type, 5, target->first_character());
+                origin->m_game->add_tokens(token_type, 5, target->get_character());
             }
             
             draw_next_feat(origin);
@@ -208,7 +208,7 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_turn_end>({nullptr, 20}, [](player_ptr origin, bool skipped) {
-            card_ptr character_card = origin->first_character();
+            card_ptr character_card = origin->get_character();
             if (character_card->deck != card_deck_type::legends && get_count_performed_feats(origin) == 0) {
                 auto [token, count] = get_card_fame_token_type(character_card);
                 if (count != 0) {

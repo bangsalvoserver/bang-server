@@ -27,7 +27,7 @@ namespace banggame {
     }
 
     bool effect_perform_feat::can_play(card_ptr origin_card, player_ptr origin) {
-        card_ptr character_card = origin->first_character();
+        card_ptr character_card = origin->get_character();
         if (origin_card->deck == card_deck_type::feats && character_card->deck != card_deck_type::legends) {
             auto [token, count] = get_card_fame_token_type(character_card);
             if (count == 0) {
@@ -112,7 +112,7 @@ namespace banggame {
         }
 
         game_string status_text(player_ptr owner) const override {
-            if (target->first_character()->deck == card_deck_type::legends) {
+            if (target->get_character()->deck == card_deck_type::legends) {
                 if (owner == target) {
                     return {"STATUS_CLAIM_FEAT", origin_card};
                 } else {
@@ -146,7 +146,7 @@ namespace banggame {
         });
 
         if (origin_card->deck == card_deck_type::feats) {
-            card_ptr character_card = origin->first_character();
+            card_ptr character_card = origin->get_character();
             if (character_card->deck == card_deck_type::legends) {
                 origin->m_game->add_log("LOG_FEAT_CLAIMED", origin, origin_card);
                 origin->m_game->queue_request<request_damage_legend>(origin);

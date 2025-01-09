@@ -15,7 +15,7 @@ namespace banggame {
     }
 
     template<> bool visit_cards::possible(const effect_context &ctx) {
-        return origin->first_character()->num_cubes() != 0
+        return origin->get_character()->num_cubes() != 0
             && contains_at_least(make_move_cube_target_set(origin, origin_card, ctx), 1);
     }
 
@@ -24,7 +24,7 @@ namespace banggame {
         rn::shuffle(targets, origin->m_game->bot_rng);
         
         targets.resize(std::min({
-            static_cast<size_t>(origin->first_character()->num_cubes()),
+            static_cast<size_t>(origin->get_character()->num_cubes()),
             static_cast<size_t>(effect.target_value),
             targets.size()
         }));
@@ -35,7 +35,7 @@ namespace banggame {
         if (targets.empty() || targets.size() > effect.target_value) {
             return "ERROR_INVALID_TARGETS";
         }
-        origin_card = origin->first_character();
+        origin_card = origin->get_character();
         if (origin_card->num_cubes() < targets.size()) {
             return {"ERROR_NOT_ENOUGH_CUBES_ON", origin_card};
         }
@@ -62,10 +62,10 @@ namespace banggame {
 
     template<> void visit_cards::play(const effect_context &ctx, const card_list &targets) {
         if (rn::all_of(targets, [first=targets.front()](card_ptr target_card) { return target_card == first; })) {
-            origin->first_character()->move_cubes(targets.front(), static_cast<int>(targets.size()));
+            origin->get_character()->move_cubes(targets.front(), static_cast<int>(targets.size()));
         } else {
             for (card_ptr target_card : targets) {
-                origin->first_character()->move_cubes(target_card, 1);
+                origin->get_character()->move_cubes(target_card, 1);
             }
         }
     }

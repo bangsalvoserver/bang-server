@@ -52,16 +52,25 @@ namespace banggame {
     };
 
     struct request_discard_all : request_picking, interface_resolvable {
-        discard_all_reason reason;
-
-        request_discard_all(player_ptr target, discard_all_reason reason, int priority = 100)
-            : request_picking(nullptr, nullptr, target, {}, priority)
-            , reason(reason) {}
+        request_discard_all(player_ptr target, int priority = 100)
+            : request_picking(nullptr, nullptr, target, {}, priority) {}
         
         bool can_pick(const_card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
         void on_update() override;
         void on_resolve() override;
+        game_string status_text(player_ptr owner) const override;
+    };
+
+    struct request_discard_all_death : request_discard_all {
+        using request_discard_all::request_discard_all;
+
+        void on_resolve() override;
+    };
+
+    struct request_sheriff_killed_deputy : request_discard_all {
+        using request_discard_all::request_discard_all;
+
         game_string status_text(player_ptr owner) const override;
     };
     

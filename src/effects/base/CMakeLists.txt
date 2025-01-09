@@ -7,7 +7,7 @@ target_sources(bangserver PRIVATE
     can_play_card.cpp
     card_choice.cpp
     damage.cpp
-    deathsave.cpp
+    death.cpp
     draw_check.cpp
     draw.cpp
     duel.cpp

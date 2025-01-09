@@ -3,7 +3,7 @@
 #include "game/game_table.h"
 #include "game/prompts.h"
 
-#include "effects/base/deathsave.h"
+#include "effects/base/death.h"
 #include "effects/base/resolve.h"
 #include "effects/base/gift_card.h"
 

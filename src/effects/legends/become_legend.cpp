@@ -7,7 +7,7 @@ namespace banggame {
 
     bool effect_become_legend::can_play(card_ptr origin_card, player_ptr origin) {
         if (!origin->check_player_flags(player_flag::legend)) {
-            for (const auto &[token, count] : origin->first_character()->tokens) {
+            for (const auto &[token, count] : origin->get_character()->tokens) {
                 if (token != card_token_type::cube && count != 0) {
                     return false;
                 }
@@ -26,7 +26,7 @@ namespace banggame {
                     return target_card->name == origin_card->name;
                 } else {
                     return rn::none_of(origin_card->m_game->m_players, [&](player_ptr target) {
-                        return target->first_character()->name == target_card->name;
+                        return target->get_character()->name == target_card->name;
                     });
                 }
             });
@@ -45,7 +45,7 @@ namespace banggame {
             c->visibility = card_visibility::hidden;
         }
 
-        card_ptr old_character = origin->first_character();
+        card_ptr old_character = origin->get_character();
         card_ptr legend_character = find_legend_character(old_character);
 
         origin->m_game->add_log("LOG_BECOME_LEGEND", origin, legend_character);

@@ -89,7 +89,7 @@ namespace banggame {
             return m_hand.empty();
         }
 
-        card_ptr first_character() const {
+        card_ptr get_character() const {
             if (!m_characters.empty()) {
                 return m_characters.front();
             }

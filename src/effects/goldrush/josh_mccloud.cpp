@@ -1,5 +1,7 @@
 #include "josh_mccloud.h"
 
+#include "ruleset.h"
+
 #include "effects/base/requests.h"
 
 #include "cards/game_enums.h"
@@ -103,7 +105,7 @@ namespace banggame {
     };
 
     void effect_josh_mccloud::on_play(card_ptr origin_card, player_ptr target) {
-        card_ptr target_card = target->m_game->draw_shop_card();
+        card_ptr target_card = draw_shop_card(target->m_game);
         if (target_card->is_black()) {
             target->m_game->queue_request<request_force_equip_card>(origin_card, target, target_card);
         } else {

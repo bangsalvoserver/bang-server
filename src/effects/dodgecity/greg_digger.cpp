@@ -2,7 +2,7 @@
 
 #include "game/game_table.h"
 
-#include "effects/base/deathsave.h"
+#include "effects/base/death.h"
 
 namespace banggame {
 

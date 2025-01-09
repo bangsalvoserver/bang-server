@@ -42,13 +42,6 @@ namespace banggame {
         removed,
         winner,
     };
-    
-    enum class discard_all_reason {
-        death,
-        sheriff_killed_deputy,
-        disable_temp_ghost,
-        discard_ghost,
-    };
 }
 
 #endif

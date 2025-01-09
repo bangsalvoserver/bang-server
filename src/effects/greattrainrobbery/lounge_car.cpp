@@ -1,5 +1,7 @@
 #include "lounge_car.h"
 
+#include "ruleset.h"
+
 #include "game/game_table.h"
 #include "game/filters.h"
 #include "game/prompts.h"
@@ -12,12 +14,8 @@ namespace banggame {
         
         void on_update() override {
             if (!live) {
-                for (int i=0; i<2; ++i) {
-                    if (card_ptr drawn_card = target->m_game->top_train_card()) {
-                        drawn_card->move_to(pocket_type::selection, target);
-                    } else {
-                        break;
-                    }
+                for (int i=0; i<2 && !target->m_game->m_train_deck.empty(); ++i) {
+                    target->m_game->m_train_deck.back()->move_to(pocket_type::selection, target);
                 }
             }
             if (target->m_game->m_selection.empty()) {
@@ -52,11 +50,10 @@ namespace banggame {
     };
 
     game_string effect_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin) {
-        if (origin->m_game->top_train_card() == nullptr) {
+        if (origin->m_game->m_train_deck.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
-        } else {
-            return {};
         }
+        return {};
     }
 
     void effect_lounge_car::on_play(card_ptr origin_card, player_ptr origin) {

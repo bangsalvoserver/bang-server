@@ -34,7 +34,7 @@ namespace banggame {
         bool can_pick(const_card_ptr target_card) const override {
             return target_card->owner == target
                 && (target_card->pocket == pocket_type::player_table && target_card->is_orange()
-                || target_card->pocket == pocket_type::player_character && target_card == target->first_character())
+                || target_card->pocket == pocket_type::player_character && target_card == target->get_character())
                 && target_card->num_cubes() < max_cubes;
         }
 
@@ -72,7 +72,7 @@ namespace banggame {
     }
 
     void effect_add_cube::on_play(card_ptr origin_card, player_ptr origin) {
-        if (int num = std::min<int>(ncubes, origin->m_game->num_cubes())) {
+        if (int num = std::min<int>(ncubes, origin->m_game->num_tokens(card_token_type::cube))) {
             origin->m_game->queue_request<request_add_cube>(origin_card, origin, num);
         }
     }

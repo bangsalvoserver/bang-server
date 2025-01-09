@@ -1,6 +1,6 @@
 #include "vulture_sam.h"
 
-#include "effects/base/deathsave.h"
+#include "effects/base/death.h"
 
 #include "game/game_table.h"
 
@@ -23,7 +23,7 @@ namespace banggame {
                     origin->disable_equip(c);
                 }
 
-                card_ptr old_character = origin->first_character();
+                card_ptr old_character = origin->get_character();
                 card_ptr base_character = find_base_character(origin_card);
 
                 origin->m_game->add_update<"remove_cards">(origin->m_characters);

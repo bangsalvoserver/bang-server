@@ -1,6 +1,6 @@
 #include "vulture_sam.h"
 
-#include "deathsave.h"
+#include "death.h"
 #include "pick.h"
 
 #include "game/game_table.h"

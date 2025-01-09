@@ -22,7 +22,7 @@ namespace banggame {
 
         bool can_pick(const_card_ptr target_card) const override {
             return target_card->pocket == pocket_type::selection
-                || (target_card->pocket == pocket_type::player_character && target_card == target->first_character());
+                || (target_card->pocket == pocket_type::player_character && target_card == target->get_character());
         }
 
         void on_pick(card_ptr target_card) override {
@@ -35,7 +35,7 @@ namespace banggame {
 
                 target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
 
-                card_ptr old_character = target->first_character();
+                card_ptr old_character = target->get_character();
                 old_character->set_visibility(card_visibility::hidden, target);
                 old_character->move_to(pocket_type::player_backup, target, card_visibility::hidden, true);
                 target_card->move_to(pocket_type::player_character, target, card_visibility::shown);

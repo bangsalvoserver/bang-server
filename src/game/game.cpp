@@ -7,7 +7,7 @@
 #include "cards/game_enums.h"
 
 #include "effects/base/requests.h"
-#include "effects/base/deathsave.h"
+#include "effects/base/death.h"
 
 #include "play_verify.h"
 #include "possible_to_play.h"

@@ -1,5 +1,5 @@
-#ifndef __BASE_DEATHSAVE_H__
-#define __BASE_DEATHSAVE_H__
+#ifndef __BASE_DEATH_H__
+#define __BASE_DEATH_H__
 
 #include "cards/card_effect.h"
 #include "resolve.h"
@@ -36,6 +36,8 @@ namespace banggame {
         prompt_string resolve_prompt() const override;
         game_string status_text(player_ptr owner) const override;
     };
+    
+    void handle_player_death(player_ptr killer, player_ptr target, bool is_death);
 }
 
 #endif

@@ -159,27 +159,28 @@ namespace banggame {
             on_pick(target_card);
         }
 
-        card_ptr character_card = target->first_character();
+        card_ptr character_card = target->get_character();
         character_card->drop_all_cubes();
-
-        if (reason == discard_all_reason::death) {
-            target->m_game->play_sound("death");
-        }
     }
 
     game_string request_discard_all::status_text(player_ptr owner) const {
-        if (reason != discard_all_reason::sheriff_killed_deputy) {
-            if (target == owner) {
-                return "STATUS_DISCARD_ALL";
-            } else {
-                return {"STATUS_DISCARD_ALL_OTHER", target};
-            }
+        if (target == owner) {
+            return "STATUS_DISCARD_ALL";
         } else {
-            if (target == owner) {
-                return "STATUS_SHERIFF_KILLED_DEPUTY";
-            } else {
-                return {"STATUS_SHERIFF_KILLED_DEPUTY_OTH", target};
-            }
+            return {"STATUS_DISCARD_ALL_OTHER", target};
+        }
+    }
+
+    void request_discard_all_death::on_resolve() {
+        request_discard_all::on_resolve();
+        target->m_game->play_sound("death");
+    }
+
+    game_string request_sheriff_killed_deputy::status_text(player_ptr owner) const {
+        if (target == owner) {
+            return "STATUS_SHERIFF_KILLED_DEPUTY";
+        } else {
+            return {"STATUS_SHERIFF_KILLED_DEPUTY_OTH", target};
         }
     }
         

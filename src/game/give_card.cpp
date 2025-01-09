@@ -50,7 +50,7 @@ namespace banggame {
                 target->disable_equip(c);
             }
 
-            card_ptr old_character = target->first_character();
+            card_ptr old_character = target->get_character();
             auto tokens = old_character->tokens;
 
             for (const auto &[token, count] : tokens) {
@@ -122,8 +122,8 @@ namespace banggame {
             } else {
                 bool from_train = target_card->pocket == pocket_type::train;
                 target->equip_card(target_card);
-                if (card_ptr drawn_card = target->m_game->top_train_card(); from_train && drawn_card) {
-                    drawn_card->move_to(pocket_type::train);
+                if (from_train && !target->m_game->m_train_deck.empty()) {
+                    target->m_game->m_train_deck.back()->move_to(pocket_type::train);
                 }
             }
             break;

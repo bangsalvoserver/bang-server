@@ -30,7 +30,7 @@ namespace banggame {
         if (filter.check(target_player_filter::notsheriff) && target->m_role == player_role::sheriff)
             return {"ERROR_TARGET_SHERIFF", origin_card, target};
         
-        if (filter.check(target_player_filter::legend) && target->first_character()->deck != card_deck_type::legends)
+        if (filter.check(target_player_filter::legend) && target->get_character()->deck != card_deck_type::legends)
             return {"ERROR_TARGET_NOT_LEGEND", origin_card, target};
 
         if (filter.check(target_player_filter::not_empty_hand) && target->empty_hand())
@@ -84,7 +84,7 @@ namespace banggame {
         } else if (filter.check(target_card_filter::cube_slot)) {
             if (!target->owner)
                 return "ERROR_CARD_HAS_NO_OWNER";
-            if (target != target->owner->first_character() && !(target->is_orange() && target->pocket == pocket_type::player_table))
+            if (target != target->owner->get_character() && !(target->is_orange() && target->pocket == pocket_type::player_table))
                 return "ERROR_TARGET_NOT_CUBE_SLOT";
         } else {
             if (filter.check(target_card_filter::selection) != (target->pocket == pocket_type::selection))

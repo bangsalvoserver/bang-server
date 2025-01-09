@@ -312,16 +312,6 @@ namespace banggame {
         }
     }
 
-    static void discard_shop_selection_card(card_ptr origin_card) {
-        origin_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
-        game_ptr m_game = origin_card->m_game;
-        m_game->queue_action([m_game]{
-            if (m_game->m_shop_selection.size() < 3) {
-                m_game->draw_shop_card();
-            }
-        }, -1);
-    }
-
     static void apply_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, is_response);
 
@@ -336,7 +326,7 @@ namespace banggame {
                 }
                 break;
             case pocket_type::shop_selection:
-                discard_shop_selection_card(origin_card);
+                origin_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
             }
         }
 

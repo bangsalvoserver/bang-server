@@ -4,7 +4,7 @@
 #include "cards/filter_enums.h"
 
 #include "effects/base/damage.h"
-#include "effects/base/deathsave.h"
+#include "effects/base/death.h"
 
 #include "game/game_table.h"
 

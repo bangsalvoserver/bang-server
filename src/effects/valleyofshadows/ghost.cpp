@@ -5,6 +5,8 @@
 #include "game/game_table.h"
 #include "game/prompts.h"
 
+#include "effects/base/death.h"
+
 namespace banggame {
 
     equip_ghost::equip_ghost(int value)
@@ -27,7 +29,7 @@ namespace banggame {
     void equip_ghost::on_disable(card_ptr target_card, player_ptr target) {
         target->remove_player_flags(flag);
         if (!target->alive()) {
-            target->m_game->handle_player_death(nullptr, target, discard_all_reason::discard_ghost);
+            handle_player_death(nullptr, target, false);
         }
     }
 }

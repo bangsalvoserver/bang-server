@@ -6,8 +6,7 @@
 #include "cards/game_enums.h"
 
 #include "effects/base/requests.h"
-#include "effects/base/deathsave.h"
-#include "effects/greattrainrobbery/ruleset.h"
+#include "effects/base/death.h"
 
 namespace banggame {
 
@@ -165,41 +164,6 @@ namespace banggame {
         return drawn_card;
     }
 
-    card_ptr game_table::draw_shop_card() {
-        if (m_shop_deck.empty()) {
-            throw game_error("Shop deck is empty. Cannot reshuffle");
-        }
-        if (m_shop_deck.back()->visibility == card_visibility::shown) {
-            for (card_ptr c : m_shop_deck) {
-                c->visibility = card_visibility::hidden;
-            }
-            shuffle_cards_and_ids(m_shop_deck);
-            add_log("LOG_SHOP_RESHUFFLED");
-            play_sound("shuffle");
-            add_update<"deck_shuffled">(pocket_type::shop_deck);
-        }
-        card_ptr drawn_card = m_shop_deck.back();
-        add_log("LOG_DRAWN_SHOP_CARD", drawn_card);
-        drawn_card->move_to(pocket_type::shop_selection);
-        return drawn_card;
-    }
-
-    card_ptr game_table::top_train_card() {
-        if (!m_train_deck.empty()) {
-            return m_train_deck.back();
-        }
-        return nullptr;
-    }
-
-    void game_table::advance_train(player_ptr origin) {
-        play_sound("train");
-        
-        add_log("LOG_TRAIN_ADVANCE");
-        add_update<"move_train">(++train_position);
-
-        call_event(event_type::on_train_advance{ origin, std::make_shared<locomotive_context>(1) });
-    }
-
     void game_table::add_short_pause() {
         add_update<"short_pause">(nullptr);
     }
@@ -237,131 +201,6 @@ namespace banggame {
         next_player->start_of_turn();
 
         call_event(event_type::on_turn_switch{ next_player });
-    }
-
-    void game_table::handle_player_death(player_ptr killer, player_ptr target, discard_all_reason reason) {
-        if (killer != m_playing) killer = nullptr;
-        
-        queue_action([this, killer, target, reason]{
-            if (target->m_hp <= 0) {
-                if (killer && killer != target) {
-                    add_log("LOG_PLAYER_KILLED", killer, target);
-                } else {
-                    add_log("LOG_PLAYER_DIED", target);
-                }
-
-                target->add_player_flags(player_flag::dead);
-                target->set_hp(0, true);
-            }
-
-            if (!target->alive()) {
-                target->remove_extra_characters();
-                for (card_ptr c : target->m_characters) {
-                    target->disable_equip(c);
-                }
-
-                if (target->add_player_flags(player_flag::role_revealed)) {
-                    add_update<"player_show_role">(update_target::excludes(target), target, target->m_role);
-                }
-
-                call_event(event_type::on_player_eliminated{ killer, target });
-            }
-        }, 50);
-
-        if (killer && reason != discard_all_reason::discard_ghost) {
-            queue_action([this, killer, target] {
-                if (killer->alive() && !target->alive()) {
-                    if (m_players.size() > 3) {
-                        if (target->m_role == player_role::outlaw) {
-                            add_log("LOG_KILLED_OUTLAW", killer);
-                            killer->draw_card(3);
-                        } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
-                            target->m_game->add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                            queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy, -4);
-                        }
-                    } else if (m_players.size() == 3 && (
-                        (target->m_role == player_role::deputy_3p && killer->m_role == player_role::renegade_3p) ||
-                        (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::deputy_3p) ||
-                        (target->m_role == player_role::renegade_3p && killer->m_role == player_role::outlaw_3p)))
-                    {
-                        killer->draw_card(3);
-                    }
-                }
-            }, 50);
-        }
-        
-        queue_action([this, target, reason]{
-            if (!target->alive()) {
-                queue_request<request_discard_all>(target, reason);
-            }
-        }, 50);
-
-        if (rn::none_of(get_all_cards(), [](const_card_ptr c) { return c->has_tag(tag_type::ghost_card); })) {
-            queue_action([this]{
-                bool any_player_removed = false;
-                for (player_ptr p : m_players) {
-                    if (!p->alive() && p->add_player_flags(player_flag::removed)) {
-                        any_player_removed = true;
-                    }
-                }
-                
-                if (any_player_removed) {
-                    add_update<"player_order">(m_players);
-                }
-            }, -6);
-        }
-
-        queue_action([this, killer, target] {
-            if (target == m_first_player && !target->alive() && num_alive() > 1) {
-                m_first_player = target->get_next_player();
-            }
-
-            auto declare_winners = [this](auto &&winners) {
-                for (player_ptr p : range_all_players(m_playing)) {
-                    if (p->add_player_flags(player_flag::role_revealed)) {
-                        add_update<"player_show_role">(update_target::excludes(p), p, p->m_role);
-                    }
-                }
-                add_log("LOG_GAME_OVER");
-                for (player_ptr p : winners) {
-                    p->add_player_flags(player_flag::winner);
-                }
-                add_game_flags(game_flag::game_over);
-            };
-
-            auto alive_players = rv::filter(m_players, &player::alive);
-
-            if (check_flags(game_flag::free_for_all)) {
-                if (rn::distance(alive_players) <= 1) {
-                    declare_winners(alive_players);
-                }
-            } else if (m_players.size() > 3) {
-                auto is_outlaw = [](player_ptr p) { return p->m_role == player_role::outlaw; };
-                auto is_renegade = [](player_ptr p) { return p->m_role == player_role::renegade; };
-                auto is_sheriff = [](player_ptr p) { return p->m_role == player_role::sheriff; };
-                auto is_sheriff_or_deputy = [](player_ptr p) { return p->m_role == player_role::sheriff || p->m_role == player_role::deputy; };
-
-                if (rn::none_of(alive_players, is_sheriff)) {
-                    if (rn::distance(alive_players) == 1 && is_renegade(alive_players.front())) {
-                        declare_winners(alive_players);
-                    } else {
-                        declare_winners(rv::filter(m_players, is_outlaw));
-                    }
-                } else if (rn::all_of(alive_players, is_sheriff_or_deputy)) {
-                    declare_winners(rv::filter(m_players, is_sheriff_or_deputy));
-                }
-            } else {
-                if (rn::distance(alive_players) <= 1) {
-                    declare_winners(alive_players);
-                } else if (killer && !target->alive() && (
-                    (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::renegade_3p) ||
-                    (target->m_role == player_role::renegade_3p && killer->m_role == player_role::deputy_3p) ||
-                    (target->m_role == player_role::deputy_3p && killer->m_role == player_role::outlaw_3p)))
-                {
-                    declare_winners(rv::single(killer));
-                }
-            }
-        }, -8);
     }
 
     void game_table::add_game_flags(game_flag flags) {

@@ -5,7 +5,7 @@
 #include "game/game_table.h"
 #include "game/game_options.h"
 
-#include "deathsave.h"
+#include "death.h"
 
 namespace banggame {
     

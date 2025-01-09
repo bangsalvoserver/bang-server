@@ -4,7 +4,7 @@
 #include "game/game_options.h"
 
 #include "effects/highnoon/ruleset.h"
-#include "effects/base/deathsave.h"
+#include "effects/base/death.h"
 
 namespace banggame {
 

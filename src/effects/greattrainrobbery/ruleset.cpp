@@ -34,12 +34,8 @@ namespace banggame {
             origin->enable_equip(c);
         }
         
-        for (int i=0; i<3; ++i) {
-            if (card_ptr drawn_card = origin->m_game->top_train_card()) {
-                drawn_card->move_to(pocket_type::train);
-            } else {
-                break;
-            }
+        for (int i=0; i<3 && !origin->m_game->m_train_deck.empty(); ++i) {
+            origin->m_game->m_train_deck.back()->move_to(pocket_type::train);
         }
     }
 
@@ -109,8 +105,8 @@ namespace banggame {
                     });
                 }
 
-                if (card_ptr drawn_card = origin->m_game->top_train_card()) {
-                    drawn_card->move_to(pocket_type::train);
+                if (!origin->m_game->m_train_deck.empty()) {
+                    origin->m_game->m_train_deck.back()->move_to(pocket_type::train);
                 }
             }
         });
@@ -132,7 +128,7 @@ namespace banggame {
         game->add_listener<event_type::on_turn_switch>({nullptr, 1}, [](player_ptr origin) {
             if (origin == origin->m_game->m_first_player) {
                 origin->m_game->queue_action([=]{
-                    origin->m_game->advance_train(origin);
+                    effect_next_stop{}.on_play(nullptr, origin);
                 }, -10);
             }
         });

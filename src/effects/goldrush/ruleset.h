@@ -23,6 +23,8 @@ namespace banggame {
 
     DEFINE_EFFECT(add_gold, effect_add_gold)
 
+    card_ptr draw_shop_card(game_ptr game);
+
 }
 
 #endif
