@@ -217,8 +217,5 @@ namespace banggame {
             }
         });
     }
-
-    bool ruleset_legends::is_valid_with(const expansion_set &set) {
-        return set.size() == 1;
-    }
+    
 }
