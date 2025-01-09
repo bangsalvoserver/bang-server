@@ -5,7 +5,7 @@
 #include "cards/game_enums.h"
 
 #include "play_verify.h"
-#include "game.h"
+#include "game_table.h"
 
 #include "utils/json_aggregate.h"
 

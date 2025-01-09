@@ -2,7 +2,7 @@
 
 #include "effects/wildwestshow/youl_grinner.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/possible_to_play.h"
 
 namespace banggame {

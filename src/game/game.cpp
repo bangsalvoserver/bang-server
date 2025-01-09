@@ -16,13 +16,80 @@
 
 namespace banggame {
 
-    player_order_update game::make_player_order_update(bool instant) {
-        return player_order_update{m_players
-            | rv::filter([](player_ptr p) {
-                return !p->check_player_flags(player_flag::removed);
-            })
-            | rn::to_vector,
-            instant ? 0ms : durations.move_player};
+    static std::optional<timer_status_args> get_request_timer_status(request_timer *timer) {
+        if (timer) {
+            return timer_status_args{
+                .timer_id = timer->get_timer_id(),
+                .duration = std::chrono::duration_cast<game_duration>(timer->get_duration())
+            };
+        }
+        return std::nullopt;
+    }
+
+    static player_distances make_player_distances(player_ptr owner) {
+        if (!owner) return {};
+
+        return {
+            .distance_mods = owner->m_game->m_players
+                | rv::filter([&](player_ptr target) { return target != owner; })
+                | rv::transform([&](player_ptr target) {
+                    return player_distance_item {
+                        .player = target,
+                        .value = target->get_distance_mod()
+                    };
+                })
+                | rv::cache1
+                | rv::filter([](const player_distance_item &item) {
+                    return item.value != 0;
+                })
+                | rn::to_vector,
+            .range_mod = owner->get_range_mod(),
+            .weapon_range = owner->get_weapon_range()
+        };
+    }
+    
+    static player_list get_request_target_set_players(player_ptr origin) {
+        if (origin) {
+            if (auto req = origin->m_game->top_request<interface_target_set_players>(target_is{origin})) {
+                return origin->m_game->m_players
+                    | rv::filter([&](const_player_ptr p){ return req->in_target_set(p); })
+                    | rn::to_vector;
+            }
+        }
+        return {};
+    }
+
+    static card_list get_request_target_set_cards(player_ptr origin) {
+        if (origin) {
+            if (auto req = origin->m_game->top_request<interface_target_set_cards>(target_is{origin})) {
+                return get_all_targetable_cards(origin)
+                    | rv::filter([&](const_card_ptr c){ return req->in_target_set(c); })
+                    | rn::to_vector;
+            }
+        }
+        return {};
+    }
+
+    static request_status_args make_request_update(request_base &req, player_ptr owner = nullptr) {
+        return request_status_args{
+            .origin_card = req.origin_card,
+            .origin = req.origin,
+            .target = req.target,
+            .status_text = req.status_text(owner),
+            .respond_cards = generate_playable_cards_list(owner, true),
+            .highlight_cards = req.get_highlights(),
+            .target_set_players = get_request_target_set_players(owner),
+            .target_set_cards = get_request_target_set_cards(owner),
+            .distances = make_player_distances(owner),
+            .timer = get_request_timer_status(req.timer())
+        };
+    }
+
+    static status_ready_args make_status_ready_update(player_ptr owner) {
+        return {
+            .play_cards = generate_playable_cards_list(owner),
+            .distances = make_player_distances(owner)
+        };
     }
     
     ticks game::get_total_update_time() const {
@@ -48,7 +115,7 @@ namespace banggame {
             co_yield make_update<"player_flags">(p, p->m_player_flags);
         }
 
-        co_yield make_update<"player_order">(make_player_order_update(true));
+        co_yield make_update<"player_order">(m_players, 0ms);
 
         auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) -> std::generator<json::json> {
             auto &range = get_pocket(pocket, owner);
@@ -125,8 +192,10 @@ namespace banggame {
         if (m_playing) {
             co_yield make_update<"switch_turn">(m_playing);
         }
-        if (!is_waiting() && pending_requests()) {
-            co_yield make_update<"request_status">(make_request_update(nullptr));
+        if (!is_waiting()) {
+            if (auto req = top_request()) {
+                co_yield make_update<"request_status">(make_request_update(*req));
+            }
         }
 
         co_yield make_update<"game_flags">(m_game_flags);
@@ -160,24 +229,11 @@ namespace banggame {
         }
 
         if (!is_game_over() && !is_waiting()) {
-            if (pending_requests()) {
-                co_yield make_update<"request_status">(make_request_update(target));
+            if (auto req = top_request()) {
+                co_yield make_update<"request_status">(make_request_update(*req, target));
             } else if (target == m_playing) {
                 co_yield make_update<"status_ready">(make_status_ready_update(target));
             }
-        }
-    }
-
-    card_ptr game::add_card(const card_data &data) {
-        return &m_cards_storage.emplace(this, int(m_cards_storage.first_available_id()), data);
-    }
-
-    void game::add_players(std::span<int> user_ids) {
-        rn::shuffle(user_ids, rng);
-
-        int player_id = 0;
-        for (int id : user_ids) {
-            m_players.emplace_back(&m_players_storage.emplace(this, ++player_id, id));
         }
     }
 
@@ -365,87 +421,6 @@ namespace banggame {
         });
     }
 
-    player_distances game::make_player_distances(player_ptr owner) {
-        if (!owner) return {};
-
-        return {
-            .distance_mods = m_players
-                | rv::filter([&](player_ptr target) { return target != owner; })
-                | rv::transform([&](player_ptr target) {
-                    return player_distance_item {
-                        .player = target,
-                        .value = target->get_distance_mod()
-                    };
-                })
-                | rv::cache1
-                | rv::filter([](const player_distance_item &item) {
-                    return item.value != 0;
-                })
-                | rn::to_vector,
-            .range_mod = owner->get_range_mod(),
-            .weapon_range = owner->get_weapon_range()
-        };
-    }
-    
-    static player_list get_request_target_set_players(player_ptr origin) {
-        if (origin) {
-            if (auto req = origin->m_game->top_request<interface_target_set_players>(target_is{origin})) {
-                return origin->m_game->m_players
-                    | rv::filter([&](const_player_ptr p){ return req->in_target_set(p); })
-                    | rn::to_vector;
-            }
-        }
-        return {};
-    }
-
-    static card_list get_request_target_set_cards(player_ptr origin) {
-        if (origin) {
-            if (auto req = origin->m_game->top_request<interface_target_set_cards>(target_is{origin})) {
-                return get_all_targetable_cards(origin)
-                    | rv::filter([&](const_card_ptr c){ return req->in_target_set(c); })
-                    | rn::to_vector;
-            }
-        }
-        return {};
-    }
-
-    static std::optional<timer_status_args> get_request_timer_status(request_timer *timer) {
-        if (timer) {
-            return timer_status_args{
-                .timer_id = timer->get_timer_id(),
-                .duration = std::chrono::duration_cast<game_duration>(timer->get_duration())
-            };
-        }
-        return std::nullopt;
-    }
-
-    request_status_args game::make_request_update(player_ptr owner) {
-        auto req = top_request();
-        return request_status_args{
-            .origin_card = req->origin_card,
-            .origin = req->origin,
-            .target = req->target,
-            .status_text = req->status_text(owner),
-            .respond_cards = generate_playable_cards_list(owner, true),
-            .highlight_cards = req->get_highlights(),
-            .target_set_players = get_request_target_set_players(owner),
-            .target_set_cards = get_request_target_set_cards(owner),
-            .distances = make_player_distances(owner),
-            .timer = get_request_timer_status(req->timer())
-        };
-    }
-
-    status_ready_args game::make_status_ready_update(player_ptr owner) {
-        return {
-            .play_cards = generate_playable_cards_list(owner),
-            .distances = make_player_distances(owner)
-        };
-    }
-
-    void game::send_request_status_clear() {
-        add_update<"status_clear">();
-    }
-
     request_state game::send_request_status_ready() {
         if (!m_playing) {
             return utils::tag<"done">{};
@@ -469,170 +444,15 @@ namespace banggame {
     }
 
     void game::send_request_update() {
+        auto req = top_request();
         auto spectator_target = update_target::excludes_public();
         for (player_ptr p : m_players) {
             spectator_target.add(p);
             if (!p->is_bot()) {
-                add_update<"request_status">(update_target::includes_private(p), make_request_update(p));
+                add_update<"request_status">(update_target::includes_private(p), make_request_update(*req, p));
             }
         }
-        add_update<"request_status">(std::move(spectator_target), make_request_update(nullptr));
-    }
-
-    void game::start_next_turn() {
-        if (num_alive() == 0) return;
-
-        player_ptr next_player;
-
-        if (m_playing) {
-            auto it = rn::find(m_players, m_playing);
-            while (true) {
-                if (check_flags(game_flag::invert_rotation)) {
-                    if (it == m_players.begin()) it = m_players.end();
-                    --it;
-                } else {
-                    ++it;
-                    if (it == m_players.end()) it = m_players.begin();
-                }
-                if (!(*it)->remove_player_flags(player_flag::skip_turn)) {
-                    call_event(event_type::check_revivers{ *it });
-                    if ((*it)->alive()) break;
-                }
-            }
-
-            next_player = *it;
-        } else {
-            next_player = m_first_player;
-        }
-        
-        next_player->start_of_turn();
-
-        call_event(event_type::on_turn_switch{ next_player });
-    }
-
-    void game::handle_player_death(player_ptr killer, player_ptr target, discard_all_reason reason) {
-        if (killer != m_playing) killer = nullptr;
-        
-        queue_action([this, killer, target, reason]{
-            if (target->m_hp <= 0) {
-                if (killer && killer != target) {
-                    add_log("LOG_PLAYER_KILLED", killer, target);
-                } else {
-                    add_log("LOG_PLAYER_DIED", target);
-                }
-
-                target->add_player_flags(player_flag::dead);
-                target->set_hp(0, true);
-            }
-
-            if (!target->alive()) {
-                target->remove_extra_characters();
-                for (card_ptr c : target->m_characters) {
-                    target->disable_equip(c);
-                }
-
-                if (target->add_player_flags(player_flag::role_revealed)) {
-                    add_update<"player_show_role">(update_target::excludes(target), target, target->m_role);
-                }
-
-                call_event(event_type::on_player_eliminated{ killer, target });
-            }
-        }, 50);
-
-        if (killer && reason != discard_all_reason::discard_ghost) {
-            queue_action([this, killer, target] {
-                if (killer->alive() && !target->alive()) {
-                    if (m_players.size() > 3) {
-                        if (target->m_role == player_role::outlaw) {
-                            add_log("LOG_KILLED_OUTLAW", killer);
-                            killer->draw_card(3);
-                        } else if (target->m_role == player_role::deputy && killer->m_role == player_role::sheriff) {
-                            target->m_game->add_log("LOG_SHERIFF_KILLED_DEPUTY", killer);
-                            queue_request<request_discard_all>(killer, discard_all_reason::sheriff_killed_deputy, -4);
-                        }
-                    } else if (m_players.size() == 3 && (
-                        (target->m_role == player_role::deputy_3p && killer->m_role == player_role::renegade_3p) ||
-                        (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::deputy_3p) ||
-                        (target->m_role == player_role::renegade_3p && killer->m_role == player_role::outlaw_3p)))
-                    {
-                        killer->draw_card(3);
-                    }
-                }
-            }, 50);
-        }
-        
-        queue_action([this, target, reason]{
-            if (!target->alive()) {
-                queue_request<request_discard_all>(target, reason);
-            }
-        }, 50);
-
-        if (rn::none_of(get_all_cards(), [](const_card_ptr c) { return c->has_tag(tag_type::ghost_card); })) {
-            queue_action([this]{
-                bool any_player_removed = false;
-                for (player_ptr p : m_players) {
-                    if (!p->alive() && p->add_player_flags(player_flag::removed)) {
-                        any_player_removed = true;
-                    }
-                }
-                
-                if (any_player_removed) {
-                    add_update<"player_order">(make_player_order_update());
-                }
-            }, -6);
-        }
-
-        queue_action([this, killer, target] {
-            if (target == m_first_player && !target->alive() && num_alive() > 1) {
-                m_first_player = target->get_next_player();
-            }
-
-            auto declare_winners = [this](auto &&winners) {
-                for (player_ptr p : range_all_players(m_playing)) {
-                    if (p->add_player_flags(player_flag::role_revealed)) {
-                        add_update<"player_show_role">(update_target::excludes(p), p, p->m_role);
-                    }
-                }
-                add_log("LOG_GAME_OVER");
-                for (player_ptr p : winners) {
-                    p->add_player_flags(player_flag::winner);
-                }
-                add_game_flags(game_flag::game_over);
-            };
-
-            auto alive_players = rv::filter(m_players, &player::alive);
-
-            if (check_flags(game_flag::free_for_all)) {
-                if (rn::distance(alive_players) <= 1) {
-                    declare_winners(alive_players);
-                }
-            } else if (m_players.size() > 3) {
-                auto is_outlaw = [](player_ptr p) { return p->m_role == player_role::outlaw; };
-                auto is_renegade = [](player_ptr p) { return p->m_role == player_role::renegade; };
-                auto is_sheriff = [](player_ptr p) { return p->m_role == player_role::sheriff; };
-                auto is_sheriff_or_deputy = [](player_ptr p) { return p->m_role == player_role::sheriff || p->m_role == player_role::deputy; };
-
-                if (rn::none_of(alive_players, is_sheriff)) {
-                    if (rn::distance(alive_players) == 1 && is_renegade(alive_players.front())) {
-                        declare_winners(alive_players);
-                    } else {
-                        declare_winners(rv::filter(m_players, is_outlaw));
-                    }
-                } else if (rn::all_of(alive_players, is_sheriff_or_deputy)) {
-                    declare_winners(rv::filter(m_players, is_sheriff_or_deputy));
-                }
-            } else {
-                if (rn::distance(alive_players) <= 1) {
-                    declare_winners(alive_players);
-                } else if (killer && !target->alive() && (
-                    (target->m_role == player_role::outlaw_3p && killer->m_role == player_role::renegade_3p) ||
-                    (target->m_role == player_role::renegade_3p && killer->m_role == player_role::deputy_3p) ||
-                    (target->m_role == player_role::deputy_3p && killer->m_role == player_role::outlaw_3p)))
-                {
-                    declare_winners(rv::single(killer));
-                }
-            }
-        }, -8);
+        add_update<"request_status">(std::move(spectator_target), make_request_update(*req));
     }
 
 }

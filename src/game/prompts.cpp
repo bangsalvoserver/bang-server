@@ -1,6 +1,6 @@
 #include "prompts.h"
 
-#include "game.h"
+#include "game_table.h"
 #include "bot_suggestion.h"
 
 #include "cards/filter_enums.h"

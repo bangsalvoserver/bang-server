@@ -1,7 +1,7 @@
 #ifndef __VTABLE_BUILD_H__
 #define __VTABLE_BUILD_H__
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/filters.h"
 
 namespace banggame {

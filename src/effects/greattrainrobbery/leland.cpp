@@ -1,6 +1,6 @@
 #include "leland.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 #include "effects/base/generalstore.h"
 

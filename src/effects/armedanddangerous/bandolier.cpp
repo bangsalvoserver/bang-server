@@ -1,6 +1,6 @@
 #include "bandolier.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 #include "cards/filter_enums.h"
 

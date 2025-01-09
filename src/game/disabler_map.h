@@ -45,12 +45,12 @@ namespace banggame {
 
     private:
         disabler_map_t m_disablers;
-        game_table *m_game;
+        game_ptr m_game;
 
         void do_remove_disablers(disabler_map_range range);
 
     public:
-        disabler_map(game_table *game): m_game(game) {}
+        disabler_map(game_ptr m_game): m_game(m_game) {}
 
         void add_disabler(event_card_key key, card_disabler_fun &&fun);
 

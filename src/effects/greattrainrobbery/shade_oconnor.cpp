@@ -1,6 +1,6 @@
 #include "shade_oconnor.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "ruleset.h"
 
 #include "effects/base/can_play_card.h"

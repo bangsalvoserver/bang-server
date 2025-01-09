@@ -1,6 +1,6 @@
 #include "blood_brothers.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/prompts.h"
 
 #include "effects/base/can_play_card.h"

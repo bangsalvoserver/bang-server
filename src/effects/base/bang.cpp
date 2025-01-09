@@ -3,7 +3,7 @@
 #include "cards/game_enums.h"
 #include "cards/filter_enums.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/filters.h"
 #include "game/play_verify.h"
 #include "game/prompts.h"

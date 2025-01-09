@@ -3,7 +3,7 @@
 #include "game/filters.h"
 #include "cards/filter_enums.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"

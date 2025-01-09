@@ -1,6 +1,6 @@
 #include "dining_car.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 #include "effects/base/predraw_check.h"
 

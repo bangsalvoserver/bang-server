@@ -2,7 +2,7 @@
 
 #include "requests.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/filters.h"
 #include "game/prompts.h"
 #include "game/game_options.h"

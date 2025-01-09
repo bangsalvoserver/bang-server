@@ -7,7 +7,7 @@
 
 #include "filters.h"
 
-#include "game.h"
+#include "game_table.h"
 
 #include <unordered_set>
 
@@ -386,7 +386,7 @@ namespace banggame {
             }
         }
 
-        origin->m_game->send_request_status_clear();
+        origin->m_game->clear_request_status();
 
         origin->m_game->call_event(event_type::on_play_card{
             origin,

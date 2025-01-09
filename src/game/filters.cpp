@@ -3,7 +3,7 @@
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
-#include "game.h"
+#include "game_table.h"
 
 namespace banggame {
 

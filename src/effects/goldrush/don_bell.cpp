@@ -3,7 +3,7 @@
 #include "cards/game_enums.h"
 #include "effects/base/draw_check.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 namespace banggame {
 

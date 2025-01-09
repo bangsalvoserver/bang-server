@@ -1,6 +1,6 @@
 #include "ruleset.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/game_options.h"
 
 #include "effects/highnoon/ruleset.h"

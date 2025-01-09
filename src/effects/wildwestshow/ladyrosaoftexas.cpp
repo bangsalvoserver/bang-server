@@ -2,7 +2,7 @@
 
 #include "cards/game_enums.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/prompts.h"
 
 namespace banggame {
@@ -34,6 +34,6 @@ namespace banggame {
         std::iter_swap(
             rn::find(origin->m_game->m_players, origin),
             rn::find(origin->m_game->m_players, target));
-        origin->m_game->add_update<"player_order">(origin->m_game->make_player_order_update());
+        origin->m_game->add_update<"player_order">(origin->m_game->m_players);
     }
 }

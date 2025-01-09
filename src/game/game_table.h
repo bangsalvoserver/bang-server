@@ -57,6 +57,9 @@ namespace banggame {
 
         game_table(const game_options &options);
 
+        card_ptr add_card(const card_data &data);
+        void add_players(std::span<int> user_ids);
+
         card_ptr find_card(int card_id) const override;
         player_ptr find_player(int player_id) const override;
         player_ptr find_player_by_userid(int user_id) const override;
@@ -93,6 +96,8 @@ namespace banggame {
             return num_tokens(card_token_type::cube);
         }
 
+        void clear_request_status();
+
         card_ptr top_of_deck();
         card_ptr top_train_card();
         card_ptr draw_shop_card();
@@ -101,6 +106,9 @@ namespace banggame {
 
         void add_short_pause();
         void play_sound(std::string_view sound_id);
+        
+        void start_next_turn();
+        void handle_player_death(player_ptr killer, player_ptr target, discard_all_reason reason);
 
         void add_game_flags(game_flag flags);
         void remove_game_flags(game_flag flags);

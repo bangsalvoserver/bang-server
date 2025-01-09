@@ -1,6 +1,6 @@
 #include "bill_noface.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 #include "effects/base/draw.h"
 

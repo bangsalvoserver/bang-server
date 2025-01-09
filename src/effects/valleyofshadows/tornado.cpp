@@ -8,7 +8,7 @@
 #include "effects/base/pick.h"
 #include "effects/base/gift_card.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/possible_to_play.h"
 
 namespace banggame {

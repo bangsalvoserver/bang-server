@@ -1,6 +1,6 @@
 #include "frankie_canton.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/prompts.h"
 
 namespace banggame {

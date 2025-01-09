@@ -4,7 +4,7 @@
 
 #include "effects/dodgecity/ruleset.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/filters.h"
 #include "game/prompts.h"
 

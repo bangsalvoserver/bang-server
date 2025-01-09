@@ -10,11 +10,11 @@
 
 namespace banggame {
     
-    struct game;
+    struct game_table;
     struct card;
     struct player;
 
-    using game_ptr = game *;
+    using game_ptr = game_table *;
     using card_ptr = card *;
     using player_ptr = player *;
 

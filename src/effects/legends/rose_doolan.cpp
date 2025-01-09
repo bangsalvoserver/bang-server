@@ -1,6 +1,6 @@
 #include "rose_doolan.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 #include "cards/game_enums.h"
 

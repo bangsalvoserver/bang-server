@@ -5,7 +5,7 @@
 #include "predraw_check.h"
 #include "draw_check.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/prompts.h"
 
 namespace banggame {

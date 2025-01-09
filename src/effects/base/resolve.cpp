@@ -1,6 +1,6 @@
 #include "resolve.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"

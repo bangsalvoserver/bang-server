@@ -1,5 +1,5 @@
 #include "bot_suggestion.h"
-#include "game.h"
+#include "game_table.h"
 
 #include "cards/game_enums.h"
 

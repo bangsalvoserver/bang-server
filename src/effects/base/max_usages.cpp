@@ -1,6 +1,6 @@
 #include "max_usages.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 namespace banggame {
     game_string effect_max_usages::get_error(card_ptr origin_card, player_ptr origin) {

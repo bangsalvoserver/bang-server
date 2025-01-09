@@ -1,6 +1,6 @@
 #include "map.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"
 #include "cards/game_enums.h"

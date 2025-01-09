@@ -1,6 +1,6 @@
 #include "bandidos.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/prompts.h"
 #include "game/possible_to_play.h"
 

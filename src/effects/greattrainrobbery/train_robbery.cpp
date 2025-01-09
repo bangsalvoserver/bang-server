@@ -1,6 +1,6 @@
 #include "train_robbery.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/prompts.h"
 
 #include "effects/base/bang.h"

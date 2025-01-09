@@ -9,20 +9,20 @@
 
 namespace banggame {
 
-    static auto disableable_cards(game_table *table) {
+    static auto disableable_cards(game_ptr game) {
         struct to_player_card_pair {
             player_ptr p;
             auto operator()(card_ptr c) const { return std::pair{p, c}; }
         };
 
         return rv::concat(
-            table->m_scenario_cards
+            game->m_scenario_cards
                 | rv::take_last(1)
-                | rv::transform(to_player_card_pair{table->m_first_player}),
-            table->m_wws_scenario_cards
+                | rv::transform(to_player_card_pair{game->m_first_player}),
+            game->m_wws_scenario_cards
                 | rv::take_last(1)
-                | rv::transform(to_player_card_pair{table->m_first_player}),
-            table->m_players
+                | rv::transform(to_player_card_pair{game->m_first_player}),
+            game->m_players
                 | rv::filter(&player::alive)
                 | rv::for_each([](player_ptr p) {
                     return rv::concat(p->m_table, p->m_characters)

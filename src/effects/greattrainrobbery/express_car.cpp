@@ -1,6 +1,6 @@
 #include "express_car.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 #include "effects/base/requests.h"
 #include "effects/base/max_usages.h"

@@ -1,6 +1,6 @@
 #include "refund.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 #include "effects/base/steal_destroy.h"
 

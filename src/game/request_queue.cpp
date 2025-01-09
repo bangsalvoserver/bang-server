@@ -1,6 +1,6 @@
 #include "request_queue.h"
 
-#include "game.h"
+#include "game_table.h"
 
 #include "utils/type_name.h"
 

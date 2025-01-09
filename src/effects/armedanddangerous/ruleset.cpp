@@ -1,7 +1,7 @@
 #include "ruleset.h"
 #include "add_cube.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 #include "effects/base/requests.h"
 

@@ -1,6 +1,6 @@
 #include "give_card.h"
 
-#include "game.h"
+#include "game_table.h"
 
 namespace banggame {
 
@@ -33,7 +33,7 @@ namespace banggame {
         }
         card_ptr target_card = *card_it;
         
-        target->m_game->send_request_status_clear();
+        target->m_game->clear_request_status();
         
         switch (target_card->deck) {
         case card_deck_type::main_deck: {

@@ -5,7 +5,7 @@
 #include "effects/base/damage.h"
 #include "cards/game_enums.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 namespace banggame {
 

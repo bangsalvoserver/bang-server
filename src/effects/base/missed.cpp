@@ -1,6 +1,6 @@
 #include "missed.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "bang.h"
 
 #include "game/possible_to_play.h"

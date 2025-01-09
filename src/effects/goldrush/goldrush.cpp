@@ -1,6 +1,6 @@
 #include "goldrush.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 namespace banggame {
     void effect_goldrush::on_play(card_ptr origin_card, player_ptr origin) {

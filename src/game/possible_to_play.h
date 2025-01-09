@@ -1,7 +1,7 @@
 #ifndef __POSSIBLE_TO_PLAY_H__
 #define __POSSIBLE_TO_PLAY_H__
 
-#include "game.h"
+#include "game_table.h"
 
 #include "filters.h"
 #include "play_verify.h"

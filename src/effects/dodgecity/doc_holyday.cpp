@@ -3,7 +3,7 @@
 #include "effects/base/bang.h"
 #include "effects/base/steal_destroy.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/prompts.h"
 
 namespace banggame {

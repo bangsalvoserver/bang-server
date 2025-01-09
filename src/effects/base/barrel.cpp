@@ -1,6 +1,6 @@
 #include "barrel.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "bang.h"
 #include "draw_check.h"
 

@@ -1,6 +1,6 @@
 #include "player.h"
 
-#include "game.h"
+#include "game_table.h"
 
 #include "play_verify.h"
 #include "game_update.h"
@@ -15,9 +15,6 @@
 #include "effects/base/heal.h"
 #include "effects/base/predraw_check.h"
 #include "effects/base/requests.h"
-
-#include <cassert>
-#include <numeric>
 
 namespace banggame {
 

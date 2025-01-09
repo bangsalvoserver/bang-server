@@ -1,6 +1,6 @@
 #include "fistfulofcards.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "effects/base/bang.h"
 
 namespace banggame {

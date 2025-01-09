@@ -1,6 +1,6 @@
 #include "dynamite.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 
 #include "predraw_check.h"
 

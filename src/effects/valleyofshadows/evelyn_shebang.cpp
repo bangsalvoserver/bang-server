@@ -1,6 +1,6 @@
 #include "evelyn_shebang.h"
 
-#include "game/game.h"
+#include "game/game_table.h"
 #include "game/prompts.h"
 
 #include "effects/base/bang.h"
