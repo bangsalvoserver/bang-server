@@ -67,8 +67,8 @@ namespace banggame {
 
         legend_character->flash_card();
         
-        if (origin->m_hp < 3) {
-            origin->set_hp(3);
+        if (!origin->is_ghost()) {
+            origin->set_hp(std::clamp<int>(origin->m_hp, 3, origin->m_max_hp));
         }
     }
 }
