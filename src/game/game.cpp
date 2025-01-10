@@ -254,7 +254,7 @@ namespace banggame {
 
         add_update<"player_add">(m_players);
         
-        auto add_cards = [&](std::span<const card_data> cards, pocket_type pocket, card_list *out_pocket = nullptr) {
+        auto add_cards = [&](auto &&cards, pocket_type pocket, card_list *out_pocket = nullptr) {
             if (!out_pocket && pocket != pocket_type::none) out_pocket = &get_pocket(pocket);
 
             int count = 0;
@@ -368,7 +368,9 @@ namespace banggame {
         add_cards(all_cards.legends, pocket_type::none);
 
         card_list character_ptrs;
-        if (add_cards(all_cards.characters, pocket_type::none, &character_ptrs)) {
+        if (add_cards(all_cards.characters | rv::filter([&](const card_data &c) {
+            return !m_options.only_base_characters || c.expansion.empty();
+        }), pocket_type::none, &character_ptrs)) {
             rn::shuffle(character_ptrs, rng);
         }
 
