@@ -32,7 +32,7 @@ namespace banggame {
             effect_add_cube{ndiscarded}.on_play(nullptr, target);
         });
 
-        game->add_listener<event_type::on_finish_tokens>({nullptr, 1}, [=](card_ptr origin_card, card_ptr target_card, card_token_type token_type) {
+        game->add_listener<event_type::on_finish_tokens>(nullptr, [=](card_ptr origin_card, card_ptr target_card, card_token_type token_type) {
             if (token_type == card_token_type::cube && origin_card->deck == card_deck_type::main_deck) {
                 game->add_log("LOG_DISCARDED_ORANGE_CARD", origin_card->owner, origin_card);
                 origin_card->owner->disable_equip(origin_card);

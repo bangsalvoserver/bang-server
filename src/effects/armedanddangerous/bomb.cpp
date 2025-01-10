@@ -54,13 +54,11 @@ namespace banggame {
     }
 
     void equip_bomb::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::on_finish_tokens>(target_card, [=](card_ptr e_origin_card, card_ptr e_target_card, card_token_type token_type) {
+        target->m_game->add_listener<event_type::on_finish_tokens>({target_card, 1}, [=](card_ptr e_origin_card, card_ptr e_target_card, card_token_type token_type) {
             if (token_type == card_token_type::cube && e_origin_card == target_card && !target->immune_to(target_card, nullptr, {})) {
-                target->m_game->queue_action([=]{
-                    target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
-                    target->m_game->play_sound("dynamite");
-                    target->damage(target_card, nullptr, 2);
-                }, 1);
+                target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
+                target->m_game->play_sound("dynamite");
+                target->damage(target_card, nullptr, 2);
             }
         });
         
