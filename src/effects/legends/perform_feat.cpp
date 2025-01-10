@@ -32,7 +32,7 @@ namespace banggame {
         card_ptr character_card = origin->get_character();
         if (origin_card->deck == card_deck_type::feats && character_card->deck != card_deck_type::legends) {
             auto [token, count] = get_card_fame_token_type(character_card);
-            if (count == 0) {
+            if (count == 0 || origin_card->num_tokens(token) != 0) {
                 return false;
             }
         }
