@@ -25,7 +25,7 @@ namespace banggame::event_type {
         player_ptr origin;
         card_ptr origin_card;
         card_list modifiers;
-        effect_context ctx;
+        const effect_context &ctx;
     };
 
     struct on_finish_tokens {
