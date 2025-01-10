@@ -41,6 +41,9 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_play_card>(nullptr, [=](player_ptr origin, card_ptr origin_card, const card_list &modifiers, const effect_context &ctx) {
+            if (ctx.card_choice) {
+                origin_card = ctx.card_choice;
+            }
             if (origin_card->pocket == pocket_type::shop_selection) {
                 game->queue_action([=]{ draw_shop_card(game); }, -1);
             }
