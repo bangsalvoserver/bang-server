@@ -31,6 +31,11 @@ namespace banggame {
         return false;
     }
 
+    prompt_string effect_jourdonnais_legend::on_prompt(card_ptr origin_card, player_ptr origin) {
+        auto req = origin->m_game->top_request<escapable_request>();
+        return req->escape_prompt(origin);
+    }
+
     void effect_jourdonnais_legend::on_play(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request<escapable_request>();
         req->add_card(origin_card);

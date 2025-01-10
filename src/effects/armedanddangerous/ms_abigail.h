@@ -15,6 +15,7 @@ namespace banggame {
         static bool can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags);
         
         bool can_play(card_ptr origin_card, player_ptr target);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin);
     };
 
