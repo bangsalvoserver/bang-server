@@ -41,8 +41,8 @@ namespace banggame {
     }
 
     struct request_damage_legend : request_can_play_card {
-        request_damage_legend(player_ptr target)
-            : request_can_play_card{nullptr, nullptr, target} {}
+        request_damage_legend(card_ptr origin_card, player_ptr target)
+            : request_can_play_card{origin_card, nullptr, target} {}
 
         game_string status_text(player_ptr owner) const override {
             if (owner == target) {
@@ -151,7 +151,7 @@ namespace banggame {
             card_ptr character_card = origin->get_character();
             if (character_card->deck == card_deck_type::legends) {
                 origin->m_game->add_log("LOG_FEAT_CLAIMED", origin, origin_card);
-                origin->m_game->queue_request<request_damage_legend>(origin);
+                origin->m_game->queue_request<request_damage_legend>(origin_card, origin);
                 origin->m_game->queue_action([=]{
                     origin_card->drop_all_fame();
                     origin_card->m_game->m_first_player->disable_equip(origin_card);
