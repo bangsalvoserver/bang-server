@@ -4,8 +4,6 @@
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
-#include "effects/armedanddangerous/ruleset.h"
-
 namespace banggame {
 
     bool card::is_equip_card() const {
@@ -175,11 +173,8 @@ namespace banggame {
             }
             m_game->add_update<"move_tokens">(token_type, num_tokens, this, nullptr, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens);
         }
-        if (sign && card_tokens == 0) {
-            m_game->add_log("LOG_DISCARDED_ORANGE_CARD", owner, this);
-            m_game->call_event(event_type::on_discard_orange_card{ owner, this });
-            owner->disable_equip(this);
-            move_to(pocket_type::discard_pile);
+        if (card_tokens == 0) {
+            m_game->call_event(event_type::on_finish_tokens{ this, target, token_type });
         }
     }
 

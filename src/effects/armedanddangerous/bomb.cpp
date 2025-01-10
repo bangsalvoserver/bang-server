@@ -5,8 +5,6 @@
 #include "game/game_table.h"
 #include "game/prompts.h"
 
-#include "ruleset.h"
-
 #include "effects/base/predraw_check.h"
 
 namespace banggame {
@@ -55,8 +53,8 @@ namespace banggame {
     }
 
     void equip_bomb::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::on_discard_orange_card>(target_card, [=](player_ptr e_target, card_ptr e_card) {
-            if (e_target == target && e_card == target_card && !target->immune_to(target_card, nullptr, {})) {
+        target->m_game->add_listener<event_type::on_finish_tokens>(target_card, [=](card_ptr e_origin_card, card_ptr e_target_card, card_token_type token_type) {
+            if (token_type == card_token_type::cube && e_origin_card == target_card && !target->immune_to(target_card, nullptr, {})) {
                 target->m_game->queue_action([=]{
                     target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
                     target->m_game->play_sound("dynamite");

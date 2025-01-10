@@ -5,13 +5,6 @@
 
 namespace banggame {
 
-    namespace event_type {
-        struct on_discard_orange_card{
-            player_ptr target;
-            card_ptr target_card;
-        };
-    }
-
     struct ruleset_armedanddangerous {
         void on_apply(game_ptr game);
     };
