@@ -1,8 +1,8 @@
 #include "escape.h"
 
-#include "cards/game_enums.h"
+#include "effects/base/escapable.h"
 
-#include "effects/base/resolve.h"
+#include "cards/game_enums.h"
 
 #include "game/game_table.h"
 

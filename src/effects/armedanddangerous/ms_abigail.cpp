@@ -1,6 +1,6 @@
 #include "ms_abigail.h"
 
-#include "effects/base/resolve.h"
+#include "effects/base/escapable.h"
 
 #include "cards/game_enums.h"
 

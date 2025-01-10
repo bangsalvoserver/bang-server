@@ -1,7 +1,9 @@
 #include "handcuffs.h"
 
 #include "effects/base/draw.h"
+
 #include "cards/filter_enums.h"
+#include "cards/game_events.h"
 
 #include "game/game_table.h"
 

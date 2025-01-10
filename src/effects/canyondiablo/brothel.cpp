@@ -3,6 +3,8 @@
 #include "game/game_table.h"
 #include "game/prompts.h"
 
+#include "cards/game_events.h"
+
 #include "effects/base/death.h"
 #include "effects/base/predraw_check.h"
 

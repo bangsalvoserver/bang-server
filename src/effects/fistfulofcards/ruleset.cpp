@@ -3,6 +3,8 @@
 #include "game/game_table.h"
 #include "game/game_options.h"
 
+#include "cards/game_events.h"
+
 #include "effects/highnoon/ruleset.h"
 #include "effects/base/death.h"
 

@@ -3,8 +3,6 @@
 
 #include "card.h"
 
-#include "cards/game_events.h" // temp
-
 namespace banggame {
 
     struct player {

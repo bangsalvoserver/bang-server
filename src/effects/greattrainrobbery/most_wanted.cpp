@@ -5,6 +5,7 @@
 
 #include "effects/base/resolve.h"
 #include "effects/base/draw_check.h"
+#include "effects/base/escapable.h"
 
 namespace banggame {
 

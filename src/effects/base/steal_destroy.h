@@ -4,6 +4,7 @@
 #include "cards/card_effect.h"
 
 #include "resolve.h"
+#include "escapable.h"
 
 namespace banggame {
 

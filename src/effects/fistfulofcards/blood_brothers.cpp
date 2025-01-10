@@ -1,9 +1,11 @@
 #include "blood_brothers.h"
 
+#include "effects/base/can_play_card.h"
+
+#include "cards/game_events.h"
+
 #include "game/game_table.h"
 #include "game/prompts.h"
-
-#include "effects/base/can_play_card.h"
 
 namespace banggame {
 

@@ -1,5 +1,6 @@
 #include "ruleset.h"
 
+#include "cards/game_events.h"
 #include "cards/game_enums.h"
 #include "cards/filter_enums.h"
 

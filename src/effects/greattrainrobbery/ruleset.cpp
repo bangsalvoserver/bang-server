@@ -1,9 +1,10 @@
 #include "ruleset.h"
 
-#include "game/filters.h"
-
 #include "next_stop.h"
 
+#include "cards/game_events.h"
+
+#include "game/filters.h"
 #include "game/game_table.h"
 
 namespace banggame {

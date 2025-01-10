@@ -1,5 +1,7 @@
 #include "highnoon.h"
 
+#include "cards/game_events.h"
+
 #include "game/game_table.h"
 
 namespace banggame {

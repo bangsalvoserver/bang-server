@@ -1,6 +1,7 @@
 #include "curse.h"
 
 #include "game/game_table.h"
+#include "cards/game_events.h"
 
 namespace banggame {
 

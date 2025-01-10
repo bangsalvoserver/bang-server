@@ -2,7 +2,9 @@
 #define __BASE_BANG_H__
 
 #include "cards/card_effect.h"
+
 #include "resolve.h"
+#include "escapable.h"
 
 namespace banggame {
     

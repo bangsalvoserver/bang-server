@@ -1,8 +1,10 @@
 #include "al_preacher.h"
 
-#include "game/game_table.h"
-
 #include "effects/base/can_play_card.h"
+
+#include "cards/game_events.h"
+
+#include "game/game_table.h"
 
 namespace banggame {
 

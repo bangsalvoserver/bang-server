@@ -3,8 +3,6 @@
 
 #include "cards/card_effect.h"
 
-#include "escapable.h" // temp
-
 namespace banggame {
 
     enum class resolve_type {

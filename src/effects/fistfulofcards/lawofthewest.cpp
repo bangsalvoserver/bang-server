@@ -1,5 +1,7 @@
 #include "lawofthewest.h"
 
+#include "cards/game_events.h"
+
 #include "effects/base/draw.h"
 #include "effects/base/pass_turn.h"
 

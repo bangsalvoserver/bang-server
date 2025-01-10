@@ -7,6 +7,7 @@
 #include "cards/game_enums.h"
 
 #include "effects/base/requests.h"
+#include "effects/base/escapable.h"
 
 namespace banggame {
 

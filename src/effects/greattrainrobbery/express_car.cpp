@@ -1,9 +1,11 @@
 #include "express_car.h"
 
-#include "game/game_table.h"
-
 #include "effects/base/requests.h"
 #include "effects/base/max_usages.h"
+
+#include "cards/game_events.h"
+
+#include "game/game_table.h"
 
 namespace banggame {
 

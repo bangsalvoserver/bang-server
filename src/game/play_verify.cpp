@@ -4,9 +4,9 @@
 
 #include "cards/game_enums.h"
 #include "cards/filter_enums.h"
+#include "cards/game_events.h"
 
 #include "filters.h"
-
 #include "game_table.h"
 
 #include <unordered_set>

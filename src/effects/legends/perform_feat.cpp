@@ -6,6 +6,8 @@
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"
 
+#include "cards/game_events.h"
+
 #include "game/game_table.h"
 #include "game/prompts.h"
 

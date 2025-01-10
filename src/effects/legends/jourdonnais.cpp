@@ -1,6 +1,6 @@
 #include "jourdonnais.h"
 
-#include "effects/base/resolve.h"
+#include "effects/base/escapable.h"
 #include "effects/base/draw_check.h"
 
 #include "cards/game_enums.h"

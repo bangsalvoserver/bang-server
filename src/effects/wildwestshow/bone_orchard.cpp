@@ -1,6 +1,7 @@
 #include "bone_orchard.h"
 
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
 
 #include "game/game_table.h"
 

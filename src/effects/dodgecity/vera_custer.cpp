@@ -1,8 +1,9 @@
 #include "vera_custer.h"
 
-#include "cards/filter_enums.h"
-
 #include "effects/base/pick.h"
+
+#include "cards/filter_enums.h"
+#include "cards/game_events.h"
 
 #include "game/game_table.h"
 

@@ -4,6 +4,7 @@
 #include "game/game_options.h"
 
 #include "effects/base/resolve.h"
+#include "effects/base/escapable.h"
 
 namespace banggame {
 

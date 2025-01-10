@@ -1,9 +1,12 @@
 #include "map.h"
 
-#include "game/game_table.h"
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"
+
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
+
+#include "game/game_table.h"
 
 namespace banggame {
 

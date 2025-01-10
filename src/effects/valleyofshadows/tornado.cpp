@@ -1,7 +1,7 @@
 #include "tornado.h"
 
 #include "effects/base/pick.h"
-#include "effects/base/resolve.h"
+#include "effects/base/escapable.h"
 
 #include "cards/game_enums.h"
 

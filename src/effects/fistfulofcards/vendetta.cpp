@@ -1,7 +1,9 @@
 #include "vendetta.h"
 
-#include "cards/game_enums.h"
 #include "effects/base/draw_check.h"
+
+#include "cards/game_enums.h"
+#include "cards/game_events.h"
 
 #include "game/game_table.h"
 

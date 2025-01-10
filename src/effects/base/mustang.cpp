@@ -1,7 +1,9 @@
 #include "mustang.h"
 
-#include "game/game_table.h"
 #include "cards/filter_enums.h"
+#include "cards/game_events.h"
+
+#include "game/game_table.h"
 
 namespace banggame {
     

@@ -2,6 +2,8 @@
 
 #include "perform_feat.h"
 
+#include "cards/game_events.h"
+
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"
 

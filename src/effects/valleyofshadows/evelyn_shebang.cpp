@@ -1,9 +1,11 @@
 #include "evelyn_shebang.h"
 
-#include "game/game_table.h"
-#include "game/prompts.h"
+#include "cards/game_events.h"
 
 #include "effects/base/bang.h"
+
+#include "game/game_table.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
