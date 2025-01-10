@@ -7,6 +7,7 @@ armedanddangerous: !include sets/armedanddangerous.yml
 greattrainrobbery: !include sets/greattrainrobbery.yml
 highnoon: !include sets/highnoon.yml
 fistfulofcards: !include sets/fistfulofcards.yml
+wildwestshow_characters: !include sets/wildwestshow_characters.yml
 wildwestshow: !include sets/wildwestshow.yml
 thebullet: !include sets/thebullet.yml
 legends: !include sets/legends.yml

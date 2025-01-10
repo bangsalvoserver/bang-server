@@ -12,6 +12,10 @@ namespace banggame {
         };
     }
 
+    struct ruleset_wildwestshow_characters {};
+
+    DEFINE_RULESET(wildwestshow_characters, ruleset_wildwestshow_characters)
+
     struct ruleset_wildwestshow {
         void on_apply(game_ptr game);
     };
