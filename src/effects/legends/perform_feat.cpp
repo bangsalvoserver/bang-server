@@ -40,9 +40,32 @@ namespace banggame {
         return get_count_performed_feats(origin) == 0;
     }
 
-    struct request_damage_legend : request_can_play_card {
+    struct request_damage_legend : request_resolvable, interface_target_set_players {
         request_damage_legend(card_ptr origin_card, player_ptr target)
-            : request_can_play_card{origin_card, nullptr, target} {}
+            : request_resolvable{origin_card, nullptr, target} {}
+
+        bool can_kill = false;
+
+        void on_update() override {
+            if (!live) {
+                target->m_game->call_event(event_type::check_damage_legend_kill{ target, can_kill });
+            }
+            auto_resolve();
+        }
+
+        resolve_type get_resolve_type() const override {
+            return resolve_type::dismiss;
+        }
+
+        void on_resolve() override {
+            target->m_game->pop_request();
+        }
+        
+        bool in_target_set(const_player_ptr target_player) const override {
+            return target_player != target && target_player->alive()
+                && target_player->get_character()->deck == card_deck_type::legends
+                && (target_player->m_hp > 1 || can_kill);
+        }
 
         game_string status_text(player_ptr owner) const override {
             if (owner == target) {
@@ -55,17 +78,6 @@ namespace banggame {
 
     bool effect_damage_legend::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<request_damage_legend>(target_is{origin}) != nullptr;
-    }
-
-    game_string effect_damage_legend::get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (target->m_hp <= 1) {
-            bool can_kill = false;
-            target->m_game->call_event(event_type::check_damage_legend_kill{origin, can_kill});
-            if (!can_kill) {
-                return "ERROR_DAMAGE_LEGEND_KILL";
-            }
-        }
-        return {};
     }
 
     game_string effect_damage_legend::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {

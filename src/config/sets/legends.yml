@@ -222,6 +222,6 @@ hidden:
       - preselect
   - name: CLAIM_FEAT
     responses:
-      - damage_legend player legend notself
+      - damage_legend player target_set
     tags:
       - preselect
