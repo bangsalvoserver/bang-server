@@ -4,10 +4,11 @@
 
 #include "play_verify.h"
 #include "game_update.h"
+#include "filters.h"
 
-#include "game/filters.h"
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
 
 #include "effects/base/bang.h"
 #include "effects/base/damage.h"
@@ -226,12 +227,6 @@ namespace banggame {
             }
         }
         return !cards.empty();
-    }
-
-    escape_type player::get_escape_type(player_ptr origin, card_ptr origin_card, effect_flags flags) const {
-        escape_type result = escape_type::no_escape;
-        m_game->call_event(event_type::apply_escapable_modifier{ origin_card, origin, this, flags, result });
-        return result;
     }
 
     void player::add_to_hand(card_ptr target) {

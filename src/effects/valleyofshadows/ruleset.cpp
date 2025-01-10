@@ -3,6 +3,8 @@
 #include "escape.h"
 
 #include "effects/base/damage.h"
+#include "effects/base/escapable.h"
+
 #include "cards/game_enums.h"
 
 #include "game/game_table.h"

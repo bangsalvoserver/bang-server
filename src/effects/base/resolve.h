@@ -3,6 +3,8 @@
 
 #include "cards/card_effect.h"
 
+#include "escapable.h" // temp
+
 namespace banggame {
 
     enum class resolve_type {
@@ -33,30 +35,6 @@ namespace banggame {
 
     protected:
         void auto_resolve();
-    };
-    
-    class escapable_request {
-    public:
-        virtual ~escapable_request() = default;
-        
-        size_t num_cards_used() const {
-            return m_cards_used.size();
-        }
-        
-        void add_card(card_ptr c) {
-            m_cards_used.insert(c);
-        }
-
-        virtual bool can_escape(card_ptr c) const {
-            return !m_cards_used.contains(c);
-        }
-
-        virtual prompt_string escape_prompt(player_ptr owner) const {
-            return {};
-        }
-
-    private:
-        std::set<card_ptr> m_cards_used;
     };
 }
 

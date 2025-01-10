@@ -1,19 +1,13 @@
 #ifndef __GAME_EVENTS_H__
 #define __GAME_EVENTS_H__
 
-#include "cards/card_fwd.h"
+#include "card_defs.h"
 
 namespace banggame {
     enum class range_mod_type {
         range_mod,
         weapon_range,
         distance_mod
-    };
-
-    enum class escape_type {
-        no_escape,
-        escape_timer,
-        escape_no_timer
     };
 }
 
@@ -60,14 +54,6 @@ namespace banggame::event_type {
         const_player_ptr target;
         effect_flags flags;
         nullable_ref<card_list> cards;
-    };
-
-    struct apply_escapable_modifier {
-        card_ptr origin_card;
-        player_ptr origin;
-        const_player_ptr target;
-        effect_flags flags;
-        nullable_ref<escape_type> value;
     };
     
     struct count_range_mod {

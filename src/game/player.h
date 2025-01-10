@@ -2,7 +2,8 @@
 #define __PLAYER_H__
 
 #include "card.h"
-#include "game_events.h"
+
+#include "cards/game_events.h" // temp
 
 namespace banggame {
 
@@ -45,8 +46,6 @@ namespace banggame {
         void play_sound(std::string_view sound_id);
         
         card_ptr random_hand_card() const;
-
-        escape_type get_escape_type(player_ptr origin, card_ptr origin_card, effect_flags flags) const;
         
         void add_to_hand(card_ptr card);
         void draw_card(int ncards = 1, card_ptr origin_card = nullptr);

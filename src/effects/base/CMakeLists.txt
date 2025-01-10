@@ -13,6 +13,7 @@ target_sources(bangserver PRIVATE
     duel.cpp
     dynamite.cpp
     el_gringo.cpp
+    escapable.cpp
     generalstore.cpp
     gift_card.cpp
     heal.cpp

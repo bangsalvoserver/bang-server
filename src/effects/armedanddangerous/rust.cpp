@@ -33,7 +33,7 @@ namespace banggame {
             if (target->immune_to(origin_card, origin, flags)) {
                 target->m_game->pop_request();
             } else {
-                switch (target->get_escape_type(origin, origin_card, flags)) {
+                switch (get_escape_type(origin, target, origin_card, flags)) {
                 case escape_type::no_escape:
                     auto_resolve();
                     break;

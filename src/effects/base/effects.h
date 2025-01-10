@@ -27,7 +27,6 @@
 #include "pass_turn.h"
 #include "pick.h"
 #include "predraw_check.h"
-#include "requests.h"
 #include "resolve.h"
 #include "scope.h"
 #include "slab_the_killer.h"
