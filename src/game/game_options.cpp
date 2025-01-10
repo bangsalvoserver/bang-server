@@ -52,12 +52,6 @@ namespace banggame {
         }
     };
 
-    template<> struct game_option_transformer<game_option_field_index("tumbleweed_timer")> {
-        game_duration operator()(game_duration value) const {
-            return std::clamp(value, game_duration{}, game_duration{10s});
-        }
-    };
-
     template<> struct game_option_transformer<game_option_field_index("duration_coefficient")> {
         float operator()(float value) const {
             return std::clamp(value, 0.f, 4.f);

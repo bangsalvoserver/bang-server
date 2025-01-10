@@ -15,24 +15,6 @@ namespace banggame {
 
         shared_draw_check_handler handler;
 
-        struct timer_tumbleweed : request_timer {
-            explicit timer_tumbleweed(request_tumbleweed *request)
-                : request_timer(request, request->target->m_game->m_options.tumbleweed_timer) {}
-        
-            void on_finished() override {
-                static_cast<request_tumbleweed *>(request)->on_finished();
-            }
-        };
-
-        timer_tumbleweed m_timer{this};
-        request_timer *timer() override {
-            if (m_timer.get_duration() <= ticks{}) {
-                return nullptr;
-            } else {
-                return &m_timer;
-            }
-        }
-
         card_list get_highlights() const override {
             auto vec = handler->get_drawn_cards();
             vec.push_back(handler->get_drawing_card());

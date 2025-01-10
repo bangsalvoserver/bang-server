@@ -20,7 +20,6 @@ namespace banggame {
         game_duration damage_timer = 1500ms;
         game_duration escape_timer = 3000ms;
         game_duration bot_play_timer = 500ms;
-        game_duration tumbleweed_timer = 0ms;
         float duration_coefficient = 1.f;
         unsigned int game_seed = 0;
 
