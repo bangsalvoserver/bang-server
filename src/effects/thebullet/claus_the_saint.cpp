@@ -20,7 +20,7 @@ namespace banggame {
         void on_update() override {
             if (!live) {
                 for (player_ptr p : target->m_game->m_players) {
-                    if (p != target) {
+                    if (p->alive() && p != target) {
                         remaining_targets.insert(p);
                     }
                 }
