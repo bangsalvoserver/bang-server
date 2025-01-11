@@ -1,8 +1,11 @@
 #include "ruleset.h"
 
+#include "effects/base/death.h"
+
 #include "cards/game_events.h"
 
 #include "game/game_table.h"
+#include "game/game_options.h"
 
 namespace banggame {
 
@@ -33,6 +36,12 @@ namespace banggame {
                         }
                     });
                 }
+            }
+        });
+
+        game->add_listener<event_type::check_remove_player>(nullptr, [=](bool &value) {
+            if (game->m_options.enable_ghost_cards) {
+                value = false;
             }
         });
     }

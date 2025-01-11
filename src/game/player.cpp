@@ -26,7 +26,8 @@ namespace banggame {
     static bool has_ghost_tag(const_player_ptr origin) {
         return origin->check_player_flags(player_flag::ghost_1)
             || origin->check_player_flags(player_flag::ghost_2)
-            || origin->check_player_flags(player_flag::temp_ghost);
+            || origin->check_player_flags(player_flag::temp_ghost)
+            || origin->check_player_flags(player_flag::shadow);
     }
 
     bool player::is_ghost() const {
@@ -349,6 +350,13 @@ namespace banggame {
         } else {
             m_game->add_update<"player_show_role">(update_target::includes(this), this, m_role, duration);
         }
+    }
+
+    player_role player::get_base_role() const {
+        if (m_role == player_role::shadow_deputy || m_role == player_role::shadow_outlaw) {
+            return player_role::renegade;
+        }
+        return m_role;
     }
 
     void player::reset_max_hp() {

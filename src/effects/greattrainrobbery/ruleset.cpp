@@ -2,10 +2,13 @@
 
 #include "next_stop.h"
 
+#include "effects/base/death.h"
+
 #include "cards/game_events.h"
 
 #include "game/filters.h"
 #include "game/game_table.h"
+#include "game/game_options.h"
 
 namespace banggame {
 
@@ -131,6 +134,12 @@ namespace banggame {
                 origin->m_game->queue_action([=]{
                     effect_next_stop{}.on_play(nullptr, origin);
                 }, -10);
+            }
+        });
+        
+        game->add_listener<event_type::check_remove_player>(nullptr, [=](bool &value) {
+            if (game->m_options.enable_ghost_cards) {
+                value = false;
             }
         });
     }

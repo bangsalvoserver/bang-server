@@ -31,6 +31,10 @@ namespace banggame {
             player_ptr origin;
             card_ptr target_card;
         };
+
+        struct on_discard_all {
+            player_ptr origin;
+        };
         
         struct post_discard_pass {
             player_ptr origin;

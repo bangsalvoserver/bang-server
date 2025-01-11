@@ -4,10 +4,12 @@
 
 #include "effects/base/damage.h"
 #include "effects/base/escapable.h"
+#include "effects/base/death.h"
 
 #include "cards/game_enums.h"
 
 #include "game/game_table.h"
+#include "game/game_options.h"
 
 namespace banggame {
 
@@ -28,6 +30,12 @@ namespace banggame {
                 value = true;
             }
         });
+        
+        game->add_listener<event_type::check_remove_player>(nullptr, [=](bool &value) {
+            if (game->m_options.enable_ghost_cards) {
+                value = false;
+            }
+        });
     }
 
     void ruleset_udolistinu::on_apply(game_ptr game) {
@@ -45,6 +53,12 @@ namespace banggame {
                 return p != target && p != target->m_game->m_playing && p->alive() && !p->empty_hand();
             }) && !rn::contains(target->m_game->m_discards, "SAVED", &card::name)) {
                 value = true;
+            }
+        });
+
+        game->add_listener<event_type::check_remove_player>(nullptr, [=](bool &value) {
+            if (game->m_options.enable_ghost_cards) {
+                value = false;
             }
         });
     }

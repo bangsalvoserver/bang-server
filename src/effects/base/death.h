@@ -9,7 +9,8 @@ namespace banggame {
     enum class death_type {
         death,
         ghost_discard,
-        ghosttown_turn_end
+        ghosttown_turn_end,
+        shadow_turn_end
     };
     
     void handle_player_death(player_ptr killer, player_ptr target, death_type type);
@@ -24,6 +25,10 @@ namespace banggame {
             player_ptr origin;
             player_ptr target;
             death_type type;
+        };
+
+        struct check_remove_player {
+            nullable_ref<bool> value;
         };
     }
 

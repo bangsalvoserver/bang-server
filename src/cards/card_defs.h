@@ -98,6 +98,8 @@ namespace banggame {
         deputy_3p,
         outlaw_3p,
         renegade_3p,
+        shadow_deputy,
+        shadow_outlaw
     };
 
     using cubes_and_players = std::pair<card_list, player_list>;

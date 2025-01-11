@@ -106,7 +106,9 @@ namespace banggame {
             }
         }, 50);
 
-        if (rn::none_of(target->m_game->get_all_cards(), [](const_card_ptr c) { return c->has_tag(tag_type::ghost_card); })) {
+        bool remove_player = true;
+        target->m_game->call_event(event_type::check_remove_player{ remove_player });
+        if (remove_player) {
             target->m_game->queue_action([=]{
                 bool any_player_removed = false;
                 for (player_ptr p : target->m_game->m_players) {
@@ -146,10 +148,21 @@ namespace banggame {
                     declare_winners(alive_players);
                 }
             } else if (target->m_game->m_players.size() > 3) {
-                auto is_outlaw = [](player_ptr p) { return p->m_role == player_role::outlaw; };
-                auto is_renegade = [](player_ptr p) { return p->m_role == player_role::renegade; };
-                auto is_sheriff = [](player_ptr p) { return p->m_role == player_role::sheriff; };
-                auto is_sheriff_or_deputy = [](player_ptr p) { return p->m_role == player_role::sheriff || p->m_role == player_role::deputy; };
+                auto is_outlaw = [](player_ptr p) {
+                    return p->m_role == player_role::outlaw
+                        || p->m_role == player_role::shadow_outlaw;
+                };
+                auto is_renegade = [](player_ptr p) {
+                    return p->m_role == player_role::renegade;
+                };
+                auto is_sheriff = [](player_ptr p) {
+                    return p->m_role == player_role::sheriff;
+                };
+                auto is_sheriff_or_deputy = [](player_ptr p) {
+                    return p->m_role == player_role::sheriff
+                        || p->m_role == player_role::deputy
+                        || p->m_role == player_role::shadow_deputy;
+                };
 
                 if (rn::none_of(alive_players, is_sheriff)) {
                     if (rn::distance(alive_players) == 1 && is_renegade(alive_players.front())) {

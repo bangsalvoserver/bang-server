@@ -11,30 +11,38 @@ namespace banggame::bot_suggestion {
         }
         switch (origin->m_role) {
         case player_role::outlaw:
+        case player_role::shadow_outlaw:
             return target->m_role == player_role::sheriff
-                || target->m_role == player_role::deputy;
+                || target->m_role == player_role::deputy
+                || target->m_role == player_role::shadow_deputy;
         case player_role::sheriff:
         case player_role::deputy:
+        case player_role::shadow_deputy:
             return target->m_role == player_role::outlaw
-                || target->m_role == player_role::renegade;
+                || target->m_role == player_role::renegade
+                || target->m_role == player_role::shadow_outlaw;
         case player_role::renegade: {
             auto targets = origin->m_game->m_players | rv::filter([origin](player_ptr p) {
                 return p != origin && p->alive();
             });
             auto num_outlaws = rn::count_if(targets, [](player_role role) {
                 return role == player_role::outlaw
-                    || role == player_role::renegade;
+                    || role == player_role::renegade
+                    || role == player_role::shadow_outlaw;
             }, &player::m_role);
             auto num_sheriff_or_deputy = rn::count_if(targets, [](player_role role) {
                 return role == player_role::sheriff
-                    || role == player_role::deputy;
+                    || role == player_role::deputy
+                    || role == player_role::shadow_deputy;
             }, &player::m_role);
             if (num_outlaws > num_sheriff_or_deputy) {
                 return target->m_role == player_role::outlaw
+                    || target->m_role == player_role::shadow_outlaw
                     || target->m_role == player_role::renegade
                     && origin != target;
             } else if (num_sheriff_or_deputy > 1) {
-                return target->m_role == player_role::deputy;
+                return target->m_role == player_role::deputy
+                    || target->m_role == player_role::shadow_deputy;
             } else if (target->m_role == player_role::sheriff && num_outlaws > 0) {
                 return target->m_hp > 2;
             } else {
@@ -58,11 +66,15 @@ namespace banggame::bot_suggestion {
         }
         switch (origin->m_role) {
         case player_role::outlaw:
-            return target->m_role == player_role::outlaw;
+        case player_role::shadow_outlaw:
+            return target->m_role == player_role::outlaw
+                || target->m_role == player_role::shadow_outlaw;
         case player_role::sheriff:
         case player_role::deputy:
+        case player_role::shadow_deputy:
             return target->m_role == player_role::sheriff
-                || target->m_role == player_role::deputy;
+                || target->m_role == player_role::deputy
+                || target->m_role == player_role::shadow_deputy;
         case player_role::renegade:
         default:
             return origin == target;

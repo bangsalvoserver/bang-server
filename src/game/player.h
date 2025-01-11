@@ -94,6 +94,8 @@ namespace banggame {
         }
 
         void set_role(player_role role, bool instant = true);
+        player_role get_base_role() const;
+        
         void reset_max_hp();
 
         void start_of_turn();

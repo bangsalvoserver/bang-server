@@ -25,6 +25,12 @@ namespace banggame {
 
     card_ptr draw_shop_card(game_ptr game);
 
+    struct ruleset_shadowgunslingers {
+        void on_apply(game_ptr game);
+    };
+
+    DEFINE_RULESET(shadowgunslingers, ruleset_shadowgunslingers)
+
 }
 
 #endif

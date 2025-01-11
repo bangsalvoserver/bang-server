@@ -39,5 +39,9 @@ namespace banggame {
                 origin_card->move_to(pocket_type::discard_pile);
             }
         });
+
+        game->add_listener<event_type::on_discard_all>(nullptr, [](player_ptr target) {
+            target->get_character()->drop_all_cubes();
+        });
     }
 }
