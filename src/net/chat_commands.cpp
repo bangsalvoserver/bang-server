@@ -19,7 +19,7 @@ namespace banggame {
         { "set-option",     { proxy<&game_manager::command_set_game_option>,    "SET_OPTION_DESCRIPTION", { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "reset-options",  { proxy<&game_manager::command_reset_game_options>, "RESET_OPTIONS_DESCRIPTION", { command_permissions::lobby_owner, command_permissions::lobby_waiting } }},
         { "give",           { proxy<&game_manager::command_give_card>,          "GIVE_CARD_DESCRIPTION", command_permissions::game_cheat }},
-        { "seed",           { proxy<&game_manager::command_get_rng_seed>,       "GET_RNG_SEED_DESCRIPTION", command_permissions::lobby_finished }},
+        { "seed",           { proxy<&game_manager::command_get_rng_seed>,       "GET_RNG_SEED_DESCRIPTION", command_permissions::lobby_in_game }},
         { "quit",           { proxy<&game_manager::command_quit>,               "QUIT_DESCRIPTION" }},
     };
 

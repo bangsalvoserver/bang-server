@@ -461,6 +461,10 @@ void game_manager::handle_chat_command(session_ptr session, const std::string &m
         throw lobby_error("ERROR_LOBBY_NOT_FINISHED");
     }
 
+    if (command.permissions().check(command_permissions::lobby_in_game) && !lobby.m_game) {
+        throw lobby_error("ERROR_LOBBY_NOT_IN_GAME");
+    }
+
     if (command.permissions().check(command_permissions::game_cheat)) {
         if (lobby.state != lobby_state::playing) {
             throw lobby_error("ERROR_LOBBY_NOT_PLAYING");

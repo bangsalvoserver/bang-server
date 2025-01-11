@@ -10,6 +10,7 @@ namespace banggame {
         lobby_waiting,
         lobby_playing,
         lobby_finished,
+        lobby_in_game,
         game_cheat,
     };
 
