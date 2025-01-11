@@ -19,6 +19,7 @@ add_custom_command(
         sets/greattrainrobbery.yml
         sets/highnoon.yml
         sets/fistfulofcards.yml
+        sets/wildwestshow_characters.yml
         sets/wildwestshow.yml
         sets/thebullet.yml
         sets/canyondiablo.yml
