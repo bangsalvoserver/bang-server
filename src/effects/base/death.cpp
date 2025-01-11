@@ -29,7 +29,7 @@ namespace banggame {
         target->m_game->pop_request();
         target->m_game->call_event(event_type::on_player_death{ target, tried_save });
 
-        handle_player_death(origin, target, true);
+        handle_player_death(origin, target, death_type::death);
     }
 
     prompt_string request_death::resolve_prompt() const {
@@ -45,7 +45,7 @@ namespace banggame {
         }
     }
     
-    void handle_player_death(player_ptr killer, player_ptr target, bool is_death) {
+    void handle_player_death(player_ptr killer, player_ptr target, death_type type) {
         if (killer != target->m_game->m_playing) killer = nullptr;
         
         target->m_game->queue_action([=]{
@@ -70,11 +70,11 @@ namespace banggame {
                     target->m_game->add_update<"player_show_role">(update_target::excludes(target), target, target->m_role);
                 }
 
-                target->m_game->call_event(event_type::on_player_eliminated{ killer, target });
+                target->m_game->call_event(event_type::on_player_eliminated{ killer, target, type });
             }
         }, 50);
 
-        if (killer && is_death) {
+        if (killer && type == death_type::death) {
             target->m_game->queue_action([=] {
                 if (killer->alive() && !target->alive()) {
                     if (target->m_game->m_players.size() > 3) {
@@ -98,7 +98,7 @@ namespace banggame {
         
         target->m_game->queue_action([=]{
             if (!target->alive()) {
-                if (is_death) {
+                if (type == death_type::death) {
                     target->m_game->queue_request<request_discard_all_death>(target);
                 } else {
                     target->m_game->queue_request<request_discard_all>(target);

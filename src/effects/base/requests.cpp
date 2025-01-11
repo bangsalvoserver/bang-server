@@ -159,8 +159,7 @@ namespace banggame {
             on_pick(target_card);
         }
 
-        card_ptr character_card = target->get_character();
-        character_card->drop_all_cubes();
+        target->get_character()->drop_all_cubes();
     }
 
     game_string request_discard_all::status_text(player_ptr owner) const {

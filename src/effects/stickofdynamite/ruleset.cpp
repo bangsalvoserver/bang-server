@@ -85,7 +85,7 @@ namespace banggame {
             }
         });
 
-        game->add_listener<event_type::on_player_eliminated>({nullptr, 20}, [=](player_ptr killer, player_ptr target) {
+        game->add_listener<event_type::on_player_eliminated>({nullptr, 20}, [=](player_ptr killer, player_ptr target, death_type death) {
             if (target->remove_player_flags(player_flag::stick_of_dynamite) && game->m_first_player->alive()) {
                 game->m_first_player->add_player_flags(player_flag::stick_of_dynamite);
             }

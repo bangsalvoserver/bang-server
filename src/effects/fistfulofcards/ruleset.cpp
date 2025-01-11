@@ -19,8 +19,8 @@ namespace banggame {
             });
         }
 
-        game->add_listener<event_type::on_player_eliminated>(nullptr, [first = true](player_ptr origin, player_ptr target) mutable {
-            if (std::exchange(first, false)) {
+        game->add_listener<event_type::on_player_eliminated>(nullptr, [first = true](player_ptr origin, player_ptr target, death_type type) mutable {
+            if (type == death_type::death && std::exchange(first, false)) {
                 target->m_game->add_listener<event_type::get_first_dead_player>(nullptr, [=](player_ptr &result) {
                     result = target;
                 });

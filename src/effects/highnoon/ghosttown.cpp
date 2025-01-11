@@ -23,7 +23,7 @@ namespace banggame {
         origin->m_game->add_listener<event_type::on_turn_end>({target_card, -3}, [](player_ptr target, bool skipped) {
             target->m_game->queue_action([=]{
                 if (target->m_extra_turns == 0 && target->remove_player_flags(player_flag::temp_ghost) && !target->alive()) {
-                    handle_player_death(nullptr, target, false);
+                    handle_player_death(nullptr, target, death_type::ghosttown_turn_end);
                 }
             }, -10);
         });

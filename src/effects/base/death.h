@@ -6,6 +6,14 @@
 
 namespace banggame {
 
+    enum class death_type {
+        death,
+        ghost_discard,
+        ghosttown_turn_end
+    };
+    
+    void handle_player_death(player_ptr killer, player_ptr target, death_type type);
+
     namespace event_type {
         struct on_player_death {
             player_ptr target;
@@ -15,6 +23,7 @@ namespace banggame {
         struct on_player_eliminated {
             player_ptr origin;
             player_ptr target;
+            death_type type;
         };
     }
 
@@ -36,8 +45,6 @@ namespace banggame {
         prompt_string resolve_prompt() const override;
         game_string status_text(player_ptr owner) const override;
     };
-    
-    void handle_player_death(player_ptr killer, player_ptr target, bool is_death);
 }
 
 #endif
