@@ -19,7 +19,7 @@ namespace banggame {
         
         void on_update() override {
             if (!live) {
-                for (int i=0; i < req_draw->num_cards_to_draw; ++i) {
+                for (int i = req_draw->num_drawn_cards; i < req_draw->num_cards_to_draw; ++i) {
                     req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
                 }
             }
