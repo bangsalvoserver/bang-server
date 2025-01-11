@@ -24,7 +24,7 @@ namespace banggame {
                 target->set_hp(2);
                 target->draw_card(2);
 
-                for (auto *c : target->m_characters) {
+                for (card_ptr c : target->m_characters) {
                     target->enable_equip(c);
                 }
             }

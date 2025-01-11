@@ -113,7 +113,7 @@ namespace banggame {
                 
                 if (!play_cards.empty()) {
                     std::optional<timer_id_t> timer_id;
-                    if (auto *timer = origin->m_game->top_request()->timer()) {
+                    if (request_timer *timer = origin->m_game->top_request()->timer()) {
                         timer_id = timer->get_timer_id();
                     }
 

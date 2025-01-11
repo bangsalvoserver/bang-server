@@ -20,7 +20,7 @@ namespace banggame {
             if (top_request() != req) {
                 return utils::tag<"next">{};
             }
-            if (auto *timer = req->timer()) {
+            if (request_timer *timer = req->timer()) {
                 if (timer->get_duration() <= ticks{0}) {
                     pop_request();
                     timer->on_finished();
@@ -39,7 +39,7 @@ namespace banggame {
         if (is_game_over()) {
             return utils::tag<"done">{};
         } else if (auto req = top_request()) {
-            if (auto *timer = req->timer()) {
+            if (request_timer *timer = req->timer()) {
                 timer->tick();
                 if (timer->finished()) {
                     send_request_status_clear();

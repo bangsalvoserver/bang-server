@@ -73,7 +73,7 @@ namespace banggame {
     static game_string verify_timer_response(player_ptr origin, std::optional<timer_id_t> timer_id) {
         std::optional<timer_id_t> current_timer_id;
         if (auto req = origin->m_game->top_request()) {
-            if (auto *timer = req->timer()) {
+            if (request_timer *timer = req->timer()) {
                 current_timer_id = timer->get_timer_id();
             }
         }

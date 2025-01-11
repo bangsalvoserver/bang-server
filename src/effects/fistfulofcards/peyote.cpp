@@ -41,7 +41,7 @@ namespace banggame {
     }
 
     void effect_peyote::on_play(card_ptr target_card, player_ptr target) {
-        auto *drawn_card = target->m_game->top_of_deck();
+        card_ptr drawn_card = target->m_game->top_of_deck();
         drawn_card->set_visibility(card_visibility::shown);
         drawn_card->add_short_pause();
 

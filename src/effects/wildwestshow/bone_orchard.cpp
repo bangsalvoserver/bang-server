@@ -31,7 +31,7 @@ namespace banggame {
                 target->remove_player_flags(player_flag::dead);
                 target->set_hp(1);
 
-                for (auto *c : target->m_characters) {
+                for (card_ptr c : target->m_characters) {
                     target->enable_equip(c);
                 }
             }
