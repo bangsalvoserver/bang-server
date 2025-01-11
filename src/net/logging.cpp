@@ -39,9 +39,9 @@ namespace logging {
             enums::to_string(local_level)
         );
         for (std::string_view ctx : get_log_context()) {
-            std::print(out, "[{}] ", ctx);
+            std::print(out, " [{}]", ctx);
         }
-        std::println(out, "{}", message);
+        std::println(out, " {}", message);
         
         fflush(out);
     }
