@@ -29,8 +29,13 @@ namespace banggame {
         void on_pick(player_ptr target_player) {
             target->m_game->pop_request();
 
-            auto new_cards = target_player->m_characters
-                | rv::take_last(2)
+            std::span<card_ptr> target_characters = target_player->m_characters;
+            if (target_characters.size() > 1) {
+                // Handle Greygory Deck
+                target_characters = target_characters.subspan(1);
+            }
+
+            auto new_cards = target_characters
                 | rv::transform([](const_card_ptr target_card) {
                     for (card_ptr c : target_card->m_game->get_all_cards()) {
                         if (c != target_card && c->deck == target_card->deck && c->name == target_card->name) {
