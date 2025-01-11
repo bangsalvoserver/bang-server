@@ -90,7 +90,9 @@ void game_manager::tick() {
         game_lobby &lobby = pair.second;
         if (lobby.state == lobby_state::playing && lobby.m_game) {
             try {
+                logging::push_context(std::format("game {}", lobby.name));
                 lobby.m_game->tick();
+                logging::pop_context();
                 
                 while (lobby.m_game->pending_updates()) {
                     auto [target, update, update_time] = lobby.m_game->get_next_update();
@@ -652,7 +654,9 @@ void game_manager::handle_message(utils::tag<"game_action">, session_ptr session
     }
 
     try {
+        logging::push_context(std::format("game {}", lobby.name));
         lobby.m_game->handle_game_action(origin, value);
+        logging::pop_context();
     } catch (const game_error &e) {
         lobby.state = lobby_state::finished;
         add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", { utils::tag<"string">{}, e.what() }, lobby_chat_flag::translated });

@@ -54,6 +54,10 @@ namespace logging {
 
     void set_logging_level(level global_level);
 
+    void push_context(std::string context);
+
+    void pop_context();
+
     constexpr auto trace = log_function(level::trace);
     constexpr auto debug = log_function(level::debug);
     constexpr auto info = log_function(level::info);
