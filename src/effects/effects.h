@@ -10,7 +10,7 @@
 #include "wildwestshow/effects.h"
 #include "highnoon/effects.h"
 #include "legends/effects.h"
-#include "thebullet/effects.h"
+#include "mostwanted/effects.h"
 #include "fistfulofcards/effects.h"
 #include "greattrainrobbery/effects.h"
 #include "stickofdynamite/effects.h"

@@ -1,5 +1,5 @@
-#ifndef __THEBULLET_JOHHNY_KISCH_H__
-#define __THEBULLET_JOHHNY_KISCH_H__
+#ifndef __MOSTWANTED_JOHHNY_KISCH_H__
+#define __MOSTWANTED_JOHHNY_KISCH_H__
 
 #include "cards/card_effect.h"
 

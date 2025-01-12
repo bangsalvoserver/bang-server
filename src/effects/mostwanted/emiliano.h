@@ -1,5 +1,5 @@
-#ifndef __THEBULLET_EMILIANO_H__
-#define __THEBULLET_EMILIANO_H__
+#ifndef __MOSTWANTED_EMILIANO_H__
+#define __MOSTWANTED_EMILIANO_H__
 
 #include "cards/card_effect.h"
 

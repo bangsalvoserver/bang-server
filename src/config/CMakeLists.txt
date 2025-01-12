@@ -21,7 +21,7 @@ add_custom_command(
         sets/fistfulofcards.yml
         sets/wildwestshow_characters.yml
         sets/wildwestshow.yml
-        sets/thebullet.yml
+        sets/mostwanted.yml
         sets/canyondiablo.yml
         sets/legends.yml
         parse_bang_cards.py

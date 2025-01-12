@@ -1,5 +1,5 @@
-#ifndef __THEBULLET_HANDCUFFS_H__
-#define __THEBULLET_HANDCUFFS_H__
+#ifndef __MOSTWANTED_HANDCUFFS_H__
+#define __MOSTWANTED_HANDCUFFS_H__
 
 #include "cards/card_effect.h"
 

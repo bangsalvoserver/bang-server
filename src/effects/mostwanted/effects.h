@@ -1,5 +1,5 @@
-#ifndef __THEBULLET_EFFECTS_H__
-#define __THEBULLET_EFFECTS_H__
+#ifndef __MOSTWANTED_EFFECTS_H__
+#define __MOSTWANTED_EFFECTS_H__
 
 #include "claus_the_saint.h"
 #include "emiliano.h"

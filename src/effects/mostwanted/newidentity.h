@@ -1,5 +1,5 @@
-#ifndef __THEBULLET_NEWIDENTITY_H__
-#define __THEBULLET_NEWIDENTITY_H__
+#ifndef __MOSTWANTED_NEWIDENTITY_H__
+#define __MOSTWANTED_NEWIDENTITY_H__
 
 #include "cards/card_effect.h"
 
