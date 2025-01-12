@@ -23,19 +23,29 @@ namespace json {
         }
     };
 
-    template<typename Context> struct deserializer<banggame::ruleset_ptr, Context> {
-        banggame::ruleset_ptr operator ()(const json &value) const {
-            if (!value.is_string()) {
-                throw deserialize_error("Cannot deserialize ruleset_vtable");
+    template<typename Context> struct deserializer<banggame::expansion_set, Context> {
+        banggame::expansion_set operator()(const json &value) const {
+            if (!value.is_array()) {
+                throw deserialize_error("Cannot deserialize expansion_set");
             }
 
-            std::string_view name = value.get<std::string_view>();
-            auto it = rn::find(banggame::all_cards.expansions, name, &banggame::ruleset_vtable::name);
-            if (it == banggame::all_cards.expansions.end()) {
-                throw deserialize_error(std::format("Invalid ruleset_vtable name: {}", name));
+            banggame::expansion_set result;
+
+            for (const auto &elem : value) {
+                if (!elem.is_string()) {
+                    throw deserialize_error("Cannot deserialize ruleset_ptr");
+                }
+
+                auto name = elem.get<std::string_view>();
+                for (banggame::ruleset_ptr expansion : banggame::all_cards.expansions) {
+                    if (expansion->name == name) {
+                        result.insert(expansion);
+                        break;
+                    }
+                }
             }
 
-            return *it;
+            return result;
         }
     };
 
