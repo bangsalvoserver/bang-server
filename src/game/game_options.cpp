@@ -63,11 +63,11 @@ namespace banggame {
         return banggame::game_option_transformer<I>{}(value);
     }
 
-    std::string game_options::to_string() const {
+    std::string game_options::to_string(std::string_view sep) const {
         std::string result;
         reflect::for_each<game_options>([&](auto I) {
             if constexpr (I != 0) {
-                result += '\n';
+                result += sep;
             }
             result += std::format("{} = {}", reflect::member_name<I>(*this), reflect::get<I>(*this));
         });

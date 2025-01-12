@@ -562,9 +562,8 @@ void game_manager::handle_message(utils::tag<"game_start">, session_ptr session)
 
     broadcast_message_lobby<"game_started">(lobby);
 
+    logging::push_context(std::format("game {}", lobby.name));
     lobby.m_game = std::make_unique<banggame::game>(lobby.options);
-
-    logging::info("Started game {} with seed {}", lobby.name, lobby.m_game->rng_seed);
 
     std::vector<int> user_ids;
     for (const game_user &user : lobby.connected_users()) {
@@ -592,6 +591,7 @@ void game_manager::handle_message(utils::tag<"game_start">, session_ptr session)
     lobby.m_game->add_players(user_ids);
     lobby.m_game->start_game();
     lobby.m_game->commit_updates();
+    logging::pop_context();
 }
 
 void game_manager::handle_message(utils::tag<"game_rejoin">, session_ptr session, const game_rejoin_args &value) {

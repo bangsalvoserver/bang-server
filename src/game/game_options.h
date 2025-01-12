@@ -23,10 +23,11 @@ namespace banggame {
         game_duration bot_play_timer = 500ms;
         float duration_coefficient = 1.f;
         unsigned int game_seed = 0;
+        unsigned int bot_rng_seed = 0;
 
         static game_options deserialize_json(const json::json &value);
 
-        std::string to_string() const;
+        std::string to_string(std::string_view sep = "\n") const;
         void set_option(std::string_view key, std::string_view value);
     };
 

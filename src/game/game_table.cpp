@@ -9,20 +9,31 @@
 #include "effects/base/requests.h"
 #include "effects/base/death.h"
 
+#include "net/logging.h"
+
 namespace banggame {
 
     game_table::game_table(const game_options &options)
         : disabler_map{this}
         , m_options{options}
     {
+        logging::info("Options: [{}]", options.to_string(", "));
+
         std::random_device rd;
-        if (options.game_seed == 0) {
+        
+        rng_seed = options.game_seed;
+        if (rng_seed == 0) {
             rng_seed = rd();
-        } else {
-            rng_seed = options.game_seed;
         }
+        logging::info("RNG seed: {}", rng_seed);
         rng.seed(rng_seed);
-        bot_rng.seed(rd());
+
+        auto bot_rng_seed = options.bot_rng_seed;
+        if (bot_rng_seed == 0) {
+            bot_rng_seed = rd();
+        }
+        logging::info("Bot RNG seed: {}", bot_rng_seed);
+        bot_rng.seed(bot_rng_seed);
     }
 
     card_ptr game_table::add_card(const card_data &data) {
