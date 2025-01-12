@@ -31,11 +31,9 @@ namespace banggame {
             }
         });
         
-        game->add_listener<event_type::check_remove_player>(nullptr, [=](bool &value) {
-            if (game->m_options.enable_ghost_cards) {
-                value = false;
-            }
-        });
+        if (game->m_options.enable_ghost_cards) {
+            game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) { value = false; });
+        }
     }
 
     void ruleset_udolistinu::on_apply(game_ptr game) {
@@ -55,12 +53,10 @@ namespace banggame {
                 value = true;
             }
         });
-
-        game->add_listener<event_type::check_remove_player>(nullptr, [=](bool &value) {
-            if (game->m_options.enable_ghost_cards) {
-                value = false;
-            }
-        });
+        
+        if (game->m_options.enable_ghost_cards) {
+            game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) { value = false; });
+        }
     }
 
     bool ruleset_udolistinu::is_valid_with(const expansion_set &set) {

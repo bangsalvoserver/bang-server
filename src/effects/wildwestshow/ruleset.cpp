@@ -38,11 +38,9 @@ namespace banggame {
                 }
             }
         });
-
-        game->add_listener<event_type::check_remove_player>(nullptr, [=](bool &value) {
-            if (game->m_options.enable_ghost_cards) {
-                value = false;
-            }
-        });
+        
+        if (game->m_options.enable_ghost_cards) {
+            game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) { value = false; });
+        }
     }
 }

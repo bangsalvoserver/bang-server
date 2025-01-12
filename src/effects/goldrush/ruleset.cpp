@@ -103,8 +103,6 @@ namespace banggame {
                 }
             }, -10);
         });
-        game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) {
-            value = false;
-        });
+        game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) { value = false; });
     }
 }
