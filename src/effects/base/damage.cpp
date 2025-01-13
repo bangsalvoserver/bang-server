@@ -35,7 +35,7 @@ namespace banggame {
         , damage(damage) {}
     
     card_list request_damage::get_highlights() const {
-        return target->m_backup_character;
+        return { target->get_character() };
     }
 
     void request_damage::on_update() {

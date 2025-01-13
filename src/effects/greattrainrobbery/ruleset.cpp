@@ -13,28 +13,19 @@
 namespace banggame {
 
     static void init_stations_and_train(player_ptr origin) {
-        origin->m_game->m_stations = origin->m_game->get_all_cards()
+        origin->m_game->add_cards_to(origin->m_game->get_all_cards()
             | rv::filter([](card_ptr c) { return c->deck == card_deck_type::station; })
             | rv::sample(std::max(int(origin->m_game->m_players.size()), 4), origin->m_game->rng)
-            | rn::to_vector;
-            
-        origin->m_game->add_update<"add_cards">(origin->m_game->m_stations, pocket_type::stations);
-        for (card_ptr c : origin->m_game->m_stations) {
-            c->pocket = pocket_type::stations;
-            c->set_visibility(card_visibility::shown, nullptr, true);
-        }
+            | rn::to_vector, pocket_type::stations, nullptr, card_visibility::shown);
 
-        origin->m_game->m_train = origin->m_game->get_all_cards()
+        origin->m_game->add_cards_to(origin->m_game->get_all_cards()
             | rv::filter([&](card_ptr c) {
                 return c->deck == card_deck_type::locomotive && !rn::contains(origin->m_game->m_train, c);
             })
             | rv::sample(1, origin->m_game->rng)
-            | rn::to_vector;
+            | rn::to_vector, pocket_type::train, nullptr, card_visibility::shown);
 
-        origin->m_game->add_update<"add_cards">(origin->m_game->m_train, pocket_type::train);
         for (card_ptr c : origin->m_game->m_train) {
-            c->pocket = pocket_type::train;
-            c->set_visibility(card_visibility::shown, nullptr, true);
             origin->enable_equip(c);
         }
         
@@ -58,16 +49,12 @@ namespace banggame {
             origin->m_game->add_update<"deck_shuffled">(pocket_type::train_deck);
         }
 
-        for (card_ptr c : origin->m_game->m_train) {
-            c->set_visibility(card_visibility::hidden);
-            origin->disable_equip(c);
+        for (card_ptr target_card : origin->m_game->m_train) {
+            origin->disable_equip(target_card);
         }
-        origin->m_game->add_update<"remove_cards">(origin->m_game->m_train);
-        
-        origin->m_game->add_update<"remove_cards">(origin->m_game->m_stations);
-        for (card_ptr c : origin->m_game->m_stations) {
-            c->visibility = card_visibility::hidden;
-        }
+
+        origin->m_game->remove_cards(origin->m_game->m_train);
+        origin->m_game->remove_cards(origin->m_game->m_stations);
         
         init_stations_and_train(origin);
     }

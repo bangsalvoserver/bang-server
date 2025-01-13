@@ -63,12 +63,12 @@ namespace banggame {
                 rn::shuffle(roles, origin->m_game->rng);
                 
                 for (player_ptr p : alive_players) {
-                    p->set_role(player_role::unknown, false);
+                    p->set_role(player_role::unknown);
                     p->remove_player_flags(player_flag::role_revealed);
                 }
 
                 for (auto [p, role] : rv::zip(alive_players, roles)) {
-                    p->set_role(role, false);
+                    p->set_role(role);
                 }
             }
         }

@@ -34,6 +34,12 @@ namespace banggame {
         }
     };
 
+    template<> struct game_option_transformer<game_option_field_index("character_choice")> {
+        int operator()(int value) const {
+            return std::clamp(value, 1, 3);
+        }
+    };
+
     template<> struct game_option_transformer<game_option_field_index("damage_timer")> {
         game_duration operator()(game_duration value) const {
             return std::clamp(value, game_duration{}, game_duration{5s});

@@ -13,7 +13,7 @@ namespace banggame {
                 case card_deck_type::main_deck:
                     return target_card->pocket != pocket_type::player_hand || target_card->owner != target;
                 case card_deck_type::character:
-                    return target_card->pocket != pocket_type::player_character && target_card->pocket != pocket_type::player_backup;
+                    return true;
                 case card_deck_type::goldrush:
                     return target_card->pocket != pocket_type::shop_selection && target_card->pocket != pocket_type::hidden_deck
                         && (target_card->pocket != pocket_type::player_table || target_card->owner != target);
@@ -45,39 +45,12 @@ namespace banggame {
             break;
         }
         case card_deck_type::character: {
-            target->remove_extra_characters();
-            for (card_ptr c : target->m_characters) {
-                target->disable_equip(c);
+            if (target_card->pocket == pocket_type::player_character) {
+                card_ptr old_character = target->get_character();
+                target->remove_extra_characters(true);
+                target_card->owner->set_character(old_character);
             }
-
-            card_ptr old_character = target->get_character();
-            auto tokens = old_character->tokens;
-
-            for (const auto &[token, count] : tokens) {
-                old_character->move_tokens(token, nullptr, count);
-            }
-
-            target->m_game->add_update<"remove_cards">(std::vector{old_character});
-
-            old_character->pocket = pocket_type::none;
-            old_character->owner = nullptr;
-            old_character->visibility = card_visibility::hidden;
-
-            target->m_characters.clear();
-            target->m_characters.push_back(target_card);
-
-            target_card->pocket = pocket_type::player_character;
-            target_card->owner = target;
-
-            target->m_game->add_update<"add_cards">(target_card, pocket_type::player_character, target);
-            target_card->set_visibility(card_visibility::shown, nullptr, true);
-
-            target->reset_max_hp();
-            target->enable_equip(target_card);
-
-            for (const auto &[token, count] : tokens) {
-                target_card->add_tokens(token, count);
-            }
+            target->set_character(target_card);
             break;
         }
         case card_deck_type::goldrush: {

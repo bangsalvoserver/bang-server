@@ -177,7 +177,6 @@ namespace banggame {
 
             if (!p->check_player_flags(player_flag::removed)) {
                 co_yield std::ranges::elements_of(add_cards(pocket_type::player_character, p));
-                co_yield std::ranges::elements_of(add_cards(pocket_type::player_backup, p));
 
                 co_yield std::ranges::elements_of(add_cards(pocket_type::player_table, p));
                 co_yield std::ranges::elements_of(add_cards(pocket_type::player_hand, p));
@@ -333,7 +332,7 @@ namespace banggame {
 
         rn::shuffle(role_ptr, role_ptr + m_players.size(), rng);
         for (player_ptr p : m_players) {
-            p->set_role(*role_ptr++);
+            p->set_role(*role_ptr++, true);
         }
 
         m_first_player = *rn::find(m_players,
@@ -378,19 +377,21 @@ namespace banggame {
 
         auto character_it = character_ptrs.rbegin();
         for (player_ptr p : range_alive_players(m_first_player)) {
-            for (int i=0; i<2; ++i) {
-                card_ptr c = *character_it++;
-                p->m_hand.push_back(c);
-                c->pocket = pocket_type::player_hand;
-                c->owner = p;
-            }
-            add_update<"add_cards">(p->m_hand, pocket_type::player_hand, p);
-            if (m_options.character_choice) {
-                for (card_ptr c : p->m_hand) {
-                    c->set_visibility(card_visibility::shown, p, true);
+            if (m_options.character_choice > 1) {
+                card_list characters;
+                characters.reserve(m_options.character_choice);
+                for (int i=0; i<characters.capacity(); ++i) {
+                    characters.push_back(*character_it++);
                 }
+
+                add_cards_to(std::move(characters), pocket_type::player_hand, p, card_visibility::shown);
+                queue_request<request_characterchoice>(p);
+            } else {
+                card_ptr target_card = *character_it++;
+                add_log("LOG_CHARACTER_CHOICE", p, target_card);
+                p->set_character(target_card);
+                p->set_hp(p->m_max_hp, true);
             }
-            queue_request<request_characterchoice>(p);
         }
 
         queue_action([this] {

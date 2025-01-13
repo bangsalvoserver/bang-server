@@ -313,19 +313,6 @@ namespace banggame {
         });
     }
 
-    void player::remove_extra_characters() {
-        if (auto range = m_characters | rv::drop(1)) {
-            m_game->add_update<"remove_cards">(range | rn::to_vector);
-
-            for (card_ptr character : range) {
-                disable_equip(character);
-                character->visibility = card_visibility::hidden;
-            }
-
-            m_characters.resize(1);
-        }
-    }
-
     void player::reveal_hand() {
         if (!empty_hand() && !m_game->check_flags(game_flag::hands_shown)) {
             for (card_ptr target_card : m_hand) {
@@ -337,6 +324,44 @@ namespace banggame {
                 target_card->set_visibility(card_visibility::show_owner, this);
             }
         }
+    }
+
+    void player::remove_extra_characters(bool remove_all) {
+        std::span range = m_characters;
+        if (!remove_all) {
+            range = range.subspan(1);
+        }
+        for (card_ptr character : range) {
+            disable_equip(character);
+        }
+
+        m_game->remove_cards(range | rn::to_vector);
+    }
+
+    void player::set_character(card_ptr target_card) {
+        card_ptr old_character = get_character();
+        if (old_character) {
+            remove_extra_characters(true);
+        }
+        
+        if (target_card->pocket == pocket_type::none) {
+            m_game->add_cards_to({ target_card }, pocket_type::player_character, this, card_visibility::shown);
+        } else {
+            target_card->move_to(pocket_type::player_character, this, card_visibility::shown);
+        }
+
+        if (old_character) {
+            for (const auto &[token, count] : old_character->tokens) {
+                old_character->move_tokens(token, target_card, count, true);
+            }
+        }
+
+        reset_max_hp();
+        enable_equip(target_card);
+    }
+
+    void player::reset_max_hp() {
+        m_max_hp = get_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
     }
 
     void player::set_role(player_role role, bool instant) {
@@ -357,10 +382,6 @@ namespace banggame {
             return player_role::renegade;
         }
         return m_role;
-    }
-
-    void player::reset_max_hp() {
-        m_max_hp = get_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
     }
 
     bool player::add_player_flags(player_flag flags) {

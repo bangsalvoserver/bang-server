@@ -222,7 +222,6 @@ namespace banggame {
         player_hand,
         player_table,
         player_character,
-        player_backup,
         main_deck,
         discard_pile,
         selection,

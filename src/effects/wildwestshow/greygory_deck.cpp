@@ -19,14 +19,10 @@ namespace banggame {
             }),
             std::back_inserter(base_characters), 2, target->m_game->rng);
 
-        target->m_game->add_update<"add_cards">(base_characters, pocket_type::player_character, target);
+        target->m_game->add_cards_to(base_characters, pocket_type::player_character, target, card_visibility::shown);
         for (card_ptr c : base_characters) {
-            target->m_characters.push_back(c);
             target->m_game->add_log("LOG_CHARACTER_CHOICE", target, c);
-            c->pocket = pocket_type::player_character;
-            c->owner = target;
             target->enable_equip(c);
-            c->set_visibility(card_visibility::shown, nullptr, true);
         }
     }
 

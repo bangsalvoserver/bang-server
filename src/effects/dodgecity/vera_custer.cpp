@@ -48,18 +48,11 @@ namespace banggame {
 
             if (!rn::equal(target->m_characters | rv::drop(1), new_cards)) {
                 target->remove_extra_characters();
-
+                target->m_game->add_cards_to(new_cards, pocket_type::player_character, target, card_visibility::shown);
+                
                 for (card_ptr target_card : new_cards) {
                     target->m_game->add_log("LOG_COPY_CHARACTER", target, target_card);
-
-                    target_card->pocket = pocket_type::player_character;
-                    target_card->owner = target;
-                    
-                    target->m_characters.emplace_back(target_card);
                     target->enable_equip(target_card);
-
-                    target->m_game->add_update<"add_cards">(target_card, pocket_type::player_character, target);
-                    target_card->set_visibility(card_visibility::shown, nullptr, true);
                 }
             }
         }

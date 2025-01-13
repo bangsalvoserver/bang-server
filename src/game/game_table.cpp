@@ -49,6 +49,34 @@ namespace banggame {
         }
     }
 
+    void game_table::remove_cards(card_list cards) {
+        if (!cards.empty()) {
+            for (card_ptr target_card : cards) {
+                auto &pocket = get_pocket(target_card->pocket, target_card->owner);
+                pocket.erase(rn::find(pocket, target_card));
+
+                target_card->visibility = card_visibility::hidden;
+                target_card->pocket = pocket_type::none;
+                target_card->owner = nullptr;
+            }
+            add_update<"remove_cards">(std::move(cards));
+        }
+    }
+
+    void game_table::add_cards_to(card_list cards, pocket_type pocket, player_ptr owner, card_visibility visibility, bool instant) {
+        if (!cards.empty()) {
+            add_update<"add_cards">(cards, pocket, owner);
+
+            auto &pile = get_pocket(pocket, owner);
+            for (card_ptr target_card : cards) {
+                target_card->set_visibility(visibility, owner, instant);
+                target_card->pocket = pocket;
+                target_card->owner = owner;
+                pile.push_back(target_card);
+            }
+        }
+    }
+
     card_ptr game_table::find_card(int card_id) const {
         if (auto it = m_cards_storage.find(card_id); it != m_cards_storage.end()) {
             return &*it;
@@ -79,7 +107,6 @@ namespace banggame {
         case pocket_type::player_hand:       return owner->m_hand;
         case pocket_type::player_table:      return owner->m_table;
         case pocket_type::player_character:  return owner->m_characters;
-        case pocket_type::player_backup:     return owner->m_backup_character;
         case pocket_type::main_deck:         return m_deck;
         case pocket_type::discard_pile:      return m_discards;
         case pocket_type::selection:         return m_selection;

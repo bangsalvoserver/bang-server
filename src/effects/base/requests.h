@@ -11,7 +11,6 @@ namespace banggame {
         request_characterchoice(player_ptr target)
             : request_picking(nullptr, nullptr, target) {}
         
-        void on_update() override;
         bool can_pick(const_card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
         game_string status_text(player_ptr owner) const override;

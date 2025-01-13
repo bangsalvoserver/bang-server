@@ -13,7 +13,6 @@ namespace banggame {
         card_list m_hand;
         card_list m_table;
         card_list m_characters;
-        card_list m_backup_character;
 
         rn::concat_view<
             rn::ref_view<card_list>,
@@ -93,7 +92,9 @@ namespace banggame {
             return nullptr;
         }
 
-        void set_role(player_role role, bool instant = true);
+        void set_character(card_ptr target_card);
+
+        void set_role(player_role role, bool instant = false);
         player_role get_base_role() const;
         
         void reset_max_hp();
@@ -116,7 +117,7 @@ namespace banggame {
             );
         }
 
-        void remove_extra_characters();
+        void remove_extra_characters(bool remove_all = false);
         void reveal_hand();
     };
 

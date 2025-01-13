@@ -8,6 +8,14 @@
 
 namespace banggame {
 
+    static card_ptr get_random_character(player_ptr origin) {
+        return random_element(origin->m_game->get_all_cards()
+            | rv::filter([&](card_ptr target_card) {
+                return target_card->deck == card_deck_type::character
+                    && target_card->owner == nullptr;
+            }), origin->m_game->rng);
+    }
+
     struct request_newidentity : request_picking {
         request_newidentity(card_ptr origin_card, player_ptr target)
             : request_picking(origin_card, nullptr, target, {}, -20) {}
@@ -15,7 +23,7 @@ namespace banggame {
         void on_update() override {
             if (target->alive() && target->m_game->m_playing == target) {
                 if (!live) {
-                    target->m_backup_character.front()->move_to(pocket_type::selection);
+                    target->m_game->add_cards_to({ get_random_character(target) }, pocket_type::selection, nullptr, card_visibility::shown);
                 }
             } else {
                 target->m_game->pop_request();
@@ -30,30 +38,14 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
             if (target_card->pocket == pocket_type::selection) {
-                target->remove_extra_characters();
-                for (card_ptr c : target->m_characters) {
-                    target->disable_equip(c);
-                }
-
                 target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
-
-                card_ptr old_character = target->get_character();
-                old_character->set_visibility(card_visibility::hidden, target);
-                old_character->move_to(pocket_type::player_backup, target, card_visibility::hidden, true);
-                target_card->move_to(pocket_type::player_character, target, card_visibility::shown);
-                
-                for (const auto &[token, count] : old_character->tokens) {
-                    old_character->move_tokens(token, target_card, count, true);
-                }
-
-                target->reset_max_hp();
-                target->enable_equip(target_card);
+                target->set_character(target_card);
                 
                 if (!target->is_ghost()) {
                     target->set_hp(2);
                 }
             } else {
-                target->m_game->m_selection.front()->move_to(pocket_type::player_backup, target, card_visibility::hidden);
+                target->m_game->remove_cards(target->m_game->m_selection);
             }
         }
 

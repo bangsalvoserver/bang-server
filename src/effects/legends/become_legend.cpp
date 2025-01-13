@@ -39,31 +39,10 @@ namespace banggame {
     void effect_become_legend::on_play(card_ptr origin_card, player_ptr origin) {
         origin->add_player_flags(player_flag::legend);
 
-        origin->remove_extra_characters();
-        for (card_ptr c : origin->m_characters) {
-            origin->disable_equip(c);
-            c->visibility = card_visibility::hidden;
-        }
-
-        card_ptr old_character = origin->get_character();
-        card_ptr legend_character = find_legend_character(old_character);
-
+        card_ptr legend_character = find_legend_character(origin->get_character());
+        
         origin->m_game->add_log("LOG_BECOME_LEGEND", origin, legend_character);
-
-        origin->m_game->add_update<"remove_cards">(origin->m_characters);
-        origin->m_characters = std::vector{ legend_character };
-        origin->m_game->add_update<"add_cards">(origin->m_characters, pocket_type::player_character, origin);
-
-        legend_character->pocket = pocket_type::player_character;
-        legend_character->owner = origin;
-        legend_character->set_visibility(card_visibility::shown, origin, true);
-                
-        for (const auto &[token, count] : old_character->tokens) {
-            old_character->move_tokens(token, legend_character, count, true);
-        }
-
-        origin->reset_max_hp();
-        origin->enable_equip(legend_character);
+        origin->set_character(legend_character);
 
         legend_character->flash_card();
         
