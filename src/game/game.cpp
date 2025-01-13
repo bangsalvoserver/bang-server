@@ -376,10 +376,11 @@ namespace banggame {
         add_game_flags(game_flag::hands_shown);
 
         auto character_it = character_ptrs.rbegin();
+        int max_character_choice = character_ptrs.size() / num_alive();
         for (player_ptr p : range_alive_players(m_first_player)) {
             if (m_options.character_choice > 1) {
                 card_list characters;
-                characters.reserve(m_options.character_choice);
+                characters.reserve(std::min(max_character_choice, m_options.character_choice));
                 for (int i=0; i<characters.capacity(); ++i) {
                     characters.push_back(*character_it++);
                 }
