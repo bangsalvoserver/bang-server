@@ -8,21 +8,17 @@
 
 namespace banggame {
 
-    static card_ptr get_random_character(player_ptr origin) {
-        return random_element(origin->m_game->get_deck(card_deck_type::character)
-            | rv::filter([](card_ptr target_card) {
-                return target_card->pocket == pocket_type::none;
-            }), origin->m_game->rng);
-    }
-
     struct request_newidentity : request_picking {
-        request_newidentity(card_ptr origin_card, player_ptr target)
-            : request_picking(origin_card, nullptr, target, {}, -20) {}
+        request_newidentity(card_ptr origin_card, player_ptr target, card_ptr choice_card)
+            : request_picking(origin_card, nullptr, target, {}, -20)
+            , choice_card{choice_card} {}
+        
+        card_ptr choice_card;
 
         void on_update() override {
             if (target->alive() && target->m_game->m_playing == target) {
                 if (!live) {
-                    target->m_game->add_cards_to({ get_random_character(target) }, pocket_type::selection, nullptr, card_visibility::shown);
+                    target->m_game->add_cards_to({ choice_card }, pocket_type::selection, nullptr, card_visibility::shown);
                 }
             } else {
                 target->m_game->pop_request();
@@ -30,13 +26,12 @@ namespace banggame {
         }
 
         bool can_pick(const_card_ptr target_card) const override {
-            return target_card->pocket == pocket_type::selection
-                || (target_card->pocket == pocket_type::player_character && target_card == target->get_character());
+            return target_card == choice_card || target_card == target->get_character();
         }
 
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
-            if (target_card->pocket == pocket_type::selection) {
+            if (target_card == choice_card) {
                 target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
                 target->set_character(target_card);
                 
@@ -57,9 +52,14 @@ namespace banggame {
         }
     };
 
-    void equip_newidentity::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::on_turn_switch>({target_card, -1}, [=](player_ptr origin) {
-            target->m_game->queue_request<request_newidentity>(target_card, origin);
+    void equip_newidentity::on_enable(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->add_listener<event_type::on_turn_switch>({origin_card, -1}, [=, selected_cards = std::set<card_ptr>{}](player_ptr target) mutable {
+            card_ptr choice_card = random_element(origin->m_game->get_deck(card_deck_type::character)
+                | rv::filter([&](card_ptr c) {
+                    return c->pocket == pocket_type::none && !selected_cards.contains(c);
+                }), origin->m_game->rng);
+            selected_cards.insert(choice_card);
+            origin->m_game->queue_request<request_newidentity>(origin_card, target, choice_card);
         });
     }
 }
