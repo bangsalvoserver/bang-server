@@ -5,7 +5,7 @@
 namespace banggame {
 
     bool give_card(player_ptr target, std::string_view card_name) {
-        auto all_cards = target->m_game->get_all_cards();
+        auto all_cards = target->m_game->get_deck(card_deck_type::none);
         auto card_it = rn::find_if(all_cards, [&](const_card_ptr target_card) {
             if (string_equal_icase(card_name, target_card->name)) {
                 switch (target_card->deck) {
@@ -13,7 +13,7 @@ namespace banggame {
                 case card_deck_type::main_deck:
                     return target_card->pocket != pocket_type::player_hand || target_card->owner != target;
                 case card_deck_type::character:
-                    return true;
+                    return target_card != target->get_character();
                 case card_deck_type::goldrush:
                     return target_card->pocket != pocket_type::shop_selection && target_card->pocket != pocket_type::hidden_deck
                         && (target_card->pocket != pocket_type::player_table || target_card->owner != target);
@@ -45,7 +45,7 @@ namespace banggame {
             break;
         }
         case card_deck_type::character: {
-            if (target_card->pocket == pocket_type::player_character) {
+            if (target_card->pocket == pocket_type::player_character && target_card->owner != target) {
                 card_ptr old_character = target->get_character();
                 target->remove_extra_characters(true);
                 target_card->owner->set_character(old_character);

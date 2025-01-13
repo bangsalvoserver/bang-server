@@ -9,10 +9,9 @@
 namespace banggame {
 
     static card_ptr get_random_character(player_ptr origin) {
-        return random_element(origin->m_game->get_all_cards()
-            | rv::filter([&](card_ptr target_card) {
-                return target_card->deck == card_deck_type::character
-                    && target_card->owner == nullptr;
+        return random_element(origin->m_game->get_deck(card_deck_type::character)
+            | rv::filter([](card_ptr target_card) {
+                return target_card->pocket == pocket_type::none;
             }), origin->m_game->rng);
     }
 

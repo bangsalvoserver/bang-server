@@ -18,11 +18,9 @@ namespace banggame {
     }
 
     static card_ptr find_legend_character(card_ptr origin_card) {
-        auto range = origin_card->m_game->get_all_cards()
-            | rv::filter([&](card_ptr target_card) {
-                if (target_card->deck != card_deck_type::legends) {
-                    return false;
-                } else if (origin_card->expansion.empty()) {
+        auto range = origin_card->m_game->get_deck(card_deck_type::legends)
+            | rv::filter([=](card_ptr target_card) {
+                if (origin_card->expansion.empty()) {
                     return target_card->name == origin_card->name;
                 } else {
                     return rn::none_of(origin_card->m_game->m_players, [&](player_ptr target) {

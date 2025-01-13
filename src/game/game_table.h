@@ -68,8 +68,13 @@ namespace banggame {
         player_ptr find_player_by_userid(int user_id) const override;
         game_duration transform_duration(game_duration duration) const override;
 
-        auto get_all_cards() const {
-            return m_cards_storage | rv::addressof;
+        auto get_deck(card_deck_type deck) const {
+            return m_cards_storage
+                | rv::addressof
+                | rv::filter([=](card_ptr target_card) {
+                    return deck == card_deck_type::none
+                        || target_card->deck == deck;
+                });
         }
         
         card_list &get_pocket(pocket_type pocket, player_ptr owner = nullptr);

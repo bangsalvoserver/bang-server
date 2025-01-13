@@ -37,8 +37,8 @@ namespace banggame {
 
             auto new_cards = target_characters
                 | rv::transform([](const_card_ptr target_card) {
-                    for (card_ptr c : target_card->m_game->get_all_cards()) {
-                        if (c != target_card && c->deck == target_card->deck && c->name == target_card->name) {
+                    for (card_ptr c : target_card->m_game->get_deck(card_deck_type::character)) {
+                        if (c != target_card && c->name == target_card->name) {
                             return c;
                         }
                     }
