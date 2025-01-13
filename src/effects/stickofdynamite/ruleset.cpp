@@ -57,8 +57,12 @@ namespace banggame {
                     drawn_card->set_visibility(card_visibility::shown);
                     drawn_card->add_short_pause();
 
-                    player_ptr target = find_dynamite_stick(game); 
+                    player_ptr target = find_dynamite_stick(game);
+                    if (!target) {
+                        target = game->m_playing;
+                    }
                     if (target && target->alive() && !target->find_equipped_card(drawn_card)) {
+                        target->add_player_flags(player_flag::stick_of_dynamite);
                         target->equip_card(drawn_card);
                     } else if (game->m_deck.size() <= 1) {
                         drawn_card->move_to(pocket_type::discard_pile);
@@ -86,9 +90,7 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_player_eliminated>({nullptr, 20}, [=](player_ptr killer, player_ptr target, death_type death) {
-            if (target->remove_player_flags(player_flag::stick_of_dynamite) && game->m_first_player->alive()) {
-                game->m_first_player->add_player_flags(player_flag::stick_of_dynamite);
-            }
+            target->remove_player_flags(player_flag::stick_of_dynamite);
         });
 
         game->add_listener<event_type::on_discard_any_card>(nullptr, [](player_ptr origin, card_ptr target_card) {
