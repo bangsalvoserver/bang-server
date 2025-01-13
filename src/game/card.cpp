@@ -25,14 +25,6 @@ namespace banggame {
             || origin->check_player_flags(player_flag::treat_missed_as_bang)
             && has_tag(tag_type::missed);
     }
-
-    int card::get_card_cost(const effect_context &ctx) const {
-        const_card_ptr target = ctx.card_choice ? ctx.card_choice : this;
-        if (!ctx.repeat_card && target->pocket != pocket_type::player_table) {
-            return target->get_tag_value(tag_type::buy_cost).value_or(0) - ctx.discount;
-        }
-        return 0;
-    }
     
     card_sign card::get_modified_sign() const {
         auto value = sign;

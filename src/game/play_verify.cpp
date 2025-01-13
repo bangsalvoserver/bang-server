@@ -214,13 +214,7 @@ namespace banggame {
             MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
         }
 
-        MAYBE_RETURN(get_play_card_error(origin, origin_card, ctx));
-        
-        if (!is_response && origin->m_gold < origin_card->get_card_cost(ctx)) {
-            return "ERROR_NOT_ENOUGH_GOLD";
-        }
-
-        return {};
+        return get_play_card_error(origin, origin_card, ctx);
     }
 
     prompt_string get_equip_prompt(player_ptr origin, card_ptr origin_card, player_ptr target) {
@@ -384,10 +378,6 @@ namespace banggame {
             args.modifiers | rv::transform(&modifier_pair::card) | rn::to_vector,
             ctx
         });
-
-        if (!is_response) {
-            origin->add_gold(-args.card->get_card_cost(ctx));
-        }
 
         for (const auto &[mod_card, mod_targets] : args.modifiers) {
             apply_target_list(origin, mod_card, is_response, mod_targets, ctx);

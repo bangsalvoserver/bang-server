@@ -36,7 +36,6 @@ namespace banggame {
 
         bool is_equip_card() const;
         bool is_bang_card(const_player_ptr origin) const;
-        int get_card_cost(const effect_context &ctx) const;
         card_sign get_modified_sign() const;
 
         void set_visibility(card_visibility visibility, player_ptr owner = nullptr, bool instant = false);

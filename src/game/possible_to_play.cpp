@@ -93,11 +93,7 @@ namespace banggame {
                 return map_cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy, std::not_fn(rn::empty));
             }
         }
-        
-        if (!is_response && origin->m_gold < origin_card->get_card_cost(ctx)) {
-            return false;
-        }
-        
+
         return true;
     }
 
