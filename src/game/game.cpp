@@ -390,7 +390,7 @@ namespace banggame {
                 card_ptr target_card = *character_it++;
                 add_log("LOG_CHARACTER_CHOICE", p, target_card);
                 p->set_character(target_card);
-                p->set_hp(p->m_max_hp, true);
+                p->set_hp(p->get_character_max_hp(), true);
             }
         }
 

@@ -344,6 +344,8 @@ namespace banggame {
         } else {
             target_card->move_to(pocket_type::player_character, this, card_visibility::shown);
         }
+        
+        m_max_hp = get_character_max_hp();
 
         if (old_character) {
             for (const auto &[token, count] : old_character->tokens) {
@@ -351,12 +353,11 @@ namespace banggame {
             }
         }
 
-        reset_max_hp();
         enable_equip(target_card);
     }
 
-    void player::reset_max_hp() {
-        m_max_hp = get_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
+    int player::get_character_max_hp() const {
+        return get_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
     }
 
     void player::set_role(player_role role, bool instant) {

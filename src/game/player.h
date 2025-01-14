@@ -93,11 +93,11 @@ namespace banggame {
         }
 
         void set_character(card_ptr target_card);
+        
+        int get_character_max_hp() const;
 
         void set_role(player_role role, bool instant = false);
         player_role get_base_role() const;
-        
-        void reset_max_hp();
 
         void start_of_turn();
         

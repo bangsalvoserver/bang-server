@@ -18,7 +18,7 @@ namespace banggame {
         target->set_character(target_card);
 
         target->m_game->remove_cards(target->m_hand);
-        target->set_hp(target->m_max_hp);
+        target->set_hp(target->get_character_max_hp());
     }
 
     game_string request_characterchoice::status_text(player_ptr owner) const {
