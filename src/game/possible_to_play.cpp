@@ -9,7 +9,11 @@ namespace banggame {
                 small_int_set(small_int_set_sized_tag, targets.size())
             }.get_error(origin_card, origin, targets, ctx);
         }
-        const auto &effect = effects.at(mth.args[targets.size()]);
+        size_t index = mth.args[targets.size()];
+        if (index >= effects.size()) {
+            throw game_error("invalid access to mth: out of bounds");
+        }
+        const auto &effect = effects[index];
         if (effect.target == TARGET_TYPE(player)) {
             for (player_ptr target : get_all_player_targets(origin, origin_card, effect, ctx)) {
                 targets.emplace_back(utils::tag<"player">{}, target);
