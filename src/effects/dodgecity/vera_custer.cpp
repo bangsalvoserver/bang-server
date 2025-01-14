@@ -12,7 +12,7 @@ namespace banggame {
     static card_ptr get_card_copy(card_ptr target_card)  {
         card_list &deck = target_card->m_game->m_copies;
         for (card_ptr c : deck) {
-            if (c->name == target_card->name) {
+            if (c->name == target_card->name && c->deck == target_card->deck) {
                 return c;
             }
         }
