@@ -3,7 +3,7 @@
 import re
 import sys
 import yaml_custom as yaml
-from cpp_generator import CppDeclaration, CppObject, CppEnum, CppLiteral, print_cpp_file
+from cpp_generator import *
 
 def parse_sign(sign):
     match = re.match(r'^\s*([\w\d]+)\s*(\w+)\s*$', sign)
@@ -85,7 +85,7 @@ def parse_effects(effect_list):
             target_value =     int(target_value) if target_value else None,
             type =             CppLiteral(f'GET_EFFECT({effect_type})')
         ))
-    return result
+    return CppSpan('effect_holder', result)
 
 def parse_equips(equip_list):
     if not isinstance(equip_list, list):
@@ -108,13 +108,13 @@ def parse_equips(equip_list):
             effect_value = int(effect_value) if effect_value else None,
             type = CppLiteral(f'GET_EQUIP({effect_type})')
         ))
-    return result
+    return CppSpan('equip_holder', result)
 
 def parse_tags(tag_list):
     if not isinstance(tag_list, list):
         raise RuntimeError(f'in parse_tags: expected list, got {tag_list}')
 
-    result = dict()
+    result = []
     for tag in tag_list:
         match = re.match(
             r'^\s*(\w+)' # type
@@ -130,8 +130,8 @@ def parse_tags(tag_list):
         tag_type = CppEnum('tag_type', tag_type_str)
         if tag_type in result:
             raise RuntimeError(f'Duplicate tag: {tag_type_str}')
-        result[tag_type] = int(tag_value) if tag_value else 0
-    return result
+        result.append([tag_type, int(tag_value) if tag_value else 0])
+    return CppSpan('tag_value_pair', result)
 
 def parse_mth(effect):
     match = re.match(
@@ -157,7 +157,7 @@ def parse_all_effects(card):
             responses =    parse_effects(card['responses']) if 'responses' in card else None,
             equips =       parse_equips(card['equip']) if 'equip' in card else None,
             tags =         parse_tags(card['tags']) if 'tags' in card else None,
-            expansion =    [CppLiteral(f"GET_RULESET({f})") for f in card['expansion'].split()] if 'expansion' in card else None,
+            expansion =    CppSpan('ruleset_ptr', [CppLiteral(f"GET_RULESET({f})") for f in card['expansion'].split()]) if 'expansion' in card else None,
             deck =         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
             modifier =     CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier']})")) if 'modifier' in card else None,
             modifier_response = CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier_response']})")) if 'modifier_response' in card else None,
@@ -234,14 +234,14 @@ def parse_file(data):
             if 'deck' not in card:
                 card['deck'] = deck.deck or key
             return card
-        return deck.key or key, list(parse_all_effects(card) for c in cards for card in deck.strategy(add_deck(c)))
+        return deck.key or key, CppSpan('card_data', list(parse_all_effects(card) for c in cards for card in deck.strategy(add_deck(c))))
 
     return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
 
 def parse_expansions(expansions):
-    return { 'expansions': [
+    return { 'expansions': CppSpan('ruleset_ptr', [
         CppLiteral(f"GET_RULESET({expansion})") for expansion in expansions
-    ] }
+    ]) }
 
 INCLUDE_FILENAMES = ['cards/vtable_build.h', 'cards/filter_enums.h', 'effects/effects.h']
 

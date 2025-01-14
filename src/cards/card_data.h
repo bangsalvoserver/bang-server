@@ -9,15 +9,15 @@
 namespace banggame {
 
     struct card_data {
-        std::string name;
-        std::string image;
+        std::string_view name;
+        std::string_view image;
 
         effect_list effects;
         effect_list responses;
         equip_list equips;
         tag_map tags;
 
-        expansion_set expansion;
+        expansion_list expansion;
         card_deck_type deck;
 
         modifier_holder modifier;
@@ -42,15 +42,13 @@ namespace banggame {
         }
 
         bool has_tag(tag_type tag) const {
-            return tags.find(tag) != tags.end();
+            return rn::contains(tags, tag, &tag_value_pair::first);
         }
 
         std::optional<short> get_tag_value(tag_type tag) const {
-            if (auto it = tags.find(tag); it != tags.end()) {
-                return it->second;
-            } else {
-                return std::nullopt;
-            }
+            auto it = rn::find(tags, tag, &tag_value_pair::first);
+            if (it != tags.end()) return it->second;
+            return std::nullopt;
         }
 
         bool self_equippable() const {
@@ -65,24 +63,24 @@ namespace banggame {
         bool is_train() const { return color == card_color_type::train; }
     };
 
-    using card_initializer_list = std::initializer_list<card_data>;
+    using card_data_list = std::span<card_data>;
 
     struct all_cards_t {
-        card_initializer_list deck;
-        card_initializer_list characters;
-        card_initializer_list goldrush;
-        card_initializer_list highnoon;
-        card_initializer_list fistfulofcards;
-        card_initializer_list wildwestshow;
-        card_initializer_list button_row;
-        card_initializer_list stations;
-        card_initializer_list train;
-        card_initializer_list locomotive;
-        card_initializer_list legends;
-        card_initializer_list feats;
-        card_initializer_list hidden;
+        card_data_list deck;
+        card_data_list characters;
+        card_data_list goldrush;
+        card_data_list highnoon;
+        card_data_list fistfulofcards;
+        card_data_list wildwestshow;
+        card_data_list button_row;
+        card_data_list stations;
+        card_data_list train;
+        card_data_list locomotive;
+        card_data_list legends;
+        card_data_list feats;
+        card_data_list hidden;
 
-        std::initializer_list<ruleset_ptr> expansions;
+        std::span<ruleset_ptr> expansions;
     };
 
     extern const all_cards_t all_cards;

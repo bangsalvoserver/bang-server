@@ -2,7 +2,7 @@ import re
 import sys
 import yaml_custom as yaml
 from PIL import Image
-from cpp_generator import print_cpp_file, CppDeclaration, CppObject, CppLiteral
+from cpp_generator import *
 
 INCLUDE_FILENAMES = ['net/bot_info.h']
 
@@ -72,7 +72,7 @@ def parse_file(data):
         object_name='const bot_info_t bot_info',
         object_value=CppObject(
             propic_size = propic_size,
-            names = data['names'],
+            names = CppSpan('std::string_view', data['names']),
             propics = propics,
             settings = parse_settings(data['settings'])
         ),

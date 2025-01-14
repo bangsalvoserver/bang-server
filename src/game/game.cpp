@@ -237,7 +237,7 @@ namespace banggame {
         }
     }
 
-    static bool matches_expansions(const expansion_set &lhs, const expansion_set &rhs) {
+    static bool matches_expansions(const expansion_list &lhs, const expansion_set &rhs) {
         for (ruleset_ptr ruleset : lhs) {
             if (!rhs.contains(ruleset)) {
                 return false;

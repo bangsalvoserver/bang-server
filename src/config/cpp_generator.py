@@ -10,6 +10,11 @@ class CppObject:
     def __init__(self, **value):
         self.value = value
 
+class CppSpan:
+    def __init__(self, type_name, value):
+        self.type_name = type_name
+        self.value = value
+
 class CppEnum:
     def __init__(self, enum_name, value):
         self.enum_name = enum_name
@@ -40,8 +45,11 @@ def as_list(value):
 
 def object_to_string(object_value, indent = 0):
     if isinstance(object_value, CppObject):
-        if not object_value: return '{}'
+        if not object_value.value: return '{}'
         return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}.{key} {object_to_string(value, indent + 1)}" for key, value in object_value.value.items() if value is not None) + '\n' + (SPACE * indent) + '}'
+    elif isinstance(object_value, CppSpan):
+        if not object_value.value: return '{}'
+        return f'{{({object_value.type_name}[]){{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(value, indent + 1)}" for value in object_value.value if value is not None) + '\n' + (SPACE * indent) + '}}'
     elif isinstance(object_value, dict):
         if not object_value: return '{}'
         return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{{{object_to_string(key)}, {object_to_string(value)}}}" for key, value in object_value.items()) + '\n' + (SPACE * indent) + '}'
@@ -49,7 +57,7 @@ def object_to_string(object_value, indent = 0):
         if not object_value: return '{}'
         return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(value, indent + 1)}" for value in object_value if value is not None) + '\n' + (SPACE * indent) + '}'
     elif isinstance(object_value, str):
-        return f'{{\"{object_value}\"}}'
+        return f'{{\"{object_value}\"sv}}'
     elif isinstance(object_value, bool):
         return f"{{{'true' if object_value else 'false'}}}"
     elif isinstance(object_value, bytes):
