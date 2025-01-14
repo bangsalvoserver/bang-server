@@ -11,7 +11,7 @@ namespace banggame {
     static void greygory_deck_add_characters(card_ptr target_card, player_ptr target) {
         std::vector<card_ptr> base_characters;
 
-        rn::sample(target->m_game->get_deck(card_deck_type::character)
+        rn::sample(target->m_game->m_characters
             | rv::filter([=](card_ptr c) {
                 return c != target_card && c->expansion.empty()
                     && (c->pocket == pocket_type::none

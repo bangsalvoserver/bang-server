@@ -4,6 +4,8 @@
 #include <span>
 #include <random>
 
+#include "utils/id_map.h"
+
 #include "player.h"
 #include "game_net.h"
 #include "event_map.h"
@@ -24,6 +26,10 @@ namespace banggame {
         utils::id_map<player> m_players_storage;
 
         player_list m_players;
+
+        card_list m_characters;
+        card_list m_legends;
+        card_list m_copies;
         
         card_list m_deck;
         card_list m_discards;
@@ -39,7 +45,10 @@ namespace banggame {
         card_list m_wws_scenario_deck;
         card_list m_wws_scenario_cards;
 
+        card_list m_stations_deck;
         card_list m_stations;
+        
+        card_list m_locomotive;
         card_list m_train_deck;
         card_list m_train;
 
@@ -67,15 +76,6 @@ namespace banggame {
         player_ptr find_player(int player_id) const override;
         player_ptr find_player_by_userid(int user_id) const override;
         game_duration transform_duration(game_duration duration) const override;
-
-        auto get_deck(card_deck_type deck) const {
-            return m_cards_storage
-                | rv::addressof
-                | rv::filter([=](card_ptr target_card) {
-                    return deck == card_deck_type::none
-                        || target_card->deck == deck;
-                });
-        }
         
         card_list &get_pocket(pocket_type pocket, player_ptr owner = nullptr);
 

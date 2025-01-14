@@ -9,6 +9,16 @@
 
 namespace banggame {
 
+    static card_ptr get_card_copy(card_ptr target_card)  {
+        card_list &deck = target_card->m_game->m_copies;
+        for (card_ptr c : deck) {
+            if (c->name == target_card->name) {
+                return c;
+            }
+        }
+        return deck.emplace_back(target_card->m_game->add_card(*target_card));
+    }
+
     struct request_vera_custer : request_picking_player {
         request_vera_custer(card_ptr origin_card, player_ptr target)
             : request_picking_player(origin_card, nullptr, target, {}, -25) {}
@@ -35,16 +45,7 @@ namespace banggame {
                 target_characters = target_characters.subspan(1);
             }
 
-            auto new_cards = target_characters
-                | rv::transform([](const_card_ptr target_card) {
-                    for (card_ptr c : target_card->m_game->get_deck(card_deck_type::character)) {
-                        if (c != target_card && c->name == target_card->name) {
-                            return c;
-                        }
-                    }
-                    return target_card->m_game->add_card(*target_card);
-                })
-                | rn::to_vector;
+            auto new_cards = target_characters | rv::transform(get_card_copy) | rn::to_vector;
 
             if (!rn::equal(target->m_characters | rv::drop(1), new_cards)) {
                 target->remove_extra_characters();

@@ -7,7 +7,7 @@
 namespace banggame {
 
     static card_ptr find_base_character(card_ptr origin_card) {
-        for (card_ptr c : origin_card->m_game->get_deck(card_deck_type::character)) {
+        for (card_ptr c : origin_card->m_game->m_characters) {
             if (c->name == origin_card->name) {
                 return c;
             }

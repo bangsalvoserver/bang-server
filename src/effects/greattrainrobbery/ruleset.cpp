@@ -13,11 +13,11 @@
 namespace banggame {
 
     static void init_stations_and_train(player_ptr origin) {
-        origin->m_game->add_cards_to(origin->m_game->get_deck(card_deck_type::station)
+        origin->m_game->add_cards_to(origin->m_game->m_stations_deck
             | rv::sample(std::max(int(origin->m_game->m_players.size()), 4), origin->m_game->rng)
             | rn::to_vector, pocket_type::stations, nullptr, card_visibility::shown);
 
-        origin->m_game->add_cards_to(origin->m_game->get_deck(card_deck_type::locomotive)
+        origin->m_game->add_cards_to(origin->m_game->m_locomotive
             | rv::filter([](card_ptr c) { return c->pocket != pocket_type::train; })
             | rv::sample(1, origin->m_game->rng)
             | rn::to_vector, pocket_type::train, nullptr, card_visibility::shown);

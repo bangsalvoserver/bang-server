@@ -253,8 +253,8 @@ namespace banggame {
 
         add_update<"player_add">(m_players);
         
-        auto add_cards = [&](auto &&cards, pocket_type pocket, card_list *out_pocket = nullptr) {
-            if (!out_pocket && pocket != pocket_type::none) out_pocket = &get_pocket(pocket);
+        auto add_cards = [&](auto &&cards, pocket_type pocket, card_list *add_to_list = nullptr) {
+            if (!add_to_list && pocket != pocket_type::none) add_to_list = &get_pocket(pocket);
 
             int count = 0;
             for (const card_data &c : cards) {
@@ -269,8 +269,8 @@ namespace banggame {
                 card_ptr new_card = add_card(c);
                 new_card->pocket = pocket;
                 
-                if (out_pocket) {
-                    out_pocket->push_back(new_card);
+                if (add_to_list) {
+                    add_to_list->push_back(new_card);
                 }
                 ++count;
             }
@@ -361,22 +361,21 @@ namespace banggame {
             add_update<"add_cards">(m_wws_scenario_deck, pocket_type::wws_scenario_deck);
         }
 
-        add_cards(all_cards.stations, pocket_type::none);
-        add_cards(all_cards.locomotive, pocket_type::none);
+        add_cards(all_cards.stations, pocket_type::none, &m_stations_deck);
+        add_cards(all_cards.locomotive, pocket_type::none, &m_locomotive);
 
-        add_cards(all_cards.legends, pocket_type::none);
+        add_cards(all_cards.legends, pocket_type::none, &m_legends);
 
-        card_list character_ptrs;
         if (add_cards(all_cards.characters | rv::filter([&](const card_data &c) {
             return !m_options.only_base_characters || c.expansion.empty();
-        }), pocket_type::none, &character_ptrs)) {
-            rn::shuffle(character_ptrs, rng);
+        }), pocket_type::none, &m_characters)) {
+            rn::shuffle(m_characters, rng);
         }
 
         add_game_flags(game_flag::hands_shown);
 
-        auto character_it = character_ptrs.rbegin();
-        int max_character_choice = character_ptrs.size() / num_alive();
+        auto character_it = m_characters.begin();
+        int max_character_choice = m_characters.size() / num_alive();
         for (player_ptr p : range_alive_players(m_first_player)) {
             if (m_options.character_choice > 1) {
                 card_list characters;

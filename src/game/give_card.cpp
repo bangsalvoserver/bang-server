@@ -5,7 +5,7 @@
 namespace banggame {
 
     bool give_card(player_ptr target, std::string_view card_name) {
-        auto all_cards = target->m_game->get_deck(card_deck_type::none);
+        auto all_cards = target->m_game->m_cards_storage | rv::addressof;
         auto card_it = rn::find_if(all_cards, [&](const_card_ptr target_card) {
             if (string_equal_icase(card_name, target_card->name)) {
                 switch (target_card->deck) {

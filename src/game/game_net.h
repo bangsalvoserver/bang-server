@@ -7,8 +7,6 @@
 #include "player.h"
 #include "game_update.h"
 
-#include "utils/id_map.h"
-
 namespace banggame {
 
     class update_target {
