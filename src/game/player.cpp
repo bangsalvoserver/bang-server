@@ -326,22 +326,17 @@ namespace banggame {
         }
     }
 
-    void player::remove_extra_characters(bool remove_all) {
-        std::span range = m_characters;
-        if (!remove_all) {
-            range = range.subspan(1);
+    void player::remove_cards(card_list cards) {
+        for (card_ptr target_card : cards) {
+            disable_equip(target_card);
         }
-        for (card_ptr character : range) {
-            disable_equip(character);
-        }
-
-        m_game->remove_cards(range | rn::to_vector);
+        m_game->remove_cards(std::move(cards));
     }
 
     void player::set_character(card_ptr target_card) {
         card_ptr old_character = get_character();
         if (old_character) {
-            remove_extra_characters(true);
+            remove_cards(m_characters);
         }
         
         if (target_card->pocket == pocket_type::none) {

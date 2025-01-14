@@ -38,7 +38,7 @@ namespace banggame {
     }
     
     void effect_greygory_deck::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->remove_extra_characters();
+        origin->remove_cards({origin->m_characters.begin() + 1, origin->m_characters.end()});
         greygory_deck_add_characters(origin_card, origin);
     }
 }

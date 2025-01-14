@@ -61,10 +61,10 @@ namespace banggame {
             }
 
             if (!target->alive()) {
-                target->remove_extra_characters();
-                for (card_ptr c : target->m_characters) {
-                    target->disable_equip(c);
+                for (card_ptr character : target->m_characters) {
+                    target->disable_equip(character);
                 }
+                target->m_game->remove_cards({ target->m_characters.begin() + 1, target->m_characters.end() });
 
                 if (target->add_player_flags(player_flag::role_revealed)) {
                     target->m_game->add_update<"player_show_role">(update_target::excludes(target), target, target->m_role);

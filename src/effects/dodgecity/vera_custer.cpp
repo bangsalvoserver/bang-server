@@ -28,7 +28,7 @@ namespace banggame {
                 auto_pick();
             } else {
                 target->m_game->pop_request();
-                target->remove_extra_characters();
+                target->remove_cards({target->m_characters.begin() + 1, target->m_characters.end()});
             }
         }
 
@@ -48,7 +48,7 @@ namespace banggame {
             auto new_cards = target_characters | rv::transform(get_card_copy) | rn::to_vector;
 
             if (!rn::equal(target->m_characters | rv::drop(1), new_cards)) {
-                target->remove_extra_characters();
+                target->remove_cards({target->m_characters.begin() + 1, target->m_characters.end()});
                 target->m_game->add_cards_to(new_cards, pocket_type::player_character, target, card_visibility::shown);
                 
                 for (card_ptr target_card : new_cards) {

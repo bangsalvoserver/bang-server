@@ -117,7 +117,7 @@ namespace banggame {
             );
         }
 
-        void remove_extra_characters(bool remove_all = false);
+        void remove_cards(card_list cards);
         void reveal_hand();
     };
 

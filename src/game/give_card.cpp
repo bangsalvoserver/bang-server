@@ -47,7 +47,7 @@ namespace banggame {
         case card_deck_type::character: {
             if (target_card->pocket == pocket_type::player_character && target_card->owner != target) {
                 card_ptr old_character = target->get_character();
-                target->remove_extra_characters(true);
+                target->remove_cards(target->m_characters);
                 target_card->owner->set_character(old_character);
             }
             target->set_character(target_card);
