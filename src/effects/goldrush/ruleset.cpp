@@ -89,9 +89,7 @@ namespace banggame {
             if (!target->alive()) {
                 game->add_log("LOG_SHADOW_GUNSLINGER", target);
                 target->add_player_flags(player_flag::shadow);
-                for (card_ptr c : target->m_characters) {
-                    target->enable_equip(c);
-                }
+                target->enable_equip(target->get_character());
             }
         });
         game->add_listener<event_type::on_turn_start>({nullptr, 10}, [=](player_ptr target) {
