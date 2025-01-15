@@ -28,7 +28,6 @@ namespace banggame {
                 auto_pick();
             } else {
                 target->m_game->pop_request();
-                target->remove_cards({target->m_characters.begin() + 1, target->m_characters.end()});
             }
         }
 
@@ -46,16 +45,22 @@ namespace banggame {
             }
 
             auto new_cards = target_characters | rv::transform(get_card_copy) | rn::to_vector;
-
-            if (!rn::equal(target->m_characters | rv::drop(1), new_cards)) {
-                target->remove_cards({target->m_characters.begin() + 1, target->m_characters.end()});
-                target->m_game->add_cards_to(new_cards, pocket_type::player_character, target, card_visibility::shown);
-                
-                for (card_ptr target_card : new_cards) {
-                    target->m_game->add_log("LOG_COPY_CHARACTER", target, target_card);
-                    target->enable_equip(target_card);
-                }
+            target->m_game->add_cards_to(new_cards, pocket_type::player_character, target, card_visibility::shown);
+            
+            for (card_ptr target_card : new_cards) {
+                target->m_game->add_log("LOG_COPY_CHARACTER", target, target_card);
+                target->enable_equip(target_card);
             }
+
+            event_card_key key{origin_card, 10};
+            target->m_game->add_listener<event_type::pre_turn_start>(key, [=, target=target](player_ptr origin){
+                if (origin == target) {
+                    target->m_game->remove_listeners(key);
+                    target->m_game->queue_action([=]{
+                        target->remove_cards({target->m_characters.begin() + 1, target->m_characters.end()});
+                    }, -24);
+                }
+            });
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -73,6 +78,10 @@ namespace banggame {
                 origin->m_game->queue_request<request_vera_custer>(origin_card, target);
             }
         });
+    }
+
+    void equip_vera_custer::on_disable(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->remove_listeners(event_card_key{ origin_card, 0 });
     }
 
 }

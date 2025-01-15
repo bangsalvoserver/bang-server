@@ -7,28 +7,10 @@
 #include "game/game_table.h"
 
 namespace banggame {
-    
-    static void greygory_deck_add_characters(card_ptr target_card, player_ptr target) {
-        std::vector<card_ptr> base_characters;
-
-        rn::sample(target->m_game->m_characters
-            | rv::filter([=](card_ptr c) {
-                return c != target_card && c->expansion.empty()
-                    && (c->pocket == pocket_type::none
-                    || (c->pocket == pocket_type::player_character && c->owner == target));
-            }),
-            std::back_inserter(base_characters), 2, target->m_game->rng);
-
-        target->m_game->add_cards_to(base_characters, pocket_type::player_character, target, card_visibility::shown);
-        for (card_ptr c : base_characters) {
-            target->m_game->add_log("LOG_CHARACTER_CHOICE", target, c);
-            target->enable_equip(c);
-        }
-    }
 
     void equip_greygory_deck::on_enable(card_ptr target_card, player_ptr target) {
         if (target->m_characters.size() == 1) {
-            greygory_deck_add_characters(target_card, target);
+            effect_greygory_deck{}.on_play(target_card, target);
         }
         target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player_ptr origin) {
             if (origin == target) {
@@ -39,6 +21,17 @@ namespace banggame {
     
     void effect_greygory_deck::on_play(card_ptr origin_card, player_ptr origin) {
         origin->remove_cards({origin->m_characters.begin() + 1, origin->m_characters.end()});
-        greygory_deck_add_characters(origin_card, origin);
+        card_list characters = origin->m_game->m_characters
+            | rv::filter([](card_ptr c) {
+                return c->pocket == pocket_type::none && c->expansion.empty();
+            })
+            | rv::sample(2, origin->m_game->rng)
+            | rn::to_vector;
+
+        origin->m_game->add_cards_to(characters, pocket_type::player_character, origin, card_visibility::shown);
+        for (card_ptr c : characters) {
+            origin->m_game->add_log("LOG_CHARACTER_CHOICE", origin, c);
+            origin->enable_equip(c);
+        }
     }
 }

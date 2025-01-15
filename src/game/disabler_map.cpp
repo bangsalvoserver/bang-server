@@ -8,25 +8,26 @@
 #include "utils/type_name.h"
 
 namespace banggame {
+    
+    static auto to_pairs(auto &&left) {
+        return rv::transform([left=std::move(left)](auto &&right) {
+            return std::pair{left, std::move(right)};
+        });
+    };
 
     static auto disableable_cards(game_ptr game) {
-        struct to_player_card_pair {
-            player_ptr p;
-            auto operator()(card_ptr c) const { return std::pair{p, c}; }
-        };
-
         return rv::concat(
             game->m_scenario_cards
-                | rv::take_last(1)
-                | rv::transform(to_player_card_pair{game->m_first_player}),
+                | rv::take_last(1) | to_pairs(game->m_first_player),
             game->m_wws_scenario_cards
-                | rv::take_last(1)
-                | rv::transform(to_player_card_pair{game->m_first_player}),
+                | rv::take_last(1) | to_pairs(game->m_first_player),
             game->m_players
                 | rv::filter(&player::alive)
                 | rv::for_each([](player_ptr p) {
-                    return rv::concat(p->m_table, p->m_characters)
-                        | rv::transform(to_player_card_pair{p});
+                    return rv::concat(
+                        p->m_table,
+                        p->m_characters | rv::take(1)
+                    ) | to_pairs(p);
                 })
         );
     }

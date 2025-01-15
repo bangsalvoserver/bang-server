@@ -23,8 +23,8 @@ namespace banggame {
         size_t ncubes = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng);
         
         return {
-            cubes | rv::sample(ncubes) | rn::to_vector,
-            players | rv::sample(ncubes + effect.target_value) | rn::to_vector
+            cubes | rv::sample(ncubes, origin->m_game->bot_rng) | rn::to_vector,
+            players | rv::sample(ncubes + effect.target_value, origin->m_game->bot_rng) | rn::to_vector
         };
     }
 
