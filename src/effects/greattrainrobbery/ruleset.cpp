@@ -47,6 +47,7 @@ namespace banggame {
         }
 
         for (card_ptr target_card : origin->m_game->m_train) {
+            target_card->set_visibility(card_visibility::hidden);
             origin->disable_equip(target_card);
         }
 
