@@ -80,7 +80,7 @@ namespace banggame {
         card_data_list feats;
         card_data_list hidden;
 
-        std::span<ruleset_ptr> expansions;
+        expansion_list expansions;
     };
 
     extern const all_cards_t all_cards;
