@@ -112,7 +112,9 @@ namespace banggame {
 
     void game_manager::command_get_rng_seed(session_ptr session) {
         send_message<"lobby_chat">(session->client, 0,
-            "GAME_SEED", chat_format_arg_list{{utils::tag<"integer">{}, session->lobby->m_game->rng_seed}}, lobby_chat_flag::translated
+            "GAME_SEED", chat_format_arg_list{
+                {utils::tag<"string">{}, std::format("{}", session->lobby->m_game->rng_seed)}
+            }, lobby_chat_flag::translated
         );
     }
 
