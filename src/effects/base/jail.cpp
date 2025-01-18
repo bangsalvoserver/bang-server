@@ -31,18 +31,20 @@ namespace banggame {
         });
     }
 
+    static constexpr auto checking_card_is_jail = [](const event_card_key &key) {
+        return key.target_card->has_tag(tag_type::jail);
+    };
+
     bool effect_escape_jail::can_play(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request<request_predraw>(target_is{origin})) {
-            if (auto cards = req->get_checking_cards(); cards.size() == 1) {
-                return cards.front().target_card->has_tag(tag_type::jail);
-            }
+            return rn::any_of(req->get_checking_cards(), checking_card_is_jail);
         }
         return false;
     }
 
     void effect_escape_jail::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         auto req = origin->m_game->top_request<request_predraw>();
-        card_ptr jail_card = req->get_checking_cards().front().target_card;
+        card_ptr jail_card = rn::find_if(req->get_checking_cards(), checking_card_is_jail)->target_card;
         req->remove_check(jail_card);
 
         effect_discard::on_play(origin_card, origin, target_card);
