@@ -3,9 +3,11 @@
 #include "perform_feat.h"
 
 #include "cards/game_events.h"
+#include "cards/filter_enums.h"
 
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"
+#include "effects/base/predraw_check.h"
 
 #include "game/game_table.h"
 
@@ -206,6 +208,12 @@ namespace banggame {
         game->add_listener<event_type::apply_maxcards_modifier>({nullptr, 20}, [](const_player_ptr origin, int &value) {
             if (origin->m_hp <= 1) {
                 ++value;
+            }
+        });
+
+        game->add_listener<event_type::check_predraw_auto_pick>(nullptr, [](player_ptr origin, card_ptr checking_card, bool &value) {
+            if (!origin->empty_hand() && checking_card->has_tag(tag_type::jail)) {
+                value = false;
             }
         });
 

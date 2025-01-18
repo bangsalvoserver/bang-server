@@ -33,15 +33,16 @@ namespace banggame {
 
     bool effect_escape_jail::can_play(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request<request_predraw>(target_is{origin})) {
-            card_ptr jail_card = req->checks[0].target_card;
-            return jail_card->has_tag(tag_type::jail);
+            if (auto cards = req->get_checking_cards(); cards.size() == 1) {
+                return cards.front().target_card->has_tag(tag_type::jail);
+            }
         }
         return false;
     }
 
     void effect_escape_jail::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         auto req = origin->m_game->top_request<request_predraw>();
-        card_ptr jail_card = req->checks[0].target_card;
+        card_ptr jail_card = req->get_checking_cards().front().target_card;
         req->remove_check(jail_card);
 
         effect_discard::on_play(origin_card, origin, target_card);

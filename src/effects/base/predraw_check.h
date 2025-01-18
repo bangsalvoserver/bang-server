@@ -17,6 +17,12 @@ namespace banggame {
             player_ptr origin;
             card_ptr target_card;
         };
+
+        struct check_predraw_auto_pick {
+            player_ptr origin;
+            card_ptr checking_card;
+            nullable_ref<bool> value;
+        };
     }
 
     struct request_predraw : request_picking {
@@ -25,6 +31,7 @@ namespace banggame {
 
         std::vector<event_card_key> checks;
 
+        std::span<const event_card_key> get_checking_cards() const;
         void remove_check(card_ptr target_card);
         
         void on_update() override;

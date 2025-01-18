@@ -11,24 +11,31 @@ namespace banggame {
                 target->m_game->call_event(event_type::get_predraw_checks{ target, checks });
                 rn::sort(checks, std::greater{}, &event_card_key::priority);
             }
-            if (checks.empty()) {
+            auto cards = get_checking_cards();
+            if (cards.empty()) {
                 target->m_game->pop_request();
-            } else if (target->m_game->m_options.auto_pick_predraw) {
-                auto_pick();
+            } else if (cards.size() == 1) {
+                bool is_auto_pick = target->m_game->m_options.auto_pick_predraw;
+                card_ptr checking_card = cards.front().target_card;
+                target->m_game->call_event(event_type::check_predraw_auto_pick{ target, checking_card, is_auto_pick });
+                if (is_auto_pick) {
+                    on_pick(checking_card);
+                }
             }
         } else {
             target->m_game->pop_request();
         }
     }
 
-    bool request_predraw::can_pick(const_card_ptr target_card) const {
-        if (target_card->owner == target) {
-            int top_priority = checks[0].priority;
-            return rn::contains(checks | rv::take_while([=](const event_card_key &key) {
-                return key.priority == top_priority;
-            }), target_card, &event_card_key::target_card);
-        }
-        return false;
+    std::span<const event_card_key> request_predraw::get_checking_cards() const {
+        if (checks.empty()) return {};
+
+        auto top_priority = checks.front().priority;
+        auto end = rn::find_if_not(checks, [&](const event_card_key &key) {
+            return key.priority == top_priority;
+        });
+
+        return {checks.begin(), end};
     }
 
     void request_predraw::remove_check(card_ptr target_card) {
@@ -37,16 +44,30 @@ namespace banggame {
         });
     }
 
+    bool request_predraw::can_pick(const_card_ptr target_card) const {
+        return rn::contains(get_checking_cards(), target_card, &event_card_key::target_card);
+    }
+
     void request_predraw::on_pick(card_ptr target_card) {
         remove_check(target_card);
         target->m_game->call_event(event_type::on_predraw_check{ target, target_card });
     }
 
     game_string request_predraw::status_text(player_ptr owner) const {
-        if (owner == target) {
-            return "STATUS_PREDRAW";
+        auto cards = get_checking_cards();
+        if (cards.size() == 1) {
+            card_ptr checking_card = cards.front().target_card;
+            if (owner == target) {
+                return {"STATUS_PREDRAW_FOR", checking_card};
+            } else {
+                return {"STATUS_PREDRAW_FOR_OTHER", target, checking_card};
+            }
         } else {
-            return {"STATUS_PREDRAW_OTHER", target};
+            if (owner == target) {
+                return "STATUS_PREDRAW";
+            } else {
+                return {"STATUS_PREDRAW_OTHER", target};
+            }
         }
     }
 
