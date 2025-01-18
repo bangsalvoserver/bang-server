@@ -9,7 +9,6 @@ namespace banggame {
         if (target->alive() && target->m_game->m_playing == target) {
             if (!live) {
                 target->m_game->call_event(event_type::get_predraw_checks{ target, checks });
-                rn::sort(checks, std::greater{}, &event_card_key::priority);
             }
             auto cards = get_checking_cards();
             if (cards.empty()) {
@@ -72,7 +71,7 @@ namespace banggame {
     }
 
     void equip_predraw_check::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::get_predraw_checks>({target_card, 10},
+        target->m_game->add_listener<event_type::get_predraw_checks>({target_card, 10 + priority},
             [=, priority=priority](player_ptr origin, std::vector<event_card_key> &ret) {
                 if (origin == target) {
                     ret.emplace_back(target_card, priority);
@@ -81,6 +80,6 @@ namespace banggame {
     }
 
     void equip_predraw_check::on_disable(card_ptr target_card, player_ptr target) {
-        target->m_game->remove_listeners(event_card_key{target_card, 10});
+        target->m_game->remove_listeners(event_card_key{target_card, 10 + priority});
     }
 }
