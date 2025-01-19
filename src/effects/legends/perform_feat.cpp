@@ -99,7 +99,8 @@ namespace banggame {
             if (target->alive() && target == target->m_game->m_playing) {
                 if (!live) {
                     target->m_game->call_event(event_type::get_performable_feats{ target, target_cards });   
-                    if (target_cards.empty() || !effect_perform_feat{}.can_play(target_cards.front(), target)) {
+
+                    if (target_cards.empty()) {
                         target->m_game->pop_request();
                     }
                 }
@@ -171,7 +172,10 @@ namespace banggame {
         target->m_game->add_listener<event_type::get_performable_feats>(key, [=](player_ptr origin, card_list &target_cards) {
             if (origin == target) {
                 target->m_game->remove_listeners(key);
-                target_cards.push_back(origin_card);
+                
+                if (effect_perform_feat{}.can_play(origin_card, target)) {
+                    target_cards.push_back(origin_card);
+                }
             }
         });
         target->m_game->add_listener<event_type::on_turn_end>(key, [=](player_ptr origin, bool skipped) {
