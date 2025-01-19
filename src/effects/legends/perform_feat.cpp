@@ -172,7 +172,7 @@ namespace banggame {
         target->m_game->add_listener<event_type::get_performable_feats>(key, [=](player_ptr origin, card_list &target_cards) {
             if (origin == target) {
                 target->m_game->remove_listeners(key);
-                
+
                 if (effect_perform_feat{}.can_play(origin_card, target)) {
                     target_cards.push_back(origin_card);
                 }
@@ -209,14 +209,14 @@ namespace banggame {
                     origin_card->m_game->m_first_player->disable_equip(origin_card);
                     origin_card->move_to(pocket_type::feats_discard);
                     draw_next_feat(origin);
-                });
+                }, 10);
             } else {
                 origin->m_game->add_log("LOG_FEAT_PERFORMED", origin, origin_card);
                 origin->m_game->queue_action([=]{
                     card_ptr character_card = origin->get_character();
                     auto [token, count] = get_card_fame_token_type(character_card);
                     character_card->move_tokens(token, origin_card, std::min<int>(count, 2));
-                });
+                }, 10);
             }
         }
     }
