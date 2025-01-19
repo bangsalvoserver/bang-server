@@ -6,6 +6,11 @@
 namespace banggame {
 
     namespace event_type {
+        struct get_performable_feats {
+            player_ptr origin;
+            nullable_ref<card_list> target_cards;
+        };
+
         struct count_performed_feats {
             player_ptr origin;
             nullable_ref<int> num_feats;

@@ -29,9 +29,8 @@ namespace banggame {
     }
 
     bool effect_perform_feat::can_play(card_ptr origin_card, player_ptr origin) {
-        card_ptr character_card = origin->get_character();
-        if (origin_card->deck == card_deck_type::feats && character_card->deck != card_deck_type::legends) {
-            auto [token, count] = get_card_fame_token_type(character_card);
+        if (origin_card->deck == card_deck_type::feats && !is_legend(origin)) {
+            auto [token, count] = get_card_fame_token_type(origin->get_character());
             if (count == 0 || origin_card->num_tokens(token) != 0) {
                 return false;
             }
@@ -62,8 +61,7 @@ namespace banggame {
         }
         
         bool in_target_set(const_player_ptr target_player) const override {
-            return target_player != target && target_player->alive()
-                && target_player->get_character()->deck == card_deck_type::legends
+            return target_player != target && target_player->alive() && is_legend(target_player)
                 && (target_player->m_hp > 1 || can_kill);
         }
 
@@ -92,11 +90,20 @@ namespace banggame {
     }
 
     struct request_perform_feat : request_resolvable, interface_picking {
-        request_perform_feat(card_ptr origin_card, player_ptr target)
-            : request_resolvable{origin_card, nullptr, target, {}, 30} {}
+        request_perform_feat(player_ptr target)
+            : request_resolvable{nullptr, nullptr, target, {}, 30} {}
+        
+        card_list target_cards;
         
         void on_update() override {
-            if (!(target->alive() && target == target->m_game->m_playing && effect_perform_feat{}.can_play(origin_card, target))) {
+            if (target->alive() && target == target->m_game->m_playing) {
+                if (!live) {
+                    target->m_game->call_event(event_type::get_performable_feats{ target, target_cards });   
+                    if (target_cards.empty() || !effect_perform_feat{}.can_play(target_cards.front(), target)) {
+                        target->m_game->pop_request();
+                    }
+                }
+            } else {
                 target->m_game->pop_request();
             }
         }
@@ -117,33 +124,63 @@ namespace banggame {
         }
 
         bool can_pick(const_card_ptr target_card) const override {
-            return target_card == origin_card;
+            return rn::contains(target_cards, target_card);
         }
 
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
-            effect_perform_feat{}.on_play(origin_card, target);
+            effect_perform_feat{}.on_play(target_card, target);
         }
 
         game_string status_text(player_ptr owner) const override {
-            if (target->get_character()->deck == card_deck_type::legends) {
-                if (owner == target) {
-                    return {"STATUS_CLAIM_FEAT", origin_card};
+            if (target_cards.size() == 1) {
+                card_ptr target_card = target_cards.front();
+                if (is_legend(target)) {
+                    if (owner == target) {
+                        return {"STATUS_CLAIM_FEAT", target_card};
+                    } else {
+                        return {"STATUS_CLAIM_FEAT_OTHER", target_card, target};
+                    }
                 } else {
-                    return {"STATUS_CLAIM_FEAT_OTHER", origin_card, target};
+                    if (owner == target) {
+                        return {"STATUS_PERFORM_FEAT", target_card};
+                    } else {
+                        return {"STATUS_PERFORM_FEAT_OTHER", target_card, target};
+                    }
                 }
             } else {
-                if (owner == target) {
-                    return {"STATUS_PERFORM_FEAT", origin_card};
+                if (is_legend(target)) {
+                    if (owner == target) {
+                        return "STATUS_CLAIM_A_FEAT";
+                    } else {
+                        return {"STATUS_CLAIM_A_FEAT_OTHER", target};
+                    }
                 } else {
-                    return {"STATUS_PERFORM_FEAT_OTHER", origin_card, target};
+                    if (owner == target) {
+                        return "STATUS_PERFORM_A_FEAT";
+                    } else {
+                        return {"STATUS_PERFORM_A_FEAT_OTHER", target};
+                    }
                 }
             }
         }
     };
 
     void queue_request_perform_feat(card_ptr origin_card, player_ptr target) {
-        target->m_game->queue_request<request_perform_feat>(origin_card, target);
+        event_card_key key{ origin_card, 6 };
+        target->m_game->add_listener<event_type::get_performable_feats>(key, [=](player_ptr origin, card_list &target_cards) {
+            if (origin == target) {
+                target->m_game->remove_listeners(key);
+                target_cards.push_back(origin_card);
+            }
+        });
+        target->m_game->add_listener<event_type::on_turn_end>(key, [=](player_ptr origin, bool skipped) {
+            if (origin == target) {
+                target->m_game->remove_listeners(key);
+            }
+        });
+
+        target->m_game->queue_request<request_perform_feat>(target);
     }
 
     void effect_perform_feat::on_play(card_ptr origin_card, player_ptr origin) {
@@ -160,8 +197,7 @@ namespace banggame {
         });
 
         if (origin_card->deck == card_deck_type::feats) {
-            card_ptr character_card = origin->get_character();
-            if (character_card->deck == card_deck_type::legends) {
+            if (is_legend(origin)) {
                 origin->m_game->add_log("LOG_FEAT_CLAIMED", origin, origin_card);
                 origin->m_game->queue_request<request_damage_legend>(origin_card, origin);
                 origin->m_game->queue_action([=]{
@@ -173,6 +209,7 @@ namespace banggame {
             } else {
                 origin->m_game->add_log("LOG_FEAT_PERFORMED", origin, origin_card);
                 origin->m_game->queue_action([=]{
+                    card_ptr character_card = origin->get_character();
                     auto [token, count] = get_card_fame_token_type(character_card);
                     character_card->move_tokens(token, origin_card, std::min<int>(count, 2));
                 });

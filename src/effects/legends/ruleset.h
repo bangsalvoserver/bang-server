@@ -5,6 +5,7 @@
 
 namespace banggame {
 
+    bool is_legend(const_player_ptr origin);
     card_ptr draw_next_feat(player_ptr origin);
 
     struct ruleset_legends {

@@ -29,9 +29,6 @@ namespace banggame {
 
         if (filter.check(target_player_filter::notsheriff) && target->m_role == player_role::sheriff)
             return {"ERROR_TARGET_SHERIFF", origin_card, target};
-        
-        if (filter.check(target_player_filter::legend) && target->get_character()->deck != card_deck_type::legends)
-            return {"ERROR_TARGET_NOT_LEGEND", origin_card, target};
 
         if (filter.check(target_player_filter::not_empty_hand) && target->empty_hand())
             return {"ERROR_TARGET_EMPTY_HAND", origin_card, target};

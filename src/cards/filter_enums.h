@@ -16,7 +16,6 @@ namespace banggame {
         range_1,
         range_2,
         reachable,
-        legend,
         target_set,
         not_empty_hand,
         not_empty_table,

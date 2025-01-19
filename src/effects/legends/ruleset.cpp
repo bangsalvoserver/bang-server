@@ -13,6 +13,10 @@
 
 namespace banggame {
 
+    bool is_legend(const_player_ptr origin) {
+        return origin->get_character()->deck == card_deck_type::legends;
+    }
+
     card_ptr draw_next_feat(player_ptr origin) {
         auto &feats_deck = origin->m_game->m_feats_deck;
 
@@ -218,9 +222,8 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_turn_end>({nullptr, 20}, [](player_ptr origin, bool skipped) {
-            card_ptr character_card = origin->get_character();
-            if (character_card->deck != card_deck_type::legends && get_count_performed_feats(origin) == 0) {
-                auto [token, count] = get_card_fame_token_type(character_card);
+            if (!is_legend(origin) && get_count_performed_feats(origin) == 0) {
+                auto [token, count] = get_card_fame_token_type(origin->get_character());
                 if (count != 0) {
                     origin->m_game->queue_request<request_boast_feat>(origin);
                 }
