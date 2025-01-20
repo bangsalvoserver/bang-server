@@ -15,7 +15,7 @@ namespace banggame {
 
         shared_draw_check_handler handler;
 
-        card_list get_highlights() const override {
+        card_list get_highlights(player_ptr owner) const override {
             auto vec = handler->get_drawn_cards();
             vec.push_back(handler->get_drawing_card());
             return vec;

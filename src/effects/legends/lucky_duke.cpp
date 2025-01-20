@@ -16,7 +16,7 @@ namespace banggame {
         
         shared_request_check req;
 
-        card_list get_highlights() const override {
+        card_list get_highlights(player_ptr owner) const override {
             return { req->origin_card };
         }
 

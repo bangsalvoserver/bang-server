@@ -40,7 +40,7 @@ namespace banggame {
         
         shared_locomotive_context ctx;
 
-        card_list get_highlights() const override {
+        card_list get_highlights(player_ptr owner) const override {
             return {target->m_game->m_train.front()};
         }
 

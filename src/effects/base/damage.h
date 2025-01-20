@@ -55,7 +55,7 @@ namespace banggame {
         timer_damage m_timer{this};
         request_timer *timer() override { return &m_timer; }
 
-        card_list get_highlights() const override;
+        card_list get_highlights(player_ptr owner) const override;
         void on_update() override;
         void on_finished();
         game_string status_text(player_ptr owner) const override;

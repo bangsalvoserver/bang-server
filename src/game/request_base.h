@@ -75,7 +75,7 @@ namespace banggame {
         virtual request_timer *timer() { return nullptr; }
 
         virtual game_string status_text(player_ptr owner) const { return {}; };
-        virtual card_list get_highlights() const { return {}; }
+        virtual card_list get_highlights(player_ptr owner) const { return {}; }
     };
 
     struct interface_target_set_players {

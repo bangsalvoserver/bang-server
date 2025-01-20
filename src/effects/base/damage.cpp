@@ -34,7 +34,7 @@ namespace banggame {
         : request_base(origin_card, origin, target, flags, 200)
         , damage(damage) {}
     
-    card_list request_damage::get_highlights() const {
+    card_list request_damage::get_highlights(player_ptr owner) const {
         return { target->get_character() };
     }
 

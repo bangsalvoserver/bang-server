@@ -76,7 +76,7 @@ namespace banggame {
         void on_resolve() final;
         virtual void on_resolve_target() = 0;
 
-        virtual card_list get_highlights() const override;
+        virtual card_list get_highlights(player_ptr owner) const override;
     };
 }
 

@@ -39,7 +39,7 @@ namespace banggame {
         on_resolve_target();
     }
     
-    card_list request_targeting::get_highlights() const {
+    card_list request_targeting::get_highlights(player_ptr owner) const {
         if (target_card->pocket == pocket_type::player_hand) {
             return target->m_hand;
         } else {

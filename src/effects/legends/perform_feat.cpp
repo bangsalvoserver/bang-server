@@ -113,8 +113,11 @@ namespace banggame {
             return resolve_type::dismiss;
         }
 
-        card_list get_highlights() const override {
-            return target_cards;
+        card_list get_highlights(player_ptr owner) const override {
+            if (owner != target) {
+                return target_cards;
+            }
+            return {};
         }
 
         void on_resolve() override {
