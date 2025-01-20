@@ -113,6 +113,10 @@ namespace banggame {
             return resolve_type::dismiss;
         }
 
+        card_list get_highlights() const override {
+            return target_cards;
+        }
+
         void on_resolve() override {
             target->m_game->pop_request();
         }
