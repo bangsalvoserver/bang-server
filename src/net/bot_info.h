@@ -47,6 +47,7 @@ namespace banggame {
 
     DEFINE_BOT_RULE(pocket, rule_filter_by_pocket, pocket_type)
     DEFINE_BOT_RULE(repeat, rule_repeat)
+    DEFINE_BOT_RULE(preselect, rule_preselect)
     DEFINE_BOT_RULE(blue_buttons, rule_blue_buttons)
 
 }

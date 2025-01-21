@@ -55,6 +55,12 @@ namespace banggame {
         };
     }
 
+    bot_rule rule_preselect() {
+        return [](card_node node) {
+            return node->card->has_tag(tag_type::preselect);
+        };
+    }
+
     bot_rule rule_blue_buttons() {
         return [](card_node node) {
             return node->card->get_tag_value(tag_type::button_color) == std::optional{2};

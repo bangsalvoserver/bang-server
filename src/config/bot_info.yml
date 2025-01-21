@@ -7,6 +7,7 @@ bots:
     bypass_prompt_after: 5
     
     response_rules:
+    - preselect
     - pocket(pocket_type::player_character)
     - pocket(pocket_type::player_table)
     - pocket(pocket_type::player_hand)
