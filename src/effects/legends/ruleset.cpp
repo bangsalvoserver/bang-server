@@ -142,10 +142,7 @@ namespace banggame {
         }
 
         prompt_string resolve_prompt() const override {
-            if (target->is_bot()) {
-                return "BOT_BAD_PLAY";
-            }
-            return {};
+            return "PROMPT_CANCEL_BOAST_FEAT";
         }
 
         bool can_pick(const_card_ptr target_card) const override {

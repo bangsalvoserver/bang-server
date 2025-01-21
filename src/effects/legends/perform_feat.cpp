@@ -125,8 +125,8 @@ namespace banggame {
         }
 
         prompt_string resolve_prompt() const override {
-            if (target->is_bot()) {
-                return "BOT_BAD_PLAY";
+            if (!is_legend(target)) {
+                return "PROMPT_CANCEL_PERFORM_FEAT";
             }
             return {};
         }
