@@ -4,8 +4,6 @@
 #include "play_verify.h"
 #include "possible_to_play.h"
 
-#include "cards/filter_enums.h"
-
 #include "net/bot_info.h"
 #include "net/logging.h"
 
@@ -38,33 +36,6 @@ namespace banggame {
         }
 
         return ret;
-    }
-
-    bot_rule rule_filter_by_pocket(pocket_type pocket) {
-        return [=](card_node node) {
-            if (card_ptr choice_card = node->context.get().card_choice) {
-                return choice_card->pocket == pocket;
-            }
-            return node->card->pocket == pocket;
-        };
-    }
-
-    bot_rule rule_repeat() {
-        return [](card_node node) {
-            return node->context.get().repeat_card != nullptr;
-        };
-    }
-
-    bot_rule rule_preselect() {
-        return [](card_node node) {
-            return node->card->has_tag(tag_type::preselect);
-        };
-    }
-
-    bot_rule rule_blue_buttons() {
-        return [](card_node node) {
-            return node->card->get_tag_value(tag_type::button_color) == std::optional{2};
-        };
     }
     
     static card_node get_selected_node(player_ptr origin, bool is_response, const std::set<card_node> &node_set) {

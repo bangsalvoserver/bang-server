@@ -7,19 +7,21 @@ bots:
     bypass_prompt_after: 5
     
     response_rules:
-    - preselect
+    - tag_value(tag_type::preselect, 0)
     - pocket(pocket_type::player_character)
     - pocket(pocket_type::player_table)
     - pocket(pocket_type::player_hand)
+    - tag_value_not(tag_type::resolve, 0)
     
     in_play_rules:
     - repeat
-    - blue_buttons
+    - tag_value(tag_type::button_color, 2)
     - pocket(pocket_type::player_table)
     - pocket(pocket_type::player_hand)
     - pocket(pocket_type::player_character)
     - pocket(pocket_type::shop_selection)
     - pocket(pocket_type::train)
+    - tag_value_not(tag_type::pass_turn, 0)
   
   names:
   - Salvo

@@ -1,6 +1,7 @@
 target_sources(bangserver
 PRIVATE
     bot_ai.cpp
+    bot_rules.cpp
     bot_suggestion.cpp
     card.cpp
     game.cpp
