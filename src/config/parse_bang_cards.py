@@ -195,9 +195,7 @@ def merge_cards(card_sets):
 
 def parse_file(data):
     def get_main_deck_cards(card):
-        for sign in card['signs']:
-            card['sign'] = sign
-            yield card
+        return [{'sign': sign, **card} for sign in card['signs']]
 
     def get_goldrush_cards(card):
         return [card] * card.get('count', 1)
