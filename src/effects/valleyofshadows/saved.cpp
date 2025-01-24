@@ -41,7 +41,7 @@ namespace banggame {
                 && (bot_suggestion::is_target_enemy(target, saved)
                 != (target_card->pocket == pocket_type::player_hand)))
             {
-                return "BOT_BAD_PICK";
+                return "BOT_SAVED_WRONG_PICK";
             } else {
                 return {};
             }

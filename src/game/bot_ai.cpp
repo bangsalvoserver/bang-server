@@ -69,7 +69,22 @@ namespace banggame {
                     auto args = generate_random_play(origin, *selected_node, is_response);
                     args.bypass_prompt = bypass_prompt;
                     args.timer_id = timer_id;
-                    if (holds_alternative<"ok">(verify_and_play(origin, args))) {
+
+                    auto result = verify_and_play(origin, args);
+
+                    if (utils::visit_tagged(overloaded{
+                        [](utils::tag<"ok">) {
+                            return true;
+                        },
+                        [&](utils::tag<"prompt">, const prompt_string &prompt) {
+                            logging::trace("BOT PROMPT: message={}, i={}", std::string_view{prompt.message.format_str}, i);
+                            return false;
+                        },
+                        [&](utils::tag<"error">, const game_string &error) {
+                            logging::trace("BOT ERROR: message={}, i={}", std::string_view{error.format_str}, i);
+                            return false;
+                        }
+                    }, result)) {
                         return utils::tag<"next">{};
                     }
                 } catch (const random_element_error &) {

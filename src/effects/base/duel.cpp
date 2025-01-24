@@ -31,7 +31,7 @@ namespace banggame {
 
         prompt_string resolve_prompt() const override {
             if (target->is_bot() && target->m_hp <= 1 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
-                return "BOT_BAD_PLAY";
+                return "BOT_MUST_RESPOND_DUEL";
             }
             return {};
         }

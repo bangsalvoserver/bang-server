@@ -74,7 +74,7 @@ namespace banggame {
     game_string effect_train_robbery_discard::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         if (origin->is_bot()) {
             if (ctx.target_card->has_tag(tag_type::ghost_card)) {
-                return "BOT_BAD_PLAY";
+                return "BOT_DISCARD_GHOST";
             }
         }
         return {};
@@ -102,10 +102,10 @@ namespace banggame {
     game_string effect_train_robbery_bang::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         if (origin->is_bot()) {
             if (!ctx.target_card->self_equippable() && !ctx.target_card->has_tag(tag_type::ghost_card)) {
-                return "BOT_BAD_PLAY";
+                return "BOT_DISCARD_GHOST";
             }
             if (origin->m_hp <= 1 && count_missed_cards(origin) == 0) {
-                return "BOT_BAD_PLAY";
+                return "BOT_DISCARD_OR_DIE";
             }
         }
         return {};

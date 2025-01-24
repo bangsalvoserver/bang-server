@@ -77,7 +77,7 @@ namespace banggame {
     prompt_string request_check_base::redraw_prompt(card_ptr target_card, player_ptr owner) const {
         if (owner->is_bot()) {
             if (bot_suggestion::is_target_friend(owner, target) == is_lucky(drawn_card)) {
-                return "BOT_BAD_PLAY";
+                return "BOT_DONT_REDRAW";
             }
         }
         return {};

@@ -165,7 +165,7 @@ namespace banggame {
     game_string effect_discard_hand::on_prompt(card_ptr origin_card, player_ptr origin) {
         if (origin->is_bot()) {
             if (rn::any_of(get_all_playable_cards(origin), [](card_ptr c) { return c->pocket == pocket_type::player_hand; })) {
-                return "BOT_BAD_PLAY";
+                return "BOT_CAN_PLAY_OTHER_CARDS";
             }
         } else if (int ncards = int(origin->m_hand.size())) {
             return {"PROMPT_PASS_DISCARD", ncards};

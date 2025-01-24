@@ -18,7 +18,7 @@ namespace banggame {
 
     game_string effect_damage::on_prompt(card_ptr origin_card, player_ptr origin) {
         if (origin->is_bot() && origin->m_hp <= origin->m_max_hp - 2) {
-            return "BOT_BAD_PLAY";
+            return "BOT_TOO_MUCH_DAMAGE";
         }
         return {};
     }

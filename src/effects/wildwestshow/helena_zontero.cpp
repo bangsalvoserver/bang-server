@@ -46,7 +46,7 @@ namespace banggame {
 
         prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
             if (owner->is_bot() && !is_lucky()) {
-                return "BOT_BAD_PLAY";
+                return "BOT_DONT_REDRAW_HELENA_ZONTERO";
             }
             return {};
         }

@@ -19,7 +19,7 @@ namespace banggame {
         
         prompt_string escape_prompt(player_ptr owner) const override {
             if (owner->is_bot()) {
-                return "BOT_BAD_PLAY";
+                return "BOT_ESCAPE_TORNADO";
             }
             return {};
         }

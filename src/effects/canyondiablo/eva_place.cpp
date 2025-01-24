@@ -38,14 +38,14 @@ namespace banggame {
 
         prompt_string pick_prompt(card_ptr target_card) const override {
             if (target->is_bot() && !drawn_card->sign.is_diamonds()) {
-                return "BOT_BAD_PLAY";
+                return "BOT_UNNECESSARY_REVEAL";
             }
             return {};
         }
 
         prompt_string resolve_prompt() const override {
             if (target->is_bot() && drawn_card->sign.is_diamonds()) {
-                return "BOT_BAD_PLAY";
+                return "BOT_CAN_REVEAL";
             }
             return {};
         }

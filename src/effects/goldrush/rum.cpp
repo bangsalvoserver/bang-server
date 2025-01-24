@@ -57,7 +57,7 @@ namespace banggame {
 
         prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
             if (owner->is_bot()) {
-                return "BOT_BAD_PLAY";
+                return "BOT_DONT_REDRAW_RUM";
             }
             return {};
         }
@@ -79,7 +79,7 @@ namespace banggame {
 
     game_string effect_rum::on_prompt(card_ptr origin_card, player_ptr origin) {
         if (origin->is_bot() && origin->m_max_hp - origin->m_hp < 2) {
-            return "BOT_BAD_PLAY";
+            return "BOT_WASTEFUL_RUM";
         }
         if (origin->m_hp == origin->m_max_hp) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
