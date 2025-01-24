@@ -38,9 +38,9 @@ namespace banggame {
     }
     
     void ruleset_goldrush::on_apply(game_ptr game) {
-        game->add_listener<event_type::on_game_setup>({nullptr, 2}, [=](player_ptr origin){
+        game->add_listener<event_type::on_game_setup>({nullptr, 2}, [](player_ptr origin){
             for (int i=0; i<3; ++i) {
-                draw_shop_card(game);
+                draw_shop_card(origin->m_game);
             }
         });
 
@@ -55,26 +55,29 @@ namespace banggame {
             }
         });
         
-        game->add_listener<event_type::on_hit>({nullptr, 6}, [=](card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags) {
-            if (origin && game->m_playing == origin && origin != target && origin->alive()) {
+        game->add_listener<event_type::on_hit>({nullptr, 6}, [](card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags) {
+            if (origin && origin->m_game->m_playing == origin && origin != target && origin->alive()) {
                 origin->add_gold(damage);
             }
         });
 
-        game->add_listener<event_type::on_play_card>(nullptr, [=](player_ptr origin, card_ptr origin_card, const card_list &modifiers, const effect_context &ctx) {
-            if (ctx.card_choice) {
-                origin_card = ctx.card_choice;
-            }
-            if (origin_card->pocket == pocket_type::shop_selection) {
-                if (!origin->m_game->pending_requests()) {
-                    origin->add_gold(-get_card_cost(origin_card, ctx));
+        game->add_listener<event_type::on_play_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const card_list &modifiers, const effect_context &ctx) {
+            if (!origin->m_game->pending_requests()) {
+                if (ctx.card_choice) {
+                    origin_card = ctx.card_choice;
                 }
-                game->queue_action([=]{ draw_shop_card(game); }, -1);
+                if (origin_card->pocket == pocket_type::shop_selection) {
+                    origin->add_gold(-get_card_cost(origin_card, ctx));
+                    
+                    origin->m_game->queue_action([=]{
+                        draw_shop_card(origin->m_game);
+                    }, -1);
+                }
             }
         });
 
-        game->add_listener<event_type::on_discard_all>({nullptr, 1}, [=](player_ptr origin) {
-            if (origin->alive() || !game->m_options.expansions.contains(GET_RULESET(shadowgunslingers))) {
+        game->add_listener<event_type::on_discard_all>({nullptr, 1}, [](player_ptr origin) {
+            if (origin->alive() || !origin->m_game->m_options.expansions.contains(GET_RULESET(shadowgunslingers))) {
                 origin->add_gold(-origin->m_gold);
             }
         });
@@ -85,16 +88,16 @@ namespace banggame {
     }
 
     void ruleset_shadowgunslingers::on_apply(game_ptr game) {
-        game->add_listener<event_type::check_revivers>({nullptr, -2}, [=](player_ptr target) {
+        game->add_listener<event_type::check_revivers>({nullptr, -2}, [](player_ptr target) {
             if (!target->alive()) {
-                game->add_log("LOG_SHADOW_GUNSLINGER", target);
+                target->m_game->add_log("LOG_SHADOW_GUNSLINGER", target);
                 target->add_player_flags(player_flag::shadow);
                 target->enable_equip(target->get_character());
             }
         });
-        game->add_listener<event_type::on_turn_start>({nullptr, 10}, [=](player_ptr target) {
+        game->add_listener<event_type::on_turn_start>({nullptr, 10}, [](player_ptr target) {
             if (target->check_player_flags(player_flag::shadow) && target->get_base_role() == player_role::renegade) {
-                auto roles_revealed = game->m_players | rv::filter([](player_ptr p) {
+                auto roles_revealed = target->m_game->m_players | rv::filter([](player_ptr p) {
                     return p->check_player_flags(player_flag::role_revealed);
                 });
                 auto count_outlaws = rn::count_if(roles_revealed, [](player_ptr p) {
@@ -114,8 +117,8 @@ namespace banggame {
                 }
             }
         });
-        game->add_listener<event_type::on_turn_end>({nullptr, -3}, [=](player_ptr target, bool skipped) {
-            game->queue_action([=]{
+        game->add_listener<event_type::on_turn_end>({nullptr, -3}, [](player_ptr target, bool skipped) {
+            target->m_game->queue_action([=]{
                 if (target->m_extra_turns == 0 && target->remove_player_flags(player_flag::shadow) && !target->alive()) {
                     handle_player_death(nullptr, target, death_type::shadow_turn_end);
                 }
