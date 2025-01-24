@@ -68,7 +68,7 @@ namespace banggame {
         });
 
         target->m_game->add_listener<event_type::on_draw_check_start>(target_card, [=](player_ptr origin, shared_request_check req, bool &handled) {
-            if (!handled && req->origin_card && req->origin_card->deck == card_deck_type::main_deck) {
+            if (!handled && req->target != target && req->origin_card && req->origin_card->deck == card_deck_type::main_deck) {
                 if (rn::none_of(origin->m_game->range_all_players(origin)
                     | rv::take_while([=](const_player_ptr current) { return current != target; })
                     | rv::filter(&player::alive),
