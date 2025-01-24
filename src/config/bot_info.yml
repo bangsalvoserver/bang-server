@@ -2,7 +2,6 @@ bots:
   propic_size: 512
   
   settings:
-    allow_timer_no_action: false
     max_random_tries: 10
     bypass_prompt_after: 5
     
@@ -11,6 +10,7 @@ bots:
     - pocket(pocket_type::player_table)
     - pocket(pocket_type::player_hand)
     - tag_value_not(tag_type::resolve, 1)
+    - do_nothing
     
     in_play_rules:
     - repeat

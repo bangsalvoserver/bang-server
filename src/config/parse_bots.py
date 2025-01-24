@@ -44,7 +44,6 @@ def parse_bot_rule(value):
 
 def parse_settings(settings):
     return CppObject(
-        allow_timer_no_action = settings['allow_timer_no_action'],
         max_random_tries = settings['max_random_tries'],
         bypass_prompt_after = settings['bypass_prompt_after'],
         response_rules = [parse_bot_rule(value) for value in settings['response_rules']],

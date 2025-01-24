@@ -31,6 +31,7 @@ namespace banggame {
     DEFINE_BOT_RULE(preselect, rule_preselect)
     DEFINE_BOT_RULE(tag_value, rule_tag_value, tag_type, int)
     DEFINE_BOT_RULE(tag_value_not, rule_tag_value_not, tag_type, int)
+    DEFINE_BOT_RULE(do_nothing, rule_do_nothing)
 }
 
 #endif

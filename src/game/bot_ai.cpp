@@ -51,10 +51,17 @@ namespace banggame {
     static request_state execute_random_play(player_ptr origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
             std::set<card_node> node_set = play_cards | rv::addressof | rn::to<std::set>;
+            if (timer_id) {
+                node_set.insert(nullptr);
+            }
             
             while (!node_set.empty()) {
                 auto selected_node = get_selected_node(origin, is_response, node_set);
                 node_set.erase(selected_node);
+
+                if (!selected_node) {
+                    return utils::tag<"done">{};
+                }
 
                 // maybe add random variation?
                 bool bypass_prompt = node_set.empty() && i >= bot_info.settings.bypass_prompt_after;
