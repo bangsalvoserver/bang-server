@@ -7,11 +7,10 @@ bots:
     bypass_prompt_after: 5
     
     response_rules:
-    - tag_value(tag_type::preselect, 0)
     - pocket(pocket_type::player_character)
     - pocket(pocket_type::player_table)
     - pocket(pocket_type::player_hand)
-    - tag_value_not(tag_type::resolve, 0)
+    - tag_value_not(tag_type::resolve, 1)
     
     in_play_rules:
     - repeat
