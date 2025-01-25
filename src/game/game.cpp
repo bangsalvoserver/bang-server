@@ -262,10 +262,6 @@ namespace banggame {
                     continue;
                 }
 
-                if (c.has_tag(tag_type::ghost_card) && !m_options.enable_ghost_cards) {
-                    continue;
-                }
-
                 card_ptr new_card = add_card(c);
                 new_card->pocket = pocket;
                 

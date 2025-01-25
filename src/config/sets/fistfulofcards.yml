@@ -10,6 +10,7 @@ fistfulofcards:
       - sniper player reachable notself
   - name: DEAD_MAN
     image: 05_deadman
+    expansion: ghost_cards
     equip:
       - deadman
     tags:

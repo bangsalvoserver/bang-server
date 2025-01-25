@@ -4,6 +4,7 @@ main_deck:
       - 9 spades
       - 10 spades
     image: 07_fantasma
+    expansion: ghost_cards
     color: blue
     equip_target: dead
     equip:

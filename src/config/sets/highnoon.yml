@@ -5,6 +5,7 @@ highnoon:
       - blessing
   - name: GHOST_TOWN
     image: 05_cittafantasma
+    expansion: ghost_cards
     equip:
       - ghosttown
     tags:

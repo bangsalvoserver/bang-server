@@ -3,6 +3,7 @@ wildwestshow:
   #   image: 06_bavaglio
   - name: BONE_ORCHARD
     image: 06_camposanto
+    expansion: ghost_cards
     equip:
       - bone_orchard
     tags:

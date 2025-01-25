@@ -295,6 +295,7 @@ train:
       - express_car
   - name: GHOST_CAR
     image: 27_ghost_car
+    expansion: ghost_cards
     color: train
     equip_target: notsheriff dead_or_alive
     equip:

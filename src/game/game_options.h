@@ -10,7 +10,6 @@ namespace banggame {
     
     struct game_options {
         expansion_set expansions;
-        bool enable_ghost_cards = true;
         int character_choice = 1;
         bool quick_discard_all = true;
         bool auto_pick_predraw = true;

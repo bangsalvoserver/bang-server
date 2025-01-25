@@ -3,6 +3,7 @@
 
 #include "base/effects.h"
 #include "dodgecity/effects.h"
+#include "ghost_cards/effects.h"
 #include "goldrush/effects.h"
 #include "armedanddangerous/effects.h"
 #include "valleyofshadows/effects.h"

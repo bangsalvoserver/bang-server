@@ -3,6 +3,7 @@
 #include "next_stop.h"
 
 #include "effects/base/death.h"
+#include "effects/ghost_cards/ruleset.h"
 
 #include "cards/game_events.h"
 
@@ -122,7 +123,7 @@ namespace banggame {
             }
         });
         
-        if (game->m_options.enable_ghost_cards) {
+        if (game->m_options.expansions.contains(GET_RULESET(ghost_cards))) {
             game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) { value = false; });
         }
     }
