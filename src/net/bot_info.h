@@ -14,14 +14,14 @@ namespace banggame {
     struct bot_settings {
         int max_random_tries;
         int bypass_prompt_after;
-        std::initializer_list<bot_rule> response_rules;
-        std::initializer_list<bot_rule> in_play_rules;
+        std::span<const bot_rule> response_rules;
+        std::span<const bot_rule> in_play_rules;
     };
 
     struct bot_info_t {
         uint32_t propic_size;
-        std::span<std::string_view> names;
-        std::initializer_list<image_registry::registered_image> propics;
+        std::span<const std::string_view> names;
+        std::span<const image_registry::registered_image> propics;
         bot_settings settings;
     };
 

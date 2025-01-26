@@ -63,7 +63,7 @@ namespace banggame {
         bool is_train() const { return color == card_color_type::train; }
     };
 
-    using card_data_list = std::span<card_data>;
+    using card_data_list = std::span<const card_data>;
 
     struct all_cards_t {
         card_data_list deck;

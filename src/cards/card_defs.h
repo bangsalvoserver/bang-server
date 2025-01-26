@@ -9,8 +9,6 @@
 
 namespace banggame {
 
-    using namespace std::string_view_literals;
-
     enum class card_suit {
         none,
         hearts,
@@ -199,10 +197,10 @@ namespace banggame {
         void on_play(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
     };
 
-    using effect_list = std::span<effect_holder>;
-    using equip_list = std::span<equip_holder>;
+    using effect_list = std::span<const effect_holder>;
+    using equip_list = std::span<const equip_holder>;
     using tag_value_pair = std::pair<tag_type, short>;
-    using tag_map = std::span<tag_value_pair>;
+    using tag_map = std::span<const tag_value_pair>;
 
     enum class card_deck_type {
         none,
