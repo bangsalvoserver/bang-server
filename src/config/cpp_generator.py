@@ -48,6 +48,9 @@ class CppEnum:
         return isinstance(value, CppEnum) \
             and self.enum_name == value.enum_name \
             and self.value == value.value
+    
+    def __hash__(self):
+        return hash(str(self))
 
 class CppLiteral:
     def __init__(self, value):
@@ -135,7 +138,7 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
         elif isinstance(object_value, CppStaticMap):
             if not object_value: return '{}'
             return f'{{utils::make_static_map<{object_value.key_type}, {object_value.value_type}>({{\n' + \
-                ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(value, indent + 1)}" for value in object_value.value if value is not None) + \
+                ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(pair, indent + 1)}" for pair in object_value.value.items()) + \
                 '\n' + (SPACE * indent) + '})}'
         elif isinstance(object_value, str):
             return f'{{\"{object_value}\"sv}}'

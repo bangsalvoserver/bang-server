@@ -114,7 +114,7 @@ def parse_tags(tag_list):
     if not isinstance(tag_list, list):
         raise RuntimeError(f'in parse_tags: expected list, got {tag_list}')
 
-    result = []
+    result = {}
     for tag in tag_list:
         match = re.match(
             r'^\s*(\w+)' # type
@@ -130,7 +130,7 @@ def parse_tags(tag_list):
         tag_type = CppEnum('tag_type', tag_type_str)
         if tag_type in result:
             raise RuntimeError(f'Duplicate tag: {tag_type_str}')
-        result.append((tag_type, int(tag_value) if tag_value else 0))
+        result[tag_type] = int(tag_value) if tag_value else 0
     return CppStaticMap('tag_type', 'short', result)
 
 def parse_mth(effect):
