@@ -130,8 +130,8 @@ def parse_tags(tag_list):
         tag_type = CppEnum('tag_type', tag_type_str)
         if tag_type in result:
             raise RuntimeError(f'Duplicate tag: {tag_type_str}')
-        result.append([tag_type, int(tag_value) if tag_value else 0])
-    return CppSpan('tag_value_pair', result)
+        result.append((tag_type, int(tag_value) if tag_value else 0))
+    return CppStaticMap('tag_type', 'short', result)
 
 def parse_mth(effect):
     match = re.match(

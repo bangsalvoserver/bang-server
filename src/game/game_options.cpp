@@ -84,7 +84,7 @@ namespace banggame {
         static constexpr auto set_option_map = []<size_t ... Is>(std::index_sequence<Is ...>){
             using set_option_fn_ptr = void (*)(game_options &options, std::string_view value_str);
 
-            return utils::static_map<std::string_view, set_option_fn_ptr>({
+            return utils::make_static_map<std::string_view, set_option_fn_ptr>({
                 { reflect::member_name<Is, game_options>(), [](game_options &options, std::string_view value_str) {
                     auto &field = reflect::get<Is>(options);
                     if (auto value = utils::parse_string<std::remove_reference_t<decltype(field)>>(value_str)) {

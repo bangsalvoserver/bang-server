@@ -55,11 +55,11 @@ def parse_file(data):
 
     def gen_propic(filename):
         propic = ImagePixels(filename, propic_size)
-        return [CppObject(
+        return (CppObject(
             width = propic.width,
             height = propic.height,
             pixels = propic.pixels
-        )]
+        ),)
 
     return CppDeclaration(
         object_name='const bot_info_t bot_info',

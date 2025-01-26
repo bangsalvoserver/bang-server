@@ -96,7 +96,7 @@ namespace utils {
     template<typename T>
     static constexpr auto tagged_variant_name_index_map = []<size_t ... Is>(std::index_sequence<Is ...>) {
         const auto &names = tagged_variant_tag_names<T>::value;
-        return utils::static_map<std::string_view, size_t>({
+        return utils::make_static_map<std::string_view, size_t>({
             { names[Is], Is } ... }
         );
     }(std::make_index_sequence<tagged_variant_tag_names<T>::value.size()>());

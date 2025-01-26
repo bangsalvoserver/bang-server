@@ -19,6 +19,23 @@ class CppSpan:
         self.type_name = type_name
         self.value = value
 
+    def __eq__(self, value):
+        return isinstance(value, CppSpan) \
+            and self.type_name == value.type_name \
+            and self.value == value.value
+
+class CppStaticMap:
+    def __init__(self, key_type, value_type, value):
+        self.key_type = key_type
+        self.value_type = value_type
+        self.value = value
+    
+    def __eq__(self, value):
+        return isinstance(value, CppStaticMap) \
+            and self.key_type == value.key_type \
+            and self.value_type == value.value_type \
+            and self.value == value.value
+
 class CppEnum:
     def __init__(self, enum_name, value):
         self.enum_name = enum_name
@@ -74,12 +91,31 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
         elif isinstance(object_value, CppSpan):
             if not object_value.value: return []
             return CppLiteral(get_extra_declaration_name(traverse_declaration(object_value.value), object_value.type_name))
+        elif isinstance(object_value, CppStaticMap):
+            return CppLiteral(get_extra_declaration_name(CppStaticMap(
+                key_type=object_value.key_type,
+                value_type=object_value.value_type,
+                value=traverse_declaration(object_value.value)
+            ), object_type=(object_value.key_type, object_value.value_type)))
         elif isinstance(object_value, list):
             return [traverse_declaration(value) for value in object_value]
+        elif isinstance(object_value, tuple):
+            return tuple(traverse_declaration(value) for value in object_value)
         elif isinstance(object_value, bytes):
             return CppLiteral(get_extra_declaration_name(object_value, 'uint8_t'))
         else:
             return object_value
+    
+    def gen_extra_declaration(name, type_name, value):
+        if isinstance(value, CppStaticMap):
+            return CppDeclaration(
+                object_name=f"static const auto {name}",
+                object_value=value
+            )
+        return CppDeclaration(
+            object_name=f"static const {type_name} {name}[]",
+            object_value=value
+        )
 
     def object_to_string(object_value, indent = 0):
         if isinstance(object_value, CppDeclaration):
@@ -93,6 +129,14 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
         elif isinstance(object_value, list):
             if not object_value: return '{}'
             return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(value, indent + 1)}" for value in object_value if value is not None) + '\n' + (SPACE * indent) + '}'
+        elif isinstance(object_value, tuple):
+            if not object_value: return '{}'
+            return '{ ' + ', '.join(f"{object_to_string(value, indent)}" for value in object_value) + ' }'
+        elif isinstance(object_value, CppStaticMap):
+            if not object_value: return '{}'
+            return f'{{utils::make_static_map<{object_value.key_type}, {object_value.value_type}>({{\n' + \
+                ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(value, indent + 1)}" for value in object_value.value if value is not None) + \
+                '\n' + (SPACE * indent) + '})}'
         elif isinstance(object_value, str):
             return f'{{\"{object_value}\"sv}}'
         elif isinstance(object_value, bool):
@@ -111,10 +155,7 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
 
     return "\n".join(
         object_to_string(decl, indent)
-        for decl in [*[CppDeclaration(
-            object_name=f"static const {type_name} {name}[]",
-            object_value=value
-        ) for name, type_name, value in extra_declarations], transformed]
+        for decl in [*(gen_extra_declaration(*tup) for tup in extra_declarations), transformed]
     )
 
 def as_list(value):

@@ -42,12 +42,14 @@ namespace banggame {
         }
 
         bool has_tag(tag_type tag) const {
-            return rn::contains(tags, tag, &tag_value_pair::first);
+            return tags.find(tag) != tags.end();
         }
 
         std::optional<short> get_tag_value(tag_type tag) const {
-            auto it = rn::find(tags, tag, &tag_value_pair::first);
-            if (it != tags.end()) return it->second;
+            auto it = tags.find(tag);
+            if (it != tags.end()) {
+                return it->second;
+            }
             return std::nullopt;
         }
 

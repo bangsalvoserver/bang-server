@@ -57,7 +57,7 @@ namespace enums {
     template<enumeral T>
     static constexpr auto names_to_values_map = []<size_t ... Is>(std::index_sequence<Is ...>) {
         constexpr auto &values = enum_values<T>();
-        return utils::static_map<std::string_view, T>({
+        return utils::make_static_map<std::string_view, T>({
             { to_string(values[Is]), values[Is] } ...
         });
     }(std::make_index_sequence<enum_values<T>().size()>());
