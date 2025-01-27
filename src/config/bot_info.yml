@@ -20,7 +20,7 @@ bots:
     - pocket(pocket_type::player_character)
     - pocket(pocket_type::shop_selection)
     - pocket(pocket_type::train)
-    - tag_value_not(tag_type::pass_turn, 0)
+    - tag_value_not(tag_type::pass_turn)
   
   names:
   - Salvo

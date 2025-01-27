@@ -85,7 +85,7 @@ def parse_effects(effect_list):
             target_value =     int(target_value) if target_value else None,
             type =             CppLiteral(f'GET_EFFECT({effect_type})')
         ))
-    return CppSpan('effect_holder', result)
+    return CppStatic('effect_holder', result)
 
 def parse_equips(equip_list):
     if not isinstance(equip_list, list):
@@ -108,7 +108,7 @@ def parse_equips(equip_list):
             effect_value = int(effect_value) if effect_value else None,
             type = CppLiteral(f'GET_EQUIP({effect_type})')
         ))
-    return CppSpan('equip_holder', result)
+    return CppStatic('equip_holder', result)
 
 def parse_tags(tag_list):
     if not isinstance(tag_list, list):
@@ -149,7 +149,7 @@ def parse_mth(effect):
     )
 
 def parse_expansions(expansions, fn = list):
-    return CppSpan('ruleset_ptr', fn(CppLiteral(f"GET_RULESET({expansion})") for expansion in expansions ))
+    return CppStatic('ruleset_ptr', fn(CppLiteral(f"GET_RULESET({expansion})") for expansion in expansions ))
 
 def parse_all_effects(card):
     try:
@@ -235,7 +235,7 @@ def parse_file(data):
             if 'deck' not in card:
                 card['deck'] = deck.deck or key
             return card
-        return deck.key or key, CppSpan('card_data', list(parse_all_effects(card) for c in cards for card in deck.strategy(add_deck(c))))
+        return deck.key or key, CppStatic('card_data', list(parse_all_effects(card) for c in cards for card in deck.strategy(add_deck(c))))
 
     return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
 

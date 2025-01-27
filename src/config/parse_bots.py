@@ -38,16 +38,16 @@ def parse_bot_rule(value):
     rule_name = match.group(1)
     rule_args = match.group(2)
     if rule_args:
-        return CppLiteral(f'BUILD_BOT_RULE({rule_name}, {rule_args})')
+        return CppStatic('auto', CppLiteral(f'BUILD_BOT_RULE({rule_name}, {rule_args})'))
     else:
-        return CppLiteral(f'BUILD_BOT_RULE({rule_name})')
+        return CppStatic('auto', CppLiteral(f'BUILD_BOT_RULE({rule_name})'))
 
 def parse_settings(settings):
     return CppObject(
         max_random_tries = settings['max_random_tries'],
         bypass_prompt_after = settings['bypass_prompt_after'],
-        response_rules = CppSpan('bot_rule', [parse_bot_rule(value) for value in settings['response_rules']]),
-        in_play_rules = CppSpan('bot_rule', [parse_bot_rule(value) for value in settings['in_play_rules']])
+        response_rules = CppStatic('bot_rule', [parse_bot_rule(value) for value in settings['response_rules']]),
+        in_play_rules = CppStatic('bot_rule', [parse_bot_rule(value) for value in settings['in_play_rules']])
     )
 
 def parse_file(data):
@@ -65,8 +65,8 @@ def parse_file(data):
         object_name='const bot_info_t bot_info',
         object_value=CppObject(
             propic_size = propic_size,
-            names = CppSpan('std::string_view', data['names']),
-            propics = CppSpan('image_registry::registered_image', [
+            names = CppStatic('std::string_view', data['names']),
+            propics = CppStatic('image_registry::registered_image', [
                 gen_propic(filename) for filename in data['propics']
             ]),
             settings = parse_settings(data['settings'])

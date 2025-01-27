@@ -14,13 +14,13 @@ class CppObject:
         return isinstance(value, CppObject) \
             and self.value == value.value
 
-class CppSpan:
+class CppStatic:
     def __init__(self, type_name, value):
         self.type_name = type_name
         self.value = value
 
     def __eq__(self, value):
-        return isinstance(value, CppSpan) \
+        return isinstance(value, CppStatic) \
             and self.type_name == value.type_name \
             and self.value == value.value
 
@@ -95,7 +95,7 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
                 return CppObject(**{
                     key: traverse_declaration(value) for key, value in object_value.value.items()
                 })
-            case CppSpan():
+            case CppStatic():
                 if not object_value.value: return []
                 return CppLiteral(get_extra_declaration_name(traverse_declaration(object_value.value), object_value.type_name))
             case CppStaticMap():
@@ -120,9 +120,14 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
                     object_name=f"static const auto {name}",
                     object_value=value
                 )
-            case _:
+            case list() | set() | bytes():
                 return CppDeclaration(
                     object_name=f"static const {type_name} {name}[]",
+                    object_value=value
+                )
+            case _:
+                return CppDeclaration(
+                    object_name=f"static const {type_name} {name}",
                     object_value=value
                 )
 
