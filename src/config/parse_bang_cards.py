@@ -145,8 +145,11 @@ def parse_mth(effect):
     effect_value = match.group(2)
     return CppObject(
         type = CppLiteral(f'GET_MTH({effect_type})'),
-        args = [int(value.strip()) for value in effect_value.split(',')]
+        args = tuple(int(value.strip()) for value in effect_value.split(','))
     )
+
+def parse_expansions(expansions, fn = list):
+    return CppSpan('ruleset_ptr', fn(CppLiteral(f"GET_RULESET({expansion})") for expansion in expansions ))
 
 def parse_all_effects(card):
     try:
@@ -157,7 +160,7 @@ def parse_all_effects(card):
             responses =    parse_effects(card['responses']) if 'responses' in card else None,
             equips =       parse_equips(card['equip']) if 'equip' in card else None,
             tags =         parse_tags(card['tags']) if 'tags' in card else None,
-            expansion =    CppSpan('ruleset_ptr', [CppLiteral(f"GET_RULESET({f})") for f in card['expansion'].split()]) if 'expansion' in card else None,
+            expansion =    parse_expansions(card['expansion'].split(), set) if 'expansion' in card else None,
             deck =         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
             modifier =     CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier']})")) if 'modifier' in card else None,
             modifier_response = CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier_response']})")) if 'modifier_response' in card else None,
@@ -236,11 +239,6 @@ def parse_file(data):
 
     return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
 
-def parse_expansions(expansions):
-    return { 'expansions': CppSpan('ruleset_ptr', [
-        CppLiteral(f"GET_RULESET({expansion})") for expansion in expansions
-    ]) }
-
 INCLUDE_FILENAMES = ['cards/vtable_build.h', 'cards/filter_enums.h', 'effects/effects.h']
 
 if __name__ == '__main__':
@@ -254,7 +252,7 @@ if __name__ == '__main__':
             object_name='const all_cards_t all_cards',
             object_value=CppObject(
                 **parse_file(data),
-                **parse_expansions(expansions)
+                expansions = parse_expansions(expansions)
             ),
             namespace_name='banggame'
         )

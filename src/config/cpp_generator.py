@@ -50,7 +50,7 @@ class CppEnum:
             and self.value == value.value
     
     def __hash__(self):
-        return hash(str(self))
+        return hash((self.enum_name, self.value))
 
 class CppLiteral:
     def __init__(self, value):
@@ -62,6 +62,9 @@ class CppLiteral:
     def __eq__(self, value):
         return isinstance(value, CppLiteral) \
             and self.value == value.value
+    
+    def __hash__(self):
+        return hash(self.value)
 
 SPACE = '  '
 
@@ -101,7 +104,7 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
                     value_type=object_value.value_type,
                     value=traverse_declaration(object_value.value)
                 ), object_type=(object_value.key_type, object_value.value_type)))
-            case list():
+            case list() | set():
                 return [traverse_declaration(value) for value in object_value]
             case tuple():
                 return tuple(traverse_declaration(value) for value in object_value)
@@ -133,7 +136,7 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
             case dict():
                 if not object_value: return '{}'
                 return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{{{object_to_string(key)}, {object_to_string(value)}}}" for key, value in object_value.items()) + '\n' + (SPACE * indent) + '}'
-            case list():
+            case list() | set():
                 if not object_value: return '{}'
                 return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(value, indent + 1)}" for value in object_value if value is not None) + '\n' + (SPACE * indent) + '}'
             case tuple():
