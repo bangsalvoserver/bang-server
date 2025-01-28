@@ -14,6 +14,7 @@ namespace banggame {
     struct bot_settings {
         int max_random_tries;
         int bypass_prompt_after;
+        int repeat_card_nodes;
         std::span<const bot_rule> response_rules;
         std::span<const bot_rule> in_play_rules;
     };

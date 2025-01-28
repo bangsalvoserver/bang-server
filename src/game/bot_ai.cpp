@@ -37,8 +37,10 @@ namespace banggame {
 
         return ret;
     }
+
+    using node_set_t = std::multiset<card_node>;
     
-    static card_node get_selected_node(player_ptr origin, bool is_response, const std::set<card_node> &node_set) {
+    static card_node get_selected_node(player_ptr origin, bool is_response, const node_set_t &node_set) {
         auto &rules = is_response ? bot_info.settings.response_rules : bot_info.settings.in_play_rules;
         for (const bot_rule &rule : rules) {
             if (auto filter = rv::filter(node_set, std::ref(rule))) {
@@ -50,7 +52,12 @@ namespace banggame {
 
     static request_state execute_random_play(player_ptr origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
-            std::set<card_node> node_set = play_cards | rv::addressof | rn::to<std::set>;
+            auto node_set = play_cards
+                | rv::for_each([&](const playable_card_info &info) {
+                    return rv::repeat_n(&info, bot_info.settings.repeat_card_nodes);
+                })
+                | rn::to<node_set_t>;
+            
             if (timer_id) {
                 node_set.insert(nullptr);
             }
