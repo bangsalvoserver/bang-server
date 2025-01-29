@@ -43,7 +43,7 @@ namespace banggame {
     static card_node get_selected_node(player_ptr origin, bool is_response, const node_set_t &node_set) {
         auto &rules = is_response ? bot_info.settings.response_rules : bot_info.settings.in_play_rules;
         for (const bot_rule &rule : rules) {
-            if (auto filter = rv::filter(node_set, std::ref(rule))) {
+            if (auto filter = rv::filter(node_set, rule)) {
                 return random_element(filter, origin->m_game->bot_rng);
             }
         }
