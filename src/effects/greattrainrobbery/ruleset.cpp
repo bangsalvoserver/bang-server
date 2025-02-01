@@ -14,12 +14,16 @@
 namespace banggame {
 
     static void init_stations_and_train(player_ptr origin) {
+        origin->m_game->remove_cards(origin->m_game->m_stations);
         origin->m_game->add_cards_to(origin->m_game->m_stations_deck
             | rv::sample(std::max(int(origin->m_game->m_players.size()), 4), origin->m_game->rng)
             | rn::to_vector, pocket_type::stations, nullptr, card_visibility::shown);
 
+        auto old_locomotive = origin->m_game->m_train;
+        origin->m_game->remove_cards(old_locomotive);
+
         origin->m_game->add_cards_to(origin->m_game->m_locomotive
-            | rv::filter([](card_ptr c) { return c->pocket != pocket_type::train; })
+            | rv::filter([&](card_ptr c) { return !rn::contains(old_locomotive, c); })
             | rv::sample(1, origin->m_game->rng)
             | rn::to_vector, pocket_type::train, nullptr, card_visibility::shown);
 
@@ -51,9 +55,6 @@ namespace banggame {
             target_card->set_visibility(card_visibility::hidden);
             origin->disable_equip(target_card);
         }
-
-        origin->m_game->remove_cards(origin->m_game->m_train);
-        origin->m_game->remove_cards(origin->m_game->m_stations);
         
         init_stations_and_train(origin);
     }
