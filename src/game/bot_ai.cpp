@@ -70,11 +70,9 @@ namespace banggame {
                     return utils::tag<"done">{};
                 }
 
-                // maybe add random variation?
-                bool bypass_prompt = node_set.empty() && i >= bot_info.settings.bypass_prompt_after;
                 try {
                     auto args = generate_random_play(origin, *selected_node, is_response);
-                    args.bypass_prompt = bypass_prompt;
+                    args.bypass_prompt = i >= bot_info.settings.bypass_prompt_after;
                     args.timer_id = timer_id;
 
                     auto result = verify_and_play(origin, args);
