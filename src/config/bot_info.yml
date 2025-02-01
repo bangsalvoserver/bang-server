@@ -2,8 +2,8 @@ bots:
   propic_size: 512
   
   settings:
-    max_random_tries: 3
-    bypass_prompt_after: 2
+    max_random_tries: 6
+    bypass_prompt_after: 4
     repeat_card_nodes: 5
     
     response_rules:
