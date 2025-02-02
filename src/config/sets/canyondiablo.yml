@@ -217,7 +217,7 @@ main_deck:
     image: 20_attaccabrighe
     color: green
     effects:
-      - steal card range_1
+      - steal card range_1 | not_self_hand
     tags:
       - skip_logs
   - name: SHYLOCK

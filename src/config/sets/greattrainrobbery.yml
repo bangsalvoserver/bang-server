@@ -402,7 +402,7 @@ hidden:
     image: main_deck/01_panico
     effects:
       - card_choice
-      - steal card range_1
+      - steal card range_1 | not_self_hand
     tags:
       - card_choice(3)
   - name: BAGGAGE_CAR_CAT_BALOU

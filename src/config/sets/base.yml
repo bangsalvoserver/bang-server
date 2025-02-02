@@ -259,7 +259,7 @@ main_deck:
     image: 01_panico
     color: brown
     effects:
-      - steal card range_1
+      - steal card range_1 | not_self_hand
     tags:
       - skip_logs
       - catbalou_panic

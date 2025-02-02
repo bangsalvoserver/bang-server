@@ -203,10 +203,10 @@ hidden:
     deck: goldrush
     effects:
       - card_choice
-      - steal card range_1
+      - steal card range_1 | not_self_hand
     responses:
       - card_choice
-      - steal card range_1
+      - steal card range_1 | not_self_hand
     tags:
       - card_choice(1)
   - name: BOTTLE_BEER
