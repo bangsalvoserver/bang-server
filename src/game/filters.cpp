@@ -175,6 +175,9 @@ namespace banggame {
 
         if (filter.check(target_card_filter::hand) && target->pocket != pocket_type::player_hand)
             return "ERROR_TARGET_NOT_HAND_CARD";
+        
+        if (filter.check(target_card_filter::not_self_hand) && target->pocket == pocket_type::player_hand && target->owner == origin)
+            return "ERROR_TARGET_SELF_HAND";
 
         return {};
     }

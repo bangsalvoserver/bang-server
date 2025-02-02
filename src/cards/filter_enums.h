@@ -27,6 +27,7 @@ namespace banggame {
         selection,
         table,
         hand,
+        not_self_hand,
         blue,
         black,
         train,
