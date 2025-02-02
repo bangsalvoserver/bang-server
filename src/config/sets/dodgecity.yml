@@ -82,7 +82,7 @@ main_deck:
     effects:
       - discard extra_card self | hand
       - discard
-      - steal card
+      - steal random_if_hand_card
     tags:
       - skip_logs
       - no_auto_discard
@@ -163,7 +163,7 @@ main_deck:
     image: 03_can_can
     color: green
     effects:
-      - destroy card
+      - destroy random_if_hand_card
     tags:
       - skip_logs
   - name: TEN_GALLON_HAT
@@ -179,7 +179,7 @@ main_deck:
     image: 03_conestoga
     color: green
     effects:
-      - steal card
+      - steal random_if_hand_card
     tags:
       - skip_logs
   - name: DERRINGER

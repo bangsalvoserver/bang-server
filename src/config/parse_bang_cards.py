@@ -27,6 +27,7 @@ def check_allowed_filters(effect, target_type, player_filter, card_filter):
         'adjacent_players': PLAYER,
         'player_per_cube': PLAYER,
         'card': CARD,
+        'random_if_hand_card': CARD,
         'extra_card': CARD,
         'players': PLAYER,
         'cards': CARD,

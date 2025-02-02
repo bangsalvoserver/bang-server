@@ -172,7 +172,7 @@ main_deck:
     image: 01_catbalou
     color: brown
     effects:
-      - destroy card
+      - destroy random_if_hand_card
     tags:
       - skip_logs
       - catbalou_panic
@@ -259,7 +259,7 @@ main_deck:
     image: 01_panico
     color: brown
     effects:
-      - steal card range_1
+      - steal random_if_hand_card range_1
     tags:
       - skip_logs
       - catbalou_panic
@@ -316,7 +316,7 @@ character:
     responses:
       - add_draw_card
       - no_cards_drawn
-      - steal card notself | hand
+      - steal random_if_hand_card notself | hand
     tags:
       - drawing
   - name: JOURDONNAIS

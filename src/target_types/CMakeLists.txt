@@ -5,6 +5,7 @@ PRIVATE
     cards.cpp
     conditional_player.cpp
     adjacent_players.cpp
+    random_if_hand_card.cpp
     extra_card.cpp
     max_cards.cpp
     move_cube_slot.cpp

@@ -216,7 +216,7 @@ main_deck:
     color: orange
     effects:
       - none self_cubes(3)
-      - steal card notself | hand
+      - steal random_if_hand_card notself | hand
     tags:
       - skip_logs
   - name: THUNDERER

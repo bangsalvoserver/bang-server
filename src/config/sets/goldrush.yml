@@ -203,10 +203,10 @@ hidden:
     deck: goldrush
     effects:
       - card_choice
-      - steal card range_1
+      - steal random_if_hand_card range_1
     responses:
       - card_choice
-      - steal card range_1
+      - steal random_if_hand_card range_1
     tags:
       - card_choice(1)
   - name: BOTTLE_BEER
@@ -265,9 +265,9 @@ hidden:
     deck: goldrush
     effects:
       - card_choice
-      - destroy card
+      - destroy random_if_hand_card
     responses:
       - card_choice
-      - destroy card
+      - destroy random_if_hand_card
     tags:
       - card_choice(2)

@@ -331,7 +331,7 @@ train:
     color: train
     effects:
       - discard
-      - steal card notself
+      - steal random_if_hand_card notself
   - name: PRISONER_CAR
     image: 27_prisoner_car
     color: train
@@ -402,14 +402,14 @@ hidden:
     image: main_deck/01_panico
     effects:
       - card_choice
-      - steal card range_1
+      - steal random_if_hand_card range_1
     tags:
       - card_choice(3)
   - name: BAGGAGE_CAR_CAT_BALOU
     image: main_deck/01_catbalou
     effects:
       - card_choice
-      - destroy card
+      - destroy random_if_hand_card
     tags:
       - card_choice(3)
   - name: BAGGAGE_CAR_BANG

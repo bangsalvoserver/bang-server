@@ -110,6 +110,7 @@ namespace banggame {
         utils::tag<"conditional_player", nullable_player>,
         utils::tag<"adjacent_players", player_list>,
         utils::tag<"player_per_cube", cubes_and_players>,
+        utils::tag<"random_if_hand_card", card_ptr>,
         utils::tag<"card", card_ptr>,
         utils::tag<"extra_card", nullable_card>,
         utils::tag<"players">,

@@ -30,6 +30,14 @@ namespace banggame {
                 if (result) return true;
             }
             return false;
+        } else if (effect.target == TARGET_TYPE(random_if_hand_card)) {
+            for (card_ptr target : get_all_card_targets(origin, origin_card, effect, ctx)) {
+                targets.emplace_back(utils::tag<"random_if_hand_card">{}, target);
+                bool result = is_possible_mth(origin, origin_card, mth, effects, ctx, targets);
+                targets.pop_back();
+                if (result) return true;
+            }
+            return false;
         } else {
             // ignore other target types
             return true;

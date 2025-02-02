@@ -80,7 +80,7 @@ legends:
     effects:
       - max_usages(1)
       - discard card self | blue
-      - steal card range_1
+      - steal random_if_hand_card range_1
   - name: SID_KETCHUM
     image: 23_sid_ketchum
     equip:
