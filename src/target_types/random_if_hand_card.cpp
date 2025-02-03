@@ -11,6 +11,10 @@ namespace banggame {
         return defer<"card">().possible(ctx);
     }
 
+    template<> bool visit_card::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return defer<"card">().any_of_possible_targets(ctx, fn);
+    }
+
     template<> card_ptr visit_card::random_target(const effect_context &ctx) {
         return defer<"card">().random_target(ctx);
     }

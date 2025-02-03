@@ -10,6 +10,10 @@ namespace banggame {
         return true;
     }
 
+    template<> bool visit_cards::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return true;
+    }
+
     static auto cards_target_set(const_player_ptr origin, const_card_ptr origin_card, enums::bitset<target_card_filter> filter, player_ptr target, const effect_context &ctx) {
         return rv::concat(target->m_table, target->m_hand)
             | rv::filter([=, &ctx](const_card_ptr target_card) {

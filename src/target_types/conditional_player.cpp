@@ -8,6 +8,10 @@ namespace banggame {
         return true;
     }
 
+    template<> bool visit_player::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return true;
+    }
+
     template<> nullable_player visit_player::random_target(const effect_context &ctx) {
         auto targets = get_all_player_targets(origin, origin_card, effect, ctx);
         if (targets.empty()) {

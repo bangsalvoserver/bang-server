@@ -10,6 +10,10 @@ namespace banggame {
         return ctx.repeat_card || bool(get_all_card_targets(origin, origin_card, effect, ctx));
     }
 
+    template<> bool visit_card::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return true;
+    }
+
     template<> nullable_card visit_card::random_target(const effect_context &ctx) {
         if (ctx.repeat_card) {
             return nullptr;

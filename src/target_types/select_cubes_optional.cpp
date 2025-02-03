@@ -8,6 +8,10 @@ namespace banggame {
         return true;
     }
 
+    template<> bool visit_cubes::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return true;
+    }
+
     template<> card_list visit_cubes::random_target(const effect_context &ctx) {
         auto deferred = defer<"select_cubes">();
         if (deferred.possible(ctx)) {

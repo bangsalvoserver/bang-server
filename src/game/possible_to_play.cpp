@@ -13,35 +13,12 @@ namespace banggame {
         if (index >= effects.size()) {
             throw game_error("invalid access to mth: out of bounds");
         }
-        const auto &effect = effects[index];
-        if (effect.target == TARGET_TYPE(player)) {
-            for (player_ptr target : get_all_player_targets(origin, origin_card, effect, ctx)) {
-                targets.emplace_back(utils::tag<"player">{}, target);
-                bool result = is_possible_mth(origin, origin_card, mth, effects, ctx, targets);
-                targets.pop_back();
-                if (result) return true;
-            }
-            return false;
-        } else if (effect.target == TARGET_TYPE(card)) {
-            for (card_ptr target : get_all_card_targets(origin, origin_card, effect, ctx)) {
-                targets.emplace_back(utils::tag<"card">{}, target);
-                bool result = is_possible_mth(origin, origin_card, mth, effects, ctx, targets);
-                targets.pop_back();
-                if (result) return true;
-            }
-            return false;
-        } else if (effect.target == TARGET_TYPE(random_if_hand_card)) {
-            for (card_ptr target : get_all_card_targets(origin, origin_card, effect, ctx)) {
-                targets.emplace_back(utils::tag<"random_if_hand_card">{}, target);
-                bool result = is_possible_mth(origin, origin_card, mth, effects, ctx, targets);
-                targets.pop_back();
-                if (result) return true;
-            }
-            return false;
-        } else {
-            // ignore other target types
-            return true;
-        }
+        return play_dispatch::any_of_possible_targets(origin, origin_card, effects[index], ctx, [&](const play_card_target &target) {
+            targets.emplace_back(target);
+            bool result = is_possible_mth(origin, origin_card, mth, effects, ctx, targets);
+            targets.pop_back();
+            return result;
+        });
     }
 
     static auto map_cards_playable_with_modifiers(

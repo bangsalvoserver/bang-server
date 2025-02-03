@@ -11,6 +11,10 @@ namespace banggame {
         return bool(get_all_card_targets(origin, origin_card, effect, ctx));
     }
 
+    template<> bool visit_card::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return rn::any_of(get_all_card_targets(origin, origin_card, effect, ctx), fn);
+    }
+
     template<> card_ptr visit_card::random_target(const effect_context &ctx) {
         return random_element(get_all_card_targets(origin, origin_card, effect, ctx), origin->m_game->bot_rng);
     }

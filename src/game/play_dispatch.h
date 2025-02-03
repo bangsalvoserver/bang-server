@@ -2,10 +2,14 @@
 #define __PLAY_DISPATCH_H__
 
 #include "cards/card_defs.h"
+#include "utils/function_ref.h"
 
 namespace banggame::play_dispatch {
 
     bool possible(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx);
+
+    using play_card_target_predicate = std23::function_ref<bool(const play_card_target &) const>;
+    bool any_of_possible_targets(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target_predicate &fn);
 
     play_card_target random_target(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx);
 
@@ -49,6 +53,7 @@ namespace banggame {
     struct play_visitor_t<Tag> {
         using value_type = target_type_value<Tag>;
         using arg_type = std::conditional_t<std::is_trivially_copyable_v<value_type>, value_type, const value_type &>;
+        using arg_type_predicate = std23::function_ref<bool(arg_type) const>;
 
         player_ptr origin;
         card_ptr origin_card;
@@ -60,6 +65,7 @@ namespace banggame {
         }
 
         bool possible(const effect_context &ctx);
+        bool any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn);
         value_type random_target(const effect_context &ctx);
         game_string get_error(const effect_context &ctx, arg_type arg);
         prompt_string prompt(const effect_context &ctx, arg_type arg);

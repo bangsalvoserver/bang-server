@@ -10,6 +10,10 @@ namespace banggame {
         return contains_at_least(get_all_player_targets(origin, origin_card, effect, ctx), effect.target_value);
     }
 
+    template<> bool visit_cubes::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return true;
+    }
+
     template<> cubes_and_players visit_cubes::random_target(const effect_context &ctx) {
         auto cubes = origin->cube_slots()
             | rv::for_each([](card_ptr slot) {

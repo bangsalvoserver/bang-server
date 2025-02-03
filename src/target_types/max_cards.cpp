@@ -8,6 +8,10 @@ namespace banggame {
         return bool(get_all_card_targets(origin, origin_card, effect, ctx));
     }
 
+    template<> bool visit_cards::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return true;
+    }
+
     template<> card_list visit_cards::random_target(const effect_context &ctx) {
         auto targets = get_all_card_targets(origin, origin_card, effect, ctx);
         size_t count = effect.target_value;

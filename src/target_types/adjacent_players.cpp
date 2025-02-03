@@ -22,6 +22,10 @@ namespace banggame {
         return bool(make_adjacent_players_target_set(origin, origin_card, effect, ctx));
     }
 
+    template<> bool visit_players::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return true;
+    }
+
     template<> player_list visit_players::random_target(const effect_context &ctx) {
         auto targets = make_adjacent_players_target_set(origin, origin_card, effect, ctx);
         auto [target1, target2] = random_element(targets, origin->m_game->bot_rng);
