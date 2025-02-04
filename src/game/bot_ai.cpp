@@ -64,7 +64,7 @@ namespace banggame {
             
             while (!node_set.empty()) {
                 auto selected_node = get_selected_node(origin, is_response, node_set);
-                node_set.erase(selected_node);
+                node_set.erase(node_set.find(selected_node));
 
                 if (!selected_node) {
                     return utils::tag<"done">{};
