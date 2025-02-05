@@ -287,17 +287,14 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
         }
         send_message<"game_started">(session->client);
 
-        for (const auto &msg : lobby.m_game->get_spectator_join_updates()) {
-            send_message<"game_update">(session->client, msg);
-        }
+        auto fun = [&](json::json &&message) {
+            send_message<"game_update">(session->client, std::move(message));
+        };
+        lobby.m_game->send_spectator_join_updates(fun);
         if (target) {
-            for (const auto &msg : lobby.m_game->get_rejoin_updates(target)) {
-                send_message<"game_update">(session->client, msg);
-            }
+            lobby.m_game->send_rejoin_updates(target, fun);
         }
-        for (const auto &msg : lobby.m_game->get_game_log_updates(target)) {
-            send_message<"game_update">(session->client, msg);
-        }
+        lobby.m_game->send_game_log_updates(target, fun);
     }
 
     broadcast_message_no_lobby<"lobby_update">(lobby);
@@ -623,12 +620,11 @@ void game_manager::handle_message(utils::tag<"game_rejoin">, session_ptr session
 
     lobby.m_game->add_update<"player_add">(target);
     
-    for (const auto &msg : lobby.m_game->get_rejoin_updates(target)) {
-        send_message<"game_update">(session->client, msg);
-    }
-    for (const auto &msg : lobby.m_game->get_game_log_updates(target)) {
-        send_message<"game_update">(session->client, msg);
-    }
+    auto fun = [&](json::json &&message) {
+        send_message<"game_update">(session->client, std::move(message));
+    };
+    lobby.m_game->send_rejoin_updates(target, fun);
+    lobby.m_game->send_game_log_updates(target, fun);
 
     broadcast_message_no_lobby<"lobby_update">(lobby);
 }

@@ -109,130 +109,130 @@ namespace banggame {
         return std::chrono::duration_cast<ticks>(transform_duration(result));
     }
 
-    std::generator<json::json> game::get_spectator_join_updates() {
-        co_yield make_update<"player_add">(m_players);
+    void game::send_spectator_join_updates(const send_update_function &send_update) {
+        send_update(make_update<"player_add">(m_players));
 
         for (player_ptr p : m_players) {
-            co_yield make_update<"player_flags">(p, p->m_player_flags);
+            send_update(make_update<"player_flags">(p, p->m_player_flags));
         }
 
-        co_yield make_update<"player_order">(m_players, 0ms);
+        send_update(make_update<"player_order">(m_players, 0ms));
 
-        auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) -> std::generator<json::json> {
+        auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) {
             auto &range = get_pocket(pocket, owner);
             if (!range.empty()) {
-                co_yield make_update<"add_cards">(range, pocket, owner);
+                send_update(make_update<"add_cards">(range, pocket, owner));
             }
             for (card_ptr c : range) {
                 if (c->visibility == card_visibility::shown) {
-                    co_yield make_update<"show_card">(c, *c, 0ms);
+                    send_update(make_update<"show_card">(c, *c, 0ms));
                 }
                 for (const auto &[token, count] : c->tokens) {
                     if (count > 0) {
-                        co_yield make_update<"add_tokens">(token, count, c);
+                        send_update(make_update<"add_tokens">(token, count, c));
                     }
                 }
                 if (c->inactive) {
-                    co_yield make_update<"tap_card">(c, true, 0ms);
+                    send_update(make_update<"tap_card">(c, true, 0ms));
                 }
             }
         };
 
-        co_yield std::ranges::elements_of(add_cards(pocket_type::button_row));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::main_deck));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::shop_deck));
+        add_cards(pocket_type::button_row);
+        add_cards(pocket_type::main_deck);
+        add_cards(pocket_type::shop_deck);
 
-        co_yield std::ranges::elements_of(add_cards(pocket_type::discard_pile));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::selection));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::shop_selection));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::hidden_deck));
+        add_cards(pocket_type::discard_pile);
+        add_cards(pocket_type::selection);
+        add_cards(pocket_type::shop_selection);
+        add_cards(pocket_type::hidden_deck);
 
         if (train_position != 0) {
-            co_yield make_update<"move_train">(train_position, 0ms);
+            send_update(make_update<"move_train">(train_position, 0ms));
         }
 
-        co_yield std::ranges::elements_of(add_cards(pocket_type::stations));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::train_deck));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::train));
+        add_cards(pocket_type::stations);
+        add_cards(pocket_type::train_deck);
+        add_cards(pocket_type::train);
 
-        co_yield std::ranges::elements_of(add_cards(pocket_type::scenario_deck));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::scenario_card));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::wws_scenario_deck));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::wws_scenario_card));
+        add_cards(pocket_type::scenario_deck);
+        add_cards(pocket_type::scenario_card);
+        add_cards(pocket_type::wws_scenario_deck);
+        add_cards(pocket_type::wws_scenario_card);
 
-        co_yield std::ranges::elements_of(add_cards(pocket_type::feats_deck));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::feats_discard));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::feats));
+        add_cards(pocket_type::feats_deck);
+        add_cards(pocket_type::feats_discard);
+        add_cards(pocket_type::feats);
         
         for (const auto &[token, count] : tokens) {
             if (count > 0) {
-                co_yield make_update<"add_tokens">(token, count);
+                send_update(make_update<"add_tokens">(token, count));
             }
         }
 
         for (player_ptr p : m_players) {
             if (p->check_player_flags(player_flag::role_revealed)) {
-                co_yield make_update<"player_show_role">(p, p->m_role, 0ms);
+                send_update(make_update<"player_show_role">(p, p->m_role, 0ms));
             }
 
             if (!p->check_player_flags(player_flag::removed)) {
-                co_yield std::ranges::elements_of(add_cards(pocket_type::player_character, p));
+                add_cards(pocket_type::player_character, p);
 
-                co_yield std::ranges::elements_of(add_cards(pocket_type::player_table, p));
-                co_yield std::ranges::elements_of(add_cards(pocket_type::player_hand, p));
+                add_cards(pocket_type::player_table, p);
+                add_cards(pocket_type::player_hand, p);
 
-                co_yield make_update<"player_hp">(p, p->m_hp, 0ms);
+                send_update(make_update<"player_hp">(p, p->m_hp, 0ms));
                 
                 if (p->m_gold != 0) {
-                    co_yield make_update<"player_gold">(p, p->m_gold);
+                    send_update(make_update<"player_gold">(p, p->m_gold));
                 }
             }
         }
 
         if (m_playing) {
-            co_yield make_update<"switch_turn">(m_playing);
+            send_update(make_update<"switch_turn">(m_playing));
         }
         if (!is_waiting()) {
             if (auto req = top_request()) {
-                co_yield make_update<"request_status">(make_request_update(*req));
+                send_update(make_update<"request_status">(make_request_update(*req)));
             }
         }
 
-        co_yield make_update<"game_flags">(m_game_flags);
+        send_update(make_update<"game_flags">(m_game_flags));
     }
 
-    std::generator<json::json> game::get_game_log_updates(player_ptr target) {
-        co_yield make_update<"clear_logs">();
+    void game::send_game_log_updates(player_ptr target, const send_update_function &send_update) {
+        send_update(make_update<"clear_logs">());
         
         for (const auto &[upd_target, log] : m_saved_log) {
             if (upd_target.matches(target)) {
-                co_yield make_update<"game_log">(log);
+                send_update(make_update<"game_log">(log));
             }
         }
     }
 
-    std::generator<json::json> game::get_rejoin_updates(player_ptr target) {
-        co_yield make_update<"player_add">(target);
+    void game::send_rejoin_updates(player_ptr target, const send_update_function &send_update) {
+        send_update(make_update<"player_add">(target));
 
         if (!target->check_player_flags(player_flag::role_revealed)) {
-            co_yield make_update<"player_show_role">(target, target->m_role, 0ms);
+            send_update(make_update<"player_show_role">(target, target->m_role, 0ms));
         }
 
         for (card_ptr c : target->m_hand) {
-            co_yield make_update<"show_card">(c, *c, 0ms);
+            send_update(make_update<"show_card">(c, *c, 0ms));
         }
 
         for (card_ptr c : m_selection) {
             if (c->owner == target) {
-                co_yield make_update<"show_card">(c, *c, 0ms);
+                send_update(make_update<"show_card">(c, *c, 0ms));
             }
         }
 
         if (!is_game_over() && !is_waiting()) {
             if (auto req = top_request()) {
-                co_yield make_update<"request_status">(make_request_update(*req, target));
+                send_update(make_update<"request_status">(make_request_update(*req, target)));
             } else if (target == m_playing) {
-                co_yield make_update<"status_ready">(make_status_ready_update(target));
+                send_update(make_update<"status_ready">(make_status_ready_update(target)));
             }
         }
     }
