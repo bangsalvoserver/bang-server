@@ -10,6 +10,12 @@
 
 #include "json_serial.h"
 
+template<size_t N> struct uint_sized;
+
+template<size_t N> requires (N <= 8) struct uint_sized<N> : std::type_identity<uint8_t> {};
+template<size_t N> requires (N > 8 && N <= 16) struct uint_sized<N> : std::type_identity<uint16_t> {};
+
+template<size_t N>
 class small_int_set_iterator {
 public:
     using iterator_category = std::bidirectional_iterator_tag;
@@ -19,11 +25,13 @@ public:
     using reference = int;
 
 private:
-    uint8_t value;
+    using referenced_value = typename uint_sized<N>::type;
+
+    referenced_value value;
     uint8_t index;
 
 public:
-    constexpr small_int_set_iterator(uint8_t value, uint8_t index)
+    constexpr small_int_set_iterator(referenced_value value, uint8_t index)
         : value{value}, index{index} {}
     
     constexpr int operator *() const {
@@ -31,8 +39,8 @@ public:
     }
 
     constexpr small_int_set_iterator &operator++() {
-        uint8_t mask = (1 << (index + 1)) - 1;
-        index = std::countr_zero<uint8_t>(value & ~mask);
+        referenced_value mask = (1 << (index + 1)) - 1;
+        index = std::countr_zero<referenced_value>(value & ~mask);
         return *this;
     }
 
@@ -43,8 +51,8 @@ public:
     }
 
     constexpr small_int_set_iterator &operator--() {
-        uint8_t mask = (1 << index) - 1;
-        index = 7 - std::countl_zero<uint8_t>(value & mask);
+        referenced_value mask = (1 << index) - 1;
+        index = 7 - std::countl_zero<referenced_value>(value & mask);
         return *this;
     }
 
@@ -61,37 +69,47 @@ struct small_int_set_sized_tag_t {};
 
 static constexpr small_int_set_sized_tag_t small_int_set_sized_tag;
 
-class small_int_set {
+template<size_t N>
+class small_int_set_sized {
 private:
-    uint8_t m_value{};
+    using value_type = typename uint_sized<N>::type;
 
-    constexpr small_int_set(uint8_t value)
+    value_type m_value{};
+
+    constexpr small_int_set_sized(value_type value)
         : m_value{value} {}
 
 public:
-    constexpr small_int_set(std::initializer_list<int> values) {
-        int prev = -1;
+    constexpr small_int_set_sized(std::initializer_list<int> values) {
         for (int value : values) {
-            if (value < 0 || value >= 8) {
-                throw std::runtime_error("invalid small_int_set, ints must be in range 0-7");
-            }
-            if (value <= prev) {
-                throw std::runtime_error("invalid small_int_set, values must be in ascending order");
-            }
-            m_value |= 1 << value;
-            prev = value;
+            set(value);
         }
     }
 
-    constexpr small_int_set(small_int_set_sized_tag_t, size_t size)
-        : m_value{static_cast<uint8_t>(size == 0 ? 0 : (1 << size) - 1)} {}
+    constexpr small_int_set_sized(small_int_set_sized_tag_t, size_t size)
+        : m_value{static_cast<value_type>(size == 0 ? 0 : (1 << size) - 1)} {}
+
+    constexpr void set(uint8_t value) {
+        if (value < 0 || value >= N) {
+            throw std::runtime_error(std::format("Values must be in range 0-{}", N - 1));
+        }
+        m_value |= 1 << value;
+    }
+
+    constexpr void clear(uint8_t value) {
+        m_value &= ~(1 << value);
+    }
+
+    constexpr bool check(uint8_t value) const {
+        return bool(m_value & (1 << value));
+    }
 
     constexpr auto begin() const {
-        return small_int_set_iterator{m_value, static_cast<uint8_t>(std::countr_zero(m_value))};
+        return small_int_set_iterator<N>{m_value, static_cast<uint8_t>(std::countr_zero(m_value))};
     }
 
     constexpr auto end() const {
-        return small_int_set_iterator{m_value, 8};
+        return small_int_set_iterator<N>{m_value, static_cast<uint8_t>(N)};
     }
 
     constexpr size_t size() const {
@@ -102,6 +120,8 @@ public:
         return *(std::next(begin(), index));
     }
 };
+
+using small_int_set = small_int_set_sized<8>;
 
 namespace json {
     template<typename Context>

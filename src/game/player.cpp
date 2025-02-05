@@ -62,7 +62,7 @@ namespace banggame {
     }
 
     void player::play_sound(std::string_view sound_id) {
-        m_game->add_update<"play_sound">(update_target::includes_private(this), std::string(sound_id));
+        m_game->add_update<"play_sound">(update_target::includes(this), std::string(sound_id));
     }
 
     int player::max_cards_end_of_turn() const {

@@ -97,7 +97,7 @@ void game_manager::tick() {
                 while (lobby.m_game->pending_updates()) {
                     auto [target, update, update_time] = lobby.m_game->get_next_update();
                     for (const game_user &user : lobby.connected_users()) {
-                        if (target.matches(user.user_id)) {
+                        if (target.matches(lobby.m_game->find_player_by_userid(user.user_id))) {
                             send_message<"game_update">(user.session->client, update);
                         }
                     }

@@ -11,28 +11,14 @@ namespace banggame {
 
     class update_target {
     private:
-        const_player_ptr m_targets[lobby_max_players];
-
-        struct {
-            bool m_inclusive:1;
-            bool m_invert_public:1;
-            int m_num_targets:6;
-        };
-
-        update_target(bool inclusive, bool invert_public, std::convertible_to<const_player_ptr> auto ... targets)
-            : m_targets{targets ...}
-            , m_inclusive{inclusive}
-            , m_invert_public{invert_public}
-            , m_num_targets{sizeof...(targets)}
-        {
-            static_assert(sizeof...(targets) <= lobby_max_players);
-        }
+        small_int_set_sized<16> m_value;
 
         update_target(bool inclusive, std::convertible_to<const_player_ptr> auto ... targets)
-            : update_target(inclusive, false, targets...) {}
-
-        auto targets() const {
-            return std::span{m_targets, m_targets + m_num_targets};
+            : m_value{targets->id ...}
+        {
+            if (inclusive) {
+                m_value.set(0);
+            }   
         }
 
     public:
@@ -44,28 +30,12 @@ namespace banggame {
             return update_target(false, targets...);
         }
 
-        static update_target includes_private(std::convertible_to<const_player_ptr> auto ... targets) {
-            return update_target(true, true, targets...);
-        }
-
-        static update_target excludes_public(std::convertible_to<const_player_ptr> auto ... targets) {
-            return update_target(false, true, targets...);
-        }
-
-        void add(player_ptr target) {
-            m_targets[m_num_targets++] = target;
+        void add(const_player_ptr target) {
+            m_value.set(target->id);
         }
 
         bool matches(const_player_ptr target) const {
-            return rn::contains(targets(), target) == m_inclusive;
-        }
-
-        bool matches(int user_id) const {
-            return rn::contains(targets(), user_id, &player::user_id) == m_inclusive;
-        }
-
-        bool is_public() const {
-            return m_invert_public != m_inclusive != (m_num_targets == 0);
+            return (target && m_value.check(target->id)) == m_value.check(0);
         }
     };
 

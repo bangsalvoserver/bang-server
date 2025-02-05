@@ -179,10 +179,10 @@ namespace banggame {
                 origin->m_game->commit_updates();
             },
             [&](utils::tag<"error">, game_string error) {
-                add_update<"game_error">(update_target::includes_private(origin), error);
+                add_update<"game_error">(update_target::includes(origin), error);
             },
             [&](utils::tag<"prompt">, prompt_string prompt) {
-                add_update<"game_prompt">(update_target::includes_private(origin), prompt.message);
+                add_update<"game_prompt">(update_target::includes(origin), prompt.message);
             }
         }, result);
     }

@@ -438,18 +438,18 @@ namespace banggame {
             m_playing->pass_turn();
             return utils::tag<"next">{};
         } else {
-            add_update<"status_ready">(update_target::includes_private(m_playing), std::move(args));
+            add_update<"status_ready">(update_target::includes(m_playing), std::move(args));
             return utils::tag<"done">{};
         }
     }
 
     void game::send_request_update() {
         auto req = top_request();
-        auto spectator_target = update_target::excludes_public();
+        auto spectator_target = update_target::excludes();
         for (player_ptr p : m_players) {
             spectator_target.add(p);
             if (!p->is_bot()) {
-                add_update<"request_status">(update_target::includes_private(p), make_request_update(*req, p));
+                add_update<"request_status">(update_target::includes(p), make_request_update(*req, p));
             }
         }
         add_update<"request_status">(std::move(spectator_target), make_request_update(*req));
