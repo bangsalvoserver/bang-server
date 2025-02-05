@@ -39,7 +39,7 @@ protected:
 private:
     template<utils::fixed_string E> requires server_message_type<E>
     void send_message(client_handle client, auto && ... args) {
-        push_message(client, make_message<E>(FWD(args) ... ));
+        m_outgoing_messages.emplace_back(client, make_message<E>(FWD(args) ... ));
     }
 
     template<utils::fixed_string E> requires server_message_type<E>
@@ -47,7 +47,7 @@ private:
         std::string message = make_message<E>(FWD(args) ... );
         for (session_ptr session : m_sessions | rv::values) {
             if (!session->lobby) {
-                push_message(session->client, message);
+                m_outgoing_messages.emplace_back(session->client, message);
             }
         }
     }
@@ -56,7 +56,7 @@ private:
     void broadcast_message_lobby(const game_lobby &lobby, auto && ... args) {
         std::string message = make_message<E>(FWD(args) ... );
         for (const game_user &user : lobby.connected_users()) {
-            push_message(user.session->client, message);
+            m_outgoing_messages.emplace_back(user.session->client, message);
         }
     }
 
@@ -105,6 +105,8 @@ private:
     user_map m_sessions;
     lobby_map m_lobbies;
     client_map m_connections;
+
+    message_list m_outgoing_messages;
 
     server_options m_options;
 

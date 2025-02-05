@@ -46,7 +46,7 @@ void game_manager::stop() {
 }
 
 void game_manager::tick() {
-    net::wsserver::tick();
+    poll();
 
     for (auto &[client, con] : m_connections) {
         std::visit(overloaded{
@@ -124,6 +124,11 @@ void game_manager::tick() {
         return false;
     })) {
         tracking::track_lobby_count(m_lobbies.size());
+    }
+
+    if (!m_outgoing_messages.empty()) {
+        push_messages(std::move(m_outgoing_messages));
+        m_outgoing_messages.clear();
     }
 }
 

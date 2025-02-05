@@ -144,7 +144,7 @@ namespace net {
         }, m_server);
     }
 
-    void wsserver::tick() {
+    void wsserver::poll() {
         while (auto elem = m_message_queue.pop()) {
             const auto &[client, message] = *elem;
 
@@ -163,6 +163,20 @@ namespace net {
                     auto *data = ws->getUserData();
                     logging::info("[{}] <== {:.{}}", data->address, message, max_message_log_size);
                     ws->send(message, uWS::TEXT);
+                }
+            });
+        }, m_server);
+    }
+
+    void wsserver::push_messages(message_list messages) {
+        visit_server([&]<bool SSL>(uWS::TemplatedApp<SSL> &server) {
+            server.getLoop()->defer([messages = std::move(messages)]{
+                for (const auto &[client, message] : messages) {
+                    if (auto *ws = websocket_cast<SSL>(client)) {
+                        auto *data = ws->getUserData();
+                        logging::info("[{}] <== {:.{}}", data->address, message, max_message_log_size);
+                        ws->send(message, uWS::TEXT);
+                    }
                 }
             });
         }, m_server);

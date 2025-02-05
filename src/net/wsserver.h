@@ -2,6 +2,7 @@
 #define __WSSERVER_H__
 
 #include <memory>
+#include <vector>
 
 #include "utils/tsqueue.h"
 
@@ -18,6 +19,7 @@ namespace net {
     class wsserver {
     public:
         using client_handle = std::weak_ptr<void>;
+        using message_list = std::vector<std::pair<client_handle, std::string>>;
 
         static constexpr int kick_opcode = 1000;
 
@@ -46,9 +48,11 @@ namespace net {
 
         void stop();
 
-        void tick();
+        void poll();
 
         void push_message(client_handle client, std::string message);
+
+        void push_messages(message_list messages);
 
         void kick_client(client_handle client, std::string message, int code = kick_opcode);
     };
