@@ -45,7 +45,8 @@ def parse_bot_rule(value):
 def parse_settings(settings):
     return CppObject(
         max_random_tries = settings['max_random_tries'],
-        bypass_prompt_after = settings['bypass_prompt_after'],
+        bypass_empty_index = settings['bypass_empty_index'],
+        bypass_unconditional_index = settings['bypass_unconditional_index'],
         repeat_card_nodes = settings['repeat_card_nodes'],
         response_rules = CppStatic('bot_rule', [parse_bot_rule(value) for value in settings['response_rules']]),
         in_play_rules = CppStatic('bot_rule', [parse_bot_rule(value) for value in settings['in_play_rules']])

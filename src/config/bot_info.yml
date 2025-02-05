@@ -3,7 +3,8 @@ bots:
   
   settings:
     max_random_tries: 6
-    bypass_prompt_after: 4
+    bypass_empty_index: 3
+    bypass_unconditional_index: 4
     repeat_card_nodes: 5
     
     response_rules:
