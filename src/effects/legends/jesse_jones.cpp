@@ -1,6 +1,7 @@
 #include "jesse_jones.h"
 
 #include "effects/base/pick.h"
+#include "effects/base/steal_destroy.h"
 
 #include "cards/game_events.h"
 
@@ -51,6 +52,10 @@ namespace banggame {
     }
 
     void effect_jesse_jones_legend::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        origin->m_game->queue_request<request_jesse_jones_legend>(origin_card, target, origin);
+        if (target->m_hand.size() == 1) {
+            effect_steal{}.on_play(origin_card, origin, target->m_hand.front());
+        } else {
+            origin->m_game->queue_request<request_jesse_jones_legend>(origin_card, target, origin);
+        }
     }
 }
