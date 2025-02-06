@@ -27,14 +27,11 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
 
-            target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", target, origin, target_card);
-            target->add_to_hand(target_card);
-
             while (!target->m_game->m_selection.empty()) {
                 origin->add_to_hand(target->m_game->m_selection.front());
             }
 
-            target->m_game->call_event(event_type::on_discard_hand_card{ origin, target_card, false });
+            effect_steal{}.on_play(origin_card, target, target_card);
         }
 
         game_string status_text(player_ptr owner) const override {
