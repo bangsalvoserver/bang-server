@@ -127,7 +127,12 @@ void game_manager::tick() {
     }
 
     if (!m_outgoing_messages.empty()) {
-        push_messages(std::move(m_outgoing_messages));
+        if (m_outgoing_messages.size() == 1) {
+            auto [client, message] = std::move(m_outgoing_messages.front());
+            push_message(client, std::move(message));
+        } else {
+            push_messages(std::move(m_outgoing_messages));
+        }
         m_outgoing_messages.clear();
     }
 }
