@@ -59,7 +59,7 @@ namespace net {
     };
 
     template<bool SSL>
-    uWS::WebSocket<SSL, true, wsclient_data> *websocket_cast(wsserver::client_handle client) {
+    static uWS::WebSocket<SSL, true, wsclient_data> *websocket_cast(wsserver::client_handle client) {
         if (auto ptr = client.lock()) {
             return *static_cast<uWS::WebSocket<SSL, true, wsclient_data> **>(ptr.get());
         }
@@ -156,14 +156,19 @@ namespace net {
         }
     }
 
+    template<bool SSL>
+    static void do_send_message(wsserver::client_handle client, std::string_view message) {
+        if (auto *ws = websocket_cast<SSL>(client)) {
+            auto *data = ws->getUserData();
+            logging::info("[{}] <== {:.{}}", data->address, message, max_message_log_size);
+            ws->send(message, uWS::TEXT);
+        }
+    }
+
     void wsserver::push_message(client_handle client, std::string message) {
         visit_server([&]<bool SSL>(uWS::TemplatedApp<SSL> &server) {
             server.getLoop()->defer([client, message = std::move(message)]{
-                if (auto *ws = websocket_cast<SSL>(client)) {
-                    auto *data = ws->getUserData();
-                    logging::info("[{}] <== {:.{}}", data->address, message, max_message_log_size);
-                    ws->send(message, uWS::TEXT);
-                }
+                do_send_message<SSL>(client, message);
             });
         }, m_server);
     }
@@ -172,11 +177,7 @@ namespace net {
         visit_server([&]<bool SSL>(uWS::TemplatedApp<SSL> &server) {
             server.getLoop()->defer([messages = std::move(messages)]{
                 for (const auto &[client, message] : messages) {
-                    if (auto *ws = websocket_cast<SSL>(client)) {
-                        auto *data = ws->getUserData();
-                        logging::info("[{}] <== {:.{}}", data->address, message, max_message_log_size);
-                        ws->send(message, uWS::TEXT);
-                    }
+                    do_send_message<SSL>(client, message);
                 }
             });
         }, m_server);
