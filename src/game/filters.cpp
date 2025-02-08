@@ -70,19 +70,11 @@ namespace banggame {
     }
 
     game_string check_card_filter(const_card_ptr origin_card, const_player_ptr origin, enums::bitset<target_card_filter> filter, const_card_ptr target, const effect_context &ctx) {
-        if (!filter.check(target_card_filter::can_target_self) && target == origin_card)
-            return "ERROR_TARGET_PLAYING_CARD";
-
         if (filter.check(target_card_filter::target_set)) {
             auto req = origin->m_game->top_request<interface_target_set_cards>(target_is{origin});
             if (!req || !req->in_target_set(target)) {
                 return {"ERROR_TARGET_NOT_IN_TARGET_SET", origin_card, target};
             }
-        } else if (filter.check(target_card_filter::cube_slot)) {
-            if (!target->owner)
-                return "ERROR_CARD_HAS_NO_OWNER";
-            if (target != target->owner->get_character() && !(target->is_orange() && target->pocket == pocket_type::player_table))
-                return "ERROR_TARGET_NOT_CUBE_SLOT";
         } else {
             if (filter.check(target_card_filter::selection) != (target->pocket == pocket_type::selection))
                 return "ERROR_TARGET_NOT_SELECTION";

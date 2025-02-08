@@ -250,7 +250,7 @@ character:
     effects:
       - max_usages(1)
       - discard card self | hand
-      - add_cube(2) card self | cube_slot can_target_self
+      - add_cube(2) cube_slot self
   - name: BLOODY_MARY
     image: 17_bloodymary
     equip:
@@ -259,7 +259,7 @@ character:
     image: 17_frankiecanton
     effects:
       - max_usages(1)
-      - frankie_canton card | cube_slot
+      - frankie_canton cube_slot
   - name: JULIE_CUTTER
     image: 17_juliecutter
     equip:

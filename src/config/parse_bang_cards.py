@@ -33,6 +33,7 @@ def check_allowed_filters(effect, target_type, player_filter, card_filter):
         'cards': CARD,
         'max_cards': CARD,
         'card_per_player': CARD,
+        'cube_slot': PLAYER,
         'move_cube_slot': NONE,
         'select_cubes': NONE,
         'select_cubes_optional': NONE,

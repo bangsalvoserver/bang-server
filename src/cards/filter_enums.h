@@ -48,8 +48,6 @@ namespace banggame {
         not_missedcard,
         beer,
         bronco,
-        cube_slot,
-        can_target_self,
         catbalou_panic,
     };
     

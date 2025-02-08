@@ -117,6 +117,7 @@ namespace banggame {
         utils::tag<"cards", card_list>,
         utils::tag<"max_cards", card_list>,
         utils::tag<"card_per_player", card_list>,
+        utils::tag<"cube_slot", card_ptr>,
         utils::tag<"move_cube_slot", card_list>,
         utils::tag<"select_cubes", card_list>,
         utils::tag<"select_cubes_optional", card_list>,
