@@ -70,6 +70,10 @@ namespace banggame {
     }
 
     game_string check_card_filter(const_card_ptr origin_card, const_player_ptr origin, enums::bitset<target_card_filter> filter, const_card_ptr target, const effect_context &ctx) {
+        if (target == origin_card) {
+            return "ERROR_TARGET_PLAYING_CARD";
+        }
+
         if (filter.check(target_card_filter::target_set)) {
             auto req = origin->m_game->top_request<interface_target_set_cards>(target_is{origin});
             if (!req || !req->in_target_set(target)) {
