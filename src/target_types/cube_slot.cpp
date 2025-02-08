@@ -18,6 +18,15 @@ namespace banggame {
             return "ERROR_TARGET_NOT_CUBE_SLOT";
         }
 
+        if (effect.target_value != 0) {
+            if (target == origin->get_character()) {
+                return "ERROR_TARGET_PLAYING_CARD";
+            }
+            if (target->num_cubes() == 0) {
+                return {"ERROR_NOT_ENOUGH_CUBES_ON", target};
+            }
+        }
+
         return effect.get_error(origin_card, origin, target, ctx);
     }
 

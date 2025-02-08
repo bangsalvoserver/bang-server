@@ -259,7 +259,7 @@ character:
     image: 17_frankiecanton
     effects:
       - max_usages(1)
-      - frankie_canton cube_slot
+      - frankie_canton cube_slot(1)
   - name: JULIE_CUTTER
     image: 17_juliecutter
     equip:
