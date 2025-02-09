@@ -6,8 +6,8 @@
 namespace banggame {
 
     struct effect_jesse_jones_legend {
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 
     DEFINE_EFFECT(jesse_jones_legend, effect_jesse_jones_legend)

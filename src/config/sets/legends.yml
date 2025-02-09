@@ -36,7 +36,7 @@ legends:
     responses:
       - add_draw_card
       - no_cards_drawn
-      - jesse_jones_legend player notself not_empty_hand
+      - jesse_jones_legend random_if_hand_card notself | hand
     tags:
       - drawing
   - name: JOURDONNAIS

@@ -14,14 +14,15 @@ namespace banggame {
         using selection_picker::selection_picker;
 
         void on_update() override {
-            if (!live) {
+            if (origin->m_hand.size() == 1) {
+                on_pick(origin->m_hand.front());
+            } else if (!live) {
                 while (!origin->empty_hand()) {
                     card_ptr target_card = origin->m_hand.front();
                     target->m_game->add_log(update_target::includes(origin, target), "LOG_REVEALED_CARD", origin, target_card);
                     target_card->move_to(pocket_type::selection, target);
                 }
             }
-            auto_pick();
         }
         
         void on_pick(card_ptr target_card) override {
@@ -43,16 +44,12 @@ namespace banggame {
         }
     };
 
-    game_string effect_jesse_jones_legend::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+    game_string effect_jesse_jones_legend::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) {
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target->owner));
         return {};
     }
 
-    void effect_jesse_jones_legend::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (target->m_hand.size() == 1) {
-            effect_steal{}.on_play(origin_card, origin, target->m_hand.front());
-        } else {
-            origin->m_game->queue_request<request_jesse_jones_legend>(origin_card, target, origin);
-        }
+    void effect_jesse_jones_legend::on_play(card_ptr origin_card, player_ptr origin, card_ptr target) {
+        origin->m_game->queue_request<request_jesse_jones_legend>(origin_card, target->owner, origin);
     }
 }
