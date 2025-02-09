@@ -128,7 +128,7 @@ void game_manager::tick() {
 
     if (!m_outgoing_messages.empty()) {
         if (m_outgoing_messages.size() == 1) {
-            auto [client, message] = std::move(m_outgoing_messages.front());
+            auto &[client, message] = m_outgoing_messages.front();
             push_message(client, std::move(message));
         } else {
             push_messages(std::move(m_outgoing_messages));
