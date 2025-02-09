@@ -48,4 +48,17 @@ namespace banggame {
             origin->set_hp(std::clamp<int>(origin->m_hp, 3, origin->get_character_max_hp()));
         }
     }
+
+    bool effect_drop_all_fame::can_play(card_ptr origin_card, player_ptr origin) {
+        for (const auto &[token, count] : origin->get_character()->tokens) {
+            if (token != card_token_type::cube && count != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void effect_drop_all_fame::on_play(card_ptr origin_card, player_ptr origin) {
+        origin->get_character()->drop_all_fame();
+    }
 }
