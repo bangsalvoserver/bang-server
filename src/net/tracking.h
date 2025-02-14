@@ -26,7 +26,7 @@ namespace tracking {
     };
 
     std::expected<duration, std::string> parse_length(std::string_view length);
-    tracking_response get_tracking_for(duration length);
+    tracking_response get_tracking_for(duration length, size_t max_count);
 
 }
 

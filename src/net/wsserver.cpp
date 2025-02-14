@@ -97,10 +97,12 @@ namespace net {
                 logging::warn("[{}] is trying to hack the server", res->getRemoteAddressAsText());
             })
             .get("/tracking", [this](auto *res, auto *req) {
-                if (auto length = tracking::parse_length(req->getQuery("length"))) {
+                auto length = tracking::parse_length(req->getQuery("length"));
+                auto max_count = utils::parse_string<size_t>(req->getQuery("max_count"));
+                if (length) {
                     res->writeHeader("Access-Control-Allow-Origin","*");
                     res->writeHeader("Content-Type", "application/json");
-                    res->end(json::serialize(tracking::get_tracking_for(*length)).dump());
+                    res->end(json::serialize(tracking::get_tracking_for(*length, max_count.value_or(3000))).dump());
                 } else {
                     res->writeStatus("400 Bad Request");
                     res->writeHeader("Access-Control-Allow-Origin","*");

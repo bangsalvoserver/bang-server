@@ -63,7 +63,7 @@ namespace tracking {
         track_simple("lobby_count", lobby_count);
     }
 
-    static timestamp_counts read_tracking_simple(std::string_view table_name, timestamp start_date) {
+    static timestamp_counts read_tracking_simple(std::string_view table_name, timestamp start_date, duration max_diff) {
         timestamp_counts result;
         if (s_connection) {
             try {
@@ -74,7 +74,10 @@ namespace tracking {
                 while (stmt.step()) {
                     timestamp time{std::chrono::seconds{stmt.column_int64(0)}};
                     size_t count = stmt.column_uint64(1);
-                    result.emplace_back(time, count);
+                    if (time >= start_date) {
+                        result.emplace_back(time, count);
+                        start_date += max_diff;
+                    }
                 }
             } catch (const std::exception &error) {
                 logging::error("SQL error: {}", error.what());
@@ -93,12 +96,14 @@ namespace tracking {
         }
     }
 
-    tracking_response get_tracking_for(duration length) {
+    tracking_response get_tracking_for(duration length, size_t max_count) {
         timestamp start_date = std::chrono::time_point_cast<duration>(clock::now() - length);
+        auto max_diff = length / std::min(3000uz, max_count);
+        
         return {
-            read_tracking_simple("client_count", start_date),
-            read_tracking_simple("user_count", start_date),
-            read_tracking_simple("lobby_count", start_date)
+            read_tracking_simple("client_count", start_date, max_diff),
+            read_tracking_simple("user_count", start_date, max_diff),
+            read_tracking_simple("lobby_count", start_date, max_diff)
         };
     }
 
