@@ -98,7 +98,7 @@ namespace tracking {
 
     tracking_response get_tracking_for(duration length, size_t max_count) {
         timestamp start_date = std::chrono::time_point_cast<duration>(clock::now() - length);
-        auto max_diff = length / std::min(3000uz, max_count);
+        auto max_diff = length / std::clamp(max_count, 1000uz, 3000uz);
         
         return {
             read_tracking_simple("client_count", start_date, max_diff),
