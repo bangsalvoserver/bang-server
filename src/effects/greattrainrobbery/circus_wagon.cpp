@@ -3,6 +3,7 @@
 #include "effects/base/pick.h"
 
 #include "game/game_table.h"
+#include "game/bot_suggestion.h"
 
 #include "cards/filter_enums.h"
 
@@ -42,6 +43,17 @@ namespace banggame {
             }
         }
     };
+
+    prompt_string effect_circus_wagon::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        if (origin->is_bot() && bot_suggestion::is_target_enemy(origin, target)) {
+            if (rn::any_of(target->m_table, [](card_ptr target_card) {
+                return target_card->has_tag(tag_type::jail);
+            })) {
+                return { prompt_type::priority, "BOT_ENEMY_HAS_JAIL" };
+            }
+        }
+        return {};
+    }
 
     void effect_circus_wagon::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
         origin->m_game->queue_request<request_discard_table>(origin_card, origin, target);
