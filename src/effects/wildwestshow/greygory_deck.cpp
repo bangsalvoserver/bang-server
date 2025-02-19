@@ -23,7 +23,7 @@ namespace banggame {
         origin->remove_cards({origin->m_characters.begin() + 1, origin->m_characters.end()});
         card_list characters = origin->m_game->m_characters
             | rv::filter([](card_ptr c) {
-                return c->pocket == pocket_type::none && c->expansion.empty();
+                return c->pocket == pocket_type::none && c->owner == nullptr && c->expansion.empty();
             })
             | rv::sample(2, origin->m_game->rng)
             | rn::to_vector;
