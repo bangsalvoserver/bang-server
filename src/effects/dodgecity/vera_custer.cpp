@@ -9,14 +9,25 @@
 
 namespace banggame {
 
+    namespace event_type {
+        struct get_card_copy {
+            card_ptr target_card;
+            nullable_ref<card_ptr> result;
+        };
+    }
+
     static card_ptr get_card_copy(card_ptr target_card)  {
-        card_list &deck = target_card->m_game->m_copies;
-        for (card_ptr c : deck) {
-            if (c->name == target_card->name && c->deck == target_card->deck) {
-                return c;
-            }
+        card_ptr result = nullptr;
+        target_card->m_game->call_event(event_type::get_card_copy{ target_card, result });
+        if (!result) {
+            result = target_card->m_game->add_card(*target_card);
+            target_card->m_game->add_listener<event_type::get_card_copy>(nullptr, [=](card_ptr e_target_card, card_ptr &e_result) {
+                if (e_target_card == target_card) {
+                    e_result = result;
+                }
+            });
         }
-        return deck.emplace_back(target_card->m_game->add_card(*target_card));
+        return result;
     }
 
     struct request_vera_custer : request_picking_player {

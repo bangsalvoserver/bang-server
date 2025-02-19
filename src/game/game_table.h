@@ -29,7 +29,6 @@ namespace banggame {
 
         card_list m_characters;
         card_list m_legends;
-        card_list m_copies;
         
         card_list m_deck;
         card_list m_discards;
