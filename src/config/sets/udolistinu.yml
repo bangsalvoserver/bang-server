@@ -148,9 +148,9 @@ character:
     tags:
       - skip_logs
   - name: COLORADO_BILL
-    image: 07_coloradobill
+    image: 07_coloradobill2
     equip:
-      - colorado_bill
+      - colorado_bill2
   - name: DER_SPOT_BURST_RINGER
     image: 07_derspot
     effects:

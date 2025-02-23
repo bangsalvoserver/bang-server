@@ -130,7 +130,6 @@ namespace banggame {
         if (--bang_strength == 0) {
             missed_flags.merge(flags);
             target->m_game->call_event(event_type::on_missed{ origin_card, origin, target, c, missed_flags });
-            target->m_game->pop_request();
         }
     }
 
@@ -150,7 +149,9 @@ namespace banggame {
                     target->play_sound("bang");
                 }
             }
-            if (target->empty_hand() || unavoidable) {
+            if (!unavoidable && bang_strength == 0) {
+                target->m_game->pop_request();
+            } else if (unavoidable || target->empty_hand()) {
                 auto_resolve();
             }
         }
