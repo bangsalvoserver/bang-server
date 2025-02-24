@@ -4,6 +4,7 @@
 #include "game/prompts.h"
 
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
 
 namespace banggame {
     
@@ -17,6 +18,9 @@ namespace banggame {
             origin->m_game->add_log(update_target::excludes(origin, target_player), "LOG_GIFTED_A_CARD", origin, target_player);
         } else {
             origin->m_game->add_log("LOG_GIFTED_CARD", origin, target_player, target_card);
+        }
+        if (target_card->pocket == pocket_type::player_hand) {
+            origin->m_game->call_event(event_type::on_discard_hand_card{ origin, target_card, used });
         }
         target_player->add_to_hand(target_card);
     }
