@@ -37,6 +37,9 @@ namespace banggame {
 
     bool effect_escape2::can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) {
         return origin && origin_card
+            && (origin_card->deck == card_deck_type::main_deck
+                || origin_card->deck == card_deck_type::goldrush
+                || origin_card->deck == card_deck_type::train)
             && !flags.check(effect_flag::is_bang)
             && flags.check(effect_flag::single_target)
             && !flags.check(effect_flag::multi_target);
