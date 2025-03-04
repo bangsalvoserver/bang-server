@@ -131,10 +131,23 @@ namespace banggame {
 
     struct request_boast_feat : request_picking, interface_resolvable {
         request_boast_feat(player_ptr target)
-            : request_picking{nullptr, nullptr, target} {}
+            : request_picking{nullptr, nullptr, target, {}, 25} {}
 
         resolve_type get_resolve_type() const override {
             return resolve_type::dismiss;
+        }
+
+        void on_update() override {
+            if (!live) {
+                if (!target->alive() || is_legend(target) || get_count_performed_feats(target) != 0) {
+                    target->m_game->pop_request();
+                } else {
+                    auto [token, count] = get_card_fame_token_type(target->get_character());
+                    if (count == 0) {
+                        target->m_game->pop_request();
+                    }
+                }
+            }
         }
 
         void on_resolve() override {
@@ -219,12 +232,7 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_turn_end>({nullptr, 20}, [](player_ptr origin, bool skipped) {
-            if (!is_legend(origin) && get_count_performed_feats(origin) == 0) {
-                auto [token, count] = get_card_fame_token_type(origin->get_character());
-                if (count != 0) {
-                    origin->m_game->queue_request<request_boast_feat>(origin);
-                }
-            }
+            origin->m_game->queue_request<request_boast_feat>(origin);
         });
     }
     
