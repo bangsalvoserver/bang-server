@@ -203,7 +203,9 @@ namespace banggame {
         });
         origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player_ptr p, bool skipped) {
             if (origin == p) {
-                origin->m_game->remove_listeners(key);
+                origin->m_game->queue_action([=]{
+                    origin->m_game->remove_listeners(key);
+                }, 20);
             }
         });
 
