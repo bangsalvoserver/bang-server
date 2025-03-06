@@ -53,22 +53,6 @@ namespace banggame {
         return target->m_game->top_request<request_annie_oakey>(target_is{target}) != nullptr;
     }
 
-    static int get_ncards(int choice, card_sign sign) {
-        static constexpr std::pair<bool (card_sign::*)() const, int> lookup[] = {
-            {&card_sign::is_red, 1},
-            {&card_sign::is_hearts, 2},
-            {&card_sign::is_diamonds, 2},
-            {&card_sign::is_black, 1},
-            {&card_sign::is_clubs, 2},
-            {&card_sign::is_spades, 2}
-        };
-        if (choice >= 1 && choice <= std::size(lookup)) {
-            auto &[fn, ncards] = lookup[choice-1];
-            return static_cast<int>(std::invoke(fn, sign)) * ncards;
-        }
-        throw game_error("Invalid choice");
-    }
-
     void effect_annie_oakey::on_play(card_ptr origin_card, player_ptr target) {
         shared_request_draw req_draw = target->m_game->top_request<request_annie_oakey>()->req_draw;
 
@@ -77,7 +61,7 @@ namespace banggame {
         drawn_card->add_short_pause();
         req_draw->add_to_hand_phase_one(drawn_card);
 
-        if (int ncards = get_ncards(choice, drawn_card->sign)) {
+        if (std::invoke(fn, drawn_card->sign)) {
             target->draw_card(ncards, origin_card);
         }
     }
