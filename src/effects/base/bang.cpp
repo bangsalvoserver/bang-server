@@ -99,9 +99,6 @@ namespace banggame {
         });
     }
 
-    equip_treat_as_bang::equip_treat_as_bang(int value)
-        : flag{value == 1 ? player_flag::treat_missed_as_bang : player_flag::treat_any_as_bang} {}
-
     void equip_treat_as_bang::on_enable(card_ptr origin_card, player_ptr p) {
         p->add_player_flags(flag);
     }

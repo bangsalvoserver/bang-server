@@ -7,7 +7,7 @@ namespace banggame {
     
     struct effect_add_cube {
         int ncubes;
-        effect_add_cube(int ncubes) : ncubes(std::max(ncubes, 1)) {}
+        effect_add_cube(int ncubes) : ncubes{ncubes} {}
 
         game_string on_prompt(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin);

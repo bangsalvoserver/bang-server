@@ -8,7 +8,7 @@ namespace banggame {
     
     struct effect_draw {
         int ncards;
-        effect_draw(int value) : ncards(std::max(1, value)) {}
+        effect_draw(int ncards = 1) : ncards{ncards} {}
         
         void on_play(card_ptr origin_card, player_ptr origin) {
             on_play(origin_card, origin, origin);
@@ -20,7 +20,7 @@ namespace banggame {
 
     struct effect_queue_draw {
         int ncards;
-        effect_queue_draw(int value) : ncards(std::max(1, value)) {}
+        effect_queue_draw(int ncards = 1) : ncards{ncards} {}
 
         void on_play(card_ptr origin_card, player_ptr origin) {
             on_play(origin_card, origin, origin);
@@ -43,7 +43,7 @@ namespace banggame {
 
     struct effect_draw_to_discard {
         int ncards;
-        effect_draw_to_discard(int value) : ncards(std::max(1, value)) {}
+        effect_draw_to_discard(int ncards = 1) : ncards{ncards} {}
 
         void on_play(card_ptr origin_card, player_ptr origin);
     };

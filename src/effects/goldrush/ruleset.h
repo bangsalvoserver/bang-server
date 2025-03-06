@@ -13,7 +13,7 @@ namespace banggame {
 
     struct effect_add_gold {
         int amount;
-        effect_add_gold(int value) : amount(std::max(1, value)) {}
+        effect_add_gold(int amount): amount{amount} {}
 
         void on_play(card_ptr origin_card, player_ptr origin) {
             on_play(origin_card, origin, origin);

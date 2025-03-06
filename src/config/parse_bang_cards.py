@@ -60,7 +60,7 @@ def parse_effects(effect_list):
     for effect in effect_list:
         match = re.match(
             r'^\s*(\w+)' # effect_type
-            r'(?:\s*\((-?\d+)\))?' # effect_value
+            r'(?:\s*\(\s*(.+?)\s*\))?' # effect_value
             r'(?:\s*(\w+)' # target_type
             r'\s*(?:\((-?\d+)\))?)?' # target_value
             r'([\w\s]*?)' # player_filter
@@ -83,9 +83,9 @@ def parse_effects(effect_list):
             target =           CppLiteral(f'TARGET_TYPE({target_type})') if target_type else None,
             player_filter =    [CppEnum('target_player_filter', f) for f in player_filter.split()] if player_filter else None,
             card_filter =      [CppEnum('target_card_filter', f) for f in card_filter.split()] if card_filter else None,
-            effect_value =     int(effect_value) if effect_value else None,
             target_value =     int(target_value) if target_value else None,
-            type =             CppLiteral(f'GET_EFFECT({effect_type})')
+            type =             CppLiteral(f'GET_EFFECT({effect_type})'),
+            effect_value =     CppStatic('auto', CppLiteral(f"BUILD_EFFECT_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
         ))
     return CppStatic('effect_holder', result)
 
@@ -97,7 +97,7 @@ def parse_equips(equip_list):
     for effect in equip_list:
         match = re.match(
             r'^\s*(\w+)' # type
-            r'(?:\s*\((-?\d+)\))?\s*$', # effect_value
+            r'(?:\s*\(\s*(.+?)\s*\))?\s*$', # effect_value
             effect
         )
         if not match:
@@ -107,8 +107,8 @@ def parse_equips(equip_list):
         effect_value = match.group(2)
 
         result.append(CppObject(
-            effect_value = int(effect_value) if effect_value else None,
-            type = CppLiteral(f'GET_EQUIP({effect_type})')
+            type = CppLiteral(f'GET_EQUIP({effect_type})'),
+            effect_value = CppStatic('auto', CppLiteral(f"BUILD_EQUIP_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
         ))
     return CppStatic('equip_holder', result)
 
@@ -241,7 +241,7 @@ def parse_file(data):
 
     return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
 
-INCLUDE_FILENAMES = ['cards/vtable_build.h', 'cards/filter_enums.h', 'effects/effects.h']
+INCLUDE_FILENAMES = ['cards/vtable_build.h', 'effects/effects.h']
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

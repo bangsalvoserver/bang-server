@@ -24,7 +24,7 @@ character:
   - name: ANNIE_VERSARY
     image: 02_annieversary
     equip:
-      - treat_as_bang(2)
+      - treat_as_bang(player_flag::treat_any_as_bang)
     effects:
       - banglimit
       - set_playing card self | hand not_bangcard
@@ -63,7 +63,7 @@ hidden:
     expansion: highnoon
     responses:
       - card_choice
-      - handcuffs(1)
+      - handcuffs(card_suit::hearts)
     tags:
       - card_choice(6)
   - name: HANDCUFFS_DIAMONDS
@@ -71,7 +71,7 @@ hidden:
     expansion: highnoon
     responses:
       - card_choice
-      - handcuffs(2)
+      - handcuffs(card_suit::diamonds)
     tags:
       - card_choice(6)
   - name: HANDCUFFS_CLUBS
@@ -79,7 +79,7 @@ hidden:
     expansion: highnoon
     responses:
       - card_choice
-      - handcuffs(3)
+      - handcuffs(card_suit::clubs)
     tags:
       - card_choice(6)
   - name: HANDCUFFS_SPADES
@@ -87,6 +87,6 @@ hidden:
     expansion: highnoon
     responses:
       - card_choice
-      - handcuffs(4)
+      - handcuffs(card_suit::spades)
     tags:
       - card_choice(6)

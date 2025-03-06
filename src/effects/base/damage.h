@@ -22,7 +22,7 @@ namespace banggame {
     
     struct effect_damage {
         int damage;
-        effect_damage(int damage) : damage(std::max(1, damage)) {}
+        effect_damage(int damage = 1) : damage{damage} {}
 
         game_string get_error(card_ptr origin_card, player_ptr origin, effect_flags flags = {});
 

@@ -7,7 +7,7 @@ namespace banggame {
 
     struct equip_bart_cassidy : event_equip {
         int ncards;
-        equip_bart_cassidy(int value): ncards{std::max(1, value)} {}
+        equip_bart_cassidy(int ncards = 1): ncards{ncards} {}
         
         void on_enable(card_ptr target_card, player_ptr target);
     };

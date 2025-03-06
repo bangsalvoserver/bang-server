@@ -293,7 +293,7 @@ character:
   - name: CALAMITY_JANET
     image: 01_calamityjanet
     equip:
-      - treat_as_bang(1)
+      - treat_as_bang(player_flag::treat_missed_as_bang)
     effects:
       - banglimit
       - set_playing card self | hand missed
@@ -378,13 +378,13 @@ character:
 button_row:
   - name: GAME_CONFIRM
     responses:
-      - resolve(0)
+      - resolve(resolve_type::resolve)
     tags:
       - resolve(0)
       - button_color(1)
   - name: GAME_DISMISS
     responses:
-      - resolve(1)
+      - resolve(resolve_type::dismiss)
     tags:
       - resolve(1)
       - button_color(2)
