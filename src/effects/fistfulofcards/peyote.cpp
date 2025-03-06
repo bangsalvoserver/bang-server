@@ -45,7 +45,7 @@ namespace banggame {
         drawn_card->set_visibility(card_visibility::shown);
         drawn_card->add_short_pause();
 
-        if ((choice == 1) == drawn_card->sign.is_red()) {
+        if (std::invoke(fn, drawn_card->sign)) {
             target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
             target->add_to_hand(drawn_card);
         } else {

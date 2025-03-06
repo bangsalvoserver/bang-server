@@ -90,13 +90,13 @@ hidden:
     image: fistfulofcards/05_peyote_rosso
     responses:
       - card_choice
-      - peyote(1)
+      - peyote(&card_sign::is_red)
     tags:
       - card_choice(5)
   - name: PEYOTE_BLACK
     image: fistfulofcards/05_peyote_nero
     responses:
       - card_choice
-      - peyote(2)
+      - peyote(&card_sign::is_black)
     tags:
       - card_choice(5)
