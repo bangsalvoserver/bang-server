@@ -7,20 +7,16 @@
 #include "player.h"
 #include "game_update.h"
 
-#include "utils/small_int_set.h"
-
 namespace banggame {
 
     class update_target {
     private:
-        small_int_set<16> m_value;
+        uint16_t m_value;
 
         update_target(bool inclusive, std::convertible_to<const_player_ptr> auto ... targets)
-            : m_value{targets->id ...}
+            : m_value{static_cast<uint16_t>(inclusive)}
         {
-            if (inclusive) {
-                m_value.set(0);
-            }   
+            (add(targets), ...);
         }
 
     public:
@@ -33,11 +29,19 @@ namespace banggame {
         }
 
         void add(const_player_ptr target) {
-            m_value.set(target->id);
+            m_value |= 1 << target->id;
+        }
+
+        bool contains(const_player_ptr target) const {
+            return target && bool(m_value & (1 << target->id));
         }
 
         bool matches(const_player_ptr target) const {
-            return (target && m_value.check(target->id)) == m_value.check(0);
+            return contains(target) == inclusive();
+        }
+
+        bool inclusive() const {
+            return bool(m_value & 1);
         }
     };
 
