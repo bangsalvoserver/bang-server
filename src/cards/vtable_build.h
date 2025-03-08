@@ -202,41 +202,41 @@ namespace banggame {
         return {
             .name = name,
 
-            .add_context = [](card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-                T handler{};
-                if constexpr (requires { handler.add_context(origin_card, origin, ctx); }) {
-                    handler.add_context(origin_card, origin, ctx);
+            .add_context = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+                auto &&value = effect_cast<T>(effect_value);
+                if constexpr (requires { value.add_context(origin_card, origin, ctx); }) {
+                    value.add_context(origin_card, origin, ctx);
                 }
             },
 
-            .get_error = [](card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) -> game_string {
-                T handler{};
+            .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) -> game_string {
+                auto &&value = effect_cast<T>(effect_value);
                 if (target_card->is_equip_card()) {
-                    if constexpr (requires { handler.valid_with_equip(origin_card, origin, target_card); }) {
-                        if (handler.valid_with_equip(origin_card, origin, target_card)) {
+                    if constexpr (requires { value.valid_with_equip(origin_card, origin, target_card); }) {
+                        if (value.valid_with_equip(origin_card, origin, target_card)) {
                             return {};
                         } else {
                             return {"ERROR_CANT_PLAY_WHILE_EQUIPPING", origin_card, target_card};
                         }
                     }
                 } else if (target_card->get_modifier(origin->m_game->pending_requests())) {
-                    if constexpr (requires { handler.valid_with_modifier(origin_card, origin, target_card); }) {
-                        if (handler.valid_with_modifier(origin_card, origin, target_card)) {
+                    if constexpr (requires { value.valid_with_modifier(origin_card, origin, target_card); }) {
+                        if (value.valid_with_modifier(origin_card, origin, target_card)) {
                             return {};
                         } else {
                             return {"ERROR_NOT_ALLOWED_WITH_MODIFIER", origin_card, target_card};
                         }
                     }
                 }
-                if constexpr (requires { handler.valid_with_card(origin_card, origin, target_card); }) {
-                    if (!handler.valid_with_card(origin_card, origin, target_card)) {
+                if constexpr (requires { value.valid_with_card(origin_card, origin, target_card); }) {
+                    if (!value.valid_with_card(origin_card, origin, target_card)) {
                         return {"ERROR_NOT_ALLOWED_WITH_CARD", origin_card, target_card};
                     }
                 }
-                if constexpr (requires { handler.get_error(origin_card, origin, target_card, ctx); }) {
-                    return handler.get_error(origin_card, origin, target_card, ctx);
-                } else if constexpr (requires { handler.get_error(origin_card, origin, target_card); }) {
-                    return handler.get_error(origin_card, origin, target_card);
+                if constexpr (requires { value.get_error(origin_card, origin, target_card, ctx); }) {
+                    return value.get_error(origin_card, origin, target_card, ctx);
+                } else if constexpr (requires { value.get_error(origin_card, origin, target_card); }) {
+                    return value.get_error(origin_card, origin, target_card);
                 }
                 return {};
             }

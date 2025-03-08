@@ -135,6 +135,22 @@ def parse_tags(tag_list):
         result[tag_type] = int(tag_value) if tag_value else 0
     return CppStaticMap('tag_type', 'short', result)
 
+def parse_modifier(modifier):
+    match = re.match(
+        r'^\s*(\w+)' # type
+        r'(?:\s*\(\s*(.+?)\s*\))?\s*$', # effect_value
+        modifier
+    )
+    if not match:
+        raise RuntimeError(f'Invalid modifier string: {modifier}')
+    
+    effect_type = match.group(1)
+    effect_value = match.group(2)
+    return CppObject(
+        type = CppLiteral(f"GET_MODIFIER({modifier})"),
+        effect_value = CppStatic('auto', CppLiteral(f"BUILD_MODIFIER_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
+    )
+
 def parse_mth(effect):
     match = re.match(
         r'^(\w+)\s*' # type
@@ -164,8 +180,8 @@ def parse_all_effects(card):
             tags =         parse_tags(card['tags']) if 'tags' in card else None,
             expansion =    parse_expansions(card['expansion'].split(), set) if 'expansion' in card else None,
             deck =         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
-            modifier =     CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier']})")) if 'modifier' in card else None,
-            modifier_response = CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier_response']})")) if 'modifier_response' in card else None,
+            modifier =      parse_modifier(card['modifier']) if 'modifier' in card else None,
+            modifier_response = parse_modifier(card['modifier_response']) if 'modifier_response' in card else None,
             mth_effect =   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
             mth_response = parse_mth(card['mth_response']) if 'mth_response' in card else None,
             equip_target = [CppEnum('target_player_filter', f) for f in card['equip_target'].split()] if 'equip_target' in card else None,

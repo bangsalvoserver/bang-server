@@ -128,26 +128,27 @@ namespace banggame {
     struct modifier_vtable {
         std::string_view name;
 
-        void (*add_context)(card_ptr origin_card, player_ptr origin, effect_context &ctx);
-        game_string (*get_error)(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx);
+        void (*add_context)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx);
+        game_string (*get_error)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx);
     };
 
     inline void modifier_holder::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
-        type->add_context(origin_card, origin, ctx);
+        type->add_context(effect_value, origin_card, origin, ctx);
     }
 
     inline game_string modifier_holder::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) const {
-        return type->get_error(origin_card, origin, target_card, ctx);
+        return type->get_error(effect_value, origin_card, origin, target_card, ctx);
     }
 
     template<utils::fixed_string Name> struct modifier_vtable_map;
 
     #define BUILD_MODIFIER_VTABLE(name, type)
-    #define DEFINE_MODIFIER(name, type) \
-        template<> struct modifier_vtable_map<#name> { static const modifier_vtable value; }; \
-        BUILD_MODIFIER_VTABLE(name, type)
+    #define DEFINE_MODIFIER(NAME, TYPE) \
+        template<> struct modifier_vtable_map<#NAME> { using type = TYPE; static const modifier_vtable value; }; \
+        BUILD_MODIFIER_VTABLE(NAME, TYPE)
     
     #define GET_MODIFIER(name) (&modifier_vtable_map<#name>::value)
+    #define BUILD_MODIFIER_VALUE(name, ...) (modifier_vtable_map<#name>::type{__VA_ARGS__})
 
     struct mth_vtable {
         std::string_view name;

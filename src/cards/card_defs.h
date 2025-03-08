@@ -177,6 +177,7 @@ namespace banggame {
 
     struct modifier_holder {
         const modifier_vtable *type;
+        const void *effect_value;
 
         explicit operator bool () const {
             return type != nullptr;
