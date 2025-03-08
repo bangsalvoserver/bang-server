@@ -4,7 +4,8 @@ namespace banggame {
 
     static bool is_possible_recurse(player_ptr origin, card_ptr origin_card, const effect_list &effects, const mth_holder &mth, const effect_context &ctx, target_list &targets) {
         if (targets.size() == effects.size()) {
-            return !(mth && mth.get_error(origin_card, origin, targets, ctx));
+            return !(mth && mth.get_error(origin_card, origin, targets, ctx))
+                && !check_duplicates(ctx);
         }
 
         const effect_holder &effect = effects[targets.size()];
@@ -13,9 +14,13 @@ namespace banggame {
         }
 
         return play_dispatch::any_of_possible_targets(origin, origin_card, effect, ctx, [&](const play_card_target &target) {
+            auto ctx_copy = ctx;
+            play_dispatch::add_context(origin, origin_card, effect, ctx_copy, target);
+
             targets.emplace_back(target);
-            bool result = is_possible_recurse(origin, origin_card, effects, mth, ctx, targets);
+            bool result = is_possible_recurse(origin, origin_card, effects, mth, ctx_copy, targets);
             targets.pop_back();
+            
             return result;
         });
     }
