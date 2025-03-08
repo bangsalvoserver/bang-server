@@ -2,7 +2,7 @@
 
 namespace banggame {
 
-    static bool is_possible_recurse(player_ptr origin, card_ptr origin_card, const effect_list &effects, const mth_holder &mth, effect_context &ctx, target_list &targets) {
+    static bool is_possible_recurse(player_ptr origin, card_ptr origin_card, const effect_list &effects, const mth_holder &mth, const effect_context &ctx, target_list &targets) {
         if (targets.size() == effects.size()) {
             return !(mth && mth.get_error(origin_card, origin, targets, ctx))
                 && !check_duplicates(ctx);
@@ -20,8 +20,7 @@ namespace banggame {
             targets.emplace_back(std::move(target));
             bool result = is_possible_recurse(origin, origin_card, effects, mth, ctx_copy, targets);
             targets.pop_back();
-
-            if (result) ctx = ctx_copy;
+            
             return result;
         });
     }
@@ -67,17 +66,16 @@ namespace banggame {
 
             const mth_holder &mth = origin_card->get_mth(is_response);
 
-            auto ctx_copy = ctx;
-
             target_list targets;
             targets.reserve(effects.size());
-            if (!is_possible_recurse(origin, origin_card, effects, mth, ctx_copy, targets)) {
+            if (!is_possible_recurse(origin, origin_card, effects, mth, ctx, targets)) {
                 return false;
             }
 
             if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
                 auto modifiers_copy = modifiers;
                 modifiers_copy.push_back(origin_card);
+                auto ctx_copy = ctx;
                 modifier.add_context(origin_card, origin, ctx_copy);
                 
                 return map_cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy, std::not_fn(rn::empty));
