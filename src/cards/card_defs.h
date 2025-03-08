@@ -190,7 +190,7 @@ namespace banggame {
     struct mth_holder {
         const mth_vtable *type;
         const void *effect_value;
-        small_int_set args;
+        small_int_set indices;
 
         explicit operator bool () const {
             return type != nullptr;

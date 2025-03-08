@@ -3,14 +3,14 @@
 namespace banggame {
 
     static bool is_possible_mth(player_ptr origin, card_ptr origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, target_list &targets) {
-        if (targets.size() == mth.args.size()) {
+        if (targets.size() == mth.indices.size()) {
             return !mth_holder{
                 mth.type,
                 mth.effect_value,
                 small_int_set(small_int_set_sized_tag, targets.size())
             }.get_error(origin_card, origin, targets, ctx);
         }
-        size_t index = mth.args[targets.size()];
+        size_t index = mth.indices[targets.size()];
         if (index >= effects.size()) {
             throw game_error("invalid access to mth: out of bounds");
         }
@@ -68,7 +68,7 @@ namespace banggame {
 
             if (const auto &mth = origin_card->get_mth(is_response)) {
                 target_list targets;
-                targets.reserve(mth.args.size());
+                targets.reserve(mth.indices.size());
                 if (!is_possible_mth(origin, origin_card, mth, effects, {}, targets)) {
                     return false;
                 }

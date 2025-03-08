@@ -250,11 +250,11 @@ namespace banggame {
     #define BUILD_MODIFIER_VTABLE(name, type) template<> const modifier_vtable modifier_vtable_map<#name>::value = build_modifier_vtable<type>(#name);
 
     template<typename ... Ts>
-    auto build_mth_args(const target_list &targets, small_int_set args) {
+    auto build_mth_args(const target_list &targets, small_int_set indices) {
         static constexpr size_t N = sizeof...(Ts);
 
-        if (args.size() != N) {
-            throw game_error("invalid access to mth: invalid args size");
+        if (indices.size() != N) {
+            throw game_error("invalid access to mth: invalid indices size");
         }
 
         std::array<target_list::const_iterator, N> target_array;
@@ -262,8 +262,8 @@ namespace banggame {
         auto it = targets.begin();
         auto out_it = target_array.begin();
         int prev = 0;
-        for (int arg : args) {
-            for (; prev != arg && it != targets.end(); ++prev, ++it);
+        for (int index : indices) {
+            for (; prev != index && it != targets.end(); ++prev, ++it);
             if (it == targets.end()) {
                 throw game_error("invalid access to mth: out of bounds");
             }
@@ -294,10 +294,10 @@ namespace banggame {
     struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>> {
         fun_mem_ptr_t<RetType, HandlerType, Args...> m_value;
 
-        RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) {
+        RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set indices, const effect_context &ctx) {
             return std::apply(m_value, std::tuple_cat(
                 std::tuple{effect_cast<HandlerType>(effect_value), origin_card, origin},
-                build_mth_args<Args...>(targets, args)
+                build_mth_args<Args...>(targets, indices)
             ));
         }
     };
@@ -306,10 +306,10 @@ namespace banggame {
     struct mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>> {
         ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...> m_value;
 
-        RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, CtxType ctx) {
+        RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set indices, CtxType ctx) {
             return std::apply(m_value, std::tuple_cat(
                 std::tuple{effect_cast<HandlerType>(effect_value), origin_card, origin, ctx},
-                build_mth_args<Args...>(targets, args)
+                build_mth_args<Args...>(targets, indices)
             ));
         }
     };
@@ -325,23 +325,23 @@ namespace banggame {
         return {
             .name = name,
 
-            .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> game_string {
+            .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set indices, const effect_context &ctx) -> game_string {
                 if constexpr (requires { mth_unwrapper{&T::get_error}; }) {
-                    return mth_unwrapper{&T::get_error}(effect_value, origin_card, origin, targets, args, ctx);
+                    return mth_unwrapper{&T::get_error}(effect_value, origin_card, origin, targets, indices, ctx);
                 }
                 return {};
             },
 
-            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> prompt_string {
+            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set indices, const effect_context &ctx) -> prompt_string {
                 if constexpr (requires { mth_unwrapper{&T::on_prompt}; }) {
-                    return mth_unwrapper{&T::on_prompt}(effect_value, origin_card, origin, targets, args, ctx);
+                    return mth_unwrapper{&T::on_prompt}(effect_value, origin_card, origin, targets, indices, ctx);
                 }
                 return {};
             },
 
-            .on_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) {
+            .on_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set indices, const effect_context &ctx) {
                 if constexpr (requires { mth_unwrapper{&T::on_play}; }) {
-                    mth_unwrapper{&T::on_play}(effect_value, origin_card, origin, targets, args, ctx);
+                    mth_unwrapper{&T::on_play}(effect_value, origin_card, origin, targets, indices, ctx);
                 }
             }
         };
