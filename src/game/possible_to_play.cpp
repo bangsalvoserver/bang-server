@@ -6,6 +6,7 @@ namespace banggame {
         if (targets.size() == mth.args.size()) {
             return !mth_holder{
                 mth.type,
+                mth.effect_value,
                 small_int_set(small_int_set_sized_tag, targets.size())
             }.get_error(origin_card, origin, targets, ctx);
         }

@@ -154,16 +154,20 @@ def parse_modifier(modifier):
 def parse_mth(effect):
     match = re.match(
         r'^(\w+)\s*' # type
-        r'\(((?:\s*\d+,)*\s*\d+\s*)\)', #args
+        r'\(((?:\s*\d+,)*\s*\d+\s*)\)' #args
+        r'(?:\s*\(\s*(.+?)\s*\))?\s*$', # effect_value
         effect
     )
     if not match:
         raise RuntimeError(f'Invalid mth string: {effect}')
+    
     effect_type = match.group(1)
-    effect_value = match.group(2)
+    args = match.group(2)
+    effect_value = match.group(3)
     return CppObject(
         type = CppLiteral(f'GET_MTH({effect_type})'),
-        args = tuple(int(value.strip()) for value in effect_value.split(','))
+        effect_value = CppStatic('auto', CppLiteral(f"BUILD_MTH_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
+        args = tuple(int(value.strip()) for value in args.split(',')),
     )
 
 def parse_expansions(expansions, fn = list):

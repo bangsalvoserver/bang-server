@@ -189,6 +189,7 @@ namespace banggame {
 
     struct mth_holder {
         const mth_vtable *type;
+        const void *effect_value;
         small_int_set args;
 
         explicit operator bool () const {

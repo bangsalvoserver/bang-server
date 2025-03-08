@@ -153,31 +153,32 @@ namespace banggame {
     struct mth_vtable {
         std::string_view name;
         
-        game_string (*get_error)(card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx);
-        prompt_string (*on_prompt)(card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx);
-        void (*on_play)(card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx);
+        game_string (*get_error)(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx);
+        prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx);
+        void (*on_play)(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx);
     };
 
     inline game_string mth_holder::get_error(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const {
-        return type->get_error(origin_card, origin, targets, args, ctx);
+        return type->get_error(effect_value, origin_card, origin, targets, args, ctx);
     }
 
     inline prompt_string mth_holder::on_prompt(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const {
-        return type->on_prompt(origin_card, origin, targets, args, ctx);
+        return type->on_prompt(effect_value, origin_card, origin, targets, args, ctx);
     }
 
     inline void mth_holder::on_play(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const {
-        type->on_play(origin_card, origin, targets, args, ctx);
+        type->on_play(effect_value, origin_card, origin, targets, args, ctx);
     }
 
     template<utils::fixed_string Name> struct mth_vtable_map;
 
     #define BUILD_MTH_VTABLE(name, type)
-    #define DEFINE_MTH(name, type) \
-        template<> struct mth_vtable_map<#name> { static const mth_vtable value; }; \
-        BUILD_MTH_VTABLE(name, type)
+    #define DEFINE_MTH(NAME, TYPE) \
+        template<> struct mth_vtable_map<#NAME> { using type = TYPE; static const mth_vtable value; }; \
+        BUILD_MTH_VTABLE(NAME, TYPE)
     
     #define GET_MTH(name) (&mth_vtable_map<#name>::value)
+    #define BUILD_MTH_VALUE(name, ...) (mth_vtable_map<#name>::type{__VA_ARGS__})
     
     struct ruleset_vtable {
         std::string_view name;
