@@ -13,11 +13,11 @@ namespace banggame {
             return false;
         }
 
-        return play_dispatch::any_of_possible_targets(origin, origin_card, effect, ctx, [&](const play_card_target &target) {
+        return play_dispatch::any_of_possible_targets(origin, origin_card, effect, ctx, [&](play_card_target target) {
             auto ctx_copy = ctx;
             play_dispatch::add_context(origin, origin_card, effect, ctx_copy, target);
 
-            targets.emplace_back(target);
+            targets.emplace_back(std::move(target));
             bool result = is_possible_recurse(origin, origin_card, effects, mth, ctx_copy, targets);
             targets.pop_back();
 

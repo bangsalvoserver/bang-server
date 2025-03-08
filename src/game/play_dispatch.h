@@ -6,7 +6,7 @@
 
 namespace banggame::play_dispatch {
 
-    using play_card_target_predicate = std23::function_ref<bool(const play_card_target &) const>;
+    using play_card_target_predicate = std23::function_ref<bool(play_card_target) const>;
     bool any_of_possible_targets(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target_predicate &fn);
 
     play_card_target random_target(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx);
