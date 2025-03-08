@@ -4,12 +4,12 @@ namespace banggame {
 
     using visit_none = play_visitor<"none">;
 
-    template<> bool visit_none::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return !effect.get_error(origin_card, origin, ctx) && fn();
-    }
-
     template<> game_string visit_none::get_error(const effect_context &ctx) {
         return effect.get_error(origin_card, origin, ctx);
+    }
+
+    template<> bool visit_none::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return !get_error(ctx) && fn();
     }
 
     template<> prompt_string visit_none::prompt(const effect_context &ctx) {

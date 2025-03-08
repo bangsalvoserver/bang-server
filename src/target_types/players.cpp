@@ -7,10 +7,6 @@ namespace banggame {
 
     using visit_players = play_visitor<"players">;
 
-    template<> bool visit_players::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return fn();
-    }
-
     static auto get_player_targets_range(const_card_ptr origin_card, player_ptr origin, enums::bitset<target_player_filter> player_filter, const effect_context &ctx) {
         return origin->m_game->range_alive_players(origin) | rv::filter([=, &ctx](const_player_ptr target) {
             return target != ctx.skipped_player && !check_player_filter(origin_card, origin, player_filter, target, ctx);
@@ -22,6 +18,10 @@ namespace banggame {
             MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
         return {};
+    }
+
+    template<> bool visit_players::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return !get_error(ctx) && fn();
     }
 
     template<> prompt_string visit_players::prompt(const effect_context &ctx) {
