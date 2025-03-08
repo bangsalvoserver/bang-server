@@ -166,8 +166,12 @@ def parse_mth(effect):
     effect_value = match.group(3)
     return CppObject(
         type = CppLiteral(f'GET_MTH({effect_type})'),
-        effect_value = CppStatic('auto', CppLiteral(f"BUILD_MTH_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
-        indices = tuple(int(value.strip()) for value in indices.split(',')),
+        effect_value = CppStatic('auto', CppLiteral(
+            f"BUILD_MTH_VALUE({effect_type}, "
+            f"({', '.join(value.strip() for value in indices.split(','))})"
+            + ((', ' + effect_value) if effect_value else '')
+            + ')'
+        ), pointer=True),
     )
 
 def parse_expansions(expansions, fn = list):

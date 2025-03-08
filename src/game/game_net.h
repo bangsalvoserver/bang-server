@@ -7,11 +7,13 @@
 #include "player.h"
 #include "game_update.h"
 
+#include "utils/small_int_set.h"
+
 namespace banggame {
 
     class update_target {
     private:
-        small_int_set_sized<16> m_value;
+        small_int_set<16> m_value;
 
         update_target(bool inclusive, std::convertible_to<const_player_ptr> auto ... targets)
             : m_value{targets->id ...}

@@ -65,29 +65,22 @@ public:
     constexpr bool operator == (const small_int_set_iterator &other) const = default;
 };
 
-struct small_int_set_sized_tag_t {};
-
-static constexpr small_int_set_sized_tag_t small_int_set_sized_tag;
-
 template<size_t N>
-class small_int_set_sized {
+class small_int_set {
 private:
     using value_type = typename uint_sized<N>::type;
 
     value_type m_value{};
 
-    constexpr small_int_set_sized(value_type value)
+    constexpr small_int_set(value_type value)
         : m_value{value} {}
 
 public:
-    constexpr small_int_set_sized(std::initializer_list<int> values) {
+    constexpr small_int_set(std::initializer_list<int> values) {
         for (int value : values) {
             set(value);
         }
     }
-
-    constexpr small_int_set_sized(small_int_set_sized_tag_t, size_t size)
-        : m_value{static_cast<value_type>(size == 0 ? 0 : (1 << size) - 1)} {}
 
     constexpr void set(uint8_t value) {
         if (value < 0 || value >= N) {
@@ -120,20 +113,5 @@ public:
         return *(std::next(begin(), index));
     }
 };
-
-using small_int_set = small_int_set_sized<8>;
-
-namespace json {
-    template<typename Context>
-    struct serializer<small_int_set, Context> {
-        json operator()(small_int_set value) const {
-            auto ret = json::array();
-            for (int n : value) {
-                ret.push_back(n);
-            }
-            return ret;
-        }
-    };
-}
 
 #endif

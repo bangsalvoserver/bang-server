@@ -153,22 +153,30 @@ namespace banggame {
     struct mth_vtable {
         std::string_view name;
         
-        game_string (*get_error)(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set indices, const effect_context &ctx);
-        prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set indices, const effect_context &ctx);
-        void (*on_play)(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set indices, const effect_context &ctx);
+        game_string (*get_error)(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx);
+        prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx);
+        void (*on_play)(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx);
     };
 
     inline game_string mth_holder::get_error(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const {
-        return type->get_error(effect_value, origin_card, origin, targets, indices, ctx);
+        return type->get_error(effect_value, origin_card, origin, targets, ctx);
     }
 
     inline prompt_string mth_holder::on_prompt(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const {
-        return type->on_prompt(effect_value, origin_card, origin, targets, indices, ctx);
+        return type->on_prompt(effect_value, origin_card, origin, targets, ctx);
     }
 
     inline void mth_holder::on_play(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const {
-        type->on_play(effect_value, origin_card, origin, targets, indices, ctx);
+        type->on_play(effect_value, origin_card, origin, targets, ctx);
     }
+
+    template<typename T, size_t N>
+    struct mth_handler : T {
+        std::array<int, N> indices;
+
+        mth_handler(T value, std::array<int, N> indices)
+            : T{std::move(value)}, indices{indices} {}
+    };
 
     template<utils::fixed_string Name> struct mth_vtable_map;
 
@@ -178,7 +186,9 @@ namespace banggame {
         BUILD_MTH_VTABLE(NAME, TYPE)
     
     #define GET_MTH(name) (&mth_vtable_map<#name>::value)
-    #define BUILD_MTH_VALUE(name, ...) (mth_vtable_map<#name>::type{__VA_ARGS__})
+
+    #define MAKE_ARRAY(...) std::array{ __VA_ARGS__ }
+    #define BUILD_MTH_VALUE(name, indices, ...) (mth_handler{ mth_vtable_map<#name>::type{__VA_ARGS__}, MAKE_ARRAY indices })
     
     struct ruleset_vtable {
         std::string_view name;
