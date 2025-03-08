@@ -7,8 +7,8 @@ namespace banggame {
 
     using visit_players = play_visitor<"players">;
 
-    template<> bool visit_players::possible(const effect_context &ctx) {
-        return true;
+    template<> bool visit_players::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
+        return fn();
     }
 
     static auto get_player_targets_range(const_card_ptr origin_card, player_ptr origin, enums::bitset<target_player_filter> player_filter, const effect_context &ctx) {

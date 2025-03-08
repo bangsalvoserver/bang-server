@@ -2,21 +2,19 @@
 
 namespace banggame {
 
-    static bool is_possible_mth(player_ptr origin, card_ptr origin_card, const mth_holder &mth, const effect_list &effects, const effect_context &ctx, target_list &targets) {
-        if (targets.size() == mth.indices.size()) {
-            return !mth_holder{
-                mth.type,
-                mth.effect_value,
-                small_int_set(small_int_set_sized_tag, targets.size())
-            }.get_error(origin_card, origin, targets, ctx);
+    static bool is_possible_recurse(player_ptr origin, card_ptr origin_card, const effect_list &effects, const mth_holder &mth, const effect_context &ctx, target_list &targets) {
+        if (targets.size() == effects.size()) {
+            return !(mth && mth.get_error(origin_card, origin, targets, ctx));
         }
-        size_t index = mth.indices[targets.size()];
-        if (index >= effects.size()) {
-            throw game_error("invalid access to mth: out of bounds");
+
+        const effect_holder &effect = effects[targets.size()];
+        if (!effect.can_play(origin_card, origin, ctx)) {
+            return false;
         }
-        return play_dispatch::any_of_possible_targets(origin, origin_card, effects[index], ctx, [&](const play_card_target &target) {
+
+        return play_dispatch::any_of_possible_targets(origin, origin_card, effect, ctx, [&](const play_card_target &target) {
             targets.emplace_back(target);
-            bool result = is_possible_mth(origin, origin_card, mth, effects, ctx, targets);
+            bool result = is_possible_recurse(origin, origin_card, effects, mth, ctx, targets);
             targets.pop_back();
             return result;
         });
@@ -58,20 +56,15 @@ namespace banggame {
                 return false;
             }
         } else {
-            const auto &effects = origin_card->get_effect_list(is_response);
-            if (effects.empty() || !rn::all_of(effects, [&](const effect_holder &effect) {
-                return effect.can_play(origin_card, origin, ctx)
-                    && play_dispatch::possible(origin, origin_card, effect, ctx);
-            })) {
-                return false;
-            }
+            const effect_list &effects = origin_card->get_effect_list(is_response);
+            if (effects.empty()) return false;
 
-            if (const auto &mth = origin_card->get_mth(is_response)) {
-                target_list targets;
-                targets.reserve(mth.indices.size());
-                if (!is_possible_mth(origin, origin_card, mth, effects, {}, targets)) {
-                    return false;
-                }
+            const mth_holder &mth = origin_card->get_mth(is_response);
+
+            target_list targets;
+            targets.reserve(effects.size());
+            if (!is_possible_recurse(origin, origin_card, effects, mth, {}, targets)) {
+                return false;
             }
 
             if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {

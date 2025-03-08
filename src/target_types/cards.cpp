@@ -6,12 +6,9 @@ namespace banggame {
 
     using visit_cards = play_visitor<"cards">;
 
-    template<> bool visit_cards::possible(const effect_context &ctx) {
-        return contains_at_least(get_all_card_targets(origin, origin_card, effect, ctx), std::max<int>(1, effect.target_value));
-    }
-
     template<> bool visit_cards::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return true;
+        return contains_at_least(get_all_card_targets(origin, origin_card, effect, ctx), std::max<int>(1, effect.target_value))
+            && fn({});
     }
 
     template<> card_list visit_cards::random_target(const effect_context &ctx) {

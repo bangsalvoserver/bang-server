@@ -4,12 +4,8 @@ namespace banggame {
 
     using visit_player = play_visitor<"conditional_player">;
 
-    template<> bool visit_player::possible(const effect_context &ctx) {
-        return true;
-    }
-
     template<> bool visit_player::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return true;
+        return fn({});
     }
 
     template<> nullable_player visit_player::random_target(const effect_context &ctx) {

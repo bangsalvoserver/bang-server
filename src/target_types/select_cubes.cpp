@@ -4,12 +4,8 @@ namespace banggame {
 
     using visit_cubes = play_visitor<"select_cubes">;
 
-    template<> bool visit_cubes::possible(const effect_context &ctx) {
-        return origin->count_cubes() >= effect.target_value;
-    }
-
     template<> bool visit_cubes::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return true;
+        return origin->count_cubes() >= effect.target_value && fn({});
     }
 
     template<> card_list visit_cubes::random_target(const effect_context &ctx) {

@@ -6,8 +6,6 @@
 
 namespace banggame::play_dispatch {
 
-    bool possible(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx);
-
     using play_card_target_predicate = std23::function_ref<bool(const play_card_target &) const>;
     bool any_of_possible_targets(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target_predicate &fn);
 
@@ -32,6 +30,8 @@ namespace banggame {
     using target_type_value = utils::tagged_variant_value_type<play_card_target, Tag>;
 
     template<target_type_tag Tag> struct play_visitor_t {
+        using arg_type_predicate = std23::function_ref<bool() const>;
+        
         player_ptr origin;
         card_ptr origin_card;
         const effect_holder &effect;
@@ -41,7 +41,7 @@ namespace banggame {
             return {origin, origin_card, effect};
         }
 
-        bool possible(const effect_context &ctx);
+        bool any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn);
         std::monostate random_target(const effect_context &ctx) { return {}; }
         game_string get_error(const effect_context &ctx);
         prompt_string prompt(const effect_context &ctx);
@@ -64,7 +64,6 @@ namespace banggame {
             return {origin, origin_card, effect};
         }
 
-        bool possible(const effect_context &ctx);
         bool any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn);
         value_type random_target(const effect_context &ctx);
         game_string get_error(const effect_context &ctx, arg_type arg);

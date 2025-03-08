@@ -7,10 +7,6 @@ namespace banggame {
 
     using visit_card = play_visitor<"random_if_hand_card">;
 
-    template<> bool visit_card::possible(const effect_context &ctx) {
-        return defer<"card">().possible(ctx);
-    }
-
     template<> bool visit_card::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
         return defer<"card">().any_of_possible_targets(ctx, fn);
     }

@@ -7,10 +7,6 @@ namespace banggame {
 
     using visit_player = play_visitor<"player">;
 
-    template<> bool visit_player::possible(const effect_context &ctx) {
-        return bool(get_all_player_targets(origin, origin_card, effect, ctx));
-    }
-
     template<> bool visit_player::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
         return rn::any_of(get_all_player_targets(origin, origin_card, effect, ctx), fn);
     }
