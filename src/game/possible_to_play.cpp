@@ -63,7 +63,7 @@ namespace banggame {
 
             target_list targets;
             targets.reserve(effects.size());
-            if (!is_possible_recurse(origin, origin_card, effects, mth, {}, targets)) {
+            if (!is_possible_recurse(origin, origin_card, effects, mth, ctx, targets)) {
                 return false;
             }
 
