@@ -8,8 +8,10 @@ namespace banggame {
         return effect.get_error(origin_card, origin, ctx);
     }
 
-    template<> bool visit_none::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return !get_error(ctx) && fn();
+    template<> std::generator<std::monostate> visit_none::possible_targets(const effect_context &ctx) {
+        if (!get_error(ctx)) {
+            co_yield {};
+        }
     }
 
     template<> prompt_string visit_none::prompt(const effect_context &ctx) {

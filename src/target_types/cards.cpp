@@ -6,9 +6,10 @@ namespace banggame {
 
     using visit_cards = play_visitor<"cards">;
 
-    template<> bool visit_cards::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return contains_at_least(get_all_card_targets(origin, origin_card, effect, ctx), std::max<int>(1, effect.target_value))
-            && fn({});
+    template<> std::generator<card_list> visit_cards::possible_targets(const effect_context &ctx) {
+        if (contains_at_least(get_all_card_targets(origin, origin_card, effect, ctx), std::max<int>(1, effect.target_value))) {
+            co_yield {};
+        }
     }
 
     template<> card_list visit_cards::random_target(const effect_context &ctx) {

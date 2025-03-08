@@ -20,8 +20,10 @@ namespace banggame {
         return {};
     }
 
-    template<> bool visit_players::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return !get_error(ctx) && fn();
+    template<> std::generator<std::monostate> visit_players::possible_targets(const effect_context &ctx) {
+        if (!get_error(ctx)) {
+            co_yield {};
+        }
     }
 
     template<> prompt_string visit_players::prompt(const effect_context &ctx) {

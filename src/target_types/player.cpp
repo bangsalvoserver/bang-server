@@ -7,8 +7,10 @@ namespace banggame {
 
     using visit_player = play_visitor<"player">;
 
-    template<> bool visit_player::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return rn::any_of(get_all_player_targets(origin, origin_card, effect, ctx), fn);
+    template<> std::generator<player_ptr> visit_player::possible_targets(const effect_context &ctx) {
+        for (player_ptr target : get_all_player_targets(origin, origin_card, effect, ctx)) {
+            co_yield target;
+        }
     }
 
     template<> player_ptr visit_player::random_target(const effect_context &ctx) {

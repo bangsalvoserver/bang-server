@@ -6,9 +6,10 @@ namespace banggame {
 
     using visit_cubes = play_visitor<"player_per_cube">;
 
-    template<> bool visit_cubes::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return contains_at_least(get_all_player_targets(origin, origin_card, effect, ctx), effect.target_value)
-            && fn({});
+    template<> std::generator<cubes_and_players> visit_cubes::possible_targets(const effect_context &ctx) {
+        if (contains_at_least(get_all_player_targets(origin, origin_card, effect, ctx), effect.target_value)) {
+            co_yield {};
+        }
     }
 
     template<> cubes_and_players visit_cubes::random_target(const effect_context &ctx) {

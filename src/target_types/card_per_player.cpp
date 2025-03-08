@@ -6,8 +6,8 @@ namespace banggame {
 
     using visit_cards = play_visitor<"card_per_player">;
 
-    template<> bool visit_cards::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return fn({});
+    template<> std::generator<card_list> visit_cards::possible_targets(const effect_context &ctx) {
+        co_yield {};
     }
 
     static auto cards_target_set(const_player_ptr origin, const_card_ptr origin_card, enums::bitset<target_card_filter> filter, player_ptr target, const effect_context &ctx) {

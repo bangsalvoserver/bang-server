@@ -2,12 +2,12 @@
 #define __PLAY_DISPATCH_H__
 
 #include "cards/card_defs.h"
-#include "utils/function_ref.h"
+
+#include <generator>
 
 namespace banggame::play_dispatch {
 
-    using play_card_target_predicate = std23::function_ref<bool(play_card_target) const>;
-    bool any_of_possible_targets(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target_predicate &fn);
+    std::generator<play_card_target> possible_targets(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx);
 
     play_card_target random_target(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx);
 
@@ -30,8 +30,8 @@ namespace banggame {
     using target_type_value = utils::tagged_variant_value_type<play_card_target, Tag>;
 
     template<target_type_tag Tag> struct play_visitor_t {
-        using arg_type_predicate = std23::function_ref<bool() const>;
-        
+        using value_type = std::monostate;
+
         player_ptr origin;
         card_ptr origin_card;
         const effect_holder &effect;
@@ -41,8 +41,8 @@ namespace banggame {
             return {origin, origin_card, effect};
         }
 
-        bool any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn);
-        std::monostate random_target(const effect_context &ctx) { return {}; }
+        std::generator<value_type> possible_targets(const effect_context &ctx);
+        value_type random_target(const effect_context &ctx) { return {}; }
         game_string get_error(const effect_context &ctx);
         prompt_string prompt(const effect_context &ctx);
         void add_context(effect_context &ctx);
@@ -53,7 +53,6 @@ namespace banggame {
     struct play_visitor_t<Tag> {
         using value_type = target_type_value<Tag>;
         using arg_type = std::conditional_t<std::is_trivially_copyable_v<value_type>, value_type, const value_type &>;
-        using arg_type_predicate = std23::function_ref<bool(arg_type) const>;
 
         player_ptr origin;
         card_ptr origin_card;
@@ -64,7 +63,7 @@ namespace banggame {
             return {origin, origin_card, effect};
         }
 
-        bool any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn);
+        std::generator<value_type> possible_targets(const effect_context &ctx);
         value_type random_target(const effect_context &ctx);
         game_string get_error(const effect_context &ctx, arg_type arg);
         prompt_string prompt(const effect_context &ctx, arg_type arg);

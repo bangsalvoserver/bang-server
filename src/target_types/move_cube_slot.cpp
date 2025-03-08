@@ -14,10 +14,12 @@ namespace banggame {
             });
     }
 
-    template<> bool visit_cards::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return origin->get_character()->num_cubes() != 0
+    template<> std::generator<card_list> visit_cards::possible_targets(const effect_context &ctx) {
+        if (origin->get_character()->num_cubes() != 0
             && contains_at_least(make_move_cube_target_set(origin, origin_card, ctx), 1)
-            && fn({});
+        ) {
+            co_yield {};
+        }
     }
 
     template<> card_list visit_cards::random_target(const effect_context &ctx) {
