@@ -9,9 +9,6 @@ namespace banggame {
         }
 
         const effect_holder &effect = effects[targets.size()];
-        if (!effect.can_play(origin_card, origin, ctx)) {
-            return false;
-        }
 
         for (play_card_target target : play_dispatch::possible_targets(origin, origin_card, effect, ctx)) {
             auto ctx_copy = ctx;
@@ -65,6 +62,12 @@ namespace banggame {
         } else {
             const effect_list &effects = origin_card->get_effect_list(is_response);
             if (effects.empty()) return false;
+            
+            for (const effect_holder &effect : effects) {
+                if (!effect.can_play(origin_card, origin, ctx)) {
+                    return false;
+                }
+            }
 
             const mth_holder &mth = origin_card->get_mth(is_response);
 
