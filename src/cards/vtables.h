@@ -170,12 +170,18 @@ namespace banggame {
         type->on_play(effect_value, origin_card, origin, targets, ctx);
     }
 
-    template<typename T, size_t N>
-    struct mth_handler : T {
-        std::array<int, N> indices;
+    template<int ... Is>
+    struct indices_t {
+        static constexpr std::array<int, sizeof...(Is)> value{Is ...};
+    };
 
-        mth_handler(T value, std::array<int, N> indices)
-            : T{std::move(value)}, indices{indices} {}
+    template<typename T>
+    struct mth_handler : T {
+        std::span<const int> indices;
+
+        template<int ... Is>
+        mth_handler(T value, indices_t<Is...> indices)
+            : T{std::move(value)}, indices{indices.value} {}
     };
 
     template<utils::fixed_string Name> struct mth_vtable_map;
@@ -187,8 +193,8 @@ namespace banggame {
     
     #define GET_MTH(name) (&mth_vtable_map<#name>::value)
 
-    #define MAKE_ARRAY(...) std::array{ __VA_ARGS__ }
-    #define BUILD_MTH_VALUE(name, indices, ...) (mth_handler{ mth_vtable_map<#name>::type{__VA_ARGS__}, MAKE_ARRAY indices })
+    #define MAKE_INDICES(...) indices_t<__VA_ARGS__>{}
+    #define BUILD_MTH_VALUE(name, indices, ...) (mth_handler{ mth_vtable_map<#name>::type{__VA_ARGS__}, MAKE_INDICES indices })
     
     struct ruleset_vtable {
         std::string_view name;

@@ -250,7 +250,10 @@ namespace banggame {
     #define BUILD_MODIFIER_VTABLE(name, type) template<> const modifier_vtable modifier_vtable_map<#name>::value = build_modifier_vtable<type>(#name);
 
     template<typename ... Ts>
-    auto build_mth_args(const target_list &targets, std::span<const int, sizeof...(Ts)> indices) {
+    auto build_mth_args(const target_list &targets, std::span<const int> indices) {
+        if (indices.size() != sizeof...(Ts)) {
+            throw game_error("invalid access to mth: invalid indices size");
+        }
         return [&]<size_t ... Is>(std::index_sequence<Is...>) {
             return std::make_tuple(std::visit([](const auto &value) -> Ts {
                 if constexpr (std::is_convertible_v<std::remove_cvref_t<decltype(value)>, Ts>) {
@@ -276,7 +279,7 @@ namespace banggame {
         fun_mem_ptr_t<RetType, HandlerType, Args...> m_value;
 
         RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) {
-            auto &&value = effect_cast<mth_handler<HandlerType, sizeof...(Args)>>(effect_value);
+            auto &&value = effect_cast<mth_handler<HandlerType>>(effect_value);
             return std::apply(m_value, std::tuple_cat(
                 std::tuple{static_cast<HandlerType &&>(value), origin_card, origin},
                 build_mth_args<Args...>(targets, value.indices)
@@ -289,7 +292,7 @@ namespace banggame {
         ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...> m_value;
 
         RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, CtxType ctx) {
-            auto &&value = effect_cast<mth_handler<HandlerType, sizeof...(Args)>>(effect_value);
+            auto &&value = effect_cast<mth_handler<HandlerType>>(effect_value);
             return std::apply(m_value, std::tuple_cat(
                 std::tuple{static_cast<HandlerType &&>(value), origin_card, origin, ctx},
                 build_mth_args<Args...>(targets, value.indices)
