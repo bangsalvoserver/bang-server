@@ -159,6 +159,7 @@ namespace banggame {
     #endif
 
     #define BUILD_EFFECT_VTABLE(name, type) template<> const effect_vtable effect_vtable_map<#name>::value = build_effect_vtable<type>(#name);
+    #define BUILD_EFFECT_VALUE(name, ...) (effect_vtable_map<#name>::type{__VA_ARGS__})
     
     template<typename T>
     constexpr equip_vtable build_equip_vtable(std::string_view name) {
@@ -196,6 +197,7 @@ namespace banggame {
     #endif
 
     #define BUILD_EQUIP_VTABLE(name, type) template<> const equip_vtable equip_vtable_map<#name>::value = build_equip_vtable<type>(#name);
+    #define BUILD_EQUIP_VALUE(name, ...) (equip_vtable_map<#name>::type{__VA_ARGS__})
 
     template<typename T>
     constexpr modifier_vtable build_modifier_vtable(std::string_view name) {
@@ -248,6 +250,25 @@ namespace banggame {
     #endif
 
     #define BUILD_MODIFIER_VTABLE(name, type) template<> const modifier_vtable modifier_vtable_map<#name>::value = build_modifier_vtable<type>(#name);
+    #define BUILD_MODIFIER_VALUE(name, ...) (modifier_vtable_map<#name>::type{__VA_ARGS__})
+
+    template<int ... Is>
+    struct indices_t {
+        static constexpr std::array<int, sizeof...(Is)> value{Is ...};
+    };
+
+    template<typename T>
+    struct mth_value : T {
+        std::span<const int> indices;
+
+        template<int ... Is>
+        mth_value(T handler, indices_t<Is...> indices)
+            : T{std::move(handler)}, indices{indices.value} {}
+        
+        T &handler() {
+            return static_cast<T &>(*this);
+        }
+    };
 
     template<typename ... Ts>
     auto build_mth_args(const target_list &targets, std::span<const int> indices) {
@@ -279,9 +300,9 @@ namespace banggame {
         fun_mem_ptr_t<RetType, HandlerType, Args...> m_value;
 
         RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) {
-            auto &&value = effect_cast<mth_handler<HandlerType>>(effect_value);
+            auto &&value = effect_cast<mth_value<HandlerType>>(effect_value);
             return std::apply(m_value, std::tuple_cat(
-                std::tuple{static_cast<HandlerType &&>(value), origin_card, origin},
+                std::tuple{value.handler(), origin_card, origin},
                 build_mth_args<Args...>(targets, value.indices)
             ));
         }
@@ -292,9 +313,9 @@ namespace banggame {
         ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...> m_value;
 
         RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, CtxType ctx) {
-            auto &&value = effect_cast<mth_handler<HandlerType>>(effect_value);
+            auto &&value = effect_cast<mth_value<HandlerType>>(effect_value);
             return std::apply(m_value, std::tuple_cat(
-                std::tuple{static_cast<HandlerType &&>(value), origin_card, origin, ctx},
+                std::tuple{value.handler(), origin_card, origin, ctx},
                 build_mth_args<Args...>(targets, value.indices)
             ));
         }
@@ -338,6 +359,9 @@ namespace banggame {
     #endif
 
     #define BUILD_MTH_VTABLE(name, type) template<> const mth_vtable mth_vtable_map<#name>::value = build_mth_vtable<type>(#name);
+
+    #define MAKE_INDICES(...) indices_t<__VA_ARGS__>{}
+    #define BUILD_MTH_VALUE(name, indices, ...) (mth_value{ mth_vtable_map<#name>::type{__VA_ARGS__}, MAKE_INDICES indices })
     
     template<typename T>
     constexpr ruleset_vtable build_ruleset_vtable(std::string_view name) {

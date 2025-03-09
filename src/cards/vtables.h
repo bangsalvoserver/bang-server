@@ -88,7 +88,6 @@ namespace banggame {
         BUILD_EFFECT_VTABLE(NAME, TYPE)
     
     #define GET_EFFECT(name) (&effect_vtable_map<#name>::value)
-    #define BUILD_EFFECT_VALUE(name, ...) (effect_vtable_map<#name>::type{__VA_ARGS__})
     
     struct equip_vtable {
         std::string_view name;
@@ -123,7 +122,6 @@ namespace banggame {
         BUILD_EQUIP_VTABLE(NAME, TYPE)
     
     #define GET_EQUIP(name) (&equip_vtable_map<#name>::value)
-    #define BUILD_EQUIP_VALUE(name, ...) (equip_vtable_map<#name>::type{__VA_ARGS__})
     
     struct modifier_vtable {
         std::string_view name;
@@ -148,7 +146,6 @@ namespace banggame {
         BUILD_MODIFIER_VTABLE(NAME, TYPE)
     
     #define GET_MODIFIER(name) (&modifier_vtable_map<#name>::value)
-    #define BUILD_MODIFIER_VALUE(name, ...) (modifier_vtable_map<#name>::type{__VA_ARGS__})
 
     struct mth_vtable {
         std::string_view name;
@@ -170,20 +167,6 @@ namespace banggame {
         type->on_play(effect_value, origin_card, origin, targets, ctx);
     }
 
-    template<int ... Is>
-    struct indices_t {
-        static constexpr std::array<int, sizeof...(Is)> value{Is ...};
-    };
-
-    template<typename T>
-    struct mth_handler : T {
-        std::span<const int> indices;
-
-        template<int ... Is>
-        mth_handler(T value, indices_t<Is...> indices)
-            : T{std::move(value)}, indices{indices.value} {}
-    };
-
     template<utils::fixed_string Name> struct mth_vtable_map;
 
     #define BUILD_MTH_VTABLE(name, type)
@@ -192,9 +175,6 @@ namespace banggame {
         BUILD_MTH_VTABLE(NAME, TYPE)
     
     #define GET_MTH(name) (&mth_vtable_map<#name>::value)
-
-    #define MAKE_INDICES(...) indices_t<__VA_ARGS__>{}
-    #define BUILD_MTH_VALUE(name, indices, ...) (mth_handler{ mth_vtable_map<#name>::type{__VA_ARGS__}, MAKE_INDICES indices })
     
     struct ruleset_vtable {
         std::string_view name;
@@ -207,9 +187,9 @@ namespace banggame {
     struct ruleset_vtable_map;
 
     #define BUILD_RULESET_VTABLE(name, type)
-    #define DEFINE_RULESET(name, type) \
-        template<> struct ruleset_vtable_map<#name> { static const ruleset_vtable value; }; \
-        BUILD_RULESET_VTABLE(name, type)
+    #define DEFINE_RULESET(NAME, TYPE) \
+        template<> struct ruleset_vtable_map<#NAME> { using type = TYPE; static const ruleset_vtable value; }; \
+        BUILD_RULESET_VTABLE(NAME, TYPE)
     
     #define GET_RULESET(name) (&ruleset_vtable_map<#name>::value)
 }
