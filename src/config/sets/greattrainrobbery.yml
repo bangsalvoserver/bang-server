@@ -299,7 +299,7 @@ train:
     color: train
     equip_target: notsheriff dead_or_alive
     equip:
-      - ghost(2)
+      - ghost(player_flag::ghost_2)
     tags:
       - ghost_card
   - name: LOUNGE_CAR

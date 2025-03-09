@@ -6,12 +6,14 @@ namespace banggame {
     
     using visit_card = play_visitor<"extra_card">;
 
-    template<> bool visit_card::possible(const effect_context &ctx) {
-        return ctx.repeat_card || bool(get_all_card_targets(origin, origin_card, effect, ctx));
-    }
-
-    template<> bool visit_card::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return true;
+    template<> std::generator<nullable_card> visit_card::possible_targets(const effect_context &ctx) {
+        if (ctx.repeat_card) {
+            co_yield nullptr;
+        } else {
+            for (card_ptr target : get_all_card_targets(origin, origin_card, effect, ctx)) {
+                co_yield target;
+            }
+        }
     }
 
     template<> nullable_card visit_card::random_target(const effect_context &ctx) {

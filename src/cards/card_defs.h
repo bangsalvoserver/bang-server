@@ -134,9 +134,9 @@ namespace banggame {
         target_type target;
         enums::bitset<target_player_filter> player_filter;
         enums::bitset<target_card_filter> card_filter;
-        short effect_value;
         short target_value;
         const effect_vtable *type;
+        const void *effect_value;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -162,8 +162,8 @@ namespace banggame {
     };
 
     struct equip_holder {
-        short effect_value;
         const equip_vtable *type;
+        const void *effect_value;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -177,6 +177,7 @@ namespace banggame {
 
     struct modifier_holder {
         const modifier_vtable *type;
+        const void *effect_value;
 
         explicit operator bool () const {
             return type != nullptr;
@@ -188,7 +189,7 @@ namespace banggame {
 
     struct mth_holder {
         const mth_vtable *type;
-        small_int_set args;
+        const void *effect_value;
 
         explicit operator bool () const {
             return type != nullptr;

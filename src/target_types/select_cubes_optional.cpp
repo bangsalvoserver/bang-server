@@ -4,18 +4,13 @@ namespace banggame {
 
     using visit_cubes = play_visitor<"select_cubes_optional">;
 
-    template<> bool visit_cubes::possible(const effect_context &ctx) {
-        return true;
-    }
-
-    template<> bool visit_cubes::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return true;
+    template<> std::generator<card_list> visit_cubes::possible_targets(const effect_context &ctx) {
+        co_yield {};
     }
 
     template<> card_list visit_cubes::random_target(const effect_context &ctx) {
-        auto deferred = defer<"select_cubes">();
-        if (deferred.possible(ctx)) {
-            return deferred.random_target(ctx);
+        if (origin->count_cubes() >= effect.target_value) {
+            return defer<"select_cubes">().random_target(ctx);
         }
         return {};
     }

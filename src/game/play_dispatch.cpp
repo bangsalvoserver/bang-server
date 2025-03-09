@@ -1,21 +1,12 @@
 #include "play_dispatch.h"
 
 namespace banggame::play_dispatch {
-    bool possible(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx) {
-        return utils::visit_tagged([&](target_type_tag auto tag) {
-            return play_visitor<tag.name>{origin, origin_card, effect}.possible(ctx);
-        }, effect.target);
-    }
-
-    bool any_of_possible_targets(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target_predicate &fn) {
-        return utils::visit_tagged([&](target_type_tag auto tag) {
-            if constexpr (!std::is_void_v<target_type_value<decltype(tag)>>) {
-                return play_visitor<tag.name>{origin, origin_card, effect}
-                    .any_of_possible_targets(ctx, [&](auto &&arg) { return fn(play_card_target{tag, FWD(arg)}); });
-            } else {
-                return fn(play_card_target{tag});
+    std::generator<play_card_target> possible_targets(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx) {
+        co_yield std::ranges::elements_of(utils::visit_tagged([&](target_type_tag auto tag) -> std::generator<play_card_target> {
+            for (auto &&value : play_visitor<tag.name>{origin, origin_card, effect}.possible_targets(ctx)) {
+                co_yield play_card_target{tag, FWD(value)};
             }
-        }, effect.target);
+        }, effect.target));
     }
 
     play_card_target random_target(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx) {

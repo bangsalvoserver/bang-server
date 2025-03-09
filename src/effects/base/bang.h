@@ -40,7 +40,7 @@ namespace banggame {
 
     struct equip_treat_as_bang {
         player_flag flag;
-        equip_treat_as_bang(int value);
+        equip_treat_as_bang(player_flag flag): flag{flag} {}
         
         void on_enable(card_ptr target_card, player_ptr target);
         void on_disable(card_ptr target_card, player_ptr target);

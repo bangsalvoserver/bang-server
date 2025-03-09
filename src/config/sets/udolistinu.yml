@@ -8,7 +8,7 @@ main_deck:
     color: blue
     equip_target: dead
     equip:
-      - ghost(1)
+      - ghost(player_flag::ghost_1)
     tags:
       - ghost_card
   - name: LEMAT

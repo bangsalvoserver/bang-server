@@ -98,7 +98,7 @@ main_deck:
       - set_playing card self | hand used_bang
       - discard card self | hand
       - none players notself
-    mth_effect: bulldog(1, 2)
+    mth_effect: play_as_gatling(1)
     tags:
       - weapon
   - name: LAST_WILL
@@ -332,41 +332,41 @@ hidden:
     image: character/20_annie_oakey_red
     responses:
       - card_choice
-      - annie_oakey(1)
+      - annie_oakey(&card_sign::is_red, 1)
     tags:
       - card_choice(-1)
   - name: ANNIE_OAKEY_HEARTS
     image: character/20_annie_oakey_hearts
     responses:
       - card_choice
-      - annie_oakey(2)
+      - annie_oakey(&card_sign::is_hearts, 2)
     tags:
       - card_choice(-1)
   - name: ANNIE_OAKEY_DIAMONDS
     image: character/20_annie_oakey_diamonds
     responses:
       - card_choice
-      - annie_oakey(3)
+      - annie_oakey(&card_sign::is_diamonds, 2)
     tags:
       - card_choice(-1)
   - name: ANNIE_OAKEY_BLACK
     image: character/20_annie_oakey_black
     responses:
       - card_choice
-      - annie_oakey(4)
+      - annie_oakey(&card_sign::is_black, 1)
     tags:
       - card_choice(-1)
   - name: ANNIE_OAKEY_CLUBS
     image: character/20_annie_oakey_clubs
     responses:
       - card_choice
-      - annie_oakey(5)
+      - annie_oakey(&card_sign::is_clubs, 2)
     tags:
       - card_choice(-1)
   - name: ANNIE_OAKEY_SPADES
     image: character/20_annie_oakey_spades
     responses:
       - card_choice
-      - annie_oakey(6)
+      - annie_oakey(&card_sign::is_spades, 2)
     tags:
       - card_choice(-1)

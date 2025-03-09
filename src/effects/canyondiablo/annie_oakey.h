@@ -11,9 +11,13 @@ namespace banggame {
 
     DEFINE_EQUIP(annie_oakey, equip_annie_oakey)
 
+    using card_sign_function = bool (card_sign::*)() const;
+
     struct effect_annie_oakey {
-        int choice;
-        effect_annie_oakey(int choice): choice{choice} {}
+        card_sign_function fn;
+        int ncards;
+        effect_annie_oakey(card_sign_function fn, int ncards)
+            : fn{fn}, ncards{ncards} {}
 
         bool can_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin);

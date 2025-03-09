@@ -3,13 +3,18 @@
 namespace banggame {
 
     using visit_cubes = play_visitor<"self_cubes">;
-    
-    template<> bool visit_cubes::possible(const effect_context &ctx) {
-        return origin_card->num_cubes() >= effect.target_value;
-    }
 
     template<> game_string visit_cubes::get_error(const effect_context &ctx) {
+        if (origin_card->num_cubes() < effect.target_value) {
+            return "ERROR_NOT_ENOUGH_CUBES";
+        }
         return {};
+    }
+    
+    template<> std::generator<std::monostate> visit_cubes::possible_targets(const effect_context &ctx) {
+        if (!get_error(ctx)) {
+            co_yield {};
+        }
     }
 
     template<> prompt_string visit_cubes::prompt(const effect_context &ctx) {

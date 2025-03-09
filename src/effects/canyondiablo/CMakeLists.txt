@@ -2,7 +2,6 @@ target_sources(bangserver PRIVATE
     annie_oakey.cpp
     brothel.cpp
     buffalo_bell.cpp
-    bulldog.cpp
     clash_the_stampede.cpp
     eva_place.cpp
     disarm.cpp

@@ -73,6 +73,12 @@ namespace json {
         }
     };
 
+    template<typename Context> struct serializer<const void *, Context> {
+        json operator()(const void *) const {
+            return {};
+        }
+    };
+
     template<typename Context> struct serializer<const banggame::effect_vtable *, Context> {
         json operator()(const banggame::effect_vtable *value) const {
             return value->name;

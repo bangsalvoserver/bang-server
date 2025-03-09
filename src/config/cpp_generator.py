@@ -15,14 +15,16 @@ class CppObject:
             and self.value == value.value
 
 class CppStatic:
-    def __init__(self, type_name, value):
+    def __init__(self, type_name, value, pointer = False):
         self.type_name = type_name
         self.value = value
+        self.pointer = pointer
 
     def __eq__(self, value):
         return isinstance(value, CppStatic) \
             and self.type_name == value.type_name \
-            and self.value == value.value
+            and self.value == value.value \
+            and self.pointer == value.pointer
 
 class CppStaticMap:
     def __init__(self, key_type, value_type, value):
@@ -97,7 +99,10 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
                 })
             case CppStatic():
                 if not object_value.value: return []
-                return CppLiteral(get_extra_declaration_name(traverse_declaration(object_value.value), object_value.type_name))
+                decl_name = get_extra_declaration_name(traverse_declaration(object_value.value), object_value.type_name)
+                if object_value.pointer:
+                    decl_name = '&' + decl_name
+                return CppLiteral(decl_name)
             case CppStaticMap():
                 return CppLiteral(get_extra_declaration_name(CppStaticMap(
                     key_type=object_value.key_type,

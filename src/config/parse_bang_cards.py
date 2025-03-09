@@ -60,7 +60,7 @@ def parse_effects(effect_list):
     for effect in effect_list:
         match = re.match(
             r'^\s*(\w+)' # effect_type
-            r'(?:\s*\((-?\d+)\))?' # effect_value
+            r'(?:\s*\(\s*(.+?)\s*\))?' # effect_value
             r'(?:\s*(\w+)' # target_type
             r'\s*(?:\((-?\d+)\))?)?' # target_value
             r'([\w\s]*?)' # player_filter
@@ -83,9 +83,9 @@ def parse_effects(effect_list):
             target =           CppLiteral(f'TARGET_TYPE({target_type})') if target_type else None,
             player_filter =    [CppEnum('target_player_filter', f) for f in player_filter.split()] if player_filter else None,
             card_filter =      [CppEnum('target_card_filter', f) for f in card_filter.split()] if card_filter else None,
-            effect_value =     int(effect_value) if effect_value else None,
             target_value =     int(target_value) if target_value else None,
-            type =             CppLiteral(f'GET_EFFECT({effect_type})')
+            type =             CppLiteral(f'GET_EFFECT({effect_type})'),
+            effect_value =     CppStatic('auto', CppLiteral(f"BUILD_EFFECT_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
         ))
     return CppStatic('effect_holder', result)
 
@@ -97,7 +97,7 @@ def parse_equips(equip_list):
     for effect in equip_list:
         match = re.match(
             r'^\s*(\w+)' # type
-            r'(?:\s*\((-?\d+)\))?\s*$', # effect_value
+            r'(?:\s*\(\s*(.+?)\s*\))?\s*$', # effect_value
             effect
         )
         if not match:
@@ -107,8 +107,8 @@ def parse_equips(equip_list):
         effect_value = match.group(2)
 
         result.append(CppObject(
-            effect_value = int(effect_value) if effect_value else None,
-            type = CppLiteral(f'GET_EQUIP({effect_type})')
+            type = CppLiteral(f'GET_EQUIP({effect_type})'),
+            effect_value = CppStatic('auto', CppLiteral(f"BUILD_EQUIP_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
         ))
     return CppStatic('equip_holder', result)
 
@@ -135,19 +135,43 @@ def parse_tags(tag_list):
         result[tag_type] = int(tag_value) if tag_value else 0
     return CppStaticMap('tag_type', 'short', result)
 
+def parse_modifier(modifier):
+    match = re.match(
+        r'^\s*(\w+)' # type
+        r'(?:\s*\(\s*(.+?)\s*\))?\s*$', # effect_value
+        modifier
+    )
+    if not match:
+        raise RuntimeError(f'Invalid modifier string: {modifier}')
+    
+    effect_type = match.group(1)
+    effect_value = match.group(2)
+    return CppObject(
+        type = CppLiteral(f"GET_MODIFIER({modifier})"),
+        effect_value = CppStatic('auto', CppLiteral(f"BUILD_MODIFIER_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
+    )
+
 def parse_mth(effect):
     match = re.match(
         r'^(\w+)\s*' # type
-        r'\(((?:\s*\d+,)*\s*\d+\s*)\)', #args
+        r'\(((?:\s*\d+,)*\s*\d+\s*)\)' # indices
+        r'(?:\s*\(\s*(.+?)\s*\))?\s*$', # effect_value
         effect
     )
     if not match:
         raise RuntimeError(f'Invalid mth string: {effect}')
+    
     effect_type = match.group(1)
-    effect_value = match.group(2)
+    indices = match.group(2)
+    effect_value = match.group(3)
     return CppObject(
         type = CppLiteral(f'GET_MTH({effect_type})'),
-        args = tuple(int(value.strip()) for value in effect_value.split(','))
+        effect_value = CppStatic('auto', CppLiteral(
+            f"BUILD_MTH_VALUE({effect_type}, "
+            f"({', '.join(value.strip() for value in indices.split(','))})"
+            + ((', ' + effect_value) if effect_value else '')
+            + ')'
+        ), pointer=True),
     )
 
 def parse_expansions(expansions, fn = list):
@@ -164,8 +188,8 @@ def parse_all_effects(card):
             tags =         parse_tags(card['tags']) if 'tags' in card else None,
             expansion =    parse_expansions(card['expansion'].split(), set) if 'expansion' in card else None,
             deck =         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
-            modifier =     CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier']})")) if 'modifier' in card else None,
-            modifier_response = CppObject(type = CppLiteral(f"GET_MODIFIER({card['modifier_response']})")) if 'modifier_response' in card else None,
+            modifier =      parse_modifier(card['modifier']) if 'modifier' in card else None,
+            modifier_response = parse_modifier(card['modifier_response']) if 'modifier_response' in card else None,
             mth_effect =   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
             mth_response = parse_mth(card['mth_response']) if 'mth_response' in card else None,
             equip_target = [CppEnum('target_player_filter', f) for f in card['equip_target'].split()] if 'equip_target' in card else None,
@@ -241,7 +265,7 @@ def parse_file(data):
 
     return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
 
-INCLUDE_FILENAMES = ['cards/vtable_build.h', 'cards/filter_enums.h', 'effects/effects.h']
+INCLUDE_FILENAMES = ['cards/vtable_build.h', 'effects/effects.h']
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

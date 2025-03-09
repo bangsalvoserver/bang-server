@@ -13,7 +13,7 @@ namespace banggame {
 
     struct effect_handcuffs {
         card_suit suit;
-        effect_handcuffs(int value): suit{static_cast<card_suit>(value)} {}
+        effect_handcuffs(card_suit suit): suit{suit} {}
 
         bool can_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin);

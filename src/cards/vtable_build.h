@@ -1,18 +1,20 @@
 #ifndef __VTABLE_BUILD_H__
 #define __VTABLE_BUILD_H__
 
+#include "game_enums.h"
+#include "filter_enums.h"
+
 #include "game/game_table.h"
 #include "game/filters.h"
 
 namespace banggame {
     
     template<typename T>
-    inline auto build_effect(int effect_value) {
-        if constexpr (requires { T{effect_value}; }) {
-            return T{effect_value};
-        } else {
-            return T{};
-        }
+    inline T effect_cast(const void *effect_value) {
+        // TODO add const to all effect member functions
+        // so we can return const T &
+        static_assert(std::is_trivially_copyable_v<T>);
+        return *static_cast<const T *>(effect_value);
     }
     
     template<typename T>
@@ -20,8 +22,8 @@ namespace banggame {
         return {
             .name = name,
 
-            .can_play = [](int effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> bool {
-                T value = build_effect<T>(effect_value);
+            .can_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> bool {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.can_play(origin_card, origin, ctx); }) {
                     return value.can_play(origin_card, origin, ctx);
                 } else if constexpr (requires { value.can_play(origin_card, origin); }) {
@@ -30,8 +32,8 @@ namespace banggame {
                 return true;
             },
 
-            .get_error = [](int effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> game_string {
-                T value = build_effect<T>(effect_value);
+            .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> game_string {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.get_error(origin_card, origin, ctx); }) {
                     return value.get_error(origin_card, origin, ctx);
                 } else if constexpr (requires { value.get_error(origin_card, origin); }) {
@@ -40,8 +42,8 @@ namespace banggame {
                 return {};
             },
 
-            .on_prompt = [](int effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> prompt_string {
-                T value = build_effect<T>(effect_value);
+            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> prompt_string {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.on_prompt(origin_card, origin, ctx); }) {
                     return value.on_prompt(origin_card, origin, ctx);
                 } else if constexpr (requires { value.on_prompt(origin_card, origin); }) {
@@ -50,15 +52,15 @@ namespace banggame {
                 return {};
             },
 
-            .add_context = [](int effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-                T value = build_effect<T>(effect_value);
+            .add_context = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.add_context(origin_card, origin, ctx); }) {
                     value.add_context(origin_card, origin, ctx);
                 }
             },
 
-            .on_play = [](int effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) {
-                T value = build_effect<T>(effect_value);
+            .on_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.on_play(origin_card, origin, flags, ctx); }) {
                     value.on_play(origin_card, origin, flags, ctx);
                 } else if constexpr (requires { value.on_play(origin_card, origin, ctx); }) {
@@ -70,8 +72,8 @@ namespace banggame {
                 }
             },
 
-            .get_error_player = [](int effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> game_string {
-                T value = build_effect<T>(effect_value);
+            .get_error_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> game_string {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.get_error(origin_card, origin, target, ctx); }) {
                     return value.get_error(origin_card, origin, target, ctx);
                 } else if constexpr (requires { value.get_error(origin_card, origin, target); }) {
@@ -80,8 +82,8 @@ namespace banggame {
                 return {};
             },
             
-            .on_prompt_player = [](int effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> prompt_string {
-                T value = build_effect<T>(effect_value);
+            .on_prompt_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> prompt_string {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
                     return value.on_prompt(origin_card, origin, target, ctx);
                 } else if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
@@ -90,15 +92,15 @@ namespace banggame {
                 return {};
             },
 
-            .add_context_player = [](int effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
-                T value = build_effect<T>(effect_value);
+            .add_context_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.add_context(origin_card, origin, target, ctx); }) {
                     value.add_context(origin_card, origin, target, ctx);
                 }
             },
 
-            .on_play_player = [](int effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
-                T value = build_effect<T>(effect_value);
+            .on_play_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.on_play(origin_card, origin, target, flags, ctx); }) {
                     value.on_play(origin_card, origin, target, flags, ctx);
                 } else if constexpr (requires { value.on_play(origin_card, origin, target, ctx); }) {
@@ -110,8 +112,8 @@ namespace banggame {
                 }
             },
 
-            .get_error_card = [](int effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) -> game_string {
-                T value = build_effect<T>(effect_value);
+            .get_error_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) -> game_string {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.get_error(origin_card, origin, target, ctx); }) {
                     return value.get_error(origin_card, origin, target, ctx);
                 } else if constexpr (requires { value.get_error(origin_card, origin, target); }) {
@@ -120,8 +122,8 @@ namespace banggame {
                 return {};
             },
 
-            .on_prompt_card = [](int effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) -> prompt_string {
-                T value = build_effect<T>(effect_value);
+            .on_prompt_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) -> prompt_string {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
                     return value.on_prompt(origin_card, origin, target, ctx);
                 } else if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
@@ -130,15 +132,15 @@ namespace banggame {
                 return {};
             },
 
-            .add_context_card = [](int effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) {
-                T value = build_effect<T>(effect_value);
+            .add_context_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.add_context(origin_card, origin, target, ctx); }) {
                     value.add_context(origin_card, origin, target, ctx);
                 }
             },
 
-            .on_play_card = [](int effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) {
-                T value = build_effect<T>(effect_value);
+            .on_play_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.on_play(origin_card, origin, target, flags, ctx); }) {
                     value.on_play(origin_card, origin, target, flags, ctx);
                 } else if constexpr (requires { value.on_play(origin_card, origin, target, ctx); }) {
@@ -157,29 +159,30 @@ namespace banggame {
     #endif
 
     #define BUILD_EFFECT_VTABLE(name, type) template<> const effect_vtable effect_vtable_map<#name>::value = build_effect_vtable<type>(#name);
+    #define BUILD_EFFECT_VALUE(name, ...) (effect_vtable_map<#name>::type{__VA_ARGS__})
     
     template<typename T>
     constexpr equip_vtable build_equip_vtable(std::string_view name) {
         return {
             .name = name,
 
-            .on_prompt = [](int effect_value, card_ptr origin_card, player_ptr origin, player_ptr target) -> prompt_string {
-                auto value = build_effect<T>(effect_value);
+            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target) -> prompt_string {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                     return value.on_prompt(origin_card, origin, target);
                 }
                 return {};
             },
 
-            .on_enable = [](int effect_value, card_ptr target_card, player_ptr target) {
-                auto value = build_effect<T>(effect_value);
+            .on_enable = [](const void *effect_value, card_ptr target_card, player_ptr target) {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.on_enable(target_card, target); }) {
                     value.on_enable(target_card, target);
                 }
             },
 
-            .on_disable = [](int effect_value, card_ptr target_card, player_ptr target) {
-                auto value = build_effect<T>(effect_value);
+            .on_disable = [](const void *effect_value, card_ptr target_card, player_ptr target) {
+                auto &&value = effect_cast<T>(effect_value);
                 if constexpr (requires { value.on_disable(target_card, target); }) {
                     value.on_disable(target_card, target);
                 }
@@ -194,47 +197,48 @@ namespace banggame {
     #endif
 
     #define BUILD_EQUIP_VTABLE(name, type) template<> const equip_vtable equip_vtable_map<#name>::value = build_equip_vtable<type>(#name);
+    #define BUILD_EQUIP_VALUE(name, ...) (equip_vtable_map<#name>::type{__VA_ARGS__})
 
     template<typename T>
     constexpr modifier_vtable build_modifier_vtable(std::string_view name) {
         return {
             .name = name,
 
-            .add_context = [](card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-                T handler{};
-                if constexpr (requires { handler.add_context(origin_card, origin, ctx); }) {
-                    handler.add_context(origin_card, origin, ctx);
+            .add_context = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+                auto &&value = effect_cast<T>(effect_value);
+                if constexpr (requires { value.add_context(origin_card, origin, ctx); }) {
+                    value.add_context(origin_card, origin, ctx);
                 }
             },
 
-            .get_error = [](card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) -> game_string {
-                T handler{};
+            .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) -> game_string {
+                auto &&value = effect_cast<T>(effect_value);
                 if (target_card->is_equip_card()) {
-                    if constexpr (requires { handler.valid_with_equip(origin_card, origin, target_card); }) {
-                        if (handler.valid_with_equip(origin_card, origin, target_card)) {
+                    if constexpr (requires { value.valid_with_equip(origin_card, origin, target_card); }) {
+                        if (value.valid_with_equip(origin_card, origin, target_card)) {
                             return {};
                         } else {
                             return {"ERROR_CANT_PLAY_WHILE_EQUIPPING", origin_card, target_card};
                         }
                     }
                 } else if (target_card->get_modifier(origin->m_game->pending_requests())) {
-                    if constexpr (requires { handler.valid_with_modifier(origin_card, origin, target_card); }) {
-                        if (handler.valid_with_modifier(origin_card, origin, target_card)) {
+                    if constexpr (requires { value.valid_with_modifier(origin_card, origin, target_card); }) {
+                        if (value.valid_with_modifier(origin_card, origin, target_card)) {
                             return {};
                         } else {
                             return {"ERROR_NOT_ALLOWED_WITH_MODIFIER", origin_card, target_card};
                         }
                     }
                 }
-                if constexpr (requires { handler.valid_with_card(origin_card, origin, target_card); }) {
-                    if (!handler.valid_with_card(origin_card, origin, target_card)) {
+                if constexpr (requires { value.valid_with_card(origin_card, origin, target_card); }) {
+                    if (!value.valid_with_card(origin_card, origin, target_card)) {
                         return {"ERROR_NOT_ALLOWED_WITH_CARD", origin_card, target_card};
                     }
                 }
-                if constexpr (requires { handler.get_error(origin_card, origin, target_card, ctx); }) {
-                    return handler.get_error(origin_card, origin, target_card, ctx);
-                } else if constexpr (requires { handler.get_error(origin_card, origin, target_card); }) {
-                    return handler.get_error(origin_card, origin, target_card);
+                if constexpr (requires { value.get_error(origin_card, origin, target_card, ctx); }) {
+                    return value.get_error(origin_card, origin, target_card, ctx);
+                } else if constexpr (requires { value.get_error(origin_card, origin, target_card); }) {
+                    return value.get_error(origin_card, origin, target_card);
                 }
                 return {};
             }
@@ -246,28 +250,31 @@ namespace banggame {
     #endif
 
     #define BUILD_MODIFIER_VTABLE(name, type) template<> const modifier_vtable modifier_vtable_map<#name>::value = build_modifier_vtable<type>(#name);
+    #define BUILD_MODIFIER_VALUE(name, ...) (modifier_vtable_map<#name>::type{__VA_ARGS__})
+
+    template<int ... Is>
+    struct indices_t {
+        static constexpr std::array<int, sizeof...(Is)> value{Is ...};
+    };
+
+    template<typename T>
+    struct mth_value : T {
+        std::span<const int> indices;
+
+        template<int ... Is>
+        mth_value(T handler, indices_t<Is...> indices)
+            : T{std::move(handler)}, indices{indices.value} {}
+        
+        T &handler() {
+            return static_cast<T &>(*this);
+        }
+    };
 
     template<typename ... Ts>
-    auto build_mth_args(const target_list &targets, small_int_set args) {
-        static constexpr size_t N = sizeof...(Ts);
-
-        if (args.size() != N) {
-            throw game_error("invalid access to mth: invalid args size");
+    auto build_mth_args(const target_list &targets, std::span<const int> indices) {
+        if (indices.size() != sizeof...(Ts)) {
+            throw game_error("invalid access to mth: invalid indices size");
         }
-
-        std::array<target_list::const_iterator, N> target_array;
-
-        auto it = targets.begin();
-        auto out_it = target_array.begin();
-        int prev = 0;
-        for (int arg : args) {
-            for (; prev != arg && it != targets.end(); ++prev, ++it);
-            if (it == targets.end()) {
-                throw game_error("invalid access to mth: out of bounds");
-            }
-            *out_it++ = it;
-        }
-
         return [&]<size_t ... Is>(std::index_sequence<Is...>) {
             return std::make_tuple(std::visit([](const auto &value) -> Ts {
                 if constexpr (std::is_convertible_v<std::remove_cvref_t<decltype(value)>, Ts>) {
@@ -275,8 +282,8 @@ namespace banggame {
                 } else {
                     throw game_error("invalid access to mth: wrong target type");
                 }
-            }, *target_array[Is]) ...);
-        }(std::make_index_sequence<N>());
+            }, targets.at(indices[Is])) ...);
+        }(std::index_sequence_for<Ts ...>());
     }
 
     template<typename RetType, typename HandlerType, typename ... Args>
@@ -292,10 +299,11 @@ namespace banggame {
     struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>> {
         fun_mem_ptr_t<RetType, HandlerType, Args...> m_value;
 
-        RetType operator()(card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) {
+        RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) {
+            auto &&value = effect_cast<mth_value<HandlerType>>(effect_value);
             return std::apply(m_value, std::tuple_cat(
-                std::tuple{HandlerType{}, origin_card, origin},
-                build_mth_args<Args...>(targets, args)
+                std::tuple{value.handler(), origin_card, origin},
+                build_mth_args<Args...>(targets, value.indices)
             ));
         }
     };
@@ -304,10 +312,11 @@ namespace banggame {
     struct mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>> {
         ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...> m_value;
 
-        RetType operator()(card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, CtxType ctx) {
+        RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, CtxType ctx) {
+            auto &&value = effect_cast<mth_value<HandlerType>>(effect_value);
             return std::apply(m_value, std::tuple_cat(
-                std::tuple{HandlerType{}, origin_card, origin, ctx},
-                build_mth_args<Args...>(targets, args)
+                std::tuple{value.handler(), origin_card, origin, ctx},
+                build_mth_args<Args...>(targets, value.indices)
             ));
         }
     };
@@ -323,23 +332,23 @@ namespace banggame {
         return {
             .name = name,
 
-            .get_error = [](card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> game_string {
+            .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) -> game_string {
                 if constexpr (requires { mth_unwrapper{&T::get_error}; }) {
-                    return mth_unwrapper{&T::get_error}(origin_card, origin, targets, args, ctx);
+                    return mth_unwrapper{&T::get_error}(effect_value, origin_card, origin, targets, ctx);
                 }
                 return {};
             },
 
-            .on_prompt = [](card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) -> prompt_string {
+            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) -> prompt_string {
                 if constexpr (requires { mth_unwrapper{&T::on_prompt}; }) {
-                    return mth_unwrapper{&T::on_prompt}(origin_card, origin, targets, args, ctx);
+                    return mth_unwrapper{&T::on_prompt}(effect_value, origin_card, origin, targets, ctx);
                 }
                 return {};
             },
 
-            .on_play = [](card_ptr origin_card, player_ptr origin, const target_list &targets, small_int_set args, const effect_context &ctx) {
+            .on_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) {
                 if constexpr (requires { mth_unwrapper{&T::on_play}; }) {
-                    mth_unwrapper{&T::on_play}(origin_card, origin, targets, args, ctx);
+                    mth_unwrapper{&T::on_play}(effect_value, origin_card, origin, targets, ctx);
                 }
             }
         };
@@ -350,6 +359,9 @@ namespace banggame {
     #endif
 
     #define BUILD_MTH_VTABLE(name, type) template<> const mth_vtable mth_vtable_map<#name>::value = build_mth_vtable<type>(#name);
+
+    #define MAKE_INDICES(...) indices_t<__VA_ARGS__>{}
+    #define BUILD_MTH_VALUE(name, indices, ...) (mth_value{ mth_vtable_map<#name>::type{__VA_ARGS__}, MAKE_INDICES indices })
     
     template<typename T>
     constexpr ruleset_vtable build_ruleset_vtable(std::string_view name) {

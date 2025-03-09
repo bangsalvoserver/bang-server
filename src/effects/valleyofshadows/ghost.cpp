@@ -9,9 +9,6 @@
 
 namespace banggame {
 
-    equip_ghost::equip_ghost(int value)
-        : flag(value == 1 ? player_flag::ghost_1 : player_flag::ghost_2) {}
-
     game_string equip_ghost::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
         MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
         return {};

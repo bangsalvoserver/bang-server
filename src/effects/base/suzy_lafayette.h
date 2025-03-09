@@ -7,7 +7,7 @@ namespace banggame {
 
     struct equip_suzy_lafayette : event_equip {
         int ncards;
-        equip_suzy_lafayette(int value): ncards{std::max(1, value)} {}
+        equip_suzy_lafayette(int ncards = 1): ncards{ncards} {}
         
         void on_enable(card_ptr target_card, player_ptr target);
     };

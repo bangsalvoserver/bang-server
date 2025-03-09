@@ -18,12 +18,10 @@ namespace banggame {
             });
     }
 
-    template<> bool visit_players::possible(const effect_context &ctx) {
-        return bool(make_adjacent_players_target_set(origin, origin_card, effect, ctx));
-    }
-
-    template<> bool visit_players::any_of_possible_targets(const effect_context &ctx, const arg_type_predicate &fn) {
-        return true;
+    template<> std::generator<player_list> visit_players::possible_targets(const effect_context &ctx) {
+        for (auto [target1, target2] : make_adjacent_players_target_set(origin, origin_card, effect, ctx)) {
+            co_yield {target1, target2};
+        }
     }
 
     template<> player_list visit_players::random_target(const effect_context &ctx) {

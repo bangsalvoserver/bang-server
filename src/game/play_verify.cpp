@@ -13,7 +13,7 @@
 
 namespace banggame {
 
-    static game_string check_duplicates(const effect_context &ctx) {
+    game_string check_duplicates(const effect_context &ctx) {
         std::unordered_set<player_ptr> players;
         for (player_ptr p : ctx.selected_players) {
             if (auto [it, inserted] = players.insert(p); !inserted) {

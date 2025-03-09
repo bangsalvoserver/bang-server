@@ -13,7 +13,7 @@ namespace banggame {
 
     struct effect_heal {
         int amount;
-        effect_heal(int value) : amount(std::max(1, value)) {}
+        effect_heal(int amount = 1): amount(amount) {}
 
         game_string on_prompt(card_ptr origin_card, player_ptr origin) {
             return on_prompt(origin_card, origin, origin);

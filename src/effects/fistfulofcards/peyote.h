@@ -12,9 +12,11 @@ namespace banggame {
 
     DEFINE_EQUIP(peyote, equip_peyote)
 
+    using card_sign_function = bool (card_sign::*)() const;
+
     struct effect_peyote {
-        int choice;
-        effect_peyote(int choice): choice{choice} {}
+        card_sign_function fn;
+        effect_peyote(card_sign_function fn): fn{fn} {}
 
         bool can_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin);
