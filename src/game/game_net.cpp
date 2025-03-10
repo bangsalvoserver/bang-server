@@ -73,10 +73,8 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<const void *, Context> {
-        json operator()(const void *) const {
-            return {};
-        }
+    template<> struct serializer<const void *, banggame::game_context> {
+        struct skip_field{};
     };
 
     template<typename Context> struct serializer<const banggame::effect_vtable *, Context> {

@@ -26,14 +26,17 @@ namespace json {
     template<aggregate T, typename Context>
     struct aggregate_serializer_unchecked {
         json operator()(const T &value, const Context &ctx) const {
-            return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
-                return json::object({
-                    {
-                        reflect::member_name<Is, T>(),
-                        serialize_unchecked(reflect::get<Is>(value), ctx)
-                    } ... 
-                });
-            }(std::make_index_sequence<reflect::size<T>()>());
+            json result = json::object();
+            reflect::for_each<T>([&](auto I) {
+                using member_type = reflect::member_type<I, T>;
+                if constexpr (!requires { typename serializer<member_type, Context>::skip_field; }) {
+                    result.push_back({
+                        reflect::member_name<I, T>(),
+                        serialize_unchecked(reflect::get<I>(value), ctx)
+                    });
+                }
+            });
+            return result;
         }
     };
 
