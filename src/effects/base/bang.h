@@ -38,16 +38,6 @@ namespace banggame {
 
     DEFINE_EFFECT(banglimit, effect_banglimit)
 
-    struct equip_treat_as_bang {
-        player_flag flag;
-        equip_treat_as_bang(player_flag flag): flag{flag} {}
-        
-        void on_enable(card_ptr target_card, player_ptr target);
-        void on_disable(card_ptr target_card, player_ptr target);
-    };
-
-    DEFINE_EQUIP(treat_as_bang, equip_treat_as_bang)
-
     struct modifier_bangmod {
         bool valid_with_equip(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
             return false;

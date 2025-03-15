@@ -99,14 +99,6 @@ namespace banggame {
         });
     }
 
-    void equip_treat_as_bang::on_enable(card_ptr origin_card, player_ptr p) {
-        p->add_player_flags(flag);
-    }
-
-    void equip_treat_as_bang::on_disable(card_ptr origin_card, player_ptr p) {
-        p->remove_player_flags(flag);
-    }
-
     bool modifier_bangmod::valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         return target_card->has_tag(tag_type::bangmod);
     }

@@ -24,7 +24,7 @@ character:
   - name: ANNIE_VERSARY
     image: 02_annieversary
     equip:
-      - treat_as_bang(player_flag::treat_any_as_bang)
+      - add_flag(player_flag::treat_any_as_bang)
     effects:
       - banglimit
       - set_playing card self | hand not_bangcard

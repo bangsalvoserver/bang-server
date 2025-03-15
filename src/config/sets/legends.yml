@@ -13,7 +13,7 @@ legends:
   - name: CALAMITY_JANET
     image: 23_calamity_janet
     equip:
-      - treat_as_bang(player_flag::treat_any_as_bang)
+      - add_flag(player_flag::treat_any_as_bang)
     effects:
       - banglimit
       - set_playing card self | hand not_bangcard

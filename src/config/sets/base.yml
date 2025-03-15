@@ -293,7 +293,7 @@ character:
   - name: CALAMITY_JANET
     image: 01_calamityjanet
     equip:
-      - treat_as_bang(player_flag::treat_missed_as_bang)
+      - add_flag(player_flag::treat_missed_as_bang)
     effects:
       - banglimit
       - set_playing card self | hand missed

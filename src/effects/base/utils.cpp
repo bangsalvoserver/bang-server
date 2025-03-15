@@ -21,4 +21,12 @@ namespace banggame {
         return get_play_card_error(origin, target, ctx);
     }
 
+    void equip_add_flag::on_enable(card_ptr origin_card, player_ptr target) {
+        target->add_player_flags(flag);
+    }
+
+    void equip_add_flag::on_disable(card_ptr origin_card, player_ptr target) {
+        target->remove_player_flags(flag);
+    }
+
 }
