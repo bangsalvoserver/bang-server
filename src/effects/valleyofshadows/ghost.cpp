@@ -18,11 +18,9 @@ namespace banggame {
         if (!target->alive()) {
             target->enable_equip(target->get_character());
         }
-        target->add_player_flags(flag);
     }
     
     void equip_ghost::on_disable(card_ptr target_card, player_ptr target) {
-        target->remove_player_flags(flag);
         if (!target->alive()) {
             handle_player_death(nullptr, target, death_type::ghost_discard);
         }
