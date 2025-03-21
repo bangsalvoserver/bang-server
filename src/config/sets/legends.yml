@@ -76,7 +76,7 @@ legends:
   - name: ROSE_DOOLAN
     image: 23_rose_doolan
     equip:
-      - rose_doolan_legend
+      - add_flag(player_flag::ignore_distances)
     effects:
       - max_usages(1)
       - discard card self | blue

@@ -18,7 +18,6 @@ target_sources(bangserver PRIVATE
     pedro_ramirez.cpp
     perform_feat.cpp
     quick_death.cpp
-    rose_doolan.cpp
     ruleset.cpp
     scrugs_ballad.cpp
     sid_ketchum.cpp
