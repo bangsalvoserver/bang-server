@@ -4,7 +4,6 @@ target_sources(bangserver PRIVATE
     ghosttown.cpp
     hangover.cpp
     highnoon.cpp
-    invert_rotation.cpp
     reverend.cpp
     ruleset.cpp
     sermon.cpp

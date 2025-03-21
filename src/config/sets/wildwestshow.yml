@@ -30,7 +30,7 @@ wildwestshow:
   - name: SHOWDOWN
     image: 06_regolamentodiconti
     equip:
-      - showdown
+      - game_flag(game_flag::showdown)
     effects:
       - banglimit
       - set_playing card self | hand not_bangcard
@@ -45,10 +45,11 @@ wildwestshow:
   - name: SACAGAWAY
     image: 06_sacagaway
     equip:
+      - game_flag(game_flag::hands_shown)
       - sacagaway
   - name: WILD_WEST_SHOW
     image: 06_wildwestshow
     equip:
-      - wildwestshow
+      - game_flag(game_flag::free_for_all)
     tags:
       - last_scenario_card

@@ -15,9 +15,7 @@
 #include "miss_susanna.h"
 #include "ruleset.h"
 #include "sacagaway.h"
-#include "showdown.h"
 #include "teren_kill.h"
 #include "youl_grinner.h"
-#include "wildwestshow.h"
 
 #endif

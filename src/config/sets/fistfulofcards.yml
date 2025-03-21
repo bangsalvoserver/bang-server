@@ -2,7 +2,7 @@ fistfulofcards:
   - name: AMBUSH
     image: 05_agguato
     equip:
-      - ambush
+      - game_flag(game_flag::disable_player_distances)
   - name: SNIPER
     image: 05_cecchino
     effects:
@@ -25,7 +25,7 @@ fistfulofcards:
   - name: THE_JUDGE
     image: 05_ilgiudice
     equip:
-      - judge
+      - game_flag(game_flag::disable_equipping)
   - name: LASSO
     image: 05_lazo
     equip:
@@ -43,11 +43,12 @@ fistfulofcards:
   - name: ABANDONED_MINE
     image: 05_minieraabbandonata
     equip:
-      - abandonedmine
+      - game_flag(game_flag::phase_one_draw_discard)
   - name: PEYOTE
     image: 05_peyote
     equip:
       - peyote
+      - game_flag(game_flag::phase_one_override)
     modifier_response: card_choice
     responses:
       - none

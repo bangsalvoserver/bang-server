@@ -14,8 +14,6 @@ target_sources(bangserver PRIVATE
     miss_susanna.cpp
     ruleset.cpp
     sacagaway.cpp
-    showdown.cpp
     teren_kill.cpp
-    wildwestshow.cpp
     youl_grinner.cpp
 )

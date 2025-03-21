@@ -29,4 +29,12 @@ namespace banggame {
         target->remove_player_flags(flag);
     }
 
+    void equip_game_flag::on_enable(card_ptr origin_card, player_ptr target) {
+        target->m_game->add_game_flags(flag);
+    }
+
+    void equip_game_flag::on_disable(card_ptr origin_card, player_ptr target) {
+        target->m_game->remove_game_flags(flag);
+    }
+
 }

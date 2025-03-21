@@ -13,7 +13,7 @@ highnoon:
   - name: INVERT_ROTATION
     image: 05_corsaalloro
     equip:
-      - invert_rotation
+      - game_flag(game_flag::invert_rotation)
   - name: THE_DALTONS
     image: 05_idalton
     equip:
