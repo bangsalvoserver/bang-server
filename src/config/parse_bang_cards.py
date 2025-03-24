@@ -222,7 +222,7 @@ def merge_cards(card_sets):
                 result[deck] = cards
     return result, expansions
 
-def parse_file(data):
+def parse_file(card_sets):
     def get_main_deck_cards(card):
         return [{'sign': sign, **card} for sign in card['signs']]
 
@@ -233,37 +233,43 @@ def parse_file(data):
         return [card]
 
     class Deck:
-        def __init__(self, strategy=get_cards_default, key=None, order=0, deck=None) -> None:
+        def __init__(self, name, strategy=get_cards_default, key=None, deck=None) -> None:
+            self.name = name
             self.strategy = strategy
             self.key = key
-            self.order = order
             self.deck = deck
 
-    DECKS = {
-        'main_deck': Deck(strategy=get_main_deck_cards, key='deck', order=0),
-        'character': Deck(key='characters', order=1),
-        'goldrush': Deck(strategy=get_goldrush_cards, order=2),
-        'highnoon': Deck(order=3),
-        'fistfulofcards': Deck(order=4),
-        'wildwestshow': Deck(order=5),
-        'button_row': Deck(deck='none', order=6),
-        'station': Deck(key='stations', order=7),
-        'train': Deck(order=8),
-        'locomotive': Deck(order=9),
-        'legends': Deck(order=10),
-        'feats': Deck(order=11),
-        'hidden': Deck(deck='none', order=12),
-    }
+        def get_cards(self, card_data):
+            if 'deck' not in card_data:
+                card_data['deck'] = self.deck or self.key or self.name
+            return self.strategy(card_data)
+        
+    DECKS = [
+        Deck('deck', strategy=get_main_deck_cards, key='main_deck'),
+        Deck('characters', key='character'),
+        Deck('goldrush', strategy=get_goldrush_cards),
+        Deck('highnoon'),
+        Deck('fistfulofcards'),
+        Deck('wildwestshow'),
+        Deck('button_row', deck='none'),
+        Deck('stations', key='station'),
+        Deck('train'),
+        Deck('locomotive'),
+        Deck('legends'),
+        Deck('feats'),
+        Deck('hidden', deck='none'),
+    ]
+    
+    data, expansions = merge_cards(card_sets)
 
-    def get_cards_for_deck(key, cards):
-        deck = DECKS.get(key, Deck())
-        def add_deck(card):
-            if 'deck' not in card:
-                card['deck'] = deck.deck or key
-            return card
-        return deck.key or key, CppStatic('card_data', list(parse_all_effects(card) for c in cards for card in deck.strategy(add_deck(c))))
-
-    return dict(get_cards_for_deck(*item) for item in sorted(data.items(), key=lambda item: DECKS.get(item[0], Deck()).order))
+    return CppObject(**{
+        deck.name : CppStatic('card_data', [
+            parse_all_effects(card)
+            for card_data in data[deck.key or deck.name]
+            for card in deck.get_cards(card_data)
+        ])
+        for deck in DECKS
+    }, expansions = parse_expansions(expansions))
 
 INCLUDE_FILENAMES = ['cards/vtable_build.h', 'effects/effects.h']
 
@@ -273,13 +279,9 @@ if __name__ == '__main__':
         sys.exit(1)
 
     with open(sys.argv[1], 'r', encoding='utf8') as file:
-        data, expansions = merge_cards(yaml.safe_load(file))
         bang_cards = CppDeclaration(
             object_name='const all_cards_t all_cards',
-            object_value=CppObject(
-                **parse_file(data),
-                expansions = parse_expansions(expansions)
-            ),
+            object_value=parse_file(yaml.safe_load(file)),
             namespace_name='banggame'
         )
     
