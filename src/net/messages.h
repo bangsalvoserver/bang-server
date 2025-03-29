@@ -12,46 +12,77 @@ namespace banggame {
     
     using id_type = unsigned int;
 
-    struct connect_args {
-        std::string username;
-        image_pixels propic;
-        id_type session_id;
-    };
+    namespace client_messages {
+        
+        struct pong {};
+        
+        struct connect {
+            std::string username;
+            image_pixels propic;
+            id_type session_id;
+        };
 
-    struct lobby_make_args {
-        std::string name;
-        std::string password;
-        game_options options;
-    };
+        struct user_set_name {
+            std::string username;
+        };
 
-    struct lobby_join_args {
-        id_type lobby_id;
-        std::string password;
-    };
+        struct user_set_propic {
+            image_pixels propic;
+        };
+        
+        struct lobby_make {
+            std::string name;
+            std::string password;
+            game_options options;
+        };
 
-    struct lobby_chat_client_args {
-        std::string message;
-    };
+        struct lobby_game_options {
+            game_options options;
+        };
 
-    struct game_rejoin_args {
-        int user_id;
-    };
+        struct lobby_join {
+            id_type lobby_id;
+            std::string password;
+        };
 
-    using client_message = utils::tagged_variant<
-        TAG_T(pong),
-        TAG_T(connect, connect_args),
-        TAG_T(user_set_name, std::string),
-        TAG_T(user_set_propic, image_pixels),
-        TAG_T(lobby_make, lobby_make_args),
-        TAG_T(lobby_game_options, game_options),
-        TAG_T(lobby_join, lobby_join_args),
-        TAG_T(lobby_leave),
-        TAG_T(lobby_chat, lobby_chat_client_args),
-        TAG_T(lobby_return),
-        TAG_T(user_spectate, bool),
-        TAG_T(game_start),
-        TAG_T(game_rejoin, game_rejoin_args),
-        TAG_T(game_action, json::json)
+        struct lobby_leave {};
+
+        struct lobby_chat {
+            std::string message;
+        };
+
+        struct lobby_return {};
+
+        struct user_spectate {
+            bool spectator;
+        };
+
+        struct game_start {};
+
+        struct game_rejoin {
+            int user_id;
+        };
+
+        struct game_action {
+            json::json action;
+        };
+    }
+    
+    using client_message = std::variant<
+        client_messages::pong,
+        client_messages::connect,
+        client_messages::user_set_name,
+        client_messages::user_set_propic,
+        client_messages::lobby_make,
+        client_messages::lobby_game_options,
+        client_messages::lobby_join,
+        client_messages::lobby_leave,
+        client_messages::lobby_chat,
+        client_messages::lobby_return,
+        client_messages::user_spectate,
+        client_messages::game_start,
+        client_messages::game_rejoin,
+        client_messages::game_action
     >;
 
     client_message deserialize_message(const json::json &value);

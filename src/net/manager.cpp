@@ -8,20 +8,20 @@ using namespace banggame;
 void game_manager::on_message(client_handle client, std::string_view msg) {
     try {
         auto client_msg = deserialize_message(json::json::parse(msg));
-        utils::visit_tagged([&](utils::tag_for<client_message> auto tag, auto && ... args) {
+        std::visit([&](auto && msg) {
             auto it = m_connections.find(client);
             if (it == m_connections.end()) {
                 throw critical_error("CLIENT_NOT_FOUND");
             }
             connection &con = it->second;
-            if constexpr (requires { handle_message(tag, client, con, args ...); }) {
-                handle_message(tag, client, con, FWD(args) ...);
+            if constexpr (requires { handle_message(FWD(msg), client, con); }) {
+                handle_message(FWD(msg), client, con);
             } else if (auto *value = std::get_if<connection_state::connected>(&con)) {
-                handle_message(tag, value->session, FWD(args) ...);
+                handle_message(FWD(msg), value->session);
             } else {
                 throw critical_error("CLIENT_NOT_VALIDATED");
             }
-        }, client_msg);
+        }, std::move(client_msg));
     } catch (const json::json_error &e) {
         logging::warn("Invalid message: {:.{}}\n{}", msg, net::max_message_log_size, e.what());
         kick_client(client, "INVALID_MESSAGE");
@@ -148,7 +148,7 @@ static id_type generate_session_id(auto &rng, auto &map, int max_iters) {
     throw critical_error("CANNOT_GENERATE_SESSION_ID");
 }
 
-void game_manager::handle_message(TAG_T(connect), client_handle client, connection &con, connect_args args) {
+void game_manager::handle_message(client_messages::connect &&args, client_handle client, connection &con) {
     if (!std::holds_alternative<connection_state::not_validated>(con)) {
         throw lobby_error("USER_ALREADY_CONNECTED");
     }
@@ -183,7 +183,7 @@ void game_manager::handle_message(TAG_T(connect), client_handle client, connecti
     }
 }
 
-void game_manager::handle_message(TAG_T(pong), client_handle client, connection &con) {
+void game_manager::handle_message(client_messages::pong &&args, client_handle client, connection &con) {
     if (auto *value = std::get_if<connection_state::connected>(&con)) {
         value->ping_count = 0;
     } else {
@@ -191,8 +191,8 @@ void game_manager::handle_message(TAG_T(pong), client_handle client, connection 
     }
 }
 
-void game_manager::handle_message(TAG_T(user_set_name), session_ptr session, std::string username) {
-    session->set_username(std::move(username));
+void game_manager::handle_message(client_messages::user_set_name &&args, session_ptr session) {
+    session->set_username(std::move(args.username));
 
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
@@ -200,8 +200,8 @@ void game_manager::handle_message(TAG_T(user_set_name), session_ptr session, std
     }
 }
 
-void game_manager::handle_message(TAG_T(user_set_propic), session_ptr session, image_pixels propic) {
-    session->set_propic(std::move(propic));
+void game_manager::handle_message(client_messages::user_set_propic &&args, session_ptr session) {
+    session->set_propic(std::move(args.propic));
 
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
@@ -209,20 +209,20 @@ void game_manager::handle_message(TAG_T(user_set_propic), session_ptr session, i
     }
 }
 
-void game_manager::handle_message(TAG_T(lobby_make), session_ptr session, const lobby_make_args &value) {
+void game_manager::handle_message(client_messages::lobby_make &&args, session_ptr session) {
     if (session->lobby) {
         throw lobby_error("ERROR_PLAYER_IN_LOBBY");
     }
 
     id_type lobby_id = m_lobbies.empty() ? 1 : m_lobbies.rbegin()->first + 1;
-    game_lobby &lobby = m_lobbies.try_emplace(lobby_id, lobby_id, value.name, value.options).first->second;
+    game_lobby &lobby = m_lobbies.try_emplace(lobby_id, lobby_id, args.name, args.options).first->second;
     tracking::track_lobby_count(m_lobbies.size());
 
     game_user &user = lobby.add_user(session).first;
     user.flags.add(game_user_flag::lobby_owner);
 
     lobby.state = lobby_state::waiting;
-    lobby.password = value.password;
+    lobby.password = args.password;
 
     broadcast_message_no_lobby<"lobby_update">(lobby);
 
@@ -234,7 +234,7 @@ void game_manager::handle_message(TAG_T(lobby_make), session_ptr session, const 
     });
 }
 
-void game_manager::handle_message(TAG_T(lobby_game_options), session_ptr session, const game_options &options) {
+void game_manager::handle_message(client_messages::lobby_game_options &&args, session_ptr session) {
     if (!session->lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -249,11 +249,11 @@ void game_manager::handle_message(TAG_T(lobby_game_options), session_ptr session
         throw lobby_error("ERROR_LOBBY_NOT_WAITING");
     }
 
-    lobby.options = options;
+    lobby.options = args.options;
     
     for (const game_user &user : lobby.connected_users()) {
         if (user.session != session) {
-            send_message<"lobby_game_options">(user.session->client, options);
+            send_message<"lobby_game_options">(user.session->client, args.options);
         }
     }
 }
@@ -328,18 +328,18 @@ bool game_manager::remove_user_flag(game_lobby &lobby, game_user &user, game_use
     return false;
 }
 
-void game_manager::handle_message(TAG_T(lobby_join), session_ptr session, const lobby_join_args &value) {
+void game_manager::handle_message(client_messages::lobby_join &&args, session_ptr session) {
     if (session->lobby) {
         throw lobby_error("ERROR_PLAYER_IN_LOBBY");
     }
 
-    auto lobby_it = m_lobbies.find(value.lobby_id);
+    auto lobby_it = m_lobbies.find(args.lobby_id);
     if (lobby_it == m_lobbies.end()) {
         throw lobby_error("ERROR_INVALID_LOBBY");
     }
 
     game_lobby &lobby = lobby_it->second;
-    if (!lobby.password.empty() && lobby.password != value.password) {
+    if (!lobby.password.empty() && lobby.password != args.password) {
         throw lobby_error("ERROR_PASSWORD_INCORRECT");
     }
 
@@ -405,7 +405,7 @@ void game_manager::on_disconnect(client_handle client) {
     tracking::track_client_count(m_connections.size());
 }
 
-void game_manager::handle_message(TAG_T(lobby_leave), session_ptr session) {
+void game_manager::handle_message(client_messages::lobby_leave &&args, session_ptr session) {
     if (!session->lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -426,18 +426,18 @@ void game_manager::add_lobby_chat_message(game_lobby &lobby, game_user *is_read_
     lobby.chat_messages.emplace_back(std::move(with_is_read));
 }
 
-void game_manager::handle_message(TAG_T(lobby_chat), session_ptr session, const lobby_chat_client_args &value) {
+void game_manager::handle_message(client_messages::lobby_chat &&args, session_ptr session) {
     if (!session->lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
-    if (!value.message.empty()) {
+    if (!args.message.empty()) {
         game_lobby &lobby = *session->lobby;
         game_user &user = lobby.find_user(session);
         if (!user.is_muted()) {
-            add_lobby_chat_message(lobby, nullptr, { user.user_id, value.message });
+            add_lobby_chat_message(lobby, nullptr, { user.user_id, args.message });
         }
-        if (value.message[0] == chat_command::start_char) {
-            handle_chat_command(session, value.message.substr(1));
+        if (args.message[0] == chat_command::start_char) {
+            handle_chat_command(session, args.message.substr(1));
         }
     }
 }
@@ -496,7 +496,7 @@ void game_manager::handle_chat_command(session_ptr session, const std::string &m
     command(this, session, args);
 }
 
-void game_manager::handle_message(TAG_T(lobby_return), session_ptr session) {
+void game_manager::handle_message(client_messages::lobby_return &&args, session_ptr session) {
     if (!session->lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -524,7 +524,7 @@ void game_manager::handle_message(TAG_T(lobby_return), session_ptr session) {
     broadcast_message_no_lobby<"lobby_update">(lobby);
 }
 
-void game_manager::handle_message(TAG_T(user_spectate), session_ptr session, bool spectator) {
+void game_manager::handle_message(client_messages::user_spectate &&args, session_ptr session) {
     if (!session->lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -533,7 +533,7 @@ void game_manager::handle_message(TAG_T(user_spectate), session_ptr session, boo
         throw lobby_error("ERROR_LOBBY_NOT_WAITING");
     }
     game_user &user = lobby.find_user(session);
-    if (spectator) {
+    if (args.spectator) {
         add_user_flag(lobby, user, game_user_flag::spectator);
     } else {
         remove_user_flag(lobby, user, game_user_flag::spectator);
@@ -541,7 +541,7 @@ void game_manager::handle_message(TAG_T(user_spectate), session_ptr session, boo
     broadcast_message_no_lobby<"lobby_update">(lobby);
 }
 
-void game_manager::handle_message(TAG_T(game_start), session_ptr session) {
+void game_manager::handle_message(client_messages::game_start &&args, session_ptr session) {
     if (!session->lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -601,7 +601,7 @@ void game_manager::handle_message(TAG_T(game_start), session_ptr session) {
     logging::pop_context();
 }
 
-void game_manager::handle_message(TAG_T(game_rejoin), session_ptr session, const game_rejoin_args &value) {
+void game_manager::handle_message(client_messages::game_rejoin &&args, session_ptr session) {
     game_lobby &lobby = *session->lobby;
     game_user &user = lobby.find_user(session);
 
@@ -613,11 +613,11 @@ void game_manager::handle_message(TAG_T(game_rejoin), session_ptr session, const
         throw lobby_error("ERROR_USER_NOT_SPECTATOR");
     }
 
-    if (rn::contains(lobby.connected_users(), value.user_id, &game_user::user_id)) {
+    if (rn::contains(lobby.connected_users(), args.user_id, &game_user::user_id)) {
         throw lobby_error("ERROR_PLAYER_NOT_REJOINABLE");
     }
 
-    player_ptr target = lobby.m_game->find_player_by_userid(value.user_id);
+    player_ptr target = lobby.m_game->find_player_by_userid(args.user_id);
     if (!target) {
         throw lobby_error("ERROR_CANNOT_FIND_PLAYER");
     }
@@ -639,7 +639,7 @@ void game_manager::handle_message(TAG_T(game_rejoin), session_ptr session, const
     broadcast_message_no_lobby<"lobby_update">(lobby);
 }
 
-void game_manager::handle_message(TAG_T(game_action), session_ptr session, const json::json &value) {
+void game_manager::handle_message(client_messages::game_action &&args, session_ptr session) {
     if (!session->lobby) {
         throw lobby_error("ERROR_PLAYER_NOT_IN_LOBBY");
     }
@@ -661,7 +661,7 @@ void game_manager::handle_message(TAG_T(game_action), session_ptr session, const
 
     try {
         logging::push_context(std::format("game {}", lobby.name));
-        lobby.m_game->handle_game_action(origin, value);
+        lobby.m_game->handle_game_action(origin, args.action);
         logging::pop_context();
     } catch (const game_error &e) {
         lobby.state = lobby_state::finished;
