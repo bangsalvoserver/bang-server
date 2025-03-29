@@ -15,6 +15,9 @@ namespace utils {
         using type = T;
     };
 
+    #define TAG(name) utils::tag<#name>{}
+    #define TAG_T(name, ...) utils::tag<#name __VA_OPT__(,) __VA_ARGS__>
+
     template<typename T>
     concept is_tag = requires {
         { T::name } -> std::convertible_to<std::string_view>;

@@ -357,16 +357,16 @@ namespace banggame {
         ctx.playing_card = args.card;
 
         if (game_string error = verify_timer_response(origin, args.timer_id)) {
-            return {utils::tag<"error">{}, error};
+            return {TAG(error), error};
         }
 
         if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-            return {utils::tag<"error">{}, error};
+            return {TAG(error), error};
         }
 
         if (!args.bypass_prompt) {
             if (prompt_string prompt = get_prompt_message(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-                return {utils::tag<"prompt">{}, prompt};
+                return {TAG(prompt), prompt};
             }
         }
 

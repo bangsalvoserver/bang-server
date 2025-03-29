@@ -423,11 +423,11 @@ namespace banggame {
 
     request_state game::send_request_status_ready() {
         if (!m_playing) {
-            return utils::tag<"done">{};
+            return TAG(done);
         }
         if (!m_playing->alive()) {
             start_next_turn();
-            return utils::tag<"next">{};
+            return TAG(next);
         }
 
         auto args = make_status_ready_update(m_playing);
@@ -436,10 +436,10 @@ namespace banggame {
             return args.card->has_tag(tag_type::pass_turn);
         })) {
             m_playing->pass_turn();
-            return utils::tag<"next">{};
+            return TAG(next);
         } else {
             add_update<"status_ready">(update_target::includes(m_playing), std::move(args));
-            return utils::tag<"done">{};
+            return TAG(done);
         }
     }
 

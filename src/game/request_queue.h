@@ -35,10 +35,10 @@ namespace banggame {
     };
 
     using request_state = utils::tagged_variant<
-        utils::tag<"done">,
-        utils::tag<"next">,
-        utils::tag<"waiting", ticks>,
-        utils::tag<"bot_play", ticks>
+        TAG_T(done),
+        TAG_T(next),
+        TAG_T(waiting, ticks),
+        TAG_T(bot_play, ticks)
     >;
 
     using request_state_index = utils::tagged_variant_index<request_state>;

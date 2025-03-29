@@ -179,13 +179,13 @@ namespace banggame {
         auto result = verify_and_play(origin, action);
 
         utils::visit_tagged(overloaded{
-            [&](utils::tag<"ok">) {
+            [&](TAG_T(ok)) {
                 origin->m_game->commit_updates();
             },
-            [&](utils::tag<"error">, game_string error) {
+            [&](TAG_T(error), game_string error) {
                 add_update<"game_error">(update_target::includes(origin), error);
             },
-            [&](utils::tag<"prompt">, prompt_string prompt) {
+            [&](TAG_T(prompt), prompt_string prompt) {
                 add_update<"game_prompt">(update_target::includes(origin), prompt.message);
             }
         }, result);

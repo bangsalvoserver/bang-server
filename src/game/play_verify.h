@@ -15,9 +15,9 @@ namespace banggame {
     prompt_string get_equip_prompt(player_ptr origin, card_ptr origin_card, player_ptr target);
 
     using game_message = utils::tagged_variant<
-        utils::tag<"ok">,
-        utils::tag<"error", game_string>,
-        utils::tag<"prompt", prompt_string>
+        TAG_T(ok),
+        TAG_T(error, game_string),
+        TAG_T(prompt, prompt_string)
     >;
 
     game_message verify_and_play(player_ptr origin, const game_action &action);

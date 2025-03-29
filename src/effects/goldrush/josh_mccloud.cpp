@@ -26,7 +26,7 @@ namespace banggame {
                     target_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
                     
                     for (const effect_holder &effect : target_card->responses) {
-                        play_dispatch::play(target, target_card, effect, {}, utils::tag<"none">{});
+                        play_dispatch::play(target, target_card, effect, {}, TAG(none));
                     }
                 }
             } else {

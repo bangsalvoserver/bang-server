@@ -10,9 +10,9 @@ namespace banggame {
     static constexpr size_t format_arg_list_max_size = 5;
 
     using format_arg_variant = utils::tagged_variant<
-        utils::tag<"integer", int>,
-        utils::tag<"card", utils::nullable<banggame::const_card_ptr>>,
-        utils::tag<"player", utils::nullable<banggame::const_player_ptr>>
+        TAG_T(integer, int),
+        TAG_T(card, utils::nullable<banggame::const_card_ptr)>,
+        TAG_T(player, utils::nullable<banggame::const_player_ptr)>
     >;
 
     class format_arg_list;
@@ -144,11 +144,11 @@ namespace banggame {
         
         switch (type) {
         case banggame::format_arg_list::format_number:
-            return {utils::tag<"integer">{}, arg.number_value};
+            return {TAG(integer), arg.number_value};
         case banggame::format_arg_list::format_card:
-            return {utils::tag<"card">{}, arg.card_value};
+            return {TAG(card), arg.card_value};
         case banggame::format_arg_list::format_player:
-            return {utils::tag<"player">{}, arg.player_value};
+            return {TAG(player), arg.player_value};
         default:
             throw std::runtime_error("invalid format_arg");
         }

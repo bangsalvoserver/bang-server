@@ -105,24 +105,24 @@ namespace banggame {
     using cubes_and_players = std::pair<card_list, player_list>;
 
     using play_card_target = utils::tagged_variant<
-        utils::tag<"none">,
-        utils::tag<"player", player_ptr>,
-        utils::tag<"conditional_player", nullable_player>,
-        utils::tag<"adjacent_players", player_list>,
-        utils::tag<"player_per_cube", cubes_and_players>,
-        utils::tag<"random_if_hand_card", card_ptr>,
-        utils::tag<"card", card_ptr>,
-        utils::tag<"extra_card", nullable_card>,
-        utils::tag<"players">,
-        utils::tag<"cards", card_list>,
-        utils::tag<"max_cards", card_list>,
-        utils::tag<"card_per_player", card_list>,
-        utils::tag<"cube_slot", card_ptr>,
-        utils::tag<"move_cube_slot", card_list>,
-        utils::tag<"select_cubes", card_list>,
-        utils::tag<"select_cubes_optional", card_list>,
-        utils::tag<"select_cubes_repeat", card_list>,
-        utils::tag<"self_cubes">
+        TAG_T(none),
+        TAG_T(player, player_ptr),
+        TAG_T(conditional_player, nullable_player),
+        TAG_T(adjacent_players, player_list),
+        TAG_T(player_per_cube, cubes_and_players),
+        TAG_T(random_if_hand_card, card_ptr),
+        TAG_T(card, card_ptr),
+        TAG_T(extra_card, nullable_card),
+        TAG_T(players),
+        TAG_T(cards, card_list),
+        TAG_T(max_cards, card_list),
+        TAG_T(card_per_player, card_list),
+        TAG_T(cube_slot, card_ptr),
+        TAG_T(move_cube_slot, card_list),
+        TAG_T(select_cubes, card_list),
+        TAG_T(select_cubes_optional, card_list),
+        TAG_T(select_cubes_repeat, card_list),
+        TAG_T(self_cubes)
     >;
 
     using target_type = utils::tagged_variant_index<play_card_target>;

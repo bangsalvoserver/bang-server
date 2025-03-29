@@ -38,20 +38,20 @@ namespace banggame {
     };
 
     using client_message = utils::tagged_variant<
-        utils::tag<"pong">,
-        utils::tag<"connect", connect_args>,
-        utils::tag<"user_set_name", std::string>,
-        utils::tag<"user_set_propic", image_pixels>,
-        utils::tag<"lobby_make", lobby_make_args>,
-        utils::tag<"lobby_game_options", game_options>,
-        utils::tag<"lobby_join", lobby_join_args>,
-        utils::tag<"lobby_leave">,
-        utils::tag<"lobby_chat", lobby_chat_client_args>,
-        utils::tag<"lobby_return">,
-        utils::tag<"user_spectate", bool>,
-        utils::tag<"game_start">,
-        utils::tag<"game_rejoin", game_rejoin_args>,
-        utils::tag<"game_action", json::json>
+        TAG_T(pong),
+        TAG_T(connect, connect_args),
+        TAG_T(user_set_name, std::string),
+        TAG_T(user_set_propic, image_pixels),
+        TAG_T(lobby_make, lobby_make_args),
+        TAG_T(lobby_game_options, game_options),
+        TAG_T(lobby_join, lobby_join_args),
+        TAG_T(lobby_leave),
+        TAG_T(lobby_chat, lobby_chat_client_args),
+        TAG_T(lobby_return),
+        TAG_T(user_spectate, bool),
+        TAG_T(game_start),
+        TAG_T(game_rejoin, game_rejoin_args),
+        TAG_T(game_action, json::json)
     >;
 
     client_message deserialize_message(const json::json &value);
@@ -112,9 +112,9 @@ namespace banggame {
     using lobby_chat_flags = enums::bitset<lobby_chat_flag>;
 
     using chat_format_arg = utils::tagged_variant<
-        utils::tag<"user", int>,
-        utils::tag<"integer", int>,
-        utils::tag<"string", std::string>
+        TAG_T(user, int),
+        TAG_T(integer, int),
+        TAG_T(string, std::string)
     >;
 
     using chat_format_arg_list = std::vector<chat_format_arg>;
@@ -127,18 +127,18 @@ namespace banggame {
     };
 
     using server_message = utils::tagged_variant<
-        utils::tag<"ping">,
-        utils::tag<"client_accepted", client_accepted_args>,
-        utils::tag<"lobby_error", std::string>,
-        utils::tag<"lobby_update", lobby_data>,
-        utils::tag<"lobby_entered", lobby_entered_args>,
-        utils::tag<"lobby_game_options", game_options>,
-        utils::tag<"lobby_removed", lobby_removed_args>,
-        utils::tag<"lobby_user_update", lobby_user_args>,
-        utils::tag<"lobby_kick">,
-        utils::tag<"lobby_chat", lobby_chat_args>,
-        utils::tag<"game_update", json::json>,
-        utils::tag<"game_started">
+        TAG_T(ping),
+        TAG_T(client_accepted, client_accepted_args),
+        TAG_T(lobby_error, std::string),
+        TAG_T(lobby_update, lobby_data),
+        TAG_T(lobby_entered, lobby_entered_args),
+        TAG_T(lobby_game_options, game_options),
+        TAG_T(lobby_removed, lobby_removed_args),
+        TAG_T(lobby_user_update, lobby_user_args),
+        TAG_T(lobby_kick),
+        TAG_T(lobby_chat, lobby_chat_args),
+        TAG_T(game_update, json::json),
+        TAG_T(game_started)
     >;
 
     template<utils::fixed_string Name>
