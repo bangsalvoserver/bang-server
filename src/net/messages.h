@@ -22,10 +22,12 @@ namespace banggame {
         };
 
         struct user_set_name {
+            struct transparent{};
             std::string username;
         };
 
         struct user_set_propic {
+            struct transparent{};
             image_pixels propic;
         };
         
@@ -36,6 +38,7 @@ namespace banggame {
         };
 
         struct lobby_game_options {
+            struct transparent{};
             game_options options;
         };
 
@@ -53,6 +56,7 @@ namespace banggame {
         struct lobby_return {};
 
         struct user_spectate {
+            struct transparent{};
             bool spectator;
         };
 
@@ -63,6 +67,7 @@ namespace banggame {
         };
 
         struct game_action {
+            struct transparent{};
             json::json action;
         };
     }
@@ -134,6 +139,7 @@ namespace banggame {
         };
 
         struct lobby_error {
+            struct transparent{};
             std::string message;
         };
 
@@ -155,6 +161,7 @@ namespace banggame {
         };
 
         struct lobby_game_options {
+            struct transparent{};
             game_options options;
         };
 
@@ -186,6 +193,7 @@ namespace banggame {
         };
 
         struct game_update {
+            struct transparent{};
             json::json update;
         };
 

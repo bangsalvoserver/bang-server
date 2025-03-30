@@ -5,24 +5,6 @@
 
 #include "utils/json_aggregate.h"
 
-namespace json {
-
-    template<typename Context>
-    struct deserializer<banggame::client_messages::game_action, Context> {
-        banggame::client_messages::game_action operator()(const json &value, const Context &ctx) const {
-            return { value };
-        }
-    };
-
-    template<typename Context>
-    struct serializer<banggame::server_messages::game_update, Context> {
-        json operator()(const banggame::server_messages::game_update &value, const Context &ctx) const {
-            return value.update;
-        }
-    };
-
-}
-
 namespace banggame {
     
     std::string serialize_message(const server_message &message) {

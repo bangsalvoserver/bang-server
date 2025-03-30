@@ -41,14 +41,17 @@ namespace banggame {
     namespace game_updates {
 
         struct game_error {
+            struct transparent{};
             game_string message;
         };
 
         struct game_log {
+            struct transparent{};
             game_string message;
         };
 
         struct game_prompt {
+            struct transparent{};
             game_string message;
         };
 
@@ -153,6 +156,7 @@ namespace banggame {
         };
 
         struct switch_turn {
+            struct transparent{};
             player_ptr player;
         };
 
@@ -191,10 +195,12 @@ namespace banggame {
         };
 
         struct game_flags {
+            struct transparent{};
             banggame::game_flags flags;
         };
 
         struct play_sound {
+            struct transparent{};
             std::string sound;
         };
 
