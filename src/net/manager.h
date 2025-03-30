@@ -10,12 +10,6 @@
 
 namespace banggame {
 
-template<utils::fixed_string E> requires server_message_type<E>
-std::string make_message(auto && ... args) {
-    return serialize_message(server_message{utils::tag<E>{}, FWD(args) ...})
-        .dump(-1, ' ', true, nlohmann::json::error_handler_t::replace);
-}
-
 struct server_options {
     bool enable_cheats = false;
     int max_session_id_count = 10;
@@ -37,14 +31,12 @@ protected:
     void on_message(client_handle client, std::string_view message) override;
 
 private:
-    template<utils::fixed_string E> requires server_message_type<E>
-    void send_message(client_handle client, auto && ... args) {
-        m_outgoing_messages.emplace_back(client, make_message<E>(FWD(args) ... ));
+    void send_message(client_handle client, const server_message &msg) {
+        m_outgoing_messages.emplace_back(client, serialize_message(msg));
     }
 
-    template<utils::fixed_string E> requires server_message_type<E>
-    void broadcast_message_no_lobby(auto && ... args) {
-        std::string message = make_message<E>(FWD(args) ... );
+    void broadcast_message_no_lobby(const server_message &msg) {
+        std::string message = serialize_message(msg);
         for (session_ptr session : m_sessions | rv::values) {
             if (!session->lobby) {
                 m_outgoing_messages.emplace_back(session->client, message);
@@ -52,9 +44,8 @@ private:
         }
     }
 
-    template<utils::fixed_string E> requires server_message_type<E>
-    void broadcast_message_lobby(const game_lobby &lobby, auto && ... args) {
-        std::string message = make_message<E>(FWD(args) ... );
+    void broadcast_message_lobby(const game_lobby &lobby, const server_message &msg) {
+        std::string message = serialize_message(msg);
         for (const game_user &user : lobby.connected_users()) {
             m_outgoing_messages.emplace_back(user.session->client, message);
         }
@@ -62,7 +53,7 @@ private:
 
     void invalidate_connection(client_handle client);
     void kick_user_from_lobby(session_ptr session);
-    void add_lobby_chat_message(game_lobby &lobby, game_user *is_read_for, lobby_chat_args message);
+    void add_lobby_chat_message(game_lobby &lobby, game_user *is_read_for, server_messages::lobby_chat message);
     void handle_join_lobby(session_ptr session, game_lobby &lobby);
 
     bool add_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag);

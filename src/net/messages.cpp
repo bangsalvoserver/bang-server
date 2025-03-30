@@ -50,12 +50,33 @@ namespace json {
         }
     };
 
+    template<typename Context>
+    struct serializer<banggame::server_messages::game_update, Context> {
+        json operator()(const banggame::server_messages::game_update &value, const Context &ctx) const {
+            return serialize_unchecked(value.update, ctx);
+        }
+    };
+
+    template<typename Context, typename ... Ts>
+    struct serializer<std::variant<Ts ...>, Context> {
+        using variant_type = std::variant<Ts ...>;
+
+        json operator()(const variant_type &value, const Context &ctx) const {
+            return std::visit([&](const auto &inner_value) {
+                return json{{
+                    reflect::type_name<std::remove_cvref_t<decltype(inner_value)>>(),
+                    serialize_unchecked(inner_value, ctx)
+                }};
+            }, value);
+        }
+    };
+
 }
 
 namespace banggame {
     
-    json::json serialize_message(const server_message &message) {
-        return json::serialize(message);
+    std::string serialize_message(const server_message &message) {
+        return json::serialize(message).dump(-1, ' ', true, nlohmann::json::error_handler_t::replace);
     }
 
     client_message deserialize_message(const json::json &value) {

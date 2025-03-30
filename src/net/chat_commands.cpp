@@ -26,11 +26,11 @@ namespace banggame {
     void game_manager::command_print_help(session_ptr session) {
         for (const auto &[cmd_name, command] : chat_command::commands) {
             if (!command.permissions().check(command_permissions::game_cheat) || m_options.enable_cheats) {
-                send_message<"lobby_chat">(session->client, 0,
+                send_message(session->client, server_messages::lobby_chat{ 0,
                     std::string{command.description()},
                     chat_format_arg_list{{TAG(string), std::format("{}{}", chat_command::start_char, cmd_name)}},
                     lobby_chat_flag::translated
-                );
+                });
             }
         }
     }
@@ -39,13 +39,13 @@ namespace banggame {
         game_lobby &lobby = *session->lobby;
         for (const game_user &user : lobby.connected_users()) {
             if (user.flags.empty()) {
-                send_message<"lobby_chat">(session->client, 0,
+                send_message(session->client, server_messages::lobby_chat{ 0,
                     std::format("{} : {}", user.user_id, user.session->username)
-                );
+                });
             } else {
-                send_message<"lobby_chat">(session->client, 0,
+                send_message(session->client, server_messages::lobby_chat{ 0,
                     std::format("{} : {} ({})", user.user_id, user.session->username, user.flags)
-                );
+                });
             }
         }
     }
@@ -73,14 +73,14 @@ namespace banggame {
     }
     
     void game_manager::command_get_game_options(session_ptr session) {
-        send_message<"lobby_chat">(session->client, 0, session->lobby->options.to_string());
+        send_message(session->client, server_messages::lobby_chat{ 0, session->lobby->options.to_string() });
     }
 
     void game_manager::command_set_game_option(session_ptr session, std::string_view key, std::string_view value) {
         try {
             game_lobby &lobby = *session->lobby;
             lobby.options.set_option(key, value);
-            broadcast_message_lobby<"lobby_game_options">(lobby, lobby.options);
+            broadcast_message_lobby(lobby, server_messages::lobby_game_options{ lobby.options });
         } catch (const std::exception &e) {
             throw lobby_error(e.what());
         }
@@ -89,7 +89,7 @@ namespace banggame {
     void game_manager::command_reset_game_options(session_ptr session) {
         game_lobby &lobby = *session->lobby;
         lobby.options = game_options{};
-        broadcast_message_lobby<"lobby_game_options">(lobby, lobby.options);
+        broadcast_message_lobby(lobby, server_messages::lobby_game_options{ lobby.options });
     }
 
     void game_manager::command_give_card(session_ptr session, std::string_view card_name) {
@@ -111,11 +111,11 @@ namespace banggame {
     }
 
     void game_manager::command_get_rng_seed(session_ptr session) {
-        send_message<"lobby_chat">(session->client, 0,
+        send_message(session->client, server_messages::lobby_chat{0,
             "GAME_SEED", chat_format_arg_list{
                 {TAG(string), std::format("{}", session->lobby->m_game->rng_seed)}
             }, lobby_chat_flag::translated
-        );
+        });
     }
 
     void game_manager::command_quit(session_ptr session) {
