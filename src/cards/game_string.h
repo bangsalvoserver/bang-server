@@ -2,17 +2,33 @@
 #define __GAME_STRING_H__
 
 #include "utils/small_string.h"
-#include "utils/tagged_variant.h"
 #include "card_fwd.h"
 
 namespace banggame {
 
     static constexpr size_t format_arg_list_max_size = 5;
 
-    using format_arg_variant = utils::tagged_variant<
-        utils::tag<"integer", int>,
-        utils::tag<"card", utils::nullable<banggame::const_card_ptr>>,
-        utils::tag<"player", utils::nullable<banggame::const_player_ptr>>
+    namespace game_string_args {
+        struct integer {
+            struct transparent{};
+            int value;
+        };
+
+        struct card {
+            struct transparent{};
+            utils::nullable<banggame::const_card_ptr> value;
+        };
+
+        struct player {
+            struct transparent{};
+            utils::nullable<banggame::const_player_ptr> value;
+        };
+    }
+
+    using format_arg_variant = std::variant<
+        game_string_args::integer,
+        game_string_args::card,
+        game_string_args::player
     >;
 
     class format_arg_list;
@@ -144,11 +160,11 @@ namespace banggame {
         
         switch (type) {
         case banggame::format_arg_list::format_number:
-            return {utils::tag<"integer">{}, arg.number_value};
+            return game_string_args::integer{ arg.number_value};
         case banggame::format_arg_list::format_card:
-            return {utils::tag<"card">{}, arg.card_value};
+            return game_string_args::card{ arg.card_value};
         case banggame::format_arg_list::format_player:
-            return {utils::tag<"player">{}, arg.player_value};
+            return game_string_args::player{ arg.player_value};
         default:
             throw std::runtime_error("invalid format_arg");
         }

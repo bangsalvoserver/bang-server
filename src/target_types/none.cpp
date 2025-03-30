@@ -2,13 +2,13 @@
 
 namespace banggame {
 
-    using visit_none = play_visitor<"none">;
+    using visit_none = play_visitor<target_types::none>;
 
     template<> game_string visit_none::get_error(const effect_context &ctx) {
         return effect.get_error(origin_card, origin, ctx);
     }
 
-    template<> std::generator<std::monostate> visit_none::possible_targets(const effect_context &ctx) {
+    template<> std::generator<target_types::none> visit_none::possible_targets(const effect_context &ctx) {
         if (!get_error(ctx)) {
             co_yield {};
         }

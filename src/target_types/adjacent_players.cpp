@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    using visit_players = play_visitor<"adjacent_players">;
+    using visit_players = play_visitor<target_types::adjacent_players>;
 
     static auto make_adjacent_players_target_set(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx) {
         return rv::cartesian_product(origin->m_game->m_players, origin->m_game->m_players)
@@ -49,13 +49,13 @@ namespace banggame {
 
     template<> prompt_string visit_players::prompt(const effect_context &ctx, const player_list &targets) {
         return merge_prompts(targets | rv::transform([&](player_ptr target) {
-            return defer<"player">().prompt(ctx, target);
+            return defer<target_types::player>().prompt(ctx, target);
         }));
     }
 
     template<> void visit_players::add_context(effect_context &ctx, const player_list &targets) {
         for (player_ptr target : targets) {
-            defer<"player">().add_context(ctx, target);
+            defer<target_types::player>().add_context(ctx, target);
         }
     }
 

@@ -42,13 +42,13 @@ namespace banggame {
         }
         
         origin->m_game->train_position = 0;
-        origin->m_game->add_update<"move_train">(0);
+        origin->m_game->add_update(game_updates::move_train{ 0 });
 
         if (!origin->m_game->m_train_deck.empty()) {
             origin->m_game->shuffle_cards_and_ids(origin->m_game->m_train_deck);
             origin->m_game->add_log("LOG_TRAIN_RESHUFFLED");
             origin->m_game->play_sound("shuffle");
-            origin->m_game->add_update<"deck_shuffled">(pocket_type::train_deck);
+            origin->m_game->add_update(game_updates::deck_shuffled{ pocket_type::train_deck });
         }
 
         for (card_ptr target_card : origin->m_game->m_train) {

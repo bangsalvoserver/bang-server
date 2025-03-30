@@ -90,7 +90,7 @@ struct game_user {
         return flags.check(game_user_flag::muted);
     }
 
-    explicit operator lobby_user_args() const;
+    explicit operator server_messages::lobby_user_update() const;
 };
 
 struct lobby_bot {
@@ -98,7 +98,7 @@ struct lobby_bot {
     std::string username;
     image_pixels_hash propic;
 
-    explicit operator lobby_user_args() const;
+    explicit operator server_messages::lobby_user_update() const;
 };
 
 struct game_lobby {
@@ -117,7 +117,7 @@ struct game_lobby {
 
     std::vector<game_user> users;
     std::vector<lobby_bot> bots;
-    std::vector<lobby_chat_args> chat_messages;
+    std::vector<server_messages::lobby_chat> chat_messages;
     
     lobby_state state;
     ticks lifetime = lobby_lifetime;
@@ -135,7 +135,7 @@ struct game_lobby {
 
     static std::string crop_lobby_name(const std::string &name);
 
-    explicit operator lobby_data() const;
+    explicit operator server_messages::lobby_update() const;
 };
 
 using user_map = std::unordered_map<id_type, session_ptr>;

@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    using visit_cards = play_visitor<"cards">;
+    using visit_cards = play_visitor<target_types::cards>;
 
     template<> std::generator<card_list> visit_cards::possible_targets(const effect_context &ctx) {
         if (contains_at_least(get_all_card_targets(origin, origin_card, effect, ctx), std::max<int>(1, effect.target_value))) {
@@ -23,27 +23,27 @@ namespace banggame {
             return "ERROR_INVALID_TARGETS";
         }
         for (card_ptr c : targets) {
-            MAYBE_RETURN(defer<"card">().get_error(ctx, c));
+            MAYBE_RETURN(defer<target_types::card>().get_error(ctx, c));
         }
         return {};
     }
 
     template<> prompt_string visit_cards::prompt(const effect_context &ctx, const card_list &targets) {
         for (card_ptr c : targets) {
-            MAYBE_RETURN(defer<"card">().prompt(ctx, c));
+            MAYBE_RETURN(defer<target_types::card>().prompt(ctx, c));
         }
         return {};
     }
 
     template<> void visit_cards::add_context(effect_context &ctx, const card_list &targets) {
         for (card_ptr c : targets) {
-            defer<"card">().add_context(ctx, c);
+            defer<target_types::card>().add_context(ctx, c);
         }
     }
 
     template<> void visit_cards::play(const effect_context &ctx, const card_list &targets) {
         for (card_ptr c : targets) {
-            defer<"card">().play(ctx, c);
+            defer<target_types::card>().play(ctx, c);
         }
     }
 

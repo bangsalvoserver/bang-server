@@ -25,8 +25,9 @@ namespace banggame {
 
         if (args.card->is_equip_card()) {
             if (!args.card->self_equippable()) {
-                ret.targets.emplace_back(utils::tag<"player">{},
-                    random_element(get_all_equip_targets(origin, args.card, ctx), origin->m_game->bot_rng));
+                ret.targets.push_back(target_types::player{
+                    random_element(get_all_equip_targets(origin, args.card, ctx), origin->m_game->bot_rng)
+                });
             }
         } else {
             for (const effect_holder &holder : args.card->get_effect_list(is_response)) {
@@ -67,7 +68,7 @@ namespace banggame {
                 node_set.erase(node_set.find(selected_node));
 
                 if (!selected_node) {
-                    return utils::tag<"done">{};
+                    return request_states::done{};
                 }
 
                 try {
@@ -79,20 +80,20 @@ namespace banggame {
 
                     auto result = verify_and_play(origin, args);
 
-                    if (utils::visit_tagged(overloaded{
-                        [](utils::tag<"ok">) {
+                    if (std::visit(overloaded{
+                        [](play_verify_results::ok) {
                             return true;
                         },
-                        [&](utils::tag<"prompt">, const prompt_string &prompt) {
-                            logging::trace("BOT PROMPT: message={}, i={}", std::string_view{prompt.message.format_str}, i);
+                        [&](play_verify_results::prompt prompt) {
+                            logging::trace("BOT PROMPT: message={}, i={}", std::string_view{prompt.message.message.format_str}, i);
                             return false;
                         },
-                        [&](utils::tag<"error">, const game_string &error) {
-                            logging::trace("BOT ERROR: message={}, i={}", std::string_view{error.format_str}, i);
+                        [&](play_verify_results::error error) {
+                            logging::trace("BOT ERROR: message={}, i={}", std::string_view{error.message.format_str}, i);
                             return false;
                         }
                     }, result)) {
-                        return utils::tag<"next">{};
+                        return request_states::next{};
                     }
                 } catch (const random_element_error &) {
                     // ignore
@@ -103,14 +104,14 @@ namespace banggame {
         // softlock
         logging::warn("BOT ERROR: could not find card in execute_random_play()");
 
-        return utils::tag<"done">{};
+        return request_states::done{};
     }
 
     request_state game::request_bot_play(bool instant) {
         if (m_options.num_bots == 0) {
-            return utils::tag<"done">{};
+            return request_states::done{};
         } else if (!instant && m_options.bot_play_timer > game_duration{0}) {
-            return { utils::tag<"bot_play">{}, get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
+            return request_states::bot_play{ get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
         }
 
         if (pending_requests()) {
@@ -123,8 +124,8 @@ namespace banggame {
                         timer_id = timer->get_timer_id();
                     }
 
-                    if (holds_alternative<"next">(execute_random_play(origin, true, timer_id, play_cards))) {
-                        return utils::tag<"next">{};
+                    if (std::holds_alternative<request_states::next>(execute_random_play(origin, true, timer_id, play_cards))) {
+                        return request_states::next{};
                     }
                 }
             }
@@ -132,7 +133,7 @@ namespace banggame {
             playable_cards_list play_cards = generate_playable_cards_list(m_playing);
             return execute_random_play(m_playing, false, std::nullopt, play_cards);
         }
-        return utils::tag<"done">{};
+        return request_states::done{};
     }
 
     

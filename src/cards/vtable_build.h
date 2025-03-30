@@ -277,11 +277,14 @@ namespace banggame {
         }
         return [&]<size_t ... Is>(std::index_sequence<Is...>) {
             return std::make_tuple(std::visit([](const auto &value) -> Ts {
-                if constexpr (std::is_convertible_v<std::remove_cvref_t<decltype(value)>, Ts>) {
-                    return value;
-                } else {
-                    throw game_error("invalid access to mth: wrong target type");
+                using value_type = std::remove_cvref_t<decltype(value)>;
+                if constexpr (reflect::size<value_type>() == 1) {
+                    using inner_type = reflect::member_type<0, value_type>;
+                    if constexpr (std::is_convertible_v<inner_type, Ts>) {
+                        return { reflect::get<0>(value) };
+                    }
                 }
+                throw game_error("invalid access to mth: wrong target type");
             }, targets.at(indices[Is])) ...);
         }(std::index_sequence_for<Ts ...>());
     }

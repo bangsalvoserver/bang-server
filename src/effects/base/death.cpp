@@ -67,7 +67,7 @@ namespace banggame {
                 target->m_game->remove_cards({ target->m_characters.begin() + 1, target->m_characters.end() });
 
                 if (target->add_player_flags(player_flag::role_revealed)) {
-                    target->m_game->add_update<"player_show_role">(update_target::excludes(target), target, target->m_role);
+                    target->m_game->add_update(update_target::excludes(target), game_updates::player_show_role{ target, target->m_role });
                 }
 
                 target->m_game->call_event(event_type::on_player_eliminated{ killer, target, type });
@@ -118,7 +118,7 @@ namespace banggame {
                 }
                 
                 if (any_player_removed) {
-                    target->m_game->add_update<"player_order">(target->m_game->m_players);
+                    target->m_game->add_update(game_updates::player_order{ target->m_game->m_players });
                 }
             }, -6);
         }
@@ -131,7 +131,7 @@ namespace banggame {
             auto declare_winners = [&](auto &&winners) {
                 for (player_ptr p : target->m_game->range_all_players(target->m_game->m_playing)) {
                     if (p->add_player_flags(player_flag::role_revealed)) {
-                        target->m_game->add_update<"player_show_role">(update_target::excludes(p), p, p->m_role);
+                        target->m_game->add_update(update_target::excludes(p), game_updates::player_show_role{ p, p->m_role });
                     }
                 }
                 target->m_game->add_log("LOG_GAME_OVER");

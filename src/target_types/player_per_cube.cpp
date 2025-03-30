@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    using visit_cubes = play_visitor<"player_per_cube">;
+    using visit_cubes = play_visitor<target_types::player_per_cube>;
 
     template<> std::generator<cubes_and_players> visit_cubes::possible_targets(const effect_context &ctx) {
         if (contains_at_least(get_all_player_targets(origin, origin_card, effect, ctx), effect.target_value)) {
@@ -40,27 +40,27 @@ namespace banggame {
             return "ERROR_INVALID_TARGETS";
         }
         for (player_ptr target : target.second) {
-            MAYBE_RETURN(defer<"player">().get_error(ctx, target));
+            MAYBE_RETURN(defer<target_types::player>().get_error(ctx, target));
         }
         return {};
     }
 
     template<> prompt_string visit_cubes::prompt(const effect_context &ctx, const cubes_and_players &target) {
-        MAYBE_RETURN(defer<"select_cubes">().prompt(ctx, target.first));
+        MAYBE_RETURN(defer<target_types::select_cubes>().prompt(ctx, target.first));
         return merge_prompts(target.second | rv::transform([&](player_ptr target) {
-            return defer<"player">().prompt(ctx, target);
+            return defer<target_types::player>().prompt(ctx, target);
         }));
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const cubes_and_players &target) {
         ctx.selected_cubes.insert(origin_card, target.first, 1);
         for (player_ptr target : target.second) {
-            defer<"player">().add_context(ctx, target);
+            defer<target_types::player>().add_context(ctx, target);
         }
     }
 
     template<> void visit_cubes::play(const effect_context &ctx, const cubes_and_players &target) {
-        defer<"select_cubes">().play(ctx, target.first);
+        defer<target_types::select_cubes>().play(ctx, target.first);
         
         effect_flags flags = effect_flag::multi_target;
         if (target.second.size() == 1) {

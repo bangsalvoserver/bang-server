@@ -104,29 +104,112 @@ namespace banggame {
 
     using cubes_and_players = std::pair<card_list, player_list>;
 
-    using play_card_target = utils::tagged_variant<
-        utils::tag<"none">,
-        utils::tag<"player", player_ptr>,
-        utils::tag<"conditional_player", nullable_player>,
-        utils::tag<"adjacent_players", player_list>,
-        utils::tag<"player_per_cube", cubes_and_players>,
-        utils::tag<"random_if_hand_card", card_ptr>,
-        utils::tag<"card", card_ptr>,
-        utils::tag<"extra_card", nullable_card>,
-        utils::tag<"players">,
-        utils::tag<"cards", card_list>,
-        utils::tag<"max_cards", card_list>,
-        utils::tag<"card_per_player", card_list>,
-        utils::tag<"cube_slot", card_ptr>,
-        utils::tag<"move_cube_slot", card_list>,
-        utils::tag<"select_cubes", card_list>,
-        utils::tag<"select_cubes_optional", card_list>,
-        utils::tag<"select_cubes_repeat", card_list>,
-        utils::tag<"self_cubes">
+    namespace target_types {
+        struct none {};
+
+        struct player {
+            struct transparent{};
+            player_ptr value;
+        };
+
+        struct conditional_player {
+            struct transparent{};
+            nullable_player value;
+        };
+
+        struct adjacent_players {
+            struct transparent{};
+            player_list value;
+        };
+
+        struct player_per_cube {
+            struct transparent{};
+            cubes_and_players value;
+        };
+
+        struct random_if_hand_card {
+            struct transparent{};
+            card_ptr value;
+        };
+
+        struct card {
+            struct transparent{};
+            card_ptr value;
+        };
+
+        struct extra_card {
+            struct transparent{};
+            nullable_card value;
+        };
+
+        struct players {};
+
+        struct cards {
+            struct transparent{};
+            card_list value;
+        };
+
+        struct max_cards {
+            struct transparent{};
+            card_list value;
+        };
+
+        struct card_per_player {
+            struct transparent{};
+            card_list value;
+        };
+
+        struct cube_slot {
+            struct transparent{};
+            card_ptr value;
+        };
+
+        struct move_cube_slot {
+            struct transparent{};
+            card_list value;
+        };
+
+        struct select_cubes {
+            struct transparent{};
+            card_list value;
+        };
+
+        struct select_cubes_optional {
+            struct transparent{};
+            card_list value;
+        };
+
+        struct select_cubes_repeat {
+            struct transparent{};
+            card_list value;
+        };
+
+        struct self_cubes {};
+    }
+
+    using play_card_target = std::variant<
+        target_types::none,
+        target_types::player,
+        target_types::conditional_player,
+        target_types::adjacent_players,
+        target_types::player_per_cube,
+        target_types::random_if_hand_card,
+        target_types::card,
+        target_types::extra_card,
+        target_types::players,
+        target_types::cards,
+        target_types::max_cards,
+        target_types::card_per_player,
+        target_types::cube_slot,
+        target_types::move_cube_slot,
+        target_types::select_cubes,
+        target_types::select_cubes_optional,
+        target_types::select_cubes_repeat,
+        target_types::self_cubes
     >;
 
     using target_type = utils::tagged_variant_index<play_card_target>;
-    #define TARGET_TYPE(name) target_type{utils::tag<#name>{}}
+    #define TARGET_TYPE(NAME) target_type{std::in_place_type<target_types::NAME>}
 
     using target_list = std::vector<play_card_target>;
 

@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    using visit_players = play_visitor<"players">;
+    using visit_players = play_visitor<target_types::players>;
 
     static auto get_player_targets_range(const_card_ptr origin_card, player_ptr origin, enums::bitset<target_player_filter> player_filter, const effect_context &ctx) {
         return origin->m_game->range_alive_players(origin) | rv::filter([=, &ctx](const_player_ptr target) {
@@ -20,7 +20,7 @@ namespace banggame {
         return {};
     }
 
-    template<> std::generator<std::monostate> visit_players::possible_targets(const effect_context &ctx) {
+    template<> std::generator<target_types::players> visit_players::possible_targets(const effect_context &ctx) {
         if (!get_error(ctx)) {
             co_yield {};
         }
@@ -38,7 +38,7 @@ namespace banggame {
 
     template<> void visit_players::add_context(effect_context &ctx) {
         for (player_ptr target : get_player_targets_range(origin_card, origin, effect.player_filter, ctx)) {
-            defer<"player">().add_context(ctx, target);
+            defer<target_types::player>().add_context(ctx, target);
         }
     }
 

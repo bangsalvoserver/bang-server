@@ -5,6 +5,7 @@
 #include "cards/filter_enums.h"
 
 #include "utils/function_ref.h"
+#include "utils/fixed_string.h"
 
 namespace banggame {
     struct playable_card_info;

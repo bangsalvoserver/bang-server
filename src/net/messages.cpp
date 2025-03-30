@@ -7,8 +7,8 @@
 
 namespace banggame {
     
-    json::json serialize_message(const server_message &message) {
-        return json::serialize(message);
+    std::string serialize_message(const server_message &message) {
+        return json::serialize(message).dump(-1, ' ', true, nlohmann::json::error_handler_t::replace);
     }
 
     client_message deserialize_message(const json::json &value) {

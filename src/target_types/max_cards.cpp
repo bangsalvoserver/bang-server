@@ -2,7 +2,7 @@
 
 namespace banggame {
 
-    using visit_cards = play_visitor<"max_cards">;
+    using visit_cards = play_visitor<target_types::max_cards>;
 
     template<> std::generator<card_list> visit_cards::possible_targets(const effect_context &ctx) {
         if (get_all_card_targets(origin, origin_card, effect, ctx)) {
@@ -27,21 +27,21 @@ namespace banggame {
             return "ERROR_INVALID_TARGETS";
         }
         for (card_ptr c : targets) {
-            MAYBE_RETURN(defer<"card">().get_error(ctx, c));
+            MAYBE_RETURN(defer<target_types::card>().get_error(ctx, c));
         }
         return {};
     }
 
     template<> prompt_string visit_cards::prompt(const effect_context &ctx, const card_list &targets) {
-        return defer<"cards">().prompt(ctx, targets);
+        return defer<target_types::cards>().prompt(ctx, targets);
     }
 
     template<> void visit_cards::add_context(effect_context &ctx, const card_list &targets) {
-        defer<"cards">().add_context(ctx, targets);
+        defer<target_types::cards>().add_context(ctx, targets);
     }
 
     template<> void visit_cards::play(const effect_context &ctx, const card_list &targets) {
-        defer<"cards">().play(ctx, targets);
+        defer<target_types::cards>().play(ctx, targets);
     }
 
 }

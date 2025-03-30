@@ -2,7 +2,7 @@
 
 namespace banggame {
 
-    using visit_cubes = play_visitor<"select_cubes_repeat">;
+    using visit_cubes = play_visitor<target_types::select_cubes_repeat>;
 
     template<> std::generator<card_list> visit_cubes::possible_targets(const effect_context &ctx) {
         co_yield {};
@@ -35,15 +35,15 @@ namespace banggame {
     }
 
     template<> prompt_string visit_cubes::prompt(const effect_context &ctx, const card_list &target_cards) {
-        return defer<"select_cubes">().prompt(ctx, target_cards);
+        return defer<target_types::select_cubes>().prompt(ctx, target_cards);
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const card_list &target_cards) {
-        defer<"select_cubes">().add_context(ctx, target_cards);
+        defer<target_types::select_cubes>().add_context(ctx, target_cards);
     }
 
     template<> void visit_cubes::play(const effect_context &ctx, const card_list &target_cards) {
-        defer<"select_cubes">().play(ctx, target_cards);
+        defer<target_types::select_cubes>().play(ctx, target_cards);
     }
 
 }

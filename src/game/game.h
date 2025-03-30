@@ -3,18 +3,16 @@
 
 #include "game_table.h"
 
-#include "utils/function_ref.h"
+#include <generator>
 
 namespace banggame {
-
-    using send_update_function = std23::function_ref<void (json::json &&) const>;
 
     struct game : game_table {
         using game_table::game_table;
         
-        void send_spectator_join_updates(const send_update_function &send_update);
-        void send_game_log_updates(player_ptr target, const send_update_function &send_update);
-        void send_rejoin_updates(player_ptr target, const send_update_function &send_update);
+        std::generator<game_update> get_spectator_join_updates();
+        std::generator<game_update> get_game_log_updates(player_ptr target);
+        std::generator<game_update> get_rejoin_updates(player_ptr target);
 
         void start_game();
 

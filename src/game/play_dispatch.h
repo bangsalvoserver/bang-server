@@ -2,6 +2,7 @@
 #define __PLAY_DISPATCH_H__
 
 #include "cards/card_defs.h"
+#include "utils/json_aggregate.h"
 
 #include <generator>
 
@@ -24,20 +25,21 @@ namespace banggame::play_dispatch {
 namespace banggame {
 
     template<typename T>
-    concept target_type_tag = utils::tag_for<T, play_card_target>;
-    
-    template<target_type_tag Tag>
-    using target_type_value = utils::tagged_variant_value_type<play_card_target, Tag>;
+    concept empty_target = requires {
+        requires json::aggregate<T>;
+        requires reflect::size<T>() == 0;
+    };
 
-    template<target_type_tag Tag> struct play_visitor_t {
-        using value_type = std::monostate;
+    template<typename T> struct play_visitor;
+    
+    template<empty_target T> struct play_visitor<T> {
+        using value_type = T;
 
         player_ptr origin;
         card_ptr origin_card;
         const effect_holder &effect;
 
-        template<utils::fixed_string E>
-        play_visitor_t<utils::tag<E>> defer() const {
+        template<typename U> play_visitor<U> defer() const {
             return {origin, origin_card, effect};
         }
 
@@ -49,17 +51,15 @@ namespace banggame {
         void play(const effect_context &ctx);
     };
 
-    template<target_type_tag Tag> requires (!std::is_void_v<target_type_value<Tag>>)
-    struct play_visitor_t<Tag> {
-        using value_type = target_type_value<Tag>;
+    template<json::transparent_aggregate T> struct play_visitor<T> {
+        using value_type = json::transparent_value_type<T>;
         using arg_type = std::conditional_t<std::is_trivially_copyable_v<value_type>, value_type, const value_type &>;
 
         player_ptr origin;
         card_ptr origin_card;
         const effect_holder &effect;
 
-        template<utils::fixed_string E>
-        play_visitor_t<utils::tag<E>> defer() const {
+        template<typename U> play_visitor<U> defer() const {
             return {origin, origin_card, effect};
         }
 
@@ -70,9 +70,6 @@ namespace banggame {
         void add_context(effect_context &ctx, arg_type arg);
         void play(const effect_context &ctx, arg_type arg);
     };
-
-    template<utils::fixed_string Name>
-    using play_visitor = play_visitor_t<utils::tag<Name>>;
 }
 
 #endif

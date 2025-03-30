@@ -146,7 +146,7 @@ namespace banggame {
     }
 
     static player_ptr get_equip_target(player_ptr origin, card_ptr origin_card, const target_list &targets) {
-        return origin_card->self_equippable() ? origin : get<"player">(targets.front());
+        return origin_card->self_equippable() ? origin : std::get<target_types::player>(targets.front()).value;
     }
 
     static game_string verify_equip_target(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
@@ -167,7 +167,7 @@ namespace banggame {
             if (targets.size() != 1 || target_type(targets.front()) != TARGET_TYPE(player)) {
                 return "ERROR_INVALID_EQUIP_TARGET";
             }
-            target = get<"player">(targets.front());
+            target = std::get<target_types::player>(targets.front()).value;
         }
         
         return get_equip_error(origin, origin_card, target, ctx);
@@ -349,7 +349,7 @@ namespace banggame {
         }, 45);
     }
 
-    game_message verify_and_play(player_ptr origin, const game_action &args) {
+    play_verify_result verify_and_play(player_ptr origin, const game_action &args) {
         bool is_response = origin->m_game->pending_requests();
 
         effect_context ctx{};
@@ -357,16 +357,16 @@ namespace banggame {
         ctx.playing_card = args.card;
 
         if (game_string error = verify_timer_response(origin, args.timer_id)) {
-            return {utils::tag<"error">{}, error};
+            return play_verify_results::error{ error };
         }
 
         if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-            return {utils::tag<"error">{}, error};
+            return play_verify_results::error{ error };
         }
 
         if (!args.bypass_prompt) {
             if (prompt_string prompt = get_prompt_message(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-                return {utils::tag<"prompt">{}, prompt};
+                return play_verify_results::prompt{ prompt };
             }
         }
 
@@ -389,6 +389,6 @@ namespace banggame {
             apply_target_list(origin, args.card, is_response, args.targets, ctx);
         }
 
-        return {};
+        return play_verify_results::ok{};
     }
 }

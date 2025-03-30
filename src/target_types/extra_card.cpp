@@ -4,7 +4,7 @@
 
 namespace banggame {
     
-    using visit_card = play_visitor<"extra_card">;
+    using visit_card = play_visitor<target_types::extra_card>;
 
     template<> std::generator<nullable_card> visit_card::possible_targets(const effect_context &ctx) {
         if (ctx.repeat_card) {
@@ -20,7 +20,7 @@ namespace banggame {
         if (ctx.repeat_card) {
             return nullptr;
         } else {
-            return defer<"card">().random_target(ctx);
+            return defer<target_types::card>().random_target(ctx);
         }
     }
 
@@ -35,14 +35,14 @@ namespace banggame {
             if (ctx.repeat_card) {
                 return "ERROR_TARGET_SET_EMPTY";
             } else {
-                return defer<"card">().get_error(ctx, target);
+                return defer<target_types::card>().get_error(ctx, target);
             }
         }
     }
 
     template<> prompt_string visit_card::prompt(const effect_context &ctx, nullable_card target) {
         if (target) {
-            return defer<"card">().prompt(ctx, target);
+            return defer<target_types::card>().prompt(ctx, target);
         } else {
             return {};
         }
@@ -50,13 +50,13 @@ namespace banggame {
 
     template<> void visit_card::add_context(effect_context &ctx, nullable_card target) {
         if (target) {
-            defer<"card">().add_context(ctx, target);
+            defer<target_types::card>().add_context(ctx, target);
         }
     }
 
     template<> void visit_card::play(const effect_context &ctx, nullable_card target) {
         if (target) {
-            return defer<"card">().play(ctx, target);
+            return defer<target_types::card>().play(ctx, target);
         }
     }
 

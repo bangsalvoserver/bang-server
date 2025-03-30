@@ -35,7 +35,7 @@ namespace banggame {
             origin->m_game->shuffle_cards_and_ids(feats_deck);
             origin->m_game->add_log("LOG_FEATS_RESHUFFLED");
             origin->m_game->play_sound("shuffle");
-            origin->m_game->add_update<"deck_shuffled">(pocket_type::feats_deck);
+            origin->m_game->add_update(game_updates::deck_shuffled{ pocket_type::feats_deck });
         }
         
         card_ptr feat_card = feats_deck.back();

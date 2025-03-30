@@ -7,7 +7,6 @@
 
 #include "cards/card_effect.h"
 
-#include "utils/tagged_variant.h"
 #include "utils/stable_queue.h"
 
 namespace banggame {
@@ -34,14 +33,26 @@ namespace banggame {
         void on_update() override;
     };
 
-    using request_state = utils::tagged_variant<
-        utils::tag<"done">,
-        utils::tag<"next">,
-        utils::tag<"waiting", ticks>,
-        utils::tag<"bot_play", ticks>
-    >;
+    namespace request_states {
+        struct done {};
 
-    using request_state_index = utils::tagged_variant_index<request_state>;
+        struct next {};
+
+        struct waiting {
+            ticks timer;
+        };
+
+        struct bot_play {
+            ticks timer;
+        };
+    }
+
+    using request_state = std::variant<
+        request_states::done,
+        request_states::next,
+        request_states::waiting,
+        request_states::bot_play
+    >;
 
     struct any_request {
         bool operator()(const request_base &) const {
@@ -84,7 +95,7 @@ namespace banggame {
         }
 
         bool is_waiting() const {
-            return holds_alternative<"waiting">(m_state);
+            return std::holds_alternative<request_states::waiting>(m_state);
         }
 
         template<typename T = request_base, std::predicate<const request_base &> Function = any_request>

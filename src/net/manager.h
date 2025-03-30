@@ -10,12 +10,6 @@
 
 namespace banggame {
 
-template<utils::fixed_string E> requires server_message_type<E>
-std::string make_message(auto && ... args) {
-    return serialize_message(server_message{utils::tag<E>{}, FWD(args) ...})
-        .dump(-1, ' ', true, nlohmann::json::error_handler_t::replace);
-}
-
 struct server_options {
     bool enable_cheats = false;
     int max_session_id_count = 10;
@@ -37,52 +31,33 @@ protected:
     void on_message(client_handle client, std::string_view message) override;
 
 private:
-    template<utils::fixed_string E> requires server_message_type<E>
-    void send_message(client_handle client, auto && ... args) {
-        m_outgoing_messages.emplace_back(client, make_message<E>(FWD(args) ... ));
-    }
-
-    template<utils::fixed_string E> requires server_message_type<E>
-    void broadcast_message_no_lobby(auto && ... args) {
-        std::string message = make_message<E>(FWD(args) ... );
-        for (session_ptr session : m_sessions | rv::values) {
-            if (!session->lobby) {
-                m_outgoing_messages.emplace_back(session->client, message);
-            }
-        }
-    }
-
-    template<utils::fixed_string E> requires server_message_type<E>
-    void broadcast_message_lobby(const game_lobby &lobby, auto && ... args) {
-        std::string message = make_message<E>(FWD(args) ... );
-        for (const game_user &user : lobby.connected_users()) {
-            m_outgoing_messages.emplace_back(user.session->client, message);
-        }
-    }
+    void send_message(client_handle client, const server_message &msg);
+    void broadcast_message_no_lobby(const server_message &msg);
+    void broadcast_message_lobby(const game_lobby &lobby, const server_message &msg);
 
     void invalidate_connection(client_handle client);
     void kick_user_from_lobby(session_ptr session);
-    void add_lobby_chat_message(game_lobby &lobby, game_user *is_read_for, lobby_chat_args message);
+    void add_lobby_chat_message(game_lobby &lobby, game_user *is_read_for, server_messages::lobby_chat message);
     void handle_join_lobby(session_ptr session, game_lobby &lobby);
 
     bool add_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag);
     bool remove_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag);
 
 private:
-    void handle_message(utils::tag<"connect">,        client_handle client, connection &con, connect_args value);
-    void handle_message(utils::tag<"pong">,           client_handle client, connection &con);
-    void handle_message(utils::tag<"user_set_name">,  session_ptr session, std::string username);
-    void handle_message(utils::tag<"user_set_propic">, session_ptr session, image_pixels propic);
-    void handle_message(utils::tag<"lobby_make">,     session_ptr session, const lobby_make_args &value);
-    void handle_message(utils::tag<"lobby_game_options">, session_ptr session, const game_options &options);
-    void handle_message(utils::tag<"lobby_join">,     session_ptr session, const lobby_join_args &value);
-    void handle_message(utils::tag<"lobby_leave">,    session_ptr session);
-    void handle_message(utils::tag<"lobby_chat">,     session_ptr session, const lobby_chat_client_args &value);
-    void handle_message(utils::tag<"lobby_return">,   session_ptr session);
-    void handle_message(utils::tag<"user_spectate">,  session_ptr session, bool spectator);
-    void handle_message(utils::tag<"game_start">,     session_ptr session);
-    void handle_message(utils::tag<"game_rejoin">,    session_ptr session, const game_rejoin_args &value);
-    void handle_message(utils::tag<"game_action">,    session_ptr session, const json::json &value);
+    void handle_message(client_messages::connect &&msg, client_handle client, connection &con);
+    void handle_message(client_messages::pong &&msg, client_handle client, connection &con);
+    void handle_message(client_messages::user_set_name &&msg, session_ptr session);
+    void handle_message(client_messages::user_set_propic &&msg, session_ptr session);
+    void handle_message(client_messages::lobby_make &&msg, session_ptr session);
+    void handle_message(client_messages::lobby_game_options &&msg, session_ptr session);
+    void handle_message(client_messages::lobby_join &&msg, session_ptr session);
+    void handle_message(client_messages::lobby_leave &&msg, session_ptr session);
+    void handle_message(client_messages::lobby_chat &&msg, session_ptr session);
+    void handle_message(client_messages::lobby_return &&msg, session_ptr session);
+    void handle_message(client_messages::user_spectate &&msg, session_ptr session);
+    void handle_message(client_messages::game_start &&msg, session_ptr session);
+    void handle_message(client_messages::game_rejoin &&msg, session_ptr session);
+    void handle_message(client_messages::game_action &&msg, session_ptr session);
 
     void handle_chat_command(session_ptr session, const std::string &command);
 
