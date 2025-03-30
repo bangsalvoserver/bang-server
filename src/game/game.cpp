@@ -194,7 +194,7 @@ namespace banggame {
         }
         if (!is_waiting()) {
             if (auto req = top_request()) {
-                co_yield game_updates::request_status{ make_request_update(*req) };
+                co_yield make_request_update(*req);
             }
         }
 
@@ -230,9 +230,9 @@ namespace banggame {
 
         if (!is_game_over() && !is_waiting()) {
             if (auto req = top_request()) {
-                co_yield game_updates::request_status{ make_request_update(*req, target) };
+                co_yield make_request_update(*req, target);
             } else if (target == m_playing) {
-                co_yield game_updates::status_ready{ make_status_ready_update(target) };
+                co_yield make_status_ready_update(target);
             }
         }
     }
@@ -449,10 +449,10 @@ namespace banggame {
         for (player_ptr p : m_players) {
             spectator_target.add(p);
             if (!p->is_bot()) {
-                add_update(update_target::includes(p), game_updates::request_status{ make_request_update(*req, p) });
+                add_update(update_target::includes(p), make_request_update(*req, p));
             }
         }
-        add_update(std::move(spectator_target), game_updates::request_status{ make_request_update(*req) });
+        add_update(std::move(spectator_target), make_request_update(*req));
     }
 
 }
