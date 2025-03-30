@@ -31,25 +31,9 @@ protected:
     void on_message(client_handle client, std::string_view message) override;
 
 private:
-    void send_message(client_handle client, const server_message &msg) {
-        m_outgoing_messages.emplace_back(client, serialize_message(msg));
-    }
-
-    void broadcast_message_no_lobby(const server_message &msg) {
-        std::string message = serialize_message(msg);
-        for (session_ptr session : m_sessions | rv::values) {
-            if (!session->lobby) {
-                m_outgoing_messages.emplace_back(session->client, message);
-            }
-        }
-    }
-
-    void broadcast_message_lobby(const game_lobby &lobby, const server_message &msg) {
-        std::string message = serialize_message(msg);
-        for (const game_user &user : lobby.connected_users()) {
-            m_outgoing_messages.emplace_back(user.session->client, message);
-        }
-    }
+    void send_message(client_handle client, const server_message &msg);
+    void broadcast_message_no_lobby(const server_message &msg);
+    void broadcast_message_lobby(const game_lobby &lobby, const server_message &msg);
 
     void invalidate_connection(client_handle client);
     void kick_user_from_lobby(session_ptr session);

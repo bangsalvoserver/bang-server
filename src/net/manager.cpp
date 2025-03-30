@@ -377,6 +377,26 @@ void game_manager::on_connect(client_handle client) {
     tracking::track_client_count(m_connections.size());
 }
 
+void game_manager::send_message(client_handle client, const server_message &msg) {
+    m_outgoing_messages.emplace_back(client, serialize_message(msg));
+}
+
+void game_manager::broadcast_message_no_lobby(const server_message &msg) {
+    std::string message = serialize_message(msg);
+    for (session_ptr session : m_sessions | rv::values) {
+        if (!session->lobby) {
+            m_outgoing_messages.emplace_back(session->client, message);
+        }
+    }
+}
+
+void game_manager::broadcast_message_lobby(const game_lobby &lobby, const server_message &msg) {
+    std::string message = serialize_message(msg);
+    for (const game_user &user : lobby.connected_users()) {
+        m_outgoing_messages.emplace_back(user.session->client, message);
+    }
+}
+
 void game_manager::invalidate_connection(client_handle client) {
     if (auto it = m_connections.find(client); it != m_connections.end()) {
         auto &con = it->second;
@@ -628,7 +648,7 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
     remove_user_flag(lobby, user, game_user_flag::spectator);
     target->user_id = user.user_id;
 
-    lobby.m_game->add_update<"player_add">(target);
+    lobby.m_game->add_update(game_updates::player_add{ target });
     
     auto fun = [&](json::json &&message) {
         send_message(session->client, server_messages::game_update{ std::move(message) });
