@@ -297,14 +297,17 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
         }
         send_message(session->client, server_messages::game_started{});
 
-        auto fun = [&](game_update &&update) {
+        for (game_update &&update : lobby.m_game->get_spectator_join_updates()) {
             send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
-        };
-        lobby.m_game->send_spectator_join_updates(fun);
-        if (target) {
-            lobby.m_game->send_rejoin_updates(target, fun);
         }
-        lobby.m_game->send_game_log_updates(target, fun);
+        if (target) {
+            for (game_update &&update : lobby.m_game->get_rejoin_updates(target)) {
+                send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
+            }
+        }
+        for (game_update &&update : lobby.m_game->get_game_log_updates(target)) {
+            send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
+        }
     }
 
     broadcast_message_no_lobby(server_messages::lobby_update(lobby));
@@ -650,11 +653,12 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
 
     lobby.m_game->add_update(game_updates::player_add{ target });
     
-    auto fun = [&](game_update &&update) {
+    for (game_update &&update : lobby.m_game->get_rejoin_updates(target)) {
         send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
-    };
-    lobby.m_game->send_rejoin_updates(target, fun);
-    lobby.m_game->send_game_log_updates(target, fun);
+    }
+    for (game_update &&update : lobby.m_game->get_game_log_updates(target)) {
+        send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
+    }
 
     broadcast_message_no_lobby(server_messages::lobby_update(lobby));
 }
