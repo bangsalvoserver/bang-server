@@ -34,6 +34,6 @@ namespace banggame {
         std::iter_swap(
             rn::find(origin->m_game->m_players, origin),
             rn::find(origin->m_game->m_players, target));
-        origin->m_game->add_update<"player_order">(origin->m_game->m_players);
+        origin->m_game->add_update(game_updates::player_order{ origin->m_game->m_players });
     }
 }

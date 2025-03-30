@@ -24,7 +24,7 @@ namespace banggame {
             game->shuffle_cards_and_ids(game->m_shop_deck);
             game->add_log("LOG_SHOP_RESHUFFLED");
             game->play_sound("shuffle");
-            game->add_update<"deck_shuffled">(pocket_type::shop_deck);
+            game->add_update(game_updates::deck_shuffled{ pocket_type::shop_deck });
         }
         card_ptr drawn_card = game->m_shop_deck.back();
         game->add_log("LOG_DRAWN_SHOP_CARD", drawn_card);

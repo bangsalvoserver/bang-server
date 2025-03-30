@@ -17,7 +17,7 @@ namespace json {
     template<typename Context>
     struct serializer<banggame::server_messages::game_update, Context> {
         json operator()(const banggame::server_messages::game_update &value, const Context &ctx) const {
-            return serialize_unchecked(value.update, ctx);
+            return value.update;
         }
     };
 

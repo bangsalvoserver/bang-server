@@ -36,26 +36,26 @@ namespace banggame {
         animation_duration duration = instant ? 0ms : durations.flip_card;
         if (new_visibility == card_visibility::hidden) {
             if (visibility == card_visibility::show_owner) {
-                m_game->add_update<"hide_card">(update_target::includes(owner), this, duration);
+                m_game->add_update(update_target::includes(owner), game_updates::hide_card{ this, duration });
             } else if (visibility == card_visibility::shown) {
-                m_game->add_update<"hide_card">(this, duration);
+                m_game->add_update(game_updates::hide_card{ this, duration });
             }
             visibility = card_visibility::hidden;
         } else if (!new_owner || new_visibility == card_visibility::shown) {
             if (visibility == card_visibility::show_owner) {
-                m_game->add_update<"show_card">(update_target::excludes(owner), this, *this, duration);
+                m_game->add_update(update_target::excludes(owner), game_updates::show_card{ this, *this, duration });
             } else if (visibility == card_visibility::hidden) {
-                m_game->add_update<"show_card">(this, *this, duration);
+                m_game->add_update(game_updates::show_card{ this, *this, duration });
             }
             visibility = card_visibility::shown;
         } else if (owner != new_owner || visibility != card_visibility::show_owner) {
             if (visibility == card_visibility::shown) {
-                m_game->add_update<"hide_card">(update_target::excludes(new_owner), this, duration);
+                m_game->add_update(update_target::excludes(new_owner), game_updates::hide_card{ this, duration });
             } else {
                 if (visibility == card_visibility::show_owner) {
-                    m_game->add_update<"hide_card">(update_target::includes(owner), this, duration);
+                    m_game->add_update(update_target::includes(owner), game_updates::hide_card{ this, duration });
                 }
-                m_game->add_update<"show_card">(update_target::includes(new_owner), this, *this, duration);
+                m_game->add_update(update_target::includes(new_owner), game_updates::show_card{ this, *this, duration });
             }
             visibility = card_visibility::show_owner;
         }
@@ -91,22 +91,22 @@ namespace banggame {
         }
         }
         
-        m_game->add_update<"move_card">(this, new_owner, new_pocket, instant ? 0ms : durations.move_card, position);
+        m_game->add_update(game_updates::move_card{ this, new_owner, new_pocket, instant ? 0ms : durations.move_card, position });
     }
 
     void card::set_inactive(bool new_inactive) {
         if (new_inactive != inactive) {
-            m_game->add_update<"tap_card">(this, new_inactive);
+            m_game->add_update(game_updates::tap_card{ this, new_inactive });
             inactive = new_inactive;
         }
     }
 
     void card::flash_card() {
-        m_game->add_update<"flash_card">(this);
+        m_game->add_update(game_updates::flash_card{ this });
     }
 
     void card::add_short_pause() {
-        m_game->add_update<"short_pause">(this);
+        m_game->add_update(game_updates::short_pause{ this });
     }
 
     int card::num_tokens(card_token_type token_type) const {
@@ -130,7 +130,7 @@ namespace banggame {
             if (token_type == card_token_type::cube) {
                 m_game->add_log("LOG_ADD_CUBE", owner, this, num_tokens);
             }
-            m_game->add_update<"move_tokens">(token_type, num_tokens, nullptr, this, num_tokens == 1 ? durations.move_token : durations.move_tokens);
+            m_game->add_update(game_updates::move_tokens{ token_type, num_tokens, nullptr, this, num_tokens == 1 ? durations.move_token : durations.move_tokens });
         }
     }
 
@@ -156,7 +156,7 @@ namespace banggame {
                     m_game->add_log("LOG_MOVED_CUBE_FROM", target->owner, owner, this, target, added_tokens);
                 }
             }
-            m_game->add_update<"move_tokens">(token_type, added_tokens, this, target, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens);
+            m_game->add_update(game_updates::move_tokens{ token_type, added_tokens, this, target, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens });
         }
         if (num_tokens > 0) {
             card_tokens -= num_tokens;
@@ -164,7 +164,7 @@ namespace banggame {
             if (token_type == card_token_type::cube) {
                 m_game->add_log("LOG_PAID_CUBE", owner, this, num_tokens);
             }
-            m_game->add_update<"move_tokens">(token_type, num_tokens, this, nullptr, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens);
+            m_game->add_update(game_updates::move_tokens{ token_type, num_tokens, this, nullptr, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens });
         }
         if (card_tokens == 0) {
             m_game->call_event(event_type::on_finish_tokens{ this, target, token_type });
@@ -175,7 +175,7 @@ namespace banggame {
         if (auto &count = tokens[card_token_type::cube]) {
             m_game->add_log("LOG_DROP_CUBE", owner, this, count);
             m_game->tokens[card_token_type::cube] += count;
-            m_game->add_update<"move_tokens">(card_token_type::cube, count, this, nullptr, count == 1 ? durations.move_token : durations.move_tokens);
+            m_game->add_update(game_updates::move_tokens{ card_token_type::cube, count, this, nullptr, count == 1 ? durations.move_token : durations.move_tokens });
             count = 0;
         }
     }
@@ -183,7 +183,7 @@ namespace banggame {
     void card::drop_all_fame() {
         for (auto [token, count] : tokens) {
             if (token != card_token_type::cube && count > 0) {
-                m_game->add_update<"add_tokens">(token, -count, this);
+                m_game->add_update(game_updates::add_tokens{ token, -count, this });
                 count = 0;
             }
         }

@@ -7,7 +7,7 @@
 
 namespace banggame {
 
-    using send_update_function = std23::function_ref<void (json::json &&) const>;
+    using send_update_function = std23::function_ref<void (game_update &&) const>;
 
     struct game : game_table {
         using game_table::game_table;

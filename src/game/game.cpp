@@ -17,9 +17,9 @@
 
 namespace banggame {
 
-    static std::optional<timer_status_args> get_request_timer_status(request_timer *timer) {
+    static std::optional<game_updates::timer_status> get_request_timer_status(request_timer *timer) {
         if (timer) {
-            return timer_status_args{
+            return game_updates::timer_status{
                 .timer_id = timer->get_timer_id(),
                 .duration = std::chrono::duration_cast<game_duration>(timer->get_duration())
             };
@@ -27,20 +27,20 @@ namespace banggame {
         return std::nullopt;
     }
 
-    static player_distances make_player_distances(player_ptr owner) {
+    static game_updates::player_distances make_player_distances(player_ptr owner) {
         if (!owner) return {};
 
         return {
             .distance_mods = owner->m_game->m_players
                 | rv::filter([&](player_ptr target) { return target != owner; })
                 | rv::transform([&](player_ptr target) {
-                    return player_distance_item {
+                    return game_updates::player_distance_item {
                         .player = target,
                         .value = target->get_distance_mod()
                     };
                 })
                 | rv::cache1
-                | rv::filter([](const player_distance_item &item) {
+                | rv::filter([](const game_updates::player_distance_item &item) {
                     return item.value != 0;
                 })
                 | rn::to_vector,
@@ -71,8 +71,8 @@ namespace banggame {
         return {};
     }
 
-    static request_status_args make_request_update(request_base &req, player_ptr owner = nullptr) {
-        return request_status_args{
+    static game_updates::request_status make_request_update(request_base &req, player_ptr owner = nullptr) {
+        return game_updates::request_status {
             .origin_card = req.origin_card,
             .origin = req.origin,
             .target = req.target,
@@ -86,7 +86,7 @@ namespace banggame {
         };
     }
 
-    static status_ready_args make_status_ready_update(player_ptr owner) {
+    static game_updates::status_ready make_status_ready_update(player_ptr owner) {
         return {
             .play_cards = generate_playable_cards_list(owner),
             .distances = make_player_distances(owner)
@@ -110,30 +110,30 @@ namespace banggame {
     }
 
     void game::send_spectator_join_updates(const send_update_function &send_update) {
-        send_update(make_update<"player_add">(m_players));
+        send_update(game_updates::player_add{ m_players });
 
         for (player_ptr p : m_players) {
-            send_update(make_update<"player_flags">(p, p->m_player_flags));
+            send_update(game_updates::player_flags{ p, p->m_player_flags });
         }
 
-        send_update(make_update<"player_order">(m_players, 0ms));
+        send_update(game_updates::player_order{ m_players, 0ms });
 
         auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) {
             auto &range = get_pocket(pocket, owner);
             if (!range.empty()) {
-                send_update(make_update<"add_cards">(range, pocket, owner));
+                send_update(game_updates::add_cards{ range, pocket, owner });
             }
             for (card_ptr c : range) {
                 if (c->visibility == card_visibility::shown) {
-                    send_update(make_update<"show_card">(c, *c, 0ms));
+                    send_update(game_updates::show_card{ c, *c, 0ms });
                 }
                 for (const auto &[token, count] : c->tokens) {
                     if (count > 0) {
-                        send_update(make_update<"add_tokens">(token, count, c));
+                        send_update(game_updates::add_tokens{ token, count, c });
                     }
                 }
                 if (c->inactive) {
-                    send_update(make_update<"tap_card">(c, true, 0ms));
+                    send_update(game_updates::tap_card{ c, true, 0ms });
                 }
             }
         };
@@ -148,7 +148,7 @@ namespace banggame {
         add_cards(pocket_type::hidden_deck);
 
         if (train_position != 0) {
-            send_update(make_update<"move_train">(train_position, 0ms));
+            send_update(game_updates::move_train{ train_position, 0ms });
         }
 
         add_cards(pocket_type::stations);
@@ -166,13 +166,13 @@ namespace banggame {
         
         for (const auto &[token, count] : tokens) {
             if (count > 0) {
-                send_update(make_update<"add_tokens">(token, count));
+                send_update(game_updates::add_tokens{ token, count });
             }
         }
 
         for (player_ptr p : m_players) {
             if (p->check_player_flags(player_flag::role_revealed)) {
-                send_update(make_update<"player_show_role">(p, p->m_role, 0ms));
+                send_update(game_updates::player_show_role{ p, p->m_role, 0ms });
             }
 
             if (!p->check_player_flags(player_flag::removed)) {
@@ -181,58 +181,58 @@ namespace banggame {
                 add_cards(pocket_type::player_table, p);
                 add_cards(pocket_type::player_hand, p);
 
-                send_update(make_update<"player_hp">(p, p->m_hp, 0ms));
+                send_update(game_updates::player_hp{ p, p->m_hp, 0ms });
                 
                 if (p->m_gold != 0) {
-                    send_update(make_update<"player_gold">(p, p->m_gold));
+                    send_update(game_updates::player_gold{ p, p->m_gold });
                 }
             }
         }
 
         if (m_playing) {
-            send_update(make_update<"switch_turn">(m_playing));
+            send_update(game_updates::switch_turn{ m_playing });
         }
         if (!is_waiting()) {
             if (auto req = top_request()) {
-                send_update(make_update<"request_status">(make_request_update(*req)));
+                send_update(game_updates::request_status{ make_request_update(*req) });
             }
         }
 
-        send_update(make_update<"game_flags">(m_game_flags));
+        send_update(game_updates::game_flags{ m_game_flags });
     }
 
     void game::send_game_log_updates(player_ptr target, const send_update_function &send_update) {
-        send_update(make_update<"clear_logs">());
+        send_update(game_updates::clear_logs{});
         
         for (const auto &[upd_target, log] : m_saved_log) {
             if (upd_target.matches(target)) {
-                send_update(make_update<"game_log">(log));
+                send_update(game_updates::game_log{ log });
             }
         }
     }
 
     void game::send_rejoin_updates(player_ptr target, const send_update_function &send_update) {
-        send_update(make_update<"player_add">(target));
+        send_update(game_updates::player_add{ target });
 
         if (!target->check_player_flags(player_flag::role_revealed)) {
-            send_update(make_update<"player_show_role">(target, target->m_role, 0ms));
+            send_update(game_updates::player_show_role{ target, target->m_role, 0ms });
         }
 
         for (card_ptr c : target->m_hand) {
-            send_update(make_update<"show_card">(c, *c, 0ms));
+            send_update(game_updates::show_card{ c, *c, 0ms });
         }
 
         for (card_ptr c : m_selection) {
             if (c->owner == target) {
-                send_update(make_update<"show_card">(c, *c, 0ms));
+                send_update(game_updates::show_card{ c, *c, 0ms });
             }
         }
 
         if (!is_game_over() && !is_waiting()) {
             if (auto req = top_request()) {
-                send_update(make_update<"request_status">(make_request_update(*req, target)));
+                send_update(game_updates::request_status{ make_request_update(*req, target) });
             } else if (target == m_playing) {
-                send_update(make_update<"status_ready">(make_status_ready_update(target)));
+                send_update(game_updates::status_ready{ make_status_ready_update(target) });
             }
         }
     }
@@ -251,7 +251,7 @@ namespace banggame {
             ruleset->on_apply(this);
         }
 
-        add_update<"player_add">(m_players);
+        add_update(game_updates::player_add{ m_players });
         
         auto add_cards = [&](auto &&cards, pocket_type pocket, card_list *add_to_list = nullptr) {
             if (!add_to_list && pocket != pocket_type::none) add_to_list = &get_pocket(pocket);
@@ -274,14 +274,14 @@ namespace banggame {
         };
 
         if (add_cards(all_cards.button_row, pocket_type::button_row)) {
-            add_update<"add_cards">(m_button_row, pocket_type::button_row);
+            add_update(game_updates::add_cards{ m_button_row, pocket_type::button_row });
             for (card_ptr c : m_button_row) {
                 c->set_visibility(card_visibility::shown, nullptr, true);
             }
         }
 
         if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
-            add_update<"add_cards">(m_hidden_deck, pocket_type::hidden_deck);
+            add_update(game_updates::add_cards{ m_hidden_deck, pocket_type::hidden_deck });
             for (card_ptr c : m_hidden_deck) {
                 c->set_visibility(card_visibility::shown, nullptr, true);
             }
@@ -289,22 +289,22 @@ namespace banggame {
 
         if (add_cards(all_cards.deck, pocket_type::main_deck)) {
             shuffle_cards_and_ids(m_deck);
-            add_update<"add_cards">(m_deck, pocket_type::main_deck);
+            add_update(game_updates::add_cards{ m_deck, pocket_type::main_deck });
         }
 
         if (add_cards(all_cards.goldrush, pocket_type::shop_deck)) {
             shuffle_cards_and_ids(m_shop_deck);
-            add_update<"add_cards">(m_shop_deck, pocket_type::shop_deck);
+            add_update(game_updates::add_cards{ m_shop_deck, pocket_type::shop_deck });
         }
 
         if (add_cards(all_cards.train, pocket_type::train_deck)) {
             shuffle_cards_and_ids(m_train_deck);
-            add_update<"add_cards">(m_train_deck, pocket_type::train_deck);
+            add_update(game_updates::add_cards{ m_train_deck, pocket_type::train_deck });
         }
 
         if (add_cards(all_cards.feats, pocket_type::feats_deck)) {
             shuffle_cards_and_ids(m_feats_deck);
-            add_update<"add_cards">(m_feats_deck, pocket_type::feats_deck);
+            add_update(game_updates::add_cards{ m_feats_deck, pocket_type::feats_deck });
         }
         
         player_role roles[] = {
@@ -348,13 +348,13 @@ namespace banggame {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
             }
 
-            add_update<"add_cards">(m_scenario_deck, pocket_type::scenario_deck);
+            add_update(game_updates::add_cards{ m_scenario_deck, pocket_type::scenario_deck });
         }
 
         if (add_cards(all_cards.wildwestshow, pocket_type::wws_scenario_deck)) {
             shuffle_cards_and_ids(m_wws_scenario_deck);
             rn::partition(m_wws_scenario_deck, is_last_scenario_card);
-            add_update<"add_cards">(m_wws_scenario_deck, pocket_type::wws_scenario_deck);
+            add_update(game_updates::add_cards{ m_wws_scenario_deck, pocket_type::wws_scenario_deck });
         }
 
         add_cards(all_cards.stations, pocket_type::none, &m_stations_deck);
@@ -438,7 +438,7 @@ namespace banggame {
             m_playing->pass_turn();
             return TAG(next);
         } else {
-            add_update<"status_ready">(update_target::includes(m_playing), std::move(args));
+            add_update(update_target::includes(m_playing), game_updates::status_ready{ std::move(args) });
             return TAG(done);
         }
     }
@@ -449,10 +449,10 @@ namespace banggame {
         for (player_ptr p : m_players) {
             spectator_target.add(p);
             if (!p->is_bot()) {
-                add_update<"request_status">(update_target::includes(p), make_request_update(*req, p));
+                add_update(update_target::includes(p), game_updates::request_status{ make_request_update(*req, p) });
             }
         }
-        add_update<"request_status">(std::move(spectator_target), make_request_update(*req));
+        add_update(std::move(spectator_target), game_updates::request_status{ make_request_update(*req) });
     }
 
 }

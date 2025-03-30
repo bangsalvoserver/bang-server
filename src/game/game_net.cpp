@@ -183,10 +183,10 @@ namespace banggame {
                 origin->m_game->commit_updates();
             },
             [&](TAG_T(error), game_string error) {
-                add_update<"game_error">(update_target::includes(origin), error);
+                add_update(update_target::includes(origin), game_updates::game_error{ error });
             },
             [&](TAG_T(prompt), prompt_string prompt) {
-                add_update<"game_prompt">(update_target::includes(origin), prompt.message);
+                add_update(update_target::includes(origin), game_updates::game_prompt{ prompt.message });
             }
         }, result);
     }

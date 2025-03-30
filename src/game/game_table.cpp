@@ -59,13 +59,13 @@ namespace banggame {
                 target_card->pocket = pocket_type::none;
                 // target_card->owner = nullptr;
             }
-            add_update<"remove_cards">(std::move(cards));
+            add_update(game_updates::remove_cards{ std::move(cards) });
         }
     }
 
     void game_table::add_cards_to(card_list cards, pocket_type pocket, player_ptr owner, card_visibility visibility, bool instant) {
         if (!cards.empty()) {
-            add_update<"add_cards">(cards, pocket, owner);
+            add_update(game_updates::add_cards{ cards, pocket, owner });
 
             auto &pile = get_pocket(pocket, owner);
             for (card_ptr target_card : cards) {
@@ -174,11 +174,11 @@ namespace banggame {
         } else {
             tokens[token_type] += num_tokens;
         }
-        add_update<"add_tokens">(token_type, num_tokens, target_card);
+        add_update(game_updates::add_tokens{ token_type, num_tokens, target_card });
     }
 
     void game_table::clear_request_status() {
-        add_update<"status_clear">();
+        add_update(game_updates::status_clear{});
     }
 
     card_ptr game_table::top_of_deck() {
@@ -196,7 +196,7 @@ namespace banggame {
             shuffle_cards_and_ids(m_deck);
             add_log("LOG_DECK_RESHUFFLED");
             play_sound("shuffle");
-            add_update<"deck_shuffled">(pocket_type::main_deck);
+            add_update(game_updates::deck_shuffled{ pocket_type::main_deck });
         }
         card_ptr drawn_card = m_deck.back();
         call_event(event_type::on_drawn_any_card{ drawn_card });
@@ -204,11 +204,11 @@ namespace banggame {
     }
 
     void game_table::add_short_pause() {
-        add_update<"short_pause">(nullptr);
+        add_update(game_updates::short_pause{ nullptr });
     }
 
     void game_table::play_sound(std::string_view sound_id) {
-        add_update<"play_sound">(std::string(sound_id));
+        add_update(game_updates::play_sound{ std::string(sound_id) });
     }
 
     void game_table::start_next_turn() {
@@ -244,12 +244,12 @@ namespace banggame {
 
     void game_table::add_game_flags(game_flag flags) {
         m_game_flags.add(flags);
-        add_update<"game_flags">(m_game_flags);
+        add_update(game_updates::game_flags{ m_game_flags });
     }
 
     void game_table::remove_game_flags(game_flag flags) {
         m_game_flags.remove(flags);
-        add_update<"game_flags">(m_game_flags);
+        add_update(game_updates::game_flags{ m_game_flags });
     }
 
     bool game_table::check_flags(game_flag flags) const {

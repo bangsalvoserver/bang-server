@@ -17,79 +17,10 @@ namespace banggame {
         card_backface_list(card_ptr card): cards{card} {}
     };
 
-    struct add_cards_update {
-        card_backface_list card_ids;
-        pocket_type pocket;
-        nullable_player player;
-    };
-
-    struct remove_cards_update {
-        card_list cards;
-    };
-
     enum class pocket_position {
         begin,
         random,
         end,
-    };
-
-    struct move_card_update {
-        card_ptr card;
-        nullable_player player;
-        pocket_type pocket;
-        animation_duration duration = durations.move_card;
-        pocket_position position = pocket_position::end;
-    };
-
-    struct add_tokens_update {
-        card_token_type token_type;
-        int num_tokens;
-        nullable_card target_card;
-    };
-
-    struct move_tokens_update {
-        card_token_type token_type;
-        int num_tokens;
-        nullable_card origin_card;
-        nullable_card target_card;
-        animation_duration duration = durations.move_tokens;
-    };
-
-    struct move_train_update {
-        int position;
-        animation_duration duration = durations.move_train;
-    };
-
-    struct deck_shuffled_update {
-        pocket_type pocket;
-        animation_duration duration = durations.deck_shuffle;
-    };
-
-    struct show_card_update {
-        card_ptr card;
-        card_data info;
-        animation_duration duration = durations.flip_card;
-    };
-
-    struct hide_card_update {
-        card_ptr card;
-        animation_duration duration = durations.flip_card;
-    };
-
-    struct tap_card_update {
-        card_ptr card;
-        bool inactive;
-        animation_duration duration = durations.tap_card;
-    };
-
-    struct flash_card_update {
-        card_ptr card;
-        animation_duration duration = durations.flash_card;
-    };
-
-    struct short_pause_update {
-        nullable_card card;
-        animation_duration duration = durations.short_pause;
     };
 
     struct player_user_list {
@@ -100,37 +31,6 @@ namespace banggame {
         player_user_list(player_ptr player): players{player} {}
     };
 
-    struct player_add_update {
-        player_user_list players;
-    };
-
-    struct player_order_update {
-        player_list players;
-        animation_duration duration = durations.move_player;
-    };
-
-    struct player_hp_update {
-        player_ptr player;
-        int hp;
-        animation_duration duration = durations.player_hp;
-    };
-
-    struct player_gold_update {
-        player_ptr player;
-        int gold;
-    };
-
-    struct player_show_role_update {
-        player_ptr player;
-        player_role role;
-        animation_duration duration = durations.flip_card;
-    };
-
-    struct player_flags_update {
-        player_ptr player;
-        player_flags flags;
-    };
-
     struct playable_card_info {
         card_ptr card;
         card_list modifiers;
@@ -139,73 +39,202 @@ namespace banggame {
 
     using playable_cards_list = std::vector<playable_card_info>;
 
-    struct player_distance_item {
-        player_ptr player;
-        int value;
-    };
+    namespace game_updates {
 
-    struct player_distances {
-        std::vector<player_distance_item> distance_mods;
-        int range_mod;
-        int weapon_range;
-    };
+        struct game_error {
+            game_string message;
+        };
 
-    struct timer_status_args {
-        timer_id_t timer_id;
-        game_duration duration;
-    };
+        struct game_log {
+            game_string message;
+        };
 
-    struct request_status_args {
-        nullable_card origin_card;
-        nullable_player origin;
-        nullable_player target;
-        game_string status_text;
-        playable_cards_list respond_cards;
-        card_list highlight_cards;
-        player_list target_set_players;
-        card_list target_set_cards;
-        player_distances distances;
-        std::optional<timer_status_args> timer;
-    };
+        struct game_prompt {
+            game_string message;
+        };
 
-    struct status_ready_args {
-        playable_cards_list play_cards;
-        player_distances distances;
-    };
+        struct add_cards {
+            card_backface_list card_ids;
+            pocket_type pocket;
+            nullable_player player;
+        };
 
-    using game_update = utils::tagged_variant<
-        TAG_T(game_error, game_string),
-        TAG_T(game_log, game_string),
-        TAG_T(game_prompt, game_string),
-        TAG_T(add_cards, add_cards_update),
-        TAG_T(remove_cards, remove_cards_update),
-        TAG_T(move_card, move_card_update),
-        TAG_T(add_tokens, add_tokens_update),
-        TAG_T(move_tokens, move_tokens_update),
-        TAG_T(move_train, move_train_update),
-        TAG_T(deck_shuffled, deck_shuffled_update),
-        TAG_T(show_card, show_card_update),
-        TAG_T(hide_card, hide_card_update),
-        TAG_T(tap_card, tap_card_update),
-        TAG_T(flash_card, flash_card_update),
-        TAG_T(short_pause, short_pause_update),
-        TAG_T(player_add, player_add_update),
-        TAG_T(player_order, player_order_update),
-        TAG_T(player_hp, player_hp_update),
-        TAG_T(player_gold, player_gold_update),
-        TAG_T(player_show_role, player_show_role_update),
-        TAG_T(player_flags, player_flags_update),
-        TAG_T(switch_turn, player_ptr),
-        TAG_T(request_status, request_status_args),
-        TAG_T(status_ready, status_ready_args),
-        TAG_T(game_flags, game_flags),
-        TAG_T(play_sound, std::string),
-        TAG_T(status_clear),
-        TAG_T(clear_logs)
+        struct remove_cards {
+            card_list cards;
+        };
+
+        struct move_card {
+            card_ptr card;
+            nullable_player player;
+            pocket_type pocket;
+            animation_duration duration = durations.move_card;
+            pocket_position position = pocket_position::end;
+        };
+
+        struct add_tokens {
+            card_token_type token_type;
+            int num_tokens;
+            nullable_card target_card;
+        };
+
+        struct move_tokens {
+            card_token_type token_type;
+            int num_tokens;
+            nullable_card origin_card;
+            nullable_card target_card;
+            animation_duration duration = durations.move_tokens;
+        };
+
+        struct move_train {
+            int position;
+            animation_duration duration = durations.move_train;
+        };
+
+        struct deck_shuffled {
+            pocket_type pocket;
+            animation_duration duration = durations.deck_shuffle;
+        };
+
+        struct show_card {
+            card_ptr card;
+            card_data info;
+            animation_duration duration = durations.flip_card;
+        };
+
+        struct hide_card {
+            card_ptr card;
+            animation_duration duration = durations.flip_card;
+        };
+
+        struct tap_card {
+            card_ptr card;
+            bool inactive;
+            animation_duration duration = durations.tap_card;
+        };
+
+        struct flash_card {
+            card_ptr card;
+            animation_duration duration = durations.flash_card;
+        };
+
+        struct short_pause {
+            nullable_card card;
+            animation_duration duration = durations.short_pause;
+        };
+
+        struct player_add {
+            player_user_list players;
+        };
+
+        struct player_order {
+            player_list players;
+            animation_duration duration = durations.move_player;
+        };
+
+        struct player_hp {
+            player_ptr player;
+            int hp;
+            animation_duration duration = durations.player_hp;
+        };
+
+        struct player_gold {
+            player_ptr player;
+            int gold;
+        };
+
+        struct player_show_role {
+            player_ptr player;
+            player_role role;
+            animation_duration duration = durations.flip_card;
+        };
+
+        struct player_flags {
+            player_ptr player;
+            banggame::player_flags flags;
+        };
+
+        struct switch_turn {
+            player_ptr player;
+        };
+
+        struct player_distance_item {
+            player_ptr player;
+            int value;
+        };
+    
+        struct player_distances {
+            std::vector<player_distance_item> distance_mods;
+            int range_mod;
+            int weapon_range;
+        };
+
+        struct timer_status {
+            timer_id_t timer_id;
+            game_duration duration;
+        };
+
+        struct request_status {
+            nullable_card origin_card;
+            nullable_player origin;
+            nullable_player target;
+            game_string status_text;
+            playable_cards_list respond_cards;
+            card_list highlight_cards;
+            player_list target_set_players;
+            card_list target_set_cards;
+            player_distances distances;
+            std::optional<timer_status> timer;
+        };
+
+        struct status_ready {
+            playable_cards_list play_cards;
+            player_distances distances;
+        };
+
+        struct game_flags {
+            banggame::game_flags flags;
+        };
+
+        struct play_sound {
+            std::string sound;
+        };
+
+        struct status_clear {};
+
+        struct clear_logs {};
+
+    }
+
+    using game_update = std::variant<
+        game_updates::game_error,
+        game_updates::game_log,
+        game_updates::game_prompt,
+        game_updates::add_cards,
+        game_updates::remove_cards,
+        game_updates::move_card,
+        game_updates::add_tokens,
+        game_updates::move_tokens,
+        game_updates::move_train,
+        game_updates::deck_shuffled,
+        game_updates::show_card,
+        game_updates::hide_card,
+        game_updates::tap_card,
+        game_updates::flash_card,
+        game_updates::short_pause,
+        game_updates::player_add,
+        game_updates::player_order,
+        game_updates::player_hp,
+        game_updates::player_gold,
+        game_updates::player_show_role,
+        game_updates::player_flags,
+        game_updates::switch_turn,
+        game_updates::request_status,
+        game_updates::status_ready,
+        game_updates::game_flags,
+        game_updates::play_sound,
+        game_updates::status_clear,
+        game_updates::clear_logs
     >;
-
-    template<utils::fixed_string Name>
-    concept game_update_type = utils::tag_for<utils::tag<Name>, game_update>;
 
     struct modifier_pair {
         card_ptr card;
