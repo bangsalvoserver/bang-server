@@ -7,7 +7,6 @@ using namespace banggame;
 
 void game_manager::on_message(client_handle client, std::string_view msg) {
     try {
-        auto client_msg = deserialize_message(json::json::parse(msg));
         std::visit([&](auto && msg) {
             auto it = m_connections.find(client);
             if (it == m_connections.end()) {
@@ -21,7 +20,7 @@ void game_manager::on_message(client_handle client, std::string_view msg) {
             } else {
                 throw critical_error("CLIENT_NOT_VALIDATED");
             }
-        }, std::move(client_msg));
+        }, deserialize_message(msg));
     } catch (const json::json_error &e) {
         logging::warn("Invalid message: {:.{}}\n{}", msg, net::max_message_log_size, e.what());
         kick_client(client, "INVALID_MESSAGE");

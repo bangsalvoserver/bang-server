@@ -11,8 +11,8 @@ namespace banggame {
         return json::serialize(message).dump(-1, ' ', true, nlohmann::json::error_handler_t::replace);
     }
 
-    client_message deserialize_message(const json::json &value) {
-        return json::deserialize<client_message>(value);
+    client_message deserialize_message(std::string_view value) {
+        return json::deserialize<client_message>(json::json::parse(value));
     }
 
 }

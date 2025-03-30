@@ -89,7 +89,7 @@ namespace banggame {
         client_messages::game_action
     >;
 
-    client_message deserialize_message(const json::json &value);
+    client_message deserialize_message(std::string_view value);
 
     enum class lobby_state {
         waiting,
