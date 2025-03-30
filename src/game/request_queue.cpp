@@ -10,7 +10,7 @@ namespace banggame {
 
     request_state request_queue::invoke_update() {
         if (is_game_over()) {
-            return TAG(done);
+            return request_states::done{};
         } else if (auto req = top_request()) {
             logging::debug("on_update() on {: >5}: {}", req->priority, utils::demangle(typeid(*req).name()));
 
@@ -18,26 +18,26 @@ namespace banggame {
             req->live = true;
             
             if (top_request() != req) {
-                return TAG(next);
+                return request_states::next{};
             }
             if (request_timer *timer = req->timer()) {
                 if (timer->get_duration() <= ticks{0}) {
                     pop_request();
                     timer->on_finished();
-                    return TAG(next);
+                    return request_states::next{};
                 }
                 timer->start(get_total_update_time());
             }
             send_request_update();
-        } else if (holds_alternative<"next">(send_request_status_ready())) {
-            return TAG(next);
+        } else if (std::holds_alternative<request_states::next>(send_request_status_ready())) {
+            return request_states::next{};
         }
         return request_bot_play(false);
     }
 
     request_state request_queue::invoke_tick_update() {
         if (is_game_over()) {
-            return TAG(done);
+            return request_states::done{};
         } else if (auto req = top_request()) {
             if (request_timer *timer = req->timer()) {
                 timer->tick();
@@ -45,23 +45,23 @@ namespace banggame {
                     send_request_status_clear();
                     pop_request();
                     timer->on_finished();
-                    return TAG(next);
+                    return request_states::next{};
                 }
             }
         }
 
-        return utils::visit_tagged(overloaded{
-            [](const auto &state) -> request_state { return state; },
-            [](TAG_T(waiting), ticks timer) -> request_state {
-                if (timer > ticks{}) {
-                    return {TAG(waiting), timer - ticks{1} };
+        return std::visit(overloaded{
+            [](auto state) -> request_state { return state; },
+            [](request_states::waiting state) -> request_state {
+                if (state.timer > ticks{}) {
+                    return request_states::waiting{ state.timer - ticks{1} };
                 } else {
-                    return TAG(next);
+                    return request_states::next{};
                 }
             },
-            [&](TAG_T(bot_play), ticks timer) -> request_state {
-                if (timer > ticks{}) {
-                    return {TAG(bot_play), timer - ticks{1} };
+            [&](request_states::bot_play state) -> request_state {
+                if (state.timer > ticks{}) {
+                    return request_states::bot_play{ state.timer - ticks{1} };
                 } else {
                     return request_bot_play(true);
                 }
@@ -72,7 +72,7 @@ namespace banggame {
     void request_queue::tick() {
         m_state = invoke_tick_update();
 
-        if (holds_alternative<"next">(m_state)) {
+        if (std::holds_alternative<request_states::next>(m_state)) {
             commit_updates();
         }
     }
@@ -85,11 +85,11 @@ namespace banggame {
         do {
             auto timer = get_total_update_time();
             if (timer > max_update_timer_duration || count > max_update_count) {
-                m_state = { TAG(waiting), timer };
+                m_state = request_states::waiting{ timer };
             } else {
                 m_state = invoke_update();
                 ++count;
             }
-        } while (holds_alternative<"next">(m_state));
+        } while (std::holds_alternative<request_states::next>(m_state));
     }
 }

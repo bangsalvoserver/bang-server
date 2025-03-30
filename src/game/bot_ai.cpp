@@ -67,7 +67,7 @@ namespace banggame {
                 node_set.erase(node_set.find(selected_node));
 
                 if (!selected_node) {
-                    return TAG(done);
+                    return request_states::done{};
                 }
 
                 try {
@@ -92,7 +92,7 @@ namespace banggame {
                             return false;
                         }
                     }, result)) {
-                        return TAG(next);
+                        return request_states::next{};
                     }
                 } catch (const random_element_error &) {
                     // ignore
@@ -103,14 +103,14 @@ namespace banggame {
         // softlock
         logging::warn("BOT ERROR: could not find card in execute_random_play()");
 
-        return TAG(done);
+        return request_states::done{};
     }
 
     request_state game::request_bot_play(bool instant) {
         if (m_options.num_bots == 0) {
-            return TAG(done);
+            return request_states::done{};
         } else if (!instant && m_options.bot_play_timer > game_duration{0}) {
-            return { TAG(bot_play), get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
+            return request_states::bot_play{ get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
         }
 
         if (pending_requests()) {
@@ -123,8 +123,8 @@ namespace banggame {
                         timer_id = timer->get_timer_id();
                     }
 
-                    if (holds_alternative<"next">(execute_random_play(origin, true, timer_id, play_cards))) {
-                        return TAG(next);
+                    if (std::holds_alternative<request_states::next>(execute_random_play(origin, true, timer_id, play_cards))) {
+                        return request_states::next{};
                     }
                 }
             }
@@ -132,7 +132,7 @@ namespace banggame {
             playable_cards_list play_cards = generate_playable_cards_list(m_playing);
             return execute_random_play(m_playing, false, std::nullopt, play_cards);
         }
-        return TAG(done);
+        return request_states::done{};
     }
 
     
