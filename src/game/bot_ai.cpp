@@ -79,16 +79,16 @@ namespace banggame {
 
                     auto result = verify_and_play(origin, args);
 
-                    if (utils::visit_tagged(overloaded{
-                        [](TAG_T(ok)) {
+                    if (std::visit(overloaded{
+                        [](play_verify_results::ok) {
                             return true;
                         },
-                        [&](TAG_T(prompt), const prompt_string &prompt) {
-                            logging::trace("BOT PROMPT: message={}, i={}", std::string_view{prompt.message.format_str}, i);
+                        [&](play_verify_results::prompt prompt) {
+                            logging::trace("BOT PROMPT: message={}, i={}", std::string_view{prompt.message.message.format_str}, i);
                             return false;
                         },
-                        [&](TAG_T(error), const game_string &error) {
-                            logging::trace("BOT ERROR: message={}, i={}", std::string_view{error.format_str}, i);
+                        [&](play_verify_results::error error) {
+                            logging::trace("BOT ERROR: message={}, i={}", std::string_view{error.message.format_str}, i);
                             return false;
                         }
                     }, result)) {

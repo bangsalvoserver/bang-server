@@ -14,13 +14,25 @@ namespace banggame {
 
     prompt_string get_equip_prompt(player_ptr origin, card_ptr origin_card, player_ptr target);
 
-    using game_message = utils::tagged_variant<
-        TAG_T(ok),
-        TAG_T(error, game_string),
-        TAG_T(prompt, prompt_string)
+    namespace play_verify_results {
+        struct ok {};
+
+        struct error {
+            game_string message;
+        };
+
+        struct prompt {
+            prompt_string message;
+        };
+    }
+
+    using play_verify_result = std::variant<
+        play_verify_results::ok,
+        play_verify_results::error,
+        play_verify_results::prompt
     >;
 
-    game_message verify_and_play(player_ptr origin, const game_action &action);
+    play_verify_result verify_and_play(player_ptr origin, const game_action &action);
 
     template<rn::input_range R> requires std::convertible_to<rn::range_value_t<R>, prompt_string>
     inline prompt_string merge_prompts(R &&prompts) {

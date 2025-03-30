@@ -178,15 +178,15 @@ namespace banggame {
         auto action = json::deserialize<game_action, game_context>(value, *this);
         auto result = verify_and_play(origin, action);
 
-        utils::visit_tagged(overloaded{
-            [&](TAG_T(ok)) {
+        std::visit(overloaded{
+            [&](play_verify_results::ok) {
                 origin->m_game->commit_updates();
             },
-            [&](TAG_T(error), game_string error) {
-                add_update(update_target::includes(origin), game_updates::game_error{ error });
+            [&](play_verify_results::error error) {
+                add_update(update_target::includes(origin), game_updates::game_error{ error.message });
             },
-            [&](TAG_T(prompt), prompt_string prompt) {
-                add_update(update_target::includes(origin), game_updates::game_prompt{ prompt.message });
+            [&](play_verify_results::prompt prompt) {
+                add_update(update_target::includes(origin), game_updates::game_prompt{ prompt.message.message });
             }
         }, result);
     }

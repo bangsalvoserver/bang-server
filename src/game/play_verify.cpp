@@ -349,7 +349,7 @@ namespace banggame {
         }, 45);
     }
 
-    game_message verify_and_play(player_ptr origin, const game_action &args) {
+    play_verify_result verify_and_play(player_ptr origin, const game_action &args) {
         bool is_response = origin->m_game->pending_requests();
 
         effect_context ctx{};
@@ -357,16 +357,16 @@ namespace banggame {
         ctx.playing_card = args.card;
 
         if (game_string error = verify_timer_response(origin, args.timer_id)) {
-            return {TAG(error), error};
+            return play_verify_results::error{ error };
         }
 
         if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-            return {TAG(error), error};
+            return play_verify_results::error{ error };
         }
 
         if (!args.bypass_prompt) {
             if (prompt_string prompt = get_prompt_message(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
-                return {TAG(prompt), prompt};
+                return play_verify_results::prompt{ prompt };
             }
         }
 
@@ -389,6 +389,6 @@ namespace banggame {
             apply_target_list(origin, args.card, is_response, args.targets, ctx);
         }
 
-        return {};
+        return play_verify_results::ok{};
     }
 }
