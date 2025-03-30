@@ -4,7 +4,6 @@
 #include "game/game_options.h"
 
 #include "utils/enum_bitset.h"
-#include "utils/tagged_variant.h"
 
 #include "image_pixels.h"
 

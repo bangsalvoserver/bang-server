@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    using visit_card = play_visitor<"cube_slot">;
+    using visit_card = play_visitor<target_types::cube_slot>;
 
     static game_string get_cube_slot_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_holder &effect, const effect_context &ctx) {
         if (!target->owner) return "ERROR_CARD_HAS_NO_OWNER";
@@ -52,15 +52,15 @@ namespace banggame {
     }
 
     template<> prompt_string visit_card::prompt(const effect_context &ctx, card_ptr target) {
-        return defer<"card">().prompt(ctx, target);
+        return defer<target_types::card>().prompt(ctx, target);
     }
 
     template<> void visit_card::add_context(effect_context &ctx, card_ptr target) {
-        return defer<"card">().add_context(ctx, target);
+        return defer<target_types::card>().add_context(ctx, target);
     }
 
     template<> void visit_card::play(const effect_context &ctx, card_ptr target) {
-        return defer<"card">().play(ctx, target);
+        return defer<target_types::card>().play(ctx, target);
     }
 
 }

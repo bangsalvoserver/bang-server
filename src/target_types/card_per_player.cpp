@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    using visit_cards = play_visitor<"card_per_player">;
+    using visit_cards = play_visitor<target_types::card_per_player>;
 
     template<> std::generator<card_list> visit_cards::possible_targets(const effect_context &ctx) {
         co_yield {};

@@ -2,7 +2,6 @@
 #define __GAME_STRING_H__
 
 #include "utils/small_string.h"
-#include "utils/tagged_variant.h"
 #include "card_fwd.h"
 
 namespace banggame {

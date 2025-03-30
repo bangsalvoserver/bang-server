@@ -2,7 +2,7 @@
 
 namespace banggame {
 
-    using visit_cubes = play_visitor<"select_cubes">;
+    using visit_cubes = play_visitor<target_types::select_cubes>;
 
     template<> std::generator<card_list> visit_cubes::possible_targets(const effect_context &ctx) {
         if (origin->count_cubes() >= effect.target_value) {

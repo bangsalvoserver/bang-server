@@ -5,7 +5,7 @@
 
 namespace banggame {
 
-    using visit_player = play_visitor<"player">;
+    using visit_player = play_visitor<target_types::player>;
 
     template<> std::generator<player_ptr> visit_player::possible_targets(const effect_context &ctx) {
         for (player_ptr target : get_all_player_targets(origin, origin_card, effect, ctx)) {

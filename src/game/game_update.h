@@ -4,7 +4,6 @@
 #include "durations.h"
 #include "cards/card_data.h"
 
-#include "utils/tagged_variant.h"
 #include "utils/remove_defaults.h"
 
 namespace banggame {

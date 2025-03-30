@@ -7,7 +7,6 @@
 
 #include "cards/card_effect.h"
 
-#include "utils/tagged_variant.h"
 #include "utils/stable_queue.h"
 
 namespace banggame {

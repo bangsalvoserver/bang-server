@@ -2,7 +2,7 @@
 
 namespace banggame {
 
-    using visit_cubes = play_visitor<"self_cubes">;
+    using visit_cubes = play_visitor<target_types::self_cubes>;
 
     template<> game_string visit_cubes::get_error(const effect_context &ctx) {
         if (origin_card->num_cubes() < effect.target_value) {
@@ -11,7 +11,7 @@ namespace banggame {
         return {};
     }
     
-    template<> std::generator<std::monostate> visit_cubes::possible_targets(const effect_context &ctx) {
+    template<> std::generator<target_types::self_cubes> visit_cubes::possible_targets(const effect_context &ctx) {
         if (!get_error(ctx)) {
             co_yield {};
         }

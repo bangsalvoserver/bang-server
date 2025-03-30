@@ -4,7 +4,7 @@
 
 namespace banggame {
 
-    using visit_cards = play_visitor<"move_cube_slot">;
+    using visit_cards = play_visitor<target_types::move_cube_slot>;
 
     static auto make_move_cube_target_set(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
         return origin->m_table

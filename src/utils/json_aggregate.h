@@ -83,10 +83,10 @@ namespace json {
         }
     };
     
-    template<aggregate T, typename Context> requires all_fields_deserializable<T, Context>
+    template<aggregate T, typename Context> requires (all_fields_deserializable<T, Context> && !transparent_aggregate<T>)
     struct deserializer<T, Context> : aggregate_deserializer_unchecked<T, Context> {};
 
-    template<typename T, typename Context> requires (all_fields_serializable<T, Context> && !transparent_aggregate<T>)
+    template<typename T, typename Context> requires all_fields_serializable<T, Context>
     struct serializer<utils::remove_defaults<T>, Context>  {
         json operator()(const utils::remove_defaults<T> &value, const Context &ctx) const {
             json result;
