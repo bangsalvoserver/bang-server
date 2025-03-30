@@ -438,7 +438,7 @@ namespace banggame {
             m_playing->pass_turn();
             return request_states::next{};
         } else {
-            add_update(update_target::includes(m_playing), game_updates::status_ready{ std::move(args) });
+            add_update(update_target::includes(m_playing), std::move(args));
             return request_states::done{};
         }
     }
