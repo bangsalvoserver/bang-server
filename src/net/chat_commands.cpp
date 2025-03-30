@@ -28,7 +28,7 @@ namespace banggame {
             if (!command.permissions().check(command_permissions::game_cheat) || m_options.enable_cheats) {
                 send_message(session->client, server_messages::lobby_chat{ 0,
                     std::string{command.description()},
-                    chat_format_arg_list{{TAG(string), std::format("{}{}", chat_command::start_char, cmd_name)}},
+                    {chat_format_arg::string{std::format("{}{}", chat_command::start_char, cmd_name)}},
                     lobby_chat_flag::translated
                 });
             }
@@ -112,9 +112,7 @@ namespace banggame {
 
     void game_manager::command_get_rng_seed(session_ptr session) {
         send_message(session->client, server_messages::lobby_chat{0,
-            "GAME_SEED", chat_format_arg_list{
-                {TAG(string), std::format("{}", session->lobby->m_game->rng_seed)}
-            }, lobby_chat_flag::translated
+            "GAME_SEED", {chat_format_arg::string{std::format("{}", session->lobby->m_game->rng_seed)}}, lobby_chat_flag::translated
         });
     }
 

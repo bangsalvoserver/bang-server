@@ -109,13 +109,22 @@ namespace banggame {
 
     using lobby_chat_flags = enums::bitset<lobby_chat_flag>;
 
-    using chat_format_arg = utils::tagged_variant<
-        TAG_T(user, int),
-        TAG_T(integer, int),
-        TAG_T(string, std::string)
-    >;
+    namespace chat_format_arg {
+        struct user {
+            struct transparent{};
+            int value;
+        };
 
-    using chat_format_arg_list = std::vector<chat_format_arg>;
+        struct integer {
+            struct transparent{};
+            int value;
+        };
+
+        struct string {
+            struct transparent{};
+            std::string value;
+        };
+    }
 
     namespace server_messages {
         
@@ -164,10 +173,16 @@ namespace banggame {
 
         struct lobby_kick {};
 
+        using chat_format_args = std::vector<std::variant<
+            chat_format_arg::user,
+            chat_format_arg::integer,
+            chat_format_arg::string
+        >>;
+
         struct lobby_chat {
             int user_id;
             std::string message;
-            chat_format_arg_list args;
+            chat_format_args args;
             lobby_chat_flags flags;
         };
 

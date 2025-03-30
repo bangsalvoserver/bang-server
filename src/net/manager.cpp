@@ -109,7 +109,7 @@ void game_manager::tick() {
                 }
             } catch (const game_error &e) {
                 lobby.state = lobby_state::finished;
-                add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", { TAG(string), e.what() }, lobby_chat_flag::translated });
+                add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", {chat_format_arg::string{e.what()}}, lobby_chat_flag::translated });
                 broadcast_message_no_lobby(server_messages::lobby_update(lobby));
             }
         }
@@ -230,7 +230,7 @@ void game_manager::handle_message(client_messages::lobby_make &&args, session_pt
     send_message(session->client, server_messages::lobby_user_update(user));
 
     add_lobby_chat_message(lobby, &user, {
-        0, "USER_JOINED_LOBBY", {{ TAG(user), user.user_id }}, lobby_chat_flag::translated
+        0, "USER_JOINED_LOBBY", {chat_format_arg::user{ user.user_id }}, lobby_chat_flag::translated
     });
 }
 
@@ -286,7 +286,7 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
     }
     if (inserted) {
         add_lobby_chat_message(lobby, &new_user, {
-            0, "USER_JOINED_LOBBY", {{ TAG(user), new_user.user_id }}, lobby_chat_flag::translated
+            0, "USER_JOINED_LOBBY", {chat_format_arg::user{ new_user.user_id }}, lobby_chat_flag::translated
         });
     }
     
@@ -368,7 +368,7 @@ void game_manager::kick_user_from_lobby(session_ptr session) {
     }
 
     add_lobby_chat_message(lobby, nullptr, {
-        0, "USER_LEFT_LOBBY", {{ TAG(user), lobby.find_user(session).user_id }}, lobby_chat_flag::translated
+        0, "USER_LEFT_LOBBY", {chat_format_arg::user{ lobby.find_user(session).user_id }}, lobby_chat_flag::translated
     });
 }
 
@@ -685,7 +685,7 @@ void game_manager::handle_message(client_messages::game_action &&args, session_p
         logging::pop_context();
     } catch (const game_error &e) {
         lobby.state = lobby_state::finished;
-        add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", { TAG(string), e.what() }, lobby_chat_flag::translated });
+        add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", {chat_format_arg::string{e.what()}}, lobby_chat_flag::translated });
         broadcast_message_no_lobby(server_messages::lobby_update(lobby));
     }
 }

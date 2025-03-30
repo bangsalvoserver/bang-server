@@ -23,6 +23,16 @@ namespace json {
             return (deserializable<reflect::member_type<Is, T>, Context> && ...);
         }(std::make_index_sequence<reflect::size<T>()>());
 
+    template<typename T>
+    concept transparent_aggregate = requires {
+        requires aggregate<T>;
+        typename T::transparent;
+        requires reflect::size<T>() == 1;
+    };
+
+    template<transparent_aggregate T>
+    using transparent_value_type = reflect::member_type<0, T>;
+
     template<aggregate T, typename Context>
     struct aggregate_serializer_unchecked {
         json operator()(const T &value, const Context &ctx) const {
@@ -40,8 +50,15 @@ namespace json {
         }
     };
 
-    template<aggregate T, typename Context> requires all_fields_serializable<T, Context>
+    template<aggregate T, typename Context> requires (all_fields_serializable<T, Context> && !transparent_aggregate<T>)
     struct serializer<T, Context> : aggregate_serializer_unchecked<T, Context> {};
+
+    template<transparent_aggregate T, typename Context>
+    struct serializer<T, Context> {
+        json operator()(const T &value, const Context &ctx) const {
+            return serialize_unchecked(reflect::get<0>(value), ctx);
+        }
+    };
 
     template<aggregate T, typename Context>
     struct aggregate_deserializer_unchecked {
@@ -69,7 +86,7 @@ namespace json {
     template<aggregate T, typename Context> requires all_fields_deserializable<T, Context>
     struct deserializer<T, Context> : aggregate_deserializer_unchecked<T, Context> {};
 
-    template<typename T, typename Context> requires all_fields_serializable<T, Context>
+    template<typename T, typename Context> requires (all_fields_serializable<T, Context> && !transparent_aggregate<T>)
     struct serializer<utils::remove_defaults<T>, Context>  {
         json operator()(const utils::remove_defaults<T> &value, const Context &ctx) const {
             json result;
@@ -87,6 +104,13 @@ namespace json {
                 }
             });
             return result;
+        }
+    };
+
+    template<transparent_aggregate T, typename Context>
+    struct deserializer<T, Context> {
+        T operator()(const json &value, const Context &ctx) const {
+            return { deserialize_unchecked<transparent_value_type<T>>(value, ctx) };
         }
     };
 
