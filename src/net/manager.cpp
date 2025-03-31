@@ -104,12 +104,12 @@ void game_manager::tick() {
 
                 if (lobby.m_game->is_game_over()) {
                     lobby.state = lobby_state::finished;
-                    broadcast_message_no_lobby(server_messages::lobby_update(lobby));
+                    broadcast_message_no_lobby(lobby.make_lobby_update());
                 }
             } catch (const game_error &e) {
                 lobby.state = lobby_state::finished;
                 add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", {chat_format_arg::string{e.what()}}, lobby_chat_flag::translated });
-                broadcast_message_no_lobby(server_messages::lobby_update(lobby));
+                broadcast_message_no_lobby(lobby.make_lobby_update());
             }
         }
         if (lobby.connected_users().empty()) {
@@ -174,7 +174,7 @@ void game_manager::handle_message(client_messages::connect &&args, client_handle
     
     send_message(client, server_messages::client_accepted{ session_id });
     for (const auto &[id, lobby] : m_lobbies) {
-        send_message(client, server_messages::lobby_update(lobby));
+        send_message(client, lobby.make_lobby_update());
     }
 
     if (game_lobby *lobby = session->lobby) {
@@ -195,7 +195,7 @@ void game_manager::handle_message(client_messages::user_set_name &&args, session
 
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
-        broadcast_message_lobby(*lobby, server_messages::lobby_user_update(user));
+        broadcast_message_lobby(*lobby, user.make_user_update());
     }
 }
 
@@ -204,7 +204,7 @@ void game_manager::handle_message(client_messages::user_set_propic &&args, sessi
 
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
-        broadcast_message_lobby(*lobby, server_messages::lobby_user_update(user));
+        broadcast_message_lobby(*lobby, user.make_user_update());
     }
 }
 
@@ -223,10 +223,10 @@ void game_manager::handle_message(client_messages::lobby_make &&args, session_pt
     lobby.state = lobby_state::waiting;
     lobby.password = args.password;
 
-    broadcast_message_no_lobby(server_messages::lobby_update(lobby));
+    broadcast_message_no_lobby(lobby.make_lobby_update());
 
     send_message(session->client, server_messages::lobby_entered{ user.user_id, lobby.lobby_id, lobby.name, lobby.options });
-    send_message(session->client, server_messages::lobby_user_update(user));
+    send_message(session->client, user.make_user_update());
 
     add_lobby_chat_message(lobby, &user, {
         0, "USER_JOINED_LOBBY", {chat_format_arg::user{ user.user_id }}, lobby_chat_flag::translated
@@ -273,12 +273,12 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
 
     for (const game_user &user : lobby.users) {
         if (!user.is_disconnected() && user.session != session) {
-            send_message(user.session->client, server_messages::lobby_user_update(new_user));
+            send_message(user.session->client, new_user.make_user_update());
         }
-        send_message(session->client, server_messages::lobby_user_update(user));
+        send_message(session->client, user.make_user_update());
     }
     for (const lobby_bot &bot : lobby.bots) {
-        send_message(session->client, server_messages::lobby_user_update(bot));
+        send_message(session->client, bot.make_user_update());
     }
     for (const auto &message: lobby.chat_messages) {
         send_message(session->client, server_messages::lobby_chat{ message });
@@ -309,13 +309,13 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
         }
     }
 
-    broadcast_message_no_lobby(server_messages::lobby_update(lobby));
+    broadcast_message_no_lobby(lobby.make_lobby_update());
 }
 
 bool game_manager::add_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag) {
     if (!user.flags.check(flag)) {
         user.flags.add(flag);
-        broadcast_message_lobby(lobby, server_messages::lobby_user_update(user));
+        broadcast_message_lobby(lobby, user.make_user_update());
         return true;
     }
     return false;
@@ -324,7 +324,7 @@ bool game_manager::add_user_flag(game_lobby &lobby, game_user &user, game_user_f
 bool game_manager::remove_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag) {
     if (user.flags.check(flag)) {
         user.flags.remove(flag);
-        broadcast_message_lobby(lobby, server_messages::lobby_user_update(user));
+        broadcast_message_lobby(lobby, user.make_user_update());
         return true;
     }
     return false;
@@ -360,13 +360,13 @@ void game_manager::kick_user_from_lobby(session_ptr session) {
         }
     }
 
-    broadcast_message_no_lobby(server_messages::lobby_update(lobby));
+    broadcast_message_no_lobby(lobby.make_lobby_update());
 
     session->lobby = nullptr;
     send_message(session->client, server_messages::lobby_kick{});
 
     for (const auto &[id, lobby] : m_lobbies) {
-        send_message(session->client, server_messages::lobby_update(lobby));
+        send_message(session->client, lobby.make_lobby_update());
     }
 
     add_lobby_chat_message(lobby, nullptr, {
@@ -408,7 +408,7 @@ void game_manager::invalidate_connection(client_handle client) {
             session->client.reset();
             if (game_lobby *lobby = session->lobby) {
                 game_user &user = lobby->find_user(session);
-                broadcast_message_lobby(*lobby, server_messages::lobby_user_update(user));
+                broadcast_message_lobby(*lobby, user.make_user_update());
             }
         }
 
@@ -543,7 +543,7 @@ void game_manager::handle_message(client_messages::lobby_return &&args, session_
         remove_user_flag(lobby, user, game_user_flag::spectator);
     }
 
-    broadcast_message_no_lobby(server_messages::lobby_update(lobby));
+    broadcast_message_no_lobby(lobby.make_lobby_update());
 }
 
 void game_manager::handle_message(client_messages::user_spectate &&args, session_ptr session) {
@@ -560,7 +560,7 @@ void game_manager::handle_message(client_messages::user_spectate &&args, session
     } else {
         remove_user_flag(lobby, user, game_user_flag::spectator);
     }
-    broadcast_message_no_lobby(server_messages::lobby_update(lobby));
+    broadcast_message_no_lobby(lobby.make_lobby_update());
 }
 
 void game_manager::handle_message(client_messages::game_start &&args, session_ptr session) {
@@ -587,7 +587,7 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
     }
 
     lobby.state = lobby_state::playing;
-    broadcast_message_no_lobby(server_messages::lobby_update(lobby));
+    broadcast_message_no_lobby(lobby.make_lobby_update());
 
     broadcast_message_lobby(lobby, server_messages::game_started{});
 
@@ -614,7 +614,7 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
         auto &bot = lobby.bots.emplace_back(bot_id, std::format("BOT {}", names[i % names.size()]), propics[i % propics.size()]);
         user_ids.push_back(bot_id);
 
-        broadcast_message_lobby(lobby, server_messages::lobby_user_update(bot));
+        broadcast_message_lobby(lobby, bot.make_user_update());
     }
 
     lobby.m_game->add_players(user_ids);
@@ -659,7 +659,7 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
         send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
     }
 
-    broadcast_message_no_lobby(server_messages::lobby_update(lobby));
+    broadcast_message_no_lobby(lobby.make_lobby_update());
 }
 
 void game_manager::handle_message(client_messages::game_action &&args, session_ptr session) {
@@ -689,6 +689,6 @@ void game_manager::handle_message(client_messages::game_action &&args, session_p
     } catch (const game_error &e) {
         lobby.state = lobby_state::finished;
         add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", {chat_format_arg::string{e.what()}}, lobby_chat_flag::translated });
-        broadcast_message_no_lobby(server_messages::lobby_update(lobby));
+        broadcast_message_no_lobby(lobby.make_lobby_update());
     }
 }

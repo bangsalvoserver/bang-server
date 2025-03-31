@@ -19,7 +19,7 @@ namespace banggame {
         propic.reset(std::move(new_propic).scale_to(bot_info.propic_size));
     }
 
-    game_user::operator server_messages::lobby_user_update() const {
+    server_messages::lobby_user_update game_user::make_user_update() const {
         return {
             .user_id = user_id,
             .username = session->username,
@@ -31,7 +31,7 @@ namespace banggame {
         };
     }
 
-    lobby_bot::operator server_messages::lobby_user_update() const {
+    server_messages::lobby_user_update lobby_bot::make_user_update() const {
         return {
             .user_id = user_id,
             .username = username,
@@ -91,7 +91,7 @@ namespace banggame {
         }
     }
 
-    game_lobby::operator server_messages::lobby_update() const {
+    server_messages::lobby_update game_lobby::make_lobby_update() const {
         return {
             .lobby_id = lobby_id,
             .name = name,

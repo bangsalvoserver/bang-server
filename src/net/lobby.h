@@ -90,7 +90,7 @@ struct game_user {
         return flags.check(game_user_flag::muted);
     }
 
-    explicit operator server_messages::lobby_user_update() const;
+    server_messages::lobby_user_update make_user_update() const;
 };
 
 struct lobby_bot {
@@ -98,7 +98,7 @@ struct lobby_bot {
     std::string username;
     image_pixels_hash propic;
 
-    explicit operator server_messages::lobby_user_update() const;
+    server_messages::lobby_user_update make_user_update() const;
 };
 
 struct game_lobby {
@@ -135,7 +135,7 @@ struct game_lobby {
 
     static std::string crop_lobby_name(const std::string &name);
 
-    explicit operator server_messages::lobby_update() const;
+    server_messages::lobby_update make_lobby_update() const;
 };
 
 using user_map = std::unordered_map<id_type, session_ptr>;
