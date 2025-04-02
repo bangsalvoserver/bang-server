@@ -167,6 +167,13 @@ namespace json {
         }
     };
 
+    template<> struct deserializer<banggame::target_types::player_per_cube, banggame::game_context> {
+        banggame::target_types::player_per_cube operator()(const json &value, const banggame::game_context &context) const {
+            auto [cubes, players] = deserialize_unchecked<std::pair<banggame::card_list, banggame::player_list>>(value, context);
+            return { std::move(cubes), std::move(players) };
+        }
+    };
+
 }
 
 namespace banggame {

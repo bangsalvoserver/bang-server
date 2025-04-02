@@ -102,8 +102,6 @@ namespace banggame {
         shadow_outlaw
     };
 
-    using cubes_and_players = std::pair<card_list, player_list>;
-
     namespace target_types {
         struct none {};
 
@@ -123,8 +121,8 @@ namespace banggame {
         };
 
         struct player_per_cube {
-            struct transparent{};
-            cubes_and_players value;
+            card_list cubes;
+            player_list players;
         };
 
         struct random_if_hand_card {
