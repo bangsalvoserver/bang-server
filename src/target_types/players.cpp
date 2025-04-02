@@ -13,7 +13,7 @@ namespace banggame {
         });
     }
 
-    template<> game_string visit_players::get_error(const effect_context &ctx) {
+    template<> game_string visit_players::get_error(const effect_context &ctx, target_types::players) {
         for (player_ptr target : get_player_targets_range(origin_card, origin, effect.player_filter, ctx)) {
             MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
@@ -21,12 +21,16 @@ namespace banggame {
     }
 
     template<> std::generator<target_types::players> visit_players::possible_targets(const effect_context &ctx) {
-        if (!get_error(ctx)) {
+        if (!get_error(ctx, {})) {
             co_yield {};
         }
     }
 
-    template<> prompt_string visit_players::prompt(const effect_context &ctx) {
+    template<> target_types::players visit_players::random_target(const effect_context &ctx) {
+        return {};
+    }
+
+    template<> prompt_string visit_players::prompt(const effect_context &ctx, target_types::players) {
         auto targets = get_player_targets_range(origin_card, origin, effect.player_filter, ctx);
         if (targets.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
@@ -36,13 +40,13 @@ namespace banggame {
         }));
     }
 
-    template<> void visit_players::add_context(effect_context &ctx) {
+    template<> void visit_players::add_context(effect_context &ctx, target_types::players) {
         for (player_ptr target : get_player_targets_range(origin_card, origin, effect.player_filter, ctx)) {
             defer<target_types::player>().add_context(ctx, target);
         }
     }
 
-    template<> void visit_players::play(const effect_context &ctx) {
+    template<> void visit_players::play(const effect_context &ctx, target_types::players) {
         auto targets = get_player_targets_range(origin_card, origin, effect.player_filter, ctx);
 
         effect_flags flags { effect_flag::multi_target, effect_flag::skip_target_logs };

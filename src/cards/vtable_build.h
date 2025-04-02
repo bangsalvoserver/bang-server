@@ -6,6 +6,7 @@
 
 #include "game/game_table.h"
 #include "game/filters.h"
+#include "game/play_dispatch.h"
 
 namespace banggame {
     
@@ -277,14 +278,12 @@ namespace banggame {
         }
         return [&]<size_t ... Is>(std::index_sequence<Is...>) {
             return std::make_tuple(std::visit([](const auto &value) -> Ts {
-                using value_type = std::remove_cvref_t<decltype(value)>;
-                if constexpr (reflect::size<value_type>() == 1) {
-                    using inner_type = reflect::member_type<0, value_type>;
-                    if constexpr (std::is_convertible_v<inner_type, Ts>) {
-                        return { reflect::get<0>(value) };
-                    }
+                const auto &unwrapped = unwrap_target(value);
+                if constexpr (std::is_convertible_v<decltype(unwrapped), Ts>) {
+                    return unwrapped;
+                } else {
+                    throw game_error("invalid access to mth: wrong target type");
                 }
-                throw game_error("invalid access to mth: wrong target type");
             }, targets.at(indices[Is])) ...);
         }(std::index_sequence_for<Ts ...>());
     }

@@ -56,7 +56,8 @@ namespace json {
     template<transparent_aggregate T, typename Context>
     struct serializer<T, Context> {
         json operator()(const T &value, const Context &ctx) const {
-            return serialize_unchecked(reflect::get<0>(value), ctx);
+            const auto &[ unwrapped ] = value;
+            return serialize_unchecked(unwrapped, ctx);
         }
     };
 

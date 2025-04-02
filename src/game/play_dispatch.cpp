@@ -17,45 +17,25 @@ namespace banggame::play_dispatch {
 
     game_string get_error(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
         return std::visit([&]<typename T>(const T &value) {
-            play_visitor<T> visitor{origin, origin_card, effect};
-            if constexpr (empty_target<T>) {
-                return visitor.get_error(ctx);
-            } else {
-                return visitor.get_error(ctx, reflect::get<0>(value));
-            }
+            return play_visitor<T>{origin, origin_card, effect}.get_error(ctx, unwrap_target(value));
         }, target);
     }
 
     prompt_string prompt(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
         return std::visit([&]<typename T>(const T &value) {
-            play_visitor<T> visitor{origin, origin_card, effect};
-            if constexpr (empty_target<T>) {
-                return visitor.prompt(ctx);
-            } else {
-                return visitor.prompt(ctx, reflect::get<0>(value));
-            }
+            return play_visitor<T>{origin, origin_card, effect}.prompt(ctx, unwrap_target(value));
         }, target);
     }
 
     void add_context(player_ptr origin, card_ptr origin_card, const effect_holder &effect, effect_context &ctx, const play_card_target &target) {
         std::visit([&]<typename T>(const T &value) {
-            play_visitor<T> visitor{origin, origin_card, effect};
-            if constexpr (empty_target<T>) {
-                visitor.add_context(ctx);
-            } else {
-                visitor.add_context(ctx, reflect::get<0>(value));
-            }
+            play_visitor<T>{origin, origin_card, effect}.add_context(ctx, unwrap_target(value));
         }, target);
     }
 
     void play(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
         std::visit([&]<typename T>(const T &value) {
-            play_visitor<T> visitor{origin, origin_card, effect};
-            if constexpr (empty_target<T>) {
-                visitor.play(ctx);
-            } else {
-                visitor.play(ctx, reflect::get<0>(value));
-            }
+            play_visitor<T>{origin, origin_card, effect}.play(ctx, unwrap_target(value));
         }, target);
     }
 }
