@@ -271,20 +271,30 @@ namespace banggame {
         }
     };
 
+    template<typename T>
+    T get_mth_arg(const play_card_target &target) {
+        using value_type = std::remove_cvref_t<T>;
+        if constexpr (std::is_convertible_v<value_type, play_card_target>) {
+            return std::get<value_type>(target);
+        } else {
+            return std::visit([](const auto &value) -> T {
+                const auto &unwrapped = unwrap_target(value);
+                if constexpr (std::is_convertible_v<decltype(unwrapped), T>) {
+                    return unwrapped;
+                } else {
+                    throw game_error("invalid access to mth: wrong target type");
+                }
+            }, target);
+        }
+    }
+
     template<typename ... Ts>
     auto build_mth_args(const target_list &targets, std::span<const int> indices) {
         if (indices.size() != sizeof...(Ts)) {
             throw game_error("invalid access to mth: invalid indices size");
         }
         return [&]<size_t ... Is>(std::index_sequence<Is...>) {
-            return std::make_tuple(std::visit([](const auto &value) -> Ts {
-                const auto &unwrapped = unwrap_target(value);
-                if constexpr (std::is_convertible_v<decltype(unwrapped), Ts>) {
-                    return unwrapped;
-                } else {
-                    throw game_error("invalid access to mth: wrong target type");
-                }
-            }, targets.at(indices[Is])) ...);
+            return std::make_tuple(get_mth_arg<Ts>(targets.at(indices[Is])) ...);
         }(std::index_sequence_for<Ts ...>());
     }
 
