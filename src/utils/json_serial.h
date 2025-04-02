@@ -152,6 +152,18 @@ namespace json {
             });
         }
     };
+
+    template<typename Context, typename ... Ts>
+    requires (serializable<std::remove_cvref_t<Ts>, Context> && ...)
+    struct serializer<std::tuple<Ts ...>, Context> {
+        json operator()(const std::tuple<Ts ...> &value, const Context &ctx) const {
+            return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
+                return json::array({
+                    serialize_unchecked(std::get<Is>(value), ctx) ...
+                });
+            }(std::index_sequence_for<Ts ...>());
+        }
+    };
     
     template<typename Context>
     struct deserializer<json, Context> {
@@ -245,6 +257,19 @@ namespace json {
                 deserialize_unchecked<First>(value[0], ctx),
                 deserialize_unchecked<Second>(value[1], ctx)
             };
+        }
+    };
+
+    template<typename Context, typename ...Ts>
+    requires (deserializable<Ts, Context> && ...)
+    struct deserializer<std::tuple<Ts ...>, Context> {
+        std::tuple<Ts ...> operator()(const json &value, const Context &ctx) const {
+            if (!value.is_array() || value.size() != sizeof...(Ts)) {
+                throw deserialize_error("Cannot deserialize tuple: invalid size of array");
+            }
+            return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
+                return std::make_tuple(deserialize_unchecked<Ts>(value[Is], ctx) ...);
+            }(std::index_sequence_for<Ts ...>());
         }
     };
 }

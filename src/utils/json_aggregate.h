@@ -26,12 +26,9 @@ namespace json {
     template<typename T>
     concept transparent_aggregate = requires {
         requires aggregate<T>;
+        requires !std::is_empty_v<T>;
         typename T::transparent;
-        requires reflect::size<T>() == 1;
     };
-
-    template<transparent_aggregate T>
-    using transparent_value_type = reflect::member_type<0, T>;
 
     template<aggregate T, typename Context>
     struct aggregate_serializer_unchecked {
@@ -53,11 +50,17 @@ namespace json {
     template<aggregate T, typename Context> requires (all_fields_serializable<T, Context> && !transparent_aggregate<T>)
     struct serializer<T, Context> : aggregate_serializer_unchecked<T, Context> {};
 
-    template<transparent_aggregate T, typename Context>
+    template<transparent_aggregate T, typename Context> requires (reflect::size<T>() == 1)
     struct serializer<T, Context> {
         json operator()(const T &value, const Context &ctx) const {
-            const auto &[ unwrapped ] = value;
-            return serialize_unchecked(unwrapped, ctx);
+            return serialize_unchecked(reflect::get<0>(value), ctx);
+        }
+    };
+
+    template<transparent_aggregate T, typename Context> requires (reflect::size<T>() > 1)
+    struct serializer<T, Context> {
+        json operator()(const T &value, const Context &ctx) const {
+            return serialize_unchecked(reflect::to<std::tuple>(value), ctx);
         }
     };
 
@@ -108,10 +111,21 @@ namespace json {
         }
     };
 
-    template<transparent_aggregate T, typename Context>
+    template<transparent_aggregate T, typename Context> requires (reflect::size<T>() == 1)
     struct deserializer<T, Context> {
         T operator()(const json &value, const Context &ctx) const {
-            return { deserialize_unchecked<transparent_value_type<T>>(value, ctx) };
+            return { deserialize_unchecked<reflect::member_type<0, T>>(value, ctx) };
+        }
+    };
+
+    template<transparent_aggregate T, typename Context> requires (reflect::size<T>() > 1)
+    struct deserializer<T, Context> {
+        T operator()(const json &value, const Context &ctx) const {
+            using tuple_type = std::remove_cvref_t<decltype(reflect::to<std::tuple>(std::declval<T>()))>;
+            auto tuple = deserialize_unchecked<tuple_type>(value, ctx);
+            return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
+                return T{ std::move(std::get<Is>(tuple)) ... };
+            }(std::make_index_sequence<std::tuple_size_v<tuple_type>>());
         }
     };
 

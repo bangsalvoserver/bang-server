@@ -121,6 +121,7 @@ namespace banggame {
         };
 
         struct player_per_cube {
+            struct transparent{};
             card_list cubes;
             player_list players;
         };
