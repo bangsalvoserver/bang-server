@@ -2,64 +2,51 @@
 
 #include "game_table.h"
 
+#include "utils/visit_enum.h"
+
 namespace banggame {
 
-    bool give_card(player_ptr target, std::string_view card_name) {
-        auto all_cards = target->m_game->m_cards_storage | rv::addressof;
-        auto card_it = rn::find_if(all_cards, [&](const_card_ptr target_card) {
-            if (string_equal_icase(card_name, target_card->name)) {
-                switch (target_card->deck) {
-                case card_deck_type::train:
-                case card_deck_type::main_deck:
-                    return target_card->pocket != pocket_type::player_hand || target_card->owner != target;
-                case card_deck_type::character:
-                    return target_card != target->get_character();
-                case card_deck_type::goldrush:
-                    return target_card->pocket != pocket_type::shop_selection && target_card->pocket != pocket_type::hidden_deck
-                        && (target_card->pocket != pocket_type::player_table || target_card->owner != target);
-                case card_deck_type::highnoon:
-                case card_deck_type::fistfulofcards:
-                    return target->m_game->m_scenario_cards.empty() || target_card != target->m_game->m_scenario_cards.back();
-                case card_deck_type::wildwestshow:
-                    return target->m_game->m_wws_scenario_cards.empty() || target_card != target->m_game->m_wws_scenario_cards.back();
-                case card_deck_type::feats:
-                    return target_card->pocket != pocket_type::feats;
-                }
-            }
-            return false;
-        });
-        if (card_it == all_cards.end()) {
-            return false;
+    template<card_deck_type E>
+    struct give_card_visitor {
+        bool is_valid_card(player_ptr target, card_ptr target_card) const { return false; }
+        void give_card(player_ptr target, card_ptr target_card) const {}
+    };
+
+    template<> struct give_card_visitor<card_deck_type::main_deck> {
+        bool is_valid_card(player_ptr target, card_ptr target_card) const {
+            return target_card->pocket != pocket_type::player_hand || target_card->owner != target;
         }
-        card_ptr target_card = *card_it;
         
-        target->m_game->clear_request_status();
-        
-        switch (target_card->deck) {
-        case card_deck_type::main_deck: {
+        void give_card(player_ptr target, card_ptr target_card) const {
             if (target_card->owner) {
                 target->steal_card(target_card);
             } else {
                 target->add_to_hand(target_card);
             }
-            break;
         }
-        case card_deck_type::character: {
+    };
+
+    template<> struct give_card_visitor<card_deck_type::character> {
+        bool is_valid_card(player_ptr target, card_ptr target_card) const {
+            return target_card != target->get_character();
+        }
+        
+        void give_card(player_ptr target, card_ptr target_card) const {
             if (target_card->pocket == pocket_type::player_character && target_card->owner != target) {
                 card_ptr old_character = target->get_character();
                 target->remove_cards(target->m_characters);
                 target_card->owner->set_character(old_character);
             }
             target->set_character(target_card);
-            break;
         }
-        case card_deck_type::goldrush: {
-            target->m_game->m_shop_selection.front()->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
-            target_card->move_to(pocket_type::shop_selection);
-            break;
+    };
+
+    template<> struct give_card_visitor<card_deck_type::highnoon> {
+        bool is_valid_card(player_ptr target, card_ptr target_card) const {
+            return target->m_game->m_scenario_cards.empty() || target_card != target->m_game->m_scenario_cards.back();
         }
-        case card_deck_type::highnoon:
-        case card_deck_type::fistfulofcards: {
+        
+        void give_card(player_ptr target, card_ptr target_card) const {
             if (target_card->pocket == pocket_type::scenario_deck) {
                 if (auto it = rn::find(target->m_game->m_scenario_deck, target_card); it != target->m_game->m_scenario_deck.end()) {
                     target->m_game->m_scenario_deck.erase(it);
@@ -72,9 +59,17 @@ namespace banggame {
             } else {
                 target_card->move_to(pocket_type::scenario_deck);
             }
-            break;
         }
-        case card_deck_type::wildwestshow: {
+    };
+
+    template<> struct give_card_visitor<card_deck_type::fistfulofcards> : give_card_visitor<card_deck_type::highnoon> {};
+
+    template<> struct give_card_visitor<card_deck_type::wildwestshow> {
+        bool is_valid_card(player_ptr target, card_ptr target_card) const {
+            return target->m_game->m_wws_scenario_cards.empty() || target_card != target->m_game->m_wws_scenario_cards.back();
+        }
+        
+        void give_card(player_ptr target, card_ptr target_card) const {
             if (target_card->pocket == pocket_type::wws_scenario_deck) {
                 if (auto it = rn::find(target->m_game->m_wws_scenario_deck, target_card); it != target->m_game->m_wws_scenario_deck.end()) {
                     target->m_game->m_wws_scenario_deck.erase(it);
@@ -87,9 +82,27 @@ namespace banggame {
             } else {
                 target_card->move_to(pocket_type::wws_scenario_deck);
             }
-            break;
         }
-        case card_deck_type::train: {
+    };
+
+    template<> struct give_card_visitor<card_deck_type::goldrush> {
+        bool is_valid_card(player_ptr target, card_ptr target_card) const {
+            return target_card->pocket != pocket_type::shop_selection && target_card->pocket != pocket_type::hidden_deck
+                && (target_card->pocket != pocket_type::player_table || target_card->owner != target);
+        }
+        
+        void give_card(player_ptr target, card_ptr target_card) const {
+            target->m_game->m_shop_selection.front()->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
+            target_card->move_to(pocket_type::shop_selection);
+        }
+    };
+    
+    template<> struct give_card_visitor<card_deck_type::train> {
+        bool is_valid_card(player_ptr target, card_ptr target_card) const {
+            return target_card->pocket != pocket_type::player_hand || target_card->owner != target;
+        }
+        
+        void give_card(player_ptr target, card_ptr target_card) const {
             if (target_card->owner) {
                 target->steal_card(target_card);
             } else {
@@ -99,9 +112,15 @@ namespace banggame {
                     target->m_game->m_train_deck.back()->move_to(pocket_type::train);
                 }
             }
-            break;
         }
-        case card_deck_type::feats: {
+    };
+    
+    template<> struct give_card_visitor<card_deck_type::feats> {
+        bool is_valid_card(player_ptr target, card_ptr target_card) const {
+            return target_card->pocket != pocket_type::feats;
+        }
+        
+        void give_card(player_ptr target, card_ptr target_card) const {
             if (target->m_game->m_feats.size() >= 4) {
                 card_ptr last_feat = target->m_game->m_feats.back();
                 target->m_game->m_first_player->disable_equip(last_feat);
@@ -110,11 +129,28 @@ namespace banggame {
             }
             target_card->move_to(pocket_type::feats);
             target->m_game->m_first_player->enable_equip(target_card);
-            break;
         }
-        }
+    };
 
-        target->m_game->commit_updates();
-        return true;
+    bool give_card(player_ptr target, std::string_view card_name) {
+        for (card_ptr target_card : target->m_game->m_cards_storage | rv::addressof) {
+            if (string_equal_icase(card_name, target_card->name)
+                && enums::visit_enum([&]<card_deck_type E>(enums::enum_tag_t<E>) {
+                    give_card_visitor<E> visitor;
+
+                    if (visitor.is_valid_card(target, target_card)) {
+                        target->m_game->clear_request_status();
+                        visitor.give_card(target, target_card);
+                        target->m_game->commit_updates();
+
+                        return true;
+                    }
+                    return false;
+                }, target_card->deck)
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 }
