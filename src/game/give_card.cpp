@@ -99,7 +99,7 @@ namespace banggame {
     
     template<> struct give_card_visitor<card_deck_type::train> {
         bool is_valid_card(player_ptr target, card_ptr target_card) const {
-            return target_card->pocket != pocket_type::player_hand || target_card->owner != target;
+            return target_card->owner != target;
         }
         
         void give_card(player_ptr target, card_ptr target_card) const {
