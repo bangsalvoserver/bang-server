@@ -63,8 +63,8 @@ main_deck:
     image: 17_giulatesta
     color: brown
     responses:
-      - none select_cubes_optional(2)
       - missed
+      - none select_cubes_optional(2)
       - duck
   - <<: *missed
     signs:
