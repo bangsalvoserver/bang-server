@@ -36,8 +36,11 @@ namespace banggame {
     }
 
     void effect_missed::on_play(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<missable_request>();
-        req->on_miss(origin_card);
+        if (auto req = origin->m_game->top_request<missable_request>()) {
+            req->on_miss(origin_card);
+        } else {
+            throw game_error("invalid request access in effect_missed: top_request is not missable_request");
+        }
     }
 
     void effect_missedcard::on_play(card_ptr origin_card, player_ptr origin) {
