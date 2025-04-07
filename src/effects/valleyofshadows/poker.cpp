@@ -51,7 +51,7 @@ namespace banggame {
         int num_cards = 2;
 
         void on_update() override {
-            if (live) return;
+            if (update_count != 0) return;
             
             if (auto aces = rv::filter(target->m_game->m_selection, [this](card_ptr c) {
                 return c->get_modified_sign().rank == card_rank::rank_A;

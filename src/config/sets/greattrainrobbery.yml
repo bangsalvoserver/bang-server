@@ -435,7 +435,7 @@ hidden:
       - mail_car_response
       - none card | selection
       - none player notself
-    mth_response: gift_card_selection(1,2)
+    mth_response: gift_card(1,2)
     tags:
       - preselect
   

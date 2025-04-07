@@ -17,7 +17,7 @@ namespace banggame {
 
         void on_update() override {
             if (target->alive() && target->m_game->m_playing == target) {
-                if (!live) {
+                if (update_count == 0) {
                     target->m_game->add_cards_to({ choice_card }, pocket_type::selection, nullptr, card_visibility::shown);
                 }
             } else {

@@ -13,7 +13,6 @@ namespace banggame {
 
     struct effect_kit_carlson_legend_response {
         bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(kit_carlson_legend_response, effect_kit_carlson_legend_response)

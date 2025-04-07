@@ -18,7 +18,7 @@ namespace banggame {
         shared_request_draw req_draw;
 
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 for (player_ptr p : target->m_game->m_players) {
                     if (p->alive() && p != target) {
                         remaining_targets.insert(p);

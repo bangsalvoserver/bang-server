@@ -45,7 +45,7 @@ namespace banggame {
         }
 
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 ctx->skipped_player = nullptr;
             }
         }

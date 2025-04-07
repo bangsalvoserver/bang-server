@@ -21,7 +21,7 @@ namespace banggame {
         }
 
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 int num_checks = target->get_num_checks();
                 for (int i = 0; i < num_checks; ++i) {
                     card_ptr target_card = target->m_game->top_of_deck();

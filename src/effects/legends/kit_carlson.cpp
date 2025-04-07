@@ -18,10 +18,12 @@ namespace banggame {
         shared_request_draw req_draw;
         
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 for (int i = req_draw->num_drawn_cards; i < req_draw->num_cards_to_draw; ++i) {
                     req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
                 }
+            } else {
+                on_resolve();
             }
         }
 
@@ -33,14 +35,7 @@ namespace banggame {
             target->m_game->pop_request();
 
             while (!target->m_game->m_selection.empty()) {
-                card_ptr c = target->m_game->m_selection.front();
-                if (!target->m_game->check_flags(game_flag::hands_shown)) {
-                    target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, c);
-                    target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_CARDS", target, 1);
-                } else {
-                    target->m_game->add_log("LOG_DRAWN_CARD", target, c);
-                }
-                target->add_to_hand(c);
+                req_draw->add_to_hand_phase_one(target->m_game->m_selection.front());
             }
         }
 
@@ -64,9 +59,5 @@ namespace banggame {
 
     bool effect_kit_carlson_legend_response::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<request_kit_carlson_legend>(target_is{origin}) != nullptr;
-    }
-
-    void effect_kit_carlson_legend_response::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->pop_request();
     }
 }

@@ -6,7 +6,7 @@
 namespace banggame {
 
     void request_check_base::on_update() {
-        if (!live) {
+        if (update_count == 0) {
             origin_card->flash_card();
             start();
         }

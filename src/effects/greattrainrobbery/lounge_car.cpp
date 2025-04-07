@@ -13,7 +13,7 @@ namespace banggame {
             : request_base(origin_card, nullptr, origin) {}
         
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 for (int i=0; i<2 && !target->m_game->m_train_deck.empty(); ++i) {
                     target->m_game->m_train_deck.back()->move_to(pocket_type::selection, target);
                 }

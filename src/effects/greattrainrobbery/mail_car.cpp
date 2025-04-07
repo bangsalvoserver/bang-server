@@ -12,9 +12,21 @@ namespace banggame {
             : request_base(origin_card, nullptr, origin) {}
         
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 for (int i=0; i<3; ++i) {
                     target->m_game->top_of_deck()->move_to(pocket_type::selection, target);
+                }
+            } else {
+                target->m_game->pop_request();
+                while (!target->m_game->m_selection.empty()) {
+                    card_ptr c = target->m_game->m_selection.front();
+                    if (!target->m_game->check_flags(game_flag::hands_shown)) {
+                        target->m_game->add_log(update_target::includes(target), "LOG_DRAWN_CARD", target, c);
+                        target->m_game->add_log(update_target::excludes(target), "LOG_DRAWN_CARDS", target, 1);
+                    } else {
+                        target->m_game->add_log("LOG_DRAWN_CARD", target, c);
+                    }
+                    target->add_to_hand(c);
                 }
             }
         }
@@ -34,9 +46,5 @@ namespace banggame {
 
     bool effect_mail_car_response::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<request_mail_car>(target_is{origin}) != nullptr;
-    }
-
-    void effect_mail_car_response::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->pop_request();
     }
 }

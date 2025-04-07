@@ -94,7 +94,7 @@ namespace banggame {
         origin->m_game->queue_action([=]{
             player_ptr target = origin->get_next_player();
             for (card_ptr target_card : target_cards) {
-                handler_gift_used_card{}.on_play(origin_card, origin, target_card, target);
+                handler_gift_card{true}.on_play(origin_card, origin, target_card, target);
             }
         });
     }

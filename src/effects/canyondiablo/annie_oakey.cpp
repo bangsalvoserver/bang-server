@@ -15,7 +15,7 @@ namespace banggame {
         shared_request_draw req_draw;
 
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 req_draw->cleanup_selection();
             }
             if (!target->alive() || req_draw->num_drawn_cards >= req_draw->num_cards_to_draw) {

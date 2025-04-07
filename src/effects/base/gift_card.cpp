@@ -24,19 +24,4 @@ namespace banggame {
         }
         target_player->add_to_hand(target_card);
     }
-
-    void handler_gift_card_selection::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
-        handler_gift_card::on_play(origin_card, origin, target_card, target_player);
-
-        while (!origin->m_game->m_selection.empty()) {
-            card_ptr c = origin->m_game->m_selection.front();
-            if (!origin->m_game->check_flags(game_flag::hands_shown)) {
-                origin->m_game->add_log(update_target::includes(origin), "LOG_DRAWN_CARD", origin, c);
-                origin->m_game->add_log(update_target::excludes(origin), "LOG_DRAWN_CARDS", origin, 1);
-            } else {
-                origin->m_game->add_log("LOG_DRAWN_CARD", origin, c);
-            }
-            origin->add_to_hand(c);
-        }
-    }
 }

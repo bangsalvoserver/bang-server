@@ -39,7 +39,7 @@ namespace banggame {
         : request_picking(nullptr, nullptr, target, {}, -20) {}
     
     void request_draw::on_update() {
-        if (!live) {
+        if (update_count == 0) {
             target->m_game->call_event(event_type::count_cards_to_draw{ target, num_cards_to_draw });
         }
 
@@ -48,7 +48,7 @@ namespace banggame {
             && target->alive() && target->m_game->m_playing == target
             && num_drawn_cards < num_cards_to_draw)
         {
-            if (!live) {
+            if (update_count == 0) {
                 target->play_sound("draw");
             }
             card_ptr only_card = get_single_element(get_all_playable_cards(target, true));

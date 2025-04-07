@@ -68,7 +68,7 @@ namespace banggame {
         player_ptr target;
         effect_flags flags;
         int priority;
-        bool live = false;
+        int update_count = 0;
 
         virtual void on_update() {}
 

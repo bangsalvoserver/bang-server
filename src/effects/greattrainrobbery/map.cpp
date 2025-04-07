@@ -15,7 +15,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target) {}
         
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 for (int i=0; i<2; ++i) {
                     target->m_game->top_of_deck()->move_to(pocket_type::selection, target);
                 }

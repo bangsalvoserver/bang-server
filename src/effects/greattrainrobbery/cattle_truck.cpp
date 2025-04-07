@@ -11,7 +11,7 @@ namespace banggame {
             : selection_picker(origin_card, target, target) {}
 
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 for (int i=0; i<3 && !target->m_game->m_discards.empty(); ++i) {
                     target->m_game->m_discards.back()->move_to(pocket_type::selection, target, card_visibility::shown);
                 }

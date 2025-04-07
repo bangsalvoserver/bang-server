@@ -15,7 +15,7 @@ namespace banggame {
             logging::debug("on_update() on {: >5}: {}", req->priority, utils::demangle(typeid(*req).name()));
 
             req->on_update();
-            req->live = true;
+            ++req->update_count;
             
             if (top_request() != req) {
                 return request_states::next{};

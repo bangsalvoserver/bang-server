@@ -14,7 +14,7 @@ namespace banggame {
         int ncards = 0;
 
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 ncards = int(target->m_hand.size());
             }
             request_discard_hand::on_update();

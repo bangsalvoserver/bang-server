@@ -11,7 +11,7 @@ namespace banggame {
             : request_base(origin_card, nullptr, target) {}
 
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 start();
             }
         }

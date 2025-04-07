@@ -14,7 +14,7 @@ namespace banggame {
         shared_request_draw req_draw;
         
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 int ncards = req_draw->num_cards_to_draw;
                 for (int i=0; i<ncards; ++i) {
                     req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);

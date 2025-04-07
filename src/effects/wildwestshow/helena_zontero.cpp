@@ -14,7 +14,7 @@ namespace banggame {
         card_ptr drawn_card = nullptr;
 
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 origin_card->flash_card();
                 restart();
             }

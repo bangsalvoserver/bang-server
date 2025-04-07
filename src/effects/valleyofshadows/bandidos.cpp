@@ -21,7 +21,7 @@ namespace banggame {
             if (target->immune_to(origin_card, origin, flags)) {
                 target->m_game->pop_request();
             } else {
-                if (!live) {
+                if (update_count == 0) {
                     target->play_sound("bandidos");
                 }
                 if (target->empty_hand()) {
@@ -92,7 +92,7 @@ namespace banggame {
             if (target->immune_to(origin_card, origin, flags) || target->empty_hand()) {
                 target->m_game->pop_request();
             } else {
-                if (!live) {
+                if (update_count == 0) {
                     target->play_sound("bandidos");
                 }
                 auto not_disabled = target->m_hand

@@ -46,7 +46,7 @@ namespace banggame {
         bool can_kill = false;
 
         void on_update() override {
-            if (!live) {
+            if (update_count == 0) {
                 target->m_game->call_event(event_type::check_damage_legend_kill{ target, can_kill });
             }
             auto_resolve();
@@ -97,7 +97,7 @@ namespace banggame {
         
         void on_update() override {
             if (target->alive() && target == target->m_game->m_playing) {
-                if (!live) {
+                if (update_count == 0) {
                     target->m_game->call_event(event_type::get_performable_feats{ target, target_cards });   
 
                     if (target_cards.empty()) {

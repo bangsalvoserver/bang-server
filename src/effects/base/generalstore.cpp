@@ -13,7 +13,7 @@ namespace banggame {
                 target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
             });
         } else {
-            if (!live) {
+            if (update_count == 0) {
                 target->play_sound("generalstore");
             }
             auto_pick();

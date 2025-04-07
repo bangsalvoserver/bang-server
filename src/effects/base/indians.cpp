@@ -19,7 +19,7 @@ namespace banggame {
             if (target->immune_to(origin_card, origin, flags)) {
                 target->m_game->pop_request();
             } else {
-                if (!live) {
+                if (update_count == 0) {
                     target->play_sound("indians");
                 }
                 if (target->empty_hand()) {

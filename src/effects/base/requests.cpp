@@ -126,7 +126,7 @@ namespace banggame {
     }
 
     void request_discard_all::on_update() {
-        if (!live) {
+        if (update_count == 0) {
             for (card_ptr target_card : target->m_table) {
                 target_card->set_inactive(false);
             }

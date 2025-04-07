@@ -16,7 +16,7 @@ namespace banggame {
         void on_update() override {
             if (origin->m_hand.size() == 1) {
                 on_pick(origin->m_hand.front());
-            } else if (!live) {
+            } else if (update_count == 0) {
                 while (!origin->empty_hand()) {
                     card_ptr target_card = origin->m_hand.front();
                     target->m_game->add_log(update_target::includes(origin, target), "LOG_REVEALED_CARD", origin, target_card);

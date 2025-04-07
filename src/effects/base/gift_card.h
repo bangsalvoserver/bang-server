@@ -14,18 +14,6 @@ namespace banggame {
     };
 
     DEFINE_MTH(gift_card, handler_gift_card)
-
-    struct handler_gift_used_card : handler_gift_card {
-        handler_gift_used_card(): handler_gift_card{true} {}
-    };
-
-    DEFINE_MTH(gift_used_card, handler_gift_used_card)
-
-    struct handler_gift_card_selection : handler_gift_card {
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);
-    };
-
-    DEFINE_MTH(gift_card_selection, handler_gift_card_selection)
 }
 
 #endif

@@ -13,7 +13,6 @@ namespace banggame {
 
     struct effect_mail_car_response {
         bool can_play(card_ptr origin_card, player_ptr origin);
-        void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(mail_car_response, effect_mail_car_response)
