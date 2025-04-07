@@ -12,9 +12,11 @@ namespace banggame {
         return {};
     }
 
-    game_string effect_pass_turn::get_error(card_ptr origin_card, player_ptr origin) {
+    game_string effect_pass_turn::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         game_string out_error;
-        origin->m_game->call_event(event_type::check_pass_turn{ origin, out_error });
+        if (origin->is_bot() || ctx.playing_card) {
+            origin->m_game->call_event(event_type::check_pass_turn{ origin, out_error });
+        }
         return out_error;
     }
 
