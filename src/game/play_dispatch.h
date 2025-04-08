@@ -24,7 +24,7 @@ namespace banggame::play_dispatch {
 namespace banggame {
 
     template<typename T>
-    decltype(auto) unwrap_target(const T &value) {
+    const auto &unwrap_target(const T &value) {
         if constexpr (reflect::size<T>() == 1) {
             const auto &[ unwrapped ] = value;
             return unwrapped;

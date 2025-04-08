@@ -294,7 +294,7 @@ namespace banggame {
             throw game_error("invalid access to mth: invalid indices size");
         }
         return [&]<size_t ... Is>(std::index_sequence<Is...>) {
-            return std::make_tuple(get_mth_arg<Ts>(targets.at(indices[Is])) ...);
+            return std::tuple<Ts ...>{ get_mth_arg<Ts>(targets.at(indices[Is])) ... };
         }(std::index_sequence_for<Ts ...>());
     }
 
