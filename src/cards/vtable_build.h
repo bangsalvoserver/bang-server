@@ -253,18 +253,27 @@ namespace banggame {
     #define BUILD_MODIFIER_VTABLE(name, type) template<> const modifier_vtable modifier_vtable_map<#name>::value = build_modifier_vtable<type>(#name);
     #define BUILD_MODIFIER_VALUE(name, ...) (modifier_vtable_map<#name>::type{__VA_ARGS__})
 
-    template<int ... Is>
-    struct indices_t {
-        static constexpr std::array<int, sizeof...(Is)> value{Is ...};
+    template<typename T, int I>
+    struct mth_index {
+        using type = T;
+        static constexpr int index = I;
     };
+
+    template<typename ... Indices>
+    struct indices_t {
+        using tuple_type = std::tuple<typename Indices::type ...>;
+        static constexpr auto indices = std::array{Indices::index ...};
+    };
+
+    using mth_index_span = std::span<const int>;
 
     template<typename T>
     struct mth_value : T {
-        std::span<const int> indices;
+        mth_index_span indices;
 
-        template<int ... Is>
-        mth_value(T handler, indices_t<Is...> indices)
-            : T{std::move(handler)}, indices{indices.value} {}
+        template<typename Indices>
+        mth_value(T handler, Indices)
+            : T{std::move(handler)}, indices{Indices::indices} {}
         
         T &handler() {
             return static_cast<T &>(*this);
@@ -289,7 +298,7 @@ namespace banggame {
     }
 
     template<typename ... Ts>
-    auto build_mth_args(const target_list &targets, std::span<const int> indices) {
+    auto build_mth_args(const target_list &targets, mth_index_span indices) {
         if (indices.size() != sizeof...(Ts)) {
             throw game_error("invalid access to mth: invalid indices size");
         }
@@ -372,7 +381,9 @@ namespace banggame {
 
     #define BUILD_MTH_VTABLE(name, type) template<> const mth_vtable mth_vtable_map<#name>::value = build_mth_vtable<type>(#name);
 
+    #define MTH_INDEX(T, I) mth_index<target_types::T, I>
     #define MAKE_INDICES(...) indices_t<__VA_ARGS__>{}
+
     #define BUILD_MTH_VALUE(name, indices, ...) (mth_value{ mth_vtable_map<#name>::type{__VA_ARGS__}, MAKE_INDICES indices })
     
     template<typename T>

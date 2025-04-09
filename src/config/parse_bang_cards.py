@@ -53,10 +53,13 @@ def check_allowed_filters(effect, target_type, player_filter, card_filter):
         raise RuntimeError(f'Invalid effect string: {effect}\nCard filter not allowed with {target_type}')
 
 def parse_effects(effect_list):
+    if effect_list is None:
+        return None, []
     if not isinstance(effect_list, list):
         raise RuntimeError(f'in parse_effects: expected list, got {effect_list}')
 
     result = []
+    types = []
     for effect in effect_list:
         match = re.match(
             r'^\s*(\w+)' # effect_type
@@ -87,7 +90,9 @@ def parse_effects(effect_list):
             type =             CppLiteral(f'GET_EFFECT({effect_type})'),
             effect_value =     CppStatic('auto', CppLiteral(f"BUILD_EFFECT_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
         ))
-    return CppStatic('effect_holder', result)
+
+        types.append(target_type or 'none')
+    return CppStatic('effect_holder', result), types
 
 def parse_equips(equip_list):
     if not isinstance(equip_list, list):
@@ -151,7 +156,7 @@ def parse_modifier(modifier):
         effect_value = CppStatic('auto', CppLiteral(f"BUILD_MODIFIER_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
     )
 
-def parse_mth(effect):
+def parse_mth(effect, types):
     match = re.match(
         r'^(\w+)\s*' # type
         r'\(((?:\s*\d+,)*\s*\d+\s*)\)' # indices
@@ -162,13 +167,16 @@ def parse_mth(effect):
         raise RuntimeError(f'Invalid mth string: {effect}')
     
     effect_type = match.group(1)
-    indices = match.group(2)
+    indices_str = match.group(2)
     effect_value = match.group(3)
+
+    indices = [int(value.strip()) for value in indices_str.split(',')]
+    
     return CppObject(
         type = CppLiteral(f'GET_MTH({effect_type})'),
         effect_value = CppStatic('auto', CppLiteral(
             f"BUILD_MTH_VALUE({effect_type}, "
-            f"({', '.join(value.strip() for value in indices.split(','))})"
+            f"({', '.join( f'MTH_INDEX({types[int(i)]}, {i})' for i in indices)})"
             + ((', ' + effect_value) if effect_value else '')
             + ')'
         ), pointer=True),
@@ -179,19 +187,21 @@ def parse_expansions(expansions, fn = list):
 
 def parse_all_effects(card):
     try:
+        effects, effect_types = parse_effects(card.get('effects'))
+        responses, response_types = parse_effects(card.get('responses'))
         return CppObject(
             name =         card['name'] if 'name' in card else None,
             image =        card['image'] if 'image' in card else None,
-            effects =      parse_effects(card['effects']) if 'effects' in card else None,
-            responses =    parse_effects(card['responses']) if 'responses' in card else None,
+            effects =      effects,
+            responses =    responses,
             equips =       parse_equips(card['equip']) if 'equip' in card else None,
             tags =         parse_tags(card['tags']) if 'tags' in card else None,
             expansion =    parse_expansions(card['expansion'].split(), set) if 'expansion' in card else None,
             deck =         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
             modifier =      parse_modifier(card['modifier']) if 'modifier' in card else None,
             modifier_response = parse_modifier(card['modifier_response']) if 'modifier_response' in card else None,
-            mth_effect =   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
-            mth_response = parse_mth(card['mth_response']) if 'mth_response' in card else None,
+            mth_effect =   parse_mth(card['mth_effect'], effect_types) if 'mth_effect' in card else None,
+            mth_response = parse_mth(card['mth_response'], response_types) if 'mth_response' in card else None,
             equip_target = [CppEnum('target_player_filter', f) for f in card['equip_target'].split()] if 'equip_target' in card else None,
             color =        CppEnum('card_color_type', card['color']) if 'color' in card else None,
             sign =         parse_sign(card['sign']) if 'sign' in card else None
