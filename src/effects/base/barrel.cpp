@@ -5,6 +5,10 @@
 #include "draw_check.h"
 
 namespace banggame {
+
+    bool effect_barrel::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        return effect_missed{}.can_play(origin_card, origin, ctx);
+    }
     
     void effect_barrel::on_play(card_ptr origin_card, player_ptr target) {
         auto req = target->m_game->top_request<missable_request>();
