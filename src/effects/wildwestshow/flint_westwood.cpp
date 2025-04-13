@@ -17,7 +17,7 @@ namespace banggame {
 
         for (int i=2; i && !target->empty_hand(); --i) {
             card_ptr stolen_card = target->random_hand_card();
-            if (stolen_card->visibility != card_visibility::shown) {
+            if (stolen_card->get_visibility() != card_visibility::shown) {
                 target->m_game->add_log(update_target::includes(origin, target), "LOG_STOLEN_CARD", origin, target, stolen_card);
                 target->m_game->add_log(update_target::excludes(origin, target), "LOG_STOLEN_CARD_FROM_HAND", origin, target);
             } else {

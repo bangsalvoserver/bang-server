@@ -32,32 +32,36 @@ namespace banggame {
         return value;
     }
 
-    void card::set_visibility(card_visibility new_visibility, player_ptr new_owner, bool instant) {
+    card_visibility card::get_visibility() const {
+        if (visibility.inclusive()) {
+            return visibility.empty() ? card_visibility::hidden : card_visibility::show_owner;
+        } else {
+            return card_visibility::shown;
+        }
+    }
+
+    void card::set_visibility(update_target new_visibility, bool instant) {
         animation_duration duration = instant ? 0ms : durations.flip_card;
-        if (new_visibility == card_visibility::hidden) {
-            if (visibility == card_visibility::show_owner) {
-                m_game->add_update(update_target::includes(owner), game_updates::hide_card{ this, duration });
-            } else if (visibility == card_visibility::shown) {
-                m_game->add_update(game_updates::hide_card{ this, duration });
-            }
-            visibility = card_visibility::hidden;
-        } else if (!new_owner || new_visibility == card_visibility::shown) {
-            if (visibility == card_visibility::show_owner) {
-                m_game->add_update(update_target::excludes(owner), game_updates::show_card{ this, *this, duration });
-            } else if (visibility == card_visibility::hidden) {
-                m_game->add_update(game_updates::show_card{ this, *this, duration });
-            }
-            visibility = card_visibility::shown;
-        } else if (owner != new_owner || visibility != card_visibility::show_owner) {
-            if (visibility == card_visibility::shown) {
-                m_game->add_update(update_target::excludes(new_owner), game_updates::hide_card{ this, duration });
+        if (visibility.inclusive()) {
+            if (new_visibility.inclusive()) {
+                m_game->add_update(visibility - new_visibility, game_updates::hide_card{ this, duration });
+                m_game->add_update(new_visibility - visibility, game_updates::show_card{ this, *this, duration });
             } else {
-                if (visibility == card_visibility::show_owner) {
-                    m_game->add_update(update_target::includes(owner), game_updates::hide_card{ this, duration });
-                }
-                m_game->add_update(update_target::includes(new_owner), game_updates::show_card{ this, *this, duration });
+                m_game->add_update(~visibility, game_updates::show_card{ this, *this, duration });
             }
-            visibility = card_visibility::show_owner;
+        } else if (new_visibility.inclusive()) {
+            m_game->add_update(~new_visibility, game_updates::hide_card{ this, duration });
+        }
+        visibility = new_visibility;
+    }
+
+    void card::set_visibility(card_visibility new_visibility, player_ptr new_owner, bool instant) {
+        if (new_visibility == card_visibility::hidden) {
+            set_visibility(update_target::includes(), instant);
+        } else if (!new_owner || new_visibility == card_visibility::shown) {
+            set_visibility(update_target::excludes(), instant);
+        } else {
+            set_visibility(update_target::includes(new_owner), instant);
         }
     }
 

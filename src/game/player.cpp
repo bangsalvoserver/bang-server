@@ -229,6 +229,10 @@ namespace banggame {
         }
         return !cards.empty();
     }
+    
+    bool player::empty_table() const {
+        return rn::all_of(m_table, &card::is_black);
+    }
 
     void player::add_to_hand(card_ptr target) {
         if (target->deck == card_deck_type::train) {

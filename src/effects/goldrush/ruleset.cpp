@@ -17,9 +17,9 @@ namespace banggame {
         if (game->m_shop_deck.empty()) {
             throw game_error("Shop deck is empty. Cannot reshuffle");
         }
-        if (game->m_shop_deck.back()->visibility == card_visibility::shown) {
+        if (game->m_shop_deck.back()->get_visibility() == card_visibility::shown) {
             for (card_ptr c : game->m_shop_deck) {
-                c->visibility = card_visibility::hidden;
+                c->visibility = update_target::includes();
             }
             game->shuffle_cards_and_ids(game->m_shop_deck);
             game->add_log("LOG_SHOP_RESHUFFLED");

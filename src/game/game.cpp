@@ -124,7 +124,7 @@ namespace banggame {
                 co_yield game_updates::add_cards{ range, pocket, owner };
             }
             for (card_ptr c : range) {
-                if (c->visibility == card_visibility::shown) {
+                if (c->get_visibility() == card_visibility::shown) {
                     co_yield game_updates::show_card{ c, *c, 0ms };
                 }
                 for (const auto &[token, count] : c->tokens) {

@@ -1,7 +1,7 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
-#include "card.h"
+#include "game_update.h"
 
 namespace banggame {
 
@@ -77,10 +77,7 @@ namespace banggame {
 
         bool immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet = false) const;
 
-        bool empty_table() const {
-            return rn::all_of(m_table, &card::is_black);
-        }
-
+        bool empty_table() const;
         bool empty_hand() const {
             return m_hand.empty();
         }

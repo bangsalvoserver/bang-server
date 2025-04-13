@@ -6,8 +6,8 @@
 
 #include "utils/id_map.h"
 
+#include "card.h"
 #include "player.h"
-#include "game_net.h"
 #include "event_map.h"
 #include "disabler_map.h"
 #include "request_queue.h"

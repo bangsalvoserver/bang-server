@@ -55,7 +55,7 @@ namespace banggame {
                 auto &pocket = get_pocket(target_card->pocket, target_card->owner);
                 pocket.erase(rn::find(pocket, target_card));
 
-                target_card->visibility = card_visibility::hidden;
+                target_card->visibility = update_target::includes();
                 target_card->pocket = pocket_type::none;
                 // target_card->owner = nullptr;
             }
@@ -191,7 +191,7 @@ namespace banggame {
             for (card_ptr c : m_deck) {
                 c->pocket = pocket_type::main_deck;
                 c->owner = nullptr;
-                c->visibility = card_visibility::hidden;
+                c->visibility = update_target::includes();
             }
             shuffle_cards_and_ids(m_deck);
             add_log("LOG_DECK_RESHUFFLED");

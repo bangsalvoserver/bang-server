@@ -13,6 +13,9 @@ namespace banggame {
     private:
         uint16_t m_value;
 
+        update_target(uint16_t value)
+            : m_value{value} {}
+
         update_target(bool inclusive, std::convertible_to<const_player_ptr> auto ... targets)
             : m_value{static_cast<uint16_t>(inclusive)}
         {
@@ -43,6 +46,24 @@ namespace banggame {
         bool inclusive() const {
             return bool(m_value & 1);
         }
+
+        bool empty() const {
+            return bool(m_value & ~1);
+        }
+
+        update_target operator ~() const {
+            if (inclusive()) {
+                return update_target{m_value & ~1};
+            } else {
+                return update_target{m_value | 1};
+            }
+        }
+
+        update_target operator - (const update_target &rhs) const {
+            return update_target{m_value & ~rhs.m_value};
+        }
+
+        bool operator == (const update_target &other) const = default;
     };
 
     struct game_context {

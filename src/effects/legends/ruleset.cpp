@@ -30,7 +30,7 @@ namespace banggame {
             for (card_ptr c : feats_deck) {
                 c->pocket = pocket_type::feats_deck;
                 c->owner = nullptr;
-                c->visibility = card_visibility::hidden;
+                c->get_visibility() = card_visibility::hidden;
             }
             origin->m_game->shuffle_cards_and_ids(feats_deck);
             origin->m_game->add_log("LOG_FEATS_RESHUFFLED");
@@ -71,7 +71,7 @@ namespace banggame {
         
         bool can_pick(const_card_ptr target_card) const override {
             if (target_card->pocket == pocket_type::feats
-                || target_card->pocket == pocket_type::feats_deck && target_card->visibility == card_visibility::shown
+                || target_card->pocket == pocket_type::feats_deck && target_card->get_visibility() == card_visibility::shown
             ) {
                 return count_feat_tot_fame(target_card) == max_fame;
             }

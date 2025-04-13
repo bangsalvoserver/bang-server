@@ -72,7 +72,7 @@ namespace banggame {
         origin->m_game->queue_action([=]{
             player_ptr target_player = target_card->owner;
             if ((!handled || origin->alive()) && target_player) {
-                if (origin != target_player && target_card->visibility != card_visibility::shown) {
+                if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
                     origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_STOLEN_CARD", origin, target_player, target_card);
                 }
                 origin->steal_card(target_card);
@@ -92,7 +92,7 @@ namespace banggame {
                         origin->m_game->add_log("LOG_PLAYED_CARD_STEAL", origin_card, origin, target, target_card);
                     }
                 } else {
-                    if (target_card->visibility != card_visibility::shown) {
+                    if (target_card->get_visibility() != card_visibility::shown) {
                         origin->m_game->add_log(update_target::includes(origin), "LOG_PLAYED_CARD_STEAL_OWN", origin_card, origin, target_card);
                         origin->m_game->add_log(update_target::excludes(origin), "LOG_PLAYED_CARD_STEAL_OWN_HAND", origin_card, origin);
                     } else {
@@ -189,7 +189,7 @@ namespace banggame {
         origin->m_game->queue_action([=]{
             player_ptr target_player = target_card->owner;
             if ((!handled || origin->alive()) && target_player) {
-                if (origin != target_player && target_card->visibility != card_visibility::shown) {
+                if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
                     origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
                 }
                 target_player->discard_card(target_card);
