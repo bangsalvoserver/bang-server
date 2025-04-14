@@ -1,5 +1,7 @@
 #include "game/possible_to_play.h"
 
+#include "effects/armedanddangerous/cube_slots.h"
+
 namespace banggame {
 
     using visit_cubes = play_visitor<target_types::select_cubes_repeat>;
@@ -9,7 +11,7 @@ namespace banggame {
     }
 
     template<> card_list visit_cubes::random_target(const effect_context &ctx) {
-        auto cubes = origin->cube_slots()
+        auto cubes = cube_slots(origin)
             | rv::for_each([](card_ptr slot) {
                 return rv::repeat_n(slot, slot->num_cubes());
             })

@@ -105,15 +105,6 @@ namespace banggame {
         bool remove_player_flags(player_flag flags);
         bool check_player_flags(player_flag flags) const;
 
-        int count_cubes() const;
-
-        auto cube_slots() const {
-            return rv::concat(
-                m_characters | rv::take(1),
-                m_table | rv::filter(&card::is_orange)
-            );
-        }
-
         void remove_cards(card_list cards);
         void reveal_hand();
     };

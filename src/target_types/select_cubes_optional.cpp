@@ -1,5 +1,7 @@
 #include "game/possible_to_play.h"
 
+#include "effects/armedanddangerous/cube_slots.h"
+
 namespace banggame {
 
     using visit_cubes = play_visitor<target_types::select_cubes_optional>;
@@ -9,7 +11,7 @@ namespace banggame {
     }
 
     template<> card_list visit_cubes::random_target(const effect_context &ctx) {
-        if (origin->count_cubes() >= effect.target_value) {
+        if (count_cubes(origin) >= effect.target_value) {
             return defer<target_types::select_cubes>().random_target(ctx);
         }
         return {};

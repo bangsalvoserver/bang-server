@@ -405,9 +405,4 @@ namespace banggame {
     bool player::check_player_flags(player_flag flags) const {
         return m_player_flags.check(flags);
     }
-
-    int player::count_cubes() const {
-        return rn::accumulate(cube_slots()
-            | rv::transform(&card::num_cubes), 0);
-    }
 }
