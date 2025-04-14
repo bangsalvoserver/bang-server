@@ -54,11 +54,7 @@ namespace banggame {
         }
 
         update_target operator ~() const {
-            if (exclusive()) {
-                return update_target{static_cast<uint16_t>(m_value & ~1)};
-            } else {
-                return update_target{static_cast<uint16_t>(m_value | 1)};
-            }
+            return update_target{static_cast<uint16_t>(m_value ^ 1)};
         }
 
         update_target operator - (const update_target &rhs) const {
