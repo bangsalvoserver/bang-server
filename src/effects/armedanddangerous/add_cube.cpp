@@ -1,5 +1,7 @@
 #include "add_cube.h"
 
+#include "cube_slots.h"
+
 #include "game/game_table.h"
 
 #include "effects/base/pick.h"
@@ -16,14 +18,14 @@ namespace banggame {
         void on_update() override {
             int nslots = 0;
             int ncards = 0;
-            for (card_ptr c : target->cube_slots()) {
+            for (card_ptr c : cube_slots(target)) {
                 ncards += c->num_cubes() < max_cubes;
                 nslots += max_cubes - c->num_cubes();
             }
 
             if (nslots <= ncubes || ncards <= 1) {
                 target->m_game->pop_request();
-                for (card_ptr c : target->cube_slots()) {
+                for (card_ptr c : cube_slots(target)) {
                     int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes());
                     ncubes -= cubes_to_add;
                     c->add_cubes(cubes_to_add);
@@ -62,7 +64,7 @@ namespace banggame {
     };
 
     game_string effect_add_cube::on_prompt(card_ptr origin_card, player_ptr origin) {
-        if (rn::all_of(origin->cube_slots(), [](card_ptr target) {
+        if (rn::all_of(cube_slots(origin), [](card_ptr target) {
             return target->num_cubes() == max_cubes;
         })) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};

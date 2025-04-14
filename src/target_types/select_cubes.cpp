@@ -1,17 +1,19 @@
 #include "game/possible_to_play.h"
 
+#include "effects/armedanddangerous/cube_slots.h"
+
 namespace banggame {
 
     using visit_cubes = play_visitor<target_types::select_cubes>;
 
     template<> std::generator<card_list> visit_cubes::possible_targets(const effect_context &ctx) {
-        if (origin->count_cubes() >= effect.target_value) {
+        if (count_cubes(origin) >= effect.target_value) {
             co_yield {};
         }
     }
 
     template<> card_list visit_cubes::random_target(const effect_context &ctx) {
-        auto cubes = origin->cube_slots()
+        auto cubes = cube_slots(origin)
             | rv::for_each([](card_ptr slot) {
                 return rv::repeat_n(slot, slot->num_cubes());
             })

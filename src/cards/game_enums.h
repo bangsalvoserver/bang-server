@@ -38,6 +38,7 @@ namespace banggame {
         treat_any_as_bang,
         ignore_distances,
         role_revealed,
+        show_hand_playing,
         skip_turn,
         legend,
         removed,

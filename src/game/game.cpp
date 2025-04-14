@@ -124,7 +124,7 @@ namespace banggame {
                 co_yield game_updates::add_cards{ range, pocket, owner };
             }
             for (card_ptr c : range) {
-                if (c->visibility == card_visibility::shown) {
+                if (c->get_visibility() == card_visibility::shown) {
                     co_yield game_updates::show_card{ c, *c, 0ms };
                 }
                 for (const auto &[token, count] : c->tokens) {
@@ -218,12 +218,18 @@ namespace banggame {
             co_yield game_updates::player_show_role{ target, target->m_role, 0ms };
         }
 
-        for (card_ptr c : target->m_hand) {
-            co_yield game_updates::show_card{ c, *c, 0ms };
+        if (!check_flags(game_flag::hands_shown)) {
+            for (player_ptr p : m_players) {
+                for (card_ptr c : p->m_hand) {
+                    if (c->visibility.matches(target)) {
+                        co_yield game_updates::show_card{ c, *c, 0ms };
+                    }
+                }
+            }
         }
 
         for (card_ptr c : m_selection) {
-            if (c->owner == target) {
+            if (c->visibility.matches(target)) {
                 co_yield game_updates::show_card{ c, *c, 0ms };
             }
         }

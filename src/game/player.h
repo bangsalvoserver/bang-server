@@ -1,7 +1,7 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
-#include "card.h"
+#include "game_update.h"
 
 namespace banggame {
 
@@ -77,10 +77,7 @@ namespace banggame {
 
         bool immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet = false) const;
 
-        bool empty_table() const {
-            return rn::all_of(m_table, &card::is_black);
-        }
-
+        bool empty_table() const;
         bool empty_hand() const {
             return m_hand.empty();
         }
@@ -107,15 +104,6 @@ namespace banggame {
         bool add_player_flags(player_flag flags);
         bool remove_player_flags(player_flag flags);
         bool check_player_flags(player_flag flags) const;
-
-        int count_cubes() const;
-
-        auto cube_slots() const {
-            return rv::concat(
-                m_characters | rv::take(1),
-                m_table | rv::filter(&card::is_orange)
-            );
-        }
 
         void remove_cards(card_list cards);
         void reveal_hand();

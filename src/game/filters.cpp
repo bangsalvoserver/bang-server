@@ -5,6 +5,8 @@
 
 #include "game_table.h"
 
+#include "effects/armedanddangerous/cube_slots.h"
+
 namespace banggame {
 
     game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, enums::bitset<target_player_filter> filter, const_player_ptr target, const effect_context &ctx) {
@@ -36,7 +38,7 @@ namespace banggame {
         if (filter.check(target_player_filter::not_empty_table) && target->empty_table())
             return {"ERROR_TARGET_EMPTY_TABLE", origin_card, target};
 
-        if (filter.check(target_player_filter::not_empty_cubes) && target->count_cubes() == 0)
+        if (filter.check(target_player_filter::not_empty_cubes) && count_cubes(target) == 0)
             return {"ERROR_TARGET_EMPTY_CUBES", origin_card, target};
         
         if (filter.check(target_player_filter::target_set)) {

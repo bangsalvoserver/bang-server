@@ -229,6 +229,10 @@ namespace banggame {
         }
         return !cards.empty();
     }
+    
+    bool player::empty_table() const {
+        return rn::all_of(m_table, &card::is_black);
+    }
 
     void player::add_to_hand(card_ptr target) {
         if (target->deck == card_deck_type::train) {
@@ -400,10 +404,5 @@ namespace banggame {
 
     bool player::check_player_flags(player_flag flags) const {
         return m_player_flags.check(flags);
-    }
-
-    int player::count_cubes() const {
-        return rn::accumulate(cube_slots()
-            | rv::transform(&card::num_cubes), 0);
     }
 }

@@ -8,6 +8,8 @@
 #include <memory>
 
 #include "game_update.h"
+#include "game_net.h"
+#include "player.h"
 
 namespace banggame {
 
@@ -29,7 +31,7 @@ namespace banggame {
         game_ptr m_game = nullptr;
         player_ptr owner = nullptr;
         pocket_type pocket = pocket_type::none;
-        card_visibility visibility = card_visibility::hidden;
+        update_target visibility = update_target::includes();
         
         bool inactive = false;
         token_map tokens;
@@ -38,6 +40,8 @@ namespace banggame {
         bool is_bang_card(const_player_ptr origin) const;
         card_sign get_modified_sign() const;
 
+        card_visibility get_visibility() const;
+        void set_visibility(update_target visibility, bool instant = false);
         void set_visibility(card_visibility visibility, player_ptr owner = nullptr, bool instant = false);
         void move_to(pocket_type pocket, player_ptr owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false, pocket_position position = pocket_position::end);
         void set_inactive(bool inactive);
