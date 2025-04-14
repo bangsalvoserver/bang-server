@@ -44,8 +44,12 @@ namespace banggame {
         animation_duration duration = instant ? 0ms : durations.flip_card;
         if (visibility.inclusive()) {
             if (new_visibility.inclusive()) {
-                m_game->add_update(visibility - new_visibility, game_updates::hide_card{ this, duration });
-                m_game->add_update(new_visibility - visibility, game_updates::show_card{ this, *this, duration });
+                if (auto hide_to = visibility - new_visibility; !hide_to.empty()) {
+                    m_game->add_update(hide_to, game_updates::hide_card{ this, duration });
+                }
+                if (auto show_to = new_visibility - visibility; !show_to.empty()) {
+                    m_game->add_update(show_to, game_updates::show_card{ this, *this, duration });
+                }
             } else {
                 m_game->add_update(~visibility, game_updates::show_card{ this, *this, duration });
             }
