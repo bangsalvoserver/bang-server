@@ -1,7 +1,7 @@
 #ifndef __EVENT_CARD_KEY_H__
 #define __EVENT_CARD_KEY_H__
 
-#include "player.h"
+#include "card.h"
 
 namespace banggame {
 
