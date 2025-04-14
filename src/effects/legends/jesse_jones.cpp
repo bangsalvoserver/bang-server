@@ -36,13 +36,15 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
 
-            for (card_ptr target_card : origin->m_hand) {
-                target_card->set_visibility(card_visibility::show_owner, origin);
-            }
-            
-            origin->remove_player_flags(player_flag::show_hand_playing);
-
             effect_steal{}.on_play(origin_card, target, target_card);
+
+            target->m_game->queue_action([origin=origin]{
+                for (card_ptr target_card : origin->m_hand) {
+                    target_card->set_visibility(card_visibility::show_owner, origin);
+                }
+                
+                origin->remove_player_flags(player_flag::show_hand_playing);
+            }, 39);
         }
 
         game_string status_text(player_ptr owner) const override {
