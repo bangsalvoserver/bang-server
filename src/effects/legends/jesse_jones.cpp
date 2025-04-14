@@ -4,6 +4,7 @@
 #include "effects/base/steal_destroy.h"
 
 #include "cards/game_events.h"
+#include "cards/game_enums.h"
 
 #include "game/game_table.h"
 #include "game/prompts.h"
@@ -18,6 +19,8 @@ namespace banggame {
                 if (origin->m_hand.size() == 1) {
                     on_pick(origin->m_hand.front());
                 } else {
+                    origin->add_player_flags(player_flag::show_hand_playing);
+
                     for (card_ptr target_card : origin->m_hand) {
                         target->m_game->add_log(update_target::includes(origin, target), "LOG_REVEALED_CARD", origin, target_card);
                         target_card->set_visibility(update_target::includes(origin, target));
@@ -36,6 +39,8 @@ namespace banggame {
             for (card_ptr target_card : origin->m_hand) {
                 target_card->set_visibility(card_visibility::show_owner, origin);
             }
+            
+            origin->remove_player_flags(player_flag::show_hand_playing);
 
             effect_steal{}.on_play(origin_card, target, target_card);
         }
