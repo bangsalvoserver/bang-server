@@ -30,7 +30,7 @@ namespace banggame {
             for (card_ptr c : feats_deck) {
                 c->pocket = pocket_type::feats_deck;
                 c->owner = nullptr;
-                c->get_visibility() = card_visibility::hidden;
+                c->visibility = update_target::includes();
             }
             origin->m_game->shuffle_cards_and_ids(feats_deck);
             origin->m_game->add_log("LOG_FEATS_RESHUFFLED");

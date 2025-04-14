@@ -48,7 +48,7 @@ namespace banggame {
         }
 
         bool empty() const {
-            return bool(m_value & ~1);
+            return m_value & ~1 == 0;
         }
 
         update_target operator ~() const {
