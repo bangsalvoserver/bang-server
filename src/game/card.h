@@ -31,7 +31,7 @@ namespace banggame {
         game_ptr m_game = nullptr;
         player_ptr owner = nullptr;
         pocket_type pocket = pocket_type::none;
-        update_target visibility = update_target::includes();
+        update_target visibility;
         
         bool inactive = false;
         token_map tokens;

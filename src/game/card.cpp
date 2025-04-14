@@ -33,28 +33,30 @@ namespace banggame {
     }
 
     card_visibility card::get_visibility() const {
-        if (visibility.inclusive()) {
-            return visibility.empty() ? card_visibility::hidden : card_visibility::show_owner;
-        } else {
+        if (visibility.exclusive()) {
             return card_visibility::shown;
+        } else {
+            return visibility ? card_visibility::show_owner : card_visibility::hidden;
         }
     }
 
     void card::set_visibility(update_target new_visibility, bool instant) {
         animation_duration duration = instant ? 0ms : durations.flip_card;
-        if (visibility.inclusive()) {
-            if (new_visibility.inclusive()) {
-                if (auto hide_to = visibility - new_visibility; !hide_to.empty()) {
+        if (visibility.exclusive()) {
+            if (!new_visibility.exclusive()) {
+                m_game->add_update(~new_visibility, game_updates::hide_card{ this, duration });
+            }
+        } else {
+            if (new_visibility.exclusive()) {
+                m_game->add_update(~visibility, game_updates::show_card{ this, *this, duration });
+            } else {
+                if (auto hide_to = visibility - new_visibility) {
                     m_game->add_update(hide_to, game_updates::hide_card{ this, duration });
                 }
-                if (auto show_to = new_visibility - visibility; !show_to.empty()) {
+                if (auto show_to = new_visibility - visibility) {
                     m_game->add_update(show_to, game_updates::show_card{ this, *this, duration });
                 }
-            } else {
-                m_game->add_update(~visibility, game_updates::show_card{ this, *this, duration });
             }
-        } else if (new_visibility.inclusive()) {
-            m_game->add_update(~new_visibility, game_updates::hide_card{ this, duration });
         }
         visibility = new_visibility;
     }

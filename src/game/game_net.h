@@ -11,24 +11,26 @@ namespace banggame {
 
     class update_target {
     private:
-        uint16_t m_value;
+        uint16_t m_value = 0;
 
         update_target(uint16_t value)
             : m_value{value} {}
 
-        update_target(bool inclusive, std::convertible_to<const_player_ptr> auto ... targets)
-            : m_value{static_cast<uint16_t>(inclusive)}
+        update_target(bool exclusive, std::convertible_to<const_player_ptr> auto ... targets)
+            : m_value{static_cast<uint16_t>(exclusive)}
         {
             (add(targets), ...);
         }
 
     public:
+        update_target() = default;
+
         static update_target includes(std::convertible_to<const_player_ptr> auto ... targets) {
-            return update_target(true, targets...);
+            return update_target(false, targets...);
         }
 
         static update_target excludes(std::convertible_to<const_player_ptr> auto ... targets) {
-            return update_target(false, targets...);
+            return update_target(true, targets...);
         }
 
         void add(const_player_ptr target) {
@@ -40,19 +42,19 @@ namespace banggame {
         }
 
         bool matches(const_player_ptr target) const {
-            return contains(target) == inclusive();
+            return contains(target) != exclusive();
         }
 
-        bool inclusive() const {
+        bool exclusive() const {
             return bool(m_value & 1);
         }
 
-        bool empty() const {
-            return (m_value & ~1) == 0;
+        explicit operator bool() const {
+            return m_value != 0;
         }
 
         update_target operator ~() const {
-            if (inclusive()) {
+            if (exclusive()) {
                 return update_target{static_cast<uint16_t>(m_value & ~1)};
             } else {
                 return update_target{static_cast<uint16_t>(m_value | 1)};
@@ -60,10 +62,8 @@ namespace banggame {
         }
 
         update_target operator - (const update_target &rhs) const {
-            return update_target{static_cast<uint16_t>(m_value & ~rhs.m_value | 1)};
+            return update_target{static_cast<uint16_t>(m_value & ~rhs.m_value)};
         }
-
-        bool operator == (const update_target &other) const = default;
     };
 
     struct game_context {

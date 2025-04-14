@@ -19,7 +19,7 @@ namespace banggame {
         }
         if (game->m_shop_deck.back()->get_visibility() == card_visibility::shown) {
             for (card_ptr c : game->m_shop_deck) {
-                c->visibility = update_target::includes();
+                c->visibility = {};
             }
             game->shuffle_cards_and_ids(game->m_shop_deck);
             game->add_log("LOG_SHOP_RESHUFFLED");
