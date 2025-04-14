@@ -10,26 +10,31 @@
 
 namespace banggame {
 
-    struct request_jesse_jones_legend : selection_picker {
-        using selection_picker::selection_picker;
+    struct request_jesse_jones_legend : request_picking {
+        using request_picking::request_picking;
 
         void on_update() override {
-            if (origin->m_hand.size() == 1) {
-                on_pick(origin->m_hand.front());
-            } else if (update_count == 0) {
-                while (!origin->empty_hand()) {
-                    card_ptr target_card = origin->m_hand.front();
-                    target->m_game->add_log(update_target::includes(origin, target), "LOG_REVEALED_CARD", origin, target_card);
-                    target_card->move_to(pocket_type::selection, target);
+            if (update_count == 0) {
+                if (origin->m_hand.size() == 1) {
+                    on_pick(origin->m_hand.front());
+                } else {
+                    for (card_ptr target_card : origin->m_hand) {
+                        target->m_game->add_log(update_target::includes(origin, target), "LOG_REVEALED_CARD", origin, target_card);
+                        target_card->set_visibility(update_target::includes(origin, target));
+                    }
                 }
             }
+        }
+
+        bool can_pick(const_card_ptr target_card) const override {
+            return target_card->pocket == pocket_type::player_hand && target_card->owner == origin;
         }
         
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
 
-            while (!target->m_game->m_selection.empty()) {
-                origin->add_to_hand(target->m_game->m_selection.front());
+            for (card_ptr target_card : origin->m_hand) {
+                target_card->set_visibility(card_visibility::show_owner, origin);
             }
 
             effect_steal{}.on_play(origin_card, target, target_card);
