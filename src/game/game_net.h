@@ -53,14 +53,14 @@ namespace banggame {
 
         update_target operator ~() const {
             if (inclusive()) {
-                return update_target{m_value & ~1};
+                return update_target{static_cast<uint16_t>(m_value & ~1)};
             } else {
-                return update_target{m_value | 1};
+                return update_target{static_cast<uint16_t>(m_value | 1)};
             }
         }
 
         update_target operator - (const update_target &rhs) const {
-            return update_target{m_value & ~rhs.m_value};
+            return update_target{static_cast<uint16_t>(m_value & ~rhs.m_value | 1)};
         }
 
         bool operator == (const update_target &other) const = default;
