@@ -35,8 +35,10 @@ namespace banggame {
     card_visibility card::get_visibility() const {
         if (visibility.exclusive()) {
             return card_visibility::shown;
+        } else if (visibility.matches(owner)) {
+            return card_visibility::show_owner;
         } else {
-            return visibility ? card_visibility::show_owner : card_visibility::hidden;
+            return card_visibility::hidden;
         }
     }
 
