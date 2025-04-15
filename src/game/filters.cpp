@@ -5,8 +5,6 @@
 
 #include "game_table.h"
 
-#include "effects/armedanddangerous/cube_slots.h"
-
 namespace banggame {
 
     game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, enums::bitset<target_player_filter> filter, const_player_ptr target, const effect_context &ctx) {

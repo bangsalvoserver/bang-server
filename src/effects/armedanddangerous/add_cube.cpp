@@ -1,7 +1,5 @@
 #include "add_cube.h"
 
-#include "cube_slots.h"
-
 #include "game/game_table.h"
 
 #include "effects/base/pick.h"

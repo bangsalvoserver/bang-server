@@ -2,8 +2,6 @@
 
 #include "cards/game_enums.h"
 
-#include "effects/armedanddangerous/cube_slots.h"
-
 namespace banggame {
 
     using visit_cubes = play_visitor<target_types::player_per_cube>;
