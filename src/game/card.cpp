@@ -43,14 +43,25 @@ namespace banggame {
     void card::set_visibility(update_target new_visibility, bool instant) {
         animation_duration duration = instant ? 0ms : durations.flip_card;
         if (visibility.exclusive()) {
-            if (!new_visibility.exclusive()) {
-                m_game->add_update(~new_visibility, game_updates::hide_card{ this, duration });
-                visibility = new_visibility;
+            if (new_visibility.exclusive()) {
+                if (auto hide_to = new_visibility - visibility) {
+                    m_game->add_update(hide_to, game_updates::hide_card{ this, duration });
+                }
+                if (auto show_to = visibility - new_visibility) {
+                    m_game->add_update(show_to, game_updates::show_card{ this, *this, duration });
+                }
+            } else {
+                m_game->add_update(visibility | new_visibility, game_updates::hide_card{ this, duration });
+                if (auto show_to = visibility & new_visibility) {
+                    m_game->add_update(show_to, game_updates::show_card{ this, *this, duration });
+                }
             }
         } else {
             if (new_visibility.exclusive()) {
-                m_game->add_update(~visibility, game_updates::show_card{ this, *this, duration });
-                visibility = update_target::excludes();
+                if (auto hide_to = visibility & new_visibility) {
+                    m_game->add_update(hide_to, game_updates::hide_card{ this, duration });
+                }
+                m_game->add_update(visibility | new_visibility, game_updates::show_card{ this, *this, duration });
             } else {
                 if (auto hide_to = visibility - new_visibility) {
                     m_game->add_update(hide_to, game_updates::hide_card{ this, duration });
@@ -58,9 +69,9 @@ namespace banggame {
                 if (auto show_to = new_visibility - visibility) {
                     m_game->add_update(show_to, game_updates::show_card{ this, *this, duration });
                 }
-                visibility = new_visibility;
             }
         }
+        visibility = new_visibility;
     }
 
     void card::set_visibility(card_visibility new_visibility, player_ptr new_owner, bool instant) {

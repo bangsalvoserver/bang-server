@@ -53,8 +53,12 @@ namespace banggame {
             return m_value != 0;
         }
 
-        update_target operator ~() const {
-            return update_target{static_cast<uint16_t>(m_value ^ 1)};
+        update_target operator & (const update_target &rhs) const {
+            return update_target{static_cast<uint16_t>(m_value & rhs.m_value)};
+        }
+
+        update_target operator | (const update_target &rhs) const {
+            return update_target{static_cast<uint16_t>(m_value | rhs.m_value)};
         }
 
         update_target operator - (const update_target &rhs) const {
