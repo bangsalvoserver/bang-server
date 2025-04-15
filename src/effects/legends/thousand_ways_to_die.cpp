@@ -17,10 +17,12 @@ namespace banggame {
     }
 
     void handler_thousand_ways_to_die::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card1, card_ptr target_card2) {
+        origin->m_game->add_log("LOG_REVEALED_CARD", origin, target_card1);
         target_card1->set_visibility(card_visibility::shown);
         target_card1->add_short_pause();
         target_card1->set_visibility(card_visibility::show_owner, origin);
 
+        origin->m_game->add_log("LOG_REVEALED_CARD", origin, target_card2);
         target_card2->set_visibility(card_visibility::shown);
         target_card2->add_short_pause();
         target_card2->set_visibility(card_visibility::show_owner, origin);
