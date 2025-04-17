@@ -98,7 +98,7 @@ namespace banggame {
         for (player_ptr p : m_players) {
             game_duration player_result{0};
             for (const auto &[target, content, duration] : m_updates) {
-                if (duration >= game_duration{0} && target.matches(p)) {
+                if (duration > game_duration{0} && target.matches(p)) {
                     player_result += duration;
                 }
             }
