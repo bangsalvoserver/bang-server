@@ -47,7 +47,7 @@ namespace banggame {
         }
         return {
             .images {images | rn::to_vector},
-            // .sounds {enums::enum_values<sound_id>() | rn::to_vector}
+            .sounds {enums::enum_values<sound_id>() | rn::to_vector}
         };
     }
 
