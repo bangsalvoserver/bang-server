@@ -29,7 +29,12 @@ namespace banggame {
                     images.emplace(std::format("{}/{}", enums::to_string(card.deck), image));
                 }
             }
-            if (card.deck != card_deck_type::none) {
+            switch (card.deck) {
+            case card_deck_type::none:
+            case card_deck_type::locomotive:
+            case card_deck_type::legends:
+                break;
+            default:
                 images.emplace(std::format("backface/{}", enums::to_string(card.deck)));
             }
         }
