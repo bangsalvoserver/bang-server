@@ -195,7 +195,7 @@ namespace banggame {
             }
             shuffle_cards_and_ids(m_deck);
             add_log("LOG_DECK_RESHUFFLED");
-            play_sound("shuffle");
+            play_sound(sound_id::shuffle);
             add_update(game_updates::deck_shuffled{ pocket_type::main_deck });
         }
         card_ptr drawn_card = m_deck.back();
@@ -207,8 +207,8 @@ namespace banggame {
         add_update(game_updates::short_pause{ nullptr });
     }
 
-    void game_table::play_sound(std::string_view sound_id) {
-        add_update(game_updates::play_sound{ std::string(sound_id) });
+    void game_table::play_sound(sound_id sound) {
+        add_update(game_updates::play_sound{ sound });
     }
 
     void game_table::start_next_turn() {

@@ -133,9 +133,9 @@ namespace banggame {
         } else {
             if (update_count == 0) {
                 if (flags.check(effect_flag::multi_target)) {
-                    target->play_sound("gatling");
+                    target->play_sound(sound_id::gatling);
                 } else {
-                    target->play_sound("bang");
+                    target->play_sound(sound_id::bang);
                 }
             }
             if (!unavoidable && bang_strength == 0) {

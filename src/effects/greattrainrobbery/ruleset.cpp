@@ -6,6 +6,7 @@
 #include "effects/ghost_cards/ruleset.h"
 
 #include "cards/game_events.h"
+#include "cards/game_enums.h"
 
 #include "game/filters.h"
 #include "game/game_table.h"
@@ -47,7 +48,7 @@ namespace banggame {
         if (!origin->m_game->m_train_deck.empty()) {
             origin->m_game->shuffle_cards_and_ids(origin->m_game->m_train_deck);
             origin->m_game->add_log("LOG_TRAIN_RESHUFFLED");
-            origin->m_game->play_sound("shuffle");
+            origin->m_game->play_sound(sound_id::shuffle);
             origin->m_game->add_update(game_updates::deck_shuffled{ pocket_type::train_deck });
         }
 

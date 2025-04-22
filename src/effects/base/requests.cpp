@@ -162,7 +162,7 @@ namespace banggame {
 
     void request_discard_all_death::on_resolve() {
         request_discard_all::on_resolve();
-        target->m_game->play_sound("death");
+        target->m_game->play_sound(sound_id::death);
     }
 
     game_string request_sheriff_killed_deputy::status_text(player_ptr owner) const {

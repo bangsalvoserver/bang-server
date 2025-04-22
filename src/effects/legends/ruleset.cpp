@@ -3,6 +3,7 @@
 #include "perform_feat.h"
 
 #include "cards/game_events.h"
+#include "cards/game_enums.h"
 #include "cards/filter_enums.h"
 
 #include "effects/base/pick.h"
@@ -34,7 +35,7 @@ namespace banggame {
             }
             origin->m_game->shuffle_cards_and_ids(feats_deck);
             origin->m_game->add_log("LOG_FEATS_RESHUFFLED");
-            origin->m_game->play_sound("shuffle");
+            origin->m_game->play_sound(sound_id::shuffle);
             origin->m_game->add_update(game_updates::deck_shuffled{ pocket_type::feats_deck });
         }
         

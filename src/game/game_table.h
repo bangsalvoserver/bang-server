@@ -104,7 +104,7 @@ namespace banggame {
         card_ptr top_of_deck();
 
         void add_short_pause();
-        void play_sound(std::string_view sound_id);
+        void play_sound(sound_id sound);
         
         void start_next_turn();
 

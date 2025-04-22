@@ -399,7 +399,7 @@ namespace banggame {
         queue_action([this] {
             remove_game_flags(game_flag::hands_shown);
             add_log("LOG_GAME_START");
-            play_sound("gamestart");
+            play_sound(sound_id::gamestart);
 
             auto players = range_alive_players(m_first_player);
             auto initial_cards = players

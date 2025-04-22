@@ -1,5 +1,7 @@
 #include "snake.h"
 
+#include "cards/game_enums.h"
+
 #include "game/game_table.h"
 #include "game/prompts.h"
 
@@ -19,7 +21,7 @@ namespace banggame {
                 target->m_game->queue_request<request_check>(target, target_card, std::not_fn(&card_sign::is_spades), [=](bool result) {
                     if (!result) {
                         target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
-                        target->m_game->play_sound("snake");
+                        target->m_game->play_sound(sound_id::snake);
                         target->damage(target_card, nullptr, 1);
                     }
                 });

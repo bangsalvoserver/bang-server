@@ -1,6 +1,9 @@
 #include "full_steam.h"
 
+#include "cards/game_enums.h"
+
 #include "game/game_table.h"
+
 #include "ruleset.h"
 
 namespace banggame {
@@ -12,7 +15,7 @@ namespace banggame {
     }
     
     void effect_full_steam::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->play_sound("train");
+        origin->m_game->play_sound(sound_id::train);
 
         origin->m_game->add_log("LOG_TRAIN_ADVANCE");
         origin->m_game->train_position = int8_t(origin->m_game->m_stations.size());

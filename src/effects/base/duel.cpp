@@ -3,6 +3,8 @@
 #include "bang.h"
 #include "pick.h"
 
+#include "cards/game_enums.h"
+
 #include "game/game_table.h"
 #include "game/filters.h"
 #include "game/prompts.h"
@@ -21,7 +23,7 @@ namespace banggame {
                 target->m_game->pop_request();
             } else {
                 if (update_count == 0) {
-                    target->play_sound("duel");
+                    target->play_sound(sound_id::duel);
                 }
                 if (target->empty_hand()) {
                     auto_resolve();

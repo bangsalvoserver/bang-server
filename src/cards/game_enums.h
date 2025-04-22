@@ -4,6 +4,22 @@
 #include "utils/enums.h"
 
 namespace banggame {
+
+    enum class sound_id {
+        gamestart,
+        draw,
+        death,
+        bang,
+        gatling,
+        indians,
+        duel,
+        dynamite,
+        generalstore,
+        shuffle,
+        bandidos,
+        snake,
+        train,
+    };
     
     enum class effect_flag {
         is_bang,

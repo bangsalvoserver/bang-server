@@ -49,7 +49,7 @@ namespace banggame {
             && num_drawn_cards < num_cards_to_draw)
         {
             if (update_count == 0) {
-                target->play_sound("draw");
+                target->play_sound(sound_id::draw);
             }
             card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
             if (only_card && only_card->has_tag(tag_type::pick)) {

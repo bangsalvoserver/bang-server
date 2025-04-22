@@ -1,5 +1,7 @@
 #include "dynamite.h"
 
+#include "cards/game_enums.h"
+
 #include "game/game_table.h"
 
 #include "predraw_check.h"
@@ -13,7 +15,7 @@ namespace banggame {
                 }, [=](bool result) {
                     if (!result) {
                         target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
-                        target->m_game->play_sound("dynamite");
+                        target->m_game->play_sound(sound_id::dynamite);
                         target->discard_card(target_card);
                         target->damage(target_card, nullptr, 3);
                     } else {

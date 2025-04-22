@@ -40,6 +40,8 @@ namespace banggame {
     using expansion_list = std::span<const ruleset_ptr>;
     using expansion_set = std::set<ruleset_ptr>;
 
+    enum class sound_id;
+
     enum class target_player_filter;
     enum class target_card_filter;
     enum class tag_type;

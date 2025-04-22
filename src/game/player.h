@@ -40,7 +40,7 @@ namespace banggame {
         void enable_equip(card_ptr target_card);
         void disable_equip(card_ptr target_card);
 
-        void play_sound(std::string_view sound_id);
+        void play_sound(sound_id sound);
         
         card_ptr random_hand_card() const;
         

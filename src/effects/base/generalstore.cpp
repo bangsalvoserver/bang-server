@@ -14,7 +14,7 @@ namespace banggame {
             });
         } else {
             if (update_count == 0) {
-                target->play_sound("generalstore");
+                target->play_sound(sound_id::generalstore);
             }
             auto_pick();
         }

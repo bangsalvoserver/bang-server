@@ -40,6 +40,11 @@ namespace banggame {
 
     namespace game_updates {
 
+        struct preload_assets {
+            std::vector<std::string> images;
+            std::vector<sound_id> sounds;
+        };
+
         struct game_error {
             struct transparent{};
             game_string message;
@@ -201,7 +206,7 @@ namespace banggame {
 
         struct play_sound {
             struct transparent{};
-            std::string sound;
+            sound_id sound;
         };
 
         struct status_clear {};
@@ -211,6 +216,7 @@ namespace banggame {
     }
 
     using game_update = std::variant<
+        game_updates::preload_assets,
         game_updates::game_error,
         game_updates::game_log,
         game_updates::game_prompt,
