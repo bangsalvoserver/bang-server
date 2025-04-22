@@ -22,10 +22,22 @@ namespace banggame {
         std::unordered_set<std::string> images;
         for (const card_data &card : table->m_cards_storage) {
             auto image = card.image.substr(0, card.image.find(':'));
-            if (image.contains('/')) {
-                images.emplace(image);
+            if (!image.empty()) {
+                if (image.contains('/')) {
+                    images.emplace(image);
+                } else {
+                    images.emplace(std::format("{}/{}", enums::to_string(card.deck), image));
+                }
+            }
+            if (card.deck != card_deck_type::none) {
+                images.emplace(std::format("backface/{}", enums::to_string(card.deck)));
+            }
+        }
+        for (player_role role : enums::enum_values<player_role>()) {
+            if (role == player_role::unknown) {
+                images.emplace("backface/role");
             } else {
-                images.emplace(std::format("{}/{}", enums::to_string(card.deck), image));
+                images.emplace(std::format("role/{}", enums::to_string(role)));
             }
         }
         return {
