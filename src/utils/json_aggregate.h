@@ -11,18 +11,6 @@ namespace json {
     template<typename T>
     concept aggregate = std::is_aggregate_v<T>;
 
-    template<typename T, typename Context>
-    concept all_fields_serializable = aggregate<T> && 
-        []<size_t ... Is>(std::index_sequence<Is ...>) {
-            return (serializable<reflect::member_type<Is, T>, Context> && ...);
-        }(std::make_index_sequence<reflect::size<T>()>());
-
-    template<typename T, typename Context>
-    concept all_fields_deserializable = aggregate<T> &&
-        []<size_t ... Is>(std::index_sequence<Is ...>) {
-            return (deserializable<reflect::member_type<Is, T>, Context> && ...);
-        }(std::make_index_sequence<reflect::size<T>()>());
-
     template<typename T>
     concept transparent_aggregate = requires {
         requires aggregate<T>;
@@ -47,7 +35,7 @@ namespace json {
         }
     };
 
-    template<aggregate T, typename Context> requires (all_fields_serializable<T, Context> && !transparent_aggregate<T>)
+    template<aggregate T, typename Context> requires (!transparent_aggregate<T>)
     struct serializer<T, Context> : aggregate_serializer_unchecked<T, Context> {};
 
     template<transparent_aggregate T, typename Context> requires (reflect::size<T>() == 1)
@@ -87,10 +75,10 @@ namespace json {
         }
     };
     
-    template<aggregate T, typename Context> requires (all_fields_deserializable<T, Context> && !transparent_aggregate<T>)
+    template<aggregate T, typename Context> requires (!transparent_aggregate<T>)
     struct deserializer<T, Context> : aggregate_deserializer_unchecked<T, Context> {};
 
-    template<typename T, typename Context> requires all_fields_serializable<T, Context>
+    template<typename T, typename Context>
     struct serializer<utils::remove_defaults<T>, Context>  {
         json operator()(const utils::remove_defaults<T> &value, const Context &ctx) const {
             json result;
@@ -129,7 +117,7 @@ namespace json {
         }
     };
 
-    template<typename T, typename Context> requires all_fields_deserializable<T, Context>
+    template<typename T, typename Context>
     struct deserializer<utils::remove_defaults<T>, Context> {
         using value_type = utils::remove_defaults<T>;
 

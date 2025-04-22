@@ -103,7 +103,7 @@ namespace json {
         }
     };
 
-    template<typename Context, typename ... Ts> requires (serializable<Ts, Context> && ...)
+    template<typename Context, typename ... Ts>
     struct serializer<std::variant<Ts ...>, Context> {
         using variant_type = std::variant<Ts ...>;
 
@@ -117,7 +117,7 @@ namespace json {
         }
     };
 
-    template<typename Context, typename ... Ts> requires (deserializable<Ts, Context> && ...)
+    template<typename Context, typename ... Ts>
     struct deserializer<std::variant<Ts ...>, Context> {
         using variant_type = std::variant<Ts ...>;
         

@@ -35,7 +35,7 @@ namespace utils {
 
 namespace json {
 
-    template<typename T, typename Context> requires serializable<T, Context>
+    template<typename T, typename Context>
     struct serializer<utils::nullable<T>, Context> {
         json operator()(const utils::nullable<T> &value, const Context &ctx) const {
             if (value) {
@@ -46,7 +46,7 @@ namespace json {
         }
     };
 
-    template<typename T, typename Context> requires deserializable<T, Context>
+    template<typename T, typename Context>
     struct deserializer<utils::nullable<T>, Context> {
         utils::nullable<T> operator()(const json &value, const Context &ctx) const {
             if (value.is_null()) {

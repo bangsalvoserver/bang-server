@@ -17,13 +17,7 @@ namespace json {
 
     template<typename T, typename Context> struct serializer;
 
-    template<typename T, typename Context>
-    concept serializable = is_complete<serializer<T, Context>>;
-
     template<typename T, typename Context> struct deserializer;
-
-    template<typename T, typename Context>
-    concept deserializable = is_complete<deserializer<T, Context>>;
 
     using json_error = json::exception;
 
@@ -39,7 +33,7 @@ namespace json {
 
     struct no_context {};
 
-    template<typename T, typename Context> requires serializable<T, Context>
+    template<typename T, typename Context>
     json serialize_unchecked(const T &value, const Context &context) {
         serializer<T, Context> obj{};
         if constexpr (requires { obj(value, context); }) {
@@ -49,7 +43,7 @@ namespace json {
         }
     }
 
-    template<typename T, typename Context> requires serializable<T, Context>
+    template<typename T, typename Context>
     json serialize(const T &value, const Context &context) {
         try {
             return serialize_unchecked(value, context);
@@ -60,12 +54,12 @@ namespace json {
         }
     }
 
-    template<typename T> requires serializable<T, no_context>
+    template<typename T>
     json serialize(const T &value) {
         return serialize(value, no_context{});
     }
 
-    template<typename T, typename Context> requires deserializable<T, Context>
+    template<typename T, typename Context>
     auto deserialize_unchecked(const json &value, const Context &context) {
         deserializer<T, Context> obj{};
         if constexpr (requires { obj(value, context); }) {
@@ -75,7 +69,7 @@ namespace json {
         }
     }
 
-    template<typename T, typename Context> requires deserializable<T, Context>
+    template<typename T, typename Context>
     T deserialize(const json &value, const Context &context) {
         try {
             return deserialize_unchecked<T>(value, context);
@@ -86,24 +80,40 @@ namespace json {
         }
     }
 
-    template<typename T> requires deserializable<T, no_context>
+    template<typename T>
     T deserialize(const json &value) {
         return deserialize<T>(value, no_context{});
     }
 
-    template<typename T, typename Context> requires (
-        !std::is_enum_v<T> && std::convertible_to<T, json>
-    )
-    struct serializer<T, Context> {
-        json operator()(const T &value) const {
+    template<typename Context>
+    struct serializer<json, Context> {
+        json operator()(const json &value) const {
             return value;
         }
     };
 
-    template<rn::range Range, typename Context> requires (
-        !std::convertible_to<Range, json>
-        && serializable<rn::range_value_t<Range>, Context>
-    )
+    template<std::integral T, typename Context>
+    struct serializer<T, Context> {
+        json operator()(T value) const {
+            return value;
+        }
+    };
+
+    template<std::floating_point T, typename Context>
+    struct serializer<T, Context> {
+        json operator()(T value) const {
+            return value;
+        }
+    };
+
+    template<std::convertible_to<std::string_view> T, typename Context>
+    struct serializer<T, Context> {
+        json operator()(std::string_view value) const {
+            return value;
+        }
+    };
+
+    template<rn::range Range, typename Context> requires (!std::convertible_to<Range, std::string_view>)
     struct serializer<Range, Context> {
         json operator()(const Range &value, const Context &ctx) const {
             auto ret = json::array();
@@ -131,7 +141,7 @@ namespace json {
         }
     };
 
-    template<typename T, typename Context> requires serializable<T, Context>
+    template<typename T, typename Context>
     struct serializer<std::optional<T>, Context> {
         json operator()(const std::optional<T> &value, const Context &ctx) const {
             if (value) {
@@ -143,7 +153,6 @@ namespace json {
     };
 
     template<typename First, typename Second, typename Context>
-    requires (serializable<First, Context> && serializable<Second, Context>)
     struct serializer<std::pair<First, Second>, Context> {
         json operator()(const std::pair<First, Second> &value, const Context &ctx) const {
             return json::array({
@@ -154,7 +163,6 @@ namespace json {
     };
 
     template<typename Context, typename ... Ts>
-    requires (serializable<std::remove_cvref_t<Ts>, Context> && ...)
     struct serializer<std::tuple<Ts ...>, Context> {
         json operator()(const std::tuple<Ts ...> &value, const Context &ctx) const {
             return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
@@ -202,10 +210,8 @@ namespace json {
         }
     };
     
-    template<rn::range Range, typename Context> requires (
-        !std::convertible_to<Range, json>
-        && deserializable<rn::range_value_t<Range>, Context>
-    ) struct deserializer<Range, Context> {
+    template<rn::range Range, typename Context>
+    struct deserializer<Range, Context> {
         Range operator()(const json &value, const Context &ctx) const {
             if (!value.is_array()) {
                 throw deserialize_error("Cannot deserialize range");
@@ -235,7 +241,7 @@ namespace json {
         }
     };
 
-    template<typename T, typename Context> requires deserializable<T, Context>
+    template<typename T, typename Context>
     struct deserializer<std::optional<T>, Context> {
         std::optional<T> operator()(const json &value, const Context &ctx) const {
             if (value.is_null()) {
@@ -247,7 +253,6 @@ namespace json {
     };
 
     template<typename First, typename Second, typename Context>
-    requires (deserializable<First, Context> && deserializable<Second, Context>)
     struct deserializer<std::pair<First, Second>, Context> {
         std::pair<First, Second> operator()(const json &value, const Context &ctx) const {
             if (!value.is_array() || value.size() != 2) {
@@ -261,7 +266,6 @@ namespace json {
     };
 
     template<typename Context, typename ...Ts>
-    requires (deserializable<Ts, Context> && ...)
     struct deserializer<std::tuple<Ts ...>, Context> {
         std::tuple<Ts ...> operator()(const json &value, const Context &ctx) const {
             if (!value.is_array() || value.size() != sizeof...(Ts)) {
