@@ -14,8 +14,25 @@
 #include "possible_to_play.h"
 
 #include <array>
+#include <unordered_set>
 
 namespace banggame {
+
+    static game_updates::preload_assets make_preload_assets_update(game_ptr table) {
+        std::unordered_set<std::string> images;
+        for (const card_data &card : table->m_cards_storage) {
+            auto image = card.image.substr(0, card.image.find(':'));
+            if (image.contains('/')) {
+                images.emplace(image);
+            } else {
+                images.emplace(std::format("{}/{}", enums::to_string(card.deck), image));
+            }
+        }
+        return {
+            .images {images | rn::to_vector},
+            // .sounds {enums::enum_values<sound_id>() | rn::to_vector}
+        };
+    }
 
     static std::optional<game_updates::timer_status> get_request_timer_status(request_timer *timer) {
         if (timer) {
@@ -110,6 +127,8 @@ namespace banggame {
     }
 
     std::generator<game_update> game::get_spectator_join_updates() {
+        co_yield make_preload_assets_update(this);
+
         co_yield game_updates::player_add{ m_players };
 
         for (player_ptr p : m_players) {
@@ -373,6 +392,8 @@ namespace banggame {
         }), pocket_type::none, &m_characters)) {
             rn::shuffle(m_characters, rng);
         }
+        
+        add_update(make_preload_assets_update(this));
 
         add_game_flags(game_flag::hands_shown);
 
