@@ -133,7 +133,7 @@ namespace banggame {
     }
 
     request_bang::auto_resolve_timer::auto_resolve_timer(request_bang *request)
-        : request_timer(request, request->target->m_game->m_options.escape_timer) {}
+        : request_timer(request, request->target->m_game->m_options.auto_resolve_timer) {}
 
     void request_bang::on_update() {
         if (!target->alive() || target->immune_to(origin_card, origin, flags)) {

@@ -17,6 +17,7 @@ namespace banggame {
         bool only_base_characters = false;
         int scenario_deck_size = 12;
         int num_bots = 0;
+        game_duration auto_resolve_timer = 1000ms;
         game_duration damage_timer = 1500ms;
         game_duration escape_timer = 3000ms;
         game_duration bot_play_timer = 500ms;
