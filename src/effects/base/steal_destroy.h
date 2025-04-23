@@ -64,7 +64,7 @@ namespace banggame {
             explicit timer_targeting(request_targeting *request);
             
             void on_finished() override {
-                static_cast<request_targeting *>(request)->on_resolve_target();
+                static_cast<request_targeting *>(request)->on_resolve();
             }
         };
 
@@ -72,9 +72,6 @@ namespace banggame {
         request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
 
         void on_update() override;
-
-        void on_resolve() final;
-        virtual void on_resolve_target() = 0;
 
         virtual card_list get_highlights(player_ptr owner) const override;
     };

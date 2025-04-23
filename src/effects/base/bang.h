@@ -67,7 +67,7 @@ namespace banggame {
             explicit auto_resolve_timer(request_bang *request);
             
             void on_finished() override {
-                static_cast<request_bang *>(request)->on_finish();
+                static_cast<request_bang *>(request)->on_resolve();
             }
         };
 
@@ -80,7 +80,6 @@ namespace banggame {
 
         void on_miss(card_ptr c, effect_flags missed_flags = {}) override;
         void on_resolve() override;
-        void on_finish();
 
         game_string status_text(player_ptr owner) const override;
     };

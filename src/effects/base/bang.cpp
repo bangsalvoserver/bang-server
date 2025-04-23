@@ -125,10 +125,6 @@ namespace banggame {
 
     void request_bang::on_resolve() {
         target->m_game->pop_request();
-        on_finish();
-    }
-
-    void request_bang::on_finish() {
         target->damage(origin_card, origin, bang_damage, flags);
     }
 
