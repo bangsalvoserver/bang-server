@@ -56,23 +56,12 @@ namespace banggame {
         virtual void on_miss(card_ptr c, effect_flags missed_flags = {}) = 0;
     };
 
-    struct request_bang : request_resolvable, missable_request {
-        using request_resolvable::request_resolvable;
+    struct request_bang : request_auto_resolvable, missable_request {
+        using request_auto_resolvable::request_auto_resolvable;
 
         int bang_strength = 1;
         int bang_damage = 1;
         bool unavoidable = false;
-
-        struct auto_resolve_timer : request_timer {
-            explicit auto_resolve_timer(request_bang *request);
-            
-            void on_finished() override {
-                static_cast<request_bang *>(request)->on_resolve();
-            }
-        };
-
-        std::optional<auto_resolve_timer> m_timer;
-        request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
 
         void on_update() override;
 

@@ -1,6 +1,7 @@
 #include "resolve.h"
 
 #include "game/game_table.h"
+#include "game/game_options.h"
 #include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"
@@ -31,6 +32,15 @@ namespace banggame {
     void request_resolvable::auto_resolve() {
         if (auto_resolvable()) {
             on_resolve();
+        }
+    }
+
+    request_auto_resolvable::auto_resolve_timer::auto_resolve_timer(request_auto_resolvable *request)
+        : request_timer(request, request->target->m_game->m_options.auto_resolve_timer) {}
+    
+    void request_auto_resolvable::auto_resolve() {
+        if (auto_resolvable()) {
+            m_timer.emplace(this);
         }
     }
 }
