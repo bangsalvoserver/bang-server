@@ -22,7 +22,6 @@ namespace banggame {
             }
             if (request_timer *timer = req->timer()) {
                 if (timer->get_duration() <= ticks{0}) {
-                    pop_request();
                     timer->on_finished();
                     return request_states::next{};
                 }
@@ -43,7 +42,6 @@ namespace banggame {
                 timer->tick();
                 if (timer->finished()) {
                     send_request_status_clear();
-                    pop_request();
                     timer->on_finished();
                     return request_states::next{};
                 }

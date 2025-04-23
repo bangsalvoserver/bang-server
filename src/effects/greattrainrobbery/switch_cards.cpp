@@ -47,7 +47,8 @@ namespace banggame {
             return {target_card, chosen_card};
         }
 
-        void on_resolve_target() override {
+        void on_resolve() override {
+            target->m_game->pop_request();
             resolve_switch_cards(origin_card, origin, chosen_card, target_card);
         }
 

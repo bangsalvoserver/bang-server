@@ -45,13 +45,14 @@ namespace banggame {
             bool handled = false;
             target->m_game->call_event(event_type::check_damage_response{ target, handled });
             if (!handled) {
-                target->m_game->pop_request();
                 on_finished();
             }
         }
     }
 
     void request_damage::on_finished() {
+        target->m_game->pop_request();
+        
         if (flags.check(effect_flag::play_as_bang)) {
             if (flags.check(effect_flag::multi_target)) {
                 target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_GATLING", origin_card, target);

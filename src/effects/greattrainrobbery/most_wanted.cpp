@@ -9,14 +9,6 @@
 
 namespace banggame {
 
-    static void resolve_most_wanted(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        target->m_game->queue_request<request_check>(target, origin_card, std::not_fn(&card_sign::is_spades), [=](bool result) {
-            if (!result) {
-                target->damage(origin_card, origin, 1);
-            }
-        });
-    }
-
     struct request_most_wanted : request_resolvable, escapable_request {
         request_most_wanted(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags) {}
@@ -26,7 +18,7 @@ namespace banggame {
                 : request_timer(request, request->target->m_game->m_options.escape_timer) {}
             
             void on_finished() override {
-                resolve_most_wanted(request->origin_card, request->origin, request->target);
+                static_cast<request_most_wanted *>(request)->on_resolve();
             }
         };
 
@@ -48,8 +40,13 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            origin->m_game->pop_request();
-            resolve_most_wanted(origin_card, origin, target);
+            target->m_game->pop_request();
+            target->m_game->queue_request<request_check>(target, origin_card, std::not_fn(&card_sign::is_spades),
+                [origin_card=origin_card, origin=origin, target=target](bool result) {
+                    if (!result) {
+                        target->damage(origin_card, origin, 1);
+                    }
+                });
         }
 
         game_string status_text(player_ptr owner) const override {

@@ -11,9 +11,9 @@
 
 namespace banggame {
 
-    struct request_bandidos : request_resolvable, interface_picking, escapable_request {
+    struct request_bandidos : request_auto_resolvable, interface_picking, escapable_request {
         request_bandidos(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
-            : request_resolvable(origin_card, origin, target, flags) {}
+            : request_auto_resolvable(origin_card, origin, target, flags) {}
 
         int ncards = 0;
 

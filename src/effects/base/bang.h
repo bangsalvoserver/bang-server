@@ -56,8 +56,8 @@ namespace banggame {
         virtual void on_miss(card_ptr c, effect_flags missed_flags = {}) = 0;
     };
 
-    struct request_bang : request_resolvable, missable_request {
-        using request_resolvable::request_resolvable;
+    struct request_bang : request_auto_resolvable, missable_request {
+        using request_auto_resolvable::request_auto_resolvable;
 
         int bang_strength = 1;
         int bang_damage = 1;

@@ -21,17 +21,13 @@ namespace banggame {
             return vec;
         }
 
-        void on_finished() {
-            handler->resolve();
-        }
-
         resolve_type get_resolve_type() const override {
             return resolve_type::dismiss;
         }
 
         void on_resolve() override {
             target->m_game->pop_request();
-            on_finished();
+            handler->resolve();
         }
 
         game_string status_text(player_ptr owner) const override {

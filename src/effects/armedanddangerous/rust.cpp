@@ -8,12 +8,6 @@
 
 namespace banggame {
 
-    static void resolve_rust(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        for (card_ptr c : cube_slots(target) | rn::to_vector) {
-            c->move_cubes(origin->get_character(), 1);
-        }
-    }
-
     struct request_rust : request_resolvable, escapable_request {
         request_rust(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags, 0) {}
@@ -23,7 +17,7 @@ namespace banggame {
                 : request_timer(request, request->target->m_game->m_options.escape_timer) {}
             
             void on_finished() override {
-                resolve_rust(request->origin_card, request->origin, request->target);
+                static_cast<request_rust *>(request)->on_resolve();
             }
         };
 
@@ -46,7 +40,9 @@ namespace banggame {
 
         void on_resolve() override {
             origin->m_game->pop_request();
-            resolve_rust(origin_card, origin, target);
+            for (card_ptr c : cube_slots(target) | rn::to_vector) {
+                c->move_cubes(origin->get_character(), 1);
+            }
         }
 
         game_string status_text(player_ptr owner) const override {

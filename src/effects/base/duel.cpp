@@ -11,9 +11,9 @@
 
 namespace banggame {
 
-    struct request_duel_base : request_resolvable, interface_picking, respondable_with_bang {
+    struct request_duel_base : request_auto_resolvable, interface_picking, respondable_with_bang {
         request_duel_base(card_ptr origin_card, player_ptr origin, player_ptr target, player_ptr respond_to, effect_flags flags = {})
-            : request_resolvable(origin_card, origin, target, flags)
+            : request_auto_resolvable(origin_card, origin, target, flags)
             , respond_to{respond_to} {}
 
         player_ptr respond_to = nullptr;

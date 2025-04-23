@@ -1,6 +1,7 @@
 #include "resolve.h"
 
 #include "game/game_table.h"
+#include "game/game_options.h"
 #include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"
@@ -22,11 +23,24 @@ namespace banggame {
         auto req = origin->m_game->top_request<interface_resolvable>();
         req->on_resolve();
     }
+
+    bool request_resolvable::auto_resolvable() const {
+        card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
+        return only_card && only_card->has_tag(tag_type::resolve);
+    }
     
     void request_resolvable::auto_resolve() {
-        card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
-        if (only_card && only_card->has_tag(tag_type::resolve)) {
+        if (auto_resolvable()) {
             on_resolve();
+        }
+    }
+
+    request_auto_resolvable::auto_resolve_timer::auto_resolve_timer(request_auto_resolvable *request)
+        : request_timer(request, request->target->m_game->m_options.auto_resolve_timer) {}
+    
+    void request_auto_resolvable::auto_resolve() {
+        if (auto_resolvable()) {
+            m_timer.emplace(this);
         }
     }
 }

@@ -33,11 +33,6 @@ namespace banggame {
             }
         }
     }
-
-    void request_targeting::on_resolve() {
-        target->m_game->pop_request();
-        on_resolve_target();
-    }
     
     card_list request_targeting::get_highlights(player_ptr owner) const {
         if (target_card->pocket == pocket_type::player_hand) {
@@ -103,7 +98,8 @@ namespace banggame {
             request_targeting::on_update();
         }
 
-        void on_resolve_target() override {
+        void on_resolve() override {
+            target->m_game->pop_request();
             effect_steal{}.on_resolve(origin_card, origin, target_card);
         }
 
@@ -215,7 +211,8 @@ namespace banggame {
             request_targeting::on_update();
         }
 
-        void on_resolve_target() override {
+        void on_resolve() override {
+            target->m_game->pop_request();
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
         }
 
