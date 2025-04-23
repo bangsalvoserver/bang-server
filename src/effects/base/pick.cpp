@@ -1,6 +1,7 @@
 #include "pick.h"
 
 #include "game/game_table.h"
+#include "game/game_options.h"
 #include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"
@@ -41,23 +42,53 @@ namespace banggame {
         req->on_pick(target);
     }
 
-    void request_picking::auto_pick() {
+    card_ptr request_picking::get_auto_pick_target() const {
         card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
         if (only_card && only_card->has_tag(tag_type::pick)) {
             auto pick_cards = get_all_targetable_cards(target) | rv::filter([&](const_card_ptr c){ return in_target_set(c); });
-            if (card_ptr target_card = get_single_element(pick_cards)) {
-                on_pick(target_card);
-            }
+            return get_single_element(pick_cards);
+        }
+        return nullptr;
+    }
+
+    void request_picking::auto_pick() {
+        if (card_ptr target_card = get_auto_pick_target()) {
+            on_pick(target_card);
         }
     }
 
-    void request_picking_player::auto_pick() {
+    request_auto_pickable::auto_pick_timer::auto_pick_timer(request_auto_pickable *request, card_ptr target_card)
+        : request_timer(request, request->target->m_game->m_options.auto_resolve_timer)
+        , target_card{target_card} {}
+    
+    void request_auto_pickable::auto_pick() {
+        if (card_ptr target_card = get_auto_pick_target()) {
+            m_timer.emplace(this, target_card);
+        }
+    }
+
+    player_ptr request_picking_player::get_auto_pick_target() const {
         card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
         if (only_card && only_card->has_tag(tag_type::pick)) {
             auto pick_players = target->m_game->m_players | rv::filter([&](const_player_ptr p){ return in_target_set(p); });
-            if (player_ptr target_player = get_single_element(pick_players)) {
-                on_pick(target_player);
-            }
+            return get_single_element(pick_players);
+        }
+        return nullptr;
+    }
+
+    void request_picking_player::auto_pick() {
+        if (player_ptr target_player = get_auto_pick_target()) {
+            on_pick(target_player);
+        }
+    }
+
+    request_auto_pickable_player::auto_pick_timer::auto_pick_timer(request_auto_pickable_player *request, player_ptr target_player)
+        : request_timer(request, request->target->m_game->m_options.auto_resolve_timer)
+        , target_player{target_player} {}
+    
+    void request_auto_pickable_player::auto_pick() {
+        if (player_ptr target_player = get_auto_pick_target()) {
+            m_timer.emplace(this, target_player);
         }
     }
 
