@@ -8,6 +8,7 @@
 #include "game/filters.h"
 #include "game/play_verify.h"
 #include "game/prompts.h"
+#include "game/game_options.h"
 
 #include "damage.h"
 
@@ -124,8 +125,15 @@ namespace banggame {
 
     void request_bang::on_resolve() {
         target->m_game->pop_request();
+        on_finish();
+    }
+
+    void request_bang::on_finish() {
         target->damage(origin_card, origin, bang_damage, flags);
     }
+
+    request_bang::auto_resolve_timer::auto_resolve_timer(request_bang *request)
+        : request_timer(request, request->target->m_game->m_options.escape_timer) {}
 
     void request_bang::on_update() {
         if (!target->alive() || target->immune_to(origin_card, origin, flags)) {
@@ -141,7 +149,9 @@ namespace banggame {
             if (!unavoidable && bang_strength == 0) {
                 target->m_game->pop_request();
             } else if (unavoidable || target->empty_hand()) {
-                auto_resolve();
+                if (auto_resolvable()) {
+                    m_timer.emplace(this);
+                }
             }
         }
     }

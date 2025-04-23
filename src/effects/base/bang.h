@@ -63,12 +63,24 @@ namespace banggame {
         int bang_damage = 1;
         bool unavoidable = false;
 
+        struct auto_resolve_timer : request_timer {
+            explicit auto_resolve_timer(request_bang *request);
+            
+            void on_finished() override {
+                static_cast<request_bang *>(request)->on_finish();
+            }
+        };
+
+        std::optional<auto_resolve_timer> m_timer;
+        request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
+
         void on_update() override;
 
         bool can_miss(card_ptr c) const override;
 
         void on_miss(card_ptr c, effect_flags missed_flags = {}) override;
         void on_resolve() override;
+        void on_finish();
 
         game_string status_text(player_ptr owner) const override;
     };

@@ -32,6 +32,7 @@ namespace banggame {
         using request_base::request_base;
 
     protected:
+        bool auto_resolvable() const;
         void auto_resolve();
     };
 }

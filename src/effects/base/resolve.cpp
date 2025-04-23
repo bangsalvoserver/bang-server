@@ -22,10 +22,14 @@ namespace banggame {
         auto req = origin->m_game->top_request<interface_resolvable>();
         req->on_resolve();
     }
+
+    bool request_resolvable::auto_resolvable() const {
+        card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
+        return only_card && only_card->has_tag(tag_type::resolve);
+    }
     
     void request_resolvable::auto_resolve() {
-        card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
-        if (only_card && only_card->has_tag(tag_type::resolve)) {
+        if (auto_resolvable()) {
             on_resolve();
         }
     }
