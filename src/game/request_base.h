@@ -20,16 +20,15 @@ namespace banggame {
         ticks duration;
 
     private:
-        timer_id_t timer_id;
         static inline timer_id_t timer_id_counter = 0;
-
+        
+        timer_id_t timer_id = 0;
         ticks lifetime{};
 
     public:
         template<typename Rep, typename Period>
         request_timer(std::chrono::duration<Rep, Period> duration)
-            : duration{ std::chrono::duration_cast<ticks>(duration) }
-            , timer_id{ timer_id_counter++ } {}
+            : duration{ std::chrono::duration_cast<ticks>(duration) } {}
 
         timer_id_t get_timer_id() const {
             return timer_id;
@@ -41,6 +40,7 @@ namespace banggame {
 
         void start(ticks total_update_time) {
             lifetime = duration + total_update_time;
+            timer_id = timer_id_counter++;
         }
 
         void tick() {
