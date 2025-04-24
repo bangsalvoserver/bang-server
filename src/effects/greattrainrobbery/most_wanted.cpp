@@ -14,15 +14,14 @@ namespace banggame {
             : request_resolvable(origin_card, origin, target, flags) {}
 
         struct most_wanted_timer : request_timer {
-            explicit most_wanted_timer(request_most_wanted *request)
-                : request_timer(request, request->target->m_game->m_options.escape_timer) {}
+            using request_timer::request_timer;
             
             void on_finished() override {
                 static_cast<request_most_wanted *>(request)->on_resolve();
             }
         };
 
-        std::optional<most_wanted_timer> m_timer{this};
+        std::optional<most_wanted_timer> m_timer;
         request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
         
         void on_update() override {
@@ -31,10 +30,14 @@ namespace banggame {
             } else {
                 switch (get_escape_type(origin, target, origin_card, flags)) {
                 case escape_type::no_escape:
-                    auto_resolve();
+                    m_timer.emplace(this, target->m_game->m_options.auto_resolve_timer);
                     break;
-                case escape_type::escape_no_timer:
-                    m_timer.reset();
+                case escape_type::escape_timer:
+                    m_timer.emplace(this, std::max(
+                        target->m_game->m_options.auto_resolve_timer,
+                        target->m_game->m_options.escape_timer
+                    ));
+                    break;
                 }
             }
         }
