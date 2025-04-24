@@ -45,14 +45,14 @@ namespace banggame {
         player_ptr savior = nullptr;
         
         struct timer_damage : request_timer {
-            explicit timer_damage(request_damage *request);
+            using request_timer::request_timer;
             
-            void on_finished() override {
-                static_cast<request_damage *>(request)->on_finished();
+            void on_finished(request_base &request) override {
+                static_cast<request_damage &>(request).on_finished();
             }
         };
 
-        timer_damage m_timer{this};
+        timer_damage m_timer;
         request_timer *timer() override { return &m_timer; }
 
         card_list get_highlights(player_ptr owner) const override;

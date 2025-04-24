@@ -36,20 +36,20 @@ namespace banggame {
         void auto_resolve();
     };
 
+    struct resolve_timer : request_timer {
+        using request_timer::request_timer;
+            
+        void on_finished(request_base &request) override {
+            static_cast<request_resolvable &>(request).on_resolve();
+        }
+    };
+
     class request_auto_resolvable: public request_resolvable {
     public:
         using request_resolvable::request_resolvable;
     
     private:
-        struct auto_resolve_timer : request_timer {
-            explicit auto_resolve_timer(request_auto_resolvable *request);
-            
-            void on_finished() override {
-                static_cast<request_auto_resolvable *>(request)->on_resolve();
-            }
-        };
-
-        std::optional<auto_resolve_timer> m_timer;
+        std::optional<resolve_timer> m_timer;
 
     public:
         request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }

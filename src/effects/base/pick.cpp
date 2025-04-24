@@ -56,14 +56,10 @@ namespace banggame {
             on_pick(target_card);
         }
     }
-
-    request_auto_pickable::auto_pick_timer::auto_pick_timer(request_auto_pickable *request, card_ptr target_card)
-        : request_timer(request, request->target->m_game->m_options.auto_resolve_timer)
-        , target_card{target_card} {}
     
     void request_auto_pickable::auto_pick() {
         if (card_ptr target_card = get_auto_pick_target()) {
-            m_timer.emplace(this, target_card);
+            m_timer.emplace(target->m_game->m_options.auto_resolve_timer, target_card);
         }
     }
 
@@ -81,14 +77,10 @@ namespace banggame {
             on_pick(target_player);
         }
     }
-
-    request_auto_pickable_player::auto_pick_timer::auto_pick_timer(request_auto_pickable_player *request, player_ptr target_player)
-        : request_timer(request, request->target->m_game->m_options.auto_resolve_timer)
-        , target_player{target_player} {}
     
     void request_auto_pickable_player::auto_pick() {
         if (player_ptr target_player = get_auto_pick_target()) {
-            m_timer.emplace(this, target_player);
+            m_timer.emplace(target->m_game->m_options.auto_resolve_timer, target_player);
         }
     }
 

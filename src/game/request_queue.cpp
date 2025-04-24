@@ -22,7 +22,7 @@ namespace banggame {
             }
             if (request_timer *timer = req->timer()) {
                 if (timer->get_duration() <= ticks{0}) {
-                    timer->on_finished();
+                    timer->on_finished(*req);
                     return request_states::next{};
                 }
                 timer->start(get_total_update_time());
@@ -42,7 +42,7 @@ namespace banggame {
                 timer->tick();
                 if (timer->finished()) {
                     send_request_status_clear();
-                    timer->on_finished();
+                    timer->on_finished(*req);
                     return request_states::next{};
                 }
             }

@@ -60,15 +60,7 @@ namespace banggame {
         
         card_ptr target_card;
 
-        struct timer_targeting : request_timer {
-            explicit timer_targeting(request_targeting *request);
-            
-            void on_finished() override {
-                static_cast<request_targeting *>(request)->on_resolve();
-            }
-        };
-
-        std::optional<timer_targeting> m_timer{this};
+        std::optional<resolve_timer> m_timer;
         request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
 
         void on_update() override;

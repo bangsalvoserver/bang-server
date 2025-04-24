@@ -48,10 +48,11 @@ namespace banggame {
         struct auto_pick_timer : request_timer {
             card_ptr target_card;
 
-            auto_pick_timer(request_auto_pickable *request, card_ptr target_card);
+            auto_pick_timer(auto duration, card_ptr target_card)
+                : request_timer{duration}, target_card{target_card} {}
             
-            void on_finished() override {
-                static_cast<request_auto_pickable *>(request)->on_pick(target_card);
+            void on_finished(request_base &request) override {
+                static_cast<request_auto_pickable &>(request).on_pick(target_card);
             }
         };
 
@@ -95,10 +96,11 @@ namespace banggame {
         struct auto_pick_timer : request_timer {
             player_ptr target_player;
 
-            auto_pick_timer(request_auto_pickable_player *request, player_ptr target_player);
+            auto_pick_timer(auto duration, player_ptr target_player)
+                : request_timer{duration}, target_player{target_player} {}
             
-            void on_finished() override {
-                static_cast<request_auto_pickable_player *>(request)->on_pick(target_player);
+            void on_finished(request_base &request) override {
+                static_cast<request_auto_pickable_player &>(request).on_pick(target_player);
             }
         };
 

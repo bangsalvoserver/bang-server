@@ -27,12 +27,10 @@ namespace banggame {
         target->damage(origin_card, origin, damage, flags);
     }
 
-    request_damage::timer_damage::timer_damage(request_damage *request)
-        : request_timer(request, request->target->m_game->m_options.damage_timer) {}
-
     request_damage::request_damage(card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags)
         : request_base(origin_card, origin, target, flags, 200)
-        , damage(damage) {}
+        , damage(damage)
+        , m_timer(target->m_game->m_options.damage_timer) {}
     
     card_list request_damage::get_highlights(player_ptr owner) const {
         return { target->get_character() };

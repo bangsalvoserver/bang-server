@@ -34,13 +34,10 @@ namespace banggame {
             on_resolve();
         }
     }
-
-    request_auto_resolvable::auto_resolve_timer::auto_resolve_timer(request_auto_resolvable *request)
-        : request_timer(request, request->target->m_game->m_options.auto_resolve_timer) {}
     
     void request_auto_resolvable::auto_resolve() {
         if (auto_resolvable()) {
-            m_timer.emplace(this);
+            m_timer.emplace(target->m_game->m_options.auto_resolve_timer);
         }
     }
 }

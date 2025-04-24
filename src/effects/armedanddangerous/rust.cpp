@@ -12,16 +12,7 @@ namespace banggame {
         request_rust(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_resolvable(origin_card, origin, target, flags, 0) {}
 
-        struct rust_timer : request_timer {
-            explicit rust_timer(request_rust *request)
-                : request_timer(request, request->target->m_game->m_options.escape_timer) {}
-            
-            void on_finished() override {
-                static_cast<request_rust *>(request)->on_resolve();
-            }
-        };
-
-        std::optional<rust_timer> m_timer{this};
+        std::optional<resolve_timer> m_timer;
         request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
 
         void on_update() override {
@@ -32,8 +23,8 @@ namespace banggame {
                 case escape_type::no_escape:
                     auto_resolve();
                     break;
-                case escape_type::escape_no_timer:
-                    m_timer.reset();
+                case escape_type::escape_timer:
+                    m_timer.emplace(target->m_game->m_options.escape_timer);
                 }
             }
         }

@@ -12,24 +12,19 @@
 
 namespace banggame {
 
-    request_targeting::timer_targeting::timer_targeting(request_targeting *request)
-        : request_timer(request, request->target->m_game->m_options.escape_timer) {}
-
     void request_targeting::on_update() {
         if (target->immune_to(origin_card, origin, flags)) {
             target->m_game->pop_request();
+        } else if (origin == target_card->owner && auto_resolvable()) {
+            // auto resolve if targeting self, unless player has escape
+            on_resolve();
         } else {
             switch (get_escape_type(origin, target, origin_card, flags)) {
-            case escape_type::escape_timer:
-                if (origin != target_card->owner) {
-                    break;
-                }
-                [[fallthrough]];
             case escape_type::no_escape:
                 auto_resolve();
                 break;
-            case escape_type::escape_no_timer:
-                m_timer.reset();
+            case escape_type::escape_timer:
+                m_timer.emplace(target->m_game->m_options.escape_timer);
             }
         }
     }

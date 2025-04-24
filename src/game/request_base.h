@@ -17,7 +17,6 @@ namespace banggame {
 
     class request_timer {
     protected:
-        request_base *request;
         ticks duration;
 
     private:
@@ -28,9 +27,8 @@ namespace banggame {
 
     public:
         template<typename Rep, typename Period>
-        request_timer(request_base *request, std::chrono::duration<Rep, Period> duration)
-            : request{ request }
-            , duration{ std::chrono::duration_cast<ticks>(duration) }
+        request_timer(std::chrono::duration<Rep, Period> duration)
+            : duration{ std::chrono::duration_cast<ticks>(duration) }
             , timer_id{ timer_id_counter++ } {}
 
         timer_id_t get_timer_id() const {
@@ -53,7 +51,7 @@ namespace banggame {
             return lifetime <= ticks{0};
         }
 
-        virtual void on_finished() {}
+        virtual void on_finished(request_base &request) {}
     };
 
     class request_base {
