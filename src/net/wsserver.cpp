@@ -8,7 +8,6 @@
 #include "utils/parse_string.h"
 #include "utils/misc.h"
 
-#include <variant>
 #include <stdexcept>
 
 #include <App.h>
