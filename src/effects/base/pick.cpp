@@ -56,12 +56,6 @@ namespace banggame {
             on_pick(target_card);
         }
     }
-    
-    void request_auto_pickable::auto_pick() {
-        if (card_ptr target_card = get_auto_pick_target()) {
-            m_timer.emplace(target->m_game->m_options.auto_resolve_timer, target_card);
-        }
-    }
 
     player_ptr request_picking_player::get_auto_pick_target() const {
         card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
@@ -75,12 +69,6 @@ namespace banggame {
     void request_picking_player::auto_pick() {
         if (player_ptr target_player = get_auto_pick_target()) {
             on_pick(target_player);
-        }
-    }
-    
-    void request_auto_pickable_player::auto_pick() {
-        if (player_ptr target_player = get_auto_pick_target()) {
-            m_timer.emplace(target->m_game->m_options.auto_resolve_timer, target_player);
         }
     }
 

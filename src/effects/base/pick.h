@@ -40,31 +40,6 @@ namespace banggame {
         void auto_pick();
     };
 
-    class request_auto_pickable: public request_picking {
-    public:
-        using request_picking::request_picking;
-    
-    private:
-        struct auto_pick_timer : request_timer {
-            card_ptr target_card;
-
-            auto_pick_timer(auto duration, card_ptr target_card)
-                : request_timer{duration}, target_card{target_card} {}
-            
-            void on_finished(request_base &request) override {
-                static_cast<request_auto_pickable &>(request).on_pick(target_card);
-            }
-        };
-
-        std::optional<auto_pick_timer> m_timer;
-
-    public:
-        request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
-    
-    protected:
-        void auto_pick();
-    };
-
     struct selection_picker : request_picking {
         using request_picking::request_picking;
 
@@ -85,31 +60,6 @@ namespace banggame {
 
     protected:
         player_ptr get_auto_pick_target() const;
-        void auto_pick();
-    };
-
-    class request_auto_pickable_player: public request_picking_player {
-    public:
-        using request_picking_player::request_picking_player;
-    
-    private:
-        struct auto_pick_timer : request_timer {
-            player_ptr target_player;
-
-            auto_pick_timer(auto duration, player_ptr target_player)
-                : request_timer{duration}, target_player{target_player} {}
-            
-            void on_finished(request_base &request) override {
-                static_cast<request_auto_pickable_player &>(request).on_pick(target_player);
-            }
-        };
-
-        std::optional<auto_pick_timer> m_timer;
-
-    public:
-        request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
-    
-    protected:
         void auto_pick();
     };
 

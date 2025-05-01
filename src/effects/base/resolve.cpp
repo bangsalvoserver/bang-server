@@ -37,7 +37,7 @@ namespace banggame {
     
     void request_auto_resolvable::auto_resolve() {
         if (auto_resolvable()) {
-            m_timer.emplace(target->m_game->m_options.auto_resolve_timer);
+            set_duration(target->m_game->m_options.auto_resolve_timer);
         }
     }
 }

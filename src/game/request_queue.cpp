@@ -2,6 +2,8 @@
 
 #include "game_table.h"
 
+#include "request_timer.h"
+
 #include "utils/type_name.h"
 
 #include "net/logging.h"
@@ -20,9 +22,9 @@ namespace banggame {
             if (top_request() != req) {
                 return request_states::next{};
             }
-            if (request_timer *timer = req->timer()) {
-                if (timer->get_duration() <= ticks{0}) {
-                    timer->on_finished(*req);
+            if (auto *timer = dynamic_cast<request_timer *>(req.get()); timer && timer->enabled()) {
+                if (timer->get_duration() <= game_duration{0}) {
+                    timer->on_finished();
                     return request_states::next{};
                 }
                 timer->start(get_total_update_time());
@@ -37,14 +39,12 @@ namespace banggame {
     request_state request_queue::invoke_tick_update() {
         if (is_game_over()) {
             return request_states::done{};
-        } else if (auto req = top_request()) {
-            if (request_timer *timer = req->timer()) {
-                timer->tick();
-                if (timer->finished()) {
-                    send_request_status_clear();
-                    timer->on_finished(*req);
-                    return request_states::next{};
-                }
+        } else if (auto timer = top_request<request_timer>(); timer && timer->enabled()) {
+            timer->tick();
+            if (timer->finished()) {
+                send_request_status_clear();
+                timer->on_finished();
+                return request_states::next{};
             }
         }
 

@@ -53,15 +53,12 @@ namespace banggame {
 
     DEFINE_EFFECT(destroy, effect_destroy)
 
-    struct request_targeting : request_resolvable {
+    struct request_targeting : request_resolvable_timer {
         request_targeting(card_ptr origin_card, player_ptr origin, player_ptr target, card_ptr target_card, effect_flags flags = {}, int priority = 40)
-            : request_resolvable(origin_card, origin, target, flags, priority)
+            : request_resolvable_timer(origin_card, origin, target, flags, priority)
             , target_card(target_card) {}
         
         card_ptr target_card;
-
-        std::optional<resolve_timer> m_timer;
-        request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
 
         void on_update() override;
 

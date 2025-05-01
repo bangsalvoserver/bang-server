@@ -9,12 +9,9 @@
 
 namespace banggame {
 
-    struct request_most_wanted : request_resolvable, escapable_request {
+    struct request_most_wanted : request_resolvable_timer, escapable_request {
         request_most_wanted(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
-            : request_resolvable(origin_card, origin, target, flags) {}
-
-        std::optional<resolve_timer> m_timer;
-        request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
+            : request_resolvable_timer(origin_card, origin, target, flags) {}
         
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
@@ -22,10 +19,10 @@ namespace banggame {
             } else {
                 switch (get_escape_type(origin, target, origin_card, flags)) {
                 case escape_type::no_escape:
-                    m_timer.emplace(target->m_game->m_options.auto_resolve_timer);
+                    set_duration(target->m_game->m_options.auto_resolve_timer);
                     break;
                 case escape_type::escape_timer:
-                    m_timer.emplace(std::max(
+                    set_duration(std::max(
                         target->m_game->m_options.auto_resolve_timer,
                         target->m_game->m_options.escape_timer
                     ));

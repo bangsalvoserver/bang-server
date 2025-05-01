@@ -51,11 +51,11 @@ namespace banggame {
         };
     }
 
-    static std::optional<game_updates::timer_status> get_request_timer_status(request_timer *timer) {
-        if (timer) {
+    static std::optional<game_updates::timer_status> get_request_timer_status(request_base &req) {
+        if (auto *timer = dynamic_cast<request_timer *>(&req); timer && timer->enabled()) {
             return game_updates::timer_status{
                 .timer_id = timer->get_timer_id(),
-                .duration = std::chrono::duration_cast<game_duration>(timer->get_duration())
+                .duration = timer->get_duration()
             };
         }
         return std::nullopt;
@@ -116,7 +116,7 @@ namespace banggame {
             .target_set_players = get_request_target_set_players(owner),
             .target_set_cards = get_request_target_set_cards(owner),
             .distances = make_player_distances(owner),
-            .timer = get_request_timer_status(req.timer())
+            .timer = get_request_timer_status(req)
         };
     }
 
