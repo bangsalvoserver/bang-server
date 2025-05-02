@@ -271,7 +271,7 @@ def parse_file(card_sets):
         for deck in DECKS
     }, expansions = parse_expansions(expansions))
 
-INCLUDE_FILENAMES = ['cards/vtable_build.h', 'effects/effects.h']
+INCLUDE_FILENAMES = ['cards/bang_cards.h', 'cards/vtable_build.h', 'effects/effects.h']
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
@@ -280,7 +280,7 @@ if __name__ == '__main__':
 
     with open(sys.argv[1], 'r', encoding='utf8') as file:
         bang_cards = CppDeclaration(
-            object_name='const all_cards_t all_cards',
+            object_name='const bang_cards_t bang_cards',
             object_value=parse_file(yaml.safe_load(file)),
             namespace_name='banggame'
         )

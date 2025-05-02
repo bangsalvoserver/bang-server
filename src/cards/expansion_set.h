@@ -1,7 +1,7 @@
 #ifndef __EXPANSION_SET_H__
 #define __EXPANSION_SET_H__
 
-#include "cards/card_data.h"
+#include "cards/bang_cards.h"
 
 #include "utils/parse_string.h"
 
@@ -37,7 +37,7 @@ namespace json {
                 }
 
                 auto name = elem.get<std::string_view>();
-                for (banggame::ruleset_ptr expansion : banggame::all_cards.expansions) {
+                for (banggame::ruleset_ptr expansion : banggame::bang_cards.expansions) {
                     if (expansion->name == name) {
                         result.insert(expansion);
                         break;
@@ -56,7 +56,7 @@ namespace std {
     template<> struct formatter<banggame::expansion_set> : formatter<std::string_view> {
         static string expansions_to_string(banggame::expansion_set value) {
             std::string ret;
-            for (banggame::ruleset_ptr ruleset : banggame::all_cards.expansions) {
+            for (banggame::ruleset_ptr ruleset : banggame::bang_cards.expansions) {
                 if (value.contains(ruleset)) {
                     if (!ret.empty()) {
                         ret += ' ';
@@ -85,8 +85,8 @@ namespace utils {
                 if (pos == std::string_view::npos) break;
                 str = str.substr(pos);
                 pos = str.find_first_of(whitespace);
-                auto it = rn::find(banggame::all_cards.expansions, str.substr(0, pos), &banggame::ruleset_vtable::name);
-                if (it != banggame::all_cards.expansions.end()) {
+                auto it = rn::find(banggame::bang_cards.expansions, str.substr(0, pos), &banggame::ruleset_vtable::name);
+                if (it != banggame::bang_cards.expansions.end()) {
                     result.insert(*it);
                 } else {
                     return std::nullopt;

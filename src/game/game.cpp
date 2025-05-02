@@ -3,6 +3,7 @@
 #include "game_update.h"
 #include "game_options.h"
 
+#include "cards/bang_cards.h"
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 #include "cards/game_events.h"
@@ -315,36 +316,36 @@ namespace banggame {
             return count;
         };
 
-        if (add_cards(all_cards.button_row, pocket_type::button_row)) {
+        if (add_cards(bang_cards.button_row, pocket_type::button_row)) {
             add_update(game_updates::add_cards{ m_button_row, pocket_type::button_row });
             for (card_ptr c : m_button_row) {
                 c->set_visibility(card_visibility::shown, nullptr, true);
             }
         }
 
-        if (add_cards(all_cards.hidden, pocket_type::hidden_deck)) {
+        if (add_cards(bang_cards.hidden, pocket_type::hidden_deck)) {
             add_update(game_updates::add_cards{ m_hidden_deck, pocket_type::hidden_deck });
             for (card_ptr c : m_hidden_deck) {
                 c->set_visibility(card_visibility::shown, nullptr, true);
             }
         }
 
-        if (add_cards(all_cards.deck, pocket_type::main_deck)) {
+        if (add_cards(bang_cards.deck, pocket_type::main_deck)) {
             shuffle_cards_and_ids(m_deck);
             add_update(game_updates::add_cards{ m_deck, pocket_type::main_deck });
         }
 
-        if (add_cards(all_cards.goldrush, pocket_type::shop_deck)) {
+        if (add_cards(bang_cards.goldrush, pocket_type::shop_deck)) {
             shuffle_cards_and_ids(m_shop_deck);
             add_update(game_updates::add_cards{ m_shop_deck, pocket_type::shop_deck });
         }
 
-        if (add_cards(all_cards.train, pocket_type::train_deck)) {
+        if (add_cards(bang_cards.train, pocket_type::train_deck)) {
             shuffle_cards_and_ids(m_train_deck);
             add_update(game_updates::add_cards{ m_train_deck, pocket_type::train_deck });
         }
 
-        if (add_cards(all_cards.feats, pocket_type::feats_deck)) {
+        if (add_cards(bang_cards.feats, pocket_type::feats_deck)) {
             shuffle_cards_and_ids(m_feats_deck);
             add_update(game_updates::add_cards{ m_feats_deck, pocket_type::feats_deck });
         }
@@ -380,7 +381,7 @@ namespace banggame {
             return c->has_tag(tag_type::last_scenario_card);
         };
 
-        if (add_cards(all_cards.highnoon, pocket_type::scenario_deck) + add_cards(all_cards.fistfulofcards, pocket_type::scenario_deck)) {
+        if (add_cards(bang_cards.highnoon, pocket_type::scenario_deck) + add_cards(bang_cards.fistfulofcards, pocket_type::scenario_deck)) {
             shuffle_cards_and_ids(m_scenario_deck);
             auto last_scenario_cards = rn::partition(m_scenario_deck, is_last_scenario_card);
             if (last_scenario_cards != m_scenario_deck.begin()) {
@@ -393,18 +394,18 @@ namespace banggame {
             add_update(game_updates::add_cards{ m_scenario_deck, pocket_type::scenario_deck });
         }
 
-        if (add_cards(all_cards.wildwestshow, pocket_type::wws_scenario_deck)) {
+        if (add_cards(bang_cards.wildwestshow, pocket_type::wws_scenario_deck)) {
             shuffle_cards_and_ids(m_wws_scenario_deck);
             rn::partition(m_wws_scenario_deck, is_last_scenario_card);
             add_update(game_updates::add_cards{ m_wws_scenario_deck, pocket_type::wws_scenario_deck });
         }
 
-        add_cards(all_cards.stations, pocket_type::none, &m_stations_deck);
-        add_cards(all_cards.locomotive, pocket_type::none, &m_locomotive);
+        add_cards(bang_cards.stations, pocket_type::none, &m_stations_deck);
+        add_cards(bang_cards.locomotive, pocket_type::none, &m_locomotive);
 
-        add_cards(all_cards.legends, pocket_type::none, &m_legends);
+        add_cards(bang_cards.legends, pocket_type::none, &m_legends);
 
-        if (add_cards(all_cards.characters | rv::filter([&](const card_data &c) {
+        if (add_cards(bang_cards.characters | rv::filter([&](const card_data &c) {
             return !m_options.only_base_characters || c.expansion.empty();
         }), pocket_type::none, &m_characters)) {
             rn::shuffle(m_characters, rng);
