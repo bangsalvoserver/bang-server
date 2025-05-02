@@ -29,8 +29,7 @@ namespace banggame {
 
     request_damage::request_damage(card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags)
         : request_base(origin_card, origin, target, flags, 200)
-        , damage(damage)
-        , m_timer(target->m_game->m_options.damage_timer) {}
+        , damage(damage) {}
     
     card_list request_damage::get_highlights(player_ptr owner) const {
         return { target->get_character() };
@@ -42,7 +41,9 @@ namespace banggame {
         } else {
             bool handled = false;
             target->m_game->call_event(event_type::check_damage_response{ target, handled });
-            if (!handled) {
+            if (handled) {
+                set_duration(target->m_game->m_options.damage_timer);
+            } else {
                 on_finished();
             }
         }

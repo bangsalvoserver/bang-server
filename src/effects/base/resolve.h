@@ -3,6 +3,8 @@
 
 #include "cards/card_effect.h"
 
+#include "game/request_timer.h"
+
 namespace banggame {
 
     enum class resolve_type {
@@ -36,23 +38,17 @@ namespace banggame {
         void auto_resolve();
     };
 
-    struct resolve_timer : request_timer {
-        using request_timer::request_timer;
-            
-        void on_finished(request_base &request) override {
-            static_cast<request_resolvable &>(request).on_resolve();
+    struct request_resolvable_timer : request_resolvable, request_timer {
+        using request_resolvable::request_resolvable;
+
+        void on_finished() override {
+            on_resolve();
         }
     };
 
-    class request_auto_resolvable: public request_resolvable {
+    class request_auto_resolvable: public request_resolvable_timer {
     public:
-        using request_resolvable::request_resolvable;
-    
-    private:
-        std::optional<resolve_timer> m_timer;
-
-    public:
-        request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
+        using request_resolvable_timer::request_resolvable_timer;
     
     protected:
         void auto_resolve();

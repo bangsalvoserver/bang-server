@@ -3,6 +3,8 @@
 
 #include "cards/card_effect.h"
 
+#include "game/request_timer.h"
+
 namespace banggame {
 
     namespace event_type {
@@ -37,27 +39,16 @@ namespace banggame {
 
     DEFINE_EFFECT(damage, effect_damage)
 
-    struct request_damage : request_base {
+    struct request_damage : request_base, request_timer {
         request_damage(card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags = {});
 
         int damage;
 
         player_ptr savior = nullptr;
-        
-        struct timer_damage : request_timer {
-            using request_timer::request_timer;
-            
-            void on_finished(request_base &request) override {
-                static_cast<request_damage &>(request).on_finished();
-            }
-        };
-
-        timer_damage m_timer;
-        request_timer *timer() override { return &m_timer; }
 
         card_list get_highlights(player_ptr owner) const override;
         void on_update() override;
-        void on_finished();
+        void on_finished() override;
         game_string status_text(player_ptr owner) const override;
     };
 }

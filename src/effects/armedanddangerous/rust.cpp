@@ -8,12 +8,9 @@
 
 namespace banggame {
 
-    struct request_rust : request_resolvable, escapable_request {
+    struct request_rust : request_resolvable_timer, escapable_request {
         request_rust(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
-            : request_resolvable(origin_card, origin, target, flags, 0) {}
-
-        std::optional<resolve_timer> m_timer;
-        request_timer *timer() override { return m_timer ? &*m_timer : nullptr; }
+            : request_resolvable_timer(origin_card, origin, target, flags, 0) {}
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
@@ -24,7 +21,7 @@ namespace banggame {
                     auto_resolve();
                     break;
                 case escape_type::escape_timer:
-                    m_timer.emplace(target->m_game->m_options.escape_timer);
+                    set_duration(target->m_game->m_options.escape_timer);
                 }
             }
         }

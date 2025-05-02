@@ -37,6 +37,8 @@ namespace banggame {
     };
 
     using playable_cards_list = std::vector<playable_card_info>;
+    
+    using timer_id_t = size_t;
 
     namespace game_updates {
 
