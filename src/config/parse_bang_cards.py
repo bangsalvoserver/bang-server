@@ -205,11 +205,10 @@ def merge_cards(card_sets):
     if not isinstance(card_sets, dict):
         raise RuntimeError(f'Error in merge_cards: Expected dict, got {card_sets}')
     for expansion, card_set in card_sets.items():
-        if expansion != 'base':
-            expansions.append(expansion)
         for deck, cards in card_set.items():
             if not isinstance(cards, list):
                 raise RuntimeError(f'Error in merge_cards: Expected list, got {cards}')
+            if deck == 'sounds': continue
             if expansion != 'base':
                 for card in cards:
                     if 'expansion' in card:
@@ -220,6 +219,11 @@ def merge_cards(card_sets):
                 result[deck].extend(cards)
             else:
                 result[deck] = cards
+        
+        expansions.append(CppObject(
+            expansion = CppLiteral(f"GET_RULESET({expansion})") if expansion != 'base' else None,
+            sounds = CppStatic('sound_id', [CppEnum('sound_id', sound) for sound in card_set['sounds']]) if 'sounds' in card_set else None
+        ))
     return result, expansions
 
 def parse_file(card_sets):
@@ -269,7 +273,7 @@ def parse_file(card_sets):
             for card in deck.get_cards(card_data)
         ])
         for deck in DECKS
-    }, expansions = parse_expansions(expansions))
+    }, expansions = CppStatic('expansion_data', expansions))
 
 INCLUDE_FILENAMES = ['cards/bang_cards.h', 'cards/vtable_build.h', 'effects/effects.h']
 

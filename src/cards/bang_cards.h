@@ -5,6 +5,15 @@
 
 namespace banggame {
 
+    using sound_list = std::span<const sound_id>;
+
+    struct expansion_data {
+        ruleset_ptr expansion;
+        sound_list sounds;
+    };
+
+    using expansion_data_list = std::span<const expansion_data>;
+
     using card_data_list = std::span<const card_data>;
 
     struct bang_cards_t {
@@ -22,7 +31,7 @@ namespace banggame {
         card_data_list feats;
         card_data_list hidden;
 
-        expansion_list expansions;
+        expansion_data_list expansions;
     };
 
     extern const bang_cards_t bang_cards;

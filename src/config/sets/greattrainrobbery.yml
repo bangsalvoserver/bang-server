@@ -461,3 +461,6 @@ hidden:
       - train_robbery_bang
     tags:
       - card_choice(7)
+
+sounds:
+  - train

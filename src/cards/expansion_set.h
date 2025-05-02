@@ -37,9 +37,9 @@ namespace json {
                 }
 
                 auto name = elem.get<std::string_view>();
-                for (banggame::ruleset_ptr expansion : banggame::bang_cards.expansions) {
-                    if (expansion->name == name) {
-                        result.insert(expansion);
+                for (const banggame::expansion_data &data : banggame::bang_cards.expansions) {
+                    if (data.expansion && data.expansion->name == name) {
+                        result.insert(data.expansion);
                         break;
                     }
                 }
@@ -56,12 +56,12 @@ namespace std {
     template<> struct formatter<banggame::expansion_set> : formatter<std::string_view> {
         static string expansions_to_string(banggame::expansion_set value) {
             std::string ret;
-            for (banggame::ruleset_ptr ruleset : banggame::bang_cards.expansions) {
-                if (value.contains(ruleset)) {
+            for (const banggame::expansion_data &data : banggame::bang_cards.expansions) {
+                if (data.expansion && value.contains(data.expansion)) {
                     if (!ret.empty()) {
                         ret += ' ';
                     }
-                    ret.append(ruleset->name);
+                    ret.append(data.expansion->name);
                 }
             }
             return ret;
@@ -85,9 +85,11 @@ namespace utils {
                 if (pos == std::string_view::npos) break;
                 str = str.substr(pos);
                 pos = str.find_first_of(whitespace);
-                auto it = rn::find(banggame::bang_cards.expansions, str.substr(0, pos), &banggame::ruleset_vtable::name);
+                auto it = rn::find(banggame::bang_cards.expansions, str.substr(0, pos), [](const banggame::expansion_data &data) {
+                    return data.expansion ? data.expansion->name : std::string_view{};
+                });
                 if (it != banggame::bang_cards.expansions.end()) {
-                    result.insert(*it);
+                    result.insert(it->expansion);
                 } else {
                     return std::nullopt;
                 }

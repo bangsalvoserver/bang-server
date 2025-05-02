@@ -191,3 +191,7 @@ character:
       - tuco_franziskaner
     tags:
       - max_hp(5)
+
+sounds:
+  - bandidos
+  - snake

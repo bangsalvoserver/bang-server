@@ -46,9 +46,17 @@ namespace banggame {
                 images.emplace(std::format("role/{}", enums::to_string(role)));
             }
         }
+
+        std::unordered_set<sound_id> sounds = bang_cards.expansions
+            | rv::filter([&](const expansion_data &data) {
+                return !data.expansion || table->m_options.expansions.contains(data.expansion);
+            })
+            | rv::for_each(&expansion_data::sounds)
+            | rn::to<std::unordered_set>;
+        
         return {
             .images {images | rn::to_vector},
-            .sounds {enums::enum_values<sound_id>() | rn::to_vector}
+            .sounds {sounds | rn::to_vector}
         };
     }
 

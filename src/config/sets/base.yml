@@ -407,3 +407,15 @@ hidden:
     tags:
       - pick
       - preselect
+
+sounds:
+  - gamestart
+  - draw
+  - death
+  - bang
+  - gatling
+  - indians
+  - duel
+  - dynamite
+  - generalstore
+  - shuffle
