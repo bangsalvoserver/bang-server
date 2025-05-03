@@ -587,7 +587,6 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
     }
 
     lobby.state = lobby_state::playing;
-    broadcast_message_no_lobby(lobby.make_lobby_update());
 
     broadcast_message_lobby(lobby, server_messages::game_started{});
 
@@ -616,6 +615,8 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
 
         broadcast_message_lobby(lobby, bot.make_user_update());
     }
+    
+    broadcast_message_no_lobby(lobby.make_lobby_update());
 
     lobby.m_game->add_players(user_ids);
     lobby.m_game->start_game();
