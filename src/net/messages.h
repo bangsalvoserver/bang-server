@@ -147,6 +147,7 @@ namespace banggame {
             id_type lobby_id;
             std::string name;
             int num_players;
+            int num_bots;
             int num_spectators;
             int max_players;
             bool secure;

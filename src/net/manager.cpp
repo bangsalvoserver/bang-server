@@ -643,8 +643,13 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
     if (!target) {
         throw lobby_error("ERROR_CANNOT_FIND_PLAYER");
     }
-    if (!lobby.options.allow_bot_rejoin && target->is_bot()) {
-        throw lobby_error("ERROR_CANNOT_REJOIN_ON_BOT");
+    if (target->is_bot()) {
+        if (lobby.options.allow_bot_rejoin) {
+            auto it = rn::find(lobby.bots, args.user_id, &lobby_bot::user_id);
+            lobby.bots.erase(it);
+        } else {
+            throw lobby_error("ERROR_CANNOT_REJOIN_ON_BOT");
+        }
     }
 
     remove_user_flag(lobby, user, game_user_flag::spectator);
