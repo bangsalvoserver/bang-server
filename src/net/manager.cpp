@@ -647,7 +647,9 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
     if (target->is_bot()) {
         if (lobby.options.allow_bot_rejoin) {
             auto it = rn::find(lobby.bots, args.user_id, &lobby_bot::user_id);
-            lobby.bots.erase(it);
+            if (it != lobby.bots.end()) {
+                lobby.bots.erase(it);
+            }
         } else {
             throw lobby_error("ERROR_CANNOT_REJOIN_ON_BOT");
         }
