@@ -272,7 +272,11 @@ namespace banggame {
     };
 
     template<typename T>
-    T get_mth_arg(const play_card_target &target) {
+    T get_mth_arg(const target_list &targets, size_t index) {
+        if (index >= targets.size()) {
+            throw game_error("invalid access to mth: out of bounds");
+        }
+        const play_card_target &target = targets[index];
         using value_type = std::remove_cvref_t<T>;
         if constexpr (std::is_convertible_v<value_type, play_card_target>) {
             return std::get<value_type>(target);
@@ -294,7 +298,7 @@ namespace banggame {
             throw game_error("invalid access to mth: invalid indices size");
         }
         return [&]<size_t ... Is>(std::index_sequence<Is...>) {
-            return std::tuple<Ts ...>{ get_mth_arg<Ts>(targets.at(indices[Is])) ... };
+            return std::tuple<Ts ...>{ get_mth_arg<Ts>(targets, indices[Is]) ... };
         }(std::index_sequence_for<Ts ...>());
     }
 
