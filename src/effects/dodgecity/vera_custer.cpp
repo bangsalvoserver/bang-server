@@ -3,6 +3,7 @@
 #include "effects/base/pick.h"
 
 #include "cards/filter_enums.h"
+#include "cards/game_enums.h"
 #include "cards/game_events.h"
 
 #include "game/game_table.h"
@@ -35,7 +36,7 @@ namespace banggame {
             : request_picking_player(origin_card, nullptr, target, {}, -25) {}
 
         void on_update() override {
-            if (target->alive() && target->m_game->m_playing == target && !target->m_game->is_disabled(origin_card)) {
+            if (target->alive() && target->m_game->m_playing == target && !target->check_player_flags(player_flag::extra_turn) && !target->m_game->is_disabled(origin_card)) {
                 auto_pick();
             } else {
                 target->m_game->pop_request();
@@ -65,7 +66,7 @@ namespace banggame {
 
             event_card_key key{origin_card, 10};
             target->m_game->add_listener<event_type::pre_turn_start>(key, [=, target=target](player_ptr origin){
-                if (origin == target) {
+                if (origin == target && !target->check_player_flags(player_flag::extra_turn)) {
                     target->m_game->remove_listeners(key);
                     target->m_game->queue_action([=]{
                         target->remove_cards({target->m_characters.begin() + 1, target->m_characters.end()});
