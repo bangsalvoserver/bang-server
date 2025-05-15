@@ -393,6 +393,7 @@ hidden:
 
   - name: BAGGAGE_CAR_MISSED
     image: main_deck/01_mancato
+    deck: train
     responses:
       - card_choice
       - missed
@@ -401,6 +402,7 @@ hidden:
 
   - name: BAGGAGE_CAR_PANIC
     image: main_deck/01_panico
+    deck: train
     effects:
       - card_choice
       - steal random_if_hand_card range_1
@@ -408,6 +410,7 @@ hidden:
       - card_choice(3)
   - name: BAGGAGE_CAR_CAT_BALOU
     image: main_deck/01_catbalou
+    deck: train
     effects:
       - card_choice
       - destroy random_if_hand_card
@@ -415,6 +418,7 @@ hidden:
       - card_choice(3)
   - name: BAGGAGE_CAR_BANG
     image: main_deck/01_bang
+    deck: train
     effects:
       - card_choice
       - bang player reachable notself
