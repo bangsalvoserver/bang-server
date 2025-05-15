@@ -81,9 +81,6 @@ namespace banggame {
 
     void effect_duel::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
         target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
-        if (ctx.card_choice) {
-            origin_card = ctx.card_choice;
-        }
         target->m_game->queue_request<request_duel>(origin_card, origin, target, origin, flags);
     }
 }

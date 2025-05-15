@@ -24,9 +24,6 @@ namespace banggame {
         if (!flags.check(effect_flag::skip_target_logs)) {
             target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         }
-        if (ctx.card_choice) {
-            origin_card = ctx.card_choice;
-        }
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
