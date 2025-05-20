@@ -45,11 +45,15 @@ namespace banggame {
     };
 
     prompt_string effect_circus_wagon::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (origin->is_bot() && bot_suggestion::is_target_enemy(origin, target)) {
-            if (rn::any_of(target->m_table, [](card_ptr target_card) {
-                return target_card->has_tag(tag_type::jail);
-            })) {
-                return { prompt_type::priority, "BOT_ENEMY_HAS_JAIL" };
+        if (origin->is_bot()) {
+            if (bot_suggestion::is_target_enemy(origin, target)) {
+                if (rn::any_of(target->m_table, [](card_ptr target_card) {
+                    return target_card->has_tag(tag_type::jail);
+                })) {
+                    return { prompt_type::priority, "BOT_ENEMY_HAS_JAIL" };
+                }
+            } else {
+                return "BOT_TARGET_ENEMY";
             }
         }
         return {};
