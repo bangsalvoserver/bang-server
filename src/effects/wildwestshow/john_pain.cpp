@@ -28,6 +28,7 @@ namespace banggame {
                         get_john_pain)
                     ) {
                         player_end->m_game->add_log("LOG_DRAWN_CARD", player_end, target_card);
+                        target_card->add_short_pause();
                         player_end->add_to_hand(target_card);
                     }
                 }
