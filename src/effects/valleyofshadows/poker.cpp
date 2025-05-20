@@ -21,6 +21,12 @@ namespace banggame {
             }
         }
 
+        card_list get_highlights(player_ptr owner) const override {
+            card_list result;
+            target->m_game->call_event(event_type::get_selected_cards{ origin_card, owner, result });
+            return result;
+        }
+
         bool can_pick(const_card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
         }
@@ -28,7 +34,22 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
 
+            target->m_game->add_listener<event_type::get_selected_cards>(origin_card,
+                [origin_card=origin_card, target=target, target_card](card_ptr e_origin_card, player_ptr owner, card_list &result) {
+                    if (origin_card == e_origin_card) {
+                        if (owner == target) {
+                            result.push_back(target_card);
+                        } else {
+                            for (card_ptr c : target->m_hand) {
+                                result.push_back(c);
+                            }
+                        }
+                    }
+                });
+
             target->m_game->queue_action([=, origin_card=origin_card, target=target]{
+                target->m_game->remove_listeners(origin_card);
+
                 target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
                 target_card->move_to(pocket_type::selection);
                 target->m_game->call_event(event_type::on_discard_hand_card{ target, target_card, true });

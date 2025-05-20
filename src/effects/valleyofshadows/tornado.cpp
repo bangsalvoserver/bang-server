@@ -11,6 +11,8 @@
 #include "game/game_table.h"
 #include "game/possible_to_play.h"
 
+#include "poker.h"
+
 namespace banggame {
 
     struct request_tornado : request_picking, escapable_request {
@@ -64,6 +66,12 @@ namespace banggame {
     struct request_tornado2 : request_base {
         using request_base::request_base;
 
+        card_list get_highlights(player_ptr owner) const override {
+            card_list result;
+            target->m_game->call_event(event_type::get_selected_cards{ origin_card, owner, result });
+            return result;
+        }
+
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags) || target->empty_hand()) {
                 target->m_game->pop_request();
@@ -90,8 +98,27 @@ namespace banggame {
     }
 
     void handler_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {
+        origin_card = origin->m_game->top_request()->origin_card;
         origin->m_game->pop_request();
+
+        origin->m_game->add_listener<event_type::get_selected_cards>(origin_card,
+            [=](card_ptr e_origin_card, player_ptr owner, card_list &result) {
+                if (origin_card == e_origin_card) {
+                    if (owner == origin) {
+                        for (card_ptr c : target_cards) {
+                            result.push_back(c);
+                        }
+                    } else {
+                        for (card_ptr c : origin->m_hand) {
+                            result.push_back(c);
+                        }
+                    }
+                }
+            });
+        
         origin->m_game->queue_action([=]{
+            origin->m_game->remove_listeners(origin_card);
+
             player_ptr target = origin->get_next_player();
             for (card_ptr target_card : target_cards) {
                 handler_gift_card{true}.on_play(origin_card, origin, target_card, target);
