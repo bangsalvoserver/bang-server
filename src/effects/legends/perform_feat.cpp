@@ -21,11 +21,11 @@ namespace banggame {
 
     std::pair<card_token_type, int> get_card_fame_token_type(const_card_ptr origin_card) {
         for (const auto &[token, count] : origin_card->tokens) {
-            if (token != card_token_type::cube && count > 0) {
+            if (is_fame_token(token) && count > 0) {
                 return {token, count};
             }
         }
-        return {card_token_type::cube, 0};
+        return {card_token_type::fame1, 0};
     }
 
     bool effect_perform_feat::can_play(card_ptr origin_card, player_ptr origin) {

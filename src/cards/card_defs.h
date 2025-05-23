@@ -76,6 +76,7 @@ namespace banggame {
     };
 
     enum class card_token_type {
+        gold,
         cube,
         fame1,
         fame2,
@@ -86,6 +87,11 @@ namespace banggame {
         fame7,
         fame8
     };
+
+    inline bool is_fame_token(card_token_type token) {
+        return enums::indexof(token) >= enums::indexof(card_token_type::fame1)
+            && enums::indexof(token) <= enums::indexof(card_token_type::fame8);
+    }
 
     using token_map = enums::enum_map<card_token_type, uint8_t>;
 

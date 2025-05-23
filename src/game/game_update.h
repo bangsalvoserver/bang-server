@@ -146,11 +146,6 @@ namespace banggame {
             animation_duration duration = durations.player_hp;
         };
 
-        struct player_gold {
-            player_ptr player;
-            int gold;
-        };
-
         struct player_show_role {
             player_ptr player;
             player_role role;
@@ -237,7 +232,6 @@ namespace banggame {
         game_updates::player_add,
         game_updates::player_order,
         game_updates::player_hp,
-        game_updates::player_gold,
         game_updates::player_show_role,
         game_updates::player_flags,
         game_updates::switch_turn,

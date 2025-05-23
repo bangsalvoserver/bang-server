@@ -15,7 +15,7 @@ namespace banggame {
     }
 
     game_string effect_discard_black::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        if (origin->m_gold < target_card->get_tag_value(tag_type::buy_cost).value_or(0) + 1) {
+        if (origin->get_gold() < target_card->get_tag_value(tag_type::buy_cost).value_or(0) + 1) {
             return "ERROR_NOT_ENOUGH_GOLD";
         }
         return {};

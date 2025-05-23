@@ -207,7 +207,7 @@ namespace banggame {
 
     void card::drop_all_fame() {
         for (auto [token, count] : tokens) {
-            if (token != card_token_type::cube && count > 0) {
+            if (is_fame_token(token) && count > 0) {
                 m_game->add_update(game_updates::add_tokens{ token, -count, this });
                 count = 0;
             }

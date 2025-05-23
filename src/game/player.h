@@ -29,8 +29,6 @@ namespace banggame {
 
         player_flags m_player_flags;
 
-        int8_t m_gold = 0;
-
         player(game_ptr game, int id, int user_id)
             : m_game(game), id(id), user_id(user_id) {}
 
@@ -73,6 +71,7 @@ namespace banggame {
         void heal(int value);
         void set_hp(int value, bool instant = false);
 
+        int get_gold() const;
         void add_gold(int amount);
 
         bool immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet = false) const;

@@ -227,10 +227,6 @@ namespace banggame {
                 co_yield std::ranges::elements_of(add_cards(pocket_type::player_hand, p));
 
                 co_yield game_updates::player_hp{ p, p->m_hp, 0ms };
-                
-                if (p->m_gold != 0) {
-                    co_yield game_updates::player_gold{ p, p->m_gold };
-                }
             }
         }
 

@@ -211,10 +211,16 @@ namespace banggame {
         }
     }
 
+    int player::get_gold() const {
+        if (card_ptr character = get_character()) {
+            return character->num_tokens(card_token_type::gold);
+        }
+        return 0;
+    }
+
     void player::add_gold(int amount) {
-        if (amount) {
-            m_gold += amount;
-            m_game->add_update(game_updates::player_gold{ this, m_gold });
+        if (card_ptr character = get_character()) {
+            m_game->add_tokens(card_token_type::gold, amount, character);
         }
     }
 

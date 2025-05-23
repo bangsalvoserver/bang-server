@@ -52,7 +52,7 @@ namespace banggame {
     static int count_feat_tot_fame(const_card_ptr target_card) {
         int result = 0;
         for (const auto &[token, count] : target_card->tokens) {
-            if (token != card_token_type::cube) {
+            if (is_fame_token(token)) {
                 result += count;
             }
         }

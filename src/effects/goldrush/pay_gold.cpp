@@ -5,7 +5,7 @@
 namespace banggame {
 
     game_string effect_pay_gold::get_error(card_ptr origin_card, player_ptr origin) {
-        if (origin->m_gold < amount) {
+        if (origin->get_gold() < amount) {
             return "ERROR_NOT_ENOUGH_GOLD";
         }
         return {};

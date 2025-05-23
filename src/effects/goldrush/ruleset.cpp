@@ -49,7 +49,7 @@ namespace banggame {
                 if (ctx.card_choice) {
                     origin_card = ctx.card_choice;
                 }
-                if (origin_card->pocket == pocket_type::shop_selection && origin->m_gold < get_card_cost(origin_card, ctx)) {
+                if (origin_card->pocket == pocket_type::shop_selection && origin->get_gold() < get_card_cost(origin_card, ctx)) {
                     out_error = "ERROR_NOT_ENOUGH_GOLD";
                 }
             }
@@ -78,7 +78,7 @@ namespace banggame {
 
         game->add_listener<event_type::on_discard_all>({nullptr, 1}, [](player_ptr origin) {
             if (origin->alive() || !origin->m_game->m_options.expansions.contains(GET_RULESET(shadowgunslingers))) {
-                origin->add_gold(-origin->m_gold);
+                origin->add_gold(-origin->get_gold());
             }
         });
     }
