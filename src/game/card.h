@@ -50,22 +50,17 @@ namespace banggame {
         void add_short_pause();
 
         int num_tokens(card_token_type token_type) const;
-        void add_tokens(card_token_type token_type, int num_tokens);
         void move_tokens(card_token_type token_type, card_ptr target, int num_tokens, bool instant = false);
-        void drop_all_cubes();
-        void drop_all_fame();
 
         int num_cubes() const {
             return num_tokens(card_token_type::cube);
         }
 
-        void add_cubes(int ncubes) {
-            add_tokens(card_token_type::cube, ncubes);
-        }
+        void add_cubes(int ncubes);
+        void move_cubes(card_ptr target, int ncubes, bool instant = false);
 
-        void move_cubes(card_ptr target, int ncubes, bool instant = false) {
-            move_tokens(card_token_type::cube, target, ncubes, instant);
-        }
+        void drop_all_cubes();
+        void drop_all_fame();
     };
 
     inline auto cube_slots(const_player_ptr target) {

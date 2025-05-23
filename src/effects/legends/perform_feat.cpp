@@ -224,7 +224,7 @@ namespace banggame {
                 origin->m_game->queue_action([=]{
                     card_ptr character_card = origin->get_character();
                     auto [token, count] = get_card_fame_token_type(character_card);
-                    character_card->move_tokens(token, origin_card, std::min<int>(count, 2));
+                    character_card->move_tokens(token, origin_card, 2);
                 }, 10);
             }
         }

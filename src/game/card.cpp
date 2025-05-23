@@ -137,29 +137,49 @@ namespace banggame {
     int card::num_tokens(card_token_type token_type) const {
         return tokens[token_type];
     }
-    
-    void card::add_tokens(card_token_type token_type, int num_tokens) {
-        auto &table_tokens = m_game->tokens[token_type];
-        auto &card_tokens = tokens[token_type];
 
-        if (table_tokens < num_tokens) {
-            num_tokens = table_tokens;
-        }
-        if (token_type == card_token_type::cube) {
-            num_tokens = std::min<int>(num_tokens, max_cubes - card_tokens);
-        }
-
-        if (num_tokens > 0) {
-            table_tokens -= num_tokens;
-            card_tokens += num_tokens;
-            if (token_type == card_token_type::cube) {
-                m_game->add_log("LOG_ADD_CUBE", owner, this, num_tokens);
-            }
-            m_game->add_update(game_updates::move_tokens{ token_type, num_tokens, nullptr, this, num_tokens == 1 ? durations.move_token : durations.move_tokens });
+    static animation_duration move_token_duration(int num_tokens, bool instant = false) {
+        if (instant) {
+            return 0ms;
+        } else if (num_tokens == 1) { 
+            return durations.move_token;
+        } else {
+            return durations.move_tokens;
         }
     }
 
     void card::move_tokens(card_token_type token_type, card_ptr target, int num_tokens, bool instant) {
+        auto &target_tokens = target ? target->tokens[token_type] : m_game->tokens[token_type];
+        auto &card_tokens = tokens[token_type];
+
+        if (card_tokens < num_tokens) {
+            num_tokens = card_tokens;
+        }
+        if (num_tokens > 0) {
+            target_tokens += num_tokens;
+            card_tokens -= num_tokens;
+            
+            m_game->add_update(game_updates::move_tokens{ token_type, num_tokens, this, target, move_token_duration(num_tokens, instant) });
+        }
+    }
+    
+    void card::add_cubes(int num_tokens) {
+        const card_token_type token_type = card_token_type::cube;
+        auto &table_tokens = m_game->tokens[token_type];
+        auto &card_tokens = tokens[token_type];
+
+        num_tokens = std::min<int>({num_tokens, table_tokens, max_cubes - card_tokens});
+        if (num_tokens > 0) {
+            table_tokens -= num_tokens;
+            card_tokens += num_tokens;
+
+            m_game->add_log("LOG_ADD_CUBE", owner, this, num_tokens);
+            m_game->add_update(game_updates::move_tokens{ token_type, num_tokens, nullptr, this, move_token_duration(num_tokens) });
+        }
+    }
+
+    void card::move_cubes(card_ptr target, int num_tokens, bool instant) {
+        const card_token_type token_type = card_token_type::cube;
         auto &table_tokens = m_game->tokens[token_type];
         auto &target_tokens = target ? target->tokens[token_type] : table_tokens;
         auto &card_tokens = tokens[token_type];
@@ -167,29 +187,25 @@ namespace banggame {
         if (card_tokens < num_tokens) {
             num_tokens = card_tokens;
         }
-        if (target && num_tokens > 0 && (token_type != card_token_type::cube || target_tokens < max_cubes)) {
-            int added_tokens = token_type == card_token_type::cube
-                ? std::min<int>(num_tokens, max_cubes - target_tokens)
-                : num_tokens;
+        if (target && num_tokens > 0 && target_tokens < max_cubes) {
+            int added_tokens = std::min<int>(num_tokens, max_cubes - target_tokens);
             target_tokens += added_tokens;
             card_tokens -= added_tokens;
             num_tokens -= added_tokens;
-            if (token_type == card_token_type::cube) {
-                if (owner == target->owner) {
-                    m_game->add_log("LOG_MOVED_CUBE", target->owner, this, target, added_tokens);
-                } else {
-                    m_game->add_log("LOG_MOVED_CUBE_FROM", target->owner, owner, this, target, added_tokens);
-                }
+
+            if (owner == target->owner) {
+                m_game->add_log("LOG_MOVED_CUBE", target->owner, this, target, added_tokens);
+            } else {
+                m_game->add_log("LOG_MOVED_CUBE_FROM", target->owner, owner, this, target, added_tokens);
             }
-            m_game->add_update(game_updates::move_tokens{ token_type, added_tokens, this, target, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens });
+            m_game->add_update(game_updates::move_tokens{ token_type, added_tokens, this, target, move_token_duration(added_tokens, instant) });
         }
         if (num_tokens > 0) {
             card_tokens -= num_tokens;
             table_tokens += num_tokens;
-            if (token_type == card_token_type::cube) {
-                m_game->add_log("LOG_PAID_CUBE", owner, this, num_tokens);
-            }
-            m_game->add_update(game_updates::move_tokens{ token_type, num_tokens, this, nullptr, instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens });
+            
+            m_game->add_log("LOG_PAID_CUBE", owner, this, num_tokens);
+            m_game->add_update(game_updates::move_tokens{ token_type, num_tokens, this, nullptr, move_token_duration(num_tokens, instant) });
         }
         if (card_tokens == 0) {
             m_game->call_event(event_type::on_finish_tokens{ this, target, token_type });
@@ -197,10 +213,11 @@ namespace banggame {
     }
 
     void card::drop_all_cubes() {
-        if (auto &count = tokens[card_token_type::cube]) {
+        const card_token_type token_type = card_token_type::cube;
+        if (auto &count = tokens[token_type]) {
             m_game->add_log("LOG_DROP_CUBE", owner, this, count);
-            m_game->tokens[card_token_type::cube] += count;
-            m_game->add_update(game_updates::move_tokens{ card_token_type::cube, count, this, nullptr, count == 1 ? durations.move_token : durations.move_tokens });
+            m_game->tokens[token_type] += count;
+            m_game->add_update(game_updates::move_tokens{ token_type, count, this, nullptr, move_token_duration(count) });
             count = 0;
         }
     }
