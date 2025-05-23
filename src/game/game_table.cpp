@@ -169,12 +169,14 @@ namespace banggame {
     }
 
     void game_table::add_tokens(card_token_type token_type, int num_tokens, card_ptr target_card) {
-        if (target_card) {
-            target_card->tokens[token_type] += num_tokens;
-        } else {
-            tokens[token_type] += num_tokens;
+        if (num_tokens != 0) {
+            if (target_card) {
+                target_card->tokens[token_type] += num_tokens;
+            } else {
+                tokens[token_type] += num_tokens;
+            }
+            add_update(game_updates::add_tokens{ token_type, num_tokens, target_card });
         }
-        add_update(game_updates::add_tokens{ token_type, num_tokens, target_card });
     }
 
     void game_table::clear_request_status() {

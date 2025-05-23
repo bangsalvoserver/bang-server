@@ -353,8 +353,9 @@ namespace banggame {
 
         if (old_character) {
             for (const auto &[token, count] : old_character->tokens) {
-                old_character->move_tokens(token, target_card, count, true);
+                m_game->add_tokens(token, count, target_card);
             }
+            old_character->tokens = {};
         }
 
         enable_equip(target_card);
