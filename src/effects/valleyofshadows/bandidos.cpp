@@ -8,6 +8,7 @@
 
 #include "effects/base/requests.h"
 #include "effects/base/escapable.h"
+#include "effects/base/steal_destroy.h"
 
 namespace banggame {
 
@@ -101,7 +102,10 @@ namespace banggame {
                     })
                     | rn::to_vector;
                 if (not_disabled.size() <= 1) {
-                    handler_bandidos2_response{}.on_play(origin_card, target, not_disabled);
+                    origin->m_game->pop_request();
+                    for (card_ptr target_card : not_disabled) {
+                        effect_discard{true}.on_play(origin_card, target, target_card);
+                    }
                     target->reveal_hand();
                 }
             }
@@ -124,24 +128,7 @@ namespace banggame {
         return origin->m_game->top_request<request_bandidos2>(target_is{origin}) != nullptr;
     }
 
-    game_string handler_bandidos2_response::get_error(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {
-        for (card_ptr target_card : target_cards) {
-            if (card_ptr disabler = origin->m_game->get_usage_disabler(target_card)) {
-                return {"ERROR_CARD_DISABLED_BY", target_card, disabler};
-            }
-        }
-        if (target_cards.size() == 1 && !target_cards.front()->is_bang_card(origin)) {
-            return "ERROR_TARGET_NOT_BANG";
-        }
-        return {};
-    }
-
-    void handler_bandidos2_response::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {
+    void effect_bandidos2_response::on_play(card_ptr origin_card, player_ptr origin) {
         origin->m_game->pop_request();
-
-        for (card_ptr target_card : target_cards) {
-            origin->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, origin, target_card);
-            origin->discard_used_card(target_card);
-        }
     }
 }

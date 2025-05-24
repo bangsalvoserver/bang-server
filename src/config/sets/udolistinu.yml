@@ -204,8 +204,7 @@ hidden:
   - name: BANDIDOS
     responses:
       - bandidos2_response
-      - none max_cards(2) self | hand
-    mth_response: bandidos2_response(1)
+      - discard(true) bang_or_cards(2) self | hand
     tags:
       - preselect
 

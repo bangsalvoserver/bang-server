@@ -159,6 +159,11 @@ namespace banggame {
             card_list value;
         };
 
+        struct bang_or_cards {
+            struct transparent{};
+            card_list value;
+        };
+
         struct card_per_player {
             struct transparent{};
             card_list value;
@@ -204,6 +209,7 @@ namespace banggame {
         target_types::players,
         target_types::cards,
         target_types::max_cards,
+        target_types::bang_or_cards,
         target_types::card_per_player,
         target_types::cube_slot,
         target_types::move_cube_slot,

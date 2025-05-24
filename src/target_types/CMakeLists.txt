@@ -9,6 +9,7 @@ PRIVATE
     random_if_hand_card.cpp
     extra_card.cpp
     max_cards.cpp
+    bang_or_cards.cpp
     move_cube_slot.cpp
     none.cpp
     player_per_cube.cpp
