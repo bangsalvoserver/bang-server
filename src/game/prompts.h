@@ -15,7 +15,7 @@ namespace banggame::prompts {
     
     game_string bot_check_target_friend(player_ptr origin, player_ptr target);
 
-    game_string bot_check_target_card(player_ptr origin, card_ptr target);
+    prompt_string bot_check_target_card(player_ptr origin, card_ptr target);
 }
 
 #endif

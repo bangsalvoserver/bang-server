@@ -46,11 +46,29 @@ namespace banggame::prompts {
         return {};
     }
 
-    game_string bot_check_target_card(player_ptr origin, card_ptr target) {
-        if (target->pocket == pocket_type::player_table && !target->self_equippable() && !target->has_tag(tag_type::ghost_card)) {
-            return bot_check_target_friend(origin, target->owner);
-        } else {
-            return bot_check_target_enemy(origin, target->owner);
+    prompt_string bot_check_target_card(player_ptr origin, card_ptr target_card) {
+        if (origin->is_bot()) {
+            player_ptr target = target_card->owner;
+            if (target->is_ghost()) {
+                if (bot_suggestion::is_target_enemy(origin, target)) {
+                    if (target_card->has_tag(tag_type::ghost_card)) {
+                        return {};
+                    } else {
+                        return {prompt_type::priority, "BOT_TARGET_NOT_GHOST_CARD"};
+                    }
+                } else if (bot_suggestion::is_target_friend(origin, target)) {
+                    if (target_card->has_tag(tag_type::ghost_card)) {
+                        return {prompt_type::priority, "BOT_TARGET_GHOST_CARD"};
+                    }
+                }
+                return "BOT_TARGET_ENEMY";
+            }
+            if (target_card->pocket == pocket_type::player_table && !target_card->self_equippable()) {
+                return bot_check_target_friend(origin, target);
+            } else {
+                return bot_check_target_enemy(origin, target);
+            }
         }
+        return {};
     }
 }
