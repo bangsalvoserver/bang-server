@@ -5,74 +5,21 @@
 
 namespace banggame {
 
-    constexpr size_t game_option_field_index(std::string_view name) {
-        constexpr auto member_names = []<size_t ... Is>(std::index_sequence<Is ...>) {
-            return std::array{
-                reflect::member_name<Is, game_options>() ...
-            };
-        }(std::make_index_sequence<reflect::size<game_options>()>());
-        auto it = rn::find(member_names, name);
-        if (it != member_names.end()) {
-            return rn::distance(member_names.begin(), it);
-        }
-        throw std::out_of_range("Cannot find game_option_field_index");
+    template<typename T, std::convertible_to<T> U>
+    void clamp_value(T &value, const U &min, const U &max) {
+        value = std::clamp<T>(value, min, max);
     }
 
-    template<size_t I> struct game_option_transformer {
-        template<typename T>
-        T operator()(const T &value) const {
-            return value;
+    void validate_game_options(game_options &options) {
+        if (!validate_expansions(options.expansions)) {
+            options.expansions = {};
         }
-    };
-
-    template<> struct game_option_transformer<game_option_field_index("expansions")> {
-        expansion_set operator()(const expansion_set &value) const {
-            if (!validate_expansions(value)) {
-                throw std::runtime_error("INVALID_EXPANSIONS");
-            }
-            return value;
-        }
-    };
-
-    template<> struct game_option_transformer<game_option_field_index("character_choice")> {
-        int operator()(int value) const {
-            return std::clamp(value, 1, 3);
-        }
-    };
-
-    template<> struct game_option_transformer<game_option_field_index("auto_resolve_timer")> {
-        game_duration operator()(game_duration value) const {
-            return std::clamp(value, game_duration{}, game_duration{5s});
-        }
-    };
-
-    template<> struct game_option_transformer<game_option_field_index("damage_timer")> {
-        game_duration operator()(game_duration value) const {
-            return std::clamp(value, game_duration{}, game_duration{5s});
-        }
-    };
-
-    template<> struct game_option_transformer<game_option_field_index("escape_timer")> {
-        game_duration operator()(game_duration value) const {
-            return std::clamp(value, game_duration{}, game_duration{10s});
-        }
-    };
-
-    template<> struct game_option_transformer<game_option_field_index("bot_play_timer")> {
-        game_duration operator()(game_duration value) const {
-            return std::clamp(value, game_duration{}, game_duration{10s});
-        }
-    };
-
-    template<> struct game_option_transformer<game_option_field_index("duration_coefficient")> {
-        float operator()(float value) const {
-            return std::clamp(value, 0.f, 4.f);
-        }
-    };
-
-    template<size_t I, typename T>
-    T transform_field(const T &value) {
-        return banggame::game_option_transformer<I>{}(value);
+        clamp_value(options.character_choice, 1, 3);
+        clamp_value(options.auto_resolve_timer, 0s, 5s);
+        clamp_value(options.damage_timer, 0s, 5s);
+        clamp_value(options.escape_timer, 0s, 10s);
+        clamp_value(options.bot_play_timer, 0s, 10s);
+        clamp_value(options.duration_coefficient, 0.f, 4.f);
     }
 
     std::string game_options::to_string(std::string_view sep) const {
@@ -94,7 +41,7 @@ namespace banggame {
                 { reflect::member_name<Is, game_options>(), [](game_options &options, std::string_view value_str) {
                     auto &field = reflect::get<Is>(options);
                     if (auto value = utils::parse_string<std::remove_reference_t<decltype(field)>>(value_str)) {
-                        field = transform_field<Is>(*value);
+                        field = *value;
                     } else {
                         throw std::runtime_error("INVALID_OPTION_VALUE");
                     }
@@ -107,6 +54,7 @@ namespace banggame {
         }
         
         it->second(*this, value);
+        validate_game_options(*this);
     }
     
     game_options game_options::deserialize_json(const json::json &value) {
@@ -119,7 +67,7 @@ namespace banggame {
                         auto &field = reflect::get<I>(result);
 
                         using option_type = reflect::member_type<I, game_options>;
-                        field = transform_field<I>(json::deserialize<option_type>(*it));
+                        field = json::deserialize<option_type>(*it);
                     } catch (const std::exception &error) {
                         // ignore errors.
                         // game_options are stored in the clients' application storage and we don't want them kicked out if it's invalid.
@@ -127,6 +75,7 @@ namespace banggame {
                 }
             });
         }
+        validate_game_options(result);
         return result;
     }
 
