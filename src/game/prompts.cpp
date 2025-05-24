@@ -51,13 +51,13 @@ namespace banggame::prompts {
             player_ptr target = target_card->owner;
             if (target->is_ghost()) {
                 if (bot_suggestion::is_target_enemy(origin, target)) {
-                    if (target_card->has_tag(tag_type::ghost_card)) {
+                    if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::ghost_card)) {
                         return {};
                     } else {
                         return {prompt_type::priority, "BOT_TARGET_NOT_GHOST_CARD"};
                     }
                 } else if (bot_suggestion::is_target_friend(origin, target)) {
-                    if (target_card->has_tag(tag_type::ghost_card)) {
+                    if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::ghost_card)) {
                         return {prompt_type::priority, "BOT_TARGET_GHOST_CARD"};
                     }
                 }
