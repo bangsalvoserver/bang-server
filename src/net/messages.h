@@ -149,7 +149,6 @@ namespace banggame {
             int num_players;
             int num_bots;
             int num_spectators;
-            int max_players;
             bool secure;
             lobby_state state;
         };

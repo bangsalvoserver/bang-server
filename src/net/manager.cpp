@@ -582,7 +582,7 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
 
     if (num_players < 3) {
         throw lobby_error("ERROR_NOT_ENOUGH_PLAYERS");
-    } else if (num_players > lobby_max_players) {
+    } else if (num_players > 8) {
         throw lobby_error("ERROR_TOO_MANY_PLAYERS");
     }
 

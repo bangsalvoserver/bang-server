@@ -7,8 +7,6 @@ namespace banggame {
     using namespace std::chrono_literals;
 
     constexpr uint16_t default_server_port = 47654;
-    constexpr int server_max_clients = 100;
-    constexpr int lobby_max_players = 8;
     constexpr int server_tickrate = 120;
 
     template<std::integral T>

@@ -98,7 +98,6 @@ namespace banggame {
             .num_players = int(rn::count_if(connected_users(), std::not_fn(&game_user::is_spectator))),
             .num_bots = int(bots.size()),
             .num_spectators = int(rn::count_if(connected_users(), &game_user::is_spectator)),
-            .max_players = lobby_max_players,
             .secure = !password.empty(),
             .state = state
         };
