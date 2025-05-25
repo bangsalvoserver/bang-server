@@ -578,11 +578,17 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
         throw lobby_error("ERROR_LOBBY_NOT_WAITING");
     }
 
-    size_t num_players = rn::count_if(lobby.connected_users(), std::not_fn(&game_user::is_spectator)) + lobby.options.num_bots;
+    size_t num_players = rn::count_if(lobby.connected_users(), std::not_fn(&game_user::is_spectator));
+    
+    int num_bots = 0;
+    if (lobby.options.add_bots && num_players < lobby.options.max_players) {
+        num_bots = lobby.options.max_players - num_players;
+        num_players = lobby.options.max_players;
+    }
 
     if (num_players < 3) {
         throw lobby_error("ERROR_NOT_ENOUGH_PLAYERS");
-    } else if (num_players > 8) {
+    } else if (num_players > lobby.options.max_players) {
         throw lobby_error("ERROR_TOO_MANY_PLAYERS");
     }
 
@@ -601,14 +607,14 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
     }
 
     auto names = bot_info.names
-        | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
+        | rv::sample(num_bots, lobby.m_game->bot_rng)
         | rn::to<std::vector<std::string_view>>;
 
     auto propics = bot_info.propics
-        | rv::sample(lobby.options.num_bots, lobby.m_game->bot_rng)
+        | rv::sample(num_bots, lobby.m_game->bot_rng)
         | rn::to<std::vector<image_pixels_hash>>;
 
-    for (int i=0; i < lobby.options.num_bots; ++i) {
+    for (int i=0; i < num_bots; ++i) {
         int bot_id = -1-i;
         auto &bot = lobby.bots.emplace_back(bot_id, std::format("BOT {}", names[i % names.size()]), propics[i % propics.size()]);
         user_ids.push_back(bot_id);

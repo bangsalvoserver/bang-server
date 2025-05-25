@@ -36,6 +36,7 @@ namespace banggame {
     }
 
     DEFINE_TRANSFORMER(character_choice, clamp_value(1, 3))
+    DEFINE_TRANSFORMER(max_players, clamp_value(3, 8))
     DEFINE_TRANSFORMER(auto_resolve_timer, clamp_value(0s, 5s))
     DEFINE_TRANSFORMER(damage_timer, clamp_value(0s, 5s))
     DEFINE_TRANSFORMER(escape_timer, clamp_value(0s, 10s))

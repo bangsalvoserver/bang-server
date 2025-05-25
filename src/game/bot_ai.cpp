@@ -109,7 +109,7 @@ namespace banggame {
     }
 
     request_state game::request_bot_play(bool instant) {
-        if (m_options.num_bots == 0) {
+        if (rn::none_of(m_players, &player::is_bot)) {
             return request_states::done{};
         } else if (!instant && m_options.bot_play_timer > game_duration{0}) {
             return request_states::bot_play{ get_total_update_time() + std::chrono::duration_cast<ticks>(m_options.bot_play_timer) };
