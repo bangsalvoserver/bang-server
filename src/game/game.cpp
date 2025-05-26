@@ -174,7 +174,7 @@ namespace banggame {
                 }
                 for (const auto &[token, count] : c->tokens) {
                     if (count > 0) {
-                        co_yield game_updates::add_tokens{ token, count, c };
+                        co_yield game_updates::add_tokens{ token, count, token_positions::card{c} };
                     }
                 }
                 if (c->inactive) {
@@ -211,7 +211,7 @@ namespace banggame {
         
         for (const auto &[token, count] : tokens) {
             if (count > 0) {
-                co_yield game_updates::add_tokens{ token, count };
+                co_yield game_updates::add_tokens{ token, count, token_positions::table{} };
             }
         }
 
@@ -227,6 +227,12 @@ namespace banggame {
                 co_yield std::ranges::elements_of(add_cards(pocket_type::player_hand, p));
 
                 co_yield game_updates::player_hp{ p, p->m_hp, 0ms };
+
+                for (const auto &[token, count] : p->tokens) {
+                    if (count > 0) {
+                        co_yield game_updates::add_tokens{ token, count, token_positions::player{p} };
+                    }
+                }
             }
         }
 

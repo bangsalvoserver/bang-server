@@ -133,35 +133,6 @@ namespace banggame {
     void card::add_short_pause() {
         m_game->add_update(game_updates::short_pause{ this });
     }
-
-    int card::num_tokens(card_token_type token_type) const {
-        return tokens[token_type];
-    }
-
-    static animation_duration move_token_duration(int num_tokens, bool instant = false) {
-        if (instant) {
-            return 0ms;
-        } else if (num_tokens == 1) { 
-            return durations.move_token;
-        } else {
-            return durations.move_tokens;
-        }
-    }
-
-    void card::move_tokens(card_token_type token_type, card_ptr target, int num_tokens, bool instant) {
-        auto &target_tokens = target ? target->tokens[token_type] : m_game->tokens[token_type];
-        auto &card_tokens = tokens[token_type];
-
-        if (card_tokens < num_tokens) {
-            num_tokens = card_tokens;
-        }
-        if (num_tokens > 0) {
-            target_tokens += num_tokens;
-            card_tokens -= num_tokens;
-            
-            m_game->add_update(game_updates::move_tokens{ token_type, num_tokens, this, target, move_token_duration(num_tokens, instant) });
-        }
-    }
     
     void card::add_cubes(int num_tokens) {
         const card_token_type token_type = card_token_type::cube;
@@ -170,11 +141,8 @@ namespace banggame {
 
         num_tokens = std::min<int>({num_tokens, table_tokens, max_cubes - card_tokens});
         if (num_tokens > 0) {
-            table_tokens -= num_tokens;
-            card_tokens += num_tokens;
-
             m_game->add_log("LOG_ADD_CUBE", owner, this, num_tokens);
-            m_game->add_update(game_updates::move_tokens{ token_type, num_tokens, nullptr, this, move_token_duration(num_tokens) });
+            m_game->move_tokens(token_type, token_positions::table{}, token_positions::card{this}, num_tokens);
         }
     }
 
@@ -189,8 +157,6 @@ namespace banggame {
         }
         if (target && num_tokens > 0 && target_tokens < max_cubes) {
             int added_tokens = std::min<int>(num_tokens, max_cubes - target_tokens);
-            target_tokens += added_tokens;
-            card_tokens -= added_tokens;
             num_tokens -= added_tokens;
 
             if (owner == target->owner) {
@@ -198,14 +164,11 @@ namespace banggame {
             } else {
                 m_game->add_log("LOG_MOVED_CUBE_FROM", target->owner, owner, this, target, added_tokens);
             }
-            m_game->add_update(game_updates::move_tokens{ token_type, added_tokens, this, target, move_token_duration(added_tokens, instant) });
+            m_game->move_tokens(token_type, token_positions::card{this}, token_positions::card{target}, added_tokens, instant);
         }
         if (num_tokens > 0) {
-            card_tokens -= num_tokens;
-            table_tokens += num_tokens;
-            
             m_game->add_log("LOG_PAID_CUBE", owner, this, num_tokens);
-            m_game->add_update(game_updates::move_tokens{ token_type, num_tokens, this, nullptr, move_token_duration(num_tokens, instant) });
+            m_game->move_tokens(token_type, token_positions::card{this}, token_positions::table{}, num_tokens, instant);
         }
         if (card_tokens == 0) {
             m_game->call_event(event_type::on_finish_tokens{ this, target, token_type });
@@ -213,20 +176,16 @@ namespace banggame {
     }
 
     void card::drop_all_cubes() {
-        const card_token_type token_type = card_token_type::cube;
-        if (auto &count = tokens[token_type]) {
+        if (int count = num_cubes()) {
             m_game->add_log("LOG_DROP_CUBE", owner, this, count);
-            m_game->tokens[token_type] += count;
-            m_game->add_update(game_updates::move_tokens{ token_type, count, this, nullptr, move_token_duration(count) });
-            count = 0;
+            m_game->move_tokens(card_token_type::cube, token_positions::card{this}, token_positions::table{}, count);
         }
     }
 
     void card::drop_all_fame() {
         for (auto [token, count] : tokens) {
-            if (is_fame_token(token) && count > 0) {
-                m_game->add_update(game_updates::add_tokens{ token, -count, this });
-                count = 0;
+            if (is_fame_token(token) && count != 0) {
+                m_game->add_tokens(token, -count, token_positions::card{this});
             }
         }
     }

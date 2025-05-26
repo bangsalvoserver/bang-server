@@ -19,8 +19,8 @@ namespace banggame {
         return num_feats;
     }
 
-    std::pair<card_token_type, int> get_card_fame_token_type(const_card_ptr origin_card) {
-        for (const auto &[token, count] : origin_card->tokens) {
+    std::pair<card_token_type, int> get_player_fame_tokens(const_player_ptr origin) {
+        for (const auto &[token, count] : origin->tokens) {
             if (is_fame_token(token) && count > 0) {
                 return {token, count};
             }
@@ -30,7 +30,7 @@ namespace banggame {
 
     bool effect_perform_feat::can_play(card_ptr origin_card, player_ptr origin) {
         if (origin_card->deck == card_deck_type::feats && !is_legend(origin)) {
-            auto [token, count] = get_card_fame_token_type(origin->get_character());
+            auto [token, count] = get_player_fame_tokens(origin);
             if (count == 0 || origin_card->num_tokens(token) != 0) {
                 return false;
             }
@@ -222,9 +222,8 @@ namespace banggame {
             } else {
                 origin->m_game->add_log("LOG_FEAT_PERFORMED", origin, origin_card);
                 origin->m_game->queue_action([=]{
-                    card_ptr character_card = origin->get_character();
-                    auto [token, count] = get_card_fame_token_type(character_card);
-                    character_card->move_tokens(token, origin_card, 2);
+                    auto [token, count] = get_player_fame_tokens(origin);
+                    origin->m_game->move_tokens(token, token_positions::player{origin}, token_positions::card{origin_card}, 2);
                 }, 10);
             }
         }

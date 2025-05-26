@@ -212,16 +212,11 @@ namespace banggame {
     }
 
     int player::get_gold() const {
-        if (card_ptr character = get_character()) {
-            return character->num_tokens(card_token_type::gold);
-        }
-        return 0;
+        return tokens[card_token_type::gold];
     }
 
     void player::add_gold(int amount) {
-        if (card_ptr character = get_character()) {
-            m_game->add_tokens(card_token_type::gold, amount, character);
-        }
+        m_game->add_tokens(card_token_type::gold, amount, token_positions::player{this});
     }
 
     bool player::immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet) const {
@@ -359,7 +354,7 @@ namespace banggame {
 
         if (old_character) {
             for (const auto &[token, count] : old_character->tokens) {
-                m_game->add_tokens(token, count, target_card);
+                m_game->add_tokens(token, count, token_positions::card{target_card});
             }
             old_character->tokens = {};
         }

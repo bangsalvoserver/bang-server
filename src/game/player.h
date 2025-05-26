@@ -27,6 +27,8 @@ namespace banggame {
         
         int8_t m_extra_turns = 0;
 
+        token_map tokens;
+
         player_flags m_player_flags;
 
         player(game_ptr game, int id, int user_id)

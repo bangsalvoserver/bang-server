@@ -49,8 +49,9 @@ namespace banggame {
         void flash_card();
         void add_short_pause();
 
-        int num_tokens(card_token_type token_type) const;
-        void move_tokens(card_token_type token_type, card_ptr target, int num_tokens, bool instant = false);
+        int num_tokens(card_token_type token_type) const {
+            return tokens[token_type];
+        }
 
         int num_cubes() const {
             return num_tokens(card_token_type::cube);

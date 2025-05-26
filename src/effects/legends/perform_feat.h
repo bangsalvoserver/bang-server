@@ -23,7 +23,7 @@ namespace banggame {
     }
 
     int get_count_performed_feats(player_ptr origin);
-    std::pair<card_token_type, int> get_card_fame_token_type(const_card_ptr origin_card);
+    std::pair<card_token_type, int> get_player_fame_tokens(const_player_ptr origin);
     void queue_request_perform_feat(card_ptr origin_card, player_ptr target);
 
     struct effect_perform_feat {

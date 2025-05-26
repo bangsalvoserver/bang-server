@@ -164,18 +164,44 @@ namespace banggame {
         }
     }
 
+    static token_map &get_token_map(game_ptr m_game, token_position position) {
+        return std::visit(overloaded{
+            [m_game](token_positions::table) -> token_map & {
+                return m_game->tokens;
+            },
+            [](token_positions::card c) -> token_map & {
+                return c.card->tokens;
+            },
+            [](token_positions::player p) -> token_map & {
+                return p.player->tokens;
+            }
+        }, position);
+    }
+
     int game_table::num_tokens(card_token_type token_type) const {
         return tokens[token_type];
     }
 
-    void game_table::add_tokens(card_token_type token_type, int num_tokens, card_ptr target_card) {
+    void game_table::add_tokens(card_token_type token_type, int num_tokens, token_position target) {
         if (num_tokens != 0) {
-            if (target_card) {
-                target_card->tokens[token_type] += num_tokens;
-            } else {
-                tokens[token_type] += num_tokens;
-            }
-            add_update(game_updates::add_tokens{ token_type, num_tokens, target_card });
+            get_token_map(this, target)[token_type] += num_tokens;
+            add_update(game_updates::add_tokens{ token_type, num_tokens, target });
+        }
+    }
+
+    void game_table::move_tokens(card_token_type token_type, token_position origin, token_position target, int num_tokens, bool instant) {
+        auto &origin_tokens = get_token_map(this, origin)[token_type];
+        auto &target_tokens = get_token_map(this, target)[token_type];
+
+        if (origin_tokens < num_tokens) {
+            num_tokens = origin_tokens;
+        }
+        if (num_tokens > 0) {
+            target_tokens += num_tokens;
+            origin_tokens -= num_tokens;
+
+            animation_duration duration = instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens;
+            add_update(game_updates::move_tokens{ token_type, num_tokens, origin, target, duration });
         }
     }
 

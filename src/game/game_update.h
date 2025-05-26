@@ -40,6 +40,26 @@ namespace banggame {
     
     using timer_id_t = size_t;
 
+    namespace token_positions {
+        struct table {};
+
+        struct card {
+            struct transparent{};
+            card_ptr card;
+        };
+
+        struct player {
+            struct transparent{};
+            player_ptr player;
+        };
+    }
+
+    using token_position = std::variant<
+        token_positions::table,
+        token_positions::card,
+        token_positions::player
+    >;
+
     namespace game_updates {
 
         struct preload_assets {
@@ -83,14 +103,14 @@ namespace banggame {
         struct add_tokens {
             card_token_type token_type;
             int num_tokens;
-            nullable_card target_card;
+            token_position target;
         };
 
         struct move_tokens {
             card_token_type token_type;
             int num_tokens;
-            nullable_card origin_card;
-            nullable_card target_card;
+            token_position origin;
+            token_position target;
             animation_duration duration = durations.move_tokens;
         };
 

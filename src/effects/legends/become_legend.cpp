@@ -7,7 +7,7 @@ namespace banggame {
 
     bool effect_become_legend::can_play(card_ptr origin_card, player_ptr origin) {
         if (!origin->check_player_flags(player_flag::legend)) {
-            for (const auto &[token, count] : origin->get_character()->tokens) {
+            for (const auto &[token, count] : origin->tokens) {
                 if (is_fame_token(token) && count != 0) {
                     return false;
                 }
@@ -50,7 +50,7 @@ namespace banggame {
     }
 
     bool effect_drop_all_fame::can_play(card_ptr origin_card, player_ptr origin) {
-        for (const auto &[token, count] : origin->get_character()->tokens) {
+        for (const auto &[token, count] : origin->tokens) {
             if (is_fame_token(token) && count != 0) {
                 return true;
             }

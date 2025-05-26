@@ -107,7 +107,7 @@ namespace banggame {
 
         bool can_pick(const_card_ptr target_card) const override {
             if (target_card->pocket == pocket_type::feats) {
-                auto [token, count] = get_card_fame_token_type(target->get_character());
+                auto [token, count] = get_player_fame_tokens(target);
                 return target_card->tokens[token] == 0;
             }
             return false;
@@ -116,9 +116,8 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
             target->m_game->add_log("LOG_FEAT_BOASTED", target, target_card);
-            card_ptr character_card = target->get_character();
-            auto [token, count] = get_card_fame_token_type(character_card);
-            character_card->move_tokens(token, target_card, 1);
+            auto [token, count] = get_player_fame_tokens(target);
+            target->m_game->move_tokens(token, token_positions::player{target}, token_positions::card{target_card}, 1);
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -143,7 +142,7 @@ namespace banggame {
                 if (!target->alive() || target->m_game->m_playing != target || is_legend(target) || get_count_performed_feats(target) != 0) {
                     target->m_game->pop_request();
                 } else {
-                    auto [token, count] = get_card_fame_token_type(target->get_character());
+                    auto [token, count] = get_player_fame_tokens(target);
                     if (count == 0) {
                         target->m_game->pop_request();
                     }
@@ -201,7 +200,7 @@ namespace banggame {
             rn::shuffle(tokens, origin->m_game->rng);
 
             for (auto [token_type, target] : rv::zip(tokens, origin->m_game->range_all_players(origin))) {
-                origin->m_game->add_tokens(token_type, 5, target->get_character());
+                origin->m_game->add_tokens(token_type, 5, token_positions::player{target});
             }
             
             draw_next_feat(origin);
