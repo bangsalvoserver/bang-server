@@ -216,10 +216,15 @@ namespace banggame {
     }
 
     void player::add_gold(int amount) {
+        const auto token_type = card_token_type::gold;
         if (amount > 0) {
-            m_game->move_tokens(card_token_type::gold, token_positions::table{}, token_positions::player{this}, amount);
+            int table_gold = m_game->tokens[token_type];
+            if (table_gold < amount) {
+                m_game->add_tokens(token_type, amount - table_gold, token_positions::table{});
+            }
+            m_game->move_tokens(token_type, token_positions::table{}, token_positions::player{this}, amount);
         } else {
-            m_game->move_tokens(card_token_type::gold, token_positions::player{this}, token_positions::table{}, -amount);
+            m_game->move_tokens(token_type, token_positions::player{this}, token_positions::table{}, -amount);
         }
     }
 
