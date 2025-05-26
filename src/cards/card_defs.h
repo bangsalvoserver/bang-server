@@ -76,8 +76,6 @@ namespace banggame {
     };
 
     enum class card_token_type {
-        gold,
-        cube,
         fame1,
         fame2,
         fame3,
@@ -85,7 +83,9 @@ namespace banggame {
         fame5,
         fame6,
         fame7,
-        fame8
+        fame8,
+        cube,
+        gold
     };
 
     inline bool is_fame_token(card_token_type token) {
