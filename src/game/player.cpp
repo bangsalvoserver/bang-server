@@ -216,7 +216,11 @@ namespace banggame {
     }
 
     void player::add_gold(int amount) {
-        m_game->add_tokens(card_token_type::gold, amount, token_positions::player{this});
+        if (amount > 0) {
+            m_game->move_tokens(card_token_type::gold, token_positions::table{}, token_positions::player{this}, amount);
+        } else {
+            m_game->move_tokens(card_token_type::gold, token_positions::player{this}, token_positions::table{}, -amount);
+        }
     }
 
     bool player::immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet) const {

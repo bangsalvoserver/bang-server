@@ -39,6 +39,7 @@ namespace banggame {
     
     void ruleset_goldrush::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 2}, [](player_ptr origin){
+            origin->m_game->add_tokens(card_token_type::gold, 30, token_positions::table{});
             for (int i=0; i<3; ++i) {
                 draw_shop_card(origin->m_game);
             }
