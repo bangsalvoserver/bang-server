@@ -59,6 +59,10 @@ namespace banggame {
     }
 
     void effect_drop_all_fame::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->get_character()->drop_all_fame();
+        for (auto [token, count] : origin->tokens) {
+            if (is_fame_token(token) && count != 0) {
+                origin->m_game->add_tokens(token, -count, token_positions::player{origin});
+            }
+        }
     }
 }
