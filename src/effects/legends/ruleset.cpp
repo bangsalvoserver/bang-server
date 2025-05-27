@@ -186,16 +186,7 @@ namespace banggame {
 
     void ruleset_legends::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 0}, [](player_ptr origin) {
-            card_token_type tokens[] = {
-                card_token_type::fame1,
-                card_token_type::fame2,
-                card_token_type::fame3,
-                card_token_type::fame4,
-                card_token_type::fame5,
-                card_token_type::fame6,
-                card_token_type::fame7,
-                card_token_type::fame8,
-            };
+            auto tokens = enums::filtered_enum_array<card_token_type, is_fame_token>();
 
             rn::shuffle(tokens, origin->m_game->rng);
 

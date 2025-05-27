@@ -46,18 +46,15 @@ namespace banggame {
         bool is_black() const       { return is_clubs() || is_spades(); }
 
         bool is_two_to_nine() const {
-            return enums::indexof(rank) >= enums::indexof(card_rank::rank_2)
-                && enums::indexof(rank) <= enums::indexof(card_rank::rank_9);
+            return enums::is_between(rank, card_rank::rank_2, card_rank::rank_9);
         }
 
         bool is_ten_to_ace() const {
-            return enums::indexof(rank) >= enums::indexof(card_rank::rank_10)
-                && enums::indexof(rank) <= enums::indexof(card_rank::rank_A);
+            return enums::is_between(rank, card_rank::rank_10, card_rank::rank_A);
         }
 
         bool is_jack_to_ace() const {
-            return enums::indexof(rank) >= enums::indexof(card_rank::rank_J)
-                && enums::indexof(rank) <= enums::indexof(card_rank::rank_A);
+            return enums::is_between(rank, card_rank::rank_J, card_rank::rank_A);
         }
 
         explicit operator bool () const {
@@ -88,9 +85,8 @@ namespace banggame {
         gold
     };
 
-    inline bool is_fame_token(card_token_type token) {
-        return enums::indexof(token) >= enums::indexof(card_token_type::fame1)
-            && enums::indexof(token) <= enums::indexof(card_token_type::fame8);
+    constexpr bool is_fame_token(card_token_type token) {
+        return enums::is_between(token, card_token_type::fame1, card_token_type::fame8);
     }
 
     using token_map = enums::enum_map<card_token_type, uint8_t>;

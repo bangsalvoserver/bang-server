@@ -50,6 +50,12 @@ namespace enums {
     }
 
     template<enumeral T>
+    constexpr bool is_between(T value, T min, T max) {
+        size_t index = indexof(value);
+        return index >= indexof(min) && index <= indexof(max);
+    }
+
+    template<enumeral T>
     constexpr std::string_view to_string(T input) {
         return reflect::enumerators<T>[indexof(input)].second;
     }
@@ -74,6 +80,30 @@ namespace enums {
     template<enumeral auto ... Values> struct enum_sequence {
         static constexpr size_t size = sizeof...(Values);
     };
+
+    template<enumeral E, std::predicate<E> auto F>
+    constexpr size_t count_values_if() {
+        size_t count = 0;
+        for (E value : enum_values<E>()) {
+            if (std::invoke(F, value)) {
+                ++count;
+            }
+        }
+        return count;
+    }
+
+    template<enumeral E, std::predicate<E> auto F>
+    constexpr auto filtered_enum_array() {
+        std::array<E, count_values_if<E, F>()> result;
+        auto ptr = result.begin();
+        for (E value : enum_values<E>()) {
+            if (std::invoke(F, value)) {
+                *ptr = value;
+                ++ptr;
+            }
+        }
+        return result;
+    }
     
 }
 

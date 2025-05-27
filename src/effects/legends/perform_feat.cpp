@@ -25,7 +25,7 @@ namespace banggame {
                 return {token, count};
             }
         }
-        return {card_token_type::fame1, 0};
+        return {};
     }
 
     bool effect_perform_feat::can_play(card_ptr origin_card, player_ptr origin) {
