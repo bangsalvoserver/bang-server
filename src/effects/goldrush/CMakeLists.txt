@@ -3,12 +3,12 @@ target_sources(bangserver PRIVATE
     discount.cpp
     don_bell.cpp
     dutch_will.cpp
+    goldpan.cpp
     goldrush.cpp
     gunbelt.cpp
     josh_mccloud.cpp
     luckycharm.cpp
     madam_yto.cpp
-    pay_gold.cpp
     pickaxe.cpp
     ruleset.cpp
     rum.cpp

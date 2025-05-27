@@ -30,9 +30,10 @@ character:
       - max_usages(1)
   - name: RADDIE_SNAKE
     image: 04_raddie_snake
+    equip:
+      - goldpan
     effects:
-      - max_usages(2)
-      - pay_gold(1)
+      - goldpan(2)
       - draw
   - name: SIMEON_PICOS
     image: 04_simeon_picos
@@ -143,9 +144,10 @@ goldrush:
   - name: GOLD_PAN
     image: 04_setaccio
     color: black
+    equip:
+      - goldpan
     effects:
-      - max_usages(2)
-      - pay_gold(1)
+      - goldpan(2)
       - draw
     tags:
       - buy_cost(3)
