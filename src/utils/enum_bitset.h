@@ -59,7 +59,7 @@ namespace enums {
         }
 
         constexpr bool check(bitset value) const {
-            return (m_value & value.m_value) == m_value;
+            return (m_value & value.m_value) == value.m_value;
         }
     };
 
