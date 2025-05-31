@@ -11,7 +11,8 @@ namespace banggame {
     bool effect_escape::can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) {
         return origin && origin_card
             && origin_card->is_brown()
-            && !flags.check(effect_flag::is_bang);
+            && !flags.check(effect_flag::is_bang)
+            && !flags.check({effect_flag::play_as_bang, effect_flag::multi_target});
     }
     
     bool effect_escape::can_play(card_ptr origin_card, player_ptr origin) {
