@@ -47,6 +47,12 @@ namespace banggame {
             nullable_ref<bool> handled;
         };
     }
+
+    enum class draw_check_result {
+        unlucky,
+        lucky,
+        indifferent
+    };
     
     struct request_check_base : selection_picker, draw_check_handler, std::enable_shared_from_this<request_check_base> {
         request_check_base(player_ptr target, card_ptr origin_card)
@@ -73,19 +79,37 @@ namespace banggame {
             return origin_card;
         }
 
-        bool is_lucky(card_ptr target_card) const;
+        draw_check_result get_result(card_ptr target_card) const;
+
+        bool is_unlucky(card_ptr target_card) const { return get_result(target_card) == draw_check_result::unlucky; }
+        bool is_lucky(card_ptr target_card) const { return get_result(target_card) == draw_check_result::lucky; }
+        bool is_indifferent(card_ptr target_card) const { return get_result(target_card) == draw_check_result::indifferent; }
 
         prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override;
         
         void resolve() override;
         void restart() override;
 
-        virtual bool check_condition(card_sign sign) const = 0;
+        virtual draw_check_result check_condition(card_sign sign) const = 0;
         virtual void on_resolve(bool result) = 0;
     };
 
     template<typename T>
-    concept draw_check_condition = std::predicate<T, card_sign>;
+    concept draw_check_condition = requires (T function, card_sign sign) {
+        { std::invoke(function, sign) } -> std::convertible_to<draw_check_result>;
+    };
+    
+    template<typename T>
+    concept draw_check_condition_legacy = std::predicate<T, card_sign>;
+
+    template<draw_check_condition_legacy T>
+    struct draw_check_condition_wrapper {
+        T fun;
+
+        draw_check_result operator()(card_sign sign) const {
+            return std::invoke(fun, sign) ? draw_check_result::lucky : draw_check_result::unlucky;
+        }
+    };
 
     template<typename T>
     concept draw_check_function = std::invocable<T, bool>;
@@ -102,7 +126,14 @@ namespace banggame {
             , m_condition(FWD(condition))
             , m_function(FWD(function)) {}
         
-        bool check_condition(card_sign sign) const override {
+        template<draw_check_condition_legacy ConditionLegacy>
+        request_check(player_ptr target, card_ptr origin_card, ConditionLegacy &&condition, Function &&function)
+            : request_check(target, origin_card,
+                draw_check_condition_wrapper{std::move(condition)},
+                std::move(function)
+            ) {}
+        
+        draw_check_result check_condition(card_sign sign) const override {
             return std::invoke(m_condition, sign);
         }
 
@@ -110,6 +141,9 @@ namespace banggame {
             std::invoke(m_function, result);
         }
     };
+
+    template<draw_check_condition_legacy C, draw_check_function F>
+    request_check(player_ptr, card_ptr, C &&, F &&) -> request_check<draw_check_condition_wrapper<C>, F>;
 
 }
 
