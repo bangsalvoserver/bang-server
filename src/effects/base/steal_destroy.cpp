@@ -60,12 +60,18 @@ namespace banggame {
         bool handled = false;
         origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, false, handled });
         origin->m_game->queue_action([=]{
-            player_ptr target_player = target_card->owner;
-            if ((!handled || origin->alive()) && target_player) {
-                if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
-                    origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_STOLEN_CARD", origin, target_player, target_card);
+            if (player_ptr target_player = target_card->owner) {
+                if (origin->alive()) {
+                    if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
+                        origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_STOLEN_CARD", origin, target_player, target_card);
+                    }
+                    origin->steal_card(target_card);
+                } else if (!handled) {
+                    if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
+                        origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
+                    }
+                    target_player->discard_card(target_card);
                 }
-                origin->steal_card(target_card);
             }
         }, 42);
     }
@@ -175,12 +181,13 @@ namespace banggame {
         bool handled = false;
         origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, true, handled });
         origin->m_game->queue_action([=]{
-            player_ptr target_player = target_card->owner;
-            if ((!handled || origin->alive()) && target_player) {
-                if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
-                    origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
+            if (player_ptr target_player = target_card->owner) {
+                if (!handled || origin->alive()) {
+                    if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
+                        origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
+                    }
+                    target_player->discard_card(target_card);
                 }
-                target_player->discard_card(target_card);
             }
         }, 42);
     }
