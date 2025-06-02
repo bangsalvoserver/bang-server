@@ -1,8 +1,7 @@
 #ifndef __HIGHNOON_EFFECTS_H__
 #define __HIGHNOON_EFFECTS_H__
 
-#include "blessing.h"
-#include "curse.h"
+#include "blessing_curse.h"
 #include "ghosttown.h"
 #include "hangover.h"
 #include "highnoon.h"

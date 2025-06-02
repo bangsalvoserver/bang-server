@@ -1,6 +1,7 @@
 #include "ms_abigail.h"
 
 #include "effects/base/escapable.h"
+#include "effects/base/draw_check.h"
 
 #include "cards/game_enums.h"
 
@@ -12,7 +13,7 @@ namespace banggame {
         return origin && origin_card
             && origin_card->is_brown()
             && flags.check(effect_flag::single_target)
-            && origin_card->get_modified_sign().is_jack_to_ace();
+            && get_modified_sign(origin_card).is_jack_to_ace();
     }
 
     void equip_ms_abigail::on_enable(card_ptr origin_card, player_ptr origin) {

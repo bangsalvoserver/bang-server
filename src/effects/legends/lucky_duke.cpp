@@ -38,8 +38,17 @@ namespace banggame {
 
         prompt_string pick_prompt(card_ptr target_card) const override {
             if (target->is_bot()) {
-                if (bot_suggestion::is_target_friend(target, origin) != req->is_lucky(target_card)) {
-                    return "PROMPT_BAD_DRAW";
+                switch (req->get_result(target_card)) {
+                case draw_check_result::unlucky:
+                    if (bot_suggestion::is_target_friend(target, origin)) {
+                        return "PROMPT_BAD_DRAW";
+                    }
+                    break;
+                case draw_check_result::lucky:
+                    if (!bot_suggestion::is_target_friend(target, origin)) {
+                        return "PROMPT_BAD_DRAW";
+                    }
+                    break;
                 }
             }
             return {};

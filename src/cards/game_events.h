@@ -38,10 +38,6 @@ namespace banggame::event_type {
         player_ptr origin;
         card_ptr target_card;
     };
-    
-    struct apply_sign_modifier {
-        nullable_ref<card_sign> value;
-    };
 
     struct apply_maxcards_modifier {
         const_player_ptr origin;

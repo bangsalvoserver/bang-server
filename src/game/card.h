@@ -38,7 +38,6 @@ namespace banggame {
 
         bool is_equip_card() const;
         bool is_bang_card(const_player_ptr origin) const;
-        card_sign get_modified_sign() const;
 
         card_visibility get_visibility() const;
         void set_visibility(update_target visibility, bool instant = false);

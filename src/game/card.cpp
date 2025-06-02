@@ -25,12 +25,6 @@ namespace banggame {
             || origin->check_player_flags(player_flag::treat_missed_as_bang)
             && has_tag(tag_type::missed);
     }
-    
-    card_sign card::get_modified_sign() const {
-        auto value = sign;
-        m_game->call_event(event_type::apply_sign_modifier{ value });
-        return value;
-    }
 
     card_visibility card::get_visibility() const {
         if (visibility.exclusive()) {

@@ -1,5 +1,6 @@
 #include "black_jack.h"
 #include "draw.h"
+#include "draw_check.h"
 
 #include "game/game_table.h"
 
@@ -10,7 +11,7 @@ namespace banggame {
             if (origin == target && req_draw->num_drawn_cards == 2) {
                 reveal = true;
 
-                if (drawn_card->get_modified_sign().is_red()) {
+                if (get_modified_sign(drawn_card).is_red()) {
                     ++req_draw->num_cards_to_draw;
                 }
             }

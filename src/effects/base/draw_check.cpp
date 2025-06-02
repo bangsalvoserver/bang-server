@@ -4,6 +4,12 @@
 #include "game/bot_suggestion.h"
 
 namespace banggame {
+    
+    card_sign get_modified_sign(const_card_ptr target_card) {
+        auto value = target_card->sign;
+        target_card->m_game->call_event(event_type::apply_sign_modifier{ value });
+        return value;
+    }
 
     void request_check_base::on_update() {
         if (update_count == 0) {
@@ -13,7 +19,7 @@ namespace banggame {
     }
 
     prompt_string request_check_base::pick_prompt(card_ptr target_card) const {
-        if (target->is_bot() && !is_lucky(target_card)) {
+        if (target->is_bot() && is_unlucky(target_card)) {
             return "PROMPT_BAD_DRAW";
         } else {
             return {};
@@ -70,14 +76,21 @@ namespace banggame {
         start();
     }
 
-    bool request_check_base::is_lucky(card_ptr target_card) const {
-        return check_condition(target_card->get_modified_sign());
-    }
-
     prompt_string request_check_base::redraw_prompt(card_ptr target_card, player_ptr owner) const {
         if (owner->is_bot()) {
-            if (bot_suggestion::is_target_friend(owner, target) == is_lucky(drawn_card)) {
-                return "BOT_DONT_REDRAW";
+            switch (get_result(drawn_card)) {
+                case draw_check_result::unlucky:
+                if (!bot_suggestion::is_target_friend(owner, target)) {
+                    return "BOT_DONT_REDRAW_UNLUCKY";
+                }
+                break;
+            case draw_check_result::lucky:
+                if (bot_suggestion::is_target_friend(owner, target)) {
+                    return "BOT_DONT_REDRAW_LUCKY";
+                }
+                break;
+            case draw_check_result::indifferent:
+                return "BOT_DONT_REDRAW_INDIFFERENT";
             }
         }
         return {};
@@ -96,6 +109,6 @@ namespace banggame {
         } else {
             target->m_game->call_event(event_type::on_draw_check_resolve{origin_card, target, drawn_card, drawn_card });
         }
-        on_resolve(is_lucky(drawn_card));
+        on_resolve(get_result(drawn_card));
     }
 }

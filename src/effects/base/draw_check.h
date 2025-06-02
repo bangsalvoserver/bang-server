@@ -46,7 +46,19 @@ namespace banggame {
             shared_draw_check_handler req;
             nullable_ref<bool> handled;
         };
+        
+        struct apply_sign_modifier {
+            nullable_ref<card_sign> value;
+        };
     }
+    
+    card_sign get_modified_sign(const_card_ptr target_card);
+
+    enum class draw_check_result {
+        unlucky,
+        lucky,
+        indifferent
+    };
     
     struct request_check_base : selection_picker, draw_check_handler, std::enable_shared_from_this<request_check_base> {
         request_check_base(player_ptr target, card_ptr origin_card)
@@ -73,40 +85,86 @@ namespace banggame {
             return origin_card;
         }
 
-        bool is_lucky(card_ptr target_card) const;
+        bool is_unlucky(card_ptr target_card) const { return get_result(target_card) == draw_check_result::unlucky; }
+        bool is_lucky(card_ptr target_card) const { return get_result(target_card) == draw_check_result::lucky; }
+        bool is_indifferent(card_ptr target_card) const { return get_result(target_card) == draw_check_result::indifferent; }
 
         prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override;
         
         void resolve() override;
         void restart() override;
 
-        virtual bool check_condition(card_sign sign) const = 0;
-        virtual void on_resolve(bool result) = 0;
+        virtual draw_check_result get_result(card_ptr target_card) const = 0;
+        virtual void on_resolve(draw_check_result result) = 0;
+    };
+
+    template<typename T> struct draw_check_condition_wrapper;
+
+    template<std::invocable<card_ptr> T> requires std::convertible_to<std::invoke_result_t<T, card_ptr>, draw_check_result>
+    struct draw_check_condition_wrapper<T> {
+        T fun;
+
+        draw_check_result operator()(card_ptr target_card) const {
+            return std::invoke(fun, target_card);
+        }
+    };
+
+    template<std::predicate<card_sign> T>
+    struct draw_check_condition_wrapper<T> {
+        T fun;
+
+        draw_check_result operator()(card_ptr target_card) const {
+            return std::invoke(fun, get_modified_sign(target_card)) ? draw_check_result::lucky : draw_check_result::unlucky;
+        }
     };
 
     template<typename T>
-    concept draw_check_condition = std::predicate<T, card_sign>;
+    concept draw_check_condition = requires {
+        sizeof(draw_check_condition_wrapper<T>);
+    };
+
+    template<typename T> struct draw_check_function_wrapper;
+
+    template<std::invocable<draw_check_result> T>
+    struct draw_check_function_wrapper<T> {
+        T fun;
+
+        void operator()(draw_check_result result) const {
+            std::invoke(fun, result);
+        }
+    };
+
+    template<std::invocable<bool> T>
+    struct draw_check_function_wrapper<T> {
+        T fun;
+
+        void operator()(draw_check_result result) const {
+            std::invoke(fun, result == draw_check_result::lucky);
+        }
+    };
 
     template<typename T>
-    concept draw_check_function = std::invocable<T, bool>;
+    concept draw_check_function = requires {
+        sizeof(draw_check_function_wrapper<T>);
+    };
 
     template<draw_check_condition Condition, draw_check_function Function>
     class request_check : public request_check_base {
     private:
-        Condition m_condition;
-        Function m_function;
+        draw_check_condition_wrapper<Condition> m_condition;
+        draw_check_function_wrapper<Function> m_function;
 
     public:
         request_check(player_ptr target, card_ptr origin_card, Condition &&condition, Function &&function)
             : request_check_base(target, origin_card)
-            , m_condition(FWD(condition))
-            , m_function(FWD(function)) {}
+            , m_condition{FWD(condition)}
+            , m_function{FWD(function)} {}
         
-        bool check_condition(card_sign sign) const override {
-            return std::invoke(m_condition, sign);
+        draw_check_result get_result(card_ptr target_card) const override {
+            return std::invoke(m_condition, target_card);
         }
 
-        void on_resolve(bool result) override {
+        void on_resolve(draw_check_result result) override {
             std::invoke(m_function, result);
         }
     };

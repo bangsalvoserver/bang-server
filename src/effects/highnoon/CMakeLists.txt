@@ -1,6 +1,5 @@
 target_sources(bangserver PRIVATE
-    blessing.cpp
-    curse.cpp
+    blessing_curse.cpp
     ghosttown.cpp
     hangover.cpp
     highnoon.cpp

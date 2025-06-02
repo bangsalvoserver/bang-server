@@ -49,7 +49,7 @@ namespace banggame {
         int count_suits() const {
             std::vector<card_suit> suits;
             for (card_ptr c : target->m_game->m_selection) {
-                suits.push_back(c->get_modified_sign().suit);
+                suits.push_back(get_modified_sign(c).suit);
             }
             std::sort(suits.begin(), suits.end());
             return int(std::unique(suits.begin(), suits.end()) - suits.begin());

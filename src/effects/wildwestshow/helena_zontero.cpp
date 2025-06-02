@@ -1,9 +1,10 @@
 #include "helena_zontero.h"
 
-#include "game/game_table.h"
-
 #include "cards/game_enums.h"
+
 #include "effects/base/draw_check.h"
+
+#include "game/game_table.h"
 
 namespace banggame {
 
@@ -40,12 +41,12 @@ namespace banggame {
             return origin_card;
         }
 
-        bool is_lucky() const {
-            return drawn_card->get_modified_sign().is_red();
+        bool is_positive() const {
+            return get_modified_sign(drawn_card).is_red();
         }
 
         prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
-            if (owner->is_bot() && !is_lucky()) {
+            if (owner->is_bot() && !is_positive()) {
                 return "BOT_DONT_REDRAW_HELENA_ZONTERO";
             }
             return {};
@@ -53,7 +54,7 @@ namespace banggame {
         
         void resolve() override {
             origin->m_game->pop_request();
-            if (is_lucky()) {
+            if (is_positive()) {
                 auto alive_players = origin->m_game->m_players
                     | rv::filter([](player_ptr p) {
                         return p->alive() && p->m_role != player_role::sheriff;

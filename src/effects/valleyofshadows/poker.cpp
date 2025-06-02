@@ -2,6 +2,7 @@
 
 #include "effects/base/pick.h"
 #include "effects/base/escapable.h"
+#include "effects/base/draw_check.h"
 
 #include "cards/game_events.h"
 
@@ -75,7 +76,7 @@ namespace banggame {
             if (update_count != 0) return;
             
             if (auto aces = rv::filter(target->m_game->m_selection, [this](card_ptr c) {
-                return c->get_modified_sign().rank == card_rank::rank_A;
+                return get_modified_sign(c).rank == card_rank::rank_A;
             })) {
                 for (card_ptr c : aces) {
                     c->flash_card();
