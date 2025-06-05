@@ -3,6 +3,8 @@
 
 #include <string>
 #include <typeinfo>
+#include <typeindex>
+#include <format>
 
 #ifdef __GNUG__
 #include <cxxabi.h>
@@ -32,5 +34,15 @@ namespace utils {
 }
 
 #endif
+
+namespace std {
+    
+    template<std::convertible_to<std::type_index> T>
+    struct formatter<T> : formatter<std::string_view> {
+        auto format(const std::type_index &type, std::format_context &ctx) const {
+            return formatter<std::string_view>::format(utils::demangle(type.name()), ctx);
+        }
+    };
+}
 
 #endif

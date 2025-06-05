@@ -14,7 +14,7 @@ namespace banggame {
         if (is_game_over()) {
             return request_states::done{};
         } else if (auto req = top_request()) {
-            logging::debug("on_update() on {: >5}: {}", req->priority, utils::demangle(typeid(*req).name()));
+            logging::debug("on_update() on {: >5}: {}", req->priority, typeid(*req));
 
             req->on_update();
             ++req->update_count;

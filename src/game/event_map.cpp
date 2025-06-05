@@ -10,13 +10,13 @@ namespace std {
         }
 
         auto format(const banggame::event_listener_key &value, std::format_context &ctx) const {
-            return std::format_to(ctx.out(), "{}: [{}]", value.key, utils::demangle(value.type.name()));
+            return std::format_to(ctx.out(), "{}: [{}]", value.key, value.type);
         }
     };
 
-    template<> struct formatter<banggame::event_listener> : formatter<std::string_view> {
+    template<> struct formatter<banggame::event_listener> : formatter<std::type_index> {
         auto format(const banggame::event_listener &value, std::format_context &ctx) const {
-            return formatter<std::string_view>::format(utils::demangle(value.target_type().name()), ctx);
+            return formatter<std::type_index>::format(value.target_type(), ctx);
         }
     };
 }
