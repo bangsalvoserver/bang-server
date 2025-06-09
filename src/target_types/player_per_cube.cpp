@@ -49,7 +49,7 @@ namespace banggame {
         MAYBE_RETURN(defer<target_types::select_cubes>().prompt(ctx, target.cubes));
         return merge_prompts(target.players | rv::transform([&](player_ptr target) {
             return defer<target_types::player>().prompt(ctx, target);
-        }));
+        }), true);
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const target_types::player_per_cube &target) {
