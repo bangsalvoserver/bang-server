@@ -29,10 +29,9 @@ namespace banggame {
     }
 
     template<> prompt_string visit_cards::prompt(const effect_context &ctx, const card_list &targets) {
-        for (card_ptr c : targets) {
-            MAYBE_RETURN(defer<target_types::card>().prompt(ctx, c));
-        }
-        return {};
+        return merge_prompts(targets | rv::transform([&](card_ptr c) {
+            return defer<target_types::card>().prompt(ctx, c);
+        }));
     }
 
     template<> void visit_cards::add_context(effect_context &ctx, const card_list &targets) {
