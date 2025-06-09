@@ -50,7 +50,7 @@ namespace banggame {
                 if (rn::any_of(target->m_table, [](card_ptr target_card) {
                     return target_card->has_tag(tag_type::jail);
                 })) {
-                    return { prompt_type::priority, "BOT_ENEMY_HAS_JAIL" };
+                    return {1, "BOT_ENEMY_HAS_JAIL"};
                 }
             } else {
                 return "BOT_TARGET_ENEMY";

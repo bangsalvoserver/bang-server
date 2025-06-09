@@ -77,7 +77,7 @@ namespace banggame {
     prompt_string effect_bandidos::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
         MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
         if (origin == target && target->m_hp <= 1 && target->m_hand.size() <= 1) {
-            return { prompt_type::priority, "PROMPT_SUICIDE", origin_card };
+            return {1, "PROMPT_SUICIDE", origin_card};
         }
         return {};
     }

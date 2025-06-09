@@ -27,7 +27,7 @@ namespace banggame::prompts {
             && !(origin->m_role == player_role::outlaw || origin->m_role == player_role::renegade && origin->m_game->num_alive() <= 2)
             && (target->m_hp <= 1 && target->m_role == player_role::sheriff)
         ) {
-            return { prompt_type::priority, "BOT_DONT_KILL_SHERIFF" };
+            return {1, "BOT_DONT_KILL_SHERIFF"};
         }
         return {};
     }
@@ -54,11 +54,11 @@ namespace banggame::prompts {
                     if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::ghost_card)) {
                         return {};
                     } else {
-                        return {prompt_type::priority, "BOT_TARGET_NOT_GHOST_CARD"};
+                        return {1, "BOT_TARGET_NOT_GHOST_CARD"};
                     }
                 } else if (bot_suggestion::is_target_friend(origin, target)) {
                     if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::ghost_card)) {
-                        return {prompt_type::priority, "BOT_TARGET_GHOST_CARD"};
+                        return {1, "BOT_TARGET_GHOST_CARD"};
                     }
                 }
                 return "BOT_TARGET_ENEMY";

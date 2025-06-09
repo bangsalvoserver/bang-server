@@ -187,14 +187,9 @@ namespace banggame {
         }
     };
 
-    enum class prompt_type {
-        normal,
-        priority
-    };
-
     struct prompt_string {
         game_string message;
-        prompt_type type = prompt_type::normal;
+        int priority = 0;
 
         prompt_string() = default;
 
@@ -206,11 +201,11 @@ namespace banggame {
                 auto && ... args)
             : message{message, FWD(args) ...} {}
         
-        prompt_string(prompt_type type,
+        prompt_string(int priority,
                 std::convertible_to<small_string> auto &&message,
                 auto && ... args)
             : message{message, FWD(args) ...}
-            , type{type} {}
+            , priority{priority} {}
 
         explicit operator bool() const {
             return bool(message);

@@ -16,7 +16,7 @@ namespace banggame {
             && !(origin->m_role == player_role::outlaw || origin->m_role == player_role::renegade && origin->m_game->num_alive() <= 2)
             && (target->m_hp <= locomotive_count && target->m_role == player_role::sheriff)
         ) {
-            return { prompt_type::priority, "BOT_DONT_KILL_SHERIFF" };
+            return {1, "BOT_DONT_KILL_SHERIFF"};
         }
         return {};
     }

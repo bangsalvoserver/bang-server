@@ -39,15 +39,13 @@ namespace banggame {
         prompt_string result;
         bool empty = false;
         for (const prompt_string &str : prompts) {
-            if (str.type == prompt_type::priority) {
-                return str;
-            } else if (!str) {
+            if (!str) {
                 empty = true;
-            } else if (!result) {
+            } else if (!result || str.priority > result.priority) {
                 result = str;
             }
         }
-        if (empty && !ignore_empty) {
+        if (empty && result.priority == 0 && !ignore_empty) {
             return {};
         }
         return result;
