@@ -42,8 +42,7 @@ main_deck:
     image: 17_flintlock
     color: brown
     effects:
-      - none select_cubes_optional(2)
-      - bang player reachable notself
+      - bang select_cubes_player(2) reachable notself
       - flintlock
     tags:
       - skip_logs

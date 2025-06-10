@@ -38,6 +38,7 @@ def check_allowed_filters(effect, target_type, player_filter, card_filter):
         'move_cube_slot': NONE,
         'select_cubes': NONE,
         'select_cubes_optional': NONE,
+        'select_cubes_player': PLAYER,
         'select_cubes_repeat': NONE,
         'self_cubes': NONE
     }

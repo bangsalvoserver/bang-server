@@ -185,6 +185,12 @@ namespace banggame {
             card_list value;
         };
 
+        struct select_cubes_player {
+            struct transparent{};
+            card_list cubes;
+            player_ptr player;
+        };
+
         struct select_cubes_repeat {
             struct transparent{};
             card_list value;
@@ -211,6 +217,7 @@ namespace banggame {
         target_types::move_cube_slot,
         target_types::select_cubes,
         target_types::select_cubes_optional,
+        target_types::select_cubes_player,
         target_types::select_cubes_repeat,
         target_types::self_cubes
     >;
