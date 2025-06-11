@@ -3,6 +3,7 @@
 #include "effects/base/draw_check.h"
 
 #include "game/game_table.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
@@ -81,6 +82,7 @@ namespace banggame {
         if (origin->is_bot() && origin->m_max_hp - origin->m_hp < 2) {
             return "BOT_WASTEFUL_RUM";
         }
+        MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, origin));
         if (origin->m_hp == origin->m_max_hp) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
