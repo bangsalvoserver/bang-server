@@ -116,7 +116,7 @@ namespace net {
                         res->writeHeader("Content-Type", "image/png");
                         res->end({ reinterpret_cast<const char*>(bytes.data()), bytes.size() });
                     } else {
-                        res->writeStatus("404 File Not Found");
+                        res->writeStatus("404 Not Found");
                         res->end();
                     }
                 } else {
