@@ -98,10 +98,11 @@ namespace banggame {
         
         target->m_game->queue_action([=]{
             if (!target->alive()) {
+                target->m_game->queue_request<request_discard_all>(target);
                 if (type == death_type::death) {
-                    target->m_game->queue_request<request_discard_all_death>(target);
-                } else {
-                    target->m_game->queue_request<request_discard_all>(target);
+                    target->m_game->queue_action([=]{
+                        target->m_game->play_sound(sound_id::death);
+                    }, 100);
                 }
             }
         }, 50);
@@ -137,6 +138,7 @@ namespace banggame {
                 target->m_game->add_log("LOG_GAME_OVER");
                 for (player_ptr p : winners) {
                     p->add_player_flags(player_flag::winner);
+                    p->play_sound(sound_id::victory);
                 }
                 target->m_game->add_game_flags(game_flag::game_over);
             };

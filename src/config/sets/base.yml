@@ -410,6 +410,7 @@ hidden:
 
 sounds:
   - gamestart
+  - victory
   - draw
   - death
   - bang

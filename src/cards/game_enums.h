@@ -7,6 +7,7 @@ namespace banggame {
 
     enum class sound_id {
         gamestart,
+        victory,
         draw,
         death,
         bang,

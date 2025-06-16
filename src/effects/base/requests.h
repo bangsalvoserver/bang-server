@@ -65,12 +65,6 @@ namespace banggame {
         game_string status_text(player_ptr owner) const override;
     };
 
-    struct request_discard_all_death : request_discard_all {
-        using request_discard_all::request_discard_all;
-
-        void on_resolve() override;
-    };
-
     struct request_sheriff_killed_deputy : request_discard_all {
         using request_discard_all::request_discard_all;
 
