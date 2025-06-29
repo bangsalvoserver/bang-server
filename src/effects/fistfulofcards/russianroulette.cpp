@@ -13,8 +13,8 @@ namespace banggame {
             target->m_game->queue_request(std::move(req));
         };
         queue_russianroulette_request(target);
-        target->m_game->add_listener<event_type::on_missed>(target_card, [=](card_ptr origin_card, player_ptr origin, player_ptr target, card_ptr missed_card, effect_flags flags) {
-            if (target_card == origin_card) {
+        target->m_game->add_listener<event_type::on_missed>(target_card, [=](card_ptr missed_card, effect_flags flags, shared_request_bang req) {
+            if (target_card == req->origin_card) {
                 queue_russianroulette_request(target->get_next_player());
             }
         });

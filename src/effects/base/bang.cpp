@@ -112,10 +112,10 @@ namespace banggame {
         return !unavoidable && missable_request::can_miss(c);
     }
 
-    void request_bang::on_miss(card_ptr c, effect_flags missed_flags) {
+    void request_bang::on_miss(card_ptr missed_card, effect_flags missed_flags) {
         if (--bang_strength == 0) {
             missed_flags.merge(flags);
-            target->m_game->call_event(event_type::on_missed{ origin_card, origin, target, c, missed_flags });
+            target->m_game->call_event(event_type::on_missed{ missed_card, missed_flags, shared_from_this() });
         }
     }
 

@@ -54,10 +54,9 @@ namespace banggame {
     
     card_sign get_modified_sign(const_card_ptr target_card);
 
-    enum class draw_check_result {
-        unlucky,
-        lucky,
-        indifferent
+    struct draw_check_result {
+        bool lucky;
+        bool indifferent;
     };
     
     struct request_check_base : selection_picker, draw_check_handler, std::enable_shared_from_this<request_check_base> {
@@ -85,10 +84,6 @@ namespace banggame {
             return origin_card;
         }
 
-        bool is_unlucky(card_ptr target_card) const { return get_result(target_card) == draw_check_result::unlucky; }
-        bool is_lucky(card_ptr target_card) const { return get_result(target_card) == draw_check_result::lucky; }
-        bool is_indifferent(card_ptr target_card) const { return get_result(target_card) == draw_check_result::indifferent; }
-
         prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override;
         
         void resolve() override;
@@ -114,7 +109,7 @@ namespace banggame {
         T fun;
 
         draw_check_result operator()(card_ptr target_card) const {
-            return std::invoke(fun, get_modified_sign(target_card)) ? draw_check_result::lucky : draw_check_result::unlucky;
+            return draw_check_result{ .lucky = std::invoke(fun, get_modified_sign(target_card)) };
         }
     };
 
@@ -139,7 +134,7 @@ namespace banggame {
         T fun;
 
         void operator()(draw_check_result result) const {
-            std::invoke(fun, result == draw_check_result::lucky);
+            std::invoke(fun, result.lucky);
         }
     };
 
