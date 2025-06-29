@@ -14,7 +14,7 @@ namespace banggame {
         bool indifferent;
 
         colorado_bill_check_result(player_ptr target)
-            : indifferent{count_missed_cards(target) == 0} {}
+            : indifferent{target->empty_hand() && count_missed_cards(target) == 0} {}
 
         draw_check_result operator()(card_ptr target_card) const {
             return draw_check_result {
