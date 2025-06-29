@@ -118,36 +118,14 @@ namespace banggame {
         sizeof(draw_check_condition_wrapper<T>);
     };
 
-    template<typename T> struct draw_check_function_wrapper;
-
-    template<std::invocable<draw_check_result> T>
-    struct draw_check_function_wrapper<T> {
-        T fun;
-
-        void operator()(draw_check_result result) const {
-            std::invoke(fun, result);
-        }
-    };
-
-    template<std::invocable<bool> T>
-    struct draw_check_function_wrapper<T> {
-        T fun;
-
-        void operator()(draw_check_result result) const {
-            std::invoke(fun, result.lucky);
-        }
-    };
-
     template<typename T>
-    concept draw_check_function = requires {
-        sizeof(draw_check_function_wrapper<T>);
-    };
+    concept draw_check_function = std::invocable<T, bool>;
 
     template<draw_check_condition Condition, draw_check_function Function>
     class request_check : public request_check_base {
     private:
         draw_check_condition_wrapper<Condition> m_condition;
-        draw_check_function_wrapper<Function> m_function;
+        Function m_function;
 
     public:
         request_check(player_ptr target, card_ptr origin_card, Condition &&condition, Function &&function)
@@ -160,7 +138,7 @@ namespace banggame {
         }
 
         void on_resolve(draw_check_result result) override {
-            std::invoke(m_function, result);
+            std::invoke(m_function, result.lucky);
         }
     };
 
