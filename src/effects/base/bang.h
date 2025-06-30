@@ -56,7 +56,7 @@ namespace banggame {
         virtual void on_miss(card_ptr c, effect_flags missed_flags = {}) = 0;
     };
 
-    struct request_bang : request_auto_resolvable, missable_request {
+    struct request_bang : request_auto_resolvable, missable_request, std::enable_shared_from_this<request_bang> {
         using request_auto_resolvable::request_auto_resolvable;
 
         int bang_strength = 1;
@@ -95,11 +95,9 @@ namespace banggame {
         };
         
         struct on_missed {
-            card_ptr origin_card;
-            player_ptr origin;
-            player_ptr target;
             card_ptr missed_card;
             effect_flags flags;
+            shared_request_bang req;
         };
     }
 

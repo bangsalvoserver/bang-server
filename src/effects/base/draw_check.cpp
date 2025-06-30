@@ -19,11 +19,13 @@ namespace banggame {
     }
 
     prompt_string request_check_base::pick_prompt(card_ptr target_card) const {
-        if (target->is_bot() && is_unlucky(target_card)) {
-            return "PROMPT_BAD_DRAW";
-        } else {
-            return {};
+        if (target->is_bot()) {
+            auto result = get_result(target_card);
+            if (!result.lucky && !result.indifferent) {
+                return "PROMPT_BAD_DRAW";
+            }
         }
+        return {};
     }
 
     void request_check_base::on_pick(card_ptr target_card) {
@@ -78,19 +80,9 @@ namespace banggame {
 
     prompt_string request_check_base::redraw_prompt(card_ptr target_card, player_ptr owner) const {
         if (owner->is_bot()) {
-            switch (get_result(drawn_card)) {
-                case draw_check_result::unlucky:
-                if (!bot_suggestion::is_target_friend(owner, target)) {
-                    return "BOT_DONT_REDRAW_UNLUCKY";
-                }
-                break;
-            case draw_check_result::lucky:
-                if (bot_suggestion::is_target_friend(owner, target)) {
-                    return "BOT_DONT_REDRAW_LUCKY";
-                }
-                break;
-            case draw_check_result::indifferent:
-                return "BOT_DONT_REDRAW_INDIFFERENT";
+            draw_check_result result = get_result(drawn_card);
+            if (result.indifferent || result.lucky == bot_suggestion::is_target_friend(owner, target)) {
+                return "BOT_DONT_REDRAW";
             }
         }
         return {};
