@@ -11,6 +11,14 @@ namespace banggame {
 
     DEFINE_RULESET(armedanddangerous, ruleset_armedanddangerous)
 
+    namespace event_type {
+        struct get_select_cubes_prompt {
+            player_ptr origin;
+            const effect_context &ctx;
+            nullable_ref<prompt_string> out_prompt;
+        };
+    }
+
 }
 
 #endif

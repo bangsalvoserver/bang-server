@@ -1,5 +1,7 @@
 #include "game/possible_to_play.h"
 
+#include "effects/armedanddangerous/ruleset.h"
+
 namespace banggame {
 
     using visit_cubes = play_visitor<target_types::select_cubes>;
@@ -35,7 +37,9 @@ namespace banggame {
     }
 
     template<> prompt_string visit_cubes::prompt(const effect_context &ctx, const card_list &target_cards) {
-        return {};
+        prompt_string out_prompt;
+        origin->m_game->call_event(event_type::get_select_cubes_prompt{ origin, ctx, out_prompt });
+        return out_prompt;
     }
 
     template<> void visit_cubes::add_context(effect_context &ctx, const card_list &target_cards) {

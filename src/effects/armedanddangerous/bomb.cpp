@@ -8,6 +8,8 @@
 
 #include "effects/base/predraw_check.h"
 
+#include "ruleset.h"
+
 namespace banggame {
     
     struct request_move_bomb : request_picking_player {
@@ -54,6 +56,12 @@ namespace banggame {
     }
 
     void equip_bomb::on_enable(card_ptr target_card, player_ptr target) {
+        target->m_game->add_listener<event_type::get_select_cubes_prompt>(target_card, [=](player_ptr origin, const effect_context &ctx, prompt_string &out_prompt) {
+            if (origin == target && rn::count(ctx.selected_cubes.all_cubes(), target_card) >= target_card->num_cubes()) {
+                out_prompt = {"PROMPT_EXPLODE_BOMB", target_card};
+            }
+        });
+
         target->m_game->add_listener<event_type::on_finish_tokens>({target_card, 1}, [=](card_ptr e_origin_card, card_ptr e_target_card, card_token_type token_type) {
             if (token_type == card_token_type::cube && e_origin_card == target_card && !target->immune_to(target_card, nullptr, {})) {
                 target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
