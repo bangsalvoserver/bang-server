@@ -53,7 +53,7 @@ namespace banggame {
         target->m_game->pop_request();
         
         if (flags.check(effect_flag::play_as_bang)) {
-            if (flags.check(effect_flag::multi_target)) {
+            if (flags.check(effect_flag::target_players)) {
                 target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_GATLING", origin_card, target);
             } else {
                 target->m_game->add_log("LOG_TAKEN_DAMAGE_AS_BANG", origin_card, target, damage);
@@ -68,7 +68,7 @@ namespace banggame {
 
     game_string request_damage::status_text(player_ptr owner) const {
         if (flags.check(effect_flag::play_as_bang)) {
-            if (flags.check(effect_flag::multi_target)) {
+            if (flags.check(effect_flag::target_players)) {
                 return {"STATUS_DAMAGING_AS_GATLING", target, origin_card};
             } else {
                 return {"STATUS_DAMAGING_AS_BANG", target, origin_card, damage};

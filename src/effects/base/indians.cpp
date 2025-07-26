@@ -72,7 +72,7 @@ namespace banggame {
     }
     
     void effect_indians::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
-        if (!flags.check(effect_flag::skip_target_logs)) {
+        if (!flags.check(effect_flag::target_players)) {
             target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         }
         target->m_game->queue_request<request_indians>(origin_card, origin, target, flags);

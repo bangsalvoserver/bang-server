@@ -21,7 +21,7 @@ namespace banggame {
     }
     
     void effect_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
-        if (!flags.check(effect_flag::skip_target_logs)) {
+        if (!flags.check(effect_flag::target_players)) {
             target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         }
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
@@ -60,14 +60,14 @@ namespace banggame {
     }
 
     game_string effect_play_as_bang::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
-        if (!flags.check(effect_flag::multi_target)) {
+        if (!flags.check(effect_flag::target_players)) {
             return effect_bangcard{}.get_error(ctx.playing_card, origin, target, ctx);
         }
         return {};
     }
 
     prompt_string effect_play_as_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
-        if (flags.check(effect_flag::multi_target)) {
+        if (flags.check(effect_flag::target_players)) {
             return effect_bang{}.on_prompt(ctx.playing_card, origin, target);
         } else {
             return effect_bangcard{}.on_prompt(ctx.playing_card, origin, target);
@@ -76,7 +76,7 @@ namespace banggame {
 
     void effect_play_as_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
         flags.add(effect_flag::play_as_bang);
-        if (flags.check(effect_flag::multi_target)) {
+        if (flags.check(effect_flag::target_players)) {
             effect_bang{}.on_play(ctx.playing_card, origin, target, flags);
         } else {
             effect_bangcard{}.on_play(ctx.playing_card, origin, target, flags);
@@ -140,7 +140,7 @@ namespace banggame {
             target->m_game->pop_request();
         } else {
             if (update_count == 0) {
-                if (flags.check(effect_flag::multi_target)) {
+                if (flags.check(effect_flag::target_players)) {
                     target->play_sound(sound_id::gatling);
                 } else {
                     target->play_sound(sound_id::bang);
@@ -156,7 +156,7 @@ namespace banggame {
 
     game_string request_bang::status_text(player_ptr owner) const {
         if (flags.check(effect_flag::play_as_bang)) {
-            if (flags.check(effect_flag::multi_target)) {
+            if (flags.check(effect_flag::target_players)) {
                 if (target != owner) {
                     return {"STATUS_CARD_AS_GATLING_OTHER", target, origin_card};
                 } else {

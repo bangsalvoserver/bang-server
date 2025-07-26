@@ -26,7 +26,7 @@ namespace banggame {
             origin->m_game->queue_action([=]{
                 for (player_ptr p : target->m_game->range_alive_players(target)) {
                     if (p != ctx->skipped_player) {
-                        origin->m_game->queue_request<request_bang>(origin_card, nullptr, p, effect_flag::multi_target);
+                        origin->m_game->queue_request<request_bang>(origin_card, nullptr, p, effect_flag::target_players);
                     }
                 }
             });

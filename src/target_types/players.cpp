@@ -49,7 +49,7 @@ namespace banggame {
     template<> void visit_players::play(const effect_context &ctx, target_types::players) {
         auto targets = get_player_targets_range(origin_card, origin, effect.player_filter, ctx);
 
-        effect_flags flags { effect_flag::multi_target, effect_flag::skip_target_logs };
+        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
         if (get_single_element(targets)) {
             flags.add(effect_flag::single_target);
         }

@@ -28,7 +28,7 @@ namespace banggame {
         play_as_bang,
         single_target,
         multi_target,
-        skip_target_logs,
+        target_players,
     };
     
     enum class game_flag {
