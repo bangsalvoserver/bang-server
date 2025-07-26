@@ -18,18 +18,18 @@ namespace banggame {
     struct effect_bangcard {
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
         game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
     };
 
     DEFINE_EFFECT(bangcard, effect_bangcard)
 
-    struct handler_play_as_bang {
-        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target);
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target);
+    struct effect_play_as_bang {
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
     };
 
-    DEFINE_MTH(play_as_bang, handler_play_as_bang)
+    DEFINE_EFFECT(play_as_bang, effect_play_as_bang)
 
     struct effect_banglimit {
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx);

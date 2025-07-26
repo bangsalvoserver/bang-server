@@ -20,6 +20,18 @@ namespace banggame {
     game_string effect_set_playing::get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) {
         return get_play_card_error(origin, target, ctx);
     }
+    
+    void effect_set_playing::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        switch (type) {
+        case play_as::missed:
+            origin->m_game->add_log("LOG_PLAYED_CARD_AS_MISSED", target_card, origin);
+            break;
+        case play_as::gatling:
+            origin->m_game->add_log("LOG_PLAYED_CARD_AS_GATLING", target_card, origin);
+            break;
+        }
+        origin->discard_used_card(target_card);
+    }
 
     void equip_add_flag::on_enable(card_ptr origin_card, player_ptr target) {
         target->add_player_flags(flag);

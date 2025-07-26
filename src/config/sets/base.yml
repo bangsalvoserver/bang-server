@@ -296,12 +296,11 @@ character:
       - add_flag(player_flag::treat_missed_as_bang)
     effects:
       - banglimit
-      - set_playing card self | hand missed
-      - none player reachable notself
-    mth_effect: play_as_bang(1,2)
+      - set_playing(play_as::bang) card self | hand missed
+      - play_as_bang player reachable notself
     responses:
-      - set_playing card self | hand bangcard
-    mth_response: play_as_missed(0)
+      - set_playing(play_as::missed) card self | hand bangcard
+      - play_as_missed
     tags:
       - play_as_bang
       - banglimit

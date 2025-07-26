@@ -95,10 +95,9 @@ main_deck:
       - weapon(2)
     effects:
       - max_usages(1)
-      - set_playing card self | hand used_bang
+      - set_playing(play_as::gatling) card self | hand used_bang
       - discard card self | hand
-      - none players notself
-    mth_effect: play_as_gatling(1)
+      - play_as_bang players notself
     tags:
       - weapon
   - name: LAST_WILL

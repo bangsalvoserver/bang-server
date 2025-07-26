@@ -21,13 +21,13 @@ namespace banggame {
 
     DEFINE_EFFECT(missedcard, effect_missedcard)
 
-    struct handler_play_as_missed {
-        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr target_card);
-        game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card);
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card);
+    struct effect_play_as_missed {
+        bool can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
     };
 
-    DEFINE_MTH(play_as_missed, handler_play_as_missed)
+    DEFINE_EFFECT(play_as_missed, effect_play_as_missed)
 }
 
 #endif

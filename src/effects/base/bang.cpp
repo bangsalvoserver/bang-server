@@ -27,14 +27,6 @@ namespace banggame {
         target->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
-    static void queue_request_bang(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}) {
-        flags.add(effect_flag::is_bang);
-        flags.add(effect_flag::single_target);
-        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags);
-        req->origin->m_game->call_event(event_type::apply_bang_modifier{ req->origin, req });
-        req->origin->m_game->queue_request(std::move(req));
-    }
-
     game_string effect_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
         if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flag::showdown)) {
             return "ERROR_CARD_INACTIVE";
@@ -53,23 +45,42 @@ namespace banggame {
         return {};
     }
 
-    void effect_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
-        queue_request_bang(origin_card, origin, target);
+    void effect_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        if (flags.check(effect_flag::play_as_bang)) {
+            origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", origin_card, origin, target);
+        } else {
+            origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
+        }
+        
+        flags.add(effect_flag::is_bang);
+        
+        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags);
+        req->origin->m_game->call_event(event_type::apply_bang_modifier{ req->origin, req });
+        req->origin->m_game->queue_request(std::move(req));
     }
 
-    game_string handler_play_as_bang::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target) {
-        return effect_bangcard{}.get_error(chosen_card, origin, target, ctx);
+    game_string effect_play_as_bang::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+        if (!flags.check(effect_flag::multi_target)) {
+            return effect_bangcard{}.get_error(ctx.playing_card, origin, target, ctx);
+        }
+        return {};
     }
 
-    game_string handler_play_as_bang::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target) {
-        return effect_bangcard{}.on_prompt(chosen_card, origin, target);
+    prompt_string effect_play_as_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+        if (flags.check(effect_flag::multi_target)) {
+            return effect_bang{}.on_prompt(ctx.playing_card, origin, target);
+        } else {
+            return effect_bangcard{}.on_prompt(ctx.playing_card, origin, target);
+        }
     }
 
-    void handler_play_as_bang::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr chosen_card, player_ptr target) {
-        origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", chosen_card, origin, target);
-        origin->discard_used_card(chosen_card);
-        queue_request_bang(chosen_card, origin, target, effect_flag::play_as_bang);
+    void effect_play_as_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+        flags.add(effect_flag::play_as_bang);
+        if (flags.check(effect_flag::multi_target)) {
+            effect_bang{}.on_play(ctx.playing_card, origin, target, flags);
+        } else {
+            effect_bangcard{}.on_play(ctx.playing_card, origin, target, flags);
+        }
     }
     
     game_string effect_banglimit::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {

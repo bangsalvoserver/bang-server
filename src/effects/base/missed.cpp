@@ -48,20 +48,15 @@ namespace banggame {
         req->on_miss(origin_card, effect_flag::is_missed);
     }
 
-    game_string handler_play_as_missed::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx, card_ptr target_card) {
-        if (!effect_missedcard{}.can_play(target_card, origin, ctx)) {
-            return {"ERROR_CANT_PLAY_CARD", target_card};
-        }
-        return {};
+    bool effect_play_as_missed::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        return effect_missedcard{}.can_play(ctx.playing_card, origin, ctx);
     }
 
-    game_string handler_play_as_missed::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        return effect_missedcard{}.on_prompt(target_card, origin);
+    game_string effect_play_as_missed::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        return effect_missedcard{}.on_prompt(ctx.playing_card, origin);
     }
 
-    void handler_play_as_missed::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        origin->m_game->add_log("LOG_PLAYED_CARD_AS_MISSED", target_card, origin);
-        origin->discard_used_card(target_card);
-        effect_missedcard{}.on_play(target_card, origin);
+    void effect_play_as_missed::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        effect_missedcard{}.on_play(ctx.playing_card, origin);
     }
 }

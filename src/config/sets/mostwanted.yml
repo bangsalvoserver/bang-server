@@ -27,9 +27,8 @@ character:
       - add_flag(player_flag::treat_any_as_bang)
     effects:
       - banglimit
-      - set_playing card self | hand not_bangcard
-      - none player reachable notself
-    mth_effect: play_as_bang(1,2)
+      - set_playing(play_as::bang) card self | hand not_bangcard
+      - play_as_bang player reachable notself
     tags:
       - play_as_bang
       - banglimit
