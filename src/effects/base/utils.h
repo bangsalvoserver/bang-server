@@ -16,7 +16,6 @@ namespace banggame {
     DEFINE_EFFECT(human, effect_human)
     
     enum class play_as {
-        none,
         bang,
         missed,
         gatling
@@ -24,16 +23,10 @@ namespace banggame {
 
     struct effect_set_playing {
         play_as type;
-        effect_set_playing(play_as type = play_as::none) : type{type} {}
-        
-        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-            add_context(origin_card, origin, origin_card, ctx);
-        }
+        effect_set_playing(play_as type) : type{type} {}
         
         void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
-        
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
-        
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card);
     };
 

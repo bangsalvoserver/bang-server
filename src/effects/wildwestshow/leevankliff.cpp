@@ -82,6 +82,7 @@ namespace banggame {
         if (last_played) {
             ctx.disable_banglimit = true;
             ctx.repeat_card = last_played;
+            ctx.playing_card = origin_card;
         }
     }
 }
