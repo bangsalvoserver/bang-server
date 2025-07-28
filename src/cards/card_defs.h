@@ -366,6 +366,8 @@ namespace banggame {
     };
 
     struct effect_context_base {
+        struct remove_defaults{};
+        
         nullable_card playing_card;
         nullable_card repeat_card;
         nullable_card card_choice;

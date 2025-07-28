@@ -4,8 +4,6 @@
 #include "durations.h"
 #include "cards/card_data.h"
 
-#include "utils/remove_defaults.h"
-
 namespace banggame {
 
     struct card_backface_list {
@@ -33,7 +31,7 @@ namespace banggame {
     struct playable_card_info {
         card_ptr card;
         card_list modifiers;
-        utils::remove_defaults<effect_context_base> context;
+        effect_context_base context;
     };
 
     using playable_cards_list = std::vector<playable_card_info>;

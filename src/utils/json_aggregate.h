@@ -2,7 +2,6 @@
 #define __JSON_AGGREGATE_H__
 
 #include "json_serial.h"
-#include "remove_defaults.h"
 
 #include <reflect>
 
@@ -17,6 +16,16 @@ namespace json {
         requires !std::is_empty_v<T>;
         typename T::transparent;
     };
+
+    template<typename T>
+    concept remove_defaults_aggregate = requires {
+        requires aggregate<T>;
+        requires std::is_default_constructible_v<T>;
+        typename T::remove_defaults;
+    };
+
+    template<typename T>
+    concept default_aggregate = aggregate<T> && !transparent_aggregate<T> && !remove_defaults_aggregate<T>;
 
     template<aggregate T, typename Context>
     struct aggregate_serializer_unchecked {
@@ -35,7 +44,7 @@ namespace json {
         }
     };
 
-    template<aggregate T, typename Context> requires (!transparent_aggregate<T>)
+    template<default_aggregate T, typename Context>
     struct serializer<T, Context> : aggregate_serializer_unchecked<T, Context> {};
 
     template<transparent_aggregate T, typename Context> requires (reflect::size<T>() == 1)
@@ -75,15 +84,15 @@ namespace json {
         }
     };
     
-    template<aggregate T, typename Context> requires (!transparent_aggregate<T>)
+    template<default_aggregate T, typename Context>
     struct deserializer<T, Context> : aggregate_deserializer_unchecked<T, Context> {};
 
-    template<typename T, typename Context>
-    struct serializer<utils::remove_defaults<T>, Context>  {
-        json operator()(const utils::remove_defaults<T> &value, const Context &ctx) const {
+    template<remove_defaults_aggregate T, typename Context>
+    struct serializer<T, Context>  {
+        json operator()(const T &value, const Context &ctx) const {
             json result;
             reflect::for_each<T>([&](auto I) {
-                const auto &member_value = reflect::get<I>(value.get());
+                const auto &member_value = reflect::get<I>(value);
                 using member_type = reflect::member_type<I, T>;
                 if (member_value != member_type{}) {
                     if (result.is_null()) {
@@ -117,15 +126,13 @@ namespace json {
         }
     };
 
-    template<typename T, typename Context>
-    struct deserializer<utils::remove_defaults<T>, Context> {
-        using value_type = utils::remove_defaults<T>;
-
-        value_type operator()(const json &value, const Context &ctx) const {
+    template<remove_defaults_aggregate T, typename Context>
+    struct deserializer<T, Context> {
+        T operator()(const json &value, const Context &ctx) const {
             if (value.is_null()) {
-                return value_type{};
+                return T{};
             } else {
-                return value_type{aggregate_deserializer_unchecked<T, Context>{*this}(value)};
+                return T{aggregate_deserializer_unchecked<T, Context>{*this}(value)};
             }
         }
     };
