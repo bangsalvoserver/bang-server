@@ -92,6 +92,13 @@ namespace json {
         }
     };
 
+    template<typename Context>
+    struct serializer<std::nullptr_t, Context> {
+        json operator()(std::nullptr_t) const {
+            return {};
+        }
+    };
+
     template<std::integral T, typename Context>
     struct serializer<T, Context> {
         json operator()(T value) const {
@@ -177,6 +184,16 @@ namespace json {
     struct deserializer<json, Context> {
         json operator()(const json &value) const {
             return value;
+        }
+    };
+
+    template<typename Context>
+    struct deserializer<std::nullptr_t, Context> {
+        std::nullptr_t operator()(const json &value) const {
+            if (!value.is_null()) {
+                throw deserialize_error("Cannot deserialize null");
+            }
+            return nullptr;
         }
     };
 
