@@ -28,7 +28,7 @@ character:
     effects:
       - banglimit
       - set_playing(play_as::bang) card self | hand not_bangcard
-      - play_as_bang player reachable notself
+      - play_as_bangcard player reachable notself
     tags:
       - play_as_bang
       - banglimit

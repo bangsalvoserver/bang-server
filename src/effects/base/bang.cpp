@@ -59,28 +59,26 @@ namespace banggame {
         req->origin->m_game->queue_request(std::move(req));
     }
 
-    game_string effect_play_as_bang::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
-        if (!flags.check(effect_flag::target_players)) {
-            return effect_bangcard{}.get_error(ctx.playing_card, origin, target, ctx);
-        }
-        return {};
-    }
-
-    prompt_string effect_play_as_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
-        if (flags.check(effect_flag::target_players)) {
-            return effect_bang{}.on_prompt(ctx.playing_card, origin, target);
-        } else {
-            return effect_bangcard{}.on_prompt(ctx.playing_card, origin, target);
-        }
+    prompt_string effect_play_as_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+        return effect_bang{}.on_prompt(ctx.playing_card, origin, target);
     }
 
     void effect_play_as_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
         flags.add(effect_flag::play_as_bang);
-        if (flags.check(effect_flag::target_players)) {
-            effect_bang{}.on_play(ctx.playing_card, origin, target, flags);
-        } else {
-            effect_bangcard{}.on_play(ctx.playing_card, origin, target, flags);
-        }
+        effect_bang{}.on_play(ctx.playing_card, origin, target, flags);
+    }
+
+    game_string effect_play_as_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+        return effect_bangcard{}.get_error(ctx.playing_card, origin, target, ctx);
+    }
+
+    prompt_string effect_play_as_bangcard::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+        return effect_bangcard{}.on_prompt(ctx.playing_card, origin, target);
+    }
+
+    void effect_play_as_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+        flags.add(effect_flag::play_as_bang);
+        effect_bangcard{}.on_play(ctx.playing_card, origin, target, flags);
     }
     
     game_string effect_banglimit::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {

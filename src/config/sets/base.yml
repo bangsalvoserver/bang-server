@@ -297,7 +297,7 @@ character:
     effects:
       - banglimit
       - set_playing(play_as::bang) card self | hand missed
-      - play_as_bang player reachable notself
+      - play_as_bangcard player reachable notself
     responses:
       - set_playing(play_as::missed) card self | hand bangcard
       - play_as_missed

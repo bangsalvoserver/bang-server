@@ -24,12 +24,19 @@ namespace banggame {
     DEFINE_EFFECT(bangcard, effect_bangcard)
 
     struct effect_play_as_bang {
-        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
     };
 
     DEFINE_EFFECT(play_as_bang, effect_play_as_bang)
+
+    struct effect_play_as_bangcard {
+        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
+    };
+
+    DEFINE_EFFECT(play_as_bangcard, effect_play_as_bangcard)
 
     struct effect_banglimit {
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
