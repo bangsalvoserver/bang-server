@@ -5,6 +5,7 @@
 #include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"
+#include "cards/game_enums.h"
 
 namespace banggame {
 
@@ -44,7 +45,7 @@ namespace banggame {
 
     void targeting_cards::on_play(const effect_context &ctx, const card_list &targets) {
         for (card_ptr c : targets) {
-            targeting_card{*this}.on_play(ctx, c);
+            effect.on_play(origin_card, origin, c, effect_flag::multi_target, ctx);
         }
     }
 
