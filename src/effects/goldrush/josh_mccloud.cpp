@@ -17,6 +17,10 @@ namespace banggame {
         
         card_ptr target_card;
 
+        card_list get_highlights(player_ptr owner) const override {
+            return {target_card};
+        }
+
         void on_update() override {
             if (target_card == get_single_element(get_all_playable_cards(target, true))) {
                 if (!target_card->modifier_response
