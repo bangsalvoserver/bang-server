@@ -36,7 +36,7 @@ namespace banggame {
 
     using playable_cards_list = std::vector<playable_card_info>;
     
-    using timer_id_t = size_t;
+    using timer_id_t = uint16_t;
 
     namespace token_positions {
         struct table {};
