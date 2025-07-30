@@ -8,7 +8,7 @@ namespace banggame {
     struct targeting_players : targeting_base {
         using targeting_base::targeting_base;
 
-        struct value_type{};
+        using value_type = std::nullptr_t;
         
         std::generator<value_type> possible_targets(const effect_context &ctx) {
             if (!get_error(ctx, {})) {
