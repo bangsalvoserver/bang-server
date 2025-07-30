@@ -10,6 +10,9 @@
 
 #include "ruleset.h"
 
+#include "target_types/players.h"
+#include "target_types/card_per_player.h"
+
 namespace banggame {
 
     game_string modifier_sgt_blaze::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {

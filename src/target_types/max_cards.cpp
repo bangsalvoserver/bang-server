@@ -1,16 +1,18 @@
+#include "max_cards.h"
+
+#include "card.h"
+
 #include "game/possible_to_play.h"
 
 namespace banggame {
 
-    using visit_cards = play_visitor<target_types::max_cards>;
-
-    template<> std::generator<card_list> visit_cards::possible_targets(const effect_context &ctx) {
+    std::generator<card_list> targeting_max_cards::possible_targets(const effect_context &ctx) {
         if (get_all_card_targets(origin, origin_card, effect, ctx)) {
             co_yield {};
         }
     }
 
-    template<> card_list visit_cards::random_target(const effect_context &ctx) {
+    card_list targeting_max_cards::random_target(const effect_context &ctx) {
         auto targets = get_all_card_targets(origin, origin_card, effect, ctx);
         size_t count = effect.target_value;
         if (count == 0) {
@@ -22,26 +24,14 @@ namespace banggame {
             | rn::to_vector;
     }
 
-    template<> game_string visit_cards::get_error(const effect_context &ctx, const card_list &targets) {
+    game_string targeting_max_cards::get_error(const effect_context &ctx, const card_list &targets) {
         if (targets.empty() || effect.target_value != 0 && targets.size() > effect.target_value) {
             return "ERROR_INVALID_TARGETS";
         }
         for (card_ptr c : targets) {
-            MAYBE_RETURN(defer<target_types::card>().get_error(ctx, c));
+            MAYBE_RETURN(targeting_card{*this}.get_error(ctx, c));
         }
         return {};
-    }
-
-    template<> prompt_string visit_cards::prompt(const effect_context &ctx, const card_list &targets) {
-        return defer<target_types::cards>().prompt(ctx, targets);
-    }
-
-    template<> void visit_cards::add_context(effect_context &ctx, const card_list &targets) {
-        defer<target_types::cards>().add_context(ctx, targets);
-    }
-
-    template<> void visit_cards::play(const effect_context &ctx, const card_list &targets) {
-        defer<target_types::cards>().play(ctx, targets);
     }
 
 }

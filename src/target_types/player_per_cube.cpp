@@ -1,18 +1,21 @@
+#include "player_per_cube.h"
+
+#include "select_cubes.h"
+#include "player.h"
+
 #include "game/possible_to_play.h"
 
 #include "cards/game_enums.h"
 
 namespace banggame {
 
-    using visit_cubes = play_visitor<target_types::player_per_cube>;
-
-    template<> std::generator<target_types::player_per_cube> visit_cubes::possible_targets(const effect_context &ctx) {
+    std::generator<targeting_player_per_cube::value_type> targeting_player_per_cube::possible_targets(const effect_context &ctx) {
         if (contains_at_least(get_all_player_targets(origin, origin_card, effect, ctx), effect.target_value)) {
             co_yield {};
         }
     }
 
-    template<> target_types::player_per_cube visit_cubes::random_target(const effect_context &ctx) {
+    targeting_player_per_cube::value_type targeting_player_per_cube::random_target(const effect_context &ctx) {
         auto cubes = cube_slots(origin)
             | rv::for_each([](card_ptr slot) {
                 return rv::repeat_n(slot, slot->num_cubes());
@@ -30,7 +33,7 @@ namespace banggame {
         };
     }
 
-    template<> game_string visit_cubes::get_error(const effect_context &ctx, const target_types::player_per_cube &target) {
+    game_string targeting_player_per_cube::get_error(const effect_context &ctx, const value_type &target) {
         for (card_ptr c : target.cubes) {
             if (c->owner != origin) {
                 return {"ERROR_TARGET_NOT_SELF", origin_card};
@@ -40,27 +43,27 @@ namespace banggame {
             return "ERROR_INVALID_TARGETS";
         }
         for (player_ptr target : target.players) {
-            MAYBE_RETURN(defer<target_types::player>().get_error(ctx, target));
+            MAYBE_RETURN(targeting_player{*this}.get_error(ctx, target));
         }
         return {};
     }
 
-    template<> prompt_string visit_cubes::prompt(const effect_context &ctx, const target_types::player_per_cube &target) {
-        MAYBE_RETURN(defer<target_types::select_cubes>().prompt(ctx, target.cubes));
+    prompt_string targeting_player_per_cube::on_prompt(const effect_context &ctx, const value_type &target) {
+        MAYBE_RETURN(targeting_select_cubes{*this}.on_prompt(ctx, target.cubes));
         return merge_prompts(target.players | rv::transform([&](player_ptr target) {
-            return defer<target_types::player>().prompt(ctx, target);
+            return targeting_player{*this}.on_prompt(ctx, target);
         }), true);
     }
 
-    template<> void visit_cubes::add_context(effect_context &ctx, const target_types::player_per_cube &target) {
+    void targeting_player_per_cube::add_context(effect_context &ctx, const value_type &target) {
         ctx.selected_cubes.insert(origin_card, target.cubes, 1);
         for (player_ptr target : target.players) {
-            defer<target_types::player>().add_context(ctx, target);
+            targeting_player{*this}.add_context(ctx, target);
         }
     }
 
-    template<> void visit_cubes::play(const effect_context &ctx, const target_types::player_per_cube &target) {
-        defer<target_types::select_cubes>().play(ctx, target.cubes);
+    void targeting_player_per_cube::on_play(const effect_context &ctx, const value_type &target) {
+        targeting_select_cubes{*this}.on_play(ctx, target.cubes);
         
         effect_flags flags = effect_flag::multi_target;
         if (target.players.size() == 1) {

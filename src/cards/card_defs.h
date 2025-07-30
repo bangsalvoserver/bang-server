@@ -3,7 +3,6 @@
 
 #include "game_string.h"
 
-#include "utils/tagged_variant.h"
 #include "utils/enum_bitset.h"
 #include "utils/enum_map.h"
 
@@ -103,127 +102,20 @@ namespace banggame {
         shadow_deputy,
         shadow_outlaw
     };
-
-    namespace target_types {
-        struct none {};
-
-        struct player {
-            struct transparent{};
-            player_ptr value;
-        };
-
-        struct conditional_player {
-            struct transparent{};
-            nullable_player value;
-        };
-
-        struct adjacent_players {
-            struct transparent{};
-            player_list value;
-        };
-
-        struct player_per_cube {
-            struct transparent{};
-            card_list cubes;
-            player_list players;
-        };
-
-        struct random_if_hand_card {
-            struct transparent{};
-            card_ptr value;
-        };
-
-        struct card {
-            struct transparent{};
-            card_ptr value;
-        };
-
-        struct extra_card {
-            struct transparent{};
-            nullable_card value;
-        };
-
-        struct players {};
-
-        struct cards {
-            struct transparent{};
-            card_list value;
-        };
-
-        struct max_cards {
-            struct transparent{};
-            card_list value;
-        };
-
-        struct bang_or_cards {
-            struct transparent{};
-            card_list value;
-        };
-
-        struct card_per_player {
-            struct transparent{};
-            card_list value;
-        };
-
-        struct cube_slot {
-            struct transparent{};
-            card_ptr value;
-        };
-
-        struct move_cube_slot {
-            struct transparent{};
-            card_list value;
-        };
-
-        struct select_cubes {
-            struct transparent{};
-            card_list value;
-        };
-
-        struct select_cubes_optional {
-            struct transparent{};
-            card_list value;
-        };
-
-        struct select_cubes_player {
-            struct transparent{};
-            card_list cubes;
-            player_ptr player;
-        };
-
-        struct select_cubes_repeat {
-            struct transparent{};
-            card_list value;
-        };
-
-        struct self_cubes {};
-    }
-
-    using play_card_target = std::variant<
-        target_types::none,
-        target_types::player,
-        target_types::conditional_player,
-        target_types::adjacent_players,
-        target_types::player_per_cube,
-        target_types::random_if_hand_card,
-        target_types::card,
-        target_types::extra_card,
-        target_types::players,
-        target_types::cards,
-        target_types::max_cards,
-        target_types::bang_or_cards,
-        target_types::card_per_player,
-        target_types::cube_slot,
-        target_types::move_cube_slot,
-        target_types::select_cubes,
-        target_types::select_cubes_optional,
-        target_types::select_cubes_player,
-        target_types::select_cubes_repeat,
-        target_types::self_cubes
-    >;
-
-    using target_type = utils::tagged_variant_index<play_card_target>;
-    #define TARGET_TYPE(NAME) target_type{std::in_place_type<target_types::NAME>}
+    
+    class play_card_target {
+    private:
+        std::any m_value;
+    
+    public:
+        template<typename T>
+        play_card_target(T &&value) : m_value{std::forward<T>(value)} {}
+    
+        template<typename T>
+        const T &get() const {
+            return std::any_cast<const T &>(m_value);
+        }
+    };
 
     using target_list = std::vector<play_card_target>;
 
@@ -241,21 +133,28 @@ namespace banggame {
 
         bool can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
 
+        std::generator<play_card_target> possible_targets(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+        play_card_target random_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
+
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
-
+        game_string get_error(card_ptr origin_card, player_ptr origin, const play_card_target &target, const effect_context &ctx) const;
+        
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const;
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const play_card_target &target, const effect_context &ctx) const;
 
         void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const;
         void add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) const;
         void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) const;
+        void add_context(card_ptr origin_card, player_ptr origin, const play_card_target &target, effect_context &ctx) const;
 
         void on_play(card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) const;
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const;
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, const play_card_target &target, const effect_context &ctx) const;
     };
 
     struct equip_holder {
@@ -368,9 +267,9 @@ namespace banggame {
     struct effect_context_base {
         struct remove_defaults{};
         
-        nullable_card playing_card;
-        nullable_card repeat_card;
-        nullable_card card_choice;
+        card_ptr playing_card;
+        card_ptr repeat_card;
+        card_ptr card_choice;
         int8_t train_advance;
         bool ignore_distances;
     };
@@ -379,9 +278,9 @@ namespace banggame {
         player_list selected_players;
         card_list selected_cards;
         selected_cubes_count selected_cubes;
-        nullable_player skipped_player;
-        nullable_card traincost;
-        nullable_card target_card;
+        player_ptr skipped_player;
+        card_ptr traincost;
+        card_ptr target_card;
         int8_t discount;
         bool disable_banglimit;
         bool disable_bang_checks;

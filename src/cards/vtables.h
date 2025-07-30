@@ -192,6 +192,53 @@ namespace banggame {
         BUILD_RULESET_VTABLE(NAME, TYPE)
     
     #define GET_RULESET(name) (&ruleset_vtable_map<#name>::value)
+
+    struct targeting_vtable {
+        std::string_view name;
+
+        play_card_target (*deserialize_json)(const json::json &value, const game_context &context);
+
+        std::generator<play_card_target> (*possible_targets)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
+        play_card_target (*random_target)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
+        game_string (*get_error)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
+        prompt_string (*on_prompt)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
+        void (*add_context)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const play_card_target &target);
+        void (*on_play)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target);
+    };
+
+    inline std::generator<play_card_target> effect_holder::possible_targets(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+        return this->target->possible_targets(origin_card, origin, *this, ctx);
+    }
+
+    inline play_card_target effect_holder::random_target(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
+        return this->target->random_target(origin_card, origin, *this, ctx);
+    }
+
+    inline game_string effect_holder::get_error(card_ptr origin_card, player_ptr origin, const play_card_target &target, const effect_context &ctx) const {
+        return this->target->get_error(origin_card, origin, *this, ctx, target);
+    }
+
+    inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, const play_card_target &target, const effect_context &ctx) const {
+        return this->target->on_prompt(origin_card, origin, *this, ctx, target);
+    }
+
+    inline void effect_holder::add_context(card_ptr origin_card, player_ptr origin, const play_card_target &target, effect_context &ctx) const {
+        this->target->add_context(origin_card, origin, *this, ctx, target);
+    }
+
+    inline void effect_holder::on_play(card_ptr origin_card, player_ptr origin, const play_card_target &target, const effect_context &ctx) const {
+        this->target->on_play(origin_card, origin, *this, ctx, target);
+    }
+
+    template<utils::fixed_string Name>
+    struct targeting_vtable_map;
+
+    #define BUILD_TARGETING_VTABLE(name, type)
+    #define DEFINE_TARGETING(NAME, TYPE) \
+        template<> struct targeting_vtable_map<#NAME> { using type = TYPE; static const targeting_vtable value; }; \
+        BUILD_TARGETING_VTABLE(NAME, TYPE)
+    
+    #define TARGET_TYPE(name) (&targeting_vtable_map<#name>::value)
 }
 
 #endif

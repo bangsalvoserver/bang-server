@@ -10,6 +10,8 @@
 #include "game_table.h"
 #include "request_timer.h"
 
+#include "target_types/player.h"
+
 #include <unordered_set>
 
 namespace banggame {
@@ -71,39 +73,17 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_timer_response(player_ptr origin, std::optional<timer_id_t> timer_id) {
-        std::optional<timer_id_t> current_timer_id;
-        if (auto timer = origin->m_game->top_request<request_timer>(); timer && timer->enabled()) {
-            current_timer_id = timer->get_timer_id();
-        }
-        if (timer_id != current_timer_id) {
-            return "ERROR_TIMER_EXPIRED";
-        }
-        return {};
-    }
-
     static game_string verify_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
         auto &effects = origin_card->get_effect_list(is_response);
 
-        if (effects.empty()) {
-            return "ERROR_EFFECT_LIST_EMPTY";
-        }
-        if (targets.size() != effects.size()) {
-            return "ERROR_INVALID_TARGETS";
-        }
-
         for (const auto &[target, effect] : rv::zip(targets, effects)) {
-            if (target_type(target) != effect.target) {
-                return "ERROR_INVALID_TARGET_TYPE";
-            }
-
-            play_dispatch::add_context(origin, origin_card, effect, ctx, target);
+            effect.add_context(origin_card, origin, target, ctx);
             
             if (!effect.can_play(origin_card, origin, ctx)) {
                 return {"ERROR_CANT_PLAY_CARD", origin_card};
             }
 
-            MAYBE_RETURN(play_dispatch::get_error(origin, origin_card, effect, ctx, target));
+            MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
 
         if (const mth_holder &mth = origin_card->get_mth(is_response)) {
@@ -145,7 +125,7 @@ namespace banggame {
     }
 
     static player_ptr get_equip_target(player_ptr origin, card_ptr origin_card, const target_list &targets) {
-        return origin_card->self_equippable() ? origin : std::get<target_types::player>(targets.front()).value;
+        return origin_card->self_equippable() ? origin : targets.front().get<player_ptr>();
     }
 
     static game_string verify_equip_target(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
@@ -157,19 +137,7 @@ namespace banggame {
             return "ERROR_INVALID_CARD_OWNER";
         }
 
-        player_ptr target = origin;
-        if (origin_card->self_equippable()) {
-            if (!targets.empty()) {
-                return "ERROR_INVALID_EQUIP_TARGET";
-            }
-        } else {
-            if (targets.size() != 1 || target_type(targets.front()) != TARGET_TYPE(player)) {
-                return "ERROR_INVALID_EQUIP_TARGET";
-            }
-            target = std::get<target_types::player>(targets.front()).value;
-        }
-        
-        return get_equip_error(origin, origin_card, target, ctx);
+        return get_equip_error(origin, origin_card, get_equip_target(origin, origin_card, targets), ctx);
     }
 
     game_string get_play_card_error(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
@@ -225,7 +193,7 @@ namespace banggame {
 
     static prompt_string get_play_prompt(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
-            MAYBE_RETURN(play_dispatch::prompt(origin, origin_card, effect, ctx, target));
+            MAYBE_RETURN(effect.on_prompt(origin_card, origin, target, ctx));
         }
 
         if (const mth_holder &mth = origin_card->get_mth(is_response)) {
@@ -324,7 +292,7 @@ namespace banggame {
         }
 
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
-            play_dispatch::play(origin, origin_card, effect, ctx, target);
+            effect.on_play(origin_card, origin, target, ctx);
         }
 
         if (const mth_holder &mth = origin_card->get_mth(is_response)) {
@@ -354,10 +322,6 @@ namespace banggame {
         effect_context ctx{};
         
         ctx.playing_card = args.card;
-
-        if (game_string error = verify_timer_response(origin, args.timer_id)) {
-            return play_verify_results::error{ error };
-        }
 
         if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
             return play_verify_results::error{ error };

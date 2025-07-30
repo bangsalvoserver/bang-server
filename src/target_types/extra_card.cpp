@@ -1,12 +1,14 @@
+#include "extra_card.h"
+
+#include "card.h"
+
 #include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"
 
 namespace banggame {
-    
-    using visit_card = play_visitor<target_types::extra_card>;
 
-    template<> std::generator<nullable_card> visit_card::possible_targets(const effect_context &ctx) {
+    std::generator<card_ptr> targeting_extra_card::possible_targets(const effect_context &ctx) {
         if (ctx.repeat_card) {
             co_yield nullptr;
         } else {
@@ -16,15 +18,15 @@ namespace banggame {
         }
     }
 
-    template<> nullable_card visit_card::random_target(const effect_context &ctx) {
+    card_ptr targeting_extra_card::random_target(const effect_context &ctx) {
         if (ctx.repeat_card) {
             return nullptr;
         } else {
-            return defer<target_types::card>().random_target(ctx);
+            return targeting_card{*this}.random_target(ctx);
         }
     }
 
-    template<> game_string visit_card::get_error(const effect_context &ctx, nullable_card target) {
+    game_string targeting_extra_card::get_error(const effect_context &ctx, card_ptr target) {
         if (!target) {
             if (ctx.repeat_card) {
                 return {};
@@ -35,28 +37,28 @@ namespace banggame {
             if (ctx.repeat_card) {
                 return "ERROR_TARGET_SET_EMPTY";
             } else {
-                return defer<target_types::card>().get_error(ctx, target);
+                return targeting_card{*this}.get_error(ctx, target);
             }
         }
     }
 
-    template<> prompt_string visit_card::prompt(const effect_context &ctx, nullable_card target) {
+    prompt_string targeting_extra_card::on_prompt(const effect_context &ctx, card_ptr target) {
         if (target) {
-            return defer<target_types::card>().prompt(ctx, target);
+            return targeting_card{*this}.on_prompt(ctx, target);
         } else {
             return {};
         }
     }
 
-    template<> void visit_card::add_context(effect_context &ctx, nullable_card target) {
+    void targeting_extra_card::add_context(effect_context &ctx, card_ptr target) {
         if (target) {
-            defer<target_types::card>().add_context(ctx, target);
+            targeting_card{*this}.add_context(ctx, target);
         }
     }
 
-    template<> void visit_card::play(const effect_context &ctx, nullable_card target) {
+    void targeting_extra_card::on_play(const effect_context &ctx, card_ptr target) {
         if (target) {
-            return defer<target_types::card>().play(ctx, target);
+            return targeting_card{*this}.on_play(ctx, target);
         }
     }
 

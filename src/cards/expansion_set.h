@@ -37,11 +37,9 @@ namespace json {
                 }
 
                 auto name = elem.get<std::string_view>();
-                for (const banggame::expansion_data &data : banggame::bang_cards.expansions) {
-                    if (data.expansion && data.expansion->name == name) {
-                        result.insert(data.expansion);
-                        break;
-                    }
+                auto it = banggame::bang_cards.expansions.find(name);
+                if (it != banggame::bang_cards.expansions.end() && it->second.expansion) {
+                    result.insert(it->second.expansion);
                 }
             }
 
@@ -56,12 +54,12 @@ namespace std {
     template<> struct formatter<banggame::expansion_set> : formatter<std::string_view> {
         static string expansions_to_string(banggame::expansion_set value) {
             std::string ret;
-            for (const banggame::expansion_data &data : banggame::bang_cards.expansions) {
+            for (const auto &[name, data] : banggame::bang_cards.expansions) {
                 if (data.expansion && value.contains(data.expansion)) {
                     if (!ret.empty()) {
                         ret += ' ';
                     }
-                    ret.append(data.expansion->name);
+                    ret.append(name);
                 }
             }
             return ret;
@@ -85,11 +83,9 @@ namespace utils {
                 if (pos == std::string_view::npos) break;
                 str = str.substr(pos);
                 pos = str.find_first_of(whitespace);
-                auto it = rn::find(banggame::bang_cards.expansions, str.substr(0, pos), [](const banggame::expansion_data &data) {
-                    return data.expansion ? data.expansion->name : std::string_view{};
-                });
-                if (it != banggame::bang_cards.expansions.end()) {
-                    result.insert(it->expansion);
+                auto it = banggame::bang_cards.expansions.find(str.substr(0, pos));
+                if (it != banggame::bang_cards.expansions.end() && it->second.expansion) {
+                    result.insert(it->second.expansion);
                 } else {
                     return std::nullopt;
                 }

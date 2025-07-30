@@ -111,6 +111,8 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
                 ), object_type=(object_value.key_type, object_value.value_type)))
             case list() | set():
                 return [traverse_declaration(value) for value in object_value]
+            case dict():
+                return {key: traverse_declaration(value) for key, value in object_value.items()}
             case tuple():
                 return tuple(traverse_declaration(value) for value in object_value)
             case bytes():

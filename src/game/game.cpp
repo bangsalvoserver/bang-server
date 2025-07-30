@@ -48,6 +48,7 @@ namespace banggame {
         }
 
         std::unordered_set<sound_id> sounds = bang_cards.expansions
+            | rv::values
             | rv::filter([&](const expansion_data &data) {
                 return !data.expansion || table->m_options.expansions.contains(data.expansion);
             })

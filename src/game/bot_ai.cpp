@@ -8,6 +8,8 @@
 #include "net/bot_info.h"
 #include "net/logging.h"
 
+#include "target_types/player.h"
+
 namespace banggame {
 
     static game_action generate_random_play(player_ptr origin, const playable_card_info &args, bool is_response) {
@@ -19,21 +21,19 @@ namespace banggame {
 
             mod_card->get_modifier(is_response).add_context(mod_card, origin, ctx);
             for (const effect_holder &holder : mod_card->get_effect_list(is_response)) {
-                const auto &target = targets.emplace_back(play_dispatch::random_target(origin, mod_card, holder, ctx));
-                play_dispatch::add_context(origin, mod_card, holder, ctx, target);
+                const auto &target = targets.emplace_back(holder.random_target(mod_card, origin, ctx));
+                holder.add_context(mod_card, origin, target, ctx);
             }
         }
 
         if (args.card->is_equip_card()) {
             if (!args.card->self_equippable()) {
-                ret.targets.push_back(target_types::player{
-                    random_element(get_all_equip_targets(origin, args.card, ctx), origin->m_game->bot_rng)
-                });
+                ret.targets.emplace_back(random_element(get_all_equip_targets(origin, args.card, ctx), origin->m_game->bot_rng));
             }
         } else {
             for (const effect_holder &holder : args.card->get_effect_list(is_response)) {
-                const auto &target = ret.targets.emplace_back(play_dispatch::random_target(origin, args.card, holder, ctx));
-                play_dispatch::add_context(origin, args.card, holder, ctx, target);
+                const auto &target = ret.targets.emplace_back(holder.random_target(args.card, origin, ctx));
+                holder.add_context(args.card, origin, target, ctx);
             }
         }
 
@@ -52,7 +52,7 @@ namespace banggame {
         return random_element(node_set, origin->m_game->bot_rng);
     }
 
-    static request_state execute_random_play(player_ptr origin, bool is_response, std::optional<timer_id_t> timer_id, const playable_cards_list &play_cards) {
+    static request_state execute_random_play(player_ptr origin, bool is_response, bool add_empty, const playable_cards_list &play_cards) {
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
             auto node_set = play_cards
                 | rv::for_each([&](const playable_card_info &info) {
@@ -60,7 +60,7 @@ namespace banggame {
                 })
                 | rn::to<node_set_t>;
             
-            if (timer_id) {
+            if (add_empty) {
                 node_set.insert(nullptr);
             }
             
@@ -77,7 +77,6 @@ namespace banggame {
                     args.bypass_prompt =
                         (i >= bot_info.settings.bypass_empty_index && node_set.empty())
                         || i >= bot_info.settings.bypass_unconditional_index;
-                    args.timer_id = timer_id;
 
                     auto result = verify_and_play(origin, args);
 
@@ -120,19 +119,17 @@ namespace banggame {
                 playable_cards_list play_cards = generate_playable_cards_list(origin, true);
                 
                 if (!play_cards.empty()) {
-                    std::optional<timer_id_t> timer_id;
-                    if (auto timer = origin->m_game->top_request<request_timer>(); timer && timer->enabled()) {
-                        timer_id = timer->get_timer_id();
-                    }
+                    auto timer = origin->m_game->top_request<request_timer>();
+                    bool add_empty = timer && timer->enabled();
 
-                    if (std::holds_alternative<request_states::next>(execute_random_play(origin, true, timer_id, play_cards))) {
+                    if (std::holds_alternative<request_states::next>(execute_random_play(origin, true, add_empty, play_cards))) {
                         return request_states::next{};
                     }
                 }
             }
         } else if (m_playing && m_playing->is_bot()) {
             playable_cards_list play_cards = generate_playable_cards_list(m_playing);
-            return execute_random_play(m_playing, false, std::nullopt, play_cards);
+            return execute_random_play(m_playing, false, false, play_cards);
         }
         return request_states::done{};
     }

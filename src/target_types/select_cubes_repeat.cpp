@@ -1,14 +1,10 @@
+#include "select_cubes_repeat.h"
+
 #include "game/possible_to_play.h"
 
 namespace banggame {
 
-    using visit_cubes = play_visitor<target_types::select_cubes_repeat>;
-
-    template<> std::generator<card_list> visit_cubes::possible_targets(const effect_context &ctx) {
-        co_yield {};
-    }
-
-    template<> card_list visit_cubes::random_target(const effect_context &ctx) {
+    card_list targeting_select_cubes_repeat::random_target(const effect_context &ctx) {
         auto cubes = cube_slots(origin)
             | rv::for_each([](card_ptr slot) {
                 return rv::repeat_n(slot, slot->num_cubes());
@@ -22,7 +18,7 @@ namespace banggame {
         return cubes;
     }
 
-    template<> game_string visit_cubes::get_error(const effect_context &ctx, const card_list &target_cards) {
+    game_string targeting_select_cubes_repeat::get_error(const effect_context &ctx, const card_list &target_cards) {
         if (target_cards.size() % effect.target_value != 0) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -32,18 +28,6 @@ namespace banggame {
             }
         }
         return {};
-    }
-
-    template<> prompt_string visit_cubes::prompt(const effect_context &ctx, const card_list &target_cards) {
-        return defer<target_types::select_cubes>().prompt(ctx, target_cards);
-    }
-
-    template<> void visit_cubes::add_context(effect_context &ctx, const card_list &target_cards) {
-        defer<target_types::select_cubes>().add_context(ctx, target_cards);
-    }
-
-    template<> void visit_cubes::play(const effect_context &ctx, const card_list &target_cards) {
-        defer<target_types::select_cubes>().play(ctx, target_cards);
     }
 
 }

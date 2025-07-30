@@ -1,11 +1,13 @@
+#include "adjacent_players.h"
+
+#include "player.h"
+
 #include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
 namespace banggame {
-
-    using visit_players = play_visitor<target_types::adjacent_players>;
 
     static auto make_adjacent_players_target_set(player_ptr origin, card_ptr origin_card, const effect_holder &effect, const effect_context &ctx) {
         return rv::cartesian_product(origin->m_game->m_players, origin->m_game->m_players)
@@ -18,22 +20,19 @@ namespace banggame {
             });
     }
 
-    template<> std::generator<player_list> visit_players::possible_targets(const effect_context &ctx) {
+    std::generator<player_pair> targeting_adjacent_players::possible_targets(const effect_context &ctx) {
         for (auto [target1, target2] : make_adjacent_players_target_set(origin, origin_card, effect, ctx)) {
             co_yield {target1, target2};
         }
     }
 
-    template<> player_list visit_players::random_target(const effect_context &ctx) {
+    player_pair targeting_adjacent_players::random_target(const effect_context &ctx) {
         auto targets = make_adjacent_players_target_set(origin, origin_card, effect, ctx);
         auto [target1, target2] = random_element(targets, origin->m_game->bot_rng);
         return {target1, target2};
     }
 
-    template<> game_string visit_players::get_error(const effect_context &ctx, const player_list &targets) {
-        if (targets.size() != 2) {
-            return "ERROR_INVALID_TARGETS";
-        }
+    game_string targeting_adjacent_players::get_error(const effect_context &ctx, player_pair targets) {
         MAYBE_RETURN(check_player_filter(origin_card, origin, effect.player_filter, targets[0], ctx));
         if (!targets[1]->alive()) {
             return {"ERROR_TARGET_DEAD", origin_card, targets[1]};
@@ -47,22 +46,21 @@ namespace banggame {
         return {};
     }
 
-    template<> prompt_string visit_players::prompt(const effect_context &ctx, const player_list &targets) {
+    prompt_string targeting_adjacent_players::on_prompt(const effect_context &ctx, player_pair targets) {
         return merge_prompts(targets | rv::transform([&](player_ptr target) {
-            return defer<target_types::player>().prompt(ctx, target);
+            return targeting_player{*this}.on_prompt(ctx, target);
         }), true);
     }
 
-    template<> void visit_players::add_context(effect_context &ctx, const player_list &targets) {
+    void targeting_adjacent_players::add_context(effect_context &ctx, player_pair targets) {
         for (player_ptr target : targets) {
-            defer<target_types::player>().add_context(ctx, target);
+            targeting_player{*this}.add_context(ctx, target);
         }
     }
 
-    template<> void visit_players::play(const effect_context &ctx, const player_list &targets) {
-        effect_flags flags = effect_flag::multi_target;
+    void targeting_adjacent_players::on_play(const effect_context &ctx, player_pair targets) {
         for (player_ptr target : targets) {
-            effect.on_play(origin_card, origin, target, flags, ctx);
+            effect.on_play(origin_card, origin, target, effect_flag::multi_target, ctx);
         }
     }
 

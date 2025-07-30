@@ -1,18 +1,18 @@
+#include "select_cubes.h"
+
 #include "game/possible_to_play.h"
 
 #include "effects/armedanddangerous/ruleset.h"
 
 namespace banggame {
 
-    using visit_cubes = play_visitor<target_types::select_cubes>;
-
-    template<> std::generator<card_list> visit_cubes::possible_targets(const effect_context &ctx) {
+    std::generator<card_list> targeting_select_cubes::possible_targets(const effect_context &ctx) {
         if (count_cubes(origin) >= effect.target_value) {
             co_yield {};
         }
     }
 
-    template<> card_list visit_cubes::random_target(const effect_context &ctx) {
+    card_list targeting_select_cubes::random_target(const effect_context &ctx) {
         auto cubes = cube_slots(origin)
             | rv::for_each([](card_ptr slot) {
                 return rv::repeat_n(slot, slot->num_cubes());
@@ -24,7 +24,7 @@ namespace banggame {
         return cubes;
     }
 
-    template<> game_string visit_cubes::get_error(const effect_context &ctx, const card_list &target_cards) {
+    game_string targeting_select_cubes::get_error(const effect_context &ctx, const card_list &target_cards) {
         if (target_cards.size() != effect.target_value) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -36,17 +36,17 @@ namespace banggame {
         return {};
     }
 
-    template<> prompt_string visit_cubes::prompt(const effect_context &ctx, const card_list &target_cards) {
+    prompt_string targeting_select_cubes::on_prompt(const effect_context &ctx, const card_list &target_cards) {
         prompt_string out_prompt;
         origin->m_game->call_event(event_type::get_select_cubes_prompt{ origin, ctx, out_prompt });
         return out_prompt;
     }
 
-    template<> void visit_cubes::add_context(effect_context &ctx, const card_list &target_cards) {
+    void targeting_select_cubes::add_context(effect_context &ctx, const card_list &target_cards) {
         ctx.selected_cubes.insert(origin_card, target_cards, effect.target_value);
     }
 
-    template<> void visit_cubes::play(const effect_context &ctx, const card_list &target_cards) {
+    void targeting_select_cubes::on_play(const effect_context &ctx, const card_list &target_cards) {
         using cube_count_pair = std::pair<card_ptr, int>;
         std::vector<cube_count_pair> card_cube_count;
 

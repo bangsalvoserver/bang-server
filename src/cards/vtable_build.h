@@ -4,9 +4,10 @@
 #include "game_enums.h"
 #include "filter_enums.h"
 
+#include "card_serial.h"
+
 #include "game/game_table.h"
 #include "game/filters.h"
-#include "game/play_dispatch.h"
 
 namespace banggame {
     
@@ -271,34 +272,15 @@ namespace banggame {
         }
     };
 
-    template<typename T>
-    T get_mth_arg(const target_list &targets, size_t index) {
-        if (index >= targets.size()) {
-            throw game_error("invalid access to mth: out of bounds");
-        }
-        const play_card_target &target = targets[index];
-        using value_type = std::remove_cvref_t<T>;
-        if constexpr (std::is_convertible_v<value_type, play_card_target>) {
-            return std::get<value_type>(target);
-        } else {
-            return std::visit([](const auto &value) -> T {
-                const auto &unwrapped = unwrap_target(value);
-                if constexpr (std::is_convertible_v<decltype(unwrapped), T>) {
-                    return unwrapped;
-                } else {
-                    throw game_error("invalid access to mth: wrong target type");
-                }
-            }, target);
-        }
-    }
-
     template<typename ... Ts>
     auto build_mth_args(const target_list &targets, std::span<const int> indices) {
         if (indices.size() != sizeof...(Ts)) {
             throw game_error("invalid access to mth: invalid indices size");
         }
         return [&]<size_t ... Is>(std::index_sequence<Is...>) {
-            return std::tuple<Ts ...>{ get_mth_arg<Ts>(targets, indices[Is]) ... };
+            return std::tuple<Ts ...>{
+                targets.at(indices[Is]).get<std::remove_cvref_t<Ts>>() ...
+            };
         }(std::index_sequence_for<Ts ...>());
     }
 
@@ -407,6 +389,51 @@ namespace banggame {
     #endif
 
     #define BUILD_RULESET_VTABLE(name, type) template<> const ruleset_vtable ruleset_vtable_map<#name>::value = build_ruleset_vtable<type>(#name);
+
+    template<typename T>
+    constexpr targeting_vtable build_targeting_vtable(std::string_view name) {
+        using value_type = typename T::value_type;
+
+        return {
+            .name = name,
+            
+            .deserialize_json = [](const json::json &value, const game_context &context) -> play_card_target {
+                return play_card_target{json::deserialize<value_type, game_context>(value, context)};
+            },
+
+            .possible_targets = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) -> std::generator<play_card_target> {
+                for (value_type value : T{origin_card, origin, effect}.possible_targets(ctx)) {
+                    co_yield play_card_target{std::move(value)};
+                }
+            },
+
+            .random_target = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) -> play_card_target {
+                return play_card_target{value_type{T{origin_card, origin, effect}.random_target(ctx)}};
+            },
+
+            .get_error = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) -> game_string {
+                return T{origin_card, origin, effect}.get_error(ctx, target.get<value_type>());
+            },
+
+            .on_prompt = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) -> prompt_string {
+                return T{origin_card, origin, effect}.on_prompt(ctx, target.get<value_type>());
+            },
+
+            .add_context = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const play_card_target &target) {
+                T{origin_card, origin, effect}.add_context(ctx, target.get<value_type>());
+            },
+
+            .on_play = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
+                T{origin_card, origin, effect}.on_play(ctx, target.get<value_type>());
+            }
+        };
+    }
+
+    #ifdef BUILD_TARGETING_VTABLE
+    #undef BUILD_TARGETING_VTABLE
+    #endif
+
+    #define BUILD_TARGETING_VTABLE(name, type) template<> const targeting_vtable targeting_vtable_map<#name>::value = build_targeting_vtable<type>(#name);
 }
 
 #endif

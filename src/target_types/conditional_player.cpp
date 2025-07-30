@@ -1,10 +1,12 @@
+#include "conditional_player.h"
+
+#include "player.h"
+
 #include "game/possible_to_play.h"
 
 namespace banggame {
 
-    using visit_player = play_visitor<target_types::conditional_player>;
-
-    template<> std::generator<nullable_player> visit_player::possible_targets(const effect_context &ctx) {
+    std::generator<player_ptr> targeting_conditional_player::possible_targets(const effect_context &ctx) {
         auto targets = get_all_player_targets(origin, origin_card, effect, ctx);
         if (targets.empty()) {
             co_yield nullptr;
@@ -15,7 +17,7 @@ namespace banggame {
         }
     }
 
-    template<> nullable_player visit_player::random_target(const effect_context &ctx) {
+    player_ptr targeting_conditional_player::random_target(const effect_context &ctx) {
         auto targets = get_all_player_targets(origin, origin_card, effect, ctx);
         if (targets.empty()) {
             return nullptr;
@@ -24,9 +26,9 @@ namespace banggame {
         }
     }
 
-    template<> game_string visit_player::get_error(const effect_context &ctx, nullable_player target) {
+    game_string targeting_conditional_player::get_error(const effect_context &ctx, player_ptr target) {
         if (target) {
-            return defer<target_types::player>().get_error(ctx, target);
+            return targeting_player{*this}.get_error(ctx, target);
         } else if (bool(get_all_player_targets(origin, origin_card, effect))) {
             return "ERROR_TARGET_SET_NOT_EMPTY";
         } else {
@@ -34,23 +36,23 @@ namespace banggame {
         }
     }
 
-    template<> prompt_string visit_player::prompt(const effect_context &ctx, nullable_player target) {
+    prompt_string targeting_conditional_player::on_prompt(const effect_context &ctx, player_ptr target) {
         if (target) {
-            return defer<target_types::player>().prompt(ctx, target);
+            return targeting_player{*this}.on_prompt(ctx, target);
         } else {
             return {};
         }
     }
 
-    template<> void visit_player::add_context(effect_context &ctx, nullable_player target) {
+    void targeting_conditional_player::add_context(effect_context &ctx, player_ptr target) {
         if (target) {
-            defer<target_types::player>().add_context(ctx, target);
+            targeting_player{*this}.add_context(ctx, target);
         }
     }
 
-    template<> void visit_player::play(const effect_context &ctx, nullable_player target) {
+    void targeting_conditional_player::on_play(const effect_context &ctx, player_ptr target) {
         if (target) {
-            defer<target_types::player>().play(ctx, target);
+            targeting_player{*this}.on_play(ctx, target);
         }
     }
 

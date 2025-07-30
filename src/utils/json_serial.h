@@ -224,6 +224,20 @@ namespace json {
         }
     };
 
+    template<typename T, typename Context, size_t N>
+    struct deserializer<std::array<T, N>, Context> {
+        std::array<T, N> operator()(const json &value, const Context &context) const {
+            if (!value.is_array() || value.size() != N) {
+                throw deserialize_error("Cannot deserialize array");
+            }
+            return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
+                return std::array<T, N>{
+                    deserialize_unchecked<T, Context>(value[Is], context) ...
+                };
+            }(std::make_index_sequence<N>());
+        }
+    };
+
     template<typename Rep, typename Period, typename Context>
     struct deserializer<std::chrono::duration<Rep, Period>, Context> {
         std::chrono::duration<Rep, Period> operator()(const json &value) const {

@@ -6,6 +6,8 @@
 #include "utils/misc.h"
 
 #include <set>
+#include <any>
+#include <generator>
 
 namespace banggame {
     
@@ -28,6 +30,7 @@ namespace banggame {
 
     struct effect_context;
     struct game_options;
+    struct game_context;
     
     struct effect_vtable;
     struct equip_vtable;
@@ -35,10 +38,13 @@ namespace banggame {
     struct mth_vtable;
 
     struct ruleset_vtable;
+    struct targeting_vtable;
 
     using ruleset_ptr = const ruleset_vtable *;
     using expansion_list = std::span<const ruleset_ptr>;
     using expansion_set = std::set<ruleset_ptr>;
+
+    using target_type = const targeting_vtable *;
 
     enum class sound_id;
 

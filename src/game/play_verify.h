@@ -2,7 +2,6 @@
 #define __PLAY_VERIFY_H__
 
 #include "game_update.h"
-#include "play_dispatch.h"
 
 namespace banggame {
 

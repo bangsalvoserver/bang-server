@@ -12,7 +12,7 @@ namespace banggame {
         sound_list sounds;
     };
 
-    using expansion_data_list = std::span<const expansion_data>;
+    using expansion_map = utils::static_map_view<std::string_view, expansion_data>;
 
     using card_data_list = std::span<const card_data>;
 
@@ -31,7 +31,7 @@ namespace banggame {
         card_data_list feats;
         card_data_list hidden;
 
-        expansion_data_list expansions;
+        expansion_map expansions;
     };
 
     extern const bang_cards_t bang_cards;

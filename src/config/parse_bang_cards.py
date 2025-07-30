@@ -43,10 +43,10 @@ def check_allowed_filters(effect, target_type, player_filter, card_filter):
         'self_cubes': NONE
     }
 
-    if target_type and target_type not in ALLOWED_FILTERS:
+    if target_type not in ALLOWED_FILTERS:
         raise RuntimeError(f'Invalid target_type: {target_type}')
     
-    allowed_type = ALLOWED_FILTERS[target_type] if target_type else NONE
+    allowed_type = ALLOWED_FILTERS[target_type]
 
     if player_filter and allowed_type == NONE:
         raise RuntimeError(f'Invalid effect string: {effect}\nPlayer filter not allowed with {target_type}')
@@ -74,7 +74,7 @@ def parse_effects(effect_list):
 
         effect_type = match.group(1)
         effect_value = match.group(2)
-        target_type = match.group(3)
+        target_type = match.group(3) or 'none'
         target_value = match.group(4)
         player_filter = match.group(5)
         card_filter = match.group(6)
@@ -82,7 +82,7 @@ def parse_effects(effect_list):
         check_allowed_filters(effect, target_type, player_filter, card_filter)
 
         result.append(CppObject(
-            target =           CppLiteral(f'TARGET_TYPE({target_type})') if target_type else None,
+            target =           CppLiteral(f'TARGET_TYPE({target_type})'),
             player_filter =    [CppEnum('target_player_filter', f) for f in player_filter.split()] if player_filter else None,
             card_filter =      [CppEnum('target_card_filter', f) for f in card_filter.split()] if card_filter else None,
             target_value =     int(target_value) if target_value else None,
@@ -203,7 +203,7 @@ def parse_all_effects(card):
 
 def merge_cards(card_sets):
     result = {}
-    expansions = []
+    expansions = {}
     if not isinstance(card_sets, dict):
         raise RuntimeError(f'Error in merge_cards: Expected dict, got {card_sets}')
     for expansion, card_set in card_sets.items():
@@ -222,10 +222,10 @@ def merge_cards(card_sets):
             else:
                 result[deck] = cards
         
-        expansions.append(CppObject(
+        expansions[expansion] = CppObject(
             expansion = CppLiteral(f"GET_RULESET({expansion})") if expansion != 'base' else None,
             sounds = CppStatic('sound_id', [CppEnum('sound_id', sound) for sound in card_set['sounds']]) if 'sounds' in card_set else None
-        ))
+        )
     return result, expansions
 
 def parse_file(card_sets):
@@ -268,16 +268,19 @@ def parse_file(card_sets):
     
     data, expansions = merge_cards(card_sets)
 
-    return CppObject(**{
-        deck.name : CppStatic('card_data', [
-            parse_all_effects(card)
-            for card_data in data[deck.key or deck.name]
-            for card in deck.get_cards(card_data)
-        ])
-        for deck in DECKS
-    }, expansions = CppStatic('expansion_data', expansions))
+    return CppObject(
+        **{
+            deck.name : CppStatic('card_data', [
+                parse_all_effects(card)
+                for card_data in data[deck.key or deck.name]
+                for card in deck.get_cards(card_data)
+            ])
+            for deck in DECKS
+        },
+        expansions = CppStaticMap('std::string_view', 'expansion_data', expansions)
+    )
 
-INCLUDE_FILENAMES = ['cards/bang_cards.h', 'cards/vtable_build.h', 'effects/effects.h']
+INCLUDE_FILENAMES = ['cards/bang_cards.h', 'cards/vtable_build.h', 'effects/effects.h', 'target_types/target_types.h']
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

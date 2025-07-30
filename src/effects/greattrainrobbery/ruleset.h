@@ -9,7 +9,7 @@ namespace banggame {
 
     struct locomotive_context {
         int8_t locomotive_count;
-        nullable_player skipped_player;
+        player_ptr skipped_player;
     };
 
     using shared_locomotive_context = std::shared_ptr<locomotive_context>;

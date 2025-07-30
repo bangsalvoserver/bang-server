@@ -10,9 +10,9 @@ namespace banggame {
 
         const effect_holder &effect = effects[targets.size()];
 
-        for (play_card_target target : play_dispatch::possible_targets(origin, origin_card, effect, ctx)) {
+        for (play_card_target target : effect.possible_targets(origin_card, origin, ctx)) {
             auto ctx_copy = ctx;
-            play_dispatch::add_context(origin, origin_card, effect, ctx_copy, target);
+            effect.add_context(origin_card, origin, target, ctx_copy);
 
             targets.emplace_back(std::move(target));
             if (is_possible_recurse(origin, origin_card, effects, mth, ctx_copy, targets)) {

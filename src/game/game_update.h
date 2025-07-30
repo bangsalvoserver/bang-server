@@ -273,7 +273,6 @@ namespace banggame {
         modifier_list modifiers;
         target_list targets;
         bool bypass_prompt;
-        std::optional<timer_id_t> timer_id;
     };
 }
 

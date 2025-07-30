@@ -1,14 +1,10 @@
+#include "card_per_player.h"
+
 #include "game/possible_to_play.h"
 
 #include "cards/game_enums.h"
 
 namespace banggame {
-
-    using visit_cards = play_visitor<target_types::card_per_player>;
-
-    template<> std::generator<card_list> visit_cards::possible_targets(const effect_context &ctx) {
-        co_yield {};
-    }
 
     static auto cards_target_set(const_player_ptr origin, const_card_ptr origin_card, enums::bitset<target_card_filter> filter, player_ptr target, const effect_context &ctx) {
         return rv::concat(target->m_table, target->m_hand)
@@ -17,7 +13,7 @@ namespace banggame {
             });
     }
 
-    template<> card_list visit_cards::random_target(const effect_context &ctx) {
+    card_list targeting_card_per_player::random_target(const effect_context &ctx) {
         card_list ret;
         for (player_ptr target : origin->m_game->range_alive_players(origin)) {
             if (target != ctx.skipped_player && !check_player_filter(origin_card, origin, effect.player_filter, target, ctx)) {
@@ -29,7 +25,7 @@ namespace banggame {
         return ret;
     }
 
-    template<> game_string visit_cards::get_error(const effect_context &ctx, const card_list &target_cards) {
+    game_string targeting_card_per_player::get_error(const effect_context &ctx, const card_list &target_cards) {
         if (!rn::all_of(origin->m_game->m_players, [&](player_ptr p) {
             size_t found = rn::count(target_cards, p, &card::owner);
             if (p == ctx.skipped_player || check_player_filter(origin_card, origin, effect.player_filter, p, ctx)) return found == 0;
@@ -46,7 +42,7 @@ namespace banggame {
         }
     }
 
-    template<> prompt_string visit_cards::prompt(const effect_context &ctx, const card_list &target_cards) {
+    prompt_string targeting_card_per_player::on_prompt(const effect_context &ctx, const card_list &target_cards) {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
@@ -55,13 +51,13 @@ namespace banggame {
         }));
     }
 
-    template<> void visit_cards::add_context(effect_context &ctx, const card_list &target_cards) {
+    void targeting_card_per_player::add_context(effect_context &ctx, const card_list &target_cards) {
         for (card_ptr target_card : target_cards) {
             effect.add_context(origin_card, origin, target_card, ctx);
         }
     }
 
-    template<> void visit_cards::play(const effect_context &ctx, const card_list &target_cards) {
+    void targeting_card_per_player::on_play(const effect_context &ctx, const card_list &target_cards) {
         effect_flags flags = effect_flag::multi_target;
         if (target_cards.size() == 1) {
             flags.add(effect_flag::single_target);

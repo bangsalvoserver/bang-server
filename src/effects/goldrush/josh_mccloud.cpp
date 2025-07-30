@@ -8,6 +8,8 @@
 
 #include "game/possible_to_play.h"
 
+#include "target_types/none.h"
+
 namespace banggame {
 
     struct request_force_play_card : request_base {
@@ -30,7 +32,7 @@ namespace banggame {
                     target_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
                     
                     for (const effect_holder &effect : target_card->responses) {
-                        play_dispatch::play(target, target_card, effect, {}, target_types::none{});
+                        effect.on_play(target_card, target, {}, {});
                     }
                 }
             } else {

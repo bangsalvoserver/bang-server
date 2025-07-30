@@ -1,10 +1,10 @@
+#include "move_cube_slot.h"
+
 #include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"
 
 namespace banggame {
-
-    using visit_cards = play_visitor<target_types::move_cube_slot>;
 
     static auto make_move_cube_target_set(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
         return origin->m_table
@@ -14,7 +14,7 @@ namespace banggame {
             });
     }
 
-    template<> std::generator<card_list> visit_cards::possible_targets(const effect_context &ctx) {
+    std::generator<card_list> targeting_move_cube_slot::possible_targets(const effect_context &ctx) {
         if (origin->get_character()->num_cubes() != 0
             && contains_at_least(make_move_cube_target_set(origin, origin_card, ctx), 1)
         ) {
@@ -22,7 +22,7 @@ namespace banggame {
         }
     }
 
-    template<> card_list visit_cards::random_target(const effect_context &ctx) {
+    card_list targeting_move_cube_slot::random_target(const effect_context &ctx) {
         auto targets = make_move_cube_target_set(origin, origin_card, ctx) | rn::to_vector;
         rn::shuffle(targets, origin->m_game->bot_rng);
         
@@ -34,7 +34,7 @@ namespace banggame {
         return targets;
     }
 
-    template<> game_string visit_cards::get_error(const effect_context &ctx, const card_list &targets) {
+    game_string targeting_move_cube_slot::get_error(const effect_context &ctx, const card_list &targets) {
         if (targets.empty() || targets.size() > effect.target_value) {
             return "ERROR_INVALID_TARGETS";
         }
@@ -57,13 +57,7 @@ namespace banggame {
         return {};
     }
 
-    template<> prompt_string visit_cards::prompt(const effect_context &ctx, const card_list &targets) {
-        return {};
-    }
-
-    template<> void visit_cards::add_context(effect_context &ctx, const card_list &targets) {}
-
-    template<> void visit_cards::play(const effect_context &ctx, const card_list &targets) {
+    void targeting_move_cube_slot::on_play(const effect_context &ctx, const card_list &targets) {
         if (rn::all_of(targets, [first=targets.front()](card_ptr target_card) { return target_card == first; })) {
             origin->get_character()->move_cubes(targets.front(), static_cast<int>(targets.size()));
         } else {
