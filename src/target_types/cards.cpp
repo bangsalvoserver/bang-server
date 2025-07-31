@@ -10,7 +10,7 @@
 namespace banggame {
 
     std::generator<card_list> targeting_cards::possible_targets(const effect_context &ctx) {
-        if (contains_at_least(get_all_card_targets(origin, origin_card, effect, ctx), std::max<int>(1, effect.target_value))) {
+        if (contains_at_least(get_all_card_targets(origin, origin_card, effect, ctx), effect.target_value)) {
             co_yield {};
         }
     }
@@ -22,7 +22,7 @@ namespace banggame {
     }
 
     game_string targeting_cards::get_error(const effect_context &ctx, const card_list &targets) {
-        if (targets.size() != std::max<size_t>(1, effect.target_value)) {
+        if (targets.size() != effect.target_value) {
             return "ERROR_INVALID_TARGETS";
         }
         for (card_ptr c : targets) {
