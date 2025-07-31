@@ -10,8 +10,6 @@
 #include "game_table.h"
 #include "request_timer.h"
 
-#include "target_types/player.h"
-
 #include <unordered_set>
 
 namespace banggame {

@@ -8,8 +8,6 @@
 #include "net/bot_info.h"
 #include "net/logging.h"
 
-#include "target_types/player.h"
-
 namespace banggame {
 
     static game_action generate_random_play(player_ptr origin, const playable_card_info &args, bool is_response) {
