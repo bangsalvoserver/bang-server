@@ -22,7 +22,6 @@ target_sources(bangserver PRIVATE
     scrugs_ballad.cpp
     sid_ketchum.cpp
     slab_the_killer.cpp
-    thousand_ways_to_die.cpp
     train_to_yooma.cpp
     vulture_sam.cpp
     wounded_pride.cpp

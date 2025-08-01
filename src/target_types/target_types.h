@@ -11,6 +11,7 @@
 #include "extra_card.h"
 #include "max_cards.h"
 #include "bang_or_cards.h"
+#include "missed_and_same_suit.h"
 #include "move_cube_slot.h"
 #include "none.h"
 #include "player_per_cube.h"

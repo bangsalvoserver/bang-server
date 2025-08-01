@@ -10,6 +10,7 @@ PRIVATE
     extra_card.cpp
     max_cards.cpp
     bang_or_cards.cpp
+    missed_and_same_suit.cpp
     move_cube_slot.cpp
     none.cpp
     player_per_cube.cpp

@@ -34,6 +34,7 @@ def check_allowed_filters(effect, target_type, player_filter, card_filter):
         'max_cards': CARD,
         'bang_or_cards': CARD,
         'card_per_player': CARD,
+        'missed_and_same_suit': CARD,
         'cube_slot': PLAYER,
         'move_cube_slot': NONE,
         'select_cubes': NONE,

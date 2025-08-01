@@ -186,10 +186,8 @@ feats:
   - name: A_THOUSAND_WAYS_TO_DIE
     image: 23_mille_modi_per_morire
     effects:
-      - none card self | hand missedcard
-      - none card self | hand
+      - reveal_card missed_and_same_suit(2) self | hand
       - perform_feat
-    mth_effect: thousand_ways_to_die(0,1)
   - name: FOR_A_FEW_CARDS_MORE
     image: 23_per_qualche_carta_in_piu
     equip:

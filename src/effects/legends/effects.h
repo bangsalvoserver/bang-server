@@ -24,7 +24,6 @@
 #include "scrugs_ballad.h"
 #include "sid_ketchum.h"
 #include "slab_the_killer.h"
-#include "thousand_ways_to_die.h"
 #include "train_to_yooma.h"
 #include "vulture_sam.h"
 #include "wounded_pride.h"

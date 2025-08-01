@@ -28,6 +28,7 @@
 #include "pick.h"
 #include "predraw_check.h"
 #include "resolve.h"
+#include "reveal_card.h"
 #include "scope.h"
 #include "slab_the_killer.h"
 #include "steal_destroy.h"

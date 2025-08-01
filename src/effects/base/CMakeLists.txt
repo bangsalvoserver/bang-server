@@ -29,6 +29,7 @@ target_sources(bangserver PRIVATE
     predraw_check.cpp
     requests.cpp
     resolve.cpp
+    reveal_card.cpp
     scope.cpp
     slab_the_killer.cpp
     steal_destroy.cpp

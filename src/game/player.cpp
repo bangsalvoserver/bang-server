@@ -330,8 +330,8 @@ namespace banggame {
     void player::reveal_hand() {
         if (!empty_hand() && !m_game->check_flags(game_flag::hands_shown)) {
             for (card_ptr target_card : m_hand) {
-                target_card->set_visibility(card_visibility::shown);
                 m_game->add_log("LOG_REVEALED_CARD", this, target_card);
+                target_card->set_visibility(card_visibility::shown);
             }
             m_game->add_short_pause();
             for (card_ptr target_card : m_hand) {
