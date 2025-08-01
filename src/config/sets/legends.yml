@@ -14,6 +14,7 @@ legends:
     image: 23_calamity_janet
     equip:
       - add_flag(player_flag::treat_any_as_bang)
+      - add_flag(player_flag::treat_any_as_missed)
     effects:
       - banglimit
       - set_playing(play_as::bang) card self | hand not_bangcard
