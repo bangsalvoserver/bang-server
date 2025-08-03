@@ -9,15 +9,15 @@
 
 namespace banggame {
 
-    struct request_most_wanted : request_resolvable_timer, escapable_request {
+    struct request_most_wanted : request_escapable_resolvable {
         request_most_wanted(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
-            : request_resolvable_timer(origin_card, origin, target, flags) {}
+            : request_escapable_resolvable(origin_card, origin, target, flags) {}
         
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
                 target->m_game->pop_request();
             } else {
-                switch (get_escape_type(origin, target, origin_card, flags)) {
+                switch (get_escape_type()) {
                 case escape_type::no_escape:
                     set_duration(target->m_game->m_options.auto_resolve_timer);
                     break;

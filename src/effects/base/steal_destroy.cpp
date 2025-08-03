@@ -1,41 +1,16 @@
 #include "steal_destroy.h"
 
 #include "requests.h"
+#include "escapable.h"
 
 #include "game/game_table.h"
 #include "game/filters.h"
 #include "game/prompts.h"
-#include "game/game_options.h"
 #include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"
 
 namespace banggame {
-
-    void request_targeting::on_update() {
-        if (target->immune_to(origin_card, origin, flags)) {
-            target->m_game->pop_request();
-        } else if (origin == target_card->owner && auto_resolvable()) {
-            // auto resolve if targeting self, unless player has escape
-            on_resolve();
-        } else {
-            switch (get_escape_type(origin, target, origin_card, flags)) {
-            case escape_type::no_escape:
-                auto_resolve();
-                break;
-            case escape_type::escape_timer:
-                set_duration(target->m_game->m_options.escape_timer);
-            }
-        }
-    }
-    
-    card_list request_targeting::get_highlights(player_ptr owner) const {
-        if (target_card->pocket == pocket_type::player_hand) {
-            return target->m_hand;
-        } else {
-            return {target_card};
-        }
-    }
 
     game_string effect_steal::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         if (target_card->pocket == pocket_type::player_table && target_card->is_train()) {
@@ -76,7 +51,7 @@ namespace banggame {
         }, 42);
     }
 
-    struct request_steal : request_targeting, escapable_request {
+    struct request_steal : request_targeting {
         using request_targeting::request_targeting;
 
         void on_update() override {
@@ -192,7 +167,7 @@ namespace banggame {
         }, 42);
     }
     
-    struct request_destroy : request_targeting, escapable_request {
+    struct request_destroy : request_targeting {
         using request_targeting::request_targeting;
 
         void on_update() override {

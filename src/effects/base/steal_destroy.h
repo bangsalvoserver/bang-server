@@ -3,9 +3,6 @@
 
 #include "cards/card_effect.h"
 
-#include "resolve.h"
-#include "escapable.h"
-
 namespace banggame {
 
     namespace event_type {
@@ -52,18 +49,6 @@ namespace banggame {
     };
 
     DEFINE_EFFECT(destroy, effect_destroy)
-
-    struct request_targeting : request_resolvable_timer {
-        request_targeting(card_ptr origin_card, player_ptr origin, player_ptr target, card_ptr target_card, effect_flags flags = {}, int priority = 40)
-            : request_resolvable_timer(origin_card, origin, target, flags, priority)
-            , target_card(target_card) {}
-        
-        card_ptr target_card;
-
-        void on_update() override;
-
-        virtual card_list get_highlights(player_ptr owner) const override;
-    };
 }
 
 #endif

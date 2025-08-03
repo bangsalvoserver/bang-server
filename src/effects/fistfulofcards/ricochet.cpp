@@ -8,8 +8,16 @@
 
 namespace banggame {
     
-    struct request_ricochet : request_targeting, missable_request {
-        using request_targeting::request_targeting;
+    struct request_ricochet : request_resolvable, missable_request {
+        request_ricochet(card_ptr origin_card, player_ptr origin, card_ptr target_card)
+            : request_resolvable(origin_card, origin, target_card->owner)
+            , target_card(target_card) {}
+        
+        card_ptr target_card;
+
+        card_list get_highlights(player_ptr owner) const override {
+            return {target_card};
+        }
 
         void on_update() override {
             if (target->empty_hand()) {
@@ -41,6 +49,6 @@ namespace banggame {
     }
 
     void effect_ricochet::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        origin->m_game->queue_request<request_ricochet>(origin_card, origin, target_card->owner, target_card);
+        origin->m_game->queue_request<request_ricochet>(origin_card, origin, target_card);
     }
 }

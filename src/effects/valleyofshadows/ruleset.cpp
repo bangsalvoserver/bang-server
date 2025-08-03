@@ -15,14 +15,15 @@
 namespace banggame {
 
     void ruleset_valleyofshadows::on_apply(game_ptr game) {
-        game->add_listener<event_type::apply_escapable_modifier>(nullptr, [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, escape_type &value) {
-            if (!target->empty_hand()
-                && effect_escape::can_escape(origin, origin_card, flags)
-                && !rn::contains(target->m_game->m_discards, "ESCAPE", &card::name)
-            ) {
-                value = escape_type::escape_timer;
-            }
-        });
+        game->add_listener<event_type::apply_escapable_modifier>(nullptr,
+            [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, const escapable_request &req, escape_type &value) {
+                if (!target->empty_hand()
+                    && effect_escape::can_escape(origin, origin_card, flags)
+                    && !rn::contains(target->m_game->m_discards, "ESCAPE", &card::name)
+                ) {
+                    value = escape_type::escape_timer;
+                }
+            });
 
         game->add_listener<event_type::check_damage_response>(nullptr, [](player_ptr target, bool &value) {
             if (!value && rn::any_of(target->m_game->m_players, [&](player_ptr p) {
@@ -38,14 +39,15 @@ namespace banggame {
     }
 
     void ruleset_udolistinu::on_apply(game_ptr game) {
-        game->add_listener<event_type::apply_escapable_modifier>(nullptr, [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, escape_type &value) {
-            if (!target->empty_hand()
-                && effect_escape2::can_escape(origin, origin_card, flags)
-                && !rn::contains(target->m_game->m_discards, "ESCAPE", &card::name)
-            ) {
-                value = escape_type::escape_timer;
-            }
-        });
+        game->add_listener<event_type::apply_escapable_modifier>(nullptr,
+            [](card_ptr origin_card, player_ptr origin, const_player_ptr target, effect_flags flags, const escapable_request &req, escape_type &value) {
+                if (!target->empty_hand()
+                    && effect_escape2::can_escape(origin, origin_card, flags)
+                    && !rn::contains(target->m_game->m_discards, "ESCAPE", &card::name)
+                ) {
+                    value = escape_type::escape_timer;
+                }
+            });
         
         game->add_listener<event_type::check_damage_response>(nullptr, [](player_ptr target, bool &value) {
             if (!value && rn::any_of(target->m_game->m_players, [&](player_ptr p) {
