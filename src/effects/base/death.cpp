@@ -136,9 +136,13 @@ namespace banggame {
                     }
                 }
                 target->m_game->add_log("LOG_GAME_OVER");
+                update_target winner_target = update_target::includes();
                 for (player_ptr p : winners) {
                     p->add_player_flags(player_flag::winner);
-                    p->play_sound(sound_id::victory);
+                    winner_target.add(p);
+                }
+                if (winner_target) {
+                    target->m_game->add_update(winner_target, game_updates::play_sound{ sound_id::victory });
                 }
                 target->m_game->add_game_flags(game_flag::game_over);
             };

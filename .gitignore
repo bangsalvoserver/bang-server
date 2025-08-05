@@ -1,4 +1,5 @@
 .vscode/*
+.idea/*
 .vs/*
 out/*
 build/*
