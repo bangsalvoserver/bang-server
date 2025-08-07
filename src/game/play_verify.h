@@ -1,7 +1,7 @@
 #ifndef __PLAY_VERIFY_H__
 #define __PLAY_VERIFY_H__
 
-#include "game_update.h"
+#include "cards/card_defs.h"
 
 namespace banggame {
 
@@ -30,6 +30,20 @@ namespace banggame {
         play_verify_results::error,
         play_verify_results::prompt
     >;
+
+    struct card_targets_pair {
+        card_ptr card;
+        target_list targets;
+    };
+
+    using modifier_list = std::vector<card_targets_pair>;
+
+    struct game_action {
+        card_ptr card;
+        modifier_list modifiers;
+        target_list targets;
+        bool bypass_prompt;
+    };
 
     play_verify_result verify_and_play(player_ptr origin, const game_action &action);
 

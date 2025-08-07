@@ -124,12 +124,13 @@ namespace json {
 
 namespace banggame {
 
-    static std::pair<card_ptr, target_list> deserialize_card_targets(const json::json &card, const json::json &targets, const game_context &context, bool check_equip = false) {
-        card_ptr origin_card = json::deserialize<card_ptr, game_context>(card, context);
-        target_list result;
+    static card_targets_pair deserialize_card_targets(const json::json &card, const json::json &targets, const game_context &context, bool check_equip = false) {
+        card_targets_pair result {
+            .card = json::deserialize<card_ptr, game_context>(card, context)
+        };
 
-        if (check_equip && origin_card->is_equip_card()) {
-            if (origin_card->self_equippable()) {
+        if (check_equip && result.card->is_equip_card()) {
+            if (result.card->self_equippable()) {
                 if (!targets.empty()) {
                     throw json::deserialize_error("Self equippable card must have no targets");
                 }
@@ -137,12 +138,12 @@ namespace banggame {
                 if (targets.size() != 1) {
                     throw json::deserialize_error("Equip card must have one target");
                 }
-                result.emplace_back(json::deserialize<player_ptr, game_context>(targets[0], context));
+                result.targets.emplace_back(json::deserialize<player_ptr, game_context>(targets[0], context));
             }
         } else {
-            bool is_response = origin_card->m_game->pending_requests();
+            bool is_response = result.card->m_game->pending_requests();
 
-            const auto &effects = origin_card->get_effect_list(is_response);
+            const auto &effects = result.card->get_effect_list(is_response);
 
             if (effects.empty()) {
                 throw json::deserialize_error("Effect list is empty");
@@ -152,13 +153,13 @@ namespace banggame {
                 throw json::deserialize_error("Invalid number of targets");
             }
             
-            result.reserve(effects.size());
+            result.targets.reserve(effects.size());
             for (const auto &[effect, target] : rv::zip(effects, targets)) {
-                result.push_back(effect.target->deserialize_json(target, context));
+                result.targets.push_back(effect.target->deserialize_json(target, context));
             }
         }
 
-        return { origin_card, std::move(result) };
+        return result;
     }
 
     static const json::json &get_value(const json::json &obj, std::string_view key) {
@@ -179,8 +180,7 @@ namespace banggame {
             if (!modifier.is_object()) {
                 throw json::deserialize_error("Cannot deserialize modifier_pair: value is not an object");
             }
-            auto [card, targets] = deserialize_card_targets(get_value(modifier, "card"), get_value(modifier, "targets"), context);
-            result.emplace_back(card, std::move(targets));
+            result.push_back(deserialize_card_targets(get_value(modifier, "card"), get_value(modifier, "targets"), context));
         }
         return result;
     }

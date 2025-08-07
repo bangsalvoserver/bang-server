@@ -260,20 +260,6 @@ namespace banggame {
         game_updates::status_clear,
         game_updates::clear_logs
     >;
-
-    struct modifier_pair {
-        card_ptr card;
-        target_list targets;
-    };
-
-    using modifier_list = std::vector<modifier_pair>;
-
-    struct game_action {
-        card_ptr card;
-        modifier_list modifiers;
-        target_list targets;
-        bool bypass_prompt;
-    };
 }
 
 #endif
