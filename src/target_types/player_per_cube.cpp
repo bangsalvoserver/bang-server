@@ -9,10 +9,8 @@
 
 namespace banggame {
 
-    std::generator<targeting_player_per_cube::value_type> targeting_player_per_cube::possible_targets(const effect_context &ctx) {
-        if (contains_at_least(get_all_player_targets(origin, origin_card, effect, ctx), effect.target_value)) {
-            co_yield {};
-        }
+    bool targeting_player_per_cube::is_possible(const effect_context &ctx) {
+        return contains_at_least(get_all_player_targets(origin, origin_card, effect, ctx), effect.target_value);
     }
 
     targeting_player_per_cube::value_type targeting_player_per_cube::random_target(const effect_context &ctx) {

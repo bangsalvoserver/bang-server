@@ -10,7 +10,7 @@ namespace banggame {
         
         using value_type = card_list;
         
-        std::generator<card_list> possible_targets(const effect_context &ctx);
+        bool is_possible(const effect_context &ctx);
         card_list random_target(const effect_context &ctx);
         game_string get_error(const effect_context &ctx, const card_list &target);
         prompt_string on_prompt(const effect_context &ctx, const card_list &target) { return {}; }

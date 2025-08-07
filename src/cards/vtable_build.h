@@ -402,8 +402,15 @@ namespace banggame {
             },
 
             .possible_targets = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) -> std::generator<play_card_target> {
-                for (value_type value : T{origin_card, origin, effect}.possible_targets(ctx)) {
-                    co_yield play_card_target{std::move(value)};
+                T handler{origin_card, origin, effect};
+                if constexpr (requires { handler.is_possible(ctx); }) {
+                    if (handler.is_possible(ctx)) {
+                        co_yield play_card_target{value_type{}};
+                    }
+                } else {
+                    for (value_type value : handler.possible_targets(ctx)) {
+                        co_yield play_card_target{std::move(value)};
+                    }
                 }
             },
 

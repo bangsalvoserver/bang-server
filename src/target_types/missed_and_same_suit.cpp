@@ -26,11 +26,9 @@ namespace banggame {
         });
     }
     
-    std::generator<card_list> targeting_missed_and_same_suit::possible_targets(const effect_context &ctx) {
+    bool targeting_missed_and_same_suit::is_possible(const effect_context &ctx) {
         auto range = get_all_card_targets(origin, origin_card, effect, ctx);
-        if (missed_cards_with_same_suits_range(origin, range, effect.target_value)) {
-            co_yield {};
-        }
+        return bool(missed_cards_with_same_suits_range(origin, range, effect.target_value));
     }
 
     card_list targeting_missed_and_same_suit::random_target(const effect_context &ctx) {

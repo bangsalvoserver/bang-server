@@ -6,10 +6,8 @@
 
 namespace banggame {
 
-    std::generator<card_list> targeting_select_cubes::possible_targets(const effect_context &ctx) {
-        if (count_cubes(origin) >= effect.target_value) {
-            co_yield {};
-        }
+    bool targeting_select_cubes::is_possible(const effect_context &ctx) {
+        return count_cubes(origin) >= effect.target_value;
     }
 
     card_list targeting_select_cubes::random_target(const effect_context &ctx) {

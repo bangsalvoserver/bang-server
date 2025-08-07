@@ -10,7 +10,7 @@ namespace banggame {
     struct targeting_bang_or_cards : targeting_cards {
         using targeting_cards::targeting_cards;
         
-        std::generator<card_list> possible_targets(const effect_context &ctx);
+        bool is_possible(const effect_context &ctx);
         card_list random_target(const effect_context &ctx);
         game_string get_error(const effect_context &ctx, const card_list &target);
     };

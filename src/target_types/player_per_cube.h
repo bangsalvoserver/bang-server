@@ -14,7 +14,7 @@ namespace banggame {
             player_list players;
         };
         
-        std::generator<value_type> possible_targets(const effect_context &ctx);
+        bool is_possible(const effect_context &ctx);
         value_type random_target(const effect_context &ctx);
         game_string get_error(const effect_context &ctx, const value_type &target);
         prompt_string on_prompt(const effect_context &ctx, const value_type &target);

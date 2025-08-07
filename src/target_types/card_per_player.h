@@ -10,8 +10,8 @@ namespace banggame {
 
         using value_type = card_list;
         
-        std::generator<card_list> possible_targets(const effect_context &ctx) {
-            co_yield {};
+        bool is_possible(const effect_context &ctx) {
+            return true;
         }
         
         card_list random_target(const effect_context &ctx);

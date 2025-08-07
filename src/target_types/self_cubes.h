@@ -10,10 +10,8 @@ namespace banggame {
         
         using value_type = std::nullptr_t;
         
-        std::generator<value_type> possible_targets(const effect_context &ctx) {
-            if (!get_error(ctx, {})) {
-                co_yield {};
-            }
+        bool is_possible(const effect_context &ctx) {
+            return !get_error(ctx, {});
         }
 
         value_type random_target(const effect_context &ctx) {

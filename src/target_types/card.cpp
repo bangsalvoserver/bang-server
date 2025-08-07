@@ -1,21 +1,8 @@
 #include "card.h"
 
-#include "game/possible_to_play.h"
-
-#include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
 namespace banggame {
-
-    std::generator<card_ptr> targeting_card::possible_targets(const effect_context &ctx) {
-        for (card_ptr target : get_all_card_targets(origin, origin_card, effect, ctx)) {
-            co_yield target;
-        }
-    }
-
-    card_ptr targeting_card::random_target(const effect_context &ctx) {
-        return random_element(get_all_card_targets(origin, origin_card, effect, ctx), origin->m_game->bot_rng);
-    }
 
     game_string targeting_card::get_error(const effect_context &ctx, card_ptr target) {
         if (target->owner) {

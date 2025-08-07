@@ -3,6 +3,8 @@
 
 #include "cards/card_effect.h"
 
+#include "game/possible_to_play.h"
+
 namespace banggame {
 
     struct targeting_select_cubes_player : targeting_base {
@@ -14,7 +16,13 @@ namespace banggame {
             player_ptr player;
         };
         
-        std::generator<value_type> possible_targets(const effect_context &ctx);
+        auto possible_targets(const effect_context &ctx) {
+            return get_all_player_targets(origin, origin_card, effect, ctx)
+                | rv::transform([](player_ptr target) {
+                    return value_type{ .player = target };
+                });
+        }
+
         value_type random_target(const effect_context &ctx);
         game_string get_error(const effect_context &ctx, const value_type &target);
         prompt_string on_prompt(const effect_context &ctx, const value_type &target);

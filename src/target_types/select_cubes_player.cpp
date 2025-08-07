@@ -3,15 +3,7 @@
 #include "player.h"
 #include "select_cubes_optional.h"
 
-#include "game/possible_to_play.h"
-
 namespace banggame {
-
-    std::generator<targeting_select_cubes_player::value_type> targeting_select_cubes_player::possible_targets(const effect_context &ctx) {
-        for (player_ptr target : get_all_player_targets(origin, origin_card, effect, ctx)) {
-            co_yield { .player = target };
-        }
-    }
 
     targeting_select_cubes_player::value_type targeting_select_cubes_player::random_target(const effect_context &ctx) {
         auto cubes = targeting_select_cubes_optional{*this}.random_target(ctx);

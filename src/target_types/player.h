@@ -3,6 +3,8 @@
 
 #include "cards/card_effect.h"
 
+#include "game/possible_to_play.h"
+
 namespace banggame {
 
     struct targeting_player : targeting_base {
@@ -10,8 +12,14 @@ namespace banggame {
 
         using value_type = player_ptr;
         
-        std::generator<player_ptr> possible_targets(const effect_context &ctx);
-        player_ptr random_target(const effect_context &ctx);
+        auto possible_targets(const effect_context &ctx) {
+            return get_all_player_targets(origin, origin_card, effect, ctx);
+        }
+
+        player_ptr random_target(const effect_context &ctx) {
+            return random_element(possible_targets(ctx), origin->m_game->bot_rng);
+        }
+
         game_string get_error(const effect_context &ctx, player_ptr target);
         prompt_string on_prompt(const effect_context &ctx, player_ptr target);
         void add_context(effect_context &ctx, player_ptr target);

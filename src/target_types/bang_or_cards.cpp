@@ -6,10 +6,8 @@
 
 namespace banggame {
 
-    std::generator<card_list> targeting_bang_or_cards::possible_targets(const effect_context &ctx) {
-        if (get_all_card_targets(origin, origin_card, effect, ctx)) {
-            co_yield {};
-        }
+    bool targeting_bang_or_cards::is_possible(const effect_context &ctx) {
+        return bool(get_all_card_targets(origin, origin_card, effect, ctx));
     }
 
     card_list targeting_bang_or_cards::random_target(const effect_context &ctx) {

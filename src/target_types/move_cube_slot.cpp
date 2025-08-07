@@ -14,12 +14,9 @@ namespace banggame {
             });
     }
 
-    std::generator<card_list> targeting_move_cube_slot::possible_targets(const effect_context &ctx) {
-        if (origin->get_character()->num_cubes() != 0
-            && contains_at_least(make_move_cube_target_set(origin, origin_card, ctx), 1)
-        ) {
-            co_yield {};
-        }
+    bool targeting_move_cube_slot::is_possible(const effect_context &ctx) {
+        return origin->get_character()->num_cubes() != 0
+            && contains_at_least(make_move_cube_target_set(origin, origin_card, ctx), 1);
     }
 
     card_list targeting_move_cube_slot::random_target(const effect_context &ctx) {
