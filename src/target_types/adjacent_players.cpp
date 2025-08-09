@@ -11,6 +11,9 @@ namespace banggame {
         if (!targets[1]->alive()) {
             return {"ERROR_TARGET_DEAD", origin_card, targets[1]};
         }
+        if (origin == targets[1]) {
+            return "ERROR_TARGET_SELF";
+        }
         if (targets[0] == targets[1] || origin->m_game->calc_distance(targets[0], targets[1]) > max_distance) {
             return "ERROR_TARGETS_NOT_ADJACENT";
         }
