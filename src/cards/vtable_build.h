@@ -161,7 +161,7 @@ namespace banggame {
     #endif
 
     #define BUILD_EFFECT_VTABLE(name, type) template<> const effect_vtable effect_vtable_map<#name>::value = build_effect_vtable<type>(#name);
-    #define EFFECT_VALUE(name, ...) effect_vtable_map<#name>::type
+    #define EFFECT_VALUE(name) effect_vtable_map<#name>::type
     
     template<typename T>
     constexpr equip_vtable build_equip_vtable(std::string_view name) {
