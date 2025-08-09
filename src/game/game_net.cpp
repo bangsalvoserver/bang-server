@@ -36,10 +36,10 @@ namespace json {
         struct skip_field{};
     };
 
-    template<typename Context> struct serializer<banggame::effect_holder, Context> : aggregate_serializer_unchecked<banggame::effect_holder, Context> {
-        json operator()(const banggame::effect_holder &effect, const Context &ctx) const {
-            json result = aggregate_serializer_unchecked<banggame::effect_holder, Context>::operator()(effect, ctx);
-            json value = effect.target->serialize_args(effect);
+    template<> struct serializer<banggame::effect_holder, banggame::game_context> : aggregate_serializer_unchecked<banggame::effect_holder, banggame::game_context> {
+        json operator()(const banggame::effect_holder &effect, const banggame::game_context &ctx) const {
+            json result = aggregate_serializer_unchecked<banggame::effect_holder, banggame::game_context>::operator()(effect, ctx);
+            json value = effect.target->serialize_args(effect, ctx);
             if (value.is_object()) {
                 for (auto &[key, val] : value.items()) {
                     result[key] = std::move(val);
