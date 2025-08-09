@@ -12,7 +12,7 @@ namespace banggame {
         bool valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr playing_card) {
             return true;
         }
-        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card);
+        bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card);
         void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
     };
     

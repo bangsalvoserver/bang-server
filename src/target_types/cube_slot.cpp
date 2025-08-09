@@ -2,10 +2,10 @@
 
 namespace banggame {
 
-    game_string targeting_cube_slot::get_error(const effect_context &ctx, card_ptr target) {
+    game_string targeting_cube_slot::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
         if (!target->owner) return "ERROR_CARD_HAS_NO_OWNER";
 
-        MAYBE_RETURN(check_player_filter(origin_card, origin, effect.player_filter, target->owner, ctx));
+        MAYBE_RETURN(check_player_filter(origin_card, origin, player_filter, target->owner, ctx));
 
         if (target != target->owner->get_character()
             && !(target->pocket == pocket_type::player_table && target->is_orange())
@@ -13,7 +13,7 @@ namespace banggame {
             return "ERROR_TARGET_NOT_CUBE_SLOT";
         }
 
-        if (effect.target_value != 0) {
+        if (stealing) {
             if (target == origin->get_character()) {
                 return "ERROR_TARGET_PLAYING_CARD";
             }

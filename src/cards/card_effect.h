@@ -13,17 +13,39 @@ namespace banggame {
         void on_disable(card_ptr target_card, player_ptr target);
     };
 
-    struct targeting_base {
-        card_ptr origin_card;
-        player_ptr origin;
-        const effect_holder &effect;
+    enum class target_filter {
+        none,
+        player,
+        card
+    };
 
-        targeting_base(card_ptr origin_card, player_ptr origin, const effect_holder &effect)
-            : origin_card{origin_card}, origin{origin}, effect{effect} {}
-        
-        template<std::derived_from<targeting_base> T>
-        targeting_base(const T &value)
-            : targeting_base{value.origin_card, value.origin, value.effect} {}
+    template<typename T, target_filter F>
+    struct targeting_args;
+
+    template<> struct targeting_args<void, target_filter::none>{};
+
+    template<> struct targeting_args<void, target_filter::player>{
+        player_filter_bitset player_filter;
+    };
+
+    template<> struct targeting_args<void, target_filter::card>{
+        player_filter_bitset player_filter;
+        card_filter_bitset card_filter;
+    };
+
+    template<typename T> struct targeting_args<T, target_filter::none>{
+        T target_value;
+    };
+
+    template<typename T> struct targeting_args<T, target_filter::player>{
+        T target_value;
+        player_filter_bitset player_filter;
+    };
+
+    template<typename T> struct targeting_args<T, target_filter::card>{
+        T target_value;
+        player_filter_bitset player_filter;
+        card_filter_bitset card_filter;
     };
 
 }

@@ -161,7 +161,7 @@ namespace banggame {
     #endif
 
     #define BUILD_EFFECT_VTABLE(name, type) template<> const effect_vtable effect_vtable_map<#name>::value = build_effect_vtable<type>(#name);
-    #define BUILD_EFFECT_VALUE(name, ...) (effect_vtable_map<#name>::type{__VA_ARGS__})
+    #define EFFECT_VALUE(name, ...) effect_vtable_map<#name>::type
     
     template<typename T>
     constexpr equip_vtable build_equip_vtable(std::string_view name) {
@@ -199,7 +199,7 @@ namespace banggame {
     #endif
 
     #define BUILD_EQUIP_VTABLE(name, type) template<> const equip_vtable equip_vtable_map<#name>::value = build_equip_vtable<type>(#name);
-    #define BUILD_EQUIP_VALUE(name, ...) (equip_vtable_map<#name>::type{__VA_ARGS__})
+    #define EQUIP_VALUE(name) equip_vtable_map<#name>::type
 
     template<typename T>
     constexpr modifier_vtable build_modifier_vtable(std::string_view name) {
@@ -252,7 +252,7 @@ namespace banggame {
     #endif
 
     #define BUILD_MODIFIER_VTABLE(name, type) template<> const modifier_vtable modifier_vtable_map<#name>::value = build_modifier_vtable<type>(#name);
-    #define BUILD_MODIFIER_VALUE(name, ...) (modifier_vtable_map<#name>::type{__VA_ARGS__})
+    #define MODIFIER_VALUE(name) modifier_vtable_map<#name>::type
 
     template<int ... Is>
     struct indices_t {
@@ -365,7 +365,7 @@ namespace banggame {
     #define BUILD_MTH_VTABLE(name, type) template<> const mth_vtable mth_vtable_map<#name>::value = build_mth_vtable<type>(#name);
 
     #define MAKE_INDICES(...) indices_t<__VA_ARGS__>{}
-    #define BUILD_MTH_VALUE(name, indices, ...) (mth_value{ mth_vtable_map<#name>::type{__VA_ARGS__}, MAKE_INDICES indices })
+    #define MTH_VALUE(name) mth_value<mth_vtable_map<#name>::type>
     
     template<typename T>
     constexpr ruleset_vtable build_ruleset_vtable(std::string_view name) {
@@ -403,41 +403,50 @@ namespace banggame {
         return {
             .name = name,
             
-            .deserialize_json = [](const json::json &value, const game_context &context) -> play_card_target {
+            .deserialize_target = [](const json::json &value, const game_context &context) -> play_card_target {
                 return play_card_target{json::deserialize<value_type, game_context>(value, context)};
             },
 
+            .serialize_args = [](const effect_holder &effect) -> json::json {
+                auto &&handler = effect_cast<T>(effect.target_value);
+                if constexpr (requires { handler.get_args(); }) {
+                    return json::serialize(handler.get_args());
+                } else {
+                    return {};
+                }
+            },
+
             .possible_targets = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) -> std::generator<play_card_target> {
-                T handler{origin_card, origin, effect};
-                if constexpr (requires { handler.is_possible(ctx); }) {
-                    if (handler.is_possible(ctx)) {
+                auto &&handler = effect_cast<T>(effect.target_value);
+                if constexpr (requires { handler.is_possible(origin_card, origin, effect, ctx); }) {
+                    if (handler.is_possible(origin_card, origin, effect, ctx)) {
                         co_yield play_card_target{value_type{}};
                     }
                 } else {
-                    for (value_type value : handler.possible_targets(ctx)) {
+                    for (value_type value : handler.possible_targets(origin_card, origin, effect, ctx)) {
                         co_yield play_card_target{std::move(value)};
                     }
                 }
             },
 
             .random_target = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) -> play_card_target {
-                return play_card_target{value_type{T{origin_card, origin, effect}.random_target(ctx)}};
+                return play_card_target{value_type{effect_cast<T>(effect.target_value).random_target(origin_card, origin, effect, ctx)}};
             },
 
             .get_error = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) -> game_string {
-                return T{origin_card, origin, effect}.get_error(ctx, target.get<value_type>());
+                return effect_cast<T>(effect.target_value).get_error(origin_card, origin, effect, ctx, target.get<value_type>());
             },
 
             .on_prompt = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) -> prompt_string {
-                return T{origin_card, origin, effect}.on_prompt(ctx, target.get<value_type>());
+                return effect_cast<T>(effect.target_value).on_prompt(origin_card, origin, effect, ctx, target.get<value_type>());
             },
 
             .add_context = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const play_card_target &target) {
-                T{origin_card, origin, effect}.add_context(ctx, target.get<value_type>());
+                effect_cast<T>(effect.target_value).add_context(origin_card, origin, effect, ctx, target.get<value_type>());
             },
 
             .on_play = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) {
-                T{origin_card, origin, effect}.on_play(ctx, target.get<value_type>());
+                effect_cast<T>(effect.target_value).on_play(origin_card, origin, effect, ctx, target.get<value_type>());
             }
         };
     }
@@ -447,6 +456,8 @@ namespace banggame {
     #endif
 
     #define BUILD_TARGETING_VTABLE(name, type) template<> const targeting_vtable targeting_vtable_map<#name>::value = build_targeting_vtable<type>(#name);
+    #define TARGET_VALUE(name) targeting_vtable_map<#name>::type
+
 }
 
 #endif

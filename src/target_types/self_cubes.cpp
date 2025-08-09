@@ -4,21 +4,21 @@
 
 namespace banggame {
 
-    game_string targeting_self_cubes::get_error(const effect_context &ctx, value_type) {
-        if (origin_card->num_cubes() < effect.target_value) {
+    game_string targeting_self_cubes::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
+        if (origin_card->num_cubes() < ncubes) {
             return "ERROR_NOT_ENOUGH_CUBES";
         }
         return {};
     }
 
-    void targeting_self_cubes::add_context(effect_context &ctx, value_type) {
+    void targeting_self_cubes::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, value_type) {
         ctx.selected_cubes.insert(origin_card,
-            card_list{static_cast<size_t>(effect.target_value), origin_card},
-            effect.target_value);
+            card_list{static_cast<size_t>(ncubes), origin_card},
+            ncubes);
     }
 
-    void targeting_self_cubes::on_play(const effect_context &ctx, value_type) {
-        origin_card->move_cubes(nullptr, effect.target_value);
+    void targeting_self_cubes::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
+        origin_card->move_cubes(nullptr, ncubes);
     }
 
 }

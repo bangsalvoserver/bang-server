@@ -196,7 +196,8 @@ namespace banggame {
     struct targeting_vtable {
         std::string_view name;
 
-        play_card_target (*deserialize_json)(const json::json &value, const game_context &context);
+        play_card_target (*deserialize_target)(const json::json &value, const game_context &context);
+        json::json (*serialize_args)(const effect_holder &effect);
 
         std::generator<play_card_target> (*possible_targets)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
         play_card_target (*random_target)(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);

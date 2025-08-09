@@ -36,6 +36,7 @@ main_deck:
       - bang player_per_cube(1) reachable notself
     tags:
       - skip_logs
+      - ranged_effect
   - name: FLINTLOCK
     signs:
       - A spades
@@ -46,6 +47,7 @@ main_deck:
       - flintlock
     tags:
       - skip_logs
+      - ranged_effect
   - name: ARROW
     signs:
       - 5 diamonds
@@ -258,7 +260,7 @@ character:
     image: 17_frankiecanton
     effects:
       - max_usages(1)
-      - frankie_canton cube_slot(1)
+      - frankie_canton cube_slot(true)
   - name: JULIE_CUTTER
     image: 17_juliecutter
     equip:
@@ -271,6 +273,7 @@ character:
       - bang player reachable notself
     tags:
       - skip_logs
+      - ranged_effect
   - name: MS_ABIGAIL
     image: 17_msabigail
     equip:

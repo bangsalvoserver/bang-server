@@ -62,6 +62,7 @@ main_deck:
       - bang player reachable notself
     tags:
       - skip_logs
+      - ranged_effect
   - <<: *missed
     signs:
       - J spades
@@ -219,6 +220,7 @@ main_deck:
       - steal random_if_hand_card range_1
     tags:
       - skip_logs
+      - ranged_effect
   - name: SHYLOCK
     signs:
       - 9 diamonds

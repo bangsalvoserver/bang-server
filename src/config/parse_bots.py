@@ -37,10 +37,7 @@ def parse_bot_rule(value):
     
     rule_name = match.group(1)
     rule_args = match.group(2)
-    if rule_args:
-        return CppStatic('auto', CppLiteral(f'BUILD_BOT_RULE({rule_name}, {rule_args})'))
-    else:
-        return CppStatic('auto', CppLiteral(f'BUILD_BOT_RULE({rule_name})'))
+    return CppStatic(f'BOT_RULE({rule_name})', CppLiteral(rule_args or ''))
 
 def parse_settings(settings):
     return CppObject(

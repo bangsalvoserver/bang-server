@@ -28,6 +28,7 @@ main_deck:
       - play_as_bang
       - banglimit
       - skip_logs
+      - ranged_effect
   - name: RATTLESNAKE
     signs:
       - 7 hearts
@@ -114,6 +115,7 @@ main_deck:
     tags:
       - skip_logs
       - banglimit
+      - ranged_effect
   - name: TOMAHAWK
     signs:
       - A diamonds
@@ -123,6 +125,7 @@ main_deck:
       - bang player notself range_2
     tags:
       - skip_logs
+      - ranged_effect
   - name: TORNADO
     signs:
       - A clubs
@@ -147,6 +150,7 @@ character:
       - bang player reachable notself
     tags:
       - skip_logs
+      - ranged_effect
   - name: COLORADO_BILL
     image: 07_coloradobill2
     equip:

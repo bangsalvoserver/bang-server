@@ -120,12 +120,10 @@ namespace banggame {
     using target_list = std::vector<play_card_target>;
 
     struct effect_holder {
-        target_type target;
-        enums::bitset<target_player_filter> player_filter;
-        enums::bitset<target_card_filter> card_filter;
-        short target_value;
         const effect_vtable *type;
         const void *effect_value;
+        const targeting_vtable *target;
+        const void *target_value;
 
         explicit operator bool () const {
             return type != nullptr;

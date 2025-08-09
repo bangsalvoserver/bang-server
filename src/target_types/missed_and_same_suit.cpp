@@ -3,8 +3,6 @@
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
-#include "game/possible_to_play.h"
-
 namespace banggame {
 
     static bool is_missed_card(player_ptr origin, card_ptr target) {
@@ -26,17 +24,17 @@ namespace banggame {
         });
     }
     
-    bool targeting_missed_and_same_suit::is_possible(const effect_context &ctx) {
-        auto range = get_all_card_targets(origin, origin_card, effect, ctx);
-        return bool(missed_cards_with_same_suits_range(origin, range, effect.target_value));
+    bool targeting_missed_and_same_suit::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        auto range = target_card.possible_targets(origin_card, origin, effect, ctx);
+        return bool(missed_cards_with_same_suits_range(origin, range, ncards));
     }
 
-    card_list targeting_missed_and_same_suit::random_target(const effect_context &ctx) {
-        auto range = get_all_card_targets(origin, origin_card, effect, ctx);
-        auto missed_cards = missed_cards_with_same_suits_range(origin, range, effect.target_value);
+    card_list targeting_missed_and_same_suit::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        auto range = target_card.possible_targets(origin_card, origin, effect, ctx);
+        auto missed_cards = missed_cards_with_same_suits_range(origin, range, ncards);
         card_ptr missed_card = random_element(missed_cards, origin->m_game->bot_rng);
         auto result = cards_with_same_suits_range(range, missed_card)
-            | rv::sample(effect.target_value - 1, origin->m_game->bot_rng)
+            | rv::sample(ncards - 1, origin->m_game->bot_rng)
             | rn::to_vector;
         
         std::uniform_int_distribution<size_t> dist{0, result.size()};
@@ -44,8 +42,8 @@ namespace banggame {
         return result;
     }
 
-    game_string targeting_missed_and_same_suit::get_error(const effect_context &ctx, const card_list &targets) {
-        MAYBE_RETURN(targeting_cards::get_error(ctx, targets));
+    game_string targeting_missed_and_same_suit::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
+        MAYBE_RETURN(targeting_cards::get_error(origin_card, origin, effect, ctx, targets));
 
         if (rn::none_of(targets, [&](card_ptr target) {
             return is_missed_card(origin, target);

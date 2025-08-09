@@ -8,6 +8,8 @@ fistfulofcards:
     effects:
       - discard cards(2) self | hand bang
       - sniper player reachable notself
+    tags:
+      - ranged_effect
   - name: DEAD_MAN
     image: 05_deadman
     expansion: ghost_cards

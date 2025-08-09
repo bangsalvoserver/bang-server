@@ -80,6 +80,7 @@ namespace banggame {
         max_hp,
         bronco,
         dynamite,
+        ranged_effect,
     };
 }
 

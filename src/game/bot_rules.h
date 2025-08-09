@@ -33,7 +33,7 @@ namespace banggame {
 
     #define DEFINE_BOT_RULE(name, rule_type) template<> struct bot_rule_map<#name> { using type = rule_type; };
 
-    #define BUILD_BOT_RULE(name, ...) bot_rule_map<#name>::type{__VA_ARGS__}
+    #define BOT_RULE(name) bot_rule_map<#name>::type
     
     struct rule_filter_by_pocket {
         pocket_type pocket;

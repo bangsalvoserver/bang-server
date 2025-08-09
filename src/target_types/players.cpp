@@ -1,7 +1,5 @@
 #include "players.h"
 
-#include "player.h"
-
 #include "game/possible_to_play.h"
 
 #include "cards/filter_enums.h"
@@ -9,21 +7,21 @@
 
 namespace banggame {
 
-    static auto get_player_targets_range(const_card_ptr origin_card, player_ptr origin, enums::bitset<target_player_filter> player_filter, const effect_context &ctx) {
+    static auto get_player_targets_range(const_card_ptr origin_card, player_ptr origin, player_filter_bitset player_filter, const effect_context &ctx) {
         return origin->m_game->range_alive_players(origin) | rv::filter([=, &ctx](const_player_ptr target) {
             return target != ctx.skipped_player && !check_player_filter(origin_card, origin, player_filter, target, ctx);
         });
     }
 
-    game_string targeting_players::get_error(const effect_context &ctx, value_type) {
-        for (player_ptr target : get_player_targets_range(origin_card, origin, effect.player_filter, ctx)) {
+    game_string targeting_players::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
+        for (player_ptr target : get_player_targets_range(origin_card, origin, target_player.player_filter, ctx)) {
             MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
         return {};
     }
 
-    prompt_string targeting_players::on_prompt(const effect_context &ctx, value_type) {
-        auto targets = get_player_targets_range(origin_card, origin, effect.player_filter, ctx);
+    prompt_string targeting_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
+        auto targets = get_player_targets_range(origin_card, origin, target_player.player_filter, ctx);
         if (targets.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
@@ -32,14 +30,14 @@ namespace banggame {
         }));
     }
 
-    void targeting_players::add_context(effect_context &ctx, value_type) {
-        for (player_ptr target : get_player_targets_range(origin_card, origin, effect.player_filter, ctx)) {
-            targeting_player{*this}.add_context(ctx, target);
+    void targeting_players::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, value_type) {
+        for (player_ptr target : get_player_targets_range(origin_card, origin, target_player.player_filter, ctx)) {
+            target_player.add_context(origin_card, origin, effect, ctx, target);
         }
     }
 
-    void targeting_players::on_play(const effect_context &ctx, value_type) {
-        auto targets = get_player_targets_range(origin_card, origin, effect.player_filter, ctx);
+    void targeting_players::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
+        auto targets = get_player_targets_range(origin_card, origin, target_player.player_filter, ctx);
 
         effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
         if (get_single_element(targets)) {

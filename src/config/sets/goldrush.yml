@@ -14,6 +14,7 @@ character:
       - bang player reachable notself
     tags:
       - skip_logs
+      - ranged_effect
   - name: JOSH_MCCLOUD
     image: 04_josh_mccloud
     effects:
@@ -211,6 +212,7 @@ hidden:
       - steal random_if_hand_card range_1
     tags:
       - card_choice(1)
+      - ranged_effect
   - name: BOTTLE_BEER
     image: main_deck/01_birra
     color: brown
@@ -235,6 +237,7 @@ hidden:
       - bang player reachable notself
     tags:
       - card_choice(1)
+      - ranged_effect
   - name: PARDNER_GENERAL_STORE
     image: main_deck/01_emporio
     color: brown

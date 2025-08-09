@@ -25,6 +25,7 @@ legends:
     tags:
       - play_as_bang
       - banglimit
+      - ranged_effect
   - name: EL_GRINGO
     image: 23_el_gringo
     equip:
@@ -81,6 +82,8 @@ legends:
       - max_usages(1)
       - discard card self | blue
       - steal random_if_hand_card range_1
+    tags:
+      - ranged_effect
   - name: SID_KETCHUM
     image: 23_sid_ketchum
     equip:
@@ -112,6 +115,8 @@ legends:
     effects:
       - perform_feat
       - bang player reachable notself
+    tags:
+      - ranged_effect
 
 feats:
   - name: FIFTY_GUNS
@@ -218,6 +223,7 @@ hidden:
       - bang player reachable notself
     tags:
       - preselect
+      - ranged_effect
   - name: CLAIM_FEAT
     responses:
       - damage_legend player target_set

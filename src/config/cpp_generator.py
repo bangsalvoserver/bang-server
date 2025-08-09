@@ -55,8 +55,9 @@ class CppEnum:
         return hash((self.enum_name, self.value))
 
 class CppLiteral:
-    def __init__(self, value):
+    def __init__(self, value, verbatim = False):
         self.value = value
+        self.verbatim = verbatim
     
     def __str__(self):
         return self.value
@@ -143,14 +144,16 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
             case CppDeclaration():
                 return f"{SPACE * indent}{object_value.object_name} {object_to_string(object_value.object_value, indent)};\n"
             case CppObject():
-                if not object_value.value: return '{}'
-                return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}.{key} {object_to_string(value, indent + 1)}" for key, value in object_value.value.items() if value is not None) + '\n' + (SPACE * indent) + '}'
+                filtered_items = [(key, value) for key, value in (object_value.value or {}).items() if value is not None]
+                if not filtered_items: return '{}'
+                return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}.{key} {object_to_string(value, indent + 1)}" for key, value in filtered_items) + '\n' + (SPACE * indent) + '}'
             case dict():
                 if not object_value: return '{}'
                 return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{{{object_to_string(key)}, {object_to_string(value)}}}" for key, value in object_value.items()) + '\n' + (SPACE * indent) + '}'
             case list() | set():
-                if not object_value: return '{}'
-                return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(value, indent + 1)}" for value in object_value if value is not None) + '\n' + (SPACE * indent) + '}'
+                filtered_items = [value for value in (object_value or []) if value is not None]
+                if not filtered_items: return '{}'
+                return '{\n' + ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(value, indent + 1)}" for value in filtered_items) + '\n' + (SPACE * indent) + '}'
             case tuple():
                 if not object_value: return '{}'
                 return '{ ' + ', '.join(f"{object_to_string(value, indent)}" for value in object_value) + ' }'
@@ -159,6 +162,9 @@ def convert_declaration(declaration: CppDeclaration, indent = 0):
                 return f'{{utils::make_static_map<{object_value.key_type}, {object_value.value_type}>({{\n' + \
                     ',\n'.join(f"{SPACE * (indent + 1)}{object_to_string(pair, indent + 1)}" for pair in object_value.value.items()) + \
                     '\n' + (SPACE * indent) + '})}'
+            case CppLiteral():
+                if object_value.verbatim: return object_value.value
+                else: return f'{{{object_value.value}}}'
             case str():
                 return f'{{\"{object_value}\"sv}}'
             case bool():

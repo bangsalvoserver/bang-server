@@ -24,7 +24,7 @@ namespace banggame {
         modifier_holder modifier_response;
         mth_holder mth_effect;
         mth_holder mth_response;
-        enums::bitset<target_player_filter> equip_target;
+        player_filter_bitset equip_target;
         
         card_color_type color;
         card_sign sign;

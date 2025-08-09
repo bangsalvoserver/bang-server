@@ -2,46 +2,44 @@
 
 #include "card.h"
 
-#include "game/possible_to_play.h"
-
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
 namespace banggame {
 
-    bool targeting_cards::is_possible(const effect_context &ctx) {
-        return contains_at_least(get_all_card_targets(origin, origin_card, effect, ctx), effect.target_value);
+    bool targeting_cards::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        return contains_at_least(target_card.possible_targets(origin_card, origin, effect, ctx), ncards);
     }
 
-    card_list targeting_cards::random_target(const effect_context &ctx) {
-        return get_all_card_targets(origin, origin_card, effect, ctx)
-            | rv::sample(effect.target_value, origin->m_game->bot_rng)
+    card_list targeting_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        return target_card.possible_targets(origin_card, origin, effect, ctx)
+            | rv::sample(ncards, origin->m_game->bot_rng)
             | rn::to_vector;
     }
 
-    game_string targeting_cards::get_error(const effect_context &ctx, const card_list &targets) {
-        if (targets.size() != effect.target_value) {
+    game_string targeting_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
+        if (targets.size() != ncards) {
             return "ERROR_INVALID_TARGETS";
         }
         for (card_ptr c : targets) {
-            MAYBE_RETURN(targeting_card{*this}.get_error(ctx, c));
+            MAYBE_RETURN(target_card.get_error(origin_card, origin, effect, ctx, c));
         }
         return {};
     }
 
-    prompt_string targeting_cards::on_prompt(const effect_context &ctx, const card_list &targets) {
+    prompt_string targeting_cards::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
         return merge_prompts(targets | rv::transform([&](card_ptr c) {
-            return targeting_card{*this}.on_prompt(ctx, c);
+            return target_card.on_prompt(origin_card, origin, effect, ctx, c);
         }));
     }
 
-    void targeting_cards::add_context(effect_context &ctx, const card_list &targets) {
+    void targeting_cards::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &targets) {
         for (card_ptr c : targets) {
-            targeting_card{*this}.add_context(ctx, c);
+            target_card.add_context(origin_card, origin, effect, ctx, c);
         }
     }
 
-    void targeting_cards::on_play(const effect_context &ctx, const card_list &targets) {
+    void targeting_cards::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
         for (card_ptr c : targets) {
             effect.on_play(origin_card, origin, c, effect_flag::multi_target, ctx);
         }

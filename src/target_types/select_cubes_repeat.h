@@ -10,12 +10,12 @@ namespace banggame {
     struct targeting_select_cubes_repeat : targeting_select_cubes {
         using targeting_select_cubes::targeting_select_cubes;
         
-        bool is_possible(const effect_context &ctx) {
+        bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
             return true;
         }
 
-        card_list random_target(const effect_context &ctx);
-        game_string get_error(const effect_context &ctx, const card_list &target);
+        card_list random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
+        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target);
     };
 
     DEFINE_TARGETING(select_cubes_repeat, targeting_select_cubes_repeat)

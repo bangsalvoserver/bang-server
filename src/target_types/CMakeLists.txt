@@ -6,7 +6,6 @@ PRIVATE
     conditional_player.cpp
     cube_slot.cpp
     adjacent_players.cpp
-    random_if_hand_card.cpp
     extra_card.cpp
     max_cards.cpp
     bang_or_cards.cpp
@@ -15,8 +14,6 @@ PRIVATE
     player_per_cube.cpp
     player.cpp
     players.cpp
-    select_cubes_optional.cpp
-    select_cubes_player.cpp
     select_cubes_repeat.cpp
     select_cubes.cpp
     self_cubes.cpp

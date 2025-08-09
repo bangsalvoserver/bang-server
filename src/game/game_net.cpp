@@ -20,13 +20,32 @@ namespace json {
         }
     };
 
+    template<typename Context> struct serializer<const banggame::effect_vtable *, Context> {
+        json operator()(const banggame::effect_vtable *value) const {
+            return value->name;
+        }
+    };
+
+    template<typename Context> struct serializer<const banggame::targeting_vtable *, Context> {
+        json operator()(const banggame::targeting_vtable *value) const {
+            return value->name;
+        }
+    };
+
     template<> struct serializer<const void *, banggame::game_context> {
         struct skip_field{};
     };
 
-    template<typename Context> struct serializer<const banggame::effect_vtable *, Context> {
-        json operator()(const banggame::effect_vtable *value) const {
-            return value->name;
+    template<typename Context> struct serializer<banggame::effect_holder, Context> : aggregate_serializer_unchecked<banggame::effect_holder, Context> {
+        json operator()(const banggame::effect_holder &effect, const Context &ctx) const {
+            json result = aggregate_serializer_unchecked<banggame::effect_holder, Context>::operator()(effect, ctx);
+            json value = effect.target->serialize_args(effect);
+            if (value.is_object()) {
+                for (auto &[key, val] : value.items()) {
+                    result[key] = std::move(val);
+                }
+            }
+            return result;
         }
     };
 
@@ -53,12 +72,6 @@ namespace json {
             } else {
                 return {};
             }
-        }
-    };
-
-    template<typename Context> struct serializer<const banggame::targeting_vtable *, Context> {
-        json operator()(const banggame::targeting_vtable *value) const {
-            return value->name;
         }
     };
 
@@ -155,7 +168,7 @@ namespace banggame {
             
             result.targets.reserve(effects.size());
             for (const auto &[effect, target] : rv::zip(effects, targets)) {
-                result.targets.push_back(effect.target->deserialize_json(target, context));
+                result.targets.push_back(effect.target->deserialize_target(target, context));
             }
         }
 

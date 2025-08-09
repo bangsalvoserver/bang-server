@@ -32,6 +32,7 @@ character:
     tags:
       - play_as_bang
       - banglimit
+      - ranged_effect
   - name: EMILIANO
     image: 02_emiliano
     equip:

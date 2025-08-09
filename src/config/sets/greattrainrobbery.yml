@@ -45,6 +45,7 @@ main_deck:
       - bang player reachable notself
     tags:
       - banglimit
+      - ranged_effect
   - name: MAP
     signs:
       - 3 diamonds
@@ -133,6 +134,8 @@ character:
     responses:
       - discard card self | hand origin_card_suit
       - evan_babbit player notself notorigin range_1
+    tags:
+      - ranged_effect
   - name: JIMMY_TEXAS
     image: 27_jimmy_texas
     equip:
@@ -354,6 +357,8 @@ train:
       - max_usages(1)
       - discard card self | blue_or_train
       - bangresponse
+    tags:
+      - ranged_effect
 
 locomotive:
   - name: IRONHORSE
@@ -408,6 +413,7 @@ hidden:
       - steal random_if_hand_card range_1
     tags:
       - card_choice(3)
+      - ranged_effect
   - name: BAGGAGE_CAR_CAT_BALOU
     image: main_deck/01_catbalou
     deck: train
@@ -424,6 +430,7 @@ hidden:
       - bang player reachable notself
     tags:
       - card_choice(3)
+      - ranged_effect
       
   - name: LOUNGE_CAR
     responses:

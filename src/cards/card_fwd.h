@@ -44,12 +44,14 @@ namespace banggame {
     using expansion_list = std::span<const ruleset_ptr>;
     using expansion_set = std::set<ruleset_ptr>;
 
-    using target_type = const targeting_vtable *;
-
     enum class sound_id;
 
     enum class target_player_filter;
     enum class target_card_filter;
+    
+    using player_filter_bitset = enums::bitset<target_player_filter>;
+    using card_filter_bitset = enums::bitset<target_card_filter>;
+
     enum class tag_type;
     
     enum class effect_flag;

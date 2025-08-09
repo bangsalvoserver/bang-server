@@ -144,6 +144,7 @@ main_deck:
       - bangcard
       - banglimit
       - skip_logs
+      - ranged_effect
   - &beer
     name: BEER
     signs:
@@ -263,6 +264,7 @@ main_deck:
     tags:
       - skip_logs
       - catbalou_panic
+      - ranged_effect
   - &saloon
     name: SALOON
     signs:
@@ -304,6 +306,7 @@ character:
     tags:
       - play_as_bang
       - banglimit
+      - ranged_effect
   - name: EL_GRINGO
     image: 01_elgringo
     equip:

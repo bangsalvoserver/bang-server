@@ -1,33 +1,67 @@
 #ifndef __TARGET_TYPE_SELECT_CUBES_PLAYER_H__
 #define __TARGET_TYPE_SELECT_CUBES_PLAYER_H__
 
-#include "cards/card_effect.h"
-
-#include "game/possible_to_play.h"
+#include "select_cubes_optional.h"
+#include "player.h"
 
 namespace banggame {
 
-    struct targeting_select_cubes_player : targeting_base {
-        using targeting_base::targeting_base;
-
+    struct targeting_select_cubes_player {
         struct value_type {
             struct transparent{};
             card_list cubes;
             player_ptr player;
         };
+
+        targeting_select_cubes_optional target_cubes;
+        targeting_player target_player;
+
+        targeting_select_cubes_player(targeting_args<int, target_filter::player> args)
+            : target_cubes{{ .target_value = args.target_value }}
+            , target_player{{ .player_filter = args.player_filter }} {}
         
-        auto possible_targets(const effect_context &ctx) {
-            return get_all_player_targets(origin, origin_card, effect, ctx)
+        auto get_args() const {
+            struct args {
+                player_filter_bitset player_filter;
+                int ncubes;
+            };
+            return args{ target_player.player_filter, target_cubes.ncubes };
+        }
+        
+        auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+            return target_player.possible_targets(origin_card, origin, effect, ctx)
                 | rv::transform([](player_ptr target) {
                     return value_type{ .player = target };
                 });
         }
 
-        value_type random_target(const effect_context &ctx);
-        game_string get_error(const effect_context &ctx, const value_type &target);
-        prompt_string on_prompt(const effect_context &ctx, const value_type &target);
-        void add_context(effect_context &ctx, const value_type &target);
-        void on_play(const effect_context &ctx, const value_type &target);
+        value_type random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+            auto cubes = target_cubes.random_target(origin_card, origin, effect, ctx);
+            auto target = target_player.random_target(origin_card, origin, effect, ctx);
+            return { cubes, target };
+        }
+
+        game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+            MAYBE_RETURN(target_cubes.get_error(origin_card, origin, effect, ctx, target.cubes));
+            MAYBE_RETURN(target_player.get_error(origin_card, origin, effect, ctx, target.player));
+            return {};
+        }
+
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+            MAYBE_RETURN(target_cubes.on_prompt(origin_card, origin, effect, ctx, target.cubes));
+            MAYBE_RETURN(target_player.on_prompt(origin_card, origin, effect, ctx, target.player));
+            return {};
+        }
+
+        void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const value_type &target) {    
+            target_cubes.add_context(origin_card, origin, effect, ctx, target.cubes);
+            target_player.add_context(origin_card, origin, effect, ctx, target.player);
+        }
+
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+            target_cubes.on_play(origin_card, origin, effect, ctx, target.cubes);
+            target_player.on_play(origin_card, origin, effect, ctx, target.player);
+        }
     };
 
     DEFINE_TARGETING(select_cubes_player, targeting_select_cubes_player)

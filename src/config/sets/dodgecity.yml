@@ -74,6 +74,7 @@ main_deck:
       - bang player notself range_1
     tags:
       - skip_logs
+      - ranged_effect
   - name: RAG_TIME
     signs:
       - 9 hearts
@@ -192,6 +193,7 @@ main_deck:
       - bang player notself range_1
     tags:
       - skip_logs
+      - ranged_effect
   - name: BUFFALO_RIFLE
     signs:
       - 9 clubs
@@ -217,6 +219,7 @@ main_deck:
       - bang player reachable notself
     tags:
       - skip_logs
+      - ranged_effect
   - name: IRON_PLATE
     signs:
       - A diamonds
@@ -242,6 +245,7 @@ main_deck:
       - bang player notself range_1
     tags:
       - skip_logs
+      - ranged_effect
   - name: SOMBRERO
     signs:
       - 7 clubs
@@ -277,6 +281,8 @@ character:
       - none cards(2) self | hand
       - none player reachable notself
     mth_effect: doc_holyday(1,2)
+    tags:
+      - ranged_effect
   - name: ELENA_FUENTE
     image: 03_elena_fuente
     responses:

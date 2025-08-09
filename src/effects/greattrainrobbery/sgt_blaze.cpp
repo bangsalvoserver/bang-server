@@ -17,12 +17,18 @@ namespace banggame {
 
     game_string modifier_sgt_blaze::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
         for (const effect_holder &effect : playing_card->get_effect_list(origin->m_game->pending_requests())) {
-            if (effect.target == TARGET_TYPE(players) || effect.target == TARGET_TYPE(card_per_player)) {
-                if (ctx.skipped_player && check_player_filter(playing_card, origin, effect.player_filter, ctx.skipped_player, ctx)) {
-                    return {"ERROR_CANNOT_SKIP_PLAYER", ctx.skipped_player};
-                } else {
-                    return {};
-                }
+            player_filter_bitset player_filter;
+            if (effect.target == TARGET_TYPE(players)) {
+                player_filter = static_cast<const targeting_players *>(effect.target_value)->target_player.player_filter;
+            } else if (effect.target == TARGET_TYPE(card_per_player)) {
+                player_filter = static_cast<const targeting_card_per_player *>(effect.target_value)->player_filter;
+            } else {
+                continue;
+            }
+            if (ctx.skipped_player && check_player_filter(playing_card, origin, player_filter, ctx.skipped_player, ctx)) {
+                return {"ERROR_CANNOT_SKIP_PLAYER", ctx.skipped_player};
+            } else {
+                return {};
             }
         }
         return {"ERROR_NO_PLAYERS_TARGET", origin_card, playing_card};

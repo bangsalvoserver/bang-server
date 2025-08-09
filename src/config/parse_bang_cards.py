@@ -14,46 +14,6 @@ def parse_sign(sign):
         )
     else:
         raise RuntimeError(f'Invalid sign string: {sign}')
-    
-def check_allowed_filters(effect, target_type, player_filter, card_filter):
-    NONE = 0
-    PLAYER = 1
-    CARD = 2
-
-    ALLOWED_FILTERS = {
-        'none': NONE,
-        'player': PLAYER,
-        'conditional_player': PLAYER,
-        'adjacent_players': PLAYER,
-        'player_per_cube': PLAYER,
-        'card': CARD,
-        'random_if_hand_card': CARD,
-        'extra_card': CARD,
-        'players': PLAYER,
-        'cards': CARD,
-        'max_cards': CARD,
-        'bang_or_cards': CARD,
-        'card_per_player': CARD,
-        'missed_and_same_suit': CARD,
-        'cube_slot': PLAYER,
-        'move_cube_slot': NONE,
-        'select_cubes': NONE,
-        'select_cubes_optional': NONE,
-        'select_cubes_player': PLAYER,
-        'select_cubes_repeat': NONE,
-        'self_cubes': NONE
-    }
-
-    if target_type not in ALLOWED_FILTERS:
-        raise RuntimeError(f'Invalid target_type: {target_type}')
-    
-    allowed_type = ALLOWED_FILTERS[target_type]
-
-    if player_filter and allowed_type == NONE:
-        raise RuntimeError(f'Invalid effect string: {effect}\nPlayer filter not allowed with {target_type}')
-        
-    if card_filter and allowed_type != CARD:
-        raise RuntimeError(f'Invalid effect string: {effect}\nCard filter not allowed with {target_type}')
 
 def parse_effects(effect_list):
     if not isinstance(effect_list, list):
@@ -65,7 +25,7 @@ def parse_effects(effect_list):
             r'^\s*(\w+)' # effect_type
             r'(?:\s*\(\s*(.+?)\s*\))?' # effect_value
             r'(?:\s*(\w+)' # target_type
-            r'\s*(?:\((-?\d+)\))?)?' # target_value
+            r'\s*(?:\((.+?)\))?)?' # target_value
             r'([\w\s]*?)' # player_filter
             r'(?:\s*\|\s*([\w\s]+))?\s*$', # card_filter
             effect
@@ -80,15 +40,15 @@ def parse_effects(effect_list):
         player_filter = match.group(5)
         card_filter = match.group(6)
 
-        check_allowed_filters(effect, target_type, player_filter, card_filter)
-
         result.append(CppObject(
-            target =           CppLiteral(f'TARGET_TYPE({target_type})'),
-            player_filter =    [CppEnum('target_player_filter', f) for f in player_filter.split()] if player_filter else None,
-            card_filter =      [CppEnum('target_card_filter', f) for f in card_filter.split()] if card_filter else None,
-            target_value =     int(target_value) if target_value else None,
             type =             CppLiteral(f'GET_EFFECT({effect_type})'),
-            effect_value =     CppStatic('auto', CppLiteral(f"BUILD_EFFECT_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
+            effect_value =     CppStatic(f'EFFECT_VALUE({effect_type})', CppLiteral(effect_value or ''), pointer=True),
+            target =           CppLiteral(f'TARGET_TYPE({target_type})'),
+            target_value =     CppStatic(f'TARGET_VALUE({target_type})', (CppObject(
+                target_value =  CppLiteral(target_value) if target_value else None,
+                player_filter = [CppEnum('target_player_filter', f) for f in sorted(player_filter.split())] if player_filter else None,
+                card_filter = [CppEnum('target_card_filter', f) for f in sorted(card_filter.split())] if card_filter else None,
+            ),), pointer=True)
         ))
     return CppStatic('effect_holder', result)
 
@@ -111,7 +71,7 @@ def parse_equips(equip_list):
 
         result.append(CppObject(
             type = CppLiteral(f'GET_EQUIP({effect_type})'),
-            effect_value = CppStatic('auto', CppLiteral(f"BUILD_EQUIP_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
+            effect_value = CppStatic(f'EQUIP_VALUE({effect_type})', CppLiteral(effect_value or ''), pointer=True),
         ))
     return CppStatic('equip_holder', result)
 
@@ -151,7 +111,7 @@ def parse_modifier(modifier):
     effect_value = match.group(2)
     return CppObject(
         type = CppLiteral(f"GET_MODIFIER({modifier})"),
-        effect_value = CppStatic('auto', CppLiteral(f"BUILD_MODIFIER_VALUE({effect_type}{', ' + effect_value if effect_value else ''})"), pointer=True),
+        effect_value = CppStatic(f'MODIFIER_VALUE({effect_type})', CppLiteral(effect_value or ''), pointer=True),
     )
 
 def parse_mth(effect):
@@ -169,11 +129,9 @@ def parse_mth(effect):
     effect_value = match.group(3)
     return CppObject(
         type = CppLiteral(f'GET_MTH({effect_type})'),
-        effect_value = CppStatic('auto', CppLiteral(
-            f"BUILD_MTH_VALUE({effect_type}, "
-            f"({', '.join(value.strip() for value in indices.split(','))})"
-            + ((', ' + effect_value) if effect_value else '')
-            + ')'
+        effect_value = CppStatic(f'MTH_VALUE({effect_type})', (
+            CppLiteral(effect_value or ''),
+            CppLiteral(f"MAKE_INDICES({', '.join(value.strip() for value in indices.split(','))})", verbatim=True)
         ), pointer=True),
     )
 
@@ -195,7 +153,7 @@ def parse_all_effects(card):
             modifier_response = parse_modifier(card['modifier_response']) if 'modifier_response' in card else None,
             mth_effect =   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
             mth_response = parse_mth(card['mth_response']) if 'mth_response' in card else None,
-            equip_target = [CppEnum('target_player_filter', f) for f in card['equip_target'].split()] if 'equip_target' in card else None,
+            equip_target = [CppEnum('target_player_filter', f) for f in sorted(card['equip_target'].split())] if 'equip_target' in card else None,
             color =        CppEnum('card_color_type', card['color']) if 'color' in card else None,
             sign =         parse_sign(card['sign']) if 'sign' in card else None
         )

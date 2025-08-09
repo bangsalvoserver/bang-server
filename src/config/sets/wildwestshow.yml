@@ -41,6 +41,7 @@ wildwestshow:
     tags:
       - play_as_bang
       - banglimit
+      - ranged_effect
   - name: SACAGAWAY
     image: 06_sacagaway
     equip:
