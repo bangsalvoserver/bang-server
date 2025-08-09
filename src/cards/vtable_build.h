@@ -277,11 +277,17 @@ namespace banggame {
         if (indices.size() != sizeof...(Ts)) {
             throw game_error("invalid access to mth: invalid indices size");
         }
-        return [&]<size_t ... Is>(std::index_sequence<Is...>) {
-            return std::tuple<Ts ...>{
-                targets.at(indices[Is]).get<std::remove_cvref_t<Ts>>() ...
-            };
-        }(std::index_sequence_for<Ts ...>());
+        try {
+            return [&]<size_t ... Is>(std::index_sequence<Is...>) {
+                return std::tuple<Ts ...>{
+                    targets.at(indices[Is]).get<std::remove_cvref_t<Ts>>() ...
+                };
+            }(std::index_sequence_for<Ts ...>());
+        } catch (const std::bad_any_cast &) {
+            throw game_error("invalid access to mth: invalid target type");
+        } catch (const std::out_of_range &) {
+            throw game_error("invalid access to mth: index out of range");
+        }
     }
 
     template<typename RetType, typename HandlerType, typename ... Args>
