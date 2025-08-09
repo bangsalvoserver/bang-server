@@ -20,12 +20,15 @@ namespace logging {
         return ctx;
     }
 
-    void push_context(std::string context) {
+    context_guard push_context(std::string context) {
         get_log_context().push_back(std::move(context));
+        return context_guard{};
     }
 
-    void pop_context() {
-        get_log_context().pop_back();
+    context_guard::~context_guard() {
+        if (!moved) {
+            get_log_context().pop_back();
+        }
     }
 
     void log_function::do_log(std::string_view message) const {

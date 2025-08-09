@@ -89,9 +89,10 @@ void game_manager::tick() {
         game_lobby &lobby = pair.second;
         if (lobby.state == lobby_state::playing && lobby.m_game) {
             try {
-                logging::push_context(std::format("game {}", lobby.name));
-                lobby.m_game->tick();
-                logging::pop_context();
+                {
+                    auto guard = logging::push_context(std::format("game {}", lobby.name));
+                    lobby.m_game->tick();
+                }
                 
                 while (lobby.m_game->pending_updates()) {
                     auto [target, update, update_time] = lobby.m_game->get_next_update();
@@ -596,7 +597,7 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
 
     broadcast_message_lobby(lobby, server_messages::game_started{});
 
-    logging::push_context(std::format("game {}", lobby.name));
+    auto guard = logging::push_context(std::format("game {}", lobby.name));
     lobby.m_game = std::make_unique<banggame::game>(lobby.options);
 
     std::vector<int> user_ids;
@@ -627,7 +628,6 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
     lobby.m_game->add_players(user_ids);
     lobby.m_game->start_game();
     lobby.m_game->commit_updates();
-    logging::pop_context();
 }
 
 void game_manager::handle_message(client_messages::game_rejoin &&args, session_ptr session) {
@@ -697,9 +697,8 @@ void game_manager::handle_message(client_messages::game_action &&args, session_p
     }
 
     try {
-        logging::push_context(std::format("game {}", lobby.name));
+        auto guard = logging::push_context(std::format("game {}", lobby.name));
         lobby.m_game->handle_game_action(origin, args.action);
-        logging::pop_context();
     } catch (const game_error &e) {
         lobby.state = lobby_state::finished;
         add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", {chat_format_arg::string{e.what()}}, lobby_chat_flag::translated });

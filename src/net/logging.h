@@ -54,9 +54,25 @@ namespace logging {
 
     void set_logging_level(level global_level);
 
-    void push_context(std::string context);
+    class context_guard {
+    private:
+        bool moved = false;
 
-    void pop_context();
+    public:
+        context_guard() = default;
+        context_guard(const context_guard &) = delete;
+        context_guard(context_guard &&other) noexcept : moved{std::exchange(other.moved, true)} {}
+
+        context_guard &operator = (const context_guard &) = delete;
+        context_guard &operator = (context_guard &&other) noexcept {
+            std::swap(moved, other.moved);
+            return *this;
+        }
+
+        ~context_guard();
+    };
+
+    [[nodiscard]] context_guard push_context(std::string context);
 
     constexpr auto trace = log_function(level::trace);
     constexpr auto debug = log_function(level::debug);
