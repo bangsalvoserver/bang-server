@@ -14,14 +14,14 @@ namespace banggame {
     }
 
     game_string targeting_players::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
-        for (player_ptr target : get_player_targets_range(origin_card, origin, target_player.player_filter, ctx)) {
+        for (player_ptr target : get_player_targets_range(origin_card, origin, player_filter, ctx)) {
             MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
         return {};
     }
 
     prompt_string targeting_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
-        auto targets = get_player_targets_range(origin_card, origin, target_player.player_filter, ctx);
+        auto targets = get_player_targets_range(origin_card, origin, player_filter, ctx);
         if (targets.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
@@ -31,13 +31,13 @@ namespace banggame {
     }
 
     void targeting_players::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, value_type) {
-        for (player_ptr target : get_player_targets_range(origin_card, origin, target_player.player_filter, ctx)) {
-            target_player.add_context(origin_card, origin, effect, ctx, target);
+        for (player_ptr target : get_player_targets_range(origin_card, origin, player_filter, ctx)) {
+            effect.add_context(origin_card, origin, target, ctx);
         }
     }
 
     void targeting_players::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
-        auto targets = get_player_targets_range(origin_card, origin, target_player.player_filter, ctx);
+        auto targets = get_player_targets_range(origin_card, origin, player_filter, ctx);
 
         effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
         if (get_single_element(targets)) {

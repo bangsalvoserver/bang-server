@@ -1,20 +1,25 @@
 #ifndef __TARGET_TYPE_PLAYERS_H__
 #define __TARGET_TYPE_PLAYERS_H__
 
-#include "player.h"
+#include "cards/card_effect.h"
+
+#include "game/game_table.h"
 
 namespace banggame {
 
     struct targeting_players {
         using value_type = std::nullptr_t;
 
-        targeting_player target_player;
+        player_filter_bitset player_filter;
 
         targeting_players(targeting_args<void, target_filter::player> args)
-            : target_player{{ .player_filter = args.player_filter }} {}
+            : player_filter{args.player_filter} {}
         
         auto get_args() const {
-            return target_player.get_args();
+            struct args {
+                player_filter_bitset player_filter;
+            };
+            return args { player_filter };
         }
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {

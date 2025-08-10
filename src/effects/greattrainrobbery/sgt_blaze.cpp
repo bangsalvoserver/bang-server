@@ -19,7 +19,7 @@ namespace banggame {
         for (const effect_holder &effect : playing_card->get_effect_list(origin->m_game->pending_requests())) {
             player_filter_bitset player_filter;
             if (effect.target == TARGET_TYPE(players)) {
-                player_filter = static_cast<const targeting_players *>(effect.target_value)->target_player.player_filter;
+                player_filter = static_cast<const targeting_players *>(effect.target_value)->player_filter;
             } else if (effect.target == TARGET_TYPE(card_per_player)) {
                 player_filter = static_cast<const targeting_card_per_player *>(effect.target_value)->player_filter;
             } else {
