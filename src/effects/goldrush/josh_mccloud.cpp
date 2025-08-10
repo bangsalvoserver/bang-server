@@ -8,7 +8,7 @@
 
 #include "game/possible_to_play.h"
 
-#include "target_types/none.h"
+#include "target_types/base/none.h"
 
 namespace banggame {
 

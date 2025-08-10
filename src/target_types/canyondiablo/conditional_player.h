@@ -1,7 +1,7 @@
 #ifndef __TARGET_TYPE_CONDITIONAL_PLAYER_H__
 #define __TARGET_TYPE_CONDITIONAL_PLAYER_H__
 
-#include "player.h"
+#include "target_types/base/player.h"
 
 namespace banggame {
 

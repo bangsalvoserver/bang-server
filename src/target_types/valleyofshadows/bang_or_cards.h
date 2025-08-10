@@ -1,11 +1,11 @@
-#ifndef __TARGET_TYPE_MAX_CARDS_H__
-#define __TARGET_TYPE_MAX_CARDS_H__
+#ifndef __TARGET_TYPE_BANG_OR_CARDS_H__
+#define __TARGET_TYPE_BANG_OR_CARDS_H__
 
-#include "cards.h"
+#include "target_types/base/cards.h"
 
 namespace banggame {
 
-    struct targeting_max_cards : targeting_cards {
+    struct targeting_bang_or_cards : targeting_cards {
         using targeting_cards::targeting_cards;
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
@@ -13,7 +13,7 @@ namespace banggame {
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target);
     };
 
-    DEFINE_TARGETING(max_cards, targeting_max_cards)
+    DEFINE_TARGETING(bang_or_cards, targeting_bang_or_cards)
 }
 
 #endif

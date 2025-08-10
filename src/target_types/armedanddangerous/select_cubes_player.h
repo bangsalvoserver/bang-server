@@ -1,8 +1,9 @@
 #ifndef __TARGET_TYPE_SELECT_CUBES_PLAYER_H__
 #define __TARGET_TYPE_SELECT_CUBES_PLAYER_H__
 
+#include "target_types/base/player.h"
+
 #include "select_cubes_optional.h"
-#include "player.h"
 
 namespace banggame {
 

@@ -1,0 +1,9 @@
+target_sources(bangserver
+PRIVATE
+    cube_slot.cpp
+    move_cube_slot.cpp
+    player_per_cube.cpp
+    select_cubes_repeat.cpp
+    select_cubes.cpp
+    self_cubes.cpp
+)

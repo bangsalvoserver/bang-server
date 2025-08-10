@@ -1,8 +1,5 @@
 #include "player_per_cube.h"
 
-#include "select_cubes.h"
-#include "player.h"
-
 #include "game/possible_to_play.h"
 
 #include "cards/game_enums.h"

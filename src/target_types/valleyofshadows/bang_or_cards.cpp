@@ -1,7 +1,5 @@
 #include "bang_or_cards.h"
 
-#include "card.h"
-
 namespace banggame {
 
     bool targeting_bang_or_cards::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {

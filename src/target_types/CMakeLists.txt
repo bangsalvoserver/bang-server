@@ -1,18 +1,6 @@
-target_sources(bangserver
-PRIVATE
-    card.cpp
-    card_per_player.cpp
-    cards.cpp
-    cube_slot.cpp
-    adjacent_players.cpp
-    max_cards.cpp
-    bang_or_cards.cpp
-    missed_and_same_suit.cpp
-    move_cube_slot.cpp
-    player_per_cube.cpp
-    player.cpp
-    players.cpp
-    select_cubes_repeat.cpp
-    select_cubes.cpp
-    self_cubes.cpp
-)
+add_subdirectory(armedanddangerous)
+add_subdirectory(base)
+add_subdirectory(dodgecity)
+add_subdirectory(fistfulofcards)
+add_subdirectory(legends)
+add_subdirectory(valleyofshadows)

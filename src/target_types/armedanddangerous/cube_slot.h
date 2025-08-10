@@ -3,7 +3,7 @@
 
 #include "cards/card_effect.h"
 
-#include "card.h"
+#include "target_types/base/card.h"
 
 namespace banggame {
 

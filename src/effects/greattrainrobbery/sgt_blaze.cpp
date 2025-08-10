@@ -10,8 +10,8 @@
 
 #include "ruleset.h"
 
-#include "target_types/players.h"
-#include "target_types/card_per_player.h"
+#include "target_types/base/players.h"
+#include "target_types/dodgecity/card_per_player.h"
 
 namespace banggame {
 

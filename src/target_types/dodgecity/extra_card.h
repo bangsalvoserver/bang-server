@@ -1,7 +1,7 @@
 #ifndef __TARGET_TYPE_EXTRA_CARD_H__
 #define __TARGET_TYPE_EXTRA_CARD_H__
 
-#include "card.h"
+#include "target_types/base/card.h"
 
 namespace banggame {
 

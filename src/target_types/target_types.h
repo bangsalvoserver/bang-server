@@ -1,26 +1,12 @@
 #ifndef __TARGET_TYPES_H__
 #define __TARGET_TYPES_H__
 
-#include "card.h"
-#include "card_per_player.h"
-#include "cards.h"
-#include "conditional_player.h"
-#include "cube_slot.h"
-#include "adjacent_players.h"
-#include "random_if_hand_card.h"
-#include "extra_card.h"
-#include "max_cards.h"
-#include "bang_or_cards.h"
-#include "missed_and_same_suit.h"
-#include "move_cube_slot.h"
-#include "none.h"
-#include "player_per_cube.h"
-#include "player.h"
-#include "players.h"
-#include "select_cubes_optional.h"
-#include "select_cubes_player.h"
-#include "select_cubes_repeat.h"
-#include "select_cubes.h"
-#include "self_cubes.h"
+#include "base/target_types.h"
+#include "armedanddangerous/target_types.h"
+#include "canyondiablo/target_types.h"
+#include "dodgecity/target_types.h"
+#include "fistfulofcards/target_types.h"
+#include "legends/target_types.h"
+#include "valleyofshadows/target_types.h"
 
 #endif

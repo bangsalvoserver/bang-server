@@ -1,7 +1,7 @@
 #ifndef __TARGET_TYPE_MISSED_AND_SAME_SUIT_H__
 #define __TARGET_TYPE_MISSED_AND_SAME_SUIT_H__
 
-#include "target_types/cards.h"
+#include "target_types/base/cards.h"
 
 namespace banggame {
 
