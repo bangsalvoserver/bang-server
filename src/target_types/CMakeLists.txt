@@ -3,10 +3,8 @@ PRIVATE
     card.cpp
     card_per_player.cpp
     cards.cpp
-    conditional_player.cpp
     cube_slot.cpp
     adjacent_players.cpp
-    extra_card.cpp
     max_cards.cpp
     bang_or_cards.cpp
     missed_and_same_suit.cpp
