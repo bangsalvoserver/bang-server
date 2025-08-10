@@ -42,7 +42,7 @@ namespace banggame {
             if (target) {
                 return targeting_player::on_prompt(origin_card, origin, effect, ctx, target);
             } else {
-                return {};
+                return {"PROMPT_CARD_NO_TARGET", origin_card};
             }
         }
 
