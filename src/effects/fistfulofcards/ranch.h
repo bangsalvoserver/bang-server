@@ -13,15 +13,10 @@ namespace banggame {
 
     struct effect_ranch {
         bool can_play(card_ptr origin_card, player_ptr origin);
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
     };
 
     DEFINE_EFFECT(ranch, effect_ranch)
-
-    struct handler_ranch {
-        void on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards);
-    };
-
-    DEFINE_MTH(ranch, handler_ranch)
 }
 
 #endif

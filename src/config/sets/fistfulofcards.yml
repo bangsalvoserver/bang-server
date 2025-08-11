@@ -63,9 +63,8 @@ fistfulofcards:
     equip:
       - ranch
     responses:
+      - discard max_cards self | hand
       - ranch
-      - none max_cards self | hand
-    mth_response: ranch(1)
     tags:
       - preselect
   - name: RICOCHET
