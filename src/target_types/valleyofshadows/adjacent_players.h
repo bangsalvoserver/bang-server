@@ -31,7 +31,7 @@ namespace banggame {
                     auto [target1, target2] = pair;
                     return player_pair{target1, target2};
                 })
-                | rv::filter([=, this](player_pair targets) {
+                | rv::filter([=, &ctx, this](player_pair targets) {
                     return !get_error(origin_card, origin, effect, ctx, targets);
                 });
         }

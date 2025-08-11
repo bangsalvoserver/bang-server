@@ -27,7 +27,7 @@ namespace banggame {
         
         auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
             return get_all_targetable_cards(origin)
-                | rv::filter([=, this](card_ptr target_card) {
+                | rv::filter([=, &ctx, this](card_ptr target_card) {
                     return !get_error(origin_card, origin, effect, ctx, target_card);
                 });
         }
