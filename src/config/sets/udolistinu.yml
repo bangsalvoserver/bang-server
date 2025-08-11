@@ -198,9 +198,8 @@ character:
 hidden:
   - name: TORNADO
     responses:
-      - tornado2_response
       - none cards(2) self | hand
-    mth_response: tornado2_response(1)
+      - tornado2_response
     tags:
       - preselect
   - name: BANDIDOS

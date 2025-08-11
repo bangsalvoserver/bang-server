@@ -76,8 +76,36 @@ namespace banggame {
             if (target->immune_to(origin_card, origin, flags) || target->empty_hand()) {
                 target->m_game->pop_request();
             } else if (target->m_hand.size() <= 2) {
-                handler_tornado2_response{}.on_play(origin_card, target, target->m_hand);
+                on_resolve(target->m_hand);
             }
+        }
+
+        void on_resolve(const card_list &target_cards) {
+            target->m_game->pop_request();
+
+            target->m_game->add_listener<event_type::get_selected_cards>(origin_card,
+                [origin_card=origin_card, target=target, target_cards](card_ptr e_origin_card, player_ptr owner, card_list &result) {
+                    if (origin_card == e_origin_card) {
+                        if (owner == target) {
+                            for (card_ptr c : target_cards) {
+                                result.push_back(c);
+                            }
+                        } else {
+                            for (card_ptr c : target->m_hand) {
+                                result.push_back(c);
+                            }
+                        }
+                    }
+                });
+            
+            target->m_game->queue_action([origin_card=origin_card, target=target, target_cards]{
+                target->m_game->remove_listeners(origin_card);
+
+                player_ptr target_player = target->get_next_player();
+                for (card_ptr target_card : target_cards) {
+                    handler_gift_card{true}.on_play(origin_card, target, target_card, target_player);
+                }
+            });
         }
         
         game_string status_text(player_ptr owner) const override {
@@ -97,32 +125,8 @@ namespace banggame {
         return origin->m_game->top_request<request_tornado2>(target_is{origin}) != nullptr;
     }
 
-    void handler_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards) {
-        origin_card = origin->m_game->top_request()->origin_card;
-        origin->m_game->pop_request();
-
-        origin->m_game->add_listener<event_type::get_selected_cards>(origin_card,
-            [=](card_ptr e_origin_card, player_ptr owner, card_list &result) {
-                if (origin_card == e_origin_card) {
-                    if (owner == origin) {
-                        for (card_ptr c : target_cards) {
-                            result.push_back(c);
-                        }
-                    } else {
-                        for (card_ptr c : origin->m_hand) {
-                            result.push_back(c);
-                        }
-                    }
-                }
-            });
-        
-        origin->m_game->queue_action([=]{
-            origin->m_game->remove_listeners(origin_card);
-
-            player_ptr target = origin->get_next_player();
-            for (card_ptr target_card : target_cards) {
-                handler_gift_card{true}.on_play(origin_card, origin, target_card, target);
-            }
-        });
+    void effect_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        auto req = origin->m_game->top_request<request_tornado2>();
+        req->on_resolve(ctx.selected_cards);
     }
 }
