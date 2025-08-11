@@ -129,9 +129,9 @@ def parse_mth(effect):
     effect_value = match.group(3)
     return CppObject(
         type = CppLiteral(f'GET_MTH({effect_type})'),
-        effect_value = CppStatic(f'MTH_VALUE({effect_type})', (
-            CppLiteral(effect_value or ''),
-            CppLiteral(f"MAKE_INDICES({', '.join(value.strip() for value in indices.split(','))})", verbatim=True)
+        effect_value = CppStatic(f'MTH_VALUE({effect_type})', CppObject(
+            handler = CppLiteral(effect_value) if effect_value else None,
+            indices = CppStatic('mth_index', [int(index) for index in indices.split(',')])
         ), pointer=True),
     )
 

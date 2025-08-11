@@ -254,26 +254,17 @@ namespace banggame {
     #define BUILD_MODIFIER_VTABLE(name, type) template<> const modifier_vtable modifier_vtable_map<#name>::value = build_modifier_vtable<type>(#name);
     #define MODIFIER_VALUE(name) modifier_vtable_map<#name>::type
 
-    template<int ... Is>
-    struct indices_t {
-        static constexpr std::array<int, sizeof...(Is)> value{Is ...};
-    };
+    using mth_index = uint8_t;
+    using index_list = std::span<const mth_index>;
 
-    template<typename T>
-    struct mth_value : T {
-        std::span<const int> indices;
-
-        template<int ... Is>
-        mth_value(T handler, indices_t<Is...> indices)
-            : T{std::move(handler)}, indices{indices.value} {}
-        
-        T &handler() {
-            return static_cast<T &>(*this);
-        }
+    template<typename HandlerType>
+    struct mth_value {
+        [[no_unique_address]] HandlerType handler;
+        index_list indices;
     };
 
     template<typename ... Ts>
-    auto build_mth_args(const target_list &targets, std::span<const int> indices) {
+    auto build_mth_args(const target_list &targets, index_list indices) {
         if (indices.size() != sizeof...(Ts)) {
             throw game_error("invalid access to mth: invalid indices size");
         }
@@ -306,7 +297,7 @@ namespace banggame {
         RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) {
             auto &&value = effect_cast<mth_value<HandlerType>>(effect_value);
             return std::apply(m_value, std::tuple_cat(
-                std::tuple{value.handler(), origin_card, origin},
+                std::tuple{value.handler, origin_card, origin},
                 build_mth_args<Args...>(targets, value.indices)
             ));
         }
@@ -319,7 +310,7 @@ namespace banggame {
         RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, CtxType ctx) {
             auto &&value = effect_cast<mth_value<HandlerType>>(effect_value);
             return std::apply(m_value, std::tuple_cat(
-                std::tuple{value.handler(), origin_card, origin, ctx},
+                std::tuple{value.handler, origin_card, origin, ctx},
                 build_mth_args<Args...>(targets, value.indices)
             ));
         }
@@ -364,7 +355,6 @@ namespace banggame {
 
     #define BUILD_MTH_VTABLE(name, type) template<> const mth_vtable mth_vtable_map<#name>::value = build_mth_vtable<type>(#name);
 
-    #define MAKE_INDICES(...) indices_t<__VA_ARGS__>{}
     #define MTH_VALUE(name) mth_value<mth_vtable_map<#name>::type>
     
     template<typename T>
