@@ -53,11 +53,16 @@ namespace banggame {
         if (range.empty()) return;
 
         ++m_lock;
-        for (auto &[key, listener] : range) {
-            if (key.type == type && listener.is_active()) {
-                logging::trace("call_event() on {} {}", key, listener);
-                std::invoke(listener, tuple);
+        try {
+            for (auto &[key, listener] : range) {
+                if (key.type == type && listener.is_active()) {
+                    logging::trace("call_event() on {} {}", key, listener);
+                    std::invoke(listener, tuple);
+                }
             }
+        } catch (...) {
+            --m_lock;
+            throw;
         }
         --m_lock;
         
