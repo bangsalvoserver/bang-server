@@ -34,6 +34,7 @@ private:
     void send_message(client_handle client, const server_message &msg);
     void broadcast_message_no_lobby(const server_message &msg);
     void broadcast_message_lobby(const game_lobby &lobby, const server_message &msg);
+    void broadcast_lobby_update(const game_lobby &lobby);
 
     void invalidate_connection(client_handle client);
     void kick_user_from_lobby(session_ptr session);

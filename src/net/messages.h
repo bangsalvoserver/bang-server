@@ -113,6 +113,12 @@ namespace banggame {
 
     using lobby_chat_flags = enums::bitset<lobby_chat_flag>;
 
+    enum class lobby_security {
+        open,
+        unlocked,
+        locked,
+    };
+
     namespace chat_format_arg {
         struct user {
             struct transparent{};
@@ -149,7 +155,7 @@ namespace banggame {
             int num_players;
             int num_bots;
             int num_spectators;
-            bool secure;
+            lobby_security security;
             lobby_state state;
         };
 

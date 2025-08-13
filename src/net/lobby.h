@@ -135,7 +135,7 @@ struct game_lobby {
 
     static std::string crop_lobby_name(const std::string &name);
 
-    server_messages::lobby_update make_lobby_update() const;
+    server_messages::lobby_update make_lobby_update(session_ptr owner) const;
 };
 
 using user_map = std::unordered_map<id_type, session_ptr>;

@@ -91,14 +91,18 @@ namespace banggame {
         }
     }
 
-    server_messages::lobby_update game_lobby::make_lobby_update() const {
+    server_messages::lobby_update game_lobby::make_lobby_update(session_ptr owner) const {
         return {
             .lobby_id = lobby_id,
             .name = name,
             .num_players = int(rn::count_if(connected_users(), std::not_fn(&game_user::is_spectator))),
             .num_bots = int(bots.size()),
             .num_spectators = int(rn::count_if(connected_users(), &game_user::is_spectator)),
-            .secure = !password.empty(),
+            .security = password.empty()
+                ? lobby_security::open
+                : (owner != nullptr && rn::contains(users, owner, &game_user::session))
+                    ? lobby_security::unlocked
+                    : lobby_security::locked,
             .state = state
         };
     }
