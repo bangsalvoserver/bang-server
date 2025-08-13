@@ -20,14 +20,15 @@ namespace banggame {
     class request_queue;
 
     template<std::invocable Function>
-    class request_action: public request_base, private Function {
+    class request_action : public request_base {
     private:
+        [[no_unique_address]] Function m_function;
         request_queue *queue;
     
     public:
         request_action(Function &&fun, request_queue *queue, int priority)
             : request_base(nullptr, nullptr, nullptr, {}, priority)
-            , Function(FWD(fun))
+            , m_function(FWD(fun))
             , queue(queue) {}
 
         void on_update() override;
@@ -141,7 +142,7 @@ namespace banggame {
     template<std::invocable Function>
     void request_action<Function>::on_update() {
         queue->pop_request();
-        std::invoke(static_cast<Function &>(*this));
+        std::invoke(m_function);
     }
 
 }

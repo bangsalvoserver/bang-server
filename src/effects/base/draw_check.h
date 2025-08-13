@@ -97,7 +97,7 @@ namespace banggame {
 
     template<std::invocable<card_ptr> T> requires std::convertible_to<std::invoke_result_t<T, card_ptr>, draw_check_result>
     struct draw_check_condition_wrapper<T> {
-        T fun;
+        [[no_unique_address]] T fun;
 
         draw_check_result operator()(card_ptr target_card) const {
             return std::invoke(fun, target_card);
@@ -106,7 +106,7 @@ namespace banggame {
 
     template<std::predicate<card_sign> T>
     struct draw_check_condition_wrapper<T> {
-        T fun;
+        [[no_unique_address]] T fun;
 
         draw_check_result operator()(card_ptr target_card) const {
             return draw_check_result{ .lucky = std::invoke(fun, get_modified_sign(target_card)) };
@@ -124,8 +124,8 @@ namespace banggame {
     template<draw_check_condition Condition, draw_check_function Function>
     class request_check : public request_check_base {
     private:
-        draw_check_condition_wrapper<Condition> m_condition;
-        Function m_function;
+        [[no_unique_address]] draw_check_condition_wrapper<Condition> m_condition;
+        [[no_unique_address]] Function m_function;
 
     public:
         request_check(player_ptr target, card_ptr origin_card, Condition &&condition, Function &&function)
