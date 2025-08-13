@@ -38,9 +38,12 @@ namespace banggame {
         return !check_player_flags(player_flag::dead) || has_ghost_tag(this);
     }
 
-    void player::equip_card(card_ptr target) {
-        target->move_to(pocket_type::player_table, this, card_visibility::shown);
-        enable_equip(target);
+    void player::equip_card(card_ptr target, bool skip_enable) {
+        pocket_position position = target->has_tag(tag_type::weapon) ? pocket_position::begin : pocket_position::end;
+        target->move_to(pocket_type::player_table, this, card_visibility::shown, false, position);
+        if (!skip_enable) {
+            enable_equip(target);
+        }
     }
 
     void player::enable_equip(card_ptr target_card) {

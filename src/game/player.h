@@ -34,7 +34,7 @@ namespace banggame {
         player(game_ptr game, int id, int user_id)
             : m_game(game), id(id), user_id(user_id) {}
 
-        void equip_card(card_ptr card);
+        void equip_card(card_ptr card, bool skip_enable = false);
         card_ptr find_equipped_card(const_card_ptr card) const;
 
         void enable_equip(card_ptr target_card);
