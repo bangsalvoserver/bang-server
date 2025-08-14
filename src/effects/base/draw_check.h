@@ -95,7 +95,7 @@ namespace banggame {
 
     template<typename T> struct draw_check_condition_wrapper;
 
-    template<std::invocable<card_ptr> T> requires std::convertible_to<std::invoke_result_t<T, card_ptr>, draw_check_result>
+    template<invocable_like<draw_check_result(card_ptr)> T>
     struct draw_check_condition_wrapper<T> {
         [[no_unique_address]] T fun;
 
