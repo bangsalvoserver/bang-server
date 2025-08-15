@@ -616,13 +616,9 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
         }
     }
 
-    auto names = bot_info.names
-        | rv::sample(num_bots, lobby.m_game->bot_rng)
-        | rn::to<std::vector<std::string_view>>;
+    auto names = sample_elements_r<std::string_view>(bot_info.names, num_bots, lobby.m_game->bot_rng);
 
-    auto propics = bot_info.propics
-        | rv::sample(num_bots, lobby.m_game->bot_rng)
-        | rn::to<std::vector<image_pixels_hash>>;
+    auto propics = sample_elements_r<image_pixels_hash>(bot_info.propics, num_bots, lobby.m_game->bot_rng);
 
     for (int i=0; i < num_bots; ++i) {
         int bot_id = -1-i;

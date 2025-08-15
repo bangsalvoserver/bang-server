@@ -71,8 +71,10 @@ namespace banggame {
     }
 
     inline int count_cubes(const_player_ptr target) {
-        return rn::accumulate(cube_slots(target)
-            | rv::transform(&card::num_cubes), 0);
+        return rn::fold_left(
+            cube_slots(target) | rv::transform(&card::num_cubes),
+            0, std::plus{}
+        );
     }
 
 }

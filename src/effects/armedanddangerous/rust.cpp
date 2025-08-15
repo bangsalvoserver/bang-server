@@ -29,12 +29,12 @@ namespace banggame {
         card_list get_highlights(player_ptr owner) const override {
             return cube_slots(target)
                 | rv::filter([](card_ptr c) { return c->num_cubes() != 0; })
-                | rn::to_vector;
+                | rn::to<std::vector>();
         }
 
         void on_resolve() override {
             origin->m_game->pop_request();
-            for (card_ptr c : cube_slots(target) | rn::to_vector) {
+            for (card_ptr c : cube_slots(target) | rn::to<std::vector>()) {
                 c->move_cubes(origin->get_character(), 1);
             }
         }

@@ -336,7 +336,7 @@ namespace banggame {
         origin->m_game->call_event(event_type::on_play_card{
             origin,
             args.card,
-            args.modifiers | rv::transform(&card_targets_pair::card) | rn::to_vector,
+            args.modifiers | rv::transform(&card_targets_pair::card) | rn::to<std::vector>(),
             ctx
         });
 

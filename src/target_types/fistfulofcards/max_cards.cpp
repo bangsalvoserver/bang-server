@@ -13,9 +13,7 @@ namespace banggame {
             auto dist = std::uniform_int_distribution<size_t>{1, static_cast<size_t>(rn::distance(targets))};
             count = dist(origin->m_game->bot_rng);
         }
-        return targets
-            | rv::sample(count, origin->m_game->bot_rng)
-            | rn::to_vector;
+        return sample_elements(targets, count, origin->m_game->bot_rng);
     }
 
     game_string targeting_max_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {

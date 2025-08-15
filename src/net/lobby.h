@@ -125,7 +125,7 @@ struct game_lobby {
     std::unique_ptr<banggame::game> m_game;
 
     auto connected_users(this auto &&self) {
-        return rv::remove_if(std::forward_like<decltype(self)>(self.users), &game_user::is_disconnected);
+        return std::forward_like<decltype(self)>(self.users) | rv::remove_if(&game_user::is_disconnected);
     }
 
     std::pair<game_user &, bool> add_user(session_ptr session);

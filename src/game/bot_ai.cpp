@@ -52,11 +52,13 @@ namespace banggame {
 
     static request_state execute_random_play(player_ptr origin, bool is_response, bool add_empty, const playable_cards_list &play_cards) {
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
-            auto node_set = play_cards
-                | rv::for_each([&](const playable_card_info &info) {
-                    return rv::repeat_n(&info, bot_info.settings.repeat_card_nodes);
-                })
-                | rn::to<node_set_t>;
+            node_set_t node_set;
+            
+            for (const playable_card_info &info : play_cards) {
+                for (int j=0; j<bot_info.settings.repeat_card_nodes; ++j) {
+                    node_set.insert(&info);
+                }
+            }
             
             if (add_empty) {
                 node_set.insert(nullptr);

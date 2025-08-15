@@ -91,7 +91,7 @@ namespace banggame {
             if (get_single_element(range_targets)) {
                 for (card_ptr target_card : target->m_table
                     | rv::remove_if(&card::is_black)
-                    | rn::to_vector
+                    | rn::to<std::vector>()
                 ) {
                     steal_card(origin, target, target_card);
                 }

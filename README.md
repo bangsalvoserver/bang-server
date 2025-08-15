@@ -15,7 +15,6 @@ This is the backend server for [bang.salvoserver.it](https://bang.salvoserver.it
 - Minimal external dependencies:
   - [libuv](https://github.com/libuv/libuv)
   - [uWebSockets](https://github.com/uNetworking/uWebSockets)
-  - [range-v3](https://github.com/ericniebler/range-v3)
   - [cxxopts](https://github.com/jarro2783/cxxopts)
   - [nlohmann-json](https://github.com/nlohmann/json)
   - [libpng](http://www.libpng.org/pub/png/libpng.html)
@@ -30,7 +29,6 @@ This is the backend server for [bang.salvoserver.it](https://bang.salvoserver.it
 - Dependencies:
   - libuv
   - uWebSockets
-  - range-v3
   - cxxopts
   - nlohmann-json
   - libpng

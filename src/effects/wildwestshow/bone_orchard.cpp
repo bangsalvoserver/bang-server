@@ -15,7 +15,7 @@ namespace banggame {
 
                 auto dead_players = target->m_game->m_players | rv::remove_if(&player::alive);
                 if (rn::distance(dead_players) > 1) {
-                    auto roles = dead_players | rv::transform(&player::get_base_role) | rn::to_vector;
+                    auto roles = dead_players | rv::transform(&player::get_base_role) | rn::to<std::vector>();
                     rn::shuffle(roles, origin->m_game->rng);
                     
                     for (player_ptr p : dead_players) {

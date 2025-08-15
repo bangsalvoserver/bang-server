@@ -56,7 +56,7 @@ namespace banggame {
                 target_characters = target_characters.subspan(1);
             }
 
-            auto new_cards = target_characters | rv::transform(get_card_copy) | rn::to_vector;
+            auto new_cards = target_characters | rv::transform(get_card_copy) | rn::to<std::vector>();
             target->m_game->add_cards_to(new_cards, pocket_type::player_character, target, card_visibility::shown);
             
             for (card_ptr target_card : new_cards) {

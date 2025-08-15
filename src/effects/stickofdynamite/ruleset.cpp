@@ -35,7 +35,7 @@ namespace banggame {
 
             for (player_ptr p : origin->m_game->range_alive_players(origin)) {
                 while (auto filter = p->m_hand | rv::filter(is_dynamite)) {
-                    card_ptr target_card = rn::front(filter);
+                    card_ptr target_card = filter.front();
 
                     game->add_log("LOG_REVEALED_CARD", p, target_card);
                     target_card->set_visibility(card_visibility::shown);

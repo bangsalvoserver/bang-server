@@ -36,11 +36,6 @@ target_link_libraries(banglibs INTERFACE reflect)
 find_package(SQLite3 REQUIRED)
 target_link_libraries(banglibs INTERFACE SQLite::SQLite3)
 
-# range-v3
-
-find_package(range-v3 REQUIRED)
-target_link_libraries(banglibs INTERFACE range-v3)
-
 # cxxopts
 
 find_package(cxxopts REQUIRED)

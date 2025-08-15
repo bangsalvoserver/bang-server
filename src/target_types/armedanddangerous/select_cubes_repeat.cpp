@@ -7,9 +7,9 @@ namespace banggame {
     card_list targeting_select_cubes_repeat::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
         auto cubes = cube_slots(origin)
             | rv::for_each([](card_ptr slot) {
-                return rv::repeat_n(slot, slot->num_cubes());
+                return rv::repeat(slot, slot->num_cubes());
             })
-            | rn::to_vector;
+            | rn::to<std::vector>();
         rn::shuffle(cubes, origin->m_game->bot_rng);
         
         size_t max_count = cubes.size() / ncubes;

@@ -10,7 +10,7 @@ namespace banggame {
         return origin->m_table
             | rv::filter(&card::is_orange)
             | rv::for_each([](card_ptr slot) {
-                return rv::repeat_n(slot, max_cubes - slot->num_cubes());
+                return rv::repeat(slot, max_cubes - slot->num_cubes());
             });
     }
 
@@ -20,7 +20,7 @@ namespace banggame {
     }
 
     card_list targeting_move_cube_slot::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
-        auto targets = make_move_cube_target_set(origin, origin_card, ctx) | rn::to_vector;
+        auto targets = make_move_cube_target_set(origin, origin_card, ctx) | rn::to<std::vector>();
         rn::shuffle(targets, origin->m_game->bot_rng);
         
         targets.resize(std::min({

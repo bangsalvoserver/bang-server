@@ -13,19 +13,18 @@ namespace banggame {
     targeting_player_per_cube::value_type targeting_player_per_cube::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
         auto cubes = cube_slots(origin)
             | rv::for_each([](card_ptr slot) {
-                return rv::repeat_n(slot, slot->num_cubes());
+                return rv::repeat(slot, slot->num_cubes());
             })
-            | rn::to_vector;
+            | rn::to<std::vector>();
 
         auto players = target_player.possible_targets(origin_card, origin, effect, ctx);
         
         size_t max_count = std::min(cubes.size(), rn::distance(players) - static_cast<size_t>(extra_players));
         size_t ncubes = std::uniform_int_distribution<size_t>{0, max_count}(origin->m_game->bot_rng);
         
-        return {
-            cubes | rv::sample(ncubes, origin->m_game->bot_rng) | rn::to_vector,
-            players | rv::sample(ncubes + extra_players, origin->m_game->bot_rng) | rn::to_vector
-        };
+        auto random_cubes = sample_elements(cubes, ncubes, origin->m_game->bot_rng);
+        auto random_players = sample_elements(players, ncubes + extra_players, origin->m_game->bot_rng);
+        return { std::move(random_cubes), std::move(random_players) };
     }
 
     game_string targeting_player_per_cube::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {

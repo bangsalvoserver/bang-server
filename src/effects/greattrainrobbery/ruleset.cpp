@@ -16,17 +16,20 @@ namespace banggame {
 
     static void init_stations_and_train(player_ptr origin) {
         origin->m_game->remove_cards(origin->m_game->m_stations);
-        origin->m_game->add_cards_to(origin->m_game->m_stations_deck
-            | rv::sample(std::max(int(origin->m_game->m_players.size()), 4), origin->m_game->rng)
-            | rn::to_vector, pocket_type::stations, nullptr, card_visibility::shown);
+
+        origin->m_game->add_cards_to(sample_elements(
+            origin->m_game->m_stations_deck,
+            std::max(int(origin->m_game->m_players.size()), 4),
+            origin->m_game->rng
+        ), pocket_type::stations, nullptr, card_visibility::shown);
 
         auto old_locomotive = origin->m_game->m_train;
         origin->m_game->remove_cards(old_locomotive);
 
-        origin->m_game->add_cards_to(origin->m_game->m_locomotive
-            | rv::filter([&](card_ptr c) { return !rn::contains(old_locomotive, c); })
-            | rv::sample(1, origin->m_game->rng)
-            | rn::to_vector, pocket_type::train, nullptr, card_visibility::shown);
+        origin->m_game->add_cards_to(sample_elements(
+            origin->m_game->m_locomotive | rv::filter([&](card_ptr c) { return !rn::contains(old_locomotive, c); }),
+            1, origin->m_game->rng
+        ), pocket_type::train, nullptr, card_visibility::shown);
 
         for (card_ptr c : origin->m_game->m_train) {
             origin->enable_equip(c);

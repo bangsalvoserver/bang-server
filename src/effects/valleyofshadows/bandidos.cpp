@@ -100,7 +100,7 @@ namespace banggame {
                     | rv::remove_if([&](const_card_ptr c) {
                         return target->m_game->is_usage_disabled(c);
                     })
-                    | rn::to_vector;
+                    | rn::to<std::vector>();
                 if (not_disabled.size() <= 1) {
                     origin->m_game->pop_request();
                     for (card_ptr target_card : not_disabled) {

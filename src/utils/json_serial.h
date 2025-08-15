@@ -237,7 +237,7 @@ namespace json {
                 | rv::transform([&](const json &obj) {
                     return deserialize_unchecked<rn::range_value_t<Range>>(obj, ctx);
                 })
-                | rn::to<Range>;
+                | rn::to<Range>();
         }
     };
 

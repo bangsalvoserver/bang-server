@@ -53,11 +53,11 @@ namespace banggame {
                 return !data.expansion || table->m_options.expansions.contains(data.expansion);
             })
             | rv::for_each(&expansion_data::sounds)
-            | rn::to<std::unordered_set>;
+            | rn::to<std::unordered_set>();
         
         return {
-            .images {images | rn::to_vector},
-            .sounds {sounds | rn::to_vector}
+            .images {images | rn::to<std::vector>()},
+            .sounds {sounds | rn::to<std::vector>()}
         };
     }
 
@@ -72,25 +72,19 @@ namespace banggame {
     }
 
     static game_updates::player_distances make_player_distances(player_ptr owner) {
-        if (!owner) return {};
-
-        return {
-            .distance_mods = owner->m_game->m_players
-                | rv::filter([&](player_ptr target) { return target != owner; })
-                | rv::transform([&](player_ptr target) {
-                    return game_updates::player_distance_item {
-                        .player = target,
-                        .value = target->get_distance_mod()
-                    };
-                })
-                | rv::cache1
-                | rv::filter([](const game_updates::player_distance_item &item) {
-                    return item.value != 0;
-                })
-                | rn::to_vector,
-            .range_mod = owner->get_range_mod(),
-            .weapon_range = owner->get_weapon_range()
-        };
+        game_updates::player_distances result{};
+        if (owner) {
+            for (player_ptr target : owner->m_game->m_players) {
+                if (target != owner) {
+                    if (int distance_mod = target->get_distance_mod()) {
+                        result.distance_mods.emplace_back(target, distance_mod);
+                    }
+                }
+            }
+            result.range_mod = owner->get_range_mod();
+            result.weapon_range = owner->get_weapon_range();
+        }
+        return result;
     }
     
     static player_list get_request_target_set_players(player_ptr origin) {
@@ -98,7 +92,7 @@ namespace banggame {
             if (auto req = origin->m_game->top_request<interface_target_set_players>(target_is{origin})) {
                 return origin->m_game->m_players
                     | rv::filter([&](const_player_ptr p){ return req->in_target_set(p); })
-                    | rn::to_vector;
+                    | rn::to<std::vector>();
             }
         }
         return {};
@@ -109,7 +103,7 @@ namespace banggame {
             if (auto req = origin->m_game->top_request<interface_target_set_cards>(target_is{origin})) {
                 return get_all_targetable_cards(origin)
                     | rv::filter([&](const_card_ptr c){ return req->in_target_set(c); })
-                    | rn::to_vector;
+                    | rn::to<std::vector>();
             }
         }
         return {};
@@ -394,7 +388,7 @@ namespace banggame {
 
         if (add_cards(bang_cards.highnoon, pocket_type::scenario_deck) + add_cards(bang_cards.fistfulofcards, pocket_type::scenario_deck)) {
             shuffle_cards_and_ids(m_scenario_deck);
-            auto last_scenario_cards = rn::partition(m_scenario_deck, is_last_scenario_card);
+            auto last_scenario_cards = rn::partition(m_scenario_deck, is_last_scenario_card).begin();
             if (last_scenario_cards != m_scenario_deck.begin()) {
                 m_scenario_deck.erase(m_scenario_deck.begin() + 1, last_scenario_cards);
             }
@@ -458,7 +452,7 @@ namespace banggame {
                     call_event(event_type::count_initial_cards{ p, ncards });
                     return ncards;
                 })
-                | rn::to_vector;
+                | rn::to<std::vector>();
 
             int cycles = rn::max(initial_cards);
             for (int i=0; i<cycles; ++i) {

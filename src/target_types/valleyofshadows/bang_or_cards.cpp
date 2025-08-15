@@ -13,9 +13,7 @@ namespace banggame {
         })) {
             return std::vector{random_element(bang_targets, origin->m_game->bot_rng)};
         }
-        return targets
-            | rv::sample(ncards, origin->m_game->bot_rng)
-            | rn::to_vector;
+        return sample_elements(targets, ncards, origin->m_game->bot_rng);
     }
 
     game_string targeting_bang_or_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
