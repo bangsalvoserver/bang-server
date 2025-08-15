@@ -11,7 +11,7 @@ namespace banggame {
 
     struct request_ranch : request_resolvable {
         request_ranch(card_ptr target_card, player_ptr target)
-            : request_resolvable(target_card, nullptr, target, {}, -25) {}
+            : request_resolvable(target_card, nullptr, target) {}
          
         void on_update() override {
             if (!target->alive() || target->empty_hand() || target->m_game->m_playing != target) {
@@ -38,7 +38,9 @@ namespace banggame {
 
     void equip_ranch::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_turn_start>(target_card, [=](player_ptr origin) {
-            origin->m_game->queue_request<request_ranch>(target_card, origin);
+            origin->m_game->queue_action([=]{
+                origin->m_game->queue_request<request_ranch>(target_card, origin);
+            }, -25);
         });
     }
 
