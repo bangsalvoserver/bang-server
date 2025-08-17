@@ -2,8 +2,6 @@
 
 #include "game_table.h"
 
-#include "utils/visit_enum.h"
-
 namespace banggame {
 
     template<card_deck_type E>

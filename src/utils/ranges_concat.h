@@ -6,6 +6,8 @@
 #include <variant>
 #include <cassert>
 
+#include "visit_indexed.h"
+
 namespace std::ranges {
 
   namespace detail {
@@ -124,6 +126,8 @@ namespace std::ranges {
 
     template<bool IsConst>
     class iterator : public detail::concat_view_iter_cat<IsConst, Vs...> {
+      static constexpr size_t num_views = sizeof...(Vs);
+
       static auto get_iterator_concept() {
         if constexpr (detail::concat_is_random_access<IsConst, Vs...>)
           return random_access_iterator_tag{};
@@ -151,7 +155,7 @@ namespace std::ranges {
 
       template<size_t N>
       constexpr void satisfy() {
-        if constexpr (N < (sizeof...(Vs) - 1)) {
+        if constexpr (N < (num_views - 1)) {
           if (std::get<N>(m_it) == ranges::end(std::get<N>(*m_views))) {
             m_it.template emplace<N + 1>(ranges::begin(std::get<N + 1>(*m_views)));
             satisfy<N + 1>();
@@ -175,7 +179,7 @@ namespace std::ranges {
       template<size_t N>
       constexpr void advance_fwd(difference_type offset, difference_type steps) {
         using Dt = iter_difference_t<variant_alternative_t<N, base_iter>>;
-        if constexpr (N == sizeof...(Vs) - 1) {
+        if constexpr (N == num_views - 1) {
           std::get<N>(m_it) += static_cast<Dt>(steps);
         } else {
           auto n_size = ranges::distance(std::get<N>(*m_views));
@@ -202,23 +206,6 @@ namespace std::ranges {
         }
       }
 
-      // Invoke the function object fun, which has a call operator with a size_t
-      // template parameter (corresponding to an index into the pack of views),
-      // using the runtime value of index as the template argument.
-      template<typename Function>
-      static constexpr auto invoke_with_runtime_index(Function&& fun, size_t index) {
-        using ret_type = decltype(fun.template operator()<0>());
-        using function_type = ret_type (*)(Function &&fun);
-        static constexpr auto vtable = []<size_t ... Is>(index_sequence<Is ...>) {
-          return array<function_type, sizeof...(Is)>{
-            [](Function &&fun) {
-              return fun.template operator()<Is>();
-            } ...
-          };
-        }(index_sequence_for<Vs...>());
-        return vtable[index](std::forward<Function>(fun));
-      }
-
       template<typename... Args>
       explicit constexpr iterator(detail::maybe_const_t<IsConst, tuple<Vs...>>* views, Args&&... args)
         requires constructible_from<base_iter, Args&&...>
@@ -232,7 +219,7 @@ namespace std::ranges {
       iterator(iterator<!IsConst> it)
         requires IsConst && (convertible_to<iterator_t<Vs>, iterator_t<const Vs>> && ...)
         : m_views(it.m_views)
-        , m_it(invoke_with_runtime_index([this, &it]<size_t Idx>() {
+        , m_it(utils::visit_indexed<num_views>([this, &it](auto Idx) {
             return base_iter(in_place_index<Idx>, std::get<Idx>(std::move(it.m_it)));
           }, it.m_it.index()))
       { }
@@ -244,7 +231,7 @@ namespace std::ranges {
       }
 
       constexpr iterator& operator++() {
-        invoke_with_runtime_index([this]<size_t Idx>() {
+        utils::visit_indexed<num_views>([this](auto Idx) {
           ++std::get<Idx>(m_it);
           satisfy<Idx>();
         }, m_it.index());
@@ -265,7 +252,7 @@ namespace std::ranges {
         requires detail::concat_is_bidirectional<IsConst, Vs...>
       {
         assert(!m_it.valueless_by_exception());
-        invoke_with_runtime_index([this]<size_t Idx>() {
+        utils::visit_indexed<num_views>([this](auto Idx) {
           prev<Idx>();
         }, m_it.index());
         return *this;
@@ -283,7 +270,7 @@ namespace std::ranges {
         requires detail::concat_is_random_access<IsConst, Vs...>
       {
         assert(!m_it.valueless_by_exception());
-        invoke_with_runtime_index([this, n]<size_t Idx>() {
+        utils::visit_indexed<num_views>([this, n](auto Idx) {
           auto begin = ranges::begin(std::get<Idx>(*m_views));
           if (n > 0)
             advance_fwd<Idx>(std::get<Idx>(m_it) - begin, n);
@@ -317,7 +304,7 @@ namespace std::ranges {
       friend constexpr bool operator==(const iterator& it, default_sentinel_t)
       {
         assert(!it.m_it.valueless_by_exception());
-        constexpr auto lastIdx = sizeof...(Vs) - 1;
+        constexpr auto lastIdx = num_views - 1;
         return (it.m_it.index() == lastIdx
             && (std::get<lastIdx>(it.m_it)
             == ranges::end(std::get<lastIdx>(*it.m_views))));
@@ -379,28 +366,24 @@ namespace std::ranges {
       friend constexpr difference_type operator-(const iterator& x, const iterator& y)
         requires detail::concat_is_random_access<IsConst, Vs...>
       {
-        return invoke_with_runtime_index([&]<size_t Ix>() -> difference_type {
-          return invoke_with_runtime_index([&]<size_t Iy>() -> difference_type {
-            if constexpr (Ix > Iy) {
-              auto dy = ranges::distance(std::get<Iy>(y.m_it),
-                          ranges::end(std::get<Iy>(*y.m_views)));
-              auto dx = ranges::distance(ranges::begin(std::get<Ix>(*x.m_views)),
-                          std::get<Ix>(x.m_it));
-              difference_type s = 0;
-              [&]<size_t Idx = Iy + 1>(this auto&& self) {
-                if constexpr (Idx < Ix) {
-                  s += ranges::size(std::get<Idx>(*x.m_views));
-                  self.template operator()<Idx + 1>();
-                }
-              }();
-              return dy + s + dx;
-            } else if constexpr (Ix < Iy) {
-              return -(y - x);
-            } else {
-              return std::get<Ix>(x.m_it) - std::get<Iy>(y.m_it);
-            }
-          }, y.m_it.index());
-        }, x.m_it.index());
+        return utils::visit_indexed<num_views, num_views>([&](auto Ix, auto Iy) -> difference_type {
+          if constexpr (Ix > Iy) {
+            auto dy = ranges::distance(std::get<Iy>(y.m_it), ranges::end(std::get<Iy>(*y.m_views)));
+            auto dx = ranges::distance(ranges::begin(std::get<Ix>(*x.m_views)), std::get<Ix>(x.m_it));
+            difference_type s = 0;
+            [&]<size_t Idx = decltype(Iy)::value + 1>(this auto&& self) {
+              if constexpr (Idx < Ix) {
+                s += ranges::size(std::get<Idx>(*x.m_views));
+                self.template operator()<Idx + 1>();
+              }
+            }();
+            return dy + s + dx;
+          } else if constexpr (Ix < Iy) {
+            return -(y - x);
+          } else {
+            return std::get<Ix>(x.m_it) - std::get<Iy>(y.m_it);
+          }
+        }, x.m_it.index(), y.m_it.index());
       }
 
       friend constexpr difference_type operator-(const iterator& x, default_sentinel_t)
@@ -408,12 +391,11 @@ namespace std::ranges {
           iterator_t<detail::maybe_const_t<IsConst, Vs>>> && ...)
           && detail::all_but_first_sized<detail::maybe_const_t<IsConst, Vs>...>::value
       {
-        return invoke_with_runtime_index([&]<size_t Ix>() -> difference_type {
-          auto dx = ranges::distance(std::get<Ix>(x.m_it),
-                          ranges::end(std::get<Ix>(*x.m_views)));
+        return utils::visit_indexed<num_views>([&](auto Ix) -> difference_type {
+          auto dx = ranges::distance(std::get<Ix>(x.m_it), ranges::end(std::get<Ix>(*x.m_views)));
           difference_type s = 0;
-          [&]<size_t Idx = Ix + 1>(this auto&& self) {
-            if constexpr (Idx < sizeof...(Vs)) {
+          [&]<size_t Idx = decltype(Ix)::value + 1>(this auto&& self) {
+            if constexpr (Idx < num_views) {
               s += ranges::size(std::get<Idx>(*x.m_views));
               self.template operator()<Idx + 1>();
             }

@@ -5,10 +5,15 @@
 
 #include "json_serial.h"
 #include "static_map.h"
+#include "visit_indexed.h"
 
 namespace enums {
 
     template<typename T> concept enumeral = std::is_enum_v<T>;
+
+    template<enumeral auto E> struct enum_tag_t {};
+
+    template<enumeral auto E> inline constexpr enum_tag_t<E> enum_tag;
 
     template<enumeral T, typename ISeq> struct build_enum_values;
     template<enumeral T, size_t ... Is> struct build_enum_values<T, std::index_sequence<Is ...>> {
@@ -76,10 +81,19 @@ namespace enums {
         }
         return std::nullopt;
     }
+    
+    template<typename RetType, typename Visitor, enumeral ... E>
+    RetType visit_enum(Visitor &&visitor, E ... values) {
+        return utils::visit_indexed_r<RetType, enums::enum_values<E>().size() ...>([&](auto ... Is) {
+            return std::invoke(std::forward<Visitor>(visitor), enum_tag<enums::enum_values<E>()[Is]> ...);
+        }, indexof(values) ...);
+    }
 
-    template<enumeral auto ... Values> struct enum_sequence {
-        static constexpr size_t size = sizeof...(Values);
-    };
+    template<typename Visitor, enumeral E>
+    decltype(auto) visit_enum(Visitor &&visitor, E value) {
+        using return_type = std::invoke_result_t<Visitor, enum_tag_t<enums::enum_values<E>()[0]>>;
+        return visit_enum<return_type>(std::forward<Visitor>(visitor), value);
+    }
 
     template<enumeral E, std::predicate<E> auto F>
     constexpr size_t count_values_if() {
