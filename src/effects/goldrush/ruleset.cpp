@@ -62,6 +62,12 @@ namespace banggame {
             }
         });
 
+        game->add_listener<event_type::on_auto_discard>(nullptr, [](player_ptr origin, card_ptr origin_card, const effect_context &ctx) { 
+            if (origin_card->pocket == pocket_type::shop_selection) {
+                origin_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
+            }
+        });
+
         game->add_listener<event_type::on_play_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const card_list &modifiers, const effect_context &ctx) {
             if (!origin->m_game->pending_requests()) {
                 if (ctx.card_choice) {

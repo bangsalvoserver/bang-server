@@ -275,17 +275,10 @@ namespace banggame {
         log_played_card(origin_card, origin, is_response);
 
         if (origin_card != ctx.repeat_card && !origin_card->has_tag(tag_type::no_auto_discard)) {
-            switch (origin_card->pocket) {
-            case pocket_type::player_hand:
+            if (origin_card->pocket == pocket_type::player_hand) {
                 origin->discard_used_card(origin_card);
-                break;
-            case pocket_type::player_table:
-                if (origin_card->is_green()) {
-                    origin->discard_card(origin_card);
-                }
-                break;
-            case pocket_type::shop_selection:
-                origin_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
+            } else {
+                origin->m_game->call_event(event_type::on_auto_discard{ origin, origin_card, ctx });
             }
         }
 

@@ -28,6 +28,12 @@ namespace banggame::event_type {
         const effect_context &ctx;
     };
 
+    struct on_auto_discard {
+        player_ptr origin;
+        card_ptr origin_card;
+        const effect_context &ctx;
+    };
+
     struct on_finish_tokens {
         card_ptr origin_card;
         card_ptr target_card;
