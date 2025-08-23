@@ -110,6 +110,10 @@ namespace banggame {
         void reveal_hand();
     };
 
+    inline int get_player_id(const_player_ptr target) {
+        return target ? target->id : 0;
+    }
+
 }
 
 #endif

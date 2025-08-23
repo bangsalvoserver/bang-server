@@ -5,10 +5,6 @@
 
 namespace banggame {
 
-    inline int get_card_order(const_card_ptr target_card) {
-        return target_card ? target_card->order : 0;
-    }
-
     struct event_card_key {
         card_ptr target_card;
         int priority;

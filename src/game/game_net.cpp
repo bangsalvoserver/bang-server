@@ -101,28 +101,51 @@ namespace json {
         };
     };
 
-    struct game_string_tag {};
+    template<> struct serializer<banggame::format_arg_value, banggame::game_context> {
+        json serialize_card(int card_id, const banggame::game_context &ctx) const {
+            struct format_card {
+                std::string_view name;
+                banggame::card_sign sign;
+            };
 
-    template<> struct serializer<utils::nullable<banggame::const_card_ptr>, game_string_tag> {
-        struct format_card {
-            std::string_view name;
-            banggame::card_sign sign;
-        };
-
-        json operator()(utils::nullable<banggame::const_card_ptr> value, const game_string_tag &ctx) const {
-            if (value) {
-                return serialize_unchecked(format_card{ value->name, value->sign }, ctx);
+            if (card_id != 0) {
+                banggame::card_ptr target_card = ctx.find_card(card_id);
+                return serialize_unchecked(format_card{ target_card->name, target_card->sign }, ctx);
             } else {
                 return json::object();
             }
         }
+
+        json serialize_player(int player_id, const banggame::game_context &ctx) const {
+            if (player_id != 0) {
+                banggame::player_ptr target = ctx.find_player(player_id);
+                return serialize_unchecked(target, ctx);
+            } else {
+                return json{};
+            }
+        }
+
+        json operator()(banggame::format_arg_value pair, const banggame::game_context &ctx) const {
+            auto [value, type] = pair;
+            switch (type) {
+            case banggame::format_arg_type::format_number:
+                return {{"integer", value}};
+            case banggame::format_arg_type::format_card:
+                return {{"card", serialize_card(value, ctx)}};
+            case banggame::format_arg_type::format_player:
+                return {{"player", serialize_player(value, ctx)}};
+            default:
+                throw serialize_error("Invalid format arg type");
+            }
+        }
+
     };
 
-    template<typename Context> struct serializer<banggame::game_string, Context> {
-        json operator()(const banggame::game_string &value) const {
+    template<> struct serializer<banggame::game_string, banggame::game_context> {
+        json operator()(const banggame::game_string &value, const banggame::game_context &ctx) const {
             return {
-                {"format_str", std::string_view(value.format_str)},
-                {"format_args", serialize_unchecked(value.format_args, game_string_tag{})}
+                {"format_str", value ? std::string_view{value.format_str} : std::string_view{}},
+                {"format_args", serialize_unchecked(value.format_args, ctx)}
             };
         }
     };

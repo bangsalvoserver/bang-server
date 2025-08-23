@@ -66,6 +66,10 @@ namespace banggame {
         using std::runtime_error::runtime_error;
     };
 
+    int get_card_order(const_card_ptr target);
+    int get_card_id(const_card_ptr target);
+    int get_player_id(const_player_ptr target);
+
 }
 
 #endif

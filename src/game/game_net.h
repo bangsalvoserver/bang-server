@@ -73,23 +73,28 @@ namespace banggame {
         virtual game_duration transform_duration(game_duration duration) const = 0;
     };
 
-    struct game_update_tuple {
+    struct game_update_record {
         update_target target;
         json::json content;
         game_duration duration;
     };
 
+    struct saved_log_record {
+        update_target target;
+        json::json content;
+    };
+
     class game_net_manager : public game_context {
     protected:
-        std::deque<game_update_tuple> m_updates;
-        std::deque<std::pair<update_target, game_string>> m_saved_log;
+        std::deque<game_update_record> m_updates;
+        std::deque<saved_log_record> m_saved_log;
 
     public:
         bool pending_updates() const {
             return !m_updates.empty();
         }
 
-        game_update_tuple get_next_update() {
+        game_update_record get_next_update() {
             auto update = std::move(m_updates.front());
             m_updates.pop_front();
             return update;
@@ -101,28 +106,28 @@ namespace banggame {
 
     public:
         template<std::convertible_to<game_update> Update>
-        void add_update(update_target target, Update &&update) {
+        const game_update_record &add_update(update_target target, Update &&update) {
             game_duration duration{};
             if constexpr (requires { update.duration; }) {
                 duration = update.duration.get();
             }
-            m_updates.emplace_back(target, serialize_update(game_update{std::forward<Update>(update)}), duration);
+            return m_updates.emplace_back(target, serialize_update(game_update{std::forward<Update>(update)}), duration);
         }
 
         template<std::convertible_to<game_update> Update>
-        void add_update(Update &&update) {
-            add_update(update_target::excludes(), std::forward<Update>(update));
+        const game_update_record &add_update(Update &&update) {
+            return add_update(update_target::excludes(), std::forward<Update>(update));
         }
 
         template<size_t N, typename ... Ts>
-        void add_log(update_target target, const char (&message)[N], Ts && ... args) {
-            const auto &log = m_saved_log.emplace_back(target, game_string(message, FWD(args) ...));
-            add_update(target, game_updates::game_log{ log.second });
+        const saved_log_record &add_log(update_target target, const char (&message)[N], Ts && ... args) {
+            const auto &update = add_update(target, game_updates::game_log{ game_string(message, std::forward<Ts>(args) ...) });
+            return m_saved_log.emplace_back(target, update.content);
         }
 
         template<size_t N, typename ... Ts>
-        void add_log(const char (&message)[N], Ts && ... args) {
-            add_log(update_target::excludes(), message, FWD(args) ... );
+        const saved_log_record &add_log(const char (&message)[N], Ts && ... args) {
+            return add_log(update_target::excludes(), message, std::forward<Ts>(args) ... );
         }
     };
 

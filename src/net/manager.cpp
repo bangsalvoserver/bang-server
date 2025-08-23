@@ -305,8 +305,8 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
                 send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
             }
         }
-        for (game_update &&update : lobby.m_game->get_game_log_updates(target)) {
-            send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
+        for (json::json update : lobby.m_game->get_game_log_updates(target)) {
+            send_message(session->client, server_messages::game_update{ std::move(update) });
         }
     }
 
@@ -674,8 +674,8 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
     for (game_update &&update : lobby.m_game->get_rejoin_updates(target)) {
         send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
     }
-    for (game_update &&update : lobby.m_game->get_game_log_updates(target)) {
-        send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
+    for (json::json update : lobby.m_game->get_game_log_updates(target)) {
+        send_message(session->client, server_messages::game_update{ std::move(update) });
     }
 
     broadcast_lobby_update(lobby);

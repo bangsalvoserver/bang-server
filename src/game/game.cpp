@@ -243,12 +243,12 @@ namespace banggame {
         co_yield game_updates::game_flags{ m_game_flags };
     }
 
-    std::generator<game_update> game::get_game_log_updates(player_ptr target) {
-        co_yield game_updates::clear_logs{};
+    std::generator<json::json> game::get_game_log_updates(player_ptr target) {
+        co_yield serialize_update(game_updates::clear_logs{});
         
-        for (const auto &[upd_target, log] : m_saved_log) {
+        for (const auto &[upd_target, content] : m_saved_log) {
             if (upd_target.matches(target)) {
-                co_yield game_updates::game_log{ log };
+                co_yield content;
             }
         }
     }

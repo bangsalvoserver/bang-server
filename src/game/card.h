@@ -63,6 +63,14 @@ namespace banggame {
         void drop_all_fame();
     };
 
+    inline int get_card_id(const_card_ptr target) {
+        return target ? target->id : 0;
+    }
+
+    inline int get_card_order(const_card_ptr target) {
+        return target ? target->order : 0;
+    }
+
     inline auto cube_slots(const_player_ptr target) {
         return rv::concat(
             target->m_characters | rv::take(1),
