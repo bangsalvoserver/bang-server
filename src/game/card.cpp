@@ -36,7 +36,7 @@ namespace banggame {
         }
     }
 
-    void card::set_visibility(update_target new_visibility, bool instant) {
+    void card::set_visibility(player_set new_visibility, bool instant) {
         animation_duration duration = instant ? 0ms : durations.flip_card;
         if (visibility.exclusive()) {
             if (new_visibility.exclusive()) {
@@ -72,11 +72,11 @@ namespace banggame {
 
     void card::set_visibility(card_visibility new_visibility, player_ptr new_owner, bool instant) {
         if (new_visibility == card_visibility::hidden) {
-            set_visibility(update_target::includes(), instant);
+            set_visibility(player_set::includes(), instant);
         } else if (!new_owner || new_visibility == card_visibility::shown) {
-            set_visibility(update_target::excludes(), instant);
+            set_visibility(player_set::excludes(), instant);
         } else {
-            set_visibility(update_target::includes(new_owner), instant);
+            set_visibility(player_set::includes(new_owner), instant);
         }
     }
 

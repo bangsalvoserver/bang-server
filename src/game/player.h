@@ -8,7 +8,8 @@ namespace banggame {
     struct player {
         game_ptr m_game;
         int id;
-        int user_id;
+
+        int user_id = 0;
 
         card_list m_hand;
         card_list m_table;
@@ -31,8 +32,7 @@ namespace banggame {
 
         player_flags m_player_flags;
 
-        player(game_ptr game, int id, int user_id)
-            : m_game(game), id(id), user_id(user_id) {}
+        player(game_ptr game, int id): m_game(game), id(id) {}
 
         void equip_card(card_ptr card, bool skip_enable = false);
         card_ptr find_equipped_card(const_card_ptr card) const;
@@ -113,6 +113,71 @@ namespace banggame {
     inline int get_player_id(const_player_ptr target) {
         return target ? target->id : 0;
     }
+
+    class player_set {
+    private:
+        uint16_t m_value = 0;
+
+        player_set(uint16_t value)
+            : m_value{value} {}
+
+        player_set(bool exclusive, std::convertible_to<const_player_ptr> auto ... targets)
+            : m_value{static_cast<uint16_t>(exclusive)}
+        {
+            (add(targets), ...);
+        }
+
+        static uint16_t get_player_bit(const_player_ptr target) {
+            return 1 << target->id;
+        }
+
+    public:
+        player_set() = default;
+
+        static player_set includes(std::convertible_to<const_player_ptr> auto ... targets) {
+            return player_set(false, targets...);
+        }
+
+        static player_set excludes(std::convertible_to<const_player_ptr> auto ... targets) {
+            return player_set(true, targets...);
+        }
+
+        void add(const_player_ptr target) {
+            m_value |= get_player_bit(target);
+        }
+
+        void remove(const_player_ptr target) {
+            m_value &= ~get_player_bit(target);
+        }
+
+        bool contains(const_player_ptr target) const {
+            return target && bool(m_value & get_player_bit(target));
+        }
+
+        bool matches(const_player_ptr target) const {
+            return contains(target) != exclusive();
+        }
+
+        bool exclusive() const {
+            return bool(m_value & 1);
+        }
+
+        explicit operator bool() const {
+            return m_value != 0;
+        }
+
+        player_set operator & (const player_set &rhs) const {
+            return player_set{static_cast<uint16_t>(m_value & rhs.m_value)};
+        }
+
+        player_set operator | (const player_set &rhs) const {
+            return player_set{static_cast<uint16_t>(m_value | rhs.m_value)};
+        }
+
+        player_set operator - (const player_set &rhs) const {
+            return player_set{static_cast<uint16_t>(m_value & ~rhs.m_value)};
+        }
+    };
 
 }
 

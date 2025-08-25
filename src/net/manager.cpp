@@ -667,7 +667,7 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
     }
 
     remove_user_flag(lobby, user, game_user_flag::spectator);
-    target->user_id = user.user_id;
+    lobby.m_game->update_player_userid(target, user.user_id);
 
     lobby.m_game->add_update(game_updates::player_add{ target });
     

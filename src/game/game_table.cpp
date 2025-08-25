@@ -44,8 +44,10 @@ namespace banggame {
         rn::shuffle(user_ids, rng);
 
         int player_id = 0;
-        for (int id : user_ids) {
-            m_players.emplace_back(&m_players_storage.emplace(this, ++player_id, id));
+        for (int user_id : user_ids) {
+            player_ptr target = &m_players_storage.emplace(this, ++player_id);
+            update_player_userid(target, user_id);
+            m_players.emplace_back(target);
         }
     }
 
@@ -87,13 +89,6 @@ namespace banggame {
     player_ptr game_table::find_player(int player_id) const {
         if (auto it = m_players_storage.find(player_id); it != m_players_storage.end()) {
             return &*it;
-        }
-        return nullptr;
-    }
-    
-    player_ptr game_table::find_player_by_userid(int user_id) const {
-        if (auto it = rn::find(m_players, user_id, &player::user_id); it != m_players.end()) {
-            return *it;
         }
         return nullptr;
     }

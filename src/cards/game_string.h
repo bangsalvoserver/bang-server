@@ -96,22 +96,18 @@ namespace banggame {
         uint8_t count = 0;
         uint8_t types = 0;
 
-        constexpr void add(int value) {
-            args[count] = static_cast<small_int_t>(value);
-            types += exp3(count) * static_cast<uint8_t>(format_arg_type::format_number);
+        constexpr void add(small_int_t value, format_arg_type type = format_arg_type::format_number) {
+            args[count] = value;
+            types += exp3(count) * static_cast<uint8_t>(type);
             ++count;
         }
 
-        constexpr void add(const_card_ptr value) {
-            args[count] = static_cast<small_int_t>(get_card_id(value));
-            types += exp3(count) * static_cast<uint8_t>(format_arg_type::format_card);
-            ++count;
+        void add(const_card_ptr value) {
+            add(static_cast<small_int_t>(get_card_id(value)), format_arg_type::format_card);
         }
 
-        constexpr void add(const_player_ptr value) {
-            args[count] = static_cast<small_int_t>(get_player_id(value));
-            types += exp3(count) * static_cast<uint8_t>(format_arg_type::format_player);
-            ++count;
+        void add(const_player_ptr value) {
+            add(static_cast<small_int_t>(get_player_id(value)), format_arg_type::format_player);
         }
         
         static constexpr uint8_t exp3(uint8_t exp) {

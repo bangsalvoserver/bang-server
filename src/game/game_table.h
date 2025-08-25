@@ -4,13 +4,14 @@
 #include <span>
 #include <random>
 
-#include "utils/id_map.h"
-
 #include "card.h"
 #include "player.h"
+#include "game_net.h"
 #include "event_map.h"
 #include "disabler_map.h"
 #include "request_queue.h"
+
+#include "utils/id_map.h"
 #include "utils/range_utils.h"
 
 namespace banggame {
@@ -73,7 +74,6 @@ namespace banggame {
 
         card_ptr find_card(int card_id) const override;
         player_ptr find_player(int player_id) const override;
-        player_ptr find_player_by_userid(int user_id) const override;
         game_duration transform_duration(game_duration duration) const override;
         
         card_list &get_pocket(pocket_type pocket, player_ptr owner = nullptr);

@@ -268,4 +268,22 @@ namespace banggame {
             }
         }, result);
     }
+
+    player_ptr game_net_manager::find_player_by_userid(int user_id) const {
+        auto it = m_players_by_userid.find(user_id);
+        if (it != m_players_by_userid.end()) {
+            return it->second;
+        }
+        return nullptr;
+    }
+
+    void game_net_manager::update_player_userid(player_ptr target, int user_id) {
+        if (target && target->user_id != user_id) {
+            if (target->user_id != 0) {
+                m_players_by_userid.erase(target->user_id);
+            }
+            target->user_id = user_id;
+            m_players_by_userid.emplace(user_id, target);
+        }
+    }
 }

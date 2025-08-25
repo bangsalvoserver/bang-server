@@ -22,7 +22,7 @@ namespace banggame {
 
                     for (card_ptr target_card : origin->m_hand) {
                         target->m_game->add_log(update_target::includes(origin, target), "LOG_REVEALED_CARD", origin, target_card);
-                        target_card->set_visibility(update_target::includes(origin, target));
+                        target_card->set_visibility(player_set::includes(origin, target));
                     }
                 } else {
                     target->m_game->pop_request();
