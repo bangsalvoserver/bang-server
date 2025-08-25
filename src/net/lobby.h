@@ -43,6 +43,7 @@ struct game_session {
 };
 
 using session_ptr = std::shared_ptr<game_session>;
+using session_weak_ptr = std::weak_ptr<game_session>;
 
 namespace connection_state {
     struct not_validated {
@@ -108,12 +109,13 @@ struct game_lobby {
         , options{options} {}
 
     id_type lobby_id;
-    int user_id_count = 0;
 
     std::string name;
     game_options options;
 
     std::string password;
+
+    std::map<session_weak_ptr, int, std::owner_less<>> users_by_session;
 
     std::vector<game_user> users;
     std::vector<lobby_bot> bots;

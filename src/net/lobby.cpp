@@ -38,23 +38,21 @@ namespace banggame {
             .propic = propic
         };
     }
-
-    static auto find_user_it(auto &list, session_ptr session) {
-        return rn::find(list, session, &game_user::session);
-    }
     
     std::pair<game_user &, bool> game_lobby::add_user(session_ptr session) {
         session->lobby = this;
-        if (auto it = find_user_it(users, session); it != users.end()) {
-            return {*it, false};
+        if (auto it = users_by_session.find(session); it != users_by_session.end()) {
+            return {users[it->second - 1], false};
         } else {
-            return {users.emplace_back(++user_id_count, session), true};
+            game_user &user = users.emplace_back(users.size() + 1, session);
+            users_by_session.emplace(session, user.user_id);
+            return {user, true};
         }
     }
 
     game_user &game_lobby::find_user(session_ptr session) {
-        if (auto it = find_user_it(users, session); it != users.end()) {
-            return *it;
+        if (auto it = users_by_session.find(session); it != users_by_session.end()) {
+            return users[it->second - 1];
         }
         throw lobby_error("CANNOT_FIND_USER");
     }
@@ -64,8 +62,10 @@ namespace banggame {
 
         int user_id;
         if (auto [end, ec] = std::from_chars(name_or_id.data(), name_or_id.data() + name_or_id.size(), user_id); ec == std::errc{}) {
-            if (auto it = rn::find(range, user_id, &game_user::user_id); it != range.end()) {
-                return *it;
+            if (user_id >= 1 && user_id <= users.size()) {
+                if (game_user &user = users[user_id - 1]; !user.is_disconnected()) {
+                    return user;
+                }
             }
         }
 
