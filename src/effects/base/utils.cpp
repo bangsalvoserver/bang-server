@@ -3,6 +3,8 @@
 #include "game/game_table.h"
 #include "game/play_verify.h"
 
+#include "resolve.h"
+
 namespace banggame {
     
     void event_equip::on_disable(card_ptr target_card, player_ptr target) {
@@ -47,6 +49,26 @@ namespace banggame {
 
     void equip_game_flag::on_disable(card_ptr origin_card, player_ptr target) {
         target->m_game->remove_game_flags(flag);
+    }
+
+    struct request_test_timer : request_resolvable_timer {
+        using request_resolvable_timer::request_resolvable_timer;
+
+        void on_update() override {
+            set_duration(5s);
+        }
+
+        void on_resolve() override {
+            target->m_game->pop_request();
+        }
+
+        game_string status_text(player_ptr owner) const override {
+            return "STATUS_TEST_TIMER";
+        }
+    };
+
+    void effect_test_timer::on_play(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->queue_request<request_test_timer>(origin_card, nullptr, origin);
     }
 
 }

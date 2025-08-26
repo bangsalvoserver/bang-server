@@ -8,6 +8,8 @@
 #include "request_timer.h"
 #include "play_verify.h"
 
+#include "net/lobby.h"
+
 namespace json {
     
     template<typename Context> struct serializer<banggame::tag_map, Context> {
@@ -249,8 +251,7 @@ namespace banggame {
         }
 
         if (timer_id != current_timer_id) {
-            add_update(update_target::includes(origin), game_updates::game_error{ "ERROR_TIMER_EXPIRED" });
-            return;
+            throw lobby_error("ERROR_TIMER_EXPIRED");
         }
 
         auto action = deserialize_game_action(value, *this);

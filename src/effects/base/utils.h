@@ -59,6 +59,12 @@ namespace banggame {
 
     DEFINE_EQUIP(game_flag, equip_game_flag)
 
+    struct effect_test_timer {
+        void on_play(card_ptr origin_card, player_ptr origin);
+    };
+
+    DEFINE_EFFECT(test_timer, effect_test_timer)
+
 }
 
 #endif
