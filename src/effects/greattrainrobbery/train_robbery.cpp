@@ -30,6 +30,15 @@ namespace banggame {
             }
         }
 
+        card_list get_highlights(player_ptr owner) const override {
+            if (owner != target) {
+                return target->m_table
+                    | rv::filter([&](card_ptr target_card) { return in_target_set(target_card); }) 
+                    | rn::to<std::vector>(); 
+            }
+            return {};
+        }
+
         bool in_target_set(const_card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_table && target_card->owner == target
                 && !target_card->is_black() && !selected_cards.contains(target_card);
