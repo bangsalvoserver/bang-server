@@ -28,14 +28,14 @@ namespace json {
     template<typename Context>
     struct serializer<const banggame::effect_vtable *, Context> {
         static void write(const banggame::effect_vtable *value, string_writer &writer) {
-            writer.String(value->name.data(), value->name.size());
+            serialize(value->name, writer);
         }
     };
 
     template<typename Context>
     struct serializer<const banggame::targeting_vtable *, Context> {
         static void write(const banggame::targeting_vtable *value, string_writer &writer) {
-            writer.String(value->name.data(), value->name.size());
+            serialize(value->name, writer);
         }
     };
 
@@ -55,7 +55,7 @@ namespace json {
     template<typename Context>
     struct serializer<const banggame::equip_vtable *, Context> {
         static void write(const banggame::equip_vtable *value, string_writer &writer) {
-            writer.String(value->name.data(), value->name.size());
+            serialize(value->name, writer);
         }
     };
 
@@ -63,7 +63,7 @@ namespace json {
     struct serializer<const banggame::modifier_vtable *, Context> {
         static void write(const banggame::modifier_vtable *value, string_writer &writer) {
             if (value) {
-                writer.String(value->name.data(), value->name.size());
+                serialize(value->name, writer);
             } else {
                 writer.Null();
             }
@@ -73,7 +73,7 @@ namespace json {
     template<typename Context> struct serializer<const banggame::mth_vtable *, Context> {
         static void write(const banggame::mth_vtable *value, string_writer &writer) {
             if (value) {
-                writer.String(value->name.data(), value->name.size());
+                serialize(value->name, writer);
             } else {
                 writer.Null();
             }

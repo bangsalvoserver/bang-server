@@ -20,7 +20,7 @@ namespace json {
     template<typename Context>
     struct serializer<banggame::ruleset_ptr, Context> {
         static void write(banggame::ruleset_ptr value, string_writer &writer) {
-            writer.String(value->name.data(), value->name.size());
+            serialize(value->name, writer);
         }
     };
 

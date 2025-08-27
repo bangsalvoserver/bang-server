@@ -75,8 +75,7 @@ namespace json {
     struct serializer<banggame::image_pixels_hash, Context> {
         static void write(banggame::image_pixels_hash value, string_writer &writer) {
             if (value) {
-                auto str = std::format("{:x}", value.value);
-                writer.String(str.data(), str.size());
+                serialize(std::format("{:x}", value.value), writer);
             } else {
                 writer.Null();
             }

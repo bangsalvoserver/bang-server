@@ -73,8 +73,7 @@ namespace json {
             writer.StartArray();
             for (T v : enums::enum_values<T>()) {
                 if (value.check(v)) {
-                    auto str = enums::to_string(v);
-                    writer.String(str.data(), str.size());
+                    serialize(enums::to_string(v), writer);
                 }
             }
             writer.EndArray();

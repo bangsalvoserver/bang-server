@@ -52,6 +52,7 @@ namespace json {
     template<typename T, typename Context = no_context>
     void serialize(const T &value, string_writer &writer, const Context &context = {}) {
         using serializer_type = serializer<T, Context>;
+        static_assert(is_complete<serializer_type>, "No serializer specified for type T");
         if constexpr (requires { serializer_type::write(value, writer, context); }) {
             serializer_type::write(value, writer, context);
         } else {
@@ -70,6 +71,7 @@ namespace json {
     template<typename T, typename Context = no_context>
     auto deserialize(const json &value, const Context &context = {}) {
         using deserializer_type = deserializer<T, Context>;
+        static_assert(is_complete<deserializer_type>, "No deserializer specified for type T");
         if constexpr (requires { deserializer_type::read(value, context); }) {
             return deserializer_type::read(value, context);
         } else {
@@ -135,7 +137,7 @@ namespace json {
             if (!value.empty()) {
                 writer.String(value.data(), value.size());
             } else {
-                writer.String("");
+                writer.String("", 0);
             }
         }
     };
@@ -143,7 +145,11 @@ namespace json {
     template<typename Context>
     struct serializer<const char *, Context> {
         static void write(const char *value, string_writer &writer) {
-            writer.String(value ? value : "");
+            if (value) {
+                writer.String(value);
+            } else {
+                writer.String("", 0);
+            }
         }
     };
 

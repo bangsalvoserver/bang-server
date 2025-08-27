@@ -141,8 +141,7 @@ namespace json {
     template<enums::enumeral T, typename Context>
     struct serializer<T, Context> {
         static void write(const T &value, string_writer &writer) {
-            auto str = enums::to_string(value);
-            writer.String(str.data(), str.size());
+            serialize(enums::to_string(value), writer);
         }
     };
 
