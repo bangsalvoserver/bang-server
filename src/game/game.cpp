@@ -61,8 +61,8 @@ namespace banggame {
         };
     }
 
-    static std::optional<game_updates::timer_status> get_request_timer_status(request_base &req) {
-        if (auto *timer = dynamic_cast<request_timer *>(&req); timer && timer->enabled()) {
+    static std::optional<game_updates::timer_status> get_request_timer_status(const request_base &req) {
+        if (auto *timer = dynamic_cast<const request_timer *>(&req); timer && timer->enabled()) {
             return game_updates::timer_status{
                 .timer_id = timer->get_timer_id(),
                 .duration = timer->get_duration()
@@ -109,7 +109,7 @@ namespace banggame {
         return {};
     }
 
-    static game_updates::request_status make_request_update(request_base &req, player_ptr owner = nullptr) {
+    static game_updates::request_status make_request_update(const request_base &req, player_ptr owner = nullptr) {
         return game_updates::request_status {
             .origin_card = req.origin_card,
             .origin = req.origin,
