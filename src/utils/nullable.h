@@ -37,22 +37,22 @@ namespace json {
 
     template<typename T, typename Context>
     struct serializer<utils::nullable<T>, Context> {
-        json operator()(const utils::nullable<T> &value, const Context &ctx) const {
+        static void write(const utils::nullable<T> &value, string_writer &writer, const Context &ctx) {
             if (value) {
-                return serialize_unchecked(value.get(), ctx);
+                serialize(value.get(), writer, ctx);
             } else {
-                return json{};
+                writer.Null();
             }
         }
     };
 
     template<typename T, typename Context>
     struct deserializer<utils::nullable<T>, Context> {
-        utils::nullable<T> operator()(const json &value, const Context &ctx) const {
-            if (value.is_null()) {
+        static utils::nullable<T> read(const json &value, const Context &ctx) {
+            if (value.IsNull()) {
                 return {};
             } else {
-                return deserialize_unchecked<T>(value, ctx);
+                return deserialize<T>(value, ctx);
             }
         }
     };

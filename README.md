@@ -16,7 +16,7 @@ This is the backend server for [bang.salvoserver.it](https://bang.salvoserver.it
   - [libuv](https://github.com/libuv/libuv)
   - [uWebSockets](https://github.com/uNetworking/uWebSockets)
   - [cxxopts](https://github.com/jarro2783/cxxopts)
-  - [nlohmann-json](https://github.com/nlohmann/json)
+  - [rapidjson](https://rapidjson.org)
   - [libpng](http://www.libpng.org/pub/png/libpng.html)
 - Some build steps require Python 3 with additional packages
 - Designed for performance and scalability
@@ -30,7 +30,7 @@ This is the backend server for [bang.salvoserver.it](https://bang.salvoserver.it
   - libuv
   - uWebSockets
   - cxxopts
-  - nlohmann-json
+  - rapidjson
   - libpng
 - Python 3 (for build/installation scripts)
   - [PyYAML](https://pyyaml.org/)

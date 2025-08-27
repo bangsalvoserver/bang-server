@@ -9,11 +9,11 @@
 namespace banggame {
     
     std::string serialize_message(const server_message &message) {
-        return json::serialize(message).dump(-1, ' ', true, nlohmann::json::error_handler_t::replace);
+        return json::to_string(message);
     }
 
     client_message deserialize_message(std::string_view value) {
-        return json::deserialize<client_message>(json::json::parse(value));
+        return json::parse_string<client_message>(value);
     }
 
 }

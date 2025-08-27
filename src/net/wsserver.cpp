@@ -101,7 +101,7 @@ namespace net {
                 if (length) {
                     res->writeHeader("Access-Control-Allow-Origin","*");
                     res->writeHeader("Content-Type", "application/json");
-                    res->end(json::serialize(tracking::get_tracking_for(*length, max_count.value_or(3000))).dump());
+                    res->end(json::to_string(tracking::get_tracking_for(*length, max_count.value_or(3000))));
                 } else {
                     res->writeStatus("400 Bad Request");
                     res->writeHeader("Access-Control-Allow-Origin","*");

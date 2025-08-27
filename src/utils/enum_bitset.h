@@ -69,26 +69,27 @@ namespace json {
 
     template<enums::enumeral T, typename Context>
     struct serializer<enums::bitset<T>, Context> {
-        json operator()(const enums::bitset<T> &value) const {
-            auto ret = json::array();
+        static void write(const enums::bitset<T> &value, string_writer &writer) {
+            writer.StartArray();
             for (T v : enums::enum_values<T>()) {
                 if (value.check(v)) {
-                    ret.push_back(enums::to_string(v));
+                    auto str = enums::to_string(v);
+                    writer.String(str.data(), str.size());
                 }
             }
-            return ret;
+            writer.EndArray();
         }
     };
 
     template<enums::enumeral T, typename Context>
     struct deserializer<enums::bitset<T>, Context> {
-        enums::bitset<T> operator()(const json &value, const Context &ctx) const {
-            if (!value.is_array()) {
+        static enums::bitset<T> read(const json &value, const Context &ctx) {
+            if (!value.IsArray()) {
                 throw deserialize_error(std::format("Cannot deserialize {} bitset: value is not an array", reflect::type_name<T>()));
             }
             enums::bitset<T> ret;
-            for (const auto &elem : value) {
-                ret.add(deserialize_unchecked<T>(elem, ctx));
+            for (const auto &elem : value.GetArray()) {
+                ret.add(deserialize<T>(elem, ctx));
             }
             return ret;
         }

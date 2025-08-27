@@ -73,24 +73,26 @@ namespace json {
 
     template<typename Context>
     struct serializer<banggame::image_pixels_hash, Context> {
-        json operator()(banggame::image_pixels_hash value) const {
+        static void write(banggame::image_pixels_hash value, string_writer &writer) {
             if (value) {
-                return std::format("{:x}", value.value);
+                auto str = std::format("{:x}", value.value);
+                writer.String(str.data(), str.size());
+            } else {
+                writer.Null();
             }
-            return {};
         }
     };
 
     template<typename Context>
     struct deserializer<banggame::image_pixels, Context> {
-        banggame::image_pixels operator()(const json &value) const {
-            if (value.is_null()) {
+        static banggame::image_pixels read(const json &value) {
+            if (value.IsNull()) {
                 return {};
             }
-            if (!value.is_string()) {
+            if (!value.IsString()) {
                 throw deserialize_error("Cannot deserialize image_pixels");
             }
-            return banggame::image_from_png_data_url(value.get<std::string_view>());
+            return banggame::image_from_png_data_url(std::string_view{value.GetString(), value.GetStringLength()});
         }
     };
 }

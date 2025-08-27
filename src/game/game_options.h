@@ -38,7 +38,7 @@ namespace json {
 
     template<typename Context>
     struct deserializer<banggame::game_options, Context> {
-        banggame::game_options operator()(const json &value, const Context &ctx) const {
+        static banggame::game_options read(const json &value, const Context &ctx) {
             return banggame::game_options::deserialize_json(value);
         }
     };

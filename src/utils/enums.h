@@ -125,11 +125,11 @@ namespace json {
 
     template<enums::enumeral T, typename Context>
     struct deserializer<T, Context> {
-        T operator()(const json &value) const {
-            if (!value.is_string()) {
+        static T read(const json &value) {
+            if (!value.IsString()) {
                 throw deserialize_error(std::format("Cannot deserialize {}: value is not a string", reflect::type_name<T>()));
             }
-            auto str = value.get<std::string>();
+            std::string_view str{value.GetString(), value.GetStringLength()};
             if (auto ret = enums::from_string<T>(str)) {
                 return *ret;
             } else {
@@ -140,8 +140,9 @@ namespace json {
 
     template<enums::enumeral T, typename Context>
     struct serializer<T, Context> {
-        json operator()(const T &value) const {
-            return enums::to_string(value);
+        static void write(const T &value, string_writer &writer) {
+            auto str = enums::to_string(value);
+            writer.String(str.data(), str.size());
         }
     };
 

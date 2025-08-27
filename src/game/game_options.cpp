@@ -79,15 +79,16 @@ namespace banggame {
     
     game_options game_options::deserialize_json(const json::json &value) {
         game_options result{};
-        if (value.is_object()) {
+        if (value.IsObject()) {
             reflect::for_each<game_options>([&](auto I) {
                 auto member_name = reflect::member_name<I, game_options>();
-                if (auto it = value.find(member_name); it != value.end()) {
+                json::json key(rapidjson::StringRef(member_name.data(), member_name.size()));
+                if (auto it = value.FindMember(key); it != value.MemberEnd()) {
                     try {
                         auto &field = reflect::get<I>(result);
 
                         using option_type = reflect::member_type<I, game_options>;
-                        field = game_option_transformer<I>(json::deserialize<option_type>(*it));
+                        field = game_option_transformer<I>(json::deserialize<option_type>(it->value));
                     } catch (const std::exception &error) {
                         // ignore errors.
                         // game_options are stored in the clients' application storage and we don't want them kicked out if it's invalid.

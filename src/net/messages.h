@@ -68,7 +68,7 @@ namespace banggame {
 
         struct game_action {
             struct transparent{};
-            json::json action;
+            json::json_document action;
         };
     }
     
@@ -200,7 +200,7 @@ namespace banggame {
 
         struct game_update {
             struct transparent{};
-            json::json update;
+            json::raw_string update;
         };
 
         struct game_started {};

@@ -1,16 +1,24 @@
 #ifndef __JSON_SERIAL_H__
 #define __JSON_SERIAL_H__
 
-#include <nlohmann/json.hpp>
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/error/en.h>
 
 #include <vector>
 #include <chrono>
+#include <stdexcept>
 
 #include "range_utils.h"
 
 namespace json {
 
-    using json = nlohmann::ordered_json;
+    using json = rapidjson::Value;
+    using json_document = rapidjson::Document;
+
+    using string_buffer = rapidjson::StringBuffer;
+    using string_writer = rapidjson::Writer<string_buffer, rapidjson::UTF8<>, rapidjson::UTF8<>, rapidjson::CrtAllocator, rapidjson::kWriteNoFlags>;
 
     template<typename T>
     concept is_complete = requires(T self) { sizeof(self); };
@@ -19,223 +27,255 @@ namespace json {
 
     template<typename T, typename Context> struct deserializer;
 
-    using json_error = json::exception;
+    class raw_string {
+    private:
+        std::string m_value;
 
-    struct serialize_error : json_error {
-        serialize_error(const char *message): json_error(0, message) {}
-        serialize_error(const std::string &message): json_error(0, message.c_str()) {}
+    public:
+        raw_string(std::string value): m_value(std::move(value)) {}
+
+        operator std::string_view() const {
+            return m_value;
+        }
     };
 
-    struct deserialize_error : json_error {
-        deserialize_error(const char *message): json_error(0, message) {}
-        deserialize_error(const std::string &message): json_error(0, message.c_str()) {}
+    struct serialize_error : std::runtime_error {
+        using std::runtime_error::runtime_error;
+    };
+
+    struct deserialize_error : std::runtime_error {
+        using std::runtime_error::runtime_error;
     };
 
     struct no_context {};
 
-    template<typename T, typename Context>
-    json serialize_unchecked(const T &value, const Context &context) {
-        serializer<T, Context> obj{};
-        if constexpr (requires { obj(value, context); }) {
-            return obj(value, context);
+    template<typename T, typename Context = no_context>
+    void serialize(const T &value, string_writer &writer, const Context &context = {}) {
+        using serializer_type = serializer<T, Context>;
+        if constexpr (requires { serializer_type::write(value, writer, context); }) {
+            serializer_type::write(value, writer, context);
         } else {
-            return obj(value);
+            serializer_type::write(value, writer);
         }
     }
 
-    template<typename T, typename Context>
-    json serialize(const T &value, const Context &context) {
-        try {
-            return serialize_unchecked(value, context);
-        } catch (const serialize_error &) {
-            throw;
-        } catch (const std::exception &e) {
-            throw serialize_error(e.what());
-        }
+    template<typename T, typename Context = no_context>
+    std::string to_string(const T &value, const Context &context = {}) {
+        string_buffer buffer;
+        string_writer writer(buffer);
+        serialize(value, writer, context);
+        return std::string(buffer.GetString(), buffer.GetSize());
     }
 
-    template<typename T>
-    json serialize(const T &value) {
-        return serialize(value, no_context{});
-    }
-
-    template<typename T, typename Context>
-    auto deserialize_unchecked(const json &value, const Context &context) {
-        deserializer<T, Context> obj{};
-        if constexpr (requires { obj(value, context); }) {
-            return obj(value, context);
+    template<typename T, typename Context = no_context>
+    auto deserialize(const json &value, const Context &context = {}) {
+        using deserializer_type = deserializer<T, Context>;
+        if constexpr (requires { deserializer_type::read(value, context); }) {
+            return deserializer_type::read(value, context);
         } else {
-            return obj(value);
+            return deserializer_type::read(value);
         }
     }
 
-    template<typename T, typename Context>
-    T deserialize(const json &value, const Context &context) {
-        try {
-            return deserialize_unchecked<T>(value, context);
-        } catch (const deserialize_error &) {
-            throw;
-        } catch (const std::exception &e) {
-            throw deserialize_error(e.what());
+    template<typename T, typename Context = no_context>
+    T parse_string(std::string_view str, const Context &context = {}) {
+        json_document doc;
+        doc.Parse(str.data(), str.size());
+        if (doc.HasParseError()) {
+            throw deserialize_error(std::format("JSON parse error: {}", rapidjson::GetParseError_En(doc.GetParseError())));
         }
+        return deserialize<T, Context>(doc, context);
     }
-
-    template<typename T>
-    T deserialize(const json &value) {
-        return deserialize<T>(value, no_context{});
-    }
-
+    
     template<typename Context>
-    struct serializer<json, Context> {
-        json operator()(const json &value) const {
-            return value;
+    struct serializer<raw_string, Context> {
+        static void write(std::string_view value, string_writer &writer) {
+            writer.RawValue(value.data(), value.size(), rapidjson::Type::kObjectType);
         }
     };
 
     template<typename Context>
     struct serializer<std::nullptr_t, Context> {
-        json operator()(std::nullptr_t) const {
-            return {};
+        static void write(std::nullptr_t, string_writer &writer) {
+            writer.Null();
         }
     };
 
-    template<std::integral T, typename Context>
+    template<typename Context>
+    struct serializer<bool, Context> {
+        static void write(bool value, string_writer &writer) {
+            writer.Bool(value);
+        }
+    };
+
+    template<std::integral T, typename Context> requires std::is_signed_v<T>
     struct serializer<T, Context> {
-        json operator()(T value) const {
-            return value;
+        static void write(T value, string_writer &writer) {
+            writer.Int64(static_cast<int64_t>(value));
+        }
+    };
+
+    template<std::integral T, typename Context> requires std::is_unsigned_v<T>
+    struct serializer<T, Context> {
+        static void write(T value, string_writer &writer) {
+            writer.Uint64(static_cast<uint64_t>(value));
         }
     };
 
     template<std::floating_point T, typename Context>
     struct serializer<T, Context> {
-        json operator()(T value) const {
-            return value;
+        static void write(T value, string_writer &writer) {
+            writer.Double(static_cast<double>(value));
         }
     };
 
     template<std::convertible_to<std::string_view> T, typename Context>
     struct serializer<T, Context> {
-        json operator()(std::string_view value) const {
-            return value;
+        static void write(std::string_view value, string_writer &writer) {
+            if (!value.empty()) {
+                writer.String(value.data(), value.size());
+            } else {
+                writer.String("");
+            }
         }
     };
 
     template<rn::range Range, typename Context> requires (!std::convertible_to<Range, std::string_view>)
     struct serializer<Range, Context> {
-        json operator()(const Range &value, const Context &ctx) const {
-            auto ret = json::array();
-            if constexpr (rn::sized_range<Range>) {
-                ret.get_ptr<json::array_t*>()->reserve(value.size());
-            }
+        static void write(const Range &value, string_writer &writer, const Context &ctx) {
+            writer.StartArray();
             for (const auto &obj : value) {
-                ret.push_back(serialize_unchecked(obj, ctx));
+                serialize(obj, writer, ctx);
             }
-            return ret;
+            writer.EndArray();
         }
     };
 
     template<typename Rep, typename Period, typename Context>
     struct serializer<std::chrono::duration<Rep, Period>, Context> {
-        json operator()(const std::chrono::duration<Rep, Period> &value) const {
-            return value.count();
+        static void write(const std::chrono::duration<Rep, Period> &value, string_writer &writer, const Context &ctx) {
+            serialize(value.count(), writer, ctx);
         }
     };
 
     template<typename Clock, typename Duration, typename Context>
     struct serializer<std::chrono::time_point<Clock, Duration>, Context> {
-        json operator()(const std::chrono::time_point<Clock, Duration> &value, const Context &ctx) const {
-            return serialize_unchecked(value.time_since_epoch(), ctx);
+        static void write(const std::chrono::time_point<Clock, Duration> &value, string_writer &writer, const Context &ctx) {
+            serialize(value.time_since_epoch(), writer, ctx);
         }
     };
 
     template<typename T, typename Context>
     struct serializer<std::optional<T>, Context> {
-        json operator()(const std::optional<T> &value, const Context &ctx) const {
-            if (value) {
-                return serialize_unchecked(*value, ctx);
-            } else {
-                return json{};
-            }
+        static void write(const std::optional<T> &value, string_writer &writer, const Context &ctx) {
+            if (value) serialize(*value, writer, ctx);
+            else writer.Null();
         }
     };
 
     template<typename First, typename Second, typename Context>
     struct serializer<std::pair<First, Second>, Context> {
-        json operator()(const std::pair<First, Second> &value, const Context &ctx) const {
-            return json::array({
-                serialize_unchecked(value.first, ctx),
-                serialize_unchecked(value.second, ctx)
-            });
+        static void write(const std::pair<First, Second> &value, string_writer &writer, const Context &ctx) {
+            writer.StartArray();
+            serialize(value.first, writer, ctx);
+            serialize(value.second, writer, ctx);
+            writer.EndArray();
         }
     };
 
     template<typename Context, typename ... Ts>
     struct serializer<std::tuple<Ts ...>, Context> {
-        json operator()(const std::tuple<Ts ...> &value, const Context &ctx) const {
-            return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
-                return json::array({
-                    serialize_unchecked(std::get<Is>(value), ctx) ...
-                });
+        static void write(const std::tuple<Ts ...> &value, string_writer &writer, const Context &ctx) {
+            writer.StartArray();
+            [&]<size_t ... Is>(std::index_sequence<Is ...>) {
+                (serialize(std::get<Is>(value), writer, ctx), ...);
             }(std::index_sequence_for<Ts ...>());
+            writer.EndArray();
         }
     };
-    
+
     template<typename Context>
-    struct deserializer<json, Context> {
-        json operator()(const json &value) const {
-            return value;
+    struct deserializer<json_document, Context> {
+        static json_document read(const json &value) {
+            json_document doc;
+            doc.CopyFrom(value, doc.GetAllocator());
+            return doc;
         }
     };
 
     template<typename Context>
     struct deserializer<std::nullptr_t, Context> {
-        std::nullptr_t operator()(const json &value) const {
-            if (!value.is_null()) {
+        static std::nullptr_t read(const json &value) {
+            if (!value.IsNull()) {
                 throw deserialize_error("Cannot deserialize null");
             }
             return nullptr;
         }
     };
 
-    template<typename T, typename Context> requires std::is_arithmetic_v<T>
-    struct deserializer<T, Context> {
-        T operator()(const json &value) const {
-            if constexpr (std::is_same_v<T, bool>) {
-                if (!value.is_boolean()) {
-                    throw deserialize_error("Cannot deserialize boolean");
-                }
-            } else if constexpr (std::is_integral_v<T>) {
-                if (!value.is_number_integer()) {
-                    throw deserialize_error("Cannot deserialize integer");
-                }
-            } else {
-                if (!value.is_number()) {
-                    throw deserialize_error("Cannot deserialize number");
-                }
+    template<typename Context>
+    struct deserializer<bool, Context> {
+        static bool read(const json &value) {
+            if (!value.IsBool()) {
+                throw deserialize_error("Cannot deserialize boolean");
             }
-            return value.get<T>();
+            return value.GetBool();
+        }
+    };
+
+    template<std::integral T, typename Context> requires std::is_signed_v<T>
+    struct deserializer<T, Context> {
+        static T read(const json &value) {
+            if (value.IsInt()) {
+                return static_cast<T>(value.GetInt());
+            } else if (value.IsInt64()) {
+                return static_cast<T>(value.GetInt64());
+            }
+            throw deserialize_error("Cannot deserialize integer");
+        }
+    };
+
+    template<std::integral T, typename Context> requires std::is_unsigned_v<T>
+    struct deserializer<T, Context> {
+        static T read(const json &value) {
+            if (value.IsUint()) {
+                return static_cast<T>(value.GetUint());
+            } else if (value.IsUint64()) {
+                return static_cast<T>(value.GetUint64());
+            }
+            throw deserialize_error("Cannot deserialize unsigned integer");
+        }
+    };
+
+    template<std::floating_point T, typename Context>
+    struct deserializer<T, Context> {
+        static T read(const json &value) {
+            if (value.IsDouble()) {
+                return static_cast<T>(value.GetDouble());
+            }
+            throw deserialize_error("Cannot deserialize number");
         }
     };
 
     template<typename Context>
     struct deserializer<std::string, Context> {
-        std::string operator()(const json &value) const {
-            if (!value.is_string()) {
+        static std::string read(const json &value) {
+            if (!value.IsString()) {
                 throw deserialize_error("Cannot deserialize string");
             }
-            return value.get<std::string>();
+            return std::string{value.GetString(), value.GetStringLength()};
         }
     };
     
     template<rn::range Range, typename Context>
     struct deserializer<Range, Context> {
-        Range operator()(const json &value, const Context &ctx) const {
-            if (!value.is_array()) {
+        static Range read(const json &value, const Context &ctx) {
+            if (!value.IsArray()) {
                 throw deserialize_error("Cannot deserialize range");
             }
-            return value
+            return value.GetArray()
                 | rv::transform([&](const json &obj) {
-                    return deserialize_unchecked<rn::range_value_t<Range>>(obj, ctx);
+                    return deserialize<rn::range_value_t<Range>>(obj, ctx);
                 })
                 | rn::to<Range>();
         }
@@ -243,13 +283,17 @@ namespace json {
 
     template<typename T, typename Context, size_t N>
     struct deserializer<std::array<T, N>, Context> {
-        std::array<T, N> operator()(const json &value, const Context &context) const {
-            if (!value.is_array() || value.size() != N) {
+        static std::array<T, N> read(const json &value, const Context &context) {
+            if (!value.IsArray()) {
                 throw deserialize_error("Cannot deserialize array");
+            }
+            const auto &value_array = value.GetArray();
+            if (value_array.Size() != N) {
+                throw deserialize_error("Cannot deserialize array: invalid size");
             }
             return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
                 return std::array<T, N>{
-                    deserialize_unchecked<T, Context>(value[Is], context) ...
+                    deserialize<T, Context>(value_array[Is], context) ...
                 };
             }(std::make_index_sequence<N>());
         }
@@ -257,53 +301,58 @@ namespace json {
 
     template<typename Rep, typename Period, typename Context>
     struct deserializer<std::chrono::duration<Rep, Period>, Context> {
-        std::chrono::duration<Rep, Period> operator()(const json &value) const {
-            if (!value.is_number()) {
-                throw deserialize_error("Cannot deserialize duration: value is not a number");
-            }
-            return std::chrono::duration<Rep, Period>{value.get<Rep>()};
+        static std::chrono::duration<Rep, Period> read(const json &value, const Context &ctx) {
+            return std::chrono::duration<Rep, Period>{deserialize<Rep, Context>(value, ctx)};
         }
     };
     
     template<typename Clock, typename Duration, typename Context>
     struct deserializer<std::chrono::time_point<Clock, Duration>, Context> {
-        std::chrono::time_point<Clock, Duration> operator()(const json &value, const Context &ctx) const {
-            return std::chrono::time_point<Clock, Duration>{ deserialize_unchecked<Duration>(value, ctx) };
+        static std::chrono::time_point<Clock, Duration> read(const json &value, const Context &ctx) {
+            return std::chrono::time_point<Clock, Duration>{ deserialize<Duration>(value, ctx) };
         }
     };
 
     template<typename T, typename Context>
     struct deserializer<std::optional<T>, Context> {
-        std::optional<T> operator()(const json &value, const Context &ctx) const {
-            if (value.is_null()) {
+        static std::optional<T> read(const json &value, const Context &ctx) {
+            if (value.IsNull()) {
                 return std::nullopt;
             } else {
-                return deserialize_unchecked<T>(value, ctx);
+                return deserialize<T>(value, ctx);
             }
         }
     };
 
     template<typename First, typename Second, typename Context>
     struct deserializer<std::pair<First, Second>, Context> {
-        std::pair<First, Second> operator()(const json &value, const Context &ctx) const {
-            if (!value.is_array() || value.size() != 2) {
-                throw deserialize_error("Cannot deserialize pair: value is not an array of two elements");
+        static std::pair<First, Second> read(const json &value, const Context &ctx) {
+            if (!value.IsArray()) {
+                throw deserialize_error("Cannot deserialize pair: value is not an array");
+            }
+            const auto &value_array = value.GetArray();
+            if (value_array.Size() != 2) {
+                throw deserialize_error("Cannot deserialize pair: size is not 2");
             }
             return {
-                deserialize_unchecked<First>(value[0], ctx),
-                deserialize_unchecked<Second>(value[1], ctx)
+                deserialize<First>(value_array[0], ctx),
+                deserialize<Second>(value_array[1], ctx)
             };
         }
     };
 
     template<typename Context, typename ...Ts>
     struct deserializer<std::tuple<Ts ...>, Context> {
-        std::tuple<Ts ...> operator()(const json &value, const Context &ctx) const {
-            if (!value.is_array() || value.size() != sizeof...(Ts)) {
+        static std::tuple<Ts ...> read(const json &value, const Context &ctx) {
+            if (!value.IsArray()) {
+                throw deserialize_error("Cannot deserialize tuple: value is not an array");
+            }
+            const auto &value_array = value.GetArray();
+            if (value_array.Size() != sizeof...(Ts)) {
                 throw deserialize_error("Cannot deserialize tuple: invalid size of array");
             }
             return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
-                return std::make_tuple(deserialize_unchecked<Ts>(value[Is], ctx) ...);
+                return std::make_tuple(deserialize<Ts>(value_array[Is], ctx) ...);
             }(std::index_sequence_for<Ts ...>());
         }
     };

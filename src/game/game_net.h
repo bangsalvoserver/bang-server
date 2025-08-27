@@ -19,13 +19,13 @@ namespace banggame {
 
     struct game_update_record {
         update_target target;
-        json::json content;
+        json::raw_string content;
         game_duration duration;
     };
 
     struct saved_log_record {
         update_target target;
-        json::json content;
+        json::raw_string content;
     };
 
     class game_net_manager : public game_context {
@@ -47,7 +47,7 @@ namespace banggame {
             return update;
         }
         
-        json::json serialize_update(const game_update &update) const;
+        json::raw_string serialize_update(const game_update &update) const;
 
         void handle_game_action(player_ptr origin, const json::json &value);
 

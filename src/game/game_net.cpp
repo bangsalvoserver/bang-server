@@ -12,25 +12,30 @@
 
 namespace json {
     
-    template<typename Context> struct serializer<banggame::tag_map, Context> {
-        json operator()(const banggame::tag_map &map) const {
-            auto result = json::object();
+    template<typename Context>
+    struct serializer<banggame::tag_map, Context> {
+        static void write(const banggame::tag_map &map, string_writer &writer) {
+            writer.StartObject();
             for (const auto &[k, v] : map) {
-                result.push_back({enums::to_string(k), v});
+                auto key = enums::to_string(k);
+                writer.Key(key.data(), key.size());
+                writer.Int(v);
             }
-            return result;
+            writer.EndObject();
         }
     };
 
-    template<typename Context> struct serializer<const banggame::effect_vtable *, Context> {
-        json operator()(const banggame::effect_vtable *value) const {
-            return value->name;
+    template<typename Context>
+    struct serializer<const banggame::effect_vtable *, Context> {
+        static void write(const banggame::effect_vtable *value, string_writer &writer) {
+            writer.String(value->name.data(), value->name.size());
         }
     };
 
-    template<typename Context> struct serializer<const banggame::targeting_vtable *, Context> {
-        json operator()(const banggame::targeting_vtable *value) const {
-            return value->name;
+    template<typename Context>
+    struct serializer<const banggame::targeting_vtable *, Context> {
+        static void write(const banggame::targeting_vtable *value, string_writer &writer) {
+            writer.String(value->name.data(), value->name.size());
         }
     };
 
@@ -39,40 +44,38 @@ namespace json {
     };
 
     template<> struct serializer<banggame::effect_holder, banggame::game_context> : aggregate_serializer_unchecked<banggame::effect_holder, banggame::game_context> {
-        json operator()(const banggame::effect_holder &effect, const banggame::game_context &ctx) const {
-            json result = aggregate_serializer_unchecked<banggame::effect_holder, banggame::game_context>::operator()(effect, ctx);
-            json value = effect.target->serialize_args(effect, ctx);
-            if (value.is_object()) {
-                for (auto &[key, val] : value.items()) {
-                    result[key] = std::move(val);
-                }
-            }
-            return result;
+        static void write(const banggame::effect_holder &effect, string_writer &writer, const banggame::game_context &ctx) {
+            writer.StartObject();
+            write_fields(effect, writer, ctx);
+            effect.target->serialize_args(effect, writer, ctx);
+            writer.EndObject();
         }
     };
 
-    template<typename Context> struct serializer<const banggame::equip_vtable *, Context> {
-        json operator()(const banggame::equip_vtable *value) const {
-            return value->name;
+    template<typename Context>
+    struct serializer<const banggame::equip_vtable *, Context> {
+        static void write(const banggame::equip_vtable *value, string_writer &writer) {
+            writer.String(value->name.data(), value->name.size());
         }
     };
 
-    template<typename Context> struct serializer<const banggame::modifier_vtable *, Context> {
-        json operator()(const banggame::modifier_vtable *value) const {
+    template<typename Context>
+    struct serializer<const banggame::modifier_vtable *, Context> {
+        static void write(const banggame::modifier_vtable *value, string_writer &writer) {
             if (value) {
-                return value->name;
+                writer.String(value->name.data(), value->name.size());
             } else {
-                return {};
+                writer.Null();
             }
         }
     };
 
     template<typename Context> struct serializer<const banggame::mth_vtable *, Context> {
-        json operator()(const banggame::mth_vtable *value) const {
+        static void write(const banggame::mth_vtable *value, string_writer &writer) {
             if (value) {
-                return value->name;
+                writer.String(value->name.data(), value->name.size());
             } else {
-                return {};
+                writer.Null();
             }
         }
     };
@@ -83,59 +86,81 @@ namespace json {
             banggame::card_deck_type deck;
         };
 
-        json operator()(const banggame::card_backface_list &value, const Context &ctx) const {
-            return serialize_unchecked(value.cards | rv::transform([](banggame::const_card_ptr card) {
+        static void write(const banggame::card_backface_list &value, string_writer &writer, const Context &ctx) {
+            auto to_card_backface = [](banggame::const_card_ptr card) {
                 return card_backface{ card->id, card->deck };
-            }), ctx);
+            };
+
+            serialize(value.cards | rv::transform(to_card_backface), writer, ctx);
         }
     };
 
-    template<typename Context> struct serializer<banggame::player_user_list, Context> {
+    template<typename Context>
+    struct serializer<banggame::player_user_list, Context> {
         struct player_user_pair {
             int player_id;
             int user_id;
         };
 
-        json operator()(const banggame::player_user_list &value, const Context &ctx) const {
-            return serialize_unchecked(value.players | rv::transform([](banggame::const_player_ptr player) {
+        static void write(const banggame::player_user_list &value, string_writer &writer, const Context &ctx) {
+            auto to_player_user_pair = [](banggame::const_player_ptr player) {
                 return player_user_pair{ player->id, player->user_id };
-            }), ctx);
+            };
+
+            serialize(value.players | rv::transform(to_player_user_pair), writer, ctx);
         };
     };
 
     template<> struct serializer<banggame::format_arg_value, banggame::game_context> {
-        json serialize_card(int card_id, const banggame::game_context &ctx) const {
+        static void serialize_int(int value, string_writer &writer) {
+            writer.StartObject();
+            writer.Key("integer");
+            writer.Int(value);
+            writer.EndObject();
+        }
+
+        static void serialize_card(int card_id, string_writer &writer, const banggame::game_context &ctx){
             struct format_card {
                 std::string_view name;
                 banggame::card_sign sign;
             };
 
+            writer.StartObject();
+            writer.Key("card");
+            writer.StartObject();
             if (card_id != 0) {
                 banggame::card_ptr target_card = ctx.find_card(card_id);
-                return serialize_unchecked(format_card{ target_card->name, target_card->sign }, ctx);
-            } else {
-                return json::object();
+                using serializer_type = aggregate_serializer_unchecked<format_card, banggame::game_context>;
+                serializer_type::write_fields({ target_card->name, target_card->sign }, writer, ctx);
             }
+            writer.EndObject();
+            writer.EndObject();
         }
 
-        json serialize_player(int player_id, const banggame::game_context &ctx) const {
+        static void serialize_player(int player_id, string_writer &writer, const banggame::game_context &ctx) {
+            writer.StartObject();
+            writer.Key("player");
             if (player_id != 0) {
                 banggame::player_ptr target = ctx.find_player(player_id);
-                return serialize_unchecked(target, ctx);
+                serialize(target, writer, ctx);
             } else {
-                return json{};
+                writer.Null();
             }
+            writer.EndObject();
         }
 
-        json operator()(banggame::format_arg_value pair, const banggame::game_context &ctx) const {
+        static void write(banggame::format_arg_value pair, string_writer &writer, const banggame::game_context &ctx) {
             auto [value, type] = pair;
             switch (type) {
             case banggame::format_arg_type::format_number:
-                return {{"integer", value}};
+                serialize_int(value, writer);
+                break;
             case banggame::format_arg_type::format_card:
-                return {{"card", serialize_card(value, ctx)}};
+                serialize_card(value, writer, ctx);
+                break;
             case banggame::format_arg_type::format_player:
-                return {{"player", serialize_player(value, ctx)}};
+                serialize_player(value, writer, ctx);
+                break;
             default:
                 throw serialize_error("Invalid format arg type");
             }
@@ -144,17 +169,22 @@ namespace json {
     };
 
     template<> struct serializer<banggame::game_string, banggame::game_context> {
-        json operator()(const banggame::game_string &value, const banggame::game_context &ctx) const {
-            return {
-                {"format_str", value ? std::string_view{value.format_str} : std::string_view{}},
-                {"format_args", serialize_unchecked(value.format_args, ctx)}
-            };
+        static void write(const banggame::game_string &value, string_writer &writer, const banggame::game_context &ctx) {
+            writer.StartObject();
+            
+            writer.Key("format_str");
+            writer.String(value.format_str ? value.format_str : "");
+            
+            writer.Key("format_args");
+            serialize(value.format_args, writer, ctx);
+
+            writer.EndObject();
         }
     };
 
     template<> struct serializer<banggame::animation_duration, banggame::game_context> {
-        json operator()(const banggame::animation_duration &duration, const banggame::game_context &context) const {
-            return serialize_unchecked(context.transform_duration(duration.get()), context);
+        static void write(const banggame::animation_duration &duration, string_writer &writer, const banggame::game_context &context) {
+            serialize(context.transform_duration(duration.get()), writer, context);
         }
     };
 
@@ -167,13 +197,17 @@ namespace banggame {
             .card = json::deserialize<card_ptr, game_context>(card, context)
         };
 
+        if (!targets.IsArray()) {
+            throw json::deserialize_error("Cannot deserialize target list: value is not an array");
+        }
+
         if (check_equip && result.card->is_equip_card()) {
             if (result.card->self_equippable()) {
-                if (!targets.empty()) {
+                if (!targets.Empty()) {
                     throw json::deserialize_error("Self equippable card must have no targets");
                 }
             } else {
-                if (targets.size() != 1) {
+                if (targets.Size() != 1) {
                     throw json::deserialize_error("Equip card must have one target");
                 }
                 result.targets.emplace_back(json::deserialize<player_ptr, game_context>(targets[0], context));
@@ -187,12 +221,12 @@ namespace banggame {
                 throw json::deserialize_error("Effect list is empty");
             }
 
-            if (effects.size() != targets.size()) {
+            if (effects.size() != targets.Size()) {
                 throw json::deserialize_error("Invalid number of targets");
             }
             
             result.targets.reserve(effects.size());
-            for (const auto &[effect, target] : rv::zip(effects, targets)) {
+            for (const auto &[effect, target] : rv::zip(effects, targets.GetArray())) {
                 result.targets.push_back(effect.target->deserialize_target(target, context));
             }
         }
@@ -201,21 +235,21 @@ namespace banggame {
     }
 
     static const json::json &get_value(const json::json &obj, std::string_view key) {
-        auto it = obj.find(key);
-        if (it == obj.end()) {
-            throw json::deserialize_error(std::format("Missing key {} in object", key));
+        json::json json_key(rapidjson::StringRef(key.data(), key.size()));
+        if (auto it = obj.FindMember(json_key); it != obj.MemberEnd()) {
+            return it->value;
         }
-        return *it;
+        throw json::deserialize_error(std::format("Missing key {} in object", key));
     }
 
     static modifier_list deserialize_modifier_list(const json::json &value, const game_context &context) {
-        if (!value.is_array()) {
+        if (!value.IsArray()) {
             throw json::deserialize_error("Cannot deserialize modifier_list: value is not an array");
         }
         modifier_list result;
-        result.reserve(value.size());
-        for (const json::json &modifier : value) {
-            if (!modifier.is_object()) {
+        result.reserve(value.Size());
+        for (const json::json &modifier : value.GetArray()) {
+            if (!modifier.IsObject()) {
                 throw json::deserialize_error("Cannot deserialize modifier_pair: value is not an object");
             }
             result.push_back(deserialize_card_targets(get_value(modifier, "card"), get_value(modifier, "targets"), context));
@@ -233,18 +267,18 @@ namespace banggame {
         };
     }
 
-    json::json game_net_manager::serialize_update(const game_update &update) const {
-        return json::serialize<game_update, game_context>(update, *this);
+    json::raw_string game_net_manager::serialize_update(const game_update &update) const {
+        return json::to_string<game_update, game_context>(update, *this);
     }
 
     void game_net_manager::handle_game_action(player_ptr origin, const json::json &value) {
-        if (!value.is_object()) {
+        if (!value.IsObject()) {
             throw json::deserialize_error("Cannot deserialize game_action: value is not an object");
         }
         
         std::optional<timer_id_t> timer_id, current_timer_id;
-        if (auto it = value.find("timer_id"); it != value.end()) {
-            timer_id = json::deserialize<timer_id_t>(*it);
+        if (auto it = value.FindMember("timer_id"); it != value.MemberEnd()) {
+            timer_id = json::deserialize<timer_id_t>(it->value);
         }
         if (auto timer = origin->m_game->top_request<request_timer>(); timer && timer->enabled()) {
             current_timer_id = timer->get_timer_id();

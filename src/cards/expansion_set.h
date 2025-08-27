@@ -17,26 +17,28 @@ namespace banggame {
 
 namespace json {
 
-    template<typename Context> struct serializer<banggame::ruleset_ptr, Context> {
-        json operator()(banggame::ruleset_ptr value) const {
-            return value->name;
+    template<typename Context>
+    struct serializer<banggame::ruleset_ptr, Context> {
+        static void write(banggame::ruleset_ptr value, string_writer &writer) {
+            writer.String(value->name.data(), value->name.size());
         }
     };
 
-    template<typename Context> struct deserializer<banggame::expansion_set, Context> {
-        banggame::expansion_set operator()(const json &value) const {
-            if (!value.is_array()) {
+    template<typename Context>
+    struct deserializer<banggame::expansion_set, Context> {
+        static banggame::expansion_set read(const json &value) {
+            if (!value.IsArray()) {
                 throw deserialize_error("Cannot deserialize expansion_set");
             }
 
             banggame::expansion_set result;
 
-            for (const auto &elem : value) {
-                if (!elem.is_string()) {
+            for (const auto &elem : value.GetArray()) {
+                if (!elem.IsString()) {
                     throw deserialize_error("Cannot deserialize ruleset_ptr");
                 }
 
-                auto name = elem.get<std::string_view>();
+                std::string_view name{elem.GetString(), elem.GetStringLength()};
                 auto it = banggame::bang_cards.expansions.find(name);
                 if (it != banggame::bang_cards.expansions.end() && it->second.expansion) {
                     result.insert(it->second.expansion);

@@ -21,7 +21,7 @@ void game_manager::on_message(client_handle client, std::string_view msg) {
                 throw critical_error("CLIENT_NOT_VALIDATED");
             }
         }, deserialize_message(msg));
-    } catch (const json::json_error &e) {
+    } catch (const json::deserialize_error &e) {
         logging::warn("Invalid message: {:.{}}\n{}", msg, net::max_message_log_size, e.what());
         kick_client(client, "INVALID_MESSAGE");
     } catch (const critical_error &e) {
@@ -305,7 +305,7 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
                 send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
             }
         }
-        for (json::json update : lobby.m_game->get_game_log_updates(target)) {
+        for (json::raw_string &&update : lobby.m_game->get_game_log_updates(target)) {
             send_message(session->client, server_messages::game_update{ std::move(update) });
         }
     }
@@ -674,7 +674,7 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
     for (game_update &&update : lobby.m_game->get_rejoin_updates(target)) {
         send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
     }
-    for (json::json update : lobby.m_game->get_game_log_updates(target)) {
+    for (json::raw_string &&update : lobby.m_game->get_game_log_updates(target)) {
         send_message(session->client, server_messages::game_update{ std::move(update) });
     }
 

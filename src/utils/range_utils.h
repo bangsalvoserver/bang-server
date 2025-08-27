@@ -2,6 +2,7 @@
 #define __RANGE_UTILS_H__
 
 #include <ranges>
+#include <algorithm>
 #include <stdexcept>
 
 #if !defined(__cpp_lib_ranges_concat)

@@ -11,7 +11,7 @@ namespace banggame {
         using game_table::game_table;
         
         std::generator<game_update> get_spectator_join_updates();
-        std::generator<json::json> get_game_log_updates(player_ptr target);
+        std::generator<json::raw_string> get_game_log_updates(player_ptr target);
         std::generator<game_update> get_rejoin_updates(player_ptr target);
 
         void start_game();

@@ -41,10 +41,10 @@ target_link_libraries(banglibs INTERFACE SQLite::SQLite3)
 find_package(cxxopts REQUIRED)
 target_link_libraries(banglibs INTERFACE cxxopts::cxxopts)
 
-# nlohmann-json
+# rapidjson
 
-find_package(nlohmann_json 3.11.0 REQUIRED)
-target_link_libraries(banglibs INTERFACE nlohmann_json::nlohmann_json)
+add_subdirectory(external/rapidjson)
+target_link_libraries(banglibs INTERFACE RapidJSON)
 
 # libpng
 

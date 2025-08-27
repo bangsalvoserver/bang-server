@@ -29,18 +29,21 @@ namespace json {
 
     template<aggregate T, typename Context>
     struct aggregate_serializer_unchecked {
-        json operator()(const T &value, const Context &ctx) const {
-            json result = json::object();
+        static void write_fields(const T &value, string_writer &writer, const Context &ctx) {
             reflect::for_each<T>([&](auto I) {
                 using member_type = reflect::member_type<I, T>;
                 if constexpr (!requires { typename serializer<member_type, Context>::skip_field; }) {
-                    result.push_back({
-                        reflect::member_name<I, T>(),
-                        serialize_unchecked(reflect::get<I>(value), ctx)
-                    });
+                    std::string_view key = reflect::member_name<I, T>();
+                    writer.Key(key.data(), key.size());
+                    serialize(reflect::get<I>(value), writer, ctx);
                 }
             });
-            return result;
+        }
+
+        static void write(const T &value, string_writer &writer, const Context &ctx) {
+            writer.StartObject();
+            write_fields(value, writer, ctx);
+            writer.EndObject();
         }
     };
 
@@ -49,33 +52,34 @@ namespace json {
 
     template<transparent_aggregate T, typename Context> requires (reflect::size<T>() == 1)
     struct serializer<T, Context> {
-        json operator()(const T &value, const Context &ctx) const {
-            return serialize_unchecked(reflect::get<0>(value), ctx);
+        static void write(const T &value, string_writer &writer, const Context &ctx) {
+            serialize(reflect::get<0>(value), writer, ctx);
         }
     };
 
     template<transparent_aggregate T, typename Context> requires (reflect::size<T>() > 1)
     struct serializer<T, Context> {
-        json operator()(const T &value, const Context &ctx) const {
-            return serialize_unchecked(reflect::to<std::tuple>(value), ctx);
+        static void write(const T &value, string_writer &writer, const Context &ctx) {
+            serialize(reflect::to<std::tuple>(value), writer, ctx);
         }
     };
 
     template<aggregate T, typename Context>
     struct aggregate_deserializer_unchecked {
         template<size_t I>
-        reflect::member_type<I, T> deserialize_field(const json &value, const Context &ctx) const {
+        static reflect::member_type<I, T> deserialize_field(const json &value, const Context &ctx) {
             static constexpr auto name = reflect::member_name<I, T>();
             using value_type = reflect::member_type<I, T>;
-            if (auto it = value.find(name); it != value.end()) {
-                return deserialize_unchecked<value_type>(*it, ctx);
+            json key(rapidjson::StringRef(name.data(), name.size()));
+            if (auto it = value.FindMember(key); it != value.MemberEnd()) {
+                return deserialize<value_type>(it->value, ctx);
             } else {
                 throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", reflect::type_name<T>(), name));
             }
         }
 
-        T operator()(const json &value, const Context &ctx) const {
-            if (!value.is_object()) {
+        static T read(const json &value, const Context &ctx) {
+            if (!value.IsObject()) {
                 throw deserialize_error(std::format("Cannot deserialize {}: value is not an object", reflect::type_name<T>()));
             }
             return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
@@ -89,37 +93,41 @@ namespace json {
 
     template<remove_defaults_aggregate T, typename Context>
     struct serializer<T, Context>  {
-        json operator()(const T &value, const Context &ctx) const {
-            json result;
+        static void write(const T &value, string_writer &writer, const Context &ctx) {
+            bool empty = true;
             reflect::for_each<T>([&](auto I) {
                 const auto &member_value = reflect::get<I>(value);
                 using member_type = reflect::member_type<I, T>;
                 if (member_value != member_type{}) {
-                    if (result.is_null()) {
-                        result = json::object();
+                    if (empty) {
+                        empty = false;
+                        writer.StartObject();
                     }
-                    result.push_back({
-                        reflect::member_name<I, T>(),
-                        serialize_unchecked(member_value, ctx)
-                    });
+                    std::string_view key = reflect::member_name<I, T>();
+                    writer.Key(key.data(), key.size());
+                    serialize(member_value, writer, ctx);
                 }
             });
-            return result;
+            if (empty) {
+                writer.Null();
+            } else {
+                writer.EndObject();
+            }
         }
     };
 
     template<transparent_aggregate T, typename Context> requires (reflect::size<T>() == 1)
     struct deserializer<T, Context> {
-        T operator()(const json &value, const Context &ctx) const {
-            return { deserialize_unchecked<reflect::member_type<0, T>>(value, ctx) };
+        static T read(const json &value, const Context &ctx) {
+            return { deserialize<reflect::member_type<0, T>>(value, ctx) };
         }
     };
 
     template<transparent_aggregate T, typename Context> requires (reflect::size<T>() > 1)
     struct deserializer<T, Context> {
-        T operator()(const json &value, const Context &ctx) const {
+        static T read(const json &value, const Context &ctx) {
             using tuple_type = std::remove_cvref_t<decltype(reflect::to<std::tuple>(std::declval<T>()))>;
-            auto tuple = deserialize_unchecked<tuple_type>(value, ctx);
+            auto tuple = deserialize<tuple_type>(value, ctx);
             return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
                 return T{ std::move(std::get<Is>(tuple)) ... };
             }(std::make_index_sequence<std::tuple_size_v<tuple_type>>());
@@ -128,11 +136,11 @@ namespace json {
 
     template<remove_defaults_aggregate T, typename Context>
     struct deserializer<T, Context> {
-        T operator()(const json &value, const Context &ctx) const {
-            if (value.is_null()) {
+        static T read(const json &value, const Context &ctx) {
+            if (value.IsNull()) {
                 return T{};
             } else {
-                return T{aggregate_deserializer_unchecked<T, Context>{*this}(value)};
+                return T{aggregate_deserializer_unchecked<T, Context>::read(value, ctx)};
             }
         }
     };

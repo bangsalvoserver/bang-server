@@ -16,20 +16,20 @@ namespace json {
 
     template<maybe_const<banggame::card_ptr> Card, typename Context>
     struct serializer<Card, Context> {
-        json operator()(Card card) const {
+        static void write(Card card, string_writer &writer) {
             if (!card) {
                 throw serialize_error("Cannot serialize card: value is null");
             }
-            return card->id;
+            writer.Int(card->id);
         }
     };
 
     template<> struct deserializer<banggame::card_ptr, banggame::game_context> {
-        banggame::card_ptr operator()(const json &value, const banggame::game_context &context) const {
-            if (!value.is_number_integer()) {
+        static banggame::card_ptr read(const json &value, const banggame::game_context &context) {
+            if (!value.IsInt()) {
                 throw deserialize_error("Cannot deserialize card: value is not an integer");
             }
-            int card_id = value.get<int>();
+            int card_id = value.GetInt();
             if (banggame::card_ptr card = context.find_card(card_id)) {
                 return card;
             }
@@ -39,20 +39,20 @@ namespace json {
 
     template<maybe_const<banggame::player_ptr> Player, typename Context>
     struct serializer<Player, Context> {
-        json operator()(Player player) const {
+        static void write(Player player, string_writer &writer) {
             if (!player) {
                 throw serialize_error("Cannot serialize player: value is null");
             }
-            return player->id;
+            writer.Int(player->id);
         }
     };
 
     template<> struct deserializer<banggame::player_ptr, banggame::game_context> {
-        banggame::player_ptr operator()(const json &value, const banggame::game_context &context) const {
-            if (!value.is_number_integer()) {
+        static banggame::player_ptr read(const json &value, const banggame::game_context &context) {
+            if (!value.IsInt()) {
                 throw deserialize_error("Cannot deserialize player: value is not an integer");
             }
-            int player_id = value.get<int>();
+            int player_id = value.GetInt();
             if (banggame::player_ptr player = context.find_player(player_id)) {
                 return player;
             }

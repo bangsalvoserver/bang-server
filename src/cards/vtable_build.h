@@ -397,12 +397,12 @@ namespace banggame {
                 return play_card_target{json::deserialize<value_type, game_context>(value, context)};
             },
 
-            .serialize_args = [](const effect_holder &effect, const game_context &context) -> json::json {
+            .serialize_args = [](const effect_holder &effect, json::string_writer &writer, const game_context &context) {
                 auto &&handler = effect_cast<T>(effect.target_value);
                 if constexpr (requires { handler.get_args(); }) {
-                    return json::serialize(handler.get_args(), context);
-                } else {
-                    return {};
+                    using args_t = decltype(handler.get_args());
+                    using serializer_type = json::aggregate_serializer_unchecked<args_t, game_context>;
+                    serializer_type::write_fields(handler.get_args(), writer, context);
                 }
             },
 
