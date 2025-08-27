@@ -43,7 +43,7 @@ namespace json {
         struct skip_field{};
     };
 
-    template<> struct serializer<banggame::effect_holder, banggame::game_context> : aggregate_serializer_unchecked<banggame::effect_holder, banggame::game_context> {
+    template<> struct serializer<banggame::effect_holder, banggame::game_context> : aggregate_serializer<banggame::effect_holder, banggame::game_context> {
         static void write(const banggame::effect_holder &effect, string_writer &writer, const banggame::game_context &ctx) {
             writer.StartObject();
             write_fields(effect, writer, ctx);
@@ -113,40 +113,43 @@ namespace json {
 
     template<> struct serializer<banggame::format_arg_value, banggame::game_context> {
         static void serialize_int(int value, string_writer &writer) {
-            writer.StartObject();
-            writer.Key("integer");
-            writer.Int(value);
-            writer.EndObject();
+            struct format_int {
+                int integer;
+            };
+
+            serialize(format_int{ value }, writer);
         }
 
         static void serialize_card(int card_id, string_writer &writer, const banggame::game_context &ctx){
-            struct format_card {
-                std::string_view name;
-                banggame::card_sign sign;
-            };
-
-            writer.StartObject();
-            writer.Key("card");
-            writer.StartObject();
             if (card_id != 0) {
+                struct format_card {
+                    struct args {
+                        std::string_view name;
+                        banggame::card_sign sign;
+                    };
+
+                    args card;
+                };
+
                 banggame::card_ptr target_card = ctx.find_card(card_id);
-                using serializer_type = aggregate_serializer_unchecked<format_card, banggame::game_context>;
-                serializer_type::write_fields({ target_card->name, target_card->sign }, writer, ctx);
+                serialize(format_card{ .card{ target_card->name, target_card->sign }}, writer, ctx);
+            } else {
+                struct format_card_empty {
+                    struct args {};
+                    args card;
+                };
+
+                serialize(format_card_empty{}, writer, ctx);
             }
-            writer.EndObject();
-            writer.EndObject();
         }
 
         static void serialize_player(int player_id, string_writer &writer, const banggame::game_context &ctx) {
-            writer.StartObject();
-            writer.Key("player");
-            if (player_id != 0) {
-                banggame::player_ptr target = ctx.find_player(player_id);
-                serialize(target, writer, ctx);
-            } else {
-                writer.Null();
-            }
-            writer.EndObject();
+            struct format_player {
+                banggame::nullable_player player;
+            };
+
+            banggame::player_ptr target = player_id != 0 ? ctx.find_player(player_id) : nullptr;
+            serialize(format_player{ target }, writer, ctx);
         }
 
         static void write(banggame::format_arg_value pair, string_writer &writer, const banggame::game_context &ctx) {
@@ -168,19 +171,8 @@ namespace json {
 
     };
 
-    template<> struct serializer<banggame::game_string, banggame::game_context> {
-        static void write(const banggame::game_string &value, string_writer &writer, const banggame::game_context &ctx) {
-            writer.StartObject();
-            
-            writer.Key("format_str");
-            writer.String(value.format_str ? value.format_str : "");
-            
-            writer.Key("format_args");
-            serialize(value.format_args, writer, ctx);
-
-            writer.EndObject();
-        }
-    };
+    template<> struct serializer<banggame::game_string, banggame::game_context>
+        : aggregate_serializer<banggame::game_string_args, banggame::game_context> {};
 
     template<> struct serializer<banggame::animation_duration, banggame::game_context> {
         static void write(const banggame::animation_duration &duration, string_writer &writer, const banggame::game_context &context) {

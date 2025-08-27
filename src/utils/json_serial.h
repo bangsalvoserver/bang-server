@@ -140,6 +140,13 @@ namespace json {
         }
     };
 
+    template<typename Context>
+    struct serializer<const char *, Context> {
+        static void write(const char *value, string_writer &writer) {
+            writer.String(value ? value : "");
+        }
+    };
+
     template<rn::range Range, typename Context> requires (!std::convertible_to<Range, std::string_view>)
     struct serializer<Range, Context> {
         static void write(const Range &value, string_writer &writer, const Context &ctx) {

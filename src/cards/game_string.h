@@ -71,11 +71,7 @@ namespace banggame {
         using const_iterator = format_arg_iterator;
         using reverse_iterator = format_arg_iterator;
 
-        template<typename ... Ts>
-        constexpr format_arg_list(Ts ... values) {
-            static_assert(sizeof...(Ts) <= format_arg_list_max_size, "format_arg_list is too big");
-            (add(values), ...);
-        }
+        format_arg_list() = default;
 
         size_t size() const {
             return static_cast<size_t>(count);
@@ -91,33 +87,33 @@ namespace banggame {
 
     private:
         friend class format_arg_iterator;
+        friend struct game_string;
+
+        format_arg_list(std::initializer_list<format_arg_value> values) {
+            uint8_t pow3 = 1;
+            for (auto [value, type] : values) {
+                args[count] = value;
+                types += pow3 * static_cast<uint8_t>(type);
+                pow3 *= 3;
+                ++count;
+            }
+        }
+        
+        static format_arg_value make_value(small_int_t value) {
+            return {value, format_arg_type::format_number};
+        }
+
+        static format_arg_value make_value(const_card_ptr value) {
+            return {static_cast<small_int_t>(get_card_id(value)), format_arg_type::format_card};
+        }
+
+        static format_arg_value make_value(const_player_ptr value) {
+            return {static_cast<small_int_t>(get_player_id(value)), format_arg_type::format_player};
+        }
 
         std::array<small_int_t, format_arg_list_max_size> args{};
         uint8_t count = 0;
         uint8_t types = 0;
-
-        constexpr void add(small_int_t value, format_arg_type type = format_arg_type::format_number) {
-            args[count] = value;
-            types += exp3(count) * static_cast<uint8_t>(type);
-            ++count;
-        }
-
-        void add(const_card_ptr value) {
-            add(static_cast<small_int_t>(get_card_id(value)), format_arg_type::format_card);
-        }
-
-        void add(const_player_ptr value) {
-            add(static_cast<small_int_t>(get_player_id(value)), format_arg_type::format_player);
-        }
-        
-        static constexpr uint8_t exp3(uint8_t exp) {
-            uint8_t n = 1;
-            while (exp != 0) {
-                n *= 3;
-                --exp;
-            }
-            return n;
-        }
     };
     
     inline format_arg_value format_arg_iterator::operator *() const {
@@ -128,16 +124,21 @@ namespace banggame {
         return { list->args[index], static_cast<format_arg_type>(result % 3) };
     }
     
-    struct game_string {
+    struct game_string_args {
         const char *format_str = nullptr;
         format_arg_list format_args;
+    };
 
+    struct game_string : game_string_args {
         game_string() = default;
     
         template<size_t N, typename ... Ts>
-        game_string(const char (&message)[N], Ts && ... args)
-            : format_str(message)
-            , format_args{std::forward<Ts>(args) ...} {}
+        game_string(const char (&message)[N], Ts && ... args) : game_string_args{
+            .format_str{message},
+            .format_args{format_arg_list::make_value(args)...}
+        } {
+            static_assert(sizeof...(Ts) <= format_arg_list_max_size, "too many args in game_string");
+        }
 
         explicit operator bool() const {
             return format_str != nullptr;

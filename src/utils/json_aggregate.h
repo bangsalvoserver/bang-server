@@ -28,7 +28,7 @@ namespace json {
     concept default_aggregate = aggregate<T> && !transparent_aggregate<T> && !remove_defaults_aggregate<T>;
 
     template<aggregate T, typename Context>
-    struct aggregate_serializer_unchecked {
+    struct aggregate_serializer {
         static void write_fields(const T &value, string_writer &writer, const Context &ctx) {
             reflect::for_each<T>([&](auto I) {
                 using member_type = reflect::member_type<I, T>;
@@ -48,7 +48,7 @@ namespace json {
     };
 
     template<default_aggregate T, typename Context>
-    struct serializer<T, Context> : aggregate_serializer_unchecked<T, Context> {};
+    struct serializer<T, Context> : aggregate_serializer<T, Context> {};
 
     template<transparent_aggregate T, typename Context> requires (reflect::size<T>() == 1)
     struct serializer<T, Context> {
@@ -65,7 +65,7 @@ namespace json {
     };
 
     template<aggregate T, typename Context>
-    struct aggregate_deserializer_unchecked {
+    struct aggregate_deserializer {
         template<size_t I>
         static reflect::member_type<I, T> deserialize_field(const json &value, const Context &ctx) {
             static constexpr auto name = reflect::member_name<I, T>();
@@ -89,7 +89,7 @@ namespace json {
     };
     
     template<default_aggregate T, typename Context>
-    struct deserializer<T, Context> : aggregate_deserializer_unchecked<T, Context> {};
+    struct deserializer<T, Context> : aggregate_deserializer<T, Context> {};
 
     template<remove_defaults_aggregate T, typename Context>
     struct serializer<T, Context>  {
@@ -140,7 +140,7 @@ namespace json {
             if (value.IsNull()) {
                 return T{};
             } else {
-                return T{aggregate_deserializer_unchecked<T, Context>::read(value, ctx)};
+                return T{aggregate_deserializer<T, Context>::read(value, ctx)};
             }
         }
     };
