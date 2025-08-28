@@ -112,57 +112,52 @@ namespace json {
     };
 
     template<> struct serializer<banggame::format_arg_value, banggame::game_context> {
-        static void serialize_int(int value, string_writer &writer) {
+        static void write(banggame::format_arg_value pair, string_writer &writer, const banggame::game_context &ctx) {
             struct format_int {
                 int integer;
             };
 
-            serialize(format_int{ value }, writer);
-        }
+            struct format_card {
+                struct {
+                    std::string_view name;
+                    banggame::card_sign sign;
+                } card;
+            };
 
-        static void serialize_card(int card_id, string_writer &writer, const banggame::game_context &ctx){
-            if (card_id != 0) {
-                struct format_card {
-                    struct args {
-                        std::string_view name;
-                        banggame::card_sign sign;
-                    };
+            struct format_card_empty {
+                struct {} card;
+            };
 
-                    args card;
-                };
-
-                banggame::card_ptr target_card = ctx.find_card(card_id);
-                serialize(format_card{ .card{ target_card->name, target_card->sign }}, writer, ctx);
-            } else {
-                struct format_card_empty {
-                    struct args {};
-                    args card;
-                };
-
-                serialize(format_card_empty{}, writer, ctx);
-            }
-        }
-
-        static void serialize_player(int player_id, string_writer &writer, const banggame::game_context &ctx) {
             struct format_player {
                 banggame::nullable_player player;
             };
 
-            banggame::player_ptr target = player_id != 0 ? ctx.find_player(player_id) : nullptr;
-            serialize(format_player{ target }, writer, ctx);
-        }
-
-        static void write(banggame::format_arg_value pair, string_writer &writer, const banggame::game_context &ctx) {
             auto [value, type] = pair;
             switch (type) {
             case banggame::format_arg_type::format_number:
-                serialize_int(value, writer);
+                serialize(format_int{ value }, writer);
                 break;
             case banggame::format_arg_type::format_card:
-                serialize_card(value, writer, ctx);
+                if (value != 0) {
+                    banggame::card_ptr target_card = ctx.find_card(value);
+                    if (!target_card) {
+                        throw serialize_error(std::format("Cannot find card {}", value));
+                    }
+                    serialize(format_card{ .card{ target_card->name, target_card->sign }}, writer, ctx);
+                } else {
+                    serialize(format_card_empty{}, writer, ctx);
+                }
                 break;
             case banggame::format_arg_type::format_player:
-                serialize_player(value, writer, ctx);
+                if (value != 0) {
+                    banggame::player_ptr target = ctx.find_player(value);
+                    if (!target) {
+                        throw serialize_error(std::format("Cannot find player {}", value));
+                    }
+                    serialize(format_player{ target }, writer, ctx);
+                } else {
+                    serialize(format_player{}, writer, ctx);
+                }
                 break;
             default:
                 throw serialize_error("Invalid format arg type");
