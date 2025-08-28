@@ -38,6 +38,10 @@ namespace banggame {
         constexpr bool operator == (const image_pixels_hash &other) const = default;
     };
 
+    struct png_error : std::runtime_error {
+        using std::runtime_error::runtime_error;
+    };
+
     class image_pixels {
     private:
         uint32_t width;
@@ -91,7 +95,11 @@ namespace json {
             if (!value.IsString()) {
                 throw deserialize_error("Cannot deserialize image_pixels");
             }
-            return banggame::image_from_png_data_url(std::string_view{value.GetString(), value.GetStringLength()});
+            try {
+                return banggame::image_from_png_data_url(std::string_view{value.GetString(), value.GetStringLength()});
+            } catch (const banggame::png_error &e) {
+                throw deserialize_error(e.what());
+            }
         }
     };
 }

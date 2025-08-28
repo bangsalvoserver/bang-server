@@ -27,7 +27,7 @@ namespace tracking {
                     count INT NOT NULL
                 );
             )SQL");
-        } catch (const std::exception &error) {
+        } catch (const sql::sql_error &error) {
             logging::error("SQL error: {}", error.what());
         }
     }
@@ -45,7 +45,7 @@ namespace tracking {
                     "INSERT INTO {} (timestamp, count) VALUES (strftime('%s', 'now'), {})",
                     table_name, count
                 ));
-            } catch (const std::exception &error) {
+            } catch (const sql::sql_error &error) {
                 logging::error("SQL error: {}", error.what());
             }
         }
@@ -79,7 +79,7 @@ namespace tracking {
                         start_date += max_diff;
                     }
                 }
-            } catch (const std::exception &error) {
+            } catch (const sql::sql_error &error) {
                 logging::error("SQL error: {}", error.what());
             }
         }

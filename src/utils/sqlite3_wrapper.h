@@ -8,10 +8,14 @@
 #include <sqlite3.h>
 
 namespace sql {
+
+    struct sql_error : std::runtime_error {
+        using std::runtime_error::runtime_error;
+    };
     
     static void throw_if_sqlite3_error(int result) {
         if (result != SQLITE_OK) {
-            throw std::runtime_error(sqlite3_errstr(result));
+            throw sql_error(sqlite3_errstr(result));
         }
     }
 
@@ -76,7 +80,7 @@ namespace sql {
         bool step() {
             int result = sqlite3_step(stmt);
             if (result != SQLITE_DONE && result != SQLITE_ROW) {
-                throw std::runtime_error(sqlite3_errmsg(db));
+                throw sql_error(sqlite3_errmsg(db));
             }
             return result != SQLITE_DONE;
         }
@@ -127,9 +131,9 @@ namespace sql {
             int result = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errmsg.str);
             if (result != SQLITE_OK) {
                 if (errmsg.str) {
-                    throw std::runtime_error(errmsg.str);
+                    throw sql_error(errmsg.str);
                 } else {
-                    throw std::runtime_error(sqlite3_errstr(result));
+                    throw sql_error(sqlite3_errstr(result));
                 }
             }
         }

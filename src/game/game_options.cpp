@@ -23,7 +23,7 @@ namespace banggame {
 
     DEFINE_TRANSFORMER(expansions, [](const expansion_set &value) {
         if (!validate_expansions(value)) {
-            throw std::runtime_error("INVALID_EXPANSIONS");
+            throw game_option_error("INVALID_EXPANSIONS");
         }
         return value;
     })
@@ -64,14 +64,14 @@ namespace banggame {
                     if (auto value = utils::parse_string<std::remove_reference_t<decltype(field)>>(value_str)) {
                         field = game_option_transformer<Is>(*value);
                     } else {
-                        throw std::runtime_error("INVALID_OPTION_VALUE");
+                        throw game_option_error("INVALID_OPTION_VALUE");
                     }
                 }} ... });
         }(std::make_index_sequence<reflect::size<game_options>()>());
         
         auto it = set_option_map.find(key);
         if (it == set_option_map.end()) {
-            throw std::runtime_error("INVALID_OPTION_NAME");
+            throw game_option_error("INVALID_OPTION_NAME");
         }
         
         it->second(*this, value);

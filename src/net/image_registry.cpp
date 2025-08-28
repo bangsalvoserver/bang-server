@@ -42,7 +42,7 @@ namespace banggame::image_registry {
                     std::scoped_lock guard{m_mutex};
                     auto [it, inserted] = m_registry.try_emplace(hash, image);
                     ++it->second.refcount;
-                } catch (const std::exception &e) {
+                } catch (const png_error &e) {
                     logging::error("Error while registering image: {}", e.what());
                 }
             }

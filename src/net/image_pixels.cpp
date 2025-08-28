@@ -59,18 +59,18 @@ namespace banggame {
     byte_vector image_to_png(image_pixels_view image) {
         png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
         if (!png) {
-            throw std::runtime_error("Cannot create png write struct");
+            throw png_error("Cannot create png write struct");
         }
 
         png_infop info = png_create_info_struct(png);
         if (!info) {
             png_destroy_write_struct(&png, nullptr);
-            throw std::runtime_error("Cannot create png info struct");
+            throw png_error("Cannot create png info struct");
         }
 
         if (setjmp(png_jmpbuf(png))) {
             png_destroy_write_struct(&png, &info);
-            throw std::runtime_error("Error while writing png");
+            throw png_error("Error while writing png");
         }
 
         byte_vector result;
@@ -102,7 +102,7 @@ namespace banggame {
     image_pixels image_from_png_data_url(std::string_view data_url) {
         static constexpr std::string_view prefix = "data:image/png;base64,";
         if (!data_url.starts_with(prefix)) {
-            throw std::runtime_error("Invalid data URL format");
+            throw png_error("Invalid data URL format");
         }
         byte_vector png_data = base64::base64_decode(data_url.substr(prefix.size()));
 
@@ -112,7 +112,7 @@ namespace banggame {
 
         // Begin reading PNG
         if (!png_image_begin_read_from_memory(&image, png_data.data(), png_data.size())) {
-            throw std::runtime_error("Failed to read PNG data from memory");
+            throw png_error("Failed to read PNG data from memory");
         }
 
         // Allocate memory for the image buffer
@@ -121,7 +121,7 @@ namespace banggame {
         image_pixels result{ image.width, image.height };
         if (!png_image_finish_read(&image, nullptr, result.pixels.data(), 0, nullptr)) {
             png_image_free(&image);
-            throw std::runtime_error("Failed to finish reading PNG image");
+            throw png_error("Failed to finish reading PNG image");
         }
 
         return result;

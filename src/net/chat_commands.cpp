@@ -81,7 +81,7 @@ namespace banggame {
             game_lobby &lobby = *session->lobby;
             lobby.options.set_option(key, value);
             broadcast_message_lobby(lobby, server_messages::lobby_game_options{ lobby.options });
-        } catch (const std::exception &e) {
+        } catch (const game_option_error &e) {
             throw lobby_error(e.what());
         }
     }
