@@ -17,8 +17,23 @@ namespace json {
     using json = rapidjson::Value;
     using json_document = rapidjson::Document;
 
-    using string_buffer = rapidjson::StringBuffer;
-    using string_writer = rapidjson::Writer<string_buffer, rapidjson::UTF8<>, rapidjson::UTF8<>, rapidjson::CrtAllocator, rapidjson::kWriteNoFlags>;
+    template<typename Encoding = rapidjson::UTF8<>>
+    class string_adapter {
+    public:
+        using Ch = typename Encoding::Ch;
+        using string_type = std::basic_string<Ch>;
+
+        string_adapter(string_type &str) : m_str{str} {}
+
+        void Put(Ch c) { PutUnsafe(c); }
+        void PutUnsafe(Ch c) { m_str.push_back(c); }
+        void Flush() {}
+    
+    private:
+        string_type &m_str;
+    };
+
+    using string_writer = rapidjson::Writer<string_adapter<>>;
 
     template<typename T>
     concept is_complete = requires(T self) { sizeof(self); };
@@ -62,10 +77,12 @@ namespace json {
 
     template<typename T, typename Context = no_context>
     std::string to_string(const T &value, const Context &context = {}) {
-        string_buffer buffer;
-        string_writer writer(buffer);
+        std::string result;
+        result.reserve(256);
+        string_adapter adapter(result);
+        string_writer writer(adapter);
         serialize(value, writer, context);
-        return std::string(buffer.GetString(), buffer.GetSize());
+        return result;
     }
 
     template<typename T, typename Context = no_context>
