@@ -92,4 +92,29 @@ inline bool string_equal_icase(std::string_view lhs, std::string_view rhs) {
     return rn::equal(lhs, rhs, {}, toupper, toupper);
 }
 
+template<rn::forward_range auto Range, auto Pred>
+    requires std::predicate<decltype(Pred), rn::range_reference_t<decltype(Range)>>
+constexpr auto filter_static_array() {
+    using value_type = rn::range_value_t<decltype(Range)>;
+
+    static constexpr size_t count = []{
+        size_t count = 0;
+        for (auto &&value : Range) {
+            if (std::invoke(Pred, value)) ++count;
+        }
+        return count;
+    }();
+
+    std::array<value_type, count> result;
+
+    auto it = result.begin();
+    for (auto &&value : Range) {
+        if (std::invoke(Pred, value)) {
+            *it = std::move(value);
+            ++it;
+        }
+    }
+    return result;
+}
+
 #endif

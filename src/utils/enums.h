@@ -149,30 +149,6 @@ namespace enums {
         using return_type = std::invoke_result_t<Visitor, enum_tag_t<enum_values<E>[0]>>;
         return visit_enum<return_type>(std::forward<Visitor>(visitor), value);
     }
-
-    template<enumeral E, std::predicate<E> auto F>
-    constexpr size_t count_values_if() {
-        size_t count = 0;
-        for (E value : enum_values<E>) {
-            if (std::invoke(F, value)) {
-                ++count;
-            }
-        }
-        return count;
-    }
-
-    template<enumeral E, std::predicate<E> auto F>
-    constexpr auto filtered_enum_array() {
-        std::array<E, count_values_if<E, F>()> result;
-        auto ptr = result.begin();
-        for (E value : enum_values<E>) {
-            if (std::invoke(F, value)) {
-                *ptr = value;
-                ++ptr;
-            }
-        }
-        return result;
-    }
     
 }
 

@@ -186,7 +186,7 @@ namespace banggame {
 
     void ruleset_legends::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 0}, [](player_ptr origin) {
-            auto tokens = enums::filtered_enum_array<card_token_type, is_fame_token>();
+            auto tokens = filter_static_array<enums::enum_values<card_token_type>, is_fame_token>();
 
             rn::shuffle(tokens, origin->m_game->rng);
 
