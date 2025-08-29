@@ -145,16 +145,14 @@ namespace net {
         }, m_server);
     }
 
-    void wsserver::poll() {
-        while (auto elem = m_message_queue.pop()) {
-            const auto &[client, message] = *elem;
+    void wsserver::invoke_message(message_type message) {
+        const auto &[client, payload] = message;
 
-            std::visit(overloaded {
-                [&](std::string_view str) { on_message(client, str); },
-                [&](connected) { on_connect(client); },
-                [&](disconnected) { on_disconnect(client); }
-            }, message);
-        }
+        std::visit(overloaded {
+            [&](std::string_view str) { on_message(client, str); },
+            [&](connected) { on_connect(client); },
+            [&](disconnected) { on_disconnect(client); }
+        }, payload);
     }
 
     template<bool SSL>
