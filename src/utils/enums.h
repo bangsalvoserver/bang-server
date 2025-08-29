@@ -15,43 +15,98 @@ namespace enums {
 
     template<enumeral auto E> inline constexpr enum_tag_t<E> enum_tag;
 
-    template<enumeral T, typename ISeq> struct build_enum_values;
-    template<enumeral T, size_t ... Is> struct build_enum_values<T, std::index_sequence<Is ...>> {
-        static constexpr std::array value { static_cast<T>(reflect::enumerators<T>[Is].first) ... };
-    };
-
-    template<enumeral T> constexpr const auto &enum_values() {
-        return build_enum_values<T, std::make_index_sequence<reflect::enumerators<T>.size()>>::value;
-    }
-
+    template<enumeral T> inline constexpr size_t enum_count = reflect::enumerators<T>.size();
+    
     template<enumeral T>
     constexpr bool is_linear_enum() {
-        size_t i=0;
-        for (T value : enum_values<T>()) {
-            if (static_cast<size_t>(value) != i) {
+        constexpr const auto &values = reflect::enumerators<T>;
+        for (size_t i=0; i<values.size(); ++i) {
+            if (values[i].first != i) {
                 return false;
             }
-            ++i;
         }
         return true;
     }
 
     template<enumeral T>
-    constexpr size_t indexof(T value) {
-        constexpr const auto &values = enum_values<T>();
-        if constexpr (is_linear_enum<T>()) {
-            size_t result = static_cast<size_t>(value);
-            if (result >= 0 && result <= static_cast<size_t>(values.back())) {
-                return result;
-            }
-        } else {
-            for (size_t i=0; i<values.size(); ++i) {
-                if (values[i] == value) {
-                    return i;
+    class enum_values_t {
+    public:
+        class iterator {
+        public:
+            using iterator_category = std::random_access_iterator_tag;
+            using difference_type = ptrdiff_t;
+            using value_type = T;
+            using reference = value_type;
+    
+        public:
+            constexpr iterator() = default;
+
+            explicit constexpr iterator(size_t index): m_index{index} {}
+            
+            constexpr value_type operator *() const {
+                if constexpr (is_linear_enum<T>()) {
+                    return static_cast<T>(m_index);
+                } else {
+                    return static_cast<T>(reflect::enumerators<T>[m_index].first);
                 }
+            }
+
+            constexpr iterator &operator ++ () { ++m_index; return *this; }
+            constexpr iterator operator ++ (int) { auto copy = *this; ++m_index; return copy; }
+
+            constexpr iterator &operator --() { --m_index; return *this; }
+            constexpr iterator operator -- (int) { auto copy = *this; --m_index; return copy; }
+
+            constexpr iterator &operator += (difference_type n) { m_index += n; return *this; }
+            constexpr iterator &operator -= (difference_type n) { m_index -= n; return *this; }
+
+            constexpr value_type operator[](difference_type n) const { return *((*this) + n); };
+
+            friend constexpr auto operator <=> (const iterator &lhs, const iterator &rhs) = default;
+
+            friend constexpr iterator operator + (const iterator &lhs, difference_type n) { return iterator{ lhs.m_index + n }; }
+            friend constexpr iterator operator + (difference_type n, const iterator &i) { return i + n; }
+
+            friend constexpr iterator operator - (const iterator &lhs, difference_type n) { return iterator{ lhs.m_index - n }; }
+            friend constexpr difference_type operator - (const iterator &lhs, const iterator &rhs) { return lhs.m_index - rhs.m_index; }
+        
+        private:
+            size_t m_index = 0;
+        };
+    
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using value_type = T;
+        using size_type = size_t;
+    
+        constexpr iterator begin() const { return iterator{}; }
+        constexpr iterator end() const { return iterator{ enum_count<T> }; }
+
+        constexpr reverse_iterator rbegin() const { return reverse_iterator(end()); }
+        constexpr reverse_iterator rend() const { return reverse_iterator(begin()); }
+
+        constexpr value_type operator[] (size_t index) const { return *(begin() + index); }
+
+        constexpr size_type size() const { return enum_count<T>; }
+    };
+
+    template<enumeral T> inline constexpr enum_values_t<T> enum_values;
+
+    template<enumeral T>
+    constexpr size_t indexof(T value) {
+        constexpr const auto &values = enum_values<T>;
+        for (size_t i=0; i<values.size(); ++i) {
+            if (values[i] == value) {
+                return i;
             }
         }
         throw std::out_of_range("invalid enum index");
+    }
+    
+    template<enumeral T> requires (is_linear_enum<T>())
+    constexpr size_t indexof(T value) {
+        size_t result = static_cast<size_t>(value);
+        assert((result < enum_count<T>) && "enum index is out of bounds");
+        return result;
     }
 
     template<enumeral T>
@@ -66,12 +121,12 @@ namespace enums {
     }
 
     template<enumeral T>
-    static constexpr auto names_to_values_map = []<size_t ... Is>(std::index_sequence<Is ...>) {
-        constexpr auto &values = enum_values<T>();
+    inline constexpr auto names_to_values_map = []<size_t ... Is>(std::index_sequence<Is ...>) {
+        constexpr auto &values = enum_values<T>;
         return utils::make_static_map<std::string_view, T>({
             { to_string(values[Is]), values[Is] } ...
         });
-    }(std::make_index_sequence<enum_values<T>().size()>());
+    }(std::make_index_sequence<enum_count<T>>());
 
     template<enumeral T>
     constexpr std::optional<T> from_string(std::string_view str) {
@@ -84,21 +139,21 @@ namespace enums {
     
     template<typename RetType, typename Visitor, enumeral ... E>
     RetType visit_enum(Visitor &&visitor, E ... values) {
-        return utils::visit_indexed_r<RetType, enums::enum_values<E>().size() ...>([&](auto ... Is) {
-            return std::invoke(std::forward<Visitor>(visitor), enum_tag<enums::enum_values<E>()[Is]> ...);
+        return utils::visit_indexed_r<RetType, enum_count<E> ...>([&](auto ... Is) {
+            return std::invoke(std::forward<Visitor>(visitor), enum_tag<enum_values<E>[Is]> ...);
         }, indexof(values) ...);
     }
 
     template<typename Visitor, enumeral E>
     decltype(auto) visit_enum(Visitor &&visitor, E value) {
-        using return_type = std::invoke_result_t<Visitor, enum_tag_t<enums::enum_values<E>()[0]>>;
+        using return_type = std::invoke_result_t<Visitor, enum_tag_t<enum_values<E>[0]>>;
         return visit_enum<return_type>(std::forward<Visitor>(visitor), value);
     }
 
     template<enumeral E, std::predicate<E> auto F>
     constexpr size_t count_values_if() {
         size_t count = 0;
-        for (E value : enum_values<E>()) {
+        for (E value : enum_values<E>) {
             if (std::invoke(F, value)) {
                 ++count;
             }
@@ -110,7 +165,7 @@ namespace enums {
     constexpr auto filtered_enum_array() {
         std::array<E, count_values_if<E, F>()> result;
         auto ptr = result.begin();
-        for (E value : enum_values<E>()) {
+        for (E value : enum_values<E>) {
             if (std::invoke(F, value)) {
                 *ptr = value;
                 ++ptr;

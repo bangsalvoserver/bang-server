@@ -8,7 +8,7 @@ namespace enums {
     template<enumeral E, typename T>
     class enum_map {
     private:
-        using array_type = std::array<T, enum_values<E>().size()>;
+        using array_type = std::array<T, enum_count<E>>;
         array_type m_value{};
 
         template<bool is_const>
@@ -52,7 +52,7 @@ namespace enums {
             enum_map_iterator operator - (difference_type n) const { return { m_index - n, m_array }; }
 
             value_type operator *() const {
-                return { enum_values<E>()[m_index], (*m_array)[m_index] };
+                return { enum_values<E>[m_index], (*m_array)[m_index] };
             }
 
             value_type operator[] (difference_type n) const {

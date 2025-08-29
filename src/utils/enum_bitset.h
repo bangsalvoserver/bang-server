@@ -71,7 +71,7 @@ namespace json {
     struct serializer<enums::bitset<T>, Context> {
         static void write(const enums::bitset<T> &value, string_writer &writer) {
             writer.StartArray();
-            for (T v : enums::enum_values<T>()) {
+            for (T v : enums::enum_values<T>) {
                 if (value.check(v)) {
                     serialize(enums::to_string(v), writer);
                 }

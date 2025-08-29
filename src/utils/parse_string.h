@@ -165,7 +165,7 @@ namespace std {
     struct formatter<enums::bitset<E>> : formatter<std::string_view> {
         static constexpr std::string bitset_to_string(enums::bitset<E> value) {
             std::string ret;
-            for (E v : enums::enum_values<E>()) {
+            for (E v : enums::enum_values<E>) {
                 if (value.check(v)) {
                     if (!ret.empty()) {
                         ret += ' ';
