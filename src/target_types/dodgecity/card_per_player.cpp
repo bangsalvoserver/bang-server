@@ -15,7 +15,7 @@ namespace banggame {
 
     card_list targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
         card_list ret;
-        for (player_ptr target : origin->m_game->range_alive_players(origin)) {
+        for (player_ptr target : origin->m_game->range_all_players(origin)) {
             if (target != ctx.skipped_player && !check_player_filter(origin_card, origin, player_filter, target, ctx)) {
                 if (auto targets = cards_target_set(origin, origin_card, card_filter, target, ctx)) {
                     ret.push_back(random_element(targets, origin->m_game->bot_rng));

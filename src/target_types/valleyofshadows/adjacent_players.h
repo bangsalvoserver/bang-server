@@ -26,7 +26,8 @@ namespace banggame {
         }
         
         auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
-            return rv::cartesian_product(origin->m_game->m_players, origin->m_game->m_players)
+            auto all_players = origin->m_game->range_all_players(origin);
+            return rv::cartesian_product(all_players, all_players)
                 | rv::transform([](const auto &pair) {
                     auto [target1, target2] = pair;
                     return player_pair{target1, target2};
