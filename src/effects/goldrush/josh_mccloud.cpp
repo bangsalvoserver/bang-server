@@ -32,7 +32,7 @@ namespace banggame {
                     target_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
                     
                     for (const effect_holder &effect : target_card->responses) {
-                        effect.on_play(target_card, target, {}, {});
+                        targeting_none{}.on_play(target_card, target, effect, {});
                     }
                 }
             } else {
