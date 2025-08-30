@@ -12,6 +12,7 @@ wildwestshow: !include sets/wildwestshow.yml
 mostwanted: !include sets/mostwanted.yml
 legends: !include sets/legends.yml
 canyondiablo: !include sets/canyondiablo.yml
+crazy_greygory: !include sets/crazy_greygory.yml
 ghost_cards: {}
 stickofdynamite: {}
 shadowgunslingers: {}

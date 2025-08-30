@@ -13,6 +13,11 @@ namespace banggame {
 
 namespace banggame::event_type {
 
+    struct on_assign_characters {
+        player_ptr first_player;
+        nullable_ref<bool> handled;
+    };
+
     struct on_game_setup {
         player_ptr first_player;
     };

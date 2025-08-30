@@ -1,0 +1,8 @@
+character:
+  - name: GREYGORY_DECK
+    image: 06_greygorydeck
+    responses:
+      - can_play_card
+      - greygory_deck(true)
+    equip:
+      - greygory_deck(true)

@@ -15,5 +15,6 @@
 #include "fistfulofcards/effects.h"
 #include "greattrainrobbery/effects.h"
 #include "stickofdynamite/effects.h"
+#include "crazy_greygory/effects.h"
 
 #endif

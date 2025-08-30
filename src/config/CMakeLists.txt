@@ -24,6 +24,7 @@ add_custom_command(
         sets/mostwanted.yml
         sets/canyondiablo.yml
         sets/legends.yml
+        sets/crazy_greygory.yml
         parse_bang_cards.py
         cpp_generator.py
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"

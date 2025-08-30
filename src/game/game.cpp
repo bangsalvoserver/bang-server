@@ -418,25 +418,30 @@ namespace banggame {
         
         add_update(make_preload_assets_update(this));
 
-        add_game_flags(game_flag::hands_shown);
+        bool handled = false;
+        call_event(event_type::on_assign_characters{ m_first_player, handled });
 
-        auto character_it = m_characters.begin();
-        int max_character_choice = m_characters.size() / num_alive();
-        for (player_ptr p : range_alive_players(m_first_player)) {
-            if (m_options.character_choice > 1) {
-                card_list characters;
-                characters.reserve(std::min(max_character_choice, m_options.character_choice));
-                for (int i=0; i<characters.capacity(); ++i) {
-                    characters.push_back(*character_it++);
+        if (!handled) {
+            add_game_flags(game_flag::hands_shown);
+
+            auto character_it = m_characters.begin();
+            int max_character_choice = m_characters.size() / num_alive();
+            for (player_ptr p : range_alive_players(m_first_player)) {
+                if (m_options.character_choice > 1) {
+                    card_list characters;
+                    characters.reserve(std::min(max_character_choice, m_options.character_choice));
+                    for (int i=0; i<characters.capacity(); ++i) {
+                        characters.push_back(*character_it++);
+                    }
+
+                    add_cards_to(std::move(characters), pocket_type::player_hand, p, card_visibility::shown);
+                    queue_request<request_characterchoice>(p);
+                } else {
+                    card_ptr target_card = *character_it++;
+                    add_log("LOG_CHARACTER_CHOICE", p, target_card);
+                    p->set_character(target_card);
+                    p->set_hp(p->get_character_max_hp(), true);
                 }
-
-                add_cards_to(std::move(characters), pocket_type::player_hand, p, card_visibility::shown);
-                queue_request<request_characterchoice>(p);
-            } else {
-                card_ptr target_card = *character_it++;
-                add_log("LOG_CHARACTER_CHOICE", p, target_card);
-                p->set_character(target_card);
-                p->set_hp(p->get_character_max_hp(), true);
             }
         }
 
