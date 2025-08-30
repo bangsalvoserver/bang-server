@@ -5,22 +5,15 @@
 
 namespace banggame {
 
-    struct targeting_card_per_player {
+    using targeting_card_per_player_args = targeting_args<void, target_filter::card>;
+
+    struct targeting_card_per_player : targeting_card_per_player_args {
         using value_type = card_list;
 
-        player_filter_bitset player_filter;
-        card_filter_bitset card_filter;
+        targeting_card_per_player(targeting_card_per_player_args args) : targeting_card_per_player_args{args} {}
 
-        targeting_card_per_player(targeting_args<void, target_filter::card> args)
-            : player_filter{args.player_filter}
-            , card_filter{args.card_filter} {}
-
-        auto get_args() const {
-            struct args {
-                player_filter_bitset player_filter;
-                card_filter_bitset card_filter;
-            };
-            return args{ player_filter, card_filter };
+        const auto &get_args() const {
+            return static_cast<const targeting_card_per_player_args &>(*this);
         }
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
