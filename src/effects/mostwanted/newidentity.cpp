@@ -54,12 +54,13 @@ namespace banggame {
 
     void equip_newidentity::on_enable(card_ptr origin_card, player_ptr origin) {
         origin->m_game->add_listener<event_type::on_turn_switch>({origin_card, -1}, [=, selected_cards = std::set<card_ptr>{}](player_ptr target) mutable {
-            card_ptr choice_card = random_element(origin->m_game->m_characters
-                | rv::filter([&](card_ptr c) {
-                    return c->pocket == pocket_type::none && c->owner == nullptr && !selected_cards.contains(c);
-                }), origin->m_game->rng);
-            selected_cards.insert(choice_card);
-            origin->m_game->queue_request<request_newidentity>(origin_card, target, choice_card);
+            if (auto possible_cards = origin->m_game->m_characters | rv::filter([&](card_ptr c) {
+                return c->pocket == pocket_type::none && c->owner == nullptr && !selected_cards.contains(c);
+            })) {
+                card_ptr choice_card = random_element(possible_cards, origin->m_game->rng);
+                selected_cards.insert(choice_card);
+                origin->m_game->queue_request<request_newidentity>(origin_card, target, choice_card);
+            }
         });
     }
 }
