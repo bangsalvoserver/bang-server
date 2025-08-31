@@ -344,6 +344,7 @@ namespace banggame {
     }
 
     void player::remove_cards(card_list cards) {
+        std::erase_if(cards, [this](card_ptr c) { return c->owner != this; });
         for (card_ptr target_card : cards) {
             disable_equip(target_card);
         }
@@ -354,6 +355,7 @@ namespace banggame {
         card_ptr old_character = get_character();
         if (old_character) {
             remove_cards(m_characters);
+            old_character->owner = this;
         }
         
         if (target_card->pocket == pocket_type::none) {

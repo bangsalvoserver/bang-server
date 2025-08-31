@@ -69,7 +69,7 @@ namespace banggame {
                 if (origin == target && !target->check_player_flags(player_flag::extra_turn)) {
                     target->m_game->remove_listeners(key);
                     target->m_game->queue_action([=]{
-                        target->remove_cards({target->m_characters.begin() + 1, target->m_characters.end()});
+                        target->remove_cards(new_cards);
                     }, -24);
                 }
             });

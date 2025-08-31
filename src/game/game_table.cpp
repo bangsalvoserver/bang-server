@@ -59,7 +59,7 @@ namespace banggame {
 
                 target_card->visibility = {};
                 target_card->pocket = pocket_type::none;
-                // target_card->owner = nullptr;
+                target_card->owner = nullptr;
             }
             add_update(game_updates::remove_cards{ std::move(cards) });
         }
