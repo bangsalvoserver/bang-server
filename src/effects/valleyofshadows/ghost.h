@@ -7,6 +7,11 @@ namespace banggame {
 
     struct equip_ghost {
         struct nodisable {};
+
+        player_flag flag;
+        bool disable_character;
+        equip_ghost(player_flag flag, bool disable_character = false)
+            : flag{flag}, disable_character{disable_character} {}
         
         game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         void on_enable(card_ptr target_card, player_ptr target);

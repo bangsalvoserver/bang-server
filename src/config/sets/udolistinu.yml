@@ -3,13 +3,12 @@ main_deck:
     signs:
       - 9 spades
       - 10 spades
-    image: 07_fantasma
+    image: 07_fantasma2
     expansion: ghost_cards
     color: blue
     equip_target: dead
     equip:
-      - ghost
-      - add_flag_nodisable(player_flag::ghost_1)
+      - ghost(player_flag::ghost_1, true)
     tags:
       - ghost_card
   - name: LEMAT

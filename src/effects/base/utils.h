@@ -42,13 +42,6 @@ namespace banggame {
 
     DEFINE_EQUIP(add_flag, equip_add_flag)
 
-    struct equip_add_flag_nodisable : equip_add_flag {
-        using equip_add_flag::equip_add_flag;
-        struct nodisable{};
-    };
-
-    DEFINE_EQUIP(add_flag_nodisable, equip_add_flag_nodisable)
-
     struct equip_game_flag {
         game_flag flag;
         equip_game_flag(game_flag flag): flag{flag} {}
