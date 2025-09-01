@@ -22,6 +22,15 @@ namespace banggame::prompts {
         }
     }
 
+    prompt_string prompt_target_self_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        if (origin == target_card->owner) {
+            if (target_card->pocket != pocket_type::player_table || !target_card->has_tag(tag_type::penalty)) {
+                return {"PROMPT_TARGET_SELF", origin_card};
+            }
+        }
+        return {};
+    }
+
     prompt_string bot_check_kill_sheriff(player_ptr origin, player_ptr target) {
         if (origin->is_bot()
             && !(origin->m_role == player_role::outlaw || origin->m_role == player_role::renegade && origin->m_game->num_alive() <= 2)
