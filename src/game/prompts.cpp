@@ -63,7 +63,7 @@ namespace banggame::prompts {
                 }
                 return "BOT_TARGET_ENEMY";
             }
-            if (target_card->pocket == pocket_type::player_table && !target_card->self_equippable()) {
+            if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
                 return bot_check_target_friend(origin, target);
             } else {
                 return bot_check_target_enemy(origin, target);

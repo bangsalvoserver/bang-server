@@ -53,6 +53,7 @@ main_deck:
       - jail
     tags:
       - jail
+      - penalty
   - &remington
     name: REMINGTON
     signs:

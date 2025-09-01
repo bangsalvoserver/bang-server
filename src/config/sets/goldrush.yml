@@ -131,6 +131,7 @@ goldrush:
       - wanted
     tags:
       - buy_cost(2)
+      - penalty
   - count: 2
     name: RHUM
     image: 04_rum

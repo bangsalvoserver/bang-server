@@ -318,6 +318,8 @@ train:
     equip_target: any
     equip:
       - lumber_flatcar
+    tags:
+     - penalty
   - name: MAIL_CAR
     image: 27_mail_car
     color: train

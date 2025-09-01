@@ -135,6 +135,8 @@ main_deck:
     equip_target: any
     equip:
       - taxman(-2)
+    tags:
+      - penalty
   - name: BROTHEL
     signs:
       - 7 clubs
@@ -144,6 +146,8 @@ main_deck:
     equip:
       - predraw_check(-3)
       - brothel
+    tags:
+      - penalty
   - name: BRONCO
     signs:
       - Q diamonds
@@ -211,6 +215,7 @@ main_deck:
       - weapon(0)
     tags:
       - weapon
+      - penalty
   - name: SCRAPPER
     signs:
       - 9 spades

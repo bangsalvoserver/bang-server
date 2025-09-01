@@ -2,6 +2,8 @@
 
 #include "ruleset.h"
 
+#include "cards/filter_enums.h"
+
 #include "game/game_table.h"
 #include "game/filters.h"
 #include "game/prompts.h"
@@ -73,10 +75,10 @@ namespace banggame {
     }
 
     game_string handler_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
-        if (target_card->self_equippable()) {
-            MAYBE_RETURN(prompts::bot_check_target_friend(origin, target_player));
-        } else {
+        if (target_card->has_tag(tag_type::penalty)) {
             MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target_player));
+        } else {
+            MAYBE_RETURN(prompts::bot_check_target_friend(origin, target_player));
         }
         return {};
     }

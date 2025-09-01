@@ -38,6 +38,8 @@ main_deck:
     equip:
       - predraw_check(0)
       - snake
+    tags:
+      - penalty
   - name: SHOTGUN
     signs:
       - K spades
@@ -56,6 +58,8 @@ main_deck:
     equip_target: any
     equip:
       - bounty
+    tags:
+      - penalty
   - name: BANDIDOS
     signs:
       - Q diamonds

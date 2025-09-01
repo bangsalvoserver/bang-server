@@ -1,7 +1,7 @@
 #include "train_robbery.h"
 
 #include "game/game_table.h"
-#include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 #include "effects/base/bang.h"
 #include "effects/base/missed.h"
@@ -53,8 +53,18 @@ namespace banggame {
         }
     };
 
-    game_string effect_train_robbery::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+    prompt_string effect_train_robbery::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        if (origin->is_bot()) {
+            if (bot_suggestion::is_target_enemy(origin, target)) {
+                if (rn::any_of(target->m_table, [](card_ptr target_card) {
+                    return target_card->has_tag(tag_type::jail);
+                })) {
+                    return {1, "BOT_ENEMY_HAS_JAIL"};
+                }
+            } else {
+                return "BOT_TARGET_ENEMY";
+            }
+        }
         if (rn::all_of(target->m_table, &card::is_black)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
@@ -80,10 +90,17 @@ namespace banggame {
         req->selected_cards.insert(target_card);
     }
 
-    game_string effect_train_robbery_discard::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+    static bool is_penalty_card(const_card_ptr c) {
+        return c->has_tag(tag_type::penalty);
+    }
+
+    prompt_string effect_train_robbery_discard::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         if (origin->is_bot()) {
-            if (ctx.target_card->has_tag(tag_type::ghost_card)) {
-                return "BOT_DISCARD_GHOST";
+            if (origin->is_ghost()) {
+                return {1, "BOT_ONLY_BANG"};
+            }
+            if (rn::any_of(origin->m_table, is_penalty_card) && !is_penalty_card(ctx.target_card)) {
+                return "BOT_DISCARD_PENALTY";
             }
         }
         return {};
@@ -108,13 +125,13 @@ namespace banggame {
         }
     };
 
-    game_string effect_train_robbery_bang::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (origin->is_bot()) {
-            if (!ctx.target_card->self_equippable() && !ctx.target_card->has_tag(tag_type::ghost_card)) {
-                return "BOT_DISCARD_GHOST";
+    prompt_string effect_train_robbery_bang::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        if (origin->is_bot() && !origin->is_ghost()) {
+            if (rn::any_of(origin->m_table, is_penalty_card)) {
+                return "BOT_DISCARD_PENALTY";
             }
             if (origin->m_hp <= 1 && count_missed_cards(origin) == 0) {
-                return "BOT_DISCARD_OR_DIE";
+                return {1, "BOT_DISCARD_OR_DIE"};
             }
         }
         return {};

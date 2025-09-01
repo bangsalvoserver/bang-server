@@ -28,8 +28,12 @@ namespace banggame {
 
         prompt_string pick_prompt(card_ptr target_card) const override {
             if (target->is_bot()) {
-                if (target_card->has_tag(tag_type::ghost_card) || target_card->self_equippable()) {
-                    return "BOT_DISCARD_GHOST";
+                if (target_card->has_tag(tag_type::ghost_card)) {
+                    return {1, "BOT_DISCARD_GHOST"};
+                }
+                auto is_penalty_card = [](card_ptr c) { return c->has_tag(tag_type::penalty); };
+                if (rn::any_of(target->m_table, is_penalty_card) && !is_penalty_card(target_card)) {
+                    return "BOT_DISCARD_PENALTY";
                 }
             }
             return {};
