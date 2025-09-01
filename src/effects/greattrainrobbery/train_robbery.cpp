@@ -65,11 +65,13 @@ namespace banggame {
                 return "BOT_TARGET_ENEMY";
             }
         }
+        if (target->is_ghost()) {
+            return {"PROMPT_TARGET_GHOST", origin_card, target};
+        }
         if (rn::all_of(target->m_table, &card::is_black)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
-        } else {
-            return {};
         }
+        return {};
     }
 
     void effect_train_robbery::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
