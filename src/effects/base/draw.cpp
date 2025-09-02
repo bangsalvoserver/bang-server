@@ -41,6 +41,7 @@ namespace banggame {
     void request_draw::on_update() {
         if (update_count == 0) {
             target->m_game->call_event(event_type::count_cards_to_draw{ target, num_cards_to_draw });
+            target->m_game->call_event(event_type::get_draw_handlers{ target, shared_from_this() });
         }
 
         cards_from_selection = target->m_game->m_selection;
@@ -71,10 +72,14 @@ namespace banggame {
     }
 
     bool request_draw::can_pick(const_card_ptr target_card) const {
-        if (target->m_game->m_deck.empty() || target->m_game->check_flags(game_flag::phase_one_draw_discard) && !target->m_game->m_discards.empty()) {
-            return target_card->pocket == pocket_type::discard_pile;
+        if (handlers.size() <= 1) {
+            if (target->m_game->m_deck.empty() || target->m_game->check_flags(game_flag::phase_one_draw_discard) && !target->m_game->m_discards.empty()) {
+                return target_card->pocket == pocket_type::discard_pile;
+            } else {
+                return target_card->pocket == pocket_type::main_deck;
+            }
         } else {
-            return target_card->pocket == pocket_type::main_deck;
+            return rn::contains(handlers, target_card);
         }
     }
 
@@ -112,14 +117,20 @@ namespace banggame {
     }
 
     void request_draw::on_pick(card_ptr target_card) {
-        target->m_game->pop_request();
-        bool handled = false;
-        target->m_game->call_event(event_type::on_draw_from_deck{ target, shared_from_this(), handled });
-        if (!handled) {
+        if (handlers.empty()) {
+            target->m_game->pop_request();
             while (num_drawn_cards < num_cards_to_draw) {
                 add_to_hand_phase_one(phase_one_drawn_card());
             }
             cleanup_selection();
+        } else {
+            if (handlers.size() == 1) {
+                target_card = handlers.front();
+            }
+            if (target_card) {
+                target->m_game->pop_request();
+                target->m_game->call_event(event_type::on_draw_from_deck{ target, target_card, shared_from_this() });
+            }
         }
     }
 

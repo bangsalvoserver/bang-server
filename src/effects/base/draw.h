@@ -77,6 +77,8 @@ namespace banggame {
     struct request_draw : request_picking, std::enable_shared_from_this<request_draw> {
         request_draw(player_ptr target);
 
+        card_list handlers;
+
         card_list cards_from_selection;
         
         int num_drawn_cards = 0;
@@ -99,11 +101,16 @@ namespace banggame {
             player_ptr origin;
             nullable_ref<int> cards_to_draw;
         };
+
+        struct get_draw_handlers {
+            player_ptr origin;
+            shared_request_draw req;
+        };
         
         struct on_draw_from_deck {
             player_ptr origin;
+            card_ptr target_card;
             shared_request_draw req;
-            nullable_ref<bool> handled;
         };
 
         struct on_card_drawn {
