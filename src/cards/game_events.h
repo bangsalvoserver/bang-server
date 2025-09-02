@@ -80,6 +80,12 @@ namespace banggame::event_type {
         const effect_context &ctx;
         nullable_ref<game_string> out_error;
     };
+
+    struct check_character_modifier {
+        player_ptr origin;
+        nullable_ref<bool> handled;
+        nullable_ref<std::set<card_ptr>> handlers;
+    };
     
     struct check_revivers {
         player_ptr origin;

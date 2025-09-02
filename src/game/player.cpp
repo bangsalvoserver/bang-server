@@ -291,6 +291,7 @@ namespace banggame {
         m_game->queue_action([this]{
             m_game->call_event(event_type::pre_turn_start{ this });
             m_game->queue_request<request_predraw>(this);
+            m_game->queue_request<request_character_modifier>(this);
         }, -30);
 
         m_game->queue_action([this]{

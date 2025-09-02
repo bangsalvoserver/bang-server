@@ -17,15 +17,17 @@ namespace banggame {
         });
     }
 
-    void equip_greygory_deck::on_enable(card_ptr target_card, player_ptr target) {
-        if (target->m_characters.size() == 1) {
-            effect_greygory_deck{allow_expansions}.on_play(target_card, target);
+    void equip_greygory_deck::on_enable(card_ptr origin_card, player_ptr origin) {
+        if (origin->m_characters.size() == 1) {
+            effect_greygory_deck{allow_expansions}.on_play(origin_card, origin);
         }
-        target->m_game->add_listener<event_type::on_turn_start>(target_card, [=, allow_expansions=allow_expansions](player_ptr origin) {
-            if (origin == target) {
-                if (get_possible_cards(target_card, target, allow_expansions)) {
-                    target->m_game->queue_request<request_can_play_card>(target_card, nullptr, target);
-                }
+        origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 1}, [=, allow_expansions=allow_expansions](player_ptr target, bool &handled, std::set<card_ptr> &handlers) {
+            if (origin == target && !handled && !handlers.contains(origin_card)
+                && get_possible_cards(origin_card, origin, allow_expansions)
+            ) {
+                handled = true;
+                handlers.insert(origin_card);
+                target->m_game->queue_request<request_can_play_card>(origin_card, nullptr, target);
             }
         });
     }

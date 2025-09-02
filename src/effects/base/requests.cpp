@@ -1,6 +1,7 @@
 #include "requests.h"
 
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
 
 #include "game/game_table.h"
 #include "game/game_options.h"
@@ -26,6 +27,18 @@ namespace banggame {
             return "STATUS_CHARACTERCHOICE";
         } else {
             return {"STATUS_CHARACTERCHOICE_OTHER", target};
+        }
+    }
+
+    void request_character_modifier::on_update() {
+        if (target->alive() && target->m_game->m_playing == target) {
+            bool handled = false;
+            target->m_game->call_event(event_type::check_character_modifier{ target, handled, handlers });
+            if (!handled) {
+                target->m_game->pop_request();
+            }
+        } else {
+            target->m_game->pop_request();
         }
     }
 

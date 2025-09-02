@@ -32,15 +32,10 @@ namespace banggame {
     }
 
     struct request_vera_custer : request_picking_player {
-        request_vera_custer(card_ptr origin_card, player_ptr target)
-            : request_picking_player(origin_card, nullptr, target, {}, -25) {}
+        using request_picking_player::request_picking_player;
 
         void on_update() override {
-            if (target->alive() && target->m_game->m_playing == target && !target->check_player_flags(player_flag::extra_turn) && !target->m_game->is_disabled(origin_card)) {
-                auto_pick();
-            } else {
-                target->m_game->pop_request();
-            }
+            auto_pick();
         }
 
         bool can_pick(const_player_ptr target_player) const override {
@@ -70,7 +65,7 @@ namespace banggame {
                     target->m_game->remove_listeners(key);
                     target->m_game->queue_action([=]{
                         target->remove_cards(new_cards);
-                    }, -24);
+                    }, -23);
                 }
             });
         }
@@ -85,9 +80,13 @@ namespace banggame {
     };
 
     void equip_vera_custer::on_enable(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::pre_turn_start>(origin_card, [=](player_ptr target) {
-            if (origin == target) {
-                origin->m_game->queue_request<request_vera_custer>(origin_card, target);
+        origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 0}, [=](player_ptr target, bool &handled, std::set<card_ptr> &handlers) {
+            if (origin == target && !handled && !handlers.contains(origin_card)
+                && !target->check_player_flags(player_flag::extra_turn)
+            ) {
+                handled = true;
+                handlers.insert(origin_card);
+                target->m_game->queue_request<request_vera_custer>(origin_card, nullptr, target);
             }
         });
     }

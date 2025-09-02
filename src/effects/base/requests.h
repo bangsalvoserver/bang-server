@@ -15,6 +15,15 @@ namespace banggame {
         void on_pick(card_ptr target_card) override;
         game_string status_text(player_ptr owner) const override;
     };
+
+    struct request_character_modifier : request_base {
+        request_character_modifier(player_ptr target)
+            : request_base(nullptr, nullptr, target, {}, -25) {}
+
+        std::set<card_ptr> handlers;
+        
+        void on_update() override;
+    };
     
     struct request_discard : request_picking {
         using request_picking::request_picking;
