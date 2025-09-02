@@ -25,9 +25,9 @@ namespace banggame {
                 }
             }, -10);
         });
-        origin->m_game->add_listener<event_type::count_cards_to_draw>({target_card, 2}, [](player_ptr target, int &value) {
-            if (target->check_player_flags(player_flag::temp_ghost) && value == 2) {
-                value = 3;
+        origin->m_game->add_listener<event_type::init_request_draw>({target_card, 2}, [](player_ptr target, shared_request_draw req) {
+            if (target->check_player_flags(player_flag::temp_ghost) && req->num_cards_to_draw == 2) {
+                req->num_cards_to_draw = 3;
             }
         });
     }

@@ -32,9 +32,9 @@ namespace banggame {
                         target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
                         
                         event_card_key key{target_card, 1};
-                        target->m_game->add_listener<event_type::count_cards_to_draw>(key, [=](player_ptr origin, int &value) {
+                        target->m_game->add_listener<event_type::init_request_draw>(key, [=](player_ptr origin, shared_request_draw req) {
                             if (origin == target) {
-                                --value;
+                                --req->num_cards_to_draw;
                             }
                         });
                         target->m_game->add_listener<event_type::on_turn_end>(key, [=](player_ptr origin, bool skipped) {

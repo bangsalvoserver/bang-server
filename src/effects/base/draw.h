@@ -97,12 +97,7 @@ namespace banggame {
     using shared_request_draw = std::shared_ptr<request_draw>;
 
     namespace event_type {
-        struct count_cards_to_draw {
-            player_ptr origin;
-            nullable_ref<int> cards_to_draw;
-        };
-
-        struct get_draw_handlers {
+        struct init_request_draw {
             player_ptr origin;
             shared_request_draw req;
         };

@@ -40,8 +40,7 @@ namespace banggame {
     
     void request_draw::on_update() {
         if (update_count == 0) {
-            target->m_game->call_event(event_type::count_cards_to_draw{ target, num_cards_to_draw });
-            target->m_game->call_event(event_type::get_draw_handlers{ target, shared_from_this() });
+            target->m_game->call_event(event_type::init_request_draw{ target, shared_from_this() });
         }
 
         cards_from_selection = target->m_game->m_selection;

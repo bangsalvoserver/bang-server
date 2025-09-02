@@ -41,7 +41,7 @@ namespace banggame {
     };
     
     void equip_annie_oakey::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::get_draw_handlers>(target_card, [=](player_ptr origin, shared_request_draw req_draw) {
+        target->m_game->add_listener<event_type::init_request_draw>(target_card, [=](player_ptr origin, shared_request_draw req_draw) {
             if (origin == target) {
                 req_draw->handlers.push_back(target_card);
             }

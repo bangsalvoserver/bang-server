@@ -7,9 +7,9 @@
 namespace banggame {
 
     void equip_pickaxe::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::count_cards_to_draw>({target_card, 1}, [=](player_ptr origin, int &value) {
+        target->m_game->add_listener<event_type::init_request_draw>({target_card, 1}, [=](player_ptr origin, shared_request_draw req) {
             if (origin == target) {
-                ++value;
+                ++req->num_cards_to_draw;
             }
         });
     }
