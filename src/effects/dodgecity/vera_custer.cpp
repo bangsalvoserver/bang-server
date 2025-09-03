@@ -31,40 +31,36 @@ namespace banggame {
         return result;
     }
 
-    struct request_vera_custer : request_picking_player {
-        using request_picking_player::request_picking_player;
+    struct request_vera_custer : request_picking {
+        using request_picking::request_picking;
 
         void on_update() override {
             auto_pick();
         }
 
-        bool can_pick(const_player_ptr target_player) const override {
-            return target_player != target;
+        bool can_pick(const_card_ptr target_card) const override {
+            return target_card->pocket == pocket_type::player_character
+                && target_card->owner != target
+                && (target_card->owner->m_characters.size() <= 1
+                    || target_card != target_card->owner->get_character());
+            // Disallows picking Greygory Deck
         }
 
-        void on_pick(player_ptr target_player) {
+        void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
 
-            std::span<card_ptr> target_characters = target_player->m_characters;
-            if (target_characters.size() > 1) {
-                // Handle Greygory Deck
-                target_characters = target_characters.subspan(1);
-            }
-
-            auto new_cards = target_characters | rv::transform(get_card_copy) | rn::to<std::vector>();
-            target->m_game->add_cards_to(new_cards, pocket_type::player_character, target, card_visibility::shown);
+            card_ptr card_copy = get_card_copy(target_card);
+            target->m_game->add_cards_to({ card_copy }, pocket_type::player_character, target, card_visibility::shown);
             
-            for (card_ptr target_card : new_cards) {
-                target->m_game->add_log("LOG_COPY_CHARACTER", target, target_card);
-                target->enable_equip(target_card);
-            }
+            target->m_game->add_log("LOG_COPY_CHARACTER", target, card_copy);
+            target->enable_equip(card_copy);
 
             event_card_key key{origin_card, 10};
             target->m_game->add_listener<event_type::pre_turn_start>(key, [=, target=target](player_ptr origin){
                 if (origin == target && !target->check_player_flags(player_flag::extra_turn)) {
                     target->m_game->remove_listeners(key);
                     target->m_game->queue_action([=]{
-                        target->remove_cards(new_cards);
+                        target->remove_cards({ card_copy });
                     }, -23);
                 }
             });
