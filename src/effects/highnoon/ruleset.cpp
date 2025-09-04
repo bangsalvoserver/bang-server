@@ -11,19 +11,6 @@
 #include "game/game_options.h"
 
 namespace banggame {
-    
-    static void draw_scenario_card(game_ptr game) {
-        if (game->m_scenario_deck.size() > 1) {
-            card_ptr second_card = *(game->m_scenario_deck.rbegin() + 1);
-            second_card->set_visibility(card_visibility::shown, nullptr, true);
-        }
-        if (!game->m_scenario_cards.empty()) {
-            game->m_first_player->disable_equip(game->m_scenario_cards.back());
-        }
-        game->add_log("LOG_DRAWN_SCENARIO_CARD", game->m_scenario_deck.back());
-        game->m_scenario_deck.back()->move_to(pocket_type::scenario_card);
-        game->m_first_player->enable_equip(game->m_scenario_cards.back());
-    }
 
     struct request_choose_scenario : selection_picker {
         request_choose_scenario(player_ptr target)
@@ -74,11 +61,24 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_turn_switch>({nullptr, 2}, [first = true](player_ptr origin) mutable {
-            if (origin == origin->m_game->m_first_player && !origin->m_game->m_scenario_deck.empty()) {
+            auto &scenario_deck = origin->m_game->m_scenario_deck;
+            auto &scenario_cards = origin->m_game->m_scenario_cards;
+
+            if (origin == origin->m_game->m_first_player && !scenario_deck.empty()) {
                 if (std::exchange(first, false)) {
-                    origin->m_game->m_scenario_deck.back()->set_visibility(card_visibility::shown);
+                    scenario_deck.back()->set_visibility(card_visibility::shown);
                 } else {
-                    draw_scenario_card(origin->m_game);
+                    if (scenario_deck.size() > 1) {
+                        card_ptr second_card = *(scenario_deck.rbegin() + 1);
+                        second_card->set_visibility(card_visibility::shown, nullptr, true);
+                    }
+                    if (!scenario_cards.empty()) {
+                        origin->disable_equip(scenario_cards.back());
+                    }
+
+                    origin->m_game->add_log("LOG_DRAWN_SCENARIO_CARD", scenario_deck.back());
+                    scenario_deck.back()->move_to(pocket_type::scenario_card);
+                    origin->enable_equip(scenario_cards.back());
                 }
             }
         });
