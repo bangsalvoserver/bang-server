@@ -387,21 +387,17 @@ namespace banggame {
         };
 
         if (add_cards(bang_cards.highnoon, pocket_type::scenario_deck) + add_cards(bang_cards.fistfulofcards, pocket_type::scenario_deck)) {
-            shuffle_cards_and_ids(m_scenario_deck);
-            auto last_scenario_cards = rn::partition(m_scenario_deck, is_last_scenario_card).begin();
-            if (last_scenario_cards != m_scenario_deck.begin()) {
-                m_scenario_deck.erase(m_scenario_deck.begin() + 1, last_scenario_cards);
+            auto range = rn::stable_partition(m_scenario_deck, is_last_scenario_card);
+            shuffle_cards_and_ids({ range.begin(), range.end() });
+            if (range.size() > m_options.scenario_deck_size) {
+                m_scenario_deck.erase(range.begin() + m_options.scenario_deck_size, range.end());
             }
-            if (m_scenario_deck.size() > m_options.scenario_deck_size) {
-                m_scenario_deck.erase(m_scenario_deck.begin() + 1, m_scenario_deck.end() - m_options.scenario_deck_size);
-            }
-
             add_update(game_updates::add_cards{ m_scenario_deck, pocket_type::scenario_deck });
         }
 
         if (add_cards(bang_cards.wildwestshow, pocket_type::wws_scenario_deck)) {
-            shuffle_cards_and_ids(m_wws_scenario_deck);
-            rn::partition(m_wws_scenario_deck, is_last_scenario_card);
+            auto range = rn::stable_partition(m_wws_scenario_deck, is_last_scenario_card);
+            shuffle_cards_and_ids({ range.begin(), range.end() });
             add_update(game_updates::add_cards{ m_wws_scenario_deck, pocket_type::wws_scenario_deck });
         }
 
