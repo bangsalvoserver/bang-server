@@ -2,6 +2,8 @@
 
 #include "effects/base/pick.h"
 #include "effects/base/death.h"
+#include "effects/base/resolve.h"
+
 #include "effects/ghost_cards/ruleset.h"
 
 #include "cards/game_events.h"
@@ -12,7 +14,7 @@
 
 namespace banggame {
 
-    struct request_choose_scenario : selection_picker {
+    struct request_choose_scenario : selection_picker, interface_resolvable {
         request_choose_scenario(player_ptr target)
             : selection_picker(nullptr, nullptr, target) {}
 
@@ -44,6 +46,16 @@ namespace banggame {
                 target_card->set_visibility(card_visibility::hidden, nullptr, true);
                 target->m_game->add_short_pause();
             }
+        }
+
+        resolve_type get_resolve_type() const override {
+            return resolve_type::dismiss;
+        }
+
+        void on_resolve() override {
+            auto &selection = target->m_game->m_selection;
+            std::uniform_int_distribution<size_t> dist{0, selection.size() - 1};
+            on_pick(selection[dist(target->m_game->rng)]);
         }
 
         game_string status_text(player_ptr owner) const override {
