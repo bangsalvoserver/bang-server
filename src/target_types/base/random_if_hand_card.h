@@ -7,6 +7,22 @@ namespace banggame {
 
     struct targeting_random_if_hand_card : targeting_card {
         using targeting_card::targeting_card;
+
+        card_ptr random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+            auto targets = possible_targets(origin_card, origin, effect, ctx) | rn::to<std::vector>();
+            
+            std::erase_if(targets, [seen_players=player_set{}](card_ptr target_card) mutable {
+                if (target_card->pocket == pocket_type::player_hand) {
+                    if (seen_players.contains(target_card->owner)) {
+                        return true;
+                    }
+                    seen_players.add(target_card->owner);
+                }
+                return false;
+            });
+
+            return random_element(targets, origin->m_game->bot_rng);
+        }
         
         void on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
             if (target->pocket == pocket_type::player_hand) {
