@@ -20,15 +20,11 @@ namespace banggame {
     }
 
     card_list targeting_move_cube_slot::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
-        auto targets = make_move_cube_target_set(origin, origin_card, ctx) | rn::to<std::vector>();
-        rn::shuffle(targets, origin->m_game->bot_rng);
-        
-        targets.resize(std::min({
-            static_cast<size_t>(origin->get_character()->num_cubes()),
-            static_cast<size_t>(ncubes),
-            targets.size()
-        }));
-        return targets;
+        return sample_elements(
+            make_move_cube_target_set(origin, origin_card, ctx),
+            std::min(origin->get_character()->num_cubes(), ncubes),
+            origin->m_game->bot_rng
+        );
     }
 
     game_string targeting_move_cube_slot::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {

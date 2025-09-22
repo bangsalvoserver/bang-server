@@ -150,7 +150,7 @@ namespace banggame {
     }
 
     card_ptr player::random_hand_card() const {
-        return m_hand[std::uniform_int_distribution(0, int(m_hand.size() - 1))(m_game->rng)];
+        return random_element(m_hand, m_game->rng);
     }
 
     static bool move_owned_card(player_ptr owner, card_ptr target_card, bool used) {

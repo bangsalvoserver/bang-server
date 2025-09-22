@@ -62,25 +62,72 @@ struct random_element_error : std::runtime_error {
     random_element_error(): std::runtime_error{"Empty range in random_element"} {}
 };
 
-template<typename T, rn::forward_range R, typename Rng>
-auto sample_elements_r(R &&range, size_t count, Rng &rng) {
+template<typename T, rn::input_range R, typename Rng>
+std::vector<T> sample_elements_r(R &&range, size_t k, Rng &rng) {
     std::vector<T> result;
-    rn::sample(std::forward<R>(range), std::back_inserter(result), count, rng);
+    if (k != 0) {
+        auto it = rn::begin(range);
+        auto end = rn::end(range);
+
+        if (it != end) {
+            result.reserve(k);
+
+            if constexpr (rn::forward_range<R>) {
+                rn::sample(range, std::back_inserter(result), k, rng);
+                return result;
+            } else {
+                std::size_t count = 0;
+
+                for (; it != end && count < k; ++it, ++count) {
+                    result.push_back(*it);
+                }
+
+                if (count != 0) {
+                    for (; it != end; ++it, ++count) {
+                        std::uniform_int_distribution<std::size_t> dist(0, count);
+                        std::size_t idx = dist(rng);
+                        if (idx < k) result[idx] = *it;
+                    }
+                }
+            }
+        }
+    }
     return result;
 }
 
-template<rn::forward_range R, typename Rng>
+template<rn::input_range R, typename Rng>
 auto sample_elements(R &&range, size_t count, Rng &rng) {
     return sample_elements_r<rn::range_value_t<R>>(std::forward<R>(range), count, rng);
 }
 
-template<rn::forward_range R, typename Rng>
-decltype(auto) random_element(R &&range, Rng &rng) {
-    rn::range_value_t<R> ret;
-    if (rn::sample(std::forward<R>(range), &ret, 1, rng) == &ret) {
-        throw random_element_error();
+template<rn::input_range R, typename Rng>
+rn::range_value_t<R> random_element(R &&range, Rng &rng) {
+    using value_t = rn::range_value_t<R>;
+
+    if constexpr (rn::sized_range<R>) {
+        auto n = rn::size(range);
+        if (n == 0) throw random_element_error();
+
+        std::uniform_int_distribution<size_t> dist(0, n - 1);
+        auto it = rn::next(rn::begin(range), dist(rng));
+        return *it;
+    } else {
+        auto it = rn::begin(range);
+        auto end = rn::end(range);
+        if (it == end) throw random_element_error();
+
+        value_t chosen = *it;
+        size_t count = 1;
+
+        ++it;
+        for (; it != end; ++it) {
+            ++count;
+            std::uniform_int_distribution<size_t> dist(0, count - 1);
+            if (dist(rng) == 0) chosen = *it;
+        }
+
+        return chosen;
     }
-    return ret;
 }
 
 template<rn::range Rng>

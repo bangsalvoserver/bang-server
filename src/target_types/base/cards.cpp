@@ -12,10 +12,8 @@ namespace banggame {
     }
 
     card_list targeting_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
-        return sample_elements(
-            target_card.possible_targets(origin_card, origin, effect, ctx),
-            ncards, origin->m_game->bot_rng
-        );
+        auto targets = target_card.possible_targets(origin_card, origin, effect, ctx);
+        return sample_elements(targets, ncards, origin->m_game->bot_rng);
     }
 
     game_string targeting_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {

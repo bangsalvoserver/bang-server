@@ -53,9 +53,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            auto &selection = target->m_game->m_selection;
-            std::uniform_int_distribution<size_t> dist{0, selection.size() - 1};
-            on_pick(selection[dist(target->m_game->rng)]);
+            on_pick(random_element(target->m_game->m_selection, target->m_game->rng));
         }
 
         game_string status_text(player_ptr owner) const override {

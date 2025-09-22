@@ -3,6 +3,8 @@
 
 #include "cards/card_effect.h"
 
+#include "game/possible_to_play.h"
+
 namespace banggame {
 
     struct targeting_select_cubes_args {
@@ -17,6 +19,12 @@ namespace banggame {
         
         const auto &get_args() const {
             return static_cast<const targeting_select_cubes_args &>(*this);
+        }
+
+        auto get_all_cubes(player_ptr origin) const {
+            return cube_slots(origin) | rv::for_each([](card_ptr slot) {
+                return rv::repeat(slot, slot->num_cubes());
+            });
         }
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);

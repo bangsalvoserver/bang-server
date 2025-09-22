@@ -32,7 +32,9 @@ namespace banggame {
 
     inline auto get_all_targetable_cards(player_ptr origin) {
         return rv::concat(
-            origin->m_game->m_players | rv::for_each(&player::m_targetable_cards_view),
+            origin->m_game->m_players | rv::for_each([](player_ptr target) {
+                return rv::concat(target->m_hand, target->m_table, target->m_characters);
+            }),
             origin->m_game->m_selection,
             origin->m_game->m_feats,
             origin->m_game->m_deck | rv::take_last(1),

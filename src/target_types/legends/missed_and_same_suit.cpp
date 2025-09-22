@@ -25,8 +25,8 @@ namespace banggame {
     }
     
     bool targeting_missed_and_same_suit::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
-        auto range = target_card.possible_targets(origin_card, origin, effect, ctx);
-        return bool(missed_cards_with_same_suits_range(origin, range, ncards));
+        auto targets = target_card.possible_targets(origin_card, origin, effect, ctx);
+        return contains_at_least(missed_cards_with_same_suits_range(origin, targets, ncards), 1);
     }
 
     card_list targeting_missed_and_same_suit::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {

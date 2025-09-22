@@ -15,12 +15,6 @@ namespace banggame {
         card_list m_table;
         card_list m_characters;
 
-        rn::concat_view<
-            rn::ref_view<card_list>,
-            rn::ref_view<card_list>,
-            rn::ref_view<card_list>
-        > m_targetable_cards_view = rv::concat(m_hand, m_table, m_characters);
-
         player_role m_role;
 
         int8_t m_hp = 0;
