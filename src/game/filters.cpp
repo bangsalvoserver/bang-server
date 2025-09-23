@@ -46,9 +46,7 @@ namespace banggame {
             }
         }
 
-        if (!ctx.ignore_distances && !origin->check_player_flags(player_flag::ignore_distances)
-            && (filter.check(target_player_filter::reachable) || filter.check(target_player_filter::range_1) || filter.check(target_player_filter::range_2))
-        ) {
+        if (filter.check(target_player_filter::reachable) || filter.check(target_player_filter::range_1) || filter.check(target_player_filter::range_2)) {
             int range = origin->get_range_mod();
             if (filter.check(target_player_filter::reachable)) {
                 int weapon_range = origin->get_weapon_range();
@@ -61,7 +59,11 @@ namespace banggame {
             } else if (filter.check(target_player_filter::range_2)) {
                 range += 2;
             }
-            if (origin->m_game->calc_distance(origin, target) > range) {
+
+            if (!ctx.ignore_distances
+                && !origin->check_player_flags(player_flag::ignore_distances)
+                && origin->m_game->calc_distance(origin, target) > range
+            ) {
                 return {"ERROR_TARGET_NOT_IN_RANGE", origin_card, target};
             }
         }
