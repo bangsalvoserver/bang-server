@@ -71,24 +71,16 @@ std::vector<T> sample_elements_r(R &&range, size_t k, Rng &rng) {
 
         if (it != end) {
             result.reserve(k);
+            size_t count = 0;
 
-            if constexpr (rn::forward_range<R>) {
-                rn::sample(range, std::back_inserter(result), k, rng);
-                return result;
-            } else {
-                std::size_t count = 0;
+            for (; it != end && count < k; ++it, ++count) {
+                result.push_back(*it);
+            }
 
-                for (; it != end && count < k; ++it, ++count) {
-                    result.push_back(*it);
-                }
-
-                if (count != 0) {
-                    for (; it != end; ++it, ++count) {
-                        std::uniform_int_distribution<std::size_t> dist(0, count);
-                        std::size_t idx = dist(rng);
-                        if (idx < k) result[idx] = *it;
-                    }
-                }
+            for (; it != end; ++it, ++count) {
+                std::uniform_int_distribution<size_t> dist(0, count);
+                size_t idx = dist(rng);
+                if (idx < k) result[idx] = *it;
             }
         }
     }
