@@ -8,6 +8,7 @@
 #include <set>
 #include <any>
 #include <generator>
+#include <unordered_map>
 
 namespace banggame {
     

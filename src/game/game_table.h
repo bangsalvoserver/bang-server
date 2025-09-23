@@ -11,7 +11,6 @@
 #include "disabler_map.h"
 #include "request_queue.h"
 
-#include "utils/id_map.h"
 #include "utils/range_utils.h"
 
 namespace banggame {
@@ -23,8 +22,8 @@ namespace banggame {
         std::default_random_engine rng;
         std::default_random_engine bot_rng;
 
-        utils::id_map<card> m_cards_storage;
-        utils::id_map<player> m_players_storage;
+        mutable std::unordered_map<int, card> m_cards_storage;
+        mutable std::unordered_map<int, player> m_players_storage;
 
         player_list m_players;
 

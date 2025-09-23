@@ -37,7 +37,8 @@ namespace banggame {
     }
 
     card_ptr game_table::add_card(const card_data &data) {
-        return &m_cards_storage.emplace(this, int(m_cards_storage.first_available_id()), data);
+        int card_id = m_cards_storage.size() + 1;
+        return &m_cards_storage.try_emplace(card_id, this, card_id, data).first->second;
     }
 
     void game_table::add_players(std::span<int> user_ids) {
@@ -45,7 +46,8 @@ namespace banggame {
 
         int player_id = 0;
         for (int user_id : user_ids) {
-            player_ptr target = &m_players_storage.emplace(this, ++player_id);
+            ++player_id;
+            player_ptr target = &m_players_storage.try_emplace(player_id, this, player_id).first->second;
             update_player_userid(target, user_id);
             m_players.emplace_back(target);
         }
@@ -81,14 +83,14 @@ namespace banggame {
 
     card_ptr game_table::find_card(int card_id) const {
         if (auto it = m_cards_storage.find(card_id); it != m_cards_storage.end()) {
-            return &*it;
+            return &it->second;
         }
         return nullptr;
     }
 
     player_ptr game_table::find_player(int player_id) const {
         if (auto it = m_players_storage.find(player_id); it != m_players_storage.end()) {
-            return &*it;
+            return &it->second;
         }
         return nullptr;
     }
@@ -153,7 +155,8 @@ namespace banggame {
             std::swap(vec[i], vec[i2]);
             auto a = m_cards_storage.extract(vec[i]->id);
             auto b = m_cards_storage.extract(vec[i2]->id);
-            std::swap(a->id, b->id);
+            std::swap(a.key(), b.key());
+            std::swap(a.mapped().id, b.mapped().id);
             m_cards_storage.insert(std::move(a));
             m_cards_storage.insert(std::move(b));
         }

@@ -21,7 +21,7 @@ namespace banggame {
 
     static game_updates::preload_assets make_preload_assets_update(game_ptr table) {
         std::unordered_set<std::string> images;
-        for (const card_data &card : table->m_cards_storage) {
+        for (const card_data &card : table->m_cards_storage | rv::values) {
             auto image = card.image.substr(0, card.image.find(':'));
             if (!image.empty()) {
                 if (image.contains('/')) {

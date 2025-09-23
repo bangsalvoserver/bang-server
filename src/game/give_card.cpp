@@ -131,7 +131,7 @@ namespace banggame {
     };
 
     bool give_card(player_ptr target, std::string_view card_name) {
-        for (card_ptr target_card : target->m_game->m_cards_storage | rv::addressof) {
+        for (card_ptr target_card : target->m_game->m_cards_storage | rv::values | rv::addressof) {
             if (string_equal_icase(card_name, target_card->name)
                 && enums::visit_enum([&]<card_deck_type E>(enums::enum_tag_t<E>) {
                     give_card_visitor<E> visitor;
