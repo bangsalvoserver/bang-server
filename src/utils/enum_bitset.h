@@ -58,7 +58,11 @@ namespace enums {
             return (m_value & to_bit(value)) != 0;
         }
 
-        constexpr bool check(bitset value) const {
+        constexpr bool check_any(bitset value) const {
+            return (m_value & value.m_value) != 0;
+        }
+
+        constexpr bool check_all(bitset value) const {
             return (m_value & value.m_value) == value.m_value;
         }
     };

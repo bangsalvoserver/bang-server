@@ -46,7 +46,7 @@ namespace banggame {
             }
         }
 
-        if (filter.check(target_player_filter::reachable) || filter.check(target_player_filter::range_1) || filter.check(target_player_filter::range_2)) {
+        if (filter.check_any({target_player_filter::reachable, target_player_filter::range_1, target_player_filter::range_2})) {
             int range = origin->get_range_mod();
             if (filter.check(target_player_filter::reachable)) {
                 int weapon_range = origin->get_weapon_range();
