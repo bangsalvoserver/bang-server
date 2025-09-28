@@ -7,6 +7,7 @@
 
 #include "manager.h"
 #include "tracking.h"
+#include "server_options.h"
 
 std::stop_source g_stop;
 
@@ -17,8 +18,6 @@ void handle_stop(int signal = 0) {
 }
 
 int main(int argc, char **argv) {
-    banggame::game_manager server;
-
     cxxopts::Options options(argv[0], "Bang! Server");
 
     uint16_t port = banggame::default_server_port;
@@ -36,9 +35,12 @@ int main(int argc, char **argv) {
     std::string private_key_file;
 #endif
 
+    banggame::server_options serv_options;
+
     options.add_options()
         ("port",        "",                 cxxopts::value(port))
-        ("cheats",      "Enable Cheats",    cxxopts::value(server.options().enable_cheats))
+        ("cheats",      "Enable Cheats",    cxxopts::value(serv_options.enable_cheats))
+        ("P,no-ping",   "Disable Pings",    cxxopts::value(serv_options.disable_pings))
         ("l,logging",   "Logging Level",    cxxopts::value(logging_level))
         ("r,reuse-addr","Reuse Address",    cxxopts::value(reuse_addr))
         ("t,tracking-db","Tracking Database File", cxxopts::value(tracking_file))
@@ -76,6 +78,8 @@ int main(int argc, char **argv) {
     if (!tracking_file.empty()) {
         tracking::init_tracking(tracking_file);
     }
+    
+    banggame::game_manager server{serv_options};
 
 #ifndef LIBUS_NO_SSL
     if (enable_tls) {

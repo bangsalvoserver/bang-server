@@ -10,20 +10,17 @@
 
 namespace banggame {
 
-struct server_options {
-    bool enable_cheats = false;
-    int max_session_id_count = 10;
-};
+struct server_options;
 
 class game_manager: public net::wsserver {
 public:
-    game_manager();
+    explicit game_manager(const server_options &options);
 
     void stop();
     void tick();
     void kick_client(client_handle client, std::string message, int code = kick_opcode);
 
-    server_options &options() { return m_options; }
+    const server_options &options() const { return m_options; }
 
 protected:
     void on_connect(client_handle client) override;
@@ -84,7 +81,7 @@ private:
 
     message_list m_outgoing_messages;
 
-    server_options m_options;
+    const server_options &m_options;
 
     friend class chat_command;
 };

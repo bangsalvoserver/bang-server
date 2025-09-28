@@ -1,6 +1,7 @@
 #include "chat_commands.h"
 
 #include "manager.h"
+#include "server_options.h"
 
 #include "game/give_card.h"
 

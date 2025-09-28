@@ -22,13 +22,6 @@ struct critical_error : std::runtime_error {
     using std::runtime_error::runtime_error;
 };
 
-static constexpr ticks lobby_lifetime = 5min;
-static constexpr ticks user_lifetime = 10s;
-
-static constexpr ticks client_accept_timer = 30s;
-static constexpr ticks ping_interval = 10s;
-static constexpr auto pings_until_disconnect = 2min / ping_interval;
-
 struct game_session {
     std::string username;
     image_registry::registered_image propic;
@@ -36,7 +29,7 @@ struct game_session {
     game_lobby *lobby = nullptr;
 
     client_handle client;
-    ticks lifetime = user_lifetime;
+    ticks lifetime;
 
     void set_username(std::string new_username);
     void set_propic(image_pixels new_propic);
@@ -55,7 +48,7 @@ namespace connection_state {
 
         session_ptr session;
         ticks ping_timer = ticks{0};
-        int ping_count = 0;
+        ticks inactivity_timer = ticks{0};
     };
 
     struct invalid {};
@@ -122,7 +115,7 @@ struct game_lobby {
     std::vector<server_messages::lobby_chat> chat_messages;
     
     lobby_state state;
-    ticks lifetime = lobby_lifetime;
+    ticks lifetime;
 
     std::unique_ptr<banggame::game> m_game;
 

@@ -2,6 +2,7 @@
 
 #include "bot_info.h"
 #include "tracking.h"
+#include "server_options.h"
 
 using namespace banggame;
 
@@ -31,7 +32,9 @@ void game_manager::on_message(client_handle client, std::string_view msg) {
     }
 }
 
-game_manager::game_manager() {
+game_manager::game_manager(const server_options &options)
+    : m_options{options}
+{
     std::random_device rd;
     session_rng.seed(rd());
 }
@@ -50,16 +53,19 @@ void game_manager::tick() {
     for (auto &[client, con] : m_connections) {
         std::visit(overloaded{
             [&](connection_state::not_validated &value) {
-                if (++value.timeout > client_accept_timer) {
+                if (++value.timeout > options().client_accept_timer) {
                     kick_client(client, "HANDSHAKE_FAIL");
                 }
             },
             [&](connection_state::connected &value) {
-                if (++value.ping_timer > ping_interval) {
-                    value.ping_timer = ticks{};
-                    if (++value.ping_count >= pings_until_disconnect) {
+                if (!options().disable_pings) {
+                    ++value.ping_timer;
+                    ++value.inactivity_timer;
+
+                    if (value.inactivity_timer > options().inactivity_timeout) {
                         kick_client(client, "INACTIVITY");
-                    } else {
+                    } else if (value.ping_timer > options().ping_interval) {
+                        value.ping_timer = ticks{0};
                         send_message(client, server_messages::ping{});
                     }
                 }
@@ -78,7 +84,7 @@ void game_manager::tick() {
                 return true;
             }
         } else {
-            session->lifetime = user_lifetime;
+            session->lifetime = options().user_lifetime;
         }
         return false;
     })) {
@@ -119,7 +125,7 @@ void game_manager::tick() {
                 return true;
             }
         } else {
-            lobby.lifetime = lobby_lifetime;
+            lobby.lifetime = options().lobby_lifetime;
         }
         return false;
     })) {
@@ -155,7 +161,7 @@ void game_manager::handle_message(client_messages::connect &&args, client_handle
 
     id_type session_id = args.session_id;
     if (session_id == 0) {
-        session_id = generate_session_id(session_rng, m_sessions, m_options.max_session_id_count);
+        session_id = generate_session_id(session_rng, m_sessions, options().max_session_id_count);
     }
 
     auto [it, inserted] = m_sessions.try_emplace(session_id);
@@ -170,6 +176,7 @@ void game_manager::handle_message(client_messages::connect &&args, client_handle
     session->set_username(std::move(args.username));
     session->set_propic(std::move(args.propic));
     session->client = client;
+    session->lifetime = options().user_lifetime;
     
     con.emplace<connection_state::connected>(session);
     
@@ -185,7 +192,7 @@ void game_manager::handle_message(client_messages::connect &&args, client_handle
 
 void game_manager::handle_message(client_messages::pong &&args, client_handle client, connection &con) {
     if (auto *value = std::get_if<connection_state::connected>(&con)) {
-        value->ping_count = 0;
+        value->inactivity_timer = ticks{0};
     } else {
         throw critical_error("CLIENT_NOT_VALIDATED");
     }
@@ -220,9 +227,10 @@ void game_manager::handle_message(client_messages::lobby_make &&args, session_pt
 
     game_user &user = lobby.add_user(session).first;
     user.flags.add(game_user_flag::lobby_owner);
-
+    
     lobby.state = lobby_state::waiting;
     lobby.password = args.password;
+    lobby.lifetime = options().lobby_lifetime;
 
     broadcast_lobby_update(lobby);
 
@@ -509,7 +517,7 @@ void game_manager::handle_chat_command(session_ptr session, const std::string &m
     if (command.permissions().check(command_permissions::game_cheat)) {
         if (lobby.state != lobby_state::playing) {
             throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
-        } else if (!m_options.enable_cheats) {
+        } else if (!options().enable_cheats) {
             throw lobby_error("ERROR_GAME_CHEATS_NOT_ENABLED");
         }
     }
