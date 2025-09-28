@@ -17,9 +17,9 @@ namespace banggame {
         targeting_select_cubes_optional target_cubes;
         targeting_player target_player;
 
-        targeting_select_cubes_player(targeting_args<int, target_filter::player> args)
-            : target_cubes{{ .target_value = args.target_value }}
-            , target_player{{ .player_filter = args.player_filter }} {}
+        targeting_select_cubes_player(target_args::player args, int ncubes)
+            : target_cubes{{}, ncubes}
+            , target_player{args} {}
         
         auto get_args() const {
             struct args {

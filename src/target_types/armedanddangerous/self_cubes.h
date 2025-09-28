@@ -12,8 +12,8 @@ namespace banggame {
     struct targeting_self_cubes : targeting_self_cubes_args {
         using value_type = std::nullptr_t;
         
-        targeting_self_cubes(targeting_args<int, target_filter::none> args)
-            : targeting_self_cubes_args{ .ncubes{args.target_value}} {}
+        targeting_self_cubes(target_args::empty, int ncubes)
+            : targeting_self_cubes_args{ncubes} {}
         
         const auto &get_args() const {
             return static_cast<const targeting_self_cubes_args &>(*this);

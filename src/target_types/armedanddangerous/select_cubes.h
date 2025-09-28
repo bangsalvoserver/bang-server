@@ -14,8 +14,8 @@ namespace banggame {
     struct targeting_select_cubes : targeting_select_cubes_args {
         using value_type = card_list;
 
-        targeting_select_cubes(targeting_args<int, target_filter::none> args)
-            : targeting_select_cubes_args{ .ncubes{std::max(1, args.target_value)}} {}
+        targeting_select_cubes(target_args::empty, int ncubes)
+            : targeting_select_cubes_args{ncubes} {}
         
         const auto &get_args() const {
             return static_cast<const targeting_select_cubes_args &>(*this);

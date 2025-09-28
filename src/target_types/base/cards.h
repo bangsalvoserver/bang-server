@@ -11,9 +11,9 @@ namespace banggame {
         targeting_card target_card;
         int ncards;
 
-        targeting_cards(targeting_args<int, target_filter::card> args)
-            : target_card{{ .player_filter = args.player_filter, .card_filter = args.card_filter }}
-            , ncards{args.target_value} {}
+        targeting_cards(target_args::card args, int ncards)
+            : target_card{args}
+            , ncards{ncards} {}
 
         auto get_args() const {
             struct args {

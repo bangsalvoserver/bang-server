@@ -10,9 +10,9 @@ namespace banggame {
     struct targeting_cube_slot : targeting_card {
         bool stealing;
 
-        targeting_cube_slot(targeting_args<bool, target_filter::player> args)
+        targeting_cube_slot(target_args::player args, bool stealing = false)
             : targeting_card{{ .player_filter = args.player_filter }}
-            , stealing{args.target_value} {}
+            , stealing{stealing} {}
 
         auto get_args() const {
             struct args {

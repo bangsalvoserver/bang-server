@@ -25,7 +25,7 @@ def parse_effects(effect_list):
             r'^\s*(\w+)' # effect_type
             r'(?:\s*\(\s*(.+?)\s*\))?' # effect_value
             r'(?:\s*(\w+)' # target_type
-            r'\s*(?:\((.+?)\))?)?' # target_value
+            r'\s*(?:\((.+?)\))?)?' # target_args
             r'([\w\s]*?)' # player_filter
             r'(?:\s*\|\s*([\w\s]+))?\s*$', # card_filter
             effect
@@ -36,19 +36,23 @@ def parse_effects(effect_list):
         effect_type = match.group(1)
         effect_value = match.group(2)
         target_type = match.group(3) or 'none'
-        target_value = match.group(4)
+        target_args = match.group(4)
         player_filter = match.group(5)
         card_filter = match.group(6)
+
+        target_value = (
+            CppObject(
+                player_filter = [CppEnum('target_player_filter', f) for f in sorted(player_filter.split())] if player_filter else None,
+                card_filter = [CppEnum('target_card_filter', f) for f in sorted(card_filter.split())] if card_filter else None,
+            ),
+            *((CppLiteral(target_args, verbatim=True),) if target_args else ())
+        )
 
         result.append(CppObject(
             type =             CppLiteral(f'GET_EFFECT({effect_type})'),
             effect_value =     CppStatic(f'EFFECT_VALUE({effect_type})', CppLiteral(effect_value or ''), pointer=True),
             target =           CppLiteral(f'TARGET_TYPE({target_type})'),
-            target_value =     CppStatic(f'TARGET_VALUE({target_type})', (CppObject(
-                target_value =  CppLiteral(target_value) if target_value else None,
-                player_filter = [CppEnum('target_player_filter', f) for f in sorted(player_filter.split())] if player_filter else None,
-                card_filter = [CppEnum('target_card_filter', f) for f in sorted(card_filter.split())] if card_filter else None,
-            ),), pointer=True)
+            target_value =     CppStatic(f'TARGET_VALUE({target_type})', target_value, pointer=True)
         ))
     return CppStatic('effect_holder', result)
 

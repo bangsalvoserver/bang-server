@@ -13,9 +13,9 @@ namespace banggame {
         targeting_player target_player;
         int max_distance;
 
-        targeting_adjacent_players(targeting_args<int, target_filter::player> args)
-            : target_player{{ .player_filter = args.player_filter }}
-            , max_distance{args.target_value} {}
+        targeting_adjacent_players(target_args::player args, int max_distance)
+            : target_player{args}
+            , max_distance{max_distance} {}
         
         auto get_args() const {
             struct args {

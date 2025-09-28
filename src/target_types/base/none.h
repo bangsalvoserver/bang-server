@@ -8,7 +8,7 @@ namespace banggame {
     struct targeting_none {
         using value_type = std::nullptr_t;
 
-        targeting_none(targeting_args<void, target_filter::none> = {}) {}
+        targeting_none(target_args::empty = {}) {}
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
             return !get_error(origin_card, origin, effect, ctx);

@@ -10,8 +10,8 @@ namespace banggame {
 
         int ncubes;
 
-        targeting_move_cube_slot(targeting_args<int, target_filter::none> args)
-            : ncubes{args.target_value} {}
+        targeting_move_cube_slot(target_args::empty, int ncubes)
+            : ncubes{ncubes} {}
         
         auto get_args() const {
             struct args {

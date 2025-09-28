@@ -13,40 +13,18 @@ namespace banggame {
         void on_disable(card_ptr target_card, player_ptr target);
     };
 
-    enum class target_filter {
-        none,
-        player,
-        card
-    };
+    namespace target_args {
+        struct empty {};
 
-    template<typename T, target_filter F>
-    struct targeting_args;
+        struct player {
+            player_filter_bitset player_filter;
+        };
 
-    template<> struct targeting_args<void, target_filter::none>{};
-
-    template<> struct targeting_args<void, target_filter::player>{
-        player_filter_bitset player_filter;
-    };
-
-    template<> struct targeting_args<void, target_filter::card>{
-        player_filter_bitset player_filter;
-        card_filter_bitset card_filter;
-    };
-
-    template<typename T> struct targeting_args<T, target_filter::none>{
-        T target_value;
-    };
-
-    template<typename T> struct targeting_args<T, target_filter::player>{
-        T target_value;
-        player_filter_bitset player_filter;
-    };
-
-    template<typename T> struct targeting_args<T, target_filter::card>{
-        T target_value;
-        player_filter_bitset player_filter;
-        card_filter_bitset card_filter;
-    };
+        struct card {
+            player_filter_bitset player_filter;
+            card_filter_bitset card_filter;
+        };
+    }
 
 }
 

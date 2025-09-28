@@ -18,10 +18,10 @@ namespace banggame {
         targeting_player target_player;
         int extra_players;
 
-        targeting_player_per_cube(targeting_args<int, target_filter::player> args)
-            : target_cubes{{}}
-            , target_player{{ .player_filter = args.player_filter }}
-            , extra_players{args.target_value} {}
+        targeting_player_per_cube(target_args::player args, int extra_players)
+            : target_cubes{{}, 0}
+            , target_player{args}
+            , extra_players{extra_players} {}
         
         auto get_args() const {
             struct args {
