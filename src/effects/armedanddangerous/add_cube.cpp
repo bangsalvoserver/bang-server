@@ -31,6 +31,17 @@ namespace banggame {
             }
         }
         
+        prompt_string pick_prompt(card_ptr target_card) const override {
+            if (target->is_bot() && target_card->pocket == pocket_type::player_character
+                && rn::any_of(target->m_table, [](card_ptr c) {
+                    return c->is_orange() && c->num_cubes() < max_cubes;
+                })
+            ) {
+                return "BOT_PREFER_ORANGE_CARD";
+            }
+            return {};
+        }
+        
         bool can_pick(const_card_ptr target_card) const override {
             return target_card->owner == target
                 && (target_card->pocket == pocket_type::player_table && target_card->is_orange()
