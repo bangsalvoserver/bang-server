@@ -45,12 +45,12 @@ def parse_effects(effect_list):
                 player_filter = [CppEnum('target_player_filter', f) for f in sorted(player_filter.split())] if player_filter else None,
                 card_filter = [CppEnum('target_card_filter', f) for f in sorted(card_filter.split())] if card_filter else None,
             ),
-            *((CppLiteral(target_args, verbatim=True),) if target_args else ())
+            *((CppLiteral(target_args),) if target_args else ())
         )
 
         result.append(CppObject(
             type =             CppLiteral(f'GET_EFFECT({effect_type})'),
-            effect_value =     CppStatic(f'EFFECT_VALUE({effect_type})', CppLiteral(effect_value or ''), pointer=True),
+            effect_value =     CppStatic(f'EFFECT_VALUE({effect_type})', (CppLiteral(effect_value),) if effect_value else (), pointer=True),
             target =           CppLiteral(f'TARGET_TYPE({target_type})'),
             target_value =     CppStatic(f'TARGET_VALUE({target_type})', target_value, pointer=True)
         ))
@@ -75,7 +75,7 @@ def parse_equips(equip_list):
 
         result.append(CppObject(
             type = CppLiteral(f'GET_EQUIP({effect_type})'),
-            effect_value = CppStatic(f'EQUIP_VALUE({effect_type})', CppLiteral(effect_value or ''), pointer=True),
+            effect_value = CppStatic(f'EQUIP_VALUE({effect_type})', (CppLiteral(effect_value),) if effect_value else (), pointer=True),
         ))
     return CppStatic('equip_holder', result)
 
@@ -115,7 +115,7 @@ def parse_modifier(modifier):
     effect_value = match.group(2)
     return CppObject(
         type = CppLiteral(f"GET_MODIFIER({modifier})"),
-        effect_value = CppStatic(f'MODIFIER_VALUE({effect_type})', CppLiteral(effect_value or ''), pointer=True),
+        effect_value = CppStatic(f'MODIFIER_VALUE({effect_type})', (CppLiteral(effect_value),) if effect_value else (), pointer=True),
     )
 
 def parse_mth(effect):
@@ -134,7 +134,7 @@ def parse_mth(effect):
     return CppObject(
         type = CppLiteral(f'GET_MTH({effect_type})'),
         effect_value = CppStatic(f'MTH_VALUE({effect_type})', CppObject(
-            handler = CppLiteral(effect_value) if effect_value else None,
+            handler = (CppLiteral(effect_value),) if effect_value else None,
             indices = CppStatic('mth_index', [int(index) for index in indices.split(',')])
         ), pointer=True),
     )
