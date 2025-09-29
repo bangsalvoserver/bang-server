@@ -39,6 +39,7 @@ main_deck:
       - mustang
     tags:
       - horse
+      - strong
   - &jail
     name: JAIL
     signs:

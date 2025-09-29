@@ -92,6 +92,8 @@ main_deck:
     color: blue
     equip:
       - strongbox
+    tags:
+      - strong(1)
   - name: SWITCH
     signs:
       - 6 hearts
@@ -325,12 +327,16 @@ train:
     effects:
       - discard
       - mail_car
+    tags:
+      - strong
   - name: OBSERVATION_CAR
     image: 27_observation_car
     color: train
     equip:
       - scope
       - mustang
+    tags:
+      - strong
   - name: PASSENGER_CAR
     image: 27_passenger_car
     color: train

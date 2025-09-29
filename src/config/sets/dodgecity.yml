@@ -33,6 +33,8 @@ main_deck:
     color: blue
     equip:
       - mustang
+    tags:
+      - strong(1)
   - <<: *bang
     signs:
       - 8 spades
