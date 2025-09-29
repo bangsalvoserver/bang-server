@@ -44,6 +44,7 @@ namespace banggame {
         using request_picking::request_picking;
 
         bool can_pick(const_card_ptr target_card) const override;
+        prompt_string pick_prompt(card_ptr target_card) const override;
     };
 
     struct interface_picking_player : interface_target_set_players {

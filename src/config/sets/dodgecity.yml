@@ -210,6 +210,8 @@ main_deck:
     color: green
     effects:
       - bang players notself
+    tags:
+      - strong
   - name: PEPPERBOX
     signs:
       - A hearts
@@ -236,6 +238,8 @@ main_deck:
     effects:
       - draw(3)
       - changewws
+    tags:
+      - strong(2)
   - name: KNIFE
     signs:
       - 8 hearts
@@ -304,6 +308,8 @@ character:
       - max_usages(2)
       - discard card self | hand blue
       - draw(2)
+    tags:
+      - strong
   - name: MOLLY_STARK
     image: 03_molly_stark
     equip:

@@ -80,4 +80,11 @@ namespace banggame::prompts {
         }
         return {};
     }
+
+    prompt_string bot_check_discard_card(player_ptr origin, card_ptr target) {
+        if (origin->is_bot() && target->has_tag(tag_type::strong)) {
+            return "BOT_TARGET_STRONG_CARD";
+        }
+        return {};
+    }
 }

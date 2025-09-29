@@ -15,6 +15,8 @@ main_deck:
       - none select_cubes_repeat(2)
       - caravan
       - changewws
+    tags:
+      - strong(4)
   - <<: *cat_balou
     signs:
       - 3 hearts
@@ -67,6 +69,8 @@ main_deck:
       - missed
       - none select_cubes_optional(2)
       - duck
+    tags:
+      - strong(2)
   - <<: *missed
     signs:
       - K spades

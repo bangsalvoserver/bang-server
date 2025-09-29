@@ -59,6 +59,7 @@ namespace banggame {
         pass_turn,
         pick,
         penalty,
+        strong,
         skip_logs,
         no_auto_discard,
         bangcard,

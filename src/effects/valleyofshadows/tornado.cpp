@@ -10,6 +10,7 @@
 
 #include "game/game_table.h"
 #include "game/possible_to_play.h"
+#include "game/prompts.h"
 
 #include "poker.h"
 
@@ -24,6 +25,10 @@ namespace banggame {
                 return "BOT_ESCAPE_TORNADO";
             }
             return {};
+        }
+
+        prompt_string pick_prompt(card_ptr target_card) const override {
+            return prompts::bot_check_discard_card(target, target_card);
         }
         
         bool can_pick(const_card_ptr target_card) const override {
@@ -123,6 +128,13 @@ namespace banggame {
 
     bool effect_tornado2_response::can_play(card_ptr origin_card, player_ptr origin) {
         return origin->m_game->top_request<request_tornado2>(target_is{origin}) != nullptr;
+    }
+
+    prompt_string effect_tornado2_response::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        for (card_ptr target_card : ctx.selected_cards) {
+            MAYBE_RETURN(prompts::bot_check_discard_card(origin, target_card));
+        }
+        return {};
     }
 
     void effect_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {

@@ -7,6 +7,7 @@
 #include "cards/game_events.h"
 
 #include "game/game_table.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
@@ -26,6 +27,10 @@ namespace banggame {
             card_list result;
             target->m_game->call_event(event_type::get_selected_cards{ origin_card, owner, result });
             return result;
+        }
+
+        prompt_string pick_prompt(card_ptr target_card) const override {
+            return prompts::bot_check_discard_card(target, target_card);
         }
 
         bool can_pick(const_card_ptr target_card) const override {

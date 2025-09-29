@@ -101,6 +101,7 @@ main_deck:
       - play_as_bang players notself
     tags:
       - weapon
+      - strong
   - name: LAST_WILL
     signs:
       - A spades
@@ -178,6 +179,7 @@ main_deck:
       - indians players notself
     tags:
       - indians
+      - strong
   - name: ARSON
     signs:
       - J diamonds
@@ -273,6 +275,8 @@ character:
       - max_usages(1)
       - discard card self | hand blue
       - draw(2)
+    tags:
+      - strong
   - name: EVA_PLACE
     image: 20_eva_place
     effects:

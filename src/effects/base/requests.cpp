@@ -5,6 +5,7 @@
 
 #include "game/game_table.h"
 #include "game/game_options.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
@@ -51,6 +52,10 @@ namespace banggame {
         } else if (target->m_hand.size() == 1) {
             auto_pick();
         }
+    }
+
+    prompt_string request_discard::pick_prompt(card_ptr target_card) const {
+        return prompts::bot_check_discard_card(target, target_card);
     }
 
     bool request_discard::can_pick(const_card_ptr target_card) const {

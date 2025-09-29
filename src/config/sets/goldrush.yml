@@ -179,6 +179,7 @@ goldrush:
       - changewws
     tags:
       - buy_cost(4)
+      - strong
   - name: RUCKSACK
     image: 04_zaino
     color: black

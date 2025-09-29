@@ -66,6 +66,8 @@ main_deck:
     color: brown
     effects:
       - bandidos2 players notself not_empty_hand
+    tags:
+      - strong
   - name: ESCAPE
     signs:
       - 3 hearts
@@ -91,6 +93,8 @@ main_deck:
     effects:
       - poker players notself not_empty_hand
       - poker
+    tags:
+      - strong
   - name: BACKFIRE
     signs:
       - Q clubs
@@ -164,6 +168,8 @@ character:
       - max_usages(1)
       - set_playing(play_as::gatling) card self | hand used_bang
       - play_as_bang players notself
+    tags:
+      - strong
   - name: EVELYN_SHEBANG
     image: 07_evelynshebang2
     responses:
@@ -197,6 +203,7 @@ character:
       - tuco_franziskaner
     tags:
       - max_hp(5)
+      - strong
 
 hidden:
   - name: TORNADO

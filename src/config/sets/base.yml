@@ -188,6 +188,8 @@ main_deck:
     effects:
       - draw(2)
       - changewws
+    tags:
+      - strong(2)
   - &duel
     name: DUEL
     signs:
@@ -218,6 +220,8 @@ main_deck:
     color: brown
     effects:
       - bang players notself
+    tags:
+      - strong
   - &indians
     name: INDIANS
     signs:
@@ -229,6 +233,7 @@ main_deck:
       - indians players notself
     tags:
       - indians
+      - strong(1)
   - &missed
     name: MISSED
     signs:
@@ -283,6 +288,8 @@ main_deck:
     effects:
       - draw(3)
       - changewws
+    tags:
+      - strong(3)
 
 character:
   - name: BART_CASSIDY

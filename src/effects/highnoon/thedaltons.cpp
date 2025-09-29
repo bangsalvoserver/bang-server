@@ -3,6 +3,7 @@
 #include "effects/base/pick.h"
 
 #include "game/game_table.h"
+#include "game/prompts.h"
 
 #include "cards/filter_enums.h"
 
@@ -30,6 +31,7 @@ namespace banggame {
 
         prompt_string pick_prompt(card_ptr target_card) const override {
             if (target->is_bot()) {
+                MAYBE_RETURN(prompts::bot_check_discard_card(target, target_card));
                 if (target_card->has_tag(tag_type::ghost_card)) {
                     return {1, "BOT_DISCARD_GHOST"};
                 }

@@ -25,6 +25,17 @@ namespace banggame {
         return target_card->pocket == pocket_type::selection;
     }
 
+    prompt_string selection_picker::pick_prompt(card_ptr target_card) const {
+        if (target->is_bot() && rn::any_of(target->m_game->m_selection,
+            [target_strength = target_card->get_tag_value(tag_type::strong)](const_card_ptr c) {
+                return c->get_tag_value(tag_type::strong) > target_strength;
+            })
+        ) {
+            return "BOT_PICK_STRONGEST_CARD";
+        }
+        return {};
+    }
+
     bool interface_picking_player::in_target_set(const_player_ptr target_player) const {
         return target_player->alive() && can_pick(target_player);
     }

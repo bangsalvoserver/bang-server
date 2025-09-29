@@ -5,6 +5,7 @@
 
 #include "cards/game_enums.h"
 #include "cards/game_events.h"
+#include "cards/filter_enums.h"
 
 #include "game/game_table.h"
 
@@ -38,6 +39,13 @@ namespace banggame {
                     target->m_game->m_selection.front()->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
                 }
             }
+        }
+
+        prompt_string pick_prompt(card_ptr target_card) const override {
+            if (target->is_bot() && rn::all_of(target->m_game->m_selection, [](card_ptr c) { return c->has_tag(tag_type::strong); })) {
+                return "BOT_ALL_STRONG";
+            }
+            return selection_picker::pick_prompt(target_card);
         }
 
         void on_pick(card_ptr target_card) override {
