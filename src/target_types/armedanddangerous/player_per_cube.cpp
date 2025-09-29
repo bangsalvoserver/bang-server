@@ -44,7 +44,7 @@ namespace banggame {
     }
 
     void targeting_player_per_cube::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const value_type &target) {
-        ctx.selected_cubes.insert(origin_card, target.cubes, 1);
+        target_cubes.add_context(origin_card, origin, effect, ctx, target.cubes);
         for (player_ptr target : target.players) {
             target_player.add_context(origin_card, origin, effect, ctx, target);
         }

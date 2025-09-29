@@ -19,7 +19,7 @@ namespace banggame {
         int extra_players;
 
         targeting_player_per_cube(target_args::player args, int extra_players)
-            : target_cubes{{}, 0}
+            : target_cubes{{}, 1}
             , target_player{args}
             , extra_players{extra_players} {}
         
