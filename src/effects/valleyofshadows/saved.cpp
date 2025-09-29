@@ -85,6 +85,20 @@ namespace banggame {
         return false;
     }
 
+    prompt_string effect_saved::on_prompt(card_ptr origin_card, player_ptr origin) {
+        if (origin->is_bot()) {
+            auto req = origin->m_game->top_request<request_damage>();
+            player_ptr saved = req->target;
+            if (saved->m_hp <= req->damage && saved->m_role == player_role::sheriff) {
+                auto role = origin->get_base_role();
+                if (role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive() <= 2) {
+                    return "BOT_DONT_SAVE_SHERIFF";
+                }
+            }
+        }
+        return {};
+    }
+
     void effect_saved::on_play(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request<request_damage>();
         player_ptr saved = req->target;
@@ -100,6 +114,22 @@ namespace banggame {
     bool effect_saved2::can_play(card_ptr origin_card, player_ptr origin) {
         return origin != origin->m_game->m_playing
             && effect_saved{}.can_play(origin_card, origin);
+    }
+
+    prompt_string effect_saved2::on_prompt(card_ptr origin_card, player_ptr origin) {
+        if (origin->is_bot()) {
+            auto req = origin->m_game->top_request<request_damage>();
+            player_ptr saved = req->target;
+            if (saved->m_hp > req->damage) {
+                return "BOT_DONT_SAVE";
+            } else if (saved->m_role == player_role::sheriff) {
+                auto role = origin->get_base_role();
+                if (role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive() <= 2) {
+                    return "BOT_DONT_SAVE_SHERIFF";
+                }
+            }
+        }
+        return {};
     }
 
     void effect_saved2::on_play(card_ptr origin_card, player_ptr origin) {

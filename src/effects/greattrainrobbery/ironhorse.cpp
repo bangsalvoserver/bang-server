@@ -12,11 +12,13 @@
 namespace banggame {
 
     static prompt_string get_ironhorse_prompt(player_ptr origin, player_ptr target, int locomotive_count) {
-        if (origin->is_bot()
-            && !(origin->m_role == player_role::outlaw || origin->m_role == player_role::renegade && origin->m_game->num_alive() <= 2)
-            && (target->m_hp <= locomotive_count && target->m_role == player_role::sheriff)
-        ) {
-            return {1, "BOT_DONT_KILL_SHERIFF"};
+        if (origin->is_bot()) {
+            auto role = origin->get_base_role();
+            if (!(role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive() <= 2)
+                && (target->m_hp <= locomotive_count && target->m_role == player_role::sheriff)
+            ) {
+                return {1, "BOT_DONT_KILL_SHERIFF"};
+            }
         }
         return {};
     }
