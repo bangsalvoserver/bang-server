@@ -49,6 +49,12 @@ namespace banggame {
 
     DEFINE_BOT_RULE(pocket_not, rule_filter_by_pocket_not)
 
+    struct rule_equip {
+        bool operator()(card_node) const;
+    };
+
+    DEFINE_BOT_RULE(equip, rule_equip)
+
     struct rule_repeat {
         bool operator()(card_node) const;
     };

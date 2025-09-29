@@ -22,6 +22,10 @@ namespace banggame {
         return node->card->pocket != pocket;
     }
 
+    bool rule_equip::operator()(card_node node) const {
+        return node && node->card->is_equip_card();
+    }
+
     bool rule_repeat::operator()(card_node node) const {
         return node && node->context.repeat_card != nullptr;
     }

@@ -16,6 +16,7 @@ bots:
     
     in_play_rules:
     - repeat
+    - equip
     - tag_value(tag_type::strong)
     - tag_value(tag_type::button_color, 2)
     - pocket(pocket_type::player_table)
