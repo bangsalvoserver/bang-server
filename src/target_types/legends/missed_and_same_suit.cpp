@@ -17,7 +17,7 @@ namespace banggame {
         });
     }
 
-    static auto missed_cards_with_same_suits_range(player_ptr origin, auto in_range, short ncards) {
+    static auto missed_cards_with_same_suits_range(player_ptr origin, auto in_range, int ncards) {
         return rv::filter(in_range, [=](card_ptr c) {
             return is_missed_card(origin, c)
                 && contains_at_least(cards_with_same_suits_range(in_range, c), ncards - 1);

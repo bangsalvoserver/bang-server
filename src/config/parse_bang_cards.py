@@ -100,7 +100,7 @@ def parse_tags(tag_list):
         if tag_type in result:
             raise RuntimeError(f'Duplicate tag: {tag_type_str}')
         result[tag_type] = int(tag_value) if tag_value else 0
-    return CppStaticMap('tag_type', 'short', result)
+    return CppStaticMap('tag_type', 'tag_int', result)
 
 def parse_modifier(modifier):
     match = re.match(

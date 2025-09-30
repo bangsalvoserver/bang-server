@@ -196,7 +196,8 @@ namespace banggame {
 
     using effect_list = std::span<const effect_holder>;
     using equip_list = std::span<const equip_holder>;
-    using tag_map = utils::static_map_view<tag_type, short>;
+    using tag_int = int8_t;
+    using tag_map = utils::static_map_view<tag_type, tag_int>;
 
     enum class card_deck_type {
         none,

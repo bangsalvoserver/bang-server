@@ -63,7 +63,7 @@ namespace banggame {
 
     struct rule_tag_value {
         tag_type tag;
-        short value;
+        tag_int value;
         bool operator()(card_node) const;
     };
 
@@ -71,7 +71,7 @@ namespace banggame {
 
     struct rule_tag_value_not {
         tag_type tag;
-        short value;
+        tag_int value;
         bool operator()(card_node) const;
     };
 

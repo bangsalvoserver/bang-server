@@ -45,7 +45,7 @@ namespace banggame {
             return tags.find(tag) != tags.end();
         }
 
-        std::optional<short> get_tag_value(tag_type tag) const {
+        std::optional<tag_int> get_tag_value(tag_type tag) const {
             auto it = tags.find(tag);
             if (it != tags.end()) {
                 return it->second;
