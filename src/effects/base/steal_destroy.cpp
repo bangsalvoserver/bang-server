@@ -109,6 +109,9 @@ namespace banggame {
     }
 
     game_string effect_discard::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        if (origin->is_bot() && target_card->has_tag(tag_type::strong)) {
+            return "BOT_DONT_DISCARD_STRONG";
+        }
         if (target_card->pocket == pocket_type::player_table
             && target_card->owner == origin
             && target_card->has_tag(tag_type::ghost_card))
