@@ -11,7 +11,7 @@ namespace banggame {
     int count_missed_cards(player_ptr target) {
         // this doesn't account for calamity janet, elena fuente, caboose
         int count = 0;
-        for (card_ptr c : get_all_playable_cards(target, true, effect_context{ .temp_missable = true })) {
+        for (card_ptr c : get_all_playable_cards(target, true, {}, effect_context{ .temp_missable = true })) {
             if (c->pocket != pocket_type::button_row && c->pocket != pocket_type::hidden_deck) {
                 ++count;
             }

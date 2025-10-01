@@ -13,22 +13,6 @@ namespace banggame {
     bool is_possible_to_play(player_ptr origin, card_ptr origin_card, bool is_response = false, const card_list &modifiers = {}, const effect_context &ctx = {});
 
     playable_cards_list generate_playable_cards_list(player_ptr origin, bool is_response = false);
-    
-    inline auto get_all_active_cards(player_ptr origin) {
-        return rv::concat(
-            origin->m_hand,
-            origin->m_table,
-            origin->m_characters,
-            origin->m_game->m_button_row,
-            origin->m_game->m_hidden_deck,
-            origin->m_game->m_shop_selection,
-            origin->m_game->m_stations,
-            origin->m_game->m_train,
-            origin->m_game->m_feats,
-            origin->m_game->m_scenario_cards | rv::take_last(1),
-            origin->m_game->m_wws_scenario_cards | rv::take_last(1)
-        );
-    }
 
     inline auto get_all_targetable_cards(player_ptr origin) {
         return rv::concat(
@@ -44,14 +28,32 @@ namespace banggame {
         );
     }
 
-    inline auto get_all_playable_cards(player_ptr origin, bool is_response = false, const effect_context &ctx = {}) {
-        return rv::filter(get_all_active_cards(origin), [=](card_ptr origin_card) {
-            return is_possible_to_play(origin, origin_card, is_response, {}, ctx);
+    inline auto get_all_playable_cards(player_ptr origin, bool is_response = false, const card_list &modifiers = {}, const effect_context &ctx = {}) {
+        return rv::concat(
+            origin->m_hand,
+            origin->m_table,
+            origin->m_characters,
+            origin->m_game->m_button_row,
+            origin->m_game->m_hidden_deck,
+            origin->m_game->m_shop_selection,
+            origin->m_game->m_stations,
+            origin->m_game->m_train,
+            origin->m_game->m_feats,
+            origin->m_game->m_scenario_cards | rv::take_last(1),
+            origin->m_game->m_wws_scenario_cards | rv::take_last(1),
+            rv::single(ctx.repeat_card) | rv::filter([](card_ptr c) {
+                return c != nullptr
+                    && c->pocket != pocket_type::player_hand
+                    && c->pocket != pocket_type::shop_selection;
+            })
+        )
+        | rv::filter([=](card_ptr origin_card) {
+            return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
         });
     }
 
     inline auto get_all_equip_targets(player_ptr origin, card_ptr origin_card, const effect_context &ctx = {}) {
-        return rv::filter(origin->m_game->m_players, [=](player_ptr target) {
+        return origin->m_game->m_players | rv::filter([=](player_ptr target) {
             return !get_equip_error(origin, origin_card, target, ctx);
         });
     }

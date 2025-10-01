@@ -24,27 +24,6 @@ namespace banggame {
         return false;
     }
 
-    static auto map_cards_playable_with_modifiers(
-        player_ptr origin, const card_list &modifiers, bool is_response, const effect_context &ctx,
-        auto function
-    ) {
-        auto map = [&](rn::forward_range auto &&range) {
-            return function(rv::filter(std::forward<decltype(range)>(range), [&](card_ptr origin_card) {
-                return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
-            }));
-        };
-
-        if (ctx.card_choice) {
-            return map(origin->m_game->m_hidden_deck);
-        } else if (ctx.traincost) {
-            return map(origin->m_game->m_train);
-        } else if (ctx.repeat_card) {
-            return map(rv::single(ctx.repeat_card));
-        } else {
-            return map(get_all_active_cards(origin));
-        }
-    }
-
     bool is_possible_to_play(player_ptr origin, card_ptr origin_card, bool is_response, const card_list &modifiers, const effect_context &ctx) {
         for (card_ptr mod_card : modifiers) {
             if (mod_card == origin_card) return false;
@@ -83,7 +62,7 @@ namespace banggame {
                 auto ctx_copy = ctx;
                 modifier.add_context(origin_card, origin, ctx_copy);
                 
-                return map_cards_playable_with_modifiers(origin, modifiers_copy, is_response, ctx_copy, std::not_fn(rn::empty));
+                return !rn::empty(get_all_playable_cards(origin, is_response, modifiers_copy, ctx_copy));
             }
         }
 
@@ -105,11 +84,9 @@ namespace banggame {
             modifier.add_context(origin_card, origin, ctx);
 
             modifiers.push_back(origin_card);
-            map_cards_playable_with_modifiers(origin, modifiers, is_response, ctx, [&](auto &&range) {
-                for (card_ptr target_card : range) {
-                    collect_playable_cards(result, modifiers, origin, target_card, is_response, ctx);
-                }
-            });
+            for (card_ptr target_card : get_all_playable_cards(origin, is_response, modifiers, ctx)) {
+                collect_playable_cards(result, modifiers, origin, target_card, is_response, ctx);
+            }
             modifiers.pop_back();
         }
     }
