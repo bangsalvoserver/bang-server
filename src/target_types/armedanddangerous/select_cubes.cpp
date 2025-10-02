@@ -4,10 +4,12 @@
 
 #include "game/game_table.h"
 
+#include "utils/combinations.h"
+
 namespace banggame {
 
-    bool targeting_select_cubes::is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
-        return count_cubes(origin) >= ncubes;
+    std::generator<card_list> targeting_select_cubes::possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
+        return utils::combinations(rn::to<card_list>(get_all_cubes(origin)), ncubes);
     }
 
     card_list targeting_select_cubes::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
