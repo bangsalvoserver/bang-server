@@ -17,6 +17,7 @@ namespace banggame {
                 modifiers_copy.push_back(origin_card);
 
                 auto ctx_copy = ctx;
+                ctx_copy.selected_cards.push_back(origin_card);
                 modifier.add_context(origin_card, origin, ctx_copy);
                 
                 return !rn::empty(get_all_playable_cards(origin, is_response, modifiers_copy, ctx_copy));
