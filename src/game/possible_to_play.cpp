@@ -2,12 +2,29 @@
 
 namespace banggame {
 
-    static bool is_possible_recurse(player_ptr origin, card_ptr origin_card, const effect_list &effects, const mth_holder &mth, const effect_context &ctx, target_list &targets) {
+    static bool is_possible_recurse(player_ptr origin, card_ptr origin_card, bool is_response, const card_list &modifiers, const effect_context &ctx, target_list &targets) {
+        const effect_list &effects = origin_card->get_effect_list(is_response);
+        
         if (targets.size() == effects.size()) {
-            return !(mth && mth.get_error(origin_card, origin, targets, ctx))
-                && !check_duplicates(ctx);
-        }
+            if (const mth_holder &mth = origin_card->get_mth(is_response)) {
+                if (mth.get_error(origin_card, origin, targets, ctx)) {
+                    return false;
+                }
+            }
 
+            if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
+                auto modifiers_copy = modifiers;
+                modifiers_copy.push_back(origin_card);
+
+                auto ctx_copy = ctx;
+                modifier.add_context(origin_card, origin, ctx_copy);
+                
+                return !rn::empty(get_all_playable_cards(origin, is_response, modifiers_copy, ctx_copy));
+            }
+
+            return !check_duplicates(ctx);
+        }
+        
         const effect_holder &effect = effects[targets.size()];
 
         for (play_card_target target : effect.possible_targets(origin_card, origin, ctx)) {
@@ -15,7 +32,7 @@ namespace banggame {
             effect.add_context(origin_card, origin, target, ctx_copy);
 
             targets.emplace_back(std::move(target));
-            if (is_possible_recurse(origin, origin_card, effects, mth, ctx_copy, targets)) {
+            if (is_possible_recurse(origin, origin_card, is_response, modifiers, ctx_copy, targets)) {
                 return true;
             }
             targets.pop_back();
@@ -35,9 +52,7 @@ namespace banggame {
         }
 
         if (origin_card->is_equip_card()) {
-            if (is_response || get_all_equip_targets(origin, origin_card, ctx).empty()) {
-                return false;
-            }
+            return !is_response && !rn::empty(get_all_equip_targets(origin, origin_card, ctx));
         } else {
             const effect_list &effects = origin_card->get_effect_list(is_response);
             if (effects.empty()) return false;
@@ -48,25 +63,10 @@ namespace banggame {
                 }
             }
 
-            const mth_holder &mth = origin_card->get_mth(is_response);
-
             target_list targets;
             targets.reserve(effects.size());
-            if (!is_possible_recurse(origin, origin_card, effects, mth, ctx, targets)) {
-                return false;
-            }
-
-            if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
-                auto modifiers_copy = modifiers;
-                modifiers_copy.push_back(origin_card);
-                auto ctx_copy = ctx;
-                modifier.add_context(origin_card, origin, ctx_copy);
-                
-                return !rn::empty(get_all_playable_cards(origin, is_response, modifiers_copy, ctx_copy));
-            }
+            return is_possible_recurse(origin, origin_card, is_response, modifiers, ctx, targets);
         }
-
-        return true;
     }
 
     static void collect_playable_cards(
