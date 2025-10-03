@@ -10,7 +10,7 @@
 
 namespace banggame {
     
-    bool is_possible_to_play(player_ptr origin, card_ptr origin_card, bool is_response = false, const card_list &modifiers = {}, const effect_context &ctx = {});
+    bool is_possible_to_play(player_ptr origin, card_ptr origin_card, bool is_response, card_list &modifiers, const effect_context &ctx);
 
     playable_cards_list generate_playable_cards_list(player_ptr origin, bool is_response = false);
 
@@ -28,7 +28,7 @@ namespace banggame {
         );
     }
 
-    inline auto get_all_playable_cards(player_ptr origin, bool is_response = false, const card_list &modifiers = {}, const effect_context &ctx = {}) {
+    inline auto get_all_active_cards(player_ptr origin, bool is_response, const effect_context &ctx = {}) {
         return rv::concat(
             origin->m_hand,
             origin->m_table,
@@ -46,10 +46,14 @@ namespace banggame {
                     && c->pocket != pocket_type::player_hand
                     && c->pocket != pocket_type::shop_selection;
             })
-        )
-        | rv::filter([=](card_ptr origin_card) {
-            return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
-        });
+        );
+    }
+
+    inline auto get_all_playable_cards(player_ptr origin, bool is_response = false, const effect_context &ctx = {}) {
+        return get_all_active_cards(origin, is_response, ctx)
+            | rv::filter([=, modifiers=card_list{}](card_ptr origin_card) mutable {
+                return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
+            });
     }
 
     inline auto get_all_equip_targets(player_ptr origin, card_ptr origin_card, const effect_context &ctx = {}) {

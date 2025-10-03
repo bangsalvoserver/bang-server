@@ -2,7 +2,7 @@
 
 namespace banggame {
 
-    static bool is_possible_recurse(player_ptr origin, card_ptr origin_card, bool is_response, const card_list &modifiers, const effect_context &ctx, target_list &targets) {
+    static bool is_possible_recurse(player_ptr origin, card_ptr origin_card, bool is_response, card_list &modifiers, const effect_context &ctx, target_list &targets) {
         const effect_list &effects = origin_card->get_effect_list(is_response);
         
         if (targets.size() == effects.size()) {
@@ -13,14 +13,19 @@ namespace banggame {
             }
 
             if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
-                auto modifiers_copy = modifiers;
-                modifiers_copy.push_back(origin_card);
-
                 auto ctx_copy = ctx;
                 ctx_copy.selected_cards.push_back(origin_card);
                 modifier.add_context(origin_card, origin, ctx_copy);
-                
-                return !rn::empty(get_all_playable_cards(origin, is_response, modifiers_copy, ctx_copy));
+
+                modifiers.push_back(origin_card);
+                for (card_ptr target_card : get_all_active_cards(origin, is_response, ctx_copy)) {
+                    if (is_possible_to_play(origin, target_card, is_response, modifiers, ctx_copy)) {
+                        modifiers.pop_back();
+                        return true;
+                    }
+                }
+                modifiers.pop_back();
+                return false;
             }
 
             return !check_duplicates(ctx);
@@ -34,6 +39,7 @@ namespace banggame {
 
             targets.emplace_back(std::move(target));
             if (is_possible_recurse(origin, origin_card, is_response, modifiers, ctx_copy, targets)) {
+                targets.pop_back();
                 return true;
             }
             targets.pop_back();
@@ -42,7 +48,7 @@ namespace banggame {
         return false;
     }
 
-    bool is_possible_to_play(player_ptr origin, card_ptr origin_card, bool is_response, const card_list &modifiers, const effect_context &ctx) {
+    bool is_possible_to_play(player_ptr origin, card_ptr origin_card, bool is_response, card_list &modifiers, const effect_context &ctx) {
         for (card_ptr mod_card : modifiers) {
             if (mod_card == origin_card) return false;
             if (mod_card->get_modifier(is_response).get_error(mod_card, origin, origin_card, ctx)) return false;
@@ -72,7 +78,7 @@ namespace banggame {
 
     static void collect_playable_cards(
         playable_cards_list &result, card_list &modifiers,
-        player_ptr origin, card_ptr origin_card, bool is_response, effect_context ctx
+        player_ptr origin, card_ptr origin_card, bool is_response, const effect_context &ctx
     ) {
         const modifier_holder &modifier = origin_card->get_modifier(is_response);
         if (origin_card->is_equip_card() || !modifier) {
@@ -82,11 +88,14 @@ namespace banggame {
                 result.emplace_back(origin_card, modifiers, ctx);
             }
         } else {
-            modifier.add_context(origin_card, origin, ctx);
+            effect_context ctx_copy = ctx;
+            modifier.add_context(origin_card, origin, ctx_copy);
 
             modifiers.push_back(origin_card);
-            for (card_ptr target_card : get_all_playable_cards(origin, is_response, modifiers, ctx)) {
-                collect_playable_cards(result, modifiers, origin, target_card, is_response, ctx);
+            for (card_ptr target_card : get_all_active_cards(origin, is_response, ctx_copy)) {
+                if (is_possible_to_play(origin, target_card, is_response, modifiers, ctx_copy)) {
+                    collect_playable_cards(result, modifiers, origin, target_card, is_response, ctx_copy);
+                }
             }
             modifiers.pop_back();
         }
@@ -94,11 +103,15 @@ namespace banggame {
 
     playable_cards_list generate_playable_cards_list(player_ptr origin, bool is_response) {
         playable_cards_list result;
-        card_list modifiers;
-
+        
         if (origin) {
-            for (card_ptr origin_card : get_all_playable_cards(origin, is_response)) {
-                collect_playable_cards(result, modifiers, origin, origin_card, is_response, {});
+            effect_context ctx{};
+            card_list modifiers;
+
+            for (card_ptr origin_card : get_all_active_cards(origin, is_response, ctx)) {
+                if (is_possible_to_play(origin, origin_card, is_response, modifiers, ctx)) {
+                    collect_playable_cards(result, modifiers, origin, origin_card, is_response, ctx);
+                }
             }
         }
 
