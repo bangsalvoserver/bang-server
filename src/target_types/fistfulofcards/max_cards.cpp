@@ -8,12 +8,11 @@ namespace banggame {
 
     card_list targeting_max_cards::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
         auto targets = target_card.possible_targets(origin_card, origin, effect, ctx);
-        size_t count = ncards;
-        if (count == 0) {
-            auto dist = std::uniform_int_distribution<size_t>{1, static_cast<size_t>(rn::distance(targets))};
-            count = dist(origin->m_game->bot_rng);
+        if (ncards == 0) {
+            return sample_elements_streaming(targets, 0.6, origin->m_game->bot_rng);
+        } else {
+            return sample_elements(targets, ncards, origin->m_game->bot_rng);
         }
-        return sample_elements(targets, count, origin->m_game->bot_rng);
     }
 
     game_string targeting_max_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {

@@ -12,6 +12,8 @@
 #include "game/game_table.h"
 #include "game/game_options.h"
 
+#include "utils/random_element.h"
+
 namespace banggame {
 
     struct request_choose_scenario : selection_picker, interface_resolvable {

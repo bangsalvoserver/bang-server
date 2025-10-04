@@ -1,7 +1,10 @@
 #include "become_legend.h"
 
 #include "cards/game_enums.h"
+
 #include "game/game_table.h"
+
+#include "utils/random_element.h"
 
 namespace banggame {
 

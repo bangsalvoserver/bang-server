@@ -5,6 +5,8 @@
 
 #include "game/game_table.h"
 
+#include "utils/random_element.h"
+
 namespace banggame {
 
     struct targeting_player : target_args::player {

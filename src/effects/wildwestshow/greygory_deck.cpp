@@ -6,6 +6,8 @@
 
 #include "game/game_table.h"
 
+#include "utils/random_element.h"
+
 namespace banggame {
 	
     static auto get_possible_cards(card_ptr origin_card, player_ptr origin, bool allow_expansions) {

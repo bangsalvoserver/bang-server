@@ -17,6 +17,8 @@
 #include "effects/base/predraw_check.h"
 #include "effects/base/requests.h"
 
+#include "utils/random_element.h"
+
 namespace banggame {
 
     bool player::is_bot() const {

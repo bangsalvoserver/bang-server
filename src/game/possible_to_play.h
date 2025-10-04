@@ -6,7 +6,7 @@
 #include "filters.h"
 #include "play_verify.h"
 
-#include "utils/range_utils.h"
+#include "utils/random_element.h"
 
 namespace banggame {
     

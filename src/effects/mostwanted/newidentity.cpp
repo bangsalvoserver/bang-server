@@ -6,6 +6,8 @@
 
 #include "game/game_table.h"
 
+#include "utils/random_element.h"
+
 namespace banggame {
 
     struct request_newidentity : request_picking {
