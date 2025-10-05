@@ -307,12 +307,12 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
         }
         send_message(session->client, server_messages::game_started{});
 
-        for (game_update &&update : lobby.m_game->get_spectator_join_updates()) {
-            send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
+        for (json::raw_string &&update : lobby.m_game->get_spectator_join_updates()) {
+            send_message(session->client, server_messages::game_update{ std::move(update) });
         }
         if (target) {
-            for (game_update &&update : lobby.m_game->get_rejoin_updates(target)) {
-                send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
+            for (json::raw_string &&update : lobby.m_game->get_rejoin_updates(target)) {
+                send_message(session->client, server_messages::game_update{ std::move(update) });
             }
         }
         for (json::raw_string &&update : lobby.m_game->get_game_log_updates(target)) {
@@ -681,8 +681,8 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
 
     lobby.m_game->add_update(game_updates::player_add{ target });
     
-    for (game_update &&update : lobby.m_game->get_rejoin_updates(target)) {
-        send_message(session->client, server_messages::game_update{ lobby.m_game->serialize_update(update) });
+    for (json::raw_string &&update : lobby.m_game->get_rejoin_updates(target)) {
+        send_message(session->client, server_messages::game_update{ std::move(update) });
     }
     for (json::raw_string &&update : lobby.m_game->get_game_log_updates(target)) {
         send_message(session->client, server_messages::game_update{ std::move(update) });

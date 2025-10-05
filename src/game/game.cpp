@@ -147,104 +147,107 @@ namespace banggame {
         return std::chrono::duration_cast<ticks>(transform_duration(result));
     }
 
-    std::generator<game_update> game::get_spectator_join_updates() {
-        co_yield make_preload_assets_update(this);
+    #define YIELD_UPDATE(...) co_yield serialize_update(__VA_ARGS__)
+    #define YIELD_ALL_OF(...) co_yield rn::elements_of(__VA_ARGS__)
 
-        co_yield game_updates::player_add{ m_players };
+    std::generator<json::raw_string> game::get_spectator_join_updates() {
+        YIELD_UPDATE(make_preload_assets_update(this));
+
+        YIELD_UPDATE(game_updates::player_add{ m_players });
 
         for (player_ptr p : m_players) {
-            co_yield game_updates::player_flags{ p, p->m_player_flags };
+            YIELD_UPDATE(game_updates::player_flags{ p, p->m_player_flags });
         }
 
-        co_yield game_updates::player_order{ m_players, 0ms };
+        YIELD_UPDATE(game_updates::player_order{ m_players, 0ms });
 
-        auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) -> std::generator<game_update> {
+        auto add_cards = [&](pocket_type pocket, player_ptr owner = nullptr) -> std::generator<json::raw_string> {
             auto &range = get_pocket(pocket, owner);
             if (!range.empty()) {
-                co_yield game_updates::add_cards{ range, pocket, owner };
+                YIELD_UPDATE(game_updates::add_cards{ range, pocket, owner });
             }
             for (card_ptr c : range) {
                 if (c->get_visibility() == card_visibility::shown) {
-                    co_yield game_updates::show_card{ c, *c, 0ms };
+                    YIELD_UPDATE(game_updates::show_card{ c, *c, 0ms });
                 }
                 for (const auto &[token, count] : c->tokens) {
                     if (count > 0) {
-                        co_yield game_updates::add_tokens{ token, count, token_positions::card{c} };
+                        YIELD_UPDATE(game_updates::add_tokens{ token, count, token_positions::card{c} });
                     }
                 }
                 if (c->inactive) {
-                    co_yield game_updates::tap_card{ c, true, 0ms };
+                    YIELD_UPDATE(game_updates::tap_card{ c, true, 0ms });
                 }
             }
         };
 
-        co_yield std::ranges::elements_of(add_cards(pocket_type::button_row));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::main_deck));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::shop_deck));
+        YIELD_ALL_OF(add_cards(pocket_type::button_row));
+        YIELD_ALL_OF(add_cards(pocket_type::main_deck));
+        YIELD_ALL_OF(add_cards(pocket_type::shop_deck));
 
-        co_yield std::ranges::elements_of(add_cards(pocket_type::discard_pile));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::selection));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::shop_selection));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::hidden_deck));
+        YIELD_ALL_OF(add_cards(pocket_type::discard_pile));
+        YIELD_ALL_OF(add_cards(pocket_type::selection));
+        YIELD_ALL_OF(add_cards(pocket_type::shop_selection));
+        YIELD_ALL_OF(add_cards(pocket_type::hidden_deck));
 
         if (train_position != 0) {
-            co_yield game_updates::move_train{ train_position, 0ms };
+            YIELD_UPDATE(game_updates::move_train{ train_position, 0ms });
         }
 
-        co_yield std::ranges::elements_of(add_cards(pocket_type::stations));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::train_deck));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::train));
+        YIELD_ALL_OF(add_cards(pocket_type::stations));
+        YIELD_ALL_OF(add_cards(pocket_type::train_deck));
+        YIELD_ALL_OF(add_cards(pocket_type::train));
 
-        co_yield std::ranges::elements_of(add_cards(pocket_type::scenario_deck));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::scenario_card));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::wws_scenario_deck));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::wws_scenario_card));
+        YIELD_ALL_OF(add_cards(pocket_type::scenario_deck));
+        YIELD_ALL_OF(add_cards(pocket_type::scenario_card));
+        YIELD_ALL_OF(add_cards(pocket_type::wws_scenario_deck));
+        YIELD_ALL_OF(add_cards(pocket_type::wws_scenario_card));
 
-        co_yield std::ranges::elements_of(add_cards(pocket_type::feats_deck));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::feats_discard));
-        co_yield std::ranges::elements_of(add_cards(pocket_type::feats));
+        YIELD_ALL_OF(add_cards(pocket_type::feats_deck));
+        YIELD_ALL_OF(add_cards(pocket_type::feats_discard));
+        YIELD_ALL_OF(add_cards(pocket_type::feats));
         
         for (const auto &[token, count] : tokens) {
             if (count > 0) {
-                co_yield game_updates::add_tokens{ token, count, token_positions::table{} };
+                YIELD_UPDATE(game_updates::add_tokens{ token, count, token_positions::table{} });
             }
         }
 
         for (player_ptr p : m_players) {
             if (p->check_player_flags(player_flag::role_revealed)) {
-                co_yield game_updates::player_show_role{ p, p->m_role, 0ms };
+                YIELD_UPDATE(game_updates::player_show_role{ p, p->m_role, 0ms });
             }
 
             if (!p->check_player_flags(player_flag::removed)) {
-                co_yield std::ranges::elements_of(add_cards(pocket_type::player_character, p));
+                YIELD_ALL_OF(add_cards(pocket_type::player_character, p));
 
-                co_yield std::ranges::elements_of(add_cards(pocket_type::player_table, p));
-                co_yield std::ranges::elements_of(add_cards(pocket_type::player_hand, p));
+                YIELD_ALL_OF(add_cards(pocket_type::player_table, p));
+                YIELD_ALL_OF(add_cards(pocket_type::player_hand, p));
 
-                co_yield game_updates::player_hp{ p, p->m_hp, 0ms };
+                YIELD_UPDATE(game_updates::player_hp{ p, p->m_hp, 0ms });
 
                 for (const auto &[token, count] : p->tokens) {
                     if (count > 0) {
-                        co_yield game_updates::add_tokens{ token, count, token_positions::player{p} };
+                        YIELD_UPDATE(game_updates::add_tokens{ token, count, token_positions::player{p} });
                     }
                 }
             }
         }
 
         if (m_playing) {
-            co_yield game_updates::switch_turn{ m_playing };
+            YIELD_UPDATE(game_updates::switch_turn{ m_playing });
         }
         if (!is_waiting()) {
             if (auto req = top_request()) {
-                co_yield make_request_update(*req);
+                YIELD_UPDATE(make_request_update(*req));
             }
         }
 
-        co_yield game_updates::game_flags{ m_game_flags };
+        YIELD_UPDATE(game_updates::game_flags{ m_game_flags });
     }
 
     std::generator<json::raw_string> game::get_game_log_updates(player_ptr target) {
-        co_yield serialize_update(game_updates::clear_logs{});
+        YIELD_UPDATE(game_updates::clear_logs{});
         
         for (const auto &[upd_target, content] : m_saved_log) {
             if (upd_target.matches(target)) {
@@ -253,18 +256,18 @@ namespace banggame {
         }
     }
 
-    std::generator<game_update> game::get_rejoin_updates(player_ptr target) {
-        co_yield game_updates::player_add{ target };
+    std::generator<json::raw_string> game::get_rejoin_updates(player_ptr target) {
+        YIELD_UPDATE(game_updates::player_add{ target });
 
         if (!target->check_player_flags(player_flag::role_revealed)) {
-            co_yield game_updates::player_show_role{ target, target->m_role, 0ms };
+            YIELD_UPDATE(game_updates::player_show_role{ target, target->m_role, 0ms });
         }
 
         if (!check_flags(game_flag::hands_shown)) {
             for (player_ptr p : m_players) {
                 for (card_ptr c : p->m_hand) {
                     if (c->visibility.matches(target)) {
-                        co_yield game_updates::show_card{ c, *c, 0ms };
+                        YIELD_UPDATE(game_updates::show_card{ c, *c, 0ms });
                     }
                 }
             }
@@ -272,18 +275,21 @@ namespace banggame {
 
         for (card_ptr c : m_selection) {
             if (c->visibility.matches(target)) {
-                co_yield game_updates::show_card{ c, *c, 0ms };
+                YIELD_UPDATE(game_updates::show_card{ c, *c, 0ms });
             }
         }
 
         if (!is_game_over() && !is_waiting()) {
             if (auto req = top_request()) {
-                co_yield make_request_update(*req, target);
+                YIELD_UPDATE(make_request_update(*req, target));
             } else if (target == m_playing) {
-                co_yield make_status_ready_update(target);
+                YIELD_UPDATE(make_status_ready_update(target));
             }
         }
     }
+
+    #undef YIELD_UPDATE
+    #undef YIELD_ALL_OF
 
     static bool matches_expansions(const expansion_list &lhs, const expansion_set &rhs) {
         for (ruleset_ptr ruleset : lhs) {
