@@ -102,8 +102,10 @@ void game_manager::tick() {
                     lobby.m_game->tick();
                 }
 
-                for (auto &&[target_id, update] : lobby.m_game->get_pending_updates(lobby.connected_user_ids)) {
-                    send_message(lobby.find_user(target_id).session->client, server_messages::game_update{ std::move(update) });
+                if (lobby.m_game->pending_updates()) {
+                    for (auto &&[target_id, update] : lobby.m_game->get_pending_updates(lobby.connected_user_ids)) {
+                        send_message(lobby.find_user(target_id).session->client, server_messages::game_update{ std::move(update) });
+                    }
                 }
 
                 if (lobby.m_game->is_game_over()) {

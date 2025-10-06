@@ -164,7 +164,7 @@ namespace banggame {
     }
 
     std::generator<std::pair<int, json::raw_string>> game::get_pending_updates(std::span<const int> user_ids) {
-        while (!m_updates.empty()) {
+        while (pending_updates()) {
             const game_update_record &update = m_updates.front();
             
             for (int user_id : user_ids) {

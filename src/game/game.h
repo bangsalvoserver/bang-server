@@ -11,6 +11,7 @@ namespace banggame {
         virtual ~game_interface() = default;
 
         virtual void tick() = 0;
+        virtual bool pending_updates() const = 0;
         virtual std::generator<std::pair<int, json::raw_string>> get_pending_updates(std::span<const int> user_ids) = 0;
         virtual std::generator<json::raw_string> get_spectator_join_updates() = 0;
         virtual std::generator<json::raw_string> get_rejoin_updates(int user_id) = 0;
@@ -27,6 +28,10 @@ namespace banggame {
             game_table::tick();
         }
 
+        bool pending_updates() const override {
+            return !m_updates.empty();
+        }
+        
         std::generator<std::pair<int, json::raw_string>> get_pending_updates(std::span<const int> user_ids) override;
         std::generator<json::raw_string> get_spectator_join_updates() override;
         std::generator<json::raw_string> get_rejoin_updates(int user_id) override;
