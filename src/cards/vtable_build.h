@@ -9,6 +9,8 @@
 #include "game/game_table.h"
 #include "game/filters.h"
 
+#include "utils/random_element.h"
+
 namespace banggame {
     
     template<typename T>
@@ -420,7 +422,12 @@ namespace banggame {
             },
 
             .random_target = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) -> play_card_target {
-                return play_card_target{value_type{effect_cast<T>(effect.target_value).random_target(origin_card, origin, effect, ctx)}};
+                auto &&handler = effect_cast<T>(effect.target_value);
+                if constexpr (requires { handler.random_target(origin_card, origin, effect, ctx); }) {
+                    return play_card_target{value_type{handler.random_target(origin_card, origin, effect, ctx)}};
+                } else {
+                    return play_card_target{value_type{random_element(handler.possible_targets(origin_card, origin, effect, ctx), origin->m_game->bot_rng)}};
+                }
             },
 
             .get_error = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const play_card_target &target) -> game_string {

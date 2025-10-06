@@ -24,7 +24,7 @@ namespace banggame {
             if (ctx.repeat_card) {
                 return nullptr;
             } else {
-                return targeting_card::random_target(origin_card, origin, effect, ctx);
+                return random_element(targeting_card::possible_targets(origin_card, origin, effect, ctx), origin->m_game->bot_rng);
             }
         }
 

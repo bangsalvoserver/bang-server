@@ -21,10 +21,6 @@ namespace banggame {
                     return !get_error(origin_card, origin, effect, ctx, target_card);
                 });
         }
-
-        card_ptr random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
-            return random_element(possible_targets(origin_card, origin, effect, ctx), origin->m_game->bot_rng);
-        }
         
         void on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
             if (target->pocket == pocket_type::player_hand) {

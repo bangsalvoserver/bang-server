@@ -38,7 +38,7 @@ namespace banggame {
 
         value_type random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
             auto cubes = target_cubes.random_target(origin_card, origin, effect, ctx);
-            auto target = target_player.random_target(origin_card, origin, effect, ctx);
+            auto target = random_element(target_player.possible_targets(origin_card, origin, effect, ctx), origin->m_game->bot_rng);
             return { cubes, target };
         }
 

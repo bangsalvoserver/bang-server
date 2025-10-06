@@ -35,10 +35,6 @@ namespace banggame {
                 });
         }
 
-        card_ptr random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
-            return random_element(possible_targets(origin_card, origin, effect, ctx), origin->m_game->bot_rng);
-        }
-
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target);
     };
 
