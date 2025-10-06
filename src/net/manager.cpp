@@ -116,7 +116,7 @@ void game_manager::tick() {
                 broadcast_lobby_update(lobby);
             }
         }
-        if (lobby.connected_users().empty()) {
+        if (lobby.connected_user_ids.empty()) {
             if (--lobby.lifetime <= ticks{0}) {
                 broadcast_message_no_lobby(server_messages::lobby_removed{ lobby.lobby_id });
                 return true;
@@ -645,7 +645,7 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
         throw lobby_error("ERROR_USER_NOT_SPECTATOR");
     }
 
-    if (rn::contains(lobby.connected_users(), args.user_id, &game_user::user_id)) {
+    if (rn::contains(lobby.connected_user_ids, args.user_id)) {
         throw lobby_error("ERROR_PLAYER_NOT_REJOINABLE");
     }
 
