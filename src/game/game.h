@@ -7,14 +7,38 @@
 
 namespace banggame {
 
-    struct game : game_table {
-        using game_table::game_table;
-        
-        std::generator<json::raw_string> get_spectator_join_updates();
-        std::generator<json::raw_string> get_game_log_updates(player_ptr target);
-        std::generator<json::raw_string> get_rejoin_updates(player_ptr target);
+    struct game_interface {
+        virtual ~game_interface() = default;
 
-        void start_game();
+        virtual void tick() = 0;
+        virtual std::generator<std::pair<int, json::raw_string>> get_pending_updates(std::span<const int> user_ids) = 0;
+        virtual std::generator<json::raw_string> get_spectator_join_updates() = 0;
+        virtual std::generator<json::raw_string> get_rejoin_updates(int user_id) = 0;
+        virtual void handle_game_action(int user_id, const json::json &action) = 0;
+        virtual void rejoin_user(int old_user_id, int new_user_id) = 0;
+        virtual void start_game(std::span<int> user_ids) = 0;
+        virtual bool is_game_over() const = 0;
+    };
+
+    struct game : game_interface, game_table {
+        using game_table::game_table;
+    
+        void tick() override {
+            game_table::tick();
+        }
+
+        std::generator<std::pair<int, json::raw_string>> get_pending_updates(std::span<const int> user_ids) override;
+        std::generator<json::raw_string> get_spectator_join_updates() override;
+        std::generator<json::raw_string> get_rejoin_updates(int user_id) override;
+
+        void handle_game_action(int user_id, const json::json &action) override;
+
+        void rejoin_user(int old_user_id, int new_user_id) override;
+        void start_game(std::span<int> user_ids) override;
+
+        bool is_game_over() const override {
+            return game_table::is_game_over();
+        }
 
         ticks get_total_update_time() const override;
         void send_request_update() override;

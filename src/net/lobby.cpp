@@ -38,21 +38,15 @@ namespace banggame {
             .propic = propic
         };
     }
-    
-    std::pair<game_user &, bool> game_lobby::add_user(session_ptr session) {
-        session->lobby = this;
-        if (auto it = users_by_session.find(session); it != users_by_session.end()) {
-            return {users[it->second - 1], false};
-        } else {
-            game_user &user = users.emplace_back(users.size() + 1, session);
-            users_by_session.emplace(session, user.user_id);
-            return {user, true};
-        }
+
+    game_user &game_lobby::find_user(int user_id) {
+        return users[user_id - 1];
     }
 
     game_user &game_lobby::find_user(session_ptr session) {
-        if (auto it = users_by_session.find(session); it != users_by_session.end()) {
-            return users[it->second - 1];
+        auto it = users_by_session.find(session);
+        if (it != users_by_session.end()) {
+            return find_user(it->second);
         }
         throw lobby_error("CANNOT_FIND_USER");
     }
@@ -63,7 +57,8 @@ namespace banggame {
         int user_id;
         if (auto [end, ec] = std::from_chars(name_or_id.data(), name_or_id.data() + name_or_id.size(), user_id); ec == std::errc{}) {
             if (user_id >= 1 && user_id <= users.size()) {
-                if (game_user &user = users[user_id - 1]; !user.is_disconnected()) {
+                game_user &user = find_user(user_id);
+                if (!user.is_disconnected()) {
                     return user;
                 }
             }
@@ -79,6 +74,19 @@ namespace banggame {
         }
         
         throw lobby_error("CANNOT_FIND_USER");
+    }
+    
+    std::pair<game_user &, bool> game_lobby::add_user(session_ptr session) {
+        session->lobby = this;
+        if (auto it = users_by_session.find(session); it != users_by_session.end()) {
+            return {find_user(it->second), false};
+        } else {
+            int user_id = users.size() + 1;
+            game_user &user = users.emplace_back(user_id, session);
+            users_by_session.emplace(session, user_id);
+            connected_user_ids.push_back(user_id);
+            return {user, true};
+        }
     }
 
     std::string game_lobby::crop_lobby_name(const std::string &name) {

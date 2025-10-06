@@ -97,12 +97,15 @@ namespace banggame {
         game_lobby &lobby = *session->lobby;
         game_user &user = lobby.find_user(session);
 
-        player_ptr target = lobby.m_game->find_player_by_userid(user.user_id);
+        // TODO generalize game specific chat commands
+        game *m_game = dynamic_cast<game *>(lobby.m_game.get());
+
+        player_ptr target = m_game->find_player_by_userid(user.user_id);
         if (!target) {
             throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");
         }
 
-        if (lobby.m_game->pending_requests() || lobby.m_game->is_waiting() || lobby.m_game->m_playing != target) {
+        if (m_game->pending_requests() || m_game->is_waiting() || m_game->m_playing != target) {
             throw lobby_error("ERROR_PLAYER_NOT_IN_TURN");
         }
 
@@ -112,8 +115,13 @@ namespace banggame {
     }
 
     void game_manager::command_get_rng_seed(session_ptr session) {
+        game_lobby &lobby = *session->lobby;
+        
+        // TODO generalize game specific chat commands
+        game *m_game = dynamic_cast<game *>(lobby.m_game.get());
+
         send_message(session->client, server_messages::lobby_chat{0,
-            "GAME_SEED", {chat_format_arg::string{std::format("{}", session->lobby->m_game->rng_seed)}}, lobby_chat_flag::translated
+            "GAME_SEED", {chat_format_arg::string{std::format("{}", m_game->rng_seed)}}, lobby_chat_flag::translated
         });
     }
 

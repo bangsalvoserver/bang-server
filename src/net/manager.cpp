@@ -101,14 +101,9 @@ void game_manager::tick() {
                     auto guard = logging::push_context(std::format("game {}", lobby.name));
                     lobby.m_game->tick();
                 }
-                
-                while (lobby.m_game->pending_updates()) {
-                    auto [target, update, update_time] = lobby.m_game->get_next_update();
-                    for (const game_user &user : lobby.connected_users()) {
-                        if (target.matches(lobby.m_game->find_player_by_userid(user.user_id))) {
-                            send_message(user.session->client, server_messages::game_update{ update });
-                        }
-                    }
+
+                for (auto &&[target_id, update] : lobby.m_game->get_pending_updates(lobby.connected_user_ids)) {
+                    send_message(lobby.find_user(target_id).session->client, server_messages::game_update{ std::move(update) });
                 }
 
                 if (lobby.m_game->is_game_over()) {
@@ -275,7 +270,10 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
     
     if (new_user.flags.check(game_user_flag::disconnected)) {
         new_user.flags.remove(game_user_flag::disconnected);
+        lobby.connected_user_ids.push_back(new_user.user_id);
         inserted = true;
+    } else if (inserted && lobby.m_game) {
+        new_user.flags.add(game_user_flag::spectator);
     }
 
     if (rn::none_of(lobby.connected_users(), &game_user::is_lobby_owner)) {
@@ -300,22 +298,13 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
         });
     }
     
-    if (lobby.state != lobby_state::waiting && lobby.m_game) {
-        player_ptr target = lobby.m_game->find_player_by_userid(new_user.user_id);
-        if (!target) {
-            add_user_flag(lobby, new_user, game_user_flag::spectator);
-        }
+    if (lobby.m_game) {
         send_message(session->client, server_messages::game_started{});
 
         for (json::raw_string &&update : lobby.m_game->get_spectator_join_updates()) {
             send_message(session->client, server_messages::game_update{ std::move(update) });
         }
-        if (target) {
-            for (json::raw_string &&update : lobby.m_game->get_rejoin_updates(target)) {
-                send_message(session->client, server_messages::game_update{ std::move(update) });
-            }
-        }
-        for (json::raw_string &&update : lobby.m_game->get_game_log_updates(target)) {
+        for (json::raw_string &&update : lobby.m_game->get_rejoin_updates(new_user.user_id)) {
             send_message(session->client, server_messages::game_update{ std::move(update) });
         }
     }
@@ -364,6 +353,7 @@ void game_manager::kick_user_from_lobby(session_ptr session) {
     game_user &user = lobby.find_user(session);
 
     add_user_flag(lobby, user, game_user_flag::disconnected);
+    std::erase(lobby.connected_user_ids, user.user_id);
 
     if (remove_user_flag(lobby, user, game_user_flag::lobby_owner)) {
         if (auto range = lobby.connected_users()) {
@@ -626,9 +616,9 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
         }
     }
 
-    auto names = sample_elements_r<std::string_view>(bot_info.names, num_bots, lobby.m_game->bot_rng);
+    auto names = sample_elements_r<std::string_view>(bot_info.names, num_bots, session_rng);
 
-    auto propics = sample_elements_r<image_pixels_hash>(bot_info.propics, num_bots, lobby.m_game->bot_rng);
+    auto propics = sample_elements_r<image_pixels_hash>(bot_info.propics, num_bots, session_rng);
 
     for (int i=0; i < num_bots; ++i) {
         int bot_id = -1-i;
@@ -640,9 +630,7 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
     
     broadcast_lobby_update(lobby);
 
-    lobby.m_game->add_players(user_ids);
-    lobby.m_game->start_game();
-    lobby.m_game->commit_updates();
+    lobby.m_game->start_game(user_ids);
 }
 
 void game_manager::handle_message(client_messages::game_rejoin &&args, session_ptr session) {
@@ -661,30 +649,22 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
         throw lobby_error("ERROR_PLAYER_NOT_REJOINABLE");
     }
 
-    player_ptr target = lobby.m_game->find_player_by_userid(args.user_id);
-    if (!target) {
-        throw lobby_error("ERROR_CANNOT_FIND_PLAYER");
-    }
-    if (target->is_bot()) {
+    if (args.user_id < 0) {
         if (lobby.options.allow_bot_rejoin) {
             auto it = rn::find(lobby.bots, args.user_id, &lobby_bot::user_id);
-            if (it != lobby.bots.end()) {
-                lobby.bots.erase(it);
+            if (it == lobby.bots.end()) {
+                throw lobby_error("ERROR_CANNOT_FIND_BOT");
             }
+            lobby.bots.erase(it);
         } else {
             throw lobby_error("ERROR_CANNOT_REJOIN_ON_BOT");
         }
     }
 
     remove_user_flag(lobby, user, game_user_flag::spectator);
-    lobby.m_game->update_player_userid(target, user.user_id);
-
-    lobby.m_game->add_update(game_updates::player_add{ target });
+    lobby.m_game->rejoin_user(args.user_id, user.user_id);
     
-    for (json::raw_string &&update : lobby.m_game->get_rejoin_updates(target)) {
-        send_message(session->client, server_messages::game_update{ std::move(update) });
-    }
-    for (json::raw_string &&update : lobby.m_game->get_game_log_updates(target)) {
+    for (json::raw_string &&update : lobby.m_game->get_rejoin_updates(user.user_id)) {
         send_message(session->client, server_messages::game_update{ std::move(update) });
     }
 
@@ -702,18 +682,9 @@ void game_manager::handle_message(client_messages::game_action &&args, session_p
         throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
     }
 
-    if (lobby.m_game->is_waiting()) {
-        throw lobby_error("ERROR_GAME_STATE_WAITING");
-    }
-
-    player_ptr origin = lobby.m_game->find_player_by_userid(user.user_id);
-    if (!origin) {
-        throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");
-    }
-
     try {
         auto guard = logging::push_context(std::format("game {}", lobby.name));
-        lobby.m_game->handle_game_action(origin, args.action);
+        lobby.m_game->handle_game_action(user.user_id, args.action);
     } catch (const game_error &e) {
         lobby.state = lobby_state::finished;
         add_lobby_chat_message(lobby, nullptr, { 0, "GAME_ERROR", {chat_format_arg::string{e.what()}}, lobby_chat_flag::translated });

@@ -37,16 +37,6 @@ namespace banggame {
         std::unordered_map<int, player_ptr> m_players_by_userid;
 
     public:
-        bool pending_updates() const {
-            return !m_updates.empty();
-        }
-
-        game_update_record get_next_update() {
-            auto update = std::move(m_updates.front());
-            m_updates.pop_front();
-            return update;
-        }
-        
         json::raw_string serialize_update(const game_update &update) const;
 
         void handle_game_action(player_ptr origin, const json::json &value);

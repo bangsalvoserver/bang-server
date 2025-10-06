@@ -14,6 +14,8 @@
 #include "play_verify.h"
 #include "possible_to_play.h"
 
+#include "net/lobby.h"
+
 #include <array>
 #include <unordered_set>
 
@@ -150,6 +152,31 @@ namespace banggame {
     #define YIELD_UPDATE(...) co_yield serialize_update(__VA_ARGS__)
     #define YIELD_ALL_OF(...) co_yield rn::elements_of(__VA_ARGS__)
 
+    void game::handle_game_action(int user_id, const json::json &action) {
+        if (is_waiting()) {
+            throw lobby_error("ERROR_GAME_STATE_WAITING");
+        }
+        player_ptr origin = find_player_by_userid(user_id);
+        if (!origin) {
+            throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");
+        }
+        game_table::handle_game_action(origin, action);
+    }
+
+    std::generator<std::pair<int, json::raw_string>> game::get_pending_updates(std::span<const int> user_ids) {
+        while (!m_updates.empty()) {
+            const game_update_record &update = m_updates.front();
+            
+            for (int user_id : user_ids) {
+                if (update.target.matches(find_player_by_userid(user_id))) {
+                    co_yield {user_id, update.content};
+                }
+            }
+
+            m_updates.pop_front();
+        }
+    }
+
     std::generator<json::raw_string> game::get_spectator_join_updates() {
         YIELD_UPDATE(make_preload_assets_update(this));
 
@@ -246,44 +273,46 @@ namespace banggame {
         YIELD_UPDATE(game_updates::game_flags{ m_game_flags });
     }
 
-    std::generator<json::raw_string> game::get_game_log_updates(player_ptr target) {
+    std::generator<json::raw_string> game::get_rejoin_updates(int user_id) {
+        player_ptr target = find_player_by_userid(user_id);
+
+        if (target) {
+            YIELD_UPDATE(game_updates::player_add{ target });
+
+            if (!target->check_player_flags(player_flag::role_revealed)) {
+                YIELD_UPDATE(game_updates::player_show_role{ target, target->m_role, 0ms });
+            }
+
+            if (!check_flags(game_flag::hands_shown)) {
+                for (player_ptr p : m_players) {
+                    for (card_ptr c : p->m_hand) {
+                        if (c->visibility.matches(target)) {
+                            YIELD_UPDATE(game_updates::show_card{ c, *c, 0ms });
+                        }
+                    }
+                }
+            }
+
+            for (card_ptr c : m_selection) {
+                if (c->visibility.matches(target)) {
+                    YIELD_UPDATE(game_updates::show_card{ c, *c, 0ms });
+                }
+            }
+
+            if (!is_game_over() && !is_waiting()) {
+                if (auto req = top_request()) {
+                    YIELD_UPDATE(make_request_update(*req, target));
+                } else if (target == m_playing) {
+                    YIELD_UPDATE(make_status_ready_update(target));
+                }
+            }
+        }
+
         YIELD_UPDATE(game_updates::clear_logs{});
         
         for (const auto &[upd_target, content] : m_saved_log) {
             if (upd_target.matches(target)) {
                 co_yield content;
-            }
-        }
-    }
-
-    std::generator<json::raw_string> game::get_rejoin_updates(player_ptr target) {
-        YIELD_UPDATE(game_updates::player_add{ target });
-
-        if (!target->check_player_flags(player_flag::role_revealed)) {
-            YIELD_UPDATE(game_updates::player_show_role{ target, target->m_role, 0ms });
-        }
-
-        if (!check_flags(game_flag::hands_shown)) {
-            for (player_ptr p : m_players) {
-                for (card_ptr c : p->m_hand) {
-                    if (c->visibility.matches(target)) {
-                        YIELD_UPDATE(game_updates::show_card{ c, *c, 0ms });
-                    }
-                }
-            }
-        }
-
-        for (card_ptr c : m_selection) {
-            if (c->visibility.matches(target)) {
-                YIELD_UPDATE(game_updates::show_card{ c, *c, 0ms });
-            }
-        }
-
-        if (!is_game_over() && !is_waiting()) {
-            if (auto req = top_request()) {
-                YIELD_UPDATE(make_request_update(*req, target));
-            } else if (target == m_playing) {
-                YIELD_UPDATE(make_status_ready_update(target));
             }
         }
     }
@@ -300,7 +329,18 @@ namespace banggame {
         return true;
     }
 
-    void game::start_game() {
+    void game::rejoin_user(int old_user_id, int new_user_id) {
+        player_ptr target = find_player_by_userid(old_user_id);
+        if (!target) {
+            throw lobby_error("ERROR_CANNOT_FIND_PLAYER");
+        }
+        update_player_userid(target, new_user_id);
+        add_update(game_updates::player_add{ target });
+    }
+
+    void game::start_game(std::span<int> user_ids) {
+        add_players(user_ids);
+
         for (ruleset_ptr ruleset : m_options.expansions) {
             ruleset->on_apply(this);
         }
@@ -476,6 +516,8 @@ namespace banggame {
         queue_action([this]{
             start_next_turn();
         });
+
+        commit_updates();
     }
 
     request_state game::send_request_status_ready() {

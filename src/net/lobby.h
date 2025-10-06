@@ -113,20 +113,23 @@ struct game_lobby {
     std::vector<game_user> users;
     std::vector<lobby_bot> bots;
     std::vector<server_messages::lobby_chat> chat_messages;
+
+    std::vector<int> connected_user_ids;
     
     lobby_state state;
     ticks lifetime;
 
-    std::unique_ptr<banggame::game> m_game;
+    std::unique_ptr<banggame::game_interface> m_game;
 
     auto connected_users(this auto &&self) {
         return std::forward_like<decltype(self)>(self.users) | rv::remove_if(&game_user::is_disconnected);
     }
 
-    std::pair<game_user &, bool> add_user(session_ptr session);
-
+    game_user &find_user(int user_id);
     game_user &find_user(session_ptr session);
     game_user &find_user(std::string_view name_or_id);
+
+    std::pair<game_user &, bool> add_user(session_ptr session);
 
     static std::string crop_lobby_name(const std::string &name);
 
