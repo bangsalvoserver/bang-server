@@ -106,12 +106,18 @@ namespace banggame {
             .num_players = int(rn::count_if(connected_users(), std::not_fn(&game_user::is_spectator))),
             .num_bots = int(bots.size()),
             .num_spectators = int(rn::count_if(connected_users(), &game_user::is_spectator)),
-            .security = password.empty()
-                ? lobby_security::open
-                : (owner != nullptr && rn::contains(users, owner, &game_user::session))
-                    ? lobby_security::unlocked
-                    : lobby_security::locked,
+            .security = get_security(owner),
             .state = state
         };
+    }
+
+    lobby_security game_lobby::get_security(session_ptr owner) const {
+        if (password.empty()) {
+            return lobby_security::open;
+        } else if (owner != nullptr && rn::contains(users, owner, &game_user::session)) {
+            return lobby_security::unlocked;
+        } else {
+            return lobby_security::locked;
+        }
     }
 }
