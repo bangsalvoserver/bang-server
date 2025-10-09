@@ -16,8 +16,18 @@ namespace banggame {
         void on_update() override {
             if (update_count == 0) {
                 int ncards = req_draw->num_cards_to_draw;
-                for (int i=0; i<ncards; ++i) {
-                    req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
+                if (ncards > 1) {
+                    for (int i=0; i<ncards; ++i) {
+                        req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
+                    }
+                } else {
+                    target->m_game->pop_request();
+                    for (int i=0; i<ncards; ++i) {
+                        card_ptr target_card = req_draw->phase_one_drawn_card();
+                        target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
+                        target_card->move_to(pocket_type::discard_pile);
+                    }
+                    target->add_gold(1);
                 }
             }
         }
@@ -43,7 +53,7 @@ namespace banggame {
 
     void equip_dutch_will::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::init_request_draw>({target_card, -1}, [=](player_ptr origin, shared_request_draw req_draw) {
-            if (origin == target && req_draw->num_cards_to_draw < 3) {
+            if (origin == target) {
                 req_draw->handlers.push_back(target_card);
             }
         });
