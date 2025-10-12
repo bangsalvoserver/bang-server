@@ -292,6 +292,23 @@ namespace banggame {
         bool temp_missable;
     };
 
+    struct player_distance_item {
+        player_ptr player;
+        int value;
+    };
+
+    struct player_distances {
+        std::vector<player_distance_item> distance_mods;
+        int range_mod;
+        int weapon_range;
+    };
+
+    struct game_status {
+        player_distances distances;
+        player_list target_set_players;
+        card_list target_set_cards;
+    };
+
 }
 
 #endif

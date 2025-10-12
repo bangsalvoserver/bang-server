@@ -180,17 +180,6 @@ namespace banggame {
             player_ptr player;
         };
 
-        struct player_distance_item {
-            player_ptr player;
-            int value;
-        };
-    
-        struct player_distances {
-            std::vector<player_distance_item> distance_mods;
-            int range_mod;
-            int weapon_range;
-        };
-
         struct timer_status {
             timer_id_t timer_id;
             game_duration duration;
@@ -203,15 +192,13 @@ namespace banggame {
             game_string status_text;
             playable_cards_list respond_cards;
             card_list highlight_cards;
-            player_list target_set_players;
-            card_list target_set_cards;
-            player_distances distances;
             std::optional<timer_status> timer;
+            game_status status;
         };
 
         struct status_ready {
             playable_cards_list play_cards;
-            player_distances distances;
+            game_status status;
         };
 
         struct game_flags {

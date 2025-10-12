@@ -154,7 +154,7 @@ feats:
     equip:
       - good_company
     effects:
-      - good_company card self | hand
+      - discard card self | hand target_set
       - perform_feat
   - name: THE_LAST_HERO
     image: 23_l_ultimo_eroe

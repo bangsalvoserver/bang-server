@@ -120,6 +120,18 @@ namespace banggame::event_type {
         player_ptr origin;
         bool skipped;
     };
+
+    struct check_target_set_player {
+        const_player_ptr origin;
+        const_player_ptr target;
+        nullable_ref<bool> result;
+    };
+
+    struct check_target_set_card {
+        const_player_ptr origin;
+        const_card_ptr target_card;
+        nullable_ref<bool> result;
+    };
 }
 
 #endif

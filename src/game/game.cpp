@@ -2,6 +2,7 @@
 
 #include "game_update.h"
 #include "game_options.h"
+#include "filters.h"
 
 #include "cards/bang_cards.h"
 #include "cards/filter_enums.h"
@@ -73,8 +74,8 @@ namespace banggame {
         return std::nullopt;
     }
 
-    static game_updates::player_distances make_player_distances(player_ptr owner) {
-        game_updates::player_distances result{};
+    static player_distances make_player_distances(player_ptr owner) {
+        player_distances result{};
         if (owner) {
             for (player_ptr target : owner->m_game->m_players) {
                 if (target != owner) {
@@ -91,24 +92,28 @@ namespace banggame {
     
     static player_list get_request_target_set_players(player_ptr origin) {
         if (origin) {
-            if (auto req = origin->m_game->top_request<interface_target_set_players>(target_is{origin})) {
-                return origin->m_game->m_players
-                    | rv::filter([&](const_player_ptr p){ return req->in_target_set(p); })
-                    | rn::to<std::vector>();
-            }
+            return origin->m_game->m_players
+                | rv::filter([&](player_ptr target){ return check_target_set_player(origin, target); })
+                | rn::to<std::vector>();
         }
         return {};
     }
 
     static card_list get_request_target_set_cards(player_ptr origin) {
         if (origin) {
-            if (auto req = origin->m_game->top_request<interface_target_set_cards>(target_is{origin})) {
-                return get_all_targetable_cards(origin)
-                    | rv::filter([&](const_card_ptr c){ return req->in_target_set(c); })
-                    | rn::to<std::vector>();
-            }
+            return get_all_targetable_cards(origin)
+                | rv::filter([&](card_ptr target){ return check_target_set_card(origin, target); })
+                | rn::to<std::vector>();
         }
         return {};
+    }
+
+    static game_status make_game_status(player_ptr owner) {
+        return {
+            .distances = make_player_distances(owner),
+            .target_set_players = get_request_target_set_players(owner),
+            .target_set_cards = get_request_target_set_cards(owner)
+        };
     }
 
     static game_updates::request_status make_request_update(const request_base &req, player_ptr owner = nullptr) {
@@ -119,17 +124,15 @@ namespace banggame {
             .status_text = req.status_text(owner),
             .respond_cards = generate_playable_cards_list(owner, true),
             .highlight_cards = req.get_highlights(owner),
-            .target_set_players = get_request_target_set_players(owner),
-            .target_set_cards = get_request_target_set_cards(owner),
-            .distances = make_player_distances(owner),
-            .timer = get_request_timer_status(req)
+            .timer = get_request_timer_status(req),
+            .status = make_game_status(owner)
         };
     }
 
     static game_updates::status_ready make_status_ready_update(player_ptr owner) {
         return {
             .play_cards = generate_playable_cards_list(owner),
-            .distances = make_player_distances(owner)
+            .status = make_game_status(owner)
         };
     }
     

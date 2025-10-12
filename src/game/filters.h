@@ -4,6 +4,10 @@
 #include "cards/card_defs.h"
 
 namespace banggame {
+
+    bool check_target_set_player(const_player_ptr origin, const_player_ptr target);
+
+    bool check_target_set_card(const_player_ptr origin, const_card_ptr target_card);
     
     game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, player_filter_bitset filter, const_player_ptr target, const effect_context &ctx = {});
 

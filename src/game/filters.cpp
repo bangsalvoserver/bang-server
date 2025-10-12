@@ -2,10 +2,33 @@
 
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
 
 #include "game_table.h"
 
 namespace banggame {
+
+    bool check_target_set_player(const_player_ptr origin, const_player_ptr target) {
+        if (origin->m_game->pending_requests()) {
+            auto req = origin->m_game->top_request<interface_target_set_players>(target_is{origin});
+            return req && req->in_target_set(target);
+        } else {
+            bool result = false;
+            origin->m_game->call_event(event_type::check_target_set_player{ origin, target, result });
+            return result;
+        }
+    }
+
+    bool check_target_set_card(const_player_ptr origin, const_card_ptr target_card) {
+        if (origin->m_game->pending_requests()) {
+            auto req = origin->m_game->top_request<interface_target_set_cards>(target_is{origin});
+            return req && req->in_target_set(target_card);
+        } else {
+            bool result = false;
+            origin->m_game->call_event(event_type::check_target_set_card{ origin, target_card, result });
+            return result;
+        }
+    }
 
     game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, player_filter_bitset filter, const_player_ptr target, const effect_context &ctx) {
         if (!filter.check(target_player_filter::dead_or_alive)
@@ -39,11 +62,8 @@ namespace banggame {
         if (filter.check(target_player_filter::not_empty_cubes) && count_cubes(target) == 0)
             return {"ERROR_TARGET_EMPTY_CUBES", origin_card, target};
         
-        if (filter.check(target_player_filter::target_set)) {
-            auto req = origin->m_game->top_request<interface_target_set_players>(target_is{origin});
-            if (!req || !req->in_target_set(target)) {
-                return {"ERROR_TARGET_NOT_IN_TARGET_SET", origin_card, target};
-            }
+        if (filter.check(target_player_filter::target_set) && !check_target_set_player(origin, target)) {
+            return {"ERROR_TARGET_NOT_IN_TARGET_SET", origin_card, target};
         }
 
         if (filter.check_any({target_player_filter::reachable, target_player_filter::range_1, target_player_filter::range_2})) {
@@ -77,8 +97,7 @@ namespace banggame {
         }
 
         if (filter.check(target_card_filter::target_set)) {
-            auto req = origin->m_game->top_request<interface_target_set_cards>(target_is{origin});
-            if (!req || !req->in_target_set(target)) {
+            if (!check_target_set_card(origin, target)) {
                 return {"ERROR_TARGET_NOT_IN_TARGET_SET", origin_card, target};
             }
         } else {

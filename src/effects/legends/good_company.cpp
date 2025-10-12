@@ -8,16 +8,9 @@
 
 namespace banggame {
 
-    namespace event_type {
-        struct get_last_played_card {
-            player_ptr origin;
-            nullable_ref<card_ptr> value;
-        };
-    }
-
-    static bool is_same_name(player_ptr origin, card_ptr target_card1, card_ptr target_card2) {
+    static bool is_same_name(const_player_ptr origin, const_card_ptr target_card1, const_card_ptr target_card2) {
         if (origin->check_player_flags(player_flag::treat_missed_as_bang) || origin->check_player_flags(player_flag::treat_any_as_bang)) {
-            auto is_bang_or_missed = [](card_ptr card) {
+            auto is_bang_or_missed = [](const_card_ptr card) {
                 return card->has_tag(tag_type::bangcard) || card->has_tag(tag_type::missedcard);
             };
             if (is_bang_or_missed(target_card1) || is_bang_or_missed(target_card2)) {
@@ -39,12 +32,6 @@ namespace banggame {
             *tracking = {};
         });
 
-        origin->m_game->add_listener<event_type::get_last_played_card>(origin_card, [=](player_ptr e_origin, card_ptr &value) {
-            if (e_origin == origin->m_game->m_playing) {
-                value = tracking->last_played;
-            }
-        });
-
         origin->m_game->add_listener<event_type::on_destroy_card>(origin_card, [=](player_ptr e_origin, card_ptr target_card, bool is_destroyed, bool &handled) {
             if (e_origin == origin->m_game->m_playing && is_destroyed) {
                 tracking->last_discarded = target_card;
@@ -62,18 +49,12 @@ namespace banggame {
                 }
             }
         });
-    }
 
-    game_string effect_good_company::get_error(card_ptr origin_card, player_ptr origin, card_ptr target) {
-        MAYBE_RETURN(effect_discard::get_error(origin_card, origin, target));
-
-        card_ptr last_played = nullptr;
-        origin->m_game->call_event(event_type::get_last_played_card{ origin, last_played });
-        if (!last_played) {
-            return {"ERROR_CANT_PLAY_CARD", origin_card};
-        } else if (!is_same_name(origin, last_played, target)) {
-            return {"ERROR_CARDS_NOT_SAME_NAME", last_played, target};
-        }
-        return {};
+        origin->m_game->add_listener<event_type::check_target_set_card>(origin_card, [=](const_player_ptr e_origin, const_card_ptr target_card, bool &result) {
+            result = tracking->last_played
+                && target_card->pocket == pocket_type::player_hand
+                && target_card->owner == origin->m_game->m_playing
+                && is_same_name(e_origin, tracking->last_played, target_card);
+        });
     }
 }
