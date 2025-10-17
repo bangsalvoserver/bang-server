@@ -83,6 +83,7 @@ namespace banggame {
         bronco,
         dynamite,
         ranged_effect,
+        force_allow,
     };
 }
 

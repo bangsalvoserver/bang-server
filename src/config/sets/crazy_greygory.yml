@@ -6,3 +6,5 @@ character:
       - greygory_deck(true)
     equip:
       - greygory_deck(true)
+    tags:
+      - force_allow

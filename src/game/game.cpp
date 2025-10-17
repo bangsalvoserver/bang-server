@@ -453,7 +453,9 @@ namespace banggame {
         add_cards(bang_cards.legends, pocket_type::none, &m_legends);
 
         if (add_cards(bang_cards.characters | rv::filter([&](const card_data &c) {
-            return !m_options.only_base_characters || c.expansion.empty();
+            return !m_options.only_base_characters
+                || c.expansion.empty()
+                || c.has_tag(tag_type::force_allow);
         }), pocket_type::none, &m_characters)) {
             rn::shuffle(m_characters, rng);
         }
