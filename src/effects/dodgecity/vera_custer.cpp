@@ -31,11 +31,39 @@ namespace banggame {
         return result;
     }
 
+    static void resolve_vera_custer(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        size_t num_characters = origin->m_characters.size();
+        card_ptr target_card = get_card_copy(target->get_character());
+        origin->m_game->add_cards_to({ target_card }, pocket_type::player_character, origin, card_visibility::shown);
+        
+        origin->m_game->add_log("LOG_COPY_CHARACTER", origin, target_card);
+        origin->enable_equip(target_card);
+
+        event_card_key key{origin_card, 10};
+        origin->m_game->add_listener<event_type::pre_turn_start>(key, [=](player_ptr e_origin){
+            if (origin == e_origin && !origin->check_player_flags(player_flag::extra_turn)) {
+                origin->m_game->remove_listeners(key);
+                origin->m_game->queue_action([=]{
+                    origin->remove_cards({ origin->m_characters.begin() + num_characters, origin->m_characters.end() });
+                }, -23);
+            }
+        });
+    }
+
     struct request_vera_custer : request_picking_player {
         using request_picking_player::request_picking_player;
 
         void on_update() override {
-            auto_pick();
+            if (auto targetable = target->m_game->m_players | rv::filter([&](player_ptr target_player) {
+                return target_player != target && target_player->alive();
+            })) {
+                auto first_target = targetable.front();
+                if (rn::all_of(targetable, [&](player_ptr target_player) {
+                    return target_player->get_character()->name == first_target->get_character()->name;
+                })) {
+                    on_pick(first_target);
+                }
+            }
         }
 
         bool can_pick(const_player_ptr target_player) const override {
@@ -44,30 +72,7 @@ namespace banggame {
 
         void on_pick(player_ptr target_player) {
             target->m_game->pop_request();
-
-            std::span<card_ptr> target_characters = target_player->m_characters;
-            if (target_characters.size() > 1) {
-                // Handle Greygory Deck
-                target_characters = target_characters.subspan(1);
-            }
-
-            auto new_cards = target_characters | rv::transform(get_card_copy) | rn::to<std::vector>();
-            target->m_game->add_cards_to(new_cards, pocket_type::player_character, target, card_visibility::shown);
-            
-            for (card_ptr target_card : new_cards) {
-                target->m_game->add_log("LOG_COPY_CHARACTER", target, target_card);
-                target->enable_equip(target_card);
-            }
-
-            event_card_key key{origin_card, 10};
-            target->m_game->add_listener<event_type::pre_turn_start>(key, [=, target=target](player_ptr origin){
-                if (origin == target && !target->check_player_flags(player_flag::extra_turn)) {
-                    target->m_game->remove_listeners(key);
-                    target->m_game->queue_action([=]{
-                        target->remove_cards(new_cards);
-                    }, -23);
-                }
-            });
+            resolve_vera_custer(origin_card, target, target_player);
         }
 
         game_string status_text(player_ptr owner) const override {
