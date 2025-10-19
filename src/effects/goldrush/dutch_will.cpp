@@ -15,7 +15,7 @@ namespace banggame {
         
         void on_update() override {
             if (update_count == 0) {
-                int ncards = req_draw->num_cards_to_draw;
+                int ncards = req_draw->num_cards_to_draw - req_draw->num_drawn_cards;
                 if (ncards > 1) {
                     for (int i=0; i<ncards; ++i) {
                         req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
