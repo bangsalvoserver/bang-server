@@ -50,25 +50,20 @@ namespace banggame {
 
     DEFINE_EFFECT(draw_to_discard, effect_draw_to_discard)
 
-    struct effect_while_drawing {
-        bool can_play(card_ptr origin_card, player_ptr origin);
-    };
-
-    DEFINE_EFFECT(while_drawing, effect_while_drawing)
-
     struct effect_no_cards_drawn {
         bool can_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(no_cards_drawn, effect_no_cards_drawn)
 
-    struct effect_add_draw_card: effect_while_drawing {
+    struct effect_add_draw_card {
+        bool can_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin);
     };
 
     DEFINE_EFFECT(add_draw_card, effect_add_draw_card)
 
-    struct effect_skip_drawing: effect_while_drawing {
+    struct effect_skip_drawing: effect_no_cards_drawn {
         void on_play(card_ptr origin_card, player_ptr origin);
     };
 

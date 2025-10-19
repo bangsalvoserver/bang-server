@@ -40,7 +40,6 @@ fistfulofcards:
     image: 05_liquoreforte
     responses:
       - skip_drawing
-      - no_cards_drawn
       - heal_notfull
   - name: ABANDONED_MINE
     image: 05_minieraabbandonata
