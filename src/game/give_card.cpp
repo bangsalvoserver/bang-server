@@ -32,7 +32,7 @@ namespace banggame {
         void give_card(player_ptr target, card_ptr target_card) const {
             if (target_card->pocket == pocket_type::player_character && target_card->owner != target) {
                 card_ptr old_character = target->get_character();
-                target->remove_cards(target->m_characters);
+                target->remove_characters();
                 target_card->owner->set_character(old_character);
             }
             target->set_character(target_card);

@@ -346,18 +346,20 @@ namespace banggame {
         }
     }
 
-    void player::remove_cards(card_list cards) {
-        std::erase_if(cards, [this](card_ptr c) { return c->owner != this; });
+    void player::remove_characters(int start_index) {
+        card_list cards{m_characters.begin() + start_index, m_characters.end()};
+        
         for (card_ptr target_card : cards) {
             disable_equip(target_card);
         }
+
         m_game->remove_cards(std::move(cards));
     }
 
     void player::set_character(card_ptr target_card) {
         card_ptr old_character = get_character();
         if (old_character) {
-            remove_cards(m_characters);
+            remove_characters();
             old_character->owner = this;
         }
         

@@ -84,6 +84,7 @@ namespace banggame {
             return nullptr;
         }
 
+        void remove_characters(int start_index = 0);
         void set_character(card_ptr target_card);
         
         int get_character_max_hp() const;
@@ -100,7 +101,6 @@ namespace banggame {
         bool remove_player_flags(player_flag flags);
         bool check_player_flags(player_flag flags) const;
 
-        void remove_cards(card_list cards);
         void reveal_hand();
     };
 
