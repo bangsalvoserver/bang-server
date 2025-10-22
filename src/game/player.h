@@ -84,7 +84,7 @@ namespace banggame {
             return nullptr;
         }
 
-        void remove_characters(int start_index = 0);
+        void remove_characters(card_ptr start_from = nullptr, bool exclude_first = false);
         void set_character(card_ptr target_card);
         
         int get_character_max_hp() const;

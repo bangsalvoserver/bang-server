@@ -32,7 +32,6 @@ namespace banggame {
     }
 
     static void resolve_vera_custer(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        size_t num_characters = origin->m_characters.size();
         card_ptr target_card = get_card_copy(target->get_character());
         origin->m_game->add_cards_to({ target_card }, pocket_type::player_character, origin, card_visibility::shown);
         
@@ -44,7 +43,7 @@ namespace banggame {
             if (origin == e_origin && !origin->check_player_flags(player_flag::extra_turn)) {
                 origin->m_game->remove_listeners(key);
                 origin->m_game->queue_action([=]{
-                    origin->remove_characters(num_characters);
+                    origin->remove_characters(target_card);
                 }, -23);
             }
         });

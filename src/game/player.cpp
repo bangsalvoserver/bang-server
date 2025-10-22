@@ -346,8 +346,18 @@ namespace banggame {
         }
     }
 
-    void player::remove_characters(int start_index) {
-        card_list cards{m_characters.begin() + start_index, m_characters.end()};
+    void player::remove_characters(card_ptr start_from, bool exclude_first) {
+        auto begin = m_characters.begin();
+        if (start_from) {
+            for (card_ptr c : m_characters) {
+                if (c == start_from) {
+                    if (exclude_first) ++begin;
+                    break;
+                }
+                ++begin;
+            }
+        }
+        card_list cards{begin, m_characters.end()};
         
         for (card_ptr target_card : cards) {
             disable_equip(target_card);

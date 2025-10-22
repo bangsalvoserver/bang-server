@@ -61,12 +61,7 @@ namespace banggame {
     }
     
     void effect_greygory_deck::on_play(card_ptr origin_card, player_ptr origin) {
-        int count = 0;
-        for (card_ptr character : origin->m_characters) {
-            ++count;
-            if (character == origin_card) break;
-        }
-        origin->remove_characters(count);
+        origin->remove_characters(origin_card, true);
         add_greygory_deck_characters(origin_card, origin, allow_expansions);
     }
 }
