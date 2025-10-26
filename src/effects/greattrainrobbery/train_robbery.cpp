@@ -11,13 +11,21 @@
 
 namespace banggame {
 
-    struct request_train_robbery : request_base, interface_target_set_cards, escapable_request {
+    struct request_train_robbery : request_base, interface_target_set_cards, missable_request {
         using request_base::request_base;
 
         std::set<const_card_ptr> selected_cards;
 
-        bool can_escape(card_ptr c) const override {
-            return selected_cards.empty() && escapable_request::can_escape(c);
+        bool can_escape(card_ptr c, const effect_context &ctx) const override {
+            return selected_cards.empty() && escapable_request::can_escape(c, ctx);
+        }
+
+        bool can_miss(card_ptr c, const effect_context &ctx) const override {
+            return ctx.temp_missable;
+        }
+
+        void on_miss(card_ptr, effect_flags) override {
+            throw game_error("request_train_robbery: invalid call to on_miss()");
         }
 
         void on_update() override {
@@ -79,8 +87,13 @@ namespace banggame {
         origin->m_game->queue_request<request_train_robbery>(origin_card, origin, target, flags, 20);
     }
 
-    bool effect_train_robbery_response::can_play(card_ptr origin_card, player_ptr origin) {
-        return origin->m_game->top_request<request_train_robbery>(target_is{origin}) != nullptr;
+    bool effect_train_robbery_response::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        if (!ctx.temp_missable) {
+            if (auto req = origin->m_game->top_request<request_train_robbery>(target_is{origin})) {
+                return true;
+            }
+        }
+        return false;
     }
 
     void effect_train_robbery_response::add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) {

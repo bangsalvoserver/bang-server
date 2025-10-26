@@ -53,10 +53,7 @@ namespace banggame {
         }
         
         flags.add(effect_flag::is_bang);
-        
-        auto req = std::make_shared<request_bang>(origin_card, origin, target, flags);
-        req->origin->m_game->call_event(event_type::apply_bang_modifier{ req->origin, req });
-        req->origin->m_game->queue_request(std::move(req));
+        origin->m_game->queue_request<request_bang>(origin_card, origin, target, flags);
     }
 
     prompt_string effect_play_as_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
@@ -117,8 +114,8 @@ namespace banggame {
         }
     }
     
-    bool request_bang::can_miss(card_ptr c) const {
-        return !unavoidable && missable_request::can_miss(c);
+    bool request_bang::can_miss(card_ptr c, const effect_context &ctx) const {
+        return !unavoidable && missable_request::can_miss(c, ctx);
     }
 
     void request_bang::on_miss(card_ptr missed_card, effect_flags missed_flags) {
@@ -134,10 +131,18 @@ namespace banggame {
     }
 
     void request_bang::on_update() {
+        if (update_count == 0 && flags.check(effect_flag::is_bang)) {
+            auto self = shared_from_this();
+            origin->m_game->call_event(event_type::apply_bang_modifier{ origin, self });
+            if (origin->m_game->top_request() != self) {
+                return;
+            }
+        }
         if (!target->alive() || target->immune_to(origin_card, origin, flags)) {
             target->m_game->pop_request();
         } else {
-            if (update_count == 0) {
+            if (!sound_played) {
+                sound_played = true;
                 if (flags.check(effect_flag::target_players)) {
                     target->play_sound(sound_id::gatling);
                 } else {

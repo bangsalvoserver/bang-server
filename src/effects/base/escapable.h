@@ -25,7 +25,7 @@ namespace banggame {
             m_cards_used.insert(c);
         }
 
-        virtual bool can_escape(card_ptr c) const {
+        virtual bool can_escape(card_ptr c, const effect_context &ctx) const {
             return !m_cards_used.contains(c);
         }
 

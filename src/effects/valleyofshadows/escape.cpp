@@ -14,11 +14,11 @@ namespace banggame {
             && !flags.check(effect_flag::is_bang);
     }
     
-    bool effect_escape::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_escape::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         if (auto req = origin->m_game->top_request<escapable_request>([&](const request_base &base) {
             return base.target == origin && effect_escape::can_escape(base.origin, base.origin_card, base.flags);
         })) {
-            return req->can_escape(origin_card);
+            return req->can_escape(origin_card, ctx);
         }
         return false;
     }
@@ -45,11 +45,11 @@ namespace banggame {
             && !flags.check(effect_flag::multi_target);
     }
     
-    bool effect_escape2::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_escape2::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         if (auto req = origin->m_game->top_request<escapable_request>([&](const request_base &base) {
             return base.target == origin && effect_escape2::can_escape(base.origin, base.origin_card, base.flags);
         })) {
-            return req->can_escape(origin_card);
+            return req->can_escape(origin_card, ctx);
         }
         return false;
     }

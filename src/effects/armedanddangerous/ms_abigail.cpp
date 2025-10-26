@@ -25,11 +25,11 @@ namespace banggame {
             });
     }
 
-    bool effect_ms_abigail::can_play(card_ptr origin_card, player_ptr origin) {
+    bool effect_ms_abigail::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         if (auto req = origin->m_game->top_request<escapable_request>([&](const request_base &base) {
             return base.target == origin && effect_ms_abigail::can_escape(base.origin, base.origin_card, base.flags);
         })) {
-            return req->can_escape(origin_card);
+            return req->can_escape(origin_card, ctx);
         }
         return false;
     }

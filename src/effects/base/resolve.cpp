@@ -12,9 +12,11 @@ namespace banggame {
         return origin->m_game->top_request<interface_resolvable>()->resolve_prompt();
     }
 
-    bool effect_resolve::can_play(card_ptr origin_card, player_ptr origin) {
-        if (auto req = origin->m_game->top_request<interface_resolvable>(target_is{origin})) {
-            return req->get_resolve_type() == type;
+    bool effect_resolve::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        if (!ctx.temp_missable) {
+            if (auto req = origin->m_game->top_request<interface_resolvable>(target_is{origin})) {
+                return req->get_resolve_type() == type;
+            }
         }
         return false;
     }

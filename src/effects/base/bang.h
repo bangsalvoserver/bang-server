@@ -56,8 +56,8 @@ namespace banggame {
     DEFINE_MODIFIER(bangmod, modifier_bangmod)
 
     struct missable_request : escapable_request {
-        virtual bool can_miss(card_ptr c) const {
-            return can_escape(c);
+        virtual bool can_miss(card_ptr c, const effect_context &ctx) const {
+            return can_escape(c, ctx);
         }
 
         virtual void on_miss(card_ptr c, effect_flags missed_flags = {}) = 0;
@@ -69,10 +69,11 @@ namespace banggame {
         int bang_strength = 1;
         int bang_damage = 1;
         bool unavoidable = false;
+        bool sound_played = false;
 
         void on_update() override;
 
-        bool can_miss(card_ptr c) const override;
+        bool can_miss(card_ptr c, const effect_context &ctx) const override;
 
         void on_miss(card_ptr c, effect_flags missed_flags = {}) override;
         void on_resolve() override;
