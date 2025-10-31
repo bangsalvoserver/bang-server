@@ -13,9 +13,6 @@ namespace banggame {
     }
 
     void handler_doc_holyday::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
-        for (card_ptr c : target_cards) {
-            effect_discard{}.on_play(origin_card, origin, c);
-        }
         if (!rn::all_of(target_cards, [&](card_ptr target_card) {
             return target->immune_to(target_card, origin, {}, true);
         })) {

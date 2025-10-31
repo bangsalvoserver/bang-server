@@ -284,7 +284,7 @@ character:
     image: 03_doc_holyday
     effects:
       - max_usages(1)
-      - none cards(2) self | hand
+      - discard cards(2) self | hand
       - none player reachable notself
     mth_effect: doc_holyday(1,2)
     tags:
