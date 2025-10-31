@@ -23,7 +23,7 @@ main_deck:
       - set_playing(play_as::bang) card self | hand not_bangcard
       - play_as_bangcard player reachable notself
     tags:
-      - weapon
+      - weapon(1)
       - play_as_bang
       - banglimit
       - skip_logs

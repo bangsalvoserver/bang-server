@@ -16,7 +16,7 @@ main_deck:
       - weapon(2)
       - dragoon
     tags:
-      - weapon
+      - weapon(2)
   - name: EVADED
     signs:
       - Q clubs

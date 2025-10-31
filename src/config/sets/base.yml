@@ -64,7 +64,7 @@ main_deck:
     equip:
       - weapon(3)
     tags:
-      - weapon
+      - weapon(1)
   - &rev_carabine
     name: REV_CARABINE
     signs:
@@ -74,7 +74,7 @@ main_deck:
     equip:
       - weapon(4)
     tags:
-      - weapon
+      - weapon(1)
   - &schofield
     name: SCHOFIELD
     signs:
@@ -98,7 +98,7 @@ main_deck:
       - weapon(1)
       - volcanic
     tags:
-      - weapon
+      - weapon(2)
   - &winchester
     name: WINCHESTER
     signs:
@@ -108,7 +108,7 @@ main_deck:
     equip:
       - weapon(5)
     tags:
-      - weapon
+      - weapon(1)
   - &bang
     name: BANG
     signs:

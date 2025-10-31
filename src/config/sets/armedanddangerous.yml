@@ -131,7 +131,7 @@ main_deck:
       - none self_cubes(1)
       - bigfifty
     tags:
-      - weapon
+      - weapon(2)
       - bangmod
   - name: BOMB
     signs:
@@ -196,7 +196,7 @@ main_deck:
       - none self_cubes(1)
       - doublebarrel
     tags:
-      - weapon
+      - weapon(1)
       - bangmod
   - name: WHIP
     signs:
@@ -238,7 +238,7 @@ main_deck:
       - none self_cubes(1)
       - thunderer
     tags:
-      - weapon
+      - weapon(1)
       - bangmod
 
 character:

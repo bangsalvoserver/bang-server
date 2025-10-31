@@ -100,7 +100,7 @@ main_deck:
       - discard card self | hand
       - play_as_bang players notself
     tags:
-      - weapon
+      - weapon(2)
       - strong
   - name: LAST_WILL
     signs:
@@ -216,7 +216,7 @@ main_deck:
     equip:
       - weapon(0)
     tags:
-      - weapon
+      - weapon(-1)
       - penalty
   - name: SCRAPPER
     signs:
