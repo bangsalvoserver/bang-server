@@ -23,7 +23,7 @@ namespace banggame {
             return prompts::prompt_target_self(origin_card, origin, target);
         } else if (target == origin && origin->get_weapon_range() != 0) {
             if (card_ptr target_card = find_weapon_card(origin_card, target)) {
-                if (!target->is_bot() || origin_card->get_tag_value(tag_type::weapon) >= target_card->get_tag_value(tag_type::weapon)) {
+                if (!target->is_bot() || origin_card->get_tag_value(tag_type::weapon) <= target_card->get_tag_value(tag_type::weapon)) {
                     return {"PROMPT_REPLACE", origin_card, target_card};
                 }
             }
