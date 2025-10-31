@@ -80,6 +80,13 @@ namespace banggame {
             effect_steal{}.on_resolve(origin_card, origin, target_card);
         }
 
+        prompt_string escape_prompt(player_ptr owner) const override {
+            if (owner->is_bot() && target_card->has_tag(tag_type::penalty)) {
+                return "BOT_ESCAPE_STEAL_PENALTY";
+            }
+            return {};
+        }
+
         game_string status_text(player_ptr owner) const override {
             if (target == owner) {
                 if (target_card->pocket == pocket_type::player_hand) {
@@ -192,6 +199,13 @@ namespace banggame {
         void on_resolve() override {
             target->m_game->pop_request();
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
+        }
+
+        prompt_string escape_prompt(player_ptr owner) const override {
+            if (owner->is_bot() && target_card->has_tag(tag_type::penalty)) {
+                return "BOT_ESCAPE_DESTROY_PENALTY";
+            }
+            return {};
         }
 
         game_string status_text(player_ptr owner) const override {
