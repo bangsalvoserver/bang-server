@@ -24,7 +24,7 @@ namespace banggame {
                         remaining_targets.add(p);
                     }
                 }
-                int ncards = target->m_game->num_alive() + req_draw->num_cards_to_draw - 1;
+                int ncards = target->m_game->num_alive() + req_draw->num_cards_to_draw - req_draw->num_drawn_cards - 1;
                 for (int i=0; i<ncards; ++i) {
                     req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
                 }
