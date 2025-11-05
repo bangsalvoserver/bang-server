@@ -36,7 +36,6 @@ namespace banggame {
     struct effect_vtable;
     struct equip_vtable;
     struct modifier_vtable;
-    struct mth_vtable;
 
     struct ruleset_vtable;
     struct targeting_vtable;

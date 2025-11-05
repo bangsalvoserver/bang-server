@@ -12,7 +12,7 @@ character:
       - max_usages(1)
       - none card self | hand
       - none random_if_hand_card notself | hand
-    mth_effect: flint_westwood(1,2)
+      - flint_westwood mth(1,2)
   - name: GARY_LOOTER
     image: 06_garylooter
     equip:

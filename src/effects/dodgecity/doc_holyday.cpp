@@ -8,11 +8,11 @@
 
 namespace banggame {
 
-    prompt_string handler_doc_holyday::on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
+    prompt_string effect_doc_holyday::on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
         return effect_bang{}.on_prompt(origin_card, origin, target);
     }
 
-    void handler_doc_holyday::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
+    void effect_doc_holyday::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
         if (!rn::all_of(target_cards, [&](card_ptr target_card) {
             return target->immune_to(target_card, origin, {}, true);
         })) {

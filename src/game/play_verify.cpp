@@ -75,17 +75,15 @@ namespace banggame {
         auto &effects = origin_card->get_effect_list(is_response);
 
         for (const auto &[target, effect] : rv::zip(targets, effects)) {
+            // TODO add targets
             effect.add_context(origin_card, origin, target, ctx);
             
             if (!effect.can_play(origin_card, origin, ctx)) {
                 return {"ERROR_CANT_PLAY_CARD", origin_card};
             }
 
+            // TODO add targets
             MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
-        }
-
-        if (const mth_holder &mth = origin_card->get_mth(is_response)) {
-            MAYBE_RETURN(mth.get_error(origin_card, origin, targets, ctx));
         }
 
         MAYBE_RETURN(check_duplicates(ctx));
@@ -191,11 +189,8 @@ namespace banggame {
 
     static prompt_string get_play_prompt(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
+            // TODO add targets
             MAYBE_RETURN(effect.on_prompt(origin_card, origin, target, ctx));
-        }
-
-        if (const mth_holder &mth = origin_card->get_mth(is_response)) {
-            return mth.on_prompt(origin_card, origin, targets, ctx);
         }
         return {};
     }
@@ -283,11 +278,8 @@ namespace banggame {
         }
 
         for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
+            // TODO add targets
             effect.on_play(origin_card, origin, target, ctx);
-        }
-
-        if (const mth_holder &mth = origin_card->get_mth(is_response)) {
-            mth.on_play(origin_card, origin, targets, ctx);
         }
     }
 

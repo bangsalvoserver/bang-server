@@ -118,27 +118,6 @@ def parse_modifier(modifier):
         effect_value = CppStatic(f'MODIFIER_VALUE({effect_type})', (CppLiteral(effect_value),) if effect_value else (), pointer=True),
     )
 
-def parse_mth(effect):
-    match = re.match(
-        r'^(\w+)\s*' # type
-        r'\(((?:\s*\d+,)*\s*\d+\s*)\)' # indices
-        r'(?:\s*\(\s*(.+?)\s*\))?\s*$', # effect_value
-        effect
-    )
-    if not match:
-        raise RuntimeError(f'Invalid mth string: {effect}')
-    
-    effect_type = match.group(1)
-    indices = match.group(2)
-    effect_value = match.group(3)
-    return CppObject(
-        type = CppLiteral(f'GET_MTH({effect_type})'),
-        effect_value = CppStatic(f'MTH_VALUE({effect_type})', CppObject(
-            handler = (CppLiteral(effect_value),) if effect_value else None,
-            indices = CppStatic('mth_index', [int(index) for index in indices.split(',')])
-        ), pointer=True),
-    )
-
 def parse_expansions(expansions, fn = list):
     return CppStatic('ruleset_ptr', fn(CppLiteral(f"GET_RULESET({expansion})") for expansion in expansions ))
 
@@ -155,8 +134,6 @@ def parse_all_effects(card):
             deck =         CppEnum('card_deck_type', card['deck']) if 'deck' in card else None,
             modifier =      parse_modifier(card['modifier']) if 'modifier' in card else None,
             modifier_response = parse_modifier(card['modifier_response']) if 'modifier_response' in card else None,
-            mth_effect =   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
-            mth_response = parse_mth(card['mth_response']) if 'mth_response' in card else None,
             equip_target = [CppEnum('target_player_filter', f) for f in sorted(card['equip_target'].split())] if 'equip_target' in card else None,
             color =        CppEnum('card_color_type', card['color']) if 'color' in card else None,
             sign =         parse_sign(card['sign']) if 'sign' in card else None

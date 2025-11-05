@@ -22,8 +22,6 @@ namespace banggame {
 
         modifier_holder modifier;
         modifier_holder modifier_response;
-        mth_holder mth_effect;
-        mth_holder mth_response;
         player_filter_bitset equip_target;
         
         card_color_type color;
@@ -31,10 +29,6 @@ namespace banggame {
 
         const effect_list &get_effect_list(bool is_response) const {
             return is_response ? responses : effects;
-        }
-
-        const mth_holder &get_mth(bool is_response) const {
-            return is_response ? mth_response : mth_effect;
         }
 
         const modifier_holder &get_modifier(bool is_response) const {

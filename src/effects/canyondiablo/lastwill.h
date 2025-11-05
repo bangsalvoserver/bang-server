@@ -14,16 +14,11 @@ namespace banggame {
 
     struct effect_lastwill {
         bool can_play(card_ptr origin_card, player_ptr origin);
-    };
-
-    DEFINE_EFFECT(lastwill, effect_lastwill)
-
-    struct handler_lastwill {
         game_string on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target);
     };
 
-    DEFINE_MTH(lastwill, handler_lastwill)
+    DEFINE_EFFECT(lastwill, effect_lastwill)
 }
 
 #endif

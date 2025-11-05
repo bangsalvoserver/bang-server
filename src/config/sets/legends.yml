@@ -55,7 +55,7 @@ legends:
       - kit_carlson_legend_response
       - none card | selection
       - none player notself
-    mth_response: gift_card(1,2)
+      - gift_card mth(1,2)
     tags:
       - preselect
   - name: LUCKY_DUKE

@@ -108,7 +108,7 @@ namespace banggame {
 
                 player_ptr target_player = target->get_next_player();
                 for (card_ptr target_card : target_cards) {
-                    handler_gift_card{true}.on_play(origin_card, target, target_card, target_player);
+                    effect_gift_card{true}.on_play(origin_card, target, target_card, target_player);
                 }
             });
         }

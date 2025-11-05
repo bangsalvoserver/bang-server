@@ -102,7 +102,7 @@ main_deck:
     effects:
       - none card self | table
       - none card notself | table
-    mth_effect: switch_cards(0,1)
+      - switch_cards mth(0,1)
   - name: TRAIN_ROBBERY
     signs:
       - 4 diamonds
@@ -441,10 +441,9 @@ hidden:
       
   - name: LOUNGE_CAR
     responses:
-      - lounge_car_response
       - none card | selection
       - none player notself target_set dead_or_alive
-    mth_response: lounge_car(1,2)
+      - lounge_car_response mth(0,1)
     tags:
       - preselect
 
@@ -453,7 +452,7 @@ hidden:
       - mail_car_response
       - none card | selection
       - none player notself
-    mth_response: gift_card(1,2)
+      - gift_card mth(1,2)
     tags:
       - preselect
   

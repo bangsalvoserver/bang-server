@@ -66,7 +66,7 @@ namespace banggame {
         return origin->m_game->top_request<request_lounge_car>(target_is{origin}) != nullptr;
     }
 
-    game_string handler_lounge_car::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+    game_string effect_lounge_car_response::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
         for (card_ptr selection_card : origin->m_game->m_selection) {
             MAYBE_RETURN(check_player_filter(selection_card, origin, selection_card->equip_target,
                 selection_card == target_card ? target_player : origin));
@@ -74,7 +74,7 @@ namespace banggame {
         return {};
     }
 
-    game_string handler_lounge_car::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+    game_string effect_lounge_car_response::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
         if (target_card->has_tag(tag_type::penalty)) {
             MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target_player));
         } else {
@@ -83,7 +83,7 @@ namespace banggame {
         return {};
     }
 
-    void handler_lounge_car::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+    void effect_lounge_car_response::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
         origin->m_game->top_request<request_lounge_car>()->on_resolve(target_card, target_player);
     }
 }

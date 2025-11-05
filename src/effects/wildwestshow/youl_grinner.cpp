@@ -19,7 +19,7 @@ namespace banggame {
 
     void request_youl_grinner::on_pick(card_ptr target_card) {
         target->m_game->pop_request();
-        handler_gift_card{true}.on_play(origin_card, target, target_card, origin);
+        effect_gift_card{true}.on_play(origin_card, target, target_card, origin);
     }
 
     game_string request_youl_grinner::status_text(player_ptr owner) const {

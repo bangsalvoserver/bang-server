@@ -6,12 +6,6 @@ namespace banggame {
         const effect_list &effects = origin_card->get_effect_list(is_response);
         
         if (targets.size() == effects.size()) {
-            if (const mth_holder &mth = origin_card->get_mth(is_response)) {
-                if (mth.get_error(origin_card, origin, targets, ctx)) {
-                    return false;
-                }
-            }
-
             if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
                 auto ctx_copy = ctx;
                 ctx_copy.selected_cards.push_back(origin_card);
@@ -35,6 +29,7 @@ namespace banggame {
 
         for (play_card_target target : effect.possible_targets(origin_card, origin, ctx)) {
             auto ctx_copy = ctx;
+            // TODO add targets
             effect.add_context(origin_card, origin, target, ctx_copy);
 
             targets.emplace_back(std::move(target));

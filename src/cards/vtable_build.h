@@ -20,6 +20,75 @@ namespace banggame {
         static_assert(std::is_trivially_copyable_v<T>);
         return *static_cast<const T *>(effect_value);
     }
+
+    template<typename T>
+    concept is_context = std::same_as<std::remove_cvref_t<T>, effect_context>;
+
+    template<typename ... Ts>
+    using first_element_t = std::tuple_element_t<0, std::tuple<Ts...>>;
+
+    template<typename ... Ts>
+    using last_element_t = std::tuple_element_t<sizeof...(Ts) - 1, std::tuple<Ts...>>;
+    
+    template<typename ... Ts>
+    auto build_mth_args_impl(const target_list &targets) {
+        if (targets.size() != sizeof...(Ts)) {
+            throw game_error("invalid access to mth: invalid targets size");
+        }
+        try {
+            return [&]<size_t ... Is>(std::index_sequence<Is...>) {
+                return std::tuple<Ts ...>{
+                    targets[Is].get<std::remove_cvref_t<Ts>>() ...
+                };
+            }(std::index_sequence_for<Ts ...>());
+        } catch (const std::bad_any_cast &) {
+            throw game_error("invalid access to mth: invalid target type");
+        }
+    }
+
+    template<typename ... Ts>
+    auto build_mth_args(const target_list &targets, is_context auto &&ctx) {
+        if constexpr (sizeof...(Ts) == 0) {
+            return std::tuple{};
+        } else if constexpr (is_context<first_element_t<Ts...>>) {
+            return [&]<size_t ... Is>(std::index_sequence<Is...>) {
+                return std::tuple_cat(
+                    std::forward_as_tuple(ctx),
+                    build_mth_args_impl<std::tuple_element_t<Is + 1, std::tuple<Ts...>> ...>(targets)
+                );
+            }(std::make_index_sequence<sizeof...(Ts) - 1>());
+        } else if constexpr (is_context<last_element_t<Ts...>>) {
+            return [&]<size_t ... Is>(std::index_sequence<Is...>) {
+                return std::tuple_cat(
+                    build_mth_args_impl<std::tuple_element_t<Is, std::tuple<Ts...>> ...>(targets),
+                    std::forward_as_tuple(ctx)
+                );
+            }(std::make_index_sequence<sizeof...(Ts) - 1>());
+        } else {
+            return build_mth_args_impl<Ts ...>(targets);
+        }
+    }
+
+    template<typename RetType, typename HandlerType, typename ... Args>
+    using fun_mem_ptr_t = RetType (HandlerType::*)(card_ptr origin_card, player_ptr origin, Args...);
+
+    template<typename T> struct mth_unwrapper;
+
+    template<typename RetType, typename HandlerType, typename ... Args>
+    struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>> {
+        fun_mem_ptr_t<RetType, HandlerType, Args...> m_value;
+
+        template<is_context Context>
+        RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, Context &&ctx) {
+            return std::apply(m_value, std::tuple_cat(
+                std::tuple{effect_cast<HandlerType>(effect_value), origin_card, origin},
+                build_mth_args<Args...>(targets, ctx)
+            ));
+        }
+    };
+
+    template<typename RetType, typename HandlerType, typename ... Args>
+    mth_unwrapper(fun_mem_ptr_t<RetType, HandlerType, Args...>) -> mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>>;
     
     template<typename T>
     constexpr effect_vtable build_effect_vtable(std::string_view name) {
@@ -154,6 +223,32 @@ namespace banggame {
                 } else if constexpr (requires { value.on_play(origin_card, origin, target); }) {
                     value.on_play(origin_card, origin, target);
                 }
+            },
+            
+            .get_error_mth = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) -> game_string {
+                if constexpr (requires { mth_unwrapper{&T::get_error}; }) {
+                    return mth_unwrapper{&T::get_error}(effect_value, origin_card, origin, targets, ctx);
+                }
+                return {};
+            },
+
+            .on_prompt_mth = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) -> prompt_string {
+                if constexpr (requires { mth_unwrapper{&T::on_prompt}; }) {
+                    return mth_unwrapper{&T::on_prompt}(effect_value, origin_card, origin, targets, ctx);
+                }
+                return {};
+            },
+
+            .add_context_mth = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, effect_context &ctx) {
+                if constexpr (requires { mth_unwrapper{&T::add_context}; }) {
+                    return mth_unwrapper{&T::add_context}(effect_value, origin_card, origin, targets, ctx);
+                }
+            },
+
+            .on_play_mth = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) {
+                if constexpr (requires { mth_unwrapper{&T::on_play}; }) {
+                    mth_unwrapper{&T::on_play}(effect_value, origin_card, origin, targets, ctx);
+                }
             }
         };
     }
@@ -255,109 +350,6 @@ namespace banggame {
 
     #define BUILD_MODIFIER_VTABLE(name, type) template<> const modifier_vtable modifier_vtable_map<#name>::value = build_modifier_vtable<type>(#name);
     #define MODIFIER_VALUE(name) modifier_vtable_map<#name>::type
-
-    using mth_index = uint8_t;
-    using index_list = std::span<const mth_index>;
-
-    template<typename HandlerType>
-    struct mth_value {
-        [[no_unique_address]] HandlerType handler;
-        index_list indices;
-    };
-
-    template<typename ... Ts>
-    auto build_mth_args(const target_list &targets, index_list indices) {
-        if (indices.size() != sizeof...(Ts)) {
-            throw game_error("invalid access to mth: invalid indices size");
-        }
-        try {
-            return [&]<size_t ... Is>(std::index_sequence<Is...>) {
-                return std::tuple<Ts ...>{
-                    targets.at(indices[Is]).get<std::remove_cvref_t<Ts>>() ...
-                };
-            }(std::index_sequence_for<Ts ...>());
-        } catch (const std::bad_any_cast &) {
-            throw game_error("invalid access to mth: invalid target type");
-        } catch (const std::out_of_range &) {
-            throw game_error("invalid access to mth: index out of range");
-        }
-    }
-
-    template<typename RetType, typename HandlerType, typename ... Args>
-    using fun_mem_ptr_t = RetType (HandlerType::*)(card_ptr origin_card, player_ptr origin, Args...);
-
-    template<typename RetType, typename HandlerType, typename CtxType, typename ... Args>
-    requires std::same_as<std::remove_cvref_t<CtxType>, effect_context>
-    using ctx_fun_mem_ptr_t = RetType (HandlerType::*)(card_ptr origin_card, player_ptr origin, CtxType ctx, Args...);
-
-    template<typename T> struct mth_unwrapper;
-
-    template<typename RetType, typename HandlerType, typename ... Args>
-    struct mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>> {
-        fun_mem_ptr_t<RetType, HandlerType, Args...> m_value;
-
-        RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) {
-            auto &&value = effect_cast<mth_value<HandlerType>>(effect_value);
-            return std::apply(m_value, std::tuple_cat(
-                std::tuple{value.handler, origin_card, origin},
-                build_mth_args<Args...>(targets, value.indices)
-            ));
-        }
-    };
-
-    template<typename RetType, typename HandlerType, typename CtxType, typename ... Args>
-    struct mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>> {
-        ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...> m_value;
-
-        RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, CtxType ctx) {
-            auto &&value = effect_cast<mth_value<HandlerType>>(effect_value);
-            return std::apply(m_value, std::tuple_cat(
-                std::tuple{value.handler, origin_card, origin, ctx},
-                build_mth_args<Args...>(targets, value.indices)
-            ));
-        }
-    };
-
-    template<typename RetType, typename HandlerType, typename ... Args>
-    mth_unwrapper(fun_mem_ptr_t<RetType, HandlerType, Args...>) -> mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>>;
-
-    template<typename RetType, typename HandlerType, typename CtxType, typename ... Args>
-    mth_unwrapper(ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>) -> mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>>;
-    
-    template<typename T>
-    constexpr mth_vtable build_mth_vtable(std::string_view name) {
-        return {
-            .name = name,
-
-            .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) -> game_string {
-                if constexpr (requires { mth_unwrapper{&T::get_error}; }) {
-                    return mth_unwrapper{&T::get_error}(effect_value, origin_card, origin, targets, ctx);
-                }
-                return {};
-            },
-
-            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) -> prompt_string {
-                if constexpr (requires { mth_unwrapper{&T::on_prompt}; }) {
-                    return mth_unwrapper{&T::on_prompt}(effect_value, origin_card, origin, targets, ctx);
-                }
-                return {};
-            },
-
-            .on_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) {
-                if constexpr (requires { mth_unwrapper{&T::on_play}; }) {
-                    mth_unwrapper{&T::on_play}(effect_value, origin_card, origin, targets, ctx);
-                }
-            }
-        };
-    }
-
-    #ifdef BUILD_MTH_VTABLE
-    #undef BUILD_MTH_VTABLE
-    #endif
-
-    #define BUILD_MTH_VTABLE(name, type) template<> const mth_vtable mth_vtable_map<#name>::value = build_mth_vtable<type>(#name);
-
-    #define MTH_VALUE(name) mth_value<mth_vtable_map<#name>::type>
     
     template<typename T>
     constexpr ruleset_vtable build_ruleset_vtable(std::string_view name) {
