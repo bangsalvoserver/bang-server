@@ -197,6 +197,16 @@ namespace banggame {
             draw_next_feat(origin);
         });
 
+        game->add_listener<event_type::on_turn_end>({nullptr, 20}, [](player_ptr origin, bool skipped) {
+            origin->m_game->queue_request<request_boast_feat>(origin);
+        });
+    }
+
+    bool ruleset_legends::is_valid_with(const expansion_set &set) {
+        return set.contains(GET_RULESET(legends_basemod));
+    }
+
+    void ruleset_legends_basemod::on_apply(game_ptr game) {
         game->add_listener<event_type::count_initial_cards>({nullptr, -1}, [](const_player_ptr origin, int &value) {
             int count = 0;
             for (player_ptr p : origin->m_game->range_all_players(origin->m_game->m_first_player)) {
@@ -220,10 +230,6 @@ namespace banggame {
             if (!origin->empty_hand() && checking_card->has_tag(tag_type::jail)) {
                 value = false;
             }
-        });
-
-        game->add_listener<event_type::on_turn_end>({nullptr, 20}, [](player_ptr origin, bool skipped) {
-            origin->m_game->queue_request<request_boast_feat>(origin);
         });
     }
     

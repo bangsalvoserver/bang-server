@@ -23,6 +23,7 @@ add_custom_command(
         sets/wildwestshow.yml
         sets/mostwanted.yml
         sets/canyondiablo.yml
+        sets/legends_basemod.yml
         sets/legends.yml
         sets/crazy_greygory.yml
         parse_bang_cards.py

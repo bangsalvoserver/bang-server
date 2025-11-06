@@ -10,6 +10,7 @@ fistfulofcards: !include sets/fistfulofcards.yml
 wildwestshow_characters: !include sets/wildwestshow_characters.yml
 wildwestshow: !include sets/wildwestshow.yml
 mostwanted: !include sets/mostwanted.yml
+legends_basemod: !include sets/legends_basemod.yml
 legends: !include sets/legends.yml
 canyondiablo: !include sets/canyondiablo.yml
 crazy_greygory: !include sets/crazy_greygory.yml

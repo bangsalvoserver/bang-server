@@ -1,0 +1,6 @@
+button_row:
+  - name: ESCAPE_JAIL
+    responses:
+      - escape_jail card self | hand hearts
+    tags:
+      - button_color(2)

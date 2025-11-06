@@ -10,9 +10,16 @@ namespace banggame {
 
     struct ruleset_legends {
         void on_apply(game_ptr game);
+        bool is_valid_with(const expansion_set &set);
     };
 
     DEFINE_RULESET(legends, ruleset_legends)
+
+    struct ruleset_legends_basemod {
+        void on_apply(game_ptr game);
+    };
+
+    DEFINE_RULESET(legends_basemod, ruleset_legends_basemod)
 
 }
 
