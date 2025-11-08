@@ -40,7 +40,7 @@ namespace banggame {
             if (target->is_bot()) {
                 auto result = req->get_result(target_card);
                 if (!result.indifferent && result.lucky != bot_suggestion::is_target_friend(target, origin)) {
-                    return "PROMPT_BAD_DRAW";
+                    return "BOT_BAD_DRAW";
                 }
             }
             return {};

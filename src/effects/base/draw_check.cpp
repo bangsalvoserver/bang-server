@@ -22,7 +22,7 @@ namespace banggame {
         if (target->is_bot()) {
             auto result = get_result(target_card);
             if (!result.lucky && !result.indifferent) {
-                return "PROMPT_BAD_DRAW";
+                return "BOT_BAD_DRAW";
             }
         }
         return {};
