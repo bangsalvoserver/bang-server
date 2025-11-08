@@ -1,0 +1,27 @@
+match cxxConstructExpr(
+    anyOf(
+        hasType(recordDecl(hasName("banggame::prompt_string"))),
+        hasType(recordDecl(hasName("banggame::game_string")))
+    ),
+    unless(
+        anyOf(
+            hasDeclaration(cxxConstructorDecl(anyOf(
+                isDefaultConstructor(),
+                parameterCountIs(0),
+                isCopyConstructor(),
+                isMoveConstructor()
+            ))),
+            hasAnyArgument(hasType(recordDecl(hasName("banggame::game_string")))),
+            hasAncestor(recordDecl(hasName("banggame::game_string"))),
+            hasAncestor(recordDecl(hasName("banggame::prompt_string"))),
+            hasAncestor(recordDecl(hasName("banggame::game_net_manager")))
+        )
+    )
+)
+
+match cxxMemberCallExpr(
+    callee(cxxMethodDecl(hasName("add_log"))),
+    unless(
+        hasAncestor(recordDecl(hasName("banggame::game_net_manager")))
+    )
+)
