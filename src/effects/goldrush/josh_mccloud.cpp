@@ -91,7 +91,7 @@ namespace banggame {
             return get_equip_prompt(target, target_card, target_player);
         }
 
-        void on_pick(player_ptr target_player) {
+        void on_pick(player_ptr target_player) override {
             target->m_game->pop_request();
             if (target_player == target) {
                 target->m_game->add_log("LOG_EQUIPPED_CARD", target_card, target);

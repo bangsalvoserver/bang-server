@@ -25,6 +25,9 @@ namespace banggame {
     
     void effect_set_playing::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         switch (type) {
+        case play_as::bang:
+            // ignore
+            break;
         case play_as::missed:
             origin->m_game->add_log("LOG_PLAYED_CARD_AS_MISSED", target_card, origin);
             break;

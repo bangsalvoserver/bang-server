@@ -69,7 +69,7 @@ namespace banggame {
             return target_player != target;
         }
 
-        void on_pick(player_ptr target_player) {
+        void on_pick(player_ptr target_player) override {
             target->m_game->pop_request();
             resolve_vera_custer(origin_card, target, target_player);
         }

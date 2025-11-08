@@ -24,6 +24,10 @@ namespace banggame {
                 break;
             case escape_type::escape_timer:
                 set_duration(target->m_game->m_options.escape_timer);
+                break;
+            case escape_type::escape_no_timer:
+                // ignore
+                break;
             }
         }
     }

@@ -27,7 +27,7 @@ namespace utils {
         using base = std::priority_queue<stable_element<T>, std::vector<stable_element<T>>, stable_compare<T, Compare>>;
 
     public:
-        using base::priority_queue;
+        using typename base::priority_queue;
 
         const T &top() const { return base::c.front().first; }
         T &top() { return base::c.front().first; }
