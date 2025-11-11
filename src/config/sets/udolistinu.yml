@@ -1,9 +1,9 @@
 main_deck:
-  - name: GHOST
+  - name: GHOST_2
     signs:
       - 9 spades
       - 10 spades
-    image: 07_fantasma2
+    image: 07_fantasma
     expansion: ghost_cards
     color: blue
     equip_target: dead
@@ -11,10 +11,10 @@ main_deck:
       - ghost(player_flag::ghost_1, true)
     tags:
       - ghost_card
-  - name: LEMAT
+  - name: LEMAT_2
     signs:
       - 4 diamonds
-    image: 07_lemat2
+    image: 07_lemat
     color: blue
     equip:
       - weapon(1)
@@ -59,19 +59,19 @@ main_deck:
       - bounty
     tags:
       - penalty
-  - name: BANDIDOS
+  - name: BANDIDOS_2
     signs:
       - Q diamonds
-    image: 07_bandidos2
+    image: 07_bandidos
     color: brown
     effects:
       - bandidos2 players notself not_empty_hand
     tags:
       - strong
-  - name: ESCAPE
+  - name: ESCAPE_2
     signs:
       - 3 hearts
-    image: 07_fuga2
+    image: 07_fuga
     color: brown
     responses:
       - escape2
@@ -104,10 +104,10 @@ main_deck:
       - backfire
     tags:
       - missed
-  - name: SAVED
+  - name: SAVED_2
     signs:
       - 5 hearts
-    image: 07_salvo2
+    image: 07_salvo
     color: brown
     responses:
       - saved2
@@ -133,10 +133,10 @@ main_deck:
     tags:
       - skip_logs
       - ranged_effect
-  - name: TORNADO
+  - name: TORNADO_2
     signs:
       - A clubs
-    image: 07_tornado2
+    image: 07_tornado
     color: brown
     effects:
       - tornado2 players not_empty_hand
@@ -158,8 +158,8 @@ character:
     tags:
       - skip_logs
       - ranged_effect
-  - name: COLORADO_BILL
-    image: 07_coloradobill2
+  - name: COLORADO_BILL_2
+    image: 07_coloradobill
     equip:
       - colorado_bill2
   - name: DER_SPOT_BURST_RINGER
@@ -170,8 +170,8 @@ character:
       - play_as_bang players notself
     tags:
       - strong
-  - name: EVELYN_SHEBANG
-    image: 07_evelynshebang2
+  - name: EVELYN_SHEBANG_2
+    image: 07_evelynshebang
     responses:
       - add_draw_card
       - max_usages(1)
@@ -190,8 +190,8 @@ character:
       - heal_notfull
     tags:
       - preselect
-  - name: MICK_DEFENDER
-    image: 07_mickdefender2
+  - name: MICK_DEFENDER_2
+    image: 07_mickdefender
     equip:
       - mick_defender2
     responses:
