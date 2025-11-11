@@ -193,10 +193,13 @@ def merge_cards(card_sets):
 
 def parse_file(card_sets):
     def get_main_deck_cards(card):
-        return [{'sign': sign, **card} for sign in card['signs']]
+        return [{**card, 'sign': sign} for sign in card['signs']]
 
     def get_goldrush_cards(card):
         return [card] * card.get('count', 1)
+    
+    def get_legends_cards(card):
+        return [{**card, 'name': 'LEGEND_' + card['name']}]
     
     def get_cards_default(card):
         return [card]
@@ -224,7 +227,7 @@ def parse_file(card_sets):
         Deck('stations', key='station'),
         Deck('train'),
         Deck('locomotive'),
-        Deck('legends'),
+        Deck('legends', strategy=get_legends_cards),
         Deck('feats'),
         Deck('hidden', deck='none'),
     ]

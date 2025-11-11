@@ -20,11 +20,17 @@ namespace banggame {
         return false;
     }
 
+    static std::string_view get_base_character_name(std::string_view name) {
+        static constexpr std::string_view prefix = "LEGEND_";
+        assert(name.starts_with(prefix));
+        return name.substr(prefix.length());
+    }
+
     static card_ptr find_legend_character(card_ptr origin_card) {
         auto range = origin_card->m_game->m_legends
             | rv::filter([=](card_ptr target_card) {
                 if (origin_card->expansion.empty()) {
-                    return target_card->name == origin_card->name;
+                    return get_base_character_name(target_card->name) == origin_card->name;
                 } else {
                     return rn::none_of(origin_card->m_game->m_players, [&](player_ptr target) {
                         return target->get_character()->name == target_card->name;
