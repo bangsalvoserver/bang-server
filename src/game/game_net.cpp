@@ -80,6 +80,11 @@ namespace json {
         }
     };
 
+    void serializer<banggame::card_data, banggame::game_context>::write(const banggame::card_data &data, string_writer &writer, const banggame::game_context &ctx) {
+        using serializer_type = aggregate_serializer<banggame::card_data, banggame::game_context>;
+        serializer_type::write(data, writer, ctx);
+    };
+
     template<typename Context> struct serializer<banggame::card_backface_list, Context> {
         struct card_backface {
             int id;
@@ -178,6 +183,8 @@ namespace json {
 }
 
 namespace banggame {
+
+    const banggame::empty_context empty_context::instance;
 
     static card_targets_pair deserialize_card_targets(const json::json &card, const json::json &targets, const game_context &context, bool check_equip = false) {
         card_targets_pair result {

@@ -60,6 +60,20 @@ namespace json {
         }
     };
 
+    template<> struct serializer<banggame::card_data, banggame::game_context> {
+        static void write(const banggame::card_data &data, string_writer &writer, const banggame::game_context &ctx);
+    };
+
+}
+
+namespace banggame {
+    struct empty_context : game_context {
+        card_ptr find_card(int card_id) const override { return nullptr; }
+        player_ptr find_player(int player_id) const override { return nullptr; }
+        game_duration transform_duration(game_duration duration) const { return duration; }
+
+        static const empty_context instance;
+    };
 }
 
 #endif
