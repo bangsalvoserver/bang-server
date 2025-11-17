@@ -60,6 +60,15 @@ namespace json {
         }
     };
 
+    void serialize_card_data(const banggame::card_data &data, string_writer &writer);
+
+    template<typename Context>
+    struct serializer<banggame::card_data, Context> {
+        static void write(const banggame::card_data &data, string_writer &writer) {
+            serialize_card_data(data, writer);
+        }
+    };
+
 }
 
 #endif

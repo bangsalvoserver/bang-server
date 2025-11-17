@@ -8,6 +8,9 @@
 #include "utils/parse_string.h"
 #include "utils/misc.h"
 
+#include "cards/bang_cards.h"
+#include "cards/card_serial.h"
+
 #include <stdexcept>
 
 #include <App.h>
@@ -123,6 +126,20 @@ namespace net {
                     res->writeStatus("400 Bad Request");
                     res->end();
                 }
+            })
+            .get("/cards/:deck", [this](auto *res, auto *req) {
+                if (auto deck = enums::from_string<banggame::card_deck_type>(req->getParameter("deck"))) {
+                    auto cards = banggame::get_card_deck(*deck);
+                    if (!cards.empty()) {
+                        res->writeHeader("Access-Control-Allow-Origin","*");
+                        res->writeHeader("Content-Type", "application/json");
+                        res->end(json::to_string(cards));
+                        return;
+                    }
+                }
+                res->writeStatus("400 Bad Request");
+                res->writeHeader("Access-Control-Allow-Origin","*");
+                res->end();
             })
             .listen(port, listen_options, [=, this](us_listen_socket_t *listen_socket) {
                 if (listen_socket) {

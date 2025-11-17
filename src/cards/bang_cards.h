@@ -35,6 +35,24 @@ namespace banggame {
     };
 
     extern const bang_cards_t bang_cards;
+
+    inline card_data_list get_card_deck(card_deck_type deck) {
+        switch (deck) {
+            case card_deck_type::none:              return bang_cards.hidden;
+            case card_deck_type::main_deck:         return bang_cards.deck;
+            case card_deck_type::character:         return bang_cards.characters;
+            case card_deck_type::goldrush:          return bang_cards.goldrush;
+            case card_deck_type::highnoon:          return bang_cards.highnoon;
+            case card_deck_type::fistfulofcards:    return bang_cards.fistfulofcards;
+            case card_deck_type::wildwestshow:      return bang_cards.wildwestshow;
+            case card_deck_type::station:           return bang_cards.stations;
+            case card_deck_type::locomotive:        return bang_cards.locomotive;
+            case card_deck_type::train:             return bang_cards.train;
+            case card_deck_type::legends:           return bang_cards.legends;
+            case card_deck_type::feats:             return bang_cards.feats;
+            default: return {};
+        }
+    }
     
 }
 
