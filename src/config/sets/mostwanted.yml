@@ -59,7 +59,7 @@ highnoon:
 
 hidden:
   - name: HANDCUFFS_HEARTS
-    image: highnoon/05_manette_hearts
+    image: highnoon/05_manette
     expansion: highnoon
     responses:
       - card_choice
@@ -67,7 +67,7 @@ hidden:
     tags:
       - card_choice(6)
   - name: HANDCUFFS_DIAMONDS
-    image: highnoon/05_manette_diamonds
+    image: highnoon/05_manette
     expansion: highnoon
     responses:
       - card_choice
@@ -75,7 +75,7 @@ hidden:
     tags:
       - card_choice(6)
   - name: HANDCUFFS_CLUBS
-    image: highnoon/05_manette_clubs
+    image: highnoon/05_manette
     expansion: highnoon
     responses:
       - card_choice
@@ -83,7 +83,7 @@ hidden:
     tags:
       - card_choice(6)
   - name: HANDCUFFS_SPADES
-    image: highnoon/05_manette_spades
+    image: highnoon/05_manette
     expansion: highnoon
     responses:
       - card_choice

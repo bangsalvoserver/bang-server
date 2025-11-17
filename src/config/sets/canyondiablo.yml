@@ -338,42 +338,42 @@ button_row:
 
 hidden:
   - name: ANNIE_OAKEY_RED
-    image: character/20_annie_oakey_red
+    image: character/20_annie_oakey
     responses:
       - card_choice
       - annie_oakey(&card_sign::is_red, 1)
     tags:
       - card_choice(-1)
   - name: ANNIE_OAKEY_HEARTS
-    image: character/20_annie_oakey_hearts
+    image: character/20_annie_oakey
     responses:
       - card_choice
       - annie_oakey(&card_sign::is_hearts, 2)
     tags:
       - card_choice(-1)
   - name: ANNIE_OAKEY_DIAMONDS
-    image: character/20_annie_oakey_diamonds
+    image: character/20_annie_oakey
     responses:
       - card_choice
       - annie_oakey(&card_sign::is_diamonds, 2)
     tags:
       - card_choice(-1)
   - name: ANNIE_OAKEY_BLACK
-    image: character/20_annie_oakey_black
+    image: character/20_annie_oakey
     responses:
       - card_choice
       - annie_oakey(&card_sign::is_black, 1)
     tags:
       - card_choice(-1)
   - name: ANNIE_OAKEY_CLUBS
-    image: character/20_annie_oakey_clubs
+    image: character/20_annie_oakey
     responses:
       - card_choice
       - annie_oakey(&card_sign::is_clubs, 2)
     tags:
       - card_choice(-1)
   - name: ANNIE_OAKEY_SPADES
-    image: character/20_annie_oakey_spades
+    image: character/20_annie_oakey
     responses:
       - card_choice
       - annie_oakey(&card_sign::is_spades, 2)

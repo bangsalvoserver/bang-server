@@ -88,14 +88,14 @@ fistfulofcards:
 
 hidden:
   - name: PEYOTE_RED
-    image: fistfulofcards/05_peyote_rosso
+    image: fistfulofcards/05_peyote
     responses:
       - card_choice
       - peyote(&card_sign::is_red)
     tags:
       - card_choice(5)
   - name: PEYOTE_BLACK
-    image: fistfulofcards/05_peyote_nero
+    image: fistfulofcards/05_peyote
     responses:
       - card_choice
       - peyote(&card_sign::is_black)
