@@ -121,7 +121,7 @@ namespace banggame {
     }
 
     void card::flash_card() {
-        m_game->add_update(game_updates::flash_card{ this });
+        m_game->flash_cards({ this });
     }
 
     void card::add_short_pause() {

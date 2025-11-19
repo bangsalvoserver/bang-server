@@ -236,13 +236,14 @@ namespace banggame {
     bool player::immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet) const {
         card_list cards;
         m_game->call_event(event_type::apply_immunity_modifier{ origin_card, origin, this, flags, cards });
-        if (!quiet) {
+        bool result = !cards.empty();
+        if (!quiet && result) {
             for (card_ptr target_card : cards) {
                 m_game->add_log("LOG_PLAYER_IMMUNE_TO_CARD", this, origin_card, target_card);
-                target_card->flash_card();
             }
+            m_game->flash_cards(std::move(cards));
         }
-        return !cards.empty();
+        return result;
     }
     
     bool player::empty_table() const {

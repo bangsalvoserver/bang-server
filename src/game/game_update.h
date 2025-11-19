@@ -140,7 +140,7 @@ namespace banggame {
         };
 
         struct flash_card {
-            card_ptr card;
+            card_list cards;
             animation_duration duration = durations.flash_card;
         };
 
