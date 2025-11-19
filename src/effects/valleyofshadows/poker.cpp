@@ -83,9 +83,7 @@ namespace banggame {
             if (auto aces = rv::filter(target->m_game->m_selection, [this](card_ptr c) {
                 return get_modified_sign(c).rank == card_rank::rank_A;
             })) {
-                for (card_ptr c : aces) {
-                    c->flash_card();
-                }
+                target->m_game->flash_cards(aces | rn::to<std::vector>());
                 target->m_game->pop_request();
                 target->m_game->add_short_pause();
                 target->m_game->add_log("LOG_POKER_ACE");

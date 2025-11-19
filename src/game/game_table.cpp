@@ -233,6 +233,10 @@ namespace banggame {
         add_update(game_updates::short_pause{ nullptr });
     }
 
+    void game_table::flash_cards(card_list cards) {
+        add_update(game_updates::flash_card{ std::move(cards) });
+    }
+
     void game_table::play_sound(sound_id sound) {
         add_update(game_updates::play_sound{ sound });
     }
