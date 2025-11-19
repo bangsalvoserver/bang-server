@@ -115,9 +115,9 @@ namespace banggame {
         
         game_string status_text(player_ptr owner) const override {
             if (target == owner) {
-                return {"STATUS_TORNADO2", origin_card};
+                return {"STATUS_TORNADO2", origin_card, target->get_next_player()};
             } else {
-                return {"STATUS_TORNADO2_OTHER", target, origin_card};
+                return {"STATUS_TORNADO2_OTHER", target, origin_card, target->get_next_player()};
             }
         }
     };
