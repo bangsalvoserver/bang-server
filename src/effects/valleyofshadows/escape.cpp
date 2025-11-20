@@ -8,6 +8,17 @@
 
 namespace banggame {
 
+    prompt_string effect_escape_base::on_prompt(card_ptr origin_card, player_ptr origin) {
+        auto req = origin->m_game->top_request<escapable_request>();
+        return req->escape_prompt(origin);
+    }
+
+    void effect_escape_base::on_play(card_ptr origin_card, player_ptr origin) {
+        auto req = origin->m_game->top_request<escapable_request>();
+        req->add_card(origin_card);
+        origin->m_game->pop_request();
+    }
+
     bool effect_escape::can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) {
         return origin && origin_card
             && origin_card->is_brown()
@@ -21,18 +32,6 @@ namespace banggame {
             return req->can_escape(origin_card);
         }
         return false;
-    }
-
-    prompt_string effect_escape::on_prompt(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<escapable_request>();
-        return req->escape_prompt(origin);
-    }
-
-    void effect_escape::on_play(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<escapable_request>();
-        req->add_card(origin_card);
-
-        origin->m_game->pop_request();
     }
 
     bool effect_escape2::can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) {
@@ -52,12 +51,5 @@ namespace banggame {
             return req->can_escape(origin_card);
         }
         return false;
-    }
-
-    void effect_escape2::on_play(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<escapable_request>();
-        req->add_card(origin_card);
-        
-        origin->m_game->pop_request();
     }
 }
