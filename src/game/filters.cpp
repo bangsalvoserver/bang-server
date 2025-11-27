@@ -11,7 +11,11 @@ namespace banggame {
         if (!filter.check(target_player_filter::dead_or_alive)
             && filter.check(target_player_filter::dead) == target->alive()
         ) {
-            return {"ERROR_TARGET_DEAD", origin_card, target};
+            if (target->alive()) {
+                return {"ERROR_TARGET_NOT_DEAD", origin_card, target};
+            } else {
+                return {"ERROR_TARGET_DEAD", origin_card, target};
+            }
         }
 
         if (filter.check(target_player_filter::self) && target != origin)
