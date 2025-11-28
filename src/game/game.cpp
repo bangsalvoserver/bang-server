@@ -41,13 +41,6 @@ namespace banggame {
                 images.emplace(std::format("backface/{}", enums::to_string(card.deck)));
             }
         }
-        for (player_role role : enums::enum_values<player_role>) {
-            if (role == player_role::unknown) {
-                images.emplace("backface/role");
-            } else {
-                images.emplace(std::format("role/{}", enums::to_string(role)));
-            }
-        }
 
         std::unordered_set<sound_id> sounds = bang_cards.expansions
             | rv::values
