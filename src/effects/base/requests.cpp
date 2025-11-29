@@ -91,6 +91,10 @@ namespace banggame {
                 on_pick(target->m_hand.front());
             }
         }
+
+        prompt_string pick_prompt(card_ptr target_card) const override {
+            return {};
+        }
     };
 
     void request_discard_pass::on_update() {
@@ -98,6 +102,10 @@ namespace banggame {
             target->m_game->pop_request();
             target->m_game->queue_request<request_discard_hand_pass>(target);
         }
+    }
+
+    prompt_string request_discard_pass::pick_prompt(card_ptr target_card) const {
+        return prompts::bot_check_discard_card(target, target_card);
     }
 
     bool request_discard_pass::can_pick(const_card_ptr target_card) const {
