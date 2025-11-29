@@ -2,6 +2,7 @@
 
 #include "game/game_table.h"
 #include "game/play_verify.h"
+#include "game/prompts.h"
 
 #include "resolve.h"
 
@@ -21,6 +22,10 @@ namespace banggame {
     
     game_string effect_set_playing::get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) {
         return get_play_card_error(origin, target, ctx);
+    }
+
+    prompt_string effect_set_playing::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        return prompts::bot_check_discard_card(origin, target_card);
     }
     
     void effect_set_playing::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {

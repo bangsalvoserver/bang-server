@@ -27,6 +27,7 @@ namespace banggame {
         
         void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card);
     };
 
