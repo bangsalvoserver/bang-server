@@ -280,7 +280,7 @@ namespace json {
     template<std::floating_point T, typename Context>
     struct deserializer<T, Context> {
         static T read(const json &value) {
-            if (value.IsDouble()) {
+            if (value.IsNumber()) {
                 return static_cast<T>(value.GetDouble());
             }
             throw deserialize_error("Cannot deserialize number");
