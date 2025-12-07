@@ -24,9 +24,9 @@ namespace banggame {
     }
 
     prompt_string targeting_adjacent_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, player_pair targets) {
-        return merge_prompts(targets | rv::transform([&](player_ptr target) {
+        return merge_prompts_strict(targets | rv::transform([&](player_ptr target) {
             return target_player.on_prompt(origin_card, origin, effect, ctx, target);
-        }), true);
+        }));
     }
 
     void targeting_adjacent_players::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, player_pair targets) {

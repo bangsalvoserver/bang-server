@@ -47,19 +47,31 @@ namespace banggame {
 
     play_verify_result verify_and_play(player_ptr origin, const game_action &action);
 
-    template<rn::input_range R> requires std::convertible_to<rn::range_value_t<R>, prompt_string>
-    inline prompt_string merge_prompts(R &&prompts, bool ignore_empty = false) {
+    template<typename R>
+    concept prompt_range = rn::input_range<R> && std::convertible_to<rn::range_value_t<R>, prompt_string>;
+
+    inline prompt_string merge_prompts(prompt_range auto &&prompts) {
         prompt_string result;
-        bool empty = false;
+        bool found_empty = false;
         for (const prompt_string &str : prompts) {
             if (!str) {
-                empty = true;
+                found_empty = true;
             } else if (!result || str.priority > result.priority) {
                 result = str;
             }
         }
-        if (empty && result.priority == 0 && !ignore_empty) {
-            return {};
+        if (found_empty && result.priority == 0) {
+            result = {};
+        }
+        return result;
+    }
+
+    inline prompt_string merge_prompts_strict(prompt_range auto &&prompts) {
+        prompt_string result;
+        for (const prompt_string &str : prompts) {
+            if (str && (!result || str.priority > result.priority)) {
+                result = str;
+            }
         }
         return result;
     }

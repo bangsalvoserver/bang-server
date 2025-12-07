@@ -38,9 +38,9 @@ namespace banggame {
 
     prompt_string targeting_player_per_cube::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
         MAYBE_RETURN(target_cubes.on_prompt(origin_card, origin, effect, ctx, target.cubes));
-        return merge_prompts(target.players | rv::transform([&](player_ptr target) {
+        return merge_prompts_strict(target.players | rv::transform([&](player_ptr target) {
             return target_player.on_prompt(origin_card, origin, effect, ctx, target);
-        }), true);
+        }));
     }
 
     void targeting_player_per_cube::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const value_type &target) {
