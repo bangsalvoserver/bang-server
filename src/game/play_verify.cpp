@@ -183,21 +183,22 @@ namespace banggame {
     }
 
     prompt_string get_equip_prompt(player_ptr origin, card_ptr origin_card, player_ptr target) {
-        for (const equip_holder &holder : origin_card->equips) {
-            MAYBE_RETURN(holder.on_prompt(origin_card, origin, target));
-        }
-        return {};
+        return merge_prompts_strict(origin_card->equips | rv::transform([&](const equip_holder &holder) {
+            return holder.on_prompt(origin_card, origin, target);
+        }));
     }
 
     static prompt_string get_play_prompt(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
-        for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
-            MAYBE_RETURN(effect.on_prompt(origin_card, origin, target, ctx));
-        }
-
-        if (const mth_holder &mth = origin_card->get_mth(is_response)) {
-            return mth.on_prompt(origin_card, origin, targets, ctx);
-        }
-        return {};
+        return merge_prompts_strict(rv::concat(
+            rv::zip(targets, origin_card->get_effect_list(is_response)) | rv::transform([&](const auto &pair) {
+                const auto &[target, effect] = pair;
+                return effect.on_prompt(origin_card, origin, target, ctx);
+            }),
+            
+            rv::single(origin_card->get_mth(is_response)) | rv::transform([&](const mth_holder &mth) {
+                return mth ? mth.on_prompt(origin_card, origin, targets, ctx) : prompt_string{};
+            })
+        ));
     }
 
     static prompt_string get_prompt_message(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
