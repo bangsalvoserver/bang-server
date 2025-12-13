@@ -10,6 +10,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -39,6 +40,17 @@ namespace banggame {
         return get_count_performed_feats(origin) == 0;
     }
 
+    static bool can_damage_legend_kill(player_ptr target) {
+        bool result = false;
+        target->m_game->call_event(event_type::check_damage_legend_kill{ target, result });
+        return result;
+    }
+
+    static bool is_valid_damage_legend_target(const_player_ptr origin, const_player_ptr target, bool can_kill) {
+        return origin != target && target->alive() && is_legend(target)
+            && (target->m_hp > 1 || can_kill);
+    }
+
     struct request_damage_legend : request_resolvable, interface_target_set_players {
         request_damage_legend(card_ptr origin_card, player_ptr target)
             : request_resolvable{origin_card, nullptr, target} {}
@@ -47,7 +59,7 @@ namespace banggame {
 
         void on_update() override {
             if (update_count == 0) {
-                target->m_game->call_event(event_type::check_damage_legend_kill{ target, can_kill });
+                can_kill = can_damage_legend_kill(target);
             }
             auto_resolve();
         }
@@ -61,8 +73,7 @@ namespace banggame {
         }
         
         bool in_target_set(const_player_ptr target_player) const override {
-            return target_player != target && target_player->alive() && is_legend(target_player)
-                && (target_player->m_hp > 1 || can_kill);
+            return is_valid_damage_legend_target(target, target_player, can_kill);
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -135,6 +146,10 @@ namespace banggame {
             return rn::contains(target_cards, target_card);
         }
 
+        prompt_string pick_prompt(card_ptr target_card) const override {
+            return effect_perform_feat{}.on_prompt(target_card, target);
+        }
+
         void on_pick(card_ptr target_card) override {
             target->m_game->pop_request();
             effect_perform_feat{}.on_play(target_card, target);
@@ -192,6 +207,18 @@ namespace banggame {
         });
 
         target->m_game->queue_request<request_perform_feat>(target);
+    }
+
+    prompt_string effect_perform_feat::on_prompt(card_ptr origin_card, player_ptr origin) {
+        if (is_legend(origin) && rn::none_of(origin->m_game->range_other_players(origin),
+            [&, can_kill = can_damage_legend_kill(origin)](player_ptr target) {
+                return is_valid_damage_legend_target(origin, target, can_kill)
+                    && (!origin->is_bot() || bot_suggestion::is_target_enemy(origin, target));
+            })
+        ) {
+            return {2, "PROMPT_CLAIM_NO_TARGET"};
+        }
+        return {};
     }
 
     void effect_perform_feat::on_play(card_ptr origin_card, player_ptr origin) {

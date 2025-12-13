@@ -28,6 +28,7 @@ namespace banggame {
 
     struct effect_perform_feat {
         bool can_play(card_ptr origin_card, player_ptr origin);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin);
     };
     
