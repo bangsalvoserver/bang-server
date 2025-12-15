@@ -37,7 +37,7 @@ namespace banggame {
     }
 
     prompt_string targeting_player_per_cube::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
-        return merge_prompts_strict(rv::concat(
+        return select_prompt(rv::concat(
             rv::single(target_cubes.on_prompt(origin_card, origin, effect, ctx, target.cubes)),
 
             target.players | rv::transform([&](player_ptr target) {

@@ -24,7 +24,7 @@ namespace banggame {
     }
 
     prompt_string targeting_adjacent_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, player_pair targets) {
-        return merge_prompts_strict(targets | rv::transform([&](player_ptr target) {
+        return select_prompt(targets | rv::transform([&](player_ptr target) {
             return target_player.on_prompt(origin_card, origin, effect, ctx, target);
         }));
     }

@@ -49,7 +49,7 @@ namespace banggame {
         }
 
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
-            return merge_prompts_strict(std::array{
+            return select_prompt(std::array{
                 target_cubes.on_prompt(origin_card, origin, effect, ctx, target.cubes),
                 target_player.on_prompt(origin_card, origin, effect, ctx, target.player)
             });

@@ -50,7 +50,7 @@ namespace banggame {
     template<typename R>
     concept prompt_range = rn::input_range<R> && std::convertible_to<rn::range_value_t<R>, prompt_string>;
 
-    inline prompt_string merge_prompts(prompt_range auto &&prompts) {
+    inline prompt_string select_prompt_fallback_empty(prompt_range auto &&prompts) {
         prompt_string result;
         bool found_empty = false;
         for (const prompt_string &str : prompts) {
@@ -66,7 +66,7 @@ namespace banggame {
         return result;
     }
 
-    inline prompt_string merge_prompts_strict(prompt_range auto &&prompts) {
+    inline prompt_string select_prompt(prompt_range auto &&prompts) {
         prompt_string result;
         for (const prompt_string &str : prompts) {
             if (str && (!result || str.priority > result.priority)) {
