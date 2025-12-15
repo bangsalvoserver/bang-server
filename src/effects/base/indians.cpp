@@ -29,7 +29,7 @@ namespace banggame {
         }
 
         prompt_string resolve_prompt() const override {
-            if (target->is_bot() && target->m_hp <= 1 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
+            if (target->is_bot() && target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
                 return "BOT_MUST_RESPOND_INDIANS";
             }
             return {};
