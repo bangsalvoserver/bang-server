@@ -202,14 +202,17 @@ namespace banggame {
     }
 
     static prompt_string get_prompt_message(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
-        for (const auto &[mod_card, mod_targets] : modifiers) {
-            MAYBE_RETURN(get_play_prompt(origin, mod_card, is_response, mod_targets, ctx));
-        }
-        if (origin_card->is_equip_card()) {
-            return get_equip_prompt(origin, origin_card, get_equip_target(origin, origin_card, targets));
-        } else {
-            return get_play_prompt(origin, origin_card, is_response, targets, ctx);
-        }
+        return merge_prompts_strict(rv::concat(
+            modifiers | rv::transform([&](const auto &pair) {
+                const auto &[mod_card, mod_targets] = pair;
+                return get_play_prompt(origin, mod_card, is_response, mod_targets, ctx);
+            }),
+
+            rv::single(origin_card->is_equip_card()
+                ? get_equip_prompt(origin, origin_card, get_equip_target(origin, origin_card, targets))
+                : get_play_prompt(origin, origin_card, is_response, targets, ctx)
+            )
+        ));
     }
 
     static void log_played_card(card_ptr origin_card, player_ptr origin, bool is_response) {
