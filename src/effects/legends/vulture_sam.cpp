@@ -18,6 +18,7 @@ namespace banggame {
     void equip_vulture_sam_legend::on_enable(card_ptr origin_card, player_ptr origin) {
         origin->m_game->add_listener<event_type::on_player_death>(origin_card, [=](player_ptr target, bool tried_save) {
             if (origin == target) {
+                // TODO what should happen if vera custer copies this effect?
                 origin->set_character(find_base_character(origin->get_character()));
                 origin->set_hp(4);
             }
