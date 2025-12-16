@@ -113,6 +113,20 @@ namespace banggame {
         m_game->add_update(game_updates::move_card{ this, new_owner, new_pocket, instant ? 0ms : durations.move_card, position });
     }
 
+    void card::exchange_with(card_ptr new_card, bool instant) {
+        *rn::find(m_game->get_pocket(pocket, owner), this) = new_card;
+
+        new_card->visibility = visibility;
+        new_card->pocket = pocket;
+        new_card->owner = owner;
+
+        visibility = {};
+        pocket = pocket_type::none;
+        owner = nullptr;
+
+        m_game->add_update(game_updates::exchange_card{ this, new_card, *new_card, instant ? 0ms : durations.flip_card });
+    }
+
     void card::set_inactive(bool new_inactive) {
         if (new_inactive != inactive) {
             m_game->add_update(game_updates::tap_card{ this, new_inactive });

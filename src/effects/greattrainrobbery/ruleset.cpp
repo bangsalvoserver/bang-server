@@ -25,13 +25,16 @@ namespace banggame {
             origin->m_game->rng
         ), pocket_type::stations, nullptr, card_visibility::shown);
 
-        auto old_locomotive = origin->m_game->m_train;
-        origin->m_game->remove_cards(old_locomotive);
+        card_ptr old_locomotive = origin->m_game->m_train.empty() ? nullptr : origin->m_game->m_train.front();
+        card_ptr new_locomotive = random_element(origin->m_game->m_locomotive | rv::filter([&](card_ptr target_card) {
+            return target_card != old_locomotive;
+        }), origin->m_game->rng);
 
-        origin->m_game->add_cards_to(sample_elements(
-            origin->m_game->m_locomotive | rv::filter([&](card_ptr c) { return !rn::contains(old_locomotive, c); }),
-            1, origin->m_game->rng
-        ), pocket_type::train, nullptr, card_visibility::shown);
+        if (old_locomotive) {
+            old_locomotive->exchange_with(new_locomotive);
+        } else {
+            origin->m_game->add_cards_to({ new_locomotive }, pocket_type::train, nullptr, card_visibility::shown);
+        }
 
         for (card_ptr c : origin->m_game->m_train) {
             origin->enable_equip(c);
@@ -58,7 +61,6 @@ namespace banggame {
         }
 
         for (card_ptr target_card : origin->m_game->m_train) {
-            target_card->set_visibility(card_visibility::hidden);
             origin->disable_equip(target_card);
         }
         

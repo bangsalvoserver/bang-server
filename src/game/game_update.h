@@ -133,6 +133,13 @@ namespace banggame {
             animation_duration duration = durations.flip_card;
         };
 
+        struct exchange_card {
+            card_ptr card;
+            card_ptr new_card;
+            card_data info;
+            animation_duration duration = durations.flip_card;
+        };
+
         struct tap_card {
             card_ptr card;
             bool inactive;
@@ -244,6 +251,7 @@ namespace banggame {
         game_updates::deck_shuffled,
         game_updates::show_card,
         game_updates::hide_card,
+        game_updates::exchange_card,
         game_updates::tap_card,
         game_updates::flash_card,
         game_updates::short_pause,

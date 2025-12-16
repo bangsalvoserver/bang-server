@@ -117,14 +117,6 @@ namespace json {
         };
     };
 
-    static std::string_view get_frontface_name(std::string_view name) {
-        auto pos = name.find(':');
-        if (pos != std::string_view::npos) {
-            return name.substr(0, pos);
-        }
-        return name;
-    }
-
     template<> struct serializer<banggame::format_arg_value, banggame::game_context> {
         static void write(banggame::format_arg_value pair, string_writer &writer, const banggame::game_context &ctx) {
             struct format_int {
@@ -157,7 +149,7 @@ namespace json {
                     if (!target_card) {
                         throw serialize_error(std::format("Cannot find card {}", value));
                     }
-                    serialize(format_card{ .card{ get_frontface_name(target_card->name), target_card->sign }}, writer, ctx);
+                    serialize(format_card{ .card{ target_card->name, target_card->sign }}, writer, ctx);
                 } else {
                     serialize(format_card_empty{}, writer, ctx);
                 }

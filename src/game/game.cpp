@@ -24,12 +24,11 @@ namespace banggame {
     static game_updates::preload_assets make_preload_assets_update(game_ptr table) {
         std::unordered_set<std::string> images;
         for (const card_data &card : table->m_cards_storage | rv::values) {
-            auto image = card.image.substr(0, card.image.find(':'));
-            if (!image.empty()) {
-                if (image.contains('/')) {
-                    images.emplace(image);
+            if (!card.image.empty()) {
+                if (card.image.contains('/')) {
+                    images.emplace(card.image);
                 } else {
-                    images.emplace(std::format("{}/{}", enums::to_string(card.deck), image));
+                    images.emplace(std::format("{}/{}", enums::to_string(card.deck), card.image));
                 }
             }
             switch (card.deck) {

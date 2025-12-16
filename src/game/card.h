@@ -42,6 +42,7 @@ namespace banggame {
         void set_visibility(player_set visibility, bool instant = false);
         void set_visibility(card_visibility visibility, player_ptr owner = nullptr, bool instant = false);
         void move_to(pocket_type pocket, player_ptr owner = nullptr, card_visibility visibility = card_visibility::show_owner, bool instant = false, pocket_position position = pocket_position::end);
+        void exchange_with(card_ptr new_card, bool instant = false);
         void set_inactive(bool inactive);
 
         void flash_card();

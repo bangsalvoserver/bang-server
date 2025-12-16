@@ -368,16 +368,16 @@ train:
       - ranged_effect
 
 locomotive:
-  - name: IRONHORSE:LELAND
-    image: 27_ironhorse:27_leland
+  - name: IRONHORSE
+    image: 27_ironhorse
     color: train
     equip:
       - ironhorse
     effects:
       - next_stop
     modifier: locomotive
-  - name: LELAND:IRONHORSE
-    image: 27_leland:27_ironhorse
+  - name: LELAND
+    image: 27_leland
     color: train
     equip:
       - leland
