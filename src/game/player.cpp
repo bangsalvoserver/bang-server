@@ -378,7 +378,7 @@ namespace banggame {
             m_game->add_cards_to({ target_card }, pocket_type::player_character, this, card_visibility::shown);
         } else {
             if (target_card->pocket == pocket_type::player_character && target_card->owner != this) {
-                target_card->owner->disable_equip(target_card);
+                throw game_error("cannot move character card from one player to another");
             }
             target_card->move_to(pocket_type::player_character, this, card_visibility::shown);
         }
