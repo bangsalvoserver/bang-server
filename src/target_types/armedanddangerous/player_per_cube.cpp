@@ -1,6 +1,7 @@
 #include "player_per_cube.h"
 
 #include "game/possible_to_play.h"
+#include "game/prompts.h"
 
 #include "cards/game_enums.h"
 
@@ -37,7 +38,7 @@ namespace banggame {
     }
 
     prompt_string targeting_player_per_cube::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
-        return select_prompt(rv::concat(
+        return prompts::select_prompt(rv::concat(
             rv::single(target_cubes.on_prompt(origin_card, origin, effect, ctx, target.cubes)),
 
             target.players | rv::transform([&](player_ptr target) {

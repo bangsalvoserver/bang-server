@@ -1,8 +1,9 @@
 #include "card_per_player.h"
 
-#include "cards/game_enums.h"
-
 #include "game/possible_to_play.h"
+#include "game/prompts.h"
+
+#include "cards/game_enums.h"
 
 namespace banggame {
 
@@ -49,7 +50,7 @@ namespace banggame {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
-        return select_prompt_fallback_empty(target_cards | rv::transform([&](card_ptr target_card) {
+        return prompts::select_prompt_fallback_empty(target_cards | rv::transform([&](card_ptr target_card) {
             return effect.on_prompt(origin_card, origin, target_card, ctx);
         }));
     }

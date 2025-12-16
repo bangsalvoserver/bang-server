@@ -1,8 +1,9 @@
 #include "adjacent_players.h"
 
-#include "cards/game_enums.h"
-
 #include "game/possible_to_play.h"
+#include "game/prompts.h"
+
+#include "cards/game_enums.h"
 
 namespace banggame {
 
@@ -24,7 +25,7 @@ namespace banggame {
     }
 
     prompt_string targeting_adjacent_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, player_pair targets) {
-        return select_prompt(targets | rv::transform([&](player_ptr target) {
+        return prompts::select_prompt(targets | rv::transform([&](player_ptr target) {
             return target_player.on_prompt(origin_card, origin, effect, ctx, target);
         }));
     }

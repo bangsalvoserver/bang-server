@@ -6,6 +6,7 @@
 #include "cards/filter_enums.h"
 #include "cards/game_events.h"
 
+#include "prompts.h"
 #include "filters.h"
 #include "game_table.h"
 #include "request_timer.h"
@@ -183,13 +184,13 @@ namespace banggame {
     }
 
     prompt_string get_equip_prompt(player_ptr origin, card_ptr origin_card, player_ptr target) {
-        return select_prompt(origin_card->equips | rv::transform([&](const equip_holder &holder) {
+        return prompts::select_prompt(origin_card->equips | rv::transform([&](const equip_holder &holder) {
             return holder.on_prompt(origin_card, origin, target);
         }));
     }
 
     static prompt_string get_play_prompt(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
-        return select_prompt(rv::concat(
+        return prompts::select_prompt(rv::concat(
             rv::zip(targets, origin_card->get_effect_list(is_response)) | rv::transform([&](const auto &pair) {
                 const auto &[target, effect] = pair;
                 return effect.on_prompt(origin_card, origin, target, ctx);
@@ -202,7 +203,7 @@ namespace banggame {
     }
 
     static prompt_string get_prompt_message(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
-        return select_prompt(rv::concat(
+        return prompts::select_prompt(rv::concat(
             modifiers | rv::transform([&](const auto &pair) {
                 const auto &[mod_card, mod_targets] = pair;
                 return get_play_prompt(origin, mod_card, is_response, mod_targets, ctx);

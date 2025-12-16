@@ -2,6 +2,8 @@
 
 #include "card.h"
 
+#include "game/prompts.h"
+
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 
@@ -27,7 +29,7 @@ namespace banggame {
     }
 
     prompt_string targeting_cards::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
-        return select_prompt(targets | rv::transform([&](card_ptr c) {
+        return prompts::select_prompt(targets | rv::transform([&](card_ptr c) {
             return target_card.on_prompt(origin_card, origin, effect, ctx, c);
         }));
     }

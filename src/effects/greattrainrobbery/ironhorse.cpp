@@ -1,7 +1,7 @@
 #include "ironhorse.h"
 
 #include "game/game_table.h"
-#include "game/play_verify.h"
+#include "game/prompts.h"
 
 #include "effects/base/bang.h"
 
@@ -35,7 +35,7 @@ namespace banggame {
         });
 
         origin->m_game->add_listener<event_type::get_locomotive_prompt>(origin_card, [](player_ptr target, int locomotive_count, prompt_string &out_prompt) {
-            out_prompt = select_prompt_fallback_empty(target->m_game->range_alive_players(target) | rv::transform([&](player_ptr p){
+            out_prompt = prompts::select_prompt_fallback_empty(target->m_game->range_alive_players(target) | rv::transform([&](player_ptr p){
                 return get_ironhorse_prompt(target, p, locomotive_count);
             }));
         });
