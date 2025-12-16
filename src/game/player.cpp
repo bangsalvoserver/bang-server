@@ -368,17 +368,26 @@ namespace banggame {
     }
 
     void player::set_character(card_ptr target_card) {
-        card_ptr old_character = get_character();
-        if (old_character) {
-            remove_characters();
-            old_character->owner = this;
+        if (target_card->pocket == pocket_type::player_character && target_card->owner != this) {
+            throw game_error("cannot move character card from one player to another");
         }
         
+        card_ptr old_character = get_character();
+        
         if (target_card->pocket == pocket_type::none) {
-            m_game->add_cards_to({ target_card }, pocket_type::player_character, this, card_visibility::shown);
+            if (old_character) {
+                remove_characters(old_character, true);
+                disable_equip(old_character);
+
+                old_character->exchange_with(target_card);
+                old_character->owner = this;
+            } else {
+                m_game->add_cards_to({ target_card }, pocket_type::player_character, this, card_visibility::shown);
+            }
         } else {
-            if (target_card->pocket == pocket_type::player_character && target_card->owner != this) {
-                throw game_error("cannot move character card from one player to another");
+            if (old_character) {
+                remove_characters();
+                old_character->owner = this;
             }
             target_card->move_to(pocket_type::player_character, this, card_visibility::shown);
         }
