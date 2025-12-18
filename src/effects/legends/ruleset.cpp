@@ -49,6 +49,19 @@ namespace banggame {
         return feat_card;
     }
 
+    std::string_view get_base_character_name(card_ptr target_card) {
+        static constexpr std::string_view prefix = "LEGEND_";
+        std::string_view name;
+        if (target_card) {
+            name = target_card->name;
+        }
+        if (name.starts_with(prefix)) {
+            return name.substr(prefix.length());
+        } else {
+            return name;
+        }
+    }
+
     static int count_feat_tot_fame(const_card_ptr target_card) {
         int result = 0;
         for (const auto &[token, count] : target_card->tokens) {

@@ -347,24 +347,15 @@ namespace banggame {
         }
     }
 
-    void player::remove_characters(card_ptr start_from, bool exclude_first) {
-        auto begin = m_characters.begin();
-        if (start_from) {
-            for (card_ptr c : m_characters) {
-                if (c == start_from) {
-                    if (exclude_first) ++begin;
-                    break;
-                }
-                ++begin;
-            }
-        }
-        card_list cards{begin, m_characters.end()};
-        
-        for (card_ptr target_card : cards) {
-            disable_equip(target_card);
-        }
+    void player::remove_characters(size_t start_index) {
+        if (start_index < m_characters.size()) {
+            card_list cards{m_characters.begin() + start_index, m_characters.end()};
 
-        m_game->remove_cards(std::move(cards));
+            for (card_ptr target_card : cards) {
+                disable_equip(target_card);
+            }
+            m_game->remove_cards(std::move(cards));
+        }
     }
 
     void player::set_character(card_ptr target_card) {
@@ -376,7 +367,7 @@ namespace banggame {
         
         if (target_card->pocket == pocket_type::none) {
             if (old_character) {
-                remove_characters(old_character, true);
+                remove_characters(1);
                 disable_equip(old_character);
 
                 old_character->exchange_with(target_card);

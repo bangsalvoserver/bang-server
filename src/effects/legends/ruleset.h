@@ -7,6 +7,7 @@ namespace banggame {
 
     bool is_legend(const_player_ptr origin);
     card_ptr draw_next_feat(player_ptr origin);
+    std::string_view get_base_character_name(card_ptr target_card);
 
     struct ruleset_legends {
         void on_apply(game_ptr game);

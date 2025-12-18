@@ -6,6 +6,8 @@
 
 #include "utils/random_element.h"
 
+#include "ruleset.h"
+
 namespace banggame {
 
     bool effect_become_legend::can_play(card_ptr origin_card, player_ptr origin) {
@@ -18,19 +20,6 @@ namespace banggame {
             return true;
         }
         return false;
-    }
-
-    static std::string_view get_base_character_name(card_ptr target_card) {
-        static constexpr std::string_view prefix = "LEGEND_";
-        std::string_view name;
-        if (target_card) {
-            name = target_card->name;
-        }
-        if (name.starts_with(prefix)) {
-            return name.substr(prefix.length());
-        } else {
-            return name;
-        }
     }
 
     static card_ptr find_legend_character(card_ptr origin_card) {
