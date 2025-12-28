@@ -55,8 +55,9 @@ namespace banggame {
     card_sign get_modified_sign(const_card_ptr target_card);
 
     struct draw_check_result {
-        bool lucky;
-        bool indifferent;
+        bool lucky:1;
+        bool indifferent:1;
+        bool defensive_redraw:1;
     };
     
     struct request_check_base : selection_picker, draw_check_handler, std::enable_shared_from_this<request_check_base> {
@@ -90,7 +91,7 @@ namespace banggame {
         void restart() override;
 
         virtual draw_check_result get_result(card_ptr target_card) const = 0;
-        virtual void on_resolve(draw_check_result result) = 0;
+        virtual void on_resolve(bool lucky) = 0;
     };
 
     template<typename T> struct draw_check_condition_wrapper;
@@ -137,8 +138,8 @@ namespace banggame {
             return std::invoke(m_condition, target_card);
         }
 
-        void on_resolve(draw_check_result result) override {
-            std::invoke(m_function, result.lucky);
+        void on_resolve(bool lucky) override {
+            std::invoke(m_function, lucky);
         }
     };
 

@@ -72,7 +72,12 @@ namespace banggame {
         
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player_ptr p, card_ptr e_card) {
             if (p == target && e_card == target_card) {
-                target->m_game->queue_request<request_check>(target, target_card, &card_sign::is_red, [=](bool result) {
+                target->m_game->queue_request<request_check>(target, target_card, [](card_ptr drawn_card) {
+                    return draw_check_result{
+                        .lucky = get_modified_sign(drawn_card).is_red(),
+                        .defensive_redraw = true
+                    };
+                }, [=](bool result) {
                     if (result) {
                         target->m_game->queue_request<request_move_bomb>(target_card, target);
                     } else {

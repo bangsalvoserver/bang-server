@@ -81,8 +81,16 @@ namespace banggame {
     prompt_string request_check_base::redraw_prompt(card_ptr target_card, player_ptr owner) const {
         if (owner->is_bot()) {
             draw_check_result result = get_result(drawn_card);
-            if (result.indifferent || result.lucky == bot_suggestion::is_target_friend(owner, target)) {
-                return "BOT_DONT_REDRAW";
+            if (result.indifferent) {
+                return "BOT_DONT_REDRAW_INDIFFERENT";
+            } else if (result.defensive_redraw) {
+                if (result.lucky || !bot_suggestion::is_target_friend(owner, target)) {
+                    return "BOT_DONT_REDRAW_DEFENSIVE";
+                }
+            } else {
+                if (result.lucky == bot_suggestion::is_target_friend(owner, target)) {
+                    return "BOT_DONT_REDRAW_AGGRESSIVE";
+                }
             }
         }
         return {};
@@ -101,6 +109,6 @@ namespace banggame {
         } else {
             target->m_game->call_event(event_type::on_draw_check_resolve{origin_card, target, drawn_card, drawn_card });
         }
-        on_resolve(get_result(drawn_card));
+        on_resolve(get_result(drawn_card).lucky);
     }
 }

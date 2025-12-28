@@ -10,8 +10,12 @@ namespace banggame {
     void equip_dynamite::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_predraw_check>(target_card, [=](player_ptr e_player, card_ptr e_card) {
             if (e_player == target && e_card == target_card) {
-                target->m_game->queue_request<request_check>(target, target_card, [](card_sign sign) {
-                    return !sign.is_spades() || !sign.is_two_to_nine();
+                target->m_game->queue_request<request_check>(target, target_card, [](card_ptr drawn_card) {
+                    card_sign sign = get_modified_sign(drawn_card);
+                    return draw_check_result{
+                        .lucky = !sign.is_spades() || !sign.is_two_to_nine(),
+                        .defensive_redraw = true
+                    };
                 }, [=](bool result) {
                     if (!result) {
                         target->m_game->add_log("LOG_CARD_EXPLODES", target_card);
