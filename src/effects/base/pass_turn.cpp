@@ -4,7 +4,14 @@
 
 namespace banggame {
 
-    game_string effect_pass_turn::on_prompt(card_ptr origin_card, player_ptr origin) {
+    static prompt_string get_pass_turn_prompt(player_ptr origin) {
+        prompt_string result;
+        origin->m_game->call_event(event_type::prompt_pass_turn{ origin, result });
+        return result;
+    }
+
+    prompt_string effect_pass_turn::on_prompt(card_ptr origin_card, player_ptr origin) {
+        MAYBE_RETURN(get_pass_turn_prompt(origin));
         int diff = int(origin->m_hand.size()) - origin->max_cards_end_of_turn();
         if (diff >= 1) {
             return {"PROMPT_PASS_DISCARD", diff};

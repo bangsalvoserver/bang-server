@@ -26,7 +26,7 @@ wildwestshow:
   - name: MISS_SUSANNA
     image: 06_misssusanna
     equip:
-      - miss_susanna
+      - miss_susanna(3)
   - name: SHOWDOWN
     image: 06_regolamentodiconti
     equip:
