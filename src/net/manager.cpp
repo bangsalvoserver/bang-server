@@ -270,11 +270,7 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
 
     send_message(session->client, server_messages::lobby_entered{ new_user.user_id, lobby.lobby_id, lobby.name, lobby.options });
     
-    if (new_user.flags.check(game_user_flag::disconnected)) {
-        new_user.flags.remove(game_user_flag::disconnected);
-        lobby.connected_user_ids.push_back(new_user.user_id);
-        inserted = true;
-    } else if (inserted && lobby.m_game) {
+    if (inserted && lobby.m_game) {
         new_user.flags.add(game_user_flag::spectator);
     }
 

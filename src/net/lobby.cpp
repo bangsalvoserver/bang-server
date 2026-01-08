@@ -79,7 +79,13 @@ namespace banggame {
     std::pair<game_user &, bool> game_lobby::add_user(session_ptr session) {
         session->lobby = this;
         if (auto it = users_by_session.find(session); it != users_by_session.end()) {
-            return {find_user(it->second), false};
+            game_user &user = find_user(it->second);
+            if (user.is_disconnected()) {
+                user.flags.remove(game_user_flag::disconnected);
+                connected_user_ids.push_back(user.user_id);
+                return {user, true};
+            }
+            return {user, false};
         } else {
             int user_id = users.size() + 1;
             game_user &user = users.emplace_back(user_id, session);
