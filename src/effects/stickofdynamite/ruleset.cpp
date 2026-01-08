@@ -53,7 +53,7 @@ namespace banggame {
                         throw game_error("recursion limit hit in stickofdynamite on_drawn_any_card");
                     }
 
-                    game->add_log("LOG_REVEALED_CARD", static_cast<player_ptr>(nullptr), drawn_card);
+                    game->add_log("LOG_REVEALED_ANY_CARD", drawn_card);
                     drawn_card->set_visibility(card_visibility::shown);
                     drawn_card->add_short_pause();
 
