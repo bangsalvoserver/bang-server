@@ -5,8 +5,44 @@
 #include "effects/base/draw_check.h"
 
 #include "game/game_table.h"
+#include "game/game_options.h"
+#include "game/request_timer.h"
 
 namespace banggame {
+
+    struct request_shuffle_roles : request_base, request_timer {
+        request_shuffle_roles(card_ptr origin_card, player_ptr origin)
+            : request_base(origin_card, origin, nullptr) {}
+        
+        void on_update() override {
+            set_duration(origin->m_game->m_options.auto_resolve_timer);
+        }
+
+        void on_finished() override {
+            origin->m_game->pop_request();
+            
+            auto alive_players = origin->m_game->m_players
+                | rv::filter([](player_ptr p) {
+                    return p->alive() && p->m_role != player_role::sheriff;
+                });
+            
+            auto roles = alive_players | rv::transform(&player::get_base_role) | rn::to<std::vector>();
+            rn::shuffle(roles, origin->m_game->rng);
+            
+            for (player_ptr p : alive_players) {
+                p->set_role(player_role::unknown);
+                p->remove_player_flags(player_flag::role_revealed);
+            }
+
+            for (auto [p, role] : rv::zip(alive_players, roles)) {
+                p->set_role(role);
+            }
+        }
+
+        game_string status_text(player_ptr owner) const override {
+            return "STATUS_ROLES_SHUFFLED";
+        }
+    };
 
     struct request_helena_zontero_check : request_base, draw_check_handler, std::enable_shared_from_this<request_helena_zontero_check> {
         request_helena_zontero_check(card_ptr origin_card, player_ptr origin)
@@ -25,7 +61,7 @@ namespace banggame {
             drawn_card = origin->m_game->top_of_deck();
             drawn_card->move_to(pocket_type::discard_pile);
 
-            origin->m_game->add_log("LOG_CHECK_DREW_CARD", origin_card, static_cast<player_ptr>(nullptr), drawn_card);
+            origin->m_game->add_log("LOG_CHECK_CARD_DRAWN", origin_card, drawn_card);
             bool handled = false;
             origin->m_game->call_event(event_type::on_draw_check_select{ nullptr, shared_from_this(), handled });
             if (!handled) {
@@ -55,22 +91,8 @@ namespace banggame {
         void resolve() override {
             origin->m_game->pop_request();
             if (is_positive()) {
-                auto alive_players = origin->m_game->m_players
-                    | rv::filter([](player_ptr p) {
-                        return p->alive() && p->m_role != player_role::sheriff;
-                    });
-                
-                auto roles = alive_players | rv::transform(&player::get_base_role) | rn::to<std::vector>();
-                rn::shuffle(roles, origin->m_game->rng);
-                
-                for (player_ptr p : alive_players) {
-                    p->set_role(player_role::unknown);
-                    p->remove_player_flags(player_flag::role_revealed);
-                }
-
-                for (auto [p, role] : rv::zip(alive_players, roles)) {
-                    p->set_role(role);
-                }
+                origin->m_game->add_log("LOG_CARD_HAS_EFFECT", origin_card);
+                origin->m_game->queue_request<request_shuffle_roles>(origin_card, origin);
             }
         }
     };
