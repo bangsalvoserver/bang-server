@@ -94,9 +94,23 @@ namespace banggame {
         target->add_gold(amount);
     }
 
+    static bool only_sheriff_and_renegade_alive(player_ptr origin) {
+        int alive_count = 0;
+        bool has_sheriff = false;
+        bool has_renegade = false;
+        for (player_ptr p : origin->m_game->m_players) {
+            if (!p->alive()) continue;
+            ++alive_count;
+            if (alive_count > 2) return false;
+            if (p->m_role == player_role::sheriff) has_sheriff = true;
+            else if (p->m_role == player_role::renegade) has_renegade = true;
+        }
+        return alive_count == 2 && has_sheriff && has_renegade;
+    }
+
     void ruleset_shadowgunslingers::on_apply(game_ptr game) {
         game->add_listener<event_type::check_revivers>({nullptr, -2}, [](player_ptr target) {
-            if (!target->alive()) {
+            if (!target->alive() && !only_sheriff_and_renegade_alive(target)) {
                 target->m_game->add_log("LOG_SHADOW_GUNSLINGER", target);
                 target->add_player_flags(player_flag::shadow);
                 target->enable_equip(target->get_character());
