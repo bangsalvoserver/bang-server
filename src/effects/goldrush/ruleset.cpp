@@ -133,9 +133,6 @@ namespace banggame {
                     : player_role::shadow_outlaw;
                 
                 if (role != target->m_role) {
-                    if (target->m_role == player_role::renegade) {
-                        target->set_role(player_role::unknown);
-                    }
                     target->set_role(role);
                 }
             }

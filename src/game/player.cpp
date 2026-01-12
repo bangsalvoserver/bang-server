@@ -399,6 +399,12 @@ namespace banggame {
         return get_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
     }
 
+    void player::hide_role() {
+        if (remove_player_flags(player_flag::role_revealed)) {
+            m_game->add_update(update_target::excludes(this), game_updates::player_show_role{ this, player_role::unknown, durations.flip_card });
+        }
+    }
+
     void player::set_role(player_role role, bool instant) {
         m_role = role;
 

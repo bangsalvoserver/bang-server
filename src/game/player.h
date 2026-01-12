@@ -15,7 +15,7 @@ namespace banggame {
         card_list m_table;
         card_list m_characters;
 
-        player_role m_role;
+        player_role m_role = player_role::unknown;
 
         int8_t m_hp = 0;
         int8_t m_max_hp = 0;
@@ -89,6 +89,7 @@ namespace banggame {
         
         int get_character_max_hp() const;
 
+        void hide_role();
         void set_role(player_role role, bool instant = false);
         player_role get_base_role() const;
 

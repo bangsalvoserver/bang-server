@@ -28,13 +28,9 @@ namespace banggame {
             
             auto roles = alive_players | rv::transform(&player::get_base_role) | rn::to<std::vector>();
             rn::shuffle(roles, origin->m_game->rng);
-            
-            for (player_ptr p : alive_players) {
-                p->set_role(player_role::unknown);
-                p->remove_player_flags(player_flag::role_revealed);
-            }
 
             for (auto [p, role] : rv::zip(alive_players, roles)) {
+                p->hide_role();
                 p->set_role(role);
             }
         }
