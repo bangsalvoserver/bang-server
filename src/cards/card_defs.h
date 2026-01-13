@@ -269,26 +269,67 @@ namespace banggame {
         }
     };
 
+    // Serialized context payload
     struct effect_context_base {
+        // Only pass values that are not null
         struct remove_defaults{};
         
+        // The current "playing" card.
+        // value = origin_card during verify_and_play
+        // value = nullptr during is_possible_to_play
+        // value is overwritten during "play as" effects
+        // Also used for train equip (value = matching train if origin_card is a station)
         card_ptr playing_card;
+
+        // The card we are repeating the effect of.
         card_ptr repeat_card;
+
+        // The multiple choice card.
         card_ptr card_choice;
+
+        // By how much we need to advance the train during this action.
         int8_t train_advance;
+
+        // Disables distance checks.
+        // Enabled during the effect of Bell Tower.
         bool ignore_distances;
     };
 
     struct effect_context : effect_context_base {
+        // The list of all targeted players
+        // used for duplicate check
         player_list selected_players;
+
+        // The list of all targeted cards, and playing modifier cards
+        // used for duplicate check
         card_list selected_cards;
+
+        // The set of all targeted cubes, grouped by origin_card
         selected_cubes_count selected_cubes;
+
+        // The player selected by Sgt. Blaze's effect.
         player_ptr skipped_player;
+
+        // The selected station or train equip enabler.
         card_ptr traincost;
+
+        // The card targeted by Train Robbery.
         card_ptr target_card;
+
+        // By how much we need to reduce the cost of Gold Rush shop cards.
         int8_t discount;
+
+        // Enabled during "play as" effects.
+        bool playing_as;
+
+        // Disables bang limit checks.
+        // Enabled during the effect of Bandolier and "repeating" effects.
         bool disable_banglimit;
+
+        // Disables error checking in effect_bangcard
         bool disable_bang_checks;
+
+        // Enabled during count_missed_cards
         bool temp_missable;
     };
 
