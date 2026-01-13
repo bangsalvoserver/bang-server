@@ -15,7 +15,7 @@ namespace banggame {
         });
 
         game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const effect_context &ctx, game_string &out_error) {
-            if (origin_card->pocket == pocket_type::player_hand && origin_card->is_orange() && origin->m_game->num_tokens(card_token_type::cube) < 3) {
+            if (origin_card->pocket == pocket_type::player_hand && origin_card->is_orange() && !ctx.playing_as && origin->m_game->num_tokens(card_token_type::cube) < 3) {
                 out_error = "ERROR_NOT_ENOUGH_CUBES";
             }
         });
