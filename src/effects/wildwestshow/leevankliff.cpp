@@ -85,9 +85,9 @@ namespace banggame {
         card_ptr last_played = nullptr;
         origin->m_game->call_event(event_type::get_last_played_brown_card{ origin, last_played });
         if (last_played) {
-            ctx.get<contexts::disable_banglimit>() = true;
-            ctx.get<contexts::repeat_card>() = last_played;
-            ctx.get<contexts::playing_card>() = origin_card;
+            ctx.set<contexts::disable_banglimit>(true);
+            ctx.set<contexts::repeat_card>(last_played);
+            ctx.set<contexts::playing_card>(origin_card);
         }
     }
 }

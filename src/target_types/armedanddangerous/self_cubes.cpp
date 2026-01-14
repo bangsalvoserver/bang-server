@@ -14,7 +14,7 @@ namespace banggame {
     }
 
     void targeting_self_cubes::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, value_type) {
-        ctx.get<contexts::selected_cubes>().insert(origin_card,
+        ctx.add<contexts::selected_cubes>().insert(origin_card,
             card_list{static_cast<size_t>(ncubes), origin_card},
             ncubes);
     }

@@ -22,6 +22,6 @@ namespace banggame {
     }
 
     void modifier_card_choice::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        ctx.get<contexts::card_choice>() = origin_card;
+        ctx.set<contexts::card_choice>(origin_card);
     }
 }

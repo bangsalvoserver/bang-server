@@ -103,7 +103,7 @@ namespace banggame {
     static game_string verify_modifiers(player_ptr origin, card_ptr origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
         for (const auto &[mod_card, targets] : modifiers) {
             if (const modifier_holder &modifier = mod_card->get_modifier(is_response)) {
-                ctx.get<contexts::selected_cards>().push_back(mod_card);
+                ctx.add<contexts::selected_cards>().push_back(mod_card);
                 modifier.add_context(mod_card, origin, ctx);
                 
                 MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
@@ -319,7 +319,7 @@ namespace banggame {
 
         effect_context ctx{};
         
-        ctx.get<contexts::playing_card>() = args.card;
+        ctx.set<contexts::playing_card>(args.card);
 
         if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
             return play_verify_results::error{ error };

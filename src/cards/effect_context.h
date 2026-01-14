@@ -12,8 +12,12 @@ namespace banggame {
 
     template<typename T>
     decltype(auto) unwrap_value(T &&value) {
-        auto &&[unwrapped] = std::forward<T>(value);
-        return (unwrapped);
+        if constexpr (reflect::size<std::remove_cvref_t<T>>() == 1) {
+            auto &&[unwrapped] = std::forward<T>(value);
+            return (unwrapped);
+        } else {
+            return value;
+        }
     }
 
     template<typename T>
@@ -39,9 +43,9 @@ namespace banggame {
         }
 
     public:
-        template<typename T>
-        context_entry(std::in_place_type_t<T> tag)
-            : value{tag}
+        template<typename T, typename ... Ts>
+        context_entry(std::in_place_type_t<T> tag, Ts && ... args)
+            : value{tag, std::forward<Ts>(args) ...}
             , serialize_fun{make_serialize_fun<std::remove_cvref_t<T>>()}
         {}
 
@@ -81,8 +85,14 @@ namespace banggame {
     
     public:
         template<typename T>
-        unwrapped_t<T> &get() {
+        unwrapped_t<T> &add() {
             auto [it, inserted] = m_entries.try_emplace(key<T>(), std::in_place_type<T>);
+            return it->second.template get<T>();
+        }
+
+        template<typename T, typename ... Ts>
+        unwrapped_t<T> &set(Ts && ... args) {
+            auto [it, inserted] = m_entries.insert_or_assign(key<T>(), context_entry{std::in_place_type<T>, std::forward<Ts>(args) ...});
             return it->second.template get<T>();
         }
 

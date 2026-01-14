@@ -29,9 +29,10 @@ namespace banggame {
     }
 
     void modifier_moneybag::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        ctx.get<contexts::disable_banglimit>() = true;
+        ctx.set<contexts::disable_banglimit>(true);
         if (!origin->m_game->m_discards.empty()) {
-            ctx.get<contexts::repeat_card>() = origin->m_game->m_discards.back();
+            card_ptr target_card = origin->m_game->m_discards.back();
+            ctx.set<contexts::repeat_card>(target_card);
         }
     }
 }

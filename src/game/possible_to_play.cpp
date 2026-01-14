@@ -14,7 +14,7 @@ namespace banggame {
 
             if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
                 auto ctx_copy = ctx;
-                ctx_copy.get<contexts::selected_cards>().push_back(origin_card);
+                ctx_copy.add<contexts::selected_cards>().push_back(origin_card);
                 modifier.add_context(origin_card, origin, ctx_copy);
 
                 modifiers.push_back(origin_card);

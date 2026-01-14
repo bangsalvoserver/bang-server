@@ -90,7 +90,7 @@ namespace banggame {
     }
 
     void effect_train_robbery_response::add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) {
-        ctx.get<contexts::train_robbery_target>() = target_card;
+        ctx.set<contexts::train_robbery_target>(target_card);
     }
 
     void effect_train_robbery_response::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {

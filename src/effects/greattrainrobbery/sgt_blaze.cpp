@@ -36,7 +36,7 @@ namespace banggame {
     }
 
     void effect_skip_player::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
-        ctx.get<contexts::skipped_player>() = target;
+        ctx.set<contexts::skipped_player>(target);
     }
 
     void effect_skip_player::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {

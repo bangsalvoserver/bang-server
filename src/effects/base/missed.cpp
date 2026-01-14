@@ -19,7 +19,7 @@ namespace banggame {
         int count = 0;
 
         effect_context ctx;
-        ctx.get<contexts::temp_missable>() = true;
+        ctx.set<contexts::temp_missable>(true);
 
         for (card_ptr c : get_all_playable_cards(target, true, ctx)) {
             if (c->pocket != pocket_type::button_row && c->pocket != pocket_type::hidden_deck) {
