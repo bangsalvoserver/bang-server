@@ -2,6 +2,8 @@
 
 #include "game/possible_to_play.h"
 
+#include "select_cubes.h"
+
 namespace banggame {
 
     game_string targeting_self_cubes::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {

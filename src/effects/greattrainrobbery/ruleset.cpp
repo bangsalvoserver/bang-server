@@ -1,6 +1,7 @@
 #include "ruleset.h"
 
 #include "next_stop.h"
+#include "traincost.h"
 
 #include "effects/base/death.h"
 #include "effects/ghost_cards/ruleset.h"
@@ -72,7 +73,7 @@ namespace banggame {
 
         game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const effect_context &ctx, game_string &out_error) {
             if (origin_card->is_equip_card() && origin_card->is_train()) {
-                card_ptr traincost = ctx.get<contexts::traincost>();
+                card_ptr traincost = ctx.get<contexts::train_cost>();
                 if (!traincost) {
                     out_error = "ERROR_MUST_PAY_TRAIN_COST";
                 } else if (traincost->deck != card_deck_type::main_deck) {
@@ -90,7 +91,7 @@ namespace banggame {
 
         game->add_listener<event_type::on_equip_card>(nullptr, [](player_ptr origin, player_ptr target, card_ptr origin_card, const effect_context &ctx) {
             if (origin_card->is_train()) {
-                if (ctx.get<contexts::traincost>()->deck != card_deck_type::main_deck) {
+                if (ctx.get<contexts::train_cost>()->deck != card_deck_type::main_deck) {
                     event_card_key key{origin_card, 5};
                     origin->m_game->add_listener<event_type::count_train_equips>(key, [=](player_ptr p, int &train_equips, int &num_advance) {
                         if (origin == p) {

@@ -8,6 +8,12 @@
 
 namespace banggame {
 
+    namespace contexts {
+        struct temp_missable {
+            bool value;
+        };
+    }
+
     int count_missed_cards(player_ptr target) {
         // this doesn't account for calamity janet, elena fuente, caboose
         int count = 0;

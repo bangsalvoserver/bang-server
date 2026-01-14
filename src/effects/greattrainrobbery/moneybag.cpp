@@ -2,6 +2,7 @@
 
 #include "cards/filter_enums.h"
 
+#include "effects/base/bang.h"
 #include "effects/wildwestshow/leevankliff.h"
 
 #include "game/game_table.h"

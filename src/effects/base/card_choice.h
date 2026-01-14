@@ -17,6 +17,13 @@ namespace banggame {
     };
     
     DEFINE_MODIFIER(card_choice, modifier_card_choice)
+
+    namespace contexts {
+        struct card_choice {
+            struct serialize_context{};
+            card_ptr value;
+        };
+    }
 }
 
 #endif

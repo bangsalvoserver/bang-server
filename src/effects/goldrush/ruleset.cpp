@@ -3,6 +3,7 @@
 #include "effects/base/damage.h"
 #include "effects/base/death.h"
 #include "effects/base/requests.h"
+#include "effects/base/card_choice.h"
 
 #include "cards/game_events.h"
 #include "cards/game_enums.h"
@@ -10,6 +11,8 @@
 
 #include "game/game_table.h"
 #include "game/game_options.h"
+
+#include "discount.h"
 
 namespace banggame {
 

@@ -1,5 +1,9 @@
 #include "leevankliff.h"
 
+#include "effects/base/bang.h"
+#include "effects/base/card_choice.h"
+#include "effects/greattrainrobbery/traincost.h"
+
 #include "cards/filter_enums.h"
 #include "cards/game_events.h"
 
@@ -17,7 +21,7 @@ namespace banggame {
     card_ptr get_repeat_playing_card(card_ptr origin_card, const effect_context &ctx) {
         if (card_ptr card_choice = ctx.get<contexts::card_choice>()) {
             return card_choice;
-        } else if (card_ptr traincost = ctx.get<contexts::traincost>()) {
+        } else if (card_ptr traincost = ctx.get<contexts::train_cost>()) {
             return traincost;
         } else {
             return origin_card;
@@ -59,13 +63,14 @@ namespace banggame {
     }
 
     game_string modifier_leevankliff::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
-        if (!ctx.get<contexts::repeat_card>()) {
+        card_ptr repeat_card = ctx.get<contexts::repeat_card>();
+        if (!repeat_card) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
 
         playing_card = get_repeat_playing_card(playing_card, ctx);
                 
-        if (ctx.get<contexts::repeat_card>() != playing_card) {
+        if (repeat_card != playing_card) {
             return "INVALID_MODIFIER_CARD";
         }
 

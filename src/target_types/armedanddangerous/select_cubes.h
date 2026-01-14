@@ -36,6 +36,42 @@ namespace banggame {
     };
 
     DEFINE_TARGETING(select_cubes, targeting_select_cubes)
+
+    class selected_cubes_count {
+    private:
+        struct selected_cubes_entry {
+            const_card_ptr origin_card;
+            card_list cubes;
+            int ncubes;
+        };
+
+        std::vector<selected_cubes_entry> m_value;
+
+    public:
+        void insert(const_card_ptr origin_card, card_list cubes, int ncubes) {
+            m_value.emplace_back(origin_card, std::move(cubes), ncubes);
+        }
+
+        int count(const_card_ptr origin_card) const {
+            int result = 0;
+            for (const auto &entry : m_value) {
+                if (entry.origin_card == origin_card && entry.ncubes != 0) {
+                    result += entry.cubes.size() / entry.ncubes;
+                }
+            }
+            return result;
+        }
+
+        auto all_cubes() const {
+            return m_value | rv::for_each(&selected_cubes_entry::cubes);
+        }
+    };
+
+    namespace contexts {
+        struct selected_cubes {
+            selected_cubes_count value;
+        };
+    }
 }
 
 #endif

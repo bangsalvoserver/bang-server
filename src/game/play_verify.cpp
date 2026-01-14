@@ -6,6 +6,8 @@
 #include "cards/filter_enums.h"
 #include "cards/game_events.h"
 
+#include "target_types/armedanddangerous/select_cubes.h"
+
 #include "prompts.h"
 #include "filters.h"
 #include "game_table.h"

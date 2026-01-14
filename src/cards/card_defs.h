@@ -240,128 +240,25 @@ namespace banggame {
         feats
     };
 
-    class selected_cubes_count {
-    private:
-        struct selected_cubes_entry {
-            const_card_ptr origin_card;
-            card_list cubes;
-            int ncubes;
-        };
-
-        std::vector<selected_cubes_entry> m_value;
-
-    public:
-        void insert(const_card_ptr origin_card, card_list cubes, int ncubes) {
-            m_value.emplace_back(origin_card, std::move(cubes), ncubes);
-        }
-
-        int count(const_card_ptr origin_card) const {
-            int result = 0;
-            for (const auto &entry : m_value) {
-                if (entry.origin_card == origin_card && entry.ncubes != 0) {
-                    result += entry.cubes.size() / entry.ncubes;
-                }
-            }
-            return result;
-        }
-
-        auto all_cubes() const {
-            return m_value | rv::for_each(&selected_cubes_entry::cubes);
-        }
-    };
-
     namespace contexts {
-
-        // The current "playing" card.
-        // value = origin_card during verify_and_play
-        // value = nullptr during is_possible_to_play
-        // value is overwritten during "play as" effects
-        // Also used for train equip (value = matching train if origin_card is a station)
         struct playing_card {
-            struct serialize_context{};
             card_ptr value;
         };
 
-        // The card we are repeating the effect of.
         struct repeat_card {
             struct serialize_context{};
             card_ptr value;
         };
 
-        // The multiple choice card.
-        struct card_choice {
-            struct serialize_context{};
-            card_ptr value;
-        };
-
-        // By how much we need to advance the train during this action.
-        struct train_advance {
-            struct serialize_context{};
-            int value;
-        };
-
-        // Disables distance checks.
-        // Enabled during the effect of Bell Tower.
-        struct ignore_distances {
-            struct serialize_context{};
-            bool value;
-        };
-
-        // The list of all targeted players
-        // used for duplicate check
         struct selected_players {
             player_list value;
         };
 
-        // The list of all targeted cards, and playing modifier cards
-        // used for duplicate check
         struct selected_cards {
             card_list value;
         };
 
-        // The set of all targeted cubes, grouped by origin_card
-        struct selected_cubes {
-            selected_cubes_count value;
-        };
-
-        // The player selected by Sgt. Blaze's effect.
-        struct skipped_player {
-            player_ptr value;
-        };
-
-        // The selected station or train equip enabler.
-        struct traincost {
-            card_ptr value;
-        };
-
-        // The card targeted by Train Robbery.
-        struct target_card {
-            card_ptr value;
-        };
-
-        // By how much we need to reduce the cost of Gold Rush shop cards.
-        struct discount {
-            int8_t value;
-        };
-
-        // Enabled during "play as" effects.
         struct playing_as {
-            bool value;
-        };
-
-        // Disables bang limit checks.
-        // Enabled during the effect of Bandolier and "repeating" effects.
-        struct disable_banglimit {
-            bool value;
-        };
-
-        // Disables error checking in effect_bangcard
-        struct disable_bang_checks {
-            bool value;
-        };
-
-        // Enabled during count_missed_cards
-        struct temp_missable {
             bool value;
         };
     }

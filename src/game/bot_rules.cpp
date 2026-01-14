@@ -2,6 +2,8 @@
 
 #include "game_table.h"
 
+#include "effects/base/card_choice.h"
+
 #include "cards/filter_enums.h"
 
 namespace banggame {

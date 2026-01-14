@@ -1,5 +1,7 @@
 #include "card_per_player.h"
 
+#include "effects/greattrainrobbery/sgt_blaze.h"
+
 #include "game/possible_to_play.h"
 #include "game/prompts.h"
 

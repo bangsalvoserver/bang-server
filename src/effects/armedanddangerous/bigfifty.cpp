@@ -1,5 +1,7 @@
 #include "bigfifty.h"
 
+#include "effects/base/bang.h"
+
 #include "game/game_table.h"
 
 namespace banggame {

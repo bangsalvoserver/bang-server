@@ -29,6 +29,12 @@ namespace banggame {
     };
 
     DEFINE_EQUIP(sgt_blaze, equip_sgt_blaze)
+
+    namespace contexts {
+        struct skipped_player {
+            player_ptr value;
+        };
+    }
     
 }
 

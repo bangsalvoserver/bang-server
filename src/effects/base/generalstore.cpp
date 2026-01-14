@@ -2,6 +2,8 @@
 
 #include "cards/game_enums.h"
 
+#include "effects/greattrainrobbery/sgt_blaze.h"
+
 #include "game/game_table.h"
 
 namespace banggame {

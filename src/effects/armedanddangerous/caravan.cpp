@@ -4,6 +4,8 @@
 
 #include "game/game_table.h"
 
+#include "target_types/armedanddangerous/select_cubes.h"
+
 namespace banggame {
     
     inline effect_draw build_effect_draw(card_ptr origin_card, const effect_context &ctx) {

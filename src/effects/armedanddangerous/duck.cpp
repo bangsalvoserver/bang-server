@@ -1,7 +1,10 @@
 #include "duck.h"
 
 #include "game/game_table.h"
+
 #include "effects/base/bang.h"
+
+#include "target_types/armedanddangerous/select_cubes.h"
 
 namespace banggame {
 

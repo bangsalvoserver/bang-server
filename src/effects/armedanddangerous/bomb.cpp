@@ -8,6 +8,8 @@
 
 #include "effects/base/predraw_check.h"
 
+#include "target_types/armedanddangerous/select_cubes.h"
+
 #include "ruleset.h"
 
 namespace banggame {

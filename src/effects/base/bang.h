@@ -120,6 +120,16 @@ namespace banggame {
     
     DEFINE_EFFECT(bangresponse, effect_bangresponse)
 
+    namespace contexts {
+        struct disable_banglimit {
+            bool value;
+        };
+
+        struct disable_bang_checks {
+            bool value;
+        };
+    }
+
 }
 
 #endif

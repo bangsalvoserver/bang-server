@@ -23,6 +23,22 @@ namespace banggame {
     
     DEFINE_MODIFIER(locomotive, modifier_locomotive)
 
+    namespace contexts {
+        struct train_advance {
+            struct serialize_context{};
+            int value;
+        };
+
+        struct train_cost {
+            card_ptr value;
+        };
+
+        struct train_card {
+            struct serialize_context{};
+            card_ptr value;
+        };
+    }
+
 }
 
 #endif

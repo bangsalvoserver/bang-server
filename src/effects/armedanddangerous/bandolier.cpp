@@ -1,5 +1,7 @@
 #include "bandolier.h"
 
+#include "effects/base/bang.h"
+
 #include "game/game_table.h"
 
 #include "cards/filter_enums.h"

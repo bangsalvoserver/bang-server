@@ -7,6 +7,8 @@
 #include "game/game_table.h"
 #include "game/prompts.h"
 
+#include "target_types/armedanddangerous/select_cubes.h"
+
 namespace banggame {
 
     game_string effect_squaw::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) {

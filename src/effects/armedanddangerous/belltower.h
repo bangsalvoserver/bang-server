@@ -17,6 +17,13 @@ namespace banggame {
     };
     
     DEFINE_MODIFIER(belltower, modifier_belltower)
+
+    namespace contexts {
+        struct ignore_distances {
+            struct serialize_context{};
+            bool value;
+        };
+    }
 }
 
 #endif
