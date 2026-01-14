@@ -10,7 +10,7 @@ namespace banggame {
     
     struct effect_bang {
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}, const effect_context &ctx = {});
+        void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
     };
 
     DEFINE_EFFECT(bang, effect_bang)

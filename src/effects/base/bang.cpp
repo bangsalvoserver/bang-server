@@ -20,7 +20,7 @@ namespace banggame {
         return {};
     }
     
-    void effect_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
+    void effect_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         if (!flags.check(effect_flag::target_players)) {
             target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         }

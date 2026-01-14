@@ -104,7 +104,7 @@ namespace banggame {
         }
     };
 
-    void effect_steal::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags, const effect_context &ctx) {
+    void effect_steal::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
         origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
     }
 
@@ -225,7 +225,7 @@ namespace banggame {
         }
     };
     
-    void effect_destroy::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags, const effect_context &ctx) {
+    void effect_destroy::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
         origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
     }
 }
