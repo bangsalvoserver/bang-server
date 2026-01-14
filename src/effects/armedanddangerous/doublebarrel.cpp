@@ -20,7 +20,7 @@ namespace banggame {
     }
 
     game_string effect_doublebarrel::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        card_sign sign = get_modified_sign(ctx.playing_card);
+        card_sign sign = get_modified_sign(ctx.get<contexts::playing_card>());
         if (sign && !sign.is_diamonds()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {

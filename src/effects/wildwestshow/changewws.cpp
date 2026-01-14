@@ -9,7 +9,7 @@ namespace banggame {
         auto &scenario_cards = origin->m_game->m_wws_scenario_cards;
 
         if (scenario_deck.empty()) return;
-        if (ctx.repeat_card) return;
+        if (ctx.get<contexts::repeat_card>()) return;
         
         if (!scenario_cards.empty()) {
             origin->m_game->m_first_player->disable_equip(scenario_cards.back());

@@ -2,6 +2,7 @@
 #define __CARD_DEFS_H__
 
 #include "game_string.h"
+#include "effect_context.h"
 
 #include "utils/enum_bitset.h"
 #include "utils/enum_map.h"
@@ -269,69 +270,101 @@ namespace banggame {
         }
     };
 
-    // Serialized context payload
-    struct effect_context_base {
-        // Only pass values that are not null
-        struct remove_defaults{};
-        
+    namespace contexts {
+
         // The current "playing" card.
         // value = origin_card during verify_and_play
         // value = nullptr during is_possible_to_play
         // value is overwritten during "play as" effects
         // Also used for train equip (value = matching train if origin_card is a station)
-        card_ptr playing_card;
+        struct playing_card {
+            struct serialize_context{};
+            card_ptr value;
+        };
 
         // The card we are repeating the effect of.
-        card_ptr repeat_card;
+        struct repeat_card {
+            struct serialize_context{};
+            card_ptr value;
+        };
 
         // The multiple choice card.
-        card_ptr card_choice;
+        struct card_choice {
+            struct serialize_context{};
+            card_ptr value;
+        };
 
         // By how much we need to advance the train during this action.
-        int8_t train_advance;
+        struct train_advance {
+            struct serialize_context{};
+            int value;
+        };
 
         // Disables distance checks.
         // Enabled during the effect of Bell Tower.
-        bool ignore_distances;
-    };
+        struct ignore_distances {
+            struct serialize_context{};
+            bool value;
+        };
 
-    struct effect_context : effect_context_base {
         // The list of all targeted players
         // used for duplicate check
-        player_list selected_players;
+        struct selected_players {
+            player_list value;
+        };
 
         // The list of all targeted cards, and playing modifier cards
         // used for duplicate check
-        card_list selected_cards;
+        struct selected_cards {
+            card_list value;
+        };
 
         // The set of all targeted cubes, grouped by origin_card
-        selected_cubes_count selected_cubes;
+        struct selected_cubes {
+            selected_cubes_count value;
+        };
 
         // The player selected by Sgt. Blaze's effect.
-        player_ptr skipped_player;
+        struct skipped_player {
+            player_ptr value;
+        };
 
         // The selected station or train equip enabler.
-        card_ptr traincost;
+        struct traincost {
+            card_ptr value;
+        };
 
         // The card targeted by Train Robbery.
-        card_ptr target_card;
+        struct target_card {
+            card_ptr value;
+        };
 
         // By how much we need to reduce the cost of Gold Rush shop cards.
-        int8_t discount;
+        struct discount {
+            int8_t value;
+        };
 
         // Enabled during "play as" effects.
-        bool playing_as;
+        struct playing_as {
+            bool value;
+        };
 
         // Disables bang limit checks.
         // Enabled during the effect of Bandolier and "repeating" effects.
-        bool disable_banglimit;
+        struct disable_banglimit {
+            bool value;
+        };
 
         // Disables error checking in effect_bangcard
-        bool disable_bang_checks;
+        struct disable_bang_checks {
+            bool value;
+        };
 
         // Enabled during count_missed_cards
-        bool temp_missable;
-    };
+        struct temp_missable {
+            bool value;
+        };
+    }
 
 }
 

@@ -31,7 +31,7 @@ namespace banggame {
     struct playable_card_info {
         card_ptr card;
         card_list modifiers;
-        effect_context_base context;
+        effect_context context;
     };
 
     using playable_cards_list = std::vector<playable_card_info>;

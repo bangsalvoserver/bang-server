@@ -11,11 +11,11 @@ namespace banggame {
             return "ERROR_NOT_ALLOWED_WITH_CARD";
         }
 
-        size_t train_index = std::distance(origin->m_game->m_train.begin(), rn::find(origin->m_game->m_train, target_card)) - ctx.train_advance;
+        size_t train_index = std::distance(origin->m_game->m_train.begin(), rn::find(origin->m_game->m_train, target_card)) - ctx.get<contexts::train_advance>();
         if (train_index > origin->m_game->train_position) {
             return "ERROR_TRAIN_NOT_IN_ANY_STATION";
         }
-        if (origin_card->pocket == pocket_type::stations && ctx.playing_card != target_card) {
+        if (origin_card->pocket == pocket_type::stations && ctx.get<contexts::playing_card>() != target_card) {
             return "ERROR_TRAIN_NOT_IN_THIS_STATION";
         }
 
@@ -23,13 +23,13 @@ namespace banggame {
     }
 
     void modifier_traincost::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        ctx.traincost = origin_card;
+        ctx.get<contexts::traincost>() = origin_card;
 
         if (origin_card->pocket == pocket_type::stations) {
             size_t station_index = std::distance(origin->m_game->m_stations.begin(), rn::find(origin->m_game->m_stations, origin_card));
-            int train_index = ctx.train_advance + origin->m_game->train_position - static_cast<int>(station_index);
+            int train_index = ctx.get<contexts::train_advance>() + origin->m_game->train_position - static_cast<int>(station_index);
             if (train_index >= 0 && train_index < origin->m_game->m_train.size()) {
-                ctx.playing_card = origin->m_game->m_train[train_index];
+                ctx.get<contexts::playing_card>() = origin->m_game->m_train[train_index];
             }
         }
     }
@@ -44,7 +44,7 @@ namespace banggame {
     }
 
     void modifier_locomotive::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        ctx.train_advance = 1;
+        ctx.get<contexts::train_advance>() = 1;
     }
 
 }

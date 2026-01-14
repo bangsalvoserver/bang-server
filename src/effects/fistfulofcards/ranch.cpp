@@ -51,6 +51,6 @@ namespace banggame {
     void effect_ranch::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         origin->m_game->pop_request();
         
-        origin->draw_card(static_cast<int>(ctx.selected_cards.size()), origin_card);
+        origin->draw_card(static_cast<int>(ctx.get<contexts::selected_cards>().size()), origin_card);
     }
 }

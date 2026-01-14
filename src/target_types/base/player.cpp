@@ -16,7 +16,7 @@ namespace banggame {
     }
 
     void targeting_player::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, player_ptr target) {
-        ctx.selected_players.push_back(target);
+        ctx.get<contexts::selected_players>().push_back(target);
         effect.add_context(origin_card, origin, target, ctx);
     }
 

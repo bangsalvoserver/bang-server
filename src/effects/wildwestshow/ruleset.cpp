@@ -26,7 +26,7 @@ namespace banggame {
                 };
                 
                 int count = rn::count_if(modifiers, is_playing_card);
-                if (origin_card != ctx.playing_card || is_playing_card(origin_card)) {
+                if (origin_card != ctx.get<contexts::playing_card>() || is_playing_card(origin_card)) {
                     ++count;
                 }
 

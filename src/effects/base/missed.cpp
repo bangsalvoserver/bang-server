@@ -11,7 +11,11 @@ namespace banggame {
     int count_missed_cards(player_ptr target) {
         // this doesn't account for calamity janet, elena fuente, caboose
         int count = 0;
-        for (card_ptr c : get_all_playable_cards(target, true, effect_context{ .temp_missable = true })) {
+
+        effect_context ctx;
+        ctx.get<contexts::temp_missable>() = true;
+
+        for (card_ptr c : get_all_playable_cards(target, true, ctx)) {
             if (c->pocket != pocket_type::button_row && c->pocket != pocket_type::hidden_deck) {
                 ++count;
             }
@@ -23,7 +27,7 @@ namespace banggame {
         if (auto req = origin->m_game->top_request<missable_request>(target_is{origin})) {
             return req->can_miss(origin_card);
         }
-        return ctx.temp_missable;
+        return ctx.get<contexts::temp_missable>();
     }
 
     game_string effect_missed::on_prompt(card_ptr origin_card, player_ptr origin) {
@@ -49,14 +53,14 @@ namespace banggame {
     }
 
     bool effect_play_as_missed::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        return effect_missedcard{}.can_play(ctx.playing_card, origin, ctx);
+        return effect_missedcard{}.can_play(ctx.get<contexts::playing_card>(), origin, ctx);
     }
 
     game_string effect_play_as_missed::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        return effect_missedcard{}.on_prompt(ctx.playing_card, origin);
+        return effect_missedcard{}.on_prompt(ctx.get<contexts::playing_card>(), origin);
     }
 
     void effect_play_as_missed::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        effect_missedcard{}.on_play(ctx.playing_card, origin);
+        effect_missedcard{}.on_play(ctx.get<contexts::playing_card>(), origin);
     }
 }

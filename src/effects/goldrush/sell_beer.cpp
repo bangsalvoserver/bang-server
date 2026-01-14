@@ -8,7 +8,7 @@
 namespace banggame {
     
     void effect_sell_beer::add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) {
-        ctx.playing_card = target;
+        ctx.get<contexts::playing_card>() = target;
     }
 
     game_string effect_sell_beer::get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) {

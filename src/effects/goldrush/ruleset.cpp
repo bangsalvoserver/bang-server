@@ -33,8 +33,8 @@ namespace banggame {
     }
 
     static int get_card_cost(card_ptr target_card, const effect_context &ctx) {
-        if (ctx.repeat_card) return 0;
-        return target_card->get_tag_value(tag_type::buy_cost).value_or(0) - ctx.discount;
+        if (ctx.get<contexts::repeat_card>()) return 0;
+        return target_card->get_tag_value(tag_type::buy_cost).value_or(0) - ctx.get<contexts::discount>();
     }
     
     void ruleset_goldrush::on_apply(game_ptr game) {
@@ -47,8 +47,8 @@ namespace banggame {
 
         game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const effect_context &ctx, game_string &out_error) {
             if (!origin->m_game->pending_requests()) {
-                if (ctx.card_choice) {
-                    origin_card = ctx.card_choice;
+                if (card_ptr card_choice = ctx.get<contexts::card_choice>()) {
+                    origin_card = card_choice;
                 }
                 if (origin_card->pocket == pocket_type::shop_selection && origin->get_gold() < get_card_cost(origin_card, ctx)) {
                     out_error = "ERROR_NOT_ENOUGH_GOLD";
@@ -70,8 +70,8 @@ namespace banggame {
 
         game->add_listener<event_type::on_play_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const card_list &modifiers, const effect_context &ctx) {
             if (!origin->m_game->pending_requests()) {
-                if (ctx.card_choice) {
-                    origin_card = ctx.card_choice;
+                if (card_ptr card_choice = ctx.get<contexts::card_choice>()) {
+                    origin_card = card_choice;
                 }
                 if (origin_card->pocket == pocket_type::shop_selection) {
                     origin->add_gold(-get_card_cost(origin_card, ctx));

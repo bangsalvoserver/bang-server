@@ -21,6 +21,6 @@ namespace banggame {
     }
 
     void modifier_bigfifty::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        ctx.disable_bang_checks = true;
+        ctx.get<contexts::disable_bang_checks>() = true;
     }
 }

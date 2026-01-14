@@ -84,7 +84,7 @@ namespace banggame {
     }
 
     void effect_train_robbery_response::add_context(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_context &ctx) {
-        ctx.target_card = target_card;
+        ctx.get<contexts::target_card>() = target_card;
     }
 
     void effect_train_robbery_response::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
@@ -101,7 +101,7 @@ namespace banggame {
             if (origin->is_ghost()) {
                 return {1, "BOT_ONLY_BANG"};
             }
-            if (rn::any_of(origin->m_table, is_penalty_card) && !is_penalty_card(ctx.target_card)) {
+            if (rn::any_of(origin->m_table, is_penalty_card) && !is_penalty_card(ctx.get<contexts::target_card>())) {
                 return "BOT_DISCARD_PENALTY";
             }
         }
@@ -109,7 +109,7 @@ namespace banggame {
     }
 
     void effect_train_robbery_discard::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        card_ptr target_card = ctx.target_card;
+        card_ptr target_card = ctx.get<contexts::target_card>();
 
         origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", origin, target_card);
         origin->discard_card(target_card);
@@ -141,7 +141,7 @@ namespace banggame {
 
     void effect_train_robbery_bang::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         auto req = origin->m_game->top_request<request_train_robbery>();
-        card_ptr target_card = ctx.target_card;
+        card_ptr target_card = ctx.get<contexts::target_card>();
 
         origin->m_game->add_log("LOG_RECEIVED_N_BANGS_FOR", origin, target_card, 1);
         origin->m_game->queue_request<request_train_robbery_bang>(req->origin_card, req->origin, origin, target_card);

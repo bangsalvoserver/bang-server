@@ -25,8 +25,9 @@ namespace banggame {
             } else {
                 continue;
             }
-            if (ctx.skipped_player && check_player_filter(playing_card, origin, player_filter, ctx.skipped_player, ctx)) {
-                return {"ERROR_CANNOT_SKIP_PLAYER", ctx.skipped_player};
+            player_ptr skipped_player = ctx.get<contexts::skipped_player>();
+            if (skipped_player && check_player_filter(playing_card, origin, player_filter, skipped_player, ctx)) {
+                return {"ERROR_CANNOT_SKIP_PLAYER", skipped_player};
             } else {
                 return {};
             }
@@ -35,11 +36,11 @@ namespace banggame {
     }
 
     void effect_skip_player::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
-        ctx.skipped_player = target;
+        ctx.get<contexts::skipped_player>() = target;
     }
 
     void effect_skip_player::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
-        origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, ctx.playing_card);
+        origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, ctx.get<contexts::playing_card>());
     }
 
     struct request_sgt_blaze : request_resolvable, interface_picking_player {

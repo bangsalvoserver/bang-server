@@ -18,14 +18,7 @@ namespace json {
     };
 
     template<typename T>
-    concept remove_defaults_aggregate = requires {
-        requires aggregate<T>;
-        requires std::is_default_constructible_v<T>;
-        typename T::remove_defaults;
-    };
-
-    template<typename T>
-    concept default_aggregate = aggregate<T> && !transparent_aggregate<T> && !remove_defaults_aggregate<T>;
+    concept default_aggregate = aggregate<T> && !transparent_aggregate<T>;
 
     template<aggregate T, typename Context>
     struct aggregate_serializer {
@@ -91,31 +84,6 @@ namespace json {
     template<default_aggregate T, typename Context>
     struct deserializer<T, Context> : aggregate_deserializer<T, Context> {};
 
-    template<remove_defaults_aggregate T, typename Context>
-    struct serializer<T, Context>  {
-        static void write(const T &value, string_writer &writer, const Context &ctx) {
-            bool empty = true;
-            reflect::for_each<T>([&](auto I) {
-                const auto &member_value = reflect::get<I>(value);
-                using member_type = reflect::member_type<I, T>;
-                if (member_value != member_type{}) {
-                    if (empty) {
-                        empty = false;
-                        writer.StartObject();
-                    }
-                    std::string_view key = reflect::member_name<I, T>();
-                    writer.Key(key.data(), key.size());
-                    serialize(member_value, writer, ctx);
-                }
-            });
-            if (empty) {
-                writer.Null();
-            } else {
-                writer.EndObject();
-            }
-        }
-    };
-
     template<transparent_aggregate T, typename Context> requires (reflect::size<T>() == 1)
     struct deserializer<T, Context> {
         static T read(const json &value, const Context &ctx) {
@@ -131,17 +99,6 @@ namespace json {
             return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
                 return T{ std::move(std::get<Is>(tuple)) ... };
             }(std::make_index_sequence<std::tuple_size_v<tuple_type>>());
-        }
-    };
-
-    template<remove_defaults_aggregate T, typename Context>
-    struct deserializer<T, Context> {
-        static T read(const json &value, const Context &ctx) {
-            if (value.IsNull()) {
-                return T{};
-            } else {
-                return T{aggregate_deserializer<T, Context>::read(value, ctx)};
-            }
         }
     };
 

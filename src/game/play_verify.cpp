@@ -17,21 +17,21 @@ namespace banggame {
 
     game_string check_duplicates(const effect_context &ctx) {
         std::unordered_set<player_ptr> players;
-        for (player_ptr p : ctx.selected_players) {
+        for (player_ptr p : ctx.get<contexts::selected_players>()) {
             if (auto [it, inserted] = players.insert(p); !inserted) {
                 return {"ERROR_DUPLICATE_PLAYER", p};
             }
         }
 
         std::unordered_set<card_ptr> cards;
-        for (card_ptr c : ctx.selected_cards) {
+        for (card_ptr c : ctx.get<contexts::selected_cards>()) {
             if (auto [it, inserted] = cards.insert(c); !inserted) {
                 return {"ERROR_DUPLICATE_CARD", c};
             }
         }
 
         std::unordered_map<card_ptr, int> cubes;
-        for (card_ptr c : ctx.selected_cubes.all_cubes()) {
+        for (card_ptr c : ctx.get<contexts::selected_cubes>().all_cubes()) {
             if (++cubes[c] > c->num_cubes()) {
                 return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
             }
@@ -91,7 +91,7 @@ namespace banggame {
 
         MAYBE_RETURN(check_duplicates(ctx));
 
-        if (ctx.repeat_card != origin_card) {
+        if (ctx.get<contexts::repeat_card>() != origin_card) {
             MAYBE_RETURN(check_pocket(origin, origin_card));
         }
 
@@ -101,7 +101,7 @@ namespace banggame {
     static game_string verify_modifiers(player_ptr origin, card_ptr origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
         for (const auto &[mod_card, targets] : modifiers) {
             if (const modifier_holder &modifier = mod_card->get_modifier(is_response)) {
-                ctx.selected_cards.push_back(mod_card);
+                ctx.get<contexts::selected_cards>().push_back(mod_card);
                 modifier.add_context(mod_card, origin, ctx);
                 
                 MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
@@ -279,7 +279,7 @@ namespace banggame {
     static void apply_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, is_response);
 
-        if (origin_card != ctx.repeat_card && !origin_card->has_tag(tag_type::no_auto_discard)) {
+        if (origin_card != ctx.get<contexts::repeat_card>() && !origin_card->has_tag(tag_type::no_auto_discard)) {
             if (origin_card->pocket == pocket_type::player_hand) {
                 origin->discard_used_card(origin_card);
             } else {
@@ -317,7 +317,7 @@ namespace banggame {
 
         effect_context ctx{};
         
-        ctx.playing_card = args.card;
+        ctx.get<contexts::playing_card>() = args.card;
 
         if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
             return play_verify_results::error{ error };

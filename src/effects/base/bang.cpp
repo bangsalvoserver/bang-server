@@ -30,7 +30,7 @@ namespace banggame {
     game_string effect_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
         if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flag::showdown)) {
             return "ERROR_CARD_INACTIVE";
-        } else if (!ctx.disable_bang_checks) {
+        } else if (!ctx.get<contexts::disable_bang_checks>()) {
             game_string out_error;
             origin->m_game->call_event(event_type::check_bang_target{ origin_card, origin, target, effect_flag::is_bang, out_error });
             return out_error;
@@ -60,36 +60,36 @@ namespace banggame {
     }
 
     prompt_string effect_play_as_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
-        return effect_bang{}.on_prompt(ctx.playing_card, origin, target);
+        return effect_bang{}.on_prompt(ctx.get<contexts::playing_card>(), origin, target);
     }
 
     void effect_play_as_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
         flags.add(effect_flag::play_as_bang);
-        effect_bang{}.on_play(ctx.playing_card, origin, target, flags);
+        effect_bang{}.on_play(ctx.get<contexts::playing_card>(), origin, target, flags);
     }
 
     game_string effect_play_as_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
-        return effect_bangcard{}.get_error(ctx.playing_card, origin, target, ctx);
+        return effect_bangcard{}.get_error(ctx.get<contexts::playing_card>(), origin, target, ctx);
     }
 
     prompt_string effect_play_as_bangcard::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
-        return effect_bangcard{}.on_prompt(ctx.playing_card, origin, target);
+        return effect_bangcard{}.on_prompt(ctx.get<contexts::playing_card>(), origin, target);
     }
 
     void effect_play_as_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
         flags.add(effect_flag::play_as_bang);
-        effect_bangcard{}.on_play(ctx.playing_card, origin, target, flags);
+        effect_bangcard{}.on_play(ctx.get<contexts::playing_card>(), origin, target, flags);
     }
     
     game_string effect_banglimit::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (!ctx.disable_banglimit && origin->get_bangs_played() >= 1) {
+        if (!ctx.get<contexts::disable_banglimit>() && origin->get_bangs_played() >= 1) {
             return "ERROR_ONE_BANG_PER_TURN";
         }
         return {};
     }
 
     void effect_banglimit::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (ctx.disable_banglimit) {
+        if (ctx.get<contexts::disable_banglimit>()) {
             return;
         }
         event_card_key key{origin_card, 4};

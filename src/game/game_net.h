@@ -9,12 +9,6 @@
 
 namespace banggame {
 
-    struct game_context {
-        virtual card_ptr find_card(int card_id) const = 0;
-        virtual player_ptr find_player(int player_id) const = 0;
-        virtual game_duration transform_duration(game_duration duration) const = 0;
-    };
-
     using update_target = player_set;
 
     struct game_update_record {

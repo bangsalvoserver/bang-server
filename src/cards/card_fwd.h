@@ -29,9 +29,14 @@ namespace banggame {
     using nullable_card = utils::nullable<card_ptr>;
     using nullable_player = utils::nullable<player_ptr>;
 
-    struct effect_context;
+    using game_duration = std::chrono::milliseconds;
+
+    class effect_context;
+    
     struct game_options;
     struct game_context;
+    
+    struct card_data;
     
     struct effect_vtable;
     struct equip_vtable;

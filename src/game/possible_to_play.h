@@ -41,7 +41,7 @@ namespace banggame {
             origin->m_game->m_feats,
             origin->m_game->m_scenario_cards | rv::take_last(1),
             origin->m_game->m_wws_scenario_cards | rv::take_last(1),
-            rv::single(ctx.repeat_card) | rv::filter([=](card_ptr c) {
+            rv::single(ctx.get<contexts::repeat_card>()) | rv::filter([=](card_ptr c) {
                 return c != nullptr
                     && (c->pocket != pocket_type::player_hand || c->owner != origin)
                     && c->pocket != pocket_type::shop_selection;

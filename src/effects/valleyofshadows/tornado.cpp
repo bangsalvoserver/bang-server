@@ -131,7 +131,7 @@ namespace banggame {
     }
 
     prompt_string effect_tornado2_response::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        for (card_ptr target_card : ctx.selected_cards) {
+        for (card_ptr target_card : ctx.get<contexts::selected_cards>()) {
             MAYBE_RETURN(prompts::bot_check_discard_card(origin, target_card));
         }
         return {};
@@ -139,6 +139,6 @@ namespace banggame {
 
     void effect_tornado2_response::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
         auto req = origin->m_game->top_request<request_tornado2>();
-        req->on_resolve(ctx.selected_cards);
+        req->on_resolve(ctx.get<contexts::selected_cards>());
     }
 }

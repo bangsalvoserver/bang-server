@@ -72,15 +72,16 @@ namespace banggame {
 
         game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const effect_context &ctx, game_string &out_error) {
             if (origin_card->is_equip_card() && origin_card->is_train()) {
-                if (!ctx.traincost) {
+                card_ptr traincost = ctx.get<contexts::traincost>();
+                if (!traincost) {
                     out_error = "ERROR_MUST_PAY_TRAIN_COST";
-                } else if (ctx.traincost->deck != card_deck_type::main_deck) {
+                } else if (traincost->deck != card_deck_type::main_deck) {
                     int train_equips = 0;
                     int num_advance = 0;
                     origin->m_game->call_event(event_type::count_train_equips{ origin, train_equips, num_advance });
                     if (train_equips >= 1) {
                         out_error = "ERROR_ONE_TRAIN_EQUIP_PER_TURN";
-                    } else if (ctx.train_advance >= 1 && num_advance >= 1) {
+                    } else if (ctx.get<contexts::train_advance>() >= 1 && num_advance >= 1) {
                         out_error = "ERROR_ONE_TRAIN_ADVANCE_PER_TURN";
                     }
                 }
@@ -89,12 +90,12 @@ namespace banggame {
 
         game->add_listener<event_type::on_equip_card>(nullptr, [](player_ptr origin, player_ptr target, card_ptr origin_card, const effect_context &ctx) {
             if (origin_card->is_train()) {
-                if (ctx.traincost->deck != card_deck_type::main_deck) {
+                if (ctx.get<contexts::traincost>()->deck != card_deck_type::main_deck) {
                     event_card_key key{origin_card, 5};
                     origin->m_game->add_listener<event_type::count_train_equips>(key, [=](player_ptr p, int &train_equips, int &num_advance) {
                         if (origin == p) {
                             ++train_equips;
-                            num_advance += ctx.train_advance;
+                            num_advance += ctx.get<contexts::train_advance>();
                         }
                     });
                     origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player_ptr p, bool skipped) {

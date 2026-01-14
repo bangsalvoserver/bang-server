@@ -57,7 +57,7 @@ namespace banggame {
 
     void equip_bomb::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::get_select_cubes_prompt>(target_card, [=](player_ptr origin, const effect_context &ctx, prompt_string &out_prompt) {
-            if (origin == target && !target->is_ghost() && rn::count(ctx.selected_cubes.all_cubes(), target_card) >= target_card->num_cubes()) {
+            if (origin == target && !target->is_ghost() && rn::count(ctx.get<contexts::selected_cubes>().all_cubes(), target_card) >= target_card->num_cubes()) {
                 out_prompt = {"PROMPT_EXPLODE_BOMB", target_card};
             }
         });

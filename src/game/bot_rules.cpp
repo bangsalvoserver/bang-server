@@ -8,7 +8,7 @@ namespace banggame {
 
     bool rule_filter_by_pocket::operator()(card_node node) const {
         if (!node) return false;
-        if (card_ptr choice_card = node->context.card_choice) {
+        if (card_ptr choice_card = node->context.get<contexts::card_choice>()) {
             return choice_card->pocket == pocket;
         }
         return node->card->pocket == pocket;
@@ -16,7 +16,7 @@ namespace banggame {
 
     bool rule_filter_by_pocket_not::operator()(card_node node) const {
         if (!node) return false;
-        if (card_ptr choice_card = node->context.card_choice) {
+        if (card_ptr choice_card = node->context.get<contexts::card_choice>()) {
             return choice_card->pocket != pocket;
         }
         return node->card->pocket != pocket;
@@ -27,7 +27,7 @@ namespace banggame {
     }
 
     bool rule_repeat::operator()(card_node node) const {
-        return node && node->context.repeat_card != nullptr;
+        return node && node->context.get<contexts::repeat_card>() != nullptr;
     }
 
     bool rule_tag_value::operator()(card_node node) const {

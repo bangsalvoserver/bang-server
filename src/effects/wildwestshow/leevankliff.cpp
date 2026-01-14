@@ -15,10 +15,10 @@ namespace banggame {
     }
 
     card_ptr get_repeat_playing_card(card_ptr origin_card, const effect_context &ctx) {
-        if (ctx.card_choice) {
-            return ctx.card_choice;
-        } else if (ctx.traincost) {
-            return ctx.traincost;
+        if (card_ptr card_choice = ctx.get<contexts::card_choice>()) {
+            return card_choice;
+        } else if (card_ptr traincost = ctx.get<contexts::traincost>()) {
+            return traincost;
         } else {
             return origin_card;
         }
@@ -59,13 +59,13 @@ namespace banggame {
     }
 
     game_string modifier_leevankliff::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
-        if (!ctx.repeat_card) {
+        if (!ctx.get<contexts::repeat_card>()) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         }
 
         playing_card = get_repeat_playing_card(playing_card, ctx);
                 
-        if (ctx.repeat_card != playing_card) {
+        if (ctx.get<contexts::repeat_card>() != playing_card) {
             return "INVALID_MODIFIER_CARD";
         }
 
@@ -80,9 +80,9 @@ namespace banggame {
         card_ptr last_played = nullptr;
         origin->m_game->call_event(event_type::get_last_played_brown_card{ origin, last_played });
         if (last_played) {
-            ctx.disable_banglimit = true;
-            ctx.repeat_card = last_played;
-            ctx.playing_card = origin_card;
+            ctx.get<contexts::disable_banglimit>() = true;
+            ctx.get<contexts::repeat_card>() = last_played;
+            ctx.get<contexts::playing_card>() = origin_card;
         }
     }
 }

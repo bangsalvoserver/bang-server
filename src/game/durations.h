@@ -3,9 +3,9 @@
 
 #include <chrono>
 
-namespace banggame {
+#include "cards/card_fwd.h"
 
-    using game_duration = std::chrono::milliseconds;
+namespace banggame {
 
     class animation_duration {
     private:
