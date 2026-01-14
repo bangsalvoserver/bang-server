@@ -66,7 +66,7 @@ namespace banggame {
                 range += 2;
             }
 
-            if (!ctx.get<contexts::ignore_distances>()
+            if (!ctx.contains<contexts::ignore_distances>()
                 && !origin->check_player_flags(player_flag::ignore_distances)
                 && origin->m_game->calc_distance(origin, target) > range
             ) {

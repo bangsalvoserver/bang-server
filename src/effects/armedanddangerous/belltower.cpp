@@ -11,6 +11,6 @@ namespace banggame {
     }
 
     void modifier_belltower::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        ctx.set<contexts::ignore_distances>(true);
+        ctx.add<contexts::ignore_distances>();
     }
 }

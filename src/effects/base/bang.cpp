@@ -30,7 +30,7 @@ namespace banggame {
     game_string effect_bangcard::get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
         if (origin_card->has_tag(tag_type::bangcard) && origin->m_game->check_flags(game_flag::showdown)) {
             return "ERROR_CARD_INACTIVE";
-        } else if (!ctx.get<contexts::disable_bang_checks>()) {
+        } else if (!ctx.contains<contexts::disable_bang_checks>()) {
             game_string out_error;
             origin->m_game->call_event(event_type::check_bang_target{ origin_card, origin, target, effect_flag::is_bang, out_error });
             return out_error;
@@ -82,14 +82,14 @@ namespace banggame {
     }
     
     game_string effect_banglimit::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (!ctx.get<contexts::disable_banglimit>() && origin->get_bangs_played() >= 1) {
+        if (!ctx.contains<contexts::disable_banglimit>() && origin->get_bangs_played() >= 1) {
             return "ERROR_ONE_BANG_PER_TURN";
         }
         return {};
     }
 
     void effect_banglimit::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (ctx.get<contexts::disable_banglimit>()) {
+        if (ctx.contains<contexts::disable_banglimit>()) {
             return;
         }
         event_card_key key{origin_card, 4};

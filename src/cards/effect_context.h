@@ -97,6 +97,11 @@ namespace banggame {
         }
 
         template<typename T>
+        bool contains() const {
+            return m_entries.contains(key<T>());
+        }
+
+        template<typename T>
         const unwrapped_t<T> &get() const {
             auto it = m_entries.find(key<T>());
             if (it != m_entries.end()) {

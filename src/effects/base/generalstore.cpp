@@ -37,7 +37,7 @@ namespace banggame {
     }
 
     void effect_generalstore::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        int num_targets = origin->m_game->num_alive() - bool(ctx.get<contexts::skipped_player>());
+        int num_targets = origin->m_game->num_alive() - ctx.contains<contexts::skipped_player>();
         for (int i=0; i < num_targets; ++i) {
             origin->m_game->top_of_deck()->move_to(pocket_type::selection);
         }

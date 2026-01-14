@@ -36,7 +36,7 @@ namespace banggame {
     }
 
     static int get_card_cost(card_ptr target_card, const effect_context &ctx) {
-        if (ctx.get<contexts::repeat_card>()) return 0;
+        if (ctx.contains<contexts::repeat_card>()) return 0;
         return target_card->get_tag_value(tag_type::buy_cost).value_or(0) - ctx.get<contexts::discount>();
     }
     

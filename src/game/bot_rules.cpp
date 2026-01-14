@@ -29,7 +29,7 @@ namespace banggame {
     }
 
     bool rule_repeat::operator()(card_node node) const {
-        return node && node->context.get<contexts::repeat_card>() != nullptr;
+        return node && node->context.contains<contexts::repeat_card>();
     }
 
     bool rule_tag_value::operator()(card_node node) const {

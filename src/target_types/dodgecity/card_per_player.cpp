@@ -21,8 +21,9 @@ namespace banggame {
 
     card_list targeting_card_per_player::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
         card_list ret;
+        player_ptr skipped_player = ctx.get<contexts::skipped_player>();
         for (player_ptr target : origin->m_game->range_all_players(origin)) {
-            if (target != ctx.get<contexts::skipped_player>() && !check_player_filter(origin_card, origin, player_filter, target, ctx)) {
+            if (target != skipped_player && !check_player_filter(origin_card, origin, player_filter, target, ctx)) {
                 if (auto targets = cards_target_set(origin, origin_card, card_filter, target, ctx)) {
                     ret.push_back(random_element(targets, origin->m_game->bot_rng));
                 }
@@ -32,9 +33,10 @@ namespace banggame {
     }
 
     game_string targeting_card_per_player::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
+        player_ptr skipped_player = ctx.get<contexts::skipped_player>();
         if (!rn::all_of(origin->m_game->m_players, [&](player_ptr p) {
             size_t found = rn::count(target_cards, p, [](card_ptr c) { return c->owner; });
-            if (p == ctx.get<contexts::skipped_player>() || check_player_filter(origin_card, origin, player_filter, p, ctx)) return found == 0;
+            if (p == skipped_player || check_player_filter(origin_card, origin, player_filter, p, ctx)) return found == 0;
             if (cards_target_set(origin, origin_card, card_filter, p, ctx).empty()) return found == 0;
             return found == 1;
         })) {

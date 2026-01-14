@@ -7,7 +7,7 @@
 namespace banggame {
 
     bool effect_card_choice::can_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (ctx.get<contexts::repeat_card>()) {
+        if (ctx.contains<contexts::repeat_card>()) {
             return true;
         }
         if (card_ptr card_choice = ctx.get<contexts::card_choice>()) {

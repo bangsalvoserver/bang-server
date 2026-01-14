@@ -21,7 +21,6 @@ namespace banggame {
     namespace contexts {
         struct ignore_distances {
             struct serialize_context{};
-            bool value;
         };
     }
 }

@@ -9,9 +9,7 @@
 namespace banggame {
 
     namespace contexts {
-        struct temp_missable {
-            bool value;
-        };
+        struct temp_missable {};
     }
 
     int count_missed_cards(player_ptr target) {
@@ -19,7 +17,7 @@ namespace banggame {
         int count = 0;
 
         effect_context ctx;
-        ctx.set<contexts::temp_missable>(true);
+        ctx.add<contexts::temp_missable>();
 
         for (card_ptr c : get_all_playable_cards(target, true, ctx)) {
             if (c->pocket != pocket_type::button_row && c->pocket != pocket_type::hidden_deck) {
@@ -33,7 +31,7 @@ namespace banggame {
         if (auto req = origin->m_game->top_request<missable_request>(target_is{origin})) {
             return req->can_miss(origin_card);
         }
-        return ctx.get<contexts::temp_missable>();
+        return ctx.contains<contexts::temp_missable>();
     }
 
     game_string effect_missed::on_prompt(card_ptr origin_card, player_ptr origin) {

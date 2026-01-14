@@ -258,9 +258,7 @@ namespace banggame {
             card_list value;
         };
 
-        struct playing_as {
-            bool value;
-        };
+        struct playing_as {};
     }
 
 }
