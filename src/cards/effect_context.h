@@ -11,8 +11,14 @@
 namespace banggame {
 
     template<typename T>
+    concept aggregate_with_one_member = requires {
+        requires std::is_aggregate_v<T>;
+        requires (reflect::size<T>() == 1);
+    };
+
+    template<typename T>
     decltype(auto) unwrap_value(T &&value) {
-        if constexpr (reflect::size<std::remove_cvref_t<T>>() == 1) {
+        if constexpr (aggregate_with_one_member<std::remove_cvref_t<T>>) {
             auto &&[unwrapped] = std::forward<T>(value);
             return (unwrapped);
         } else {
