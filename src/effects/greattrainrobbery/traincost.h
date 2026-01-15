@@ -26,7 +26,6 @@ namespace banggame {
     namespace contexts {
         struct train_advance {
             struct serialize_context{};
-            int value;
         };
 
         struct train_cost {

@@ -82,7 +82,7 @@ namespace banggame {
                     origin->m_game->call_event(event_type::count_train_equips{ origin, train_equips, num_advance });
                     if (train_equips >= 1) {
                         out_error = "ERROR_ONE_TRAIN_EQUIP_PER_TURN";
-                    } else if (ctx.get<contexts::train_advance>() >= 1 && num_advance >= 1) {
+                    } else if (ctx.contains<contexts::train_advance>() && num_advance >= 1) {
                         out_error = "ERROR_ONE_TRAIN_ADVANCE_PER_TURN";
                     }
                 }
@@ -96,7 +96,7 @@ namespace banggame {
                     origin->m_game->add_listener<event_type::count_train_equips>(key, [=](player_ptr p, int &train_equips, int &num_advance) {
                         if (origin == p) {
                             ++train_equips;
-                            num_advance += ctx.get<contexts::train_advance>();
+                            num_advance += ctx.contains<contexts::train_advance>();
                         }
                     });
                     origin->m_game->add_listener<event_type::on_turn_end>(key, [=](player_ptr p, bool skipped) {

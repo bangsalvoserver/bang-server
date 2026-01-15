@@ -14,9 +14,7 @@ namespace banggame {
     DEFINE_MODIFIER(discount, modifier_discount)
 
     namespace contexts {
-        struct discount {
-            int value;
-        };
+        struct discount {};
     }
 }
 
