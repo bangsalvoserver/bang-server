@@ -2,8 +2,8 @@
 #define __EFFECT_CONTEXT_H__
 
 #include <any>
-#include <typeindex>
-#include <unordered_map>
+#include <vector>
+#include <typeinfo>
 #include <functional>
 
 #include "card_serial.h"
@@ -59,6 +59,10 @@ namespace banggame {
             , serialize_fun{make_serialize_fun<std::remove_cvref_t<T>>()}
         {}
 
+        const std::type_info &type() const {
+            return value.type();
+        }
+
         template<typename T>
         unwrapped_t<T> &get() {
             return unwrap_value(std::any_cast<T &>(value));
@@ -80,11 +84,11 @@ namespace banggame {
 
     class effect_context {
     private:
-        std::unordered_map<std::type_index, context_entry> m_entries;
+        std::vector<context_entry> m_entries;
 
         template<typename T>
-        static std::type_index key() {
-            return std::type_index{typeid(std::remove_cvref_t<T>)};
+        auto find(this auto &&self) {
+            return rn::find(self.m_entries, typeid(T), &context_entry::type);
         }
 
         template<typename T>
@@ -96,42 +100,47 @@ namespace banggame {
     public:
         template<typename T>
         unwrapped_t<T> &add() {
-            auto [it, inserted] = m_entries.try_emplace(key<T>(), std::in_place_type<T>);
-            return it->second.template get<T>();
+            if (auto it = find<T>(); it != m_entries.end()) {
+                return it->template get<T>();
+            }
+            return m_entries.emplace_back(std::in_place_type<T>).template get<T>();
         }
 
         template<typename T, typename ... Ts>
         unwrapped_t<T> &set(Ts && ... args) {
-            auto [it, inserted] = m_entries.insert_or_assign(key<T>(), context_entry{std::in_place_type<T>, std::forward<Ts>(args) ...});
-            return it->second.template get<T>();
+            context_entry entry{std::in_place_type<T>, std::forward<Ts>(args) ...};
+            if (auto it = find<T>(); it != m_entries.end()) {
+                *it = std::move(entry);
+                return it->template get<T>();
+            } else {
+                return m_entries.emplace_back(std::move(entry)).get<T>();
+            }
         }
 
         template<typename T>
         bool contains() const {
-            return m_entries.contains(key<T>());
+            return find<T>() != m_entries.end();
         }
 
         template<typename T>
         const unwrapped_t<T> &get() const {
-            auto it = m_entries.find(key<T>());
-            if (it != m_entries.end()) {
-                return it->second.template get<T>();
+            if (auto it = find<T>(); it != m_entries.end()) {
+                return it->template get<T>();
             }
             return default_value<unwrapped_t<T>>();
         }
 
         template<typename T> requires std::is_trivially_copyable_v<T>
         unwrapped_t<T> get() const {
-            auto it = m_entries.find(key<T>());
-            if (it != m_entries.end()) {
-                return it->second.template get<T>();
+            if (auto it = find<T>(); it != m_entries.end()) {
+                return it->template get<T>();
             }
             return {};
         }
         
         void serialize(json::string_writer &writer) const {
             bool empty = true;
-            for (const auto &[type, entry] : m_entries) {
+            for (const context_entry &entry : m_entries) {
                 if (entry.serializable()) {
                     if (empty) {
                         empty = false;
