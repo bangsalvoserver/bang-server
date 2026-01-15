@@ -42,7 +42,11 @@ namespace banggame {
                 return [](const context_entry &self, json::string_writer &writer) {
                     auto key = reflect::type_name<T>();
                     writer.Key(key.data(), key.size());
-                    json::serialize(self.get<T>(), writer);
+                    if constexpr (std::is_empty_v<T>) {
+                        writer.Bool(true);
+                    } else {
+                        json::serialize(self.get<T>(), writer);
+                    }
                 };
             }
             return nullptr;
