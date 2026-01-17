@@ -257,8 +257,6 @@ namespace banggame {
         struct selected_cards {
             card_list value;
         };
-
-        struct playing_as {};
     }
 
 }

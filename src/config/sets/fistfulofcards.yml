@@ -27,7 +27,7 @@ fistfulofcards:
   - name: THE_JUDGE
     image: 05_ilgiudice
     equip:
-      - game_flag(game_flag::disable_equipping)
+      - thejudge
   - name: LASSO
     image: 05_lazo
     equip:

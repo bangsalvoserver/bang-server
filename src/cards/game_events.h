@@ -81,6 +81,14 @@ namespace banggame::event_type {
         nullable_ref<game_string> out_error;
     };
 
+    struct check_equip_card {
+        player_ptr origin;
+        card_ptr origin_card;
+        const_player_ptr target;
+        const effect_context &ctx;
+        nullable_ref<game_string> out_error;
+    };
+
     struct check_character_modifier {
         player_ptr origin;
         nullable_ref<bool> handled;

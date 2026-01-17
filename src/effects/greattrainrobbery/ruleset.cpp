@@ -71,8 +71,8 @@ namespace banggame {
     void ruleset_greattrainrobbery::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 1}, init_stations_and_train);
 
-        game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const effect_context &ctx, game_string &out_error) {
-            if (origin_card->is_equip_card() && origin_card->is_train()) {
+        game->add_listener<event_type::check_equip_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx, game_string &out_error) {
+            if (origin_card->is_train()) {
                 card_ptr traincost = ctx.get<contexts::train_cost>();
                 if (!traincost) {
                     out_error = "ERROR_MUST_PAY_TRAIN_COST";

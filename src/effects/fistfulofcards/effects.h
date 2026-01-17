@@ -12,6 +12,7 @@
 #include "ricochet.h"
 #include "russianroulette.h"
 #include "sniper.h"
+#include "thejudge.h"
 #include "vendetta.h"
 
 #endif

@@ -151,8 +151,10 @@ namespace banggame {
     }
 
     game_string get_equip_error(player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx) {
-        if (origin->m_game->check_flags(game_flag::disable_equipping)) {
-            return "ERROR_CANT_EQUIP_CARDS";
+        game_string result;
+        origin->m_game->call_event(event_type::check_equip_card{ origin, origin_card, target, ctx, result });
+        if (result) {
+            return result;
         }
         if (origin_card->self_equippable()) {
             if (origin != target) {

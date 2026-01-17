@@ -10,5 +10,6 @@ target_sources(bangserver PRIVATE
     ricochet.cpp
     russianroulette.cpp
     sniper.cpp
+    thejudge.cpp
     vendetta.cpp
 )

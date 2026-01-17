@@ -34,7 +34,6 @@ namespace banggame {
     enum class game_flag {
         game_over,
         invert_rotation,
-        disable_equipping,
         phase_one_draw_discard,
         phase_one_override,
         disable_player_distances,
