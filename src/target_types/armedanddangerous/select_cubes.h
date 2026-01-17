@@ -53,11 +53,30 @@ namespace banggame {
                 m_value.emplace_back(origin_card, std::move(cubes), ncubes);
             }
 
-            int count(const_card_ptr origin_card) const {
+            bool contains(const_card_ptr origin_card) const {
+                for (const selected_cubes_entry &entry : m_value) {
+                    if (entry.origin_card == origin_card && !entry.cubes.empty()) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            int count_repeats(const_card_ptr origin_card) const {
                 int result = 0;
-                for (const auto &entry : m_value) {
+                for (const selected_cubes_entry &entry : m_value) {
                     if (entry.origin_card == origin_card && entry.ncubes != 0) {
                         result += entry.cubes.size() / entry.ncubes;
+                    }
+                }
+                return result;
+            }
+
+            int count_selected_on(const_card_ptr target_card) const {
+                int result = 0;
+                for (const selected_cubes_entry &entry : m_value) {
+                    for (card_ptr c : entry.cubes) {
+                        if (c == target_card) ++result;
                     }
                 }
                 return result;

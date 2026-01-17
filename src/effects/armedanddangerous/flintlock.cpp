@@ -9,7 +9,7 @@
 namespace banggame {
 
     void effect_flintlock::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (ctx.get<contexts::selected_cubes>().count(origin_card) != 0) {
+        if (ctx.get<contexts::selected_cubes>().contains(origin_card)) {
             origin->m_game->add_listener<event_type::on_missed>(origin_card, [=](card_ptr missed_card, effect_flags flags, shared_request_bang req) {
                 if (origin == req->origin) {
                     origin->m_game->queue_action([=]{

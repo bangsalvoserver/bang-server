@@ -9,7 +9,7 @@
 namespace banggame {
 
     inline effect_heal build_effect_heal(card_ptr origin_card, const effect_context &ctx) {
-        return effect_heal{ctx.get<contexts::selected_cubes>().count(origin_card) + 1};
+        return effect_heal{ctx.get<contexts::selected_cubes>().count_repeats(origin_card) + 1};
     }
     
     game_string effect_a_little_nip::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {

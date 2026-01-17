@@ -16,7 +16,7 @@ namespace banggame {
     }
 
     game_string effect_duck::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (ctx.get<contexts::selected_cubes>().count(origin_card) == 0) {
+        if (!ctx.get<contexts::selected_cubes>().contains(origin_card)) {
             if (!origin->is_bot() || origin->m_hp > get_bang_damage(origin)) {
                 return {"PROMPT_NO_REDRAW", origin_card};
             }
@@ -25,7 +25,7 @@ namespace banggame {
     }
 
     void effect_duck::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        if (ctx.get<contexts::selected_cubes>().count(origin_card) != 0) {
+        if (ctx.get<contexts::selected_cubes>().contains(origin_card)) {
             origin->m_game->add_log("LOG_STOLEN_SELF_CARD", origin, origin_card);
             origin_card->add_short_pause();
             origin->add_to_hand(origin_card);
