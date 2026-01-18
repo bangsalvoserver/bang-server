@@ -151,11 +151,6 @@ namespace banggame {
     }
 
     game_string get_equip_error(player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx) {
-        game_string result;
-        origin->m_game->call_event(event_type::check_equip_card{ origin, origin_card, target, ctx, result });
-        if (result) {
-            return result;
-        }
         if (origin_card->self_equippable()) {
             if (origin != target) {
                 return "ERROR_INVALID_EQUIP_TARGET";
@@ -166,7 +161,9 @@ namespace banggame {
         if (card_ptr equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};
         }
-        return {};
+        game_string result;
+        origin->m_game->call_event(event_type::check_equip_card{ origin, origin_card, target, ctx, result });
+        return result;
     }
 
     static game_string verify_card_targets(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
