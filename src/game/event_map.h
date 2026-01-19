@@ -26,9 +26,18 @@ namespace banggame {
     template<event T>
     using event_tuple = decltype(to_event_tuple(std::declval<const T &>()));
 
+    template<typename T>
+    struct event_result_impl { using type = void; };
+
+    template<typename T> requires requires { typename T::result_type; }
+    struct event_result_impl<T> { using type = typename T::result_type; };
+
+    template<typename T>
+    using event_result = typename event_result_impl<T>::type;
+
     template<typename Function, typename T>
-    concept applicable = requires (Function fun, T tup) {
-        std::apply(fun, tup);
+    concept applicable_as_event = requires (Function fun, event_tuple<T> tup) {
+        { std::apply(fun, tup) } -> std::convertible_to<event_result<T>>;
     };
 
     struct event_listener_key {
@@ -52,20 +61,29 @@ namespace banggame {
 
     class event_listener {
     private:
-        std::move_only_function<void(const void *tuple)> m_fun;
+        std::move_only_function<bool(const void *tuple, void *result)> m_fun;
         std::type_index m_type;
         bool m_active = true;
     
     public:
-        template<event T, typename Function> requires applicable<Function, event_tuple<T>>
+        template<event T, typename Function> requires applicable_as_event<Function, T>
         event_listener(std::in_place_type_t<T>, Function &&fun)
-            : m_fun{[fun=std::move(fun)](const void *tuple) mutable {
-                std::apply(fun, *static_cast<const event_tuple<T> *>(tuple));
+            : m_fun{[fun=std::move(fun)](const void *tuple, void *result) mutable {
+                using tuple_type = event_tuple<T>;
+                using result_type = event_result<T>;
+                const tuple_type &tuple_ref = *static_cast<const tuple_type *>(tuple);
+                if constexpr (std::is_void_v<result_type>) {
+                    std::apply(fun, tuple_ref);
+                } else if (result_type value = std::apply(fun, tuple_ref)) {
+                    *static_cast<result_type *>(result) = std::move(value);
+                    return true;
+                }
+                return false;
             }},
             m_type{typeid(Function)} {}
         
-        void operator()(const void *tuple) {
-            m_fun(tuple);
+        bool operator()(const void *tuple, void *result) {
+            return m_fun(tuple, result);
         }
 
         const std::type_index &target_type() const {
@@ -102,10 +120,10 @@ namespace banggame {
     private:
         void do_add_listener(event_listener_key key, event_listener &&listener);
         void do_remove_listeners(iterator_map_range range);
-        void do_call_event(std::type_index type, const void *tuple);
+        void do_call_event(std::type_index type, const void *tuple, void *result);
 
     public:
-        template<event T, typename Function> requires applicable<Function, event_tuple<T>>
+        template<event T, typename Function> requires applicable_as_event<Function, T>
         void add_listener(event_card_key key, Function &&fun) {
             do_add_listener({ typeid(T), key }, { std::in_place_type<T>, std::forward<Function>(fun) });
         }
@@ -121,9 +139,16 @@ namespace banggame {
         }
 
         template<event T>
-        void call_event(const T &value) {
+        auto call_event(const T &value) {
             auto tuple = to_event_tuple(value);
-            do_call_event(typeid(T), &tuple);
+            using result_type = event_result<T>;
+            if constexpr (std::is_void_v<result_type>) {
+                do_call_event(typeid(T), &tuple, nullptr);
+            } else {
+                result_type result{};
+                do_call_event(typeid(T), &tuple, &result);
+                return result;
+            }
         }
     };
 
