@@ -17,11 +17,12 @@ namespace banggame {
     }
 
     void equip_ms_abigail::on_enable(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::apply_escapable_modifier>({origin_card, -1},
-            [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags e_flags, const escapable_request &req, escape_type &value) {
+        origin->m_game->add_listener<event_type::apply_escapable_modifier>(origin_card,
+            [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags e_flags, const escapable_request &req) {
                 if (e_target == origin && effect_ms_abigail::can_escape(e_origin, e_origin_card, e_flags)) {
-                    value = escape_type::escape_no_timer;
+                    return escape_type::escape_no_timer;
                 }
+                return escape_type::no_escape;
             });
     }
 

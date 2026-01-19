@@ -6,9 +6,7 @@
 namespace banggame {
 
     escape_type request_escapable_resolvable::get_escape_type() const {
-        escape_type result = escape_type::no_escape;
-        target->m_game->call_event(event_type::apply_escapable_modifier{ origin_card, origin, target, flags, *this, result });
-        return result;
+        return target->m_game->call_event(event_type::apply_escapable_modifier{ origin_card, origin, target, flags, *this });
     }
 
     void request_targeting::on_update() {

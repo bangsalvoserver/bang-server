@@ -74,7 +74,7 @@ namespace banggame {
                 const tuple_type &tuple_ref = *static_cast<const tuple_type *>(tuple);
                 if constexpr (std::is_void_v<result_type>) {
                     std::apply(fun, tuple_ref);
-                } else if (result_type value = std::apply(fun, tuple_ref)) {
+                } else if (result_type value = std::apply(fun, tuple_ref); static_cast<bool>(value)) {
                     *static_cast<result_type *>(result) = std::move(value);
                     return true;
                 }

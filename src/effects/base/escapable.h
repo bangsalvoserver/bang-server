@@ -57,12 +57,12 @@ namespace banggame {
 
     namespace event_type {
         struct apply_escapable_modifier {
+            using result_type = escape_type;
             card_ptr origin_card;
             player_ptr origin;
             const_player_ptr target;
             effect_flags flags;
             const escapable_request &req;
-            nullable_ref<escape_type> value;
         };
     }
 
