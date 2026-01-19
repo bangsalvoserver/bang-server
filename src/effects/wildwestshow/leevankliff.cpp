@@ -13,8 +13,8 @@ namespace banggame {
 
     namespace event_type {
         struct get_last_played_brown_card {
+            using result_type = card_ptr;
             player_ptr origin;
-            nullable_ref<card_ptr> value;
         };
     }
 
@@ -37,10 +37,11 @@ namespace banggame {
             }
         });
 
-        origin->m_game->add_listener<event_type::get_last_played_brown_card>(origin_card, [=](player_ptr e_origin, card_ptr &value) {
+        origin->m_game->add_listener<event_type::get_last_played_brown_card>(origin_card, [=](player_ptr e_origin) -> card_ptr {
             if (origin == e_origin) {
-                value = *last_played;
+                return *last_played;
             }
+            return nullptr;
         });
 
         origin->m_game->add_listener<event_type::on_play_card>(origin_card, [=](player_ptr e_origin, card_ptr e_origin_card, const card_list &modifiers, const effect_context &ctx) {
@@ -82,9 +83,7 @@ namespace banggame {
     }
 
     void modifier_leevankliff::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        card_ptr last_played = nullptr;
-        origin->m_game->call_event(event_type::get_last_played_brown_card{ origin, last_played });
-        if (last_played) {
+        if (card_ptr last_played = origin->m_game->call_event(event_type::get_last_played_brown_card{ origin })) {
             ctx.add<contexts::disable_banglimit>();
             ctx.set<contexts::repeat_card>(last_played);
             ctx.set<contexts::playing_card>(origin_card);

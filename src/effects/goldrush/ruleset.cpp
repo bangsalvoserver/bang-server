@@ -48,15 +48,16 @@ namespace banggame {
             }
         });
 
-        game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const effect_context &ctx, game_string &out_error) {
+        game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const effect_context &ctx) -> game_string {
             if (!origin->m_game->pending_requests()) {
                 if (card_ptr card_choice = ctx.get<contexts::card_choice>()) {
                     origin_card = card_choice;
                 }
                 if (origin_card->pocket == pocket_type::shop_selection && origin->get_gold() < get_card_cost(origin_card, ctx)) {
-                    out_error = "ERROR_NOT_ENOUGH_GOLD";
+                    return "ERROR_NOT_ENOUGH_GOLD";
                 }
             }
+            return {};
         });
         
         game->add_listener<event_type::on_hit>({nullptr, 6}, [](card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags) {
@@ -147,6 +148,6 @@ namespace banggame {
                 }
             }, -10);
         });
-        game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) { value = false; });
+        game->add_listener<event_type::check_remove_player>(nullptr, []{ return true; });
     }
 }

@@ -14,8 +14,8 @@ namespace banggame {
 namespace banggame::event_type {
 
     struct on_assign_characters {
+        using result_type = bool;
         player_ptr first_player;
-        nullable_ref<bool> handled;
     };
 
     struct on_game_setup {
@@ -75,23 +75,23 @@ namespace banggame::event_type {
     };
     
     struct check_play_card {
+        using result_type = game_string;
         player_ptr origin;
         card_ptr origin_card;
         const effect_context &ctx;
-        nullable_ref<game_string> out_error;
     };
 
     struct check_equip_card {
+        using result_type = game_string;
         player_ptr origin;
         card_ptr origin_card;
         const_player_ptr target;
         const effect_context &ctx;
-        nullable_ref<game_string> out_error;
     };
 
     struct check_character_modifier {
+        using result_type = bool;
         player_ptr origin;
-        nullable_ref<bool> handled;
         nullable_ref<std::set<card_ptr>> handlers;
     };
     

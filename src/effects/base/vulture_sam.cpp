@@ -20,9 +20,7 @@ namespace banggame {
     }
 
     static card_ptr get_vulture_sam(player_ptr target) {
-        card_ptr origin_card = nullptr;
-        target->m_game->call_event(event_type::check_card_taker{ target, card_taker_type::dead_players, origin_card });
-        return origin_card;
+        return target->m_game->call_event(event_type::check_card_taker{ target, card_taker_type::dead_players });
     }
 
     struct request_multi_vulture_sam : request_picking {
@@ -74,10 +72,11 @@ namespace banggame {
     };
     
     void equip_vulture_sam::on_enable(card_ptr target_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type, card_ptr &value){
+        origin->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type) -> card_ptr {
             if (type == card_taker_type::dead_players && e_target == origin) {
-                value = target_card;
+                return target_card;
             }
+            return nullptr;
         });
         origin->m_game->add_listener<event_type::on_player_eliminated>(target_card, [=](player_ptr killer, player_ptr target, death_type type) {
             if (type == death_type::shadow_turn_end) return;

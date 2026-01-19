@@ -145,9 +145,7 @@ namespace banggame {
         if (card_ptr disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
-        game_string out_error;
-        origin->m_game->call_event(event_type::check_play_card{ origin, origin_card, ctx, out_error });
-        return out_error;
+        return origin->m_game->call_event(event_type::check_play_card{ origin, origin_card, ctx });
     }
 
     game_string get_equip_error(player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx) {
@@ -161,9 +159,7 @@ namespace banggame {
         if (card_ptr equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};
         }
-        game_string result;
-        origin->m_game->call_event(event_type::check_equip_card{ origin, origin_card, target, ctx, result });
-        return result;
+        return origin->m_game->call_event(event_type::check_equip_card{ origin, origin_card, target, ctx });
     }
 
     static game_string verify_card_targets(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {

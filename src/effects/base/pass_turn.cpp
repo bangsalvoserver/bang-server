@@ -5,9 +5,7 @@
 namespace banggame {
 
     static prompt_string get_pass_turn_prompt(player_ptr origin) {
-        prompt_string result;
-        origin->m_game->call_event(event_type::prompt_pass_turn{ origin, result });
-        return result;
+        return origin->m_game->call_event(event_type::prompt_pass_turn{ origin });
     }
 
     prompt_string effect_pass_turn::on_prompt(card_ptr origin_card, player_ptr origin) {
@@ -20,11 +18,10 @@ namespace banggame {
     }
 
     game_string effect_pass_turn::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        game_string out_error;
         if (origin->is_bot() || ctx.contains<contexts::playing_card>()) {
-            origin->m_game->call_event(event_type::check_pass_turn{ origin, out_error });
+            return origin->m_game->call_event(event_type::check_pass_turn{ origin });
         }
-        return out_error;
+        return {};
     }
 
     void effect_pass_turn::on_play(card_ptr origin_card, player_ptr origin) {

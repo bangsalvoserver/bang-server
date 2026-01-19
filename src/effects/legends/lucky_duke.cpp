@@ -56,29 +56,29 @@ namespace banggame {
     };
 
     static card_ptr get_lucky_duke(player_ptr target) {
-        card_ptr origin_card = nullptr;
-        target->m_game->call_event(event_type::check_card_taker{ target, card_taker_type::draw_check_start, origin_card });
-        return origin_card;
+        return target->m_game->call_event(event_type::check_card_taker{ target, card_taker_type::draw_check_start });
     }
     
     void equip_lucky_duke_legend::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type, card_ptr &value) {
+        target->m_game->add_listener<event_type::check_card_taker>(target_card, [=](player_ptr e_target, card_taker_type type) -> card_ptr {
             if (type == card_taker_type::draw_check_start && e_target == target) {
-                value = target_card;
+                return target_card;
             }
+            return nullptr;
         });
 
-        target->m_game->add_listener<event_type::on_draw_check_start>(target_card, [=](player_ptr origin, shared_request_check req, bool &handled) {
-            if (!handled && req->target != target && req->origin_card && req->origin_card->deck == card_deck_type::main_deck) {
+        target->m_game->add_listener<event_type::on_draw_check_start>(target_card, [=](player_ptr origin, shared_request_check req) {
+            if (req->target != target && req->origin_card && req->origin_card->deck == card_deck_type::main_deck) {
                 if (rn::none_of(origin->m_game->range_all_players(origin)
                     | rv::take_while([=](const_player_ptr current) { return current != target; })
                     | rv::filter(&player::alive),
                     get_lucky_duke)
                 ) {
-                    handled = true;
                     target->m_game->queue_request<request_lucky_duke_legend>(target_card, origin, target, std::move(req));
+                    return true;
                 }
             }
+            return false;
         });
 
         target->m_game->add_listener<event_type::on_draw_check_resolve>(target_card, [=](card_ptr origin_card, player_ptr origin, card_ptr target_card, card_ptr drawn_card) {

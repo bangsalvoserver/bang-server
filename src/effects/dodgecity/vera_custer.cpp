@@ -12,20 +12,20 @@ namespace banggame {
 
     namespace event_type {
         struct get_card_copy {
+            using result_type = card_ptr;
             card_ptr target_card;
-            nullable_ref<card_ptr> result;
         };
     }
 
     static card_ptr get_card_copy(card_ptr target_card)  {
-        card_ptr result = nullptr;
-        target_card->m_game->call_event(event_type::get_card_copy{ target_card, result });
+        card_ptr result = target_card->m_game->call_event(event_type::get_card_copy{ target_card });
         if (!result) {
             result = target_card->m_game->add_card(*target_card);
-            target_card->m_game->add_listener<event_type::get_card_copy>(nullptr, [=](card_ptr e_target_card, card_ptr &e_result) {
+            target_card->m_game->add_listener<event_type::get_card_copy>(nullptr, [=](card_ptr e_target_card) -> card_ptr {
                 if (e_target_card == target_card) {
-                    e_result = result;
+                    return result;
                 }
+                return nullptr;
             });
         }
         return result;
@@ -88,14 +88,15 @@ namespace banggame {
     };
 
     void equip_vera_custer::on_enable(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 0}, [=](player_ptr target, bool &handled, std::set<card_ptr> &handlers) {
-            if (origin == target && !handled && !handlers.contains(origin_card)
+        origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 0}, [=](player_ptr target, std::set<card_ptr> &handlers) {
+            if (origin == target && !handlers.contains(origin_card)
                 && !target->check_player_flags(player_flag::extra_turn)
             ) {
-                handled = true;
                 handlers.insert(origin_card);
                 target->m_game->queue_request<request_vera_custer>(origin_card, nullptr, target);
+                return true;
             }
+            return false;
         });
     }
 

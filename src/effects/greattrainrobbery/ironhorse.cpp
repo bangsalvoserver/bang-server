@@ -21,16 +21,17 @@ namespace banggame {
             });
         });
 
-        origin->m_game->add_listener<event_type::get_locomotive_prompt>(origin_card, [](player_ptr target, int locomotive_count, prompt_string &out_prompt) {
+        origin->m_game->add_listener<event_type::get_locomotive_prompt>(origin_card, [](player_ptr target, int locomotive_count) -> game_string {
             if (target->is_bot()) {
                 player_ptr sheriff = target->m_game->m_first_player;
                 auto role = target->get_base_role();
                 if (!(role == player_role::outlaw || role == player_role::renegade && target->m_game->num_alive() <= 2)
                     && (sheriff->m_hp <= locomotive_count && sheriff->m_role == player_role::sheriff)
                 ) {
-                    out_prompt = "BOT_DONT_KILL_SHERIFF";
+                    return "BOT_DONT_KILL_SHERIFF";
                 }
             }
+            return {};
         });
     }
 }

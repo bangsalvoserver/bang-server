@@ -19,10 +19,8 @@ namespace banggame {
             if (target_card->is_green()) {
                 target_card->set_inactive(true);
 
-                origin->m_game->add_listener<event_type::check_equipped_green_card>(key, [=](player_ptr e_origin, card_ptr e_origin_card, bool &value) {
-                    if (origin == e_origin && target_card == e_origin_card) {
-                        value = true;
-                    }
+                origin->m_game->add_listener<event_type::check_equipped_green_card>(key, [=](player_ptr e_origin, card_ptr e_origin_card) {
+                    return origin == e_origin && target_card == e_origin_card;
                 });
             }
         });
@@ -35,10 +33,11 @@ namespace banggame {
             }
         });
 
-        game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr target_card, const effect_context &ctx, game_string &out_error) {
+        game->add_listener<event_type::check_play_card>(nullptr, [](player_ptr origin, card_ptr target_card, const effect_context &ctx) -> game_string {
             if (target_card->is_green() && target_card->inactive) {
-                out_error = {"ERROR_CARD_INACTIVE", target_card};
+                return {"ERROR_CARD_INACTIVE", target_card};
             }
+            return {};
         });
     }
 }

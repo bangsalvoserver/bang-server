@@ -32,9 +32,9 @@ namespace banggame {
         };
 
         struct get_locomotive_prompt {
+            using result_type = prompt_string;
             player_ptr origin;
             int locomotive_count;
-            nullable_ref<prompt_string> out_prompt;
         };
     }
     

@@ -27,16 +27,14 @@ namespace banggame {
                 }
             });
 
-        game->add_listener<event_type::check_damage_response>(nullptr, [](player_ptr target, bool &value) {
-            if (!value && rn::any_of(target->m_game->m_players, [&](player_ptr p) {
+        game->add_listener<event_type::check_damage_response>(nullptr, [](player_ptr target) {
+            return rn::any_of(target->m_game->m_players, [&](player_ptr p) {
                 return p != target && p->alive() && !p->empty_hand();
-            }) && !rn::contains(target->m_game->m_discards, "SAVED"sv, &card::name)) {
-                value = true;
-            }
+            }) && !rn::contains(target->m_game->m_discards, "SAVED"sv, &card::name);
         });
         
         if (game->m_options.expansions.contains(GET_RULESET(ghost_cards))) {
-            game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) { value = false; });
+            game->add_listener<event_type::check_remove_player>(nullptr, []{ return true; });
         }
     }
 
@@ -51,16 +49,14 @@ namespace banggame {
                 }
             });
         
-        game->add_listener<event_type::check_damage_response>(nullptr, [](player_ptr target, bool &value) {
-            if (!value && rn::any_of(target->m_game->m_players, [&](player_ptr p) {
+        game->add_listener<event_type::check_damage_response>(nullptr, [](player_ptr target) {
+            return rn::any_of(target->m_game->m_players, [&](player_ptr p) {
                 return p != target && p != target->m_game->m_playing && p->alive() && !p->empty_hand();
-            }) && !rn::contains(target->m_game->m_discards, "SAVED_2"sv, &card::name)) {
-                value = true;
-            }
+            }) && !rn::contains(target->m_game->m_discards, "SAVED_2"sv, &card::name);
         });
         
         if (game->m_options.expansions.contains(GET_RULESET(ghost_cards))) {
-            game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) { value = false; });
+            game->add_listener<event_type::check_remove_player>(nullptr, []{ return true; });
         }
     }
 

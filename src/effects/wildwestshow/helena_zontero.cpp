@@ -58,9 +58,7 @@ namespace banggame {
             drawn_card->move_to(pocket_type::discard_pile);
 
             origin->m_game->add_log("LOG_CHECK_CARD_DRAWN", origin_card, drawn_card);
-            bool handled = false;
-            origin->m_game->call_event(event_type::on_draw_check_select{ nullptr, shared_from_this(), handled });
-            if (!handled) {
+            if (!origin->m_game->call_event(event_type::on_draw_check_select{ nullptr, shared_from_this() })) {
                 resolve();
             }
         }

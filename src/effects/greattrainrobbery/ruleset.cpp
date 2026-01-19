@@ -71,22 +71,24 @@ namespace banggame {
     void ruleset_greattrainrobbery::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 1}, init_stations_and_train);
 
-        game->add_listener<event_type::check_equip_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx, game_string &out_error) {
+        game->add_listener<event_type::check_equip_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx) -> game_string {
             if (origin_card->is_train()) {
                 card_ptr traincost = ctx.get<contexts::train_cost>();
                 if (!traincost) {
-                    out_error = "ERROR_MUST_PAY_TRAIN_COST";
-                } else if (traincost->deck != card_deck_type::main_deck) {
+                    return "ERROR_MUST_PAY_TRAIN_COST";
+                }
+                if (traincost->deck != card_deck_type::main_deck) {
                     int train_equips = 0;
                     int num_advance = 0;
                     origin->m_game->call_event(event_type::count_train_equips{ origin, train_equips, num_advance });
                     if (train_equips >= 1) {
-                        out_error = "ERROR_ONE_TRAIN_EQUIP_PER_TURN";
+                        return "ERROR_ONE_TRAIN_EQUIP_PER_TURN";
                     } else if (ctx.contains<contexts::train_advance>() && num_advance >= 1) {
-                        out_error = "ERROR_ONE_TRAIN_ADVANCE_PER_TURN";
+                        return "ERROR_ONE_TRAIN_ADVANCE_PER_TURN";
                     }
                 }
             }
+            return {};
         });
 
         game->add_listener<event_type::on_equip_card>(nullptr, [](player_ptr origin, player_ptr target, card_ptr origin_card, const effect_context &ctx) {
@@ -135,7 +137,7 @@ namespace banggame {
         });
         
         if (game->m_options.expansions.contains(GET_RULESET(ghost_cards))) {
-            game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) { value = false; });
+            game->add_listener<event_type::check_remove_player>(nullptr, []{ return true; });
         }
     }
 

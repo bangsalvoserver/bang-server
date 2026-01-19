@@ -94,11 +94,11 @@ namespace banggame {
         };
         
         struct check_bang_target {
+            using result_type = game_string;
             card_ptr origin_card;
             player_ptr origin;
             player_ptr target;
             effect_flags flags;
-            nullable_ref<game_string> out_error;
         };
         
         struct on_missed {

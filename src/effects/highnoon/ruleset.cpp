@@ -96,7 +96,7 @@ namespace banggame {
         });
         
         if (game->m_options.expansions.contains(GET_RULESET(ghost_cards))) {
-            game->add_listener<event_type::check_remove_player>(nullptr, [](bool &value) { value = false; });
+            game->add_listener<event_type::check_remove_player>(nullptr, []{ return true; });
         }
     }
 }

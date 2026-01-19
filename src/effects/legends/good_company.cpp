@@ -10,8 +10,8 @@ namespace banggame {
 
     namespace event_type {
         struct get_last_played_card {
+            using result_type = card_ptr;
             player_ptr origin;
-            nullable_ref<card_ptr> value;
         };
     }
 
@@ -39,10 +39,11 @@ namespace banggame {
             *tracking = {};
         });
 
-        origin->m_game->add_listener<event_type::get_last_played_card>(origin_card, [=](player_ptr e_origin, card_ptr &value) {
+        origin->m_game->add_listener<event_type::get_last_played_card>(origin_card, [=](player_ptr e_origin) -> card_ptr {
             if (e_origin == origin->m_game->m_playing) {
-                value = tracking->last_played;
+                return tracking->last_played;
             }
+            return nullptr;
         });
 
         origin->m_game->add_listener<event_type::on_destroy_card>(origin_card, [=](player_ptr e_origin, card_ptr target_card, bool is_destroyed, bool &handled) {
@@ -67,8 +68,7 @@ namespace banggame {
     game_string effect_good_company::get_error(card_ptr origin_card, player_ptr origin, card_ptr target) {
         MAYBE_RETURN(effect_discard::get_error(origin_card, origin, target));
 
-        card_ptr last_played = nullptr;
-        origin->m_game->call_event(event_type::get_last_played_card{ origin, last_played });
+        card_ptr last_played = origin->m_game->call_event(event_type::get_last_played_card{ origin });
         if (!last_played) {
             return {"ERROR_CANT_PLAY_CARD", origin_card};
         } else if (!is_same_name(origin, last_played, target)) {

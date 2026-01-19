@@ -29,9 +29,7 @@ namespace banggame {
     }
 
     prompt_string targeting_select_cubes::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
-        prompt_string out_prompt;
-        origin->m_game->call_event(event_type::get_select_cubes_prompt{ origin, ctx, out_prompt });
-        return out_prompt;
+        return origin->m_game->call_event(event_type::get_select_cubes_prompt{ origin, ctx });
     }
 
     void targeting_select_cubes::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target_cards) {

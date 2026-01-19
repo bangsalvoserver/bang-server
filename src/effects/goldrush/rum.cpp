@@ -25,9 +25,7 @@ namespace banggame {
                 drawn_card->move_to(pocket_type::selection);
             }
 
-            bool handled = false;
-            target->m_game->call_event(event_type::on_draw_check_select{ target, shared_from_this(), handled });
-            if (!handled) {
+            if (!target->m_game->call_event(event_type::on_draw_check_select{ target, shared_from_this() })) {
                 resolve();
             }
         }

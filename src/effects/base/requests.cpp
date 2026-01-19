@@ -33,9 +33,7 @@ namespace banggame {
 
     void request_character_modifier::on_update() {
         if (target->alive() && target->m_game->m_playing == target) {
-            bool handled = false;
-            target->m_game->call_event(event_type::check_character_modifier{ target, handled, handlers });
-            if (!handled) {
+            if (!target->m_game->call_event(event_type::check_character_modifier{ target, handlers })) {
                 target->m_game->pop_request();
             }
         } else {

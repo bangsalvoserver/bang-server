@@ -42,9 +42,7 @@ namespace banggame {
     }
 
     void request_check_base::start() {
-        bool handled = false;
-        target->m_game->call_event(event_type::on_draw_check_start{ target, shared_from_this(), handled });
-        if (!handled) {
+        if (!target->m_game->call_event(event_type::on_draw_check_start{ target, shared_from_this() })) {
             int num_checks = target->get_num_checks();
             if (num_checks > 1) {
                 for (int i=0; i<num_checks; ++i) {
@@ -64,9 +62,7 @@ namespace banggame {
         drawn_card = target_card;
 
         target->m_game->add_log("LOG_CHECK_DREW_CARD", origin_card, target, target_card);
-        bool handled = false;
-        target->m_game->call_event(event_type::on_draw_check_select{ target, shared_from_this(), handled });
-        if (!handled) {
+        if (!target->m_game->call_event(event_type::on_draw_check_select{ target, shared_from_this() })) {
             resolve();
         }
     }

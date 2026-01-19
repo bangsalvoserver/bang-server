@@ -454,10 +454,7 @@ namespace banggame {
         
         add_update(make_preload_assets_update(this));
 
-        bool handled = false;
-        call_event(event_type::on_assign_characters{ m_first_player, handled });
-
-        if (!handled) {
+        if (!call_event(event_type::on_assign_characters{ m_first_player })) {
             add_game_flags(game_flag::hands_shown);
 
             auto character_it = m_characters.begin();

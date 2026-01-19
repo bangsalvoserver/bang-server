@@ -15,10 +15,8 @@ namespace banggame {
             }
         });
 
-        origin->m_game->add_listener<event_type::check_damage_legend_kill>(origin_card, [=](player_ptr target, bool &value) {
-            if (origin == target) {
-                value = true;
-            }
+        origin->m_game->add_listener<event_type::check_damage_legend_kill>(origin_card, [=](player_ptr target) {
+            return origin == target;
         });
     }
 }

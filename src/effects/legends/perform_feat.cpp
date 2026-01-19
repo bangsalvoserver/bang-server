@@ -41,9 +41,7 @@ namespace banggame {
     }
 
     static bool can_damage_legend_kill(player_ptr target) {
-        bool result = false;
-        target->m_game->call_event(event_type::check_damage_legend_kill{ target, result });
-        return result;
+        return target->m_game->call_event(event_type::check_damage_legend_kill{ target });
     }
 
     static bool is_valid_damage_legend_target(const_player_ptr origin, const_player_ptr target, bool can_kill) {

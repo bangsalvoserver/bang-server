@@ -107,9 +107,7 @@ namespace banggame {
             }
         }, 50);
 
-        bool remove_player = true;
-        target->m_game->call_event(event_type::check_remove_player{ remove_player });
-        if (remove_player) {
+        if (!target->m_game->call_event(event_type::check_remove_player{})) {
             target->m_game->queue_action([=]{
                 bool any_player_removed = false;
                 for (player_ptr p : target->m_game->m_players) {

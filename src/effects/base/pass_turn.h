@@ -7,13 +7,13 @@ namespace banggame {
 
     namespace event_type {
         struct check_pass_turn {
+            using result_type = game_string;
             player_ptr origin;
-            nullable_ref<game_string> out_error;
         };
 
         struct prompt_pass_turn {
+            using result_type = prompt_string;
             player_ptr origin;
-            nullable_ref<prompt_string> out_prompt;
         };
     }
 

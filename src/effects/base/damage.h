@@ -9,8 +9,8 @@ namespace banggame {
 
     namespace event_type {
         struct check_damage_response {
+            using result_type = bool;
             player_ptr target;
-            nullable_ref<bool> value;
         };
         
         struct on_hit {

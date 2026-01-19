@@ -40,10 +40,11 @@ namespace banggame {
         target->m_game->pop_request();
 
         target->m_game->add_listener<event_type::check_play_card>({origin_card, 1},
-            [origin_card, target, suit=suit](player_ptr origin, card_ptr c, const effect_context &ctx, game_string &out_error) {
+            [origin_card, target, suit=suit](player_ptr origin, card_ptr c, const effect_context &ctx) -> game_string {
                 if (c->pocket == pocket_type::player_hand && c->owner == target && c->sign.suit != suit) {
-                    out_error = {"ERROR_INVALID_SUIT", origin_card, c};
+                    return {"ERROR_INVALID_SUIT", origin_card, c};
                 }
+                return {};
             });
     }
 }

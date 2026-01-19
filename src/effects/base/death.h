@@ -28,7 +28,7 @@ namespace banggame {
         };
 
         struct check_remove_player {
-            nullable_ref<bool> value;
+            using result_type = bool;
         };
     }
 

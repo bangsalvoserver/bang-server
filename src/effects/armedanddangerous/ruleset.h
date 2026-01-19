@@ -13,9 +13,9 @@ namespace banggame {
 
     namespace event_type {
         struct get_select_cubes_prompt {
+            using result_type = prompt_string;
             player_ptr origin;
             const effect_context &ctx;
-            nullable_ref<prompt_string> out_prompt;
         };
     }
 

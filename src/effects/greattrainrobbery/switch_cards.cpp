@@ -13,9 +13,7 @@
 namespace banggame {
 
     static bool has_equipped_card(player_ptr origin, card_ptr target_card) {
-        bool value = false;
-        origin->m_game->call_event(event_type::check_equipped_green_card{ origin, target_card, value });
-        return value;
+        return origin->m_game->call_event(event_type::check_equipped_green_card{ origin, target_card });
     }
 
     static void resolve_switch_cards(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {

@@ -29,9 +29,9 @@ namespace banggame {
         };
 
         struct on_draw_check_start {
+            using result_type = bool;
             player_ptr origin;
             shared_request_check req;
-            nullable_ref<bool> handled;
         };
 
         struct on_draw_check_resolve {
@@ -42,9 +42,9 @@ namespace banggame {
         };
         
         struct on_draw_check_select {
+            using result_type = bool;
             player_ptr origin;
             shared_draw_check_handler req;
-            nullable_ref<bool> handled;
         };
         
         struct apply_sign_modifier {

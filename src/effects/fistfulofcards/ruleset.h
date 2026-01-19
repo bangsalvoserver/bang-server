@@ -13,7 +13,7 @@ namespace banggame {
 
     namespace event_type {
         struct get_first_dead_player {
-            nullable_ref<player_ptr> result;
+            using result_type = player_ptr;
         };
     }
 

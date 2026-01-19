@@ -17,8 +17,8 @@ namespace banggame {
         };
 
         struct check_damage_legend_kill {
+            using result_type = bool;
             player_ptr origin;
-            nullable_ref<bool> value;
         };
     }
 

@@ -7,9 +7,9 @@ namespace banggame {
 
     namespace event_type {
         struct check_equipped_green_card {
+            using result_type = bool;
             player_ptr origin;
             card_ptr origin_card;
-            nullable_ref<bool> value;
         };
     };
 

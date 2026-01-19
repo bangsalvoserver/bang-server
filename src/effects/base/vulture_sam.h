@@ -14,9 +14,9 @@ namespace banggame {
 
     namespace event_type {
         struct check_card_taker {
+            using result_type = card_ptr;
             player_ptr target;
             card_taker_type type;
-            nullable_ref<card_ptr> value;
         };
     }
     
