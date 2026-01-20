@@ -19,9 +19,9 @@ namespace banggame {
         };
 
         struct check_predraw_auto_pick {
+            using result_type = bool;
             player_ptr origin;
             card_ptr checking_card;
-            nullable_ref<bool> value;
         };
     }
 

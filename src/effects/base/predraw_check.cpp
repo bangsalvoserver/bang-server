@@ -14,10 +14,10 @@ namespace banggame {
             if (cards.empty()) {
                 target->m_game->pop_request();
             } else if (cards.size() == 1) {
-                bool is_auto_pick = target->m_game->m_options.auto_pick_predraw;
                 card_ptr checking_card = cards.front().target_card;
-                target->m_game->call_event(event_type::check_predraw_auto_pick{ target, checking_card, is_auto_pick });
-                if (is_auto_pick) {
+                if (target->m_game->m_options.auto_pick_predraw
+                    && !target->m_game->call_event(event_type::check_predraw_auto_pick{ target, checking_card })
+                ) {
                     on_pick(checking_card);
                 }
             }

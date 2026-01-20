@@ -239,10 +239,8 @@ namespace banggame {
             }
         });
 
-        game->add_listener<event_type::check_predraw_auto_pick>(nullptr, [](player_ptr origin, card_ptr checking_card, bool &value) {
-            if (!origin->empty_hand() && checking_card->has_tag(tag_type::jail)) {
-                value = false;
-            }
+        game->add_listener<event_type::check_predraw_auto_pick>(nullptr, [](player_ptr origin, card_ptr checking_card) {
+            return !origin->empty_hand() && checking_card->has_tag(tag_type::jail);
         });
     }
     
