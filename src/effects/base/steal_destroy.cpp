@@ -33,8 +33,8 @@ namespace banggame {
     }
 
     void effect_steal::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        bool handled = false;
-        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, false, handled });
+        destroy_flags flags{};
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, false, flags });
         origin->m_game->queue_action([=]{
             if (player_ptr target_player = target_card->owner) {
                 if (origin->alive()) {
@@ -42,7 +42,7 @@ namespace banggame {
                         origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_STOLEN_CARD", origin, target_player, target_card);
                     }
                     origin->steal_card(target_card);
-                } else if (!handled) {
+                } else if (!flags.check(destroy_flag::ignore_if_dead)) {
                     if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
                         origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
                     }
@@ -164,11 +164,11 @@ namespace banggame {
     }
 
     void effect_destroy::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        bool handled = false;
-        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, true, handled });
+        destroy_flags flags{};
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, true, flags });
         origin->m_game->queue_action([=]{
             if (player_ptr target_player = target_card->owner) {
-                if (!handled || origin->alive()) {
+                if (!flags.check(destroy_flag::ignore_if_dead) || origin->alive()) {
                     if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
                         origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
                     }

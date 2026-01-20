@@ -46,7 +46,7 @@ namespace banggame {
             return nullptr;
         });
 
-        origin->m_game->add_listener<event_type::on_destroy_card>(origin_card, [=](player_ptr e_origin, card_ptr target_card, bool is_destroyed, bool &handled) {
+        origin->m_game->add_listener<event_type::on_destroy_card>(origin_card, [=](player_ptr e_origin, card_ptr target_card, bool is_destroyed, destroy_flags &flags) {
             if (e_origin == origin->m_game->m_playing && is_destroyed) {
                 tracking->last_discarded = target_card;
             }

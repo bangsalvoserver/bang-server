@@ -5,12 +5,18 @@
 
 namespace banggame {
 
+    enum class destroy_flag {
+        ignore_if_dead
+    };
+
+    using destroy_flags = enums::bitset<destroy_flag>;
+
     namespace event_type {
         struct on_destroy_card {
             player_ptr origin;
             card_ptr target_card;
             bool is_destroyed;
-            nullable_ref<bool> handled;
+            nullable_ref<destroy_flags> flags;
         };
     }
 
