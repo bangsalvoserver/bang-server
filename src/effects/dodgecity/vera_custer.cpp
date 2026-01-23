@@ -88,11 +88,11 @@ namespace banggame {
     };
 
     void equip_vera_custer::on_enable(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 0}, [=](player_ptr target, std::set<card_ptr> &handlers) {
+        origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 0}, [=](player_ptr target, card_set &handlers) {
             if (origin == target && !handlers.contains(origin_card)
                 && !target->check_player_flags(player_flag::extra_turn)
             ) {
-                handlers.insert(origin_card);
+                handlers.add(origin_card);
                 target->m_game->queue_request<request_vera_custer>(origin_card, nullptr, target);
                 return true;
             }

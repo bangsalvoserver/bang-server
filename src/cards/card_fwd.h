@@ -3,12 +3,13 @@
 
 #include "utils/enum_bitset.h"
 #include "utils/nullable.h"
+#include "utils/int_set.h"
 #include "utils/misc.h"
 
-#include <set>
 #include <any>
 #include <generator>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace banggame {
     
@@ -48,7 +49,7 @@ namespace banggame {
 
     using ruleset_ptr = const ruleset_vtable *;
     using expansion_list = std::span<const ruleset_ptr>;
-    using expansion_set = std::set<ruleset_ptr>;
+    using expansion_set = std::unordered_set<ruleset_ptr>;
 
     enum class sound_id;
 
@@ -75,6 +76,32 @@ namespace banggame {
     int get_card_order(const_card_ptr target);
     int get_card_id(const_card_ptr target);
     int get_player_id(const_player_ptr target);
+    
+    class card_set {
+    private:
+        utils::int_set m_value;
+    
+    public:
+        void add(const_card_ptr value) {
+            m_value.add(get_card_order(value));
+        }
+
+        void remove(const_card_ptr value) {
+            m_value.remove(get_card_order(value));
+        }
+
+        bool contains(const_card_ptr value) const {
+            return m_value.contains(get_card_order(value));
+        }
+
+        size_t size() const {
+            return m_value.size();
+        }
+
+        bool empty() const {
+            return m_value.empty();
+        }
+    };
 
 }
 

@@ -20,7 +20,7 @@ namespace banggame {
         request_character_modifier(player_ptr target)
             : request_base(nullptr, nullptr, target, {}, -25) {}
 
-        std::set<card_ptr> handlers;
+        card_set handlers;
         
         void on_update() override;
     };

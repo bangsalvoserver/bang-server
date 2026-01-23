@@ -18,18 +18,20 @@
 namespace banggame {
 
     game_string check_duplicates(const effect_context &ctx) {
-        std::unordered_set<player_ptr> players;
+        player_set players;
         for (player_ptr p : ctx.get<contexts::selected_players>()) {
-            if (auto [it, inserted] = players.insert(p); !inserted) {
+            if (players.contains(p)) {
                 return {"ERROR_DUPLICATE_PLAYER", p};
             }
+            players.add(p);
         }
 
-        std::unordered_set<card_ptr> cards;
+        card_set cards;
         for (card_ptr c : ctx.get<contexts::selected_cards>()) {
-            if (auto [it, inserted] = cards.insert(c); !inserted) {
+            if (cards.contains(c)) {
                 return {"ERROR_DUPLICATE_CARD", c};
             }
+            cards.add(c);
         }
 
         std::unordered_map<card_ptr, int> cubes;

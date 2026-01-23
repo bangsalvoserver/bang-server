@@ -14,7 +14,7 @@ namespace banggame {
     struct request_train_robbery : request_base, interface_target_set_cards, escapable_request {
         using request_base::request_base;
 
-        std::set<const_card_ptr> selected_cards;
+        card_set selected_cards;
 
         bool can_escape(card_ptr c) const override {
             return selected_cards.empty() && escapable_request::can_escape(c);
@@ -95,7 +95,7 @@ namespace banggame {
 
     void effect_train_robbery_response::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         auto req = origin->m_game->top_request<request_train_robbery>();
-        req->selected_cards.insert(target_card);
+        req->selected_cards.add(target_card);
     }
 
     static bool is_penalty_card(const_card_ptr c) {

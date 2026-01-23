@@ -1,7 +1,6 @@
 #ifndef __BANGGAME_CARD_H__
 #define __BANGGAME_CARD_H__
 
-#include <map>
 #include <vector>
 #include <algorithm>
 #include <functional>

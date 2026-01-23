@@ -6,7 +6,6 @@
 #include <functional>
 #include <memory>
 #include <vector>
-#include <set>
 #include <map>
 
 #include "event_card_key.h"

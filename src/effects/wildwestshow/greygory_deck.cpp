@@ -45,11 +45,11 @@ namespace banggame {
     };
 
     void equip_greygory_deck::on_enable(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 1}, [=, allow_expansions=allow_expansions](player_ptr target, std::set<card_ptr> &handlers) {
+        origin->m_game->add_listener<event_type::check_character_modifier>({origin_card, 1}, [=, allow_expansions=allow_expansions](player_ptr target, card_set &handlers) {
             if (origin == target && !handlers.contains(origin_card)
                 && get_possible_cards(origin_card, origin, allow_expansions)
             ) {
-                handlers.insert(origin_card);
+                handlers.add(origin_card);
                 target->m_game->queue_request<request_greygory_deck>(origin_card, target, allow_expansions);
                 return true;
             }

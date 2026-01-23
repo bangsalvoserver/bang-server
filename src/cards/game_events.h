@@ -92,7 +92,7 @@ namespace banggame::event_type {
     struct check_character_modifier {
         using result_type = bool;
         player_ptr origin;
-        nullable_ref<std::set<card_ptr>> handlers;
+        nullable_ref<card_set> handlers;
     };
     
     struct check_revivers {

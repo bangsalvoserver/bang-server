@@ -22,7 +22,7 @@ namespace banggame {
         }
         
         void add_card(card_ptr c) {
-            m_cards_used.insert(c);
+            m_cards_used.add(c);
         }
 
         virtual bool can_escape(card_ptr c) const {
@@ -34,7 +34,7 @@ namespace banggame {
         }
 
     private:
-        std::set<card_ptr> m_cards_used;
+        card_set m_cards_used;
     };
 
     struct request_escapable_resolvable : request_resolvable_timer, escapable_request {
