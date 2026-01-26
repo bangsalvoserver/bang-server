@@ -9,7 +9,6 @@
 #include <any>
 #include <generator>
 #include <unordered_map>
-#include <unordered_set>
 
 namespace banggame {
     
@@ -33,6 +32,7 @@ namespace banggame {
     using game_duration = std::chrono::milliseconds;
 
     class effect_context;
+    class expansion_set;
     
     struct game_options;
     struct game_context;
@@ -49,7 +49,6 @@ namespace banggame {
 
     using ruleset_ptr = const ruleset_vtable *;
     using expansion_list = std::span<const ruleset_ptr>;
-    using expansion_set = std::unordered_set<ruleset_ptr>;
 
     enum class sound_id;
 

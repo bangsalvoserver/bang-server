@@ -1,7 +1,6 @@
 #include "game_net.h"
 
 #include "cards/card_serial.h"
-#include "cards/expansion_set.h"
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 

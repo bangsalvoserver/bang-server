@@ -11,6 +11,7 @@
 #include "effects/base/predraw_check.h"
 
 #include "game/game_table.h"
+#include "game/expansion_set.h"
 
 namespace banggame {
 

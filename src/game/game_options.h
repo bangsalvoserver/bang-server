@@ -2,6 +2,7 @@
 #define __GAME_OPTIONS_H__
 
 #include "durations.h"
+#include "expansion_set.h"
 #include "cards/card_fwd.h"
 
 namespace banggame {

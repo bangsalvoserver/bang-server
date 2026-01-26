@@ -12,6 +12,7 @@ PRIVATE
     disabler_map.cpp
     durations.cpp
     event_map.cpp
+    expansion_set.cpp
     filters.cpp
     player.cpp
     play_verify.cpp

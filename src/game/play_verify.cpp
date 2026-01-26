@@ -13,8 +13,6 @@
 #include "game_table.h"
 #include "request_timer.h"
 
-#include <unordered_set>
-
 namespace banggame {
 
     game_string check_duplicates(const effect_context &ctx) {

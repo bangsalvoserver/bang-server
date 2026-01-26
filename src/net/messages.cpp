@@ -1,6 +1,5 @@
 #include "messages.h"
 
-#include "cards/expansion_set.h"
 #include "cards/vtables.h"
 
 #include "utils/json_aggregate.h"

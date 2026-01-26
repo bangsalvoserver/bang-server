@@ -12,6 +12,7 @@
 #include "game/filters.h"
 #include "game/game_table.h"
 #include "game/game_options.h"
+#include "game/expansion_set.h"
 
 #include "utils/random_element.h"
 

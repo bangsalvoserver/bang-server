@@ -2,6 +2,7 @@
 
 #include "game/game_table.h"
 #include "game/game_options.h"
+#include "game/expansion_set.h"
 
 #include "effects/base/damage.h"
 #include "effects/dodgecity/ruleset.h"

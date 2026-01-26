@@ -1,6 +1,5 @@
 #include "game_options.h"
 
-#include "cards/expansion_set.h"
 #include "utils/static_map.h"
 
 namespace banggame {
