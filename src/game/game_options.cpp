@@ -4,21 +4,8 @@
 
 namespace banggame {
 
-    constexpr size_t game_option_field_index(std::string_view name) {
-        constexpr auto member_names = []<size_t ... Is>(std::index_sequence<Is ...>) {
-            return std::array{
-                reflect::member_name<Is, game_options>() ...
-            };
-        }(std::make_index_sequence<reflect::size<game_options>()>());
-        auto it = rn::find(member_names, name);
-        if (it != member_names.end()) {
-            return rn::distance(member_names.begin(), it);
-        }
-        throw std::out_of_range("Cannot find game_option_field_index");
-    }
-
     template<size_t I> constexpr auto game_option_transformer = [](const auto &value) { return value; };
-    #define DEFINE_TRANSFORMER(FIELD, FUN) template<> constexpr auto game_option_transformer<game_option_field_index(#FIELD)> = FUN;
+    #define DEFINE_TRANSFORMER(FIELD, FUN) template<> constexpr auto game_option_transformer<reflect::index_of<#FIELD, game_options>()> = FUN;
 
     DEFINE_TRANSFORMER(expansions, [](const expansion_set &value) {
         if (!validate_expansions(value)) {
