@@ -6,9 +6,7 @@
 namespace banggame {
 
     static int get_beer_heal_amount(player_ptr target) {
-        int amount = 1;
-        target->m_game->call_event(event_type::apply_beer_modifier{ target, amount });
-        return amount;
+        return 1 + target->m_game->call_event(event_type::apply_beer_modifier{ target });
     }
     
     game_string effect_beer::on_prompt(card_ptr origin_card, player_ptr target) {

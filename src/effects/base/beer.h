@@ -7,8 +7,8 @@ namespace banggame {
 
     namespace event_type {
         struct apply_beer_modifier {
+            using result_type = int;
             player_ptr origin;
-            nullable_ref<int> value;
         };
 
         struct on_play_beer {
