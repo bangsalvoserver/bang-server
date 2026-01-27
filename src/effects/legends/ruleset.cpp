@@ -221,17 +221,13 @@ namespace banggame {
     }
 
     void ruleset_legends_basemod::on_apply(game_ptr game) {
-        game->add_listener<event_type::count_initial_cards>({nullptr, -1}, [](const_player_ptr origin, int &value) {
+        game->add_listener<event_type::count_initial_cards>({nullptr, 1}, [](const_player_ptr origin) {
             int count = 0;
             for (player_ptr p : origin->m_game->range_all_players(origin->m_game->m_first_player)) {
                 ++count;
                 if (p == origin) break;
             }
-            if (count >= 6) {
-                value = 5;
-            } else {
-                value = 4;
-            }
+            return count >= 6 ? 5 : 4;
         });
 
         game->add_listener<event_type::apply_maxcards_modifier>({nullptr, 20}, [](const_player_ptr origin, int &value) {

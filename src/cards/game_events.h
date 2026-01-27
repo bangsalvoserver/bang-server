@@ -70,8 +70,8 @@ namespace banggame::event_type {
     };
 
     struct count_initial_cards {
+        using result_type = std::optional<int>;
         const_player_ptr origin;
-        nullable_ref<int> value;
     };
     
     struct check_play_card {

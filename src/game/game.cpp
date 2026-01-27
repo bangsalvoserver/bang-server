@@ -486,9 +486,7 @@ namespace banggame {
             auto players = range_alive_players(m_first_player);
             auto initial_cards = players
                 | rv::transform([this](const_player_ptr p) {
-                    int ncards = p->m_hp;
-                    call_event(event_type::count_initial_cards{ p, ncards });
-                    return ncards;
+                    return call_event(event_type::count_initial_cards{ p }).value_or(p->m_hp);
                 })
                 | rn::to<std::vector>();
 
