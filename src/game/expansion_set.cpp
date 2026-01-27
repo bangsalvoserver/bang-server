@@ -12,10 +12,13 @@ namespace banggame {
         // This is O(N), which is fine
         uint64_t result = 1;
         for (const auto &[name, expansion] : bang_cards.expansions) {
-            if (expansion.expansion == value) break;
+            if (expansion.expansion == value) {
+                return result;
+            }
             result <<= 1;
         }
-        return result;
+        // Should never happen
+        return 0;
     }
     
     ruleset_ptr get_expansion_by_name(std::string_view name) {
