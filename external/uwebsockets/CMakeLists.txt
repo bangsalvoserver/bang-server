@@ -46,7 +46,7 @@ endif()
 FetchContent_Declare(
     uWebSockets_content
     GIT_REPOSITORY https://github.com/uNetworking/uWebSockets
-    GIT_TAG v20.70.0
+    GIT_TAG v20.74.0
     GIT_SHALLOW ON
     GIT_SUBMODULES ""
 )
