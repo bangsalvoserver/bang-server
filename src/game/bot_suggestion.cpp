@@ -34,7 +34,22 @@ namespace banggame::bot_suggestion {
     }
 
     static bool is_role_visible(const_player_ptr origin, const_player_ptr target) {
-        return origin == target || target->check_player_flags(player_flag::role_revealed);
+        if (origin == target || target->check_player_flags(player_flag::role_revealed)) {
+            return true;
+        } else {
+            player_role first_role = player_role::unknown;
+            for (player_ptr p : origin->m_game->m_players) {
+                if (p != origin && !p->check_player_flags(player_flag::role_revealed)) {
+                    player_role role = p->m_role;
+                    if (first_role == player_role::unknown) {
+                        first_role = role;
+                    } else if (first_role != role) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 
     static bool is_same_karma(const_player_ptr origin, const_player_ptr target) {
