@@ -7,6 +7,7 @@
 #include "game/game_table.h"
 #include "game/filters.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 #include "cards/game_enums.h"
 
@@ -78,6 +79,8 @@ namespace banggame {
     }
 
     void handler_switch_cards::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
+        bot_suggestion::signal_remove_card(origin, target_card);
+        
         origin->m_game->queue_request<request_switch_cards>(origin_card, origin, target_card->owner, chosen_card, target_card);
     }
 }

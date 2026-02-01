@@ -7,7 +7,11 @@ namespace banggame {
 
     struct handler_gift_card {
         bool used;
-        handler_gift_card(bool used = false): used{used} {}
+        bool forced_response;
+
+        handler_gift_card(bool used = false, bool forced_response = false)
+            : used{used}
+            , forced_response{forced_response} {}
 
         game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target);

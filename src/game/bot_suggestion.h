@@ -9,6 +9,8 @@ namespace banggame::bot_suggestion {
 
     void signal_helpful_action(player_ptr origin, const_player_ptr target, effect_flags flags = {}, const effect_context &ctx = {});
 
+    void signal_remove_card(player_ptr origin, const_card_ptr target_card, effect_flags flags = {}, const effect_context &ctx = {});
+
     bool is_target_enemy(const_player_ptr origin, const_player_ptr target);
 
     bool is_target_friend(const_player_ptr origin, const_player_ptr target);

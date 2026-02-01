@@ -6,7 +6,7 @@ character:
     responses:
       - none card | selection
       - claus_the_saint_response player target_set
-    mth_response: gift_card(0,1)
+    mth_response: gift_card(0,1) (false, true)
     tags:
       - max_hp(3)
       - preselect

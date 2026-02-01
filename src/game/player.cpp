@@ -400,6 +400,9 @@ namespace banggame {
     }
 
     void player::hide_role() {
+        remove_player_flags(player_flag::positive_karma);
+        remove_player_flags(player_flag::negative_karma);
+        
         if (remove_player_flags(player_flag::role_revealed)) {
             m_game->add_update(update_target::excludes(this), game_updates::player_show_role{ this, player_role::unknown, durations.flip_card });
         }

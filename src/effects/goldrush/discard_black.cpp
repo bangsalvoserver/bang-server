@@ -2,6 +2,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 #include "effects/base/steal_destroy.h"
 
@@ -22,6 +23,8 @@ namespace banggame {
     }
 
     void effect_discard_black::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        bot_suggestion::signal_remove_card(origin, target_card);
+
         origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_card->owner, target_card);
         origin->add_gold(-target_card->get_tag_value(tag_type::buy_cost).value_or(0) - 1);
         target_card->owner->discard_card(target_card);

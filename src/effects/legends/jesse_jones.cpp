@@ -8,6 +8,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -62,6 +63,8 @@ namespace banggame {
         if (target->owner->m_hand.size() == 1) {
             effect_steal{}.on_play(origin_card, origin, target);
         } else {
+            bot_suggestion::signal_hostile_action(origin, target->owner);
+
             origin->m_game->queue_request<request_jesse_jones_legend>(origin_card, target->owner, origin);
         }
     }

@@ -106,11 +106,8 @@ namespace banggame {
     };
 
     void effect_steal::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
-        if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
-            bot_suggestion::signal_helpful_action(origin, target_card->owner, flags);
-        } else {
-            bot_suggestion::signal_hostile_action(origin, target_card->owner, flags);
-        }
+        bot_suggestion::signal_remove_card(origin, target_card, flags);
+
         origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
     }
 
@@ -232,11 +229,8 @@ namespace banggame {
     };
     
     void effect_destroy::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
-        if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
-            bot_suggestion::signal_helpful_action(origin, target_card->owner, flags);
-        } else {
-            bot_suggestion::signal_hostile_action(origin, target_card->owner, flags);
-        }
+        bot_suggestion::signal_remove_card(origin, target_card, flags);
+        
         origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
     }
 }

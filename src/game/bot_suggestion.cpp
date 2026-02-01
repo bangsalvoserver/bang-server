@@ -2,6 +2,7 @@
 #include "game_table.h"
 
 #include "cards/game_enums.h"
+#include "cards/filter_enums.h"
 
 namespace banggame::bot_suggestion {
 
@@ -115,6 +116,16 @@ namespace banggame::bot_suggestion {
         } else {
             // origin helping player with neutral karma
             set_karma_neutral(origin);
+        }
+    }
+
+    void signal_remove_card(player_ptr origin, const_card_ptr target_card, effect_flags flags, const effect_context &ctx) {
+        if (const_player_ptr owner = target_card->owner) {
+            if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
+                signal_helpful_action(origin, owner, flags, ctx);
+            } else {
+                signal_hostile_action(origin, owner, flags, ctx);
+            }
         }
     }
 

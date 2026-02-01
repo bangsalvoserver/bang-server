@@ -6,6 +6,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -24,6 +25,8 @@ namespace banggame {
     }
 
     void effect_evan_babbit::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        bot_suggestion::signal_hostile_action(origin, target);
+        
         auto req = origin->m_game->top_request();
         origin->m_game->add_log("LOG_DEFLECTED_BANG_TO", origin_card, origin, req->origin_card, target);
         req->target = target;
