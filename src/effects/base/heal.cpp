@@ -2,6 +2,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
     
@@ -17,6 +18,8 @@ namespace banggame {
     }
 
     void effect_heal::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        bot_suggestion::signal_helpful_action(origin, target, flags);
+
         if (!target->immune_to(origin_card, origin, flags)) {
             target->heal(amount);
         }

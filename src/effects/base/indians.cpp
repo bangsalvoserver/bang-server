@@ -8,6 +8,7 @@
 #include "game/game_table.h"
 #include "game/filters.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -72,6 +73,8 @@ namespace banggame {
     }
     
     void effect_indians::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        bot_suggestion::signal_hostile_action(origin, target, flags);
+        
         if (!flags.check(effect_flag::target_players)) {
             target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         }

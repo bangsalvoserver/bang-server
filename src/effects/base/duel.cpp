@@ -8,6 +8,7 @@
 #include "game/game_table.h"
 #include "game/filters.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -80,6 +81,8 @@ namespace banggame {
     }
 
     void effect_duel::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        bot_suggestion::signal_hostile_action(origin, target, flags);
+        
         target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         target->m_game->queue_request<request_duel>(origin_card, origin, target, origin, flags);
     }
