@@ -77,8 +77,12 @@ namespace banggame {
     }
 
     void targeting_adjacent_players::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) {
+        effect_flags flags = effect_flag::multi_target;
+        if (targets.size() == 1) {
+            flags.add(effect_flag::single_target);
+        }
         for (player_ptr target : targets) {
-            effect.on_play(origin_card, origin, target, effect_flag::multi_target, ctx);
+            effect.on_play(origin_card, origin, target, flags, ctx);
         }
     }
 

@@ -45,9 +45,10 @@ namespace banggame::bot_suggestion {
     void signal_hostile_action(player_ptr origin, const_player_ptr target, effect_flags flags, const effect_context &ctx) {
         if (origin == target) return;
 
-        // TODO improve these?
         if (flags.check(effect_flag::target_players)) return;
-        if (flags.check(effect_flag::multi_target)) return;
+
+        // if (flags.check(effect_flag::multi_target)) return;
+        // This is ignored but could make it so the ordering of attacks matter, which is probably fine
 
         if (is_role_visible(origin, target)) {
             switch (target->m_role) {
@@ -77,9 +78,7 @@ namespace banggame::bot_suggestion {
     void signal_helpful_action(player_ptr origin, const_player_ptr target, effect_flags flags, const effect_context &ctx) {
         if (origin == target) return;
 
-        // TODO improve these?
         if (flags.check(effect_flag::target_players)) return;
-        if (flags.check(effect_flag::multi_target)) return;
 
         if (is_role_visible(origin, target)) {
             switch (target->m_role) {
