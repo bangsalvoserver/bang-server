@@ -4,6 +4,7 @@
 
 #include "game/game_table.h"
 #include "game/game_options.h"
+#include "game/bot_suggestion.h"
 
 #include "death.h"
 
@@ -24,6 +25,8 @@ namespace banggame {
     }
 
     void effect_damage::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        bot_suggestion::signal_hostile_action(origin, target);
+        
         target->damage(origin_card, origin, damage, flags);
     }
 

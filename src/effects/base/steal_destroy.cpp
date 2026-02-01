@@ -7,6 +7,7 @@
 #include "game/filters.h"
 #include "game/prompts.h"
 #include "game/possible_to_play.h"
+#include "game/bot_suggestion.h"
 
 #include "cards/filter_enums.h"
 
@@ -105,6 +106,8 @@ namespace banggame {
     };
 
     void effect_steal::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
+        bot_suggestion::signal_remove_card(origin, target_card, flags);
+
         origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
     }
 
@@ -226,6 +229,8 @@ namespace banggame {
     };
     
     void effect_destroy::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
+        bot_suggestion::signal_remove_card(origin, target_card, flags);
+        
         origin->m_game->queue_request<request_destroy>(origin_card, origin, target_card->owner, target_card, flags);
     }
 }

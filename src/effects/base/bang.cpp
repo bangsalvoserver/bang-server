@@ -8,6 +8,7 @@
 #include "game/filters.h"
 #include "game/play_verify.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 #include "damage.h"
 
@@ -21,6 +22,8 @@ namespace banggame {
     }
     
     void effect_bang::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        bot_suggestion::signal_hostile_action(origin, target, flags);
+        
         if (!flags.check(effect_flag::target_players)) {
             target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         }
@@ -44,6 +47,8 @@ namespace banggame {
     }
 
     void effect_bangcard::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        bot_suggestion::signal_hostile_action(origin, target, flags);
+
         if (flags.check(effect_flag::play_as_bang)) {
             origin->m_game->add_log("LOG_PLAYED_CARD_AS_BANG_ON", origin_card, origin, target);
         } else {

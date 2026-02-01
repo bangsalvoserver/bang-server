@@ -93,6 +93,8 @@ namespace banggame {
     }
 
     void effect_damage_legend::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        bot_suggestion::signal_hostile_action(origin, target);
+        
         origin->m_game->pop_request();
         target->m_game->add_log("LOG_DAMAGED_LEGEND", origin, target);
         target->damage(origin_card, origin, 1);

@@ -25,6 +25,6 @@ namespace banggame {
             }
             origin->steal_card(stolen_card);
         }
-        handler_gift_card{}.on_play(origin_card, origin, chosen_card, target);
+        handler_gift_card{false, true}.on_play(origin_card, origin, chosen_card, target);
     }
 }

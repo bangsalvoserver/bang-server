@@ -6,6 +6,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -32,6 +33,8 @@ namespace banggame {
     }
 
     void effect_blood_brothers::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        bot_suggestion::signal_helpful_action(origin, target);
+        
         origin->damage(origin_card, origin, 1);
         origin->m_game->queue_action([=]{ target->heal(1); });
     }

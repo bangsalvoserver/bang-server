@@ -2,6 +2,7 @@
 
 #include "game/game_table.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 #include "effects/base/bang.h"
 
@@ -14,6 +15,8 @@ namespace banggame {
     }
 
     void effect_sniper::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        bot_suggestion::signal_hostile_action(origin, target);
+        
         target->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         auto req = std::make_shared<request_bang>(origin_card, origin, target);
         req->bang_strength = 2;

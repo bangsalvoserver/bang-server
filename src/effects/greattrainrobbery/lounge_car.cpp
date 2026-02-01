@@ -7,6 +7,7 @@
 #include "game/game_table.h"
 #include "game/filters.h"
 #include "game/prompts.h"
+#include "game/bot_suggestion.h"
 
 namespace banggame {
 
@@ -84,6 +85,11 @@ namespace banggame {
     }
 
     void handler_lounge_car::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
+        if (target_card->has_tag(tag_type::penalty)) {
+            bot_suggestion::signal_hostile_action(origin, target_player);
+        } else {
+            bot_suggestion::signal_helpful_action(origin, target_player);
+        }
         origin->m_game->top_request<request_lounge_car>()->on_resolve(target_card, target_player);
     }
 }

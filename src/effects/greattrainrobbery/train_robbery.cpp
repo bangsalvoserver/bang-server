@@ -75,6 +75,8 @@ namespace banggame {
     }
 
     void effect_train_robbery::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        bot_suggestion::signal_hostile_action(origin, target, flags);
+
         origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         origin->m_game->queue_request<request_train_robbery>(origin_card, origin, target, flags, 20);
     }
