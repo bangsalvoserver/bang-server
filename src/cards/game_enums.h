@@ -60,6 +60,8 @@ namespace banggame {
         legend,
         removed,
         winner,
+        positive_karma,
+        negative_karma
     };
 }
 
