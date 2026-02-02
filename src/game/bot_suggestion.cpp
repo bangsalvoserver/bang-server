@@ -170,6 +170,17 @@ namespace banggame::bot_suggestion {
                 return is_positive_karma(target);
             }
         case player_role::sheriff:
+            if (is_role_visible(origin, target)) {
+                return target->m_role == player_role::outlaw
+                    || target->m_role == player_role::renegade
+                    || target->m_role == player_role::shadow_outlaw;
+            } else if (is_negative_karma(target)) {
+                return true;
+            } else if (is_positive_karma(target)) {
+                return false;
+            } else {
+                return target->m_hp > 1;
+            }
         case player_role::deputy:
         case player_role::shadow_deputy:
             if (is_role_visible(origin, target)) {
