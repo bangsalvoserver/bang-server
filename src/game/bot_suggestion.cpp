@@ -10,22 +10,18 @@ namespace banggame::bot_suggestion {
         return origin->check_player_flags(player_flag::positive_karma);
     }
 
+    static bool is_negative_karma(const_player_ptr origin) {
+        return origin->check_player_flags(player_flag::negative_karma);
+    }
+
     static void set_karma_positive(player_ptr origin) {
         origin->remove_player_flags(player_flag::negative_karma);
         origin->add_player_flags(player_flag::positive_karma);
     }
 
-    static bool is_negative_karma(const_player_ptr origin) {
-        return origin->check_player_flags(player_flag::negative_karma);
-    }
-
     static void set_karma_negative(player_ptr origin) {
         origin->remove_player_flags(player_flag::positive_karma);
         origin->add_player_flags(player_flag::negative_karma);
-    }
-
-    static bool is_neutral_karma(const_player_ptr origin) {
-        return !is_positive_karma(origin) && !is_negative_karma(origin);
     }
 
     static void set_karma_neutral(player_ptr origin) {
@@ -52,11 +48,6 @@ namespace banggame::bot_suggestion {
         }
     }
 
-    static bool is_same_karma(const_player_ptr origin, const_player_ptr target) {
-        return (is_positive_karma(origin) && is_positive_karma(target))
-            || (is_negative_karma(origin) && is_negative_karma(target));
-    }
-
     void signal_hostile_action(player_ptr origin, const_player_ptr target, effect_flags flags, const effect_context &ctx) {
         if (origin == target) return;
 
@@ -81,12 +72,26 @@ namespace banggame::bot_suggestion {
                 // ignore
                 break;
             }
-        } else if (is_same_karma(origin, target)) {
-            set_karma_neutral(origin);
-        } else if (is_negative_karma(target) || is_neutral_karma(target)) {
-            set_karma_positive(origin);
-        } else if (is_positive_karma(target)) {
-            set_karma_negative(origin);
+        } else {
+            //     N   0   P
+            //   +---+---+---+
+            // N | 0 | 0 | N |
+            //   +---+---+---+
+            // 0 | P | P | N |
+            //   +---+---+---+
+            // P | P | P | 0 |
+            //   +---+---+---+
+            if (is_positive_karma(target)) {
+                if (is_positive_karma(origin)) {
+                    set_karma_neutral(origin);
+                } else {
+                    set_karma_negative(origin);
+                }
+            } else if (is_negative_karma(origin)) {
+                set_karma_neutral(origin);
+            } else {
+                set_karma_positive(origin);
+            }
         }
     }
 
@@ -121,15 +126,22 @@ namespace banggame::bot_suggestion {
                 // ignore
                 break;
             }
-        } else if (is_same_karma(origin, target)) {
-            // ignore, origin is helping a teammate
-        } else if (is_negative_karma(target)) {
-            set_karma_negative(origin);
-        } else if (is_positive_karma(target)) {
-            set_karma_positive(origin);
         } else {
-            // origin helping player with neutral karma
-            set_karma_neutral(origin);
+            //     N   0   P
+            //   +---+---+---+
+            // N | N | 0 | 0 |
+            //   +---+---+---+
+            // 0 | N | 0 | P |
+            //   +---+---+---+
+            // P | 0 | 0 | P |
+            //   +---+---+---+
+            if (is_negative_karma(target) && !is_positive_karma(origin)) {
+                set_karma_negative(origin);
+            } else if (is_positive_karma(target) && !is_negative_karma(origin)) {
+                set_karma_positive(origin);
+            } else {
+                set_karma_neutral(origin);
+            }
         }
     }
 
@@ -165,7 +177,7 @@ namespace banggame::bot_suggestion {
                     || target->m_role == player_role::renegade
                     || target->m_role == player_role::shadow_outlaw;
             } else {
-                return is_negative_karma(target) || is_neutral_karma(target);
+                return !is_positive_karma(target);
             }
         case player_role::renegade: {
             auto targets = origin->m_game->m_players | rv::filter([origin](player_ptr p) {
@@ -189,14 +201,14 @@ namespace banggame::bot_suggestion {
                         || target->m_role == player_role::shadow_outlaw
                         || target->m_role == player_role::renegade;
                 } else {
-                    return is_negative_karma(target) || is_neutral_karma(target);
+                    return !is_positive_karma(target);
                 }
             } else if (num_sheriff_or_deputy > 1) {
                 if (is_role_visible(origin, target)) {
                     return target->m_role == player_role::deputy
                         || target->m_role == player_role::shadow_deputy;
                 } else {
-                    return is_positive_karma(target) || is_neutral_karma(target);
+                    return !is_negative_karma(target);
                 }
             } else if (target->m_role == player_role::sheriff && num_outlaws > 0) {
                 return target->m_hp > 2;
