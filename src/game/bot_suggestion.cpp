@@ -49,7 +49,7 @@ namespace banggame::bot_suggestion {
     }
 
     void signal_hostile_action(player_ptr origin, const_player_ptr target, effect_flags flags, const effect_context &ctx) {
-        if (origin == target) return;
+        if (origin == target || origin->check_player_flags(player_flag::role_revealed)) return;
 
         if (flags.check(effect_flag::target_players)) return;
 
@@ -96,7 +96,7 @@ namespace banggame::bot_suggestion {
     }
 
     void signal_helpful_action(player_ptr origin, const_player_ptr target, effect_flags flags, const effect_context &ctx) {
-        if (origin == target) return;
+        if (origin == target || origin->check_player_flags(player_flag::role_revealed)) return;
 
         if (flags.check(effect_flag::target_players)) return;
 
