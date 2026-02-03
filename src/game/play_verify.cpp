@@ -297,9 +297,9 @@ namespace banggame {
     static void apply_equip(player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &ctx) {
         if (origin != target) {
             if (origin_card->has_tag(tag_type::penalty)) {
-                bot_suggestion::signal_hostile_action(origin, target, {}, ctx);
+                bot_suggestion::signal_hostile_action(origin, target);
             } else {
-                bot_suggestion::signal_helpful_action(origin, target, {}, ctx);
+                bot_suggestion::signal_helpful_action(origin, target);
             }
         }
 

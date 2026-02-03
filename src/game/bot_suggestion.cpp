@@ -48,7 +48,7 @@ namespace banggame::bot_suggestion {
         }
     }
 
-    void signal_hostile_action(player_ptr origin, const_player_ptr target, effect_flags flags, const effect_context &ctx) {
+    void signal_hostile_action(player_ptr origin, const_player_ptr target, effect_flags flags) {
         if (origin == target || origin->check_player_flags(player_flag::role_revealed)) return;
 
         if (flags.check(effect_flag::target_players)) return;
@@ -95,7 +95,7 @@ namespace banggame::bot_suggestion {
         }
     }
 
-    void signal_helpful_action(player_ptr origin, const_player_ptr target, effect_flags flags, const effect_context &ctx) {
+    void signal_helpful_action(player_ptr origin, const_player_ptr target, effect_flags flags) {
         if (origin == target || origin->check_player_flags(player_flag::role_revealed)) return;
 
         if (flags.check(effect_flag::target_players)) return;
@@ -145,12 +145,12 @@ namespace banggame::bot_suggestion {
         }
     }
 
-    void signal_remove_card(player_ptr origin, const_card_ptr target_card, effect_flags flags, const effect_context &ctx) {
+    void signal_remove_card(player_ptr origin, const_card_ptr target_card, effect_flags flags) {
         if (const_player_ptr owner = target_card->owner) {
             if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
-                signal_helpful_action(origin, owner, flags, ctx);
+                signal_helpful_action(origin, owner, flags);
             } else {
-                signal_hostile_action(origin, owner, flags, ctx);
+                signal_hostile_action(origin, owner, flags);
             }
         }
     }
