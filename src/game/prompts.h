@@ -13,7 +13,7 @@ namespace banggame::prompts {
 
     prompt_string bot_check_kill_sheriff(player_ptr origin, player_ptr target);
 
-    game_string bot_check_target_enemy(player_ptr origin, player_ptr target);
+    game_string bot_check_target_enemy(player_ptr origin, player_ptr target, bool confident = false);
     
     game_string bot_check_target_friend(player_ptr origin, player_ptr target);
 
