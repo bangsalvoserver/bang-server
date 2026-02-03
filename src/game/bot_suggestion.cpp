@@ -29,10 +29,8 @@ namespace banggame::bot_suggestion {
         origin->remove_player_flags(player_flag::negative_karma);
     }
 
-    static bool is_role_visible(const_player_ptr origin, const_player_ptr target) {
-        if (origin == target || target->check_player_flags(player_flag::role_revealed)) {
-            return true;
-        } else {
+    static bool is_role_known(const_player_ptr origin, const_player_ptr target) {
+        if (!target->check_player_flags(player_flag::role_revealed)) {
             player_role first_role = player_role::unknown;
             for (player_ptr p : origin->m_game->m_players) {
                 if (p != origin && !p->check_player_flags(player_flag::role_revealed)) {
@@ -44,8 +42,8 @@ namespace banggame::bot_suggestion {
                     }
                 }
             }
-            return true;
         }
+        return true;
     }
 
     void signal_hostile_action(player_ptr origin, const_player_ptr target, effect_flags flags) {
@@ -56,7 +54,7 @@ namespace banggame::bot_suggestion {
         // if (flags.check(effect_flag::multi_target)) return;
         // This is ignored but could make it so the ordering of attacks matter, which is probably fine
 
-        if (is_role_visible(origin, target)) {
+        if (target->check_player_flags(player_flag::role_revealed)) {
             switch (target->m_role) {
             case player_role::sheriff:
             case player_role::deputy:
@@ -100,7 +98,7 @@ namespace banggame::bot_suggestion {
 
         if (flags.check(effect_flag::target_players)) return;
 
-        if (is_role_visible(origin, target)) {
+        if (target->check_player_flags(player_flag::role_revealed)) {
             switch (target->m_role) {
             case player_role::sheriff:
             case player_role::deputy:
@@ -156,13 +154,13 @@ namespace banggame::bot_suggestion {
     }
 
     bool is_target_enemy(const_player_ptr origin, const_player_ptr target) {
-        if (origin->m_game->check_flags(game_flag::free_for_all)) {
-            return origin != target;
-        }
+        if (origin == target) return false;
+        if (origin->m_game->check_flags(game_flag::free_for_all)) return true;
+
         switch (origin->m_role) {
         case player_role::outlaw:
         case player_role::shadow_outlaw:
-            if (is_role_visible(origin, target)) {
+            if (is_role_known(origin, target)) {
                 return target->m_role == player_role::sheriff
                     || target->m_role == player_role::deputy
                     || target->m_role == player_role::shadow_deputy;
@@ -170,7 +168,7 @@ namespace banggame::bot_suggestion {
                 return is_positive_karma(target);
             }
         case player_role::sheriff:
-            if (is_role_visible(origin, target)) {
+            if (is_role_known(origin, target)) {
                 return target->m_role == player_role::outlaw
                     || target->m_role == player_role::renegade
                     || target->m_role == player_role::shadow_outlaw;
@@ -183,7 +181,7 @@ namespace banggame::bot_suggestion {
             }
         case player_role::deputy:
         case player_role::shadow_deputy:
-            if (is_role_visible(origin, target)) {
+            if (is_role_known(origin, target)) {
                 return target->m_role == player_role::outlaw
                     || target->m_role == player_role::renegade
                     || target->m_role == player_role::shadow_outlaw;
@@ -207,7 +205,7 @@ namespace banggame::bot_suggestion {
             if (num_outlaws > num_sheriff_or_deputy) {
                 if (origin == target) {
                     return false;
-                } else if (is_role_visible(origin, target)) {
+                } else if (is_role_known(origin, target)) {
                     return target->m_role == player_role::outlaw
                         || target->m_role == player_role::shadow_outlaw
                         || target->m_role == player_role::renegade;
@@ -215,7 +213,7 @@ namespace banggame::bot_suggestion {
                     return !is_positive_karma(target);
                 }
             } else if (num_sheriff_or_deputy > 1) {
-                if (is_role_visible(origin, target)) {
+                if (is_role_known(origin, target)) {
                     return target->m_role == player_role::deputy
                         || target->m_role == player_role::shadow_deputy;
                 } else {
@@ -239,13 +237,13 @@ namespace banggame::bot_suggestion {
     }
 
     bool is_target_friend(const_player_ptr origin, const_player_ptr target) {
-        if (origin->m_game->check_flags(game_flag::free_for_all)) {
-            return origin == target;
-        }
+        if (origin == target) return true;
+        if (origin->m_game->check_flags(game_flag::free_for_all)) return false;
+
         switch (origin->m_role) {
         case player_role::outlaw:
         case player_role::shadow_outlaw:
-            if (is_role_visible(origin, target)) {
+            if (is_role_known(origin, target)) {
                 return target->m_role == player_role::outlaw
                     || target->m_role == player_role::shadow_outlaw;
             } else {
@@ -254,7 +252,7 @@ namespace banggame::bot_suggestion {
         case player_role::sheriff:
         case player_role::deputy:
         case player_role::shadow_deputy:
-            if (is_role_visible(origin, target)) {
+            if (is_role_known(origin, target)) {
                 return target->m_role == player_role::sheriff
                     || target->m_role == player_role::deputy
                     || target->m_role == player_role::shadow_deputy;
@@ -263,7 +261,7 @@ namespace banggame::bot_suggestion {
             }
         case player_role::renegade:
         default:
-            return origin == target;
+            return false;
         }
     }
 }
