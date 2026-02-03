@@ -25,7 +25,7 @@ namespace banggame {
     }
 
     void effect_damage::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
-        bot_suggestion::signal_hostile_action(origin, target);
+        bot_suggestion::signal_hostile_action(origin, target, flags);
         
         target->damage(origin_card, origin, damage, flags);
     }
