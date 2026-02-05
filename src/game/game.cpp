@@ -455,8 +455,6 @@ namespace banggame {
         add_update(make_preload_assets_update(this));
 
         if (!call_event(event_type::on_assign_characters{ m_first_player })) {
-            add_game_flags(game_flag::hands_shown);
-
             auto character_it = m_characters.begin();
             int max_character_choice = m_characters.size() / num_alive();
             for (player_ptr p : range_alive_players(m_first_player)) {
@@ -467,7 +465,7 @@ namespace banggame {
                         characters.push_back(*character_it++);
                     }
 
-                    add_cards_to(std::move(characters), pocket_type::player_hand, p, card_visibility::shown);
+                    add_cards_to(std::move(characters), pocket_type::player_hand, p, card_visibility::show_owner);
                     queue_request<request_characterchoice>(p);
                 } else {
                     card_ptr target_card = *character_it++;
@@ -479,7 +477,6 @@ namespace banggame {
         }
 
         queue_action([this] {
-            remove_game_flags(game_flag::hands_shown);
             add_log("LOG_GAME_START");
             play_sound(sound_id::gamestart);
 

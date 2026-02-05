@@ -9,7 +9,7 @@ namespace banggame {
 
     struct request_characterchoice : request_picking {
         request_characterchoice(player_ptr target)
-            : request_picking(nullptr, nullptr, target) {}
+            : request_picking(nullptr, nullptr, target, {}, 200) {}
         
         bool can_pick(const_card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
