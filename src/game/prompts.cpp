@@ -35,7 +35,7 @@ namespace banggame::prompts {
         if (origin->is_bot()) {
             auto role = origin->get_base_role();
             if (!(role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive() <= 2)
-                && (target->m_hp <= 1 && target->m_role == player_role::sheriff)
+                && (target->m_hp <= 1 && target->is_sheriff())
             ) {
                 return {1, "BOT_DONT_KILL_SHERIFF"};
             }

@@ -152,30 +152,14 @@ namespace banggame {
                     declare_winners(alive_players);
                 }
             } else if (target->m_game->m_players.size() > 3) {
-                auto is_outlaw = [](player_ptr p) {
-                    return p->m_role == player_role::outlaw
-                        || p->m_role == player_role::shadow_outlaw;
-                };
-                auto is_renegade = [](player_ptr p) {
-                    return p->m_role == player_role::renegade;
-                };
-                auto is_sheriff = [](player_ptr p) {
-                    return p->m_role == player_role::sheriff;
-                };
-                auto is_sheriff_or_deputy = [](player_ptr p) {
-                    return p->m_role == player_role::sheriff
-                        || p->m_role == player_role::deputy
-                        || p->m_role == player_role::shadow_deputy;
-                };
-
-                if (rn::none_of(alive_players, is_sheriff)) {
-                    if (rn::distance(alive_players) == 1 && is_renegade(alive_players.front())) {
+                if (rn::none_of(alive_players, &player::is_sheriff)) {
+                    if (rn::distance(alive_players) == 1 && alive_players.front()->is_renegade()) {
                         declare_winners(alive_players);
                     } else {
-                        declare_winners(rv::filter(target->m_game->m_players, is_outlaw));
+                        declare_winners(rv::filter(target->m_game->m_players, &player::is_outlaw));
                     }
-                } else if (rn::all_of(alive_players, is_sheriff_or_deputy)) {
-                    declare_winners(rv::filter(target->m_game->m_players, is_sheriff_or_deputy));
+                } else if (rn::all_of(alive_players, &player::is_sheriff_or_deputy)) {
+                    declare_winners(rv::filter(target->m_game->m_players, &player::is_sheriff_or_deputy));
                 }
             } else {
                 if (rn::distance(alive_players) <= 1) {

@@ -40,7 +40,7 @@ namespace banggame {
 
     game_string equip_lastwill::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
         MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
-        if (target->m_role == player_role::sheriff) {
+        if (target->is_sheriff()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
             return {};

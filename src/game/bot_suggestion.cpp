@@ -161,9 +161,7 @@ namespace banggame::bot_suggestion {
         case player_role::outlaw:
         case player_role::shadow_outlaw:
             if (is_role_known(origin, target)) {
-                return target->m_role == player_role::sheriff
-                    || target->m_role == player_role::deputy
-                    || target->m_role == player_role::shadow_deputy;
+                return target->is_sheriff_or_deputy();
             } else {
                 return is_positive_karma(target);
             }
@@ -171,37 +169,30 @@ namespace banggame::bot_suggestion {
         case player_role::deputy:
         case player_role::shadow_deputy:
             if (is_role_known(origin, target)) {
-                return target->m_role == player_role::outlaw
-                    || target->m_role == player_role::renegade
-                    || target->m_role == player_role::shadow_outlaw;
+                return target->is_outlaw_or_renegade();
             } else if (is_negative_karma(target)) {
                 return true;
             } else if (is_positive_karma(target)) {
                 return false;
             } else {
-                return !confident && (origin->m_role != player_role::sheriff || target->m_hp > 1);
+                return !confident && (!origin->is_sheriff() || target->m_hp > 1);
             }
         case player_role::renegade: {
-            auto targets = origin->m_game->m_players | rv::filter([origin](player_ptr p) {
-                return p != origin && p->alive();
-            });
-            auto num_outlaws = rn::count_if(targets, [](player_role role) {
-                return role == player_role::outlaw
-                    || role == player_role::renegade
-                    || role == player_role::shadow_outlaw;
-            }, &player::m_role);
-            auto num_sheriff_or_deputy = rn::count_if(targets, [](player_role role) {
-                return role == player_role::sheriff
-                    || role == player_role::deputy
-                    || role == player_role::shadow_deputy;
-            }, &player::m_role);
-            if (num_outlaws > num_sheriff_or_deputy) {
+            int num_law = 0;
+            int num_bandit = 0;
+
+            for (player_ptr p : origin->m_game->m_players) {
+                if (p != origin && p->alive()) {
+                    if (p->is_sheriff_or_deputy()) ++num_law;
+                    if (p->is_outlaw_or_renegade()) ++num_bandit;
+                }
+            }
+
+            if (num_bandit > num_law) {
                 if (origin == target) {
                     return false;
                 } else if (is_role_known(origin, target)) {
-                    return target->m_role == player_role::outlaw
-                        || target->m_role == player_role::shadow_outlaw
-                        || target->m_role == player_role::renegade;
+                    return target->is_outlaw_or_renegade();
                 } else if (is_negative_karma(target)) {
                     return true;
                 } else if (is_positive_karma(target)) {
@@ -209,10 +200,9 @@ namespace banggame::bot_suggestion {
                 } else {
                     return !confident;
                 }
-            } else if (num_sheriff_or_deputy > 1) {
+            } else if (num_law > 1) {
                 if (is_role_known(origin, target)) {
-                    return target->m_role == player_role::deputy
-                        || target->m_role == player_role::shadow_deputy;
+                    return target->is_deputy();
                 } else if (is_negative_karma(target)) {
                     return false;
                 } else if (is_positive_karma(target)) {
@@ -220,7 +210,7 @@ namespace banggame::bot_suggestion {
                 } else {
                     return !confident;
                 }
-            } else if (target->m_role == player_role::sheriff && num_outlaws > 0) {
+            } else if (target->is_sheriff() && num_bandit > 0) {
                 return target->m_hp > 2;
             } else {
                 return true;
@@ -245,8 +235,7 @@ namespace banggame::bot_suggestion {
         case player_role::outlaw:
         case player_role::shadow_outlaw:
             if (is_role_known(origin, target)) {
-                return target->m_role == player_role::outlaw
-                    || target->m_role == player_role::shadow_outlaw;
+                return target->is_outlaw();
             } else {
                 return is_negative_karma(target);
             }
@@ -254,9 +243,7 @@ namespace banggame::bot_suggestion {
         case player_role::deputy:
         case player_role::shadow_deputy:
             if (is_role_known(origin, target)) {
-                return target->m_role == player_role::sheriff
-                    || target->m_role == player_role::deputy
-                    || target->m_role == player_role::shadow_deputy;
+                return target->is_sheriff_or_deputy();
             } else {
                 return is_positive_karma(target);
             }

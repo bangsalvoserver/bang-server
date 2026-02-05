@@ -21,10 +21,9 @@ namespace banggame {
         void on_finished() override {
             origin->m_game->pop_request();
             
-            auto alive_players = origin->m_game->m_players
-                | rv::filter([](player_ptr p) {
-                    return p->alive() && p->m_role != player_role::sheriff;
-                });
+            auto alive_players = rv::filter(origin->m_game->m_players, [](player_ptr p) {
+                return p->alive() && !p->is_sheriff();
+            });
             
             auto roles = alive_players | rv::transform(&player::get_base_role) | rn::to<std::vector>();
             rn::shuffle(roles, origin->m_game->rng);

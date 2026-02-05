@@ -91,7 +91,20 @@ namespace banggame {
 
         void hide_role();
         void set_role(player_role role, bool instant = false);
-        player_role get_base_role() const;
+
+        player_role get_base_role() const {
+            if (m_role == player_role::shadow_deputy || m_role == player_role::shadow_outlaw) {
+                return player_role::renegade;
+            }
+            return m_role;
+        }
+
+        bool is_sheriff() const { return m_role == player_role::sheriff; }
+        bool is_deputy() const { return m_role == player_role::deputy || m_role == player_role::shadow_deputy; }
+        bool is_sheriff_or_deputy() const { return is_sheriff() || is_deputy(); }
+        bool is_outlaw() const { return m_role == player_role::outlaw || m_role == player_role::shadow_outlaw; }
+        bool is_renegade() const { return m_role == player_role::renegade; }
+        bool is_outlaw_or_renegade() const { return is_outlaw() || is_renegade(); }
 
         void start_of_turn();
         

@@ -396,7 +396,7 @@ namespace banggame {
     }
 
     int player::get_character_max_hp() const {
-        return get_character()->get_tag_value(tag_type::max_hp).value_or(4) + (m_role == player_role::sheriff);
+        return get_character()->get_tag_value(tag_type::max_hp).value_or(4) + is_sheriff();
     }
 
     void player::hide_role() {
@@ -419,13 +419,6 @@ namespace banggame {
         } else {
             m_game->add_update(update_target::includes(this), game_updates::player_show_role{ this, m_role, duration });
         }
-    }
-
-    player_role player::get_base_role() const {
-        if (m_role == player_role::shadow_deputy || m_role == player_role::shadow_outlaw) {
-            return player_role::renegade;
-        }
-        return m_role;
     }
 
     bool player::add_player_flags(player_flag flags) {

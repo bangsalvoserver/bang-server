@@ -107,8 +107,8 @@ namespace banggame {
             if (!p->alive()) continue;
             ++alive_count;
             if (alive_count > 2) return false;
-            if (p->m_role == player_role::sheriff) has_sheriff = true;
-            else if (p->m_role == player_role::renegade) has_renegade = true;
+            if (p->is_sheriff()) has_sheriff = true;
+            else if (p->is_renegade()) has_renegade = true;
         }
         return alive_count == 2 && has_sheriff && has_renegade;
     }
@@ -123,19 +123,17 @@ namespace banggame {
         });
         game->add_listener<event_type::on_turn_start>({nullptr, 10}, [](player_ptr target) {
             if (target->check_player_flags(player_flag::shadow) && target->get_base_role() == player_role::renegade) {
-                auto roles_revealed = target->m_game->m_players | rv::filter([](player_ptr p) {
-                    return p->check_player_flags(player_flag::role_revealed);
-                });
-                auto count_outlaws = rn::count_if(roles_revealed, [](player_ptr p) {
-                    return p->m_role == player_role::outlaw;
-                });
-                auto count_deputies = rn::count_if(roles_revealed, [](player_ptr p) {
-                    return p->m_role == player_role::deputy || p->m_role == player_role::sheriff;
-                });
+                int count_deputy = 0;
+                int count_outlaw = 0;
 
-                player_role role = count_deputies > count_outlaws
-                    ? player_role::shadow_deputy
-                    : player_role::shadow_outlaw;
+                for (player_ptr p : target->m_game->m_players) {
+                    if (p->check_player_flags(player_flag::role_revealed)) {
+                        if (p->is_sheriff_or_deputy()) ++count_deputy;
+                        if (p->is_outlaw()) ++count_outlaw;
+                    }
+                }
+
+                player_role role = count_deputy > count_outlaw ? player_role::shadow_deputy : player_role::shadow_outlaw;
                 
                 if (role != target->m_role) {
                     target->set_role(role);

@@ -33,7 +33,7 @@ namespace banggame {
             }
         }
 
-        if (filter.check(target_player_filter::notsheriff) && target->m_role == player_role::sheriff)
+        if (filter.check(target_player_filter::notsheriff) && target->is_sheriff())
             return {"ERROR_TARGET_SHERIFF", origin_card, target};
 
         if (filter.check(target_player_filter::not_empty_hand) && target->empty_hand())

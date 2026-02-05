@@ -26,7 +26,7 @@ namespace banggame {
                 player_ptr sheriff = target->m_game->m_first_player;
                 auto role = target->get_base_role();
                 if (!(role == player_role::outlaw || role == player_role::renegade && target->m_game->num_alive() <= 2)
-                    && (sheriff->m_hp <= locomotive_count && sheriff->m_role == player_role::sheriff)
+                    && (sheriff->m_hp <= locomotive_count && sheriff->is_sheriff())
                 ) {
                     return "BOT_DONT_KILL_SHERIFF";
                 }
