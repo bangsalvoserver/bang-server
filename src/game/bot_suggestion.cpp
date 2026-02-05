@@ -166,6 +166,17 @@ namespace banggame::bot_suggestion {
                 return is_positive_karma(target);
             }
         case player_role::sheriff:
+            if (is_role_known(origin, target)) {
+                return target->is_outlaw_or_renegade();
+            } else if (rn::none_of(origin->m_game->m_players, [](player_ptr p) { return p->alive() && p->is_outlaw(); })) {
+                return target->m_hp > 1;
+            } else if (is_negative_karma(target)) {
+                return true;
+            } else if (is_positive_karma(target)) {
+                return false;
+            } else {
+                return !confident && target->m_hp > 1;
+            }
         case player_role::deputy:
         case player_role::shadow_deputy:
             if (is_role_known(origin, target)) {
@@ -175,7 +186,7 @@ namespace banggame::bot_suggestion {
             } else if (is_positive_karma(target)) {
                 return false;
             } else {
-                return !confident && (!origin->is_sheriff() || target->m_hp > 1);
+                return !confident;
             }
         case player_role::renegade: {
             int num_law = 0;
