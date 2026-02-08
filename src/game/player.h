@@ -89,6 +89,7 @@ namespace banggame {
         
         int get_character_max_hp() const;
 
+        void reveal_role();
         void hide_role();
         void set_role(player_role role, bool instant = false);
 

@@ -66,9 +66,7 @@ namespace banggame {
                 }
                 target->m_game->remove_cards({ target->m_characters.begin() + 1, target->m_characters.end() });
 
-                if (target->add_player_flags(player_flag::role_revealed)) {
-                    target->m_game->add_update(update_target::excludes(target), game_updates::player_show_role{ target, target->m_role });
-                }
+                target->reveal_role();
 
                 target->m_game->call_event(event_type::on_player_eliminated{ killer, target, type });
             }
@@ -129,13 +127,11 @@ namespace banggame {
 
             auto declare_winners = [&](auto &&winners) {
                 for (player_ptr p : target->m_game->range_all_players(target->m_game->m_playing)) {
-                    if (p->add_player_flags(player_flag::role_revealed)) {
-                        target->m_game->add_update(update_target::excludes(p), game_updates::player_show_role{ p, p->m_role });
-                    }
+                    p->reveal_role();
                 }
-                target->m_game->add_log("LOG_GAME_OVER");
                 update_target winner_target = update_target::includes();
                 for (player_ptr p : winners) {
+                    target->m_game->add_log("LOG_WINNER", p);
                     p->add_player_flags(player_flag::winner);
                     winner_target.add(p);
                 }
@@ -143,6 +139,7 @@ namespace banggame {
                     target->m_game->add_update(winner_target, game_updates::play_sound{ sound_id::victory });
                 }
                 target->m_game->add_game_flags(game_flag::game_over);
+                target->m_game->add_log("LOG_GAME_OVER");
             };
 
             auto alive_players = rv::filter(target->m_game->m_players, &player::alive);
@@ -153,12 +150,15 @@ namespace banggame {
                 }
             } else if (target->m_game->m_players.size() > 3) {
                 if (rn::none_of(alive_players, &player::is_sheriff)) {
-                    if (rn::distance(alive_players) == 1 && alive_players.front()->is_renegade()) {
+                    if (player_ptr p = get_single_element(alive_players); p && p->is_renegade()) {
+                        target->m_game->add_log("LOG_WINNER_RENEGADE");
                         declare_winners(alive_players);
                     } else {
+                        target->m_game->add_log("LOG_WINNER_OUTLAW");
                         declare_winners(rv::filter(target->m_game->m_players, &player::is_outlaw));
                     }
                 } else if (rn::all_of(alive_players, &player::is_sheriff_or_deputy)) {
+                    target->m_game->add_log("LOG_WINNER_SHERIFF");
                     declare_winners(rv::filter(target->m_game->m_players, &player::is_sheriff_or_deputy));
                 }
             } else {

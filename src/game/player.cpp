@@ -399,6 +399,24 @@ namespace banggame {
         return get_character()->get_tag_value(tag_type::max_hp).value_or(4) + is_sheriff();
     }
 
+    void player::reveal_role() {
+        remove_player_flags(player_flag::positive_karma);
+        remove_player_flags(player_flag::negative_karma);
+        
+        if (add_player_flags(player_flag::role_revealed)) {
+            switch (m_role) {
+            case player_role::deputy: m_game->add_log("LOG_REVEAL_DEPUTY", this); break;
+            case player_role::outlaw: m_game->add_log("LOG_REVEAL_OUTLAW", this); break;
+            case player_role::renegade: m_game->add_log("LOG_REVEAL_RENEGADE", this); break;
+            default:
+                // ignore
+                break;
+            }
+
+            m_game->add_update(update_target::excludes(this), game_updates::player_show_role{ this, m_role });
+        }
+    }
+
     void player::hide_role() {
         remove_player_flags(player_flag::positive_karma);
         remove_player_flags(player_flag::negative_karma);
@@ -414,6 +432,9 @@ namespace banggame {
         animation_duration duration = instant ? 0ms : durations.flip_card;
 
         if (role == player_role::sheriff || m_game->m_players.size() <= 3 || check_player_flags(player_flag::role_revealed)) {
+            if (role == player_role::sheriff) {
+                m_game->add_log("LOG_REVEAL_SHERIFF", this);
+            }
             m_game->add_update(game_updates::player_show_role{ this, m_role, duration });
             add_player_flags(player_flag::role_revealed);
         } else {

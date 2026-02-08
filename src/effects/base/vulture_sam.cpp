@@ -53,12 +53,11 @@ namespace banggame {
         }
 
         void on_update() override {
-            auto cards = rv::concat(
+            if (card_ptr target_card = get_single_element(rv::concat(
                 origin->m_table | rv::remove_if(&card::is_black),
                 origin->m_hand | rv::take(1)
-            );
-            if (rn::distance(cards) == 1) {
-                on_pick(cards.front());
+            ))) {
+                on_pick(target_card);
             }
         }
 
