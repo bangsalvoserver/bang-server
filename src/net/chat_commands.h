@@ -20,13 +20,6 @@ namespace banggame {
 
     template<auto FnMemPtr> static constexpr proxy_t<FnMemPtr> proxy;
 
-    template<typename FnMemPtr> struct argument_number;
-
-    template<typename ... Args>
-    struct argument_number<void (game_manager::* const)(session_ptr, Args...)> {
-        static constexpr size_t value = sizeof...(Args);
-    };
-
     using manager_fn = void (*)(game_manager *, session_ptr, std::span<std::string>);
 
     class chat_command;
@@ -59,7 +52,7 @@ namespace banggame {
         template<typename Proxy>
         static void call_manager_fun(game_manager *mgr, session_ptr session, std::span<std::string> args) {
             call_manager_fun_impl<Proxy>(mgr, session, args,
-                std::make_index_sequence<argument_number<decltype(Proxy::value)>::value>());
+                std::make_index_sequence<argument_number_v<decltype(Proxy::value)> - 1>());
         }
 
     public:

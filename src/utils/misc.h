@@ -33,4 +33,21 @@ inline constexpr bool is_invocable_like_v = is_invocable_like<T, Function>::valu
 template<typename T, typename Function>
 concept invocable_like = is_invocable_like_v<T, Function>;
 
+template<typename Fun> struct argument_number;
+
+template<typename R, typename ... Ts>
+struct argument_number<R (*)(Ts...)> : std::integral_constant<size_t, sizeof...(Ts)> {};
+
+template<typename T, typename R, typename ... Ts>
+struct argument_number<R (T::*)(Ts...)> : std::integral_constant<size_t, sizeof...(Ts)> {};
+
+template<typename T, typename R, typename ... Ts>
+struct argument_number<R (T::*)(Ts...) const> : std::integral_constant<size_t, sizeof...(Ts)> {};
+
+template<typename T> requires requires { &T::operator(); }
+struct argument_number<T> : argument_number<decltype(&T::operator())> {};
+
+template<typename Fun>
+inline constexpr size_t argument_number_v = argument_number<std::remove_cvref_t<Fun>>::value;
+
 #endif
