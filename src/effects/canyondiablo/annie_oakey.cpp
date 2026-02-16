@@ -66,7 +66,7 @@ namespace banggame {
         drawn_card->add_short_pause();
         req_draw->add_to_hand_phase_one(drawn_card);
 
-        if (std::invoke(fn, drawn_card->sign)) {
+        if ((drawn_card->sign.*fn)()) {
             target->draw_card(ncards, origin_card);
         }
     }

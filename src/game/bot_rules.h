@@ -24,7 +24,7 @@ namespace banggame {
             }} {}
     
         bool operator()(card_node node) const {
-            return std::invoke(thunk, data, node);
+            return (*thunk)(data, node);
         }
     };
 

@@ -135,7 +135,7 @@ namespace banggame {
             , m_function{FWD(function)} {}
         
         draw_check_result get_result(card_ptr target_card) const override {
-            return std::invoke(m_condition, target_card);
+            return m_condition(target_card);
         }
 
         void on_resolve(bool lucky) override {

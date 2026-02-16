@@ -78,7 +78,7 @@ namespace banggame {
         }
 
         void serialize(json::string_writer &writer) const {
-            std::invoke(serialize_fun, *this, writer);
+            (*serialize_fun)(*this, writer);
         }
     };
 

@@ -34,7 +34,7 @@ namespace banggame {
 
     void disabler_map::add_disabler(event_card_key key, card_disabler_fun &&fun) {
         for (auto [owner, c] : disableable_cards(m_game)) {
-            if (std::invoke(fun, c) && !is_disabled(c)) {
+            if (fun(c) && !is_disabled(c)) {
                 for (const equip_holder &holder : c->equips | rv::reverse) {
                     if (!holder.is_nodisable()) {
                         holder.on_disable(c, owner);
@@ -49,7 +49,7 @@ namespace banggame {
 
     void disabler_map::do_remove_disablers(disabler_map_range range) {
         for (auto [owner, c] : disableable_cards(m_game)) {
-            auto disables_c = [c](const auto &pair) { return std::invoke(pair.second, c); };
+            auto disables_c = [c](const auto &pair) { return pair.second(c); };
             auto outside_range = rv::concat(
                 rn::subrange(m_disablers.begin(), range.begin()),
                 rn::subrange(range.end(), m_disablers.end())
@@ -75,7 +75,7 @@ namespace banggame {
 
     card_ptr disabler_map::get_disabler(const_card_ptr target_card, bool check_disable_use) const {
         for (auto &[card_key, fun] : m_disablers) {
-            if ((!check_disable_use || fun.is_disable_use()) && std::invoke(fun, target_card)) {
+            if ((!check_disable_use || fun.is_disable_use()) && fun(target_card)) {
                 return card_key.target_card;
             }
         }
