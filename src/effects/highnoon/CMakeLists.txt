@@ -1,5 +1,4 @@
 target_sources(bangserver PRIVATE
-    blessing_curse.cpp
     ghosttown.cpp
     hangover.cpp
     highnoon.cpp
@@ -7,6 +6,7 @@ target_sources(bangserver PRIVATE
     ruleset.cpp
     sermon.cpp
     shootout.cpp
+    suit_modifier.cpp
     thedaltons.cpp
     thedoctor.cpp
     thirst.cpp

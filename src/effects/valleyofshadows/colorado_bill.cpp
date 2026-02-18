@@ -14,9 +14,9 @@ namespace banggame {
         origin->m_game->add_listener<event_type::apply_bang_modifier>(origin_card, [=](player_ptr e_origin, shared_request_bang req) {
             if (e_origin == origin) {
                 bool indifferent = req->unavoidable || (req->target->empty_hand() && count_missed_cards(req->target) == 0);
-                origin->m_game->queue_request<request_check>(origin, origin_card, [=](card_ptr target_card) {
+                origin->m_game->queue_request<request_check>(origin, origin_card, [=](card_sign sign) {
                     return draw_check_result {
-                        .lucky = get_modified_sign(target_card).is_spades(),
+                        .lucky = sign.is_spades(),
                         .indifferent = indifferent
                     };
                 }, [=](bool result) {

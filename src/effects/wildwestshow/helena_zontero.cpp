@@ -70,20 +70,19 @@ namespace banggame {
             return origin_card;
         }
 
-        bool is_positive() const {
-            return get_modified_sign(drawn_card).is_red();
-        }
-
         prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const override {
-            if (owner->is_bot() && !is_positive()) {
-                return "BOT_DONT_REDRAW_HELENA_ZONTERO";
+            if (owner->is_bot()) {
+                auto sign = get_modified_sign(drawn_card);
+                if (sign.modified || sign.is_black()) {
+                    return "BOT_DONT_REDRAW_HELENA_ZONTERO";
+                }
             }
             return {};
         }
         
         void resolve() override {
             origin->m_game->pop_request();
-            if (is_positive()) {
+            if (get_modified_sign(drawn_card).is_red()) {
                 origin->m_game->add_log("LOG_CARD_HAS_EFFECT", origin_card);
                 origin->m_game->queue_request<request_shuffle_roles>(origin_card, origin);
             }

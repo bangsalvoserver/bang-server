@@ -81,7 +81,7 @@ namespace banggame {
             if (update_count != 0) return;
             
             if (auto aces = rv::filter(target->m_game->m_selection, [this](card_ptr c) {
-                return get_modified_sign(c).rank == card_rank::rank_A;
+                return c->sign.rank == card_rank::rank_A;
             })) {
                 target->m_game->flash_cards(aces | rn::to<std::vector>());
                 target->m_game->pop_request();

@@ -4,11 +4,15 @@
 #include "game/bot_suggestion.h"
 
 namespace banggame {
-    
-    card_sign get_modified_sign(const_card_ptr target_card) {
-        auto value = target_card->sign;
-        target_card->m_game->call_event(event_type::apply_sign_modifier{ value });
-        return value;
+
+    modified_sign get_modified_sign(const_card_ptr target_card) {
+        modified_sign sign = target_card->sign;
+        card_suit suit = target_card->m_game->call_event(event_type::get_suit_modifier{});
+        if (suit != card_suit::none) {
+            sign.suit = suit;
+            sign.modified = true;
+        }
+        return sign;
     }
 
     void request_check_base::on_update() {
@@ -108,5 +112,14 @@ namespace banggame {
             target->m_game->call_event(event_type::on_draw_check_resolve{origin_card, target, drawn_card, drawn_card });
         }
         on_resolve(get_result(drawn_card).lucky);
+    }
+
+    draw_check_result request_check_base::get_result(card_ptr target_card) const {
+        auto sign = get_modified_sign(target_card);
+        auto result = get_result(sign);
+        if (sign.modified && !result.rank_dependent) {
+            result.indifferent = true;
+        }
+        return result;
     }
 }

@@ -13,7 +13,7 @@ namespace banggame {
         return origin && origin_card
             && origin_card->is_brown()
             && flags.check(effect_flag::single_target)
-            && get_modified_sign(origin_card).is_jack_to_ace();
+            && origin_card->sign.is_jack_to_ace();
     }
 
     void equip_ms_abigail::on_enable(card_ptr origin_card, player_ptr origin) {

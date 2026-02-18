@@ -47,15 +47,22 @@ namespace banggame {
             shared_draw_check_handler req;
         };
         
-        struct apply_sign_modifier {
-            nullable_ref<card_sign> value;
+        struct get_suit_modifier {
+            using result_type = card_suit;
         };
     }
-    
-    card_sign get_modified_sign(const_card_ptr target_card);
+
+    struct modified_sign : card_sign {
+        bool modified;
+        modified_sign(card_sign sign, bool modified = false)
+            : card_sign{sign}, modified{modified} {}
+    };
+
+    modified_sign get_modified_sign(const_card_ptr target_card);
 
     struct draw_check_result {
         bool lucky:1;
+        bool rank_dependent:1;
         bool indifferent:1;
         bool defensive_redraw:1;
     };
@@ -90,18 +97,20 @@ namespace banggame {
         void resolve() override;
         void restart() override;
 
-        virtual draw_check_result get_result(card_ptr target_card) const = 0;
+        draw_check_result get_result(card_ptr drawn_card) const;
+
+        virtual draw_check_result get_result(card_sign sign) const = 0;
         virtual void on_resolve(bool lucky) = 0;
     };
 
     template<typename T> struct draw_check_condition_wrapper;
 
-    template<invocable_like<draw_check_result(card_ptr)> T>
+    template<invocable_like<draw_check_result(card_sign)> T>
     struct draw_check_condition_wrapper<T> {
         [[no_unique_address]] T fun;
 
-        draw_check_result operator()(card_ptr target_card) const {
-            return std::invoke(fun, target_card);
+        draw_check_result operator()(card_sign sign) const {
+            return std::invoke(fun, sign);
         }
     };
 
@@ -109,8 +118,8 @@ namespace banggame {
     struct draw_check_condition_wrapper<T> {
         [[no_unique_address]] T fun;
 
-        draw_check_result operator()(card_ptr target_card) const {
-            return draw_check_result{ .lucky = std::invoke(fun, get_modified_sign(target_card)) };
+        draw_check_result operator()(card_sign sign) const {
+            return draw_check_result{ .lucky = std::invoke(fun, sign) };
         }
     };
 
@@ -134,8 +143,8 @@ namespace banggame {
             , m_condition{FWD(condition)}
             , m_function{FWD(function)} {}
         
-        draw_check_result get_result(card_ptr target_card) const override {
-            return m_condition(target_card);
+        draw_check_result get_result(card_sign sign) const override {
+            return m_condition(sign);
         }
 
         void on_resolve(bool lucky) override {

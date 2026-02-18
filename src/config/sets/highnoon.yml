@@ -2,7 +2,7 @@ highnoon:
   - name: BLESSING
     image: 05_benedizione
     equip:
-      - blessing
+      - suit_modifier(card_suit::hearts)
   - name: GHOST_TOWN
     image: 05_cittafantasma
     expansion: ghost_cards
@@ -33,7 +33,7 @@ highnoon:
   - name: CURSE
     image: 05_maledizione
     equip:
-      - curse
+      - suit_modifier(card_suit::spades)
   - name: HANGOVER
     image: 05_sbornia
     equip:
