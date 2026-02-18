@@ -48,7 +48,7 @@ namespace banggame {
         void add_short_pause();
 
         int num_tokens(card_token_type token_type) const {
-            return tokens[token_type];
+            return get_num_tokens(tokens, token_type);
         }
 
         int num_cubes() const {

@@ -144,8 +144,8 @@ namespace banggame {
     
     void card::add_cubes(int num_tokens) {
         const card_token_type token_type = card_token_type::cube;
-        auto &table_tokens = m_game->tokens[token_type];
-        auto &card_tokens = tokens[token_type];
+        auto table_tokens = m_game->num_tokens(token_type);
+        auto card_tokens = this->num_tokens(token_type);
 
         num_tokens = std::min<int>({num_tokens, table_tokens, max_cubes - card_tokens});
         if (num_tokens > 0) {
@@ -156,15 +156,11 @@ namespace banggame {
 
     void card::move_cubes(card_ptr target, int num_tokens, bool instant) {
         const card_token_type token_type = card_token_type::cube;
-        auto &table_tokens = m_game->tokens[token_type];
-        auto &target_tokens = target ? target->tokens[token_type] : table_tokens;
-        auto &card_tokens = tokens[token_type];
+        auto target_tokens = target ? target->num_tokens(token_type) : m_game->num_tokens(token_type);
 
-        if (card_tokens < num_tokens) {
-            num_tokens = card_tokens;
-        }
+        num_tokens = std::min(num_cubes(), num_tokens);
         if (target && num_tokens > 0 && target_tokens < max_cubes) {
-            int added_tokens = std::min<int>(num_tokens, max_cubes - target_tokens);
+            int added_tokens = std::min(num_tokens, max_cubes - target_tokens);
             num_tokens -= added_tokens;
 
             if (owner == target->owner) {
@@ -178,7 +174,7 @@ namespace banggame {
             m_game->add_log("LOG_PAID_CUBE", owner, this, num_tokens);
             m_game->move_tokens(token_type, token_positions::card{this}, token_positions::table{}, num_tokens, instant);
         }
-        if (card_tokens == 0) {
+        if (num_cubes() == 0) {
             m_game->call_event(event_type::on_finish_tokens{ this, target, token_type });
         }
     }

@@ -95,7 +95,10 @@ namespace banggame {
 
         void shuffle_cards_and_ids(std::span<card_ptr> vec);
 
-        int num_tokens(card_token_type token_type) const;
+        int num_tokens(card_token_type token_type) const {
+            return get_num_tokens(tokens, token_type);
+        }
+
         void add_tokens(card_token_type token_type, int num_tokens, token_position target);
         void move_tokens(card_token_type token_type, token_position origin, token_position target, int num_tokens, bool instant = false);
 

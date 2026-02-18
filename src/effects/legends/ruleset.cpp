@@ -122,7 +122,7 @@ namespace banggame {
         bool can_pick(const_card_ptr target_card) const override {
             if (target_card->pocket == pocket_type::feats) {
                 auto [token, count] = get_player_fame_tokens(target);
-                return target_card->tokens[token] == 0;
+                return target_card->num_tokens(token) == 0;
             }
             return false;
         }

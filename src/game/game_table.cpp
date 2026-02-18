@@ -175,28 +175,39 @@ namespace banggame {
             }
         }, position);
     }
-
-    int game_table::num_tokens(card_token_type token_type) const {
-        return tokens[token_type];
+    
+    static void add_tokens_to(token_map &map, card_token_type token_type, int num_tokens) {
+        for (auto it = map.begin(); it != map.end(); ++it) {
+            auto &[token, count] = *it;
+            if (token == token_type) {
+                count += num_tokens;
+                if (count == 0) {
+                    map.erase(it);
+                }
+                return;
+            }
+        }
+        map.emplace_back(token_type, num_tokens);
     }
 
     void game_table::add_tokens(card_token_type token_type, int num_tokens, token_position target) {
         if (num_tokens != 0) {
-            get_token_map(this, target)[token_type] += num_tokens;
+            add_tokens_to(get_token_map(this, target), token_type, num_tokens);
             add_update(game_updates::add_tokens{ token_type, num_tokens, target });
         }
     }
 
     void game_table::move_tokens(card_token_type token_type, token_position origin, token_position target, int num_tokens, bool instant) {
-        auto &origin_tokens = get_token_map(this, origin)[token_type];
-        auto &target_tokens = get_token_map(this, target)[token_type];
+        auto &origin_token_map = get_token_map(this, origin);
+        auto &target_token_map = get_token_map(this, target);
 
+        int origin_tokens = get_num_tokens(origin_token_map, token_type);
         if (origin_tokens < num_tokens) {
             num_tokens = origin_tokens;
         }
         if (num_tokens > 0) {
-            target_tokens += num_tokens;
-            origin_tokens -= num_tokens;
+            add_tokens_to(target_token_map, token_type, num_tokens);
+            add_tokens_to(origin_token_map, token_type, -num_tokens);
 
             animation_duration duration = instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens;
             add_update(game_updates::move_tokens{ token_type, num_tokens, origin, target, duration });

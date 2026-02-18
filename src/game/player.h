@@ -67,7 +67,10 @@ namespace banggame {
         void heal(int value);
         void set_hp(int value, bool instant = false);
 
-        int get_gold() const;
+        int get_gold() const {
+            return get_num_tokens(tokens, card_token_type::gold);
+        }
+        
         void add_gold(int amount);
 
         bool immune_to(card_ptr origin_card, player_ptr origin, effect_flags flags, bool quiet = false) const;

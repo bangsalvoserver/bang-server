@@ -5,7 +5,6 @@
 #include "effect_context.h"
 
 #include "utils/enum_bitset.h"
-#include "utils/enum_map.h"
 
 namespace banggame {
 
@@ -89,7 +88,14 @@ namespace banggame {
         return enums::is_between(token, card_token_type::fame1, card_token_type::fame8);
     }
 
-    using token_map = enums::enum_map<card_token_type, uint8_t>;
+    using token_map = std::vector<std::pair<card_token_type, int>>;
+
+    inline int get_num_tokens(const token_map &tokens, card_token_type type) {
+        for (const auto &[token, count] : tokens) {
+            if (token == type) return count;
+        }
+        return 0;
+    }
 
     enum class player_role {
         unknown,
