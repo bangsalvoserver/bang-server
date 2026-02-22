@@ -2,7 +2,6 @@
 #define __MANAGER_H__
 
 #include "lobby.h"
-#include "chat_commands.h"
 #include "wsserver.h"
 #include "logging.h"
 
@@ -56,21 +55,8 @@ private:
     void handle_message(client_messages::game_start &&msg, session_ptr session);
     void handle_message(client_messages::game_rejoin &&msg, session_ptr session);
     void handle_message(client_messages::game_action &&msg, session_ptr session);
-
-    void handle_chat_command(session_ptr session, const std::string &command);
-
-    void command_print_help(session_ptr session);
-    void command_print_users(session_ptr session);
-    void command_kick_user(session_ptr session, std::string_view target_user);
-    void command_mute_user(session_ptr session, std::string_view target_user);
-    void command_unmute_user(session_ptr session, std::string_view target_user);
-    void command_appoint_user(session_ptr session, std::string_view target_user);
-    void command_get_game_options(session_ptr session);
-    void command_set_game_option(session_ptr session, std::string_view key, std::string_view value);
-    void command_reset_game_options(session_ptr session);
-    void command_give_card(session_ptr session, std::string_view card_name);
-    void command_get_rng_seed(session_ptr session);
-    void command_quit(session_ptr session);
+    
+    void register_chat_commands(game_lobby &lobby);
 
 private:
     std::default_random_engine session_rng;
@@ -82,8 +68,6 @@ private:
     message_list m_outgoing_messages;
 
     const server_options &m_options;
-
-    friend class chat_command;
 };
 
 }

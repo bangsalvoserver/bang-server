@@ -224,6 +224,8 @@ void game_manager::handle_message(client_messages::lobby_make &&args, session_pt
     game_lobby &lobby = m_lobbies.try_emplace(lobby_id, lobby_id, args.name, args.options).first->second;
     tracking::track_lobby_count(m_lobbies.size());
 
+    register_chat_commands(lobby);
+
     game_user &user = lobby.add_user(session).first;
     user.flags.add(game_user_flag::lobby_owner);
     
@@ -466,64 +468,63 @@ void game_manager::handle_message(client_messages::lobby_chat &&args, session_pt
         if (!user.is_muted()) {
             add_lobby_chat_message(lobby, nullptr, { user.user_id, args.message });
         }
-        if (args.message[0] == chat_command::start_char) {
-            handle_chat_command(session, args.message.substr(1));
+        if (args.message[0] == chat_command_start_char) {
+            std::string message = args.message.substr(1);
+            
+            size_t space_pos = message.find_first_of(" \t");
+            auto cmd_name = std::string_view(message).substr(0, space_pos);
+            auto cmd_it = rn::find(lobby.m_commands, cmd_name, &lobby_command::name);
+            if (cmd_it == lobby.m_commands.end()) {
+                throw lobby_error("INVALID_COMMAND_NAME");
+            }
+
+            auto &permissions = cmd_it->permissions;
+            auto &command = cmd_it->command;
+
+            game_user &user = lobby.find_user(session);
+
+            if (permissions.check(command_permissions::lobby_owner) && !user.is_lobby_owner()) {
+                throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
+            }
+
+            if (permissions.check(command_permissions::lobby_waiting) && lobby.state != lobby_state::waiting) {
+                throw lobby_error("ERROR_LOBBY_NOT_WAITING");
+            }
+
+            if (permissions.check(command_permissions::lobby_playing) && lobby.state != lobby_state::playing) {
+                throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
+            }
+
+            if (permissions.check(command_permissions::lobby_finished) && lobby.state != lobby_state::finished) {
+                throw lobby_error("ERROR_LOBBY_NOT_FINISHED");
+            }
+
+            if (permissions.check(command_permissions::lobby_in_game) && !lobby.m_game) {
+                throw lobby_error("ERROR_LOBBY_NOT_IN_GAME");
+            }
+
+            if (permissions.check(command_permissions::game_cheat)) {
+                if (lobby.state != lobby_state::playing) {
+                    throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
+                } else if (!options().enable_cheats) {
+                    throw lobby_error("ERROR_GAME_CHEATS_NOT_ENABLED");
+                }
+            }
+
+            std::vector<std::string> args;
+
+            if (space_pos != std::string::npos) {
+                std::istringstream stream(message.substr(space_pos));
+                std::string token;
+
+                while (stream >> std::quoted(token)) {
+                    args.push_back(token);
+                }
+            }
+
+            command(session, args);
         }
     }
-}
-
-void game_manager::handle_chat_command(session_ptr session, const std::string &message) {
-    size_t space_pos = message.find_first_of(" \t");
-    auto cmd_name = std::string_view(message).substr(0, space_pos);
-    auto cmd_it = rn::find(chat_command::commands, cmd_name, &string_command_map::value_type::first);
-    if (cmd_it == chat_command::commands.end()) {
-        throw lobby_error("INVALID_COMMAND_NAME");
-    }
-
-    auto &command = cmd_it->second;
-    game_lobby &lobby = *session->lobby;
-    game_user &user = lobby.find_user(session);
-
-    if (command.permissions().check(command_permissions::lobby_owner) && !user.is_lobby_owner()) {
-        throw lobby_error("ERROR_PLAYER_NOT_LOBBY_OWNER");
-    }
-
-    if (command.permissions().check(command_permissions::lobby_waiting) && lobby.state != lobby_state::waiting) {
-        throw lobby_error("ERROR_LOBBY_NOT_WAITING");
-    }
-
-    if (command.permissions().check(command_permissions::lobby_playing) && lobby.state != lobby_state::playing) {
-        throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
-    }
-
-    if (command.permissions().check(command_permissions::lobby_finished) && lobby.state != lobby_state::finished) {
-        throw lobby_error("ERROR_LOBBY_NOT_FINISHED");
-    }
-
-    if (command.permissions().check(command_permissions::lobby_in_game) && !lobby.m_game) {
-        throw lobby_error("ERROR_LOBBY_NOT_IN_GAME");
-    }
-
-    if (command.permissions().check(command_permissions::game_cheat)) {
-        if (lobby.state != lobby_state::playing) {
-            throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
-        } else if (!options().enable_cheats) {
-            throw lobby_error("ERROR_GAME_CHEATS_NOT_ENABLED");
-        }
-    }
-
-    std::vector<std::string> args;
-
-    if (space_pos != std::string::npos) {
-        std::istringstream stream(message.substr(space_pos));
-        std::string token;
-
-        while (stream >> std::quoted(token)) {
-            args.push_back(token);
-        }
-    }
-
-    command(this, session, args);
 }
 
 void game_manager::handle_message(client_messages::lobby_return &&args, session_ptr session) {
@@ -545,6 +546,11 @@ void game_manager::handle_message(client_messages::lobby_return &&args, session_
 
     lobby.bots.clear();
     lobby.m_game.reset();
+
+    std::erase_if(lobby.m_commands, [](const lobby_command &command) {
+        return command.permissions.check(command_permissions::lobby_in_game);
+    });
+
     lobby.state = lobby_state::waiting;
 
     for (game_user &user : lobby.connected_users()) {
@@ -606,6 +612,15 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
 
     auto guard = logging::push_context(std::format("game {}", lobby.name));
     lobby.m_game = std::make_unique<banggame::game>(lobby.options);
+
+    for (auto &&command : lobby.m_game->get_game_commands()) {
+        command_permission_bitset permissions { command_permissions::lobby_in_game };
+        if (command.cheat) permissions.add(command_permissions::game_cheat);
+
+        lobby.add_command(command.name, command.description, permissions, [&, fun=std::move(command.command)](session_ptr session, string_span args) {
+            fun(*this, lobby.find_user(session).user_id, args);
+        });
+    }
 
     std::vector<int> user_ids;
     for (const game_user &user : lobby.connected_users()) {

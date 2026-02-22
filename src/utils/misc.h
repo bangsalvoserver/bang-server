@@ -48,6 +48,6 @@ template<typename T> requires requires { &T::operator(); }
 struct argument_number<T> : argument_number<decltype(&T::operator())> {};
 
 template<typename Fun>
-inline constexpr size_t argument_number_v = argument_number<std::remove_cvref_t<Fun>>::value;
+inline constexpr size_t argument_number_v = argument_number<Fun>::value;
 
 #endif

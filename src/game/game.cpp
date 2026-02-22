@@ -13,8 +13,10 @@
 
 #include "play_verify.h"
 #include "possible_to_play.h"
+#include "give_card.h"
 
 #include "net/lobby.h"
+#include "net/manager.h"
 
 #include <array>
 #include <unordered_set>
@@ -538,6 +540,29 @@ namespace banggame {
             }
         }
         add_update(std::move(spectator_target), make_request_update(*req));
+    }
+
+    std::generator<game_command> game::get_game_commands() const {
+        co_yield {"give", "GIVE_CARD_DESCRIPTION", [&](game_manager &mgr, int user_id, std::string_view card_name) {
+            player_ptr target = find_player_by_userid(user_id);
+            if (!target) {
+                throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");
+            }
+
+            if (pending_requests() || is_waiting() || m_playing != target) {
+                throw lobby_error("ERROR_PLAYER_NOT_IN_TURN");
+            }
+
+            if (!give_card(target, card_name)) {
+                throw lobby_error("ERROR_CANNOT_FIND_CARD");
+            }
+        }, true};
+
+        // co_yield {"seed", "GET_RNG_SEED_DESCRIPTION", [&](game_manager &mgr, int user_id) {
+        //     mgr.send_message(session->client, server_messages::lobby_chat{0,
+        //         "GAME_SEED", {chat_format_arg::string{std::format("{}", rng_seed)}}, lobby_chat_flag::translated
+        //     });
+        // }};
     }
 
 }

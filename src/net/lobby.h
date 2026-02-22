@@ -4,6 +4,7 @@
 #include "options.h"
 #include "messages.h"
 #include "image_registry.h"
+#include "chat_command.h"
 
 #include "game/game.h"
 
@@ -37,6 +38,24 @@ struct game_session {
 
 using session_ptr = std::shared_ptr<game_session>;
 using session_weak_ptr = std::weak_ptr<game_session>;
+
+enum class command_permissions {
+    lobby_owner,
+    lobby_waiting,
+    lobby_playing,
+    lobby_finished,
+    lobby_in_game,
+    game_cheat,
+};
+
+using command_permission_bitset = enums::bitset<command_permissions>;
+
+struct lobby_command {
+    std::string_view name;
+    std::string_view description;
+    command_permission_bitset permissions;
+    chat_command<session_ptr> command;
+};
 
 namespace connection_state {
     struct not_validated {
@@ -121,6 +140,8 @@ struct game_lobby {
 
     std::unique_ptr<banggame::game_interface> m_game;
 
+    std::vector<lobby_command> m_commands;
+
     auto connected_users(this auto &&self) {
         return std::forward_like<decltype(self)>(self.users) | rv::remove_if(&game_user::is_disconnected);
     }
@@ -136,6 +157,10 @@ struct game_lobby {
     server_messages::lobby_update make_lobby_update(session_ptr owner) const;
 
     lobby_security get_security(session_ptr owner) const;
+
+    void add_command(std::string_view name, std::string_view description, command_permission_bitset permissions, chat_command<session_ptr> command) {
+        m_commands.emplace_back(name, description, permissions, std::move(command));
+    }
 };
 
 using user_map = std::unordered_map<id_type, session_ptr>;
