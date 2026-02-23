@@ -4,7 +4,6 @@
 #include "options.h"
 #include "messages.h"
 #include "image_registry.h"
-#include "chat_command.h"
 
 #include "game/game.h"
 
@@ -53,7 +52,7 @@ struct lobby_command {
     std::string_view name;
     std::string_view description;
     command_permission_bitset permissions;
-    chat_command<session_ptr> command;
+    chat_command command;
 };
 
 namespace connection_state {
@@ -114,10 +113,13 @@ struct lobby_bot {
 };
 
 struct game_lobby {
-    game_lobby(id_type lobby_id, const std::string &name, const game_options &options)
-        : lobby_id{lobby_id}
+    game_lobby(game_manager *mgr, id_type lobby_id, const std::string &name, const game_options &options)
+        : m_mgr{mgr}
+        , lobby_id{lobby_id}
         , name{crop_lobby_name(name)}
         , options{options} {}
+
+    game_manager *m_mgr;
 
     id_type lobby_id;
 
@@ -157,9 +159,15 @@ struct game_lobby {
 
     lobby_security get_security(session_ptr owner) const;
 
-    void add_command(std::string_view name, std::string_view description, command_permission_bitset permissions, chat_command<session_ptr> command) {
+    void add_command(std::string_view name, std::string_view description, command_permission_bitset permissions, chat_command command) {
         m_commands.emplace_back(name, description, permissions, std::move(command));
     }
+
+    bool add_user_flag(game_user &user, game_user_flag flag);
+    bool remove_user_flag(game_user &user, game_user_flag flag);
+
+    void add_chat_message(server_messages::lobby_chat message, game_user *is_read_for = nullptr);
+    void send_chat_message(int user_id, server_messages::lobby_chat message);
 };
 
 using user_map = std::unordered_map<id_type, session_ptr>;

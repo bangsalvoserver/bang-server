@@ -9,12 +9,10 @@
 
 namespace banggame {
 
-    class game_manager;
-
     struct game_command {
         std::string_view name;
         std::string_view description;
-        chat_command<game_manager &, int> command;
+        chat_command command;
     };
 
     struct game_interface {

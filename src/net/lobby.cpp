@@ -1,5 +1,6 @@
 #include "lobby.h"
 #include "bot_info.h"
+#include "manager.h"
 
 #include "utils/range_utils.h"
 
@@ -125,5 +126,40 @@ namespace banggame {
         } else {
             return lobby_security::locked;
         }
+    }
+    
+    bool game_lobby::add_user_flag(game_user &user, game_user_flag flag) {
+        if (!user.flags.check(flag)) {
+            user.flags.add(flag);
+            m_mgr->broadcast_message_lobby(*this, user.make_user_update());
+            return true;
+        }
+        return false;
+    }
+
+    bool game_lobby::remove_user_flag(game_user &user, game_user_flag flag) {
+        if (user.flags.check(flag)) {
+            user.flags.remove(flag);
+            m_mgr->broadcast_message_lobby(*this, user.make_user_update());
+            return true;
+        }
+        return false;
+    }
+
+    void game_lobby::add_chat_message(server_messages::lobby_chat message, game_user *is_read_for) {
+        server_messages::lobby_chat with_is_read = message;
+        with_is_read.flags.add(lobby_chat_flag::is_read);
+        for (const game_user &user : connected_users()) {
+            if (&user == is_read_for) {
+                m_mgr->send_message(user.session->client, with_is_read);
+            } else {
+                m_mgr->send_message(user.session->client, message);
+            }
+        }
+        chat_messages.emplace_back(std::move(with_is_read));
+    }
+
+    void game_lobby::send_chat_message(int user_id, server_messages::lobby_chat message) {
+        m_mgr->send_message(find_user(user_id).session->client, std::move(message));
     }
 }

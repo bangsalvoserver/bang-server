@@ -544,7 +544,7 @@ namespace banggame {
 
     std::generator<game_command> game::get_game_commands(bool enable_cheats) const {
         if (enable_cheats) {
-            co_yield {"give", "GIVE_CARD_DESCRIPTION", [&](game_manager &mgr, int user_id, std::string_view card_name) {
+            co_yield {"give", "GIVE_CARD_DESCRIPTION", [&](game_lobby &lobby, int user_id, std::string_view card_name) {
                 player_ptr target = find_player_by_userid(user_id);
                 if (!target) {
                     throw lobby_error("ERROR_USER_NOT_CONTROLLING_PLAYER");
@@ -560,11 +560,11 @@ namespace banggame {
             }};
         }
 
-        // co_yield {"seed", "GET_RNG_SEED_DESCRIPTION", [&](game_manager &mgr, int user_id) {
-        //     mgr.send_message(session->client, server_messages::lobby_chat{0,
-        //         "GAME_SEED", {chat_format_arg::string{std::format("{}", rng_seed)}}, lobby_chat_flag::translated
-        //     });
-        // }};
+        co_yield {"seed", "GET_RNG_SEED_DESCRIPTION", [&](game_lobby &lobby, int user_id) {
+            lobby.send_chat_message(user_id, {0,
+                "GAME_SEED", {chat_format_arg::string{std::format("{}", rng_seed)}}, lobby_chat_flag::translated
+            });
+        }};
     }
 
 }

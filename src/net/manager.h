@@ -34,11 +34,7 @@ private:
 
     void invalidate_connection(client_handle client);
     void kick_user_from_lobby(session_ptr session);
-    void add_lobby_chat_message(game_lobby &lobby, game_user *is_read_for, server_messages::lobby_chat message);
     void handle_join_lobby(session_ptr session, game_lobby &lobby);
-
-    bool add_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag);
-    bool remove_user_flag(game_lobby &lobby, game_user &user, game_user_flag flag);
 
 private:
     void handle_message(client_messages::connect &&msg, client_handle client, connection &con);
@@ -68,6 +64,8 @@ private:
     message_list m_outgoing_messages;
 
     const server_options &m_options;
+
+    friend class game_lobby;
 };
 
 }
