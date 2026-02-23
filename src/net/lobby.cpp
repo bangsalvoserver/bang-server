@@ -1,6 +1,7 @@
 #include "lobby.h"
 #include "bot_info.h"
 #include "manager.h"
+#include "messages.h"
 
 #include "utils/range_utils.h"
 
@@ -128,10 +129,17 @@ namespace banggame {
         }
     }
     
+    void game_lobby::broadcast_message(const server_message &msg) {
+        std::string message = serialize_message(msg);
+        for (const game_user &user : connected_users()) {
+            m_mgr->m_outgoing_messages.emplace_back(user.session->client, message);
+        }
+    }
+    
     bool game_lobby::add_user_flag(game_user &user, game_user_flag flag) {
         if (!user.flags.check(flag)) {
             user.flags.add(flag);
-            m_mgr->broadcast_message_lobby(*this, user.make_user_update());
+            broadcast_message(user.make_user_update());
             return true;
         }
         return false;
@@ -140,7 +148,7 @@ namespace banggame {
     bool game_lobby::remove_user_flag(game_user &user, game_user_flag flag) {
         if (user.flags.check(flag)) {
             user.flags.remove(flag);
-            m_mgr->broadcast_message_lobby(*this, user.make_user_update());
+            broadcast_message(user.make_user_update());
             return true;
         }
         return false;

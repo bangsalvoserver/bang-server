@@ -30,9 +30,8 @@ namespace banggame {
             }
         });
 
-        lobby.add_command("kick", "KICK_DESCRIPTION", command_permissions::lobby_owner, [&](game_lobby &lobby, int user_id, std::string_view name_or_id) {
-            game_user &user = lobby.find_user(name_or_id);
-            kick_user_from_lobby(user.session);
+        lobby.add_command("kick", "KICK_DESCRIPTION", command_permissions::lobby_owner, [](game_lobby &lobby, int user_id, std::string_view name_or_id) {
+            lobby.m_mgr->kick_user_from_lobby(lobby.find_user(name_or_id).session);
         });
 
         lobby.add_command("mute", "MUTE_DESCRIPTION", command_permissions::lobby_owner, [](game_lobby &lobby, int user_id, std::string_view name_or_id) {
@@ -53,22 +52,22 @@ namespace banggame {
             lobby.send_chat_message(user_id, { 0, lobby.options.to_string() });
         });
 
-        lobby.add_command("set-option", "SET_OPTION_DESCRIPTION", {}, [&](game_lobby &lobby, int user_id, std::string_view key, std::string_view value) {
+        lobby.add_command("set-option", "SET_OPTION_DESCRIPTION", {}, [](game_lobby &lobby, int user_id, std::string_view key, std::string_view value) {
             try {
                 lobby.options.set_option(key, value);
-                broadcast_message_lobby(lobby, server_messages::lobby_game_options{ lobby.options });
+                lobby.broadcast_message(server_messages::lobby_game_options{ lobby.options });
             } catch (const game_option_error &e) {
                 throw lobby_error(e.what());
             }
         });
 
-        lobby.add_command("reset-options", "RESET_OPTIONS_DESCRIPTION", { command_permissions::lobby_owner, command_permissions::lobby_waiting }, [&](game_lobby &lobby, int user_id) {
+        lobby.add_command("reset-options", "RESET_OPTIONS_DESCRIPTION", { command_permissions::lobby_owner, command_permissions::lobby_waiting }, [](game_lobby &lobby, int user_id) {
             lobby.options = game_options{};
-            broadcast_message_lobby(lobby, server_messages::lobby_game_options{ lobby.options });
+            lobby.broadcast_message(server_messages::lobby_game_options{ lobby.options });
         });
 
-        lobby.add_command("quit", "QUIT_DESCRIPTION", {}, [&](game_lobby &lobby, int user_id) {
-            kick_client(lobby.find_user(user_id).session->client, "QUIT");
+        lobby.add_command("quit", "QUIT_DESCRIPTION", {}, [](game_lobby &lobby, int user_id) {
+            lobby.m_mgr->kick_client(lobby.find_user(user_id).session->client, "QUIT");
         });
     };
 

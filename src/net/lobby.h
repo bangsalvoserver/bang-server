@@ -163,6 +163,8 @@ struct game_lobby {
         m_commands.emplace_back(name, description, permissions, std::move(command));
     }
 
+    void broadcast_message(const server_message &msg);
+
     bool add_user_flag(game_user &user, game_user_flag flag);
     bool remove_user_flag(game_user &user, game_user_flag flag);
 

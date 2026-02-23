@@ -120,7 +120,12 @@ void game_manager::tick() {
         }
         if (lobby.connected_user_ids.empty()) {
             if (--lobby.lifetime <= ticks{0}) {
-                broadcast_message_no_lobby(server_messages::lobby_removed{ lobby.lobby_id });
+                std::string message = serialize_message(server_messages::lobby_removed{ lobby.lobby_id });
+                for (session_ptr session : m_sessions | rv::values) {
+                    if (!session->lobby) {
+                        m_outgoing_messages.emplace_back(session->client, message);
+                    }
+                }
                 return true;
             }
         } else {
@@ -202,7 +207,7 @@ void game_manager::handle_message(client_messages::user_set_name &&args, session
 
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
-        broadcast_message_lobby(*lobby, user.make_user_update());
+        lobby->broadcast_message(user.make_user_update());
     }
 }
 
@@ -211,7 +216,7 @@ void game_manager::handle_message(client_messages::user_set_propic &&args, sessi
 
     if (game_lobby *lobby = session->lobby) {
         game_user &user = lobby->find_user(session);
-        broadcast_message_lobby(*lobby, user.make_user_update());
+        lobby->broadcast_message(user.make_user_update());
     }
 }
 
@@ -360,27 +365,10 @@ void game_manager::send_message(client_handle client, const server_message &msg)
     m_outgoing_messages.emplace_back(client, serialize_message(msg));
 }
 
-void game_manager::broadcast_message_no_lobby(const server_message &msg) {
-    std::string message = serialize_message(msg);
-    for (session_ptr session : m_sessions | rv::values) {
-        if (!session->lobby) {
-            m_outgoing_messages.emplace_back(session->client, message);
-        }
-    }
-}
-
-void game_manager::broadcast_message_lobby(const game_lobby &lobby, const server_message &msg) {
-    std::string message = serialize_message(msg);
-    for (const game_user &user : lobby.connected_users()) {
-        m_outgoing_messages.emplace_back(user.session->client, message);
-    }
-}
-
 void game_manager::broadcast_lobby_update(const game_lobby &lobby) {
     for (session_ptr session : m_sessions | rv::values) {
         if (!session->lobby) {
-            auto update = lobby.make_lobby_update(session);
-            m_outgoing_messages.emplace_back(session->client, serialize_message(update));
+            send_message(session->client, lobby.make_lobby_update(session));
         }
     }
 }
@@ -394,7 +382,7 @@ void game_manager::invalidate_connection(client_handle client) {
             session->client.reset();
             if (game_lobby *lobby = session->lobby) {
                 game_user &user = lobby->find_user(session);
-                broadcast_message_lobby(*lobby, user.make_user_update());
+                lobby->broadcast_message(user.make_user_update());
             }
         }
 
@@ -497,7 +485,7 @@ void game_manager::handle_message(client_messages::lobby_return &&args, session_
         throw lobby_error("ERROR_LOBBY_WAITING");
     }
 
-    broadcast_message_lobby(lobby, server_messages::lobby_entered{ user.user_id, lobby.lobby_id, lobby.name, lobby.options });
+    lobby.broadcast_message(server_messages::lobby_entered{ user.user_id, lobby.lobby_id, lobby.name, lobby.options });
 
     lobby.bots.clear();
     lobby.m_game.reset();
@@ -563,7 +551,7 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
 
     lobby.state = lobby_state::playing;
 
-    broadcast_message_lobby(lobby, server_messages::game_started{});
+    lobby.broadcast_message(server_messages::game_started{});
 
     auto guard = logging::push_context(std::format("game {}", lobby.name));
     lobby.m_game = std::make_unique<banggame::game>(lobby.options);
@@ -588,7 +576,7 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
         auto &bot = lobby.bots.emplace_back(bot_id, std::format("BOT {}", names[i % names.size()]), propics[i % propics.size()]);
         user_ids.push_back(bot_id);
 
-        broadcast_message_lobby(lobby, bot.make_user_update());
+        lobby.broadcast_message(bot.make_user_update());
     }
     
     broadcast_lobby_update(lobby);
