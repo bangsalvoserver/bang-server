@@ -45,7 +45,6 @@ enum class command_permissions {
     lobby_playing,
     lobby_finished,
     lobby_in_game,
-    game_cheat,
 };
 
 using command_permission_bitset = enums::bitset<command_permissions>;

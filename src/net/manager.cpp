@@ -503,14 +503,6 @@ void game_manager::handle_message(client_messages::lobby_chat &&args, session_pt
                 throw lobby_error("ERROR_LOBBY_NOT_IN_GAME");
             }
 
-            if (permissions.check(command_permissions::game_cheat)) {
-                if (lobby.state != lobby_state::playing) {
-                    throw lobby_error("ERROR_LOBBY_NOT_PLAYING");
-                } else if (!options().enable_cheats) {
-                    throw lobby_error("ERROR_GAME_CHEATS_NOT_ENABLED");
-                }
-            }
-
             std::vector<std::string> args;
 
             if (space_pos != std::string::npos) {
@@ -613,13 +605,11 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
     auto guard = logging::push_context(std::format("game {}", lobby.name));
     lobby.m_game = std::make_unique<banggame::game>(lobby.options);
 
-    for (auto &&command : lobby.m_game->get_game_commands()) {
-        command_permission_bitset permissions { command_permissions::lobby_in_game };
-        if (command.cheat) permissions.add(command_permissions::game_cheat);
-
-        lobby.add_command(command.name, command.description, permissions, [&, fun=std::move(command.command)](session_ptr session, string_span args) {
-            fun(*this, lobby.find_user(session).user_id, args);
-        });
+    for (auto &&command : lobby.m_game->get_game_commands(m_options.enable_cheats)) {
+        lobby.add_command(command.name, command.description, command_permissions::lobby_in_game,
+            [&, fun=std::move(command.command)](session_ptr session, string_span args) {
+                fun(*this, lobby.find_user(session).user_id, args);
+            });
     }
 
     std::vector<int> user_ids;

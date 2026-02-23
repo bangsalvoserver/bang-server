@@ -8,13 +8,11 @@ namespace banggame {
     void game_manager::register_chat_commands(game_lobby &lobby) {
         lobby.add_command("help", "HELP_DESCRIPTION", {}, [&](session_ptr session) {
             for (const auto &command : lobby.m_commands) {
-                if (!command.permissions.check(command_permissions::game_cheat) || m_options.enable_cheats) {
-                    send_message(session->client, server_messages::lobby_chat{ 0,
-                        std::string{command.description},
-                        {chat_format_arg::string{std::format("{}{}", chat_command_start_char, command.name)}},
-                        lobby_chat_flag::translated
-                    });
-                }
+                send_message(session->client, server_messages::lobby_chat{ 0,
+                    std::string{command.description},
+                    {chat_format_arg::string{std::format("{}{}", chat_command_start_char, command.name)}},
+                    lobby_chat_flag::translated
+                });
             }
         });
 

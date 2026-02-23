@@ -15,7 +15,6 @@ namespace banggame {
         std::string_view name;
         std::string_view description;
         chat_command<game_manager &, int> command;
-        bool cheat;
     };
 
     struct game_interface {
@@ -30,7 +29,7 @@ namespace banggame {
         virtual void rejoin_user(int old_user_id, int new_user_id) = 0;
         virtual void start_game(std::span<int> user_ids) = 0;
         virtual bool is_game_over() const = 0;
-        virtual std::generator<game_command> get_game_commands() const = 0;
+        virtual std::generator<game_command> get_game_commands(bool enable_cheats) const = 0;
     };
 
     struct game : game_interface, game_table {
@@ -57,7 +56,7 @@ namespace banggame {
             return game_table::is_game_over();
         }
 
-        std::generator<game_command> get_game_commands() const override;
+        std::generator<game_command> get_game_commands(bool enable_cheats) const override;
 
         ticks get_total_update_time() const override;
         void send_request_update() override;
