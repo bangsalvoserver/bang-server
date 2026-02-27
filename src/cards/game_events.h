@@ -23,7 +23,7 @@ namespace banggame::event_type {
     };
 
     struct on_drawn_any_card {
-        nullable_ref<card_ptr> drawn_card;
+        card_ptr &drawn_card;
     };
 
     struct on_play_card {
@@ -52,7 +52,7 @@ namespace banggame::event_type {
 
     struct apply_maxcards_modifier {
         const_player_ptr origin;
-        nullable_ref<int> value;
+        int &value;
     };
 
     struct apply_immunity_modifier {
@@ -60,13 +60,13 @@ namespace banggame::event_type {
         player_ptr origin;
         const_player_ptr target;
         effect_flags flags;
-        nullable_ref<card_list> cards;
+        card_list &cards;
     };
     
     struct count_range_mod {
         const_player_ptr origin;
         range_mod_type type;
-        nullable_ref<int> value;
+        int &value;
     };
 
     struct count_initial_cards {
@@ -92,7 +92,7 @@ namespace banggame::event_type {
     struct check_character_modifier {
         using result_type = bool;
         player_ptr origin;
-        nullable_ref<card_set> handlers;
+        card_set &handlers;
     };
     
     struct check_revivers {

@@ -25,7 +25,7 @@ namespace banggame {
     namespace event_type {
         struct count_num_checks {
             const_player_ptr origin;
-            nullable_ref<int> num_checks;
+            int &num_checks;
         };
 
         struct on_draw_check_start {
