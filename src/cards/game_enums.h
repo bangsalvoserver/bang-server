@@ -1,7 +1,8 @@
 #ifndef __CARDS_GAME_ENUMS_H__
 #define __CARDS_GAME_ENUMS_H__
 
-#include "utils/enums.h"
+#include "utils/enum_bitset.h"
+#include "utils/misc.h"
 
 namespace banggame {
 
@@ -30,17 +31,32 @@ namespace banggame {
         multi_target,
         target_players,
     };
+
+    inline constexpr struct ignore_flag_t {} ignore_flag;
+
+    template<enums::enumeral T>
+    consteval enums::bitset<T> ignored_bitset() {
+        enums::bitset<T> result;
+        for (std::meta::info value : enums::enumerators<T>) {
+            if (has_annotation(value, ^^ignore_flag_t)) {
+                result.add(std::meta::extract<T>(value));
+            }
+        }
+        return result;
+    }
     
     enum class game_flag {
         game_over,
-        invert_rotation,
-        phase_one_draw_discard,
-        phase_one_override,
+        invert_rotation [[=ignore_flag]],
+        phase_one_draw_discard [[=ignore_flag]],
+        phase_one_override [[=ignore_flag]],
         disable_player_distances,
         showdown,
         hands_shown,
-        free_for_all,
+        free_for_all [[=ignore_flag]],
     };
+
+    static constexpr auto ignored_game_flags = ignored_bitset<game_flag>();
 
     enum class player_flag {
         dead,
@@ -48,21 +64,23 @@ namespace banggame {
         ghost_2,
         temp_ghost,
         shadow,
-        extra_turn,
+        extra_turn [[=ignore_flag]],
         stick_of_dynamite,
         treat_missed_as_bang,
         treat_any_as_bang,
         treat_any_as_missed,
         ignore_distances,
-        role_revealed,
+        role_revealed [[=ignore_flag]],
         show_hand_playing,
         skip_turn,
-        legend,
+        legend [[=ignore_flag]],
         removed,
         winner,
-        positive_karma,
-        negative_karma
+        positive_karma [[=ignore_flag]],
+        negative_karma [[=ignore_flag]],
     };
+
+    static constexpr auto ignored_player_flags = ignored_bitset<player_flag>();
 }
 
 #endif

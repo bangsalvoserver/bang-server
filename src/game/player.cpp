@@ -447,7 +447,9 @@ namespace banggame {
     bool player::add_player_flags(player_flag flags) {
         if (!check_player_flags(flags)) {
             m_player_flags.add(flags);
-            m_game->add_update(game_updates::player_flags{ this, m_player_flags });
+            if (!ignored_player_flags.check(flags)) {
+                m_game->add_update(game_updates::player_flags{ this, m_player_flags.exclude(ignored_player_flags) });
+            }
             return true;
         }
         return false;
@@ -456,7 +458,9 @@ namespace banggame {
     bool player::remove_player_flags(player_flag flags) {
         if (check_player_flags(flags)) {
             m_player_flags.remove(flags);
-            m_game->add_update(game_updates::player_flags{ this, m_player_flags });
+            if (!ignored_player_flags.check(flags)) {
+                m_game->add_update(game_updates::player_flags{ this, m_player_flags.exclude(ignored_player_flags) });
+            }
             return true;
         }
         return false;
