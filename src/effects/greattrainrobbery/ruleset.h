@@ -17,8 +17,8 @@ namespace banggame {
     namespace event_type {
         struct count_train_equips {
             player_ptr origin;
-            nullable_ref<int> num_cards;
-            nullable_ref<int> num_advance;
+            int &num_cards;
+            int &num_advance;
         };
         
         struct on_train_advance {

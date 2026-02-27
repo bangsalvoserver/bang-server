@@ -10,19 +10,6 @@
 template<typename ... Ts> struct overloaded : Ts ... { using Ts::operator() ...; };
 template<typename ... Ts> overloaded(Ts ...) -> overloaded<Ts ...>;
 
-template<typename T>
-class nullable_ref {
-private:
-    T *m_ptr = nullptr;
-
-public:
-    nullable_ref() = default;
-    nullable_ref(T &value): m_ptr{&value} {}
-
-    operator T &() const { return *m_ptr; }
-    operator const T &() const { return *m_ptr; }
-};
-
 template<typename T, typename Function>
 struct is_invocable_like;
 
