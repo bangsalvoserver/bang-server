@@ -1,17 +1,17 @@
 # bang-server
 
 **Repository:** [bangsalvoserver/bang-server](https://github.com/bangsalvoserver/bang-server)  
-**Language:** C++23  
+**Language:** c++26  
 **Visibility:** Public
 
 ## Overview
 
-This is the backend server for [bang.salvoserver.it](https://bang.salvoserver.it), an online implementation of the game **Bang!** with all expansions. The server is written in modern C++ (C++23) with a focus on minimal dependencies and high performance.
+This is the backend server for [bang.salvoserver.it](https://bang.salvoserver.it), an online implementation of the game **Bang!** with all expansions. The server is written in modern C++ (c++26) with a focus on minimal dependencies and high performance.
 
 ## Features
 
 - Online multiplayer game server for **Bang!** with all expansions
-- Written in modern C++23
+- Written in modern c++26
 - Minimal external dependencies:
   - [libuv](https://github.com/libuv/libuv)
   - [uWebSockets](https://github.com/uNetworking/uWebSockets)
@@ -25,7 +25,7 @@ This is the backend server for [bang.salvoserver.it](https://bang.salvoserver.it
 
 ### Prerequisites
 
-- Modern C++ compiler with C++23 support
+- Modern C++ compiler with c++26 support
 - Dependencies:
   - libuv
   - uWebSockets
