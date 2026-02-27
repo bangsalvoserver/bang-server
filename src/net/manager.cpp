@@ -6,6 +6,8 @@
 
 #include "utils/random_element.h"
 
+#include <iomanip>
+
 using namespace banggame;
 
 void game_manager::on_message(client_handle client, std::string_view msg) {
