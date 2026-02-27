@@ -77,7 +77,7 @@ namespace json {
             writer.StartArray();
             for (T v : enums::enum_values<T>) {
                 if (value.check(v)) {
-                    serialize(enums::to_string(v), writer);
+                    serialize(v, writer);
                 }
             }
             writer.EndArray();
@@ -95,6 +95,30 @@ namespace json {
                 ret.add(deserialize<T>(elem, ctx));
             }
             return ret;
+        }
+    };
+
+}
+
+namespace std {
+
+    template<enums::enumeral E>
+    struct formatter<enums::bitset<E>> : formatter<std::string_view> {
+        static constexpr std::string bitset_to_string(enums::bitset<E> value) {
+            std::string ret;
+            for (E v : enums::enum_values<E>) {
+                if (value.check(v)) {
+                    if (!ret.empty()) {
+                        ret += ' ';
+                    }
+                    ret.append(enums::to_string(v));
+                }
+            }
+            return ret;
+        }
+
+        auto format(enums::bitset<E> value, format_context &ctx) const {
+            return formatter<std::string_view>::format(bitset_to_string(value), ctx);
         }
     };
 

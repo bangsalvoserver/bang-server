@@ -30,7 +30,7 @@ namespace banggame {
                 if (card.image.contains('/')) {
                     images.emplace(card.image);
                 } else {
-                    images.emplace(std::format("{}/{}", enums::to_string(card.deck), card.image));
+                    images.emplace(std::format("{}/{}", card.deck, card.image));
                 }
             }
             switch (card.deck) {
@@ -39,7 +39,7 @@ namespace banggame {
             case card_deck_type::legends:
                 break;
             default:
-                images.emplace(std::format("backface/{}", enums::to_string(card.deck)));
+                images.emplace(std::format("backface/{}", card.deck));
             }
         }
 

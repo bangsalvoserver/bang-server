@@ -141,46 +141,4 @@ namespace utils {
 
 }
 
-namespace std {
-
-    template<typename Rep, typename Period>
-    struct formatter<std::chrono::duration<Rep, Period>> {
-        constexpr auto parse(format_parse_context &ctx) {
-            return ctx.begin();
-        }
-
-        auto format(const std::chrono::duration<Rep, Period> &value, format_context &ctx) const {
-            return format_to(ctx.out(), "{} {}", value.count(), utils::get_suffix(typename Period::type{}));
-        }
-    };
-
-    template<enums::enumeral E>
-    struct formatter<E> : formatter<std::string_view> {
-        auto format(E value, format_context &ctx) const {
-            return formatter<std::string_view>::format(enums::to_string(value), ctx);
-        }
-    };
-
-    template<enums::enumeral E>
-    struct formatter<enums::bitset<E>> : formatter<std::string_view> {
-        static constexpr std::string bitset_to_string(enums::bitset<E> value) {
-            std::string ret;
-            for (E v : enums::enum_values<E>) {
-                if (value.check(v)) {
-                    if (!ret.empty()) {
-                        ret += ' ';
-                    }
-                    ret.append(enums::to_string(v));
-                }
-            }
-            return ret;
-        }
-
-        auto format(enums::bitset<E> value, format_context &ctx) const {
-            return formatter<std::string_view>::format(bitset_to_string(value), ctx);
-        }
-    };
-
-}
-
 #endif

@@ -2,6 +2,7 @@
 #define __ENUMS_H__
 
 #include <reflect>
+#include <format>
 
 #include "json_serial.h"
 #include "static_map.h"
@@ -176,6 +177,17 @@ namespace json {
         }
     };
 
+}
+
+namespace std {
+
+    template<enums::enumeral E>
+    struct formatter<E> : formatter<std::string_view> {
+        auto format(E value, format_context &ctx) const {
+            return formatter<std::string_view>::format(enums::to_string(value), ctx);
+        }
+    };
+    
 }
 
 #endif
