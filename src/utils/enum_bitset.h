@@ -15,6 +15,8 @@ namespace enums {
     class bitset {
     private:
         bitset_int m_value = 0;
+
+        constexpr bitset(bitset_int value): m_value{value} {}
     
     public:
         constexpr bitset() = default;
@@ -54,6 +56,10 @@ namespace enums {
             return m_value == 0;
         }
 
+        constexpr operator bool() const {
+            return m_value != 0;
+        }
+
         constexpr bool check(T value) const {
             return (m_value & to_bit(value)) != 0;
         }
@@ -64,6 +70,10 @@ namespace enums {
 
         constexpr bool check_all(bitset value) const {
             return (m_value & value.m_value) == value.m_value;
+        }
+
+        constexpr bitset exclude(bitset other) const {
+            return bitset{m_value & ~other.m_value};
         }
     };
 

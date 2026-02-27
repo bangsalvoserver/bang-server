@@ -177,7 +177,9 @@ namespace banggame {
         yield_update(game_updates::player_add{ m_players });
 
         for (player_ptr p : m_players) {
-            yield_update(game_updates::player_flags{ p, p->m_player_flags });
+            if (auto flags = p->m_player_flags.exclude(ignored_player_flags)) {
+                yield_update(game_updates::player_flags{ p, flags });
+            }
         }
 
         yield_update(game_updates::player_order{ m_players, 0ms });
@@ -264,7 +266,9 @@ namespace banggame {
             }
         }
 
-        yield_update(game_updates::game_flags{ m_game_flags });
+        if (auto flags = m_game_flags.exclude(ignored_game_flags)) {
+            yield_update(game_updates::game_flags{ flags });
+        }
     }
 
     void game::get_rejoin_updates(int user_id, consumer_callback<update_content> callback) {
