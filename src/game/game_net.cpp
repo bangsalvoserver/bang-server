@@ -167,9 +167,6 @@ namespace json {
 
     };
 
-    template<> struct serializer<banggame::game_string, banggame::game_context>
-        : aggregate_serializer<banggame::game_string_args, banggame::game_context> {};
-
     template<> struct serializer<banggame::animation_duration, banggame::game_context> {
         static void write(const banggame::animation_duration &duration, string_writer &writer, const banggame::game_context &context) {
             serialize(context.transform_duration(duration.get()), writer, context);

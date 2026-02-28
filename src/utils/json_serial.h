@@ -8,10 +8,14 @@
 
 #include <vector>
 #include <chrono>
+#include <variant>
 #include <stdexcept>
+#include <format>
 #include <meta>
 
 #include "range_utils.h"
+#include "static_map.h"
+#include "misc.h"
 
 namespace json {
 
@@ -68,6 +72,17 @@ namespace json {
     inline constexpr struct ignore_t {} ignore;
 
     inline constexpr struct transparent_t {} transparent;
+
+    inline constexpr struct as_aggregate_t {} as_aggregate;
+
+    template<typename T>
+    concept aggregate = std::is_aggregate_v<T> || has_annotation(^^T, ^^as_aggregate_t);
+
+    template<typename T>
+    static constexpr auto fields_of = std::define_static_array(
+        std::meta::nonstatic_data_members_of(^^T, std::meta::access_context::current())
+        | rv::filter([](std::meta::info field) { return !has_annotation(field, ^^ignore_t); })
+    );
 
     template<typename T, typename Context = no_context>
     void serialize(const T &value, string_writer &writer, const Context &context = {}) {
@@ -226,6 +241,59 @@ namespace json {
                 (serialize(std::get<Is>(value), writer, ctx), ...);
             }(std::index_sequence_for<Ts ...>());
             writer.EndArray();
+        }
+    };
+    
+    template<typename T, typename Context>
+    struct aggregate_serializer {
+        static constexpr auto fields = fields_of<T>;
+
+        static void write_fields(const T &value, string_writer &writer, const Context &ctx) {
+            template for (constexpr auto field : fields) {
+                std::string_view key = std::meta::identifier_of(field);
+                writer.Key(key.data(), key.size());
+                serialize(value.[:field:], writer, ctx);
+            }
+        }
+
+        static void write(const T &value, string_writer &writer, const Context &ctx) {
+            if constexpr (has_annotation(^^T, ^^transparent_t)) {
+                if constexpr (fields.size() == 1) {
+                    serialize(value.[:fields[0]:], writer, ctx);
+                } else {
+                    writer.StartArray();
+                    template for (constexpr auto field : fields) {
+                        serialize(value.[:field:], writer, ctx);
+                    }
+                    writer.EndArray();
+                }
+            } else {
+                writer.StartObject();
+                write_fields(value, writer, ctx);
+                writer.EndObject();
+            }
+        }
+    };
+
+    template<aggregate T, typename Context>
+    struct serializer<T, Context> : aggregate_serializer<T, Context> {};
+    
+    template<typename Context, typename ... Ts>
+    struct serializer<std::variant<Ts ...>, Context> {
+        using variant_type = std::variant<Ts ...>;
+
+        static void write(const variant_type &value, string_writer &writer, const Context &ctx) {
+            std::visit([&](const auto &inner_value) {
+                writer.StartObject();
+
+                using value_type = std::remove_cvref_t<decltype(inner_value)>;
+                auto key = type_name<value_type>;
+                writer.Key(key.data(), key.size());
+
+                serialize(inner_value, writer, ctx);
+
+                writer.EndObject();
+            }, value);
         }
     };
 
@@ -389,6 +457,104 @@ namespace json {
             return [&]<size_t ... Is>(std::index_sequence<Is ...>) {
                 return std::make_tuple(deserialize<Ts>(value_array[Is], ctx) ...);
             }(std::index_sequence_for<Ts ...>());
+        }
+    };
+
+    template<typename T, typename Context>
+    struct aggregate_deserializer {
+        static constexpr auto fields = fields_of<T>;
+
+        template<std::meta::info field>
+        static void deserialize_field(T &result, const json &value, const Context &ctx) {
+            static constexpr auto name = std::meta::identifier_of(field);
+            auto &field_value = result.[:field:];
+            using field_type = std::remove_reference_t<decltype(field_value)>;
+            json key(rapidjson::StringRef(name.data(), name.size()));
+            if (auto it = value.FindMember(key); it != value.MemberEnd()) {
+                field_value = deserialize<field_type>(it->value, ctx);
+            } else {
+                throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", type_name<T>, name));
+            }
+        }
+
+        template<std::meta::info field>
+        static void deserialize_transparent_field(T &result, const json &value, const Context &ctx) {
+            auto &field_value = result.[:field:];
+            using field_type = std::remove_reference_t<decltype(field_value)>;
+            field_value = deserialize<field_type>(value, ctx);
+        }
+
+        static T read(const json &value, const Context &ctx) {
+            if constexpr (has_annotation(^^T, ^^transparent_t)) {
+                if constexpr (fields.size() == 1) {
+                    T result{};
+                    auto &field_value = result.[:fields[0]:];
+                    using field_type = std::remove_reference_t<decltype(field_value)>;
+                    field_value = deserialize<field_type>(value, ctx);
+                    return result;
+                } else {
+                    if (!value.IsArray()) {
+                        throw deserialize_error(std::format("Cannot deserialize {}: value is not an array", type_name<T>));
+                    }
+                    const auto &value_array = value.GetArray();
+                    if (value_array.Size() != fields.size()) {
+                        throw deserialize_error(std::format("Cannot deserialize {}: invalid size", type_name<T>));
+                    }
+                    T result{};
+                    size_t i = 0;
+                    template for (constexpr auto field : fields) {
+                        deserialize_transparent_field<field>(result, value_array[i], ctx);
+                        ++i;
+                    }
+                    return result;
+                }
+            } else {
+                if (!value.IsObject()) {
+                    throw deserialize_error(std::format("Cannot deserialize {}: value is not an object", type_name<T>));
+                }
+                T result{};
+                template for (constexpr auto field : fields) {
+                    deserialize_field<field>(result, value, ctx);
+                }
+                return result;
+            }
+        }
+    };
+    
+    template<aggregate T, typename Context>
+    struct deserializer<T, Context> : aggregate_deserializer<T, Context> {};
+
+    template<typename Context, typename ... Ts>
+    struct deserializer<std::variant<Ts ...>, Context> {
+        using variant_type = std::variant<Ts ...>;
+        
+        static variant_type read(const json &value, const Context &ctx) {
+            if (!value.IsObject()) {
+                throw deserialize_error("Cannot deserialize tagged variant: value is not an object");
+            }
+            if (value.MemberCount() != 1) {
+                throw deserialize_error("Cannot deserialize tagged variant: object must contain only one key");
+            }
+
+            using deserialize_fun = variant_type (*)(const json &inner_value, const Context &ctx);
+            static constexpr auto vtable = utils::make_static_map<std::string_view, deserialize_fun>({
+                {
+                    type_name<Ts>,
+                    [](const json &inner_value, const Context &ctx) -> variant_type {
+                        return deserialize<Ts>(inner_value, ctx);
+                    }
+                } ...
+            });
+
+            auto key_it = value.MemberBegin();
+            std::string_view key{key_it->name.GetString(), key_it->name.GetStringLength()};
+
+            auto it = vtable.find(key);
+            if (it == vtable.end()) {
+                throw deserialize_error(std::format("Invalid variant type: {}", key));
+            }
+
+            return it->second(key_it->value, ctx);
         }
     };
 }

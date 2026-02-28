@@ -4,7 +4,6 @@
 #include "tracking.h"
 #include "image_registry.h"
 
-#include "utils/json_aggregate.h"
 #include "utils/parse_string.h"
 #include "utils/misc.h"
 

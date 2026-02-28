@@ -2,9 +2,6 @@
 
 #include "cards/vtables.h"
 
-#include "utils/json_aggregate.h"
-#include "utils/tagged_variant.h"
-
 namespace banggame {
     
     std::string serialize_message(const server_message &message) {
