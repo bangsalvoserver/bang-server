@@ -123,20 +123,18 @@ namespace banggame {
         }
         return { list->args[index], static_cast<format_arg_type>(result % 3) };
     }
-    
-    struct game_string_args {
+
+    struct [[=json::as_aggregate]] game_string {
         const char *format_str = nullptr;
         format_arg_list format_args;
-    };
 
-    struct game_string : game_string_args {
         game_string() = default;
     
         template<size_t N, typename ... Ts>
-        game_string(const char (&message)[N], Ts && ... args) : game_string_args{
-            .format_str{message},
-            .format_args{format_arg_list::make_value(args)...}
-        } {
+        game_string(const char (&message)[N], Ts && ... args)
+            : format_str{message}
+            , format_args{format_arg_list::make_value(args)...}
+        {
             static_assert(sizeof...(Ts) <= format_arg_list_max_size, "too many args in game_string");
         }
 

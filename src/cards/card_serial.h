@@ -3,9 +3,6 @@
 
 #include "card_fwd.h"
 
-#include "utils/json_aggregate.h"
-#include "utils/tagged_variant.h"
-
 namespace banggame {
     struct game_context {
         virtual card_ptr find_card(int card_id) const = 0;
