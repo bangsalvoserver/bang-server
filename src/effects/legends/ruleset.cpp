@@ -13,6 +13,8 @@
 #include "game/game_table.h"
 #include "game/expansion_set.h"
 
+#include <meta>
+
 namespace banggame {
 
     bool is_legend(const_player_ptr origin) {
@@ -198,10 +200,20 @@ namespace banggame {
         }
     };
 
+    consteval auto get_fame_tokens() {
+        static constexpr auto tokens = std::define_static_array(
+            enums::enum_values<card_token_type> | rv::filter(is_fame_token)
+        );
+
+        std::array<card_token_type, tokens.size()> result;
+        rn::copy(tokens, result.begin());
+        return result;
+    }
+
     void ruleset_legends::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 0}, [](player_ptr origin) {
-            auto tokens = filter_static_array<enums::enum_values<card_token_type>, is_fame_token>();
-
+            auto tokens = get_fame_tokens();
+            
             rn::shuffle(tokens, origin->m_game->rng);
 
             for (auto [token_type, target] : rv::zip(tokens, origin->m_game->range_all_players(origin))) {
