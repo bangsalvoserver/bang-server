@@ -37,13 +37,18 @@ namespace banggame {
         destroy_flags flags{};
         origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, false, flags });
         origin->m_game->queue_action([=]{
+            // In some rare cases the target player can die during the effect of "steal"
+            // in this case we ignore the effect
             if (player_ptr target_player = target_card->owner) {
                 if (origin->alive()) {
+                    // If the origin player is alive he steals the card normally
                     if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
                         origin->m_game->add_log(update_target::includes(origin, target_player), "LOG_STOLEN_CARD", origin, target_player, target_card);
                     }
                     origin->steal_card(target_card);
                 } else if (!flags.check(destroy_flag::ignore_if_dead)) {
+                    // If the origin player dies during this effect we check if we interacted with Henry Block
+                    // (the rules state that if Henry kills his target during his effect the panic effect is not resolved)
                     if (origin != target_player && target_card->get_visibility() != card_visibility::shown) {
                         origin->m_game->add_log("LOG_DISCARDED_CARD", origin, target_player, target_card);
                     }

@@ -2,6 +2,7 @@
 
 #include "effects/base/damage.h"
 #include "effects/base/pick.h"
+#include "effects/base/steal_destroy.h"
 
 #include "game/game_table.h"
 #include "game/bot_suggestion.h"
@@ -9,15 +10,26 @@
 namespace banggame {
 
     static void saved_steal_cards(player_ptr target, player_ptr saved) {
-        for (int i=0; i<2 && !saved->empty_hand(); ++i) {
-            card_ptr stolen_card = saved->random_hand_card();
-            if (stolen_card->get_visibility() != card_visibility::shown) {
-                target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
-                target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
-            } else {
-                target->m_game->add_log("LOG_STOLEN_CARD", target, saved, stolen_card);
-            }
-            target->steal_card(stolen_card);
+        for (int i=0; i<2; ++i) {
+            target->m_game->queue_action([=]{
+                if (target->alive() && saved->alive() && !saved->empty_hand()) {
+                    card_ptr stolen_card = saved->random_hand_card();
+
+                    destroy_flags flags{};
+                    target->m_game->call_event(event_type::on_destroy_card{ target, stolen_card, false, flags });
+                    target->m_game->queue_action([=]{
+                        if (target->alive() && saved->alive() && stolen_card->owner == saved) {
+                            if (stolen_card->get_visibility() != card_visibility::shown) {
+                                target->m_game->add_log(update_target::includes(target, saved), "LOG_STOLEN_CARD", target, saved, stolen_card);
+                                target->m_game->add_log(update_target::excludes(target, saved), "LOG_STOLEN_CARD_FROM_HAND", target, saved);
+                            } else {
+                                target->m_game->add_log("LOG_STOLEN_CARD", target, saved, stolen_card);
+                            }
+                            target->steal_card(stolen_card);
+                        }
+                    }, 42);
+                }
+            }, 40);
         }
     }
     
@@ -144,9 +156,7 @@ namespace banggame {
 
         if (fatal) {
             origin->m_game->queue_action([=]{
-                if (origin->alive() && saved->alive()) {
-                    saved_steal_cards(origin, saved);
-                }
+                saved_steal_cards(origin, saved);
             });
         }
     }
