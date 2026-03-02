@@ -67,6 +67,8 @@ namespace json {
 
     inline constexpr struct ignore_t {} ignore;
 
+    inline constexpr struct transparent_t {} transparent;
+
     template<typename T, typename Context = no_context>
     void serialize(const T &value, string_writer &writer, const Context &context = {}) {
         using serializer_type = serializer<T, Context>;

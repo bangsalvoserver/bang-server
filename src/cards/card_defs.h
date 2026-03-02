@@ -245,8 +245,7 @@ namespace banggame {
             card_ptr value;
         };
 
-        struct repeat_card {
-            struct serialize_context{};
+        struct [[=serialize_context]] repeat_card {
             card_ptr value;
         };
 
