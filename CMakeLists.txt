@@ -28,11 +28,6 @@ add_library(banglibs INTERFACE)
 add_subdirectory(external/uwebsockets)
 target_link_libraries(banglibs INTERFACE uwebsockets)
 
-# reflect
-
-add_subdirectory(external/reflect)
-target_link_libraries(banglibs INTERFACE reflect)
-
 # sqlite
 
 find_package(SQLite3 REQUIRED)

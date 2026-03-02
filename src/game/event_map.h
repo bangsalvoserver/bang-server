@@ -1,7 +1,6 @@
 #ifndef __EVENTS_H__
 #define __EVENTS_H__
 
-#include <reflect>
 #include <typeindex>
 #include <functional>
 #include <memory>
@@ -13,14 +12,13 @@
 namespace banggame {
 
     template<typename T>
-    auto to_event_tuple(const T &value) {
-        return reflect::to<std::tuple>(value);
-    }
+    concept event = std::is_aggregate_v<T>;
 
-    template<typename T>
-    concept event = requires (const T &value) {
-        to_event_tuple(value);
-    };
+    template<event T>
+    auto to_event_tuple(const T &value) {
+        const auto &[...fields] = value;
+        return std::tie(fields...);
+    }
 
     template<event T>
     using event_tuple = decltype(to_event_tuple(std::declval<const T &>()));

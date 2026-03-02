@@ -2,7 +2,6 @@
 #define __TAGGED_VARIANT_H__
 
 #include <variant>
-#include <reflect>
 
 #include "json_serial.h"
 #include "static_map.h"
@@ -17,7 +16,8 @@ namespace json {
             std::visit([&](const auto &inner_value) {
                 writer.StartObject();
 
-                auto key = reflect::type_name<std::remove_cvref_t<decltype(inner_value)>>();
+                using value_type = std::remove_cvref_t<decltype(inner_value)>;
+                auto key = type_name<value_type>;
                 writer.Key(key.data(), key.size());
 
                 serialize(inner_value, writer, ctx);
@@ -42,7 +42,7 @@ namespace json {
             using deserialize_fun = variant_type (*)(const json &inner_value, const Context &ctx);
             static constexpr auto vtable = utils::make_static_map<std::string_view, deserialize_fun>({
                 {
-                    reflect::type_name<Ts>(),
+                    type_name<Ts>,
                     [](const json &inner_value, const Context &ctx) -> variant_type {
                         return deserialize<Ts>(inner_value, ctx);
                     }
