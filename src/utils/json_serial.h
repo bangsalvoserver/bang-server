@@ -9,6 +9,7 @@
 #include <vector>
 #include <chrono>
 #include <stdexcept>
+#include <meta>
 
 #include "range_utils.h"
 
@@ -63,6 +64,8 @@ namespace json {
     };
 
     struct no_context {};
+
+    inline constexpr struct ignore_t {} ignore;
 
     template<typename T, typename Context = no_context>
     void serialize(const T &value, string_writer &writer, const Context &context = {}) {

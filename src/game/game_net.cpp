@@ -38,10 +38,6 @@ namespace json {
         }
     };
 
-    template<typename Context> struct serializer<const void *, Context> {
-        struct skip_field{};
-    };
-
     template<typename Context> struct serializer<banggame::effect_holder, Context> {
         static void write(const banggame::effect_holder &effect, string_writer &writer, const Context &ctx) {
             using serializer_type = aggregate_serializer<banggame::effect_holder, Context>;
