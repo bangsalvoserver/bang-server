@@ -29,7 +29,7 @@ namespace json {
         }
 
         static void write(const T &value, string_writer &writer, const Context &ctx) {
-            if constexpr (requires { typename T::transparent; }) {
+            if constexpr (has_annotation(^^T, ^^transparent_t)) {
                 static constexpr bool one_field = fields.size() == 1;
                 if constexpr (!one_field) {
                     writer.StartArray();

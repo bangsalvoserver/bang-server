@@ -41,13 +41,11 @@ namespace banggame {
     namespace token_positions {
         struct table {};
 
-        struct card {
-            struct transparent{};
+        struct [[=json::transparent]] card {
             card_ptr card;
         };
 
-        struct player {
-            struct transparent{};
+        struct [[=json::transparent]] player {
             player_ptr player;
         };
     }
@@ -65,18 +63,15 @@ namespace banggame {
             std::vector<sound_id> sounds;
         };
 
-        struct game_error {
-            struct transparent{};
+        struct [[=json::transparent]] game_error {
             game_string message;
         };
 
-        struct game_log {
-            struct transparent{};
+        struct [[=json::transparent]] game_log {
             game_string message;
         };
 
-        struct game_prompt {
-            struct transparent{};
+        struct [[=json::transparent]] game_prompt {
             game_string message;
         };
 
@@ -182,8 +177,7 @@ namespace banggame {
             banggame::player_flags flags;
         };
 
-        struct switch_turn {
-            struct transparent{};
+        struct [[=json::transparent]] switch_turn {
             player_ptr player;
         };
 
@@ -221,13 +215,11 @@ namespace banggame {
             player_distances distances;
         };
 
-        struct game_flags {
-            struct transparent{};
+        struct [[=json::transparent]] game_flags {
             banggame::game_flags flags;
         };
 
-        struct play_sound {
-            struct transparent{};
+        struct [[=json::transparent]] play_sound {
             sound_id sound;
         };
 

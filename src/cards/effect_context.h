@@ -27,6 +27,8 @@ namespace banggame {
     template<typename T>
     using unwrapped_t = std::remove_cvref_t<decltype(unwrap_value(std::declval<T>()))>;
 
+    inline constexpr struct serialize_context_t {} serialize_context;
+
     class context_entry {
     private:
         using serialize_fun_t = void (*)(const context_entry &self, json::string_writer &writer);
@@ -36,7 +38,7 @@ namespace banggame {
 
         template<typename T>
         static constexpr serialize_fun_t make_serialize_fun() {
-            if constexpr (requires { typename T::serialize_context; }) {
+            if constexpr (has_annotation(^^T, ^^serialize_context_t)) {
                 return [](const context_entry &self, json::string_writer &writer) {
                     auto key = type_name<T>;
                     writer.Key(key.data(), key.size());

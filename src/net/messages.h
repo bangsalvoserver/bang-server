@@ -21,13 +21,11 @@ namespace banggame {
             id_type session_id;
         };
 
-        struct user_set_name {
-            struct transparent{};
+        struct [[=json::transparent]] user_set_name {
             std::string username;
         };
 
-        struct user_set_propic {
-            struct transparent{};
+        struct [[=json::transparent]] user_set_propic {
             image_pixels propic;
         };
         
@@ -37,8 +35,7 @@ namespace banggame {
             game_options options;
         };
 
-        struct lobby_game_options {
-            struct transparent{};
+        struct [[=json::transparent]] lobby_game_options {
             game_options options;
         };
 
@@ -55,8 +52,7 @@ namespace banggame {
 
         struct lobby_return {};
 
-        struct user_spectate {
-            struct transparent{};
+        struct [[=json::transparent]] user_spectate {
             bool spectator;
         };
 
@@ -66,8 +62,7 @@ namespace banggame {
             int user_id;
         };
 
-        struct game_action {
-            struct transparent{};
+        struct [[=json::transparent]] game_action {
             json::json_document action;
         };
     }
@@ -120,18 +115,15 @@ namespace banggame {
     };
 
     namespace chat_format_arg {
-        struct user {
-            struct transparent{};
+        struct [[=json::transparent]] user {
             int value;
         };
 
-        struct integer {
-            struct transparent{};
+        struct [[=json::transparent]] integer {
             int value;
         };
 
-        struct string {
-            struct transparent{};
+        struct [[=json::transparent]] string {
             std::string value;
         };
     }
@@ -144,8 +136,7 @@ namespace banggame {
             id_type session_id;
         };
 
-        struct lobby_error {
-            struct transparent{};
+        struct [[=json::transparent]] lobby_error {
             std::string message;
         };
 
@@ -166,8 +157,7 @@ namespace banggame {
             game_options options;
         };
 
-        struct lobby_game_options {
-            struct transparent{};
+        struct [[=json::transparent]] lobby_game_options {
             game_options options;
         };
 
@@ -198,8 +188,7 @@ namespace banggame {
             lobby_chat_flags flags;
         };
 
-        struct game_update {
-            struct transparent{};
+        struct [[=json::transparent]] game_update {
             json::raw_string update;
         };
 
