@@ -91,8 +91,10 @@ namespace banggame {
                 if (bot_suggestion::is_target_friend(owner, target)) {
                     return "BOT_DONT_REDRAW_FRIEND";
                 }
-            } else if (bot_suggestion::is_target_enemy(owner, target, true)) {
-                return "BOT_DONT_REDRAW_ENEMY";
+            } else {
+                if (bot_suggestion::is_target_enemy(owner, target)) {
+                    return "BOT_DONT_REDRAW_ENEMY";
+                }
             }
         }
         return {};
