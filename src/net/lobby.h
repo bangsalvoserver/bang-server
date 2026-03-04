@@ -48,11 +48,12 @@ enum class command_permissions {
 
 using command_permission_bitset = enums::bitset<command_permissions>;
 
-struct lobby_command {
-    std::string_view name;
-    std::string_view description;
+struct lobby_command : chat_command {
     command_permission_bitset permissions;
-    chat_command command;
+
+    lobby_command(chat_command &&command, command_permission_bitset permissions)
+        : chat_command{std::move(command)}
+        , permissions{permissions} {}
 };
 
 namespace connection_state {
@@ -159,8 +160,8 @@ struct game_lobby {
 
     lobby_security get_security(session_ptr owner) const;
 
-    void add_command(std::string_view name, std::string_view description, command_permission_bitset permissions, chat_command command) {
-        m_commands.emplace_back(name, description, permissions, std::move(command));
+    void add_command(chat_command command, command_permission_bitset permissions = {}) {
+        m_commands.emplace_back(std::move(command), permissions);
     }
 
     void broadcast_message(const server_message &msg);

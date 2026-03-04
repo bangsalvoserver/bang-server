@@ -3,32 +3,9 @@
 
 #include "game_table.h"
 
-#include "net/chat_command.h"
-
-#include <generator>
+#include "net/game_interface.h"
 
 namespace banggame {
-
-    struct game_command {
-        std::string_view name;
-        std::string_view description;
-        chat_command command;
-    };
-
-    struct game_interface {
-        virtual ~game_interface() = default;
-
-        virtual void tick() = 0;
-        virtual bool pending_updates() const = 0;
-        virtual std::generator<std::pair<int, json::raw_string>> get_pending_updates(std::span<const int> user_ids) = 0;
-        virtual std::generator<json::raw_string> get_spectator_join_updates() = 0;
-        virtual std::generator<json::raw_string> get_rejoin_updates(int user_id) = 0;
-        virtual void handle_game_action(int user_id, const json::json &action) = 0;
-        virtual void rejoin_user(int old_user_id, int new_user_id) = 0;
-        virtual void start_game(std::span<int> user_ids) = 0;
-        virtual bool is_game_over() const = 0;
-        virtual std::generator<game_command> get_game_commands(bool enable_cheats) const = 0;
-    };
 
     struct game : game_interface, game_table {
         using game_table::game_table;
@@ -36,14 +13,10 @@ namespace banggame {
         void tick() override {
             game_table::tick();
         }
-
-        bool pending_updates() const override {
-            return !m_updates.empty();
-        }
         
-        std::generator<std::pair<int, json::raw_string>> get_pending_updates(std::span<const int> user_ids) override;
-        std::generator<json::raw_string> get_spectator_join_updates() override;
-        std::generator<json::raw_string> get_rejoin_updates(int user_id) override;
+        void get_pending_updates(std::span<const int> user_ids, consumer_callback<int, update_content> callback) override;
+        void get_spectator_join_updates(consumer_callback<update_content> callback) override;
+        void get_rejoin_updates(int user_id, consumer_callback<update_content> callback) override;
 
         void handle_game_action(int user_id, const json::json &action) override;
 
@@ -54,7 +27,7 @@ namespace banggame {
             return game_table::is_game_over();
         }
 
-        std::generator<game_command> get_game_commands(bool enable_cheats) const override;
+        void get_game_commands(bool enable_cheats, consumer_callback<chat_command> callback) const override;
 
         ticks get_total_update_time() const override;
         void send_request_update() override;

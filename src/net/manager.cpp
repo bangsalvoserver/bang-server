@@ -104,11 +104,9 @@ void game_manager::tick() {
                     lobby.m_game->tick();
                 }
 
-                if (lobby.m_game->pending_updates()) {
-                    for (auto &&[target_id, update] : lobby.m_game->get_pending_updates(lobby.connected_user_ids)) {
-                        send_message(lobby.find_user(target_id).session->client, server_messages::game_update{ std::move(update) });
-                    }
-                }
+                lobby.m_game->get_pending_updates(lobby.connected_user_ids, [&](int user_id, update_content update) {
+                    send_message(lobby.find_user(user_id).session->client, server_messages::game_update{ std::move(update) });
+                });
 
                 if (lobby.m_game->is_game_over()) {
                     lobby.state = lobby_state::finished;
@@ -304,12 +302,12 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
     if (lobby.m_game) {
         send_message(session->client, server_messages::game_started{});
 
-        for (json::raw_string &&update : lobby.m_game->get_spectator_join_updates()) {
+        lobby.m_game->get_spectator_join_updates([&](update_content update) {
             send_message(session->client, server_messages::game_update{ std::move(update) });
-        }
-        for (json::raw_string &&update : lobby.m_game->get_rejoin_updates(new_user.user_id)) {
+        });
+        lobby.m_game->get_rejoin_updates(new_user.user_id, [&](update_content update) {
             send_message(session->client, server_messages::game_update{ std::move(update) });
-        }
+        });
     }
 
     broadcast_lobby_update(lobby);
@@ -431,8 +429,7 @@ void game_manager::handle_message(client_messages::lobby_chat &&args, session_pt
                 throw lobby_error("INVALID_COMMAND_NAME");
             }
 
-            auto &permissions = cmd_it->permissions;
-            auto &command = cmd_it->command;
+            auto permissions = cmd_it->permissions;
 
             game_user &user = lobby.find_user(session);
 
@@ -467,7 +464,7 @@ void game_manager::handle_message(client_messages::lobby_chat &&args, session_pt
                 }
             }
 
-            command(lobby, user.user_id, args);
+            (*cmd_it)(lobby, user.user_id, args);
         }
     }
 }
@@ -558,9 +555,9 @@ void game_manager::handle_message(client_messages::game_start &&args, session_pt
     auto guard = logging::push_context(std::format("game {}", lobby.name));
     lobby.m_game = std::make_unique<banggame::game>(lobby.options);
 
-    for (auto &&command : lobby.m_game->get_game_commands(m_options.enable_cheats)) {
-        lobby.add_command(command.name, command.description, command_permissions::lobby_in_game, std::move(command.command));
-    }
+    lobby.m_game->get_game_commands(m_options.enable_cheats, [&](chat_command command) {
+        lobby.add_command(std::move(command), command_permissions::lobby_in_game);
+    });
 
     std::vector<int> user_ids;
     for (const game_user &user : lobby.connected_users()) {
@@ -617,9 +614,9 @@ void game_manager::handle_message(client_messages::game_rejoin &&args, session_p
     lobby.remove_user_flag(user, game_user_flag::spectator);
     lobby.m_game->rejoin_user(args.user_id, user.user_id);
     
-    for (json::raw_string &&update : lobby.m_game->get_rejoin_updates(user.user_id)) {
+    lobby.m_game->get_rejoin_updates(user.user_id, [&](update_content update) {
         send_message(session->client, server_messages::game_update{ std::move(update) });
-    }
+    });
 
     broadcast_lobby_update(lobby);
 }
