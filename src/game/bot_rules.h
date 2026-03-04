@@ -5,28 +5,13 @@
 #include "cards/filter_enums.h"
 
 #include "utils/fixed_string.h"
+#include "utils/function_ref.h"
 
 namespace banggame {
     struct playable_card_info;
     using card_node = const playable_card_info *;
 
-    class bot_rule {
-    private:
-        const void *data;
-        bool (*thunk)(const void *, card_node);
-    
-    public:
-        template<std::predicate<card_node> Function>
-        bot_rule(const Function &fn)
-            : data{&fn}
-            , thunk{[](const void *data, card_node node) {
-                return std::invoke(*static_cast<const Function *>(data), node);
-            }} {}
-    
-        bool operator()(card_node node) const {
-            return (*thunk)(data, node);
-        }
-    };
+    using bot_rule = utils::function_ref<bool(card_node)>;
 
     template<utils::fixed_string Name>
     struct bot_rule_map;
