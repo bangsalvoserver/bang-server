@@ -5,13 +5,12 @@
 #include "cards/filter_enums.h"
 
 #include "utils/fixed_string.h"
-#include "utils/function_ref.h"
 
 namespace banggame {
     struct playable_card_info;
     using card_node = const playable_card_info *;
 
-    using bot_rule = utils::function_ref<bool(card_node)>;
+    using bot_rule = std::function_ref<bool(card_node)>;
 
     template<utils::fixed_string Name>
     struct bot_rule_map;
