@@ -75,6 +75,13 @@ namespace json {
 
     inline constexpr struct as_aggregate_t {} as_aggregate;
 
+    struct rename {
+        const char *name;
+
+        template<size_t N>
+        constexpr rename(const char (&name)[N]): name{std::define_static_string(name)} {}
+    };
+
     template<typename T>
     concept aggregate = std::is_aggregate_v<T> || has_annotation(^^T, ^^as_aggregate_t);
 
@@ -83,6 +90,15 @@ namespace json {
         std::meta::nonstatic_data_members_of(^^T, std::meta::access_context::current())
         | rv::filter([](std::meta::info field) { return !has_annotation(field, ^^ignore_t); })
     );
+
+    inline consteval std::string_view get_name_of(std::meta::info info) {
+        for (auto annotation : std::meta::annotations_of(info)) {
+            if (std::meta::remove_cv(std::meta::type_of(annotation)) == ^^rename) {
+                return std::string_view{std::meta::extract<rename>(annotation).name};
+            }
+        }
+        return std::meta::identifier_of(info);
+    }
 
     template<typename T, typename Context = no_context>
     void serialize(const T &value, string_writer &writer, const Context &context = {}) {
@@ -250,7 +266,7 @@ namespace json {
 
         static void write_fields(const T &value, string_writer &writer, const Context &ctx) {
             template for (constexpr auto field : fields) {
-                std::string_view key = std::meta::identifier_of(field);
+                std::string_view key = get_name_of(field);
                 writer.Key(key.data(), key.size());
                 serialize(value.[:field:], writer, ctx);
             }
@@ -283,11 +299,10 @@ namespace json {
         using variant_type = std::variant<Ts ...>;
 
         static void write(const variant_type &value, string_writer &writer, const Context &ctx) {
-            std::visit([&](const auto &inner_value) {
+            std::visit([&]<typename T>(const T &inner_value) {
                 writer.StartObject();
 
-                using value_type = std::remove_cvref_t<decltype(inner_value)>;
-                auto key = type_name<value_type>;
+                std::string_view key = get_name_of(^^T);
                 writer.Key(key.data(), key.size());
 
                 serialize(inner_value, writer, ctx);
@@ -466,14 +481,14 @@ namespace json {
 
         template<std::meta::info field>
         static void deserialize_field(T &result, const json &value, const Context &ctx) {
-            static constexpr auto name = std::meta::identifier_of(field);
+            std::string_view key = get_name_of(field);
             auto &field_value = result.[:field:];
             using field_type = std::remove_reference_t<decltype(field_value)>;
-            json key(rapidjson::StringRef(name.data(), name.size()));
-            if (auto it = value.FindMember(key); it != value.MemberEnd()) {
+            json json_key(rapidjson::StringRef(key.data(), key.size()));
+            if (auto it = value.FindMember(json_key); it != value.MemberEnd()) {
                 field_value = deserialize<field_type>(it->value, ctx);
             } else {
-                throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", type_name<T>, name));
+                throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", type_name<T>, key));
             }
         }
 
@@ -539,7 +554,7 @@ namespace json {
             using deserialize_fun = variant_type (*)(const json &inner_value, const Context &ctx);
             static constexpr auto vtable = utils::make_static_map<std::string_view, deserialize_fun>({
                 {
-                    type_name<Ts>,
+                    get_name_of(^^Ts),
                     [](const json &inner_value, const Context &ctx) -> variant_type {
                         return deserialize<Ts>(inner_value, ctx);
                     }

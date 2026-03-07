@@ -5,19 +5,19 @@
 
 namespace banggame {
 
-    struct targeting_move_cube_slot {
+    struct targeting_move_cube_slot_args {
+        [[=json::rename("max_cubes")]]
+        int ncubes;
+    };
+
+    struct targeting_move_cube_slot : targeting_move_cube_slot_args {
         using value_type = card_list;
 
-        int ncubes;
-
         targeting_move_cube_slot(target_args::empty, int ncubes)
-            : ncubes{ncubes} {}
+            : targeting_move_cube_slot_args{ncubes} {}
         
-        auto get_args() const {
-            struct args {
-                int max_cubes;
-            };
-            return args{ ncubes };
+        const auto &get_args() const {
+            return static_cast<const targeting_move_cube_slot_args &>(*this);
         }
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
