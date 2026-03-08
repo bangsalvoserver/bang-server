@@ -85,13 +85,25 @@ namespace json {
     template<typename T>
     concept aggregate = std::is_aggregate_v<T> || has_annotation(^^T, ^^as_aggregate_t);
 
-    template<typename T>
-    static constexpr auto fields_of = std::define_static_array(
-        std::meta::nonstatic_data_members_of(^^T, std::meta::access_context::current())
-        | rv::filter([](std::meta::info field) { return !has_annotation(field, ^^ignore_t); })
-    );
+    consteval std::vector<std::meta::info> fields_of(std::meta::info type) {
+        static constexpr auto ctx = std::meta::access_context::current();
 
-    inline consteval std::string_view get_name_of(std::meta::info info) {
+        std::vector<std::meta::info> result;
+
+        for (std::meta::info base : std::meta::bases_of(type, ctx)) {
+            result.append_range(fields_of(std::meta::type_of(base)));
+        }
+
+        for (std::meta::info field : std::meta::nonstatic_data_members_of(type, ctx)) {
+            if (!has_annotation(field, ^^ignore_t)) {
+                result.push_back(field);
+            }
+        }
+
+        return result;
+    }
+
+    consteval std::string_view get_name_of(std::meta::info info) {
         for (auto annotation : std::meta::annotations_of(info)) {
             if (std::meta::remove_cv(std::meta::type_of(annotation)) == ^^rename) {
                 return std::string_view{std::meta::extract<rename>(annotation).name};
@@ -262,7 +274,7 @@ namespace json {
     
     template<typename T, typename Context>
     struct aggregate_serializer {
-        static constexpr auto fields = fields_of<T>;
+        static constexpr auto fields = std::define_static_array(fields_of(^^T));
 
         static void write_fields(const T &value, string_writer &writer, const Context &ctx) {
             template for (constexpr auto field : fields) {
@@ -477,7 +489,7 @@ namespace json {
 
     template<typename T, typename Context>
     struct aggregate_deserializer {
-        static constexpr auto fields = fields_of<T>;
+        static constexpr auto fields = std::define_static_array(fields_of(^^T));
 
         template<std::meta::info field>
         static void deserialize_field(T &result, const json &value, const Context &ctx) {

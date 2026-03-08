@@ -9,10 +9,6 @@ namespace banggame {
         using value_type = card_list;
 
         targeting_card_per_player(target_args::card args) : target_args::card{args} {}
-
-        const auto &get_args() const {
-            return static_cast<const target_args::card &>(*this);
-        }
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
             return true;

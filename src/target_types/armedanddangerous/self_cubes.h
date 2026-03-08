@@ -5,19 +5,13 @@
 
 namespace banggame {
 
-    struct targeting_self_cubes_args {
-        int ncubes;
-    };
-
-    struct targeting_self_cubes : targeting_self_cubes_args {
+    struct targeting_self_cubes {
         using value_type = std::nullptr_t;
+
+        int ncubes;
         
         targeting_self_cubes(target_args::empty, int ncubes)
-            : targeting_self_cubes_args{ncubes} {}
-        
-        const auto &get_args() const {
-            return static_cast<const targeting_self_cubes_args &>(*this);
-        }
+            : ncubes{ncubes} {}
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
             return !get_error(origin_card, origin, effect, ctx);

@@ -13,10 +13,6 @@ namespace banggame {
         using value_type = player_ptr;
 
         targeting_player(target_args::player args) : target_args::player{args} {}
-
-        const auto &get_args() const {
-            return static_cast<const target_args::player &>(*this);
-        }
         
         auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
             return origin->m_game->range_all_players(origin)

@@ -12,10 +12,6 @@ namespace banggame {
 
         targeting_players(target_args::player args) : target_args::player{args} {}
         
-        const auto &get_args() const {
-            return static_cast<const target_args::player &>(*this);
-        }
-        
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
             return !get_error(origin_card, origin, effect, ctx);
         }

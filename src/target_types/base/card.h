@@ -11,10 +11,6 @@ namespace banggame {
         using value_type = card_ptr;
 
         targeting_card(target_args::card args) : target_args::card{args} {}
-
-        const auto &get_args() const {
-            return static_cast<const target_args::card &>(*this);
-        }
         
         auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
             return get_all_targetable_cards(origin)

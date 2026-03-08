@@ -7,19 +7,13 @@
 
 namespace banggame {
 
-    struct targeting_select_cubes_args {
-        int ncubes;
-    };
-
-    struct targeting_select_cubes : targeting_select_cubes_args {
+    struct targeting_select_cubes {
         using value_type = card_list;
 
+        int ncubes;
+
         targeting_select_cubes(target_args::empty, int ncubes)
-            : targeting_select_cubes_args{ncubes} {}
-        
-        const auto &get_args() const {
-            return static_cast<const targeting_select_cubes_args &>(*this);
-        }
+            : ncubes{ncubes} {}
 
         auto get_all_cubes(player_ptr origin) const {
             return cube_slots(origin) | rv::for_each([](card_ptr slot) {
