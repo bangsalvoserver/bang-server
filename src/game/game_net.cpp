@@ -40,9 +40,8 @@ namespace json {
 
     template<typename Context> struct serializer<banggame::effect_holder, Context> {
         static void write(const banggame::effect_holder &effect, string_writer &writer, const Context &ctx) {
-            using serializer_type = aggregate_serializer<banggame::effect_holder, Context>;
             writer.StartObject();
-            serializer_type::write_fields(effect, writer, ctx);
+            write_aggregate_fields(effect, writer, ctx);
             effect.target->serialize_args(effect, writer);
             writer.EndObject();
         }
@@ -77,8 +76,9 @@ namespace json {
     };
 
     void serialize_card_data(const banggame::card_data &data, string_writer &writer) {
-        using serializer_type = aggregate_serializer<banggame::card_data, no_context>;
-        serializer_type::write(data, writer, {});
+        writer.StartObject();
+        write_aggregate_fields(data, writer);
+        writer.EndObject();
     };
 
     template<typename Context> struct serializer<banggame::card_backface_list, Context> {

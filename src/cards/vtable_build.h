@@ -400,8 +400,7 @@ namespace banggame {
             },
 
             .serialize_args = [](const effect_holder &effect, json::string_writer &writer) {
-                using serializer_type = json::aggregate_serializer<T, json::no_context>;
-                serializer_type::write_fields(effect_cast<T>(effect.target_value), writer, {});
+                json::write_aggregate_fields(effect_cast<T>(effect.target_value), writer);
             },
 
             .possible_targets = [](card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) -> std::generator<play_card_target> {
