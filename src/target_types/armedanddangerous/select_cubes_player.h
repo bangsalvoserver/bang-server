@@ -15,20 +15,12 @@ namespace banggame {
             player_ptr player;
         };
 
-        targeting_select_cubes_optional target_cubes;
-        targeting_player target_player;
+        [[=json::flatten]] targeting_player target_player;
+        [[=json::flatten]] targeting_select_cubes_optional target_cubes;
 
         targeting_select_cubes_player(target_args::player args, int ncubes)
-            : target_cubes{{}, ncubes}
-            , target_player{args} {}
-        
-        auto get_args() const {
-            struct args {
-                player_filter_bitset player_filter;
-                int ncubes;
-            };
-            return args{ target_player.player_filter, target_cubes.ncubes };
-        }
+            : target_player{args}
+            , target_cubes{{}, ncubes} {}
         
         auto possible_targets(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
             return target_player.possible_targets(origin_card, origin, effect, ctx)

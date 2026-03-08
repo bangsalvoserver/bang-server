@@ -13,22 +13,14 @@ namespace banggame {
             player_list players;
         };
 
-        targeting_select_cubes target_cubes;
-        targeting_player target_player;
+        [[=json::ignore]] targeting_select_cubes target_cubes;
+        [[=json::flatten]] targeting_player target_player;
         int extra_players;
 
         targeting_player_per_cube(target_args::player args, int extra_players)
             : target_cubes{{}, 1}
             , target_player{args}
             , extra_players{extra_players} {}
-        
-        auto get_args() const {
-            struct args {
-                player_filter_bitset player_filter;
-                int extra_players;
-            };
-            return args{ target_player.player_filter, extra_players };
-        }
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
         value_type random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);

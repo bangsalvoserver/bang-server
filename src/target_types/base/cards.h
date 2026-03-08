@@ -8,21 +8,12 @@ namespace banggame {
     struct targeting_cards {
         using value_type = card_list;
 
-        targeting_card target_card;
+        [[=json::flatten]] targeting_card target_card;
         int ncards;
 
         targeting_cards(target_args::card args, int ncards)
             : target_card{args}
             , ncards{ncards} {}
-
-        auto get_args() const {
-            struct args {
-                player_filter_bitset player_filter;
-                card_filter_bitset card_filter;
-                int ncards;
-            };
-            return args{ target_card.player_filter, target_card.card_filter, ncards };
-        }
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
         card_list random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
