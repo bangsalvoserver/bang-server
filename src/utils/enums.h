@@ -181,13 +181,13 @@ namespace json {
     struct deserializer<T, Context> {
         static T read(const json &value) {
             if (!value.IsString()) {
-                throw deserialize_error(std::format("Cannot deserialize {}: value is not a string", type_name<T>));
+                throw deserialize_error(std::format("Cannot deserialize {}: value is not a string", std::meta::identifier_of(^^T)));
             }
             std::string_view str{value.GetString(), value.GetStringLength()};
             if (auto ret = enums::from_string<T>(str)) {
                 return *ret;
             } else {
-                throw deserialize_error(std::format("Invalid {} value: {}", type_name<T>, str));
+                throw deserialize_error(std::format("Invalid {} value: {}", std::meta::identifier_of(^^T), str));
             }
         }
     };

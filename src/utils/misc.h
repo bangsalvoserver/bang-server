@@ -46,7 +46,4 @@ consteval bool has_annotation(std::meta::info info, std::meta::info annotation_t
     return false;
 }
 
-template<typename T>
-static constexpr std::string_view type_name = std::meta::identifier_of(^^T);
-
 #endif

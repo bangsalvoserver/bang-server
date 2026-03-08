@@ -98,7 +98,7 @@ namespace json {
     struct deserializer<enums::bitset<T>, Context> {
         static enums::bitset<T> read(const json &value, const Context &ctx) {
             if (!value.IsArray()) {
-                throw deserialize_error(std::format("Cannot deserialize {} bitset: value is not an array", type_name<T>));
+                throw deserialize_error(std::format("Cannot deserialize {} bitset: value is not an array", std::meta::identifier_of(^^T)));
             }
             enums::bitset<T> ret;
             for (const auto &elem : value.GetArray()) {
