@@ -40,12 +40,42 @@ namespace json {
 
     using string_writer = rapidjson::Writer<string_adapter<>>;
 
-    template<typename T>
-    concept is_complete = requires(T self) { sizeof(self); };
+    struct serialize_error : std::runtime_error {
+        using std::runtime_error::runtime_error;
+    };
 
-    template<typename T, typename Context> struct serializer;
+    struct deserialize_error : std::runtime_error {
+        using std::runtime_error::runtime_error;
+    };
 
-    template<typename T, typename Context> struct deserializer;
+    struct no_context {};
+
+    template<typename T, typename Context = no_context>
+    void write_object_fields(const T &value, string_writer &writer, const Context &ctx = {});
+
+    template<typename T, typename Context>
+    struct serializer {
+        static void write(const T &value, string_writer &writer, const Context &ctx) {
+            writer.StartObject();
+            write_object_fields(value, writer, ctx);
+            writer.EndObject();
+        }
+    };
+
+    template<typename T, typename Context = no_context>
+    void read_object_fields(T &result, const json &value, const Context &ctx = {});
+    
+    template<typename T, typename Context>
+    struct deserializer {
+        static T read(const json &value, const Context &ctx) {
+            if (!value.IsObject()) {
+                throw deserialize_error(std::format("Cannot deserialize {}: value is not an object", std::meta::identifier_of(^^T)));
+            }
+            T result{};
+            read_object_fields(result, value, ctx);
+            return result;
+        }
+    };
 
     class raw_string {
     private:
@@ -59,23 +89,11 @@ namespace json {
         }
     };
 
-    struct serialize_error : std::runtime_error {
-        using std::runtime_error::runtime_error;
-    };
-
-    struct deserialize_error : std::runtime_error {
-        using std::runtime_error::runtime_error;
-    };
-
-    struct no_context {};
-
     inline constexpr struct ignore_t {} ignore;
 
     inline constexpr struct transparent_t {} transparent;
 
     inline constexpr struct flatten_t {} flatten;
-
-    inline constexpr struct as_aggregate_t {} as_aggregate;
 
     struct rename {
         const char *name;
@@ -85,10 +103,7 @@ namespace json {
     };
 
     template<typename T>
-    concept aggregate = std::is_aggregate_v<T> || has_annotation(^^T, ^^as_aggregate_t);
-
-    template<typename T>
-    concept is_transparent = aggregate<T> && has_annotation(^^T, ^^transparent_t);
+    concept is_transparent = has_annotation(^^T, ^^transparent_t);
 
     consteval std::vector<std::meta::info> fields_of(std::meta::info type) {
         static constexpr auto ctx = std::meta::access_context::current();
@@ -120,7 +135,6 @@ namespace json {
     template<typename T, typename Context = no_context>
     void serialize(const T &value, string_writer &writer, const Context &context = {}) {
         using serializer_type = serializer<T, Context>;
-        static_assert(is_complete<serializer_type>, "No serializer specified for type T");
         if constexpr (requires { serializer_type::write(value, writer, context); }) {
             serializer_type::write(value, writer, context);
         } else {
@@ -141,7 +155,6 @@ namespace json {
     template<typename T, typename Context = no_context>
     auto deserialize(const json &value, const Context &context = {}) {
         using deserializer_type = deserializer<T, Context>;
-        static_assert(is_complete<deserializer_type>, "No deserializer specified for type T");
         if constexpr (requires { deserializer_type::read(value, context); }) {
             return deserializer_type::read(value, context);
         } else {
@@ -274,29 +287,6 @@ namespace json {
                 (serialize(std::get<Is>(value), writer, ctx), ...);
             }(std::index_sequence_for<Ts ...>());
             writer.EndArray();
-        }
-    };
-
-    template<typename T, typename Context = no_context>
-    void write_aggregate_fields(const T &value, string_writer &writer, const Context &ctx = {}) {
-        template for (constexpr auto field : std::define_static_array(fields_of(^^T))) {
-            const auto &field_value = value.[:field:];
-            if constexpr (has_annotation(field, ^^flatten_t)) {
-                write_aggregate_fields(field_value, writer, ctx);
-            } else {
-                std::string_view key = get_name_of(field);
-                writer.Key(key.data(), key.size());
-                serialize(field_value, writer, ctx);
-            }
-        }
-    }
-
-    template<aggregate T, typename Context>
-    struct serializer<T, Context> {
-        static void write(const T &value, string_writer &writer, const Context &ctx) {
-            writer.StartObject();
-            write_aggregate_fields(value, writer, ctx);
-            writer.EndObject();
         }
     };
     
@@ -497,37 +487,6 @@ namespace json {
             }(std::index_sequence_for<Ts ...>());
         }
     };
-
-    template<typename T, typename Context = no_context>
-    void read_aggregate_fields(T &result, const json &value, const Context &ctx = {}) {
-        template for (constexpr auto field : std::define_static_array(fields_of(^^T))) {
-            auto &field_value = result.[:field:];
-            using field_type = std::remove_reference_t<decltype(field_value)>;
-            if constexpr (has_annotation(field, ^^flatten_t)) {
-                read_aggregate_fields(field_value, value, ctx);
-            } else {
-                std::string_view key = get_name_of(field);
-                json json_key(rapidjson::StringRef(key.data(), key.size()));
-                if (auto it = value.FindMember(json_key); it != value.MemberEnd()) {
-                    field_value = deserialize<field_type>(it->value, ctx);
-                } else {
-                    throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", std::meta::identifier_of(^^T), key));
-                }
-            }
-        }
-    }
-    
-    template<aggregate T, typename Context>
-    struct deserializer<T, Context> {
-        static T read(const json &value, const Context &ctx) {
-            if (!value.IsObject()) {
-                throw deserialize_error(std::format("Cannot deserialize {}: value is not an object", std::meta::identifier_of(^^T)));
-            }
-            T result{};
-            read_aggregate_fields(result, value, ctx);
-            return result;
-        }
-    };
     
     template<is_transparent T, typename Context>
     struct deserializer<T, Context> {
@@ -594,6 +553,39 @@ namespace json {
             return it->second(key_it->value, ctx);
         }
     };
+
+    template<typename T, typename Context>
+    void write_object_fields(const T &value, string_writer &writer, const Context &ctx) {
+        template for (constexpr auto field : std::define_static_array(fields_of(^^T))) {
+            const auto &field_value = value.[:field:];
+            if constexpr (has_annotation(field, ^^flatten_t)) {
+                write_object_fields(field_value, writer, ctx);
+            } else {
+                std::string_view key = get_name_of(field);
+                writer.Key(key.data(), key.size());
+                serialize(field_value, writer, ctx);
+            }
+        }
+    }
+    
+    template<typename T, typename Context>
+    void read_object_fields(T &result, const json &value, const Context &ctx) {
+        template for (constexpr auto field : std::define_static_array(fields_of(^^T))) {
+            auto &field_value = result.[:field:];
+            using field_type = std::remove_reference_t<decltype(field_value)>;
+            if constexpr (has_annotation(field, ^^flatten_t)) {
+                read_object_fields(field_value, value, ctx);
+            } else {
+                std::string_view key = get_name_of(field);
+                json json_key(rapidjson::StringRef(key.data(), key.size()));
+                if (auto it = value.FindMember(json_key); it != value.MemberEnd()) {
+                    field_value = deserialize<field_type>(it->value, ctx);
+                } else {
+                    throw deserialize_error(std::format("Cannot deserialize {}: missing field {}", std::meta::identifier_of(^^T), key));
+                }
+            }
+        }
+    }
 }
 
 #endif

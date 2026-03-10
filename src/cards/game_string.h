@@ -124,7 +124,7 @@ namespace banggame {
         return { list->args[index], static_cast<format_arg_type>(result % 3) };
     }
 
-    struct [[=json::as_aggregate]] game_string {
+    struct game_string {
         const char *format_str = nullptr;
         format_arg_list format_args;
 
