@@ -198,8 +198,7 @@ namespace banggame {
             target_tokens += num_tokens;
             origin_tokens -= num_tokens;
 
-            animation_duration duration = instant ? 0ms : num_tokens == 1 ? durations.move_token : durations.move_tokens;
-            add_update(game_updates::move_tokens{ token_type, num_tokens, origin, target, duration });
+            add_update(game_updates::move_tokens{ token_type, num_tokens, origin, target, instant });
         }
     }
 

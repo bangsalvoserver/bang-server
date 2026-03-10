@@ -37,33 +37,32 @@ namespace banggame {
     }
 
     void card::set_visibility(player_set new_visibility, bool instant) {
-        animation_duration duration = instant ? 0ms : durations.flip_card;
         if (visibility.exclusive()) {
             if (new_visibility.exclusive()) {
                 if (auto hide_to = new_visibility - visibility) {
-                    m_game->add_update(hide_to, game_updates::hide_card{ this, duration });
+                    m_game->add_update(hide_to, game_updates::hide_card{ this, instant });
                 }
                 if (auto show_to = visibility - new_visibility) {
-                    m_game->add_update(show_to, game_updates::show_card{ this, *this, duration });
+                    m_game->add_update(show_to, game_updates::show_card{ this, *this, instant });
                 }
             } else {
-                m_game->add_update(visibility | new_visibility, game_updates::hide_card{ this, duration });
+                m_game->add_update(visibility | new_visibility, game_updates::hide_card{ this, instant });
                 if (auto show_to = visibility & new_visibility) {
-                    m_game->add_update(show_to, game_updates::show_card{ this, *this, duration });
+                    m_game->add_update(show_to, game_updates::show_card{ this, *this, instant });
                 }
             }
         } else {
             if (new_visibility.exclusive()) {
                 if (auto hide_to = visibility & new_visibility) {
-                    m_game->add_update(hide_to, game_updates::hide_card{ this, duration });
+                    m_game->add_update(hide_to, game_updates::hide_card{ this, instant });
                 }
-                m_game->add_update(visibility | new_visibility, game_updates::show_card{ this, *this, duration });
+                m_game->add_update(visibility | new_visibility, game_updates::show_card{ this, *this, instant });
             } else {
                 if (auto hide_to = visibility - new_visibility) {
-                    m_game->add_update(hide_to, game_updates::hide_card{ this, duration });
+                    m_game->add_update(hide_to, game_updates::hide_card{ this, instant });
                 }
                 if (auto show_to = new_visibility - visibility) {
-                    m_game->add_update(show_to, game_updates::show_card{ this, *this, duration });
+                    m_game->add_update(show_to, game_updates::show_card{ this, *this, instant });
                 }
             }
         }
@@ -110,7 +109,7 @@ namespace banggame {
         }
         }
         
-        m_game->add_update(game_updates::move_card{ this, new_owner, new_pocket, instant ? 0ms : durations.move_card, position });
+        m_game->add_update(game_updates::move_card{ this, new_owner, new_pocket, position, instant });
     }
 
     void card::exchange_with(card_ptr new_card, bool instant) {
@@ -124,7 +123,7 @@ namespace banggame {
         pocket = pocket_type::none;
         owner = nullptr;
 
-        m_game->add_update(game_updates::exchange_card{ this, new_card, *new_card, instant ? 0ms : durations.flip_card });
+        m_game->add_update(game_updates::exchange_card{ this, new_card, *new_card, instant });
     }
 
     void card::set_inactive(bool new_inactive) {

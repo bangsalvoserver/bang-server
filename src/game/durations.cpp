@@ -5,6 +5,7 @@ namespace banggame {
     using namespace std::chrono_literals;
 
     const durations_t durations {
+        .instant =         0ms,
         .move_token =      133ms,
         .move_tokens =     250ms,
         .move_card =       333ms,

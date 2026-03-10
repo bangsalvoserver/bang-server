@@ -53,7 +53,7 @@ namespace banggame {
                 }
                 target->m_game->m_scenario_deck.push_back(target_card);
                 target_card->set_visibility(card_visibility::shown, nullptr, true);
-                target->m_game->add_update(game_updates::move_card{ target_card, nullptr, pocket_type::scenario_deck, 0ms });
+                target->m_game->add_update(game_updates::move_card{ target_card, nullptr, pocket_type::scenario_deck, pocket_position::end, true });
             } else {
                 target_card->move_to(pocket_type::scenario_deck);
             }
@@ -76,7 +76,7 @@ namespace banggame {
                 }
                 target->m_game->m_wws_scenario_deck.push_back(target_card);
                 target_card->set_visibility(card_visibility::shown, nullptr, true);
-                target->m_game->add_update(game_updates::move_card{ target_card, nullptr, pocket_type::wws_scenario_deck, 0ms });
+                target->m_game->add_update(game_updates::move_card{ target_card, nullptr, pocket_type::wws_scenario_deck, pocket_position::end, true });
             } else {
                 target_card->move_to(pocket_type::wws_scenario_deck);
             }

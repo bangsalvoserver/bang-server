@@ -65,38 +65,60 @@ namespace banggame {
 
         struct [[=json::transparent]] game_error {
             game_string message;
+
+            game_error(game_string message)
+                : message{message} {}
         };
 
         struct [[=json::transparent]] game_log {
             game_string message;
+
+            game_log(game_string message)
+                : message{message} {}
         };
 
         struct [[=json::transparent]] game_prompt {
             game_string message;
+
+            game_prompt(game_string message)
+                : message{message} {}
         };
 
         struct add_cards {
             card_backface_list card_ids;
             pocket_type pocket;
             nullable_player player;
+
+            add_cards(card_backface_list card_ids, pocket_type pocket, nullable_player player = nullptr)
+                : card_ids{std::move(card_ids)}, pocket{pocket}, player{player} {}
         };
 
         struct remove_cards {
             card_list cards;
+
+            remove_cards(card_list cards)
+                : cards{std::move(cards)} {}
         };
 
         struct move_card {
             card_ptr card;
             nullable_player player;
             pocket_type pocket;
-            animation_duration duration = durations.move_card;
-            pocket_position position = pocket_position::end;
+            pocket_position position;
+            animation_duration duration;
+
+            move_card(card_ptr card, nullable_player player, pocket_type pocket, pocket_position position = pocket_position::end, bool instant = false)
+                : card{card}, player{player}, pocket{pocket}, position{position}
+                , duration{instant ? durations.instant : durations.move_card} {}
         };
 
         struct add_tokens {
             card_token_type token_type;
             int num_tokens;
             token_position target;
+
+            add_tokens(card_token_type token_type, int num_tokens, token_position target)
+                : token_type{token_type}, num_tokens{num_tokens}, target{target} {}
         };
 
         struct move_tokens {
@@ -104,81 +126,138 @@ namespace banggame {
             int num_tokens;
             token_position origin;
             token_position target;
-            animation_duration duration = durations.move_tokens;
+            animation_duration duration;
+
+            move_tokens(card_token_type token_type, int num_tokens, token_position origin, token_position target, bool instant = false)
+                : token_type{token_type}, num_tokens{num_tokens}, origin{origin}, target{target}
+                , duration{instant ? durations.instant : num_tokens == 1 ? durations.move_token : durations.move_tokens} {}
         };
 
         struct move_train {
             int position;
-            animation_duration duration = durations.move_train;
+            animation_duration duration;
+
+            move_train(int position, bool instant = false)
+                : position{position}
+                , duration{instant ? durations.instant : durations.move_train} {}
         };
 
         struct deck_shuffled {
             pocket_type pocket;
-            animation_duration duration = durations.deck_shuffle;
+            animation_duration duration;
+
+            deck_shuffled(pocket_type pocket, bool instant = false)
+                : pocket{pocket}
+                , duration{instant ? durations.instant : durations.deck_shuffle} {}
         };
 
         struct show_card {
             card_ptr card;
             card_data info;
-            animation_duration duration = durations.flip_card;
+            animation_duration duration;
+
+            show_card(card_ptr card, const card_data &info, bool instant = false)
+                : card{card}, info{info}
+                , duration{instant ? durations.instant : durations.flip_card} {}
         };
 
         struct hide_card {
             card_ptr card;
-            animation_duration duration = durations.flip_card;
+            animation_duration duration;
+
+            hide_card(card_ptr card, bool instant = false)
+                : card{card}
+                , duration{instant ? durations.instant : durations.flip_card} {}
         };
 
         struct exchange_card {
             card_ptr card;
             card_ptr new_card;
             card_data info;
-            animation_duration duration = durations.flip_card;
+            animation_duration duration;
+
+            exchange_card(card_ptr card, card_ptr new_card, const card_data &info, bool instant = false)
+                : card{card}, new_card{new_card}, info{info}
+                , duration{instant ? durations.instant : durations.flip_card} {}
         };
 
         struct tap_card {
             card_ptr card;
             bool inactive;
-            animation_duration duration = durations.tap_card;
+            animation_duration duration;
+
+            tap_card(card_ptr card, bool inactive, bool instant = false)
+                : card{card}, inactive{inactive}
+                , duration{instant ? durations.instant : durations.tap_card} {}
         };
 
         struct flash_card {
             card_list cards;
-            animation_duration duration = durations.flash_card;
+            animation_duration duration;
+
+            flash_card(card_list cards, bool instant = false)
+                : cards{std::move(cards)}
+                , duration{instant ? durations.instant : durations.flash_card} {}
         };
 
         struct short_pause {
             nullable_card card;
-            animation_duration duration = durations.short_pause;
+            animation_duration duration;
+
+            short_pause(nullable_card card = nullptr, bool instant = false)
+                : card{card}
+                , duration{instant ? durations.instant : durations.short_pause} {}
         };
 
         struct player_add {
             player_user_list players;
+
+            player_add(player_user_list players)
+                : players{std::move(players)} {}
         };
 
         struct player_order {
             player_list players;
-            animation_duration duration = durations.move_player;
+            animation_duration duration;
+
+            player_order(player_list players, bool instant = false)
+                : players{std::move(players)}
+                , duration{instant ? durations.instant : durations.move_player} {}
         };
 
         struct player_hp {
             player_ptr player;
             int hp;
-            animation_duration duration = durations.player_hp;
+            animation_duration duration;
+
+            player_hp(player_ptr player, int hp, bool instant = false)
+                : player{player}, hp{hp}
+                , duration{instant ? durations.instant : durations.player_hp} {}
         };
 
         struct player_show_role {
             player_ptr player;
             player_role role;
-            animation_duration duration = durations.flip_card;
+            animation_duration duration;
+
+            player_show_role(player_ptr player, player_role role, bool instant = false)
+                : player{player}, role{role}
+                , duration{instant ? durations.instant : durations.flip_card} {}
         };
 
         struct player_flags {
             player_ptr player;
             banggame::player_flags flags;
+
+            player_flags(player_ptr player, banggame::player_flags flags)
+                : player{player}, flags{flags} {}
         };
 
         struct [[=json::transparent]] switch_turn {
             player_ptr player;
+
+            switch_turn(player_ptr player)
+                : player{player} {}
         };
 
         struct player_distance_item {
@@ -217,10 +296,16 @@ namespace banggame {
 
         struct [[=json::transparent]] game_flags {
             banggame::game_flags flags;
+
+            game_flags(banggame::game_flags flags)
+                : flags{flags} {}
         };
 
         struct [[=json::transparent]] play_sound {
             sound_id sound;
+
+            play_sound(sound_id sound)
+                : sound{sound} {}
         };
 
         struct status_clear {};

@@ -212,7 +212,7 @@ namespace banggame {
     void player::set_hp(int value, bool instant) {
         if (value != m_hp) {
             m_hp = value;
-            m_game->add_update(game_updates::player_hp{ this, value, instant ? 0ms : durations.player_hp });
+            m_game->add_update(game_updates::player_hp{ this, value, instant });
         }
     }
 
@@ -424,23 +424,21 @@ namespace banggame {
         remove_player_flags(player_flag::negative_karma);
         
         if (remove_player_flags(player_flag::role_revealed)) {
-            m_game->add_update(update_target::excludes(this), game_updates::player_show_role{ this, player_role::unknown, durations.flip_card });
+            m_game->add_update(update_target::excludes(this), game_updates::player_show_role{ this, player_role::unknown });
         }
     }
 
     void player::set_role(player_role role, bool instant) {
         m_role = role;
 
-        animation_duration duration = instant ? 0ms : durations.flip_card;
-
         if (role == player_role::sheriff || m_game->m_players.size() <= 3 || check_player_flags(player_flag::role_revealed)) {
             if (role == player_role::sheriff) {
                 m_game->add_log("LOG_REVEAL_SHERIFF", this);
             }
-            m_game->add_update(game_updates::player_show_role{ this, m_role, duration });
+            m_game->add_update(game_updates::player_show_role{ this, m_role, instant });
             add_player_flags(player_flag::role_revealed);
         } else {
-            m_game->add_update(update_target::includes(this), game_updates::player_show_role{ this, m_role, duration });
+            m_game->add_update(update_target::includes(this), game_updates::player_show_role{ this, m_role, instant });
         }
     }
 
