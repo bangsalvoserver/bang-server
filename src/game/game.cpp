@@ -452,7 +452,7 @@ namespace banggame {
                 || c.expansion.empty()
                 || c.has_tag(tag_type::force_allow);
         }), pocket_type::none, &m_characters)) {
-            rn::shuffle(m_characters, rng);
+            shuffle_cards_and_ids(m_characters);
         }
         
         add_update(make_preload_assets_update(this));
