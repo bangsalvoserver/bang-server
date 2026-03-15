@@ -16,8 +16,19 @@ namespace banggame {
     }
 
     game_string targeting_max_cards::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
-        if (targets.empty() || ncards != 0 && targets.size() > ncards) {
-            return "ERROR_INVALID_TARGETS";
+        if (confirmable) {
+            if (targets.empty() || ncards != 0 && targets.size() > ncards) {
+                return "ERROR_INVALID_TARGETS";
+            }
+        } else {
+            int count = 0;
+            for (card_ptr c : target_card.possible_targets(origin_card, origin, effect, ctx)) {
+                ++count;
+                if (count >= ncards) break;
+            }
+            if (targets.empty() || targets.size() != count) {
+                return "ERROR_INVALID_TARGETS";
+            }
         }
         for (card_ptr c : targets) {
             MAYBE_RETURN(target_card.get_error(origin_card, origin, effect, ctx, c));

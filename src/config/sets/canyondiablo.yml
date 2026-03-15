@@ -112,7 +112,7 @@ main_deck:
       - lastwill
     responses:
       - lastwill
-      - none max_cards(3) self
+      - none max_cards(3, true) self
       - none player notself
     mth_response: lastwill(1,2)
     tags:

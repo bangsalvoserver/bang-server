@@ -204,6 +204,14 @@ character:
       - max_hp(5)
       - strong
 
+hidden:
+  - name: BANDIDOS
+    responses:
+      - bandidos_response
+      - discard(true) max_cards(2, false) self | hand
+    tags:
+      - preselect
+
 sounds:
   - bandidos
   - snake

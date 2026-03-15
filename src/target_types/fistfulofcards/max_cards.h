@@ -6,8 +6,11 @@
 namespace banggame {
 
     struct targeting_max_cards : targeting_cards {
-        targeting_max_cards(target_args::card args, int ncards = 0)
-            : targeting_cards{args, ncards} {}
+        bool confirmable;
+
+        targeting_max_cards(target_args::card args, int ncards = 0, bool confirmable = false)
+            : targeting_cards{args, ncards}
+            , confirmable{confirmable} {}
         
         bool is_possible(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);
         card_list random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx);

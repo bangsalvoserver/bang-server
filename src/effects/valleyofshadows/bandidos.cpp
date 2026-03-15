@@ -6,17 +6,13 @@
 
 #include "cards/game_enums.h"
 
-#include "effects/base/requests.h"
 #include "effects/base/escapable.h"
 #include "effects/base/steal_destroy.h"
 
 namespace banggame {
 
-    struct request_bandidos : request_auto_resolvable, interface_picking, escapable_request {
-        request_bandidos(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
-            : request_auto_resolvable(origin_card, origin, target, flags) {}
-
-        int ncards = 0;
+    struct request_bandidos : request_auto_resolvable, escapable_request {
+        using request_auto_resolvable::request_auto_resolvable;
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
@@ -33,40 +29,16 @@ namespace banggame {
 
         void on_resolve() override {
             target->m_game->pop_request();
-            if (ncards > 0) {
-                target->reveal_hand();
-            }
             target->damage(origin_card, origin, 1);
         }
 
         prompt_string resolve_prompt() const override {
-            if (target->is_bot() && target->m_hp <= 1 && rn::any_of(target->m_hand, [&](card_ptr target_card) { return can_pick(target_card); })) {
+            if (target->is_bot() && target->m_hp <= 1 && rn::any_of(target->m_hand, [&](card_ptr target_card) {
+                return !target->m_game->is_usage_disabled(target_card);
+            })) {
                 return "BOT_MUST_RESPOND_BANDIDOS";
             }
             return {};
-        }
-
-        prompt_string pick_prompt(card_ptr target_card) const override {
-            return prompts::bot_check_discard_card(target, target_card);
-        }
-        
-        bool can_pick(const_card_ptr target_card) const override {
-            return target_card->pocket == pocket_type::player_hand && target_card->owner == target
-                && !target->m_game->is_usage_disabled(target_card);
-        }
-
-        void on_pick(card_ptr target_card) override {
-            ++ncards;
-            
-            target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
-            target->discard_used_card(target_card);
-            
-            if (target->empty_hand()) {
-                target->m_game->pop_request();
-            } else if (rn::any_of(target->m_hand, [&](const_card_ptr c) { return can_pick(c); })) {
-                target->m_game->pop_request();
-                target->m_game->queue_request<request_discard>(origin_card, origin, target, effect_flags{}, 110);
-            }
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -88,6 +60,14 @@ namespace banggame {
 
     void effect_bandidos::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         target->m_game->queue_request<request_bandidos>(origin_card, origin, target, flags);
+    }
+
+    bool effect_bandidos_response::can_play(card_ptr origin_card, player_ptr origin) {
+        return origin->m_game->top_request<request_bandidos>(target_is{origin}) != nullptr;
+    }
+
+    void effect_bandidos_response::on_play(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->pop_request();
     }
 
     struct request_bandidos2 : request_base {

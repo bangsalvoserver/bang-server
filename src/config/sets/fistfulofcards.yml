@@ -62,7 +62,7 @@ fistfulofcards:
     equip:
       - ranch
     responses:
-      - discard max_cards self | hand
+      - discard max_cards(0, true) self | hand
       - ranch
     tags:
       - preselect
