@@ -9,7 +9,10 @@ namespace banggame {
             MAYBE_RETURN(check_player_filter(origin_card, origin, player_filter, target->owner, ctx));
         }
         MAYBE_RETURN(check_card_filter(origin_card, origin, card_filter, target, ctx));
-        return effect.get_error(origin_card, origin, target, ctx);
+        if (effect) {
+            return effect.get_error(origin_card, origin, target, ctx);
+        }
+        return {};
     }
 
     prompt_string targeting_card::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
