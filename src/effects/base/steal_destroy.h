@@ -29,11 +29,16 @@ namespace banggame {
 
     DEFINE_EFFECT(steal, effect_steal)
 
-    struct effect_discard {
+    struct effect_use {
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target);
+    };
+
+    DEFINE_EFFECT(use, effect_use)
+
+    struct effect_discard : effect_use {
         bool used;
         effect_discard(bool used = false) : used{used} {}
 
-        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target);
         game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
         void on_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);

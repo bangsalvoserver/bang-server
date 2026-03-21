@@ -2,11 +2,13 @@
 
 #include "effects/base/pick.h"
 #include "effects/base/escapable.h"
-
-#include "cards/game_enums.h"
-
 #include "effects/base/pick.h"
 #include "effects/base/gift_card.h"
+
+#include "cards/game_enums.h"
+#include "cards/filter_enums.h"
+
+#include "target_types/fistfulofcards/max_cards.h"
 
 #include "game/game_table.h"
 #include "game/possible_to_play.h"
@@ -68,6 +70,18 @@ namespace banggame {
         target->m_game->queue_request<request_tornado>(origin_card, origin, target, flags);
     }
 
+    static card_list get_auto_pick_targets(card_ptr origin_card, player_ptr target) {
+        card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
+        if (only_card && only_card->has_tag(tag_type::preselect)) {
+            for (const effect_holder &effect : only_card->responses) {
+                if (effect.target == TARGET_TYPE(max_cards)) {
+                    return auto{*static_cast<const targeting_max_cards *>(effect.target_value)}.get_only_possible_target(origin_card, target, effect, {});
+                }
+            }
+        }
+        return {};
+    }
+
     struct request_tornado2 : request_base {
         using request_base::request_base;
 
@@ -80,8 +94,8 @@ namespace banggame {
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags) || target->empty_hand()) {
                 target->m_game->pop_request();
-            } else if (target->m_hand.size() <= 2) {
-                on_resolve(target->m_hand);
+            } else if (card_list targets = get_auto_pick_targets(origin_card, target); !targets.empty()) {
+                on_resolve(targets);
             }
         }
 

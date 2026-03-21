@@ -116,7 +116,7 @@ namespace banggame {
         origin->m_game->queue_request<request_steal>(origin_card, origin, target_card->owner, target_card, flags);
     }
 
-    game_string effect_discard::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    game_string effect_use::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         if (card_ptr disabler = origin->m_game->get_usage_disabler(target_card)) {
             return {"ERROR_CARD_DISABLED_BY", target_card, disabler};
         }

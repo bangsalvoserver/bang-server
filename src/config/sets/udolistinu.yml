@@ -206,13 +206,13 @@ character:
       - strong
 
 hidden:
-  - name: TORNADO
+  - name: TORNADO_2
     responses:
-      - none cards(2) self | hand
+      - use max_cards(2, false) self | hand
       - tornado2_response
     tags:
       - preselect
-  - name: BANDIDOS
+  - name: BANDIDOS_2
     responses:
       - bandidos2_response
       - discard(true) bang_or_cards(2) self | hand
