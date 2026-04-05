@@ -40,7 +40,7 @@ fistfulofcards:
     image: 05_liquoreforte
     responses:
       - skip_drawing
-      - heal_notfull
+      - heal
   - name: ABANDONED_MINE
     image: 05_minieraabbandonata
     equip:

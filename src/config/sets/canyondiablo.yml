@@ -205,7 +205,7 @@ main_deck:
     image: 20_offrelacasa
     color: green
     effects:
-      - heal_notfull
+      - heal
       - draw
   - name: GUITAR
     signs:

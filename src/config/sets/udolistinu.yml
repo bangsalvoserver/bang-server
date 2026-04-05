@@ -187,7 +187,7 @@ character:
     responses:
       - can_play_card
       - discard card self | hand
-      - heal_notfull
+      - heal
     tags:
       - preselect
   - name: MICK_DEFENDER_2
