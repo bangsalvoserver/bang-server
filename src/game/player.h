@@ -152,11 +152,15 @@ namespace banggame {
         }
 
         void add(const_player_ptr target) {
-            m_value |= get_player_bit(target);
+            if (target) {
+                m_value |= get_player_bit(target);
+            }
         }
 
         void remove(const_player_ptr target) {
-            m_value &= ~get_player_bit(target);
+            if (target) {
+                m_value &= ~get_player_bit(target);
+            }
         }
 
         bool contains(const_player_ptr target) const {

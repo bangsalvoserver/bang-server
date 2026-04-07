@@ -105,6 +105,7 @@ namespace banggame {
 
         void add_short_pause();
         void flash_cards(card_list cards);
+        void play_sound(update_target target, sound_id sound);
         void play_sound(sound_id sound);
         
         void start_next_turn();

@@ -17,6 +17,7 @@ namespace banggame {
         dynamite,
         generalstore,
         shuffle,
+        invalid,
         bandidos,
         snake,
         train,

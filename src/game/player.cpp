@@ -67,7 +67,7 @@ namespace banggame {
     }
 
     void player::play_sound(sound_id sound) {
-        m_game->add_update(update_target::includes(this), game_updates::play_sound{ sound });
+        m_game->play_sound(update_target::includes(this), sound);
     }
 
     int player::max_cards_end_of_turn() const {
@@ -240,6 +240,7 @@ namespace banggame {
         m_game->call_event(event_type::apply_immunity_modifier{ origin_card, origin, this, flags, cards });
         bool result = !cards.empty();
         if (!quiet && result) {
+            m_game->play_sound(update_target::includes(this, origin), sound_id::invalid);
             for (card_ptr target_card : cards) {
                 m_game->add_log("LOG_PLAYER_IMMUNE_TO_CARD", this, origin_card, target_card);
             }
