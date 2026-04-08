@@ -16,7 +16,7 @@ namespace banggame {
             });
         } else {
             if (update_count == 0) {
-                target->play_sound(sound_id::generalstore);
+                target->m_game->play_sound(update_target::includes(target), sound_id::generalstore);
             }
             auto_pick();
         }

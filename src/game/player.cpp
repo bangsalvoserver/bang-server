@@ -66,10 +66,6 @@ namespace banggame {
         }
     }
 
-    void player::play_sound(sound_id sound) {
-        m_game->play_sound(update_target::includes(this), sound);
-    }
-
     int player::max_cards_end_of_turn() const {
         int ncards = m_hp;
         m_game->call_event(event_type::apply_maxcards_modifier{ this, ncards });
