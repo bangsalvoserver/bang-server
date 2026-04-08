@@ -26,7 +26,7 @@ namespace banggame {
                         target_card->set_visibility(player_set::includes(origin, target));
                     }
                 } else {
-                    target->m_game->pop_request();
+                    pop_request();
         
                     for (card_ptr target_card : origin->m_hand) {
                         target_card->set_visibility(card_visibility::show_owner, origin);

@@ -21,12 +21,12 @@ namespace banggame {
         if (target->m_hp <= 0 && !target->check_player_flags(player_flag::dead)) {
             auto_resolve();
         } else {
-            target->m_game->pop_request();
+            pop_request();
         }
     }
     
     void request_death::on_resolve() {
-        target->m_game->pop_request();
+        pop_request();
         target->m_game->call_event(event_type::on_player_death{ target, tried_save });
 
         handle_player_death(origin, target, death_type::death);

@@ -26,7 +26,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
             handler->resolve();
         }
 
@@ -67,9 +67,9 @@ namespace banggame {
     }
 
     void effect_tumbleweed::on_play(card_ptr origin_card, player_ptr origin) {
-        auto handler = origin->m_game->top_request<request_tumbleweed>()->handler;
-        origin->m_game->pop_request();
-        handler->restart();
+        auto req = origin->m_game->top_request<request_tumbleweed>();
+        req->pop_request();
+        req->handler->restart();
     }
 
 }

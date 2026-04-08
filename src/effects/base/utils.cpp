@@ -67,7 +67,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
         }
 
         game_string status_text(player_ptr owner) const override {

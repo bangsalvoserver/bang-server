@@ -94,7 +94,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             target->m_game->add_log("LOG_DISCARDED_FEAT", target, target_card);
             target_card->drop_all_fame();
             target->m_game->m_first_player->disable_equip(target_card);
@@ -128,7 +128,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             target->m_game->add_log("LOG_FEAT_BOASTED", target, target_card);
             auto [token, count] = get_player_fame_tokens(target);
             target->m_game->move_tokens(token, token_positions::player{target}, token_positions::card{target_card}, 1);
@@ -154,18 +154,18 @@ namespace banggame {
         void on_update() override {
             if (update_count == 0) {
                 if (!target->alive() || target->m_game->m_playing != target || is_legend(target) || get_count_performed_feats(target) != 0) {
-                    target->m_game->pop_request();
+                    pop_request();
                 } else {
                     auto [token, count] = get_player_fame_tokens(target);
                     if (count == 0) {
-                        target->m_game->pop_request();
+                        pop_request();
                     }
                 }
             }
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
         }
 
         prompt_string resolve_prompt() const override {
@@ -181,7 +181,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             card_ptr feat_card = draw_next_feat(target);
             if (feat_card->pocket == pocket_type::feats_deck) {
                 target->m_game->queue_request<request_discard_feat>(target);

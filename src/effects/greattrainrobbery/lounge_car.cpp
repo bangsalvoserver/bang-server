@@ -22,7 +22,7 @@ namespace banggame {
                 }
             }
             if (target->m_game->m_selection.empty()) {
-                target->m_game->pop_request();
+                pop_request();
             }
         }
 

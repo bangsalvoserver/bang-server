@@ -33,7 +33,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
             if (move_card_to_deck()) {
                 while (!target->m_game->m_selection.empty()) {
                     target->m_game->m_selection.front()->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
@@ -49,7 +49,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             if (move_card_to_deck()) {
                 target_card->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
             }

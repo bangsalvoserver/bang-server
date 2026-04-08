@@ -101,7 +101,7 @@ namespace banggame {
     }
 
     void request_check_base::resolve() {
-        target->m_game->pop_request();
+        pop_request();
         if (!target->m_game->m_selection.empty()) {
             while (!target->m_game->m_selection.empty()) {
                 card_ptr c = target->m_game->m_selection.front();

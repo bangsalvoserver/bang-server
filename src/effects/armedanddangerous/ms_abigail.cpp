@@ -47,6 +47,6 @@ namespace banggame {
         origin->m_game->play_sound(update_target::includes(origin, req->origin), sound_id::invalid);
         
         origin_card->flash_card();
-        origin->m_game->pop_request();
+        req->pop_request();
     }
 }

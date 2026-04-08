@@ -15,7 +15,7 @@ namespace banggame {
         
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
-                target->m_game->pop_request();
+                pop_request();
             } else {
                 switch (get_escape_type()) {
                 case escape_type::no_escape:
@@ -35,7 +35,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
             target->m_game->queue_request<request_check>(target, origin_card, std::not_fn(&card_sign::is_spades),
                 [origin_card=origin_card, origin=origin, target=target](bool result) {
                     if (!result) {

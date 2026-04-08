@@ -41,13 +41,13 @@ namespace banggame {
     }
 
     void effect_jourdonnais_legend::on_play(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<escapable_request>();
-        req->add_card(origin_card);
+        auto req = origin->m_game->top_request();
+        dynamic_cast<escapable_request *>(req.get())->add_card(origin_card);
 
         origin->m_game->queue_request<request_check>(origin, origin_card, &card_sign::is_jack_to_ace, [=](bool result) {
             if (result) {
                 origin->m_game->add_log("LOG_CARD_HAS_EFFECT", origin_card);
-                origin->m_game->pop_request();
+                req->pop_request();
             }
         });
     }

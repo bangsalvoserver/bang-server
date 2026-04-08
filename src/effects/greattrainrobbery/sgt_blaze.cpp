@@ -65,7 +65,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
         }
 
         bool can_pick(const_player_ptr target_player) const override {
@@ -75,7 +75,7 @@ namespace banggame {
         void on_pick(player_ptr target_player) override {
             ctx->skipped_player = target_player;
             target->m_game->add_log("LOG_SKIP_PLAYER", origin_card, target, target_player, target->m_game->m_train.front());
-            target->m_game->pop_request();
+            pop_request();
         }
 
         game_string status_text(player_ptr owner) const override {

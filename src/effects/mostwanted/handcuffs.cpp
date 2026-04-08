@@ -36,8 +36,9 @@ namespace banggame {
     }
     
     void effect_handcuffs::on_play(card_ptr target_card, player_ptr target) {
-        card_ptr origin_card = target->m_game->top_request<request_handcuffs>()->origin_card;
-        target->m_game->pop_request();
+        auto req = target->m_game->top_request<request_handcuffs>();
+        card_ptr origin_card = req->origin_card;
+        req->pop_request();
 
         target->m_game->add_listener<event_type::check_play_card>({origin_card, 1},
             [origin_card, target, suit=suit](player_ptr origin, card_ptr c, const effect_context &ctx) -> game_string {

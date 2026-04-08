@@ -16,7 +16,7 @@ namespace banggame {
                     target->m_game->m_discards.back()->move_to(pocket_type::selection, target, card_visibility::shown);
                 }
                 if (target->m_game->m_selection.empty()) {
-                    target->m_game->pop_request();
+                    pop_request();
                 } else if (target->m_game->m_selection.size() == 1) {
                     on_pick(target->m_game->m_selection.front());
                 }
@@ -24,7 +24,7 @@ namespace banggame {
         }
         
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             target->m_game->add_log("LOG_DRAWN_CARD_FOR", target, target_card, origin_card);
             target->add_to_hand(target_card);
 

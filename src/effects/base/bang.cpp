@@ -132,13 +132,13 @@ namespace banggame {
     }
 
     void request_bang::on_resolve() {
-        target->m_game->pop_request();
+        pop_request();
         target->damage(origin_card, origin, bang_damage, flags);
     }
 
     void request_bang::on_update() {
         if (!target->alive() || target->immune_to(origin_card, origin, flags)) {
-            target->m_game->pop_request();
+            pop_request();
         } else {
             if (update_count == 0) {
                 target->m_game->play_sound(
@@ -147,7 +147,7 @@ namespace banggame {
                 );
             }
             if (!unavoidable && bang_strength == 0) {
-                target->m_game->pop_request();
+                pop_request();
             } else if (unavoidable || target->empty_hand()) {
                 auto_resolve();
             }

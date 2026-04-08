@@ -19,7 +19,7 @@ namespace banggame {
                 req_draw->cleanup_selection();
             }
             if (!target->alive() || req_draw->num_drawn_cards >= req_draw->num_cards_to_draw) {
-                target->m_game->pop_request();
+                pop_request();
             }
         }
 

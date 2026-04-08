@@ -20,7 +20,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr) override {
-            target->m_game->pop_request();
+            pop_request();
 
             target->m_game->add_log("LOG_DRAWN_CARD_FOR", target, drawn_card, origin_card);
             drawn_card->set_visibility(card_visibility::shown);
@@ -51,7 +51,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
             target->m_game->add_log("LOG_DRAWN_CARDS", target, 1);
             target->add_to_hand(drawn_card);
         }

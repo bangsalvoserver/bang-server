@@ -25,7 +25,7 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             req_draw->add_to_hand_phase_one(target_card);
             if (req_draw->num_drawn_cards >= req_draw->num_cards_to_draw) {
-                target->m_game->pop_request();
+                pop_request();
                 while (!target->m_game->m_selection.empty()) {
                     target->m_game->m_selection.front()->move_to(pocket_type::main_deck, nullptr, card_visibility::hidden);
                 }

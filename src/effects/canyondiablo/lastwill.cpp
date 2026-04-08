@@ -18,7 +18,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
         }
 
         void on_update() override {
@@ -65,7 +65,8 @@ namespace banggame {
     }
 
     void handler_lastwill::on_play(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
-        origin->m_game->pop_request();
+        auto req = origin->m_game->top_request<request_lastwill>();
+        req->pop_request();
         for (card_ptr chosen_card : target_cards) {
             handler_gift_card{}.on_play(origin_card, origin, chosen_card, target);
         }

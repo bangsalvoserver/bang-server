@@ -17,7 +17,7 @@ namespace banggame {
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
-                target->m_game->pop_request();
+                pop_request();
             } else {
                 auto_pick();
             }
@@ -38,7 +38,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
 
             target->m_game->add_listener<event_type::get_selected_cards>(origin_card,
                 [origin_card=origin_card, target=target, target_card](card_ptr e_origin_card, player_ptr owner, card_list &result) {
@@ -84,14 +84,14 @@ namespace banggame {
                 return c->sign.rank == card_rank::rank_A;
             })) {
                 target->m_game->flash_cards(aces | rn::to<std::vector>());
-                target->m_game->pop_request();
+                pop_request();
                 target->m_game->add_short_pause();
                 target->m_game->add_log("LOG_POKER_ACE");
                 while (!target->m_game->m_selection.empty()) {
                     target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
                 }
             } else if (target->m_game->m_selection.size() <= 2) {
-                target->m_game->pop_request();
+                pop_request();
                 if (!target->m_game->m_selection.empty()) {
                     target->m_game->add_short_pause();
                 }
@@ -107,7 +107,7 @@ namespace banggame {
             target->m_game->add_log("LOG_DRAWN_CARD", target, target_card);
             target->add_to_hand(target_card);
             if (--num_cards == 0) {
-                target->m_game->pop_request();
+                pop_request();
                 while (!target->m_game->m_selection.empty()) {
                     target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
                 }

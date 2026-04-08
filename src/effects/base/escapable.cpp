@@ -11,7 +11,7 @@ namespace banggame {
 
     void request_targeting::on_update() {
         if (target->immune_to(origin_card, origin, flags)) {
-            target->m_game->pop_request();
+            pop_request();
         } else if (origin == target_card->owner && auto_resolvable()) {
             // auto resolve if targeting self, unless player has escape
             on_resolve();

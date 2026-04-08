@@ -33,12 +33,12 @@ namespace banggame {
                     target_card->move_to(pocket_type::selection);
                 }
             } else {
-                target->m_game->pop_request();
+                pop_request();
             }
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
 
             target->m_game->add_log("LOG_CHOSE_CARD", target_card, target);
 

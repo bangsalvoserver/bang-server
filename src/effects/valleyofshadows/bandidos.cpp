@@ -16,7 +16,7 @@ namespace banggame {
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
-                target->m_game->pop_request();
+                pop_request();
             } else {
                 if (update_count == 0) {
                     target->m_game->play_sound(update_target::includes(origin, target), sound_id::bandidos);
@@ -28,7 +28,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
             target->damage(origin_card, origin, 1);
         }
 
@@ -67,7 +67,8 @@ namespace banggame {
     }
 
     void effect_bandidos_response::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->pop_request();
+        auto req = origin->m_game->top_request<request_bandidos>();
+        req->pop_request();
     }
 
     struct request_bandidos2 : request_base {
@@ -75,7 +76,7 @@ namespace banggame {
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags) || target->empty_hand()) {
-                target->m_game->pop_request();
+                pop_request();
             } else {
                 if (update_count == 0) {
                     target->m_game->play_sound(update_target::includes(origin, target), sound_id::bandidos);
@@ -86,7 +87,7 @@ namespace banggame {
                     })
                     | rn::to<std::vector>();
                 if (not_disabled.size() <= 1) {
-                    origin->m_game->pop_request();
+                    pop_request();
                     for (card_ptr target_card : not_disabled) {
                         effect_discard{true}.on_play(origin_card, target, target_card);
                     }
@@ -113,6 +114,7 @@ namespace banggame {
     }
 
     void effect_bandidos2_response::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->pop_request();
+        auto req = origin->m_game->top_request<request_bandidos2>();
+        req->pop_request();
     }
 }

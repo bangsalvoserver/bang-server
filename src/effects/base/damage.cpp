@@ -40,7 +40,7 @@ namespace banggame {
 
     void request_damage::on_update() {
         if (target->is_ghost()) {
-            target->m_game->pop_request();
+            pop_request();
         } else if (target->m_game->call_event(event_type::check_damage_response{ target })) {
             set_duration(target->m_game->m_options.damage_timer);
         } else {
@@ -49,7 +49,7 @@ namespace banggame {
     }
 
     void request_damage::on_finished() {
-        target->m_game->pop_request();
+        pop_request();
         
         if (flags.check(effect_flag::play_as_bang)) {
             if (flags.check(effect_flag::target_players)) {

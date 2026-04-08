@@ -38,9 +38,9 @@ namespace banggame {
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
-                target->m_game->pop_request();
+                pop_request();
             } else if (rn::none_of(target->m_hand, [&](const_card_ptr c) { return can_pick(c); })) {
-                target->m_game->pop_request();
+                pop_request();
                 target->reveal_hand();
                 target->draw_card(2, origin_card);
             } else if (target->m_hand.size() == 1) {
@@ -49,7 +49,7 @@ namespace banggame {
         }
         
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
             target->discard_used_card(target_card);
             target->draw_card(2, origin_card);
@@ -79,14 +79,14 @@ namespace banggame {
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags) || target->empty_hand()) {
-                target->m_game->pop_request();
+                pop_request();
             } else if (target->m_hand.size() <= 2) {
                 on_resolve(target->m_hand);
             }
         }
 
         void on_resolve(const card_list &target_cards) {
-            target->m_game->pop_request();
+            pop_request();
 
             target->m_game->add_listener<event_type::get_selected_cards>(origin_card,
                 [origin_card=origin_card, target=target, target_cards](card_ptr e_origin_card, player_ptr owner, card_list &result) {

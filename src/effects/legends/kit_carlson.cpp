@@ -32,7 +32,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
 
             while (!target->m_game->m_selection.empty()) {
                 req_draw->add_to_hand_phase_one(target->m_game->m_selection.front());

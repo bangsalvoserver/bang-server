@@ -37,6 +37,8 @@ namespace banggame {
     }
 
     void effect_peyote::on_play(card_ptr target_card, player_ptr target) {
+        auto req = target->m_game->top_request<request_peyote>();
+
         card_ptr drawn_card = target->m_game->top_of_deck();
         drawn_card->set_visibility(card_visibility::shown);
         drawn_card->add_short_pause();
@@ -45,7 +47,7 @@ namespace banggame {
             target->m_game->add_log("LOG_DRAWN_CARD", target, drawn_card);
             target->add_to_hand(drawn_card);
         } else {
-            target->m_game->pop_request();
+            req->pop_request();
             target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, drawn_card);
             drawn_card->move_to(pocket_type::discard_pile);
         }

@@ -17,21 +17,20 @@ namespace banggame {
         }
     };
 
-    class request_queue;
-
     template<std::invocable Function>
     class request_action : public request_base {
     private:
         [[no_unique_address]] Function m_function;
-        request_queue *queue;
     
     public:
-        request_action(Function &&fun, request_queue *queue, int priority)
+        request_action(Function &&fun, int priority)
             : request_base(nullptr, nullptr, nullptr, {}, priority)
-            , m_function(FWD(fun))
-            , queue(queue) {}
+            , m_function(FWD(fun)) {}
 
-        void on_update() override;
+        void on_update() override {
+            pop_request();
+            std::invoke(m_function);
+        }
     };
 
     namespace request_states {
@@ -111,6 +110,7 @@ namespace banggame {
         }
 
         void queue_request(std::shared_ptr<request_base> &&value) {
+            value->queue = this;
             m_requests.emplace(std::move(value));
         }
 
@@ -128,21 +128,22 @@ namespace banggame {
 
         template<std::invocable Function>
         void queue_action(Function &&fun, int priority = 0) {
-            queue_request<request_action>(FWD(fun), this, priority);
+            queue_request<request_action>(FWD(fun), priority);
         }
 
-        void pop_request() {
-            if (m_requests.empty()) {
-                throw game_error("Request queue is empty. Cannot pop");
+        void pop_request(request_base *req) {
+            if (top_request().get() != req) {
+                throw game_error("Request is not the top request. Cannot pop.");
             }
             m_requests.pop();
         }
     };
 
-    template<std::invocable Function>
-    void request_action<Function>::on_update() {
-        queue->pop_request();
-        std::invoke(m_function);
+    inline void request_base::pop_request() {
+        if (!queue) {
+            throw game_error("Request is not queued. Cannot pop");
+        }
+        queue->pop_request(this);
     }
 
 }
