@@ -141,11 +141,10 @@ namespace banggame {
             target->m_game->pop_request();
         } else {
             if (update_count == 0) {
-                if (flags.check(effect_flag::target_players)) {
-                    target->play_sound(sound_id::gatling);
-                } else {
-                    target->play_sound(sound_id::bang);
-                }
+                target->m_game->play_sound(
+                    update_target::includes(origin, target),
+                    flags.check(effect_flag::target_players) ? sound_id::gatling : sound_id::bang
+                );
             }
             if (!unavoidable && bang_strength == 0) {
                 target->m_game->pop_request();

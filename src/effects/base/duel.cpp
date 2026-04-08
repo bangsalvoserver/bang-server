@@ -24,7 +24,7 @@ namespace banggame {
                 target->m_game->pop_request();
             } else {
                 if (update_count == 0) {
-                    target->play_sound(sound_id::duel);
+                    target->m_game->play_sound(update_target::includes(target, respond_to), sound_id::duel);
                 }
                 if (target->empty_hand()) {
                     auto_resolve();

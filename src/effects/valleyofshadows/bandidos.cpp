@@ -19,7 +19,7 @@ namespace banggame {
                 target->m_game->pop_request();
             } else {
                 if (update_count == 0) {
-                    target->play_sound(sound_id::bandidos);
+                    target->m_game->play_sound(update_target::includes(origin, target), sound_id::bandidos);
                 }
                 if (target->empty_hand()) {
                     auto_resolve();
@@ -78,7 +78,7 @@ namespace banggame {
                 target->m_game->pop_request();
             } else {
                 if (update_count == 0) {
-                    target->play_sound(sound_id::bandidos);
+                    target->m_game->play_sound(update_target::includes(origin, target), sound_id::bandidos);
                 }
                 auto not_disabled = target->m_hand
                     | rv::remove_if([&](const_card_ptr c) {

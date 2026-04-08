@@ -21,7 +21,7 @@ namespace banggame {
                 target->m_game->pop_request();
             } else {
                 if (update_count == 0) {
-                    target->play_sound(sound_id::indians);
+                    target->m_game->play_sound(update_target::includes(origin, target), sound_id::indians);
                 }
                 if (target->empty_hand()) {
                     auto_resolve();
