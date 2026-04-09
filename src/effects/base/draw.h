@@ -80,7 +80,7 @@ namespace banggame {
         int num_cards_to_draw = 2;
         
         card_ptr phase_one_drawn_card();
-        void add_to_hand_phase_one(card_ptr target_card);
+        void add_to_hand_phase_one(card_ptr target_card, bool reveal = false);
         void cleanup_selection();
 
         void on_update() override;

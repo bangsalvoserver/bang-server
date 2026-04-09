@@ -95,10 +95,9 @@ namespace banggame {
         }
     }
 
-    void request_draw::add_to_hand_phase_one(card_ptr drawn_card) {
+    void request_draw::add_to_hand_phase_one(card_ptr drawn_card, bool reveal) {
         ++num_drawn_cards;
         
-        bool reveal = false;
         target->m_game->call_event(event_type::on_card_drawn{ target, drawn_card, shared_from_this(), reveal });
         if (drawn_card->pocket == pocket_type::discard_pile) {
             target->m_game->add_log("LOG_DRAWN_FROM_DISCARD", target, drawn_card);

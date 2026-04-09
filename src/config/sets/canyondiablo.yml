@@ -251,6 +251,7 @@ character:
       - none
     tags:
       - card_choice(-1)
+      - skip_logs
   - name: PAT_BARRETT
     image: 20_pat_barrett
     equip:
