@@ -17,17 +17,19 @@ namespace banggame {
             : request_picking(origin_card, origin, target, {}, 39) {}
 
         void on_update() override {
-            if (!target->m_game->check_flags(game_flag::hands_shown)) {
-                if (update_count == 0) {
+            if (update_count == 0) {
+                if (!target->m_game->check_flags(game_flag::hands_shown)) {
                     origin->add_player_flags(player_flag::show_hand_playing);
 
                     for (card_ptr target_card : origin->m_hand) {
                         target->m_game->add_log(update_target::includes(origin, target), "LOG_REVEALED_CARD", origin, target_card);
                         target_card->set_visibility(player_set::includes(origin, target));
                     }
-                } else {
-                    pop_request();
+                }
+            } else {
+                pop_request();
         
+                if (!target->m_game->check_flags(game_flag::hands_shown)) {
                     for (card_ptr target_card : origin->m_hand) {
                         target_card->set_visibility(card_visibility::show_owner, origin);
                     }
