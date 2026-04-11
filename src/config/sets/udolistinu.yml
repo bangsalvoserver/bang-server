@@ -153,8 +153,8 @@ character:
     image: 07_blackflower
     effects:
       - max_usages(1)
-      - discard card self | hand clubs
-      - bang player reachable notself
+      - set_playing(play_as::bang) card self | hand clubs
+      - play_as_bangcard player reachable notself
     tags:
       - skip_logs
       - ranged_effect
