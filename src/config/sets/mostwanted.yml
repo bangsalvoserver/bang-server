@@ -20,7 +20,7 @@ character:
       - max_usages(1)
       - discard card self | hand
       - generalstore
-      - generalstore players
+      - generalstore players alive
   - name: ANNIE_VERSARY
     image: 02_annieversary
     equip:
@@ -28,7 +28,7 @@ character:
     effects:
       - banglimit
       - set_playing(play_as::bang) card self | hand not_bangcard
-      - play_as_bangcard player reachable notself
+      - play_as_bangcard player alive reachable notself
     tags:
       - play_as_bang
       - banglimit

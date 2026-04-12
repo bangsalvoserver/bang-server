@@ -11,7 +11,7 @@ character:
     image: 04_jacky_murieta
     effects:
       - pay_gold(2)
-      - bang player reachable notself
+      - bang player alive reachable notself
     tags:
       - skip_logs
       - ranged_effect
@@ -47,10 +47,10 @@ goldrush:
     image: 04_bicchierino
     color: brown
     effects:
-      - heal player
+      - heal player alive
     responses:
       - forced_play
-      - heal player
+      - heal player alive
     tags:
       - buy_cost(1)
       - preselect
@@ -126,7 +126,7 @@ goldrush:
     name: WANTED
     image: 04_ricercato
     color: black
-    equip_target: any
+    equip_target: alive
     equip:
       - wanted
     tags:
@@ -233,10 +233,10 @@ hidden:
     deck: goldrush
     effects:
       - card_choice
-      - bang player reachable notself
+      - bang player alive reachable notself
     responses:
       - card_choice
-      - bang player reachable notself
+      - bang player alive reachable notself
     tags:
       - card_choice(1)
       - ranged_effect
@@ -247,11 +247,11 @@ hidden:
     effects:
       - card_choice
       - generalstore
-      - generalstore players
+      - generalstore players alive
     responses:
       - card_choice
       - generalstore
-      - generalstore players
+      - generalstore players alive
     tags:
       - card_choice(2)
   - name: PARDNER_DUEL
@@ -260,10 +260,10 @@ hidden:
     deck: goldrush
     effects:
       - card_choice
-      - duel player notself
+      - duel player alive notself
     responses:
       - card_choice
-      - duel player notself
+      - duel player alive notself
     tags:
       - card_choice(2)
   - name: PARDNER_CAT_BALOU

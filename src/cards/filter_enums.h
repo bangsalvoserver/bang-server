@@ -6,9 +6,8 @@
 namespace banggame {
 
     enum class target_player_filter {
-        any,
+        alive,
         dead,
-        dead_or_alive,
         self,
         notself,
         notsheriff,

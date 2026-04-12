@@ -10,15 +10,11 @@
 namespace banggame {
 
     game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, player_filter_bitset filter, const_player_ptr target, const effect_context &ctx) {
-        if (!filter.check(target_player_filter::dead_or_alive)
-            && filter.check(target_player_filter::dead) == target->alive()
-        ) {
-            if (target->alive()) {
-                return {"ERROR_TARGET_NOT_DEAD", origin_card, target};
-            } else {
-                return {"ERROR_TARGET_DEAD", origin_card, target};
-            }
-        }
+        if (filter.check(target_player_filter::alive) && !target->alive())
+            return {"ERROR_TARGET_DEAD", origin_card, target};
+
+        if (filter.check(target_player_filter::dead) && target->alive())
+            return {"ERROR_TARGET_NOT_DEAD", origin_card, target};
 
         if (filter.check(target_player_filter::self) && target != origin)
             return {"ERROR_TARGET_NOT_SELF", origin_card};

@@ -8,7 +8,8 @@ main_deck:
     color: blue
     equip_target: dead
     equip:
-      - ghost(player_flag::ghost_1)
+      - ghost
+      - add_flag(player_flag::ghost_1)
     tags:
       - ghost_card
   - name: LEMAT
@@ -21,7 +22,7 @@ main_deck:
     effects:
       - banglimit
       - set_playing(play_as::bang) card self | hand not_bangcard
-      - play_as_bangcard player reachable notself
+      - play_as_bangcard player alive reachable notself
     tags:
       - weapon(1)
       - play_as_bang
@@ -33,7 +34,7 @@ main_deck:
       - 7 hearts
     image: 07_serpenteasonagli
     color: blue
-    equip_target: any
+    equip_target: alive
     equip:
       - predraw_check(0)
       - snake
@@ -54,7 +55,7 @@ main_deck:
       - 9 clubs
     image: 07_taglia
     color: blue
-    equip_target: any
+    equip_target: alive
     equip:
       - bounty
     tags:
@@ -65,7 +66,7 @@ main_deck:
     image: 07_bandidos
     color: brown
     effects:
-      - bandidos players
+      - bandidos players alive
     tags:
       - strong
   - name: ESCAPE
@@ -91,7 +92,7 @@ main_deck:
     image: 07_poker
     color: brown
     effects:
-      - poker players notself not_empty_hand
+      - poker players alive notself not_empty_hand
       - poker
     tags:
       - strong
@@ -118,7 +119,7 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - bang adjacent_players(1) reachable notself
+      - bang adjacent_players(1) alive reachable notself
     tags:
       - skip_logs
       - banglimit
@@ -129,7 +130,7 @@ main_deck:
     image: 07_tomahawk
     color: brown
     effects:
-      - bang player notself range_2
+      - bang player alive notself range_2
     tags:
       - skip_logs
       - ranged_effect
@@ -139,7 +140,7 @@ main_deck:
     image: 07_tornado
     color: brown
     effects:
-      - tornado players
+      - tornado players alive
   - name: LAST_CALL
     signs:
       - 8 diamonds
@@ -154,7 +155,7 @@ character:
     effects:
       - max_usages(1)
       - set_playing(play_as::bang) card self | hand clubs
-      - play_as_bangcard player reachable notself
+      - play_as_bangcard player alive reachable notself
     tags:
       - skip_logs
       - ranged_effect
@@ -167,14 +168,14 @@ character:
     effects:
       - max_usages(1)
       - set_playing(play_as::gatling) card self | hand used_bang
-      - play_as_bang players notself
+      - play_as_bang players alive notself
     tags:
       - strong
   - name: EVELYN_SHEBANG
     image: 07_evelynshebang
     responses:
       - add_draw_card
-      - evelyn_shebang player notself reachable
+      - evelyn_shebang player alive notself reachable
   - name: HENRY_BLOCK
     image: 07_henryblock
     equip:

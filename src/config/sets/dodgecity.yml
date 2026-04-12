@@ -73,7 +73,7 @@ main_deck:
     image: 03_pugno
     color: brown
     effects:
-      - bang player notself range_1
+      - bang player alive notself range_1
     tags:
       - skip_logs
       - ranged_effect
@@ -119,7 +119,7 @@ main_deck:
     effects:
       - discard extra_card self | hand
       - discard
-      - bang player notself
+      - bang player alive notself
     tags:
       - skip_logs
       - no_auto_discard
@@ -131,7 +131,7 @@ main_deck:
     effects:
       - discard extra_card self | hand
       - discard
-      - heal player
+      - heal player alive
     tags:
       - no_auto_discard
   - name: WHISKY
@@ -192,7 +192,7 @@ main_deck:
     color: green
     effects:
       - draw
-      - bang player notself range_1
+      - bang player alive notself range_1
     tags:
       - skip_logs
       - ranged_effect
@@ -202,7 +202,7 @@ main_deck:
     image: 03_fucile_da_caccia
     color: green
     effects:
-      - bang player notself
+      - bang player alive notself
     tags:
       - skip_logs
   - name: HOWITZER
@@ -211,7 +211,7 @@ main_deck:
     image: 03_howitzer
     color: green
     effects:
-      - bang players notself
+      - bang players alive notself
     tags:
       - strong
   - name: PEPPERBOX
@@ -220,7 +220,7 @@ main_deck:
     image: 03_pepperbox
     color: green
     effects:
-      - bang player reachable notself
+      - bang player alive reachable notself
     tags:
       - skip_logs
       - ranged_effect
@@ -248,7 +248,7 @@ main_deck:
     image: 03_pugnale
     color: green
     effects:
-      - bang player notself range_1
+      - bang player alive notself range_1
     tags:
       - skip_logs
       - ranged_effect
@@ -285,7 +285,7 @@ character:
     effects:
       - max_usages(1)
       - discard cards(2) self | hand
-      - none player reachable notself
+      - none player alive reachable notself
     mth_effect: doc_holyday(1,2)
     tags:
       - ranged_effect

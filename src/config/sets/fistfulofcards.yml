@@ -7,7 +7,7 @@ fistfulofcards:
     image: 05_cecchino
     effects:
       - discard cards(2) self | hand bang
-      - sniper player reachable notself
+      - sniper player alive reachable notself
     tags:
       - ranged_effect
   - name: DEAD_MAN
@@ -23,7 +23,7 @@ fistfulofcards:
       - blood_brothers
     responses:
       - can_play_card
-      - blood_brothers player notself
+      - blood_brothers player alive notself
   - name: THE_JUDGE
     image: 05_ilgiudice
     equip:

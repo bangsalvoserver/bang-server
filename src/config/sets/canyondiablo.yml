@@ -7,7 +7,7 @@ main_deck:
     effects:
       - graverobber
       - discard
-      - generalstore players
+      - generalstore players alive
     tags:
       - no_auto_discard
   - name: CARD_SHARPER
@@ -36,7 +36,7 @@ main_deck:
     image: 20_pattodisangue
     color: brown
     effects:
-      - blood_brothers player notself
+      - blood_brothers player alive notself
   - name: SACRIFICE
     signs:
       - 10 hearts
@@ -59,7 +59,7 @@ main_deck:
     image: 20_molotov
     color: brown
     effects:
-      - bang player reachable notself
+      - bang player alive reachable notself
     tags:
       - skip_logs
       - ranged_effect
@@ -98,7 +98,7 @@ main_deck:
       - max_usages(1)
       - set_playing(play_as::gatling) card self | hand used_bang
       - discard card self | hand
-      - play_as_bang players notself
+      - play_as_bang players alive notself
     tags:
       - weapon(2)
       - strong
@@ -107,13 +107,13 @@ main_deck:
       - A spades
     image: 20_ultimevolonta
     color: blue
-    equip_target: any
+    equip_target: alive
     equip:
       - lastwill
     responses:
       - lastwill
       - none max_cards(3, true) self
-      - none player notself
+      - none player alive notself
     mth_response: lastwill(1,2)
     tags:
       - preselect
@@ -133,7 +133,7 @@ main_deck:
       - K clubs
     image: 20_esattore
     color: blue
-    equip_target: any
+    equip_target: alive
     equip:
       - taxman(-2)
     tags:
@@ -143,7 +143,7 @@ main_deck:
       - 7 clubs
     image: 20_bordello
     color: blue
-    equip_target: any
+    equip_target: alive
     equip:
       - predraw_check(-3)
       - brothel
@@ -176,7 +176,7 @@ main_deck:
     image: 20_sentierodiguerra
     color: green
     effects:
-      - indians players notself
+      - indians players alive notself
     tags:
       - indians
       - strong
@@ -196,7 +196,7 @@ main_deck:
     color: brown
     responses:
       - missed
-      - bang conditional_player notself range_1
+      - bang conditional_player alive notself range_1
     tags:
       - missed
   - name: ON_THE_HOUSE
@@ -212,7 +212,7 @@ main_deck:
       - 9 clubs
     image: 20_chitarra
     color: blue
-    equip_target: any
+    equip_target: alive
     equip:
       - weapon(0)
     tags:

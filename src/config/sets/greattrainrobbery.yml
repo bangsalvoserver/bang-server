@@ -42,7 +42,7 @@ main_deck:
     effects:
       - banglimit
       - knife_revolver
-      - bang player reachable notself
+      - bang player alive reachable notself
     tags:
       - banglimit
       - ranged_effect
@@ -68,7 +68,7 @@ main_deck:
     color: brown
     effects:
       - draw
-      - most_wanted players
+      - most_wanted players alive
   - name: NEXT_STOP
     signs:
       - 2 diamonds
@@ -111,7 +111,7 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - train_robbery player notself
+      - train_robbery player alive notself
     tags:
       - banglimit
       - skip_logs
@@ -135,7 +135,7 @@ character:
     image: 27_evan_babbit
     responses:
       - discard card self | hand origin_card_suit
-      - evan_babbit player notself notorigin range_1
+      - evan_babbit player alive notself notorigin range_1
     tags:
       - ranged_effect
   - name: JIMMY_TEXAS
@@ -277,7 +277,7 @@ train:
     color: train
     effects:
       - discard
-      - circus_wagon players notself not_empty_table
+      - circus_wagon players alive notself not_empty_table
   - name: COAL_HOPPER
     image: 27_coal_hopper
     color: train
@@ -302,9 +302,10 @@ train:
     image: 27_ghost_car
     expansion: ghost_cards
     color: train
-    equip_target: notsheriff dead_or_alive
+    equip_target: notsheriff
     equip:
-      - ghost(player_flag::ghost_2)
+      - ghost
+      - add_flag(player_flag::ghost_2)
     tags:
       - ghost_card
   - name: LOUNGE_CAR
@@ -316,7 +317,7 @@ train:
   - name: LUMBER_FLATCAR
     image: 27_lumber_flatcar
     color: train
-    equip_target: any
+    equip_target: alive
     equip:
       - lumber_flatcar
     tags:
@@ -359,7 +360,7 @@ train:
     effects:
       - max_usages(1)
       - discard card self | blue_or_train
-      - bang player reachable notself
+      - bang player alive reachable notself
     responses:
       - max_usages(1)
       - discard card self | blue_or_train
@@ -434,7 +435,7 @@ hidden:
     deck: train
     effects:
       - card_choice
-      - bang player reachable notself
+      - bang player alive reachable notself
     tags:
       - card_choice(3)
       - ranged_effect
@@ -443,7 +444,7 @@ hidden:
     responses:
       - lounge_car_response
       - none card | selection
-      - none player notself target_set dead_or_alive
+      - none player notself target_set
     mth_response: lounge_car(1,2)
     tags:
       - preselect
@@ -452,7 +453,7 @@ hidden:
     responses:
       - mail_car_response
       - none card | selection
-      - none player notself
+      - none player alive notself
     mth_response: gift_card(1,2)
     tags:
       - preselect

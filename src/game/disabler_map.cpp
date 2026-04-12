@@ -22,11 +22,10 @@ namespace banggame {
             game->m_wws_scenario_cards
                 | rv::take_last(1) | to_pairs(game->m_first_player),
             game->m_players
-                | rv::filter(&player::alive)
                 | rv::for_each([](player_ptr p) {
                     return rv::concat(
                         p->m_table,
-                        p->m_characters | rv::take(1)
+                        p->m_characters | rv::take(p->alive())
                     ) | to_pairs(p);
                 })
         );

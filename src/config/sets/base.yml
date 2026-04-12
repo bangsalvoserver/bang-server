@@ -48,7 +48,7 @@ main_deck:
       - 10 spades
     image: 01_prigione
     color: blue
-    equip_target: notsheriff
+    equip_target: alive notsheriff
     equip:
       - predraw_check(1)
       - jail
@@ -141,7 +141,7 @@ main_deck:
     color: brown
     effects:
       - banglimit
-      - bangcard player reachable notself
+      - bangcard player alive reachable notself
     tags:
       - bangcard
       - banglimit
@@ -200,7 +200,7 @@ main_deck:
     image: 01_duello
     color: brown
     effects:
-      - duel player notself
+      - duel player alive notself
     tags:
       - skip_logs
   - &general_store
@@ -212,7 +212,7 @@ main_deck:
     color: brown
     effects:
       - generalstore
-      - generalstore players
+      - generalstore players alive
   - &gatling
     name: GATLING
     signs:
@@ -220,7 +220,7 @@ main_deck:
     image: 01_gatling
     color: brown
     effects:
-      - bang players notself
+      - bang players alive notself
     tags:
       - strong
   - &indians
@@ -231,7 +231,7 @@ main_deck:
     image: 01_indiani
     color: brown
     effects:
-      - indians players notself
+      - indians players alive notself
     tags:
       - indians
       - strong(1)
@@ -279,7 +279,7 @@ main_deck:
     image: 01_saloon
     color: brown
     effects:
-      - heal players
+      - heal players alive
   - &wells_fargo
     name: WELLS_FARGO
     signs:
@@ -308,7 +308,7 @@ character:
     effects:
       - banglimit
       - set_playing(play_as::bang) card self | hand missed
-      - play_as_bangcard player reachable notself
+      - play_as_bangcard player alive reachable notself
     responses:
       - set_playing(play_as::missed) card self | hand bangcard
       - play_as_missed
@@ -408,7 +408,7 @@ button_row:
 hidden:
   - name: PICK
     responses:
-      - pick card dead_or_alive | target_set
+      - pick card | target_set
     tags:
       - pick
       - preselect
