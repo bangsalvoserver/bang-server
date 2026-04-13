@@ -3,6 +3,8 @@
 #include "cards/game_enums.h"
 #include "cards/game_events.h"
 
+#include "effects/base/death.h"
+
 #include "game/game_table.h"
 
 namespace banggame {
@@ -27,7 +29,7 @@ namespace banggame {
                 target->remove_player_flags(player_flag::dead);
                 target->set_hp(1);
 
-                target->enable_equip(target->get_character());
+                revive_character(target);
             }
         });
     }

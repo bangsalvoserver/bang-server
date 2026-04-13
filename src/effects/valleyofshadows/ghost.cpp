@@ -28,7 +28,7 @@ namespace banggame {
     
     void equip_ghost::on_enable(card_ptr target_card, player_ptr target) {
         if (!target->alive()) {
-            target->enable_equip(target->get_character());
+            revive_character(target);
         }
     }
     

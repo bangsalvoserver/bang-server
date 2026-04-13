@@ -25,7 +25,7 @@ namespace banggame {
                 | rv::for_each([](player_ptr p) {
                     return rv::concat(
                         p->m_table,
-                        p->m_characters | rv::take(p->alive())
+                        p->m_characters | rv::take(1)
                     ) | to_pairs(p);
                 })
         );

@@ -15,7 +15,7 @@ namespace banggame {
             if (!target->alive()) {
                 origin->m_game->add_log("LOG_REVIVE", target, target_card);
                 target->add_player_flags(player_flag::temp_ghost);
-                target->enable_equip(target->get_character());
+                revive_character(target);
             }
         });
         origin->m_game->add_listener<event_type::on_turn_end>({target_card, -3}, [](player_ptr target, bool skipped) {

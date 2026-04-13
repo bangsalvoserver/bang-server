@@ -61,6 +61,11 @@ namespace banggame {
             }
 
             if (!target->alive()) {
+                card_ptr target_card = target->get_character();
+                target->m_game->add_disabler({target_card, 90}, [=](const_card_ptr c) {
+                    return c == target_card;
+                });
+
                 for (card_ptr character : target->m_characters) {
                     target->disable_equip(character);
                 }
@@ -173,5 +178,9 @@ namespace banggame {
                 }
             }
         }, -8);
+    }
+
+    void revive_character(player_ptr target) {
+        target->m_game->remove_disablers({ target->get_character(), 90 });
     }
 }

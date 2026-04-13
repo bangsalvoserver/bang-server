@@ -118,7 +118,7 @@ namespace banggame {
             if (!target->alive() && !only_sheriff_and_renegade_alive(target)) {
                 target->m_game->add_log("LOG_SHADOW_GUNSLINGER", target);
                 target->add_player_flags(player_flag::shadow);
-                target->enable_equip(target->get_character());
+                revive_character(target);
             }
         });
         game->add_listener<event_type::on_turn_start>({nullptr, 10}, [](player_ptr target) {
