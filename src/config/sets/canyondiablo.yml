@@ -186,7 +186,7 @@ main_deck:
     image: 20_incendio
     color: green
     effects:
-      - destroy card_per_player notself
+      - destroy card_per_player notself not_empty
     tags:
       - skip_logs
   - name: FLYING_BULLET
