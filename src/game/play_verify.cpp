@@ -143,6 +143,9 @@ namespace banggame {
     }
 
     game_string get_play_card_error(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
+        if (!origin->alive() && origin_card->deck != card_deck_type::none) {
+            return "ERROR_INVALID_ACTION";
+        }
         if (card_ptr disabler = origin->m_game->get_disabler(origin_card)) {
             return {"ERROR_CARD_DISABLED_BY", origin_card, disabler};
         }
