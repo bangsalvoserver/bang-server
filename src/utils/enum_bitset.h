@@ -7,9 +7,61 @@
 #include <cstdint>
 #include <type_traits>
 #include <initializer_list>
+#include <limits>
+#include <bit>
 
 namespace enums {
     using bitset_int = uint64_t;
+
+    template<enumeral T>
+    class bitset_iterator {
+    public:
+        using iterator_category = std::forward_iterator_tag;
+        using difference_type = ptrdiff_t;
+        using value_type = T;
+        using pointer = value_type *;
+        using reference = value_type;
+    
+    private:
+        static constexpr int end_index = std::numeric_limits<bitset_int>::digits;
+
+        bitset_int m_value = 0;
+        int m_index = 0;
+
+        constexpr bitset_iterator(bitset_int value, int index)
+            : m_value{value}, m_index{index} {}
+    
+    public:
+        constexpr bitset_iterator() = default;
+
+        static constexpr bitset_iterator begin(bitset_int value) {
+            return bitset_iterator{value, value == 0 ? end_index : std::countr_zero(value)};
+        }
+
+        static constexpr bitset_iterator end(bitset_int value) {
+            return bitset_iterator{value, end_index};
+        }
+        
+        constexpr bool operator == (const bitset_iterator &other) const = default;
+
+        constexpr bitset_iterator &operator ++ () {
+            auto shifted = m_value >> (m_index + 1);
+            if (shifted == 0) {
+                m_index = end_index;
+            } else {
+                m_index += 1 + std::countr_zero(shifted);
+            }
+            return *this;
+        }
+
+        constexpr bitset_iterator operator ++ (int) {
+            auto copy = *this; ++(*this); return copy;
+        }
+
+        constexpr value_type operator *() const {
+            return enum_values<T>[m_index];
+        }
+    };
 
     template<enumeral T>
     class bitset {
@@ -17,6 +69,10 @@ namespace enums {
         bitset_int m_value = 0;
     
     public:
+        using value_type = T;
+        using iterator = bitset_iterator<T>;
+        using const_iterator = bitset_iterator<T>;
+
         constexpr bitset() = default;
 
         constexpr bitset(T value) {
@@ -65,24 +121,19 @@ namespace enums {
         constexpr bool check_all(bitset value) const {
             return (m_value & value.m_value) == value.m_value;
         }
+
+        constexpr auto begin() const {
+            return iterator::begin(m_value);
+        }
+
+        constexpr auto end() const {
+            return iterator::end(m_value);
+        }
     };
 
 }
 
 namespace json {
-
-    template<enums::enumeral T, typename Context>
-    struct serializer<enums::bitset<T>, Context> {
-        static void write(const enums::bitset<T> &value, string_writer &writer) {
-            writer.StartArray();
-            for (T v : enums::enum_values<T>) {
-                if (value.check(v)) {
-                    serialize(v, writer);
-                }
-            }
-            writer.EndArray();
-        }
-    };
 
     template<enums::enumeral T, typename Context>
     struct deserializer<enums::bitset<T>, Context> {
@@ -106,13 +157,11 @@ namespace std {
     struct formatter<enums::bitset<E>> : formatter<std::string_view> {
         static constexpr std::string bitset_to_string(enums::bitset<E> value) {
             std::string ret;
-            for (E v : enums::enum_values<E>) {
-                if (value.check(v)) {
-                    if (!ret.empty()) {
-                        ret += ' ';
-                    }
-                    ret.append(enums::to_string(v));
+            for (E v : value) {
+                if (!ret.empty()) {
+                    ret += ' ';
                 }
+                ret.append(enums::to_string(v));
             }
             return ret;
         }
