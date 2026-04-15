@@ -15,7 +15,7 @@ namespace banggame {
          
         void on_update() override {
             if (!target->alive() || target->empty_hand() || target->m_game->m_playing != target) {
-                target->m_game->pop_request();
+                pop_request();
             }
         }
 
@@ -24,7 +24,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
         }
 
         game_string status_text(player_ptr owner) const override {
@@ -49,7 +49,8 @@ namespace banggame {
     }
 
     void effect_ranch::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
-        origin->m_game->pop_request();
+        auto req = origin->m_game->top_request<request_ranch>();
+        req->pop_request();
         
         origin->draw_card(static_cast<int>(ctx.get<contexts::selected_cards>().size()), origin_card);
     }

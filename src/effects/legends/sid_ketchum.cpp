@@ -32,6 +32,7 @@ namespace banggame {
     }
 
     void effect_sid_ketchum_legend_free_bang::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->pop_request();
+        auto req = origin->m_game->top_request<request_sid_ketchum_legend>();
+        req->pop_request();
     }
 }

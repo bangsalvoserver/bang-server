@@ -49,7 +49,7 @@ namespace banggame {
             && num_drawn_cards < num_cards_to_draw)
         {
             if (update_count == 0) {
-                target->play_sound(sound_id::draw);
+                target->m_game->play_sound(update_target::includes(target), sound_id::draw);
             }
             card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
             if (only_card && only_card->has_tag(tag_type::pick)) {
@@ -58,7 +58,7 @@ namespace banggame {
                 cleanup_selection();
             }
         } else {
-            target->m_game->pop_request();
+            pop_request();
             cleanup_selection();
         }
     }
@@ -95,10 +95,9 @@ namespace banggame {
         }
     }
 
-    void request_draw::add_to_hand_phase_one(card_ptr drawn_card) {
+    void request_draw::add_to_hand_phase_one(card_ptr drawn_card, bool reveal) {
         ++num_drawn_cards;
         
-        bool reveal = false;
         target->m_game->call_event(event_type::on_card_drawn{ target, drawn_card, shared_from_this(), reveal });
         if (drawn_card->pocket == pocket_type::discard_pile) {
             target->m_game->add_log("LOG_DRAWN_FROM_DISCARD", target, drawn_card);
@@ -117,7 +116,7 @@ namespace banggame {
 
     void request_draw::on_pick(card_ptr target_card) {
         if (handlers.empty()) {
-            target->m_game->pop_request();
+            pop_request();
             while (num_drawn_cards < num_cards_to_draw) {
                 add_to_hand_phase_one(phase_one_drawn_card());
             }
@@ -127,7 +126,7 @@ namespace banggame {
                 target_card = handlers.front();
             }
             if (target_card) {
-                target->m_game->pop_request();
+                pop_request();
                 target->m_game->call_event(event_type::on_draw_from_deck{ target, target_card, shared_from_this() });
             }
         }
@@ -157,7 +156,8 @@ namespace banggame {
     }
 
     void effect_skip_drawing::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->top_request<request_draw>()->cleanup_selection();
-        origin->m_game->pop_request();
+        auto req = origin->m_game->top_request<request_draw>();
+        req->cleanup_selection();
+        req->pop_request();
     }
 }

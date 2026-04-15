@@ -35,7 +35,7 @@ main_deck:
     image: 17_colporapido
     color: brown
     effects:
-      - bang player_per_cube(1) reachable notself
+      - bang player_per_cube(1) alive reachable notself
     tags:
       - skip_logs
       - ranged_effect
@@ -45,7 +45,7 @@ main_deck:
     image: 17_flintlock
     color: brown
     effects:
-      - bang select_cubes_player(2) reachable notself
+      - bang select_cubes_player(2) alive reachable notself
       - flintlock
     tags:
       - skip_logs
@@ -56,7 +56,7 @@ main_deck:
     image: 17_freccia
     color: brown
     effects:
-      - indians player_per_cube(1) notself
+      - indians player_per_cube(1) alive notself
     tags:
       - indians
       - skip_logs
@@ -88,7 +88,7 @@ main_deck:
     image: 17_ruggine
     color: brown
     effects:
-      - rust players notself not_empty_cubes
+      - rust players alive notself not_empty_cubes
   - name: SQUAW
     signs:
       - 3 diamonds
@@ -138,7 +138,7 @@ main_deck:
       - 7 diamonds
     image: 17_bomba
     color: orange
-    equip_target: any
+    equip_target: alive
     equip:
       - predraw_check(0)
       - bomb
@@ -276,7 +276,7 @@ character:
     effects:
       - max_usages(1)
       - none select_cubes(2)
-      - bang player reachable notself
+      - bang player alive reachable notself
     tags:
       - skip_logs
       - ranged_effect

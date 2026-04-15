@@ -19,7 +19,7 @@ namespace banggame {
                 req_draw->cleanup_selection();
             }
             if (!target->alive() || req_draw->num_drawn_cards >= req_draw->num_cards_to_draw) {
-                target->m_game->pop_request();
+                pop_request();
             }
         }
 
@@ -62,9 +62,7 @@ namespace banggame {
         shared_request_draw req_draw = target->m_game->top_request<request_annie_oakey>()->req_draw;
 
         card_ptr drawn_card = req_draw->phase_one_drawn_card();
-        drawn_card->set_visibility(card_visibility::shown);
-        drawn_card->add_short_pause();
-        req_draw->add_to_hand_phase_one(drawn_card);
+        req_draw->add_to_hand_phase_one(drawn_card, true);
 
         if ((drawn_card->sign.*fn)()) {
             target->draw_card(ncards, origin_card);

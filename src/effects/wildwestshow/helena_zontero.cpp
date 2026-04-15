@@ -19,7 +19,7 @@ namespace banggame {
         }
 
         void on_finished() override {
-            origin->m_game->pop_request();
+            pop_request();
             
             auto alive_players = rv::filter(origin->m_game->m_players, [](player_ptr p) {
                 return p->alive() && !p->is_sheriff();
@@ -81,7 +81,7 @@ namespace banggame {
         }
         
         void resolve() override {
-            origin->m_game->pop_request();
+            pop_request();
             if (get_modified_sign(drawn_card).is_red()) {
                 origin->m_game->add_log("LOG_CARD_HAS_EFFECT", origin_card);
                 origin->m_game->queue_request<request_shuffle_roles>(origin_card, origin);

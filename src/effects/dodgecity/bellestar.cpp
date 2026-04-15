@@ -16,13 +16,13 @@ namespace banggame {
         });
         p->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player_ptr target, bool skipped) {
             if (p == target) {
-                p->m_game->remove_disablers(target_card);
+                p->m_game->remove_disablers({ target_card, 0 });
             }
         });
     }
 
     void equip_bellestar::on_disable(card_ptr target_card, player_ptr target) {
-        target->m_game->remove_disablers(target_card);
-        target->m_game->remove_listeners(target_card);
+        target->m_game->remove_disablers({ target_card, 0 });
+        target->m_game->remove_listeners({ target_card, 0 });
     }
 }

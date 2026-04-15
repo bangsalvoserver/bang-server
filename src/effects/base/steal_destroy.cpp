@@ -82,7 +82,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
             effect_steal{}.on_resolve(origin_card, origin, target_card);
         }
 
@@ -205,7 +205,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
             effect_destroy{}.on_resolve(origin_card, origin, target_card);
         }
 

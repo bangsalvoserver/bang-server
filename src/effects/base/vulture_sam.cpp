@@ -34,7 +34,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             if (target_card->pocket == pocket_type::player_hand) {
                 target_card = origin->random_hand_card();
             }

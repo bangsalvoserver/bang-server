@@ -14,7 +14,7 @@ namespace banggame {
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
-                target->m_game->pop_request();
+                pop_request();
             } else {
                 switch (get_escape_type()) {
                 case escape_type::no_escape:
@@ -37,7 +37,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            origin->m_game->pop_request();
+            pop_request();
             for (card_ptr c : cube_slots(target) | rn::to<std::vector>()) {
                 c->move_cubes(origin->get_character(), 1);
             }

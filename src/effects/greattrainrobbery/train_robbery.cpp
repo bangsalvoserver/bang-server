@@ -26,7 +26,7 @@ namespace banggame {
                     return in_target_set(target_card);
                 })
             ) {
-                target->m_game->pop_request();
+                pop_request();
             }
         }
 

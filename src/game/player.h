@@ -34,8 +34,6 @@ namespace banggame {
         void enable_equip(card_ptr target_card);
         void disable_equip(card_ptr target_card);
 
-        void play_sound(sound_id sound);
-        
         card_ptr random_hand_card() const;
         
         void add_to_hand(card_ptr card);
@@ -152,11 +150,15 @@ namespace banggame {
         }
 
         void add(const_player_ptr target) {
-            m_value |= get_player_bit(target);
+            if (target) {
+                m_value |= get_player_bit(target);
+            }
         }
 
         void remove(const_player_ptr target) {
-            m_value &= ~get_player_bit(target);
+            if (target) {
+                m_value &= ~get_player_bit(target);
+            }
         }
 
         bool contains(const_player_ptr target) const {

@@ -5,6 +5,8 @@
 
 #include "game/game_table.h"
 
+#include "effects/base/death.h"
+
 #include "ruleset.h"
 
 namespace banggame {
@@ -23,7 +25,7 @@ namespace banggame {
                 target->set_hp(2);
                 target->draw_card(2);
 
-                target->enable_equip(target->get_character());
+                revive_character(target);
             }
         });
     }

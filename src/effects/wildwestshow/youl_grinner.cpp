@@ -18,7 +18,7 @@ namespace banggame {
     }
 
     void request_youl_grinner::on_pick(card_ptr target_card) {
-        target->m_game->pop_request();
+        pop_request();
         handler_gift_card{true, true}.on_play(origin_card, target, target_card, origin);
     }
 

@@ -38,7 +38,7 @@ namespace banggame {
 
         void on_update() override {
             if (target->m_characters.back() == origin_card) {
-                target->m_game->pop_request();
+                pop_request();
                 effect_greygory_deck{allow_expansions}.on_play(origin_card, target);
             }
         }

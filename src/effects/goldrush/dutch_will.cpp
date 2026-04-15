@@ -21,7 +21,7 @@ namespace banggame {
                         req_draw->phase_one_drawn_card()->move_to(pocket_type::selection, target);
                     }
                 } else {
-                    target->m_game->pop_request();
+                    pop_request();
                     for (int i=0; i<ncards; ++i) {
                         card_ptr target_card = req_draw->phase_one_drawn_card();
                         target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target_card);
@@ -35,7 +35,7 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             req_draw->add_to_hand_phase_one(target_card);
             if (target->m_game->m_selection.size() == 1) {
-                target->m_game->pop_request();
+                pop_request();
                 target->m_game->add_log("LOG_DISCARDED_SELF_CARD", target, target->m_game->m_selection.front());
                 target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
                 target->add_gold(1);

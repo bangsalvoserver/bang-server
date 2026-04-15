@@ -26,7 +26,7 @@ namespace banggame {
         bool fatal = saved->m_hp <= req->damage;
 
         if (--req->damage == 0) {
-            origin->m_game->pop_request();
+            req->pop_request();
         }
     
         origin->damage(origin_card, origin, 1);

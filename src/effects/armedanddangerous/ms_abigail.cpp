@@ -41,10 +41,12 @@ namespace banggame {
     }
 
     void effect_ms_abigail::on_play(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<escapable_request>();
-        req->add_card(origin_card);
+        auto req = origin->m_game->top_request();
+        dynamic_cast<escapable_request *>(req.get())->add_card(origin_card);
+
+        origin->m_game->play_sound(update_target::includes(origin, req->origin), sound_id::invalid);
         
         origin_card->flash_card();
-        origin->m_game->pop_request();
+        req->pop_request();
     }
 }

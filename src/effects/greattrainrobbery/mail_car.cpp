@@ -17,7 +17,7 @@ namespace banggame {
                     target->m_game->top_of_deck()->move_to(pocket_type::selection, target);
                 }
             } else {
-                target->m_game->pop_request();
+                pop_request();
                 while (!target->m_game->m_selection.empty()) {
                     card_ptr c = target->m_game->m_selection.front();
                     if (!target->m_game->check_flags(game_flag::hands_shown)) {

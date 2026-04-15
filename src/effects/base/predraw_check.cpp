@@ -12,7 +12,7 @@ namespace banggame {
             }
             auto cards = get_checking_cards();
             if (cards.empty()) {
-                target->m_game->pop_request();
+                pop_request();
             } else if (cards.size() == 1) {
                 card_ptr checking_card = cards.front().target_card;
                 if (target->m_game->m_options.auto_pick_predraw
@@ -22,7 +22,7 @@ namespace banggame {
                 }
             }
         } else {
-            target->m_game->pop_request();
+            pop_request();
         }
     }
 

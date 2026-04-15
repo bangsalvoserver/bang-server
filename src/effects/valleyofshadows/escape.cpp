@@ -14,9 +14,9 @@ namespace banggame {
     }
 
     void effect_escape_base::on_play(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<escapable_request>();
-        req->add_card(origin_card);
-        origin->m_game->pop_request();
+        auto req = origin->m_game->top_request();
+        dynamic_cast<escapable_request *>(req.get())->add_card(origin_card);
+        req->pop_request();
     }
 
     bool effect_escape::can_escape(player_ptr origin, card_ptr origin_card, effect_flags flags) {

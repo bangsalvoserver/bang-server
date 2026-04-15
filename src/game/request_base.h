@@ -8,6 +8,8 @@
 
 namespace banggame {
 
+    class request_queue;
+
     class request_base {
     public:
         request_base(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}, int priority = 100)
@@ -21,11 +23,14 @@ namespace banggame {
         effect_flags flags;
         int priority;
         int update_count = 0;
+        request_queue *queue = nullptr;
 
         virtual void on_update() {}
 
         virtual game_string status_text(player_ptr owner) const { return {}; };
         virtual card_list get_highlights(player_ptr owner) const { return {}; }
+
+        void pop_request();
     };
 
     struct interface_target_set_players {

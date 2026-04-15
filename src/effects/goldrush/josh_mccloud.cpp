@@ -36,7 +36,7 @@ namespace banggame {
                     }
                 }
             } else {
-                target->m_game->pop_request();
+                pop_request();
                 target_card->add_short_pause();
                 target_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
             }
@@ -59,7 +59,8 @@ namespace banggame {
     }
 
     void effect_forced_play::on_play(card_ptr origin_card, player_ptr target) {
-        target->m_game->pop_request();
+        auto req = target->m_game->top_request<request_force_play_card>();
+        req->pop_request();
     }
 
     struct request_force_equip_card : request_picking_player {
@@ -75,7 +76,7 @@ namespace banggame {
 
         void on_update() override {
             if (get_all_equip_targets(target, target_card).empty()) {
-                target->m_game->pop_request();
+                pop_request();
                 target_card->add_short_pause();
                 target_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
             } else if (target_card->self_equippable()) {
@@ -92,7 +93,7 @@ namespace banggame {
         }
 
         void on_pick(player_ptr target_player) override {
-            target->m_game->pop_request();
+            pop_request();
             if (target_player == target) {
                 target->m_game->add_log("LOG_EQUIPPED_CARD", target_card, target);
             } else {

@@ -44,7 +44,7 @@ namespace banggame {
             if (target->alive() && saved->alive()) {
                 auto_pick();
             } else {
-                target->m_game->pop_request();
+                pop_request();
             }
         }
 
@@ -73,7 +73,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             if (target_card->pocket != pocket_type::player_hand) {
                 target->draw_card(2, origin_card);
             } else {
@@ -117,7 +117,7 @@ namespace banggame {
         req->savior = origin;
 
         if (--req->damage == 0) {
-            origin->m_game->pop_request();
+            req->pop_request();
         }
 
         origin->m_game->queue_request<request_saved>(origin_card, origin, saved);
@@ -151,7 +151,7 @@ namespace banggame {
         bool fatal = saved->m_hp <= req->damage;
         
         if (--req->damage == 0) {
-            origin->m_game->pop_request();
+            req->pop_request();
         }
 
         if (fatal) {

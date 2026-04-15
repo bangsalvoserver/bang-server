@@ -23,7 +23,7 @@ namespace banggame {
                     target->m_game->add_cards_to({ choice_card }, pocket_type::selection, nullptr, card_visibility::shown);
                 }
             } else {
-                target->m_game->pop_request();
+                pop_request();
             }
         }
 
@@ -32,7 +32,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             if (target_card == choice_card) {
                 target->m_game->add_log("LOG_CHARACTER_CHOICE", target, target_card);
                 target->set_character(target_card);

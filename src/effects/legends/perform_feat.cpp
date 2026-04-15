@@ -67,7 +67,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
         }
         
         bool in_target_set(const_player_ptr target_player) const override {
@@ -93,9 +93,10 @@ namespace banggame {
     }
 
     void effect_damage_legend::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        auto req = origin->m_game->top_request<request_damage_legend>();
         bot_suggestion::signal_hostile_action(origin, target);
         
-        origin->m_game->pop_request();
+        req->pop_request();
         target->m_game->add_log("LOG_DAMAGED_LEGEND", origin, target);
         target->damage(origin_card, origin, 1);
     }
@@ -112,11 +113,11 @@ namespace banggame {
                     target->m_game->call_event(event_type::get_performable_feats{ target, target_cards });   
 
                     if (target_cards.empty()) {
-                        target->m_game->pop_request();
+                        pop_request();
                     }
                 }
             } else {
-                target->m_game->pop_request();
+                pop_request();
             }
         }
 
@@ -132,7 +133,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
         }
 
         prompt_string resolve_prompt() const override {
@@ -151,7 +152,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             effect_perform_feat{}.on_play(target_card, target);
         }
 

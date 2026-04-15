@@ -17,7 +17,10 @@ namespace banggame {
             return resolve_type::dismiss;
         }
 
-        void on_resolve() override;
+        void on_resolve() override {
+            pop_request();
+        }
+        
         game_string status_text(player_ptr owner) const override;
     };
 

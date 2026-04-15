@@ -26,7 +26,7 @@ namespace banggame {
         }
 
         void on_pick(player_ptr target_player) override {
-            target->m_game->pop_request();
+            pop_request();
             if (target != target_player) {
                 target->m_game->add_log("LOG_MOVE_BOMB_ON", origin_card, target, target_player);
                 target->disable_equip(origin_card);

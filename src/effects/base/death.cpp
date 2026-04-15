@@ -21,12 +21,12 @@ namespace banggame {
         if (target->m_hp <= 0 && !target->check_player_flags(player_flag::dead)) {
             auto_resolve();
         } else {
-            target->m_game->pop_request();
+            pop_request();
         }
     }
     
     void request_death::on_resolve() {
-        target->m_game->pop_request();
+        pop_request();
         target->m_game->call_event(event_type::on_player_death{ target, tried_save });
 
         handle_player_death(origin, target, death_type::death);
@@ -61,6 +61,11 @@ namespace banggame {
             }
 
             if (!target->alive()) {
+                card_ptr target_card = target->get_character();
+                target->m_game->add_disabler({target_card, 90}, [=](const_card_ptr c) {
+                    return c == target_card;
+                });
+
                 for (card_ptr character : target->m_characters) {
                     target->disable_equip(character);
                 }
@@ -136,7 +141,7 @@ namespace banggame {
                     winner_target.add(p);
                 }
                 if (winner_target) {
-                    target->m_game->add_update(winner_target, game_updates::play_sound{ sound_id::victory });
+                    target->m_game->play_sound(winner_target, sound_id::victory);
                 }
                 target->m_game->add_game_flags(game_flag::game_over);
                 target->m_game->add_log("LOG_GAME_OVER");
@@ -173,5 +178,9 @@ namespace banggame {
                 }
             }
         }, -8);
+    }
+
+    void revive_character(player_ptr target) {
+        target->m_game->remove_disablers({ target->get_character(), 90 });
     }
 }

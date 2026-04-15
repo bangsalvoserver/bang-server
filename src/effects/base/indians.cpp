@@ -18,10 +18,10 @@ namespace banggame {
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
-                target->m_game->pop_request();
+                pop_request();
             } else {
                 if (update_count == 0) {
-                    target->play_sound(sound_id::indians);
+                    target->m_game->play_sound(update_target::includes(origin, target), sound_id::indians);
                 }
                 if (target->empty_hand()) {
                     auto_resolve();
@@ -42,7 +42,7 @@ namespace banggame {
         }
 
         void respond_with_bang() override {
-            target->m_game->pop_request();
+            pop_request();
         }
         
         void on_pick(card_ptr target_card) override {
@@ -52,7 +52,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
             target->damage(origin_card, origin, 1);
         }
 

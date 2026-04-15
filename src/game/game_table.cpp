@@ -236,6 +236,10 @@ namespace banggame {
         add_update(game_updates::flash_card{ std::move(cards) });
     }
 
+    void game_table::play_sound(update_target target, sound_id sound) {
+        add_update(target, game_updates::play_sound{ sound });
+    }
+
     void game_table::play_sound(sound_id sound) {
         add_update(game_updates::play_sound{ sound });
     }

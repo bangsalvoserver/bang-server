@@ -22,7 +22,7 @@ namespace banggame {
             }
 
             if (nslots <= ncubes || ncards <= 1) {
-                target->m_game->pop_request();
+                pop_request();
                 for (card_ptr c : cube_slots(target)) {
                     int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes());
                     ncubes -= cubes_to_add;
@@ -51,7 +51,7 @@ namespace banggame {
 
         void on_pick(card_ptr target_card) override {
             if (--ncubes == 0) {
-                target->m_game->pop_request();
+                pop_request();
             }
         
             target_card->add_cubes(1);

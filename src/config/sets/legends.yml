@@ -18,7 +18,7 @@ legends:
     effects:
       - banglimit
       - set_playing(play_as::bang) card self | hand not_bangcard
-      - play_as_bangcard player reachable notself
+      - play_as_bangcard player alive reachable notself
     responses:
       - set_playing(play_as::missed) card self | hand not_missedcard
       - play_as_missed
@@ -54,7 +54,7 @@ legends:
     responses:
       - kit_carlson_legend_response
       - none card | selection
-      - none player notself
+      - none player alive notself
     mth_response: gift_card(1,2)
     tags:
       - preselect
@@ -114,7 +114,7 @@ legends:
       - volcanic
     effects:
       - perform_feat
-      - bang player reachable notself
+      - bang player alive reachable notself
     tags:
       - ranged_effect
 
@@ -215,7 +215,7 @@ hidden:
     responses:
       - sid_ketchum_legend_free_bang
       - max_usages(1)
-      - bang player reachable notself
+      - bang player alive reachable notself
     tags:
       - preselect
       - ranged_effect

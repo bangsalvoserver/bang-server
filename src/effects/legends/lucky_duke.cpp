@@ -32,7 +32,7 @@ namespace banggame {
         }
 
         void on_pick(card_ptr target_card) override {
-            target->m_game->pop_request();
+            pop_request();
             req->on_pick(target_card);
         }
 

@@ -8,10 +8,14 @@ namespace banggame {
 
     void ruleset_crazy_greygory::on_apply(game_ptr game) {
         game->add_listener<event_type::on_assign_characters>(nullptr, [](player_ptr first_player) {
-            card_ptr target_card = get_single_element(first_player->m_game->m_characters
-                | rv::filter([](card_ptr target_card) {
-                    return rn::contains(target_card->expansion, GET_RULESET(crazy_greygory));
-                }));
+            auto &characters_list = first_player->m_game->m_characters;
+
+            auto it = rn::find_if(characters_list, [](card_ptr target_card) {
+                return rn::contains(target_card->expansion, GET_RULESET(crazy_greygory));
+            });
+
+            card_ptr target_card = *it;
+            characters_list.erase(it);
 
             for (player_ptr p : first_player->m_game->range_alive_players(first_player)) {
                 p->set_character(first_player->m_game->add_card(*target_card));

@@ -62,7 +62,7 @@ namespace banggame {
         }
 
         void resolve() override {
-            target->m_game->pop_request();
+            pop_request();
             int heal = count_suits();
 
             while (!target->m_game->m_selection.empty()) {

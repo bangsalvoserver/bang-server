@@ -15,6 +15,8 @@ namespace banggame {
     
     void handle_player_death(player_ptr killer, player_ptr target, death_type type);
 
+    void revive_character(player_ptr target);
+
     namespace event_type {
         struct on_player_death {
             player_ptr target;

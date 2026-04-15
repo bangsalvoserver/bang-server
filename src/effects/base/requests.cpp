@@ -14,7 +14,7 @@ namespace banggame {
     }
 
     void request_characterchoice::on_pick(card_ptr target_card) {
-        target->m_game->pop_request();
+        pop_request();
 
         target_card->move_to(pocket_type::player_character, target);
         target->m_game->remove_cards(target->m_hand);
@@ -44,18 +44,18 @@ namespace banggame {
     void request_character_modifier::on_update() {
         if (target->alive() && target->m_game->m_playing == target) {
             if (!target->m_game->call_event(event_type::check_character_modifier{ target, handlers })) {
-                target->m_game->pop_request();
+                pop_request();
             }
         } else {
-            target->m_game->pop_request();
+            pop_request();
         }
     }
 
     void request_discard::on_update() {
         if (!target->alive()) {
-            target->m_game->pop_request();
+            pop_request();
         } else if (rn::none_of(target->m_hand, [&](const_card_ptr c) { return can_pick(c); })) {
-            target->m_game->pop_request();
+            pop_request();
             target->reveal_hand();
         } else if (target->m_hand.size() == 1) {
             auto_pick();
@@ -72,7 +72,7 @@ namespace banggame {
     }
     
     void request_discard::on_pick(card_ptr target_card) {
-        target->m_game->pop_request();
+        pop_request();
         target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
         target->discard_used_card(target_card);
     }
@@ -107,7 +107,7 @@ namespace banggame {
 
     void request_discard_pass::on_update() {
         if (target->max_cards_end_of_turn() == 0) {
-            target->m_game->pop_request();
+            pop_request();
             target->m_game->queue_request<request_discard_hand_pass>(target);
         }
     }
@@ -130,7 +130,7 @@ namespace banggame {
         ++ndiscarded;
         target->m_game->call_event(event_type::on_discard_pass{ target, target_card });
         if (target->m_hand.size() <= target->max_cards_end_of_turn()) {
-            target->m_game->pop_request();
+            pop_request();
             target->m_game->call_event(event_type::post_discard_pass{ target, ndiscarded });
             target->m_game->queue_action([target = target]{ target->pass_turn(); }, 1);
         }
@@ -174,7 +174,7 @@ namespace banggame {
     }
 
     void request_discard_all::on_resolve() {
-        target->m_game->pop_request();
+        pop_request();
 
         card_list cards_to_discard = rv::concat(target->m_table, target->m_hand) | rn::to<std::vector>();
         rn::stable_partition(cards_to_discard, is_valid_card);
@@ -218,7 +218,7 @@ namespace banggame {
     }
 
     void request_discard_hand::on_resolve() {
-        target->m_game->pop_request();
+        pop_request();
         while (!target->empty_hand()) {
             on_pick(target->m_hand.front());
         }

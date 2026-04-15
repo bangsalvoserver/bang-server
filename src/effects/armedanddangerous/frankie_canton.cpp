@@ -31,7 +31,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            origin->m_game->pop_request();
+            pop_request();
             target_card->move_cubes(origin->get_character(), 1);
         }
 

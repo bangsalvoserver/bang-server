@@ -21,10 +21,10 @@ namespace banggame {
 
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
-                target->m_game->pop_request();
+                pop_request();
             } else {
                 if (update_count == 0) {
-                    target->play_sound(sound_id::duel);
+                    target->m_game->play_sound(update_target::includes(target, respond_to), sound_id::duel);
                 }
                 if (target->empty_hand()) {
                     auto_resolve();
@@ -46,7 +46,7 @@ namespace banggame {
         }
 
         void respond_with_bang() override {
-            target->m_game->pop_request();
+            pop_request();
             target->m_game->queue_request<request_duel_base>(origin_card, origin, respond_to, target);
         }
 
@@ -57,7 +57,7 @@ namespace banggame {
         }
 
         void on_resolve() override {
-            target->m_game->pop_request();
+            pop_request();
             target->damage(origin_card, origin, 1);
         }
 

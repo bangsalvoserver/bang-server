@@ -10,20 +10,20 @@ namespace banggame {
 
     void request_generalstore::on_update() {
         if (target->immune_to(origin_card, origin, flags)) {
-            target->m_game->pop_request();
+            pop_request();
             target->m_game->queue_action([target=target]{
                 target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
             });
         } else {
             if (update_count == 0) {
-                target->play_sound(sound_id::generalstore);
+                target->m_game->play_sound(update_target::includes(target), sound_id::generalstore);
             }
             auto_pick();
         }
     }
 
     void request_generalstore::on_pick(card_ptr target_card) {
-        target->m_game->pop_request();
+        pop_request();
         target->m_game->add_log("LOG_DRAWN_FROM_GENERALSTORE", target, target_card, origin_card);
         target->add_to_hand(target_card);
     }
