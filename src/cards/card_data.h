@@ -59,6 +59,7 @@ namespace banggame {
         bool is_black() const { return color == card_color_type::black; }
         bool is_orange() const { return color == card_color_type::orange; }
         bool is_train() const { return color == card_color_type::train; }
+        bool is_purple() const { return color == card_color_type::purple; }
     };
 
 }

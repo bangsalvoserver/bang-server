@@ -59,8 +59,8 @@ main_deck:
     signs:
       - Q hearts
     color: purple
-    # equip_effects:
-    #   - track player alive
+    equip_effects:
+      - track player alive
     # TODO
     # equip:
     #   - undertaker
@@ -108,8 +108,8 @@ main_deck:
     signs:
       - A diamonds
     color: purple
-    # equip_effects:
-    #   - track player alive
+    equip_effects:
+      - track player alive
     # TODO
     # equip:
     #   - comanche
@@ -120,8 +120,8 @@ main_deck:
     signs:
       - 10 hearts
     color: purple
-    # equip_effects:
-    #   - track player alive
+    equip_effects:
+      - track player alive
     # TODO
     # equip:
     #   - companion
@@ -256,8 +256,8 @@ main_deck:
     signs:
       - 2 spades
     color: purple
-    # equip_effects:
-    #   - track player alive
+    equip_effects:
+      - track player alive
     # TODO
     # equip:
     #   - posse
