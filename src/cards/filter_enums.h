@@ -84,6 +84,7 @@ namespace banggame {
         dynamite,
         ranged_effect,
         force_allow,
+        pardner,
     };
 }
 
