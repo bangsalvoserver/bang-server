@@ -21,7 +21,12 @@ namespace banggame {
     void equip_brothel::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_predraw_check>({target_card, 0}, [=](player_ptr p, card_ptr e_card) {
             if (p == target && e_card == target_card) {
-                target->m_game->queue_request<request_check>(target, target_card, &card_sign::is_red, [=](bool result) {
+                target->m_game->queue_request<request_check>(target, target_card, [=](card_sign sign) {
+                    return draw_check_result{
+                        .lucky = sign.is_red(),
+                        .indifferent = target->m_game->is_disabled(target->get_character())
+                    };
+                }, [=](bool result) {
                     target->discard_card(target_card);
                     if (!result) {
                         target->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);

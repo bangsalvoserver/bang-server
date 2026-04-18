@@ -78,6 +78,7 @@ namespace banggame {
                 target->m_game->queue_request<request_check>(target, target_card, [=](card_sign sign) {
                     return draw_check_result{
                         .lucky = sign.is_red(),
+                        .indifferent = target->is_ghost(),
                         .defensive_redraw = target_card->num_cubes() <= 2
                     };
                 }, [=](bool result) {
