@@ -10,7 +10,7 @@ main_deck:
     equip:
       - disable_character
       - ghost
-      - add_flag(player_flag::ghost_1)
+      - add_flag(player_flag::ghost)
     tags:
       - ghost_card
   - name: LEMAT_2

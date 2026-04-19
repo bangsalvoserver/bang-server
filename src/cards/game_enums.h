@@ -45,8 +45,7 @@ namespace banggame {
 
     enum class player_flag {
         dead,
-        ghost_1,
-        ghost_2,
+        ghost,
         temp_ghost,
         shadow,
         extra_turn,

@@ -305,7 +305,7 @@ train:
     equip_target: notsheriff
     equip:
       - ghost
-      - add_flag(player_flag::ghost_2)
+      - add_flag(player_flag::ghost)
     tags:
       - ghost_card
   - name: LOUNGE_CAR

@@ -43,12 +43,28 @@ namespace banggame {
         origin->discard_used_card(target_card);
     }
 
+    namespace event_type {
+        struct check_player_flag {
+            using result_type = bool;
+            player_ptr target;
+            player_flag flag;
+        };
+    }
+
     void equip_add_flag::on_enable(card_ptr origin_card, player_ptr target) {
         target->add_player_flags(flag);
+
+        target->m_game->add_listener<event_type::check_player_flag>({ origin_card, 80 }, [=, flag=flag](player_ptr e_target, player_flag e_flag) {
+            return target == e_target && flag == e_flag;
+        });
     }
 
     void equip_add_flag::on_disable(card_ptr origin_card, player_ptr target) {
-        target->remove_player_flags(flag);
+        target->m_game->remove_listeners({ origin_card, 80 });
+
+        if (!target->m_game->call_event(event_type::check_player_flag{ target, flag })) {
+            target->remove_player_flags(flag);
+        }
     }
 
     void equip_game_flag::on_enable(card_ptr origin_card, player_ptr target) {

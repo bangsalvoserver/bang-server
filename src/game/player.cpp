@@ -26,8 +26,7 @@ namespace banggame {
     }
 
     static bool has_ghost_tag(const_player_ptr origin) {
-        return origin->check_player_flags(player_flag::ghost_1)
-            || origin->check_player_flags(player_flag::ghost_2)
+        return origin->check_player_flags(player_flag::ghost)
             || origin->check_player_flags(player_flag::temp_ghost)
             || origin->check_player_flags(player_flag::shadow);
     }
