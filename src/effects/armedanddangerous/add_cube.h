@@ -17,6 +17,15 @@ namespace banggame {
     };
 
     DEFINE_EFFECT(add_cube, effect_add_cube)
+
+    struct effect_min_cubes {
+        int ncubes;
+        effect_min_cubes(int ncubes) : ncubes{ncubes} {}
+
+        bool can_play(card_ptr origin_card, player_ptr origin);
+    };
+
+    DEFINE_EFFECT(min_cubes, effect_min_cubes)
 }
 
 #endif

@@ -100,4 +100,8 @@ namespace banggame {
         target->add_cubes(ncubes);
     }
 
+    bool effect_min_cubes::can_play(card_ptr origin_card, player_ptr origin) {
+        return origin_card->num_cubes() >= ncubes;
+    }
+
 }

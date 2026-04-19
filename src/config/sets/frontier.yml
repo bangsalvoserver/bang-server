@@ -227,10 +227,10 @@ main_deck:
       - K clubs
     color: orange
     expansion: armedanddangerous
-    # TODO
     effects:
+      - min_cubes(4)
       - none self_cubes(3)
-      # - pelts card notself | table
+      - switch_self card notself | table
   - name: FISHING
     image: 28_pesca
     signs:
