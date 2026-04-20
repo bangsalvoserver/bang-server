@@ -107,7 +107,8 @@ main_deck:
       - A spades
     image: 20_ultimevolonta
     color: blue
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - lastwill
     responses:
@@ -133,7 +134,8 @@ main_deck:
       - K clubs
     image: 20_esattore
     color: blue
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - taxman(-2)
     tags:
@@ -143,7 +145,8 @@ main_deck:
       - 7 clubs
     image: 20_bordello
     color: blue
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - predraw_check(-3)
       - brothel
@@ -212,7 +215,8 @@ main_deck:
       - 9 clubs
     image: 20_chitarra
     color: blue
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - weapon(0)
     tags:

@@ -2,6 +2,8 @@
 
 #include "ruleset.h"
 
+#include "effects/base/equip.h"
+
 #include "cards/filter_enums.h"
 
 #include "game/game_table.h"
@@ -39,7 +41,7 @@ namespace banggame {
 
         bool in_target_set(player_ptr target_player) const override {
             return rn::any_of(target->m_game->m_selection, [&](card_ptr target_card) {
-                return !check_player_filter(target_card, target, target_card->equip_target, target_player);
+                return !get_equip_error(target_card, target_player);
             });
         }
 
@@ -69,8 +71,7 @@ namespace banggame {
 
     game_string handler_lounge_car::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, player_ptr target_player) {
         for (card_ptr selection_card : origin->m_game->m_selection) {
-            MAYBE_RETURN(check_player_filter(selection_card, origin, selection_card->equip_target,
-                selection_card == target_card ? target_player : origin));
+            MAYBE_RETURN(get_equip_error(selection_card, selection_card == target_card ? target_player : origin));
         }
         return {};
     }

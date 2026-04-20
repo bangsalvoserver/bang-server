@@ -55,12 +55,6 @@ namespace banggame {
                 return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
             });
     }
-
-    inline auto get_all_equip_targets(player_ptr origin, card_ptr origin_card, const effect_context &ctx = {}) {
-        return origin->m_game->m_players | rv::filter([=](player_ptr target) {
-            return !get_equip_error(origin, origin_card, target, ctx);
-        });
-    }
 }
 
 #endif

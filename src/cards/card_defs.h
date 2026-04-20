@@ -241,6 +241,10 @@ namespace banggame {
     };
 
     namespace contexts {
+        struct equip_target {
+            player_ptr value;
+        };
+        
         struct playing_card {
             card_ptr value;
         };

@@ -6,6 +6,7 @@
 #include "game/game_table.h"
 
 #include "effects/base/requests.h"
+#include "effects/base/equip.h"
 
 namespace banggame {
 

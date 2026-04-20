@@ -4,6 +4,7 @@
 #include "traincost.h"
 
 #include "effects/base/death.h"
+#include "effects/base/equip.h"
 #include "effects/ghost_cards/ruleset.h"
 
 #include "cards/game_events.h"

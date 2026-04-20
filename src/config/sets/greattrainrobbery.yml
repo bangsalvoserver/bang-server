@@ -302,7 +302,8 @@ train:
     image: 27_ghost_car
     expansion: ghost_cards
     color: train
-    equip_target: notsheriff
+    equip_effects:
+      - equip_on player notsheriff
     equip:
       - ghost
       - add_flag(player_flag::ghost)
@@ -317,7 +318,8 @@ train:
   - name: LUMBER_FLATCAR
     image: 27_lumber_flatcar
     color: train
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - lumber_flatcar
     tags:

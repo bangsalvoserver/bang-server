@@ -14,6 +14,7 @@ namespace banggame {
 
         effect_list effects;
         effect_list responses;
+        effect_list equip_effects;
         equip_list equips;
         tag_map tags;
 
@@ -24,7 +25,6 @@ namespace banggame {
         modifier_holder modifier_response;
         mth_holder mth_effect;
         mth_holder mth_response;
-        player_filter_bitset equip_target;
         
         card_color_type color;
         card_sign sign;
@@ -51,10 +51,6 @@ namespace banggame {
                 return it->second;
             }
             return std::nullopt;
-        }
-
-        bool self_equippable() const {
-            return equip_target.empty();
         }
 
         bool is_brown() const { return color == card_color_type::brown; }

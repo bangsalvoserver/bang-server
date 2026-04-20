@@ -6,7 +6,8 @@ main_deck:
     image: 07_fantasma
     expansion: ghost_cards
     color: blue
-    equip_target: dead
+    equip_effects:
+      - equip_on player dead
     equip:
       - disable_character
       - ghost
@@ -35,7 +36,8 @@ main_deck:
       - 7 hearts
     image: 07_serpenteasonagli
     color: blue
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - predraw_check(0)
       - snake
@@ -56,7 +58,8 @@ main_deck:
       - 9 clubs
     image: 07_taglia
     color: blue
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - bounty
     tags:

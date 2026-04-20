@@ -3,6 +3,7 @@
 #include "ruleset.h"
 
 #include "effects/base/requests.h"
+#include "effects/base/equip.h"
 
 #include "cards/game_enums.h"
 
@@ -66,30 +67,37 @@ namespace banggame {
     struct request_force_equip_card : request_picking_player {
         request_force_equip_card(card_ptr origin_card, player_ptr target, card_ptr target_card)
             : request_picking_player(origin_card, nullptr, target)
-            , target_card(target_card) {}
+            , target_card(target_card)
+            , target_filter(get_equip_filter(target_card)) {}
         
         card_ptr target_card;
+        const player_filter_bitset *target_filter;
 
         card_list get_highlights(player_ptr owner) const override {
             return {target_card};
         }
 
         void on_update() override {
-            if (get_all_equip_targets(target, target_card).empty()) {
+            if (rn::none_of(target->m_game->m_players, [&](player_ptr p) { return in_target_set(p); })) {
                 pop_request();
                 target_card->add_short_pause();
                 target_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);
-            } else if (target_card->self_equippable()) {
+            } else if (target_filter == nullptr) {
                 on_pick(target);
             }
         }
 
         bool can_pick(player_ptr target_player) const override {
-            return !get_equip_error(target, target_card, target_player, {});
+            if (target_filter) {
+                if (check_player_filter(target_card, target, *target_filter, target_player)) return false;
+            } else {
+                if (target != target_player) return false;
+            }
+            return !effect_equip_on{}.get_error(target_card, target, target_player);
         }
 
         prompt_string pick_prompt(player_ptr target_player) const override {
-            return get_equip_prompt(target, target_card, target_player);
+            return effect_equip_on{}.on_prompt(target_card, target, target_player);
         }
 
         void on_pick(player_ptr target_player) override {

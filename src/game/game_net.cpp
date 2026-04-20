@@ -193,34 +193,22 @@ namespace banggame {
             throw json::deserialize_error("Cannot deserialize target list: value is not an array");
         }
 
-        if (check_equip && result.card->is_equip_card()) {
-            if (result.card->self_equippable()) {
-                if (!targets.Empty()) {
-                    throw json::deserialize_error("Self equippable card must have no targets");
-                }
-            } else {
-                if (targets.Size() != 1) {
-                    throw json::deserialize_error("Equip card must have one target");
-                }
-                result.targets.emplace_back(json::deserialize<player_ptr, game_context>(targets[0], context));
-            }
-        } else {
-            bool is_response = result.card->m_game->pending_requests();
+        bool is_equip = check_equip && result.card->is_equip_card();
+        bool is_response = result.card->m_game->pending_requests();
 
-            const auto &effects = result.card->get_effect_list(is_response);
+        const auto &effects = is_equip ? result.card->equip_effects : result.card->get_effect_list(is_response);
 
-            if (effects.empty()) {
-                throw json::deserialize_error("Effect list is empty");
-            }
+        if (is_equip ? is_response : effects.empty()) {
+            throw json::deserialize_error("Effect list is empty");
+        }
+        
+        if (effects.size() != targets.Size()) {
+            throw json::deserialize_error("Invalid number of targets");
+        }
 
-            if (effects.size() != targets.Size()) {
-                throw json::deserialize_error("Invalid number of targets");
-            }
-            
-            result.targets.reserve(effects.size());
-            for (const auto &[effect, target] : rv::zip(effects, targets.GetArray())) {
-                result.targets.push_back(effect.target->deserialize_target(target, context));
-            }
+        result.targets.reserve(effects.size());
+        for (const auto &[effect, target] : rv::zip(effects, targets.GetArray())) {
+            result.targets.push_back(effect.target->deserialize_target(target, context));
         }
 
         return result;

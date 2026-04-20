@@ -1,6 +1,7 @@
 #include "switch_cards.h"
 
 #include "effects/base/escapable.h"
+#include "effects/base/equip.h"
 
 #include "effects/dodgecity/ruleset.h"
 
@@ -62,14 +63,8 @@ namespace banggame {
 
     game_string handler_switch_cards::get_error(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
         player_ptr target = target_card->owner;
-        MAYBE_RETURN(check_player_filter(target_card, origin, target_card->equip_target, origin));
-        if (card_ptr c = origin->find_equipped_card(target_card)) {
-            return {"ERROR_DUPLICATED_CARD", c};
-        }
-        MAYBE_RETURN(check_player_filter(chosen_card, target, chosen_card->equip_target, target));
-        if (card_ptr c = target->find_equipped_card(chosen_card)) {
-            return {"ERROR_DUPLICATED_CARD", c};
-        }
+        MAYBE_RETURN(get_equip_error(target_card, origin));
+        MAYBE_RETURN(get_equip_error(chosen_card, target));
         return {};
     }
 

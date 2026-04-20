@@ -28,15 +28,10 @@ namespace banggame {
             }
         }
 
-        if (args.card->is_equip_card()) {
-            if (!args.card->self_equippable()) {
-                ret.targets.emplace_back(random_element(get_all_equip_targets(origin, args.card, ctx), origin->m_game->bot_rng));
-            }
-        } else {
-            for (const effect_holder &holder : args.card->get_effect_list(is_response)) {
-                const auto &target = ret.targets.emplace_back(holder.random_target(args.card, origin, ctx));
-                holder.add_context(args.card, origin, target, ctx);
-            }
+        const effect_list &effects = args.card->is_equip_card() ? args.card->equip_effects : args.card->get_effect_list(is_response);
+        for (const effect_holder &holder : effects) {
+            const auto &target = ret.targets.emplace_back(holder.random_target(args.card, origin, ctx));
+            holder.add_context(args.card, origin, target, ctx);
         }
 
         return ret;

@@ -126,7 +126,8 @@ goldrush:
     name: WANTED
     image: 04_ricercato
     color: black
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - wanted
     tags:

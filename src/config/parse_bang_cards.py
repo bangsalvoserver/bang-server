@@ -149,6 +149,7 @@ def parse_all_effects(card):
             image =        card['image'] if 'image' in card else None,
             effects =      parse_effects(card['effects']) if 'effects' in card else None,
             responses =    parse_effects(card['responses']) if 'responses' in card else None,
+            equip_effects = parse_effects(card['equip_effects']) if 'equip_effects' in card else None,
             equips =       parse_equips(card['equip']) if 'equip' in card else None,
             tags =         parse_tags(card['tags']) if 'tags' in card else None,
             expansion =    parse_expansions(card['expansion'].split(), set) if 'expansion' in card else None,
@@ -157,7 +158,6 @@ def parse_all_effects(card):
             modifier_response = parse_modifier(card['modifier_response']) if 'modifier_response' in card else None,
             mth_effect =   parse_mth(card['mth_effect']) if 'mth_effect' in card else None,
             mth_response = parse_mth(card['mth_response']) if 'mth_response' in card else None,
-            equip_target = [CppEnum('target_player_filter', f) for f in sorted(card['equip_target'].split())] if 'equip_target' in card else None,
             color =        CppEnum('card_color_type', card['color']) if 'color' in card else None,
             sign =         parse_sign(card['sign']) if 'sign' in card else None
         )

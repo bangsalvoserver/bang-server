@@ -3,32 +3,35 @@
 namespace banggame {
 
     static bool is_possible_recurse(player_ptr origin, card_ptr origin_card, bool is_response, card_list &modifiers, const effect_context &ctx, target_list &targets) {
-        const effect_list &effects = origin_card->get_effect_list(is_response);
+        bool is_equip = origin_card->is_equip_card();
+        const effect_list &effects = is_equip ? origin_card->equip_effects : origin_card->get_effect_list(is_response);
         
         if (targets.size() == effects.size()) {
-            if (const mth_holder &mth = origin_card->get_mth(is_response)) {
-                if (mth.get_error(origin_card, origin, targets, ctx)) {
+            if (!is_equip) {
+                if (const mth_holder &mth = origin_card->get_mth(is_response)) {
+                    if (mth.get_error(origin_card, origin, targets, ctx)) {
+                        return false;
+                    }
+                }
+
+                if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
+                    auto ctx_copy = ctx;
+                    ctx_copy.add<contexts::selected_cards>().push_back(origin_card);
+                    modifier.add_context(origin_card, origin, ctx_copy);
+
+                    modifiers.push_back(origin_card);
+                    for (card_ptr target_card : get_all_active_cards(origin, is_response, ctx_copy)) {
+                        if (is_possible_to_play(origin, target_card, is_response, modifiers, ctx_copy)) {
+                            modifiers.pop_back();
+                            return true;
+                        }
+                    }
+                    modifiers.pop_back();
                     return false;
                 }
             }
 
-            if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
-                auto ctx_copy = ctx;
-                ctx_copy.add<contexts::selected_cards>().push_back(origin_card);
-                modifier.add_context(origin_card, origin, ctx_copy);
-
-                modifiers.push_back(origin_card);
-                for (card_ptr target_card : get_all_active_cards(origin, is_response, ctx_copy)) {
-                    if (is_possible_to_play(origin, target_card, is_response, modifiers, ctx_copy)) {
-                        modifiers.pop_back();
-                        return true;
-                    }
-                }
-                modifiers.pop_back();
-                return false;
-            }
-
-            return !check_duplicates(ctx);
+            return !verify_context(origin, origin_card, ctx);
         }
         
         const effect_holder &effect = effects[targets.size()];
@@ -58,22 +61,20 @@ namespace banggame {
             return false;
         }
 
-        if (origin_card->is_equip_card()) {
-            return !is_response && !rn::empty(get_all_equip_targets(origin, origin_card, ctx));
-        } else {
-            const effect_list &effects = origin_card->get_effect_list(is_response);
-            if (effects.empty()) return false;
-            
-            for (const effect_holder &effect : effects) {
-                if (!effect.can_play(origin_card, origin, ctx)) {
-                    return false;
-                }
-            }
+        bool is_equip = origin_card->is_equip_card();
+        const effect_list &effects = is_equip ? origin_card->equip_effects : origin_card->get_effect_list(is_response);
 
-            target_list targets;
-            targets.reserve(effects.size());
-            return is_possible_recurse(origin, origin_card, is_response, modifiers, ctx, targets);
+        if (is_equip ? is_response : effects.empty()) return false;
+
+        for (const effect_holder &effect : effects) {
+            if (!effect.can_play(origin_card, origin, ctx)) {
+                return false;
+            }
         }
+
+        target_list targets;
+        targets.reserve(effects.size());
+        return is_possible_recurse(origin, origin_card, is_response, modifiers, ctx, targets);
     }
 
     static void collect_playable_cards(
