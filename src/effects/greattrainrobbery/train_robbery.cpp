@@ -39,7 +39,7 @@ namespace banggame {
             return {};
         }
 
-        bool in_target_set(const_card_ptr target_card) const override {
+        bool in_target_set(card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_table && target_card->owner == target
                 && !target_card->is_black() && !selected_cards.contains(target_card);
         }

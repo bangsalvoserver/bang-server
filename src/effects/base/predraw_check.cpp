@@ -43,7 +43,7 @@ namespace banggame {
         });
     }
 
-    bool request_predraw::can_pick(const_card_ptr target_card) const {
+    bool request_predraw::can_pick(card_ptr target_card) const {
         return rn::contains(get_checking_cards(), target_card, &event_card_key::target_card);
     }
 

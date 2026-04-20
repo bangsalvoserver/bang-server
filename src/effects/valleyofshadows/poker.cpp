@@ -33,7 +33,7 @@ namespace banggame {
             return prompts::bot_check_discard_card(target, target_card);
         }
 
-        bool can_pick(const_card_ptr target_card) const override {
+        bool can_pick(card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
         }
 

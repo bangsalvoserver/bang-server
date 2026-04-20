@@ -46,7 +46,7 @@ namespace banggame {
             }
         }
 
-        bool in_target_set(const_player_ptr target_player) const override {
+        bool in_target_set(player_ptr target_player) const override {
             return remaining_targets.contains(target_player);
         }
     };

@@ -69,7 +69,7 @@ namespace banggame {
             }
         }
 
-        bool can_pick(const_player_ptr target_player) const override {
+        bool can_pick(player_ptr target_player) const override {
             return target_player != target;
         }
 

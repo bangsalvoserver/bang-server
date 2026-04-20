@@ -68,7 +68,7 @@ namespace banggame {
             pop_request();
         }
 
-        bool can_pick(const_player_ptr target_player) const override {
+        bool can_pick(player_ptr target_player) const override {
             return true;
         }
 

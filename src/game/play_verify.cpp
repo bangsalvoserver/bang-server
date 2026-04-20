@@ -152,7 +152,7 @@ namespace banggame {
         return origin->m_game->call_event(event_type::check_play_card{ origin, origin_card, ctx });
     }
 
-    game_string get_equip_error(player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx) {
+    game_string get_equip_error(player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &ctx) {
         if (origin_card->self_equippable()) {
             if (origin != target) {
                 return "ERROR_INVALID_EQUIP_TARGET";

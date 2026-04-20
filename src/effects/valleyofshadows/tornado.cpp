@@ -31,7 +31,7 @@ namespace banggame {
             return prompts::bot_check_discard_card(target, target_card);
         }
         
-        bool can_pick(const_card_ptr target_card) const override {
+        bool can_pick(card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target
                 && !target->m_game->is_usage_disabled(target_card);
         }
@@ -39,7 +39,7 @@ namespace banggame {
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {
                 pop_request();
-            } else if (rn::none_of(target->m_hand, [&](const_card_ptr c) { return can_pick(c); })) {
+            } else if (rn::none_of(target->m_hand, [&](card_ptr c) { return can_pick(c); })) {
                 pop_request();
                 target->reveal_hand();
                 target->draw_card(2, origin_card);

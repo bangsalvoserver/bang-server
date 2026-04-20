@@ -84,7 +84,7 @@ namespace banggame {
             }
         }
 
-        bool can_pick(const_player_ptr target_player) const override {
+        bool can_pick(player_ptr target_player) const override {
             return !get_equip_error(target, target_card, target_player, {});
         }
 

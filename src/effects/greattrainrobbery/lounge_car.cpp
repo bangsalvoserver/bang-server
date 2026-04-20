@@ -37,7 +37,7 @@ namespace banggame {
             }
         }
 
-        bool in_target_set(const_player_ptr target_player) const override {
+        bool in_target_set(player_ptr target_player) const override {
             return rn::any_of(target->m_game->m_selection, [&](card_ptr target_card) {
                 return !check_player_filter(target_card, target, target_card->equip_target, target_player);
             });

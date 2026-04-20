@@ -17,7 +17,7 @@ namespace banggame {
         );
     }
 
-    game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, player_filter_bitset filter, const_player_ptr target, const effect_context &ctx) {
+    game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, player_filter_bitset filter, player_ptr target, const effect_context &ctx) {
         for (target_player_filter value : filter) {
             switch (value) {
             case target_player_filter::alive:
@@ -83,7 +83,7 @@ namespace banggame {
         return {};
     }
 
-    game_string check_card_filter(const_card_ptr origin_card, const_player_ptr origin, card_filter_bitset filter, const_card_ptr target, const effect_context &ctx) {
+    game_string check_card_filter(const_card_ptr origin_card, const_player_ptr origin, card_filter_bitset filter, card_ptr target, const effect_context &ctx) {
         if (target == origin_card) {
             return {"ERROR_TARGET_PLAYING_CARD", origin_card, target};
         }

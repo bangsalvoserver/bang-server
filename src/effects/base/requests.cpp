@@ -9,7 +9,7 @@
 
 namespace banggame {
 
-    bool request_characterchoice::can_pick(const_card_ptr target_card) const {
+    bool request_characterchoice::can_pick(card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
@@ -54,7 +54,7 @@ namespace banggame {
     void request_discard::on_update() {
         if (!target->alive()) {
             pop_request();
-        } else if (rn::none_of(target->m_hand, [&](const_card_ptr c) { return can_pick(c); })) {
+        } else if (rn::none_of(target->m_hand, [&](card_ptr c) { return can_pick(c); })) {
             pop_request();
             target->reveal_hand();
         } else if (target->m_hand.size() == 1) {
@@ -66,7 +66,7 @@ namespace banggame {
         return prompts::bot_check_discard_card(target, target_card);
     }
 
-    bool request_discard::can_pick(const_card_ptr target_card) const {
+    bool request_discard::can_pick(card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target
             && !target->m_game->is_usage_disabled(target_card);
     }
@@ -116,7 +116,7 @@ namespace banggame {
         return prompts::bot_check_discard_card(target, target_card);
     }
 
-    bool request_discard_pass::can_pick(const_card_ptr target_card) const {
+    bool request_discard_pass::can_pick(card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 
@@ -149,7 +149,7 @@ namespace banggame {
         return !target_card->is_black() && !target_card->is_train();
     }
         
-    bool request_discard_all::can_pick(const_card_ptr target_card) const {
+    bool request_discard_all::can_pick(card_ptr target_card) const {
         return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
             && target_card->owner == target && is_valid_card(target_card);
     }
@@ -202,7 +202,7 @@ namespace banggame {
         }
     }
         
-    bool request_discard_hand::can_pick(const_card_ptr target_card) const {
+    bool request_discard_hand::can_pick(card_ptr target_card) const {
         return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
     }
 

@@ -21,7 +21,7 @@ namespace banggame {
         req->on_pick(target);
     }
 
-    bool selection_picker::can_pick(const_card_ptr target_card) const {
+    bool selection_picker::can_pick(card_ptr target_card) const {
         return target_card->pocket == pocket_type::selection;
     }
 
@@ -36,7 +36,7 @@ namespace banggame {
         return {};
     }
 
-    bool interface_picking_player::in_target_set(const_player_ptr target_player) const {
+    bool interface_picking_player::in_target_set(player_ptr target_player) const {
         return target_player->alive() && can_pick(target_player);
     }
 
@@ -56,7 +56,7 @@ namespace banggame {
     card_ptr request_picking::get_auto_pick_target() const {
         card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
         if (only_card && only_card->has_tag(tag_type::pick)) {
-            auto pick_cards = get_all_targetable_cards(target) | rv::filter([&](const_card_ptr c){ return in_target_set(c); });
+            auto pick_cards = get_all_targetable_cards(target) | rv::filter([&](card_ptr c){ return in_target_set(c); });
             return get_single_element(pick_cards);
         }
         return nullptr;
@@ -71,7 +71,7 @@ namespace banggame {
     player_ptr request_picking_player::get_auto_pick_target() const {
         card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
         if (only_card && only_card->has_tag(tag_type::pick)) {
-            auto pick_players = target->m_game->m_players | rv::filter([&](const_player_ptr p){ return in_target_set(p); });
+            auto pick_players = target->m_game->m_players | rv::filter([&](player_ptr p){ return in_target_set(p); });
             return get_single_element(pick_players);
         }
         return nullptr;

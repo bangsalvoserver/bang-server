@@ -42,7 +42,7 @@ namespace banggame {
             return {};
         }
         
-        bool can_pick(const_card_ptr target_card) const override {
+        bool can_pick(card_ptr target_card) const override {
             return target_card->owner == target
                 && (target_card->pocket == pocket_type::player_table && target_card->is_orange()
                 || target_card->pocket == pocket_type::player_character && target_card == target->get_character())

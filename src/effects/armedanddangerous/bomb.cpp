@@ -18,7 +18,7 @@ namespace banggame {
         request_move_bomb(card_ptr origin_card, player_ptr target)
             : request_picking_player(origin_card, nullptr, target, {}, 110) {}
         
-        bool can_pick(const_player_ptr target_player) const override {
+        bool can_pick(player_ptr target_player) const override {
             if (target_player != target) {
                 return !target_player->find_equipped_card(origin_card);
             }

@@ -10,7 +10,7 @@
 namespace banggame {
 
     static auto cards_target_set(const_player_ptr origin, const_card_ptr origin_card, card_filter_bitset filter, player_ptr target, const effect_context &ctx) {
-        auto is_valid = [=, &ctx](const_card_ptr target_card) -> bool {
+        auto is_valid = [=, &ctx](card_ptr target_card) -> bool {
             return !check_card_filter(origin_card, origin, filter, target_card, ctx);
         };
         return rv::concat(

@@ -27,7 +27,7 @@ namespace banggame {
             }
         }
 
-        bool can_pick(const_card_ptr target_card) const override {
+        bool can_pick(card_ptr target_card) const override {
             return target_card == choice_card || target_card == target->get_character();
         }
 
