@@ -43,9 +43,8 @@ main_deck:
     signs:
       - 7 hearts
     color: brown
-    # TODO
-    # effects:
-    #   - ballad player alive notself
+    effects:
+      - ballad player alive notself
   - name: COFFIN
     image: 28_bara
     signs:
