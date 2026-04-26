@@ -5,8 +5,6 @@
 
 namespace banggame {
 
-    const player_filter_bitset *get_equip_filter(const_card_ptr origin_card);
-
     game_string get_equip_error(const_card_ptr origin_card, player_ptr target);
 
     struct effect_equip_on {

@@ -254,6 +254,11 @@ namespace banggame {
             card_ptr value;
         };
 
+        struct forced_play {
+            struct serialize_context{};
+            card_ptr value;
+        };
+
         struct selected_players {
             player_list value;
         };

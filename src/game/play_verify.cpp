@@ -80,8 +80,10 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
-        auto &effects = origin_card->get_effect_list(is_response);
+    static game_string verify_target_list_base(player_ptr origin, card_ptr origin_card, const effect_list &effects, const target_list &targets, effect_context &ctx) {
+        if (targets.size() != effects.size()) {
+            return "INVALID_TARGET_LIST_SIZE";
+        }
 
         for (const auto &[target, effect] : rv::zip(targets, effects)) {
             effect.add_context(origin_card, origin, target, ctx);
@@ -92,6 +94,17 @@ namespace banggame {
 
             MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
+
+        return {};
+    }
+
+    static game_string verify_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
+        const effect_list &effects = origin_card->get_effect_list(is_response);
+        if (effects.empty()) {
+            return "ERROR_EFFECT_LIST_EMPTY";
+        }
+        
+        MAYBE_RETURN(verify_target_list_base(origin, origin_card, effects, targets, ctx));
 
         if (const mth_holder &mth = origin_card->get_mth(is_response)) {
             MAYBE_RETURN(mth.get_error(origin_card, origin, targets, ctx));
@@ -107,27 +120,48 @@ namespace banggame {
     }
     
     static game_string verify_modifiers(player_ptr origin, card_ptr origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
-        for (const auto &[mod_card, targets] : modifiers) {
-            if (const modifier_holder &modifier = mod_card->get_modifier(is_response)) {
+        bool valid_response = origin->m_game->pending_requests();
+
+        card_ptr forced_play = nullptr;
+
+        for (const auto &[mod_card, mod_response, targets] : modifiers) {
+            if (forced_play == mod_card) valid_response = false;
+            
+            if (valid_response != mod_response) {
+                return "ERROR_INVALID_RESPONSE";
+            }
+
+            if (const modifier_holder &modifier = mod_card->get_modifier(mod_response)) {
                 ctx.add<contexts::selected_cards>().push_back(mod_card);
                 modifier.add_context(mod_card, origin, ctx);
                 
-                MAYBE_RETURN(verify_target_list(origin, mod_card, is_response, targets, ctx));
+                MAYBE_RETURN(verify_target_list(origin, mod_card, mod_response, targets, ctx));
                 MAYBE_RETURN(get_play_card_error(origin, mod_card, ctx));
             } else {
                 return "ERROR_CARD_IS_NOT_MODIFIER";
             }
+
+            if (valid_response && !forced_play) {
+                forced_play = ctx.get<contexts::forced_play>();
+            }
+        }
+
+        if (forced_play == origin_card) valid_response = false;
+
+        if (valid_response != is_response) {
+            return "ERROR_INVALID_RESPONSE";
         }
 
         for (size_t i=0; i<modifiers.size(); ++i) {
-            const auto &[mod_card, targets] = modifiers[i];
+            const auto &[mod_card, mod_response, targets] = modifiers[i];
 
-            MAYBE_RETURN(mod_card->get_modifier(is_response).get_error(mod_card, origin, origin_card, ctx));
+            MAYBE_RETURN(mod_card->get_modifier(mod_response).get_error(mod_card, origin, origin_card, ctx));
             for (size_t j=0; j<i; ++j) {
-                card_ptr mod_card_before = modifiers[j].card;
-                MAYBE_RETURN(mod_card_before->get_modifier(is_response).get_error(mod_card_before, origin, mod_card, ctx));
+                const auto &[mod_card_before, mod_response_before, targets_before] = modifiers[j];
+                MAYBE_RETURN(mod_card_before->get_modifier(mod_response_before).get_error(mod_card_before, origin, mod_card, ctx));
             }
         }
+
         return {};
     }
 
@@ -140,15 +174,7 @@ namespace banggame {
             return "ERROR_INVALID_CARD_OWNER";
         }
 
-        for (const auto &[target, effect] : rv::zip(targets, origin_card->equip_effects)) {
-            effect.add_context(origin_card, origin, target, ctx);
-            
-            if (!effect.can_play(origin_card, origin, ctx)) {
-                return {"ERROR_CANT_PLAY_CARD", origin_card};
-            }
-
-            MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
-        }
+        MAYBE_RETURN(verify_target_list_base(origin, origin_card, origin_card->equip_effects, targets, ctx));
 
         return verify_context(origin, origin_card, ctx);
     }
@@ -208,9 +234,8 @@ namespace banggame {
 
     static prompt_string get_prompt_message(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
         return prompts::select_prompt(rv::concat(
-            modifiers | rv::transform([&](const auto &pair) {
-                const auto &[mod_card, mod_targets] = pair;
-                return get_play_prompt(origin, mod_card, is_response, mod_targets, ctx);
+            modifiers | rv::transform([&](const target_selection &selection) {
+                return get_play_prompt(origin, selection.card, selection.is_response, selection.targets, ctx);
             }),
 
             rv::single(origin_card->is_equip_card()
@@ -295,18 +320,16 @@ namespace banggame {
     }
 
     play_verify_result verify_and_play(player_ptr origin, const game_action &args) {
-        bool is_response = origin->m_game->pending_requests();
-
         effect_context ctx{};
         
         ctx.set<contexts::playing_card>(args.card);
 
-        if (game_string error = verify_card_targets(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
+        if (game_string error = verify_card_targets(origin, args.card, args.is_response, args.targets, args.modifiers, ctx)) {
             return play_verify_results::error{ error };
         }
 
         if (!args.bypass_prompt) {
-            if (prompt_string prompt = get_prompt_message(origin, args.card, is_response, args.targets, args.modifiers, ctx)) {
+            if (prompt_string prompt = get_prompt_message(origin, args.card, args.is_response, args.targets, args.modifiers, ctx)) {
                 return play_verify_results::prompt{ prompt };
             }
         }
@@ -316,18 +339,18 @@ namespace banggame {
         origin->m_game->call_event(event_type::on_play_card{
             origin,
             args.card,
-            args.modifiers | rv::transform(&card_targets_pair::card) | rn::to<std::vector>(),
+            args.modifiers | rv::transform(&target_selection::card) | rn::to<std::vector>(),
             ctx
         });
 
-        for (const auto &[mod_card, mod_targets] : args.modifiers) {
-            apply_target_list(origin, mod_card, is_response, mod_targets, ctx);
+        for (const auto &[mod_card, mod_response, mod_targets] : args.modifiers) {
+            apply_target_list(origin, mod_card, mod_response, mod_targets, ctx);
         }
 
         if (args.card->is_equip_card()) {
             apply_equip(origin, args.card, args.targets, ctx);
         } else {
-            apply_target_list(origin, args.card, is_response, args.targets, ctx);
+            apply_target_list(origin, args.card, args.is_response, args.targets, ctx);
         }
 
         return play_verify_results::ok{};

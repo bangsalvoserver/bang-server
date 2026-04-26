@@ -42,6 +42,23 @@ namespace json {
         struct skip_field{};
     };
 
+    template<typename Context> struct serializer<banggame::playable_card_info, Context> {
+        static void write(const banggame::playable_card_info &value, string_writer &writer) {
+            writer.StartObject();
+
+            writer.Key("card");
+            serialize(value.card, writer);
+
+            writer.Key("modifiers");
+            serialize(value.modifiers | rv::transform(&banggame::card_response_pair::card), writer);
+
+            writer.Key("context");
+            serialize(value.context, writer);
+
+            writer.EndObject();
+        }
+    };
+
     template<typename Context> struct serializer<banggame::effect_holder, Context> {
         static void write(const banggame::effect_holder &effect, string_writer &writer, const Context &ctx) {
             using serializer_type = aggregate_serializer<banggame::effect_holder, Context>;
@@ -184,23 +201,29 @@ namespace json {
 
 namespace banggame {
 
-    static card_targets_pair deserialize_card_targets(const json::json &card, const json::json &targets, const game_context &context, bool check_equip = false) {
-        card_targets_pair result {
-            .card = json::deserialize<card_ptr, game_context>(card, context)
+    static const json::json &get_value(const json::json &obj, std::string_view key) {
+        json::json json_key(rapidjson::StringRef(key.data(), key.size()));
+        if (auto it = obj.FindMember(json_key); it != obj.MemberEnd()) {
+            return it->value;
+        }
+        throw json::deserialize_error(std::format("Missing key {} in object", key));
+    }
+    
+    static target_selection deserialize_card_targets(const json::json &value, const game_context &context) {
+        const json::json &card = get_value(value, "card");
+        const json::json &targets = get_value(value, "targets");
+        bool is_response = json::deserialize<bool>(get_value(value, "is_response"));
+        
+        target_selection result {
+            .card = json::deserialize<card_ptr, game_context>(card, context),
+            .is_response = is_response
         };
 
         if (!targets.IsArray()) {
             throw json::deserialize_error("Cannot deserialize target list: value is not an array");
         }
 
-        bool is_equip = check_equip && result.card->is_equip_card();
-        bool is_response = result.card->m_game->pending_requests();
-
-        const auto &effects = is_equip ? result.card->equip_effects : result.card->get_effect_list(is_response);
-
-        if (is_equip ? is_response : effects.empty()) {
-            throw json::deserialize_error("Effect list is empty");
-        }
+        const effect_list &effects = result.card->is_equip_card() ? result.card->equip_effects : result.card->get_effect_list(is_response);
         
         if (effects.size() != targets.Size()) {
             throw json::deserialize_error("Invalid number of targets");
@@ -214,14 +237,6 @@ namespace banggame {
         return result;
     }
 
-    static const json::json &get_value(const json::json &obj, std::string_view key) {
-        json::json json_key(rapidjson::StringRef(key.data(), key.size()));
-        if (auto it = obj.FindMember(json_key); it != obj.MemberEnd()) {
-            return it->value;
-        }
-        throw json::deserialize_error(std::format("Missing key {} in object", key));
-    }
-
     static modifier_list deserialize_modifier_list(const json::json &value, const game_context &context) {
         if (!value.IsArray()) {
             throw json::deserialize_error("Cannot deserialize modifier_list: value is not an array");
@@ -232,17 +247,18 @@ namespace banggame {
             if (!modifier.IsObject()) {
                 throw json::deserialize_error("Cannot deserialize modifier_pair: value is not an object");
             }
-            result.push_back(deserialize_card_targets(get_value(modifier, "card"), get_value(modifier, "targets"), context));
+            result.push_back(deserialize_card_targets(modifier, context));
         }
         return result;
     }
 
     static game_action deserialize_game_action(const json::json &value, const game_context &context) {
-        auto [card, targets] = deserialize_card_targets(get_value(value, "card"), get_value(value, "targets"), context, true);
+        auto [card, is_response, targets] = deserialize_card_targets(value, context);
         return {
             .card = card,
-            .modifiers = deserialize_modifier_list(get_value(value, "modifiers"), context),
+            .is_response = is_response,
             .targets = std::move(targets),
+            .modifiers = deserialize_modifier_list(get_value(value, "modifiers"), context),
             .bypass_prompt = json::deserialize<bool>(get_value(value, "bypass_prompt"))
         };
     }
@@ -251,11 +267,7 @@ namespace banggame {
         return json::to_string<game_update, game_context>(update, *this);
     }
 
-    void game_net_manager::handle_game_action(player_ptr origin, const json::json &value) {
-        if (!value.IsObject()) {
-            throw json::deserialize_error("Cannot deserialize game_action: value is not an object");
-        }
-        
+    static void check_timer_id(player_ptr origin, const json::json &value) {
         std::optional<timer_id_t> timer_id, current_timer_id;
         if (auto it = value.FindMember("timer_id"); it != value.MemberEnd()) {
             timer_id = json::deserialize<timer_id_t>(it->value);
@@ -267,6 +279,14 @@ namespace banggame {
         if (timer_id != current_timer_id) {
             throw lobby_error("ERROR_TIMER_EXPIRED");
         }
+    }
+
+    void game_net_manager::handle_game_action(player_ptr origin, const json::json &value) {
+        if (!value.IsObject()) {
+            throw json::deserialize_error("Cannot deserialize game_action: value is not an object");
+        }
+        
+        check_timer_id(origin, value);
 
         auto action = deserialize_game_action(value, *this);
         auto result = verify_and_play(origin, action);

@@ -21,7 +21,7 @@ namespace banggame {
                 }
                 
                 origin->m_game->add_listener<event_type::check_pass_turn>(key, [=](player_ptr p) -> game_string {
-                    card_list modifiers;
+                    card_response_list modifiers;
                     if (p == origin && drawn_card->owner == origin && is_possible_to_play(origin, drawn_card, false, modifiers, {})) {
                         return {"ERROR_MANDATORY_CARD", drawn_card};
                     }

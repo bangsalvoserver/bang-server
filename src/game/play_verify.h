@@ -27,17 +27,21 @@ namespace banggame {
         play_verify_results::prompt
     >;
 
-    struct card_targets_pair {
+    struct target_selection {
         card_ptr card;
+        bool is_response;
         target_list targets;
     };
 
-    using modifier_list = std::vector<card_targets_pair>;
+    using modifier_list = std::vector<target_selection>;
 
     struct game_action {
         card_ptr card;
-        modifier_list modifiers;
+        bool is_response;
         target_list targets;
+
+        modifier_list modifiers;
+
         bool bypass_prompt;
     };
 

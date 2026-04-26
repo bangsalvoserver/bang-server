@@ -28,9 +28,17 @@ namespace banggame {
         player_user_list(player_ptr player): players{player} {}
     };
 
+    struct card_response_pair {
+        card_ptr card;
+        bool is_response;
+    };
+
+    using card_response_list = std::vector<card_response_pair>;
+
     struct playable_card_info {
         card_ptr card;
-        card_list modifiers;
+        bool is_response;
+        card_response_list modifiers;
         effect_context context;
     };
 

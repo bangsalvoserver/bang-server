@@ -11,21 +11,18 @@
 
 namespace banggame {
 
-    const player_filter_bitset *get_equip_filter(const_card_ptr origin_card) {
+    game_string get_equip_error(const_card_ptr origin_card, player_ptr target) {
+        player_filter_bitset equip_filter { target_player_filter::alive };
+        
         for (const effect_holder &holder : origin_card->equip_effects) {
             if (holder.type == GET_EFFECT(equip_on) && holder.target == TARGET_TYPE(player)) {
-                return &static_cast<const targeting_player *>(holder.target_value)->player_filter;
+                equip_filter = static_cast<const targeting_player *>(holder.target_value)->player_filter;
+                break;
             }
         }
-        return nullptr;
-    }
 
-    game_string get_equip_error(const_card_ptr origin_card, player_ptr target) {
-        if (const player_filter_bitset *filter = get_equip_filter(origin_card)) {
-            MAYBE_RETURN(check_player_filter(origin_card, target, *filter, target));
-        } else if (!target->alive()) {
-            return {"ERROR_TARGET_DEAD", origin_card, target};
-        }
+        MAYBE_RETURN(check_player_filter(origin_card, target, equip_filter, target));
+
         if (card_ptr equipped = target->find_equipped_card(origin_card)) {
             return {"ERROR_DUPLICATED_CARD", equipped};
         }

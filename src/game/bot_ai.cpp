@@ -14,21 +14,24 @@
 
 namespace banggame {
 
-    static game_action generate_random_play(player_ptr origin, const playable_card_info &args, bool is_response) {
-        game_action ret { .card = args.card };
+    static game_action generate_random_play(player_ptr origin, const playable_card_info &args) {
+        game_action ret {
+            .card = args.card,
+            .is_response = args.is_response
+        };
         effect_context ctx{};
         
-        for (card_ptr mod_card : args.modifiers) {
-            auto &targets = ret.modifiers.emplace_back(mod_card).targets;
+        for (const auto &[mod_card, mod_response] : args.modifiers) {
+            auto &targets = ret.modifiers.emplace_back(mod_card, mod_response).targets;
 
-            mod_card->get_modifier(is_response).add_context(mod_card, origin, ctx);
-            for (const effect_holder &holder : mod_card->get_effect_list(is_response)) {
+            mod_card->get_modifier(mod_response).add_context(mod_card, origin, ctx);
+            for (const effect_holder &holder : mod_card->get_effect_list(mod_response)) {
                 const auto &target = targets.emplace_back(holder.random_target(mod_card, origin, ctx));
                 holder.add_context(mod_card, origin, target, ctx);
             }
         }
 
-        const effect_list &effects = args.card->is_equip_card() ? args.card->equip_effects : args.card->get_effect_list(is_response);
+        const effect_list &effects = args.card->is_equip_card() ? args.card->equip_effects : args.card->get_effect_list(args.is_response);
         for (const effect_holder &holder : effects) {
             const auto &target = ret.targets.emplace_back(holder.random_target(args.card, origin, ctx));
             holder.add_context(args.card, origin, target, ctx);
@@ -72,7 +75,7 @@ namespace banggame {
                 }
 
                 try {
-                    auto args = generate_random_play(origin, *selected_node, is_response);
+                    auto args = generate_random_play(origin, *selected_node);
                     args.bypass_prompt =
                         (i >= bot_info.settings.bypass_empty_index && node_set.empty())
                         || i >= bot_info.settings.bypass_unconditional_index;
