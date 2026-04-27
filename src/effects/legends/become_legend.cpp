@@ -30,7 +30,7 @@ namespace banggame {
                     return character_name == origin_card->name;
                 } else {
                     return rn::none_of(origin_card->m_game->m_players, [&](player_ptr target) {
-                        return character_name == get_base_character_name(target->get_character());
+                        return !rn::contains(target->m_characters, character_name, get_base_character_name);
                     });
                 }
             });
@@ -43,7 +43,19 @@ namespace banggame {
     void effect_become_legend::on_play(card_ptr origin_card, player_ptr origin) {
         origin->add_player_flags(player_flag::legend);
 
-        card_ptr legend_character = find_legend_character(origin->get_character());
+        card_ptr old_character = origin->get_character();
+        card_ptr legend_character = find_legend_character(old_character);
+
+        if (!old_character->expansion.empty()) {
+            if (card_ptr base_character = get_single_element(origin_card->m_game->m_characters
+                | rv::filter([character_name = get_base_character_name(legend_character)](card_ptr target_card) {
+                    return target_card->pocket == pocket_type::none && target_card->owner == nullptr
+                        && target_card->name == character_name;
+                }))
+            ) {
+                base_character->owner = origin;
+            }
+        }
         
         origin->m_game->add_log("LOG_BECOME_LEGEND", origin, legend_character);
         origin->set_character(legend_character);
