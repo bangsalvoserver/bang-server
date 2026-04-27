@@ -6,10 +6,11 @@ main_deck:
     image: 07_fantasma
     expansion: ghost_cards
     color: blue
-    equip_target: dead
+    equip_effects:
+      - equip_on player dead
     equip:
       - ghost
-      - add_flag(player_flag::ghost_1)
+      - add_flag(player_flag::ghost)
     tags:
       - ghost_card
   - name: LEMAT
@@ -34,7 +35,8 @@ main_deck:
       - 7 hearts
     image: 07_serpenteasonagli
     color: blue
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - predraw_check(0)
       - snake
@@ -55,7 +57,8 @@ main_deck:
       - 9 clubs
     image: 07_taglia
     color: blue
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - bounty
     tags:

@@ -5,13 +5,9 @@
 
 namespace banggame {
 
-    game_string check_duplicates(const effect_context &ctx);
+    game_string verify_context(player_ptr origin, card_ptr origin_card, const effect_context &ctx);
 
     game_string get_play_card_error(player_ptr origin, card_ptr origin_card, const effect_context &ctx);
-
-    game_string get_equip_error(player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx);
-
-    prompt_string get_equip_prompt(player_ptr origin, card_ptr origin_card, player_ptr target);
 
     namespace play_verify_results {
         struct ok {};
@@ -31,17 +27,21 @@ namespace banggame {
         play_verify_results::prompt
     >;
 
-    struct card_targets_pair {
+    struct target_selection {
         card_ptr card;
+        bool is_response;
         target_list targets;
     };
 
-    using modifier_list = std::vector<card_targets_pair>;
+    using modifier_list = std::vector<target_selection>;
 
     struct game_action {
         card_ptr card;
-        modifier_list modifiers;
+        bool is_response;
         target_list targets;
+
+        modifier_list modifiers;
+
         bool bypass_prompt;
     };
 

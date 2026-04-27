@@ -36,12 +36,16 @@ namespace banggame {
 
         void on_resolve() override {
             pop_request();
-            target->m_game->queue_request<request_check>(target, origin_card, std::not_fn(&card_sign::is_spades),
-                [origin_card=origin_card, origin=origin, target=target](bool result) {
-                    if (!result) {
-                        target->damage(origin_card, origin, 1);
-                    }
-                });
+            target->m_game->queue_request<request_check>(target, origin_card, [target=target](card_sign sign) {
+                return draw_check_result{
+                    .lucky = !sign.is_spades(),
+                    .indifferent = target->is_ghost()
+                };
+            }, [origin_card=origin_card, origin=origin, target=target](bool result) {
+                if (!result) {
+                    target->damage(origin_card, origin, 1);
+                }
+            });
         }
 
         game_string status_text(player_ptr owner) const override {

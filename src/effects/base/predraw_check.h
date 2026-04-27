@@ -35,7 +35,7 @@ namespace banggame {
         void remove_check(card_ptr target_card);
         
         void on_update() override;
-        bool can_pick(const_card_ptr target_card) const override;
+        bool can_pick(card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
         game_string status_text(player_ptr owner) const override;
     };

@@ -34,11 +34,11 @@ namespace banggame {
     };
 
     struct interface_target_set_players {
-        virtual bool in_target_set(const_player_ptr target_player) const = 0;
+        virtual bool in_target_set(player_ptr target_player) const = 0;
     };
 
     struct interface_target_set_cards {  
-        virtual bool in_target_set(const_card_ptr target_card) const = 0;
+        virtual bool in_target_set(card_ptr target_card) const = 0;
     };
 
 }

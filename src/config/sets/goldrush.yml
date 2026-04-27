@@ -48,26 +48,18 @@ goldrush:
     color: brown
     effects:
       - heal player alive
-    responses:
-      - forced_play
-      - heal player alive
     tags:
       - buy_cost(1)
-      - preselect
   - count: 3
     name: BOTTLE
     image: 04_bottiglia
     color: brown
     modifier: card_choice
-    modifier_response: card_choice
     effects:
       - none
-    responses:
-      - forced_play
     tags:
       - card_choice(1)
       - buy_cost(2)
-      - preselect
   - name: CALUMET
     image: 04_calumet
     color: black
@@ -87,23 +79,15 @@ goldrush:
     image: 04_complice
     color: brown
     modifier: card_choice
-    modifier_response: card_choice
     effects:
       - none
-    responses:
-      - forced_play
     tags:
       - card_choice(2)
       - buy_cost(2)
-      - preselect
   - name: GOLD_RUSH
     image: 04_corsa_all_oro
     color: brown
     effects:
-      - goldrush
-      - pass_turn
-    responses:
-      - forced_play
       - goldrush
       - pass_turn
     tags:
@@ -126,7 +110,8 @@ goldrush:
     name: WANTED
     image: 04_ricercato
     color: black
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - wanted
     tags:
@@ -137,9 +122,6 @@ goldrush:
     image: 04_rum
     color: brown
     effects:
-      - rum
-    responses:
-      - forced_play
       - rum
     tags:
       - buy_cost(3)
@@ -171,10 +153,6 @@ goldrush:
     image: 04_union_pacific
     color: brown
     effects:
-      - draw(4)
-      - changewws
-    responses:
-      - forced_play
       - draw(4)
       - changewws
     tags:
@@ -209,9 +187,6 @@ hidden:
     effects:
       - card_choice
       - steal random_if_hand_card range_1
-    responses:
-      - card_choice
-      - steal random_if_hand_card range_1
     tags:
       - card_choice(1)
       - ranged_effect
@@ -222,9 +197,6 @@ hidden:
     effects:
       - card_choice
       - heal
-    responses:
-      - card_choice
-      - heal
     tags:
       - card_choice(1)
   - name: BOTTLE_BANG
@@ -232,9 +204,6 @@ hidden:
     color: brown
     deck: goldrush
     effects:
-      - card_choice
-      - bang player alive reachable notself
-    responses:
       - card_choice
       - bang player alive reachable notself
     tags:
@@ -248,10 +217,6 @@ hidden:
       - card_choice
       - generalstore
       - generalstore players alive
-    responses:
-      - card_choice
-      - generalstore
-      - generalstore players alive
     tags:
       - card_choice(2)
   - name: PARDNER_DUEL
@@ -259,9 +224,6 @@ hidden:
     color: brown
     deck: goldrush
     effects:
-      - card_choice
-      - duel player alive notself
-    responses:
       - card_choice
       - duel player alive notself
     tags:
@@ -273,8 +235,11 @@ hidden:
     effects:
       - card_choice
       - destroy random_if_hand_card
-    responses:
-      - card_choice
-      - destroy random_if_hand_card
     tags:
       - card_choice(2)
+  - name: JOSH_MCCLOUD
+    responses:
+      - forced_play
+    modifier_response: forced_play
+    tags:
+      - preselect

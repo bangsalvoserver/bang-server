@@ -27,7 +27,7 @@ namespace banggame {
         request_multi_vulture_sam(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags, 200) {}
 
-        bool can_pick(const_card_ptr target_card) const override {
+        bool can_pick(card_ptr target_card) const override {
             return (target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::player_table)
                 && target_card->owner == origin
                 && !target_card->is_black();

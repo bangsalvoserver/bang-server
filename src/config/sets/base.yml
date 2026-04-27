@@ -48,7 +48,8 @@ main_deck:
       - 10 spades
     image: 01_prigione
     color: blue
-    equip_target: alive notsheriff
+    equip_effects:
+      - equip_on player alive notsheriff
     equip:
       - predraw_check(1)
       - jail

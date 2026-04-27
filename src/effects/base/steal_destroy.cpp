@@ -2,6 +2,7 @@
 
 #include "requests.h"
 #include "escapable.h"
+#include "equip.h"
 
 #include "game/game_table.h"
 #include "game/filters.h"
@@ -14,8 +15,8 @@
 namespace banggame {
 
     game_string effect_steal::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        if (target_card->pocket == pocket_type::player_table && target_card->is_train()) {
-            MAYBE_RETURN(check_player_filter(target_card, origin, target_card->equip_target, origin));
+        if (target_card->pocket == pocket_type::player_table && target_card->owner != origin && target_card->is_train()) {
+            MAYBE_RETURN(get_equip_error(target_card, origin));
         }
         return {};
     }

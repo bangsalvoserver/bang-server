@@ -138,7 +138,8 @@ main_deck:
       - 7 diamonds
     image: 17_bomba
     color: orange
-    equip_target: alive
+    equip_effects:
+      - equip_on player alive
     equip:
       - predraw_check(0)
       - bomb

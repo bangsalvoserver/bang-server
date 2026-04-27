@@ -70,7 +70,7 @@ namespace banggame {
             pop_request();
         }
         
-        bool in_target_set(const_player_ptr target_player) const override {
+        bool in_target_set(player_ptr target_player) const override {
             return is_valid_damage_legend_target(target, target_player, can_kill);
         }
 
@@ -143,7 +143,7 @@ namespace banggame {
             return {};
         }
 
-        bool can_pick(const_card_ptr target_card) const override {
+        bool can_pick(card_ptr target_card) const override {
             return rn::contains(target_cards, target_card);
         }
 

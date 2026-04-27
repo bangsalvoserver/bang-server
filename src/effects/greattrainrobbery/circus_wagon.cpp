@@ -17,7 +17,7 @@ namespace banggame {
             auto_pick();
         }
 
-        bool can_pick(const_card_ptr target_card) const override {
+        bool can_pick(card_ptr target_card) const override {
             return target_card->pocket == pocket_type::player_table && target_card->owner == target && !target_card->is_black();
         }
 

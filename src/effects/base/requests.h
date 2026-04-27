@@ -11,7 +11,7 @@ namespace banggame {
         request_characterchoice(player_ptr target)
             : request_picking(nullptr, nullptr, target, {}, 200) {}
         
-        bool can_pick(const_card_ptr target_card) const override;
+        bool can_pick(card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
         game_string status_text(player_ptr owner) const override;
     };
@@ -30,7 +30,7 @@ namespace banggame {
         
         void on_update() override;
         prompt_string pick_prompt(card_ptr target_card) const override;
-        bool can_pick(const_card_ptr target_card) const override;
+        bool can_pick(card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
         game_string status_text(player_ptr owner) const override;
     };
@@ -60,7 +60,7 @@ namespace banggame {
         void on_update() override;
 
         prompt_string pick_prompt(card_ptr target_card) const override;
-        bool can_pick(const_card_ptr target_card) const override;
+        bool can_pick(card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
         game_string status_text(player_ptr owner) const override;
     };
@@ -69,7 +69,7 @@ namespace banggame {
         request_discard_all(player_ptr target, int priority = 100)
             : request_picking(nullptr, nullptr, target, {}, priority) {}
         
-        bool can_pick(const_card_ptr target_card) const override;
+        bool can_pick(card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
         void on_update() override;
         void on_resolve() override;
@@ -86,7 +86,7 @@ namespace banggame {
         request_discard_hand(card_ptr origin_card, player_ptr target)
             : request_picking(origin_card, nullptr, target) {}
         
-        bool can_pick(const_card_ptr target_card) const override;
+        bool can_pick(card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;
         void on_update() override;
         void on_resolve() override;

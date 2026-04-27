@@ -12,7 +12,7 @@ namespace banggame {
 
     static auto get_player_targets_range(const_card_ptr origin_card, player_ptr origin, player_filter_bitset player_filter, const effect_context &ctx) {
         player_ptr skipped_player = ctx.get<contexts::skipped_player>();
-        return origin->m_game->range_all_players(origin) | rv::filter([=, &ctx](const_player_ptr target) {
+        return origin->m_game->range_all_players(origin) | rv::filter([=, &ctx](player_ptr target) {
             return target != skipped_player && !check_player_filter(origin_card, origin, player_filter, target, ctx);
         });
     }

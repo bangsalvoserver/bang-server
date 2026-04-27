@@ -62,7 +62,7 @@ namespace banggame {
         });
         
         game->add_listener<event_type::on_hit>({nullptr, 6}, [](card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags) {
-            if (origin && origin->m_game->m_playing == origin && origin != target && origin->alive()) {
+            if (origin && origin != target && origin->alive()) {
                 origin->add_gold(damage);
             }
         });

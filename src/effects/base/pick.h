@@ -22,11 +22,11 @@ namespace banggame {
     DEFINE_EFFECT(pick_player, effect_pick_player)
 
     struct interface_picking : interface_target_set_cards {
-        bool in_target_set(const_card_ptr target_card) const final {
+        bool in_target_set(card_ptr target_card) const final {
             return can_pick(target_card);
         }
 
-        virtual bool can_pick(const_card_ptr target_card) const = 0;
+        virtual bool can_pick(card_ptr target_card) const = 0;
         virtual void on_pick(card_ptr target_card) = 0;
         virtual prompt_string pick_prompt(card_ptr target_card) const { return {}; }
     };
@@ -43,14 +43,14 @@ namespace banggame {
     struct selection_picker : request_picking {
         using request_picking::request_picking;
 
-        bool can_pick(const_card_ptr target_card) const override;
+        bool can_pick(card_ptr target_card) const override;
         prompt_string pick_prompt(card_ptr target_card) const override;
     };
 
     struct interface_picking_player : interface_target_set_players {
-        bool in_target_set(const_player_ptr target_player) const final;
+        bool in_target_set(player_ptr target_player) const final;
 
-        virtual bool can_pick(const_player_ptr target_player) const = 0;
+        virtual bool can_pick(player_ptr target_player) const = 0;
         virtual void on_pick(player_ptr target_player) = 0;
         virtual prompt_string pick_prompt(player_ptr target_player) const { return {}; }
     };

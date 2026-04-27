@@ -1,8 +1,8 @@
 #include "thejudge.h"
 
-#include "cards/game_events.h"
-
 #include "game/game_table.h"
+
+#include "effects/base/equip.h"
 
 namespace banggame {
 
