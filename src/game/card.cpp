@@ -188,12 +188,5 @@ namespace banggame {
             m_game->move_tokens(card_token_type::cube, token_positions::card{this}, token_positions::table{}, count);
         }
     }
-
-    void card::drop_all_fame() {
-        for (auto [token, count] : tokens) {
-            if (is_fame_token(token) && count != 0) {
-                m_game->add_tokens(token, -count, token_positions::card{this});
-            }
-        }
-    }
+    
 }

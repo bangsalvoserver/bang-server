@@ -2,6 +2,8 @@
 
 #include "game_table.h"
 
+#include "effects/legends/ruleset.h"
+
 namespace banggame {
 
     template<card_deck_type E>
@@ -122,7 +124,7 @@ namespace banggame {
             if (target->m_game->m_feats.size() >= 4) {
                 card_ptr last_feat = target->m_game->m_feats.back();
                 target->m_game->m_first_player->disable_equip(last_feat);
-                last_feat->drop_all_fame();
+                drop_all_fame_tokens(last_feat);
                 last_feat->move_to(pocket_type::feats_discard);
             }
             target_card->move_to(pocket_type::feats);

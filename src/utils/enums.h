@@ -132,6 +132,12 @@ namespace enums {
         return names;
     }
 
+    template<enumeral E>
+    constexpr auto subrange(E begin, E end) {
+        using iterator_type = typename enum_values_t<E>::iterator;
+        return rn::subrange(iterator_type{indexof(begin)}, iterator_type{indexof(end) + 1});
+    }
+
     template<enumeral T>
     inline constexpr auto enum_names = build_enum_names<T>();
 
