@@ -9,10 +9,10 @@ namespace banggame {
         return target->m_game->call_event(event_type::apply_escapable_modifier{ origin_card, origin, target, flags, *this });
     }
 
-    void request_targeting::on_update() {
+    void request_escapable_resolvable::on_update() {
         if (target->immune_to(origin_card, origin, flags)) {
             pop_request();
-        } else if (origin == target_card->owner && auto_resolvable()) {
+        } else if (origin == target && auto_resolvable()) {
             // auto resolve if targeting self, unless player has escape
             on_resolve();
         } else {
@@ -27,14 +27,6 @@ namespace banggame {
                 // ignore
                 break;
             }
-        }
-    }
-    
-    card_list request_targeting::get_highlights(player_ptr owner) const {
-        if (target_card->pocket == pocket_type::player_hand) {
-            return target->m_hand;
-        } else {
-            return {target_card};
         }
     }
 

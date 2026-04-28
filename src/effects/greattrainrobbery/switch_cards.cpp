@@ -36,12 +36,14 @@ namespace banggame {
         target->enable_equip(chosen_card);
     }
 
-    struct request_switch_cards : request_targeting {
-        request_switch_cards(card_ptr origin_card, player_ptr origin, player_ptr target, card_ptr chosen_card, card_ptr target_card)
-            : request_targeting(origin_card, origin, target, target_card, effect_flag::single_target)
-            , chosen_card(chosen_card) {}
+    struct request_switch_cards : request_escapable_resolvable {
+        request_switch_cards(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card)
+            : request_escapable_resolvable(origin_card, origin, target_card->owner, effect_flag::single_target)
+            , chosen_card(chosen_card)
+            , target_card(target_card) {}
 
         card_ptr chosen_card;
+        card_ptr target_card;
 
         card_list get_highlights(player_ptr owner) const override {
             return {target_card, chosen_card};
@@ -76,6 +78,6 @@ namespace banggame {
     void handler_switch_cards::on_play(card_ptr origin_card, player_ptr origin, card_ptr chosen_card, card_ptr target_card) {
         bot_suggestion::signal_remove_card(origin, target_card);
         
-        origin->m_game->queue_request<request_switch_cards>(origin_card, origin, target_card->owner, chosen_card, target_card);
+        origin->m_game->queue_request<request_switch_cards>(origin_card, origin, chosen_card, target_card);
     }
 }

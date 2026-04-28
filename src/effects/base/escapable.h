@@ -41,18 +41,8 @@ namespace banggame {
         using request_resolvable_timer::request_resolvable_timer;
     
         escape_type get_escape_type() const;
-    };
-
-    struct request_targeting : request_escapable_resolvable {
-        request_targeting(card_ptr origin_card, player_ptr origin, player_ptr target, card_ptr target_card, effect_flags flags = {}, int priority = 40)
-            : request_escapable_resolvable(origin_card, origin, target, flags, priority)
-            , target_card(target_card) {}
-        
-        card_ptr target_card;
 
         void on_update() override;
-
-        virtual card_list get_highlights(player_ptr owner) const override;
     };
 
     namespace event_type {
