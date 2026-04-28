@@ -79,7 +79,7 @@ namespace banggame {
                     return draw_check_result{
                         .lucky = sign.is_red(),
                         .indifferent = target->is_ghost(),
-                        .defensive_redraw = target_card->num_cubes() <= 2
+                        .defensive_redraw = target_card->num_cubes() > 2
                     };
                 }, [=](bool result) {
                     if (result) {
