@@ -8,6 +8,7 @@
 #include "effects/base/pick.h"
 #include "effects/base/resolve.h"
 #include "effects/base/steal_destroy.h"
+#include "effects/base/escapable.h"
 
 namespace banggame {
 
@@ -23,9 +24,8 @@ namespace banggame {
         return {};
     }
 
-    struct request_ballad : request_picking, interface_resolvable {
-        request_ballad(card_ptr origin_card, player_ptr origin, player_ptr target)
-            : request_picking(origin_card, target, origin) {}
+    struct request_ballad_steal : request_picking, interface_resolvable {
+        using request_picking::request_picking;
 
         prompt_string pick_prompt(card_ptr target_card) const override {
             return prompts::bot_check_target_enemy(target, origin);
@@ -68,6 +68,36 @@ namespace banggame {
 
         game_string status_text(player_ptr owner) const override {
             if (target == owner) {
+                return {"STATUS_BALLAD_STEAL", origin_card, origin};
+            } else {
+                return {"STATUS_BALLAD_STEAL_OTHER", target, origin_card, origin};
+            }
+        }
+    };
+
+    struct request_ballad : request_escapable {
+        using request_escapable::request_escapable;
+        
+        card_list get_highlights(player_ptr owner) const override {
+            return target->m_table;
+        }
+
+        void on_resolve() override {
+            pop_request();
+
+            card_list target_cards = target->m_table | rv::filter(is_valid_ballad_card) | rn::to<std::vector>();
+            for (card_ptr target_card : target_cards) {
+                target->m_game->add_log("LOG_STOLEN_SELF_CARD", target, target_card);
+                target->steal_card(target_card);
+            }
+            
+            if (!target->empty_hand()) {
+                origin->m_game->queue_request<request_ballad_steal>(origin_card, target, origin);
+            }
+        }
+
+        game_string status_text(player_ptr owner) const override {
+            if (target == owner) {
                 return {"STATUS_BALLAD", origin_card, origin};
             } else {
                 return {"STATUS_BALLAD_OTHER", target, origin_card, origin};
@@ -76,14 +106,6 @@ namespace banggame {
     };
 
     void effect_ballad::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        card_list target_cards = target->m_table | rv::filter(is_valid_ballad_card) | rn::to<std::vector>();
-        for (card_ptr target_card : target_cards) {
-            target->m_game->add_log("LOG_STOLEN_SELF_CARD", target, target_card);
-            target->steal_card(target_card);
-        }
-
-        if (!target->empty_hand()) {
-            origin->m_game->queue_request<request_ballad>(origin_card, origin, target);
-        }
+        origin->m_game->queue_request<request_ballad>(origin_card, origin, target);
     }
 }
