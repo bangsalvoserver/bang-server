@@ -121,6 +121,12 @@ namespace enums {
         return reflect::enumerators<T>[indexof(input)].second;
     }
 
+    template<enumeral E>
+    constexpr auto subrange(E begin, E end) {
+        using iterator_type = typename enum_values_t<E>::iterator;
+        return rn::subrange(iterator_type{indexof(begin)}, iterator_type{indexof(end) + 1});
+    }
+
     template<enumeral T>
     inline constexpr auto names_to_values_map = []<size_t ... Is>(std::index_sequence<Is ...>) {
         constexpr auto &values = enum_values<T>;

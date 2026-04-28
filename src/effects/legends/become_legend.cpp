@@ -12,10 +12,8 @@ namespace banggame {
 
     bool effect_become_legend::can_play(card_ptr origin_card, player_ptr origin) {
         if (!origin->check_player_flags(player_flag::legend)) {
-            for (const auto &[token, count] : origin->tokens) {
-                if (is_fame_token(token) && count != 0) {
-                    return false;
-                }
+            for (card_token_type token : fame_tokens) {
+                if (origin->tokens[token] != 0) return false;
             }
             return true;
         }
@@ -68,17 +66,15 @@ namespace banggame {
     }
 
     bool effect_drop_all_fame::can_play(card_ptr origin_card, player_ptr origin) {
-        for (const auto &[token, count] : origin->tokens) {
-            if (is_fame_token(token) && count != 0) {
-                return true;
-            }
+        for (card_token_type token : fame_tokens) {
+            if (origin->tokens[token] != 0) return true;
         }
         return false;
     }
 
     void effect_drop_all_fame::on_play(card_ptr origin_card, player_ptr origin) {
-        for (auto [token, count] : origin->tokens) {
-            if (is_fame_token(token) && count != 0) {
+        for (card_token_type token : fame_tokens) {
+            if (int count = origin->tokens[token]) {
                 origin->m_game->add_tokens(token, -count, token_positions::player{origin});
             }
         }

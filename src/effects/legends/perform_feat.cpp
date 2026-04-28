@@ -21,8 +21,8 @@ namespace banggame {
     }
 
     std::pair<card_token_type, int> get_player_fame_tokens(const_player_ptr origin) {
-        for (const auto &[token, count] : origin->tokens) {
-            if (is_fame_token(token) && count > 0) {
+        for (card_token_type token : fame_tokens) {
+            if (int count = origin->tokens[token]) {
                 return {token, count};
             }
         }
@@ -242,7 +242,7 @@ namespace banggame {
                 origin->m_game->add_log("LOG_FEAT_CLAIMED", origin, origin_card);
                 origin->m_game->queue_request<request_damage_legend>(origin_card, origin);
                 origin->m_game->queue_action([=]{
-                    origin_card->drop_all_fame();
+                    drop_all_fame_tokens(origin_card);
                     origin_card->m_game->m_first_player->disable_equip(origin_card);
                     origin_card->move_to(pocket_type::feats_discard);
                     draw_next_feat(origin);
