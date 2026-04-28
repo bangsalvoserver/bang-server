@@ -11,7 +11,7 @@ namespace banggame {
     }
     
     void effect_barrel::on_play(card_ptr origin_card, player_ptr target) {
-        if (auto req = target->m_game->top_request<missable_request>()) {
+        if (auto req = target->m_game->top_request<interface_missable>()) {
             req->add_card(origin_card);
             target->m_game->queue_request<request_check>(target, origin_card, [=](card_sign sign) {
                 return draw_check_result{
@@ -25,7 +25,7 @@ namespace banggame {
                 }
             });
         } else {
-            throw game_error("invalid request access in effect_barrel: top_request is not missable_request");
+            throw game_error("invalid request access in effect_barrel: top_request is not interface_missable");
         }
     }
 }

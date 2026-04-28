@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-    struct request_bandidos : request_auto_resolvable, escapable_request {
+    struct request_bandidos : request_auto_resolvable, interface_escapable {
         using request_auto_resolvable::request_auto_resolvable;
 
         void on_update() override {

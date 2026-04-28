@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-    struct request_poker : request_picking, escapable_request {
+    struct request_poker : request_picking, interface_escapable {
         request_poker(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags, 100) {}
 

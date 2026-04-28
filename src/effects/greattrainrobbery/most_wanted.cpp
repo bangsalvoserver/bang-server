@@ -9,9 +9,9 @@
 
 namespace banggame {
 
-    struct request_most_wanted : request_escapable_resolvable {
+    struct request_most_wanted : request_escapable {
         request_most_wanted(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
-            : request_escapable_resolvable(origin_card, origin, target, flags) {}
+            : request_escapable(origin_card, origin, target, flags) {}
         
         void on_update() override {
             if (target->immune_to(origin_card, origin, flags)) {

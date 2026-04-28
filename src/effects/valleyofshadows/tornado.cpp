@@ -16,7 +16,7 @@
 
 namespace banggame {
 
-    struct request_tornado : request_picking, escapable_request {
+    struct request_tornado : request_picking, interface_escapable {
         request_tornado(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
             : request_picking(origin_card, origin, target, flags) {}
         

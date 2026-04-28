@@ -11,13 +11,13 @@
 
 namespace banggame {
 
-    struct request_train_robbery : request_base, interface_target_set_cards, escapable_request {
+    struct request_train_robbery : request_base, interface_target_set_cards, interface_escapable {
         using request_base::request_base;
 
         card_set selected_cards;
 
         bool can_escape(card_ptr c) const override {
-            return selected_cards.empty() && escapable_request::can_escape(c);
+            return selected_cards.empty() && interface_escapable::can_escape(c);
         }
 
         void on_update() override {
