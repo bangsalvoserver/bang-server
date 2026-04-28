@@ -7,9 +7,9 @@
 
 namespace banggame {
 
-    struct request_rust : request_escapable_resolvable {
+    struct request_rust : request_escapable {
         request_rust(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
-            : request_escapable_resolvable(origin_card, origin, target, flags, 0) {}
+            : request_escapable(origin_card, origin, target, flags, 0) {}
 
         card_list get_highlights(player_ptr owner) const override {
             return cube_slots(target)

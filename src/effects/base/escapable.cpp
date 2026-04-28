@@ -5,11 +5,11 @@
 
 namespace banggame {
 
-    escape_type request_escapable_resolvable::get_escape_type() const {
+    escape_type request_escapable::get_escape_type() const {
         return target->m_game->call_event(event_type::apply_escapable_modifier{ origin_card, origin, target, flags, *this });
     }
 
-    void request_escapable_resolvable::on_update() {
+    void request_escapable::on_update() {
         if (target->immune_to(origin_card, origin, flags)) {
             pop_request();
         } else if (origin == target && auto_resolvable()) {

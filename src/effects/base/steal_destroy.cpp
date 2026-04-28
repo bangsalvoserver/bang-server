@@ -59,9 +59,9 @@ namespace banggame {
         }, 42);
     }
 
-    struct request_steal : request_escapable_resolvable {
+    struct request_steal : request_escapable {
         request_steal(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags = {}, int priority = 40)
-            : request_escapable_resolvable(origin_card, origin, target_card->owner, flags, priority)
+            : request_escapable(origin_card, origin, target_card->owner, flags, priority)
             , target_card(target_card) {}
         
         card_ptr target_card;
@@ -91,7 +91,7 @@ namespace banggame {
                     }
                 }
             }
-            request_escapable_resolvable::on_update();
+            request_escapable::on_update();
         }
 
         void on_resolve() override {
@@ -199,9 +199,9 @@ namespace banggame {
         }, 42);
     }
     
-    struct request_destroy : request_escapable_resolvable {
+    struct request_destroy : request_escapable {
         request_destroy(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags = {}, int priority = 40)
-            : request_escapable_resolvable(origin_card, origin, target_card->owner, flags, priority)
+            : request_escapable(origin_card, origin, target_card->owner, flags, priority)
             , target_card(target_card) {}
         
         card_ptr target_card;
@@ -226,7 +226,7 @@ namespace banggame {
                     origin->m_game->add_log("LOG_PLAYED_CARD_DESTROY_OWN", origin_card, origin, target_card);
                 }
             }
-            request_escapable_resolvable::on_update();
+            request_escapable::on_update();
         }
 
         void on_resolve() override {

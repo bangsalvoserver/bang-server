@@ -13,9 +13,9 @@ namespace banggame {
         escape_no_timer
     };
     
-    class escapable_request {
+    class interface_escapable {
     public:
-        virtual ~escapable_request() = default;
+        virtual ~interface_escapable() = default;
         
         size_t num_cards_used() const {
             return m_cards_used.size();
@@ -37,7 +37,7 @@ namespace banggame {
         card_set m_cards_used;
     };
 
-    struct request_escapable_resolvable : request_resolvable_timer, escapable_request {
+    struct request_escapable : request_resolvable_timer, interface_escapable {
         using request_resolvable_timer::request_resolvable_timer;
     
         escape_type get_escape_type() const;
@@ -52,7 +52,7 @@ namespace banggame {
             player_ptr origin;
             const_player_ptr target;
             effect_flags flags;
-            const escapable_request &req;
+            const interface_escapable &req;
         };
     }
 

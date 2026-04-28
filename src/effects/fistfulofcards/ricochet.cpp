@@ -9,7 +9,7 @@
 
 namespace banggame {
     
-    struct request_ricochet : request_resolvable, missable_request {
+    struct request_ricochet : request_resolvable, interface_missable {
         request_ricochet(card_ptr origin_card, player_ptr origin, card_ptr target_card)
             : request_resolvable(origin_card, origin, target_card->owner)
             , target_card(target_card) {}

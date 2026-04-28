@@ -55,7 +55,7 @@ namespace banggame {
 
     DEFINE_MODIFIER(bangmod, modifier_bangmod)
 
-    struct missable_request : escapable_request {
+    struct interface_missable : interface_escapable {
         virtual bool can_miss(card_ptr c) const {
             return can_escape(c);
         }
@@ -63,7 +63,7 @@ namespace banggame {
         virtual void on_miss(card_ptr c, effect_flags missed_flags = {}) = 0;
     };
 
-    struct request_bang : request_auto_resolvable, missable_request, std::enable_shared_from_this<request_bang> {
+    struct request_bang : request_auto_resolvable, interface_missable, std::enable_shared_from_this<request_bang> {
         using request_auto_resolvable::request_auto_resolvable;
 
         int bang_strength = 1;

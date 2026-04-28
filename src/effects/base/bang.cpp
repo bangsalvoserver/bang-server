@@ -121,7 +121,7 @@ namespace banggame {
     }
     
     bool request_bang::can_miss(card_ptr c) const {
-        return !unavoidable && missable_request::can_miss(c);
+        return !unavoidable && interface_missable::can_miss(c);
     }
 
     void request_bang::on_miss(card_ptr missed_card, effect_flags missed_flags) {
