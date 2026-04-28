@@ -92,15 +92,6 @@ namespace banggame {
         pardner6,
     };
 
-    constexpr bool is_fame_token(card_token_type token) {
-        return enums::is_between(token, card_token_type::fame1, card_token_type::fame8);
-    }
-
-    constexpr card_token_type get_pardner_token(int value) {
-        assert(value >= 1 && value <= 6);
-        return enums::enum_values<card_token_type>[enums::indexof(card_token_type::pardner1) + value - 1];
-    }
-
     using token_map = enums::enum_map<card_token_type, uint8_t>;
 
     enum class player_role {

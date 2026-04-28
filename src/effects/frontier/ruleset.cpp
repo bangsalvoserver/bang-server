@@ -10,9 +10,10 @@
 
 namespace banggame {
 
-    
     card_token_type get_card_pardner_token(card_ptr target_card) {
-        return get_pardner_token(target_card->get_tag_value(tag_type::pardner).value());
+        auto tag_value = target_card->get_tag_value(tag_type::pardner);
+        assert(tag_value && *tag_value >= 1 && *tag_value <= pardner_tokens.size());
+        return pardner_tokens[*tag_value - 1];
     }
 
     player_ptr get_tracked_player(card_ptr target_card) {
@@ -66,8 +67,7 @@ namespace banggame {
 
         game->add_listener<event_type::on_discard_all>(nullptr, [](player_ptr target) {
             if (!target->alive()) {
-                for (int i=1; i<=6; ++i) {
-                    card_token_type token = get_pardner_token(i);
+                for (card_token_type token : pardner_tokens) {
                     if (int count = target->tokens[token]) {
                         target->m_game->add_tokens(token, -count, token_positions::player{ target });
                     }

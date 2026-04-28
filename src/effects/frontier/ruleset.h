@@ -5,6 +5,8 @@
 
 namespace banggame {
 
+    static constexpr auto pardner_tokens = enums::subrange(card_token_type::pardner1, card_token_type::pardner6);
+
     card_token_type get_card_pardner_token(card_ptr target_card);
 
     player_ptr get_tracked_player(card_ptr target_card);

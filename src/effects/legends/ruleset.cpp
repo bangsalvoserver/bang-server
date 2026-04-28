@@ -63,10 +63,18 @@ namespace banggame {
         }
     }
 
+    void drop_all_fame_tokens(card_ptr target_card) {
+        for (card_token_type token : fame_tokens) {
+            if (int count = target_card->tokens[token]) {
+                target_card->m_game->add_tokens(token, -count, token_positions::card{target_card});
+            }
+        }
+    }
+
     static int count_feat_tot_fame(const_card_ptr target_card) {
         int result = 0;
-        for (const auto &[token, count] : target_card->tokens) {
-            if (is_fame_token(token)) {
+        for (card_token_type token : fame_tokens) {
+            if (int count = target_card->tokens[token]) {
                 result += count;
             }
         }
@@ -96,7 +104,7 @@ namespace banggame {
         void on_pick(card_ptr target_card) override {
             pop_request();
             target->m_game->add_log("LOG_DISCARDED_FEAT", target, target_card);
-            target_card->drop_all_fame();
+            drop_all_fame_tokens(target_card);
             target->m_game->m_first_player->disable_equip(target_card);
             target_card->move_to(pocket_type::feats_discard);
             target->m_game->m_feats_deck.back()->move_to(pocket_type::feats);
@@ -200,8 +208,9 @@ namespace banggame {
 
     void ruleset_legends::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 0}, [](player_ptr origin) {
-            auto tokens = filter_static_array<enums::enum_values<card_token_type>, is_fame_token>();
+            std::array<card_token_type, fame_tokens.size()> tokens;
 
+            rn::copy(fame_tokens, tokens.begin());
             rn::shuffle(tokens, origin->m_game->rng);
 
             for (auto [token_type, target] : rv::zip(tokens, origin->m_game->range_all_players(origin))) {
