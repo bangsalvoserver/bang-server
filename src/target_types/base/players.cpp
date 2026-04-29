@@ -18,6 +18,10 @@ namespace banggame {
     }
 
     game_string targeting_players::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
+        player_ptr skipped_player = ctx.get<contexts::skipped_player>();
+        if (skipped_player && check_player_filter(origin_card, origin, player_filter, skipped_player, ctx)) {
+            return {"ERROR_CANNOT_SKIP_PLAYER", skipped_player};
+        }
         for (player_ptr target : get_player_targets_range(origin_card, origin, player_filter, ctx)) {
             MAYBE_RETURN(effect.get_error(origin_card, origin, target, ctx));
         }
