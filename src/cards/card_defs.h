@@ -252,6 +252,10 @@ namespace banggame {
             card_ptr value;
         };
 
+        struct auto_discarded {
+            card_set value;
+        };
+
         struct repeat_card {
             struct serialize_context{};
             card_ptr value;

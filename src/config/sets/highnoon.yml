@@ -8,8 +8,6 @@ highnoon:
     expansion: ghost_cards
     equip:
       - ghosttown
-    tags:
-      - ghost_card
   - name: INVERT_ROTATION
     image: 05_corsaalloro
     equip:

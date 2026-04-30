@@ -139,6 +139,10 @@ namespace banggame {
             return {"STATUS_YOUR_TURN_OTHER", target};
         }
     }
+
+    void effect_no_cards_drawn::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+        ctx.add<contexts::drawing_effect>();
+    }
     
     bool effect_no_cards_drawn::can_play(card_ptr origin_card, player_ptr origin) {
         if (auto req = origin->m_game->top_request<request_draw>(target_is{origin})) {

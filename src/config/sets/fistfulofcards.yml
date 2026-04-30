@@ -15,8 +15,6 @@ fistfulofcards:
     expansion: ghost_cards
     equip:
       - deadman
-    tags:
-      - ghost_card
   - name: BLOOD_BROTHERS
     image: 05_fratellidisangue
     equip:

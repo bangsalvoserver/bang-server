@@ -8,8 +8,6 @@ main_deck:
       - graverobber
       - discard
       - generalstore players alive
-    tags:
-      - no_auto_discard
   - name: CARD_SHARPER
     signs:
       - 10 clubs

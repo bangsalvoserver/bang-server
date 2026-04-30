@@ -5,7 +5,7 @@
 
 namespace banggame {
     
-    struct equip_russianroulette  {
+    struct equip_russianroulette : event_equip  {
         void on_enable(card_ptr target_card, player_ptr target);
     };
 

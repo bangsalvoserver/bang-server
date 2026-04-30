@@ -1,5 +1,7 @@
 #include "steal_destroy.h"
 
+#include "effects/ghost_cards/ruleset.h"
+
 #include "requests.h"
 #include "escapable.h"
 #include "equip.h"
@@ -129,6 +131,14 @@ namespace banggame {
         origin->m_game->queue_request<request_steal>(origin_card, origin, target_card, flags);
     }
 
+    void effect_discard::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+        ctx.add<contexts::auto_discarded>().add(origin_card);
+    }
+
+    void effect_discard::on_play(card_ptr origin_card, player_ptr origin) {
+        origin->discard_used_card(origin_card);
+    }
+
     game_string effect_discard::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         if (card_ptr disabler = origin->m_game->get_usage_disabler(target_card)) {
             return {"ERROR_CARD_DISABLED_BY", target_card, disabler};
@@ -142,15 +152,11 @@ namespace banggame {
         }
         if (target_card->pocket == pocket_type::player_table
             && target_card->owner == origin
-            && target_card->has_tag(tag_type::ghost_card))
+            && rn::contains(target_card->expansion, GET_RULESET(ghost_cards)))
         {
             return "PROMPT_TARGET_SELF_GHOST_CARD";
         }
         return {};
-    }
-
-    void effect_discard::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->discard_used_card(origin_card);
     }
 
     void effect_discard::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {

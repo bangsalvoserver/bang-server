@@ -33,9 +33,11 @@ namespace banggame {
         bool used;
         effect_discard(bool used = false) : used{used} {}
 
+        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
+        void on_play(card_ptr origin_card, player_ptr origin);
+
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target);
         game_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
 
