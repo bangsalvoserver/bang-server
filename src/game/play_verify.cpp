@@ -280,7 +280,11 @@ namespace banggame {
             }
             break;
         case pocket_type::shop_selection:
-            origin->m_game->add_log("LOG_BOUGHT_CARD", origin_card, origin);
+            if (origin_card == ctx.get<contexts::forced_play>()) {
+                origin->m_game->add_log("LOG_PLAYED_CARD", origin_card, origin);
+            } else {
+                origin->m_game->add_log("LOG_BOUGHT_CARD", origin_card, origin);
+            }
             break;
         case pocket_type::stations:
             origin->m_game->add_log("LOG_PAID_FOR_STATION", origin_card, origin);
