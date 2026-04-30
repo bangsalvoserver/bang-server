@@ -307,8 +307,6 @@ train:
     equip:
       - ghost
       - add_flag(player_flag::ghost)
-    tags:
-      - ghost_card
   - name: LOUNGE_CAR
     image: 27_lounge_car
     color: train

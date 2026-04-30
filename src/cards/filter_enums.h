@@ -54,7 +54,6 @@ namespace banggame {
     enum class tag_type {
         preselect,
         button_color,
-        ghost_card,
         resolve,
         pass_turn,
         pick,

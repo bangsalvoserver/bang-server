@@ -11,8 +11,6 @@ main_deck:
     equip:
       - ghost
       - add_flag(player_flag::ghost)
-    tags:
-      - ghost_card
   - name: LEMAT
     signs:
       - 4 diamonds

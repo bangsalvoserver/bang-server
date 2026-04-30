@@ -1,5 +1,7 @@
 #include "steal_destroy.h"
 
+#include "effects/ghost_cards/ruleset.h"
+
 #include "requests.h"
 #include "escapable.h"
 #include "equip.h"
@@ -150,7 +152,7 @@ namespace banggame {
         }
         if (target_card->pocket == pocket_type::player_table
             && target_card->owner == origin
-            && target_card->has_tag(tag_type::ghost_card))
+            && rn::contains(target_card->expansion, GET_RULESET(ghost_cards)))
         {
             return "PROMPT_TARGET_SELF_GHOST_CARD";
         }

@@ -1,6 +1,7 @@
 #include "circus_wagon.h"
 
 #include "effects/base/pick.h"
+#include "effects/ghost_cards/ruleset.h"
 
 #include "game/game_table.h"
 #include "game/bot_suggestion.h"
@@ -30,7 +31,7 @@ namespace banggame {
         prompt_string pick_prompt(card_ptr target_card) const override {
             if (target->is_bot()) {
                 MAYBE_RETURN(prompts::bot_check_discard_card(target, target_card));
-                if (target_card->has_tag(tag_type::ghost_card)) {
+                if (rn::contains(target_card->expansion, GET_RULESET(ghost_cards))) {
                     return {1, "BOT_DISCARD_GHOST"};
                 }
                 auto is_penalty_card = [](card_ptr c) { return c->has_tag(tag_type::penalty); };

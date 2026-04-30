@@ -12,8 +12,6 @@ main_deck:
       - disable_character
       - ghost
       - add_flag(player_flag::ghost)
-    tags:
-      - ghost_card
   - name: LEMAT_2
     signs:
       - 4 diamonds
