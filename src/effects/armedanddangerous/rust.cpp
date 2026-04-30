@@ -1,34 +1,15 @@
 #include "rust.h"
 
 #include "game/game_table.h"
-#include "game/game_options.h"
 
 #include "effects/base/resolve.h"
 #include "effects/base/escapable.h"
 
 namespace banggame {
 
-    struct request_rust : request_escapable_resolvable {
+    struct request_rust : request_escapable {
         request_rust(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {})
-            : request_escapable_resolvable(origin_card, origin, target, flags, 0) {}
-
-        void on_update() override {
-            if (target->immune_to(origin_card, origin, flags)) {
-                pop_request();
-            } else {
-                switch (get_escape_type()) {
-                case escape_type::no_escape:
-                    auto_resolve();
-                    break;
-                case escape_type::escape_timer:
-                    set_duration(target->m_game->m_options.escape_timer);
-                    break;
-                case escape_type::escape_no_timer:
-                    // ignore
-                    break;
-                }
-            }
-        }
+            : request_escapable(origin_card, origin, target, flags, 0) {}
 
         card_list get_highlights(player_ptr owner) const override {
             return cube_slots(target)

@@ -12,8 +12,6 @@ main_deck:
       - disable_character
       - ghost
       - add_flag(player_flag::ghost)
-    tags:
-      - ghost_card
   - name: LEMAT_2
     signs:
       - 4 diamonds
@@ -163,6 +161,7 @@ character:
     tags:
       - skip_logs
       - ranged_effect
+      - play_as_bang
   - name: COLORADO_BILL_2
     image: 07_coloradobill
     equip:

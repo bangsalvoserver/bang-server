@@ -15,7 +15,7 @@ namespace banggame {
 
     void equip_jourdonnais_legend::on_enable(card_ptr origin_card, player_ptr origin) {
         origin->m_game->add_listener<event_type::apply_escapable_modifier>(origin_card,
-            [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags e_flags, const escapable_request &req) -> escape_type {
+            [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags e_flags, const interface_escapable &req) -> escape_type {
                 if (e_target == origin
                     && effect_jourdonnais_legend::can_escape(e_origin, e_origin_card, e_flags)
                     && req.can_escape(origin_card)
@@ -27,7 +27,7 @@ namespace banggame {
     }
 
     bool effect_jourdonnais_legend::can_play(card_ptr origin_card, player_ptr origin) {
-        if (auto req = origin->m_game->top_request<escapable_request>([&](const request_base &base) {
+        if (auto req = origin->m_game->top_request<interface_escapable>([&](const request_base &base) {
             return base.target == origin && effect_jourdonnais_legend::can_escape(base.origin, base.origin_card, base.flags);
         })) {
             return req->can_escape(origin_card);
@@ -36,13 +36,13 @@ namespace banggame {
     }
 
     prompt_string effect_jourdonnais_legend::on_prompt(card_ptr origin_card, player_ptr origin) {
-        auto req = origin->m_game->top_request<escapable_request>();
+        auto req = origin->m_game->top_request<interface_escapable>();
         return req->escape_prompt(origin);
     }
 
     void effect_jourdonnais_legend::on_play(card_ptr origin_card, player_ptr origin) {
         auto req = origin->m_game->top_request();
-        dynamic_cast<escapable_request *>(req.get())->add_card(origin_card);
+        dynamic_cast<interface_escapable *>(req.get())->add_card(origin_card);
 
         origin->m_game->queue_request<request_check>(origin, origin_card, &card_sign::is_jack_to_ace, [=](bool result) {
             if (result) {

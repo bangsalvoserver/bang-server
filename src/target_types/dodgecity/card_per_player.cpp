@@ -34,6 +34,9 @@ namespace banggame {
 
     game_string targeting_card_per_player::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
         player_ptr skipped_player = ctx.get<contexts::skipped_player>();
+        if (skipped_player && check_player_filter(origin_card, origin, player_filter, skipped_player, ctx)) {
+            return {"ERROR_CANNOT_SKIP_PLAYER", skipped_player};
+        }
         if (!rn::all_of(origin->m_game->m_players, [&](player_ptr p) {
             size_t found = rn::count(target_cards, p, [](card_ptr c) { return c->owner; });
             if (p == skipped_player || check_player_filter(origin_card, origin, player_filter, p, ctx)) return found == 0;

@@ -58,7 +58,7 @@ namespace banggame {
         origin->m_game->queue_action([=]{ 
             if (!origin->alive()) return;
 
-            if (origin_card->pocket == pocket_type::shop_selection) {
+            if (origin_card->pocket == pocket_type::shop_selection && ctx.get<contexts::forced_play>() != origin_card) {
                 if (origin == target) {
                     origin->m_game->add_log("LOG_BOUGHT_EQUIP", origin_card, origin);
                 } else {

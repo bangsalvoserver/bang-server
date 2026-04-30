@@ -70,7 +70,7 @@ namespace banggame {
         }
     };
 
-    struct request_duel : request_duel_base, escapable_request {
+    struct request_duel : request_duel_base, interface_escapable {
         using request_duel_base::request_duel_base;
     };
 

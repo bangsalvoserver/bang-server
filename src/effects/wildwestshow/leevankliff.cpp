@@ -84,9 +84,10 @@ namespace banggame {
 
     void modifier_leevankliff::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         if (card_ptr last_played = origin->m_game->call_event(event_type::get_last_played_brown_card{ origin })) {
-            ctx.add<contexts::disable_banglimit>();
             ctx.set<contexts::repeat_card>(last_played);
+            ctx.add<contexts::auto_discarded>().add(last_played);
             ctx.set<contexts::playing_card>(origin_card);
+            ctx.add<contexts::disable_banglimit>();
         }
     }
 }

@@ -88,7 +88,6 @@ main_deck:
       - steal random_if_hand_card
     tags:
       - skip_logs
-      - no_auto_discard
   - name: BRAWL
     signs:
       - J spades
@@ -100,7 +99,6 @@ main_deck:
       - destroy card_per_player notself not_empty
     tags:
       - skip_logs
-      - no_auto_discard
   - &dodge
     name: DODGE
     signs:
@@ -122,7 +120,6 @@ main_deck:
       - bang player alive notself
     tags:
       - skip_logs
-      - no_auto_discard
   - name: TEQUILA
     signs:
       - 9 clubs
@@ -132,8 +129,6 @@ main_deck:
       - discard extra_card self | hand
       - discard
       - heal player alive
-    tags:
-      - no_auto_discard
   - name: WHISKY
     signs:
       - Q hearts
@@ -143,8 +138,6 @@ main_deck:
       - discard extra_card self | hand
       - discard
       - heal(2)
-    tags:
-      - no_auto_discard
   - name: BIBLE
     signs:
       - 10 hearts
@@ -321,8 +314,6 @@ character:
     responses:
       - skip_drawing
       - steal card | table
-    tags:
-      - drawing
   - name: PIXIE_PETE
     image: 03_pixie_pete
     equip:
