@@ -37,7 +37,7 @@ namespace banggame {
 
     bool modifier_locomotive::valid_with_modifier(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
         return target_card->deck == card_deck_type::station
-            || target_card->deck != card_deck_type::main_deck && target_card->has_tag(tag_type::traincost);
+            || target_card->deck != card_deck_type::main_deck && target_card->modifier.type == GET_MODIFIER(traincost);
     }
 
     bool modifier_locomotive::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) {

@@ -75,7 +75,6 @@ namespace banggame {
         card_choice,
         last_scenario_card,
         buy_cost,
-        traincost,
         max_hp,
         bronco,
         dynamite,
