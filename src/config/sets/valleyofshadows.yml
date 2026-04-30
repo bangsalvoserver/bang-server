@@ -160,6 +160,7 @@ character:
     tags:
       - skip_logs
       - ranged_effect
+      - play_as_bang
   - name: COLORADO_BILL
     image: 07_coloradobill
     equip:
