@@ -97,8 +97,8 @@ namespace banggame {
                     }, result)) {
                         return request_states::next{};
                     }
-                } catch (const random_element_error &) {
-                    // ignore
+                } catch (const random_element_error &e) {
+                    logging::warn("BOT ERROR: random_element_error (message={})", e.what());
                 }
             }
         }
