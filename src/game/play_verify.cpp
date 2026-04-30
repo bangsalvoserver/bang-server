@@ -2,6 +2,7 @@
 
 #include "effects/base/requests.h"
 #include "effects/base/equip.h"
+#include "effects/base/draw.h"
 
 #include "cards/game_enums.h"
 #include "cards/filter_enums.h"
@@ -245,7 +246,7 @@ namespace banggame {
         ));
     }
 
-    static void log_played_card(card_ptr origin_card, player_ptr origin, bool is_response) {
+    static void log_played_card(card_ptr origin_card, player_ptr origin, bool is_response, const effect_context &ctx) {
         if (origin_card->has_tag(tag_type::skip_logs)) return;
         
         switch (origin_card->pocket) {
@@ -270,12 +271,10 @@ namespace banggame {
             }
             break;
         case pocket_type::player_character:
-            if (is_response) {
-                if (origin_card->has_tag(tag_type::drawing)) {
-                    origin->m_game->add_log("LOG_DRAWN_WITH_CHARACTER", origin_card, origin);
-                } else {
-                    origin->m_game->add_log("LOG_RESPONDED_WITH_CHARACTER", origin_card, origin);
-                }
+            if (ctx.contains<contexts::drawing_effect>()) {
+                origin->m_game->add_log("LOG_DRAWN_WITH_CHARACTER", origin_card, origin);
+            } else if (is_response) {
+                origin->m_game->add_log("LOG_RESPONDED_WITH_CHARACTER", origin_card, origin);
             } else {
                 origin->m_game->add_log("LOG_PLAYED_CHARACTER", origin_card, origin);
             }
@@ -290,7 +289,7 @@ namespace banggame {
     }
 
     static void apply_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
-        log_played_card(origin_card, origin, is_response);
+        log_played_card(origin_card, origin, is_response, ctx);
 
         if (!ctx.get<contexts::auto_discarded>().contains(origin_card)) {
             if (origin_card->pocket == pocket_type::player_hand) {

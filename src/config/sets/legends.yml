@@ -8,8 +8,6 @@ legends:
     responses:
       - skip_drawing
       - black_jack_legend
-    tags:
-      - drawing
   - name: CALAMITY_JANET
     image: 23_calamity_janet
     equip:
@@ -38,8 +36,6 @@ legends:
       - add_draw_card
       - no_cards_drawn
       - jesse_jones_legend random_if_hand_card notself | hand
-    tags:
-      - drawing
   - name: JOURDONNAIS
     image: 23_jourdonnais
     equip:

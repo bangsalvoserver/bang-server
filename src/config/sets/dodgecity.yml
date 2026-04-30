@@ -314,8 +314,6 @@ character:
     responses:
       - skip_drawing
       - steal card | table
-    tags:
-      - drawing
   - name: PIXIE_PETE
     image: 03_pixie_pete
     equip:

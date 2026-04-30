@@ -51,6 +51,7 @@ namespace banggame {
     DEFINE_EFFECT(draw_to_discard, effect_draw_to_discard)
 
     struct effect_no_cards_drawn {
+        void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
         bool can_play(card_ptr origin_card, player_ptr origin);
     };
 
@@ -109,6 +110,10 @@ namespace banggame {
             shared_request_draw req;
             nullable_ref<bool> reveal;
         };
+    }
+
+    namespace contexts {
+        struct drawing_effect {};
     }
 }
 

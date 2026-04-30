@@ -69,7 +69,6 @@ namespace banggame {
         beer,
         indians,
         catbalou_panic,
-        drawing,
         weapon,
         horse,
         jail,
