@@ -52,34 +52,45 @@ namespace banggame {
     };
     
     enum class tag_type {
-        preselect,
-        button_color,
+        // UI - UX tags
+        preselect, // when sending this card to respond_cards, the frontend will automatically select it
+        button_color, // for button_row cards. 0 = green, 1 = red, 2 = blue
+        skip_logs, // bypass log_played_card
+        
+        // Base game logic tags
+        max_hp, // character max hp
+        weapon, // weapon card - equip on the left side - also controls weapon "value" for bots
+        
+        // Bot and prompt logic tags
+        penalty, // whether this is a bad equip card
+        strong, // controls bot decisions
+        
+        // Expansion logic tags
+        force_allow, // bypass only_base_characters
+        last_scenario_card, // move this card to the end of the scenario deck
+        buy_cost, // cost for gold rush card
+
+        // Modifier logic tags
+        card_choice, // grouping id for the card_choice modifier
+        bangmod, // can be stacked with other bangmod modifiers
+        banglimit, // can be played with Bandolier
+        ranged_effect, // can be played with Bell Tower
+        play_as_bang, // sets up a "play as BANG!" action - can be played with bangmod modifiers
+        
+        // Card identifiers
+        bangcard, // "real" BANG! card
+        missed, // "counts as a Missed!" card
+        missedcard, // "real" Missed! card
         resolve,
         pass_turn,
         pick,
-        penalty,
-        strong,
-        skip_logs,
-        bangcard,
-        missed,
-        missedcard,
-        play_as_bang,
-        banglimit,
-        bangmod,
         beer,
-        indians,
+        indians, // controls Indian Guide
         catbalou_panic,
-        weapon,
         horse,
         jail,
-        card_choice,
-        last_scenario_card,
-        buy_cost,
-        max_hp,
         bronco,
         dynamite,
-        ranged_effect,
-        force_allow,
     };
 }
 
