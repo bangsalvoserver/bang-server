@@ -61,7 +61,6 @@ namespace banggame {
         penalty,
         strong,
         skip_logs,
-        no_auto_discard,
         bangcard,
         missed,
         missedcard,

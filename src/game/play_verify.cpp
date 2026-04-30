@@ -292,7 +292,7 @@ namespace banggame {
     static void apply_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, is_response);
 
-        if (origin_card != ctx.get<contexts::repeat_card>() && !origin_card->has_tag(tag_type::no_auto_discard)) {
+        if (!ctx.get<contexts::auto_discarded>().contains(origin_card)) {
             if (origin_card->pocket == pocket_type::player_hand) {
                 origin->discard_used_card(origin_card);
             } else {
