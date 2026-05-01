@@ -219,7 +219,6 @@ main_deck:
       - bang player alive notself range_1
     tags:
       - skip_logs
-      - no_auto_discard
   - name: PELTS
     image: 28_pelli
     signs:
