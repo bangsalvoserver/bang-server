@@ -45,6 +45,8 @@ main_deck:
     color: brown
     effects:
       - ballad player alive notself
+    tags:
+      - skip_logs
   - name: COFFIN
     image: 28_bara
     signs:

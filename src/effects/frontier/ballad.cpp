@@ -106,6 +106,7 @@ namespace banggame {
     };
 
     void effect_ballad::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        origin->m_game->add_log("LOG_PLAYED_CARD_ON", origin_card, origin, target);
         origin->m_game->queue_request<request_ballad>(origin_card, origin, target);
     }
 }
