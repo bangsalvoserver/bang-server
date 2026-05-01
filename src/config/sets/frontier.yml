@@ -44,7 +44,7 @@ main_deck:
       - 7 hearts
     color: brown
     effects:
-      - ballad player alive notself
+      - ballad player alive
     tags:
       - skip_logs
   - name: COFFIN

@@ -17,9 +17,11 @@ namespace banggame {
     }
 
     game_string effect_ballad::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        if (target->empty_hand() && rn::none_of(target->m_table, is_valid_ballad_card)) {
+        if ((origin == target || target->empty_hand()) && rn::none_of(target->m_table, is_valid_ballad_card)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
+
+        MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
 
         return {};
     }
@@ -91,7 +93,7 @@ namespace banggame {
                 target->steal_card(target_card);
             }
             
-            if (!target->empty_hand()) {
+            if (origin != target && !target->empty_hand()) {
                 origin->m_game->queue_request<request_ballad_steal>(origin_card, target, origin);
             }
         }
