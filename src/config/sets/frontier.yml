@@ -236,11 +236,11 @@ main_deck:
     signs:
       - 2 clubs
     color: brown
-    # modifier: card_choice
-    # tags:
-    #   - card_choice(5)
-    # TODO aggiungere carte hidden card_choice
-    # le carte hanno seme ed effetto fishing
+    modifier: card_choice
+    effects:
+      - none
+    tags:
+      - card_choice(5)
   - name: PIONEERS
     image: 28_pionieri
     signs:
@@ -324,3 +324,37 @@ main_deck:
     #   - trap
     tags:
       - penalty
+
+hidden:
+  - name: FISHING_HEARTS
+    image: 28_pesca
+    deck: main_deck
+    effects:
+      - card_choice
+      - fishing(card_suit::hearts)
+    tags:
+      - card_choice(5)
+  - name: FISHING_DIAMONDS
+    image: 28_pesca
+    deck: main_deck
+    effects:
+      - card_choice
+      - fishing(card_suit::diamonds)
+    tags:
+      - card_choice(5)
+  - name: FISHING_CLUBS
+    image: 28_pesca
+    deck: main_deck
+    effects:
+      - card_choice
+      - fishing(card_suit::clubs)
+    tags:
+      - card_choice(5)
+  - name: FISHING_SPADES
+    image: 28_pesca
+    deck: main_deck
+    effects:
+      - card_choice
+      - fishing(card_suit::spades)
+    tags:
+      - card_choice(5)
