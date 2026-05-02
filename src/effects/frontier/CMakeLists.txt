@@ -1,5 +1,6 @@
 target_sources(bangserver PRIVATE
     ballad.cpp
+    coffee.cpp
     coffin.cpp
     companion.cpp
     fishing.cpp

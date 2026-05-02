@@ -71,9 +71,8 @@ main_deck:
     signs:
       - 5 hearts
     color: brown
-    # TODO
-    # effects:
-    #   - coffee
+    effects:
+      - coffee
   - name: CHINATOWN
     image: 28_chinatown
     signs:
