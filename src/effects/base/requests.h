@@ -83,8 +83,7 @@ namespace banggame {
     };
     
     struct request_discard_hand : request_picking, interface_resolvable {
-        request_discard_hand(card_ptr origin_card, player_ptr target)
-            : request_picking(origin_card, nullptr, target) {}
+        using request_picking::request_picking;
         
         bool can_pick(card_ptr target_card) const override;
         void on_pick(card_ptr target_card) override;

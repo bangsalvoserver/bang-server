@@ -10,9 +10,10 @@ namespace banggame {
     class request_timer {
     private:
         static inline timer_id_t timer_id_counter = 0;
+        static constexpr game_duration disabled_duration{-1};
         
         timer_id_t timer_id = 0;
-        game_duration duration{-1};
+        game_duration duration = disabled_duration;
         ticks lifetime{0};
 
     public:
@@ -22,6 +23,10 @@ namespace banggame {
 
         void set_duration(game_duration value) {
             duration = value;
+        }
+
+        void set_disabled() {
+            duration = disabled_duration;
         }
 
         game_duration get_duration() const {

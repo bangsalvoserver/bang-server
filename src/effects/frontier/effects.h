@@ -2,6 +2,7 @@
 #define __FRONTIER_EFFECTS_H_
 
 #include "ballad.h"
+#include "chinatown.h"
 #include "coffee.h"
 #include "coffin.h"
 #include "companion.h"

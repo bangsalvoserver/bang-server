@@ -181,7 +181,7 @@ namespace banggame {
     }
     
     void effect_discard_hand::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->queue_request<request_discard_hand>(origin_card, origin);
+        origin->m_game->queue_request<request_discard_hand>(origin_card, origin, origin);
     }
 
     prompt_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {

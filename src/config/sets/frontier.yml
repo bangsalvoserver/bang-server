@@ -78,10 +78,9 @@ main_deck:
     signs:
       - Q clubs
     color: brown
-    # TODO
-    # effects:
-    #   - draw
-    #   - chinatown player alive
+    effects:
+      - draw
+      - chinatown player alive
   - name: CHUCK_WAGON
     image: 28_chuck_wagon
     signs:
