@@ -76,6 +76,13 @@ namespace banggame {
         });
     }
 
+    game_string effect_track::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        if (origin == target) {
+            return {"PROMPT_TRACK_SELF", origin_card};
+        }
+        return {};
+    }
+
     void effect_track::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
         ctx.set<contexts::tracked_player>(target);
     }
