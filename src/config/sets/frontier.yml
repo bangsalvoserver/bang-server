@@ -52,9 +52,8 @@ main_deck:
     signs:
       - 2 hearts
     color: blue
-    # TODO
-    # equip:
-    #   - coffin
+    equip:
+      - coffin
   - name: UNDERTAKER
     image: 28_becchino
     signs:
