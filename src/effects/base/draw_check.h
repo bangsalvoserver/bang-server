@@ -98,43 +98,16 @@ namespace banggame {
         void restart() override;
 
         draw_check_result get_result(card_ptr drawn_card) const;
+        draw_check_result do_get_result(modified_sign sign) const;
 
         virtual draw_check_result get_result(card_sign sign) const = 0;
-        virtual void on_resolve(bool lucky) = 0;
+        virtual void on_resolve(card_ptr drawn_card, card_sign sign, bool lucky) = 0;
     };
 
-    template<typename T> struct draw_check_condition_wrapper;
-
-    template<invocable_like<draw_check_result(card_sign)> T>
-    struct draw_check_condition_wrapper<T> {
-        [[no_unique_address]] T fun;
-
-        draw_check_result operator()(card_sign sign) const {
-            return std::invoke(fun, sign);
-        }
-    };
-
-    template<std::predicate<card_sign> T>
-    struct draw_check_condition_wrapper<T> {
-        [[no_unique_address]] T fun;
-
-        draw_check_result operator()(card_sign sign) const {
-            return draw_check_result{ .lucky = std::invoke(fun, sign) };
-        }
-    };
-
-    template<typename T>
-    concept draw_check_condition = requires {
-        sizeof(draw_check_condition_wrapper<T>);
-    };
-
-    template<typename T>
-    concept draw_check_function = std::invocable<T, bool>;
-
-    template<draw_check_condition Condition, draw_check_function Function>
+    template<typename Condition, typename Function>
     class request_check : public request_check_base {
     private:
-        [[no_unique_address]] draw_check_condition_wrapper<Condition> m_condition;
+        [[no_unique_address]] Condition m_condition;
         [[no_unique_address]] Function m_function;
 
     public:
@@ -144,11 +117,27 @@ namespace banggame {
             , m_function{FWD(function)} {}
         
         draw_check_result get_result(card_sign sign) const override {
-            return m_condition(sign);
+            if constexpr (invocable_like<Condition, draw_check_result(card_sign)>) {
+                return std::invoke(m_condition, sign);
+            } else if constexpr (std::predicate<Condition, card_sign>) {
+                return { .lucky = std::invoke(m_condition, sign) };
+            } else {
+                static_assert(false, "Invalid request_check Condition type");
+            }
         }
 
-        void on_resolve(bool lucky) override {
-            std::invoke(m_function, lucky);
+        void on_resolve(card_ptr drawn_card, card_sign sign, bool lucky) override {
+            if constexpr (std::invocable<Function, card_ptr, card_sign, bool>) {
+                std::invoke(m_function, drawn_card, sign, lucky);
+            } else if constexpr (std::invocable<Function, card_sign, bool>) {
+                std::invoke(m_function, sign, lucky);
+            } else if constexpr (std::invocable<Function, card_sign>) {
+                std::invoke(m_function, sign);
+            } else if constexpr (std::invocable<Function, bool>) {
+                std::invoke(m_function, lucky);
+            } else {
+                static_assert(false, "Invalid request_check Function type");
+            }
         }
     };
 
