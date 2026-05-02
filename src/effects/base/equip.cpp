@@ -40,9 +40,9 @@ namespace banggame {
         ctx.set<contexts::equip_target>(target);
     }
 
-    prompt_string effect_equip_on::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    prompt_string effect_equip_on::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
         return prompts::select_prompt(origin_card->equips | rv::transform([&](const equip_holder &holder) {
-            return holder.on_prompt(origin_card, origin, target);
+            return holder.on_prompt(origin_card, origin, target, ctx);
         }));
     }
 

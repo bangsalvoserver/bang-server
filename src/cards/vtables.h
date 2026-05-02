@@ -92,14 +92,14 @@ namespace banggame {
     struct equip_vtable {
         std::string_view name;
 
-        prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target);
+        prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
         void (*on_enable)(const void *effect_value, card_ptr target_card, player_ptr target);
         void (*on_disable)(const void *effect_value, card_ptr target_card, player_ptr target);
         bool is_nodisable;
     };
 
-    inline prompt_string equip_holder::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) const {
-        return type->on_prompt(effect_value, origin_card, origin, target);
+    inline prompt_string equip_holder::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
+        return type->on_prompt(effect_value, origin_card, origin, target, ctx);
     }
 
     inline void equip_holder::on_enable(card_ptr target_card, player_ptr target) const {
