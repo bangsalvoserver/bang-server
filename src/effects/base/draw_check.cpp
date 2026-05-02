@@ -100,6 +100,8 @@ namespace banggame {
 
     void request_check_base::resolve() {
         pop_request();
+        modified_sign sign = get_modified_sign(drawn_card);
+        bool lucky = do_get_result(sign).lucky;
         if (!target->m_game->m_selection.empty()) {
             while (!target->m_game->m_selection.empty()) {
                 card_ptr c = target->m_game->m_selection.front();
@@ -111,11 +113,14 @@ namespace banggame {
         } else {
             target->m_game->call_event(event_type::on_draw_check_resolve{origin_card, target, drawn_card, drawn_card });
         }
-        on_resolve(get_result(drawn_card).lucky);
+        on_resolve(drawn_card, sign, lucky);
     }
 
     draw_check_result request_check_base::get_result(card_ptr target_card) const {
-        auto sign = get_modified_sign(target_card);
+        return do_get_result(get_modified_sign(target_card));
+    }
+
+    draw_check_result request_check_base::do_get_result(modified_sign sign) const {
         auto result = get_result(sign);
         if (sign.modified && !result.rank_dependent) {
             result.indifferent = true;

@@ -170,9 +170,11 @@ namespace banggame {
         return {
             .name = name,
 
-            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target) -> prompt_string {
+            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> prompt_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
+                if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
+                    return value.on_prompt(origin_card, origin, target, ctx);
+                } else if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                     return value.on_prompt(origin_card, origin, target);
                 }
                 return {};

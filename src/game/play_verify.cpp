@@ -229,7 +229,7 @@ namespace banggame {
             }),
 
             rv::single(!ctx.contains<contexts::equip_target>()
-                ? effect_equip_on{}.on_prompt(origin_card, origin, origin) : prompt_string{})
+                ? effect_equip_on{}.on_prompt(origin_card, origin, origin, ctx) : prompt_string{})
         ));
     }
 
