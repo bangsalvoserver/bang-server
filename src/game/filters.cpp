@@ -1,6 +1,7 @@
 #include "filters.h"
 
 #include "effects/armedanddangerous/belltower.h"
+#include "effects/frontier/companion.h"
 
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
@@ -10,11 +11,15 @@
 namespace banggame {
 
     static bool check_distance(const_player_ptr origin, const_player_ptr target, const effect_context &ctx, int range) {
-        return range != 0 && (
-            ctx.contains<contexts::ignore_distances>()
-            || origin->check_player_flags(player_flag::ignore_distances)
-            || origin->m_game->calc_distance(origin, target) <= (origin->get_range_mod() + range)
-        );
+        if (range == 0) return false;
+        if (origin->check_player_flags(player_flag::ignore_distances)) return true;
+        if (ctx.contains<contexts::ignore_distances>()) return true;
+
+        const_player_ptr from = origin;
+        if (const_player_ptr distance_start = ctx.get<contexts::distance_start>()) {
+            from = distance_start;
+        }
+        return origin->m_game->calc_distance(from, target) <= (origin->get_range_mod() + range);
     }
 
     game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, player_filter_bitset filter, player_ptr target, const effect_context &ctx) {
