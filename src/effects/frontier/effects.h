@@ -4,6 +4,7 @@
 #include "alexander_noon.h"
 #include "ballad.h"
 #include "chinatown.h"
+#include "cholera.h"
 #include "coffee.h"
 #include "coffin.h"
 #include "companion.h"

@@ -102,10 +102,9 @@ main_deck:
     expansion: armedanddangerous
     equip_effects:
       - equip_on player alive
-    # TODO
     equip:
       - disable_character
-    #   - cholera
+      - cholera
   - name: COMANCHE
     image: 28_comanche
     signs:
