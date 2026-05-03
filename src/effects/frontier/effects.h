@@ -1,6 +1,7 @@
 #ifndef __FRONTIER_EFFECTS_H_
 #define __FRONTIER_EFFECTS_H_
 
+#include "alexander_noon.h"
 #include "ballad.h"
 #include "chinatown.h"
 #include "coffee.h"

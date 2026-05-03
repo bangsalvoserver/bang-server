@@ -1,7 +1,12 @@
 character:
   - name: ALEXANDER_NOON
     image: 28_alexander_noon
-    # TODO
+    equip:
+      - alexander_noon
+    responses:
+      - can_play_card
+      - draw
+      - alexander_noon
   - name: CALEB_BREW
     image: 28_caleb_brew
     # TODO

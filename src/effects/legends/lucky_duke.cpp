@@ -67,13 +67,16 @@ namespace banggame {
             return nullptr;
         });
 
-        target->m_game->add_listener<event_type::on_draw_check_start>({ target_card, -1 }, [=](player_ptr origin, shared_request_check req) {
-            if (req->target != target && req->origin_card && req->origin_card->deck == card_deck_type::main_deck) {
+        target->m_game->add_listener<event_type::on_draw_check_start>({ target_card, -2 }, [=](player_ptr origin, shared_request_check req) {
+            if (req->target != target && req->origin_card && req->origin_card->deck == card_deck_type::main_deck
+                && !req->drawn_card && !req->handlers.contains(target_card)
+            ) {
                 if (rn::none_of(origin->m_game->range_all_players(origin)
                     | rv::take_while([=](const_player_ptr current) { return current != target; })
                     | rv::filter(&player::alive),
                     get_lucky_duke)
                 ) {
+                    req->handlers.add(target_card);
                     target->m_game->queue_request<request_lucky_duke_legend>(target_card, origin, target, std::move(req));
                     return true;
                 }

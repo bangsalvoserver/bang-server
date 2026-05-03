@@ -89,6 +89,10 @@ namespace banggame {
             m_value.remove(get_card_order(value));
         }
 
+        void clear() {
+            m_value.clear();
+        }
+
         bool contains(const_card_ptr value) const {
             return m_value.contains(get_card_order(value));
         }
