@@ -9,6 +9,7 @@
 #include "coffee.h"
 #include "coffin.h"
 #include "companion.h"
+#include "falcon.h"
 #include "fishing.h"
 #include "ruleset.h"
 #include "tarantula_juice.h"

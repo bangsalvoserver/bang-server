@@ -149,10 +149,9 @@ main_deck:
     signs:
       - K diamonds
     color: brown
-    # TODO
-    # effects:
-    #   - draw
-    #   - falcon player alive notself
+    effects:
+      - draw
+      - falcon player alive notself
   - name: CAMPFIRE
     image: 28_falo
     signs:
