@@ -105,6 +105,8 @@ main_deck:
     equip:
       - disable_character
       - cholera
+    tags:
+      - penalty
   - name: COMANCHE
     image: 28_comanche
     signs:
