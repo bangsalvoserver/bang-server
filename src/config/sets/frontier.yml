@@ -309,9 +309,10 @@ main_deck:
     signs:
       - 8 clubs
     color: brown
-    # TODO
-    # effects:
-    #   - cattle_drive
+    effects:
+      - discard extra_card self | hand
+      - discard
+      - cattle_drive
   - name: TRAP
     image: 28_trappola
     signs:
