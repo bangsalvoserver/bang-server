@@ -1,5 +1,7 @@
 #include "add_cube.h"
 
+#include "cards/filter_enums.h"
+
 #include "effects/armedanddangerous/ruleset.h"
 #include "effects/base/pick.h"
 
@@ -33,12 +35,17 @@ namespace banggame {
         }
         
         prompt_string pick_prompt(card_ptr target_card) const override {
-            if (target->is_bot() && target_card->pocket == pocket_type::player_character
-                && rn::any_of(target->m_table, [](card_ptr c) {
-                    return c->is_orange() && c->num_cubes() < max_cubes_per_card;
-                })
-            ) {
-                return "BOT_PREFER_ORANGE_CARD";
+            if (target->is_bot()) {
+                if (target_card->has_tag(tag_type::penalty) ||
+                    ( target_card->pocket == pocket_type::player_character &&
+                        rn::any_of(target->m_table, [](card_ptr c) {
+                            return c->is_orange() && c->num_cubes() < max_cubes_per_card
+                                && !c->has_tag(tag_type::penalty);
+                        })
+                    )
+                ) {
+                    return "BOT_PREFER_ORANGE_CARD";
+                }
             }
             return {};
         }
@@ -90,11 +97,13 @@ namespace banggame {
     }
 
     game_string effect_add_cube::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) {
+        if (origin->is_bot() && target->has_tag(tag_type::penalty)) {
+            return "BOT_BAD_ADD_CUBE";
+        }
         if (target->num_cubes() == max_cubes_per_card) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
-        } else {
-            return {};
         }
+        return {};
     }
 
     void effect_add_cube::on_play(card_ptr origin_card, player_ptr origin, card_ptr target) {
