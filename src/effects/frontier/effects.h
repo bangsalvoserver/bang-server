@@ -10,5 +10,6 @@
 #include "companion.h"
 #include "fishing.h"
 #include "ruleset.h"
+#include "tarantula_juice.h"
 
 #endif

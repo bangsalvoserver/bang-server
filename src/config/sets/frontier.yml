@@ -302,9 +302,8 @@ main_deck:
     signs:
       - 4 clubs
     color: brown
-    # TODO
-    # effects:
-    #   - tarantula_juice
+    effects:
+      - tarantula_juice
   - name: CATTLE_DRIVE
     image: 28_transumanza
     signs:

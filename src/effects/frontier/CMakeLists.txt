@@ -8,4 +8,5 @@ target_sources(bangserver PRIVATE
     companion.cpp
     fishing.cpp
     ruleset.cpp
+    tarantula_juice.cpp
 )
