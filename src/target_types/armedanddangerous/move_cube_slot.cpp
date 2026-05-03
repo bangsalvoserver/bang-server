@@ -1,8 +1,10 @@
 #include "move_cube_slot.h"
 
-#include "game/possible_to_play.h"
+#include "effects/armedanddangerous/ruleset.h"
 
 #include "cards/filter_enums.h"
+
+#include "game/possible_to_play.h"
 
 namespace banggame {
 
@@ -10,7 +12,7 @@ namespace banggame {
         return origin->m_table
             | rv::filter(&card::is_orange)
             | rv::for_each([](card_ptr slot) {
-                return rv::repeat(slot, max_cubes - slot->num_cubes());
+                return rv::repeat(slot, max_cubes_per_card - slot->num_cubes());
             });
     }
 
@@ -22,13 +24,13 @@ namespace banggame {
     card_list targeting_move_cube_slot::random_target(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx) {
         return sample_elements(
             make_move_cube_target_set(origin, origin_card, ctx),
-            std::min(origin->get_character()->num_cubes(), ncubes),
+            std::min(origin->get_character()->num_cubes(), max_cubes),
             origin->m_game->bot_rng
         );
     }
 
     game_string targeting_move_cube_slot::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
-        if (targets.empty() || targets.size() > ncubes) {
+        if (targets.empty() || targets.size() > max_cubes) {
             return "ERROR_INVALID_TARGETS";
         }
         origin_card = origin->get_character();
@@ -43,7 +45,7 @@ namespace banggame {
             for (card_ptr target : targets) {
                 if (target == target_card) ++count;
             }
-            if (count > max_cubes) {
+            if (count > max_cubes_per_card) {
                 return {"ERROR_CARD_HAS_FULL_CUBES", target_card};
             }
         }

@@ -1,8 +1,9 @@
 #include "add_cube.h"
 
-#include "game/game_table.h"
-
+#include "effects/armedanddangerous/ruleset.h"
 #include "effects/base/pick.h"
+
+#include "game/game_table.h"
 
 namespace banggame {
 
@@ -17,14 +18,14 @@ namespace banggame {
             int nslots = 0;
             int ncards = 0;
             for (card_ptr c : cube_slots(target)) {
-                ncards += c->num_cubes() < max_cubes;
-                nslots += max_cubes - c->num_cubes();
+                ncards += c->num_cubes() < max_cubes_per_card;
+                nslots += max_cubes_per_card - c->num_cubes();
             }
 
             if (nslots <= ncubes || ncards <= 1) {
                 pop_request();
                 for (card_ptr c : cube_slots(target)) {
-                    int cubes_to_add = std::min<int>(ncubes, max_cubes - c->num_cubes());
+                    int cubes_to_add = std::min<int>(ncubes, max_cubes_per_card - c->num_cubes());
                     ncubes -= cubes_to_add;
                     c->add_cubes(cubes_to_add);
                 }
@@ -34,7 +35,7 @@ namespace banggame {
         prompt_string pick_prompt(card_ptr target_card) const override {
             if (target->is_bot() && target_card->pocket == pocket_type::player_character
                 && rn::any_of(target->m_table, [](card_ptr c) {
-                    return c->is_orange() && c->num_cubes() < max_cubes;
+                    return c->is_orange() && c->num_cubes() < max_cubes_per_card;
                 })
             ) {
                 return "BOT_PREFER_ORANGE_CARD";
@@ -46,7 +47,7 @@ namespace banggame {
             return target_card->owner == target
                 && (target_card->pocket == pocket_type::player_table && target_card->is_orange()
                 || target_card->pocket == pocket_type::player_character && target_card == target->get_character())
-                && target_card->num_cubes() < max_cubes;
+                && target_card->num_cubes() < max_cubes_per_card;
         }
 
         void on_pick(card_ptr target_card) override {
@@ -74,7 +75,7 @@ namespace banggame {
 
     game_string effect_add_cube::on_prompt(card_ptr origin_card, player_ptr origin) {
         if (rn::all_of(cube_slots(origin), [](card_ptr target) {
-            return target->num_cubes() == max_cubes;
+            return target->num_cubes() == max_cubes_per_card;
         })) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
@@ -89,7 +90,7 @@ namespace banggame {
     }
 
     game_string effect_add_cube::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target) {
-        if (target->num_cubes() == max_cubes) {
+        if (target->num_cubes() == max_cubes_per_card) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         } else {
             return {};
