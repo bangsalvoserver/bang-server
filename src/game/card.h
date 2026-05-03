@@ -17,8 +17,6 @@ namespace banggame {
         show_owner
     };
     
-    static constexpr int max_cubes = 4;
-    
     struct card : card_data {
         card(game_ptr game, int id, const card_data &data)
             : card_data(data), m_game(game), order(id), id(id) {}

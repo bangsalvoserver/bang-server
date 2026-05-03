@@ -1,6 +1,8 @@
 #include "card.h"
 #include "game_table.h"
 
+#include "effects/armedanddangerous/ruleset.h"
+
 #include "cards/filter_enums.h"
 #include "cards/game_enums.h"
 #include "cards/game_events.h"
@@ -147,7 +149,7 @@ namespace banggame {
         auto &table_tokens = m_game->tokens[token_type];
         auto &card_tokens = tokens[token_type];
 
-        num_tokens = std::min<int>({num_tokens, table_tokens, max_cubes - card_tokens});
+        num_tokens = std::min<int>({num_tokens, table_tokens, max_cubes_per_card - card_tokens});
         if (num_tokens > 0) {
             m_game->add_log("LOG_ADD_CUBE", owner, this, num_tokens);
             m_game->move_tokens(token_type, token_positions::table{}, token_positions::card{this}, num_tokens);
@@ -163,8 +165,8 @@ namespace banggame {
         if (card_tokens < num_tokens) {
             num_tokens = card_tokens;
         }
-        if (target && num_tokens > 0 && target_tokens < max_cubes) {
-            int added_tokens = std::min<int>(num_tokens, max_cubes - target_tokens);
+        if (target && num_tokens > 0 && target_tokens < max_cubes_per_card) {
+            int added_tokens = std::min<int>(num_tokens, max_cubes_per_card - target_tokens);
             num_tokens -= added_tokens;
 
             if (owner == target->owner) {

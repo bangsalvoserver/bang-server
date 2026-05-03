@@ -1,5 +1,6 @@
 #include "cholera.h"
 
+#include "effects/armedanddangerous/ruleset.h"
 #include "effects/base/draw_check.h"
 
 #include "cards/game_events.h"
@@ -22,7 +23,7 @@ namespace banggame {
                     [=](card_sign sign) {
                         return draw_check_result {
                             .lucky = !sign.is_spades(),
-                            .indifferent = target_card->num_cubes() == max_cubes
+                            .indifferent = target_card->num_cubes() == max_cubes_per_card
                         };
                     },
                     [=](bool result) {
