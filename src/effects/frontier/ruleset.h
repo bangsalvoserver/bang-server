@@ -7,12 +7,10 @@ namespace banggame {
 
     static constexpr auto pardner_tokens = enums::subrange(card_token_type::pardner1, card_token_type::pardner6);
 
-    card_token_type get_card_pardner_token(card_ptr target_card);
-
     player_ptr get_tracked_player(card_ptr target_card);
+    bool is_tracked_player(card_ptr target_card, player_ptr target);
 
     void apply_pardner_token(card_ptr origin_card, player_ptr origin, player_ptr target);
-
     void remove_pardner_token(card_ptr origin_card, player_ptr origin);
 
     struct ruleset_frontier {

@@ -10,5 +10,6 @@ target_sources(bangserver PRIVATE
     falcon.cpp
     fishing.cpp
     ruleset.cpp
+    steve_tengo.cpp
     tarantula_juice.cpp
 )

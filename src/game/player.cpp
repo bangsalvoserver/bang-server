@@ -162,7 +162,9 @@ namespace banggame {
                 target_card->set_inactive(false);
                 owner->disable_equip(target_card);
                 target_card->drop_all_cubes();
-                remove_pardner_token(target_card, owner);
+                if (target_card->is_purple()) {
+                    remove_pardner_token(target_card, owner);
+                }
                 return true;
             } else if (target_card->pocket == pocket_type::player_hand) {
                 owner->m_game->call_event(event_type::on_discard_hand_card{ owner, target_card, used });

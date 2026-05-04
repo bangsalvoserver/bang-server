@@ -10,22 +10,24 @@
 
 namespace banggame {
 
-    card_token_type get_card_pardner_token(card_ptr target_card) {
+    static card_token_type get_card_pardner_token(card_ptr target_card) {
         auto tag_value = target_card->get_tag_value(tag_type::pardner);
         assert(tag_value && *tag_value >= 1 && *tag_value <= pardner_tokens.size());
         return pardner_tokens[*tag_value - 1];
     }
 
     player_ptr get_tracked_player(card_ptr target_card) {
-        if (target_card->is_purple()) {
-            card_token_type token = get_card_pardner_token(target_card);
-            for (player_ptr target : target_card->m_game->m_players) {
-                if (target->alive() && target->tokens[token]) {
-                    return target;
-                }
+        card_token_type token = get_card_pardner_token(target_card);
+        for (player_ptr target : target_card->m_game->m_players) {
+            if (target->alive() && target->tokens[token]) {
+                return target;
             }
         }
         return nullptr;
+    }
+
+    bool is_tracked_player(card_ptr target_card, player_ptr target) {
+        return target->alive() && target->tokens[get_card_pardner_token(target_card)];
     }
 
     void apply_pardner_token(card_ptr origin_card, player_ptr origin, player_ptr target) {

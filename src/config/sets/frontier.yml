@@ -38,7 +38,8 @@ character:
     # TODO
   - name: STEVE_TENGO
     image: 28_steve_tengo
-    # TODO
+    equip:
+      - steve_tengo
     tags:
       - pardner(6)
 
