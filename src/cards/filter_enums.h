@@ -80,8 +80,8 @@ namespace banggame {
         
         // Card identifiers
         bangcard, // "real" BANG! card
-        missed, // "counts as a Missed!" card
         missedcard, // "real" Missed! card
+        count_as_missed,
         resolve,
         pass_turn,
         pick,

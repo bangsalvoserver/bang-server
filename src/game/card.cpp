@@ -22,10 +22,13 @@ namespace banggame {
     }
 
     bool card::is_bang_card(const_player_ptr origin) const {
-        return origin->check_player_flags(player_flag::treat_any_as_bang)
-            || has_tag(tag_type::bangcard)
-            || origin->check_player_flags(player_flag::treat_missed_as_bang)
-            && has_tag(tag_type::missed);
+        if (origin->check_player_flags(player_flag::treat_any_as_bang)) return true;
+        if (has_tag(tag_type::bangcard)) return true;
+        
+        if (origin->check_player_flags(player_flag::treat_missed_as_bang)) {
+            return has_tag(tag_type::missedcard) || has_tag(tag_type::count_as_missed);
+        }
+        return false;
     }
 
     card_visibility card::get_visibility() const {
