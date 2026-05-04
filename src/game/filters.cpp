@@ -124,7 +124,7 @@ namespace banggame {
                 return {"ERROR_TARGET_BANG", origin_card, target};
 
             case target_card_filter::missed:
-                if (target->has_tag(tag_type::missed)) continue;
+                if (target->has_tag(tag_type::missedcard) || target->has_tag(tag_type::count_as_missed)) continue;
                 return {"ERROR_TARGET_NOT_MISSED", origin_card, target};
 
             case target_card_filter::missedcard:
