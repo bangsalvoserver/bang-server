@@ -4,6 +4,8 @@
 #include "cards/card_effect.h"
 
 namespace banggame {
+    
+    static constexpr int max_cubes_per_card = 4;
 
     struct ruleset_armedanddangerous {
         void on_apply(game_ptr game);

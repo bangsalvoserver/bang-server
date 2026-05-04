@@ -256,7 +256,6 @@ main_deck:
     responses:
       - missedcard
     tags:
-      - missed
       - missedcard
   - &panic
     name: PANIC
