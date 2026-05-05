@@ -15,5 +15,6 @@
 #include "ruleset.h"
 #include "steve_tengo.h"
 #include "tarantula_juice.h"
+#include "trap.h"
 
 #endif

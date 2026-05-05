@@ -13,4 +13,5 @@ target_sources(bangserver PRIVATE
     ruleset.cpp
     steve_tengo.cpp
     tarantula_juice.cpp
+    trap.cpp
 )

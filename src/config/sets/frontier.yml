@@ -318,9 +318,11 @@ main_deck:
     color: blue
     equip_effects:
       - equip_on player alive
-    # TODO
-    # equip:
-    #   - trap
+    equip:
+      - trap
+    effects:
+      - max_usages(1)
+      - trap
     tags:
       - penalty
 
