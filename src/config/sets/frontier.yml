@@ -138,9 +138,9 @@ main_deck:
     signs:
       - Q spades
     color: blue
-    # TODO
-    # equip:
-    #   - coyotes
+    equip:
+      - predraw_check(0)
+      - coyotes
   - name: FEUD
     image: 28_faida
     signs:

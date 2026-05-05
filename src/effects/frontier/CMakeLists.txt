@@ -7,6 +7,7 @@ target_sources(bangserver PRIVATE
     coffee.cpp
     coffin.cpp
     companion.cpp
+    coyotes.cpp
     falcon.cpp
     fishing.cpp
     ruleset.cpp
