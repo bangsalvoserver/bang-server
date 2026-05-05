@@ -135,7 +135,7 @@ main_deck:
       - Q spades
     color: blue
     equip:
-      - predraw_check(0)
+      - predraw_check(-3)
       - coyotes
   - name: FEUD
     image: 28_faida
@@ -175,7 +175,7 @@ main_deck:
       - 8 hearts
     color: blue
     equip:
-      - predraw_check(-3)
+      - predraw_check(-4)
       - dining_car
   - name: HAWKEN
     image: 28_hawken
@@ -218,7 +218,7 @@ main_deck:
     effects:
       - discard extra_card self | hand
       - discard
-      - bang player alive notself range_1
+      - damage player alive notself range_1
     tags:
       - skip_logs
   - name: PELTS
