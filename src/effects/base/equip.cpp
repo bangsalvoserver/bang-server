@@ -11,14 +11,23 @@
 
 namespace banggame {
 
-    game_string get_equip_error(const_card_ptr origin_card, player_ptr target) {
-        player_filter_bitset equip_filter { target_player_filter::alive };
-        
+    static const player_filter_bitset *get_equip_filter(const_card_ptr origin_card) {
         for (const effect_holder &holder : origin_card->equip_effects) {
             if (holder.type == GET_EFFECT(equip_on) && holder.target == TARGET_TYPE(player)) {
-                equip_filter = static_cast<const targeting_player *>(holder.target_value)->player_filter;
-                break;
+                return &static_cast<const targeting_player *>(holder.target_value)->player_filter;
             }
+        }
+        return nullptr;
+    }
+
+    bool is_self_equippable(const_card_ptr origin_card) {
+        return get_equip_filter(origin_card) == nullptr;
+    }
+
+    game_string get_equip_error(const_card_ptr origin_card, player_ptr target) {
+        player_filter_bitset equip_filter { target_player_filter::alive };
+        if (const player_filter_bitset *filter = get_equip_filter(origin_card)) {
+            equip_filter = *filter;
         }
 
         MAYBE_RETURN(check_player_filter(origin_card, target, equip_filter, target));
