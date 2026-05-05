@@ -61,18 +61,16 @@ main_deck:
     equip:
       - coffin
       - coffin_nodisable
-  - name: UNDERTAKER
-    image: 28_becchino
-    signs:
-      - Q hearts
-    color: purple
-    equip_effects:
-      - track player alive
-    # TODO
-    # equip:
-    #   - undertaker
-    tags:
-      - pardner(1)
+  # - name: UNDERTAKER
+  # TODO: add role visibility by player
+  #   image: 28_becchino
+  #   signs:
+  #     - Q hearts
+  #   color: purple
+  #   equip_effects:
+  #     - track player alive
+  #   tags:
+  #     - pardner(1)
   - name: COFFEE
     image: 28_caffe
     signs:
@@ -109,18 +107,16 @@ main_deck:
       - cholera
     tags:
       - penalty
-  - name: COMANCHE
-    image: 28_comanche
-    signs:
-      - A diamonds
-    color: purple
-    equip_effects:
-      - track player alive
-    # TODO
-    # equip:
-    #   - comanche
-    tags:
-      - pardner(2)
+  # - name: COMANCHE
+  # TODO: copy another character's effect
+  #   image: 28_comanche
+  #   signs:
+  #     - A diamonds
+  #   color: purple
+  #   equip_effects:
+  #     - track player alive
+  #   tags:
+  #     - pardner(2)
   - name: COMPANION
     image: 28_compagno
     signs:
@@ -267,16 +263,15 @@ main_deck:
     #   - posse
     tags:
       - pardner(5)
-  - name: SCALP
-    image: 28_scalpo
-    signs:
-      - 5 diamonds
-    color: orange
-    expansion: armedanddangerous
-    effects:
-      - none self_cubes(1)
-    # TODO
-    # modifier: scalp
+  # - name: SCALP
+  # TODO: copy another character's effect
+  #   image: 28_scalpo
+  #   signs:
+  #     - 5 diamonds
+  #   color: orange
+  #   expansion: armedanddangerous
+  #   effects:
+  #     - none self_cubes(1)
   - name: SCORPION
     image: 28_scorpione
     signs:
