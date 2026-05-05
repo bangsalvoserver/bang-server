@@ -11,6 +11,14 @@ namespace banggame {
     };
 
     DEFINE_EQUIP(coffin, equip_coffin)
+
+    struct equip_coffin_nodisable {
+        struct nodisable{};
+        
+        void on_disable(card_ptr target_card, player_ptr target);
+    };
+
+    DEFINE_EQUIP(coffin_nodisable, equip_coffin_nodisable)
 }
 
 #endif

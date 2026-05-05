@@ -60,6 +60,7 @@ main_deck:
     color: blue
     equip:
       - coffin
+      - coffin_nodisable
   - name: UNDERTAKER
     image: 28_becchino
     signs:
