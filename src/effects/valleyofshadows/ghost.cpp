@@ -6,6 +6,7 @@
 #include "game/prompts.h"
 
 #include "effects/base/death.h"
+#include "effects/base/utils.h"
 
 namespace banggame {
 
@@ -27,13 +28,17 @@ namespace banggame {
     }
     
     void equip_ghost::on_enable(card_ptr target_card, player_ptr target) {
-        if (!target->alive()) {
+        if (!target->check_player_flags(player_flag::keep_alive) && !target->alive()) {
             revive_character(target);
         }
+
+        equip_add_flag{player_flag::keep_alive}.on_enable(target_card, target);
     }
     
     void equip_ghost::on_disable(card_ptr target_card, player_ptr target) {
-        if (!target->alive()) {
+        equip_add_flag{player_flag::keep_alive}.on_disable(target_card, target);
+
+        if (!target->check_player_flags(player_flag::keep_alive) && !target->alive()) {
             handle_player_death(nullptr, target, death_type::ghost_discard);
         }
     }

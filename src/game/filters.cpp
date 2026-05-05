@@ -30,7 +30,7 @@ namespace banggame {
                 return {"ERROR_TARGET_DEAD", origin_card, target};
 
             case target_player_filter::dead:
-                if (!target->alive()) continue;
+                if (!target->check_player_flags(player_flag::keep_alive) && !target->alive()) continue;
                 return {"ERROR_TARGET_NOT_DEAD", origin_card, target};
 
             case target_player_filter::self:
