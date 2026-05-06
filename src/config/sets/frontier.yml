@@ -290,10 +290,9 @@ main_deck:
     signs:
       - J diamonds
     color: blue
-    # TODO
     equip:
       - weapon(1)
-      # - slocum
+      - slocum
     tags:
       - weapon
   - name: TARANTULA_JUICE

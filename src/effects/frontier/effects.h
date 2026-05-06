@@ -14,6 +14,7 @@
 #include "falcon.h"
 #include "fishing.h"
 #include "ruleset.h"
+#include "slocum.h"
 #include "steve_tengo.h"
 #include "tarantula_juice.h"
 #include "trap.h"

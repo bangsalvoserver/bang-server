@@ -96,7 +96,7 @@ namespace banggame {
             return;
         }
         event_card_key key{origin_card, 4};
-        origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](const_player_ptr p, int &value) {
+        origin->m_game->add_listener<event_type::count_bangs_played>(key, [=](const_player_ptr p, int &value, bool real_count) {
             if (origin == p) {
                 ++value;
             }

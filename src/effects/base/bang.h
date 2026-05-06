@@ -86,6 +86,7 @@ namespace banggame {
         struct count_bangs_played {
             const_player_ptr origin;
             nullable_ref<int> num_bangs_played;
+            bool real_count;
         };
 
         struct apply_bang_modifier {

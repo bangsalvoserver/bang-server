@@ -83,9 +83,9 @@ namespace banggame {
         return nchecks;
     }
 
-    int player::get_bangs_played() const {
+    int player::get_bangs_played(bool real_count) const {
         int nbangs = 0;
-        m_game->call_event(event_type::count_bangs_played{ this, nbangs });
+        m_game->call_event(event_type::count_bangs_played{ this, nbangs, real_count });
         return nbangs;
     }
 

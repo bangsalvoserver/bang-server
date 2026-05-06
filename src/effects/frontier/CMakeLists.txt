@@ -12,6 +12,7 @@ target_sources(bangserver PRIVATE
     falcon.cpp
     fishing.cpp
     ruleset.cpp
+    slocum.cpp
     steve_tengo.cpp
     tarantula_juice.cpp
     trap.cpp
