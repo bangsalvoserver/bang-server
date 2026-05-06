@@ -70,6 +70,7 @@ namespace banggame {
         last_scenario_card, // move this card to the end of the scenario deck
         buy_cost, // cost for gold rush card
         pardner, // pardner token for this card
+        undiscardable, // cannot discard this card in phase 3
 
         // Modifier logic tags
         card_choice, // grouping id for the card_choice modifier

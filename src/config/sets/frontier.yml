@@ -141,6 +141,8 @@ main_deck:
     signs:
       - 3 spades
     color: brown
+    tags:
+      - undiscardable
   - name: FALCON
     image: 28_falco
     signs:
