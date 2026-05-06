@@ -91,9 +91,8 @@ main_deck:
     signs:
       - 6 clubs
     color: blue
-    # TODO
-    # equip:
-    #   - chuck_wagon
+    equip:
+      - chuck_wagon(3)
   - name: CHOLERA
     image: 28_colera
     signs:

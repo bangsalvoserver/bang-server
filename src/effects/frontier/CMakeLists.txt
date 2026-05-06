@@ -4,6 +4,7 @@ target_sources(bangserver PRIVATE
     cattle_drive.cpp
     chinatown.cpp
     cholera.cpp
+    chuck_wagon.cpp
     coffee.cpp
     coffin.cpp
     companion.cpp

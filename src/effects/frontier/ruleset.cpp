@@ -1,12 +1,13 @@
 #include "ruleset.h"
 
 #include "cards/game_events.h"
-
-#include "game/game_table.h"
-
 #include "cards/filter_enums.h"
 
 #include "effects/base/requests.h"
+#include "effects/wildwestshow/ruleset.h"
+
+#include "game/game_table.h"
+#include "game/game_options.h"
 
 namespace banggame {
 
@@ -51,6 +52,10 @@ namespace banggame {
     }
 
     void ruleset_frontier::on_apply(game_ptr game) {
+        if (!game->m_options.expansions.contains(GET_RULESET(wildwestshow))) {
+            track_played_cards(game);
+        }
+
         // TODO add_listener on_discard_pass
         // when discarding "HEAVY_GRUB" -> heal(3)
 

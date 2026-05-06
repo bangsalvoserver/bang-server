@@ -11,7 +11,7 @@
 
 namespace banggame {
 
-    void ruleset_wildwestshow::on_apply(game_ptr game) {
+    void track_played_cards(game_ptr game) {
         event_card_key key{nullptr, -15};
 
         game->add_listener<event_type::on_turn_start>(nullptr, [=](player_ptr origin) {
@@ -40,6 +40,16 @@ namespace banggame {
                 }
             }
         });
+    }
+
+    int get_count_played_cards(player_ptr origin) {
+        int count = 0;
+        origin->m_game->call_event(event_type::get_count_played_cards{ origin, count });
+        return count;
+    }
+
+    void ruleset_wildwestshow::on_apply(game_ptr game) {
+        track_played_cards(game);
         
         if (game->m_options.expansions.contains(GET_RULESET(ghost_cards))) {
             game->add_listener<event_type::check_remove_player>(nullptr, []{ return true; });

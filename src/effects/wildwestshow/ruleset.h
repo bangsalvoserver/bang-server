@@ -12,6 +12,9 @@ namespace banggame {
         };
     }
 
+    void track_played_cards(game_ptr game);
+    int get_count_played_cards(player_ptr origin);
+
     struct ruleset_wildwestshow_characters {};
 
     DEFINE_RULESET(wildwestshow_characters, ruleset_wildwestshow_characters)

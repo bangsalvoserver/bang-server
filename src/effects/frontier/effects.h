@@ -6,6 +6,7 @@
 #include "cattle_drive.h"
 #include "chinatown.h"
 #include "cholera.h"
+#include "chuck_wagon.h"
 #include "coffee.h"
 #include "coffin.h"
 #include "companion.h"
