@@ -46,8 +46,8 @@ namespace banggame {
                 return {"ERROR_TARGET_SHERIFF", origin_card, target};
             
             case target_player_filter::min_5_table_cards:
-                if (contains_at_least(target->m_table | rv::remove_if(&card::is_black), 5)) continue;
-                return {"ERROR_TARGET_EMPTY", origin_card, target};
+                if (contains_at_least(target->m_table | rv::filter([=](card_ptr p) { return p != origin_card && !p->is_black(); }), 5)) continue;
+                return {"ERROR_TARGET_NOT_MIN_5_CARDS", origin_card, target};
 
             case target_player_filter::not_empty:
                 if (!target->empty_hand() || !target->empty_table()) continue;
