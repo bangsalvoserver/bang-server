@@ -58,22 +58,24 @@ namespace banggame {
 
     class event_listener {
     private:
-        std::move_only_function<bool(const void *tuple, void *result)> m_fun;
+        std::move_only_function<bool(const void *value, void *result)> m_fun;
         std::type_index m_type;
         bool m_active = true;
     
     public:
         template<event T, typename Function> requires applicable_as_event<Function, T>
         event_listener(std::in_place_type_t<T>, Function &&fun)
-            : m_fun{[fun=std::move(fun)](const void *tuple, void *result) mutable {
-                using tuple_type = event_tuple<T>;
+            : m_fun{[fun=std::move(fun)](const void *value_ptr, void *result_ptr) mutable {
                 using result_type = event_result<T>;
-                const tuple_type &tuple_ref = *static_cast<const tuple_type *>(tuple);
+                const T &value = *static_cast<const T *>(value_ptr);
                 if constexpr (std::is_void_v<result_type>) {
-                    std::apply(fun, tuple_ref);
-                } else if (result_type value = std::apply(fun, tuple_ref); static_cast<bool>(value)) {
-                    *static_cast<result_type *>(result) = std::move(value);
-                    return true;
+                    std::apply(fun, to_event_tuple(value));
+                } else {
+                    result_type result = std::apply(fun, to_event_tuple(value));
+                    if (static_cast<bool>(result)) {
+                        *static_cast<result_type *>(result_ptr) = std::move(result);
+                        return true;
+                    }
                 }
                 return false;
             }},
@@ -137,13 +139,12 @@ namespace banggame {
 
         template<event T>
         auto call_event(const T &value) {
-            auto tuple = to_event_tuple(value);
             using result_type = event_result<T>;
             if constexpr (std::is_void_v<result_type>) {
-                do_call_event(typeid(T), &tuple, nullptr);
+                do_call_event(typeid(T), &value, nullptr);
             } else {
                 result_type result{};
-                do_call_event(typeid(T), &tuple, &result);
+                do_call_event(typeid(T), &value, &result);
                 return result;
             }
         }
