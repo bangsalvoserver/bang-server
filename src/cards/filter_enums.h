@@ -16,6 +16,7 @@ namespace banggame {
         range_2,
         reachable,
         target_set,
+        min_5_table_cards,
         not_empty,
         not_empty_hand,
         not_empty_table,

@@ -166,10 +166,8 @@ main_deck:
     signs:
       - 10 diamonds
     color: green
-    # TODO
-    # effects:
-    #   - stampede players alive not_empty_hand
-      # TODO add player_filter ">4 hand cards"
+    effects:
+      - stampede players alive min_5_table_cards
   - name: GEYSER
     image: 28_geyser
     signs:

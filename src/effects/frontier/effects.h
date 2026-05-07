@@ -15,6 +15,7 @@
 #include "fishing.h"
 #include "ruleset.h"
 #include "slocum.h"
+#include "stampede.h"
 #include "steve_tengo.h"
 #include "tarantula_juice.h"
 #include "trap.h"
