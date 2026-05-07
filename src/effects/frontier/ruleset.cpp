@@ -5,6 +5,7 @@
 #include "cards/game_enums.h"
 
 #include "effects/base/requests.h"
+#include "effects/base/steal_destroy.h"
 #include "effects/wildwestshow/ruleset.h"
 
 #include "game/game_table.h"
@@ -52,6 +53,40 @@ namespace banggame {
         };
     }
 
+    struct request_jackalope : request_resolvable, interface_picking {
+        using request_resolvable::request_resolvable;
+        
+        bool can_pick(card_ptr target_card) const override {
+            return target_card->pocket == pocket_type::main_deck
+                || (target_card->pocket == pocket_type::discard_pile && target->m_game->m_deck.empty());
+        }
+
+        void on_pick(card_ptr target_card) override {
+            pop_request();
+            target->draw_card(2, origin_card);
+        }
+
+        void on_resolve() override {
+            pop_request();
+        }
+
+        resolve_type get_resolve_type() const override {
+            return resolve_type::dismiss;
+        }
+
+        prompt_string resolve_prompt() const override {
+            return {"PROMPT_CANCEL_DRAW", origin_card};
+        }
+
+        game_string status_text(player_ptr owner) const override {
+            if (target == owner) {
+                return {"STATUS_JACKALOPE", origin_card};
+            } else {
+                return {"STATUS_JACKALOPE_OTHER", target, origin_card};
+            }
+        }
+    };
+
     void ruleset_frontier::on_apply(game_ptr game) {
         if (!game->m_options.expansions.contains(GET_RULESET(wildwestshow))) {
             track_played_cards(game);
@@ -69,8 +104,16 @@ namespace banggame {
             }
         });
 
-        // TODO add_listener on_destroy_card
-        // when discarding "JACKALOPE" -> target draw(2)
+        game->add_listener<event_type::on_destroy_card>({ nullptr, 1 }, [](player_ptr origin, card_ptr target_card, bool is_destroy, destroy_flags &flags) {
+            player_ptr target = target_card->owner;
+            if (origin != target && target_card->name == "JACKALOPE") {
+                origin->m_game->queue_action([=]{
+                    if (target->alive()) {
+                        target->m_game->queue_request<request_jackalope>(target_card, origin, target);
+                    }
+                }, 41);
+            }
+        });
         
         game->add_listener<event_type::on_equip_card>(nullptr, [](player_ptr origin, player_ptr target, card_ptr target_card, const effect_context &ctx) {
             if (target_card->is_purple()) {
