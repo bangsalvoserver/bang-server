@@ -99,19 +99,15 @@ namespace banggame {
     
     template<> struct give_card_visitor<card_deck_type::train> {
         bool is_valid_card(player_ptr target, card_ptr target_card) const {
-            return target_card->owner != target;
+            return target_card->owner != target && target_card->pocket != pocket_type::train;
         }
         
         void give_card(player_ptr target, card_ptr target_card) const {
             if (target_card->owner) {
-                target->steal_card(target_card);
-            } else {
-                bool from_train = target_card->pocket == pocket_type::train;
-                target->equip_card(target_card);
-                if (from_train && !target->m_game->m_train_deck.empty()) {
-                    target->m_game->m_train_deck.back()->move_to(pocket_type::train);
-                }
+                target_card->owner->discard_card(target_card);
             }
+            target->m_game->m_train.back()->move_to(pocket_type::train_deck, nullptr, card_visibility::hidden);
+            target_card->move_to(pocket_type::train);
         }
     };
     
