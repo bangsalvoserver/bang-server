@@ -41,9 +41,9 @@ namespace banggame {
 
         game_string status_text(player_ptr owner) const override {
             if (target == owner) {
-                return {"STATUS_CHINATOWN", origin_card};
+                return {"STATUS_CHINATOWN", origin_card, num_cards};
             } else {
-                return {"STATUS_CHINATOWN_OTHER", target, origin_card};
+                return {"STATUS_CHINATOWN_OTHER", target, origin_card, num_cards};
             }
         }
     };
