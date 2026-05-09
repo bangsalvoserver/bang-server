@@ -3,6 +3,7 @@
 #include "ruleset.h"
 
 #include "cards/game_events.h"
+#include "cards/game_enums.h"
 
 #include "effects/base/damage.h"
 #include "effects/base/pick.h"
@@ -60,5 +61,13 @@ namespace banggame {
                 origin->draw_card(1, target_card);
             }
         });
+    }
+
+    void equip_steve_tengo::on_disable(card_ptr target_card, player_ptr target) {
+        if (!target->check_player_flags(player_flag::keep_alive) && !target->alive()) {
+            remove_pardner_token(target_card, target);
+        }
+
+        target->m_game->remove_listeners(target_card);
     }
 }
