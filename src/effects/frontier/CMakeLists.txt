@@ -11,6 +11,7 @@ target_sources(bangserver PRIVATE
     coyotes.cpp
     falcon.cpp
     fishing.cpp
+    hawken.cpp
     ruleset.cpp
     slocum.cpp
     stampede.cpp

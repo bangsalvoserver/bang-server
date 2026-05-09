@@ -181,10 +181,11 @@ main_deck:
     signs:
       - K spades
     color: blue
-    # TODO
     equip:
       - weapon(5)
-      # - hawken
+      - hawken
+    responses:
+      - hawken
     tags:
       - weapon(1)
   - name: HEAVY_GRUB

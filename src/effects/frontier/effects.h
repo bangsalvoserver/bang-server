@@ -13,6 +13,7 @@
 #include "coyotes.h"
 #include "falcon.h"
 #include "fishing.h"
+#include "hawken.h"
 #include "ruleset.h"
 #include "slocum.h"
 #include "stampede.h"
