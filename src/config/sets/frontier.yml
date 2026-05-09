@@ -257,9 +257,8 @@ main_deck:
     color: purple
     equip_effects:
       - track player alive
-    # TODO
-    # equip:
-    #   - posse
+    equip:
+      - posse
     tags:
       - pardner(5)
   # - name: SCALP

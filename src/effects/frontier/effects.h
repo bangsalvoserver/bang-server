@@ -15,6 +15,7 @@
 #include "fishing.h"
 #include "hawken.h"
 #include "pioneers.h"
+#include "posse.h"
 #include "ruleset.h"
 #include "slocum.h"
 #include "stampede.h"

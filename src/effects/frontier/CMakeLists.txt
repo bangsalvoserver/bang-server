@@ -13,6 +13,7 @@ target_sources(bangserver PRIVATE
     fishing.cpp
     hawken.cpp
     pioneers.cpp
+    posse.cpp
     ruleset.cpp
     slocum.cpp
     stampede.cpp
