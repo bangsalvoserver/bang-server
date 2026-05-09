@@ -12,6 +12,7 @@ target_sources(bangserver PRIVATE
     falcon.cpp
     fishing.cpp
     hawken.cpp
+    pioneers.cpp
     ruleset.cpp
     slocum.cpp
     stampede.cpp
