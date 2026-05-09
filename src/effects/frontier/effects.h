@@ -20,6 +20,7 @@
 #include "posse.h"
 #include "ruleset.h"
 #include "slocum.h"
+#include "scorpion.h"
 #include "stampede.h"
 #include "steve_tengo.h"
 #include "tarantula_juice.h"

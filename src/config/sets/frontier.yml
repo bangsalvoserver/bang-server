@@ -289,9 +289,8 @@ main_deck:
     color: blue
     equip_effects:
       - equip_on player alive
-    # TODO
-    # equip:
-    #   - scorpion
+    equip:
+      - scorpion
     tags:
       - penalty
   - name: SLOCUM

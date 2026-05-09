@@ -17,6 +17,7 @@ target_sources(bangserver PRIVATE
     pioneers.cpp
     posse.cpp
     ruleset.cpp
+    scorpion.cpp
     slocum.cpp
     stampede.cpp
     steve_tengo.cpp

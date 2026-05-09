@@ -11,7 +11,7 @@ namespace banggame {
 
     struct request_add_cube : request_picking {
         request_add_cube(card_ptr origin_card, player_ptr target, int ncubes = 1)
-            : request_picking(origin_card, nullptr, target)
+            : request_picking(origin_card, nullptr, target, {}, 120)
             , ncubes(ncubes) {}
 
         int ncubes = 1;
