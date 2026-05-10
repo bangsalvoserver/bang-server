@@ -7,7 +7,10 @@ namespace banggame {
 
     namespace event_type {
         struct on_heal {
+            card_ptr origin_card;
             player_ptr origin;
+            player_ptr target;
+            int amount;
         };
     }
 

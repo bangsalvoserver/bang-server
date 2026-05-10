@@ -21,7 +21,7 @@ namespace banggame {
         bot_suggestion::signal_helpful_action(origin, target, flags);
 
         if (!target->immune_to(origin_card, origin, flags)) {
-            target->heal(amount);
+            target->heal(origin_card, origin, amount);
         }
     }
 

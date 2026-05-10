@@ -11,7 +11,7 @@ namespace banggame {
         
         for (player_ptr p : target->m_game->range_alive_players(target)) {
             if (p->m_hp == min_hp) {
-                p->heal(1);
+                p->heal(target_card, nullptr, 1);
             }
         }
     }

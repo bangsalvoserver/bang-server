@@ -16,7 +16,7 @@ namespace banggame {
                     };
                 }, [=](bool result) {
                     if (result) {
-                        origin->heal(1);
+                        origin->heal(origin_card, nullptr, 1);
                     }
                 });
             }
