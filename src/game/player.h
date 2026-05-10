@@ -60,9 +60,9 @@ namespace banggame {
         bool is_ghost() const;
         bool alive() const;
 
-        void damage(card_ptr origin_card, player_ptr source, int value, effect_flags flags = {});
+        void damage(card_ptr origin_card, player_ptr origin, int value, effect_flags flags = {});
 
-        void heal(int value);
+        void heal(card_ptr origin_card, player_ptr origin, int value);
         void set_hp(int value, bool instant = false);
 
         int get_gold() const;

@@ -65,7 +65,7 @@ namespace banggame {
                     drawn_card->move_to(pocket_type::discard_pile);
                 }
             }
-            target->heal(heal);
+            target->heal(origin_card, target, heal);
         }
     };
 
