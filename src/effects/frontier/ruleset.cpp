@@ -101,7 +101,7 @@ namespace banggame {
                     target_card->add_short_pause();
                     target_card->set_visibility(card_visibility::hidden);
                 }
-                origin->heal(3);
+                origin->heal(target_card, origin, 3);
             }
         });
 

@@ -12,7 +12,7 @@ namespace banggame {
                 switch (sign.suit) {
                 case card_suit::hearts:
                 case card_suit::diamonds:
-                    origin->heal(2);
+                    origin->heal(origin_card, origin, 2);
                     break;
                 case card_suit::clubs:
                     origin->draw_card(1, origin_card);

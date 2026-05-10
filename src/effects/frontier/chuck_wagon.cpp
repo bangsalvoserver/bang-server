@@ -13,7 +13,7 @@ namespace banggame {
             if (origin == target) {
                 int count = get_count_played_cards(origin);
                 if ((!skipped || count) && count >= max_count) {
-                    origin->heal(1);
+                    origin->heal(target_card, nullptr, 1);
                 }
             }
         });
