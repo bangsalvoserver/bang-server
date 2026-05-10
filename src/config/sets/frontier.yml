@@ -9,7 +9,14 @@ character:
       - alexander_noon
   - name: CALEB_BREW
     image: 28_caleb_brew
-    # TODO
+    equip:
+      - caleb_brew
+    responses:
+      - caleb_brew
+      - discard card self | hand
+      - heal player alive
+    tags:
+      - preselect
   - name: CAYENNE_CHEE
     image: 28_cayenne_chee
     # TODO

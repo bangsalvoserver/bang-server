@@ -3,6 +3,7 @@
 
 #include "alexander_noon.h"
 #include "ballad.h"
+#include "caleb_brew.h"
 #include "cattle_drive.h"
 #include "chinatown.h"
 #include "cholera.h"
