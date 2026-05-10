@@ -15,6 +15,7 @@
 #include "falcon.h"
 #include "fishing.h"
 #include "hawken.h"
+#include "josey_strong.h"
 #include "pioneers.h"
 #include "posse.h"
 #include "ruleset.h"

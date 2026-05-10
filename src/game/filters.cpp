@@ -155,6 +155,10 @@ namespace banggame {
             case target_card_filter::beer:
                 if (target->has_tag(tag_type::beer)) continue;
                 return {"ERROR_TARGET_NOT_BEER", origin_card, target};
+            
+            case target_card_filter::brown:
+                if (target->is_brown()) continue;
+                return {"ERROR_TARGET_NOT_BROWN_CARD", origin_card, target};
 
             case target_card_filter::blue:
                 if (target->is_blue()) continue;

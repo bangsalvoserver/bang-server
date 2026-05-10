@@ -13,6 +13,7 @@ target_sources(bangserver PRIVATE
     falcon.cpp
     fishing.cpp
     hawken.cpp
+    josey_strong.cpp
     pioneers.cpp
     posse.cpp
     ruleset.cpp

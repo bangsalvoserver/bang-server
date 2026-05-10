@@ -22,7 +22,12 @@ character:
     # TODO
   - name: JOSEY_STRONG
     image: 28_josey_strong
-    # TODO
+    modifier: bangmod
+    effects:
+      - discard card self | hand brown
+      - josey_strong
+    tags:
+      - bangmod
   - name: JOSIAH_TUNG
     image: 28_josiah_tung
     # TODO
