@@ -11,6 +11,23 @@
 
 namespace banggame {
 
+    int count_played_cards(card_ptr origin_card, const card_list &modifiers, const effect_context &ctx) {
+        auto is_played_card = [](card_ptr c) {
+            switch (c->pocket) {
+            case pocket_type::player_hand:
+            case pocket_type::shop_selection:
+                return true;
+            case pocket_type::train:
+                return c->deck == card_deck_type::train;
+            default:
+                return false;
+            }
+        };
+        
+        return rn::count_if(modifiers, is_played_card)
+            + (origin_card != ctx.get<contexts::playing_card>() || is_played_card(origin_card));
+    }
+
     void track_played_cards(game_ptr game) {
         event_card_key key{nullptr, -15};
 
@@ -20,18 +37,7 @@ namespace banggame {
 
         game->add_listener<event_type::on_play_card>(nullptr, [=](player_ptr origin, card_ptr origin_card, const card_list &modifiers, const effect_context &ctx) {
             if (origin == origin->m_game->m_playing) {
-                auto is_playing_card = [](card_ptr origin_card) {
-                    return origin_card->pocket == pocket_type::player_hand
-                        || origin_card->pocket == pocket_type::shop_selection
-                        || (origin_card->pocket == pocket_type::train && origin_card->deck == card_deck_type::train);
-                };
-                
-                int count = rn::count_if(modifiers, is_playing_card);
-                if (origin_card != ctx.get<contexts::playing_card>() || is_playing_card(origin_card)) {
-                    ++count;
-                }
-
-                if (count != 0) {
+                if (int count = count_played_cards(origin_card, modifiers, ctx)) {
                     origin->m_game->add_listener<event_type::get_count_played_cards>(key, [=](player_ptr e_origin, int &value) {
                         if (origin == e_origin) {
                             value += count;

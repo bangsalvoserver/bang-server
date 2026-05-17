@@ -57,7 +57,8 @@ character:
       - bang player alive reachable notself
   - name: SHANGO_BROTHERS
     image: 28_shango_brothers
-    # TODO
+    equip:
+      - shango_brothers(3)
   - name: STEVE_TENGO
     image: 28_steve_tengo
     equip:
