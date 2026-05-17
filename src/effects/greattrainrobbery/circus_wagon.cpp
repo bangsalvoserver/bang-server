@@ -31,7 +31,7 @@ namespace banggame {
         prompt_string pick_prompt(card_ptr target_card) const override {
             if (target->is_bot()) {
                 MAYBE_RETURN(prompts::bot_check_discard_card(target, target_card));
-                if (rn::contains(target_card->expansion, GET_RULESET(ghost_cards))) {
+                if (is_ghost_card(target_card)) {
                     return {1, "BOT_DISCARD_GHOST"};
                 }
                 auto is_penalty_card = [](card_ptr c) { return c->has_tag(tag_type::penalty); };
