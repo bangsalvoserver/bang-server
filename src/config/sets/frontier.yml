@@ -30,7 +30,14 @@ character:
       - bangmod
   - name: JOSIAH_TUNG
     image: 28_josiah_tung
-    # TODO
+    equip:
+      - josiah_tung
+    responses:
+      - can_play_card
+      - discard random_if_hand_card self | hand
+      - draw(2)
+    tags:
+      - preselect
   - name: LT_MICAIAH
     image: 28_lt_micaiah
     effects:

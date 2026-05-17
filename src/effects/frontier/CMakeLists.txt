@@ -14,6 +14,7 @@ target_sources(bangserver PRIVATE
     fishing.cpp
     hawken.cpp
     josey_strong.cpp
+    josiah_tung.cpp
     pioneers.cpp
     posse.cpp
     ruleset.cpp
