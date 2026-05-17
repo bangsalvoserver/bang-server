@@ -140,6 +140,28 @@ namespace banggame {
         }
     }
 
+    bool request_can_draw::can_pick(card_ptr target_card) const {
+        return target_card->pocket == pocket_type::main_deck
+            || (target_card->pocket == pocket_type::discard_pile && target->m_game->m_deck.empty());
+    }
+
+    void request_can_draw::on_pick(card_ptr target_card) {
+        pop_request();
+        target->draw_card(ncards, origin_card);
+    }
+
+    prompt_string request_can_draw::resolve_prompt() const {
+        return {"PROMPT_CANCEL_DRAW", origin_card};
+    }
+
+    game_string request_can_draw::status_text(player_ptr owner) const {
+        if (target == owner) {
+            return {"STATUS_CAN_DRAW", origin_card, ncards};
+        } else {
+            return {"STATUS_CAN_DRAW_OTHER", target, origin_card, ncards};
+        }
+    }
+
     void effect_no_cards_drawn::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         ctx.add<contexts::drawing_effect>();
     }

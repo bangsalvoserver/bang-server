@@ -2,7 +2,9 @@
 #define __BASE_DRAW_H__
 
 #include "cards/card_effect.h"
+
 #include "pick.h"
+#include "resolve.h"
 
 namespace banggame {
     
@@ -91,6 +93,30 @@ namespace banggame {
     };
     
     using shared_request_draw = std::shared_ptr<request_draw>;
+    
+    struct request_can_draw : request_resolvable, interface_picking {
+        request_can_draw(card_ptr origin_card, player_ptr origin, player_ptr target, int ncards = 1)
+            : request_resolvable(origin_card, origin, target)
+            , ncards{ncards} {}
+        
+        int ncards;
+        
+        bool can_pick(card_ptr target_card) const override;
+
+        void on_pick(card_ptr target_card) override;
+
+        void on_resolve() override {
+            pop_request();
+        }
+
+        resolve_type get_resolve_type() const override {
+            return resolve_type::dismiss;
+        }
+
+        prompt_string resolve_prompt() const override;
+
+        game_string status_text(player_ptr owner) const override;
+    };
 
     namespace event_type {
         struct init_request_draw {
