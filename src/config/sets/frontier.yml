@@ -17,9 +17,9 @@ character:
       - heal player alive
     tags:
       - preselect
-  - name: CAYENNE_CHEE
-    image: 28_cayenne_chee
-    # TODO
+  # - name: CAYENNE_CHEE
+  # TODO: activates when "using" card, so this cannot be a modifier
+  #   image: 28_cayenne_chee
   - name: JOSEY_STRONG
     image: 28_josey_strong
     modifier: bangmod
