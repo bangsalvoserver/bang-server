@@ -51,7 +51,10 @@ character:
     # TODO
   - name: SALVO_THE_SHOOTER
     image: 28_salvo_the_shooter
-    # TODO
+    modifier: bangmod
+    effects:
+      - max_usages(2)
+      - bang player alive reachable notself
   - name: SHANGO_BROTHERS
     image: 28_shango_brothers
     # TODO
