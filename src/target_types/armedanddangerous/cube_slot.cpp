@@ -32,7 +32,6 @@ namespace banggame {
     }
 
     void targeting_cube_slot::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target) {
-        ctx.add<contexts::selected_cards>().push_back(target);
         effect.add_context(origin_card, origin, target, ctx);
     }
 

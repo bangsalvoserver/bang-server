@@ -152,7 +152,7 @@ namespace banggame {
         }
         if (target_card->pocket == pocket_type::player_table
             && target_card->owner == origin
-            && rn::contains(target_card->expansion, GET_RULESET(ghost_cards)))
+            && is_ghost_card(target_card))
         {
             return "PROMPT_TARGET_SELF_GHOST_CARD";
         }

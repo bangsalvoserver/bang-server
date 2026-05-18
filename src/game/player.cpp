@@ -197,11 +197,14 @@ namespace banggame {
         m_game->queue_request<request_damage>(origin_card, origin, this, value, flags);
     }
 
-    void player::heal(int value) {
-        if (is_ghost() || m_hp == m_max_hp) return;
-        m_game->add_log("LOG_HEALED", this, value);
-        set_hp(std::min<int>(m_hp + value, m_max_hp));
-        m_game->call_event(event_type::on_heal{ this });
+    void player::heal(card_ptr origin_card, player_ptr origin, int value) {
+        if (!is_ghost()) {
+            if (int amount = std::min<int>(value, m_max_hp - m_hp)) {
+                m_game->add_log("LOG_HEALED", this, value);
+                set_hp(m_hp + amount);
+                m_game->call_event(event_type::on_heal{ origin_card, origin, this, amount });
+            }
+        }
     }
 
     void player::set_hp(int value, bool instant) {

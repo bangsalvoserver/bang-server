@@ -36,7 +36,9 @@ namespace banggame {
         bot_suggestion::signal_helpful_action(origin, target);
         
         origin->damage(origin_card, origin, 1);
-        origin->m_game->queue_action([=]{ target->heal(1); });
+        origin->m_game->queue_action([=]{
+            target->heal(origin_card, origin, 1);
+        });
     }
 
 }

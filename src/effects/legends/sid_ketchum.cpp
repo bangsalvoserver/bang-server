@@ -20,8 +20,8 @@ namespace banggame {
     };
 
     void equip_sid_ketchum_legend::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::on_heal>(target_card, [=](player_ptr origin) {
-            if (origin == target && target->m_game->m_playing == target) {
+        target->m_game->add_listener<event_type::on_heal>(target_card, [=](card_ptr origin_card, player_ptr origin, player_ptr e_target, bool amount) {
+            if (e_target == target && target->m_game->m_playing == target) {
                 target->m_game->queue_request<request_sid_ketchum_legend>(target_card, target, target);
             }
         });
