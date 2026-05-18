@@ -26,8 +26,16 @@ namespace banggame {
             players.add(p);
         }
 
+        auto selected_cards = rv::concat(
+            rv::single(origin_card) | rv::filter([repeat_card = ctx.get<contexts::repeat_card>()](card_ptr c) {
+                return c != repeat_card;
+            }),
+            modifiers,
+            ctx.get<contexts::selected_cards>()
+        );
+
         card_set cards;
-        for (card_ptr c : rv::concat(rv::single(origin_card), modifiers, ctx.get<contexts::selected_cards>())) {
+        for (card_ptr c : selected_cards) {
             if (cards.contains(c)) {
                 return {"ERROR_DUPLICATED_CARD", c};
             }
