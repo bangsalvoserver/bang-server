@@ -25,7 +25,7 @@ namespace banggame {
     void equip_hawken::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_hit>({target_card, 3}, [=](card_ptr origin_card, player_ptr origin, player_ptr e_target, int damage, effect_flags flags) {
             if (origin == target && e_target != target && flags.check(effect_flag::is_bang)) {
-                target->m_game->queue_request<request_hawken>(target_card, e_target, target);
+                target->m_game->queue_request<request_hawken>(target_card, e_target, target, effect_flags{}, 0);
             }
         });
     }
