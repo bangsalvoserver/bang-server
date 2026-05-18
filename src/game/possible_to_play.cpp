@@ -16,7 +16,6 @@ namespace banggame {
 
                 if (const modifier_holder &modifier = origin_card->get_modifier(is_response)) {
                     auto ctx_copy = ctx;
-                    ctx_copy.add<contexts::selected_cards>().push_back(origin_card);
                     modifier.add_context(origin_card, origin, ctx_copy);
 
                     modifiers.emplace_back(origin_card, is_response);
@@ -32,7 +31,7 @@ namespace banggame {
                 }
             }
 
-            return !verify_context(origin, origin_card, ctx);
+            return !verify_context(origin, origin_card, modifiers | rv::transform(&card_response_pair::card) | rn::to<card_list>(), ctx);
         }
         
         const effect_holder &effect = effects[targets.size()];
