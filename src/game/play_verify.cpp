@@ -17,7 +17,7 @@
 
 namespace banggame {
 
-    game_string verify_context(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
+    game_string verify_context(player_ptr origin, card_ptr origin_card, const card_list &modifiers, const effect_context &ctx) {
         player_set players;
         for (player_ptr p : ctx.get<contexts::selected_players>()) {
             if (players.contains(p)) {
@@ -27,9 +27,9 @@ namespace banggame {
         }
 
         card_set cards;
-        for (card_ptr c : ctx.get<contexts::selected_cards>()) {
+        for (card_ptr c : rv::concat(rv::single(origin_card), modifiers, ctx.get<contexts::selected_cards>())) {
             if (cards.contains(c)) {
-                return {"ERROR_DUPLICATE_CARD", c};
+                return {"ERROR_DUPLICATED_CARD", c};
             }
             cards.add(c);
         }
@@ -111,8 +111,6 @@ namespace banggame {
             MAYBE_RETURN(mth.get_error(origin_card, origin, targets, ctx));
         }
 
-        MAYBE_RETURN(verify_context(origin, origin_card, ctx));
-
         if (ctx.get<contexts::repeat_card>() != origin_card) {
             MAYBE_RETURN(check_pocket(origin, origin_card));
         }
@@ -133,7 +131,6 @@ namespace banggame {
             }
 
             if (const modifier_holder &modifier = mod_card->get_modifier(mod_response)) {
-                ctx.add<contexts::selected_cards>().push_back(mod_card);
                 modifier.add_context(mod_card, origin, ctx);
                 
                 MAYBE_RETURN(verify_target_list(origin, mod_card, mod_response, targets, ctx));
@@ -175,9 +172,7 @@ namespace banggame {
             return "ERROR_INVALID_CARD_OWNER";
         }
 
-        MAYBE_RETURN(verify_target_list_base(origin, origin_card, origin_card->equip_effects, targets, ctx));
-
-        return verify_context(origin, origin_card, ctx);
+        return verify_target_list_base(origin, origin_card, origin_card->equip_effects, targets, ctx);
     }
 
     game_string get_play_card_error(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
@@ -204,6 +199,8 @@ namespace banggame {
         } else {
             MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
         }
+
+        MAYBE_RETURN(verify_context(origin, origin_card, modifiers | rv::transform(&target_selection::card) | rn::to<card_list>(), ctx));
 
         return get_play_card_error(origin, origin_card, ctx);
     }
