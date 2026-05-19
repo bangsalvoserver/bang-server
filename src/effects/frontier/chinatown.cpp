@@ -1,5 +1,6 @@
 #include "chinatown.h"
 
+#include "effects/base/draw.h"
 #include "effects/base/requests.h"
 #include "effects/base/escapable.h"
 
@@ -9,44 +10,6 @@
 #include "game/game_options.h"
 
 namespace banggame {
-
-    struct request_chinatown_draw : request_picking, interface_resolvable {
-        request_chinatown_draw(card_ptr origin_card, player_ptr origin, player_ptr target, int num_cards)
-            : request_picking{origin_card, origin, target}
-            , num_cards{num_cards} {}
-        
-        int num_cards;
-
-        bool can_pick(card_ptr target_card) const override {
-            return target_card->pocket == pocket_type::main_deck
-                || (target_card->pocket == pocket_type::discard_pile && target->m_game->m_deck.empty());
-        }
-
-        void on_pick(card_ptr target_card) override {
-            pop_request();
-            target->draw_card(num_cards, origin_card);
-        }
-
-        void on_resolve() override {
-            pop_request();
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
-
-        prompt_string resolve_prompt() const override {
-            return {"PROMPT_CANCEL_DRAW", origin_card};
-        }
-
-        game_string status_text(player_ptr owner) const override {
-            if (target == owner) {
-                return {"STATUS_CHINATOWN", origin_card, num_cards};
-            } else {
-                return {"STATUS_CHINATOWN_OTHER", target, origin_card, num_cards};
-            }
-        }
-    };
 
     struct request_chinatown : request_discard_hand, interface_escapable {
         using request_discard_hand::request_discard_hand;
@@ -70,7 +33,7 @@ namespace banggame {
         void on_resolve() override {
             request_discard_hand::on_resolve();
             if (ncards > 0) {
-                target->m_game->queue_request<request_chinatown_draw>(origin_card, origin, target, ncards);
+                target->m_game->queue_request<request_can_draw>(origin_card, origin, target, ncards);
             }
         }
     };
