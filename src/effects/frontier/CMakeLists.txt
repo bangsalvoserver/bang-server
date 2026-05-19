@@ -17,6 +17,7 @@ target_sources(bangserver PRIVATE
     josiah_tung.cpp
     pioneers.cpp
     posse.cpp
+    ray_owe.cpp
     ruleset.cpp
     scorpion.cpp
     shango_brothers.cpp

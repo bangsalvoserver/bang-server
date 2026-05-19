@@ -48,7 +48,11 @@ character:
     mth_effect: switch_cards(2,3)
   - name: RAY_OWE
     image: 28_ray_owe
-    # TODO
+    equip:
+      - ray_owe
+    effects:
+      - max_usages(1)
+      - steal random_if_hand_card notself
   - name: SALVO_THE_SHOOTER
     image: 28_salvo_the_shooter
     modifier: bangmod

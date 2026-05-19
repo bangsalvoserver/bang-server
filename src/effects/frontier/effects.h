@@ -19,6 +19,7 @@
 #include "josiah_tung.h"
 #include "pioneers.h"
 #include "posse.h"
+#include "ray_owe.h"
 #include "ruleset.h"
 #include "slocum.h"
 #include "scorpion.h"

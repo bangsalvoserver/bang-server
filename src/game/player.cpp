@@ -194,10 +194,14 @@ namespace banggame {
         }
     }
 
-    void player::steal_card(card_ptr target) {
+    void player::steal_card(card_ptr target, bool equip) {
         if (target->owner != this || target->pocket != pocket_type::player_table || !target->is_train()) {
             if (move_owned_card(target->owner, target, false)) {
-                add_to_hand(target);
+                if (equip) {
+                    equip_card(target);
+                } else {
+                    add_to_hand(target);
+                }
             }
         }
     }

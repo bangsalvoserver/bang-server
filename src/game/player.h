@@ -43,7 +43,7 @@ namespace banggame {
         void discard_used_card(card_ptr target) {
             discard_card(target, true);
         }
-        void steal_card(card_ptr target);
+        void steal_card(card_ptr target, bool equip = false);
 
         int max_cards_end_of_turn() const;
 
