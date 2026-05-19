@@ -43,12 +43,12 @@ namespace banggame {
         void discard_used_card(card_ptr target) {
             discard_card(target, true);
         }
-        void steal_card(card_ptr target);
+        void steal_card(card_ptr target, bool equip = false);
 
         int max_cards_end_of_turn() const;
 
         int get_num_checks() const;
-        int get_bangs_played() const;
+        int get_bangs_played(bool real_count = false) const;
         int get_range_mod() const;
         int get_weapon_range() const;
         int get_distance_mod() const;

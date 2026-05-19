@@ -49,6 +49,7 @@ namespace banggame {
         ghost,
         temp_ghost,
         shadow,
+        coffin,
         extra_turn,
         stick_of_dynamite,
         treat_missed_as_bang,

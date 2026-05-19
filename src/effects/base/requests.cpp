@@ -2,6 +2,7 @@
 
 #include "cards/game_enums.h"
 #include "cards/game_events.h"
+#include "cards/filter_enums.h"
 
 #include "game/game_table.h"
 #include "game/game_options.h"
@@ -117,7 +118,8 @@ namespace banggame {
     }
 
     bool request_discard_pass::can_pick(card_ptr target_card) const {
-        return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
+        return target_card->pocket == pocket_type::player_hand && target_card->owner == target
+            && !target_card->has_tag(tag_type::undiscardable);
     }
 
     void request_discard_pass::on_pick(card_ptr target_card) {

@@ -12,12 +12,6 @@ namespace banggame {
             : request_base(origin_card, nullptr, target) {}
 
         void on_update() override {
-            if (update_count == 0) {
-                start();
-            }
-        }
-
-        void start() {
             int num_cards = 3 + target->get_num_checks();
             for (int i=0; i < num_cards; ++i) {
                 card_ptr drawn_card = target->m_game->top_of_deck();
@@ -42,7 +36,6 @@ namespace banggame {
             while (!target->m_game->m_selection.empty()) {
                 target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
             }
-            start();
         }
 
         int count_suits() const {

@@ -1,0 +1,384 @@
+character:
+  - name: ALEXANDER_NOON
+    image: 28_alexander_noon
+    equip:
+      - alexander_noon
+    responses:
+      - can_play_card
+      - draw
+      - alexander_noon
+  - name: CALEB_BREW
+    image: 28_caleb_brew
+    equip:
+      - caleb_brew
+    responses:
+      - caleb_brew
+      - discard card self | hand
+      - heal player alive
+    tags:
+      - preselect
+  # - name: CAYENNE_CHEE
+  # TODO: activates when "using" card, so this cannot be a modifier
+  #   image: 28_cayenne_chee
+  - name: JOSEY_STRONG
+    image: 28_josey_strong
+    modifier: bangmod
+    effects:
+      - discard card self | hand brown
+      - josey_strong
+    tags:
+      - bangmod
+  - name: JOSIAH_TUNG
+    image: 28_josiah_tung
+    equip:
+      - josiah_tung
+    responses:
+      - can_play_card
+      - discard random_if_hand_card self | hand
+      - draw(2)
+    tags:
+      - preselect
+  - name: LT_MICAIAH
+    image: 28_lt_micaiah
+    effects:
+      - max_usages(1)
+      - discard card self | hand
+      - none card self | table
+      - none card notself | table
+    mth_effect: switch_cards(2,3)
+  - name: RAY_OWE
+    image: 28_ray_owe
+    equip:
+      - ray_owe
+    effects:
+      - max_usages(1)
+      - steal random_if_hand_card notself
+  - name: SALVO_THE_SHOOTER
+    image: 28_salvo_the_shooter
+    modifier: bangmod
+    effects:
+      - max_usages(2)
+      - bang player alive reachable notself
+  - name: SHANGO_BROTHERS
+    image: 28_shango_brothers
+    equip:
+      - shango_brothers(3)
+  - name: STEVE_TENGO
+    image: 28_steve_tengo
+    equip:
+      - steve_tengo
+    tags:
+      - pardner(6)
+
+main_deck:
+  - name: BALLAD
+    image: 28_ballata
+    signs:
+      - 7 hearts
+    color: brown
+    effects:
+      - ballad player alive
+    tags:
+      - skip_logs
+  - name: COFFIN
+    image: 28_bara
+    signs:
+      - 2 hearts
+    color: blue
+    equip:
+      - coffin
+      - coffin_nodisable
+  # - name: UNDERTAKER
+  # TODO: add role visibility by player
+  #   image: 28_becchino
+  #   signs:
+  #     - Q hearts
+  #   color: purple
+  #   equip_effects:
+  #     - track player alive
+  #   tags:
+  #     - pardner(1)
+  - name: COFFEE
+    image: 28_caffe
+    signs:
+      - 5 hearts
+    color: brown
+    effects:
+      - coffee
+  - name: CHINATOWN
+    image: 28_chinatown
+    signs:
+      - Q clubs
+    color: brown
+    effects:
+      - draw
+      - chinatown player alive
+  - name: CHUCK_WAGON
+    image: 28_chuck_wagon
+    signs:
+      - 6 clubs
+    color: blue
+    equip:
+      - chuck_wagon(3)
+  - name: CHOLERA
+    image: 28_colera
+    signs:
+      - J spades
+    color: orange
+    expansion: armedanddangerous
+    equip_effects:
+      - equip_on player alive
+    equip:
+      - disable_character
+      - cholera
+    tags:
+      - penalty
+  # - name: COMANCHE
+  # TODO: copy another character's effect
+  #   image: 28_comanche
+  #   signs:
+  #     - A diamonds
+  #   color: purple
+  #   equip_effects:
+  #     - track player alive
+  #   tags:
+  #     - pardner(2)
+  - name: COMPANION
+    image: 28_compagno
+    signs:
+      - 10 hearts
+    color: purple
+    equip_effects:
+      - track player alive
+    modifier: companion
+    effects:
+      - none
+    tags:
+      - pardner(3)
+  - name: COYOTES
+    image: 28_coyote
+    signs:
+      - Q spades
+    color: blue
+    equip:
+      - predraw_check(-3)
+      - coyotes
+  - name: FEUD
+    image: 28_faida
+    signs:
+      - 3 spades
+    color: brown
+    tags:
+      - undiscardable
+  - name: FALCON
+    image: 28_falco
+    signs:
+      - K diamonds
+    color: brown
+    effects:
+      - draw
+      - falcon player alive notself
+  - name: CAMPFIRE
+    image: 28_falo
+    signs:
+      - 7 spades
+    color: blue
+    equip:
+      - weapon(1)
+      - add_flag(player_flag::ignore_distances)
+    tags:
+      - weapon(2)
+  - name: STAMPEDE
+    image: 28_fuga_precipitosa
+    signs:
+      - 10 diamonds
+    color: green
+    effects:
+      - stampede players alive min_5_table_cards
+  - name: GEYSER
+    image: 28_geyser
+    signs:
+      - 8 hearts
+    color: blue
+    equip:
+      - predraw_check(-4)
+      - dining_car
+  - name: HAWKEN
+    image: 28_hawken
+    signs:
+      - K spades
+    color: blue
+    equip:
+      - weapon(5)
+      - hawken
+    responses:
+      - hawken
+    tags:
+      - weapon(1)
+  - name: HEAVY_GRUB
+    image: 28_heavy_grub
+    signs:
+      - 6 hearts
+    color: brown
+  - name: JACKALOPE
+    image: 28_jackalope
+    signs:
+      - A hearts
+    color: brown
+    effects:
+      - draw
+  - name: MULE
+    image: 28_mulo
+    signs:
+      - 4 hearts
+    color: orange
+    expansion: armedanddangerous
+    effects:
+      - none self_cubes(1)
+      - discard card self | hand
+      - draw
+  - name: GRIZZLY
+    image: 28_orso
+    signs:
+      - 9 spades
+    color: brown
+    effects:
+      - discard extra_card self | hand
+      - discard
+      - damage player alive notself range_1
+    tags:
+      - skip_logs
+  - name: PELTS
+    image: 28_pelli
+    signs:
+      - K clubs
+    color: orange
+    expansion: armedanddangerous
+    effects:
+      - min_cubes(4)
+      - none self_cubes(3)
+      - switch_self card notself | table
+  - name: FISHING
+    image: 28_pesca
+    signs:
+      - 2 clubs
+    color: brown
+    modifier: card_choice
+    effects:
+      - none
+    tags:
+      - card_choice(5)
+  - name: PIONEERS
+    image: 28_pionieri
+    signs:
+      - 10 clubs
+    color: purple
+    equip:
+      - pioneers
+    tags:
+      - pardner(4)
+  - name: POSSE
+    image: 28_posse
+    signs:
+      - 2 spades
+    color: purple
+    equip_effects:
+      - track player alive
+    equip:
+      - posse
+    tags:
+      - pardner(5)
+  # - name: SCALP
+  # TODO: copy another character's effect
+  #   image: 28_scalpo
+  #   signs:
+  #     - 5 diamonds
+  #   color: orange
+  #   expansion: armedanddangerous
+  #   effects:
+  #     - none self_cubes(1)
+  - name: SCORPION
+    image: 28_scorpione
+    signs:
+      - 3 diamonds
+    color: blue
+    equip_effects:
+      - equip_on player alive
+    equip:
+      - scorpion
+    tags:
+      - penalty
+  - name: SLOCUM
+    image: 28_slocum
+    signs:
+      - J diamonds
+    color: blue
+    equip:
+      - weapon(1)
+      - slocum
+    tags:
+      - weapon
+  - name: TARANTULA_JUICE
+    image: 28_tarantula_juice
+    signs:
+      - 4 clubs
+    color: brown
+    effects:
+      - tarantula_juice
+  - name: CATTLE_DRIVE
+    image: 28_transumanza
+    signs:
+      - 8 clubs
+    color: brown
+    effects:
+      - discard extra_card self | hand
+      - discard
+      - cattle_drive
+  - name: TRAP
+    image: 28_trappola
+    signs:
+      - A spades
+    color: blue
+    equip_effects:
+      - equip_on player alive
+    equip:
+      - trap
+    effects:
+      - max_usages(1)
+      - trap
+    tags:
+      - penalty
+
+hidden:
+  - name: FISHING_HEARTS
+    image: 28_pesca
+    deck: main_deck
+    effects:
+      - card_choice
+      - fishing(card_suit::hearts)
+    tags:
+      - card_choice(5)
+  - name: FISHING_DIAMONDS
+    image: 28_pesca
+    deck: main_deck
+    effects:
+      - card_choice
+      - fishing(card_suit::diamonds)
+    tags:
+      - card_choice(5)
+  - name: FISHING_CLUBS
+    image: 28_pesca
+    deck: main_deck
+    effects:
+      - card_choice
+      - fishing(card_suit::clubs)
+    tags:
+      - card_choice(5)
+  - name: FISHING_SPADES
+    image: 28_pesca
+    deck: main_deck
+    effects:
+      - card_choice
+      - fishing(card_suit::spades)
+    tags:
+      - card_choice(5)

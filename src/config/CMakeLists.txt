@@ -26,6 +26,7 @@ add_custom_command(
         sets/legends_basemod.yml
         sets/legends.yml
         sets/crazy_greygory.yml
+        sets/frontier.yml
         parse_bang_cards.py
         cpp_generator.py
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"

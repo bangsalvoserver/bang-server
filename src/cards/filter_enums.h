@@ -16,6 +16,7 @@ namespace banggame {
         range_2,
         reachable,
         target_set,
+        min_5_table_cards,
         not_empty,
         not_empty_hand,
         not_empty_table,
@@ -28,6 +29,7 @@ namespace banggame {
         table,
         hand,
         not_self_hand,
+        brown,
         blue,
         black,
         train,
@@ -69,6 +71,8 @@ namespace banggame {
         force_allow, // bypass only_base_characters
         last_scenario_card, // move this card to the end of the scenario deck
         buy_cost, // cost for gold rush card
+        pardner, // pardner token for this card
+        undiscardable, // cannot discard this card in phase 3
 
         // Modifier logic tags
         card_choice, // grouping id for the card_choice modifier

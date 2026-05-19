@@ -70,6 +70,7 @@ namespace banggame {
         black,
         orange,
         train,
+        purple,
     };
 
     enum class card_token_type {
@@ -82,7 +83,13 @@ namespace banggame {
         fame7,
         fame8,
         cube,
-        gold
+        gold,
+        pardner1,
+        pardner2,
+        pardner3,
+        pardner4,
+        pardner5,
+        pardner6,
     };
 
     using token_map = enums::enum_map<card_token_type, uint8_t>;

@@ -54,6 +54,10 @@ namespace utils {
             }
         }
 
+        void clear() {
+            m_chunks.clear();
+        }
+
         bool contains(value_type elem) const {
             auto chunk = set_chunk::for_elem(elem);
             auto it = find_chunk(chunk.offset);
