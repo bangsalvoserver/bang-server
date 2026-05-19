@@ -72,7 +72,7 @@ namespace banggame {
             }
         });
 
-        game->add_listener<event_type::on_destroy_card>({ nullptr, 1 }, [](player_ptr origin, card_ptr target_card, bool is_destroy, destroy_flags &flags) {
+        game->add_listener<event_type::on_destroy_card>({ nullptr, 1 }, [](player_ptr origin, card_ptr origin_card, card_ptr target_card, bool is_destroy, destroy_flags &flags) {
             player_ptr target = target_card->owner;
             if (origin != target && target_card->name == "JACKALOPE") {
                 origin->m_game->queue_action([=]{

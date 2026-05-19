@@ -14,6 +14,7 @@ namespace banggame {
     namespace event_type {
         struct on_destroy_card {
             player_ptr origin;
+            card_ptr origin_card;
             card_ptr target_card;
             bool is_destroyed;
             nullable_ref<destroy_flags> flags;
