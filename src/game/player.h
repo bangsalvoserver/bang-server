@@ -39,11 +39,13 @@ namespace banggame {
         void add_to_hand(card_ptr card);
         void draw_card(int ncards = 1, card_ptr origin_card = nullptr);
 
+        bool disown_card(card_ptr target_card, bool used = false);
+        
         void discard_card(card_ptr target, bool used = false);
         void discard_used_card(card_ptr target) {
             discard_card(target, true);
         }
-        void steal_card(card_ptr target, bool equip = false);
+        void steal_card(card_ptr target);
 
         int max_cards_end_of_turn() const;
 

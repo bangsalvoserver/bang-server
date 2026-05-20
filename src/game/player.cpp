@@ -16,6 +16,8 @@
 #include "effects/base/heal.h"
 #include "effects/base/predraw_check.h"
 #include "effects/base/requests.h"
+
+#include "effects/armedanddangerous/ruleset.h"
 #include "effects/frontier/ruleset.h"
 
 #include "utils/random_element.h"
@@ -156,18 +158,26 @@ namespace banggame {
         return random_element(m_hand, m_game->rng);
     }
 
-    static bool move_owned_card(player_ptr owner, card_ptr target_card, bool used) {
-        if (target_card->owner == owner) {
+    bool player::disown_card(card_ptr target_card, bool used) {
+        if (target_card->owner == this) {
             if (target_card->pocket == pocket_type::player_table) {
-                target_card->set_inactive(false);
-                owner->disable_equip(target_card);
-                target_card->drop_all_cubes();
-                if (target_card->is_purple()) {
-                    remove_pardner_token(target_card, owner);
+                if (target_card->is_green()) {
+                    target_card->set_inactive(false);
                 }
+
+                disable_equip(target_card);
+                
+                if (target_card->is_orange()) {
+                    drop_all_cubes(target_card);
+                }
+                
+                if (target_card->is_purple()) {
+                    remove_pardner_token(target_card, this);
+                }
+                
                 return true;
             } else if (target_card->pocket == pocket_type::player_hand) {
-                owner->m_game->call_event(event_type::on_discard_hand_card{ owner, target_card, used });
+                m_game->call_event(event_type::on_discard_hand_card{ this, target_card, used });
                 return true;
             }
         }
@@ -175,7 +185,7 @@ namespace banggame {
     }
 
     void player::discard_card(card_ptr target, bool used) {
-        if (move_owned_card(this, target, used)) {
+        if (disown_card(target, used)) {
             if (target->is_train()) {
                 if (m_game->m_train.size() < 4) {
                     target->move_to(pocket_type::train);
@@ -194,14 +204,10 @@ namespace banggame {
         }
     }
 
-    void player::steal_card(card_ptr target, bool equip) {
+    void player::steal_card(card_ptr target) {
         if (target->owner != this || target->pocket != pocket_type::player_table || !target->is_train()) {
-            if (move_owned_card(target->owner, target, false)) {
-                if (equip) {
-                    equip_card(target);
-                } else {
-                    add_to_hand(target);
-                }
+            if (target->owner->disown_card(target, false)) {
+                add_to_hand(target);
             }
         }
     }
