@@ -37,11 +37,17 @@ namespace banggame {
         origin->m_game->add_tokens(token, 1, token_positions::card{ origin_card });
         origin->m_game->move_tokens(token, token_positions::card{ origin_card }, token_positions::player{ target }, 1);
 
-        origin->m_game->add_listener<event_type::get_tracked_player>({ origin_card, -4 }, [=](card_ptr target_card) -> player_ptr {
-            if (origin_card == target_card && target->alive()) {
-                return target;
+        event_card_key key{ origin_card, -4 };
+        origin->m_game->add_listener<event_type::get_tracked_player>(key, [=](card_ptr target_card) {
+            return origin_card == target_card ? target : nullptr;
+        });
+
+        origin->m_game->add_listener<event_type::on_discard_all>(key, [=](player_ptr e_target) {
+            if (target == e_target && !target->alive()) {
+                target->m_game->move_tokens(token, token_positions::player{ target }, token_positions::card{ origin_card }, 1);
+                target->m_game->add_tokens(token, -1, token_positions::card{ origin_card });
+                target->m_game->remove_listeners(key);
             }
-            return nullptr;
         });
     }
 
@@ -93,16 +99,6 @@ namespace banggame {
             if (target_card->is_purple()) {
                 player_ptr tracked_player = ctx.get<contexts::tracked_player>();
                 apply_pardner_token(target_card, origin, tracked_player ? tracked_player : origin);
-            }
-        });
-
-        game->add_listener<event_type::on_discard_all>(nullptr, [](player_ptr target) {
-            if (!target->alive()) {
-                for (card_token_type token : pardner_tokens) {
-                    if (int count = target->tokens[token]) {
-                        target->m_game->add_tokens(token, -count, token_positions::player{ target });
-                    }
-                }
             }
         });
     }

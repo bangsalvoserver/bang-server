@@ -9,8 +9,9 @@
 namespace banggame {
 
     bool modifier_companion::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card) {
-        if (get_tracked_player(origin_card)) {
-            return playing_card->color == card_color_type::brown
+        if (player_ptr tracked_player = get_tracked_player(origin_card)) {
+            return tracked_player->alive()
+                && playing_card->color == card_color_type::brown
                 && playing_card->has_tag(tag_type::ranged_effect);
         }
         return false;
