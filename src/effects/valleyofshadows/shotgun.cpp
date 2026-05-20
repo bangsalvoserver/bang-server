@@ -15,4 +15,8 @@ namespace banggame {
             }
         });
     }
+
+    void equip_shotgun::on_disable(card_ptr target_card, player_ptr target) {
+        target->m_game->remove_listeners({target_card, 3});
+    }
 }

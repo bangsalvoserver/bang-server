@@ -37,7 +37,7 @@ namespace banggame {
             target->discard_card(target_card);
         }
 
-        target->m_game->add_listener<event_type::count_range_mod>(origin_card, [=, range=range](const_player_ptr origin, range_mod_type type, int &value) {
+        target->m_game->add_listener<event_type::count_range_mod>({ origin_card, -5 }, [=, range=range](const_player_ptr origin, range_mod_type type, int &value) {
             if (origin == target && type == range_mod_type::weapon_range && !origin->m_game->is_disabled(origin_card)) {
                 value = range;
             }
@@ -45,6 +45,6 @@ namespace banggame {
     }
 
     void equip_weapon::on_disable(card_ptr target_card, player_ptr target) {
-        target->m_game->remove_listeners(event_card_key{target_card, 0});
+        target->m_game->remove_listeners({ target_card, -5 });
     }
 }
