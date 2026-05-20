@@ -11,7 +11,7 @@ namespace banggame {
     void equip_pioneers::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_turn_start>({ target_card, 5 }, [=](player_ptr origin) {
             if (origin == target) {
-                if (is_tracked_player(target_card, target)) {
+                if (get_tracked_player(target_card) == target) {
                     target->discard_card(target_card);
                     int ncards = rn::count_if(target->m_game->m_players, [&](player_ptr p) { return p->alive() && p != target; });
                     target->draw_card(ncards, target_card);
@@ -26,5 +26,9 @@ namespace banggame {
                 }
             }
         });
+    }
+
+    void equip_pioneers::on_disable(card_ptr target_card, player_ptr target) {
+        target->m_game->remove_listeners({ target_card, 5 });
     }
 }

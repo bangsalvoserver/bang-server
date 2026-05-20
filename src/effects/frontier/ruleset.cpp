@@ -14,6 +14,13 @@
 
 namespace banggame {
 
+    namespace event_type {
+        struct get_tracked_player {
+            using result_type = player_ptr;
+            card_ptr target_card;
+        };
+    }
+
     static card_token_type get_card_pardner_token(card_ptr target_card) {
         auto tag_value = target_card->get_tag_value(tag_type::pardner);
         assert(tag_value && *tag_value >= 1 && *tag_value <= pardner_tokens.size());
@@ -21,17 +28,7 @@ namespace banggame {
     }
 
     player_ptr get_tracked_player(card_ptr target_card) {
-        card_token_type token = get_card_pardner_token(target_card);
-        for (player_ptr target : target_card->m_game->m_players) {
-            if (target->alive() && target->tokens[token]) {
-                return target;
-            }
-        }
-        return nullptr;
-    }
-
-    bool is_tracked_player(card_ptr target_card, player_ptr target) {
-        return target->alive() && target->tokens[get_card_pardner_token(target_card)];
+        return target_card->m_game->call_event(event_type::get_tracked_player{ target_card });
     }
 
     void apply_pardner_token(card_ptr origin_card, player_ptr origin, player_ptr target) {
@@ -39,6 +36,13 @@ namespace banggame {
         card_token_type token = get_card_pardner_token(origin_card);
         origin->m_game->add_tokens(token, 1, token_positions::card{ origin_card });
         origin->m_game->move_tokens(token, token_positions::card{ origin_card }, token_positions::player{ target }, 1);
+
+        origin->m_game->add_listener<event_type::get_tracked_player>({ origin_card, -4 }, [=](card_ptr target_card) -> player_ptr {
+            if (origin_card == target_card && target->alive()) {
+                return target;
+            }
+            return nullptr;
+        });
     }
 
     void remove_pardner_token(card_ptr origin_card, player_ptr origin) {
@@ -46,6 +50,8 @@ namespace banggame {
             card_token_type token = get_card_pardner_token(origin_card);
             origin->m_game->move_tokens(token, token_positions::player{ target }, token_positions::card{ origin_card }, 1);
             origin->m_game->add_tokens(token, -1, token_positions::card{ origin_card });
+
+            origin->m_game->remove_listeners({ origin_card, -4 });
         }
     }
 
