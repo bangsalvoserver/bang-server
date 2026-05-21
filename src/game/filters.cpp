@@ -23,6 +23,9 @@ namespace banggame {
     }
 
     game_string check_player_filter(const_card_ptr origin_card, const_player_ptr origin, player_filter_bitset filter, player_ptr target, const effect_context &ctx) {
+        if (target->check_player_flags(player_flag::coffin))
+            return {"ERROR_TARGET_DEAD", origin_card, target};
+        
         for (target_player_filter value : filter) {
             switch (value) {
             case target_player_filter::alive:
