@@ -7,6 +7,8 @@
 #include "effects/base/draw.h"
 #include "effects/base/requests.h"
 #include "effects/base/steal_destroy.h"
+
+#include "effects/dodgecity/ruleset.h"
 #include "effects/wildwestshow/ruleset.h"
 
 #include "game/game_table.h"
@@ -70,6 +72,10 @@ namespace banggame {
     void ruleset_frontier::on_apply(game_ptr game) {
         if (!game->m_options.expansions.contains(GET_RULESET(wildwestshow))) {
             track_played_cards(game);
+        }
+        
+        if (!game->m_options.expansions.contains(GET_RULESET(dodgecity))) {
+            ruleset_dodgecity{}.on_apply(game);
         }
 
         game->add_listener<event_type::on_discard_pass>({ nullptr, 1 }, [](player_ptr origin, card_ptr target_card) {
