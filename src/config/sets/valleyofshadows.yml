@@ -211,7 +211,7 @@ hidden:
   - name: BANDIDOS
     responses:
       - bandidos_response
-      - discard(true) max_cards(2, false) self | hand
+      - discard max_cards(2, false) self | hand
     tags:
       - preselect
 

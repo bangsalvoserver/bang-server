@@ -31,9 +31,6 @@ namespace banggame {
     DEFINE_EFFECT(steal, effect_steal)
 
     struct effect_discard {
-        bool used;
-        effect_discard(bool used = false) : used{used} {}
-
         void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
         void on_play(card_ptr origin_card, player_ptr origin);
 

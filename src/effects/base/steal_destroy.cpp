@@ -166,7 +166,7 @@ namespace banggame {
         } else {
             origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_player, target_card);
         }
-        target_player->discard_card(target_card, used);
+        target_player->discard_used_card(target_card);
     }
 
     game_string effect_discard_hand::on_prompt(card_ptr origin_card, player_ptr origin) {

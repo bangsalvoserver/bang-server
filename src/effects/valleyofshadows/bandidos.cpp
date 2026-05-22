@@ -89,7 +89,7 @@ namespace banggame {
                 if (not_disabled.size() <= 1) {
                     pop_request();
                     for (card_ptr target_card : not_disabled) {
-                        effect_discard{true}.on_play(origin_card, target, target_card);
+                        effect_discard{}.on_play(origin_card, target, target_card);
                     }
                     target->reveal_hand();
                 }
