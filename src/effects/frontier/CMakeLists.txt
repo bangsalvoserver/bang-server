@@ -3,6 +3,7 @@ target_sources(bangserver PRIVATE
     ballad.cpp
     caleb_brew.cpp
     cattle_drive.cpp
+    cayenne_chee.cpp
     chinatown.cpp
     cholera.cpp
     chuck_wagon.cpp

@@ -5,6 +5,7 @@
 #include "ballad.h"
 #include "caleb_brew.h"
 #include "cattle_drive.h"
+#include "cayenne_chee.h"
 #include "chinatown.h"
 #include "cholera.h"
 #include "chuck_wagon.h"
