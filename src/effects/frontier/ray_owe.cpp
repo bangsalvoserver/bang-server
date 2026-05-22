@@ -36,7 +36,7 @@ namespace banggame {
                                 if (num_cubes) {
                                     target_card->add_cubes(num_cubes);
                                 }
-                                if (tracked_player) {
+                                if (tracked_player && tracked_player->alive()) {
                                     apply_pardner_token(target_card, owner, tracked_player);
                                 }
                             } else {
