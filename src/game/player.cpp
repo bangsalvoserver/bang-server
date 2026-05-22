@@ -28,23 +28,18 @@ namespace banggame {
         return user_id < 0;
     }
 
-    static bool has_dead_tag(const_player_ptr origin) {
-        return origin->check_player_flags(player_flag::dead)
-            || origin->check_player_flags(player_flag::coffin);
-    }
-
-    static bool has_ghost_tag(const_player_ptr origin) {
-        return origin->check_player_flags(player_flag::ghost)
-            || origin->check_player_flags(player_flag::temp_ghost)
-            || origin->check_player_flags(player_flag::shadow);
-    }
-
     bool player::is_ghost() const {
-        return has_dead_tag(this) && has_ghost_tag(this);
+        return m_player_flags.check(player_flag::dead)
+            && m_player_flags.check_any({
+                player_flag::ghost,
+                player_flag::temp_ghost,
+                player_flag::shadow
+            });
     }
 
     bool player::alive() const {
-        return !has_dead_tag(this) || has_ghost_tag(this);
+        return (!m_player_flags.check(player_flag::dead) || is_ghost())
+            && !m_player_flags.check(player_flag::coffin);
     }
 
     void player::equip_card(card_ptr target, bool skip_enable) {
