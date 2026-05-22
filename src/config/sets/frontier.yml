@@ -67,6 +67,7 @@ character:
     image: 28_steve_tengo
     equip:
       - steve_tengo
+      - steve_tengo_nodisable
     tags:
       - pardner(6)
 

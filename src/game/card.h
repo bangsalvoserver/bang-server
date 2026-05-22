@@ -55,8 +55,6 @@ namespace banggame {
 
         void add_cubes(int ncubes);
         void move_cubes(card_ptr target, int ncubes, bool instant = false);
-
-        void drop_all_cubes();
     };
 
     inline int get_card_id(const_card_ptr target) {

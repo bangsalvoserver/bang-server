@@ -25,22 +25,22 @@ namespace banggame {
                     target->m_game->remove_listeners(key);
                     target->m_game->queue_action([=]{
                         if (owner->alive()) {
-                            if (target_card->is_green()) {
-                                target_card->set_inactive(false);
+                            if (player_ptr p = target_card->owner) {
+                                p->disown_card(target_card);
                             }
                             target_card->add_short_pause();
 
                             if (pocket == pocket_type::player_table) {
-                                owner->steal_card(target_card, true);
+                                owner->equip_card(target_card);
+                                
+                                if (num_cubes) {
+                                    target_card->add_cubes(num_cubes);
+                                }
+                                if (tracked_player) {
+                                    apply_pardner_token(target_card, owner, tracked_player);
+                                }
                             } else {
                                 owner->add_to_hand(target_card);
-                            }
-                            
-                            if (num_cubes) {
-                                target_card->add_cubes(num_cubes);
-                            }
-                            if (tracked_player) {
-                                apply_pardner_token(target_card, owner, tracked_player);
                             }
                         } else {
                             target_card->add_short_pause();

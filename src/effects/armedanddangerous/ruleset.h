@@ -7,6 +7,8 @@ namespace banggame {
     
     static constexpr int max_cubes_per_card = 4;
 
+    void drop_all_cubes(card_ptr target_card);
+
     struct ruleset_armedanddangerous {
         void on_apply(game_ptr game);
     };

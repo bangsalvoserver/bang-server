@@ -30,10 +30,7 @@ namespace banggame {
 
         void on_pick(player_ptr target_player) override {
             pop_request();
-            if (!is_tracked_player(origin_card, target_player)) {
-                remove_pardner_token(origin_card, target);
-                apply_pardner_token(origin_card, target, target_player);
-            }
+            apply_pardner_token(origin_card, target, target_player);
         }
 
         prompt_string pick_prompt(player_ptr target_player) const override {
@@ -58,7 +55,7 @@ namespace banggame {
         });
 
         target->m_game->add_listener<event_type::on_hit>({ target_card, 5 }, [=](card_ptr origin_card, player_ptr origin, player_ptr e_target, int damage, effect_flags flags) {
-            if (origin == target && is_tracked_player(target_card, e_target)) {
+            if (origin == target && get_tracked_player(target_card) == e_target) {
                 target_card->flash_card();
                 origin->draw_card(1, target_card);
             }
@@ -66,10 +63,11 @@ namespace banggame {
     }
 
     void equip_steve_tengo::on_disable(card_ptr target_card, player_ptr target) {
-        if (!target->check_player_flags(player_flag::keep_alive) && !target->alive()) {
-            remove_pardner_token(target_card, target);
-        }
+        target->m_game->remove_listeners({ target_card, -6 });
+        target->m_game->remove_listeners({ target_card, 5 });
+    }
 
-        target->m_game->remove_listeners(target_card);
+    void equip_steve_tengo_nodisable::on_disable(card_ptr target_card, player_ptr target) {
+        remove_pardner_token(target_card, target);
     }
 }

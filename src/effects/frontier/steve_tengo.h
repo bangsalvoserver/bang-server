@@ -11,6 +11,14 @@ namespace banggame {
     };
 
     DEFINE_EQUIP(steve_tengo, equip_steve_tengo)
+
+    struct equip_steve_tengo_nodisable {
+        struct nodisable{};
+        
+        void on_disable(card_ptr target_card, player_ptr target);
+    };
+
+    DEFINE_EQUIP(steve_tengo_nodisable, equip_steve_tengo_nodisable)
 }
 
 #endif

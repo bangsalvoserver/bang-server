@@ -13,4 +13,8 @@ namespace banggame {
             }
         });
     }
+
+    void equip_dragoon::on_disable(card_ptr origin_card, player_ptr origin) {
+        origin->m_game->remove_listeners({origin_card, 0});
+    }
 }

@@ -30,6 +30,10 @@ namespace banggame {
         });
     }
 
+    void equip_hawken::on_disable(card_ptr target_card, player_ptr target) {
+        target->m_game->remove_listeners({target_card, 3});
+    }
+
     static bool is_valid_hawken_card(const_card_ptr target_card) {
         return !target_card->is_black()
             && !target_card->is_train()

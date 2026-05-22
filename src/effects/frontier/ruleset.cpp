@@ -7,12 +7,21 @@
 #include "effects/base/draw.h"
 #include "effects/base/requests.h"
 #include "effects/base/steal_destroy.h"
+
+#include "effects/dodgecity/ruleset.h"
 #include "effects/wildwestshow/ruleset.h"
 
 #include "game/game_table.h"
 #include "game/game_options.h"
 
 namespace banggame {
+
+    namespace event_type {
+        struct get_tracked_player {
+            using result_type = player_ptr;
+            card_ptr target_card;
+        };
+    }
 
     static card_token_type get_card_pardner_token(card_ptr target_card) {
         auto tag_value = target_card->get_tag_value(tag_type::pardner);
@@ -21,24 +30,37 @@ namespace banggame {
     }
 
     player_ptr get_tracked_player(card_ptr target_card) {
-        card_token_type token = get_card_pardner_token(target_card);
-        for (player_ptr target : target_card->m_game->m_players) {
-            if (target->alive() && target->tokens[token]) {
-                return target;
-            }
-        }
-        return nullptr;
-    }
-
-    bool is_tracked_player(card_ptr target_card, player_ptr target) {
-        return target->alive() && target->tokens[get_card_pardner_token(target_card)];
+        return target_card->m_game->call_event(event_type::get_tracked_player{ target_card });
     }
 
     void apply_pardner_token(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        player_ptr tracked = get_tracked_player(origin_card);
+        if (tracked == target) return;
+        
         origin->m_game->add_log("LOG_TRACKED_PLAYER", origin, origin_card, target);
+        
         card_token_type token = get_card_pardner_token(origin_card);
-        origin->m_game->add_tokens(token, 1, token_positions::card{ origin_card });
-        origin->m_game->move_tokens(token, token_positions::card{ origin_card }, token_positions::player{ target }, 1);
+        event_card_key key{ origin_card, -4 };
+
+        if (tracked) {
+            origin->m_game->move_tokens(token, token_positions::player{ tracked }, token_positions::player{ target }, 1);
+            origin->m_game->remove_listeners(key);
+        } else {
+            origin->m_game->add_tokens(token, 1, token_positions::card{ origin_card });
+            origin->m_game->move_tokens(token, token_positions::card{ origin_card }, token_positions::player{ target }, 1);
+        }
+
+        origin->m_game->add_listener<event_type::get_tracked_player>(key, [=](card_ptr target_card) {
+            return origin_card == target_card ? target : nullptr;
+        });
+
+        origin->m_game->add_listener<event_type::on_discard_all>(key, [=](player_ptr e_target) {
+            if (target == e_target && !target->alive()) {
+                target->m_game->move_tokens(token, token_positions::player{ target }, token_positions::card{ origin_card }, 1);
+                target->m_game->add_tokens(token, -1, token_positions::card{ origin_card });
+                target->m_game->remove_listeners(key);
+            }
+        });
     }
 
     void remove_pardner_token(card_ptr origin_card, player_ptr origin) {
@@ -46,6 +68,8 @@ namespace banggame {
             card_token_type token = get_card_pardner_token(origin_card);
             origin->m_game->move_tokens(token, token_positions::player{ target }, token_positions::card{ origin_card }, 1);
             origin->m_game->add_tokens(token, -1, token_positions::card{ origin_card });
+
+            origin->m_game->remove_listeners({ origin_card, -4 });
         }
     }
 
@@ -58,6 +82,10 @@ namespace banggame {
     void ruleset_frontier::on_apply(game_ptr game) {
         if (!game->m_options.expansions.contains(GET_RULESET(wildwestshow))) {
             track_played_cards(game);
+        }
+        
+        if (!game->m_options.expansions.contains(GET_RULESET(dodgecity))) {
+            ruleset_dodgecity{}.on_apply(game);
         }
 
         game->add_listener<event_type::on_discard_pass>({ nullptr, 1 }, [](player_ptr origin, card_ptr target_card) {
@@ -87,16 +115,6 @@ namespace banggame {
             if (target_card->is_purple()) {
                 player_ptr tracked_player = ctx.get<contexts::tracked_player>();
                 apply_pardner_token(target_card, origin, tracked_player ? tracked_player : origin);
-            }
-        });
-
-        game->add_listener<event_type::on_discard_all>(nullptr, [](player_ptr target) {
-            if (!target->alive()) {
-                for (card_token_type token : pardner_tokens) {
-                    if (int count = target->tokens[token]) {
-                        target->m_game->add_tokens(token, -count, token_positions::player{ target });
-                    }
-                }
             }
         });
     }
