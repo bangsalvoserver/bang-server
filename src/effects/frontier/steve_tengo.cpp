@@ -30,10 +30,7 @@ namespace banggame {
 
         void on_pick(player_ptr target_player) override {
             pop_request();
-            if (get_tracked_player(origin_card) != target_player) {
-                remove_pardner_token(origin_card, target);
-                apply_pardner_token(origin_card, target, target_player);
-            }
+            apply_pardner_token(origin_card, target, target_player);
         }
 
         prompt_string pick_prompt(player_ptr target_player) const override {

@@ -34,12 +34,22 @@ namespace banggame {
     }
 
     void apply_pardner_token(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        player_ptr tracked = get_tracked_player(origin_card);
+        if (tracked == target) return;
+        
         origin->m_game->add_log("LOG_TRACKED_PLAYER", origin, origin_card, target);
+        
         card_token_type token = get_card_pardner_token(origin_card);
-        origin->m_game->add_tokens(token, 1, token_positions::card{ origin_card });
-        origin->m_game->move_tokens(token, token_positions::card{ origin_card }, token_positions::player{ target }, 1);
-
         event_card_key key{ origin_card, -4 };
+
+        if (tracked) {
+            origin->m_game->move_tokens(token, token_positions::player{ tracked }, token_positions::player{ target }, 1);
+            origin->m_game->remove_listeners(key);
+        } else {
+            origin->m_game->add_tokens(token, 1, token_positions::card{ origin_card });
+            origin->m_game->move_tokens(token, token_positions::card{ origin_card }, token_positions::player{ target }, 1);
+        }
+
         origin->m_game->add_listener<event_type::get_tracked_player>(key, [=](card_ptr target_card) {
             return origin_card == target_card ? target : nullptr;
         });
