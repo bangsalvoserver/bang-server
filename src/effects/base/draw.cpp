@@ -5,6 +5,7 @@
 
 #include "game/game_table.h"
 #include "game/possible_to_play.h"
+#include "game/game_options.h"
 
 namespace banggame {
 
@@ -138,6 +139,10 @@ namespace banggame {
         } else {
             return {"STATUS_YOUR_TURN_OTHER", target};
         }
+    }
+
+    void request_can_draw::on_update() {
+        set_duration(target->m_game->m_options.auto_resolve_timer);
     }
 
     bool request_can_draw::can_pick(card_ptr target_card) const {
