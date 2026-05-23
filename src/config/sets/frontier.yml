@@ -4,7 +4,6 @@ character:
     equip:
       - alexander_noon
     responses:
-      - can_play_card
       - draw
       - alexander_noon
   - name: CALEB_BREW
