@@ -90,13 +90,15 @@ namespace banggame {
 
         game->add_listener<event_type::on_discard_pass>({ nullptr, 1 }, [](player_ptr origin, card_ptr target_card) {
             if (!origin->is_ghost() && target_card->name == "HEAVY_GRUB") {
-                origin->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
-                if (origin->m_game->check_flags(game_flag::phase_one_draw_discard)) {
-                    target_card->set_visibility(card_visibility::shown);
-                    target_card->add_short_pause();
-                    target_card->set_visibility(card_visibility::hidden);
-                }
-                origin->heal(target_card, origin, 3);
+                origin->m_game->queue_action([=]{
+                    origin->m_game->add_log("LOG_CARD_HAS_EFFECT", target_card);
+                    if (origin->m_game->check_flags(game_flag::phase_one_draw_discard)) {
+                        target_card->set_visibility(card_visibility::shown);
+                        target_card->add_short_pause();
+                        target_card->set_visibility(card_visibility::hidden);
+                    }
+                    origin->heal(target_card, origin, 3);
+                }, 190);
             }
         });
 
