@@ -6,8 +6,12 @@
 namespace banggame {
 
     struct equip_shango_brothers : event_equip {
-        int ncards;
-        equip_shango_brothers(int ncards): ncards{ncards} {}
+        int card_count;
+        int max_cards;
+
+        equip_shango_brothers(int card_count, int max_cards)
+            : card_count{card_count}
+            , max_cards{max_cards} {}
 
         void on_enable(card_ptr target_card, player_ptr target);
     };
