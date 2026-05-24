@@ -275,6 +275,8 @@ main_deck:
     signs:
       - 10 clubs
     color: purple
+    equip_effects:
+      - equip_on_next
     equip:
       - pioneers
     tags:

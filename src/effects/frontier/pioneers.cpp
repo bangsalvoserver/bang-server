@@ -4,9 +4,27 @@
 
 #include "cards/game_events.h"
 
+#include "effects/base/equip.h"
+
 #include "game/game_table.h"
 
 namespace banggame {
+
+    game_string effect_equip_on_next::get_error(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        return effect_equip_on{}.get_error(origin_card, origin, origin->get_next_player(), ctx);
+    }
+
+    void effect_equip_on_next::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+        effect_equip_on{}.add_context(origin_card, origin, origin->get_next_player(), ctx);
+    }
+
+    prompt_string effect_equip_on_next::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        return effect_equip_on{}.on_prompt(origin_card, origin, origin->get_next_player(), ctx);
+    }
+
+    void effect_equip_on_next::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        effect_equip_on{}.on_play(origin_card, origin, origin->get_next_player(), ctx);
+    }
 
     void equip_pioneers::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_turn_start>({ target_card, 5 }, [=](player_ptr origin) {
