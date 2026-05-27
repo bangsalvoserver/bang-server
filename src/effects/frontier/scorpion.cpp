@@ -55,7 +55,7 @@ namespace banggame {
 
     void equip_scorpion::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_equip_card>({target_card, -1}, [=](player_ptr origin, player_ptr e_target, card_ptr origin_card, const effect_context &ctx) {
-            if (origin == target && origin_card != target_card) {
+            if (origin == target && origin_card != target_card && !origin_card->is_black()) {
                 target->m_game->queue_request<request_check>(target, target_card, std::not_fn(&card_sign::is_spades), [=](bool result) {
                     if (!result) {
                         target->m_game->queue_request<request_scorpion>(target_card, e_target, origin, origin_card);
