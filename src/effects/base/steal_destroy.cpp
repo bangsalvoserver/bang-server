@@ -37,8 +37,8 @@ namespace banggame {
     }
 
     void effect_steal::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        destroy_flags flags{};
-        origin->m_game->call_event(event_type::on_destroy_card{ origin, origin_card, target_card, false, flags });
+        destroy_flags flags{ destroy_flag::intentional };
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, origin_card, target_card, flags });
         origin->m_game->queue_action([=]{
             // In some rare cases the target player can die during the effect of "steal"
             // in this case we ignore the effect
@@ -191,8 +191,8 @@ namespace banggame {
     }
 
     void effect_destroy::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        destroy_flags flags{};
-        origin->m_game->call_event(event_type::on_destroy_card{ origin, origin_card, target_card, true, flags });
+        destroy_flags flags{ destroy_flag::intentional, destroy_flag::destroyed };
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, origin_card, target_card, flags });
         origin->m_game->queue_action([=]{
             if (player_ptr target_player = target_card->owner) {
                 if (!flags.check(destroy_flag::ignore_if_dead) || origin->alive()) {

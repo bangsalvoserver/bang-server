@@ -47,8 +47,8 @@ namespace banggame {
             
             card_ptr stolen_card = origin->random_hand_card();
 
-            destroy_flags flags{};
-            target->m_game->call_event(event_type::on_destroy_card{ target, origin_card, stolen_card, false, flags });
+            destroy_flags flags{ destroy_flag::intentional };
+            target->m_game->call_event(event_type::on_destroy_card{ target, origin_card, stolen_card, flags });
             target->m_game->queue_action([=, origin=origin, target=target]{
                 if (target->alive() && origin->alive() && stolen_card->owner == origin) {
                     if (stolen_card->get_visibility() != card_visibility::shown) {

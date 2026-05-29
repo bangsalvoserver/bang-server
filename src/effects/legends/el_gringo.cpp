@@ -1,8 +1,9 @@
 #include "el_gringo.h"
 
-#include "game/game_table.h"
-
 #include "effects/base/damage.h"
+#include "effects/base/steal_destroy.h"
+
+#include "game/game_table.h"
 
 namespace banggame {
 
@@ -24,6 +25,9 @@ namespace banggame {
                                 } else {
                                     target->m_game->add_log("LOG_STOLEN_CARD", target, origin, stolen_card);
                                 }
+                            
+                                destroy_flags flags{};
+                                target->m_game->call_event(event_type::on_destroy_card{ target, target_card, stolen_card, flags });
                                 target->steal_card(stolen_card);
                             }
                         }

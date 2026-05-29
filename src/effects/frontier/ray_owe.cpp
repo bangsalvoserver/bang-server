@@ -11,7 +11,7 @@
 namespace banggame {
 
     void equip_ray_owe::on_enable(card_ptr origin_card, player_ptr target) {
-        target->m_game->add_listener<event_type::on_destroy_card>(origin_card, [=](player_ptr origin, card_ptr e_origin_card, card_ptr target_card, bool is_destroyed, destroy_flags &flags) {
+        target->m_game->add_listener<event_type::on_destroy_card>(origin_card, [=](player_ptr origin, card_ptr e_origin_card, card_ptr target_card, destroy_flags &flags) {
             if (origin == target && e_origin_card == origin_card) {
                 event_card_key key{origin_card, 2};
 

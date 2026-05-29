@@ -79,6 +79,18 @@ namespace banggame {
         };
     }
 
+    struct request_jackalope : request_can_draw {
+        using request_can_draw::request_can_draw;
+
+        void on_pick(card_ptr target_card) override {
+            pop_request();
+            if (player_ptr owner = origin_card->owner) {
+                owner->discard_card(origin_card);
+            }
+            target->draw_card(ncards, origin_card);
+        }
+    };
+
     void ruleset_frontier::on_apply(game_ptr game) {
         if (!game->m_options.expansions.contains(GET_RULESET(wildwestshow))) {
             track_played_cards(game);
@@ -102,12 +114,12 @@ namespace banggame {
             }
         });
 
-        game->add_listener<event_type::on_destroy_card>({ nullptr, 1 }, [](player_ptr origin, card_ptr origin_card, card_ptr target_card, bool is_destroy, destroy_flags &flags) {
+        game->add_listener<event_type::on_destroy_card>({ nullptr, 1 }, [](player_ptr origin, card_ptr origin_card, card_ptr target_card, destroy_flags &flags) {
             player_ptr target = target_card->owner;
             if (origin != target && target_card->name == "JACKALOPE") {
                 origin->m_game->queue_action([=]{
                     if (target->alive()) {
-                        target->m_game->queue_request<request_can_draw>(target_card, origin, target, 2);
+                        target->m_game->queue_request<request_jackalope>(target_card, origin, target, 2);
                     }
                 }, 41);
             }

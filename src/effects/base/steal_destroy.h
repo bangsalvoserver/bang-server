@@ -6,6 +6,8 @@
 namespace banggame {
 
     enum class destroy_flag {
+        intentional,
+        destroyed,
         ignore_if_dead
     };
 
@@ -16,7 +18,6 @@ namespace banggame {
             player_ptr origin;
             card_ptr origin_card;
             card_ptr target_card;
-            bool is_destroyed;
             nullable_ref<destroy_flags> flags;
         };
     }
