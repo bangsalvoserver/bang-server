@@ -61,6 +61,16 @@ namespace banggame {
             return target_card->pocket == pocket_type::player_hand && target_card->owner == target;
         }
 
+        prompt_string pick_prompt(card_ptr target_card) const override {
+            if (target->is_bot()) {
+                auto result = req->get_result(target_card);
+                if (result.indifferent || !result.lucky) {
+                    return "BOT_BAD_DRAW";
+                }
+            }
+            return {};
+        }
+
         void on_pick(card_ptr target_card) override {
             pop_request();
             target->discard_used_card(target_card);
