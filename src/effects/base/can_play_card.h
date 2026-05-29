@@ -6,19 +6,11 @@
 
 namespace banggame {
 
-    struct request_can_play_card : request_resolvable {
-        using request_resolvable::request_resolvable;
+    struct request_can_play_card : request_dismissable {
+        using request_dismissable::request_dismissable;
 
         void on_update() override {
             auto_resolve();
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
-
-        void on_resolve() override {
-            pop_request();
         }
         
         game_string status_text(player_ptr owner) const override;

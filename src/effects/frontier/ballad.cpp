@@ -28,8 +28,8 @@ namespace banggame {
         return {};
     }
 
-    struct request_ballad_steal : request_picking, interface_resolvable {
-        using request_picking::request_picking;
+    struct request_ballad_steal : request_dismissable, interface_picking {
+        using request_dismissable::request_dismissable;
 
         prompt_string pick_prompt(card_ptr target_card) const override {
             return prompts::bot_check_target_enemy(target, origin);
@@ -60,14 +60,6 @@ namespace banggame {
                     target->steal_card(stolen_card);
                 }
             }, 42);
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
-
-        void on_resolve() override {
-            pop_request();
         }
 
         game_string status_text(player_ptr owner) const override {

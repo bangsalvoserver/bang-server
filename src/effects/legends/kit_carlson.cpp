@@ -10,9 +10,9 @@
 
 namespace banggame {
 
-    struct request_kit_carlson_legend : request_resolvable {
+    struct request_kit_carlson_legend : request_dismissable {
         request_kit_carlson_legend(card_ptr origin_card, player_ptr origin, shared_request_draw &&req_draw)
-            : request_resolvable(origin_card, nullptr, origin)
+            : request_dismissable(origin_card, nullptr, origin)
             , req_draw{std::move(req_draw)} {}
 
         shared_request_draw req_draw;
@@ -25,10 +25,6 @@ namespace banggame {
             } else {
                 on_resolve();
             }
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
         }
 
         void on_resolve() override {

@@ -9,22 +9,14 @@
 
 namespace banggame {
 
-    struct request_ranch : request_resolvable {
+    struct request_ranch : request_dismissable {
         request_ranch(card_ptr target_card, player_ptr target)
-            : request_resolvable(target_card, nullptr, target) {}
+            : request_dismissable(target_card, nullptr, target) {}
          
         void on_update() override {
             if (!target->alive() || target->empty_hand() || target->m_game->m_playing != target) {
                 pop_request();
             }
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
-
-        void on_resolve() override {
-            pop_request();
         }
 
         game_string status_text(player_ptr owner) const override {

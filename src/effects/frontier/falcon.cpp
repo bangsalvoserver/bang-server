@@ -9,8 +9,8 @@
 
 namespace banggame {
 
-    struct request_falcon : request_resolvable {
-        using request_resolvable::request_resolvable;
+    struct request_falcon : request_dismissable {
+        using request_dismissable::request_dismissable;
 
         void on_update() override {
             if (!target->m_game->check_flags(game_flag::hands_shown)) {
@@ -21,10 +21,6 @@ namespace banggame {
                     target_card->set_visibility(player_set::includes(origin, target));
                 }
             }
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
         }
 
         void on_resolve() override {

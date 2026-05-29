@@ -9,17 +9,9 @@
 
 namespace banggame {
 
-    struct request_lastwill : request_resolvable {
+    struct request_lastwill : request_dismissable {
         request_lastwill(card_ptr origin_card, player_ptr target)
-            : request_resolvable(origin_card, nullptr, target) {}
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
-
-        void on_resolve() override {
-            pop_request();
-        }
+            : request_dismissable(origin_card, nullptr, target) {}
 
         void on_update() override {
             if (target->m_hp > 0) {

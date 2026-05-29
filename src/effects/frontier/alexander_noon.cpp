@@ -7,23 +7,15 @@
 
 namespace banggame {
 
-    struct request_alexander_noon : request_resolvable {
+    struct request_alexander_noon : request_dismissable {
         request_alexander_noon(card_ptr origin_card, player_ptr target, shared_request_check &&req)
-            : request_resolvable(origin_card, nullptr, target, {}, 120)
+            : request_dismissable(origin_card, nullptr, target, {}, 120)
             , req{std::move(req)} {}
         
         shared_request_check req;
 
         card_list get_highlights(player_ptr owner) const override {
             return { req->origin_card };
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
-
-        void on_resolve() override {
-            pop_request();
         }
         
         game_string status_text(player_ptr owner) const override {
@@ -46,9 +38,9 @@ namespace banggame {
         });
     }
     
-    struct request_alexander_noon_draw : request_picking, interface_resolvable {
+    struct request_alexander_noon_draw : request_dismissable, interface_picking {
         request_alexander_noon_draw(card_ptr origin_card, player_ptr target, shared_request_check &&req)
-            : request_picking(origin_card, nullptr, target, {}, 115)
+            : request_dismissable(origin_card, nullptr, target, {}, 115)
             , req{std::move(req)} {}
         
         shared_request_check req;
@@ -75,14 +67,6 @@ namespace banggame {
             pop_request();
             target->discard_used_card(target_card);
             req->on_pick(target_card);
-        }
-        
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
-
-        void on_resolve() override {
-            pop_request();
         }
         
         game_string status_text(player_ptr owner) const override {
