@@ -5,6 +5,7 @@
 #include "game/game_table.h"
 #include "game/game_options.h"
 #include "game/bot_suggestion.h"
+#include "game/prompts.h"
 
 #include "death.h"
 
@@ -22,6 +23,10 @@ namespace banggame {
             return "BOT_TOO_MUCH_DAMAGE";
         }
         return {};
+    }
+
+    game_string effect_damage::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        return prompts::bot_check_target_enemy(origin, target);
     }
 
     void effect_damage::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {

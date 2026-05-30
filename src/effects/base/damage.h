@@ -29,6 +29,8 @@ namespace banggame {
         game_string get_error(card_ptr origin_card, player_ptr origin, effect_flags flags = {});
 
         game_string on_prompt(card_ptr origin_card, player_ptr origin);
+
+        game_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
         
         void on_play(card_ptr origin_card, player_ptr origin, effect_flags flags = {}) {
             on_play(origin_card, origin, origin, flags);
