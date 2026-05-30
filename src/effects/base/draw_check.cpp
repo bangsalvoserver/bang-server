@@ -18,7 +18,21 @@ namespace banggame {
     void request_check_base::on_update() {
         if (update_count == 0) {
             origin_card->flash_card();
-            start();
+        }
+        
+        if (!target->m_game->call_event(event_type::on_draw_check_start{ target, shared_from_this() })) {
+            int num_checks = target->get_num_checks();
+            if (num_checks > 1) {
+                for (int i=0; i<num_checks; ++i) {
+                    card_ptr target_card = target->m_game->top_of_deck();
+                    target->m_game->add_log("LOG_REVEALED_CARD", target, target_card);
+                    target_card->move_to(pocket_type::selection);
+                }
+            } else {
+                card_ptr target_card = target->m_game->top_of_deck();
+                target_card->move_to(pocket_type::discard_pile);
+                select(target_card);
+            }
         }
     }
 
@@ -45,23 +59,6 @@ namespace banggame {
         }
     }
 
-    void request_check_base::start() {
-        if (!target->m_game->call_event(event_type::on_draw_check_start{ target, shared_from_this() })) {
-            int num_checks = target->get_num_checks();
-            if (num_checks > 1) {
-                for (int i=0; i<num_checks; ++i) {
-                    card_ptr target_card = target->m_game->top_of_deck();
-                    target->m_game->add_log("LOG_REVEALED_CARD", target, target_card);
-                    target_card->move_to(pocket_type::selection);
-                }
-            } else {
-                card_ptr target_card = target->m_game->top_of_deck();
-                target_card->move_to(pocket_type::discard_pile);
-                select(target_card);
-            }
-        }
-    }
-
     void request_check_base::select(card_ptr target_card) {
         drawn_card = target_card;
 
@@ -75,7 +72,9 @@ namespace banggame {
         while (!target->m_game->m_selection.empty()) {
             target->m_game->m_selection.front()->move_to(pocket_type::discard_pile);
         }
-        start();
+
+        handlers.clear();
+        drawn_card = nullptr;
     }
 
     prompt_string request_check_base::redraw_prompt(card_ptr target_card, player_ptr owner) const {

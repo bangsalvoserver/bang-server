@@ -8,9 +8,9 @@
 
 namespace banggame {
 
-    struct request_tumbleweed : request_resolvable {
+    struct request_tumbleweed : request_dismissable {
         request_tumbleweed(card_ptr origin_card, player_ptr origin, player_ptr target, shared_draw_check_handler &&handler)
-            : request_resolvable(origin_card, origin, target, {}, 120)
+            : request_dismissable(origin_card, origin, target, {}, 120)
             , handler(std::move(handler)) {}
 
         shared_draw_check_handler handler;
@@ -19,10 +19,6 @@ namespace banggame {
             auto vec = handler->get_drawn_cards();
             vec.push_back(handler->get_drawing_card());
             return vec;
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
         }
 
         void on_resolve() override {

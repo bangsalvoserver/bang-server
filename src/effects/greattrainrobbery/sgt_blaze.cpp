@@ -16,7 +16,7 @@
 namespace banggame {
 
     game_string modifier_sgt_blaze::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
-        for (const effect_holder &effect : playing_card->get_effect_list(origin->m_game->pending_requests())) {
+        for (const effect_holder &effect : playing_card->get_effect_list(effect_list_type::effects)) {
             if (effect.target == TARGET_TYPE(players) || effect.target == TARGET_TYPE(card_per_player)) {
                 return {};
             }
@@ -32,9 +32,9 @@ namespace banggame {
         origin->m_game->add_log("LOG_SKIP_PLAYER", origin_card, origin, target, ctx.get<contexts::playing_card>());
     }
 
-    struct request_sgt_blaze : request_resolvable, interface_picking_player {
+    struct request_sgt_blaze : request_dismissable, interface_picking_player {
         request_sgt_blaze(card_ptr origin_card, player_ptr target, shared_locomotive_context ctx)
-            : request_resolvable(origin_card, nullptr, target)
+            : request_dismissable(origin_card, nullptr, target)
             , ctx(std::move(ctx)) {}
         
         shared_locomotive_context ctx;
@@ -47,14 +47,6 @@ namespace banggame {
             if (update_count == 0) {
                 ctx->skipped_player = nullptr;
             }
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
-
-        void on_resolve() override {
-            pop_request();
         }
 
         bool can_pick(player_ptr target_player) const override {

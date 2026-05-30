@@ -10,9 +10,9 @@
 
 namespace banggame {
     
-    bool is_possible_to_play(player_ptr origin, card_ptr origin_card, bool is_response, card_response_list &modifiers, const effect_context &ctx);
+    bool is_possible_to_play(player_ptr origin, card_ptr origin_card, effect_list_type type = effect_list_type::effects, const effect_context &ctx = {});
 
-    playable_cards_list generate_playable_cards_list(player_ptr origin, bool is_response = false);
+    playable_cards_list generate_playable_cards_list(player_ptr origin, effect_list_type type = effect_list_type::effects);
 
     inline auto get_all_targetable_cards(player_ptr origin) {
         return rv::concat(
@@ -49,10 +49,10 @@ namespace banggame {
         );
     }
 
-    inline auto get_all_playable_cards(player_ptr origin, bool is_response = false, const effect_context &ctx = {}) {
+    inline auto get_all_playable_cards(player_ptr origin, effect_list_type type = effect_list_type::effects, const effect_context &ctx = {}) {
         return get_all_active_cards(origin, ctx)
-            | rv::filter([=, modifiers=card_response_list{}](card_ptr origin_card) mutable {
-                return is_possible_to_play(origin, origin_card, is_response, modifiers, ctx);
+            | rv::filter([=](card_ptr origin_card) mutable {
+                return is_possible_to_play(origin, origin_card, type, ctx);
             });
     }
 }

@@ -37,8 +37,8 @@ namespace banggame {
     }
 
     void effect_steal::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        destroy_flags flags{};
-        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, false, flags });
+        destroy_flags flags{ destroy_flag::intentional };
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, origin_card, target_card, flags });
         origin->m_game->queue_action([=]{
             // In some rare cases the target player can die during the effect of "steal"
             // in this case we ignore the effect
@@ -166,12 +166,12 @@ namespace banggame {
         } else {
             origin->m_game->add_log("LOG_DISCARDED_SELF_CARD", target_player, target_card);
         }
-        target_player->discard_card(target_card, used);
+        target_player->discard_used_card(target_card);
     }
 
     game_string effect_discard_hand::on_prompt(card_ptr origin_card, player_ptr origin) {
         if (origin->is_bot()) {
-            if (rn::any_of(get_all_playable_cards(origin), [](card_ptr c) { return c->pocket == pocket_type::player_hand; })) {
+            if (rn::any_of(origin->m_hand, [&](card_ptr c) { return is_possible_to_play(origin, c); })) {
                 return "BOT_CAN_PLAY_OTHER_CARDS";
             }
         } else if (int ncards = int(origin->m_hand.size())) {
@@ -181,7 +181,7 @@ namespace banggame {
     }
     
     void effect_discard_hand::on_play(card_ptr origin_card, player_ptr origin) {
-        origin->m_game->queue_request<request_discard_hand>(origin_card, origin);
+        origin->m_game->queue_request<request_discard_hand>(origin_card, origin, origin);
     }
 
     prompt_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
@@ -191,8 +191,8 @@ namespace banggame {
     }
 
     void effect_destroy::on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
-        destroy_flags flags{};
-        origin->m_game->call_event(event_type::on_destroy_card{ origin, target_card, true, flags });
+        destroy_flags flags{ destroy_flag::intentional, destroy_flag::destroyed };
+        origin->m_game->call_event(event_type::on_destroy_card{ origin, origin_card, target_card, flags });
         origin->m_game->queue_action([=]{
             if (player_ptr target_player = target_card->owner) {
                 if (!flags.check(destroy_flag::ignore_if_dead) || origin->alive()) {

@@ -48,11 +48,8 @@ namespace banggame {
         void on_update() override {
             if (update_count == 0) {
                 origin_card->flash_card();
-                restart();
             }
-        }
 
-        void restart() override {
             drawn_card = origin->m_game->top_of_deck();
             drawn_card->move_to(pocket_type::discard_pile);
 

@@ -151,13 +151,9 @@ namespace banggame {
         }
     };
 
-    struct request_boast_feat : request_picking, interface_resolvable {
+    struct request_boast_feat : request_dismissable, interface_picking {
         request_boast_feat(player_ptr target)
-            : request_picking{nullptr, nullptr, target, {}, 25} {}
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
+            : request_dismissable{nullptr, nullptr, target, {}, 25} {}
 
         void on_update() override {
             if (update_count == 0) {
@@ -170,10 +166,6 @@ namespace banggame {
                     }
                 }
             }
-        }
-
-        void on_resolve() override {
-            pop_request();
         }
 
         prompt_string resolve_prompt() const override {

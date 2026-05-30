@@ -1,16 +1,17 @@
 #include "el_gringo.h"
 
-#include "game/game_table.h"
-
 #include "effects/base/damage.h"
+#include "effects/base/steal_destroy.h"
+
+#include "game/game_table.h"
 
 namespace banggame {
 
     void equip_el_gringo_legend::on_enable(card_ptr target_card, player_ptr p) {
         p->m_game->add_listener<event_type::on_hit>({target_card, 2}, [=](card_ptr origin_card, player_ptr origin, player_ptr target, int damage, effect_flags flags) {
-            if (origin && p == target) {
+            if (origin && p == target && origin != target) {
                 origin->m_game->queue_action([=]{
-                    if (target->alive() && p->m_game->m_playing != p) {
+                    if (target->alive()) {
                         bool flashed = false;
                         if (!origin->empty_hand()) {
                             target_card->flash_card();
@@ -24,6 +25,9 @@ namespace banggame {
                                 } else {
                                     target->m_game->add_log("LOG_STOLEN_CARD", target, origin, stolen_card);
                                 }
+                            
+                                destroy_flags flags{};
+                                target->m_game->call_event(event_type::on_destroy_card{ target, target_card, stolen_card, flags });
                                 target->steal_card(stolen_card);
                             }
                         }

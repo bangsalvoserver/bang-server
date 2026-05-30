@@ -14,7 +14,7 @@ namespace banggame {
         virtual prompt_string redraw_prompt(card_ptr target_card, player_ptr owner) const = 0;
 
         virtual void resolve() = 0;
-        virtual void restart() = 0;
+        virtual void restart() {}
     };
 
     struct request_check_base;
@@ -72,6 +72,7 @@ namespace banggame {
             : selection_picker(origin_card, nullptr, target, {}, 110) {}
 
         card_ptr drawn_card = nullptr;
+        card_set handlers;
 
         void on_update() override;
 
@@ -81,7 +82,6 @@ namespace banggame {
 
         game_string status_text(player_ptr owner) const override;
 
-        void start();
         void select(card_ptr target_card);
 
         card_list get_drawn_cards() const override {

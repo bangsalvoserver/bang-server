@@ -38,6 +38,14 @@ namespace banggame {
         void auto_resolve();
     };
 
+    class request_dismissable : public request_resolvable {
+    public:
+        using request_resolvable::request_resolvable;
+    
+        resolve_type get_resolve_type() const override { return resolve_type::dismiss; }
+        void on_resolve() override { pop_request(); }
+    };
+
     struct request_resolvable_timer : request_resolvable, request_timer {
         using request_resolvable::request_resolvable;
 

@@ -10,6 +10,13 @@
 
 namespace banggame {
 
+    void drop_all_cubes(card_ptr target_card) {
+        if (int count = target_card->num_cubes()) {
+            target_card->m_game->add_log("LOG_DROP_CUBE", target_card->owner, target_card, count);
+            target_card->m_game->move_tokens(card_token_type::cube, token_positions::card{target_card}, token_positions::table{}, count);
+        }
+    }
+
     void ruleset_armedanddangerous::on_apply(game_ptr game) {
         game->add_listener<event_type::on_game_setup>({nullptr, 4}, [](player_ptr origin){
             origin->m_game->add_tokens(card_token_type::cube, 32, token_positions::table{});
@@ -43,7 +50,7 @@ namespace banggame {
         });
 
         game->add_listener<event_type::on_discard_all>(nullptr, [](player_ptr target) {
-            target->get_character()->drop_all_cubes();
+            drop_all_cubes(target->get_character());
         });
     }
 }

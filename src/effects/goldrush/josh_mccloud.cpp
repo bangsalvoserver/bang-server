@@ -22,7 +22,7 @@ namespace banggame {
         }
 
         void on_update() override {
-            if (get_all_playable_cards(target, true).empty()) {
+            if (get_all_playable_cards(target, effect_list_type::responses).empty()) {
                 pop_request();
                 target_card->add_short_pause();
                 target_card->move_to(pocket_type::shop_deck, nullptr, card_visibility::shown, false, pocket_position::begin);

@@ -186,12 +186,5 @@ namespace banggame {
             m_game->call_event(event_type::on_finish_tokens{ this, target, token_type });
         }
     }
-
-    void card::drop_all_cubes() {
-        if (int count = num_cubes()) {
-            m_game->add_log("LOG_DROP_CUBE", owner, this, count);
-            m_game->move_tokens(card_token_type::cube, token_positions::card{this}, token_positions::table{}, count);
-        }
-    }
     
 }

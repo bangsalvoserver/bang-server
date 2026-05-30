@@ -39,6 +39,8 @@ namespace banggame {
         void add_to_hand(card_ptr card);
         void draw_card(int ncards = 1, card_ptr origin_card = nullptr);
 
+        bool disown_card(card_ptr target_card, bool used = false);
+        
         void discard_card(card_ptr target, bool used = false);
         void discard_used_card(card_ptr target) {
             discard_card(target, true);
@@ -48,7 +50,7 @@ namespace banggame {
         int max_cards_end_of_turn() const;
 
         int get_num_checks() const;
-        int get_bangs_played() const;
+        int get_bangs_played(bool real_count = false) const;
         int get_range_mod() const;
         int get_weapon_range() const;
         int get_distance_mod() const;

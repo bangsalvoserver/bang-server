@@ -29,16 +29,29 @@ namespace banggame {
         card_color_type color;
         card_sign sign;
 
-        const effect_list &get_effect_list(bool is_response) const {
-            return is_response ? responses : effects;
+        const effect_list &get_effect_list(effect_list_type type) const {
+            switch (type) {
+                case effect_list_type::effects: return effects;
+                case effect_list_type::responses: return responses;
+                case effect_list_type::equip_effects: return equip_effects;
+                default: throw game_error("Invalid effect_list_type");
+            }
         }
 
-        const mth_holder &get_mth(bool is_response) const {
-            return is_response ? mth_response : mth_effect;
+        const mth_holder &get_mth(effect_list_type type) const {
+            switch (type) {
+                case effect_list_type::effects: return mth_effect;
+                case effect_list_type::responses: return mth_response;
+                default: throw game_error("Invalid effect_list_type");
+            }
         }
 
-        const modifier_holder &get_modifier(bool is_response) const {
-            return is_response ? modifier_response : modifier;
+        const modifier_holder &get_modifier(effect_list_type type) const {
+            switch (type) {
+                case effect_list_type::effects: return modifier;
+                case effect_list_type::responses: return modifier_response;
+                default: throw game_error("Invalid effect_list_type");
+            }
         }
 
         bool has_tag(tag_type tag) const {
@@ -59,6 +72,7 @@ namespace banggame {
         bool is_black() const { return color == card_color_type::black; }
         bool is_orange() const { return color == card_color_type::orange; }
         bool is_train() const { return color == card_color_type::train; }
+        bool is_purple() const { return color == card_color_type::purple; }
     };
 
 }

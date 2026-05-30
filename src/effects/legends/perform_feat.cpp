@@ -49,9 +49,9 @@ namespace banggame {
             && (target->m_hp > 1 || can_kill);
     }
 
-    struct request_damage_legend : request_resolvable, interface_target_set_players {
+    struct request_damage_legend : request_dismissable, interface_target_set_players {
         request_damage_legend(card_ptr origin_card, player_ptr target)
-            : request_resolvable{origin_card, nullptr, target} {}
+            : request_dismissable{origin_card, nullptr, target} {}
 
         bool can_kill = false;
 
@@ -60,14 +60,6 @@ namespace banggame {
                 can_kill = can_damage_legend_kill(target);
             }
             auto_resolve();
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
-
-        void on_resolve() override {
-            pop_request();
         }
         
         bool in_target_set(player_ptr target_player) const override {
@@ -101,9 +93,9 @@ namespace banggame {
         target->damage(origin_card, origin, 1);
     }
 
-    struct request_perform_feat : request_resolvable, interface_picking {
+    struct request_perform_feat : request_dismissable, interface_picking {
         request_perform_feat(player_ptr target)
-            : request_resolvable{nullptr, nullptr, target, {}, 30} {}
+            : request_dismissable{nullptr, nullptr, target, {}, 30} {}
         
         card_list target_cards;
         
@@ -121,19 +113,11 @@ namespace banggame {
             }
         }
 
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
-        }
-
         card_list get_highlights(player_ptr owner) const override {
             if (owner != target) {
                 return target_cards;
             }
             return {};
-        }
-
-        void on_resolve() override {
-            pop_request();
         }
 
         prompt_string resolve_prompt() const override {

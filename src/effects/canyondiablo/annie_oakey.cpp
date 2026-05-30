@@ -7,9 +7,9 @@
 
 namespace banggame {
 
-    struct request_annie_oakey : request_base, interface_resolvable {
+    struct request_annie_oakey : request_dismissable {
         request_annie_oakey(card_ptr origin_card, player_ptr target, shared_request_draw &&req_draw)
-            : request_base(origin_card, nullptr, target)
+            : request_dismissable(origin_card, nullptr, target)
             , req_draw(std::move(req_draw)) {}
 
         shared_request_draw req_draw;
@@ -21,10 +21,6 @@ namespace banggame {
             if (!target->alive() || req_draw->num_drawn_cards >= req_draw->num_cards_to_draw) {
                 pop_request();
             }
-        }
-
-        resolve_type get_resolve_type() const override {
-            return resolve_type::dismiss;
         }
 
         void on_resolve() override {

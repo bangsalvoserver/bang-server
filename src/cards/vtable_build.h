@@ -227,7 +227,7 @@ namespace banggame {
                             return {"ERROR_CANT_PLAY_WHILE_EQUIPPING", origin_card, target_card};
                         }
                     }
-                } else if (target_card->get_modifier(origin->m_game->pending_requests())) {
+                } else if (target_card->get_modifier(origin->m_game->pending_requests() ? effect_list_type::responses : effect_list_type::effects)) {
                     if constexpr (requires { value.valid_with_modifier(origin_card, origin, target_card); }) {
                         if (value.valid_with_modifier(origin_card, origin, target_card)) {
                             return {};

@@ -9,14 +9,14 @@
 
 namespace banggame {
 
-    static void saved_steal_cards(player_ptr target, player_ptr saved) {
+    static void saved_steal_cards(card_ptr origin_card, player_ptr target, player_ptr saved) {
         for (int i=0; i<2; ++i) {
             target->m_game->queue_action([=]{
                 if (target->alive() && saved->alive() && !saved->empty_hand()) {
                     card_ptr stolen_card = saved->random_hand_card();
 
-                    destroy_flags flags{};
-                    target->m_game->call_event(event_type::on_destroy_card{ target, stolen_card, false, flags });
+                    destroy_flags flags{ destroy_flag::intentional };
+                    target->m_game->call_event(event_type::on_destroy_card{ target, origin_card, stolen_card, flags });
                     target->m_game->queue_action([=]{
                         if (target->alive() && saved->alive() && stolen_card->owner == saved) {
                             if (stolen_card->get_visibility() != card_visibility::shown) {
@@ -77,7 +77,7 @@ namespace banggame {
             if (target_card->pocket != pocket_type::player_hand) {
                 target->draw_card(2, origin_card);
             } else {
-                saved_steal_cards(target, saved);
+                saved_steal_cards(origin_card, target, saved);
             }
         }
 
@@ -156,7 +156,7 @@ namespace banggame {
 
         if (fatal) {
             origin->m_game->queue_action([=]{
-                saved_steal_cards(origin, saved);
+                saved_steal_cards(origin_card, origin, saved);
             });
         }
     }

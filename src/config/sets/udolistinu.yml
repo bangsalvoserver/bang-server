@@ -219,7 +219,7 @@ hidden:
   - name: BANDIDOS
     responses:
       - bandidos2_response
-      - discard(true) bang_or_cards(2) self | hand
+      - discard bang_or_cards(2) self | hand
     tags:
       - preselect
 

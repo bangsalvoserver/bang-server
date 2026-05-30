@@ -16,5 +16,6 @@
 #include "greattrainrobbery/effects.h"
 #include "stickofdynamite/effects.h"
 #include "crazy_greygory/effects.h"
+#include "frontier/effects.h"
 
 #endif

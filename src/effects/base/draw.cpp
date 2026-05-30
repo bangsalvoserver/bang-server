@@ -51,7 +51,7 @@ namespace banggame {
             if (update_count == 0) {
                 target->m_game->play_sound(update_target::includes(target), sound_id::draw);
             }
-            card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
+            card_ptr only_card = get_single_element(get_all_playable_cards(target, effect_list_type::responses));
             if (only_card && only_card->has_tag(tag_type::pick)) {
                 on_pick(nullptr);
             } else {
@@ -137,6 +137,28 @@ namespace banggame {
             return "STATUS_YOUR_TURN";
         } else {
             return {"STATUS_YOUR_TURN_OTHER", target};
+        }
+    }
+
+    bool request_can_draw::can_pick(card_ptr target_card) const {
+        return target_card->pocket == pocket_type::main_deck
+            || (target_card->pocket == pocket_type::discard_pile && target->m_game->m_deck.empty());
+    }
+
+    void request_can_draw::on_pick(card_ptr target_card) {
+        pop_request();
+        target->draw_card(ncards, origin_card);
+    }
+
+    prompt_string request_can_draw::resolve_prompt() const {
+        return {"PROMPT_CANCEL_DRAW", origin_card};
+    }
+
+    game_string request_can_draw::status_text(player_ptr owner) const {
+        if (target == owner) {
+            return {"STATUS_CAN_DRAW", origin_card, ncards};
+        } else {
+            return {"STATUS_CAN_DRAW_OTHER", target, origin_card, ncards};
         }
     }
 

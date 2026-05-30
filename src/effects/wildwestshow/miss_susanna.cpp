@@ -10,12 +10,6 @@
 
 namespace banggame {
 
-    static int get_count_played_cards(player_ptr origin) {
-        int count = 0;
-        origin->m_game->call_event(event_type::get_count_played_cards{ origin, count });
-        return count;
-    }
-
     void equip_miss_susanna::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::prompt_pass_turn>(target_card, [=, max_count=max_count](player_ptr origin) -> game_string {
             int count = get_count_played_cards(origin);
