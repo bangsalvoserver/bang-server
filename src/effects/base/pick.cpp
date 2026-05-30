@@ -54,7 +54,7 @@ namespace banggame {
     }
 
     card_ptr request_picking::get_auto_pick_target() const {
-        card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
+        card_ptr only_card = get_single_element(get_all_playable_cards(target, effect_list_type::responses));
         if (only_card && only_card->has_tag(tag_type::pick)) {
             auto pick_cards = get_all_targetable_cards(target) | rv::filter([&](card_ptr c){ return in_target_set(c); });
             return get_single_element(pick_cards);
@@ -69,7 +69,7 @@ namespace banggame {
     }
 
     player_ptr request_picking_player::get_auto_pick_target() const {
-        card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
+        card_ptr only_card = get_single_element(get_all_playable_cards(target, effect_list_type::responses));
         if (only_card && only_card->has_tag(tag_type::pick)) {
             auto pick_players = target->m_game->m_players | rv::filter([&](player_ptr p){ return in_target_set(p); });
             return get_single_element(pick_players);

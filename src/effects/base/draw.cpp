@@ -51,7 +51,7 @@ namespace banggame {
             if (update_count == 0) {
                 target->m_game->play_sound(update_target::includes(target), sound_id::draw);
             }
-            card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
+            card_ptr only_card = get_single_element(get_all_playable_cards(target, effect_list_type::responses));
             if (only_card && only_card->has_tag(tag_type::pick)) {
                 on_pick(nullptr);
             } else {

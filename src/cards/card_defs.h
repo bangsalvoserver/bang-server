@@ -203,6 +203,12 @@ namespace banggame {
     using tag_int = int8_t;
     using tag_map = utils::static_map_view<tag_type, tag_int>;
 
+    enum class effect_list_type {
+        effects,
+        responses,
+        equip_effects
+    };
+
     enum class card_deck_type {
         none,
         main_deck,

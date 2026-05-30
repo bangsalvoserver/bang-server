@@ -111,7 +111,7 @@ namespace banggame {
             .origin = req.origin,
             .target = req.target,
             .status_text = req.status_text(owner),
-            .respond_cards = generate_playable_cards_list(owner, true),
+            .respond_cards = generate_playable_cards_list(owner, effect_list_type::responses),
             .highlight_cards = req.get_highlights(owner),
             .target_set_players = get_request_target_set_players(owner),
             .target_set_cards = get_request_target_set_cards(owner),

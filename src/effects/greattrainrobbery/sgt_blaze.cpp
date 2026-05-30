@@ -16,7 +16,7 @@
 namespace banggame {
 
     game_string modifier_sgt_blaze::get_error(card_ptr origin_card, player_ptr origin, card_ptr playing_card, const effect_context &ctx) {
-        for (const effect_holder &effect : playing_card->get_effect_list(origin->m_game->pending_requests())) {
+        for (const effect_holder &effect : playing_card->get_effect_list(effect_list_type::effects)) {
             if (effect.target == TARGET_TYPE(players) || effect.target == TARGET_TYPE(card_per_player)) {
                 return {};
             }

@@ -25,7 +25,7 @@ namespace banggame {
     }
 
     bool request_resolvable::auto_resolvable() const {
-        card_ptr only_card = get_single_element(get_all_playable_cards(target, true));
+        card_ptr only_card = get_single_element(get_all_playable_cards(target, effect_list_type::responses));
         return only_card && only_card->has_tag(tag_type::resolve);
     }
     

@@ -42,23 +42,6 @@ namespace json {
         struct skip_field{};
     };
 
-    template<typename Context> struct serializer<banggame::playable_card_info, Context> {
-        static void write(const banggame::playable_card_info &value, string_writer &writer) {
-            writer.StartObject();
-
-            writer.Key("card");
-            serialize(value.card, writer);
-
-            writer.Key("modifiers");
-            serialize(value.modifiers | rv::transform(&banggame::card_response_pair::card), writer);
-
-            writer.Key("context");
-            serialize(value.context, writer);
-
-            writer.EndObject();
-        }
-    };
-
     template<typename Context> struct serializer<banggame::effect_holder, Context> {
         static void write(const banggame::effect_holder &effect, string_writer &writer, const Context &ctx) {
             using serializer_type = aggregate_serializer<banggame::effect_holder, Context>;
@@ -212,18 +195,18 @@ namespace banggame {
     static target_selection deserialize_card_targets(const json::json &value, const game_context &context) {
         const json::json &card = get_value(value, "card");
         const json::json &targets = get_value(value, "targets");
-        bool is_response = json::deserialize<bool>(get_value(value, "is_response"));
+        effect_list_type type = json::deserialize<effect_list_type>(get_value(value, "effect_list"));
         
         target_selection result {
             .card = json::deserialize<card_ptr, game_context>(card, context),
-            .is_response = is_response
+            .effect_list = type
         };
 
         if (!targets.IsArray()) {
             throw json::deserialize_error("Cannot deserialize target list: value is not an array");
         }
 
-        const effect_list &effects = result.card->is_equip_card() ? result.card->equip_effects : result.card->get_effect_list(is_response);
+        const effect_list &effects = result.card->get_effect_list(type);
         
         if (effects.size() != targets.Size()) {
             throw json::deserialize_error("Invalid number of targets");
@@ -237,11 +220,11 @@ namespace banggame {
         return result;
     }
 
-    static modifier_list deserialize_modifier_list(const json::json &value, const game_context &context) {
+    static target_selection_list deserialize_target_selection_list(const json::json &value, const game_context &context) {
         if (!value.IsArray()) {
-            throw json::deserialize_error("Cannot deserialize modifier_list: value is not an array");
+            throw json::deserialize_error("Cannot deserialize target_selection_list: value is not an array");
         }
-        modifier_list result;
+        target_selection_list result;
         result.reserve(value.Size());
         for (const json::json &modifier : value.GetArray()) {
             if (!modifier.IsObject()) {
@@ -253,12 +236,12 @@ namespace banggame {
     }
 
     static game_action deserialize_game_action(const json::json &value, const game_context &context) {
-        auto [card, is_response, targets] = deserialize_card_targets(value, context);
+        auto [card, key, targets] = deserialize_card_targets(value, context);
         return {
             .card = card,
-            .is_response = is_response,
+            .effect_list = key,
             .targets = std::move(targets),
-            .modifiers = deserialize_modifier_list(get_value(value, "modifiers"), context),
+            .modifiers = deserialize_target_selection_list(get_value(value, "modifiers"), context),
             .bypass_prompt = json::deserialize<bool>(get_value(value, "bypass_prompt"))
         };
     }

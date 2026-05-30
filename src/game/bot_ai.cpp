@@ -17,7 +17,7 @@ namespace banggame {
     static game_action generate_random_play(player_ptr origin, const playable_card_info &args) {
         game_action ret {
             .card = args.card,
-            .is_response = args.is_response
+            .effect_list = args.effect_list
         };
         effect_context ctx{};
         
@@ -31,7 +31,7 @@ namespace banggame {
             }
         }
 
-        const effect_list &effects = args.card->is_equip_card() ? args.card->equip_effects : args.card->get_effect_list(args.is_response);
+        const effect_list &effects = args.card->get_effect_list(args.effect_list);
         for (const effect_holder &holder : effects) {
             const auto &target = ret.targets.emplace_back(holder.random_target(args.card, origin, ctx));
             holder.add_context(args.card, origin, target, ctx);
@@ -118,7 +118,7 @@ namespace banggame {
 
         if (pending_requests()) {
             for (player_ptr origin : m_players | rv::filter(&player::is_bot)) {
-                playable_cards_list play_cards = generate_playable_cards_list(origin, true);
+                playable_cards_list play_cards = generate_playable_cards_list(origin, effect_list_type::responses);
                 
                 if (!play_cards.empty()) {
                     auto timer = origin->m_game->top_request<request_timer>();

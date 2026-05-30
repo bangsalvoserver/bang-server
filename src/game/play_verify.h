@@ -29,18 +29,18 @@ namespace banggame {
 
     struct target_selection {
         card_ptr card;
-        bool is_response;
+        effect_list_type effect_list;
         target_list targets;
     };
 
-    using modifier_list = std::vector<target_selection>;
+    using target_selection_list = std::vector<target_selection>;
 
     struct game_action {
         card_ptr card;
-        bool is_response;
+        effect_list_type effect_list;
         target_list targets;
 
-        modifier_list modifiers;
+        target_selection_list modifiers;
 
         bool bypass_prompt;
     };

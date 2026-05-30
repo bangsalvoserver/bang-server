@@ -48,10 +48,6 @@ namespace banggame {
                 return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
             }
         }
-        
-        if (origin_card->is_equip_card() && !ctx.contains<contexts::equip_target>()) {
-            return effect_equip_on{}.get_error(origin_card, origin, origin, ctx);
-        }
 
         return {};
     }
@@ -107,15 +103,15 @@ namespace banggame {
         return {};
     }
 
-    static game_string verify_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
-        const effect_list &effects = origin_card->get_effect_list(is_response);
+    static game_string verify_target_list(player_ptr origin, card_ptr origin_card, effect_list_type type, const target_list &targets, effect_context &ctx) {
+        const effect_list &effects = origin_card->get_effect_list(type);
         if (effects.empty()) {
             return "ERROR_EFFECT_LIST_EMPTY";
         }
         
         MAYBE_RETURN(verify_target_list_base(origin, origin_card, effects, targets, ctx));
 
-        if (const mth_holder &mth = origin_card->get_mth(is_response)) {
+        if (const mth_holder &mth = origin_card->get_mth(type)) {
             MAYBE_RETURN(mth.get_error(origin_card, origin, targets, ctx));
         }
 
@@ -126,61 +122,75 @@ namespace banggame {
         return {};
     }
     
-    static game_string verify_modifiers(player_ptr origin, card_ptr origin_card, bool is_response, const modifier_list &modifiers, effect_context &ctx) {
-        bool valid_response = origin->m_game->pending_requests();
+    static game_string verify_modifiers(player_ptr origin, card_ptr origin_card, effect_list_type type, const target_selection_list &modifiers, effect_context &ctx) {
+        effect_list_type valid_type = origin->m_game->pending_requests() ? effect_list_type::responses : effect_list_type::effects;
 
+        if (valid_type == effect_list_type::effects && origin->m_game->m_playing != origin) {
+            return "ERROR_PLAYER_NOT_IN_TURN";
+        }
+        
         card_ptr forced_play = nullptr;
 
-        for (const auto &[mod_card, mod_response, targets] : modifiers) {
-            if (forced_play == mod_card) valid_response = false;
+        for (const auto &[mod_card, mod_type, targets] : modifiers) {
+            if (forced_play == mod_card) valid_type = effect_list_type::effects;
             
-            if (valid_response != mod_response) {
-                return "ERROR_INVALID_RESPONSE";
+            if (valid_type != mod_type) {
+                return "ERROR_INVALID_EFFECT_LIST";
             }
 
-            if (const modifier_holder &modifier = mod_card->get_modifier(mod_response)) {
+            if (const modifier_holder &modifier = mod_card->get_modifier(mod_type)) {
                 modifier.add_context(mod_card, origin, ctx);
                 
-                MAYBE_RETURN(verify_target_list(origin, mod_card, mod_response, targets, ctx));
+                MAYBE_RETURN(verify_target_list(origin, mod_card, mod_type, targets, ctx));
                 MAYBE_RETURN(get_play_card_error(origin, mod_card, ctx));
             } else {
                 return "ERROR_CARD_IS_NOT_MODIFIER";
             }
 
-            if (valid_response && !forced_play) {
+            if (valid_type == effect_list_type::responses && !forced_play) {
                 forced_play = ctx.get<contexts::forced_play>();
             }
         }
 
-        if (forced_play == origin_card) valid_response = false;
+        if (forced_play == origin_card) valid_type = effect_list_type::effects;
 
-        if (valid_response != is_response) {
-            return "ERROR_INVALID_RESPONSE";
+        if (origin_card->is_equip_card()) {
+            if (valid_type == effect_list_type::effects) {
+                valid_type = effect_list_type::equip_effects;
+            } else {
+                return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
+            }
+        }
+
+        if (valid_type != type) {
+            return "ERROR_INVALID_EFFECT_LIST";
         }
 
         for (size_t i=0; i<modifiers.size(); ++i) {
-            const auto &[mod_card, mod_response, targets] = modifiers[i];
+            const auto &[mod_card, mod_type, targets] = modifiers[i];
 
-            MAYBE_RETURN(mod_card->get_modifier(mod_response).get_error(mod_card, origin, origin_card, ctx));
+            MAYBE_RETURN(mod_card->get_modifier(mod_type).get_error(mod_card, origin, origin_card, ctx));
             for (size_t j=0; j<i; ++j) {
-                const auto &[mod_card_before, mod_response_before, targets_before] = modifiers[j];
-                MAYBE_RETURN(mod_card_before->get_modifier(mod_response_before).get_error(mod_card_before, origin, mod_card, ctx));
+                const auto &[mod_card_before, mod_type_before, targets_before] = modifiers[j];
+                MAYBE_RETURN(mod_card_before->get_modifier(mod_type_before).get_error(mod_card_before, origin, mod_card, ctx));
             }
         }
 
         return {};
     }
 
-    static game_string verify_equip_target(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, effect_context &ctx) {
-        if (is_response) {
-            return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
-        }
-
+    static game_string verify_equip_target(player_ptr origin, card_ptr origin_card, const target_list &targets, effect_context &ctx) {
         if (origin_card->pocket == pocket_type::player_hand && origin_card->owner != origin) {
             return "ERROR_INVALID_CARD_OWNER";
         }
 
-        return verify_target_list_base(origin, origin_card, origin_card->equip_effects, targets, ctx);
+        MAYBE_RETURN(verify_target_list_base(origin, origin_card, origin_card->equip_effects, targets, ctx));
+        
+        if (!ctx.contains<contexts::equip_target>()) {
+            return effect_equip_on{}.get_error(origin_card, origin, origin, ctx);
+        }
+
+        return {};
     }
 
     game_string get_play_card_error(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
@@ -193,19 +203,15 @@ namespace banggame {
         return origin->m_game->call_event(event_type::check_play_card{ origin, origin_card, ctx });
     }
 
-    static game_string verify_card_targets(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, effect_context &ctx) {
-        if (!is_response && origin->m_game->m_playing != origin) {
-            return "ERROR_PLAYER_NOT_IN_TURN";
-        }
+    static game_string verify_card_targets(player_ptr origin, card_ptr origin_card, effect_list_type type, const target_list &targets, const target_selection_list &modifiers, effect_context &ctx) {
+        MAYBE_RETURN(verify_modifiers(origin, origin_card, type, modifiers, ctx));
 
-        MAYBE_RETURN(verify_modifiers(origin, origin_card, is_response, modifiers, ctx));
-
-        if (origin_card->is_equip_card()) {
-            MAYBE_RETURN(verify_equip_target(origin, origin_card, is_response, targets, ctx));
-        } else if (origin_card->get_modifier(is_response)) {
+        if (type == effect_list_type::equip_effects) {
+            MAYBE_RETURN(verify_equip_target(origin, origin_card, targets, ctx));
+        } else if (origin_card->get_modifier(type)) {
             return "ERROR_CARD_IS_MODIFIER";
         } else {
-            MAYBE_RETURN(verify_target_list(origin, origin_card, is_response, targets, ctx));
+            MAYBE_RETURN(verify_target_list(origin, origin_card, type, targets, ctx));
         }
 
         MAYBE_RETURN(verify_context(origin, origin_card, modifiers | rv::transform(&target_selection::card) | rn::to<card_list>(), ctx));
@@ -213,14 +219,14 @@ namespace banggame {
         return get_play_card_error(origin, origin_card, ctx);
     }
 
-    static prompt_string get_play_prompt(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
+    static prompt_string get_play_prompt(player_ptr origin, card_ptr origin_card, effect_list_type type, const target_list &targets, const effect_context &ctx) {
         return prompts::select_prompt(rv::concat(
-            rv::zip(targets, origin_card->get_effect_list(is_response)) | rv::transform([&](const auto &pair) {
+            rv::zip(targets, origin_card->get_effect_list(type)) | rv::transform([&](const auto &pair) {
                 const auto &[target, effect] = pair;
                 return effect.on_prompt(origin_card, origin, target, ctx);
             }),
 
-            rv::single(origin_card->get_mth(is_response)) | rv::transform([&](const mth_holder &mth) {
+            rv::single(origin_card->get_mth(type)) | rv::transform([&](const mth_holder &mth) {
                 return mth ? mth.on_prompt(origin_card, origin, targets, ctx) : prompt_string{};
             })
         ));
@@ -238,26 +244,26 @@ namespace banggame {
         ));
     }
 
-    static prompt_string get_prompt_message(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const modifier_list &modifiers, const effect_context &ctx) {
+    static prompt_string get_prompt_message(player_ptr origin, card_ptr origin_card, effect_list_type type, const target_list &targets, const target_selection_list &modifiers, const effect_context &ctx) {
         return prompts::select_prompt(rv::concat(
             modifiers | rv::transform([&](const target_selection &selection) {
-                return get_play_prompt(origin, selection.card, selection.is_response, selection.targets, ctx);
+                return get_play_prompt(origin, selection.card, selection.effect_list, selection.targets, ctx);
             }),
 
-            rv::single(origin_card->is_equip_card()
+            rv::single(type == effect_list_type::equip_effects
                 ? get_equip_prompt(origin, origin_card, targets, ctx)
-                : get_play_prompt(origin, origin_card, is_response, targets, ctx)
+                : get_play_prompt(origin, origin_card, type, targets, ctx)
             )
         ));
     }
 
-    static void log_played_card(card_ptr origin_card, player_ptr origin, bool is_response, const effect_context &ctx) {
+    static void log_played_card(card_ptr origin_card, player_ptr origin, effect_list_type type, const effect_context &ctx) {
         if (origin_card->has_tag(tag_type::skip_logs)) return;
         
         switch (origin_card->pocket) {
         case pocket_type::player_hand:
         case pocket_type::scenario_card:
-            if (is_response) {
+            if (type == effect_list_type::responses) {
                 origin->m_game->add_log("LOG_RESPONDED_WITH_CARD", origin_card, origin);
             } else {
                 origin->m_game->add_log("LOG_PLAYED_CARD", origin_card, origin);
@@ -269,7 +275,7 @@ namespace banggame {
             }
             break;
         case pocket_type::player_table:
-            if (is_response) {
+            if (type == effect_list_type::responses) {
                 origin->m_game->add_log("LOG_RESPONDED_WITH_CARD", origin_card, origin);
             } else {
                 origin->m_game->add_log("LOG_PLAYED_TABLE_CARD", origin_card, origin);
@@ -278,7 +284,7 @@ namespace banggame {
         case pocket_type::player_character:
             if (ctx.contains<contexts::drawing_effect>()) {
                 origin->m_game->add_log("LOG_DRAWN_WITH_CHARACTER", origin_card, origin);
-            } else if (is_response) {
+            } else if (type == effect_list_type::responses) {
                 origin->m_game->add_log("LOG_RESPONDED_WITH_CHARACTER", origin_card, origin);
             } else {
                 origin->m_game->add_log("LOG_PLAYED_CHARACTER", origin_card, origin);
@@ -297,8 +303,8 @@ namespace banggame {
         }
     }
 
-    static void apply_target_list(player_ptr origin, card_ptr origin_card, bool is_response, const target_list &targets, const effect_context &ctx) {
-        log_played_card(origin_card, origin, is_response, ctx);
+    static void apply_target_list(player_ptr origin, card_ptr origin_card, effect_list_type type, const target_list &targets, const effect_context &ctx) {
+        log_played_card(origin_card, origin, type, ctx);
 
         if (!ctx.get<contexts::auto_discarded>().contains(origin_card)) {
             if (origin_card->pocket == pocket_type::player_hand) {
@@ -308,11 +314,11 @@ namespace banggame {
             }
         }
 
-        for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(is_response))) {
+        for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(type))) {
             effect.on_play(origin_card, origin, target, ctx);
         }
 
-        if (const mth_holder &mth = origin_card->get_mth(is_response)) {
+        if (const mth_holder &mth = origin_card->get_mth(type)) {
             mth.on_play(origin_card, origin, targets, ctx);
         }
     }
@@ -332,12 +338,12 @@ namespace banggame {
         
         ctx.set<contexts::playing_card>(args.card);
 
-        if (game_string error = verify_card_targets(origin, args.card, args.is_response, args.targets, args.modifiers, ctx)) {
+        if (game_string error = verify_card_targets(origin, args.card, args.effect_list, args.targets, args.modifiers, ctx)) {
             return play_verify_results::error{ error };
         }
 
         if (!args.bypass_prompt) {
-            if (prompt_string prompt = get_prompt_message(origin, args.card, args.is_response, args.targets, args.modifiers, ctx)) {
+            if (prompt_string prompt = get_prompt_message(origin, args.card, args.effect_list, args.targets, args.modifiers, ctx)) {
                 return play_verify_results::prompt{ prompt };
             }
         }
@@ -351,14 +357,14 @@ namespace banggame {
             ctx
         });
 
-        for (const auto &[mod_card, mod_response, mod_targets] : args.modifiers) {
-            apply_target_list(origin, mod_card, mod_response, mod_targets, ctx);
+        for (const auto &[mod_card, mod_key, mod_targets] : args.modifiers) {
+            apply_target_list(origin, mod_card, mod_key, mod_targets, ctx);
         }
 
-        if (args.card->is_equip_card()) {
+        if (args.effect_list == effect_list_type::equip_effects) {
             apply_equip(origin, args.card, args.targets, ctx);
         } else {
-            apply_target_list(origin, args.card, args.is_response, args.targets, ctx);
+            apply_target_list(origin, args.card, args.effect_list, args.targets, ctx);
         }
 
         return play_verify_results::ok{};
