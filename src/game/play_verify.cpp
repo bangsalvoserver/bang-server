@@ -138,7 +138,9 @@ namespace banggame {
                 return "ERROR_INVALID_EFFECT_LIST";
             }
 
-            if (const modifier_holder &modifier = mod_card->get_modifier(mod_type)) {
+            if (mod_card->is_equip_card()) {
+                return "ERROR_MODIFIER_IS_EQUIP";
+            } else if (const modifier_holder &modifier = mod_card->get_modifier(mod_type)) {
                 modifier.add_context(mod_card, origin, ctx);
                 
                 MAYBE_RETURN(verify_target_list(origin, mod_card, mod_type, targets, ctx));
@@ -160,6 +162,8 @@ namespace banggame {
             } else {
                 return "ERROR_CANNOT_EQUIP_AS_RESPONSE";
             }
+        } else if (origin_card->get_modifier(valid_type)) {
+            return "ERROR_CARD_IS_MODIFIER";
         }
 
         if (valid_type != type) {
@@ -208,8 +212,6 @@ namespace banggame {
 
         if (type == effect_list_type::equip_effects) {
             MAYBE_RETURN(verify_equip_target(origin, origin_card, targets, ctx));
-        } else if (origin_card->get_modifier(type)) {
-            return "ERROR_CARD_IS_MODIFIER";
         } else {
             MAYBE_RETURN(verify_target_list(origin, origin_card, type, targets, ctx));
         }
