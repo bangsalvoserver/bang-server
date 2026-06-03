@@ -19,7 +19,7 @@ namespace banggame {
             .card = args.card,
             .effect_list = args.effect_list
         };
-        effect_context ctx{};
+        effect_context ctx;
         
         for (const auto &[mod_card, mod_response] : args.modifiers) {
             auto &targets = ret.modifiers.emplace_back(mod_card, mod_response).targets;

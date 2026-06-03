@@ -44,9 +44,9 @@ namespace banggame {
             return nullptr;
         });
 
-        origin->m_game->add_listener<event_type::on_play_card>(origin_card, [=](player_ptr e_origin, card_ptr e_origin_card, const card_list &modifiers, const effect_context &ctx) {
+        origin->m_game->add_listener<event_type::on_play_card>(origin_card, [=](player_ptr e_origin, card_ptr e_origin_card, const effect_context &ctx) {
             if (origin == e_origin) {
-                if (rn::contains(modifiers, origin_card)) {
+                if (rn::contains(ctx.get_all<contexts::modifier_card>(), origin_card)) {
                     *last_played = nullptr;
                 } else if (card_ptr target_card = get_repeat_playing_card(e_origin_card, ctx);
                     target_card->pocket == pocket_type::player_hand || target_card->pocket == pocket_type::shop_selection
@@ -84,10 +84,10 @@ namespace banggame {
 
     void modifier_leevankliff::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         if (card_ptr last_played = origin->m_game->call_event(event_type::get_last_played_brown_card{ origin })) {
-            ctx.set<contexts::repeat_card>(last_played);
-            ctx.add<contexts::auto_discarded>().add(last_played);
-            ctx.set<contexts::playing_card>(origin_card);
-            ctx.add<contexts::disable_banglimit>();
+            ctx.add(contexts::repeat_card{ last_played });
+            ctx.add(contexts::auto_discarded{ last_played });
+            ctx.add(contexts::playing_card{ origin_card });
+            ctx.add(contexts::disable_banglimit{});
         }
     }
 }

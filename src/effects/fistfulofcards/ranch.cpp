@@ -44,6 +44,7 @@ namespace banggame {
         auto req = origin->m_game->top_request<request_ranch>();
         req->pop_request();
         
-        origin->draw_card(static_cast<int>(ctx.get<contexts::selected_cards>().size()), origin_card);
+        int ncards = static_cast<int>(rn::distance(ctx.get_all<contexts::selected_card>()));
+        origin->draw_card(ncards, origin_card);
     }
 }

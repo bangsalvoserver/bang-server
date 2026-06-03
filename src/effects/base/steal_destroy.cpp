@@ -132,7 +132,7 @@ namespace banggame {
     }
 
     void effect_discard::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        ctx.add<contexts::auto_discarded>().add(origin_card);
+        ctx.add(contexts::auto_discarded{ origin_card });
     }
 
     void effect_discard::on_play(card_ptr origin_card, player_ptr origin) {

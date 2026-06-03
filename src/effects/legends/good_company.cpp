@@ -52,7 +52,7 @@ namespace banggame {
             }
         });
 
-        origin->m_game->add_listener<event_type::on_play_card>(origin_card, [=](player_ptr e_origin, card_ptr e_origin_card, const card_list &modifiers, const effect_context &ctx) {
+        origin->m_game->add_listener<event_type::on_play_card>(origin_card, [=](player_ptr e_origin, card_ptr e_origin_card, const effect_context &ctx) {
             if (e_origin == origin->m_game->m_playing && e_origin_card->deck == card_deck_type::main_deck) {
                 tracking->last_played = e_origin_card;
                 

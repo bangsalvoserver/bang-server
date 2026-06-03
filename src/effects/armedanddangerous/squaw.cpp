@@ -12,7 +12,7 @@
 namespace banggame {
 
     game_string effect_squaw::get_error(card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) {
-        if (target_card->owner && ctx.get<contexts::selected_cubes>().contains(origin_card)) {
+        if (target_card->owner && contexts::selected_cubes::contains(ctx, origin_card)) {
             return effect_steal{}.get_error(origin_card, origin, target_card);
         }
         return {};
@@ -26,7 +26,7 @@ namespace banggame {
 
     void effect_squaw::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags, const effect_context &ctx) {
         if (target_card->owner) {
-            if (ctx.get<contexts::selected_cubes>().contains(origin_card)) {
+            if (contexts::selected_cubes::contains(ctx, origin_card)) {
                 effect_steal{}.on_play(origin_card, origin, target_card, flags);
             } else {
                 effect_destroy{}.on_play(origin_card, origin, target_card, flags);

@@ -144,6 +144,6 @@ namespace banggame {
     }
 
     void effect_track::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
-        ctx.set<contexts::tracked_player>(target);
+        ctx.add(contexts::tracked_player{ target });
     }
 }

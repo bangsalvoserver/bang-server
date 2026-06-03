@@ -26,8 +26,8 @@ namespace banggame {
                     }
                     return {};
                 });
-                origin->m_game->add_listener<event_type::on_play_card>(key, [=](player_ptr p, card_ptr target_card, const card_list &modifiers, const effect_context &ctx) {
-                    if (p == origin && (target_card == drawn_card || rn::contains(modifiers, drawn_card))) {
+                origin->m_game->add_listener<event_type::on_play_card>(key, [=](player_ptr p, card_ptr target_card, const effect_context &ctx) {
+                    if (p == origin && (target_card == drawn_card || rn::contains(ctx.get_all<contexts::modifier_card>(), drawn_card))) {
                         origin->m_game->remove_listeners(key);
                     }
                 });

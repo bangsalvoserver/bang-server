@@ -163,7 +163,7 @@ namespace banggame {
     }
 
     void effect_no_cards_drawn::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        ctx.add<contexts::drawing_effect>();
+        ctx.add(contexts::drawing_effect{});
     }
     
     bool effect_no_cards_drawn::can_play(card_ptr origin_card, player_ptr origin) {

@@ -20,7 +20,7 @@ namespace banggame {
     }
 
     void targeting_card::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target) {
-        ctx.add<contexts::selected_cards>().push_back(target);
+        ctx.add(contexts::selected_card{ target });
         effect.add_context(origin_card, origin, target, ctx);
     }
 

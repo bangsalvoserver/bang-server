@@ -17,9 +17,9 @@
 
 namespace banggame {
 
-    game_string verify_context(player_ptr origin, card_ptr origin_card, const card_list &modifiers, const effect_context &ctx) {
+    game_string verify_context(player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
         player_set players;
-        for (player_ptr p : ctx.get<contexts::selected_players>()) {
+        for (player_ptr p : ctx.get_all<contexts::selected_player>()) {
             if (players.contains(p)) {
                 return {"ERROR_DUPLICATE_PLAYER", p};
             }
@@ -30,8 +30,8 @@ namespace banggame {
             rv::single(origin_card) | rv::filter([repeat_card = ctx.get<contexts::repeat_card>()](card_ptr c) {
                 return c != repeat_card;
             }),
-            modifiers,
-            ctx.get<contexts::selected_cards>()
+            ctx.get_all<contexts::modifier_card>(),
+            ctx.get_all<contexts::selected_card>()
         );
 
         card_set cards;
@@ -43,9 +43,11 @@ namespace banggame {
         }
 
         std::unordered_map<card_ptr, int> cubes;
-        for (card_ptr c : ctx.get<contexts::selected_cubes>().all_cubes()) {
-            if (++cubes[c] > c->num_cubes()) {
-                return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
+        for (const auto &entry : ctx.get_all<contexts::selected_cubes>()) {
+            for (card_ptr c : entry.cubes) {
+                if (++cubes[c] > c->num_cubes()) {
+                    return {"ERROR_NOT_ENOUGH_CUBES_ON", c};
+                }
             }
         }
 
@@ -216,7 +218,7 @@ namespace banggame {
             MAYBE_RETURN(verify_target_list(origin, origin_card, type, targets, ctx));
         }
 
-        MAYBE_RETURN(verify_context(origin, origin_card, modifiers | rv::transform(&target_selection::card) | rn::to<card_list>(), ctx));
+        MAYBE_RETURN(verify_context(origin, origin_card, ctx));
 
         return get_play_card_error(origin, origin_card, ctx);
     }
@@ -308,7 +310,7 @@ namespace banggame {
     static void apply_target_list(player_ptr origin, card_ptr origin_card, effect_list_type type, const target_list &targets, const effect_context &ctx) {
         log_played_card(origin_card, origin, type, ctx);
 
-        if (!ctx.get<contexts::auto_discarded>().contains(origin_card)) {
+        if (!rn::contains(ctx.get_all<contexts::auto_discarded>(), origin_card)) {
             if (origin_card->pocket == pocket_type::player_hand) {
                 origin->discard_used_card(origin_card);
             } else {
@@ -336,9 +338,8 @@ namespace banggame {
     }
 
     play_verify_result verify_and_play(player_ptr origin, const game_action &args) {
-        effect_context ctx{};
-        
-        ctx.set<contexts::playing_card>(args.card);
+        effect_context ctx;
+        ctx.add(contexts::playing_card{ args.card });
 
         if (game_string error = verify_card_targets(origin, args.card, args.effect_list, args.targets, args.modifiers, ctx)) {
             return play_verify_results::error{ error };
@@ -352,12 +353,7 @@ namespace banggame {
 
         origin->m_game->clear_request_status();
 
-        origin->m_game->call_event(event_type::on_play_card{
-            origin,
-            args.card,
-            args.modifiers | rv::transform(&target_selection::card) | rn::to<std::vector>(),
-            ctx
-        });
+        origin->m_game->call_event(event_type::on_play_card{ origin, args.card, ctx });
 
         for (const auto &[mod_card, mod_key, mod_targets] : args.modifiers) {
             apply_target_list(origin, mod_card, mod_key, mod_targets, ctx);
