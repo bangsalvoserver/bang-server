@@ -131,6 +131,7 @@ namespace banggame {
     };
 
     inline void modifier_holder::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {
+        ctx.add(contexts::modifier_card{ origin_card });
         type->add_context(effect_value, origin_card, origin, ctx);
     }
 

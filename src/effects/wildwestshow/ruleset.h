@@ -12,7 +12,7 @@ namespace banggame {
         };
     }
 
-    int count_played_cards(card_ptr origin_card, const card_list &modifiers, const effect_context &ctx);
+    int count_played_cards(card_ptr origin_card, const effect_context &ctx);
     
     void track_played_cards(game_ptr game);
     int get_count_played_cards(player_ptr origin);

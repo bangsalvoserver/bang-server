@@ -46,7 +46,7 @@ namespace banggame {
     }
 
     void effect_equip_on::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
-        ctx.set<contexts::equip_target>(target);
+        ctx.add(contexts::equip_target{ target });
     }
 
     prompt_string effect_equip_on::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {

@@ -19,7 +19,7 @@ namespace banggame {
 
     void modifier_companion::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         if (player_ptr target = get_tracked_player(origin_card)) {
-            ctx.set<contexts::distance_start>(target);
+            ctx.add(contexts::distance_start{ target });
         }
     }
 }

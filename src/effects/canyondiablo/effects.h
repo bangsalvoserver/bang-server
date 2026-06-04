@@ -10,6 +10,7 @@
 #include "graverobber.h"
 #include "indianguide.h"
 #include "lastwill.h"
+#include "laura_billion.h"
 #include "mirage.h"
 #include "packmule.h"
 #include "pat_barrett.h"

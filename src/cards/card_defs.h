@@ -253,13 +253,17 @@ namespace banggame {
         struct equip_target {
             player_ptr value;
         };
+
+        struct modifier_card {
+            card_ptr value;
+        };
         
         struct playing_card {
             card_ptr value;
         };
 
         struct auto_discarded {
-            card_set value;
+            card_ptr value;
         };
 
         struct [[=serialize_context]] repeat_card {
@@ -270,12 +274,12 @@ namespace banggame {
             card_ptr value;
         };
 
-        struct selected_players {
-            player_list value;
+        struct selected_player {
+            player_ptr value;
         };
 
-        struct selected_cards {
-            card_list value;
+        struct selected_card {
+            card_ptr value;
         };
     }
 

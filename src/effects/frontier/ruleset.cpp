@@ -9,6 +9,7 @@
 #include "effects/base/steal_destroy.h"
 
 #include "effects/dodgecity/ruleset.h"
+#include "effects/canyondiablo/ruleset.h"
 #include "effects/wildwestshow/ruleset.h"
 
 #include "game/game_table.h"
@@ -96,7 +97,9 @@ namespace banggame {
             track_played_cards(game);
         }
         
-        if (!game->m_options.expansions.contains(GET_RULESET(dodgecity))) {
+        if (!game->m_options.expansions.contains(GET_RULESET(dodgecity))
+            && !game->m_options.expansions.contains(GET_RULESET(canyondiablo))
+        ) {
             ruleset_dodgecity{}.on_apply(game);
         }
 
@@ -141,6 +144,6 @@ namespace banggame {
     }
 
     void effect_track::add_context(card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
-        ctx.set<contexts::tracked_player>(target);
+        ctx.add(contexts::tracked_player{ target });
     }
 }

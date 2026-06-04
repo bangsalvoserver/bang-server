@@ -8,6 +8,7 @@ target_sources(bangserver PRIVATE
     graverobber.cpp
     indianguide.cpp
     lastwill.cpp
+    laura_billion.cpp
     mirage.cpp
     packmule.cpp
     pat_barrett.cpp

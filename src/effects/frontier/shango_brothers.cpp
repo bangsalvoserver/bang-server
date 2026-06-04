@@ -23,9 +23,9 @@ namespace banggame {
             }
         });
 
-        target->m_game->add_listener<event_type::on_play_card>(target_card, [=, card_count=card_count, max_cards=max_cards](player_ptr origin, card_ptr origin_card, const card_list &modifiers, const effect_context &ctx) {
+        target->m_game->add_listener<event_type::on_play_card>(target_card, [=, card_count=card_count, max_cards=max_cards](player_ptr origin, card_ptr origin_card, const effect_context &ctx) {
             if (origin == target && origin == origin->m_game->m_playing && state->cards_drawn < max_cards) {
-                state->played_count += count_played_cards(origin_card, modifiers, ctx);
+                state->played_count += count_played_cards(origin_card, ctx);
 
                 int cards_to_draw = state->played_count / card_count;
                 state->played_count %= card_count;

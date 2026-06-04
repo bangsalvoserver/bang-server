@@ -53,9 +53,9 @@ namespace banggame {
         }
 
     public:
-        template<typename T, typename ... Ts>
-        context_entry(std::in_place_type_t<T> tag, Ts && ... args)
-            : value{tag, std::forward<Ts>(args) ...}
+        template<typename T> requires (!std::is_same_v<std::remove_cvref_t<T>, context_entry>)
+        context_entry(T &&value)
+            : value{std::forward<T>(value)}
             , serialize_fun{make_serialize_fun<std::remove_cvref_t<T>>()}
         {}
 
@@ -85,57 +85,41 @@ namespace banggame {
     class effect_context {
     private:
         std::vector<context_entry> m_entries;
-
-        template<typename T>
-        auto find(this auto &&self) {
-            return rn::find(self.m_entries, typeid(T), &context_entry::type);
-        }
-
-        template<typename T>
-        static const T &default_value() {
-            static const T value;
-            return value;
-        }
     
     public:
         template<typename T>
-        unwrapped_t<T> &add() {
-            if (auto it = find<T>(); it != m_entries.end()) {
-                return it->template get<T>();
-            }
-            return m_entries.emplace_back(std::in_place_type<T>).template get<T>();
+        void add(T &&entry) {
+            m_entries.emplace_back(std::forward<T>(entry));
         }
 
-        template<typename T, typename ... Ts>
-        unwrapped_t<T> &set(Ts && ... args) {
-            context_entry entry{std::in_place_type<T>, std::forward<Ts>(args) ...};
-            if (auto it = find<T>(); it != m_entries.end()) {
-                *it = std::move(entry);
-                return it->template get<T>();
-            } else {
-                return m_entries.emplace_back(std::move(entry)).get<T>();
-            }
+        void resize(size_t new_size) {
+            assert(new_size <= size());
+            m_entries.erase(m_entries.begin() + new_size, m_entries.end());
+        }
+
+        size_t size() const {
+            return m_entries.size();
         }
 
         template<typename T>
         bool contains() const {
-            return find<T>() != m_entries.end();
-        }
-
-        template<typename T>
-        const unwrapped_t<T> &get() const {
-            if (auto it = find<T>(); it != m_entries.end()) {
-                return it->template get<T>();
-            }
-            return default_value<unwrapped_t<T>>();
+            return rn::contains(m_entries, typeid(T), &context_entry::type);
         }
 
         template<typename T> requires std::is_trivially_copyable_v<T>
         unwrapped_t<T> get() const {
-            if (auto it = find<T>(); it != m_entries.end()) {
+            auto it = rn::find_last(m_entries, typeid(T), &context_entry::type).begin();
+            if (it != m_entries.end()) {
                 return it->template get<T>();
             }
             return {};
+        }
+
+        template<typename T>
+        auto get_all() const {
+            return m_entries
+                | rv::filter([](const context_entry &entry) { return entry.type() == typeid(T); })
+                | rv::transform([](const context_entry &entry) -> decltype(auto) { return entry.get<T>(); });
         }
         
         void serialize(json::string_writer &writer) const {
@@ -154,6 +138,16 @@ namespace banggame {
             } else {
                 writer.EndObject();
             }
+        }
+
+        effect_context get_serializable() const {
+            effect_context ctx;
+            for (const context_entry &entry : m_entries) {
+                if (entry.serializable()) {
+                    ctx.m_entries.push_back(entry);
+                }
+            }
+            return ctx;
         }
     };
 

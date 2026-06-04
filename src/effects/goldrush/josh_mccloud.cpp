@@ -85,7 +85,7 @@ namespace banggame {
 
     void modifier_forced_play::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
         auto req = origin->m_game->top_request<request_force_play_card>();
-        ctx.set<contexts::forced_play>(req->target_card);
+        ctx.add(contexts::forced_play{ req->target_card });
     }
 
     void effect_josh_mccloud::on_play(card_ptr origin_card, player_ptr target) {

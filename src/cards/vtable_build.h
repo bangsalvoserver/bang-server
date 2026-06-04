@@ -268,7 +268,7 @@ namespace banggame {
     };
 
     template<typename ... Ts>
-    auto build_mth_args(const target_list &targets, index_list indices) {
+    std::tuple<Ts ...> build_mth_args(const target_list &targets, index_list indices) {
         if (indices.size() != sizeof...(Ts)) {
             throw game_error("invalid access to mth: invalid indices size");
         }
@@ -285,12 +285,25 @@ namespace banggame {
         }
     }
 
+    template<typename ... Ts>
+    std::tuple<Ts ...> build_mth_args(const target_list &targets, index_list indices, const effect_context &ctx) {
+        using args_tuple = std::tuple<Ts ...>;
+        if constexpr (sizeof...(Ts) == 0) {
+            return build_mth_args<>(targets, indices);
+        } else if constexpr (std::is_convertible_v<const effect_context &, std::tuple_element_t<sizeof...(Ts) - 1, args_tuple>>) {
+            return std::tuple_cat(
+                [&]<size_t ... Is>(std::index_sequence<Is ...>) {
+                    return build_mth_args<std::tuple_element_t<Is, args_tuple> ...>(targets, indices);
+                }(std::make_index_sequence<sizeof...(Ts) - 1>()),
+                std::tie(ctx)
+            );
+        } else {
+            return build_mth_args<Ts ...>(targets, indices);
+        }
+    }
+
     template<typename RetType, typename HandlerType, typename ... Args>
     using fun_mem_ptr_t = RetType (HandlerType::*)(card_ptr origin_card, player_ptr origin, Args...);
-
-    template<typename RetType, typename HandlerType, typename CtxType, typename ... Args>
-    requires std::same_as<std::remove_cvref_t<CtxType>, effect_context>
-    using ctx_fun_mem_ptr_t = RetType (HandlerType::*)(card_ptr origin_card, player_ptr origin, CtxType ctx, Args...);
 
     template<typename T> struct mth_unwrapper;
 
@@ -301,30 +314,14 @@ namespace banggame {
         RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) {
             auto &&value = effect_cast<mth_value<HandlerType>>(effect_value);
             return std::apply(m_value, std::tuple_cat(
-                std::tuple{value.handler, origin_card, origin},
-                build_mth_args<Args...>(targets, value.indices)
-            ));
-        }
-    };
-
-    template<typename RetType, typename HandlerType, typename CtxType, typename ... Args>
-    struct mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>> {
-        ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...> m_value;
-
-        RetType operator()(const void *effect_value, card_ptr origin_card, player_ptr origin, const target_list &targets, CtxType ctx) {
-            auto &&value = effect_cast<mth_value<HandlerType>>(effect_value);
-            return std::apply(m_value, std::tuple_cat(
-                std::tuple{value.handler, origin_card, origin, ctx},
-                build_mth_args<Args...>(targets, value.indices)
+                std::tie(value.handler, origin_card, origin),
+                build_mth_args<Args...>(targets, value.indices, ctx)
             ));
         }
     };
 
     template<typename RetType, typename HandlerType, typename ... Args>
     mth_unwrapper(fun_mem_ptr_t<RetType, HandlerType, Args...>) -> mth_unwrapper<fun_mem_ptr_t<RetType, HandlerType, Args...>>;
-
-    template<typename RetType, typename HandlerType, typename CtxType, typename ... Args>
-    mth_unwrapper(ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>) -> mth_unwrapper<ctx_fun_mem_ptr_t<RetType, HandlerType, CtxType, Args...>>;
     
     template<typename T>
     constexpr mth_vtable build_mth_vtable(std::string_view name) {

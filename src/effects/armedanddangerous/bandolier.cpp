@@ -13,7 +13,7 @@ namespace banggame {
     }
 
     void modifier_bandolier::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
-        ctx.add<contexts::disable_banglimit>();
+        ctx.add(contexts::disable_banglimit{});
     }
 
     game_string effect_bandolier::on_prompt(card_ptr origin_card, player_ptr origin) {
