@@ -5,6 +5,7 @@
 #include "cards/game_events.h"
 
 #include "effects/base/steal_destroy.h"
+#include "effects/base/equip.h"
 
 #include "game/game_table.h"
 
@@ -48,6 +49,15 @@ namespace banggame {
                         }
                     });
                 };
+
+                if (pocket == pocket_type::player_table) {
+                    target->m_game->add_listener<event_type::get_equip_prompt>(key, [=](player_ptr origin, card_ptr e_origin_card, player_ptr e_target, const effect_context &ctx) -> prompt_string {
+                        if (origin == target && e_origin_card == target_card) {
+                            return {"PROMPT_EQUIP_RETURN", target_card, owner};
+                        }
+                        return {};
+                    });
+                }
 
                 target->m_game->add_listener<event_type::on_turn_end>(key, [=](player_ptr origin, bool skipped) {
                     if (origin == target) {

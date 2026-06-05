@@ -16,7 +16,7 @@ namespace banggame {
     }
 
     void equip_trap::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::check_equip_card>(target_card, [=](player_ptr origin, card_ptr origin_card, const_player_ptr e_target, const effect_context &ctx) -> game_string {
+        target->m_game->add_listener<event_type::check_equip_card>(target_card, [=](player_ptr origin, card_ptr origin_card, player_ptr e_target, const effect_context &ctx) -> game_string {
             if (origin == target && origin_card->is_blue()) {
                 return "ERROR_CANT_EQUIP_BLUE_CARDS";
             }
