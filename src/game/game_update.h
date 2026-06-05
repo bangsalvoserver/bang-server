@@ -28,17 +28,17 @@ namespace banggame {
         player_user_list(player_ptr player): players{player} {}
     };
 
-    struct playable_card_entry {
+    struct modifier_entry {
         card_ptr card;
         effect_list_type effect_list;
     };
 
-    using playable_card_list = std::vector<playable_card_entry>;
+    using modifier_list = std::vector<modifier_entry>;
 
     struct playable_card_info {
         card_ptr card;
         effect_list_type effect_list;
-        playable_card_list modifiers;
+        modifier_list modifiers;
         effect_context context;
     };
 

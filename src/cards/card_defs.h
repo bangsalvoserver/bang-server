@@ -122,6 +122,7 @@ namespace banggame {
     };
 
     using target_list = std::vector<play_card_target>;
+    using targets_view = std::span<const play_card_target>;
 
     struct effect_holder {
         const effect_vtable *type;
@@ -193,9 +194,9 @@ namespace banggame {
             return type != nullptr;
         }
 
-        game_string get_error(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
-        void on_play(card_ptr origin_card, player_ptr origin, const target_list &targets, const effect_context &ctx) const;
+        game_string get_error(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const;
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const;
+        void on_play(card_ptr origin_card, player_ptr origin, targets_view targets, const effect_context &ctx) const;
     };
 
     using effect_list = std::span<const effect_holder>;
