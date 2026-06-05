@@ -250,6 +250,7 @@ main_deck:
       - damage player alive notself range_1
     tags:
       - skip_logs
+      - ranged_effect
   - name: PELTS
     image: 28_pelli
     signs:
