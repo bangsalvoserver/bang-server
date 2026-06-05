@@ -171,7 +171,8 @@ namespace banggame {
 
     game_string effect_discard_hand::on_prompt(card_ptr origin_card, player_ptr origin) {
         if (origin->is_bot()) {
-            if (rn::any_of(origin->m_hand, [&](card_ptr c) { return is_possible_to_play(origin, c); })) {
+            possible_to_play state{origin};
+            if (rn::any_of(origin->m_hand, [&](card_ptr c) { return state.check(c); })) {
                 return "BOT_CAN_PLAY_OTHER_CARDS";
             }
         } else if (int ncards = int(origin->m_hand.size())) {

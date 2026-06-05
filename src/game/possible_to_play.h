@@ -9,8 +9,31 @@
 #include "utils/random_element.h"
 
 namespace banggame {
+
+    class possible_to_play {
+    private:
+        player_ptr origin;
+        effect_context ctx;
+        modifier_list modifiers;
+        target_list targets;
     
-    bool is_possible_to_play(player_ptr origin, card_ptr origin_card, effect_list_type type = effect_list_type::effects, const effect_context &ctx = {});
+    public:
+        possible_to_play(player_ptr origin, const effect_context &ctx = {})
+            : origin{origin}, ctx{ctx} {}
+    
+    private:
+        bool check_recurse(card_ptr origin_card, effect_list_type type, size_t skip_targets);
+        bool check_impl(card_ptr origin_card, effect_list_type &type);
+
+        void collect_recurse(card_ptr origin_card, effect_list_type type, playable_cards_list &result);
+
+    public:
+        bool check(card_ptr origin_card, effect_list_type type = effect_list_type::effects) {
+            return check_impl(origin_card, type);
+        }
+
+        friend playable_cards_list generate_playable_cards_list(player_ptr origin, effect_list_type type);
+    };
 
     playable_cards_list generate_playable_cards_list(player_ptr origin, effect_list_type type = effect_list_type::effects);
 
@@ -51,8 +74,8 @@ namespace banggame {
 
     inline auto get_all_playable_cards(player_ptr origin, effect_list_type type = effect_list_type::effects, const effect_context &ctx = {}) {
         return get_all_active_cards(origin, ctx)
-            | rv::filter([=](card_ptr origin_card) mutable {
-                return is_possible_to_play(origin, origin_card, type, ctx);
+            | rv::filter([type, state=possible_to_play{origin, ctx}](card_ptr origin_card) mutable {
+                return state.check(origin_card, type);
             });
     }
 }
