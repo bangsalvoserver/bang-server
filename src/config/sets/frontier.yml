@@ -33,10 +33,7 @@ character:
       - josiah_tung
     responses:
       - can_play_card
-      - discard random_if_hand_card self | hand
-      - draw(2)
-    tags:
-      - preselect
+      - josiah_tung
   - name: LT_MICAIAH
     image: 28_lt_micaiah
     effects:
