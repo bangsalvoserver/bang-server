@@ -103,7 +103,7 @@ namespace banggame {
             player_ptr saved = req->target;
             if (saved->m_hp <= req->damage && saved->is_sheriff()) {
                 auto role = origin->get_base_role();
-                if (role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive() <= 2) {
+                if (role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive(true) <= 2) {
                     return "BOT_DONT_SAVE_SHERIFF";
                 }
             }
@@ -136,7 +136,7 @@ namespace banggame {
                 return "BOT_DONT_SAVE";
             } else if (saved->is_sheriff()) {
                 auto role = origin->get_base_role();
-                if (role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive() <= 2) {
+                if (role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive(true) <= 2) {
                     return "BOT_DONT_SAVE_SHERIFF";
                 }
             }

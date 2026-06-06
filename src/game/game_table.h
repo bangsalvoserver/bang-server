@@ -91,7 +91,7 @@ namespace banggame {
 
         int calc_distance(const_player_ptr from, const_player_ptr to) const;
 
-        int num_alive() const;
+        int num_alive(bool in_game = false) const;
 
         void shuffle_cards_and_ids(std::span<card_ptr> vec);
 
