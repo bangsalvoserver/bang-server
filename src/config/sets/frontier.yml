@@ -49,6 +49,8 @@ character:
     effects:
       - max_usages(1)
       - steal random_if_hand_card notself
+    tags:
+      - strong
   - name: SALVO_THE_SHOOTER
     image: 28_salvo_the_shooter
     modifier: bangmod
@@ -279,6 +281,7 @@ main_deck:
       - pioneers
     tags:
       - pardner(4)
+      - strong(2)
   - name: POSSE
     image: 28_posse
     signs:
