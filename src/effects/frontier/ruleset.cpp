@@ -14,6 +14,7 @@
 
 #include "game/game_table.h"
 #include "game/game_options.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
@@ -139,6 +140,9 @@ namespace banggame {
     game_string effect_track::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
         if (origin == target) {
             return {"PROMPT_TRACK_SELF", origin_card};
+        }
+        if (origin_card->has_tag(tag_type::pardner_penalty)) {
+            return prompts::bot_check_target_enemy(origin, target);
         }
         return {};
     }

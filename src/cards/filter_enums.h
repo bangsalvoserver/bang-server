@@ -64,7 +64,7 @@ namespace banggame {
         weapon, // weapon card - equip on the left side - also controls weapon "value" for bots
         
         // Bot and prompt logic tags
-        penalty, // whether this is a bad equip card
+        penalty, // whether this is a "bad" equip card
         strong, // controls bot decisions
         
         // Expansion logic tags
@@ -72,6 +72,7 @@ namespace banggame {
         last_scenario_card, // move this card to the end of the scenario deck
         buy_cost, // cost for gold rush card
         pardner, // pardner token for this card
+        pardner_penalty, // being tracked by this card is "bad"
         undiscardable, // cannot discard this card in phase 3
 
         // Modifier logic tags

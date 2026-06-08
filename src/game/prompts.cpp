@@ -1,11 +1,13 @@
 #include "prompts.h"
 
+#include "cards/filter_enums.h"
+
 #include "effects/ghost_cards/ruleset.h"
+#include "effects/frontier/ruleset.h"
 
 #include "game_table.h"
 #include "bot_suggestion.h"
 
-#include "cards/filter_enums.h"
 
 namespace banggame::prompts {
 
@@ -76,7 +78,15 @@ namespace banggame::prompts {
                 }
                 return "BOT_TARGET_ENEMY";
             }
-            if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
+            if (target_card->pocket == pocket_type::player_table && target_card->is_purple()) {
+                if (player_ptr tracked_player = get_tracked_player(target_card)) {
+                    if (target_card->has_tag(tag_type::pardner_penalty)) {
+                        return bot_check_target_friend(origin, tracked_player);
+                    } else {
+                        return bot_check_target_enemy(origin, tracked_player);
+                    }
+                }
+            } else if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
                 return bot_check_target_friend(origin, target);
             } else {
                 return bot_check_target_enemy(origin, target);
