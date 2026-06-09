@@ -56,7 +56,6 @@ namespace banggame {
         treat_any_as_bang,
         treat_any_as_missed,
         ignore_distances,
-        role_revealed,
         show_hand_playing,
         skip_turn,
         legend,

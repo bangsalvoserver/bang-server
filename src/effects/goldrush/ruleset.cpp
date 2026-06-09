@@ -127,7 +127,7 @@ namespace banggame {
                 int count_outlaw = 0;
 
                 for (player_ptr p : target->m_game->m_players) {
-                    if (p->check_player_flags(player_flag::role_revealed)) {
+                    if (p->is_role_revealed()) {
                         if (p->is_sheriff_or_deputy()) ++count_deputy;
                         if (p->is_outlaw()) ++count_outlaw;
                     }

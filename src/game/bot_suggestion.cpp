@@ -30,10 +30,10 @@ namespace banggame::bot_suggestion {
     }
 
     static bool is_role_known(const_player_ptr origin, const_player_ptr target) {
-        if (!target->check_player_flags(player_flag::role_revealed)) {
+        if (!target->is_role_revealed(origin)) {
             player_role first_role = player_role::unknown;
             for (player_ptr p : origin->m_game->m_players) {
-                if (p != origin && !p->check_player_flags(player_flag::role_revealed)) {
+                if (p != origin && !p->is_role_revealed(origin)) {
                     player_role role = p->m_role;
                     if (first_role == player_role::unknown) {
                         first_role = role;
@@ -47,14 +47,14 @@ namespace banggame::bot_suggestion {
     }
 
     void signal_hostile_action(player_ptr origin, const_player_ptr target, effect_flags flags) {
-        if (origin == target || origin->check_player_flags(player_flag::role_revealed)) return;
+        if (origin == target || origin->is_role_revealed()) return;
 
         if (flags.check(effect_flag::target_players)) return;
 
         // if (flags.check(effect_flag::multi_target)) return;
         // This is ignored but could make it so the ordering of attacks matter, which is probably fine
 
-        if (target->check_player_flags(player_flag::role_revealed)) {
+        if (target->is_role_revealed()) {
             switch (target->m_role) {
             case player_role::sheriff:
             case player_role::deputy:
@@ -94,11 +94,11 @@ namespace banggame::bot_suggestion {
     }
 
     void signal_helpful_action(player_ptr origin, const_player_ptr target, effect_flags flags) {
-        if (origin == target || origin->check_player_flags(player_flag::role_revealed)) return;
+        if (origin == target || origin->is_role_revealed()) return;
 
         if (flags.check(effect_flag::target_players)) return;
 
-        if (target->check_player_flags(player_flag::role_revealed)) {
+        if (target->is_role_revealed()) {
             switch (target->m_role) {
             case player_role::sheriff:
             case player_role::deputy:

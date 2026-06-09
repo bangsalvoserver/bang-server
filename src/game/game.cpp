@@ -235,7 +235,7 @@ namespace banggame {
         }
 
         for (player_ptr p : m_players) {
-            if (p->check_player_flags(player_flag::role_revealed)) {
+            if (p->is_role_revealed()) {
                 yield_update(game_updates::player_show_role{ p, p->m_role, 0ms });
             }
 
@@ -277,7 +277,7 @@ namespace banggame {
         if (target) {
             yield_update(game_updates::player_add{ target });
 
-            if (!target->check_player_flags(player_flag::role_revealed)) {
+            if (!target->is_role_revealed()) {
                 yield_update(game_updates::player_show_role{ target, target->m_role, 0ms });
             }
 

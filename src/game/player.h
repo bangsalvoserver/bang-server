@@ -5,6 +5,75 @@
 
 namespace banggame {
 
+    class player_set {
+    private:
+        uint16_t m_value = 0;
+
+        player_set(uint16_t value)
+            : m_value{value} {}
+
+        player_set(bool exclusive, std::convertible_to<const_player_ptr> auto ... targets)
+            : m_value{static_cast<uint16_t>(exclusive)}
+        {
+            (add(targets), ...);
+        }
+
+        static uint16_t get_player_bit(const_player_ptr target) {
+            return 1 << get_player_id(target);
+        }
+
+    public:
+        player_set() = default;
+
+        static player_set includes(std::convertible_to<const_player_ptr> auto ... targets) {
+            return player_set(false, targets...);
+        }
+
+        static player_set excludes(std::convertible_to<const_player_ptr> auto ... targets) {
+            return player_set(true, targets...);
+        }
+
+        void add(const_player_ptr target) {
+            if (target) {
+                m_value |= get_player_bit(target);
+            }
+        }
+
+        void remove(const_player_ptr target) {
+            if (target) {
+                m_value &= ~get_player_bit(target);
+            }
+        }
+
+        bool contains(const_player_ptr target) const {
+            return target && bool(m_value & get_player_bit(target));
+        }
+
+        bool matches(const_player_ptr target) const {
+            return contains(target) != exclusive();
+        }
+
+        bool exclusive() const {
+            return bool(m_value & 1);
+        }
+
+        explicit operator bool() const {
+            return m_value != 0;
+        }
+
+        player_set operator & (const player_set &rhs) const {
+            return player_set{static_cast<uint16_t>(m_value & rhs.m_value)};
+        }
+
+        player_set operator | (const player_set &rhs) const {
+            return player_set{static_cast<uint16_t>(m_value | rhs.m_value)};
+        }
+
+        player_set operator - (const player_set &rhs) const {
+            return player_set{static_cast<uint16_t>(m_value & ~rhs.m_value)};
+        }
+    };
+
     struct player {
         game_ptr m_game;
         int id;
@@ -16,6 +85,7 @@ namespace banggame {
         card_list m_characters;
 
         player_role m_role = player_role::unknown;
+        player_set m_role_visibility;
 
         int8_t m_hp = 0;
         int8_t m_max_hp = 0;
@@ -90,6 +160,10 @@ namespace banggame {
         
         int get_character_max_hp() const;
 
+        bool is_role_revealed(const_player_ptr target = nullptr) const {
+            return m_role_visibility.matches(target);
+        }
+
         void reveal_role();
         void hide_role();
         void set_role(player_role role, bool instant = false);
@@ -123,75 +197,6 @@ namespace banggame {
     inline int get_player_id(const_player_ptr target) {
         return target ? target->id : 0;
     }
-
-    class player_set {
-    private:
-        uint16_t m_value = 0;
-
-        player_set(uint16_t value)
-            : m_value{value} {}
-
-        player_set(bool exclusive, std::convertible_to<const_player_ptr> auto ... targets)
-            : m_value{static_cast<uint16_t>(exclusive)}
-        {
-            (add(targets), ...);
-        }
-
-        static uint16_t get_player_bit(const_player_ptr target) {
-            return 1 << target->id;
-        }
-
-    public:
-        player_set() = default;
-
-        static player_set includes(std::convertible_to<const_player_ptr> auto ... targets) {
-            return player_set(false, targets...);
-        }
-
-        static player_set excludes(std::convertible_to<const_player_ptr> auto ... targets) {
-            return player_set(true, targets...);
-        }
-
-        void add(const_player_ptr target) {
-            if (target) {
-                m_value |= get_player_bit(target);
-            }
-        }
-
-        void remove(const_player_ptr target) {
-            if (target) {
-                m_value &= ~get_player_bit(target);
-            }
-        }
-
-        bool contains(const_player_ptr target) const {
-            return target && bool(m_value & get_player_bit(target));
-        }
-
-        bool matches(const_player_ptr target) const {
-            return contains(target) != exclusive();
-        }
-
-        bool exclusive() const {
-            return bool(m_value & 1);
-        }
-
-        explicit operator bool() const {
-            return m_value != 0;
-        }
-
-        player_set operator & (const player_set &rhs) const {
-            return player_set{static_cast<uint16_t>(m_value & rhs.m_value)};
-        }
-
-        player_set operator | (const player_set &rhs) const {
-            return player_set{static_cast<uint16_t>(m_value | rhs.m_value)};
-        }
-
-        player_set operator - (const player_set &rhs) const {
-            return player_set{static_cast<uint16_t>(m_value & ~rhs.m_value)};
-        }
-    };
 
 }
 
