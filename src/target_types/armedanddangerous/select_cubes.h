@@ -39,37 +39,31 @@ namespace banggame {
 
     namespace contexts {        
         struct selected_cubes {
-            const_card_ptr origin_card;
+            card_ptr origin_card;
             card_list cubes;
-            int ncubes;
+
+            selected_cubes(card_ptr origin_card, card_list cubes)
+                : origin_card{origin_card}
+                , cubes{std::move(cubes)} {}
+            
+            selected_cubes(card_ptr origin_card, int ncubes)
+                : origin_card{origin_card}
+                , cubes{static_cast<size_t>(ncubes), origin_card} {}
+
+            static auto get_all_cubes(const effect_context &ctx) {
+                return ctx.get_all<selected_cubes>() | rv::for_each(&selected_cubes::cubes);
+            }
 
             static bool contains(const effect_context &ctx, const_card_ptr origin_card) {
-                for (const selected_cubes &entry : ctx.get_all<selected_cubes>()) {
-                    if (entry.origin_card == origin_card && !entry.cubes.empty()) {
-                        return true;
-                    }
-                }
-                return false;
+                return rn::contains(ctx.get_all<selected_cubes>(), origin_card, &selected_cubes::origin_card);
             }
 
             static int count_repeats(const effect_context &ctx, const_card_ptr origin_card) {
-                int result = 0;
-                for (const selected_cubes &entry : ctx.get_all<selected_cubes>()) {
-                    if (entry.origin_card == origin_card && entry.ncubes != 0) {
-                        result += entry.cubes.size() / entry.ncubes;
-                    }
-                }
-                return result;
+                return static_cast<int>(rn::count(ctx.get_all<selected_cubes>(), origin_card, &selected_cubes::origin_card));
             }
             
             static int count_selected_on(const effect_context &ctx, const_card_ptr target_card) {
-                int result = 0;
-                for (const selected_cubes &entry : ctx.get_all<selected_cubes>()) {
-                    for (card_ptr c : entry.cubes) {
-                        if (c == target_card) ++result;
-                    }
-                }
-                return result;
+                return static_cast<int>(rn::count(get_all_cubes(ctx), target_card));
             }
         };
     }

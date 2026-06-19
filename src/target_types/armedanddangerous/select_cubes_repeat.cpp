@@ -10,6 +10,12 @@ namespace banggame {
 
         return sample_elements(get_all_cubes(origin), ncubes * num_repeats, origin->m_game->bot_rng);
     }
+    
+    void targeting_select_cubes_repeat::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target) {
+        for (auto chunk : target | rv::chunk(ncubes)) {
+            ctx.add(contexts::selected_cubes{ origin_card, rn::to<card_list>(chunk) });
+        }
+    }
 
     game_string targeting_select_cubes_repeat::get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
         if (target_cards.size() % ncubes != 0) {
