@@ -9,36 +9,23 @@
 
 namespace banggame {
     
-    static auto to_pairs(auto &&left) {
-        return rv::transform([left=std::move(left)](auto &&right) {
-            return std::pair{left, std::move(right)};
+    static auto disableable_cards(const player_list &players) {
+        return players | rv::for_each([](player_ptr p) {
+            return rv::concat(
+                p->m_table,
+                p->m_characters | rv::take(1)
+            );
         });
-    };
-
-    static auto disableable_cards(game_ptr game) {
-        return rv::concat(
-            game->m_scenario_cards
-                | rv::take_last(1) | to_pairs(game->m_first_player),
-            game->m_wws_scenario_cards
-                | rv::take_last(1) | to_pairs(game->m_first_player),
-            game->m_players
-                | rv::for_each([](player_ptr p) {
-                    return rv::concat(
-                        p->m_table,
-                        p->m_characters | rv::take(1)
-                    ) | to_pairs(p);
-                })
-        );
     }
 
     void disabler_map::add_disabler(event_card_key key, card_disabler_fun &&fun) {
         logging::debug("add_disabler() on {}: {}", key, fun.target_type());
 
-        for (auto [owner, c] : disableable_cards(m_game)) {
-            if (fun(c) && !is_disabled(c)) {
-                for (const equip_holder &holder : c->equips | rv::reverse) {
+        for (card_ptr target_card : disableable_cards(get_players())) {
+            if (fun(target_card) && !is_disabled(target_card)) {
+                for (const equip_holder &holder : target_card->equips | rv::reverse) {
                     if (!holder.is_nodisable()) {
-                        holder.on_disable(c, owner);
+                        holder.on_disable(target_card, target_card->owner);
                     }
                 }
             }
@@ -47,30 +34,25 @@ namespace banggame {
         m_disablers.emplace(key, std::move(fun));
     }
 
-    void disabler_map::do_remove_disablers(disabler_map_range range) {
-        for (const auto &[key, fun] : range) {
-            logging::debug("remove_disabler() on {}: {}", key, fun.target_type());
-        }
+    void disabler_map::remove_disabler(event_card_key key) {
+        auto iterator = m_disablers.find(key);
+        if (iterator == m_disablers.end()) return;
+        
+        logging::debug("remove_disabler() on {}: {}", iterator->first, iterator->second.target_type());
 
-        for (auto [owner, c] : disableable_cards(m_game)) {
-            auto disables_c = [c](const auto &pair) { return pair.second(c); };
-            auto outside_range = rv::concat(
-                rn::subrange(m_disablers.begin(), range.begin()),
-                rn::subrange(range.end(), m_disablers.end())
-            );
-            
-            // enables the card only if there are no disablers left after the removal of `range`
-            // AND the card is already disabled by at least one disabler in `range`
-            if (rn::any_of(range, disables_c) && rn::none_of(outside_range, disables_c)) {
-                for (const equip_holder &holder : c->equips) {
+        for (card_ptr target_card : disableable_cards(get_players())) {
+            if (iterator->second(target_card) && rn::none_of(m_disablers, [&](const auto &other_disabler) {
+                return &other_disabler != &*iterator && other_disabler.second(target_card);
+            })) {
+                for (const equip_holder &holder : target_card->equips) {
                     if (!holder.is_nodisable()) {
-                        holder.on_enable(c, owner);
+                        holder.on_enable(target_card, target_card->owner);
                     }
                 }
             }
         }
 
-        m_disablers.erase(range.begin(), range.end());
+        m_disablers.erase(iterator);
     }
 
     card_ptr disabler_map::get_disabler(const_card_ptr target_card, bool check_disable_use) const {

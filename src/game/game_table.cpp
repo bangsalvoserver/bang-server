@@ -13,10 +13,7 @@
 
 namespace banggame {
 
-    game_table::game_table(const game_options &options)
-        : disabler_map{this}
-        , m_options{options}
-    {
+    game_table::game_table(const game_options &options) : m_options{options} {
         logging::info("Options: [{}]", options.to_string(", "));
 
         std::random_device rd;

@@ -181,6 +181,6 @@ namespace banggame {
     }
 
     void revive_character(player_ptr target) {
-        target->m_game->remove_disablers({ target->get_character(), 90 });
+        target->m_game->remove_disabler({ target->get_character(), 90 });
     }
 }

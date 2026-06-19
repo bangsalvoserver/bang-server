@@ -18,7 +18,7 @@ namespace banggame {
 
     void equip_disable_character::on_disable(card_ptr target_card, player_ptr target) {
         target->m_game->queue_action([=]{
-            target->m_game->remove_disablers(target_card);
+            target->m_game->remove_disabler(target_card);
         }, 49);
     }
 

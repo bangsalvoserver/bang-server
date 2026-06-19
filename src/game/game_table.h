@@ -68,6 +68,10 @@ namespace banggame {
         card_ptr add_card(const card_data &data);
         void add_players(std::span<int> user_ids);
 
+        const player_list &get_players() const override {
+            return m_players;
+        }
+
         void remove_cards(card_list cards);
         void add_cards_to(card_list cards, pocket_type pocket, player_ptr owner = nullptr, card_visibility visibility = card_visibility::hidden, bool instant = true);
 
