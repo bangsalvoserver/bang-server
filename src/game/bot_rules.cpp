@@ -33,11 +33,27 @@ namespace banggame {
     }
 
     bool rule_tag_value::operator()(card_node node) const {
-        return node && node->card->get_tag_value(tag) == std::optional{value};
+        if (node) {
+            std::optional<tag_int> card_tag = node->card->get_tag_value(tag);
+            if (value.has_value()) {
+                return card_tag == value;
+            } else {
+                return card_tag.has_value();
+            }
+        }
+        return false;
     }
 
     bool rule_tag_value_not::operator()(card_node node) const {
-        return node && node->card->get_tag_value(tag) != std::optional{value};
+        if (node) {
+            std::optional<tag_int> card_tag = node->card->get_tag_value(tag);
+            if (value.has_value()) {
+                return card_tag != value;
+            } else {
+                return !card_tag.has_value();
+            }
+        }
+        return false;
     }
 
     bool rule_do_nothing::operator()(card_node node) const {

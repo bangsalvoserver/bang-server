@@ -48,7 +48,7 @@ namespace banggame {
 
     struct rule_tag_value {
         tag_type tag;
-        tag_int value;
+        std::optional<tag_int> value;
         bool operator()(card_node) const;
     };
 
@@ -56,7 +56,7 @@ namespace banggame {
 
     struct rule_tag_value_not {
         tag_type tag;
-        tag_int value;
+        std::optional<tag_int> value;
         bool operator()(card_node) const;
     };
 
