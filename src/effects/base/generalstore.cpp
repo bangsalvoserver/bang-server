@@ -5,6 +5,7 @@
 #include "effects/greattrainrobbery/sgt_blaze.h"
 
 #include "game/game_table.h"
+#include "game/prompts.h"
 
 namespace banggame {
 
@@ -34,6 +35,11 @@ namespace banggame {
         } else {
             return {"STATUS_GENERALSTORE_OTHER", target, origin_card};
         }
+    }
+
+    prompt_string effect_generalstore::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        MAYBE_RETURN(prompts::bot_check_immunity(origin_card, origin, target, flags));
+        return {};
     }
 
     void effect_generalstore::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {

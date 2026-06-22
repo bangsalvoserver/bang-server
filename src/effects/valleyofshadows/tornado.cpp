@@ -63,6 +63,11 @@ namespace banggame {
             }
         }
     };
+
+    prompt_string effect_tornado::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        MAYBE_RETURN(prompts::bot_check_immunity(origin_card, origin, target, flags));
+        return {};
+    }
     
     void effect_tornado::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         target->m_game->queue_request<request_tornado>(origin_card, origin, target, flags);
@@ -121,6 +126,11 @@ namespace banggame {
             }
         }
     };
+
+    prompt_string effect_tornado2::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        MAYBE_RETURN(prompts::bot_check_immunity(origin_card, origin, target, flags));
+        return {};
+    }
     
     void effect_tornado2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         target->m_game->queue_request<request_tornado2>(origin_card, origin, target, flags);

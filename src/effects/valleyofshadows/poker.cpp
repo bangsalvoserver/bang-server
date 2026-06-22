@@ -124,6 +124,11 @@ namespace banggame {
         }
     };
 
+    prompt_string effect_poker::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        MAYBE_RETURN(prompts::bot_check_immunity(origin_card, origin, target, flags));
+        return {};
+    }
+
     void effect_poker::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         origin->m_game->queue_request<request_poker>(origin_card, origin, target, flags);
     }

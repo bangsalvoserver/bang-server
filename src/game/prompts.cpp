@@ -101,4 +101,11 @@ namespace banggame::prompts {
         }
         return {};
     }
+
+    prompt_string bot_check_immunity(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        if (origin->is_bot() && target->immune_to(origin_card, origin, flags, true)) {
+            return {"PROMPT_TARGET_IMMUNE", origin_card, target};
+        }
+        return {};
+    }
 }

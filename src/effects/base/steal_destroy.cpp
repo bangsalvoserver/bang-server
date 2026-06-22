@@ -23,8 +23,9 @@ namespace banggame {
         return {};
     }
 
-    prompt_string effect_steal::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    prompt_string effect_steal::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
         MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
+        MAYBE_RETURN(prompts::bot_check_immunity(origin_card, origin, target_card->owner, flags));
 
         if (origin == target_card->owner) {
             if (target_card->is_train() || target_card->pocket == pocket_type::player_hand) {
@@ -185,9 +186,10 @@ namespace banggame {
         origin->m_game->queue_request<request_discard_hand>(origin_card, origin, origin);
     }
 
-    prompt_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    prompt_string effect_destroy::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target_card, effect_flags flags) {
         MAYBE_RETURN(prompts::bot_check_target_card(origin, target_card));
         MAYBE_RETURN(prompts::prompt_target_self_card(origin_card, origin, target_card));
+        MAYBE_RETURN(prompts::bot_check_immunity(origin_card, origin, target_card->owner, flags));
         return {};
     }
 

@@ -51,9 +51,10 @@ namespace banggame {
         }
     };
 
-    game_string equip_bomb::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    prompt_string equip_bomb::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
         MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
+        MAYBE_RETURN(prompts::bot_check_immunity(origin_card, origin, target));
         return {};
     }
 

@@ -20,6 +20,8 @@ namespace banggame::prompts {
     prompt_string bot_check_target_card(player_ptr origin, card_ptr target);
 
     prompt_string bot_check_discard_card(player_ptr origin, card_ptr target);
+
+    prompt_string bot_check_immunity(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
     
     template<typename R>
     concept prompt_range = rn::input_range<R> && std::convertible_to<rn::range_value_t<R>, prompt_string>;
