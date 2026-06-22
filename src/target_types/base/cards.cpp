@@ -30,7 +30,7 @@ namespace banggame {
 
     prompt_string targeting_cards::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &targets) {
         return prompts::select_prompt(targets | rv::transform([&](card_ptr c) {
-            return target_card.on_prompt(origin_card, origin, effect, ctx, c);
+            return effect.on_prompt(origin_card, origin, c, effect_flag::multi_target, ctx);
         }));
     }
 

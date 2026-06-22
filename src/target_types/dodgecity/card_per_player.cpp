@@ -53,12 +53,21 @@ namespace banggame {
         }
     }
 
+    static effect_flags get_flags(const card_list &target) {
+        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
+        if (target.size() == 1) {
+            flags.add(effect_flag::single_target);
+        }
+        return flags;
+    }
+
     prompt_string targeting_card_per_player::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
         if (target_cards.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
+        effect_flags flags = get_flags(target_cards);
         return prompts::select_prompt_fallback_empty(target_cards | rv::transform([&](card_ptr target_card) {
-            return effect.on_prompt(origin_card, origin, target_card, ctx);
+            return effect.on_prompt(origin_card, origin, target_card, flags, ctx);
         }));
     }
 
@@ -69,10 +78,7 @@ namespace banggame {
     }
 
     void targeting_card_per_player::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {
-        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
-        if (target_cards.size() == 1) {
-            flags.add(effect_flag::single_target);
-        }
+        effect_flags flags = get_flags(target_cards);
         for (card_ptr target_card : target_cards) {
             if (target_card->pocket == pocket_type::player_hand) {
                 effect.on_play(origin_card, origin, target_card->owner->random_hand_card(), flags, ctx);

@@ -16,7 +16,7 @@ namespace banggame {
     }
 
     prompt_string targeting_card::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, card_ptr target) {
-        return effect.on_prompt(origin_card, origin, target, ctx);
+        return effect.on_prompt(origin_card, origin, target, effect_flag::single_target, ctx);
     }
 
     void targeting_card::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, card_ptr target) {

@@ -46,10 +46,14 @@ namespace banggame {
                 return {};
             },
 
-            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> prompt_string {
+            .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) -> prompt_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_prompt(origin_card, origin, ctx); }) {
+                if constexpr (requires { value.on_prompt(origin_card, origin, flags, ctx); }) {
+                    return value.on_prompt(origin_card, origin, flags, ctx);
+                } else if constexpr (requires { value.on_prompt(origin_card, origin, ctx); }) {
                     return value.on_prompt(origin_card, origin, ctx);
+                } else if constexpr (requires { value.on_prompt(origin_card, origin, flags); }) {
+                    return value.on_prompt(origin_card, origin, flags);
                 } else if constexpr (requires { value.on_prompt(origin_card, origin); }) {
                     return value.on_prompt(origin_card, origin);
                 }
@@ -86,10 +90,14 @@ namespace banggame {
                 return {};
             },
             
-            .on_prompt_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> prompt_string {
+            .on_prompt_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) -> prompt_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
+                if constexpr (requires { value.on_prompt(origin_card, origin, target, flags, ctx); }) {
+                    return value.on_prompt(origin_card, origin, target, flags, ctx);
+                } else if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
                     return value.on_prompt(origin_card, origin, target, ctx);
+                } else if constexpr (requires { value.on_prompt(origin_card, origin, target, flags); }) {
+                    return value.on_prompt(origin_card, origin, target, flags);
                 } else if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                     return value.on_prompt(origin_card, origin, target);
                 }
@@ -126,10 +134,14 @@ namespace banggame {
                 return {};
             },
 
-            .on_prompt_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) -> prompt_string {
+            .on_prompt_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) -> prompt_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
+                if constexpr (requires { value.on_prompt(origin_card, origin, target, flags, ctx); }) {
+                    return value.on_prompt(origin_card, origin, target, flags, ctx);
+                } else if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
                     return value.on_prompt(origin_card, origin, target, ctx);
+                } else if constexpr (requires { value.on_prompt(origin_card, origin, target, flags); }) {
+                    return value.on_prompt(origin_card, origin, target, flags);
                 } else if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
                     return value.on_prompt(origin_card, origin, target);
                 }

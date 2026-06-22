@@ -37,12 +37,22 @@ namespace banggame {
         return {};
     }
 
+    static effect_flags get_flags(const targeting_player_per_cube::value_type &target) {
+        effect_flags flags = effect_flag::multi_target;
+        if (target.players.size() == 1) {
+            flags.add(effect_flag::single_target);
+        }
+        return flags;
+    }
+
     prompt_string targeting_player_per_cube::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+        effect_flags flags = get_flags(target);
+
         return prompts::select_prompt(rv::concat(
             rv::single(target_cubes.on_prompt(origin_card, origin, effect, ctx, target.cubes)),
 
             target.players | rv::transform([&](player_ptr target) {
-                return target_player.on_prompt(origin_card, origin, effect, ctx, target);
+                return effect.on_prompt(origin_card, origin, target, flags, ctx);
             })
         ));
     }
@@ -55,12 +65,9 @@ namespace banggame {
     }
 
     void targeting_player_per_cube::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const value_type &target) {
+        effect_flags flags = get_flags(target);
+
         target_cubes.on_play(origin_card, origin, effect, ctx, target.cubes);
-        
-        effect_flags flags = effect_flag::multi_target;
-        if (target.players.size() == 1) {
-            flags.add(effect_flag::single_target);
-        }
         for (player_ptr target : target.players) {
             effect.on_play(origin_card, origin, target, flags, ctx);
         }
