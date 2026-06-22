@@ -12,6 +12,8 @@
 #include "utils/random_element.h"
 
 namespace banggame {
+
+    #define TRY_RETURN(...) if constexpr (requires { __VA_ARGS__; }) return __VA_ARGS__
     
     template<typename T>
     inline T effect_cast(const void *effect_value) {
@@ -28,144 +30,96 @@ namespace banggame {
 
             .can_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> bool {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.can_play(origin_card, origin, ctx); }) {
-                    return value.can_play(origin_card, origin, ctx);
-                } else if constexpr (requires { value.can_play(origin_card, origin); }) {
-                    return value.can_play(origin_card, origin);
-                }
+                TRY_RETURN(value.can_play(origin_card, origin, ctx));
+                TRY_RETURN(value.can_play(origin_card, origin));
                 return true;
             },
 
             .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx) -> game_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.get_error(origin_card, origin, ctx); }) {
-                    return value.get_error(origin_card, origin, ctx);
-                } else if constexpr (requires { value.get_error(origin_card, origin); }) {
-                    return value.get_error(origin_card, origin);
-                }
+                TRY_RETURN(value.get_error(origin_card, origin, ctx));
+                TRY_RETURN(value.get_error(origin_card, origin));
                 return {};
             },
 
             .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) -> prompt_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_prompt(origin_card, origin, flags, ctx); }) {
-                    return value.on_prompt(origin_card, origin, flags, ctx);
-                } else if constexpr (requires { value.on_prompt(origin_card, origin, ctx); }) {
-                    return value.on_prompt(origin_card, origin, ctx);
-                } else if constexpr (requires { value.on_prompt(origin_card, origin, flags); }) {
-                    return value.on_prompt(origin_card, origin, flags);
-                } else if constexpr (requires { value.on_prompt(origin_card, origin); }) {
-                    return value.on_prompt(origin_card, origin);
-                }
+                TRY_RETURN(value.on_prompt(origin_card, origin, flags, ctx));
+                TRY_RETURN(value.on_prompt(origin_card, origin, ctx));
+                TRY_RETURN(value.on_prompt(origin_card, origin, flags));
+                TRY_RETURN(value.on_prompt(origin_card, origin));
                 return {};
             },
 
             .add_context = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx) {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.add_context(origin_card, origin, ctx); }) {
-                    value.add_context(origin_card, origin, ctx);
-                }
+                TRY_RETURN(value.add_context(origin_card, origin, ctx));
             },
 
             .on_play = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_play(origin_card, origin, flags, ctx); }) {
-                    value.on_play(origin_card, origin, flags, ctx);
-                } else if constexpr (requires { value.on_play(origin_card, origin, ctx); }) {
-                    value.on_play(origin_card, origin, ctx);
-                } else if constexpr (requires { value.on_play(origin_card, origin, flags); }) {
-                    value.on_play(origin_card, origin, flags);
-                } else if constexpr (requires { value.on_play(origin_card, origin); }) {
-                    value.on_play(origin_card, origin);
-                }
+                TRY_RETURN(value.on_play(origin_card, origin, flags, ctx));
+                TRY_RETURN(value.on_play(origin_card, origin, ctx));
+                TRY_RETURN(value.on_play(origin_card, origin, flags));
+                TRY_RETURN(value.on_play(origin_card, origin));
             },
 
             .get_error_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> game_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.get_error(origin_card, origin, target, ctx); }) {
-                    return value.get_error(origin_card, origin, target, ctx);
-                } else if constexpr (requires { value.get_error(origin_card, origin, target); }) {
-                    return value.get_error(origin_card, origin, target);
-                }
+                TRY_RETURN(value.get_error(origin_card, origin, target, ctx));
+                TRY_RETURN(value.get_error(origin_card, origin, target));
                 return {};
             },
             
             .on_prompt_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) -> prompt_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_prompt(origin_card, origin, target, flags, ctx); }) {
-                    return value.on_prompt(origin_card, origin, target, flags, ctx);
-                } else if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
-                    return value.on_prompt(origin_card, origin, target, ctx);
-                } else if constexpr (requires { value.on_prompt(origin_card, origin, target, flags); }) {
-                    return value.on_prompt(origin_card, origin, target, flags);
-                } else if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
-                    return value.on_prompt(origin_card, origin, target);
-                }
+                TRY_RETURN(value.on_prompt(origin_card, origin, target, flags, ctx));
+                TRY_RETURN(value.on_prompt(origin_card, origin, target, ctx));
+                TRY_RETURN(value.on_prompt(origin_card, origin, target, flags));
+                TRY_RETURN(value.on_prompt(origin_card, origin, target));
                 return {};
             },
 
             .add_context_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx) {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.add_context(origin_card, origin, target, ctx); }) {
-                    value.add_context(origin_card, origin, target, ctx);
-                }
+                TRY_RETURN(value.add_context(origin_card, origin, target, ctx));
             },
 
             .on_play_player = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_play(origin_card, origin, target, flags, ctx); }) {
-                    value.on_play(origin_card, origin, target, flags, ctx);
-                } else if constexpr (requires { value.on_play(origin_card, origin, target, ctx); }) {
-                    value.on_play(origin_card, origin, target, ctx);
-                } else if constexpr (requires { value.on_play(origin_card, origin, target, flags); }) {
-                    value.on_play(origin_card, origin, target, flags);
-                } else if constexpr (requires { value.on_play(origin_card, origin, target); }) {
-                    value.on_play(origin_card, origin, target);
-                }
+                TRY_RETURN(value.on_play(origin_card, origin, target, flags, ctx));
+                TRY_RETURN(value.on_play(origin_card, origin, target, ctx));
+                TRY_RETURN(value.on_play(origin_card, origin, target, flags));
+                TRY_RETURN(value.on_play(origin_card, origin, target));
             },
 
             .get_error_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) -> game_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.get_error(origin_card, origin, target, ctx); }) {
-                    return value.get_error(origin_card, origin, target, ctx);
-                } else if constexpr (requires { value.get_error(origin_card, origin, target); }) {
-                    return value.get_error(origin_card, origin, target);
-                }
+                TRY_RETURN(value.get_error(origin_card, origin, target, ctx));
+                TRY_RETURN(value.get_error(origin_card, origin, target));
                 return {};
             },
 
             .on_prompt_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) -> prompt_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_prompt(origin_card, origin, target, flags, ctx); }) {
-                    return value.on_prompt(origin_card, origin, target, flags, ctx);
-                } else if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
-                    return value.on_prompt(origin_card, origin, target, ctx);
-                } else if constexpr (requires { value.on_prompt(origin_card, origin, target, flags); }) {
-                    return value.on_prompt(origin_card, origin, target, flags);
-                } else if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
-                    return value.on_prompt(origin_card, origin, target);
-                }
+                TRY_RETURN(value.on_prompt(origin_card, origin, target, flags, ctx));
+                TRY_RETURN(value.on_prompt(origin_card, origin, target, ctx));
+                TRY_RETURN(value.on_prompt(origin_card, origin, target, flags));
+                TRY_RETURN(value.on_prompt(origin_card, origin, target));
                 return {};
             },
 
             .add_context_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx) {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.add_context(origin_card, origin, target, ctx); }) {
-                    value.add_context(origin_card, origin, target, ctx);
-                }
+                TRY_RETURN(value.add_context(origin_card, origin, target, ctx));
             },
 
             .on_play_card = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_play(origin_card, origin, target, flags, ctx); }) {
-                    value.on_play(origin_card, origin, target, flags, ctx);
-                } else if constexpr (requires { value.on_play(origin_card, origin, target, ctx); }) {
-                    value.on_play(origin_card, origin, target, ctx);
-                } else if constexpr (requires { value.on_play(origin_card, origin, target, flags); }) {
-                    value.on_play(origin_card, origin, target, flags);
-                } else if constexpr (requires { value.on_play(origin_card, origin, target); }) {
-                    value.on_play(origin_card, origin, target);
-                }
+                TRY_RETURN(value.on_play(origin_card, origin, target, flags, ctx));
+                TRY_RETURN(value.on_play(origin_card, origin, target, ctx));
+                TRY_RETURN(value.on_play(origin_card, origin, target, flags));
+                TRY_RETURN(value.on_play(origin_card, origin, target));
             }
         };
     }
@@ -184,26 +138,19 @@ namespace banggame {
 
             .on_prompt = [](const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) -> prompt_string {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_prompt(origin_card, origin, target, ctx); }) {
-                    return value.on_prompt(origin_card, origin, target, ctx);
-                } else if constexpr (requires { value.on_prompt(origin_card, origin, target); }) {
-                    return value.on_prompt(origin_card, origin, target);
-                }
+                TRY_RETURN(value.on_prompt(origin_card, origin, target, ctx));
+                TRY_RETURN(value.on_prompt(origin_card, origin, target));
                 return {};
             },
 
             .on_enable = [](const void *effect_value, card_ptr target_card, player_ptr target) {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_enable(target_card, target); }) {
-                    value.on_enable(target_card, target);
-                }
+                TRY_RETURN(value.on_enable(target_card, target));
             },
 
             .on_disable = [](const void *effect_value, card_ptr target_card, player_ptr target) {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.on_disable(target_card, target); }) {
-                    value.on_disable(target_card, target);
-                }
+                TRY_RETURN(value.on_disable(target_card, target));
             },
 
             .is_nodisable = requires { typename T::nodisable; }
@@ -224,9 +171,7 @@ namespace banggame {
 
             .add_context = [](const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx) {
                 auto &&value = effect_cast<T>(effect_value);
-                if constexpr (requires { value.add_context(origin_card, origin, ctx); }) {
-                    value.add_context(origin_card, origin, ctx);
-                }
+                TRY_RETURN(value.add_context(origin_card, origin, ctx));
             },
 
             .get_error = [](const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target_card, const effect_context &ctx) -> game_string {
@@ -253,11 +198,8 @@ namespace banggame {
                         return {"ERROR_NOT_ALLOWED_WITH_CARD", origin_card, target_card};
                     }
                 }
-                if constexpr (requires { value.get_error(origin_card, origin, target_card, ctx); }) {
-                    return value.get_error(origin_card, origin, target_card, ctx);
-                } else if constexpr (requires { value.get_error(origin_card, origin, target_card); }) {
-                    return value.get_error(origin_card, origin, target_card);
-                }
+                TRY_RETURN(value.get_error(origin_card, origin, target_card, ctx));
+                TRY_RETURN(value.get_error(origin_card, origin, target_card));
                 return {};
             }
         };
@@ -383,19 +325,12 @@ namespace banggame {
             .name = name,
 
             .on_apply = [](game_ptr game) {
-                T value{};
-                if constexpr (requires { value.on_apply(game); }) {
-                    value.on_apply(game);
-                }
+                TRY_RETURN(T{}.on_apply(game));
             },
 
             .is_valid_with = [](const expansion_set &set) -> bool {
-                T value{};
-                if constexpr (requires { value.is_valid_with(set); }) {
-                    return value.is_valid_with(set);
-                } else {
-                    return true;
-                }
+                TRY_RETURN(T{}.is_valid_with(set));
+                return true;
             },
         };
     }
@@ -472,6 +407,8 @@ namespace banggame {
 
     #define BUILD_TARGETING_VTABLE(name, type) template<> const targeting_vtable targeting_vtable_map<#name>::value = build_targeting_vtable<type>(#name);
     #define TARGET_VALUE(name) targeting_vtable_map<#name>::type
+
+    #undef TRY_RETURN
 
 }
 
