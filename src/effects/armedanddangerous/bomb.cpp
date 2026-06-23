@@ -39,6 +39,7 @@ namespace banggame {
                 return {"PROMPT_MOVE_BOMB_TO_SELF", origin_card};
             }
             MAYBE_RETURN(prompts::bot_check_target_enemy(target, target_player));
+            MAYBE_RETURN(prompts::bot_check_immunity(origin_card, target, target_player));
             return {};
         }
 
