@@ -26,6 +26,7 @@ namespace banggame {
     enum class effect_flag {
         is_bang,
         is_missed,
+        is_prompt,
         play_as_bang,
         single_target,
         multi_target,
