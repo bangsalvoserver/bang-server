@@ -76,7 +76,7 @@ namespace banggame {
 
     prompt_string effect_duel::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
-        MAYBE_RETURN(prompts::bot_check_immunity(origin_card, origin, target, flags));
+        MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         return {};
     }

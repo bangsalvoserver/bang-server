@@ -11,6 +11,8 @@ namespace banggame::prompts {
 
     prompt_string prompt_target_self_card(card_ptr origin_card, player_ptr origin, card_ptr target_card);
 
+    prompt_string prompt_target_immunity(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
+
     prompt_string bot_check_kill_sheriff(player_ptr origin, player_ptr target);
 
     game_string bot_check_target_enemy(player_ptr origin, player_ptr target, bool confident = false);
@@ -20,8 +22,6 @@ namespace banggame::prompts {
     prompt_string bot_check_target_card(player_ptr origin, card_ptr target);
 
     prompt_string bot_check_discard_card(player_ptr origin, card_ptr target);
-
-    prompt_string bot_check_immunity(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
     
     template<typename R>
     concept prompt_range = rn::input_range<R> && std::convertible_to<rn::range_value_t<R>, prompt_string>;

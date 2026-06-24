@@ -8,6 +8,7 @@
 
 #include "game_table.h"
 #include "bot_suggestion.h"
+#include "game_options.h"
 
 
 namespace banggame::prompts {
@@ -31,6 +32,16 @@ namespace banggame::prompts {
         if (origin == target_card->owner) {
             if (target_card->pocket != pocket_type::player_table || !target_card->has_tag(tag_type::penalty)) {
                 return {"PROMPT_TARGET_SELF", origin_card};
+            }
+        }
+        return {};
+    }
+
+    prompt_string prompt_target_immunity(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        if (origin->m_game->m_options.prompt_target_immunity || origin->is_bot()) {
+            flags.add(effect_flag::is_prompt);
+            if (target->immune_to(origin_card, origin, flags, true)) {
+                return {"PROMPT_TARGET_IMMUNE", origin_card, target};
             }
         }
         return {};
@@ -99,16 +110,6 @@ namespace banggame::prompts {
     prompt_string bot_check_discard_card(player_ptr origin, card_ptr target) {
         if (origin->is_bot() && target->has_tag(tag_type::strong)) {
             return "BOT_TARGET_STRONG_CARD";
-        }
-        return {};
-    }
-
-    prompt_string bot_check_immunity(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
-        if (origin->is_bot()) {
-            flags.add(effect_flag::is_prompt);
-            if (target->immune_to(origin_card, origin, flags, true)) {
-                return {"PROMPT_TARGET_IMMUNE", origin_card, target};
-            }
         }
         return {};
     }

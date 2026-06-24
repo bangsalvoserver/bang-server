@@ -55,7 +55,7 @@ namespace banggame {
     };
 
     prompt_string effect_train_robbery::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
-        MAYBE_RETURN(prompts::bot_check_immunity(origin_card, origin, target, flags));
+        MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
         if (origin->is_bot()) {
             if (bot_suggestion::is_target_enemy(origin, target)) {
                 if (rn::any_of(target->m_table, [](card_ptr target_card) {
