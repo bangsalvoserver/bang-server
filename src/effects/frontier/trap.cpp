@@ -27,6 +27,12 @@ namespace banggame {
     struct request_move_trap : request_picking_player {
         request_move_trap(card_ptr origin_card, player_ptr target)
             : request_picking_player(origin_card, nullptr, target) {}
+
+        void on_update() override {
+            if (rn::none_of(target->m_game->m_players, [&](player_ptr p) { return in_target_set(p); })) {
+                pop_request();
+            }
+        }
         
         bool can_pick(player_ptr target_player) const override {
             return target_player != target
