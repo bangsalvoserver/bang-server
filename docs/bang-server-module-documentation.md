@@ -1,4 +1,4 @@
-# Module documentation - bang-server
+# Module documentation — bang-server
 
 Repository: [bangsalvoserver/bang-server](https://github.com/bangsalvoserver/bang-server)
 Language: **C++23** (backend) + **Python 3** (build-time code generation)
@@ -223,6 +223,38 @@ A `game_action` sent by the client, accordingly, is never just "one card + targe
 3. It re-walks the chain a second time, calling every modifier's `get_error` against the terminal card **and** against every modifier that comes after it — so with two stacked modifiers, each has to separately approve of the other *and* of the final card, not just of the end result.
 
 Execution (`verify_and_play`) then runs the modifiers' own effects first, strictly in order (e.g. *Aim*'s `on_play`, registering the temporary `apply_bang_modifier` listener from the stacking-effects example), and only afterwards the terminal card's own effect or equip — so by the time the Bang! actually resolves, Aim's bonus is already wired into the shared request. Everything here — the chain, the pairwise compatibility, the ordering — is generic; nothing about *Bang!* or *Aim* specifically is hard-coded into `play_verify.cpp` itself.
+
+**A second, structurally different example is Gold Rush's "choice" cards** — *Bottle* and *Pardner*, each a single physical card that can act as any one of three different effects, chosen at play time. *Bottle* plays as Panic!, Beer, or Bang! (the player's choice); *Pardner* plays as General Store, Duel, or Cat Balou. Unlike `bangmod` (which restricts the *kind* of card that follows), this modifier restricts *which hidden option* is allowed to follow — and the link between a menu card and its options is a shared tag value, not a card-type check:
+```yaml
+- count: 3
+  name: BOTTLE
+  color: brown
+  modifier: card_choice
+
+hidden:
+  - name: BOTTLE_PANIC
+    effects: [card_choice, steal random_if_hand_card range_1]
+    tags: [card_choice(1)]
+  - name: BOTTLE_BEER
+    effects: [card_choice, heal]
+    tags: [card_choice(1)]
+  - name: BOTTLE_BANG
+    effects: [card_choice, bang player alive reachable notself]
+    tags: [card_choice(1)]
+```
+```cpp
+struct modifier_card_choice {
+    bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        return target_card->pocket == pocket_type::hidden_deck
+            && target_card->get_tag_value(tag_type::card_choice) == origin_card->get_tag_value(tag_type::card_choice);
+    }
+    void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+        ctx.add(contexts::card_choice{ origin_card });
+    }
+};
+DEFINE_MODIFIER(card_choice, modifier_card_choice)
+```
+Every option (`BOTTLE_PANIC`/`BOTTLE_BEER`/`BOTTLE_BANG`) is itself a hidden pseudo-card whose own first effect is `card_choice` again — this time registered as an ordinary *effect*, not a modifier (`DEFINE_EFFECT(card_choice, effect_card_choice)` alongside the `DEFINE_MODIFIER`, reusing the same name for two different vtables). Its `can_play` is the other half of the same check: it looks for the `contexts::card_choice` entry left behind by `add_context`, and only allows itself to be played if its own `card_choice` tag value matches the modifier that came before it. So `tag_type::card_choice`'s *value* (1 for Bottle's three options, 2 for Pardner's) is doing the same job `tag_type::bangcard` does for `bangmod` — a shared vocabulary a modifier and its valid follow-ups both check — just grouped by an arbitrary number instead of a single fixed tag, which is what lets several unrelated hidden-card groups (Bottle's three options vs. Pardner's three) reuse the exact same modifier and effect without colliding with each other.
 
 ### Multi-target handlers (`mth`): one effect, several different targets at once
 
