@@ -222,41 +222,41 @@ namespace banggame {
     }
 
     static prompt_string get_play_prompt(player_ptr origin, card_ptr origin_card, effect_list_type type, const target_list &targets, const effect_context &ctx) {
-        return prompts::select_prompt(rv::concat(
-            rv::zip(targets, origin_card->get_effect_list(type)) | rv::transform([&](const auto &pair) {
-                const auto &[target, effect] = pair;
-                return effect.on_prompt(origin_card, origin, target, ctx);
-            }),
+        return prompts::select_prompt([&] -> prompts::generator {
+            for (const auto &[target, effect] : rv::zip(targets, origin_card->get_effect_list(type))) {
+                co_yield effect.on_prompt(origin_card, origin, target, ctx);
+            }
 
-            rv::single(origin_card->get_mth(type)) | rv::transform([&](const mth_holder &mth) {
-                return mth ? mth.on_prompt(origin_card, origin, targets, ctx) : prompt_string{};
-            })
-        ));
+            if (const mth_holder &mth = origin_card->get_mth(type)) {
+                co_yield mth.on_prompt(origin_card, origin, targets, ctx);
+            }
+        }());
     }
 
     static prompt_string get_equip_prompt(player_ptr origin, card_ptr origin_card, const target_list &targets, const effect_context &ctx) {
-        return prompts::select_prompt(rv::concat(
-            rv::zip(targets, origin_card->equip_effects) | rv::transform([&](const auto &pair) {
-                const auto &[target, effect] = pair;
-                return effect.on_prompt(origin_card, origin, target, ctx);
-            }),
+        return prompts::select_prompt([&] -> prompts::generator {
+            for (const auto &[target, effect] : rv::zip(targets, origin_card->equip_effects)) {
+                co_yield effect.on_prompt(origin_card, origin, target, ctx);
+            }
 
-            rv::single(!ctx.contains<contexts::equip_target>()
-                ? effect_equip_on{}.on_prompt(origin_card, origin, origin, ctx) : prompt_string{})
-        ));
+            if (!ctx.contains<contexts::equip_target>()) {
+                co_yield effect_equip_on{}.on_prompt(origin_card, origin, origin, ctx);
+            }
+        }());
     }
 
     static prompt_string get_prompt_message(player_ptr origin, card_ptr origin_card, effect_list_type type, const target_list &targets, const target_selection_list &modifiers, const effect_context &ctx) {
-        return prompts::select_prompt(rv::concat(
-            modifiers | rv::transform([&](const target_selection &selection) {
-                return get_play_prompt(origin, selection.card, selection.effect_list, selection.targets, ctx);
-            }),
+        return prompts::select_prompt([&] -> prompts::generator {
+            for (const target_selection &selection : modifiers) {
+                co_yield get_play_prompt(origin, selection.card, selection.effect_list, selection.targets, ctx);
+            }
 
-            rv::single(type == effect_list_type::equip_effects
-                ? get_equip_prompt(origin, origin_card, targets, ctx)
-                : get_play_prompt(origin, origin_card, type, targets, ctx)
-            )
-        ));
+            if (type == effect_list_type::equip_effects) {
+                co_yield get_equip_prompt(origin, origin_card, targets, ctx);
+            } else {
+                co_yield get_play_prompt(origin, origin_card, type, targets, ctx);
+            }
+        }());
     }
 
     static void log_played_card(card_ptr origin_card, player_ptr origin, effect_list_type type, const effect_context &ctx) {

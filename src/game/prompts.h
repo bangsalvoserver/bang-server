@@ -22,6 +22,8 @@ namespace banggame::prompts {
     prompt_string bot_check_target_card(player_ptr origin, card_ptr target);
 
     prompt_string bot_check_discard_card(player_ptr origin, card_ptr target);
+
+    using generator = std::generator<prompt_string>;
     
     template<typename R>
     concept prompt_range = rn::input_range<R> && std::convertible_to<rn::range_value_t<R>, prompt_string>;
