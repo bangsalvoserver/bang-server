@@ -20,11 +20,15 @@ bangweb/
 │   ├── all_cards.tsx              Bootstrap for the card-gallery page (/all_cards.html)
 │   ├── Model/                   Global application state and network protocol
 │   ├── Scenes/                  The app's "screens" (Home, Lobby, Game, etc.)
+│   │   └── Game/                 The game screen — by far the largest and most involved part
+│   │       └── Model/             The client "engine": table state, target-selection state machine
 │   ├── Components/                Reusable UI components
 │   ├── Locale/                    Internationalization system (5 languages)
 │   └── Utils/                     Generic hooks and utilities
 └── public/                      Static assets (card images, sounds, fonts)
 ```
+
+The organizing idea behind the whole client, and the thread running through every section below, is that it **mirrors the server as closely as possible and pushes decision-making server-side wherever it can**, rather than re-implementing game logic independently. Concretely: the server precomputes entire modifier chains and attaches them to each playable card rather than making the client work out compatibility itself (§4.3); `mth` handlers have no client-side equivalent at all, because the server never offers a combination the handler would reject; even the client's own target-validation logic (`TargetDispatch.ts`) is explicitly "optimistic" — a UX convenience for greying out invalid clicks, never the actual authority, since `play_verify.cpp` can and does reject anything regardless of what the client thought was valid. The payoff is that most new server-side content (a new card reusing existing effects and targets) needs no client change at all, and the client stays thin enough that its own state machine (`TargetSelector.ts`) is close to the only genuinely independent logic in the whole app.
 
 The app is a **finite-state SPA**: `App.tsx` doesn't use a traditional router, but a single reducer (`sceneReducer`) that represents the entire navigation as a state machine (`home → loading → waiting_area → lobby → game`), driven by messages received from the server over WebSocket.
 
@@ -82,7 +86,7 @@ If the connection drops abnormally while the user has an active session (`sessio
 
 ## 4. Module `Scenes/Game/` — The client-side state engine
 
-This is the largest (≈390K) and conceptually most interesting part: it **replicates the server's validation logic** client-side (`play_verify.cpp`/`possible_to_play.cpp`/`target_types/`) to offer a responsive interface without having to query the server on every click.
+This is the largest and conceptually most interesting part: it **replicates the server's validation logic** client-side (`play_verify.cpp`/`possible_to_play.cpp`/`target_types/`) to offer a responsive interface without having to query the server on every click.
 
 ### 4.1 State representation (`Model/GameTable.ts`, `Model/GameUpdate.ts`)
 
@@ -106,7 +110,7 @@ The server sends an **ordered sequence** of `game_update`s for every (even minor
 This is the subsystem that **mirrors the backend's `target_types/` module**, one to one:
 
 - **`CardTarget.ts`** defines `CardTargetTypes`, a map from target-type name to `{value, target, effect}`, using **exactly the same names** as the folders/implementations in the server's `target_types/`: `none`, `player`, `conditional_player`, `adjacent_players`, `player_per_cube`, `card`, `random_if_hand_card`, `extra_card`, `players`, `cards`, `max_cards`, `bang_or_cards`, `card_per_player`, `missed_and_same_suit`, `cube_slot`, `move_cube_slot`, `select_cubes*`, `self_cubes`. Each entry specifies: the type of the "value" shown in the UI (e.g. a list of candidate cards), the serialized type to send to the server (`target`, e.g. a `CardId` or an array of them), and the effect's arguments (`effect`, e.g. `player_filter`/`card_filter`, analogous to C++ `target_args`).
-- **`TargetDispatch.ts`** (28K, the largest file in the Model module) — see the dedicated breakdown right after this list for how it's actually built and what to add when introducing a new target type.
+- **`TargetDispatch.ts`** (the largest file in the Model module) — see the dedicated breakdown right after this list for how it's actually built and what to add when introducing a new target type.
 - **`TargetSelector.ts`** implements the **finite-state machine** for game interaction (documented with an ASCII diagram in the source): modes `start → preselect → modifier → middle → target → finish`. It manages: the selected main card (`selection`), any modifier cards played beforehand (`modifiers`, e.g. *Aim*, which must precede a Bang!), any server-imposed "preselection" (requests tagged `preselect`, e.g. the "Pick" card that must be chosen automatically), and confirmation prompts (`GamePrompt`: `yesno` or `playpick`). See below for a full explanation of the `modifier`, `preselect`, and `playpick` states.
 
 #### `TargetDispatch.ts` in depth, and what a new target type needs here
@@ -130,13 +134,11 @@ Every target type needs up to ten small functions — `isCardSelected`, `isValid
 
 All of this validation is purely "optimistic"/UX — it exists so the UI can grey out invalid clicks and know when to stop asking for more targets, not to enforce the rules. **Authoritative** validation always stays server-side (`play_verify.cpp`), which can and does reject the resulting action with a `game_error` regardless of what the client thought was valid.
 
-
-
 #### What a "modifier" is, and why the client needs a state for it
 
 A modifier is a card that isn't a complete action on its own — it has to be played *together with* another card that follows it, changing how that card behaves. The classic case is *Aim*: "play this before a Bang!, and that Bang! deals +1 damage." Aim by itself doesn't do anything meaningful; the server treats a modifier-then-real-card play as a single combined action rather than two separate ones (full mechanism in the server module doc — the client doesn't need to replicate any of it).
 
-That matters client-side because `GameAction` isn't just "one card + targets," it's `{ card, targets, modifiers: [{card, effect_list, targets}, ...] }` — an ordered chain of zero or more modifier plays followed by one terminal card. The server already precomputes, for every playable card, the exact chain of modifiers required before it: each entry in `respond_cards`/`play_cards` (`PlayableCardInfo`) carries its own `modifiers` array. So `getAllPlayableCards` (`TargetSelector.ts`) never has to work out compatibility itself — its job is reduced to sequence-matching: given how many modifiers the player has already selected (`selector.modifiers`), it filters down to entries whose own `modifiers` array starts with the same sequence, and yields either the *next* required modifier (`isModifier: true`, if `selector.modifiers.length < modifiers.length` for that entry) or the terminal card itself (`isModifier: false`, once the full chain is satisfied). This is exactly what drives the `start --(2)--> modifier` transition in the state diagram: clicking a card that `newTargetSelection` resolves with `isModifier: true` enters `modifier` mode instead of `target` mode; once its own targets are picked, `(4)` moves to `middle`, from which clicking another modifier loops back to `modifier` (stacking), or clicking the terminal card moves on to `target` `(1)`. `getModifierContext` reads any extra precomputed context a chain entry carries (e.g. a `forced_play` context, used elsewhere by cards that lock in a specific next card automatically) — again information the server already derived, not something the client has to compute.
+That matters client-side because `GameAction` isn't just "one card + targets," it's `{ card, effect_list, targets, modifiers: [{card, effect_list, targets}, ...] }` — an ordered chain of zero or more modifier plays followed by one terminal card (with its own `effect_list`, exactly like each modifier has its own). The server already precomputes, for every playable card, the exact chain of modifiers required before it: each entry in `respond_cards`/`play_cards` (`PlayableCardInfo`) carries its own `modifiers` array. So `getAllPlayableCards` (`TargetSelector.ts`) never has to work out compatibility itself — its job is reduced to sequence-matching: given how many modifiers the player has already selected (`selector.modifiers`), it filters down to entries whose own `modifiers` array starts with the same sequence, and yields either the *next* required modifier (`isModifier: true`, if `selector.modifiers.length < modifiers.length` for that entry) or the terminal card itself (`isModifier: false`, once the full chain is satisfied). This is exactly what drives the `start --(2)--> modifier` transition in the state diagram: clicking a card that `newTargetSelection` resolves with `isModifier: true` enters `modifier` mode instead of `target` mode; once its own targets are picked, `(4)` moves to `middle`, from which clicking another modifier loops back to `modifier` (stacking), or clicking the terminal card moves on to `target` `(1)`. `getModifierContext` reads any extra precomputed context a chain entry carries (e.g. a `forced_play` context, used elsewhere by cards that lock in a specific next card automatically) — again information the server already derived, not something the client has to compute.
 
 **One modifier scenario gets a bespoke visual treatment: Gold Rush's *Bottle*/*Pardner*** (a single card playable as any one of three hidden effect-cards — see the server module doc's modifiers section for the full `card_choice` mechanism). Rather than falling through to the ordinary hand/target rendering, `CardChoiceView.tsx` watches for this specific case: once *Bottle* has been played as a modifier, `getModifierContext(selector, 'card_choice')` reads the shared context value the server attaches to all three hidden follow-up cards, resolves it back to the physical *Bottle* card on the table, and calls the same generic `getAllPlayableCards({ ...selector, selection: null })` used everywhere else in the modifier chain — which, given *Bottle* was just played, naturally resolves to exactly its three hidden options. Those get rendered as ordinary `<CardView>`s, but absolutely positioned in a small row centered on *Bottle*'s current on-screen position (via `CardTracker`, the same live position-tracking used for movement animations), nudged down slightly, so a little strip of "Panic! / Beer / Bang!" pops up right under the card the player just played. The layout is bespoke; everything deciding *which* cards to show and *when* is the same generic modifier-chain state every other modifier already uses.
 
@@ -191,7 +193,7 @@ The three buttons map directly onto the two paths already described, plus a thir
 So the two mechanisms fit together: the *implicit* path (click something else, preselection silently disappears) covers the common case; the `playpick` prompt exists only for the narrower case where the engine genuinely cannot tell, from the click alone, which of the two valid actions the player meant.
 - **`Model/SelectorConfirm.tsx`** closes the loop: once the state machine reaches `finish`, it builds the `GameAction` object (identical to `game::handle_game_action` on the server side: `card`, `effect_list`, `targets[]`, `modifiers[]`, `bypass_prompt`, `timer_id`) and sends it with `connection.sendMessage({ game_action: action })`. The `handleClickCard`/`handleClickPlayer`/`handleConfirm`/`handleUndo` functions, exposed via a `React.Context` (`SelectorConfirmContext`) to the entire game UI, translate user clicks into state-machine transitions.
 - **`Model/TargetSelectorReducer.ts`** is the reducer applying the `SelectorUpdate`s (e.g. `selectPlayingCard`, `addCardTarget`, `addPlayerTarget`, `confirmSelection`, `undoSelection`, `setRequest`, `setPrompt`) produced by the handlers above, updating `TargetSelector`.
-- **`Model/Filters.ts`** (12K) contains pure utility functions for querying state (e.g. `getCardColor`, `getCardOwner`, `getCardPocket`), used both by the target selector and by rendering components.
+- **`Model/Filters.ts`** contains pure utility functions for querying state (e.g. `getCardColor`, `getCardOwner`, `getCardPocket`), used both by the target selector and by rendering components.
 - **`Model/UseCardOverlay.ts`** manages the detail overlay of a card (zoom/description) when the user selects it for inspection.
 - **`Model/CardTracker.ts`** tracks the on-screen positions of cards (to compute movement animations between pockets).
 
@@ -219,7 +221,6 @@ Besides the WebSocket channel (which handles **everything** real-time: lobby, ch
 | `GET /image/:hash` | `Scenes/Lobby/LobbyUser.tsx` (`Env.bangImageUrl`) | Retrieves a user's avatar image (PNG) from its hash, out of the server's `image_registry`. Used to show other users' avatars without having to retransmit them repeatedly over WebSocket. |
 | `GET /cards/:deck` | `Scenes/AllCards/AllCards.tsx` (`Env.bangCardsUrl`) | Returns, as JSON, the entire requested deck (`card_deck_type`) — the same `card_data` generated by `config/parse_bang_cards.py` — to populate the card gallery without starting a match. |
 | `GET /tracking?length=...&max_count=...` | `Scenes/Tracking/Tracking.tsx` (`Env.bangTrackingUrl`) | Returns the historical statistics series (player/lobby counts) accumulated by the server in SQLite (`net/tracking.cpp`), to populate the charts (`chart.js`). |
-| `GET /.env` | *(none — a security trap)* | Deliberately responds `418 I'm a teapot` and logs a warning: protects against automated scans looking for accidentally exposed `.env` files. |
 
 `Model/Env.ts` derives these URLs automatically from `VITE_BANG_SERVER_URL` (replacing `wss://`→`https://`/`ws://`→`http://`), so client and server stay in sync using a single configuration environment variable.
 
@@ -249,7 +250,7 @@ The language is chosen, in priority order, from: a build-time environment variab
 | `UseAssets.ts` | Preloading of images/sounds (`preloadAssets`, consumed by the `preload_assets` update — the server signals which assets will be needed before sending the updates that use them, avoiding visual "pop-in") and sound playback (`usePlaySound`, mapping `SoundId` → audio file, mirroring the server's `cards/game_events.h`/`sound_id`). |
 | `ImageSerial.ts` | Serializes a local image (the user-chosen avatar) into a resized PNG data-URL (`PROPIC_SIZE = 512`), ready to be sent in the `connect`/`user_set_propic` message — the counterpart of `net/image_pixels.h` on the server. |
 | `Base64Utils.ts` | Base64 encoding/decoding used in image serialization. |
-| `MapCache.ts` | A map-keyed cache (likely used for assets or repeated computations). |
+| `MapCache.ts` | `makeMapCache`, a generic memoizing wrapper around a `Map` — used in `UseAssets.ts` to build `loadCardImage`/`loadGameSound`, so a given card image or sound file is only ever fetched/decoded once and reused after that. |
 | `ArrayUtils.ts` | Array utilities, including the `Container`/`parseContainer` type — the TypeScript counterpart of C++ bitsets/sets serialized as JSON arrays (e.g. `game_user_flags`, `player_flags`), converted into a client-side `Set<T>` for more natural access (`.has(flag)`). |
 | `RecordUtils.ts` | Utilities for immutably manipulating `Record<Key, Value>` (heavily used by `GameTableReducer.ts` to update `players`/`cards` maps). |
 | `UnionUtils.ts` | Generic infrastructure for Rust/F#-style discriminated unions: `createUnionDispatch` (exhaustive pattern matching for handling an incoming message, used everywhere for `ServerMessage`/`GameUpdate`/`TableUpdate`) and `createUnionReducer` (a reducer based on the same pattern, used for `sceneReducer`/`gameTableReducer`/`targetSelectorReducer`). This is the architectural "glue" that makes it natural to translate the server's C++ `std::variant`s into exhaustively-handled, type-safe TypeScript unions. |
@@ -279,21 +280,3 @@ The language is chosen, in priority order, from: a build-time environment variab
 | Bitset flags (user, player, game) | `enums::bitset<T>` serialized as a JSON array | `Container<'array', T>` → `Set<T>` (`ArrayUtils.ts`) |
 
 Since **there is no shared automatic code generation** between the two repositories (unlike the YAML→C++ link internal to `bang-server` alone), every time a new expansion or a new effect/target type is added on the server, `bangweb` must be **manually updated**: the `CardTargetTypes` union, any logic in `TargetDispatch.ts`, translations in `Locale/*/Cards.tsx` and `GameStrings.tsx`, and graphic/audio assets in `public/`.
-
----
-
-## 9. Quick frontend module summary
-
-| Module | Size (~) | Responsibility in one sentence |
-|---|---|---|
-| `Model/` | ~36K | Network protocol (mirroring `net/messages.h`), global state, scene navigation |
-| `Scenes/Game/Model/` | ~144K | The client "engine": table state, animated-update queue, target-selection state machine (mirroring `target_types/`) |
-| `Scenes/Game/` (UI) | ~250K | React components rendering the table, animations, prompts |
-| `Scenes/*` (other scenes) | ~90K | Home, waiting area, game lobby, card gallery, statistics |
-| `Locale/` | ~772K (mostly text/JSX in 5 languages) | Localization of card names, UI labels, and formatted log messages |
-| `Utils/` | ~76K | Generic React hooks (WebSocket, storage, pub/sub channels, union dispatch) |
-| `Components/` | ~104K | Shared frame UI across scenes (header, popups, menus) |
-
----
-
-*Document generated by analyzing the state of the `master` branch of the `bang-server` and `bangweb` repositories as of July 9, 2026.*

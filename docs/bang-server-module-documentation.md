@@ -2,7 +2,6 @@
 
 Repository: [bangsalvoserver/bang-server](https://github.com/bangsalvoserver/bang-server)
 Language: **C++23** (backend) + **Python 3** (build-time code generation)
-Size: ~33,500 lines across `.h`/`.cpp`/`.py`, 302 `.cpp` files, 376 `.h` files
 
 This document describes in detail the internal architecture of the **Bang!** game server (bang.salvoserver.it), analyzing the structure under `src/` module by module.
 
@@ -87,7 +86,11 @@ The logical heart of the server: manages the state of a single match, the turn, 
 ### 3.2 Event and "disabler" system (the engine behind card interactions)
 
 - **`event_map.h`** — Implements a **typed event bus** based on compile-time reflection (`reflect::to<std::tuple>`), with no inheritance from a common event base class: any aggregate struct can be used as an "event" (`concept event`) — declaring the struct **is** the registration, no macro needed, unlike the `effects`/`target_types` vtable system. Two separate maps back this, each with a distinct job: `m_listeners` (keyed by `event_listener_key`) actually holds the listeners and dictates dispatch order — **descending priority** first, then ascending `card->order` (table/play order) as a deterministic tiebreak between equal priorities. Real `on_hit` listeners alone span priorities from 1 (*Bart Cassidy*) up to 20 (a global ruleset rule), precisely because each needed to fire in a specific position relative to the others. `m_map` (keyed by the plain `event_card_key`) holds only iterators *into* `m_listeners` and exists purely to support fast removal of a card's listeners when it leaves play — it plays no part in dispatch order. `listener_map::call_event<T>(value)` invokes listeners in that priority order; if `T` declares a `result_type`, the first listener whose return value is truthy stops the chain and becomes the event's result (e.g. `check_damage_response`'s `bool`, used to decide whether to delay resolving damage); without one, the event is void and every listener runs unconditionally as a pure broadcast.
-- **`disabler_map.h`** — A separate mechanism for **disabling cards** (e.g. *Sid Ketchum* disabled while "paused", cards disabled by other cards like *Handcuffs*), via predicate functions registered per `event_card_key` (`card_disabler_fun`).
+- **`disabler_map.h`** — A separate mechanism for temporarily switching a card's ongoing ability off *without* removing it from the table. `add_disabler`/`remove_disabler` register/unregister predicate functions (keyed by `event_card_key`, so they can be scoped and later removed the same way listeners are); whenever a predicate starts or stops matching a given card, the engine calls that card's own `on_disable`/`on_enable` — the exact same lifecycle hooks that normally fire when a card is actually equipped or leaves play — so a disabled card's passive listeners get suppressed (and later restored) through the ordinary equip machinery, not a separate code path. A good real example is *Belle Star* (`effects/dodgecity/bellestar.cpp`): on her own turn she registers a disabler matching every *other* player's table cards, switching off their weapons, Mustangs, and other passive equips for as long as her turn lasts, then removes it once her turn ends. A narrower variant, `is_usage_disabled`/`get_usage_disabler` (`disable_use=true`), excludes a card from certain player-facing actions specifically, without necessarily suppressing its passive ability.
+
+  A single card can have more than one `equip_holder`, and an individual holder can opt out of this whole mechanism by nesting a marker type, `struct nodisable{};`, the same detection pattern as `serialize_context` (`build_equip_vtable` sets `is_nodisable` via `requires { typename T::nodisable; }`). The check actually lives in `player::enable_equip`/`disable_equip` (`game/player.cpp`): `if (!card_disabled || holder.is_nodisable()) holder.on_enable(...)`  — so a `nodisable` holder gets its `on_enable`/`on_disable` called *regardless* of whether the card is currently disabled, while an ordinary holder's is skipped entirely while disabled.
+
+  `equip_weapon` (`effects/base/weapon.h`) needs this for a concrete reason, not just "the ability should always work": say *Lasso* is in play, disabling every card on the table for everyone, and a player already has a Schofield equipped. If they now play a Volcanic, `player::equip_card` moves it onto the (already-disabled-by-Lasso) table and calls `enable_equip` on it. Without `nodisable`, `card_disabled` would be true and the whole condition would be false, so Volcanic's `on_enable` — the function that finds and discards the previously-equipped weapon — would never run at all, leaving both weapons sitting on the table at once. With `nodisable`, `on_enable` runs unconditionally, so the replacement still happens; the range bonus itself is a separate matter, since the listener `on_enable` registers checks `is_disabled` on its own before applying the range, so Lasso still correctly suppresses the actual bonus. `nodisable` isn't about keeping an ability active under a disabler — it's about guaranteeing that whatever `on_enable`/`on_disable` themselves need to do (bookkeeping like this replacement) still happens even while the card is otherwise disabled.
 - **`event_card_key.h`** — The `{target_card, priority}` pair passed to `add_listener`/`add_disabler`, identifying which card a listener belongs to (for later removal via `m_map`) and its priority for the dispatch-order tiebreaking described above.
 
 ### 3.3 Request cycle (turns, prompts, pending actions)
@@ -105,7 +108,7 @@ The logical heart of the server: manages the state of a single match, the turn, 
 - **`possible_to_play.h/.cpp`** — Generates the set of cards/targets **actually playable** by a player at a given moment (used both to send the client the list of available actions, and by the bot AI to generate plausible random moves — `generate_playable_cards_list`).
 - **`filters.h/.cpp`** — Implements `check_player_filter`/`check_card_filter`, i.e. validation of the "filters" declared in YAML (e.g. `alive`, `notself`, `reachable`, `range_1`) against a candidate target.
 - **`give_card.h/.cpp`** — Implementation of the `/give <card_name>` cheat command, available when the server is started with `--cheats`: looks up a card by name and hands it to a player, useful for manually testing a specific card without waiting to draw it.
-- **`prompts.h/.cpp`** — A shared library of reusable prompt/validation-message constructors that individual card effects call into from their own `get_error`/`on_prompt`, instead of each duplicating the same checks. Two families: ordinary human-facing ones (`prompt_target_self`, `prompt_target_ghost`, `prompt_target_self_card`, `prompt_target_immunity`) that warn or block regardless of who's playing, and a `bot_check_*` family (`bot_check_kill_sheriff`, `bot_check_target_enemy`, `bot_check_target_friend`, `bot_check_target_card`, `bot_check_discard_card`) that each start with an `origin->is_bot()` guard, so they're silently invisible to human players and only ever steer bot decisions (see the card-creation guide's bot-prompts case for exactly how that steering works). The file also provides the two combinators used to reconcile several simultaneously-applicable prompts on the same card into one: `select_prompt` (picks the highest-`priority` non-empty one) and `select_prompt_fallback_empty` (the same, but suppresses a merely-default-priority result if any contributing slot explicitly wanted no prompt at all).
+- **`prompts.h/.cpp`** — A shared library of reusable prompt-message constructors that individual card effects call into from their own `on_prompt`, instead of each duplicating the same checks. Two families: ordinary human-facing ones (`prompt_target_self`, `prompt_target_ghost`, `prompt_target_self_card`, `prompt_target_immunity`) that warn or nudge regardless of who's playing, and a `bot_check_*` family (e.g. `bot_check_kill_sheriff`, `bot_check_target_enemy`, `bot_check_target_friend`) that each start with an `origin->is_bot()` guard, so they're silently invisible to human players and only ever steer bot decisions (see the card-creation guide's bot-prompts case for exactly how that steering works, and for why this belongs in `on_prompt` and never `get_error` — a bot must always be able to legally make the same play a human could). The file also provides the two combinators used to reconcile several simultaneously-applicable prompts on the same card into one: `select_prompt` (picks the highest-`priority` non-empty one) and `select_prompt_fallback_empty` (the same, but suppresses a merely-default-priority result if any contributing slot explicitly wanted no prompt at all).
 
 ### 3.5 Bot / AI
 
@@ -118,8 +121,8 @@ The logical heart of the server: manages the state of a single match, the turn, 
 - **`expansion_set.h/.cpp`** — Bitset representation (`uint64_t`) of the set of expansions active in a match (`expansion_set`), with iterators, JSON (de)serialization, and string parsing (e.g. for CLI/config options).
 - **`game_options.h/.cpp`** — Match options configurable from the lobby: active expansions, max player count, various timers (`auto_resolve_timer`, `damage_timer`, `escape_timer`, `bot_play_timer`), flags like `add_bots`, `only_base_characters`, RNG seed.
 - **`game_update.h`** — Defines the "state update" (`game_update`) messages sent to the client to reflect every change (e.g. card drawn, damage taken, turn passed); these are JSON-serialized and queued via `game_net_manager::add_update`.
-- **`game_net.h/.cpp`** (`game_net_manager`) — Manages buffering of updates to send to clients (`m_updates`), the persistent game log for rejoins (`m_saved_log`), and the mapping between internal `player_ptr`s and network `user_id`s (to handle disconnections/reconnections).
-- **`event_card_key.h`**, **`card.h`** — keys/identifiers used across the event system.
+- **`game_net.h/.cpp`** (`game_net_manager`) — Manages buffering of updates to send to clients (`m_updates`), the persistent game log for rejoins (`m_saved_log`), and the mapping between internal `player_ptr`s and network `user_id`s.
+- **`event_card_key.h`** — a key/identifier used across the event system.
 
 ---
 
@@ -217,7 +220,7 @@ A `modifier_vtable` only really has two operations, both visible in `card_defs.h
 - **`add_context(origin_card, origin, ctx)`** — runs when the modifier is applied, letting it inject whatever it needs into the shared `effect_context` for the rest of the chain. The wrapper in `vtables.h` always also records `contexts::modifier_card{origin_card}` here, regardless of what the specific modifier does, so downstream code can always tell a modifier preceded the current play.
 - **`get_error(origin_card, origin, target_card, ctx)`** — asks whether a specific candidate `target_card` is a legal thing to play next. `build_modifier_vtable` (`vtable_build.h`) doesn't call a single flat function for this: it probes the type for up to three different overloads and picks based on what the candidate actually is — `valid_with_equip` if `target_card` is an equip card, `valid_with_modifier` if `target_card` is *itself* another modifier (i.e. the player is stacking a second modifier before the real card), or `valid_with_card` for the ordinary case — falling back to a custom `get_error` override for anything bespoke that doesn't fit the three-way split.
 
-A `game_action` sent by the client, accordingly, is never just "one card + targets": it's `{ card, targets, modifiers: [{card, effect_list, targets}, ...] }` — zero or more modifier plays, in order, followed by one terminal card. `play_verify.cpp::verify_modifiers` is what walks this chain:
+A `game_action` sent by the client, accordingly, is never just "one card + targets": it's `{ card, effect_list, targets, modifiers: [{card, effect_list, targets}, ...] }` — zero or more modifier plays, in order, followed by one terminal card (with its own `effect_list`, exactly like each modifier has its own). `play_verify.cpp::verify_modifiers` is what walks this chain:
 1. For each modifier in order, it calls `add_context` and validates that modifier's own targets and base playability (modifiers can have targets of their own, and can be disabled/blocked like any other card).
 2. It then figures out which effect-list the *terminal* card must belong to (an equip card forces `equip_effects`; if the terminal card is itself a modifier with nothing queued after it, the whole action is rejected with `ERROR_CARD_IS_MODIFIER` — a chain can never end on an unresolved modifier).
 3. It re-walks the chain a second time, calling every modifier's `get_error` against the terminal card **and** against every modifier that comes after it — so with two stacked modifiers, each has to separately approve of the other *and* of the final card, not just of the end result.
@@ -302,43 +305,47 @@ That resolved handler is consulted in three places, all in `game/`:
 
 That last point is why nothing about `mth` needs to leak out to the frontend at all — see the note in the frontend doc.
 
+### `effect_context`: passing information across a chain, not just within one card
+
+Where `mth` combines several target groups *within one card's own effect list*, `effect_context` (`cards/effect_context.h`) is the mechanism for the other direction: letting a **modifier communicate with the terminal card that follows it**, or more generally letting any two steps of the same play — which may be entirely separate `DEFINE_EFFECT`/`DEFINE_MODIFIER`/`DEFINE_TARGETING` registrations — pass information to each other without a direct function-call relationship. It's a `std::vector<context_entry>` under the hood: `ctx.add(SomeStruct{...})` appends a type-erased entry, and `ctx.get<T>()`/`ctx.get_all<T>()`/`ctx.contains<T>()` read them back by type. Context types themselves need no registration — they're plain structs, defined either centrally (`cards::contexts` in `card_defs.h`, for generic ones like `selected_card`/`selected_player`, automatically populated by the base target types on every pick) or declared right alongside whatever mechanic first needs a new one (e.g. `contexts::ignore_distances` lives in `effects/armedanddangerous/belltower.h`, next to the modifier that adds it) — the same "just declare it" discoverability convention as a new event type in Case 12.
+
+Most context entries are purely internal to a single resolution and never need to leave the server. Whether one does is controlled by a single opt-in marker, `struct serialize_context{};`, nested inside the context type:
+```cpp
+if constexpr (requires { typename T::serialize_context; }) {
+    return [](const context_entry &self, json::string_writer &writer) {
+        auto key = reflect::type_name<T>();          // the JSON key is the C++ type name itself
+        writer.Key(key.data(), key.size());
+        if constexpr (std::is_empty_v<T>) {
+            writer.Bool(true);                         // a bare flag — just "present"
+        } else {
+            json::serialize(self.get<T>(), writer);    // an actual value (e.g. a card_ptr → CardId)
+        }
+    };
+}
+return nullptr;   // no serialize_context marker → this entry is never serialized at all
+```
+`effect_context::serialize()` — the function that produces the JSON `context` field a `PlayableCardInfo` carries to the client — skips every entry whose function pointer came back `nullptr`. So by default a context type is server-only bookkeeping; adding `serialize_context` is how one opts *out* of that default and says "the client needs to see this." That's exactly the mechanism behind the frontend's `getModifierContext(selector, 'card_choice')`/`'forced_play'` calls described in the card-creation guide and the frontend doc: `contexts::card_choice` and `contexts::forced_play` both carry the marker specifically so the client can read them off `PlayableCardInfo.context`, while the far more common case — `selected_card`, `equip_target`, `playing_card` — carries no marker and stays entirely server-side, since the client already knows what it selected without being told again. One more detail worth knowing: the JSON key itself comes from `reflect::type_name<T>()` — the same compile-time reflection library behind the event system (Case 12), reused here to derive a wire-format key from a type instead of enumerating a struct's fields.
+
 ---
 
 ## 5. Module `effects/` — Per-expansion effect implementation
 
-Contains the concrete implementation of **every single effect/equipment/expansion rule** referenced in the YAML files. It is organized into **15 subfolders**, one per expansion (each with its own `CMakeLists.txt` and a collector `effects.h` header):
+Contains the concrete implementation of **every single effect/equipment/expansion rule** referenced in the YAML files, organized into one subfolder per expansion, each with its own `CMakeLists.txt` and a collector `effects.h` header. The shape they all share is the important part, using `base/` — the foundational one, containing the core game's cards and general mechanics — as the concrete reference:
 
-| Folder | Expansion | Representative content |
-|---|---|---|
-| `base/` | Base game | Core cards: `bang.cpp`, `beer.cpp`, `missed.cpp`, `duel.cpp`, `dynamite.cpp`, `jail.cpp`, `mustang.cpp`, `scope.cpp`, base characters (`bart_cassidy`, `black_jack`, `kit_carlson`, `lucky_duke`, `slab_the_killer`...), general mechanics (`damage.cpp`, `death.cpp`, `draw.cpp`, `draw_check.cpp`, `heal.cpp`, `equip.cpp`, `steal_destroy.cpp`, `requests.cpp`, `resolve.cpp`, `max_usages.cpp`, `card_choice.cpp`). |
-| `dodgecity/` | *Dodge City* | New mechanics introduced by this expansion (reusable "green" cards, new characters). |
-| `fistfulofcards/` | *A Fistful of Cards* | Event cards and their rules. |
-| `goldrush/` | *Gold Rush* | Additional characters. |
-| `highnoon/` | *High Noon* | Specific event cards. |
-| `wildwestshow/` | *Wild West Show* | Show characters, "rotating" turn management (`changewws.cpp`), specific tokens. |
-| `armedanddangerous/` | *Armed and Dangerous* | New weapons, `cube` (cube tokens — see also `add_cube.cpp`), characters like *Bloody Mary*, *Molly Stark*... |
-| `valleyofshadows/` | *The Valley of Shadows* | "Ghost" mechanics (`ghost.cpp`), *Bandidos*, *Poker*, *Tornado*, "escape" token. |
-| `canyondiablo/` | *Canyon Diablo* | Minor expansion with dedicated targets/effects. |
-| `greattrainrobbery/` | *The Great Train Robbery* | Train mechanics (`m_train`, `m_locomotive`, `train_position`). |
-| `stickofdynamite/` | *A Stick of Dynamite* | A dynamite rule variant. |
-| `mostwanted/` | *Most Wanted* | New characters (*Claus the Saint*, *Emiliano*...), *Handcuffs*, *New Identity*. |
-| `legends/` | *Bang! Legends* | A reimplementation of an alternative game system (legends, "feats", stations). The largest after `base/`. |
-| `frontier/` | The *Frontier* expansion | Dedicated rules/cards. |
-| `ghost_cards/` | Ghost card rules (dead players remaining active in certain variants). |
-| `crazy_greygory/` (in `config/sets`, handled as a variant) | A "crazy" character variant. |
+`base/` implements the core cards (`bang.cpp`, `beer.cpp`, `missed.cpp`, `duel.cpp`, `dynamite.cpp`, `jail.cpp`, `mustang.cpp`, `scope.cpp`...), the base characters (`bart_cassidy`, `black_jack`, `kit_carlson`, `lucky_duke`, `slab_the_killer`...), and general mechanics with no card of their own (`damage.cpp`, `death.cpp`, `draw.cpp`, `draw_check.cpp`, `heal.cpp`, `equip.cpp`, `steal_destroy.cpp`, `requests.cpp`, `resolve.cpp`, `max_usages.cpp`, `card_choice.cpp`...). Every other expansion folder follows the exact same internal shape — one `.h`/`.cpp` pair per card or mechanic, plus its own `effects.h` collector and `CMakeLists.txt` — just scoped to whatever that expansion adds: new characters, new equipment, new one-off mechanics (a rotating-turn system, a token type, a train), and so on.
 
 Each `.cpp`/`.h` file in these folders typically defines:
 1. A small struct representing the effect's **data** (e.g. `struct effect_weapon { int range; };` for a weapon with parametrized range).
 2. Static functions implementing the behavior (`can_play`, `on_play`, `get_error`, `on_prompt`...).
 3. A `DEFINE_EFFECT(yaml_name, StructType)` macro (or `DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_MTH`/`DEFINE_RULESET`) registering the name↔type link, making it visible to `GET_EFFECT(yaml_name)` used by the YAML-generated code.
 
-The `ruleset.h`/`ruleset.cpp` files present in many expansion folders (e.g. `armedanddangerous/ruleset.cpp`, `legends/ruleset.cpp`, `mostwanted/ruleset.cpp`, `valleyofshadows/ruleset.cpp`, `wildwestshow/ruleset.cpp`, `stickofdynamite/ruleset.cpp`) implement the `ruleset_vtable`: the logic applied **when an entire expansion is activated** in a match (e.g. preparing additional decks, adding starting tokens, validating compatibility with other expansions via `is_valid_with`).
+Many expansion folders also carry a `ruleset.h`/`ruleset.cpp` pair implementing the `ruleset_vtable`: the logic applied **when an entire expansion is activated** in a match (e.g. preparing additional decks, adding starting tokens, validating compatibility with other expansions via `is_valid_with`) — see the modifiers/multi-target-handler sections above and the card-creation and expansion-addition guides for the detailed mechanics of how all of this fits together.
 
 ---
 
 ## 6. Module `target_types/` — Target-type implementation
 
-Conceptually parallel to `effects/`, but for the "who/what can be the target of an effect" part. Organized by expansion (7 subfolders: `base`, `armedanddangerous`, `canyondiablo`, `dodgecity`, `fistfulofcards`, `legends`, `valleyofshadows`).
+Conceptually parallel to `effects/`, but for the "who/what can be the target of an effect" part — organized the same way, one subfolder per expansion. The foundational ones live in `base/` and are worth knowing concretely, since most target types elsewhere either compose these or follow the same shape:
 
 | Key file | Role |
 |---|---|
@@ -348,14 +355,8 @@ Conceptually parallel to `effects/`, but for the "who/what can be the target of 
 | `base/card.h/.cpp` | A single-card target (in hand or on the table) with a combined player+card filter. |
 | `base/cards.h/.cpp` | A multi-card target. |
 | `base/random_if_hand_card.h` | A variant: if the target is a card in hand, a random one is chosen (to respect the "you can't see others' hand cards" rule — e.g. *Panic!*/*Cat Balou*). |
-| `dodgecity/card_per_player.h/.cpp` | A "one card per player" target (used by *Brawl*: discard one card, then destroy one card from every other player who still has one). |
-| `dodgecity/extra_card.h` | A target with an associated extra card. |
-| `fistfulofcards/max_cards.h/.cpp` | A target with a maximum number of selectable cards. |
-| `armedanddangerous/cube_slot.h/.cpp`, `select_cubes*.h/.cpp`, `player_per_cube.h/.cpp`, `move_cube_slot.h/.cpp` | A family of targets dedicated to the **cube token** mechanic introduced by this expansion (slot/cube selection, movement). |
-| `valleyofshadows/adjacent_players.h/.cpp` | A target restricted to adjacent players (used by *Fanning*: a Bang! against two players who are adjacent to *each other*, not to the origin). |
-| `valleyofshadows/bang_or_cards.h/.cpp` | An "alternative" target (either play a Bang!, or discard cards) — a fork-choice logic. |
-| `legends/missed_and_same_suit.h/.cpp` | A target with a constraint on cards of the same suit in addition to the Missed! response. |
-| `canyondiablo/conditional_player.h` | A player target conditioned by an additional predicate. |
+
+Beyond `base/`, expansions add target types either for genuinely new shapes (e.g. *Valley of Shadows*' `adjacent_players`, restricted to two players adjacent to *each other* rather than to the origin, used by *Fanning*) or for a whole family of targets around one new mechanic (e.g. *Armed & Dangerous*' `cube_slot`/`select_cubes*`/`player_per_cube`/`move_cube_slot`, all built around the cube-token mechanic that expansion introduces) — see the card-creation guide's dedicated case (and its worked examples) for exactly how a new one gets built, including when it's worth inheriting from an existing one like `cards`/`max_cards` rather than starting from scratch.
 
 Each implementation registers, via `DEFINE_TARGETING(yaml_name, StructType)`, the corresponding `targeting_vtable`, which provides: deserialization of the target chosen by the client (`deserialize_target`), enumeration of possible targets for AI/validation (`possible_targets`, a C++23 `std::generator`), random choice (`random_target`), validation (`get_error`), confirmation messaging (`on_prompt`), and execution (`on_play`).
 
@@ -367,16 +368,16 @@ This module **contains no game logic**, only the **declarative data** and the to
 
 | File/folder | Role |
 |---|---|
-| `sets/*.yml` | One YAML file per expansion (`base.yml`, `dodgecity.yml`, `goldrush.yml`, `highnoon.yml`, `fistfulofcards.yml`, `wildwestshow.yml`, `wildwestshow_characters.yml`, `armedanddangerous.yml`, `valleyofshadows.yml`, `canyondiablo.yml`, `greattrainrobbery.yml`, `stickofdynamite.yml`, `mostwanted.yml`, `legends.yml`, `legends_basemod.yml`, `frontier.yml`, `crazy_greygory.yml`, `udolistinu.yml`). Each file lists cards split by deck (`main_deck`, `character`, `button_row`, `hidden`, `station`, `train`, `feats`, etc.), with fields such as `name`, `signs` (suit/rank), `image`, `color`, `effects`, `responses`, `equip`, `equip_effects`, `tags`, `expansion`. |
+| `sets/*.yml` | One YAML file per expansion (`base.yml`, plus one for each expansion registered in `bang_cards.yml` below). Each file lists cards split by deck (`main_deck`, `character`, `button_row`, `hidden`, `station`, `train`, `feats`, etc.), with fields such as `name`, `signs` (suit/rank), `image`, `color`, `effects`, `responses`, `equip`, `equip_effects`, `tags`, `expansion`. |
 | `bang_cards.yml` | The "index" file listing which expansion YAML files to include/combine in the build (read by `parse_bang_cards.py` via a custom `!include`, see `yaml_custom.py`). |
 | `bot_info.yml` | Configuration of bot AI heuristics (in-play/response preference rules, thresholds for random attempts). |
 | `bot_propics/*.png` | A set of default avatar images used by bots. |
 | `parse_bang_cards.py` | The main script: reads the YAML files (functions `parse_effects`, `parse_equips`, `parse_tags`, `parse_modifier`, `parse_mth`, `parse_expansions`, `parse_sign`), validates them with regular expressions (extracting effect type, parenthesized parameters, player/card filters separated by `|`), and produces a `CppObject` representing the entire data table (`bang_cards_t bang_cards`). The `merge_cards` function merges cards from all expansions into a single structure, annotating each card with its originating expansion. `parse_file` maps each logical "deck" (`Deck`) to its expansion strategy: e.g. `get_main_deck_cards` duplicates a card for every suit/rank listed in `signs`, `get_goldrush_cards` repeats it `count` times, `get_legends_cards` renames it with a `LEGEND_` prefix. |
 | `cpp_generator.py` | A support library for generating C++ code from Python structures (`CppObject`, `CppEnum`, `CppLiteral`, `CppStatic`, `CppStaticMap`, `CppDeclaration`, `print_cpp_file`): abstracts "pretty-printing" of nested C++ aggregate initializers, fully-qualified enums, static maps (`static_map`), pointers to static data, etc. |
 | `parse_bots.py` | An analogous parser for `bot_info.yml`, generating the C++ bot-rule table. |
-| `yaml_custom.py` | Extensions to the standard YAML parser (presumably an `!include` tag for composing multiple files, given its use in `bang_cards.yml`). |
+| `yaml_custom.py` | Extensions to the standard YAML parser: registers a custom `!include` tag (`yaml.add_constructor("!include", yaml_include, Loader=yaml.SafeLoader)`) that loads and parses another YAML file in place, sharing anchors with the including document — this is what lets `bang_cards.yml` compose every expansion's file into one document. |
 
-**CMake integration**: during the build, these Python scripts are invoked (presumably from `src/config/CMakeLists.txt`, as a code-generation step) to produce `bang_cards.cpp` (and the bot equivalent) **before** C++ compilation, so that the `bang_cards`/`bot_info` tables are available as native C++ symbols — no YAML parsing happens at runtime on the production server.
+**CMake integration**: `src/config/CMakeLists.txt` invokes both generators directly via `add_custom_command` — `python parse_bang_cards.py bang_cards.yml bang_cards.cpp` and `python parse_bots.py bot_info.yml bot_info.cpp` — producing `bang_cards.cpp`/`bot_info.cpp` as build outputs, each depending on its YAML inputs and the generator scripts themselves so a change to any of them retriggers generation. Both generated files are compiled into their own object libraries (`bang_cards_obj`, `bot_info_obj`) and linked into `bangserver`, so the `bang_cards`/`bot_info` tables are available as native C++ symbols with no YAML parsing at runtime on the production server.
 
 ---
 
@@ -393,7 +394,7 @@ Reusable components independent of the "Bang!" domain, used across all other mod
 | `function_ref.h` | A lightweight, non-owning reference to a function (an allocation-free alternative to `std::function`). |
 | `json_serial.h` / `json_aggregate.h` | A generic JSON (de)serialization framework based on compile-time reflection (`serializer<T>`, `deserializer<T>`), used for all network messages and state updates. |
 | `parse_string.h` | Generic string→type parsing (`string_parser<T>`), used e.g. for `expansion_set` and `game_options::set_option`. |
-| `combinations.h` | Combination generation (likely for deck/probability calculations or for the AI). |
+| `combinations.h` | `utils::combinations<T>(elems, n)`, a coroutine generator yielding every n-element combination of a vector — used by *Armed & Dangerous*'s `select_cubes` target type (`targeting_select_cubes::possible_targets`) to enumerate every valid way to pick `ncubes` cubes out of a player's available ones. |
 | `int_set.h` | An efficient set of small integers (bitset). |
 | `nullable.h` | A wrapper for optional values with custom semantics. |
 | `random_element.h` | Extraction of a random element from a range, with error handling (`random_element_error`, used by `bot_ai.cpp`). |
@@ -401,11 +402,11 @@ Reusable components independent of the "Bang!" domain, used across all other mod
 | `stable_queue.h` | A **stable** priority queue (preserves insertion order for equal priority) — used by `request_queue`. |
 | `static_map.h` | A compile-time-built map (`static_map_view`), used for card `tag_map`s. |
 | `tagged_variant.h` | A tag-dispatched variant, for handling heterogeneous type unions with minimal overhead. |
-| `tsqueue.h` | A thread-safe queue (likely for passing messages between the network thread and the tick loop). |
+| `tsqueue.h` | A thread-safe queue — used in `net/wsserver.h` as `utils::tsqueue<message_type> m_message_queue`, the queue of incoming raw messages (`client_handle` + `connected`/`disconnected`/raw string) handed off between the network I/O thread and the main tick loop. |
 | `type_name.h` | Compile-time type-name introspection (debug/log). |
 | `visit_indexed.h` | Support for `std::visit` with the index of the active alternative. |
 | `sqlite3_wrapper.h` | A minimal RAII wrapper around SQLite3, used by `net/tracking.cpp`. |
-| `base64.h` | Base64 encoding/decoding (likely for profile pictures transmitted via JSON). |
+| `base64.h` | Base64 encoding/decoding — used in `net/image_pixels.cpp`'s `image_from_png_data_url` to decode a `data:image/png;base64,...` URL (the format a user's uploaded profile picture arrives in) back into raw PNG bytes. |
 | `misc.h` | Miscellaneous utilities not otherwise categorized. |
 
 ---
@@ -419,7 +420,7 @@ To clarify how all the modules collaborate, here is the complete path of a singl
 3. **Implementation** — `effects/base/bang.cpp` defines the struct implementing the effect (damage, animation, "Missed!" response request) and registers it with `DEFINE_EFFECT(bangcard, ...)`. `target_types/base/player.cpp` implements the player-target validation/selection logic.
 4. **Runtime — proposed action** — The client sends `client_messages::game_action` (JSON) → `net::game_manager::handle_message` forwards it to `game::handle_game_action` (`game/game_net.cpp`).
 5. **Verification** — `play_verify.cpp` deserializes the target (`targeting_vtable::deserialize_target`), checks the filters (`filters.cpp`) and conditions (`effect_vtable::can_play`/`get_error`).
-6. **Execution** — If valid, `effect_vtable::on_play` applies the effect (e.g. queuing a `request_base` representing "the target must respond with Missed!" in the `request_queue`), possibly triggering events (`listener_map::call_event`) that other cards on the table can react to (e.g. *Barrel*).
+6. **Execution** — If valid, `effect_vtable::on_play` applies the effect (e.g. queuing a `request_base` representing "the target must respond with Missed!" in the `request_queue`). Any other card with a registered listener on an event this triggers (`listener_map::call_event`) reacts at that point too (e.g. *Bart Cassidy*'s passive `on_hit` listener, drawing him cards if the Bang! actually connects).
 7. **Notification** — Every change is recorded via `game_net_manager::add_update`, JSON-serialized and distributed to the relevant clients (`update_target`, a `player_set` filtering who should receive the update — useful for hiding information, e.g. which card another player drew in certain modes).
 8. **Bot cycle** — If the turn or response falls to a bot, `bot_ai.cpp` automatically generates and verifies a plausible action following the same validation path (`verify_and_play`), guaranteeing that bots follow exactly the same rules as human players.
 
@@ -432,21 +433,3 @@ To clarify how all the modules collaborate, here is the complete path of a singl
 - Each submodule (`net`, `game`, `cards` implicitly, `effects/<expansion>`, `target_types/<expansion>`, `config`) has its own `CMakeLists.txt`, aggregated by `src/CMakeLists.txt`.
 - The Python scripts in `config/` require `PyYAML` and `Pillow` and run as part of the pre-compilation code-generation step.
 - The final executable (`bangserver`/`bang-server`) links everything together via `banglibs` (a common interface for the external libraries).
-
----
-
-## Quick module summary
-
-| Module | Lines of code (~) | Responsibility in one sentence |
-|---|---|---|
-| `net/` | ~140K | Network, sessions, lobby, message protocol |
-| `game/` | ~292K | Game engine: match state, turns, events, general rules, bot AI |
-| `cards/` | ~100K | The static "vtable" framework linking YAML data and C++ implementations |
-| `effects/` | ~2.4M (with data) | Implementation of every effect/character/rule, per expansion |
-| `target_types/` | ~244K | Implementation of the target types valid for effects, per expansion |
-| `config/` | ~608K (mostly images) | Declarative card data (YAML) + Python generators → C++ |
-| `utils/` | ~148K | Generic support library (bitset, JSON, ranges, queues, RNG...) |
-
----
-
-*Document generated by analyzing the state of the repository's `master` branch as of July 9, 2026.*

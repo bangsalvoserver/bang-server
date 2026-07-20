@@ -2,7 +2,7 @@
 
 This guide builds on the previous series (server architecture, frontend architecture, adding individual cards) by tackling the level above: **how to add an entire expansion**, i.e. a package of cards plus any new global rules, toggleable from the lobby.
 
-Unlike adding a single card (which typically only touches `config/sets/*.yml` and possibly one file in `effects/`), an expansion touches **four distinct levels**:
+Unlike adding a single card (which touches `config/sets/*.yml`, and a new file in `effects/` only when the card needs behavior beyond what existing effects already provide), an expansion touches **four distinct levels**:
 
 1. **Data** — the YAML file(s) with the cards, and registering the expansion in the `bang_cards.yml` index.
 2. **Ruleset** — a C++ file representing the "global rules" activated when the expansion is selected (not all expansions need one).
@@ -133,20 +133,20 @@ along with the matching field (`card_list`) in `game_table.h`, plus the manageme
 
 ---
 
-## 4. End-to-end example: creating the fictional "Tumbleweed" expansion
+## 4. End-to-end example: creating the fictional "Dust Devil" expansion
 
-Let's put it all together with a minimal but complete example: an invented expansion called **"Tumbleweed"** that introduces:
+Let's put it all together with a minimal but complete example: an invented expansion called **"Dust Devil"** that introduces:
 - a simple global rule (no new pile/token: when a player ends their turn with an empty hand, they draw 1 extra card at the start of the next turn);
 - a card reusing already-existing effects (no C++ for the card itself, as in Case 1/2 of the previous guide).
 
-### 4.1 The cards' YAML file (`src/config/sets/tumbleweed.yml`)
+### 4.1 The cards' YAML file (`src/config/sets/dustdevil.yml`)
 
 ```yaml
 main_deck:
-  - name: TUMBLEWEED_GUST
+  - name: DUSTDEVIL_GUST
     signs:
       - 7 hearts
-    image: tw_gust
+    image: dd_gust
     color: brown
     effects:
       - draw(1)
@@ -157,23 +157,23 @@ main_deck:
 ### 4.2 Registration in the index (`src/config/bang_cards.yml`)
 
 ```yaml
-tumbleweed: !include sets/tumbleweed.yml
+dustdevil: !include sets/dustdevil.yml
 ```
 
-### 4.3 The C++ ruleset (`src/effects/tumbleweed/ruleset.h` + `.cpp`)
+### 4.3 The C++ ruleset (`src/effects/dustdevil/ruleset.h` + `.cpp`)
 
 ```cpp
 // ruleset.h
-#ifndef __TUMBLEWEED_RULESET_H__
-#define __TUMBLEWEED_RULESET_H__
+#ifndef __DUSTDEVIL_RULESET_H__
+#define __DUSTDEVIL_RULESET_H__
 
 #include "cards/card_effect.h"
 
 namespace banggame {
-    struct ruleset_tumbleweed {
+    struct ruleset_dustdevil {
         void on_apply(game_ptr game);
     };
-    DEFINE_RULESET(tumbleweed, ruleset_tumbleweed)
+    DEFINE_RULESET(dustdevil, ruleset_dustdevil)
 }
 
 #endif
@@ -185,10 +185,10 @@ namespace banggame {
 #include "game/game_table.h"
 
 namespace banggame {
-    void ruleset_tumbleweed::on_apply(game_ptr game) {
+    void ruleset_dustdevil::on_apply(game_ptr game) {
         game->add_listener<event_type::on_turn_end>({nullptr, 10}, [](player_ptr origin, bool skipped) {
             if (origin->m_hand.empty()) {
-                origin->m_game->add_log("LOG_TUMBLEWEED_BONUS_DRAW", origin);
+                origin->m_game->add_log("LOG_DUSTDEVIL_BONUS_DRAW", origin);
                 origin->draw_card(1);
             }
         });
@@ -200,17 +200,17 @@ namespace banggame {
 
 ### 4.4 Collector header and expansion folder
 
-`src/effects/tumbleweed/effects.h` (analogous to the ones in other expansions, even though here there's only the ruleset):
+`src/effects/dustdevil/effects.h` (analogous to the ones in other expansions, even though here there's only the ruleset):
 ```cpp
-#ifndef __TUMBLEWEED_EFFECTS_H__
-#define __TUMBLEWEED_EFFECTS_H__
+#ifndef __DUSTDEVIL_EFFECTS_H__
+#define __DUSTDEVIL_EFFECTS_H__
 
 #include "ruleset.h"
 
 #endif
 ```
 
-`src/effects/tumbleweed/CMakeLists.txt`:
+`src/effects/dustdevil/CMakeLists.txt`:
 ```cmake
 target_sources(bangserver PRIVATE
     ruleset.cpp
@@ -221,15 +221,15 @@ target_sources(bangserver PRIVATE
 
 In `src/effects/CMakeLists.txt`, add:
 ```cmake
-add_subdirectory(tumbleweed)
+add_subdirectory(dustdevil)
 ```
 
 In `src/effects/effects.h`, add:
 ```cpp
-#include "tumbleweed/effects.h"
+#include "dustdevil/effects.h"
 ```
 
-(If the expansion also introduced a new target type, `target_types/tumbleweed/` would similarly need to be created and referenced in `target_types/target_types.h` — see Case 6 of the previous guide.)
+(If the expansion also introduced a new target type, `target_types/dustdevil/` would similarly need to be created and referenced in `target_types/target_types.h` — see Case 6 of the previous guide.)
 
 ### 4.6 On the frontend side: making the expansion selectable
 
@@ -240,24 +240,24 @@ export type ExpansionType =
     'dodgecity' |
     ...
     'frontier' |
-    'tumbleweed';   // <- new entry
+    'dustdevil';   // <- new entry
 ```
 
 **`bangweb/src/Scenes/Lobby/GameOptionsEditor.tsx`** — add a checkbox in the appropriate group (here, "main expansions"):
 ```tsx
-<ExpansionCheckbox name='tumbleweed' />
+<ExpansionCheckbox name='dustdevil' />
 ```
 If the expansion depended on another one, or was incompatible with it (like `is_valid_with` on the server), this is expressed via `onSelect`/`onDeselect`, e.g.:
 ```tsx
-<ExpansionCheckbox name='tumbleweed' onSelect={e => e.add('ghost_cards')} />
+<ExpansionCheckbox name='dustdevil' onSelect={e => e.add('ghost_cards')} />
 ```
 
 **In each folder under `bangweb/src/Locale/<Language>/`** (Italian, English, Spanish, Czech, Hungarian):
-- `Labels.ts`, `ExpansionType` group: add `tumbleweed: "Tumbleweed"` (or a translation).
-- `Cards.tsx`: add the entry for `TUMBLEWEED_GUST` with localized name and description.
-- `GameStrings.tsx`: if the ruleset generates a new `format_str` (here `LOG_TUMBLEWEED_BONUS_DRAW`), add the corresponding entry describing how to render it in JSX.
+- `Labels.ts`, `ExpansionType` group: add `dustdevil: "Dust Devil"` (or a translation).
+- `Cards.tsx`: add the entry for `DUSTDEVIL_GUST` with localized name and description.
+- `GameStrings.tsx`: if the ruleset generates a new `format_str` (here `LOG_DUSTDEVIL_BONUS_DRAW`), add the corresponding entry describing how to render it in JSX.
 
-**Graphic assets**: the `tw_gust` image referenced in the YAML must be added to `bangweb/public/cards/` (in the format/path used by other cards in the same deck).
+**Graphic assets**: the `dd_gust` image referenced in the YAML must be added to `bangweb/public/cards/` (in the format/path used by other cards in the same deck).
 
 ---
 
@@ -284,7 +284,3 @@ If the expansion depended on another one, or was incompatible with it (like `is_
 ## 6. Note: "rule-only" expansions with no cards of their own
 
 Not every "expansion" in the game's sense introduces new physical cards — some are **rule variants** layered on top of the base deck. In the project, `ghost_cards`, `stickofdynamite`, and `shadowgunslingers` are mapped to `{}` in the `bang_cards.yml` index: they have no card YAML file, but they still exist as a registered `ruleset_vtable` (`DEFINE_RULESET`) and as a selectable entry in the lobby (typically in the "Variants" group of the options editor, not "Main expansions" — see the distinction between the `Collapsible` "expansions"/"variations"/"extras" groups in `GameOptionsEditor.tsx`). This is the right pattern to follow when you want to add **a rule variant** (e.g. "optional rule X") rather than an actual card package: you write only the `ruleset.cpp`, register `variantname: {}` in the index, and add the frontend checkbox in the appropriate group.
-
----
-
-*Document generated by analyzing the state of the `master` branch of the `bang-server` and `bangweb` repositories as of July 9, 2026.*

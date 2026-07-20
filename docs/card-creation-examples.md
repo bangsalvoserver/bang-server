@@ -155,7 +155,7 @@ void equip_bart_cassidy::on_enable(card_ptr target_card, player_ptr p) {
 Key points to note, useful as a "recipe" for similar abilities:
 - **`add_listener<event_type::on_hit>({target_card, 1}, ...)`** — registers on the general "a player took damage" event (not just from `Bang!`, but from any damage source), with **priority `1`** (to define the order in which it acts relative to other cards reacting to the same event, e.g. other players' *Barrel*).
 - **`p == target`** — the listener receives the event for *anyone* taking damage; the check filters for the case where the card's owner is the one being hit.
-- **`queue_action([=]{...})`** — the actual action (drawing cards) isn't executed immediately inside the listener, but **queued** to run after the current event has finished propagating to all listeners — this prevents an ability from altering game state while other listeners are still reading that state.
+- **`queue_action([=]{...})`** — the actual action (drawing cards) isn't executed immediately inside the listener, but **queued** as a low-priority request (`request_action`, default priority 0) rather than run synchronously. Since the `request_queue` resolves higher-priority requests first (see the priority-ordering discussion in the checklist below), this means the deferred action actually waits until every higher-priority pending request already in the queue has resolved — for example, if the hit came from a Gatling that's still working through multiple targets, or from a chain of hits triggering deaths that still need resolving, those all clear first, and Bart Cassidy's draw happens once the queue actually gets to it.
 - **`target->alive()`** — a safety check: if the damage was lethal, nothing is drawn anyway (the player has died in the meantime).
 
 The `ncards` constructor parameter allows the same implementation to be reused with different `equip_value`s (e.g. for "upgraded" variants in other expansions), similarly to how `weapon(3)` in YAML passes an integer to `weapon`'s `effect_value`.
@@ -315,7 +315,6 @@ Every line here is copied straight from the real `max_cards` dispatch except `is
 
 With all three in place, the card behaves identically to any built-in one: `possible_to_play.cpp` and `TargetDispatch.ts`'s `isValidCardTarget` independently agree on which combinations qualify (both re-derived from the same underlying rule by hand, not shared code — worth keeping in sync deliberately if the rule ever changes on one side), the UI stops offering already-used suits as the selection grows, and the resulting `GameAction` serializes to the same `CardId[]` the server's `deserialize_target` expects.
 
-
 ---
 
 ## Case 7 — Stacking effects: cards that modify another card's resolution
@@ -351,13 +350,13 @@ struct request_bang : request_auto_resolvable, interface_missable, ... {
 
 Because `call_event(apply_bang_modifier{...})` fires **after the request exists but before it's queued**, *any* card can register a listener that mutates `bang_strength`/`bang_damage` on the fly, and the base *Bang!*/*Missed!* logic (`on_miss`, decrementing `bang_strength` per card played) never has to know which cards did the mutating. Two real, independently-authored examples:
 
-**Slab the Killer** — a permanent, defensive character passive (`effects/base/slab_the_killer.cpp`):
+**Slab the Killer** — a permanent, *offensive* character passive (`effects/base/slab_the_killer.cpp`) — boosts Slab's own Bang!s, not Bang!s aimed at him:
 ```cpp
-void equip_slab_the_killer::on_enable(card_ptr target_card, player_ptr p) {
-    p->m_game->add_listener<event_type::apply_bang_modifier>(target_card,
-        [p](player_ptr target, shared_request_bang req) {
-            if (p == target) {
-                ++req->bang_strength;   // whoever targets Slab now needs 2 Missed!
+void equip_slab_the_killer::on_enable(card_ptr target_card, player_ptr target) {
+    target->m_game->add_listener<event_type::apply_bang_modifier>(target_card,
+        [target](player_ptr origin, shared_request_bang req) {
+            if (target == origin) {
+                ++req->bang_strength;   // Bang!s Slab plays now need 2 Missed! to cancel
             }
         });
 }
@@ -376,7 +375,7 @@ void effect_aim::on_play(card_ptr origin_card, player_ptr origin) {
 }
 ```
 
-Neither file references the other, and neither lives in the same expansion (Slab the Killer is a base character; Aim is from *Valley of Shadows*). Yet if a player plays *Aim* and then targets a *Slab the Killer* with *Bang!*, the single `request_bang` object created for that Bang! ends up with `bang_strength == 2` **and** `bang_damage == 2` — both modifications apply automatically, because both listeners independently reacted to the same `apply_bang_modifier` event. This is what "stacking" means in practice: the combined behavior is an emergent sum of every listener currently registered, not something either card has to anticipate. (The same event is reused by several other cards across expansions — `sniper.cpp`, `bigfifty.cpp`, `buntlinespecial.cpp`, `doublebarrel.cpp`, `colorado_bill.cpp` — all of them independently adjusting `bang_strength`/`bang_damage` the same way.)
+Neither file references the other, and neither lives in the same expansion (Slab the Killer is a base character; Aim is from *Valley of Shadows*). Both check the same thing — "am I the one currently playing this Bang!" (`target == origin` in one, `p == origin` in the other). Yet if a player *who is Slab the Killer* plays *Aim* and then plays a *Bang!*, the single `request_bang` object created for that Bang! ends up with `bang_strength == 2` **and** `bang_damage == 2` — both modifications apply automatically, because both listeners independently reacted to the same `apply_bang_modifier` event, each recognizing the same player as the one currently attacking. This is what "stacking" means in practice: the combined behavior is an emergent sum of every listener currently registered, not something either card has to anticipate. (The same event is reused by several other cards across expansions — `sniper.cpp`, `bigfifty.cpp`, `buntlinespecial.cpp`, `doublebarrel.cpp`, `colorado_bill.cpp` — all of them independently adjusting `bang_strength`/`bang_damage` the same way.)
 
 **The general recipe**, for any effect you want a new card to plug into:
 1. Check whether the effect you want to interact with already fires a "modifier event" between constructing its request and queuing it (search the effect's header for an `event_type::apply_*_modifier`-style struct — `bang.h`, for instance, also documents `check_bang_target` for veto-style checks, and `on_missed` for reacting *after* a Bang! gets cancelled).
@@ -577,7 +576,7 @@ which YAML can then reference exactly like any other rule, e.g. `color(card_colo
 
 **Goal**: a card that both humans and bots can play on any player — but a bot should avoid pointing it at the "wrong" kind of target, without restricting what a human is allowed to do.
 
-The concrete example is a new card, **Comrade's Aid** — "choose a player, heal them 1 HP." A human might deliberately heal an opponent for social reasons in a hidden-role game; that's a legitimate choice. A bot doing the same thing is almost always just wasting the effect. The fix doesn't add a bot-specific branch to the card's logic — it reuses the *same* `get_error` slot every card already has for ordinary validation, calling one of the ready-made helpers in `game/prompts.h`:
+The concrete example is a new card, **Comrade's Aid** — "choose a player, heal them 1 HP." A human might deliberately heal an opponent for social reasons in a hidden-role game; that's a legitimate choice. A bot doing the same thing is almost always just wasting the effect. One rule worth stating up front, since it's easy to get backwards: **`get_error` is only ever for genuine rule violations — something that's illegal for anyone, bot or human — never for bot-only heuristics.** Bots and humans play by exactly the same rules; a bot must always be *able* to make the same play a human could, however unwise. Steering a bot away from a bad-but-legal choice belongs in `on_prompt` instead, using one of the ready-made helpers in `game/prompts.h`:
 
 ```cpp
 // effects/base/comrades_aid.h
@@ -589,8 +588,9 @@ The concrete example is a new card, **Comrade's Aid** — "choose a player, heal
 namespace banggame {
 
     struct effect_comrades_aid {
-        game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target) {
-            return prompts::bot_check_target_friend(origin, target);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+            MAYBE_RETURN(prompts::bot_check_target_friend(origin, target));
+            return {};
         }
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
             target->heal(origin_card, origin, 1);
@@ -617,18 +617,14 @@ game_string bot_check_target_friend(player_ptr origin, player_ptr target) {
     return {};
 }
 ```
-Every helper in this family (`bot_check_target_friend`, `bot_check_target_enemy`, `bot_check_kill_sheriff`, `bot_check_target_card`, `bot_check_discard_card`) starts with the same `origin->is_bot()` guard: for a human player it always returns an empty string, so `get_error` reports no error and `Comrade's Aid` behaves like any ordinary card with no bot-specific logic at all. `bot_suggestion::is_target_friend`/`is_target_enemy` (`game/bot_suggestion.h`) are the shared primitives behind the guess — they estimate alignment from known/suspected roles and from actions the bot has observed so far, so the same two functions back every heuristic in this family rather than each card reinventing "is this player probably on my side."
+This is one of a small family of similarly-shaped `bot_check_*` helpers in `game/prompts.h` (the exact set will keep growing, so it's not worth enumerating), every one of which starts with the same `origin->is_bot()` guard: for a human player it always returns an empty string, so `on_prompt` reports no prompt and `Comrade's Aid` behaves like any ordinary card with no bot-specific logic at all. `bot_suggestion::is_target_friend`/`is_target_enemy` (`game/bot_suggestion.h`) are the shared primitives behind the guess — they estimate alignment from known/suspected roles and from actions the bot has observed so far, so the same two functions back every heuristic in this family rather than each card reinventing "is this player probably on my side." Its `game_string` return converts implicitly into the `prompt_string` that `on_prompt` expects (`prompt_string`'s constructor accepts a plain `game_string`, defaulting to priority 0), which is what lets `MAYBE_RETURN` work the same way here as it does anywhere else.
 
-**Why it works**: this piggybacks entirely on how `verify_and_play` already treats a non-empty `get_error` — it's turned into a `play_verify_results::error`, exactly the same result a genuine rules violation would produce. The bot's own decision loop, `execute_random_play` (`bot_ai.cpp`), treats *both* an `error` and a `prompt` result identically: as "this specific candidate didn't work, try a different card or target from the pool instead," never as "ask for confirmation." So a bot that draws Comrade's Aid with an enemy as the only candidate target will simply abandon that attempt and try something else in the same pass — it never sees a message, never "confirms" anything, it just doesn't pick that option, the same way it wouldn't pick a card that failed a normal filter. A human sending the exact same action never triggers the check at all, since `is_bot()` is false for them. Two consequences worth keeping in mind:
+**Why it works**: this piggybacks entirely on how `verify_and_play` already treats a non-empty `on_prompt` result — it's turned into a `play_verify_results::prompt`. The bot's own decision loop, `execute_random_play` (`bot_ai.cpp`), treats a `prompt` result as "this specific candidate didn't work, try a different card or target from the pool instead," never as "ask for confirmation." So a bot that draws Comrade's Aid with an enemy as the only candidate target will simply abandon that attempt and try something else in the same pass — it never sees a message, never "confirms" anything, it just doesn't pick that option. A human sending the exact same action never triggers the check at all, since `is_bot()` is false for them, and — critically — nothing here ever stops a human from making that same "unwise" choice on purpose. Two consequences worth keeping in mind:
 - **It's a soft discouragement, not a hard rule.** If, after `bot_info.yml`'s `max_random_tries` retries, a bot genuinely has no other legal option, `execute_random_play` sets `bypass_prompt = true` and forces the play through anyway rather than stalling forever — so this steers a bot away from bad choices when better ones exist, it doesn't forbid the bad choice outright.
-- **`on_prompt` works the same way, for softer nudges.** `bot_check_target_friend`/`bot_check_target_enemy`/`bot_check_discard_card` return a plain `game_string` and belong in `get_error`; others in the same file, like `bot_check_kill_sheriff` and `bot_check_target_card`, return a `prompt_string` (with an explicit priority, e.g. `{1, "BOT_DONT_KILL_SHERIFF"}`) and belong in `on_prompt` instead — the same `origin->is_bot()`-gated pattern, just surfacing through the "would this need a confirmation dialog" path rather than the "is this even legal" path. Both are dead ends for the bot's retry loop either way; which one you use is purely about whether the check is closer to "this is a rules-adjacent bad idea" (`get_error`) or "a human would normally get asked to confirm this" (`on_prompt`).
+- **This is why `get_error` is off-limits for this.** A non-empty `get_error` makes a play flatly illegal — for everyone, since the client won't even offer it and the server would reject it outright if forced. That's correct for an actual rule (a filter, an immunity, a turn restriction); it's wrong for "a bot probably shouldn't do this," because it would also silently take the choice away from human players, who are allowed to make it. `on_prompt` is the only one of the two that's specifically about *discouraging without forbidding*.
 
 ---
 
-## Summary: which case applies to my card?
-
-| If the card... | You need to touch... |
-|---|---|
 ## Case 12 — Defining a brand-new event type
 
 **Goal**: every hook used in Cases 3, 4, and 7 — `count_range_mod`, `on_hit`, `apply_bang_modifier` — already existed before those cards were written. This case is the other side of that: what do you actually do when the event you need *doesn't* exist yet, because you're starting a new mechanic from scratch rather than plugging into `Bang!`?
@@ -640,48 +636,48 @@ concept event = requires (const T &value) { reflect::to<std::tuple>(value); };
 ```
 `reflect::to<std::tuple>` (the vendored compile-time reflection library under `external/reflect`) is what makes this work: it turns any aggregate into a `std::tuple` of its fields, in declaration order, at compile time — no boilerplate, no name string, nothing to look up at runtime. `call_event`/`add_listener` are then just ordinary function templates parameterized on your struct's C++ type directly (`typeid(T)` is used as the internal key), not on a YAML-facing name — so there's no equivalent of `GET_EFFECT`/`TARGET_TYPE` to write.
 
-Say you're adding a new mechanic — a brown card, **Ricochet**: "target discards a card at random from their hand (not damage)." You'd like other future cards to be able to increase how many cards it makes them discard, the same way *Aim*/*Slab the Killer* stack on `apply_bang_modifier`. Since this isn't a Bang!, there's no existing hook for it — you declare one, right alongside the effect that owns it:
+Say you're adding a new mechanic — a brown card, **Buckshot**: "target discards a card at random from their hand (not damage)." You'd like other future cards to be able to increase how many cards it makes them discard, the same way *Aim*/*Slab the Killer* stack on `apply_bang_modifier`. Since this isn't a Bang!, there's no existing hook for it — you declare one, right alongside the effect that owns it:
 ```cpp
-// effects/base/ricochet.h
-#ifndef __BASE_RICOCHET_H__
-#define __BASE_RICOCHET_H__
+// effects/base/buckshot.h
+#ifndef __BASE_BUCKSHOT_H__
+#define __BASE_BUCKSHOT_H__
 
 #include "cards/card_effect.h"
 
 namespace banggame::event_type {
-    struct apply_ricochet_modifier {
+    struct apply_buckshot_modifier {
         player_ptr target;
         nullable_ref<int> ncards;
     };
 }
 
 namespace banggame {
-    struct effect_ricochet {
+    struct effect_buckshot {
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target);
     };
-    DEFINE_EFFECT(ricochet, effect_ricochet)
+    DEFINE_EFFECT(buckshot, effect_buckshot)
 }
 
 #endif
 ```
 ```cpp
-// effects/base/ricochet.cpp
-#include "ricochet.h"
+// effects/base/buckshot.cpp
+#include "buckshot.h"
 #include "game/game_table.h"
 
 namespace banggame {
-    void effect_ricochet::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    void effect_buckshot::on_play(card_ptr origin_card, player_ptr origin, player_ptr target) {
         int ncards = 1;
-        origin->m_game->call_event(event_type::apply_ricochet_modifier{ target, ncards });
+        origin->m_game->call_event(event_type::apply_buckshot_modifier{ target, ncards });
         for (int i = 0; i < ncards && !target->m_hand.empty(); ++i) {
             target->discard_card(random_element(target->m_hand));
         }
     }
 }
 ```
-A future card can now stack onto this exactly the way *Aim* stacks onto `apply_bang_modifier`, with no changes to `ricochet.h`/`.cpp` at all:
+A future card can now stack onto this exactly the way *Aim* stacks onto `apply_bang_modifier`, with no changes to `buckshot.h`/`.cpp` at all:
 ```cpp
-origin->m_game->add_listener<event_type::apply_ricochet_modifier>(origin_card,
+origin->m_game->add_listener<event_type::apply_buckshot_modifier>(origin_card,
     [=](player_ptr target, int &ncards) {
         if (/* whatever condition */) ++ncards;
     });
@@ -689,9 +685,56 @@ origin->m_game->add_listener<event_type::apply_ricochet_modifier>(origin_card,
 A few things worth being precise about:
 - **Field order is the contract.** `reflect::to<std::tuple>` unpacks fields positionally, and `std::apply` binds them positionally to the listener's parameters — the listener's parameter list has to match the struct's field order and types (by value, reference, or const reference, whichever it actually declares), not the field names. Get the order wrong and it's a hard compile error at the `add_listener` call site (the `applicable_as_event` concept simply won't be satisfied), not a silent bug — which is a nice property, but still means the field order is doing real, load-bearing work.
 - **`nullable_ref<T>`** (`utils/misc.h`) is why `ncards` is declared as `nullable_ref<int>` in the struct but received as a plain `int&` in every listener — it's a thin, default-constructible wrapper around a `T*` that converts to/from `T&` implicitly. It's a workaround for a limitation of the vendored `reflect` library (`external/reflect`, [qlibs/reflect](https://github.com/qlibs/reflect)) itself: its aggregate-reflection technique can't handle a struct that actually contains a genuine reference (`T&`) member, so event fields meant to be writable by listeners are declared as `nullable_ref<T>` instead, and it converts back and forth transparently at the call site. This is a library-specific workaround, not a fundamental language limitation — with C++26's native reflection this need goes away entirely, so `nullable_ref` is very likely a temporary fixture of this codebase rather than a permanent pattern to imitate elsewhere.
-- **`result_type` is opt-in**, and only needed if you want listeners to *answer* something rather than just observe or accumulate. Omit it entirely (as `apply_ricochet_modifier` does) for a pure notification/accumulator event. Declare it — as `check_play_card`/`check_bang_target` do, with `result_type = game_string` — when you want the *first listener with a non-empty answer* to short-circuit the rest: any type convertible to `bool` works (`game_string`/`prompt_string` empty-is-falsy, plain `bool`, `std::optional<T>`), and that's exactly the same "truthy answer wins, empty keeps asking" convention already used everywhere else in this system (`get_error`, `on_prompt`), just generalized to an arbitrary event instead of a fixed vtable slot.
-- **Where to declare it** matters for discoverability, not correctness: general-purpose events reused across many otherwise-unrelated cards belong in the shared `cards/game_events.h` (`on_hit`, `on_turn_end`...); an event that's conceptually owned by one specific mechanic belongs in that mechanic's own header, the way `apply_bang_modifier`/`on_missed`/`check_bang_target` all live in `bang.h` itself, or `check_equipped_green_card` lives in `dodgecity/ruleset.h`. Either way it's just a struct declaration — there's nothing to add to `vtable_build.h`, `effects.h`, or any collector header beyond what Ricochet's own `.h` file already needed for `DEFINE_EFFECT`.
+- **`result_type` is opt-in**, and only needed if you want listeners to *answer* something rather than just observe or accumulate. Omit it entirely (as `apply_buckshot_modifier` does) for a pure notification/accumulator event. Declare it — as `check_play_card`/`check_bang_target` do, with `result_type = game_string` — when you want the *first listener with a non-empty answer* to short-circuit the rest: any type convertible to `bool` works (`game_string`/`prompt_string` empty-is-falsy, plain `bool`, `std::optional<T>`), and that's exactly the same "truthy answer wins, empty keeps asking" convention already used everywhere else in this system (`get_error`, `on_prompt`), just generalized to an arbitrary event instead of a fixed vtable slot.
+- **Where to declare it** matters for discoverability, not correctness: general-purpose events reused across many otherwise-unrelated cards belong in the shared `cards/game_events.h` (`on_hit`, `on_turn_end`...); an event that's conceptually owned by one specific mechanic belongs in that mechanic's own header, the way `apply_bang_modifier`/`on_missed`/`check_bang_target` all live in `bang.h` itself, or `check_equipped_green_card` lives in `dodgecity/ruleset.h`. Either way it's just a struct declaration — there's nothing to add to `vtable_build.h`, `effects.h`, or any collector header beyond what Buckshot's own `.h` file already needed for `DEFINE_EFFECT`.
 - **Priority and ordering are inherited for free.** A brand-new event type goes through the exact same `add_listener`/`call_event` machinery as every existing one, so it automatically gets the same dispatch ordering already covered in the checklist (§4): higher `event_card_key.priority` fires earlier, `card->order` breaks ties. Nothing about defining a new event changes that — it's generic infrastructure, not something tied to any specific event.
+
+---
+
+## Case 13 — Letting a modifier reach into the card it precedes, via `effect_context`
+
+**Goal**: `mth` (Case 9) combines several target groups *within one card's own effect list*. This case is the other direction: a **modifier** (Case 8) that needs to change how the **terminal card** behaves — two entirely separate cards, registered independently, that only interact because they happen to be played together in one chain. (The full mechanism behind `effect_context` — how context types are declared, and the `serialize_context` opt-in that controls whether one reaches the client — is covered in the server module doc; this is the worked example.)
+
+The real card is *Bell Tower* (Armed & Dangerous): "ignore distances for the ranged card that follows." Its YAML:
+```yaml
+- name: BELL_TOWER
+  color: orange
+  modifier: belltower
+  effects:
+    - none self_cubes(1)
+```
+```cpp
+// effects/armedanddangerous/belltower.h
+struct modifier_belltower {
+    bool valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card) {
+        return playing_card->has_tag(tag_type::ranged_effect);
+    }
+    void add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx);
+};
+DEFINE_MODIFIER(belltower, modifier_belltower)
+
+namespace contexts {
+    struct ignore_distances {
+        struct serialize_context{};
+    };
+}
+```
+```cpp
+// belltower.cpp
+void modifier_belltower::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) {
+    ctx.add(contexts::ignore_distances{});
+}
+```
+That flag means nothing on its own — it only matters because the actual distance check, in `game/filters.cpp`, was written to look for it:
+```cpp
+static bool check_distance(const_player_ptr origin, const_player_ptr target, const effect_context &ctx, int range) {
+    if (range == 0) return false;
+    if (origin->check_player_flags(player_flag::ignore_distances)) return true;
+    if (ctx.contains<contexts::ignore_distances>()) return true;
+    ...
+}
+```
+`filters.cpp` even `#include`s `belltower.h` directly, just for that one struct — worth being upfront about, since it's the important caveat to this pattern: defining a new context type costs nothing (a plain struct, no macro), but *making something else respect it* is a real, deliberate change to whatever shared code needs to care. Contrast this with the generic context types (`contexts::selected_card` and friends) that the base target types already populate for every card automatically — those are "free"; a brand-new cross-cutting flag like `ignore_distances` is not, and required editing `filters.cpp` itself to wire in.
 
 ---
 
@@ -708,8 +751,9 @@ A few things worth being precise about:
 | Can't be played on its own — it must be followed immediately by a specific kind of card | A new `modifier_vtable` via `DEFINE_MODIFIER` (Case 8) |
 | Needs several differently-filtered targets delivered to *one* combined function, especially when one group's content affects what happens to another | A new `mth_vtable` via `DEFINE_MTH` (Case 9) |
 | Should be prioritized (or deprioritized) by bots relative to other legal plays | The right `tags:` entry, matched against `config/bot_info.yml`'s existing rules (Case 10) |
-| Is legal for anyone, but a bot should usually avoid a specific target/decision | A bot-only `get_error`/`on_prompt` check via `prompts::bot_check_*` (Case 11) |
+| Is legal for anyone, but a bot should usually avoid a specific target/decision | A bot-only `on_prompt` check via `prompts::bot_check_*` (Case 11) |
 | Starts a mechanic other cards should be able to hook into, and no existing event fits | A new plain aggregate struct under `event_type::`, no macro needed (Case 12) |
+| Is a modifier that needs to change how the terminal card it precedes behaves | A new `effect_context` type, read back by whatever shared code needs to respect it (Case 13) |
 
 In every case involving C++, the final step is always the same: **register the implementation with the appropriate macro** (`DEFINE_EFFECT`/`DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_MTH`/`DEFINE_TARGETING`), include the new file from its folder's collector header (`effects/<expansion>/effects.h` or `target_types/<expansion>/target_types.h`) so it's reachable from the generated `bang_cards.cpp`, reference it by name from the YAML, and — if anything user-visible changes (a new target, a new log message) — update the corresponding translations in `Locale/*/Cards.tsx` / `GameStrings.tsx` on the `bangweb` side. The one exception is Case 12 itself: a new event type is just a struct declaration, nothing to register anywhere.
 
@@ -719,12 +763,8 @@ In every case involving C++, the final step is always the same: **register the i
 
 Your list (YAML definition, effect struct, `.h`/`.cpp` file, `effects.h` + `CMakeLists.txt`, request class, bot checks, immunity checks, checking other cards that might interact with it) covers the core of it. Verified against the code, here's the full picture with the gaps filled in — mainly: **deciding the card's shape before writing anything**, **priority ordering against every other listener/request on the same event or queue**, and the frontend/i18n half that's easy to forget entirely since the server runs fine without it.
 
-**1. Decide the card's shape** *(do this first — it determines most of what follows)*
+**1. Decide the card's shape** *(do this first — it determines most of what follows; see the summary table above for which case applies)*
 - [ ] Which list does it belong to: `effects` (played on your turn), `responses` (played reacting to a request), `equip_effects` (equip on-attach), or more than one?
-- [ ] Does it need to chain with another card as a precondition (→ Case 8, `modifier`/`modifier_response`) rather than being playable on its own?
-- [ ] Does a single combined action need several differently-filtered targets at once, especially if one group's *content* affects what happens with another (→ Case 9, `mth_effect`/`mth_response`)?
-- [ ] Can every target it needs be expressed with the existing `none`/`player`/`players`/`card`/`cards` target types plus filters, or does it need a genuinely new `target_type` (→ Case 6 — the one case that also requires a frontend change up front, not just at the end)?
-- [ ] Does it start a mechanic other cards should be able to react to or stack onto later, with no existing event that fits (→ Case 12 — declaring a new `event_type::` struct, which needs no registration macro at all)?
 
 **2. YAML definition** (`config/sets/<expansion>.yml`)
 - [ ] `name`, `signs` (or omit for characters/equip-once cards), `image`, `color`, correct deck section (`main_deck`/`character`/`hidden`/etc. — this also decides which "expansion strategy" `parse_bang_cards.py` applies, e.g. one entry per sign vs. a fixed `count`).
@@ -749,7 +789,7 @@ If your new effect registers an event listener or queues a request, it's joining
 
 **6. Bot behavior** (Cases 10-11)
 - [ ] Tag it so it lands in the right `in_play_rules`/`response_rules` tier (Case 10) — only add a new `DEFINE_BOT_RULE` if the property genuinely isn't reducible to an existing tag/pocket/equip check.
-- [ ] If it's a card any player *could* legally point at the wrong target, but a bot usually shouldn't, add a bot-only `get_error`/`on_prompt` check via `prompts::bot_check_*` (Case 11) rather than restricting human players.
+- [ ] If it's a card any player *could* legally point at the wrong target, but a bot usually shouldn't, add a bot-only `on_prompt` check via `prompts::bot_check_*` (Case 11) rather than restricting human players — never `get_error` for this, since that would make the play illegal for humans too, not just discouraged for bots.
 
 **7. Frontend / localization** (`bangweb`) — the server compiles and runs fine without any of this; it just won't be legible to a real client
 - [ ] Card image asset in `public/cards/` matching the YAML's `image:` key.
