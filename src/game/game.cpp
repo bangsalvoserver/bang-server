@@ -67,6 +67,30 @@ namespace banggame {
         return std::nullopt;
     }
 
+    static unknown_card_list make_unknown_cards(player_ptr owner, const playable_cards_list &cards) {
+        unknown_card_list result;
+        card_set visited_cards;
+
+        auto add_card = [&](card_ptr target_card) {
+            if (!visited_cards.contains(target_card)) {
+                visited_cards.add(target_card);
+
+                if (!target_card->visibility.matches(owner)) {
+                    result.emplace_back(target_card, *target_card);
+                }
+            }
+        };
+
+        for (const playable_card_info &info : cards) {
+            add_card(info.card);
+            for (const modifier_entry &entry : info.modifiers) {
+                add_card(entry.card);
+            }
+        }
+
+        return result;
+    }
+
     static game_updates::player_distances make_player_distances(player_ptr owner) {
         game_updates::player_distances result{};
         if (owner) {
@@ -106,12 +130,15 @@ namespace banggame {
     }
 
     static game_updates::request_status make_request_update(const request_base &req, player_ptr owner = nullptr) {
+        auto respond_cards = generate_playable_cards_list(owner, effect_list_type::responses);
+        auto unknown_cards = make_unknown_cards(owner, respond_cards);
         return game_updates::request_status {
             .origin_card = req.origin_card,
             .origin = req.origin,
             .target = req.target,
             .status_text = req.status_text(owner),
-            .respond_cards = generate_playable_cards_list(owner, effect_list_type::responses),
+            .respond_cards = std::move(respond_cards),
+            .unknown_cards = std::move(unknown_cards),
             .highlight_cards = req.get_highlights(owner),
             .target_set_players = get_request_target_set_players(owner),
             .target_set_cards = get_request_target_set_cards(owner),
@@ -121,8 +148,11 @@ namespace banggame {
     }
 
     static game_updates::status_ready make_status_ready_update(player_ptr owner) {
+        auto play_cards = generate_playable_cards_list(owner);
+        auto unknown_cards = make_unknown_cards(owner, play_cards);
         return {
-            .play_cards = generate_playable_cards_list(owner),
+            .play_cards = std::move(play_cards),
+            .unknown_cards = std::move(unknown_cards),
             .distances = make_player_distances(owner)
         };
     }
