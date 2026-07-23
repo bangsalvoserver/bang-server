@@ -317,7 +317,7 @@ namespace banggame {
 
             for (card_ptr c : target->m_characters) {
                 if (c->get_visibility() == card_visibility::show_owner) {
-                    yield_update(game_updates::show_card{ c, *c, 0ms });
+                    yield_update(game_updates::show_card{ c, *c, true });
                 }
             }
 
