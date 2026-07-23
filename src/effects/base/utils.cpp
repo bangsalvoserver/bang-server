@@ -43,6 +43,12 @@ namespace banggame {
         origin->discard_used_card(target_card);
     }
 
+    void effect_queue_set_playing::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+        origin->m_game->queue_action([=, type=type] {
+            effect_set_playing{type}.on_play(origin_card, origin, target_card);
+        }, 200);
+    }
+
     namespace event_type {
         struct check_player_flag {
             using result_type = bool;

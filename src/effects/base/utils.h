@@ -33,6 +33,14 @@ namespace banggame {
 
     DEFINE_EFFECT(set_playing, effect_set_playing)
 
+    struct effect_queue_set_playing : effect_set_playing {
+        using effect_set_playing::effect_set_playing;
+
+        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card);
+    };
+
+    DEFINE_EFFECT(queue_set_playing, effect_queue_set_playing)
+
     struct equip_add_flag {
         player_flag flag;
         equip_add_flag(player_flag flag): flag{flag} {}
