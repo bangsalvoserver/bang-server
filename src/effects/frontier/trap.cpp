@@ -16,7 +16,7 @@ namespace banggame {
     }
 
     void equip_trap::on_enable(card_ptr target_card, player_ptr target) {
-        target->m_game->add_listener<event_type::check_equip_card>(target_card, [=](player_ptr origin, card_ptr origin_card, const_player_ptr e_target, const effect_context &ctx) -> game_string {
+        target->m_game->add_listener<event_type::check_equip_card>(target_card, [=](player_ptr origin, card_ptr origin_card, player_ptr e_target, const effect_context &ctx) -> game_string {
             if (origin == target && origin_card->is_blue()) {
                 return "ERROR_CANT_EQUIP_BLUE_CARDS";
             }
@@ -27,6 +27,12 @@ namespace banggame {
     struct request_move_trap : request_picking_player {
         request_move_trap(card_ptr origin_card, player_ptr target)
             : request_picking_player(origin_card, nullptr, target) {}
+
+        void on_update() override {
+            if (rn::none_of(target->m_game->m_players, [&](player_ptr p) { return in_target_set(p); })) {
+                pop_request();
+            }
+        }
         
         bool can_pick(player_ptr target_player) const override {
             return target_player != target

@@ -61,6 +61,7 @@ namespace banggame {
         bool is_bot() const;
         bool is_ghost() const;
         bool alive() const;
+        bool in_game() const;
 
         void damage(card_ptr origin_card, player_ptr origin, int value, effect_flags flags = {});
 

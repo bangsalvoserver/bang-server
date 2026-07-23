@@ -61,12 +61,21 @@ namespace banggame {
         return {};
     }
 
+    static effect_flags get_flags(const player_list &targets) {
+        effect_flags flags = effect_flag::multi_target;
+        if (targets.size() == 1) {
+            flags.add(effect_flag::single_target);
+        }
+        return flags;
+    }
+
     prompt_string targeting_adjacent_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) {
         if (targets.size() == 1 && origin->m_game->num_alive() > 2) {
             return {"PROMPT_SINGLE_TARGET", origin_card};
         }
+        effect_flags flags = get_flags(targets);
         return prompts::select_prompt(targets | rv::transform([&](player_ptr target) {
-            return target_player.on_prompt(origin_card, origin, effect, ctx, target);
+            return effect.on_prompt(origin_card, origin, target, flags, ctx);
         }));
     }
 
@@ -77,10 +86,7 @@ namespace banggame {
     }
 
     void targeting_adjacent_players::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const player_list &targets) {
-        effect_flags flags = effect_flag::multi_target;
-        if (targets.size() == 1) {
-            flags.add(effect_flag::single_target);
-        }
+        effect_flags flags = get_flags(targets);
         for (player_ptr target : targets) {
             effect.on_play(origin_card, origin, target, flags, ctx);
         }

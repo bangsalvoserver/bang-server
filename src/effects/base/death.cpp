@@ -114,7 +114,7 @@ namespace banggame {
             target->m_game->queue_action([=]{
                 bool any_player_removed = false;
                 for (player_ptr p : target->m_game->m_players) {
-                    if (!p->check_player_flags(player_flag::keep_alive) && !p->alive() && p->add_player_flags(player_flag::removed)) {
+                    if (!p->in_game() && p->add_player_flags(player_flag::removed)) {
                         any_player_removed = true;
                     }
                 }
@@ -147,9 +147,7 @@ namespace banggame {
                 target->m_game->add_log("LOG_GAME_OVER");
             };
 
-            auto alive_players = rv::filter(target->m_game->m_players, [](player_ptr p) {
-                return p->check_player_flags(player_flag::keep_alive) || p->alive();
-            });
+            auto alive_players = rv::filter(target->m_game->m_players, &player::in_game);
 
             if (target->m_game->check_flags(game_flag::free_for_all)) {
                 if (rn::distance(alive_players) <= 1) {
@@ -183,6 +181,6 @@ namespace banggame {
     }
 
     void revive_character(player_ptr target) {
-        target->m_game->remove_disablers({ target->get_character(), 90 });
+        target->m_game->remove_disabler({ target->get_character(), 90 });
     }
 }

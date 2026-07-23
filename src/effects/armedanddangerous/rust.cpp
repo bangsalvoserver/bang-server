@@ -1,6 +1,7 @@
 #include "rust.h"
 
 #include "game/game_table.h"
+#include "game/prompts.h"
 
 #include "effects/base/resolve.h"
 #include "effects/base/escapable.h"
@@ -32,6 +33,11 @@ namespace banggame {
             }
         }
     };
+
+    prompt_string effect_rust::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
+        return {};
+    }
     
     void effect_rust::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         origin->m_game->queue_request<request_rust>(origin_card, origin, target, flags);

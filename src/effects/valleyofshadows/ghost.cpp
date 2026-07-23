@@ -18,7 +18,7 @@ namespace banggame {
 
     void equip_disable_character::on_disable(card_ptr target_card, player_ptr target) {
         target->m_game->queue_action([=]{
-            target->m_game->remove_disablers(target_card);
+            target->m_game->remove_disabler(target_card);
         }, 49);
     }
 
@@ -28,7 +28,7 @@ namespace banggame {
     }
     
     void equip_ghost::on_enable(card_ptr target_card, player_ptr target) {
-        if (!target->check_player_flags(player_flag::keep_alive) && !target->alive()) {
+        if (!target->in_game()) {
             revive_character(target);
         }
 
@@ -38,7 +38,7 @@ namespace banggame {
     void equip_ghost::on_disable(card_ptr target_card, player_ptr target) {
         equip_add_flag{player_flag::keep_alive}.on_disable(target_card, target);
 
-        if (!target->check_player_flags(player_flag::keep_alive) && !target->alive()) {
+        if (!target->in_game()) {
             handle_player_death(nullptr, target, death_type::ghost_discard);
         }
     }

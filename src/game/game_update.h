@@ -43,6 +43,13 @@ namespace banggame {
     };
 
     using playable_cards_list = std::vector<playable_card_info>;
+
+    struct unknown_card {
+        card_ptr card;
+        card_data info;
+    };
+
+    using unknown_card_list = std::vector<unknown_card>;
     
     using timer_id_t = uint16_t;
 
@@ -290,6 +297,7 @@ namespace banggame {
             nullable_player target;
             game_string status_text;
             playable_cards_list respond_cards;
+            unknown_card_list unknown_cards;
             card_list highlight_cards;
             player_list target_set_players;
             card_list target_set_cards;
@@ -299,6 +307,7 @@ namespace banggame {
 
         struct status_ready {
             playable_cards_list play_cards;
+            unknown_card_list unknown_cards;
             player_distances distances;
         };
 

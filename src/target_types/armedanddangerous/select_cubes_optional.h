@@ -21,6 +21,12 @@ namespace banggame {
             return {};
         }
 
+        void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target) {
+            if (!target.empty()) {
+                targeting_select_cubes::add_context(origin_card, origin, effect, ctx, target);
+            }
+        }
+
         game_string get_error(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target) {
             if (!target.empty()) {
                 return targeting_select_cubes::get_error(origin_card, origin, effect, ctx, target);

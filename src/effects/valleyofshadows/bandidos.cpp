@@ -33,7 +33,7 @@ namespace banggame {
         }
 
         prompt_string resolve_prompt() const override {
-            if (target->is_bot() && target->m_hp <= 1 && rn::any_of(target->m_hand, [&](card_ptr target_card) {
+            if (target->is_bot() && target->m_hp <= 2 && rn::any_of(target->m_hand, [&](card_ptr target_card) {
                 return !target->m_game->is_usage_disabled(target_card);
             })) {
                 return "BOT_MUST_RESPOND_BANDIDOS";
@@ -50,10 +50,16 @@ namespace banggame {
         }
     };
 
-    prompt_string effect_bandidos::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+    prompt_string effect_bandidos::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
-        if (origin == target && !origin->is_ghost() && target->m_hp <= 1 && target->m_hand.size() <= 1) {
-            return {1, "PROMPT_SUICIDE", origin_card};
+        MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
+        if (origin == target && !origin->is_ghost()) {
+            int prompt_hp = target->is_bot() ? 2 : 1;
+            if (target->m_hp <= prompt_hp && target->m_hand.size() <= 1) {
+                return {1, "PROMPT_SUICIDE", origin_card};
+            } else {
+                return {"PROMPT_TARGET_SELF", origin_card};
+            }
         }
         return {};
     }
@@ -104,6 +110,11 @@ namespace banggame {
             }
         }
     };
+    
+    prompt_string effect_bandidos2::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
+        return {};
+    }
 
     void effect_bandidos2::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         target->m_game->queue_request<request_bandidos2>(origin_card, origin, target, flags);

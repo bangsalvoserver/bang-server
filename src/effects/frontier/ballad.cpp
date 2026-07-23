@@ -16,8 +16,9 @@ namespace banggame {
         return !target_card->is_black() && !target_card->is_train();
     }
 
-    game_string effect_ballad::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+    prompt_string effect_ballad::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
 
         if ((origin == target || target->empty_hand()) && rn::none_of(target->m_table, is_valid_ballad_card)) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};

@@ -13,10 +13,7 @@
 
 namespace banggame {
 
-    game_table::game_table(const game_options &options)
-        : disabler_map{this}
-        , m_options{options}
-    {
+    game_table::game_table(const game_options &options) : m_options{options} {
         logging::info("Options: [{}]", options.to_string(", "));
 
         std::random_device rd;
@@ -143,8 +140,8 @@ namespace banggame {
         return std::min(count_cw, count_ccw) + distance_mod;
     }
 
-    int game_table::num_alive() const {
-        return int(rn::count_if(m_players, &player::alive));
+    int game_table::num_alive(bool in_game) const {
+        return int(rn::count_if(m_players, in_game ? &player::in_game : &player::alive));
     }
 
     void game_table::shuffle_cards_and_ids(std::span<card_ptr> vec) {

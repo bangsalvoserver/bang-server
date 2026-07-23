@@ -2,6 +2,7 @@
 
 #include "game/game_table.h"
 #include "game/game_options.h"
+#include "game/prompts.h"
 
 #include "effects/base/resolve.h"
 #include "effects/base/draw_check.h"
@@ -56,6 +57,11 @@ namespace banggame {
             }
         }
     };
+
+    prompt_string effect_most_wanted::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
+        return {};
+    }
 
     void effect_most_wanted::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         origin->m_game->queue_request<request_most_wanted>(origin_card, origin, target, flags);

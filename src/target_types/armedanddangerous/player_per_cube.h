@@ -3,7 +3,7 @@
 
 #include "target_types/base/player.h"
 
-#include "select_cubes.h"
+#include "select_cubes_repeat.h"
 
 namespace banggame {
 
@@ -13,7 +13,7 @@ namespace banggame {
             player_list players;
         };
 
-        [[=json::ignore]] targeting_select_cubes target_cubes;
+        [[=json::ignore]] targeting_select_cubes_repeat target_cubes;
         [[=json::flatten]] targeting_player target_player;
         int extra_players;
 

@@ -15,56 +15,18 @@ namespace banggame {
     template<utils::fixed_string Name>
     struct bot_rule_map;
 
-    #define DEFINE_BOT_RULE(name, rule_type) template<> struct bot_rule_map<#name> { using type = rule_type; };
+    #define DEFINE_BOT_RULE(name, rule_type, ...) \
+        struct rule_type { __VA_OPT__(__VA_ARGS__;) bool operator()(card_node) const;  }; \
+        template<> struct bot_rule_map<#name> { using type = rule_type; };
 
     #define BOT_RULE(name) bot_rule_map<#name>::type
-    
-    struct rule_filter_by_pocket {
-        pocket_type pocket;
-        bool operator()(card_node) const;
-    };
 
-    DEFINE_BOT_RULE(pocket, rule_filter_by_pocket)
-
-    struct rule_filter_by_pocket_not {
-        pocket_type pocket;
-        bool operator()(card_node) const;
-    };
-
-    DEFINE_BOT_RULE(pocket_not, rule_filter_by_pocket_not)
-
-    struct rule_equip {
-        bool operator()(card_node) const;
-    };
-
+    DEFINE_BOT_RULE(pocket, rule_filter_by_pocket, pocket_type pocket)
+    DEFINE_BOT_RULE(pocket_not, rule_filter_by_pocket_not, pocket_type pocket)
     DEFINE_BOT_RULE(equip, rule_equip)
-
-    struct rule_repeat {
-        bool operator()(card_node) const;
-    };
-
     DEFINE_BOT_RULE(repeat, rule_repeat)
-
-    struct rule_tag_value {
-        tag_type tag;
-        tag_int value;
-        bool operator()(card_node) const;
-    };
-
-    DEFINE_BOT_RULE(tag_value, rule_tag_value)
-
-    struct rule_tag_value_not {
-        tag_type tag;
-        tag_int value;
-        bool operator()(card_node) const;
-    };
-
-    DEFINE_BOT_RULE(tag_value_not, rule_tag_value_not)
-
-    struct rule_do_nothing {
-        bool operator()(card_node) const;
-    };
-
+    DEFINE_BOT_RULE(tag_value, rule_tag_value, tag_type tag; std::optional<tag_int> value)
+    DEFINE_BOT_RULE(tag_value_not, rule_tag_value_not, tag_type tag; std::optional<tag_int> value)
     DEFINE_BOT_RULE(do_nothing, rule_do_nothing)
 }
 
