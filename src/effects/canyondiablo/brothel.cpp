@@ -36,7 +36,7 @@ namespace banggame {
                         });
                         auto clear_events = [target, event_key](player_ptr p) {
                             if (p == target) {
-                                target->m_game->remove_disablers(event_key);
+                                target->m_game->remove_disabler(event_key);
                                 target->m_game->remove_listeners(event_key);
                             }
                         };

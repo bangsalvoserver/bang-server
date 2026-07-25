@@ -14,6 +14,14 @@ namespace banggame {
     };
 
     DEFINE_EFFECT(human, effect_human)
+
+    struct effect_set_playing {
+        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
+        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
+    };
+
+    DEFINE_EFFECT(set_playing, effect_set_playing)
     
     enum class play_as {
         bang,
@@ -21,17 +29,14 @@ namespace banggame {
         gatling
     };
 
-    struct effect_set_playing {
+    struct effect_discard_playing {
         play_as type;
-        effect_set_playing(play_as type) : type{type} {}
-        
-        void add_context(card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
-        game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
-        void on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card);
+        effect_discard_playing(play_as type) : type{type} {}
+
+        void on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx);
     };
 
-    DEFINE_EFFECT(set_playing, effect_set_playing)
+    DEFINE_EFFECT(discard_playing, effect_discard_playing)
 
     struct equip_add_flag {
         player_flag flag;

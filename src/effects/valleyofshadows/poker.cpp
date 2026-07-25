@@ -56,9 +56,10 @@ namespace banggame {
             target->m_game->queue_action([=, origin_card=origin_card, target=target]{
                 target->m_game->remove_listeners(origin_card);
 
-                target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
-                target_card->move_to(pocket_type::selection);
-                target->m_game->call_event(event_type::on_discard_hand_card{ target, target_card, true });
+                if (target->disown_card(target_card, true)) {
+                    target->m_game->add_log("LOG_DISCARDED_CARD_FOR", origin_card, target, target_card);
+                    target_card->move_to(pocket_type::selection);
+                }
             }, 95);
         }
 
@@ -122,6 +123,11 @@ namespace banggame {
             }
         }
     };
+
+    prompt_string effect_poker::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
+        return {};
+    }
 
     void effect_poker::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
         origin->m_game->queue_request<request_poker>(origin_card, origin, target, flags);

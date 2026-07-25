@@ -168,7 +168,7 @@ namespace banggame::bot_suggestion {
         case player_role::sheriff:
             if (is_role_known(origin, target)) {
                 return target->is_outlaw_or_renegade();
-            } else if (rn::none_of(origin->m_game->m_players, [](player_ptr p) { return p->alive() && p->is_outlaw(); })) {
+            } else if (rn::none_of(origin->m_game->m_players, [](player_ptr p) { return p->in_game() && p->is_outlaw(); })) {
                 return target->m_hp > 1;
             } else if (is_negative_karma(target)) {
                 return true;
@@ -193,7 +193,7 @@ namespace banggame::bot_suggestion {
             int num_bandit = 0;
 
             for (player_ptr p : origin->m_game->m_players) {
-                if (p != origin && p->alive()) {
+                if (p != origin && p->in_game()) {
                     if (p->is_sheriff_or_deputy()) ++num_law;
                     if (p->is_outlaw_or_renegade()) ++num_bandit;
                 }
@@ -228,11 +228,11 @@ namespace banggame::bot_suggestion {
             }
         }
         case player_role::outlaw_3p:
-            return origin->m_game->num_alive() <= 2 || target->m_role == player_role::deputy_3p;
+            return origin->m_game->num_alive(true) <= 2 || target->m_role == player_role::deputy_3p;
         case player_role::deputy_3p:
-            return origin->m_game->num_alive() <= 2 || target->m_role == player_role::renegade_3p;
+            return origin->m_game->num_alive(true) <= 2 || target->m_role == player_role::renegade_3p;
         case player_role::renegade_3p:
-            return origin->m_game->num_alive() <= 2 || target->m_role == player_role::outlaw_3p;
+            return origin->m_game->num_alive(true) <= 2 || target->m_role == player_role::outlaw_3p;
         default:
             return true;
         }

@@ -104,15 +104,16 @@ TLS/SSL options (if built with SSL support):
 ./bang-server 12345 --secure --cert server.crt --key server.key
 ```
 
-## Tracking Database
-
-If you specify a tracking database (via `--tracking-db <file>`), it must be a SQLite file.  
-The server will record player count and lobby count over time for monitoring and analytics purposes.  
-If the database file does not exist, it will be created automatically.
-
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any proposed changes.
+
+Consult the documentation:
+
+- [Module documentation - bang-server](docs/bang-server-module-documentation.md)
+- [Module documentation - bangweb (frontend)](docs/bangweb-frontend-documentation.md)
+- [Practical examples: how to create a new card in bang-server](docs/card-creation-examples.md)
+- [Practical example: adding an entire expansion](docs/adding-an-expansion.md)
 
 ## Community
 

@@ -48,8 +48,11 @@ namespace banggame {
 
     void equip_tumbleweed::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::on_draw_check_select>(target_card, [=](player_ptr origin, shared_draw_check_handler req) {
-            target->m_game->queue_request<request_tumbleweed>(target_card, origin, target, std::move(req));
-            return true;
+            if (target->alive()) {
+                target->m_game->queue_request<request_tumbleweed>(target_card, origin, target, std::move(req));
+                return true;
+            }
+            return false;
         });
     }
 

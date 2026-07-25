@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_train_robbery {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
     };
 

@@ -36,7 +36,9 @@ namespace banggame {
         
         target->m_game->add_listener<event_type::check_revivers>({target_card, 2}, [=](player_ptr origin) {
             if (origin == target && target->check_player_flags(player_flag::coffin)) {
-                origin->discard_card(target_card);
+                if (origin->disown_card(target_card)) {
+                    target_card->move_to(pocket_type::discard_pile, nullptr, card_visibility::shown, false, pocket_position::begin);
+                }
             }
         });
     }

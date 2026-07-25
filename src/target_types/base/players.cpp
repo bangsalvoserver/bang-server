@@ -28,13 +28,23 @@ namespace banggame {
         return {};
     }
 
+    static effect_flags get_flags(rn::forward_range auto &&targets) {
+        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
+        if (get_single_element(targets)) {
+            flags.add(effect_flag::single_target);
+        }
+        return flags;
+    }
+
     prompt_string targeting_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
         auto targets = get_player_targets_range(origin_card, origin, player_filter, ctx);
         if (targets.empty()) {
             return {"PROMPT_CARD_NO_EFFECT", origin_card};
         }
+
+        effect_flags flags = get_flags(targets);
         return prompts::select_prompt_fallback_empty(targets | rv::transform([&](player_ptr target) {
-            return effect.on_prompt(origin_card, origin, target, ctx);
+            return effect.on_prompt(origin_card, origin, target, flags, ctx);
         }));
     }
 
@@ -46,11 +56,7 @@ namespace banggame {
 
     void targeting_players::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
         auto targets = get_player_targets_range(origin_card, origin, player_filter, ctx);
-
-        effect_flags flags { effect_flag::multi_target, effect_flag::target_players };
-        if (get_single_element(targets)) {
-            flags.add(effect_flag::single_target);
-        }
+        effect_flags flags = get_flags(targets);
 
         for (player_ptr target : targets) {
             effect.on_play(origin_card, origin, target, flags, ctx);

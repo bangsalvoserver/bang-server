@@ -9,6 +9,9 @@
 namespace banggame {
 
     prompt_string handler_doc_holyday::on_prompt(card_ptr origin_card, player_ptr origin, const card_list &target_cards, player_ptr target) {
+        MAYBE_RETURN(prompts::select_prompt_fallback_empty(target_cards | rv::transform([&](card_ptr target_card) {
+            return prompts::prompt_target_immunity(target_card, origin, target);
+        })));
         return effect_bang{}.on_prompt(origin_card, origin, target);
     }
 

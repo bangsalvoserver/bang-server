@@ -24,7 +24,7 @@ namespace banggame {
 
     struct effect_steal {
         game_string get_error(card_ptr origin_card, player_ptr origin, card_ptr target);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags = {});
         void on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target);
     };
@@ -50,7 +50,7 @@ namespace banggame {
     DEFINE_EFFECT(discard_hand, effect_discard_hand)
 
     struct effect_destroy {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags);
         void on_play(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags = {});
         void on_resolve(card_ptr origin_card, player_ptr origin, card_ptr target);
     };

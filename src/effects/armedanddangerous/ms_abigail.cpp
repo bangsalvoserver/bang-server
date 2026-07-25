@@ -4,6 +4,7 @@
 #include "effects/base/draw_check.h"
 
 #include "cards/game_enums.h"
+#include "cards/game_events.h"
 
 #include "game/game_table.h"
 
@@ -23,6 +24,13 @@ namespace banggame {
                     return escape_type::escape_no_timer;
                 }
                 return {};
+            });
+        
+        origin->m_game->add_listener<event_type::apply_immunity_modifier>(origin_card,
+            [=](card_ptr e_origin_card, player_ptr e_origin, const_player_ptr e_target, effect_flags flags, card_list &cards) {
+                if (e_target == origin && flags.check(effect_flag::is_prompt) && effect_ms_abigail::can_escape(e_origin, e_origin_card, flags)) {
+                    cards.push_back(origin_card);
+                }
             });
     }
 

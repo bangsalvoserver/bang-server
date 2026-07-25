@@ -1,11 +1,15 @@
 #include "prompts.h"
 
+#include "cards/filter_enums.h"
+#include "cards/game_enums.h"
+
 #include "effects/ghost_cards/ruleset.h"
+#include "effects/frontier/ruleset.h"
 
 #include "game_table.h"
 #include "bot_suggestion.h"
+#include "game_options.h"
 
-#include "cards/filter_enums.h"
 
 namespace banggame::prompts {
 
@@ -33,13 +37,35 @@ namespace banggame::prompts {
         return {};
     }
 
+    prompt_string prompt_target_immunity(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        if (origin->m_game->m_options.prompt_target_immunity || origin->is_bot()) {
+            flags.add(effect_flag::is_prompt);
+            if (target->immune_to(origin_card, origin, flags, true)) {
+                return {"PROMPT_TARGET_IMMUNE", origin_card, target};
+            }
+        }
+        return {};
+    }
+
     prompt_string bot_check_kill_sheriff(player_ptr origin, player_ptr target) {
         if (origin->is_bot()) {
-            auto role = origin->get_base_role();
-            if (!(role == player_role::outlaw || role == player_role::renegade && origin->m_game->num_alive() <= 2)
-                && (target->m_hp <= 1 && target->is_sheriff())
-            ) {
-                return {1, "BOT_DONT_KILL_SHERIFF"};
+            switch (origin->get_base_role()) {
+            case player_role::outlaw:
+                break;
+            case player_role::sheriff:
+                if (bot_suggestion::is_target_friend(origin, target) && target->m_hp <= 1) {   
+                    return {1, "BOT_DONT_KILL_DEPUTY"};
+                }
+                break;
+            case player_role::renegade:
+                if (origin->m_game->num_alive(true) <= 2) {
+                    break;
+                }
+                [[fallthrough]];
+            default:
+                if (target->is_sheriff() && target->m_hp <= 1) {
+                    return {1, "BOT_DONT_KILL_SHERIFF"};
+                }
             }
         }
         return {};
@@ -76,7 +102,15 @@ namespace banggame::prompts {
                 }
                 return "BOT_TARGET_ENEMY";
             }
-            if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
+            if (target_card->pocket == pocket_type::player_table && target_card->is_purple()) {
+                if (player_ptr tracked_player = get_tracked_player(target_card)) {
+                    if (target_card->has_tag(tag_type::pardner_penalty)) {
+                        return bot_check_target_friend(origin, tracked_player);
+                    } else {
+                        return bot_check_target_enemy(origin, tracked_player);
+                    }
+                }
+            } else if (target_card->pocket == pocket_type::player_table && target_card->has_tag(tag_type::penalty)) {
                 return bot_check_target_friend(origin, target);
             } else {
                 return bot_check_target_enemy(origin, target);

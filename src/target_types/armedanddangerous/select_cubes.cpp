@@ -33,7 +33,7 @@ namespace banggame {
     }
 
     void targeting_select_cubes::add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, const card_list &target_cards) {
-        ctx.add(contexts::selected_cubes{ origin_card, target_cards, ncubes });
+        ctx.add(contexts::selected_cubes{ origin_card, target_cards });
     }
 
     void targeting_select_cubes::on_play(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, const card_list &target_cards) {

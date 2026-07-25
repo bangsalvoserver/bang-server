@@ -22,7 +22,7 @@ namespace banggame {
             origin->m_game->add_tokens(card_token_type::cube, 32, token_positions::table{});
         });
 
-        game->add_listener<event_type::check_equip_card>(nullptr, [](player_ptr origin, card_ptr origin_card, const_player_ptr target, const effect_context &ctx) -> game_string {
+        game->add_listener<event_type::check_equip_card>(nullptr, [](player_ptr origin, card_ptr origin_card, player_ptr target, const effect_context &ctx) -> game_string {
             if (origin_card->is_orange() && origin->m_game->num_tokens(card_token_type::cube) < 3) {
                 return "ERROR_NOT_ENOUGH_CUBES";
             }

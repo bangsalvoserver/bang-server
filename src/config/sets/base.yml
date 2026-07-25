@@ -307,10 +307,12 @@ character:
       - add_flag(player_flag::treat_missed_as_bang)
     effects:
       - banglimit
-      - set_playing(play_as::bang) card self | hand missed
+      - set_playing card self | hand missed
+      - discard_playing(play_as::bang)
       - play_as_bangcard player alive reachable notself
     responses:
-      - set_playing(play_as::missed) card self | hand bangcard
+      - set_playing card self | hand bangcard
+      - discard_playing(play_as::missed)
       - play_as_missed
     tags:
       - play_as_bang

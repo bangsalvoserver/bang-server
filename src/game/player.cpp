@@ -42,6 +42,10 @@ namespace banggame {
             && !m_player_flags.check(player_flag::coffin);
     }
 
+    bool player::in_game() const {
+        return alive() || m_player_flags.check(player_flag::keep_alive);
+    }
+
     void player::equip_card(card_ptr target, bool skip_enable) {
         pocket_position position = target->has_tag(tag_type::weapon) ? pocket_position::begin : pocket_position::end;
         target->move_to(pocket_type::player_table, this, card_visibility::shown, false, position);

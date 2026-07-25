@@ -6,7 +6,7 @@
 namespace banggame {
 
     struct effect_bandidos {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
     };
 
@@ -21,6 +21,7 @@ namespace banggame {
     DEFINE_EFFECT(bandidos_response, effect_bandidos_response)
 
     struct effect_bandidos2 {
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
     };
 

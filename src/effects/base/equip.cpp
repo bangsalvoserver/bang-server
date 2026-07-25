@@ -50,6 +50,7 @@ namespace banggame {
     }
 
     prompt_string effect_equip_on::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) {
+        MAYBE_RETURN(origin->m_game->call_event(event_type::get_equip_prompt{ origin, origin_card, target, ctx }));
         return prompts::select_prompt(origin_card->equips | rv::transform([&](const equip_holder &holder) {
             return holder.on_prompt(origin_card, origin, target, ctx);
         }));
@@ -81,12 +82,11 @@ namespace banggame {
                 }
             }
             
-            if (origin_card->pocket == pocket_type::player_hand) {
-                origin->m_game->call_event(event_type::on_discard_hand_card{ origin, origin_card, true });
+            if (player_ptr owner = origin_card->owner) {
+                owner->disown_card(origin_card, true);
             }
-
+            
             target->equip_card(origin_card);
-
             origin->m_game->call_event(event_type::on_equip_card{ origin, target, origin_card, ctx });
         }, 45);
     }

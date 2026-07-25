@@ -13,17 +13,17 @@ namespace banggame {
         bool (*can_play)(const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx);
         
         game_string (*get_error)(const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx);
-        prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, const effect_context &ctx);
+        prompt_string (*on_prompt)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx);
         void (*add_context)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_context &ctx);
         void (*on_play)(const void *effect_value, card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx);
 
         game_string (*get_error_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
-        prompt_string (*on_prompt_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
+        prompt_string (*on_prompt_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
         void (*add_context_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_context &ctx);
         void (*on_play_player)(const void *effect_value, card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx);
         
         game_string (*get_error_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
-        prompt_string (*on_prompt_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx);
+        prompt_string (*on_prompt_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx);
         void (*add_context_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_context &ctx);
         void (*on_play_card)(const void *effect_value, card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx);
     };
@@ -44,16 +44,16 @@ namespace banggame {
         return type->get_error_card(effect_value, origin_card, origin, target, ctx);
     }
 
-    inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, const effect_context &ctx) const {
-        return type->on_prompt(effect_value, origin_card, origin, ctx);
+    inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, effect_flags flags, const effect_context &ctx) const {
+        return type->on_prompt(effect_value, origin_card, origin, flags, ctx);
     }
 
-    inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx) const {
-        return type->on_prompt_player(effect_value, origin_card, origin, target, ctx);
+    inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) const {
+        return type->on_prompt_player(effect_value, origin_card, origin, target, flags, ctx);
     }
 
-    inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, const effect_context &ctx) const {
-        return type->on_prompt_card(effect_value, origin_card, origin, target, ctx);
+    inline prompt_string effect_holder::on_prompt(card_ptr origin_card, player_ptr origin, card_ptr target, effect_flags flags, const effect_context &ctx) const {
+        return type->on_prompt_card(effect_value, origin_card, origin, target, flags, ctx);
     }
 
     inline void effect_holder::add_context(card_ptr origin_card, player_ptr origin, effect_context &ctx) const {

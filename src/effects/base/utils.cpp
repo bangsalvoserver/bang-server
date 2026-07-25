@@ -28,7 +28,8 @@ namespace banggame {
         return prompts::bot_check_discard_card(origin, target_card);
     }
     
-    void effect_set_playing::on_play(card_ptr origin_card, player_ptr origin, card_ptr target_card) {
+    void effect_discard_playing::on_play(card_ptr origin_card, player_ptr origin, const effect_context &ctx) {
+        card_ptr target_card = ctx.get<contexts::playing_card>();
         switch (type) {
         case play_as::bang:
             // ignore

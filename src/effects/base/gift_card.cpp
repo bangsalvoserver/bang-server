@@ -27,8 +27,8 @@ namespace banggame {
         } else {
             origin->m_game->add_log("LOG_GIFTED_CARD", origin, target_player, target_card);
         }
-        if (target_card->pocket == pocket_type::player_hand) {
-            origin->m_game->call_event(event_type::on_discard_hand_card{ origin, target_card, used });
+        if (player_ptr owner = target_card->owner) {
+            owner->disown_card(target_card, used);
         }
         target_player->add_to_hand(target_card);
     }

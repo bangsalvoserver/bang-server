@@ -23,7 +23,7 @@ namespace banggame {
         }
 
         prompt_string on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type = {}) {
-            return effect.on_prompt(origin_card, origin, ctx);
+            return effect.on_prompt(origin_card, origin, {}, ctx);
         }
 
         void add_context(card_ptr origin_card, player_ptr origin, const effect_holder &effect, effect_context &ctx, value_type = {}) {

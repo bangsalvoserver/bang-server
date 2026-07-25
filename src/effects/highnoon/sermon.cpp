@@ -20,12 +20,12 @@ namespace banggame {
             }, true});
         });
         target->m_game->add_listener<event_type::on_turn_end>(target_card, [=](player_ptr p, bool skipped) {
-            target->m_game->remove_disablers(target_card);
+            target->m_game->remove_disabler(target_card);
         });
     }
 
     void equip_sermon::on_disable(card_ptr target_card, player_ptr target) {
-        target->m_game->remove_disablers(target_card);
+        target->m_game->remove_disabler(target_card);
         target->m_game->remove_listeners(target_card);
     }
 }

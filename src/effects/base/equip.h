@@ -23,7 +23,15 @@ namespace banggame {
             using result_type = game_string;
             player_ptr origin;
             card_ptr origin_card;
-            const_player_ptr target;
+            player_ptr target;
+            const effect_context &ctx;
+        };
+
+        struct get_equip_prompt {
+            using result_type = prompt_string;
+            player_ptr origin;
+            card_ptr origin_card;
+            player_ptr target;
             const effect_context &ctx;
         };
     }

@@ -9,8 +9,11 @@
 
 namespace banggame {
 
-    game_string effect_stampede::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        return prompts::bot_check_target_enemy(origin, target);
+    prompt_string effect_stampede::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
+        MAYBE_RETURN(prompts::prompt_target_self(origin_card, origin, target));
+        return {};
     }
 
     struct request_stampede : request_picking, interface_resolvable {

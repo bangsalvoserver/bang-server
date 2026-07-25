@@ -5,6 +5,13 @@
 #include "bang.h"
 
 namespace banggame {
+
+    prompt_string equip_volcanic::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
+        if (origin->is_bot() && target->get_bangs_played() <= 0) {
+            return {1, "BOT_NO_BANGS_PLAYED"};
+        }
+        return {};
+    }
     
     void equip_volcanic::on_enable(card_ptr target_card, player_ptr target) {
         target->m_game->add_listener<event_type::count_bangs_played>(target_card, [=](const_player_ptr origin, int &value, bool real_count) {

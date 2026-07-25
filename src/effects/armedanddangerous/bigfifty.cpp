@@ -15,7 +15,7 @@ namespace banggame {
                         || c == target->get_character();
                 });
                 origin->m_game->queue_action([=]{
-                    origin->m_game->remove_disablers(key);
+                    origin->m_game->remove_disabler(key);
                 }, 90);
                 origin->m_game->remove_listeners(key);
             }
