@@ -27,7 +27,8 @@ character:
       - add_flag(player_flag::treat_any_as_bang)
     effects:
       - banglimit
-      - set_playing(play_as::bang) card self | hand not_bangcard
+      - set_playing card self | hand not_bangcard
+      - discard_playing(play_as::bang)
       - play_as_bangcard player alive reachable notself
     tags:
       - play_as_bang
