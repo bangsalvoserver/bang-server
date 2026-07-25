@@ -25,7 +25,6 @@ namespace banggame {
     DEFINE_BOT_RULE(pocket, rule_filter_by_pocket, pocket_type pocket)
     DEFINE_BOT_RULE(pocket_not, rule_filter_by_pocket_not, pocket_type pocket)
     DEFINE_BOT_RULE(equip, rule_equip)
-    DEFINE_BOT_RULE(repeat, rule_repeat)
     DEFINE_BOT_RULE(tag_value, rule_tag_value, tag_type tag; std::optional<tag_int> value)
     DEFINE_BOT_RULE(tag_value_not, rule_tag_value_not, tag_type tag; std::optional<tag_int> value)
     DEFINE_BOT_RULE(do_nothing, rule_do_nothing)

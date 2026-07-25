@@ -8,33 +8,34 @@
 
 namespace banggame {
 
-    bool rule_filter_by_pocket::operator()(card_node node) const {
-        if (!node) return false;
-        if (card_ptr choice_card = node->context.get<contexts::card_choice>()) {
-            return choice_card->pocket == pocket;
+    static card_ptr get_first_card(card_node node) {
+        if (node) {
+            return node->modifiers.empty() ? node->card : node->modifiers.front().card;
         }
-        return node->card->pocket == pocket;
+        return nullptr;
+    }
+
+    bool rule_filter_by_pocket::operator()(card_node node) const {
+        if (card_ptr origin_card = get_first_card(node)) {
+            return origin_card->pocket == pocket;
+        }
+        return false;
     }
 
     bool rule_filter_by_pocket_not::operator()(card_node node) const {
-        if (!node) return false;
-        if (card_ptr choice_card = node->context.get<contexts::card_choice>()) {
-            return choice_card->pocket != pocket;
+        if (card_ptr origin_card = get_first_card(node)) {
+            return origin_card->pocket != pocket;
         }
-        return node->card->pocket != pocket;
+        return false;
     }
 
     bool rule_equip::operator()(card_node node) const {
         return node && node->card->is_equip_card();
     }
 
-    bool rule_repeat::operator()(card_node node) const {
-        return node && node->context.contains<contexts::repeat_card>();
-    }
-
     bool rule_tag_value::operator()(card_node node) const {
-        if (node) {
-            std::optional<tag_int> card_tag = node->card->get_tag_value(tag);
+        if (card_ptr origin_card = get_first_card(node)) {
+            std::optional<tag_int> card_tag = origin_card->get_tag_value(tag);
             if (value.has_value()) {
                 return card_tag == value;
             } else {
@@ -45,8 +46,8 @@ namespace banggame {
     }
 
     bool rule_tag_value_not::operator()(card_node node) const {
-        if (node) {
-            std::optional<tag_int> card_tag = node->card->get_tag_value(tag);
+        if (card_ptr origin_card = get_first_card(node)) {
+            std::optional<tag_int> card_tag = origin_card->get_tag_value(tag);
             if (value.has_value()) {
                 return card_tag != value;
             } else {

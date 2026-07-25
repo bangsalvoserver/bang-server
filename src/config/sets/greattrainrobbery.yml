@@ -61,6 +61,8 @@ main_deck:
     effects:
       - none
     modifier: moneybag
+    tags:
+      - strong
   - name: MOST_WANTED
     signs:
       - K spades
