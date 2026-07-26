@@ -535,7 +535,6 @@ settings:
   in_play_rules:
     - tag_value(tag_type::strong)         # anything tagged "strong"
     - equip                               # then: any equip card
-    - tag_value(tag_type::button_color, 2) # then: a specific button-row tier
     - pocket(pocket_type::player_table)    # then: prefer playing from the table
     - pocket(pocket_type::player_hand)     # then: then from hand
     - pocket(pocket_type::player_character) # then: then a character ability
