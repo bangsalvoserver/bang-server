@@ -8,10 +8,6 @@
 #include "net/bot_info.h"
 #include "net/logging.h"
 
-#include "utils/random_element.h"
-
-#include <set>
-
 namespace banggame {
 
     static game_action generate_random_play(player_ptr origin, const playable_card_info &args) {
@@ -40,65 +36,81 @@ namespace banggame {
         return ret;
     }
 
-    using node_set_t = std::multiset<card_node>;
-    
-    static card_node get_selected_node(player_ptr origin, bool is_response, const node_set_t &node_set) {
-        auto &rules = is_response ? bot_info.settings.response_rules : bot_info.settings.in_play_rules;
-        for (const bot_rule &rule : rules) {
-            if (auto filter = rv::filter(node_set, rule)) {
-                return random_element(filter, origin->m_game->bot_rng);
+    template<rn::input_range Rules, typename Nodes, typename Rng>
+        requires (rn::forward_range<Nodes> && rn::sized_range<Nodes>
+            && std::predicate<rn::range_value_t<Rules>, rn::range_value_t<Nodes>>)
+    rn::iterator_t<Nodes> get_selected_node(Rules &&rules, Nodes &nodes, Rng &rng) {
+        for (const auto &rule : rules) {
+            auto chosen = nodes.end();
+            size_t count = 0;
+
+            for (auto it = nodes.begin(); it != nodes.end(); ++it) {
+                if (rule(*it)) {
+                    ++count;
+                    std::uniform_int_distribution<size_t> dist(0, count - 1);
+                    if (dist(rng) == 0) chosen = it;
+                }
+            }
+
+            if (chosen != nodes.end()) {
+                return chosen;
             }
         }
-        return random_element(node_set, origin->m_game->bot_rng);
+        std::uniform_int_distribution<size_t> dist(0, nodes.size() - 1);
+        return rn::next(nodes.begin(), dist(rng));
     }
 
-    static request_state execute_random_play(player_ptr origin, bool is_response, bool add_empty, const playable_cards_list &play_cards) {
+    static request_state execute_random_play(player_ptr origin, const bot_rule_list &bot_rules, const playable_cards_list &play_cards) {
+        auto timer = origin->m_game->top_request<request_timer>();
+        bool add_empty = timer && timer->enabled();
+        
+        std::vector<card_node> node_set;
+        node_set.reserve(play_cards.size() * bot_info.settings.repeat_card_nodes + add_empty);
+
         for (int i=0; i < bot_info.settings.max_random_tries; ++i) {
-            node_set_t node_set;
-            
             for (const playable_card_info &info : play_cards) {
                 for (int j=0; j<bot_info.settings.repeat_card_nodes; ++j) {
-                    node_set.insert(&info);
+                    node_set.push_back(&info);
                 }
             }
             
             if (add_empty) {
-                node_set.insert(nullptr);
+                node_set.push_back(nullptr);
             }
             
             while (!node_set.empty()) {
-                auto selected_node = get_selected_node(origin, is_response, node_set);
-                node_set.erase(node_set.find(selected_node));
+                auto it = get_selected_node(bot_rules, node_set, origin->m_game->bot_rng);
 
+                card_node selected_node = *it; 
                 if (!selected_node) {
                     return request_states::done{};
                 }
 
-                try {
-                    auto args = generate_random_play(origin, *selected_node);
-                    args.bypass_prompt =
-                        (i >= bot_info.settings.bypass_empty_index && node_set.empty())
-                        || i >= bot_info.settings.bypass_unconditional_index;
+                auto last = std::prev(node_set.end());
+                rn::iter_swap(it, last);
+                node_set.erase(last, node_set.end());
 
-                    auto result = verify_and_play(origin, args);
+                auto args = generate_random_play(origin, *selected_node);
+                args.bypass_prompt =
+                    (i >= bot_info.settings.bypass_empty_index && node_set.empty())
+                    || i >= bot_info.settings.bypass_unconditional_index;
 
-                    if (std::visit(overloaded{
-                        [](play_verify_results::ok) {
-                            return true;
-                        },
-                        [&](play_verify_results::prompt prompt) {
-                            logging::trace("BOT PROMPT: message={}, i={}", std::string_view{prompt.message.message.format_str}, i);
-                            return false;
-                        },
-                        [&](play_verify_results::error error) {
-                            logging::trace("BOT ERROR: message={}, i={}", std::string_view{error.message.format_str}, i);
-                            return false;
-                        }
-                    }, result)) {
-                        return request_states::next{};
+                auto result = verify_and_play(origin, args);
+
+                if (std::visit(overloaded{
+                    [](play_verify_results::ok) {
+                        return true;
+                    },
+                    [&](play_verify_results::prompt prompt) {
+                        logging::trace("BOT PROMPT: message={}, i={}", std::string_view{prompt.message.message.format_str}, i);
+                        return false;
+                    },
+                    [&](play_verify_results::error error) {
+                        logging::trace("BOT ERROR: message={}, i={}", std::string_view{error.message.format_str}, i);
+                        return false;
                     }
-                } catch (const random_element_error &e) {
-                    logging::warn("BOT ERROR: random_element_error (message={})", e.what());
+                }, result)) {
+                    return request_states::next{};
                 }
             }
         }
@@ -120,18 +132,13 @@ namespace banggame {
             for (player_ptr origin : m_players | rv::filter(&player::is_bot)) {
                 playable_cards_list play_cards = generate_playable_cards_list(origin, effect_list_type::responses);
                 
-                if (!play_cards.empty()) {
-                    auto timer = origin->m_game->top_request<request_timer>();
-                    bool add_empty = timer && timer->enabled();
-
-                    if (std::holds_alternative<request_states::next>(execute_random_play(origin, true, add_empty, play_cards))) {
-                        return request_states::next{};
-                    }
+                if (!play_cards.empty() && std::holds_alternative<request_states::next>(execute_random_play(origin, bot_info.settings.response_rules, play_cards))) {
+                    return request_states::next{};
                 }
             }
         } else if (m_playing && m_playing->is_bot()) {
             playable_cards_list play_cards = generate_playable_cards_list(m_playing);
-            return execute_random_play(m_playing, false, false, play_cards);
+            return execute_random_play(m_playing, bot_info.settings.in_play_rules, play_cards);
         }
         return request_states::done{};
     }

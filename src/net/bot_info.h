@@ -11,13 +11,15 @@
 
 namespace banggame {
 
+    using bot_rule_list = std::span<const bot_rule>;
+
     struct bot_settings {
         int max_random_tries;
         int bypass_empty_index;
         int bypass_unconditional_index;
         int repeat_card_nodes;
-        std::span<const bot_rule> response_rules;
-        std::span<const bot_rule> in_play_rules;
+        bot_rule_list response_rules;
+        bot_rule_list in_play_rules;
     };
 
     struct bot_info_t {
