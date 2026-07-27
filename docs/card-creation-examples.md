@@ -380,7 +380,7 @@ Neither file references the other, and neither lives in the same expansion (Slab
 **The general recipe**, for any effect you want a new card to plug into:
 1. Check whether the effect you want to interact with already fires a "modifier event" between constructing its request and queuing it (search the effect's header for an `event_type::apply_*_modifier`-style struct — `bang.h`, for instance, also documents `check_bang_target` for veto-style checks, and `on_missed` for reacting *after* a Bang! gets cancelled).
 2. If it does, just `add_listener<that_event>(...)` in your new card's `on_enable` (permanent equip/character ability) or `on_play` (one-shot card, removing the listener immediately after use, as *Aim* does).
-3. If the effect you want to extend doesn't expose such a hook yet, and you're not just adding an expansion card but changing a base mechanic, you'd need to add the event to the base effect yourself (see Case 12 for exactly what that involves) — but this is uncommon, since the built-in effects that are meant to be extensible (`Bang!`, `Duel`, damage, draw checks...) already expose one.
+3. If the effect you want to extend doesn't expose such a hook yet, and you're not just adding an expansion card but changing a base mechanic, you'd need to add the event to the base effect yourself (see Case 13 for exactly what that involves) — but this is uncommon, since the built-in effects that are meant to be extensible (`Bang!`, `Duel`, damage, draw checks...) already expose one.
 4. Nothing here needs a frontend change: the client never sees `bang_strength`/`bang_damage` directly — it only reacts to the resulting `game_update`s (damage dealt, a `request_status` asking for a Missed!, etc.), so stacking is entirely a backend-side concern.
 
 ---
@@ -533,16 +533,14 @@ Bots don't evaluate cards individually. `game::request_bot_play` (`game/bot_ai.c
 # config/bot_info.yml
 settings:
   in_play_rules:
-    - repeat                              # keep playing the same card again if that's still legal
-    - tag_value(tag_type::strong)         # then: anything tagged "strong"
+    - tag_value(tag_type::strong)         # anything tagged "strong"
     - equip                               # then: any equip card
-    - tag_value(tag_type::button_color, 2) # then: a specific button-row tier
     - pocket(pocket_type::player_table)    # then: prefer playing from the table
     - pocket(pocket_type::player_hand)     # then: then from hand
     - pocket(pocket_type::player_character) # then: then a character ability
     - tag_value_not(tag_type::pass_turn)   # then: anything that isn't just "pass"
 ```
-Each entry is a tiny predicate struct (`game/bot_rules.h`/`.cpp`) over a candidate card — `pocket`, `pocket_not`, `equip`, `repeat`, `tag_value`, `tag_value_not`, `do_nothing` — matched against generic, already-existing properties of the card (which pocket it's in, whether it's an equip, whether it carries a given tag, optionally with a specific value). Nothing here is per-card: it's one short global list, generated once from this YAML into a single `bot_info` object (`config/parse_bots.py`), consulted for every bot decision in the game.
+Each entry is a tiny predicate struct (`game/bot_rules.h`/`.cpp`) over a candidate card — `pocket`, `pocket_not`, `equip`, `tag_value`, `tag_value_not`, `do_nothing` — matched against generic, already-existing properties of the card (which pocket it's in, whether it's an equip, whether it carries a given tag, optionally with a specific value). Nothing here is per-card: it's one short global list, generated once from this YAML into a single `bot_info` object (`config/parse_bots.py`), consulted for every bot decision in the game.
 
 So for a typical new card, "driving" bot behavior means picking the right tag, not touching this list at all. If your new card is a big, important one-shot play — say a brown card, **Last Stand**, that should be prioritized the way other high-impact plays are — just tag it the same way they are:
 ```yaml
@@ -553,7 +551,7 @@ So for a typical new card, "driving" bot behavior means picking the right tag, n
   tags:
     - strong
 ```
-That alone routes it into the `tag_value(tag_type::strong)` tier — the second-highest priority in `in_play_rules` — ahead of ordinary hand/table plays, with zero AI code written. This is why the predicate list stays so short and generic: card authors steer bots through the same tags that already describe the card for other purposes (rules text, filters, UI), not through a parallel bot-specific configuration per card.
+That alone routes it into the `tag_value(tag_type::strong)` tier — the highest priority in `in_play_rules` — ahead of ordinary hand/table plays, with zero AI code written. This is why the predicate list stays so short and generic: card authors steer bots through the same tags that already describe the card for other purposes (rules text, filters, UI), not through a parallel bot-specific configuration per card.
 
 The list only needs a **new predicate** when the property you need genuinely isn't reducible to an existing tag/pocket/equip check. The existing set has a gap, for instance: nothing lets a rule ask about a card's *color*. Adding one follows the exact same shape as the built-in ones:
 ```cpp
@@ -563,12 +561,15 @@ DEFINE_BOT_RULE(color, rule_color, card_color_type color)
 ```cpp
 // game/bot_rules.cpp
 bool rule_color::operator()(card_node node) const {
-    return node && node->card->color == color;
+    if (card_ptr origin_card = get_first_card(node)) {
+        return origin_card->color == color;
+    }
+    return false;
 }
 ```
-which YAML can then reference exactly like any other rule, e.g. `color(card_color_type::brown)`, in either `in_play_rules` or `response_rules`. In practice this is the rare path — the seven existing predicates, especially `tag_value`, cover almost everything a new card needs, because tags themselves are freely extensible from YAML with no C++ at all.
+which YAML can then reference exactly like any other rule, e.g. `color(card_color_type::brown)`, in either `in_play_rules` or `response_rules`. Note the `get_first_card(node)` call rather than a direct `node->card->color` check: it's the same helper every built-in predicate but `rule_equip` goes through, and it's what keeps a new rule judging the right card when the candidate play chains a modifier ahead of a terminal one (e.g. *Aim* + *Bang!*) — the first card actually played, not whatever the chain resolves to. In practice this is the rare path — the existing predicates, especially `tag_value`, cover almost everything a new card needs, because tags themselves are freely extensible from YAML with no C++ at all.
 
-**Why it works**: `get_selected_node` (`bot_ai.cpp`) doesn't score cards numerically — it filters the candidate pool by each rule *in order* and stops at the first rule that matches anything (`rv::filter(node_set, rule)`), then picks uniformly at random among just those matches (`random_element`). A card that matches an earlier rule is effectively in a higher priority tier than one that only matches a later rule or none at all (in which case the final fallback is a uniform pick over everything remaining). Tagging your card is enough because the rules test generic properties every card already has — you're not writing a special case, you're placing your card into a bucket that already has a priority.
+**Why it works**: `get_selected_node` (`bot_ai.cpp`) doesn't score cards numerically — it walks the candidate pool by each rule *in order*, and for each rule does a single-pass reservoir sample: every matching candidate is counted as it's seen, with a `1/count` chance of replacing whichever match is currently held, so the end result is a uniform pick among all of that rule's matches without ever materializing a filtered copy of the pool. The first rule that matches *anything* wins; later rules are only consulted if the current one matched nothing. A card that matches an earlier rule is effectively in a higher priority tier than one that only matches a later rule or none at all (in which case the final fallback is a uniform pick over everything remaining). Tagging your card is enough because the rules test generic properties every card already has — you're not writing a special case, you're placing your card into a bucket that already has a priority.
 
 ---
 
@@ -625,7 +626,72 @@ This is one of a small family of similarly-shaped `bot_check_*` helpers in `game
 
 ---
 
-## Case 12 — Defining a brand-new event type
+## Case 12 — Reconciling several per-target bot prompts into one (multi-target bot prompts)
+
+**Goal**: the same soft-discouragement mechanism as Case 11, but for a card that doesn't have a single target to judge — it has several, all hit at once. `players` (`target_types/base/players.h/.cpp`) is the shape behind every all-players effect (*Indians!*, *General Store*, *Saloon*'s group heal, and — the one worth tracing end to end — **Gatling**): Case 11's `bot_check_*` helpers each judge one target in isolation, so a `players` card needs a step Case 11 didn't — folding several independent per-target verdicts into the single `prompt_string` `on_prompt` has to return for the whole play.
+
+The concrete example is the built-in **Gatling**: `bang players alive notself` in `config/sets/base.yml`, the ordinary `bang` effect (`effects/base/bang.cpp`) aimed at every `alive`, non-self player at once. `targeting_players::on_prompt` (`target_types/base/players.cpp`) is where the per-target verdicts get gathered:
+
+```cpp
+prompt_string targeting_players::on_prompt(card_ptr origin_card, player_ptr origin, const effect_holder &effect, const effect_context &ctx, value_type) {
+    auto targets = get_player_targets_range(origin_card, origin, player_filter, ctx);
+    if (targets.empty()) {
+        return {"PROMPT_CARD_NO_EFFECT", origin_card};
+    }
+    effect_flags flags = get_flags(targets);
+    return prompts::select_prompt_fallback_empty(targets | rv::transform([&](player_ptr target) {
+        return effect.on_prompt(origin_card, origin, target, flags, ctx);
+    }));
+}
+```
+
+Nothing here is Gatling-specific — `get_player_targets_range` just recomputes the same `alive`+`notself` range `on_play` will hit for real, and the actual per-target judgment is delegated straight to `effect.on_prompt`, which for Gatling resolves to `effect_bang::on_prompt` — the same function an ordinary single-target Bang! calls, with no idea it's being asked once per player from inside this loop:
+
+```cpp
+prompt_string effect_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {
+    MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
+    MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+    MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));
+    MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
+    return {};
+}
+```
+
+`bot_check_kill_sheriff` returns a **priority-1** result (`{1, "BOT_DONT_KILL_SHERIFF"}`/`{1, "BOT_DONT_KILL_DEPUTY"}`) when this one target is a near-death ally the bot's role shouldn't finish off; `bot_check_target_enemy` returns a plain **priority-0** `game_string` (`"BOT_TARGET_ENEMY"`, defaulting to priority 0 the same way Case 11's `bot_check_target_friend` does), whenever this one target simply isn't read as an enemy. Run once per player in range, this produces a *row* of independent verdicts — not yet the single answer the card needs.
+
+That row gets folded by `prompts::select_prompt_fallback_empty` (`game/prompts.h`), the multi-target sibling of the plain `select_prompt` used elsewhere in the codebase to reconcile several simultaneously-applicable prompts on one card:
+
+```cpp
+inline prompt_string select_prompt_fallback_empty(prompt_range auto &&prompts) {
+    prompt_string result;
+    bool found_empty = false;
+    for (const prompt_string &str : prompts) {
+        if (!str) {
+            found_empty = true;
+        } else if (!result || str.priority > result.priority) {
+            result = str;
+        }
+    }
+    if (found_empty && result.priority == 0) {
+        result = {};
+    }
+    return result;
+}
+```
+
+Two concrete 4-player deals show both branches. In both, the bot is the **Sheriff**, and Gatling's target range is `B` (an Outlaw, read as an enemy) and `C` (the Deputy):
+- **`C` is at 1 HP.** `B`'s row entry is `{}` (reads as an enemy, nothing to flag); `C`'s is `{1, "BOT_DONT_KILL_DEPUTY"}` (a friend at death's door — `bot_check_kill_sheriff` catches it before `bot_check_target_enemy` even runs, via `MAYBE_RETURN`). `found_empty` ends up `true` (from `B`), but `result.priority` is `1`, so the final `if` doesn't fire: the priority-1 verdict survives no matter what else is in range, and Gatling's `on_prompt` comes back non-empty.
+- **`C` is at a safe 4 HP.** Neither target is near death, so `B`'s entry is still `{}` and `C`'s is only the plain `{0, "BOT_TARGET_ENEMY"}` (not read as an enemy, but nothing worse). `found_empty` is `true` again, but this time `result.priority` is `0`, so the final `if` *does* fire and `result` is cleared: Gatling's `on_prompt` comes back empty.
+
+The difference between the two is exactly the point of using `select_prompt_fallback_empty` instead of `select_prompt` here: a `players` target can't be aimed around a bad outcome the way a single-target Bang! can simply pick a different player — Gatling hits `B` and `C` together or not at all. So a genuinely bad, unavoidable outcome anywhere in range (priority 1) has to survive regardless of who else is a legitimate target; but a merely "not an enemy" complaint (priority 0) is only ever about *that one* player, and gets forgiven the moment at least one real enemy (signaled by `found_empty`) is also caught in the blast — the collateral hit on a safe ally isn't worth vetoing an otherwise-good play over. (If every target in range had come back with a priority-0 complaint and none at all, `found_empty` would still fire, but there'd be no non-empty `result` worth protecting either — a bot correctly never fires a Gatling purely at friends.)
+
+**Why it works**: exactly the same mechanism as Case 11 — a non-empty `prompt_string` becomes a `play_verify_results::prompt`, which `bot_ai.cpp`'s `execute_random_play` treats as "try something else in the pool," never a confirmation dialog, and never something a human playing the same Gatling would ever see (every `bot_check_*` still starts with the same `origin->is_bot()` guard). Two things worth keeping straight:
+- **This is specifically the multi-target problem, not a new kind of check.** Every `bot_check_*` helper from Case 11 is reused completely unmodified here; `players` just needs a combinator able to tell "one bad target among several legitimate ones" from "the only target is bad" — `select_prompt` alone can't do that, since it would let a single stray priority-0 complaint from one friendly target block a play that's otherwise perfectly justified by a real enemy sitting right next to them.
+- **It's still only a soft discouragement.** As in Case 11, if a bot has no better option left after `bot_info.yml`'s `max_random_tries`, `bypass_prompt` forces the Gatling through anyway rather than stalling the game.
+
+---
+
+## Case 13 — Defining a brand-new event type
 
 **Goal**: every hook used in Cases 3, 4, and 7 — `count_range_mod`, `on_hit`, `apply_bang_modifier` — already existed before those cards were written. This case is the other side of that: what do you actually do when the event you need *doesn't* exist yet, because you're starting a new mechanic from scratch rather than plugging into `Bang!`?
 
@@ -691,7 +757,7 @@ A few things worth being precise about:
 
 ---
 
-## Case 13 — Letting a modifier reach into the card it precedes, via `effect_context`
+## Case 14 — Letting a modifier reach into the card it precedes, via `effect_context`
 
 **Goal**: `mth` (Case 9) combines several target groups *within one card's own effect list*. This case is the other direction: a **modifier** (Case 8) that needs to change how the **terminal card** behaves — two entirely separate cards, registered independently, that only interact because they happen to be played together in one chain. (The full mechanism behind `effect_context` — how context types are declared, and the `serialize_context` opt-in that controls whether one reaches the client — is covered in the server module doc; this is the worked example.)
 
@@ -752,10 +818,11 @@ static bool check_distance(const_player_ptr origin, const_player_ptr target, con
 | Needs several differently-filtered targets delivered to *one* combined function, especially when one group's content affects what happens to another | A new `mth_vtable` via `DEFINE_MTH` (Case 9) |
 | Should be prioritized (or deprioritized) by bots relative to other legal plays | The right `tags:` entry, matched against `config/bot_info.yml`'s existing rules (Case 10) |
 | Is legal for anyone, but a bot should usually avoid a specific target/decision | A bot-only `on_prompt` check via `prompts::bot_check_*` (Case 11) |
-| Starts a mechanic other cards should be able to hook into, and no existing event fits | A new plain aggregate struct under `event_type::`, no macro needed (Case 12) |
-| Is a modifier that needs to change how the terminal card it precedes behaves | A new `effect_context` type, read back by whatever shared code needs to respect it (Case 13) |
+| Same as above, but the card hits several targets at once, not just one | Reuse the same `bot_check_*` helpers per target, folded with `prompts::select_prompt_fallback_empty` (Case 12) |
+| Starts a mechanic other cards should be able to hook into, and no existing event fits | A new plain aggregate struct under `event_type::`, no macro needed (Case 13) |
+| Is a modifier that needs to change how the terminal card it precedes behaves | A new `effect_context` type, read back by whatever shared code needs to respect it (Case 14) |
 
-In every case involving C++, the final step is always the same: **register the implementation with the appropriate macro** (`DEFINE_EFFECT`/`DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_MTH`/`DEFINE_TARGETING`), include the new file from its folder's collector header (`effects/<expansion>/effects.h` or `target_types/<expansion>/target_types.h`) so it's reachable from the generated `bang_cards.cpp`, reference it by name from the YAML, and — if anything user-visible changes (a new target, a new log message) — update the corresponding translations in `Locale/*/Cards.tsx` / `GameStrings.tsx` on the `bangweb` side. The one exception is Case 12 itself: a new event type is just a struct declaration, nothing to register anywhere.
+In every case involving C++, the final step is always the same: **register the implementation with the appropriate macro** (`DEFINE_EFFECT`/`DEFINE_EQUIP`/`DEFINE_MODIFIER`/`DEFINE_MTH`/`DEFINE_TARGETING`), include the new file from its folder's collector header (`effects/<expansion>/effects.h` or `target_types/<expansion>/target_types.h`) so it's reachable from the generated `bang_cards.cpp`, reference it by name from the YAML, and — if anything user-visible changes (a new target, a new log message) — update the corresponding translations in `Locale/*/Cards.tsx` / `GameStrings.tsx` on the `bangweb` side. The one exception is Case 13 itself: a new event type is just a struct declaration, nothing to register anywhere.
 
 ---
 
@@ -787,9 +854,10 @@ If your new effect registers an event listener or queues a request, it's joining
 - [ ] Decide whether your card is meant to respect Bang!-avoidance-style immunity (Jourdonnais and similar) — this isn't automatic just because an effect deals damage or targets a player; it only applies where a card's own logic calls for it.
 - [ ] If your card is meant to be dodgeable the way a Bang! is, add the check explicitly: a hard block via `target->immune_to(origin_card, origin, flags)` (as `request_bang::on_update` does), and/or a softer, prompt-based warning via `prompts::prompt_target_immunity(origin_card, origin, target, flags)` in `on_prompt` (which also doubles as a bot-only nudge, since it fires for bots even when the human-facing option is off).
 
-**6. Bot behavior** (Cases 10-11)
+**6. Bot behavior** (Cases 10-12)
 - [ ] Tag it so it lands in the right `in_play_rules`/`response_rules` tier (Case 10) — only add a new `DEFINE_BOT_RULE` if the property genuinely isn't reducible to an existing tag/pocket/equip check.
 - [ ] If it's a card any player *could* legally point at the wrong target, but a bot usually shouldn't, add a bot-only `on_prompt` check via `prompts::bot_check_*` (Case 11) rather than restricting human players — never `get_error` for this, since that would make the play illegal for humans too, not just discouraged for bots.
+- [ ] If the card is a `players`-style multi-target effect rather than a single `player` one, remember the per-target `bot_check_*` checks all still apply unmodified — the only new piece is folding them into one verdict with `prompts::select_prompt_fallback_empty` instead of `select_prompt` (Case 12), so a single stray complaint about one target doesn't veto an otherwise-justified play against the others.
 
 **7. Frontend / localization** (`bangweb`) — the server compiles and runs fine without any of this; it just won't be legible to a real client
 - [ ] Card image asset in `public/cards/` matching the YAML's `image:` key.

@@ -16,6 +16,10 @@ namespace banggame {
 
         int ncards = 0;
 
+        bool can_pick(card_ptr target_card) const override {
+            return !target->m_game->m_options.quick_discard_all && request_discard_hand::can_pick(target_card);
+        }
+
         bool can_escape(card_ptr target_card) const override {
             return update_count == 0 && interface_escapable::can_escape(target_card);
         }

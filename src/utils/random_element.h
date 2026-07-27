@@ -61,17 +61,13 @@ auto sample_elements_streaming(R &&range, double probability, Rng &rng) {
     return sample_elements_streaming_r<rn::range_value_t<R>>(std::forward<R>(range), probability, rng);
 }
 
-struct random_element_error : std::runtime_error {
-    random_element_error(): std::runtime_error{"Empty range in random_element"} {}
-};
-
 template<rn::input_range R, typename Rng>
 rn::range_value_t<R> random_element(R &&range, Rng &rng) {
     using value_t = rn::range_value_t<R>;
 
     if constexpr (rn::sized_range<R>) {
         auto n = rn::size(range);
-        if (n == 0) throw random_element_error();
+        if (n == 0) throw std::runtime_error("Empty range in random_element");
 
         std::uniform_int_distribution<size_t> dist(0, n - 1);
         auto it = rn::next(rn::begin(range), dist(rng));
@@ -79,7 +75,7 @@ rn::range_value_t<R> random_element(R &&range, Rng &rng) {
     } else {
         auto it = rn::begin(range);
         auto end = rn::end(range);
-        if (it == end) throw random_element_error();
+        if (it == end) throw std::runtime_error("Empty range in random_element");
 
         value_t chosen = *it;
         size_t count = 0;

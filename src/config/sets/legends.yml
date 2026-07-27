@@ -207,6 +207,7 @@ button_row:
       - become_legend
     tags:
       - button_color(2)
+      - strong
 
 hidden:
   - name: SID_KETCHUM
