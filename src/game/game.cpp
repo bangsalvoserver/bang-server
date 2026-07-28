@@ -172,6 +172,11 @@ namespace banggame {
         }
         return std::chrono::duration_cast<ticks>(transform_duration(result));
     }
+
+    bool game::contains_user(int user_id) const {
+        return find_player_by_userid(user_id) != nullptr;
+    }
+
     void game::handle_game_action(int user_id, const json::json &action) {
         if (is_waiting()) {
             throw lobby_error("ERROR_GAME_STATE_WAITING");

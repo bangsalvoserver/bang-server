@@ -57,6 +57,7 @@ namespace banggame {
         virtual void get_pending_updates(std::span<const int> user_ids, consumer_callback<int, update_content> callback) = 0;
         virtual void get_spectator_join_updates(consumer_callback<update_content> callback) = 0;
         virtual void get_rejoin_updates(int user_id, consumer_callback<update_content> callback) = 0;
+        virtual bool contains_user(int user_id) const = 0;
         virtual void handle_game_action(int user_id, const json::json &action) = 0;
         virtual void rejoin_user(int old_user_id, int new_user_id) = 0;
         virtual void start_game(std::span<int> user_ids) = 0;

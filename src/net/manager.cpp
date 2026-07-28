@@ -275,7 +275,7 @@ void game_manager::handle_join_lobby(session_ptr session, game_lobby &lobby) {
 
     send_message(session->client, server_messages::lobby_entered{ new_user.user_id, lobby.lobby_id, lobby.name, lobby.options });
     
-    if (inserted && lobby.m_game) {
+    if (inserted && lobby.m_game && !lobby.m_game->contains_user(new_user.user_id)) {
         new_user.flags.add(game_user_flag::spectator);
     }
 
