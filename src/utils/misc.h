@@ -40,10 +40,7 @@ template<typename Fun>
 inline constexpr size_t argument_number_v = argument_number<Fun>::value;
 
 consteval bool has_annotation(std::meta::info info, std::meta::info annotation_type) {
-    for (std::meta::info annotation : std::meta::annotations_of(info)) {
-        if (std::meta::remove_cv(std::meta::type_of(annotation)) == annotation_type) return true;
-    }
-    return false;
+    return !std::meta::annotations_of_with_type(info, annotation_type).empty();
 }
 
 #endif

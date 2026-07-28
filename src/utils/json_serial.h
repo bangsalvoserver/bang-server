@@ -105,30 +105,31 @@ namespace json {
     template<typename T>
     concept is_transparent = has_annotation(^^T, ^^transparent_t);
 
-    consteval std::vector<std::meta::info> fields_of(std::meta::info type) {
+    template<typename T>
+    consteval std::span<const std::meta::info> fields_of() {
         static constexpr auto ctx = std::meta::access_context::current();
 
         std::vector<std::meta::info> result;
 
-        for (std::meta::info base : std::meta::bases_of(type, ctx)) {
-            result.append_range(fields_of(std::meta::type_of(base)));
+        for (std::meta::info base : std::meta::bases_of(^^T, ctx)) {
+            auto base_fields = std::meta::substitute(^^fields_of, { std::meta::type_of(base) });
+            result.append_range(std::meta::extract<std::span<const std::meta::info>(*)()>(base_fields)());
         }
 
-        for (std::meta::info field : std::meta::nonstatic_data_members_of(type, ctx)) {
+        for (std::meta::info field : std::meta::nonstatic_data_members_of(^^T, ctx)) {
             if (!has_annotation(field, ^^ignore_t)) {
                 result.push_back(field);
             }
         }
 
-        return result;
+        return std::define_static_array(result);
     }
 
     consteval std::string_view get_name_of(std::meta::info info) {
-        for (auto annotation : std::meta::annotations_of(info)) {
-            if (std::meta::remove_cv(std::meta::type_of(annotation)) == ^^rename) {
-                return std::string_view{std::meta::extract<rename>(annotation).name};
-            }
-        }
+        // the rename annotation doesn't work until gcc 16.1.0
+        // for (auto annotation : std::meta::annotations_of_with_type(info, ^^rename)) {
+        //     return std::string_view{std::meta::extract<rename>(annotation).name};
+        // }
         return std::meta::identifier_of(info);
     }
 
@@ -292,7 +293,7 @@ namespace json {
     
     template<is_transparent T, typename Context>
     struct serializer<T, Context> {
-        static constexpr auto fields = std::define_static_array(fields_of(^^T));
+        static constexpr auto fields = fields_of<T>();
 
         static void write(const T &value, string_writer &writer, const Context &ctx) {
             if constexpr (fields.size() == 1) {
@@ -490,7 +491,7 @@ namespace json {
     
     template<is_transparent T, typename Context>
     struct deserializer<T, Context> {
-        static constexpr auto fields = std::define_static_array(fields_of(^^T));
+        static constexpr auto fields = fields_of<T>();
 
         static T read(const json &value, const Context &ctx) {
             if constexpr (fields.size() == 1) {
@@ -556,7 +557,7 @@ namespace json {
 
     template<typename T, typename Context>
     void write_object_fields(const T &value, string_writer &writer, const Context &ctx) {
-        template for (constexpr auto field : std::define_static_array(fields_of(^^T))) {
+        template for (constexpr auto field : fields_of<T>()) {
             const auto &field_value = value.[:field:];
             if constexpr (has_annotation(field, ^^flatten_t)) {
                 write_object_fields(field_value, writer, ctx);
@@ -570,7 +571,7 @@ namespace json {
     
     template<typename T, typename Context>
     void read_object_fields(T &result, const json &value, const Context &ctx) {
-        template for (constexpr auto field : std::define_static_array(fields_of(^^T))) {
+        template for (constexpr auto field : fields_of<T>()) {
             auto &field_value = result.[:field:];
             using field_type = std::remove_reference_t<decltype(field_value)>;
             if constexpr (has_annotation(field, ^^flatten_t)) {
