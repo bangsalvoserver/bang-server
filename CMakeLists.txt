@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.16.0)
 project(bangcardgame VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -57,5 +57,12 @@ add_executable(bangserver "")
 
 target_include_directories(bangserver PRIVATE src)
 target_link_libraries(bangserver PRIVATE banglibs)
+
+target_precompile_headers(bangserver PRIVATE
+    <ranges>
+    <format>
+    <variant>
+    <chrono>
+)
 
 add_subdirectory(src)
