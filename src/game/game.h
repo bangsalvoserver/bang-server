@@ -18,6 +18,8 @@ namespace banggame {
         void get_spectator_join_updates(consumer_callback<update_content> callback) override;
         void get_rejoin_updates(int user_id, consumer_callback<update_content> callback) override;
 
+        bool contains_user(int user_id) const override;
+
         void handle_game_action(int user_id, const json::json &action) override;
 
         void rejoin_user(int old_user_id, int new_user_id) override;
