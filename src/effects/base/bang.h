@@ -9,7 +9,7 @@
 namespace banggame {
     
     struct effect_bang {
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {}, const effect_context &ctx = {});
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags = {});
     };
 
@@ -17,7 +17,7 @@ namespace banggame {
 
     struct effect_bangcard {
         game_string get_error(card_ptr origin_card, player_ptr origin, player_ptr target, const effect_context &ctx);
-        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
+        prompt_string on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx = {});
         void on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags);
     };
 
