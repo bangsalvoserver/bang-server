@@ -15,7 +15,7 @@ namespace banggame {
         player_ptr origin;
         effect_context ctx;
         modifier_list modifiers;
-        target_list targets;
+        target_list targets_buf;
     
     public:
         possible_to_play(player_ptr origin, const effect_context &ctx = {})

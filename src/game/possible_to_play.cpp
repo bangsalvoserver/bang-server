@@ -6,15 +6,16 @@ namespace banggame {
 
     bool possible_to_play::check_recurse(card_ptr origin_card, effect_list_type type, size_t skip_targets) {
         const effect_list &effects = origin_card->get_effect_list(type);
+        auto targets = targets_view{targets_buf}.subspan(skip_targets);
         
-        if (targets.size() == effects.size() + skip_targets) {
+        if (targets.size() == effects.size()) {
             if (type == effect_list_type::equip_effects) {
                 if (!ctx.contains<contexts::equip_target>() && effect_equip_on{}.get_error(origin_card, origin, origin, ctx)) {
                     return false;
                 }
             } else {
                 if (const mth_holder &mth = origin_card->get_mth(type)) {
-                    if (mth.get_error(origin_card, origin, targets_view{targets}.subspan(skip_targets), ctx)) {
+                    if (mth.get_error(origin_card, origin, targets, ctx)) {
                         return false;
                     }
                 }
@@ -46,16 +47,16 @@ namespace banggame {
             return true;
         }
         
-        const effect_holder &effect = effects[targets.size() - skip_targets];
+        const effect_holder &effect = effects[targets.size()];
 
         for (play_card_target target : effect.possible_targets(origin_card, origin, ctx)) {
             size_t old_size = ctx.size();
             effect.add_context(origin_card, origin, target, ctx);
-            targets.emplace_back(std::move(target));
+            targets_buf.emplace_back(std::move(target));
 
             bool found = check_recurse(origin_card, type, skip_targets);
             
-            targets.pop_back();
+            targets_buf.pop_back();
             ctx.resize(old_size);
             
             if (found) return true;
@@ -96,7 +97,7 @@ namespace banggame {
             }
         }
 
-        return check_recurse(origin_card, type, targets.size());
+        return check_recurse(origin_card, type, targets_buf.size());
     }
 
     void possible_to_play::collect_recurse(card_ptr origin_card, effect_list_type type, playable_cards_list &result) {
