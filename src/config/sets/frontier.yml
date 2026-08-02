@@ -151,9 +151,11 @@ main_deck:
     color: purple
     equip_effects:
       - track player alive
-    modifier: companion
+    equip:
+      - companion
     effects:
       - none
+    modifier: companion
     tags:
       - pardner(3)
   - name: COYOTES

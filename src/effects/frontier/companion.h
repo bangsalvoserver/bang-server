@@ -5,6 +5,12 @@
 
 namespace banggame {
 
+    struct equip_companion : event_equip {
+        void on_enable(card_ptr target_card, player_ptr target);
+    };
+
+    DEFINE_EQUIP(companion, equip_companion)
+
     struct modifier_companion {
         bool valid_with_equip(card_ptr origin_card, player_ptr origin, card_ptr playing_card) {
             return false;
