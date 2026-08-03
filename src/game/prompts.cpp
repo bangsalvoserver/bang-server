@@ -71,8 +71,8 @@ namespace banggame::prompts {
         return {};
     }
 
-    game_string bot_check_target_enemy(player_ptr origin, player_ptr target, bool confident) {
-        if (origin->is_bot() && !bot_suggestion::is_target_enemy(origin, target, confident)) {
+    game_string bot_check_target_enemy(player_ptr origin, player_ptr target, bot_suggestion::action_type type) {
+        if (origin->is_bot() && !bot_suggestion::is_target_enemy(origin, target, type)) {
             return "BOT_TARGET_ENEMY";
         }
         return {};

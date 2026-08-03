@@ -153,7 +153,7 @@ namespace banggame::bot_suggestion {
         }
     }
 
-    bool is_target_enemy(const_player_ptr origin, const_player_ptr target, bool confident) {
+    bool is_target_enemy(const_player_ptr origin, const_player_ptr target, action_type type) {
         if (origin == target) return false;
         if (origin->m_game->check_flags(game_flag::free_for_all)) return true;
 
@@ -168,14 +168,20 @@ namespace banggame::bot_suggestion {
         case player_role::sheriff:
             if (is_role_known(origin, target)) {
                 return target->is_outlaw_or_renegade();
-            } else if (rn::none_of(origin->m_game->m_players, [](player_ptr p) { return p->in_game() && p->is_outlaw(); })) {
+            } else if (type == action_type::damage && rn::none_of(origin->m_game->m_players, [](player_ptr p) { return p->in_game() && p->is_outlaw(); })) {
+                // when all targets are deputy or renegade the sheriff will damage everyone until they are 1 hp
+                // "neutral" actions will target neutral or negative players, as per the default
                 return target->m_hp > 1;
             } else if (is_negative_karma(target)) {
                 return true;
             } else if (is_positive_karma(target)) {
                 return false;
+            } else if (type == action_type::damage) {
+                // the sheriff won't kill neutral targets
+                return target->m_hp > 1;
             } else {
-                return !confident && target->m_hp > 1;
+                // don't equip jail on neutral targets
+                return type != action_type::jail;
             }
         case player_role::deputy:
         case player_role::shadow_deputy:
@@ -186,7 +192,7 @@ namespace banggame::bot_suggestion {
             } else if (is_positive_karma(target)) {
                 return false;
             } else {
-                return !confident;
+                return type != action_type::jail;
             }
         case player_role::renegade: {
             int num_law = 0;
@@ -209,7 +215,7 @@ namespace banggame::bot_suggestion {
                 } else if (is_positive_karma(target)) {
                     return false;
                 } else {
-                    return !confident;
+                    return type != action_type::jail;
                 }
             } else if (num_law > 1) {
                 if (is_role_known(origin, target)) {
@@ -219,10 +225,12 @@ namespace banggame::bot_suggestion {
                 } else if (is_positive_karma(target)) {
                     return true;
                 } else {
-                    return !confident;
+                    return type != action_type::jail;
                 }
             } else if (target->is_sheriff() && num_bandit > 0) {
-                return target->m_hp > 2;
+                // the renegade will not damage the sheriff if he has <= 2 hp
+                // but will still target him with "neutral" actions
+                return type != action_type::damage || target->m_hp > 2;
             } else {
                 return true;
             }

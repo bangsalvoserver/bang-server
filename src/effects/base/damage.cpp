@@ -26,7 +26,7 @@ namespace banggame {
     }
 
     game_string effect_damage::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        return prompts::bot_check_target_enemy(origin, target);
+        return prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage);
     }
 
     void effect_damage::on_play(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags) {

@@ -1,7 +1,7 @@
 #ifndef __BASE_PROMPTS_H__
 #define __BASE_PROMPTS_H__
 
-#include "cards/card_effect.h"
+#include "bot_suggestion.h"
 
 namespace banggame::prompts {
     
@@ -15,7 +15,7 @@ namespace banggame::prompts {
 
     prompt_string bot_check_kill_sheriff(player_ptr origin, player_ptr target);
 
-    game_string bot_check_target_enemy(player_ptr origin, player_ptr target, bool confident = false);
+    game_string bot_check_target_enemy(player_ptr origin, player_ptr target, bot_suggestion::action_type type = bot_suggestion::action_type::neutral);
     
     game_string bot_check_target_friend(player_ptr origin, player_ptr target);
 

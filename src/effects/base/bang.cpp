@@ -16,7 +16,7 @@ namespace banggame {
 
     prompt_string effect_bang::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target, effect_flags flags, const effect_context &ctx) {
         MAYBE_RETURN(prompts::bot_check_kill_sheriff(origin, target));
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         if (!ctx.contains<contexts::disable_bang_checks>()) {
             MAYBE_RETURN(prompts::prompt_target_immunity(origin_card, origin, target, flags));

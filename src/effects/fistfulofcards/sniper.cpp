@@ -9,7 +9,7 @@
 namespace banggame {
 
     game_string effect_sniper::on_prompt(card_ptr origin_card, player_ptr origin, player_ptr target) {
-        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target));
+        MAYBE_RETURN(prompts::bot_check_target_enemy(origin, target, bot_suggestion::action_type::damage));
         MAYBE_RETURN(prompts::prompt_target_ghost(origin_card, origin, target));
         return {};
     }
