@@ -20,6 +20,10 @@ namespace banggame {
         });
     }
 
+    void equip_companion::on_disable(card_ptr target_card, player_ptr target) {
+        target->m_game->remove_listeners({ target_card, 0 });
+    }
+
     bool modifier_companion::valid_with_card(card_ptr origin_card, player_ptr origin, card_ptr playing_card) {
         if (player_ptr tracked_player = get_tracked_player(origin_card)) {
             return tracked_player->alive()
