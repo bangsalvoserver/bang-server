@@ -47,7 +47,7 @@ namespace banggame {
         m_map.erase(range.begin(), range.end());
     }
 
-    void listener_map::do_call_event(std::type_index type, const void *tuple, void *result) {
+    void listener_map::do_call_event(std::type_index type, const void *value, void *result) {
         auto [low, high] = m_listeners.equal_range(type);
         rn::subrange range(low, high);
         if (range.empty()) return;
@@ -55,9 +55,13 @@ namespace banggame {
         ++m_lock;
         try {
             for (auto &[key, listener] : range) {
-                if (key.type == type && listener.is_active()) {
+                if (key.type != type) {
+                    // a new listener of another type could have been added before `high`
+                    break;
+                }
+                if (listener.is_active()) {
                     logging::trace("call_event() on {} {}", key, listener);
-                    if (listener(tuple, result)) break;
+                    if (listener(value, result)) break;
                 }
             }
         } catch (...) {

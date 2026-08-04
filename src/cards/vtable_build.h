@@ -248,13 +248,12 @@ namespace banggame {
 
     template<typename ... Ts>
     std::tuple<Ts ...> build_mth_args(targets_view targets, index_list indices, const effect_context &ctx) {
-        using args_tuple = std::tuple<Ts ...>;
         if constexpr (sizeof...(Ts) == 0) {
             return build_mth_args<>(targets, indices);
-        } else if constexpr (std::is_convertible_v<const effect_context &, std::tuple_element_t<sizeof...(Ts) - 1, args_tuple>>) {
+        } else if constexpr (std::is_convertible_v<const effect_context &, Ts...[sizeof...(Ts) - 1]>) {
             return std::tuple_cat(
                 [&]<size_t ... Is>(std::index_sequence<Is ...>) {
-                    return build_mth_args<std::tuple_element_t<Is, args_tuple> ...>(targets, indices);
+                    return build_mth_args<Ts...[Is] ...>(targets, indices);
                 }(std::make_index_sequence<sizeof...(Ts) - 1>()),
                 std::tie(ctx)
             );

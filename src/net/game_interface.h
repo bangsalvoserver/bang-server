@@ -6,7 +6,6 @@
 #include <span>
 
 #include "utils/json_serial.h"
-#include "utils/function_ref.h"
 
 namespace banggame {
 
@@ -49,7 +48,7 @@ namespace banggame {
     using update_content = json::raw_string;
 
     template<typename ... Ts>
-    using consumer_callback = utils::function_ref<void(Ts...)>;
+    using consumer_callback = std::function_ref<void(Ts...)>;
 
     struct game_interface {
         virtual ~game_interface() = default;

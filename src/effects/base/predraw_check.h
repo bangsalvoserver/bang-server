@@ -10,7 +10,7 @@ namespace banggame {
     namespace event_type {
         struct get_predraw_checks {
             player_ptr origin;
-            nullable_ref<std::vector<event_card_key>> result;
+            std::vector<event_card_key> &result;
         };
         
         struct on_predraw_check {

@@ -3,11 +3,8 @@
 
 #include <ranges>
 #include <algorithm>
+#include <functional>
 #include <stdexcept>
-
-#if !defined(__cpp_lib_ranges_concat)
-#include "ranges_concat.h"
-#endif
 
 namespace rn = std::ranges;
 namespace rv = std::views;
